@@ -175,4 +175,7 @@ public abstract class DynamicsWorld<X> extends CollisionWorld<X> {
 		return !animated.animate(curDT); //invert for the 'removeIf'
 	}
 
+	public String summary() {
+		return this.toString() + "[" + this.objects().size() + " objects]" ;
+	}
 }

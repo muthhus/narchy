@@ -5,16 +5,9 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.$;
-import nars.gui.ConceptBagInput;
-import nars.nar.Default;
-import nars.term.Termed;
 import nars.util.data.list.FasterList;
-import nars.util.experiment.DeductiveMeshTest;
-import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.layout.FastOrganicLayout;
-import spacegraph.layout.Spiral;
 import spacegraph.phys.collision.dispatch.CollisionObject;
 import spacegraph.render.JoglPhysics;
 
@@ -165,8 +158,6 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 //        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
     }
 
-
-
     @Override protected final boolean valid(CollisionObject<Spatial<O>> c) {
         Spatial vd = c.getUserPointer();
         if (vd!=null && !vd.active()) {
@@ -177,7 +168,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         return true;
     }
 
-    public synchronized void display(GLAutoDrawable drawable) {
+    public void display(GLAutoDrawable drawable) {
 
         List<SpaceInput<O,?>> ss = this.inputs;
 
@@ -199,172 +190,32 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         for (int i = 0, facialsSize = facials.size(); i < facialsSize; i++) {
             facials.get(i).render(gl);
         }
-
-        //gl.glColor4f(1f,1f,1f, 1f);
-        //gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-        //terminal.render(gl);
     }
-
-    /*public void clear(GL2 gl) {
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-    }*/
-
-//    public void render(GL2 gl, ConceptsSource s) {
-//
-//        @Deprecated float dt = Math.max(0.001f /* non-zero */, s.dt());
-//
-//        List<VDraw> toDraw = s.visible;
-//
-//        s.busy.set(true);
-//
-//        update(toDraw, dt);
-//
-//        for (int i1 = 0, toDrawSize = toDraw.size(); i1 < toDrawSize; i1++) {
-//
-//            render(gl, toDraw.get(i1));
-//
-//        }
-//
-//        s.busy.set(false);
-//    }
-
-//    public void render(GL2 gl, VDraw v) {
-//
-//        gl.glPushMatrix();
-//
-//        gl.glTranslatef(v.x(), v.y(), v.z());
-//
-//        v.render(gl);
-//
-//        gl.glPopMatrix();
-//
-//
-//    }
-
-
-
-//    public void renderVertexBase(GL2 gl, float dt, VDraw v) {
-//
-//        gl.glPushMatrix();
-//
-//
-//        //gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
-//        //gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
-//
-//
-//        float pri = v.pri;
-//
-//
-//        float r = v.radius;
-//        gl.glScalef(r, r, r);
-//
-//        final float activationPeriods = 4f;
-//        gl.glColor4f(h(pri),
-//                pri * Math.min(1f, 1f / (1f + (v.lag / (activationPeriods * dt)))),
-//                h(v.budget.dur()),
-//                v.budget.qua() * 0.25f + 0.25f);
-//        gl.glCallList(box);
-//        //glut.glutSolidTetrahedron();
-//
-//        gl.glPopMatrix();
-//    }
-
 
 
     public final synchronized void update(SpaceInput s) {
 
         float dt = s.setBusy();
 
-        List<Spatial<O>> toDraw = s.visible();
-        for (int i = 0, toDrawSize = toDraw.size(); i < toDrawSize; i++) {
-            toDraw.get(i).update(this);
+        List<Spatial<O>> active = s.active();
+
+        for (int i = 0, toDrawSize = active.size(); i < toDrawSize; i++) {
+            active.get(i).update(this);
         }
 
         List<SpaceTransform<O>> ll = this.transforms;
         for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
-            ll.get(i1).update(this, toDraw, dt);
+            ll.get(i1).update(this, active, dt);
         }
 
+        print(s, active);
     }
 
-
-    public static float h(float p) {
-        return p * 0.9f + 0.1f;
+    public void print(SpaceInput s, List<Spatial<O>> active) {
+        System.out.println();
+        System.out.println(s + ": " + active.size() + " active, "  + this.atoms.estimatedSize() + " cached; "+ "\t" + dyn.summary());
+        active.forEach(x -> System.out.println(x));
+        System.out.println();
     }
-
 
 }
-//    private void buildLists(GL2 gl) {
-//        box = gl.glGenLists(2); // Generate 2 Different Lists
-//        gl.glNewList(box, GL2.GL_COMPILE); // Start With The Box List
-//
-//        gl.glBegin(GL2.GL_QUADS);
-//        gl.glNormal3f(0.0f, -1.0f, 0.0f);
-//        //gl.glTexCoord2f(1.0f, 1.0f);
-//        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Bottom Face
-//        //gl.glTexCoord2f(0.0f, 1.0f);
-//        gl.glVertex3f(1.0f, -1.0f, -1.0f);
-//        //gl.glTexCoord2f(0.0f, 0.0f);
-//        gl.glVertex3f(1.0f, -1.0f, 1.0f);
-//        //gl.glTexCoord2f(1.0f, 0.0f);
-//        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
-//
-//        gl.glNormal3f(0.0f, 0.0f, 1.0f);
-//        //gl.glTexCoord2f(0.0f, 0.0f);
-//        gl.glVertex3f(-1.0f, -1.0f, 1.0f); // Front Face
-//        //gl.glTexCoord2f(1.0f, 0.0f);
-//        gl.glVertex3f(1.0f, -1.0f, 1.0f);
-//        //gl.glTexCoord2f(1.0f, 1.0f);
-//        gl.glVertex3f(1.0f, 1.0f, 1.0f);
-//        //gl.glTexCoord2f(0.0f, 1.0f);
-//        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
-//
-//        gl.glNormal3f(0.0f, 0.0f, -1.0f);
-//        //gl.glTexCoord2f(1.0f, 0.0f);
-//        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Back Face
-//        //gl.glTexCoord2f(1.0f, 1.0f);
-//        gl.glVertex3f(-1.0f, 1.0f, -1.0f);
-//        //gl.glTexCoord2f(0.0f, 1.0f);
-//        gl.glVertex3f(1.0f, 1.0f, -1.0f);
-//        //gl.glTexCoord2f(0.0f, 0.0f);
-//        gl.glVertex3f(1.0f, -1.0f, -1.0f);
-//
-//        gl.glNormal3f(1.0f, 0.0f, 0.0f);
-//        //gl.glTexCoord2f(1.0f, 0.0f);
-//        gl.glVertex3f(1.0f, -1.0f, -1.0f); // Right face
-//        //gl.glTexCoord2f(1.0f, 1.0f);
-//        gl.glVertex3f(1.0f, 1.0f, -1.0f);
-//        //gl.glTexCoord2f(0.0f, 1.0f);
-//        gl.glVertex3f(1.0f, 1.0f, 1.0f);
-//        //gl.glTexCoord2f(0.0f, 0.0f);
-//        gl.glVertex3f(1.0f, -1.0f, 1.0f);
-//
-//        gl.glNormal3f(-1.0f, 0.0f, 0.0f);
-//        //gl.glTexCoord2f(0.0f, 0.0f);
-//        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Left Face
-//        //gl.glTexCoord2f(1.0f, 0.0f);
-//        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
-//        //gl.glTexCoord2f(1.0f, 1.0f);
-//        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
-//        //gl.glTexCoord2f(0.0f, 1.0f);
-//        gl.glVertex3f(-1.0f, 1.0f, -1.0f);
-//        gl.glEnd();
-//
-//        gl.glEndList();
-//
-//        {
-//            isoTri = box + 1; // Storage For "Top" Is "Box" Plus One
-//            gl.glNewList(isoTri, GL2.GL_COMPILE); // Now The "Top" Display List
-//
-//            gl.glBegin(GL2.GL_TRIANGLES);
-//            gl.glNormal3f(0.0f, 0f, 1.0f);
-//
-//            final float h = 0.5f;
-//            gl.glVertex3f(0, h,  0f); //right base
-//            gl.glVertex3f(0, -h, 0f); //left base
-//            gl.glVertex3f(1,  0, 0f);  //midpoint on opposite end
-//
-//            gl.glEnd();
-//            gl.glEndList();
-//        }
-//    }

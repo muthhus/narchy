@@ -203,8 +203,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
     final void derive(@NotNull PremiseEval m, @NotNull Compound raw, @Nullable Truth truth) {
-        Premise premise = m.premise;
-        NAR nar = m.nar;
 
         if (raw.op() == NEG) {
             //negations cant term concepts or tasks, so we unwrap and invert the truth (fi
@@ -216,27 +214,17 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 truth = truth.negated();
         }
 
-
-
-        //pre-filter invalid statements: insufficient NAL level, etc
-        if (!Task.preNormalize(raw, nar))
-            return;
-
         Budget budget = m.budget(truth, raw);
         if (budget == null)
-            return;
+            return; //INSUFFICIENT BUDGET
 
-        //get the normalized term to determine the budget (via it's complexity)
-        //this way we can determine if the budget is insufficient
-        //before conceptualizating in mem.taskConcept
-        Termed<Compound> content = nar.index.normalize(raw, true);
-
+        NAR nar = m.nar;
+        Termed<Compound> content = Task.normalizeTaskTerm(raw,m.punct.get(),nar, true);
         if (content == null)
-            return; //HACK why would this happen?
-
-
+            return; //INVALID TERM FOR TASK
 
         long occ;
+        Premise premise = m.premise;
 
         if ((nar.nal() >= 7) && (m.temporal)) {
 
@@ -287,7 +275,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             occ = ETERNAL;
         }
 
-        nar.process(
+        //nar.input(
+        nar.process( //we should not need to normalize the task, so process directly is preferred
             derive(content, truth, budget, nar.time(), occ, m, this)
         );
 

@@ -37,7 +37,7 @@ import javax.vecmath.Vector3f;
  * @author jezek2
  */
 public class CollisionObject<X> {
-	
+
 	//protected final BulletStack stack = BulletStack.get();
 
 	// island management, m_activationState1
@@ -57,12 +57,12 @@ public class CollisionObject<X> {
 	protected final Vector3f interpolationAngularVelocity = new Vector3f();
 	protected BroadphaseProxy broadphaseHandle;
 	protected CollisionShape collisionShape;
-	
+
 	// rootCollisionShape is temporarily used to store the original collision shape
 	// The collisionShape might be temporarily replaced by a child collision shape during collision detection purposes
 	// If it is null, the collisionShape is not temporarily replaced.
 	protected CollisionShape rootCollisionShape;
-	
+
 	protected int collisionFlags;
 	protected int islandTag1;
 	protected int companionId;
@@ -89,8 +89,9 @@ public class CollisionObject<X> {
 	protected boolean checkCollideWith;
 
 	public CollisionObject() {
-		 this(CollisionObjectType.COLLISION_OBJECT);
+		this(CollisionObjectType.COLLISION_OBJECT);
 	}
+
 	public CollisionObject(CollisionObjectType type) {
 		this.internalType = type;
 		this.collisionFlags = CollisionFlags.STATIC_OBJECT;
@@ -326,4 +327,11 @@ public class CollisionObject<X> {
 		return worldTransform.origin;
 	}
 
+	@Override
+	public String toString() {
+		return "CollisionObject{" +
+				collisionShape +
+				" @ " + worldTransform +
+				'}';
+	}
 }

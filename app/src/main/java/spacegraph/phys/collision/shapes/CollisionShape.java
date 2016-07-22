@@ -50,14 +50,12 @@ public abstract class CollisionShape {
 
 	public float getBoundingSphere(Vector3f center) {
 
-		Transform tr = new Transform();
-		tr.setIdentity();
 		Vector3f aabbMin = new Vector3f(), aabbMax = new Vector3f();
-
-		getAabb(tr, aabbMin, aabbMax);
+		getAabb(Transform.identity, aabbMin, aabbMax);
 
 		Vector3f tmp = new Vector3f();
 		tmp.sub(aabbMax, aabbMin);
+
 		float radius = tmp.length() * 0.5f;
 
 		if (center!=null) {

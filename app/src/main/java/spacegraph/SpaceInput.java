@@ -25,7 +25,7 @@ abstract public class SpaceInput<O, M extends Spatial<O>> {
         this.space = null;
     }
 
-    public final List<M> visible() {
+    public final List<M> active() {
         return visible;
     }
 

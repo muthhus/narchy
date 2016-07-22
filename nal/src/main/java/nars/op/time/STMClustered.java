@@ -146,14 +146,32 @@ public class STMClustered extends STM {
 
         //TODO cache this value
         public float priSum() {
-            return (float)tasks.stream().mapToDouble(DefaultBLink::pri).sum();
+            return (float)tasks.stream().mapToDouble(TLink::pri).sum();
         }
 
         /** produces a parallel conjunction term consisting of all the task's terms */
-        public Stream<Task[]> termSet(int maxComponentsPerTerm) {
-            AtomicInteger as = new AtomicInteger();
-            return tasks.stream().map(StrongBLink::get).distinct().
-                    collect(Collectors.groupingBy(x -> as.incrementAndGet() / (1+maxComponentsPerTerm)))
+        public Stream<Task[]> termSet(int maxComponentsPerTerm, int maxVolume) {
+            AtomicInteger group = new AtomicInteger();
+            AtomicInteger subterms = new AtomicInteger();
+            AtomicInteger currentVolume = new AtomicInteger();
+            return tasks.stream().map(TLink::get).
+                    filter(x -> x!=null ? true : false).
+                    collect(Collectors.groupingBy(x -> {
+
+                        int v = x.volume();
+
+                        if ((subterms.intValue() == maxComponentsPerTerm) || (currentVolume.intValue() + v > maxVolume)) {
+                            //next group
+                            subterms.set(0);
+                            currentVolume.set(0);
+                            group.incrementAndGet();
+                        }
+
+                        subterms.incrementAndGet();
+                        currentVolume.addAndGet(v);
+
+                        return group.intValue();
+                    }))
                     .values().stream()
                     .filter(c -> c.size()> 1)
                     .map(c -> c.toArray(new Task[c.size()]));

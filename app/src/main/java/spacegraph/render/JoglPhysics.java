@@ -582,17 +582,17 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
                 break;
             }
             case KeyEvent.VK_END: {
-                int numObj = getDyn().getNumCollisionObjects();
-                if (numObj != 0) {
-                    CollisionObject<X> obj = getDyn().objects().get(numObj - 1);
-
-                    getDyn().removeCollisionObject(obj);
-                    RigidBody body = RigidBody.upcast(obj);
-                    if (body != null && body.getMotionState() != null) {
-                        //delete body->getMotionState();
-                    }
-                    //delete obj;
-                }
+//                int numObj = getDyn().getNumCollisionObjects();
+//                if (numObj != 0) {
+//                    CollisionObject<X> obj = getDyn().objects().get(numObj - 1);
+//
+//                    getDyn().removeCollisionObject(obj);
+//                    RigidBody body = RigidBody.upcast(obj);
+//                    if (body != null && body.getMotionState() != null) {
+//                        //delete body->getMotionState();
+//                    }
+//                    //delete obj;
+//                }
                 break;
             }
             /*

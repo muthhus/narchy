@@ -69,15 +69,15 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         }
 
 
-        float w = v.complexity() * (2f - maxConfidence((CompoundConcept)v)) * 100;
+        float w = v.complexity() * (1f - maxConfidence((CompoundConcept)v)) * 100;
 
         return (int)w;
         //}
     };
 
     private static float maxConfidence(@NotNull CompoundConcept v) {
-        //return Math.max(v.beliefs().confMax(), v.goals().confMax());
-        return v.beliefs().confMax() + v.goals().confMax();
+        return Math.max(v.beliefs().confMax(), v.goals().confMax());
+        //return v.beliefs().confMax() + v.goals().confMax();
     }
 
 

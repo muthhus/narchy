@@ -92,7 +92,12 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
     @Override
     public String toString() {
-        return label;
+
+        return label + "<" + body + " " +
+                //(body!=null ? body.shape() : "shapeless")  +
+                " " + (active() ? "on" : "off")+
+
+                ">";
     }
 
     public final Transform transform() { return motion.t; }
@@ -295,8 +300,12 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         ShapeDrawer.draw(gl, body);
     }
 
+    static float h(float p) {
+        return p * 0.9f + 0.1f;
+    }
+
     protected void colorshape(GL2 gl) {
-        float p = SpaceGraph.h(pri)/2f;
+        float p = h(pri)/2f;
         gl.glColor4f(p,
                 //pri * Math.min(1f),
                 p, //1f / (1f + (v.lag / (activationPeriods * dt)))),

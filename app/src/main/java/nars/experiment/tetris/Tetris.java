@@ -332,17 +332,17 @@ public class Tetris extends TetrisState implements Environment {
 
                     new BeliefTableChart(nar, charted).show(600, 900);
 
-                    BagChart.show((Default) nar, 128);
+                    //BagChart.show((Default) nar, 128);
 
                     //STMView.show(stm, 800, 600);
 
 
-//                    new SpaceGraph<Termed>(
-//                            new ConceptBagInput(nar, 16, 4)
-//                    ).with(
-//                            new Spiral()
-//                            //new FastOrganicLayout()
-//                    ).show(1300, 900);
+                    new SpaceGraph<Termed>(
+                            new ConceptBagInput(nar, 4, 4)
+                    ).with(
+                            new Spiral()
+                            //new FastOrganicLayout()
+                    ).show(1300, 900);
                 }
 
 

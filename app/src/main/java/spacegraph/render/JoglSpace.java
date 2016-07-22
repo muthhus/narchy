@@ -26,7 +26,7 @@ import java.util.TimerTask;
 public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     final static int DEFAULT_FPS = 25;
-    public static final int MIN_FPS = 10;
+    public static final int MIN_FPS = 3;
     private static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.DEFAULT_FPS, MIN_FPS, 50);
 
     public static final GLU glu = new GLU();

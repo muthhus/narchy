@@ -5,6 +5,7 @@ import nars.data.Range;
 import nars.nal.Level;
 import nars.task.MutableTask;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -43,7 +44,7 @@ public abstract class Param extends Container implements Level {
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public static final int compoundVolumeMax = 192;
+    public static final MutableInteger compoundVolumeMax = new MutableInteger(192);
     /**
      * maximum changes logged in deriver's stack
      */
@@ -237,29 +238,6 @@ public abstract class Param extends Container implements Level {
      * the range of "now" is [-DURATION, DURATION];
      */
     public final MutableFloat executionThreshold = new MutableFloat();
-
-    public static boolean ensureValidVolume(@NotNull Term derived) {
-
-        //HARD VOLUME LIMIT
-        boolean valid = derived.volume() <= compoundVolumeMax;
-        if (!valid && DEBUG) {
-            //$.logger.error("Term volume overflow");
-                /*c.forEach(x -> {
-                    Terms.printRecursive(x, (String line) ->$.logger.error(line) );
-                });*/
-
-            $.logger.warn("Derivation explosion: {}", derived/*, rule*/);
-
-            //System.err.println(m.premise.task().explanation());
-            //System.err.println( (m.premise.belief()!=null) ? m.premise.belief().explanation() : "belief: null");
-            //System.exit(1);
-            //throw new RuntimeException(message);
-            return false;
-        }
-
-        return valid;
-
-    }
 
 
 //    /** Maximum number of beliefs kept in a Concept */

@@ -100,32 +100,50 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //        return s;
 //    }
 
+    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory) {
+        return normalizeTaskTerm(t, punc, memory, false);
+    }
+
     /** performs some (but not exhaustive) tests on a term to determine some cases where it is invalid as a sentence content
      * returns the compound valid for a Task if so,
      * otherwise returns null
      * */
-    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory) {
+    @Nullable static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory, boolean safe) {
 
         t = memory.index.normalize(t, true);
 
         if (!(t instanceof Compound))
-            throw new InvalidTaskException(t, "Task Term Does Not Normalize to Compound");
+            return test(t, "Task Term Does Not Normalize to Compound", safe);
 
 
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
         if (op.isStatement() && subjectOrPredicateIsIndependentVar(t.term()))
-            throw new InvalidTaskException(t, "Statement Task's subject or predicate is VAR_INDEP");
+            return test(t, "Statement Task's subject or predicate is VAR_INDEP", safe);
 
 //        if (hasCoNegatedAtemporalConjunction(ct)) {
 //            throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
 //        }
 
         if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op ==Op.IMPL || op == Op.EQUI))
-            throw new InvalidTaskException(t, "Goal/Quest task term may not be Implication or Equivalence");
+            return test(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
+
+
+        if (t.volume() > memory.compoundVolumeMax.intValue())
+            return test(t, "Term exceeds maximum volume", safe);
+        if (!t.levelValid( memory.nal() ) )
+            return test(t, "Term exceeds maximum NAL level", safe);
 
         return t;
+    }
+
+    @Nullable
+    private static Termed<Compound> test(@NotNull Termed<Compound> t, String reason, boolean safe) {
+        if (safe)
+            return null;
+        else
+            throw new InvalidTaskException(t, reason);
     }
 
 //    static boolean hasCoNegatedAtemporalConjunction(Term term) {
@@ -758,22 +776,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //        }
 //    }
 
-    /** pre-verify tests to early disqualify terms that are not acceptable as Task content */
-    static boolean preNormalize(@NotNull Term t, @NotNull Memory memory) {
 
-        if (Param.ensureValidVolume(t) && t.levelValid( memory.nal() ) ) {
-
-            if (t.op().isStatement()) {
-                Compound ct = (Compound)t;
-                //TODO detect this sooner
-                if (ct.isTerm(0, Op.VAR_INDEP) || ct.isTerm(1, Op.VAR_INDEP))
-                    return false;
-            }
-
-            return true;
-        }
-        return false;
-    }
 
     @Nullable
     default Term term(int i) {

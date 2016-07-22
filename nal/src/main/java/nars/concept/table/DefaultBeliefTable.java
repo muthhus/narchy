@@ -4,7 +4,7 @@ import com.google.common.collect.Iterators;
 import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.task.GeneratedTask;
+import nars.task.EternalizedTask;
 import nars.task.Task;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
@@ -212,7 +212,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 if (eConf > confMin) {
                     if (eternal.rank(eConf, d.evidence().length) > minRank) {
 
-                        Task ee = new GeneratedTask(
+                        Task ee = new EternalizedTask(
                                 d.term(), d.punc(),
                                 $.t(d.freq(), eConf)
                             )
@@ -237,7 +237,6 @@ public class DefaultBeliefTable implements BeliefTable {
             }
         }
     }
-
 
 
 }
