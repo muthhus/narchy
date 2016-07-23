@@ -1,5 +1,6 @@
 package nars.op.time;
 
+import com.gs.collections.impl.factory.Sets;
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.AutoBag;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -59,9 +61,7 @@ public class STMClustered extends STM {
     public final class TasksNode extends Node {
 
         /** current members */
-        public final Set<TLink> tasks =
-                new ConcurrentSkipListSet<>();
-                //new HashSet()
+        public final Map<Task,TLink> tasks = new ConcurrentHashMap();
 
 
         public TasksNode(int id, int dimensions) {
@@ -110,7 +110,7 @@ public class STMClustered extends STM {
 
         protected boolean remove(TLink x) {
             x.node = null;
-            if (tasks.remove(x)) {
+            if (tasks.remove(x)!=null) {
                 return true;
             }
             //if (requireRemoval)
@@ -122,13 +122,22 @@ public class STMClustered extends STM {
             return tasks.size();
         }
 
-        public boolean insert(@NotNull TLink x) {
-            if (tasks.add(x)) {
+        public void insert(@NotNull TLink x) {
+            @Nullable Task xx = x.get();
+            if (xx != null && !xx.isDeleted()) {
+                if (x.node == this)
+                    return;
+
+                tasks.put(xx, x);
+//                if (tasks.putIfAbsent(xx, x) != null) {
+//                    throw new RuntimeException(xx + " already in this node's task set");
+//                }
+
                 x.node = this;
-                return true;
+            } else {
+                //task is deleted
+                x.node = null;
             }
-            //throw new RuntimeException("already in set");
-            return false;
         }
 
         public void delete() {
@@ -139,14 +148,14 @@ public class STMClustered extends STM {
         @Nullable
         public double[] coherence(int dim) {
             if (size() == 0) return null;
-            double[] v = Util.avgvar(tasks.stream().mapToDouble(t -> t.coord[dim]).toArray()); //HACK slow
+            double[] v = Util.avgvar(tasks.values().stream().mapToDouble(t -> t.coord[dim]).toArray()); //HACK slow
             v[1] = 1f - v[1]; //convert variance to coherence
             return v;
         }
 
         //TODO cache this value
         public float priSum() {
-            return (float)tasks.stream().mapToDouble(TLink::pri).sum();
+            return (float)tasks.values().stream().mapToDouble(TLink::pri).sum();
         }
 
         /** produces a parallel conjunction term consisting of all the task's terms */
@@ -154,7 +163,7 @@ public class STMClustered extends STM {
             AtomicInteger group = new AtomicInteger();
             AtomicInteger subterms = new AtomicInteger();
             AtomicInteger currentVolume = new AtomicInteger();
-            return tasks.stream().map(TLink::get).
+            return tasks.values().stream().map(TLink::get).
                     filter(x -> x!=null ? true : false).
                     collect(Collectors.groupingBy(x -> {
 
@@ -183,15 +192,13 @@ public class STMClustered extends STM {
 
 
 
-
-        /** removes all tasks that are part of this node, and removes them from the bag also, effectively flushing these tasks out of this STM unit */
-        public void clear() {
-            tasks.forEach(t -> {
-                @Nullable Task tt = t.get();
-                if (tt !=null) input.remove(tt);
-            } );
-            tasks.clear();
+        protected void remove(Task[] uu) {
+            for (Task x : uu) {
+                input.remove(x);
+                tasks.remove(x);
+            }
         }
+
     }
 
     /**
@@ -347,7 +354,7 @@ public class STMClustered extends STM {
         int rr = removed.size();
         for (int i = 0; i < rr; i++) {
             TasksNode t = removed.pollFirst();
-            t.tasks.forEach(TLink::migrate);
+            t.tasks.values().forEach(TLink::migrate);
             t.delete();
         }
 

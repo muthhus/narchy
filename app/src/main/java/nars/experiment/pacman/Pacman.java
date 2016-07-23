@@ -62,7 +62,7 @@ public class Pacman extends cpcman implements Environment {
 
 	final int visionRadius;
 	final int itemTypes = 3;
-	final static int runCycles = 2512;
+	final static int runCycles = 22512;
 
 	boolean trace = true;
 

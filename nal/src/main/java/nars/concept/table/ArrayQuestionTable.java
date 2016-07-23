@@ -82,21 +82,21 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     }
 
 
-    /**
-     * iterator-less implementation
-     */
-    @Nullable
-    @Override
-    public final Task get(Task t) {
-        List<Task> ll = this.list;
-        int s = ll.size();
-        for (int i = 0; i < s; i++) {
-            Task a = ll.get(i);
-            if (a.equals(t))
-                return a;
-        }
-        return null;
-    }
+//    /**
+//     * iterator-less implementation
+//     */
+//    @Nullable
+//    @Override
+//    public final Task get(Task t) {
+//        List<Task> ll = this.list;
+//        int s = ll.size();
+//        for (int i = 0; i < s; i++) {
+//            Task a = ll.get(i);
+//            if (a.equals(t))
+//                return a;
+//        }
+//        return null;
+//    }
 
 
     @Override
@@ -196,22 +196,12 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
     @Override
     public Task add(@NotNull Task q, @NotNull BeliefTable answers, List<Task> displ, @NotNull NAR n) {
-        Task existing = get(q);
-        if (existing != null) {
-            if (existing != q) {
-                BudgetMerge.max.merge(existing.budget(), q, 1f);
-                q.delete("Duplicate Question");
-            }
-            return null;
-        }
 
         q = insert(q);
-        if (q!=null) {
-            if (!answers.isEmpty()) {
-                Task a = answers.top(q.occurrence());
-                if (a!=null) {
-                    answer(q, a, n, displ);
-                }
+        if (q != null && !answers.isEmpty()) {
+            Task a = answers.top(q.occurrence());
+            if (a != null && !a.isDeleted()) {
+                answer(q, a, n, displ);
             }
         }
 

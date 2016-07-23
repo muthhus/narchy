@@ -24,11 +24,7 @@ public interface QuestionTable extends TaskTable {
 
     void capacity(int newCapacity);
 
-    /**
-     * @return null if no duplicate was discovered, or the first Task that matched if one was
-     */
-    @Nullable
-    Task get(Task t);
+
 
     /** called when a new answer appears */
     void answer(Task result, NAR nar, List<Task> displ);
@@ -83,10 +79,6 @@ public interface QuestionTable extends TaskTable {
 
         }
 
-        @Override
-        public @Nullable Task get(Task t) {
-            return null;
-        }
 
         @Override
         public void answer(Task result, NAR nar, List<Task> displ) {

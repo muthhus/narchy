@@ -153,7 +153,7 @@ public class ConceptSonification extends FrameReaction {
         else if (s == 2)
             throw new RuntimeException("no samples to granulize");
         else
-            return samples.get(Math.abs(c.get().term().hashCode() % s));
+            return samples.get(Math.abs(c.term().hashCode() % s));
     }
 
     public void update(Task c) {
@@ -182,7 +182,7 @@ public class ConceptSonification extends FrameReaction {
         //try {
         SonarSample sp = getSample(c);
 
-        Term ct = c.get().term();
+        Term ct = c.term();
         Granulize g = new Granulize(sp,
                 /* grain size */
                 0.3f * (1 + ct.volume()/ 2.0f),

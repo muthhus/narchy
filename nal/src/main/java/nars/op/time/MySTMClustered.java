@@ -127,19 +127,25 @@ public class MySTMClustered extends STMClustered {
 
 					long t = Math.round(nc[0]);
 
-					Task m = new GeneratedTask(conj, punc,
-							new DefaultTruth(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
-							.time(now, t)
-							.evidence(evidence)
-							.budget(BudgetFunctions.fund(uu, 1f / uu.length))
-							.log("STMCluster CoOccurr");
+					if ((conj = Task.normalizeTaskTerm(conj, punc, nar, true))!=null) {
 
-					//logger.debug("{}", m);
-					generate.emit(m);
+						Task m = new GeneratedTask(conj, punc,
+								new DefaultTruth(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+								.time(now, t)
+								.evidence(evidence)
+								.budget(BudgetFunctions.fund(uu, 1f / uu.length))
+								.log("STMCluster CoOccurr");
 
-					//System.err.println(m + " " + Arrays.toString(m.evidence()));
-					nar.input(m);
-					node.clear();
+
+						//logger.debug("{}", m);
+						generate.emit(m);
+
+						//System.err.println(m + " " + Arrays.toString(m.evidence()));
+						nar.input(m);
+
+						node.remove(uu);
+					}
+
 
 			});
 

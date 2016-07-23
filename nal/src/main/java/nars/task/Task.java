@@ -100,7 +100,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //        return s;
 //    }
 
-    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory) {
+    @NotNull static Compound normalizeTaskTerm(@NotNull Term t, char punc, @NotNull Memory memory) {
         return normalizeTaskTerm(t, punc, memory, false);
     }
 
@@ -108,18 +108,22 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * returns the compound valid for a Task if so,
      * otherwise returns null
      * */
-    @Nullable static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory, boolean safe) {
+    @Nullable static Compound normalizeTaskTerm(@NotNull Term t, char punc, @NotNull Memory memory, boolean safe) {
+
+        if (!(t instanceof Compound))
+            return test(t, "Task Term is not a Compound", safe);
 
         t = memory.index.normalize(t, true);
 
         if (!(t instanceof Compound))
             return test(t, "Task Term Does Not Normalize to Compound", safe);
 
+        Compound ct = (Compound)t;
 
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
-        if (op.isStatement() && subjectOrPredicateIsIndependentVar(t.term()))
+        if (op.isStatement() && subjectOrPredicateIsIndependentVar(ct))
             return test(t, "Statement Task's subject or predicate is VAR_INDEP", safe);
 
 //        if (hasCoNegatedAtemporalConjunction(ct)) {
@@ -135,11 +139,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         if (!t.levelValid( memory.nal() ) )
             return test(t, "Term exceeds maximum NAL level", safe);
 
-        return t;
+        return ct;
     }
 
     @Nullable
-    private static Termed<Compound> test(@NotNull Termed<Compound> t, String reason, boolean safe) {
+    private static Compound test(@NotNull Term t, String reason, boolean safe) {
         if (safe)
             return null;
         else
