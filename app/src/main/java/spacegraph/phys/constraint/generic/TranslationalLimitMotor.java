@@ -208,10 +208,10 @@ public class TranslationalLimitMotor {
 
 		v3 impulse_vector = new v3();
 		impulse_vector.scale(normalImpulse, axis_normal_on_a);
-		body1.applyImpulse(impulse_vector, rel_pos1);
+		body1.impulse(impulse_vector, rel_pos1);
 
 		tmp.negate(impulse_vector);
-		body2.applyImpulse(tmp, rel_pos2);
+		body2.impulse(tmp, rel_pos2);
 		return normalImpulse;
 	}
 	

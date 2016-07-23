@@ -15,9 +15,7 @@ import spacegraph.Spatial;
 
 import java.util.function.Predicate;
 
-/**
- * Created by me on 6/26/16.
- */
+
 public class ConceptWidget extends Spatial<Term> {
 
     private final NAR nar;
@@ -110,7 +108,7 @@ public class ConceptWidget extends Spatial<Term> {
 
         //width relative to the radius of the atom
         float minLineWidth = 0.02f;
-        float maxLineWidth = 0.1f;
+        float maxLineWidth = 0.15f;
         float width = minLineWidth + (maxLineWidth - minLineWidth) * (1 + pri + (dur) * (qua));
 
         float r, g, b;

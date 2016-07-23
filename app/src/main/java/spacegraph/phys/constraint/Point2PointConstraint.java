@@ -171,10 +171,10 @@ public class Point2PointConstraint extends TypedConstraint {
 			v3 impulse_vector = new v3();
 			impulse_vector.scale(impulse, normal);
 			tmp.sub(pivotAInW, rbA.getCenterOfMassPosition(tmpVec));
-			rbA.applyImpulse(impulse_vector, tmp);
+			rbA.impulse(impulse_vector, tmp);
 			tmp.negate(impulse_vector);
 			tmp2.sub(pivotBInW, rbB.getCenterOfMassPosition(tmpVec));
-			rbB.applyImpulse(tmp, tmp2);
+			rbB.impulse(tmp, tmp2);
 
 			VectorUtil.setCoord(normal, i, 0f);
 		}

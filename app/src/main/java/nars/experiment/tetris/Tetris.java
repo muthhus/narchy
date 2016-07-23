@@ -237,7 +237,7 @@ public class Tetris extends TetrisState implements Environment {
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 ,new FrameClock());
-        nar.conceptActivation.setValue(0.01f);
+        nar.conceptActivation.setValue(0.1f);
 
 
         nar.beliefConfidence(0.6f);
@@ -331,13 +331,7 @@ public class Tetris extends TetrisState implements Environment {
                     //STMView.show(stm, 800, 600);
 
 
-//                    new SpaceGraph<>(
-//                            new NARSpace(nar, 128, 4)
-//                    ).with(
-//                            //new Spiral()
-//                            //new FastOrganicLayout()
-//                            new Flatten()
-//                    ).show(1300, 900);
+                    NARSpace.newConceptWindow((Default) nar, 128, 4);
                 }
 
 
@@ -347,7 +341,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, runCycles, 0);
+        t.run(n, runCycles, 50);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

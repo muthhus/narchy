@@ -120,7 +120,7 @@ public class SpaceGraph<X> extends JoglPhysics<Spatial<X>> {
 
 
     public static float r(float range) {
-        return (-0.5f + (float)Math.random()*range)*2f;
+        return (-0.5f + (float)Math.random())*2f*range;
     }
 
 

@@ -337,7 +337,7 @@ public class RaycastVehicle extends TypedConstraint {
 			v3 relpos = new v3();
             relpos.sub(wheel.raycastInfo.contactPointWS, chassisBody.getCenterOfMassPosition(tmp));
 
-            chassisBody.applyImpulse(impulse, relpos);
+            chassisBody.impulse(impulse, relpos);
 		}
 
 		updateFriction(step);
@@ -630,7 +630,7 @@ public class RaycastVehicle extends TypedConstraint {
             if (forwardImpulse.get(wheel) != 0f) {
 				//return array[index];
 				tmp.scale(forwardImpulse.get(wheel), forwardWS.get(wheel));
-                chassisBody.applyImpulse(tmp, rel_pos);
+                chassisBody.impulse(tmp, rel_pos);
             }
             if (sideImpulse.get(wheel) != 0f) {
 				//return array[index];
@@ -644,11 +644,11 @@ public class RaycastVehicle extends TypedConstraint {
 				sideImp.scale(sideImpulse.get(wheel), axle.get(wheel));
 
                 rel_pos.z *= wheel_info.rollInfluence;
-                chassisBody.applyImpulse(sideImp, rel_pos);
+                chassisBody.impulse(sideImp, rel_pos);
 
                 // apply friction impulse on the ground
                 tmp.negate(sideImp);
-                groundObject.applyImpulse(tmp, rel_pos2);
+                groundObject.impulse(tmp, rel_pos2);
             }
         }
     }

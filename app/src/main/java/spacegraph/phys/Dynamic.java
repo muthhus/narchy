@@ -386,39 +386,40 @@ public class Dynamic<X> extends Collidable<X> {
 		angularSleepingThreshold = angular;
 	}
 
-	public void applyTorque(v3 torque) {
+	public void torque(v3 torque) {
 		totalTorque.add(torque);
 	}
 
-	public void applyForce(v3 force, v3 rel_pos) {
+	public void force(v3 force, v3 rel_pos) {
 		applyCentralForce(force);
 		
 		v3 tmp = new v3();
 		tmp.cross(rel_pos, force);
 		tmp.scale(angularFactor);
-		applyTorque(tmp);
+		torque(tmp);
 	}
 
-	public void applyCentralImpulse(v3 impulse) {
+	/** applied to the center */
+	public void impulse(v3 impulse) {
 		linearVelocity.scaleAdd(inverseMass, impulse, linearVelocity);
 	}
 	
 
-	public void applyTorqueImpulse(v3 torque) {
+	public void torqueImpulse(v3 torque) {
 		v3 tmp = new v3(torque);
 		invInertiaTensorWorld.transform(tmp);
 		angularVelocity.add(tmp);
 	}
 
 
-	public void applyImpulse(v3 impulse, v3 rel_pos) {
+	public void impulse(v3 impulse, v3 rel_pos) {
 		if (inverseMass != 0f) {
-			applyCentralImpulse(impulse);
+			impulse(impulse);
 			if (angularFactor != 0f) {
 				v3 tmp = new v3();
 				tmp.cross(rel_pos, impulse);
 				tmp.scale(angularFactor);
-				applyTorqueImpulse(tmp);
+				torqueImpulse(tmp);
 			}
 		}
 	}

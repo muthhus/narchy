@@ -1,5 +1,6 @@
 package nars.gui;
 
+import com.jogamp.newt.opengl.GLWindow;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
@@ -8,15 +9,24 @@ import nars.term.Term;
 import nars.util.event.On;
 import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
-import spacegraph.*;
+import spacegraph.ListInput;
+import spacegraph.SpaceGraph;
+import spacegraph.SpaceInput;
+import spacegraph.Spatial;
 import spacegraph.layout.FastOrganicLayout;
 import spacegraph.layout.Flatten;
+import spacegraph.phys.Dynamic;
+import spacegraph.phys.shape.CollisionShape;
 
 import java.util.List;
 
+import static spacegraph.math.v3.v;
 
-/** thread-safe visualization of capacity-bound NAR data buffers */
-public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
+
+/**
+ * thread-safe visualization of capacity-bound NAR data buffers
+ */
+public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y> {
 
     private final TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect;
     private On on;
@@ -31,26 +41,49 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
         //n.nal(4);
 
 
-        new DeductiveMeshTest(n, new int[]{6,5}, 16384);
+        new DeductiveMeshTest(n, new int[]{6, 5}, 16384);
         //new ArithmeticInduction(n);
 
-        final int maxNodes = 128;
-        final int maxEdges = 4;
+        newConceptWindow(n, 128, 6);
 
-        new SpaceGraph<Term>(
-                new NARSpace<Term,Spatial<Term>>(n, (nar,space,target) -> {
+        n.loop(30f);
+
+    }
+
+    public static GLWindow newConceptWindow(Default n, int maxNodes, int maxEdges) {
+
+        return new SpaceGraph<Term>(
+                new NARSpace<Term, Spatial<Term>>(n, (nar, space, target) -> {
                     Bag<Concept> x = ((Default) nar).core.concepts;
                     x.topWhile(b -> {
 
+                        final float initDistanceEpsilon = 5f;
+                        final float initImpulseEpsilon = 25f;
+
                         ConceptWidget w = space.update(b.get().term(),
-                                t -> new ConceptWidget(t, maxEdges, nar));
+                                t -> new ConceptWidget(t, maxEdges, nar) {
+                                    @Override
+                                    public Dynamic newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
+                                        Dynamic x = super.newBody(graphSpace, shape, collidesWithOthersLikeThis);
+
+                                        //impulse in a random direction
+                                        x.impulse(v(SpaceGraph.r(initImpulseEpsilon),
+                                                SpaceGraph.r(initImpulseEpsilon),
+                                                SpaceGraph.r(initImpulseEpsilon)));
+
+                                        return x;
+                                    }
+                                });
 
                         w.pri = b.priIfFiniteElseZero();
 
-                        final float initDistanceEpsilon = 5f;
+
+
+                        //place in a random direction
                         w.move(SpaceGraph.r(initDistanceEpsilon),
                                 SpaceGraph.r(initDistanceEpsilon),
                                 SpaceGraph.r(initDistanceEpsilon));
+
 
                         target.add(w);
 
@@ -59,16 +92,12 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
                     }, maxNodes);
 
                 }, maxNodes).with(
-                    new Flatten()
-                    //new Spiral()
-                    //new FastOrganicLayout()
+                        new Flatten(),
+                        //new Spiral()
+                        new FastOrganicLayout()
                 )
         ).show(1300, 900);
-
-        n.loop(30f);
-
     }
-
 
 
     private final int capacity;
@@ -98,15 +127,15 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
         this.nar = nar;
         on = nar.onFrame(nn -> updateIfNotBusy(this::update));
     }
+
     public final synchronized void stop() {
         on.off();
         on = null;
     }
 
     public final boolean running() {
-        return on!=null;
+        return on != null;
     }
-
 
 
     @Override
@@ -144,8 +173,6 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
         this.active = next;
 
     }
-
-
 
 
 }

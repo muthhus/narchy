@@ -401,11 +401,11 @@ public class HingeConstraint extends TypedConstraint {
 				impulse_vector.scale(impulse, normal);
 
 				tmp.sub(pivotAInW, rbA.getCenterOfMassPosition(tmpVec));
-				rbA.applyImpulse(impulse_vector, tmp);
+				rbA.impulse(impulse_vector, tmp);
 
 				tmp.negate(impulse_vector);
 				tmp2.sub(pivotBInW, rbB.getCenterOfMassPosition(tmpVec));
-				rbB.applyImpulse(tmp, tmp2);
+				rbB.impulse(tmp, tmp2);
 			}
 		}
 
@@ -472,10 +472,10 @@ public class HingeConstraint extends TypedConstraint {
 
         tmp.negate(velrelOrthog);
         tmp.add(angularError);
-        rbA.applyTorqueImpulse(tmp);
+        rbA.torqueImpulse(tmp);
 
         tmp.sub(velrelOrthog, angularError);
-        rbB.applyTorqueImpulse(tmp);
+        rbB.torqueImpulse(tmp);
 
         // solve limit
         if (solveLimit) {
@@ -492,10 +492,10 @@ public class HingeConstraint extends TypedConstraint {
             v3 impulse = new v3();
             impulse.scale(impulseMag * limitSign, axisA);
 
-            rbA.applyTorqueImpulse(impulse);
+            rbA.torqueImpulse(impulse);
 
             tmp.negate(impulse);
-            rbB.applyTorqueImpulse(tmp);
+            rbB.torqueImpulse(tmp);
         }
 
         // apply motor
@@ -519,11 +519,11 @@ public class HingeConstraint extends TypedConstraint {
             motorImp.scale(clippedMotorImpulse, axisA);
 
             tmp.add(motorImp, angularLimit);
-            rbA.applyTorqueImpulse(tmp);
+            rbA.torqueImpulse(tmp);
 
             tmp.negate(motorImp);
             tmp.sub(angularLimit);
-            rbB.applyTorqueImpulse(tmp);
+            rbB.torqueImpulse(tmp);
         }
     }
 

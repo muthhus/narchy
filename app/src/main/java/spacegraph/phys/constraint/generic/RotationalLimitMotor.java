@@ -189,10 +189,10 @@ public class RotationalLimitMotor {
 		v3 motorImp = new v3();
 		motorImp.scale(clippedMotorImpulse, axis);
 
-		body0.applyTorqueImpulse(motorImp);
+		body0.torqueImpulse(motorImp);
 		if (body1 != null) {
 			motorImp.negate();
-			body1.applyTorqueImpulse(motorImp);
+			body1.torqueImpulse(motorImp);
 		}
 
 		return clippedMotorImpulse;

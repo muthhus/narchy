@@ -1217,10 +1217,10 @@ tmpSolverBodyPool.get(solveManifold.solverBodyIdB), solveManifold, infoGlobal);
                 ///
 
                 // apply previous frames impulse on both bodies
-                body0.applyImpulse(totalImpulse, rel_pos1);
+                body0.impulse(totalImpulse, rel_pos1);
 
                 tmpVec.negate(totalImpulse);
-                body1.applyImpulse(tmpVec, rel_pos2);
+                body1.impulse(tmpVec, rel_pos2);
             }
 
         }

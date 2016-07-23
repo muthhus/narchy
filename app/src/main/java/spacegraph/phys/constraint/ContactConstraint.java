@@ -415,10 +415,10 @@ public class ContactConstraint {
                 friction_impulse = Math.max(friction_impulse, -normal_impulse);
 
                 tmp.scale(-friction_impulse, lat_vel);
-                body1.applyImpulse(tmp, rel_pos1);
+                body1.impulse(tmp, rel_pos1);
 
                 tmp.scale(friction_impulse, lat_vel);
-                body2.applyImpulse(tmp, rel_pos2);
+                body2.impulse(tmp, rel_pos2);
             }
         }
 

@@ -560,9 +560,9 @@ public class SliderConstraint extends TypedConstraint {
 			// calcutate and apply impulse
 			float normalImpulse = softness * (restitution * depth / timeStep - damping * rel_vel) * jacLinDiagABInv[i];
 			impulse_vector.scale(normalImpulse, normal);
-			rbA.applyImpulse(impulse_vector, relPosA);
+			rbA.impulse(impulse_vector, relPosA);
 			tmp.negate(impulse_vector);
-			rbB.applyImpulse(tmp, relPosB);
+			rbB.impulse(tmp, relPosB);
 
 			if (poweredLinMotor && (i == 0)) {
 				// apply linear motor
@@ -585,9 +585,9 @@ public class SliderConstraint extends TypedConstraint {
 					accumulatedLinMotorImpulse = new_acc;
 					// apply clamped impulse
 					impulse_vector.scale(normalImpulse, normal);
-					rbA.applyImpulse(impulse_vector, relPosA);
+					rbA.impulse(impulse_vector, relPosA);
 					tmp.negate(impulse_vector);
-					rbB.applyImpulse(tmp, relPosB);
+					rbB.impulse(tmp, relPosB);
 				}
 			}
 		}
@@ -638,9 +638,9 @@ public class SliderConstraint extends TypedConstraint {
 		// apply impulse
 		tmp.negate(velrelOrthog);
 		tmp.add(angularError);
-		rbA.applyTorqueImpulse(tmp);
+		rbA.torqueImpulse(tmp);
 		tmp.sub(velrelOrthog, angularError);
-		rbB.applyTorqueImpulse(tmp);
+		rbB.torqueImpulse(tmp);
 		float impulseMag;
 
 		// solve angular limits
@@ -656,9 +656,9 @@ public class SliderConstraint extends TypedConstraint {
 		}
 		v3 impulse = new v3();
 		impulse.scale(impulseMag, axisA);
-		rbA.applyTorqueImpulse(impulse);
+		rbA.torqueImpulse(impulse);
 		tmp.negate(impulse);
-		rbB.applyTorqueImpulse(tmp);
+		rbB.torqueImpulse(tmp);
 
 		// apply angular motor
 		if (poweredAngMotor) {
@@ -687,9 +687,9 @@ public class SliderConstraint extends TypedConstraint {
 				// apply clamped impulse
 				v3 motorImp = new v3();
 				motorImp.scale(angImpulse, axisA);
-				rbA.applyTorqueImpulse(motorImp);
+				rbA.torqueImpulse(motorImp);
 				tmp.negate(motorImp);
-				rbB.applyTorqueImpulse(tmp);
+				rbB.torqueImpulse(tmp);
 			}
 		}
 	}

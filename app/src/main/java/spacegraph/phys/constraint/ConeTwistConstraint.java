@@ -314,11 +314,11 @@ public class ConeTwistConstraint extends TypedConstraint {
 				impulse_vector.scale(impulse, normal);
 
 				tmp.sub(pivotAInW, rbA.getCenterOfMassPosition(tmpVec));
-				rbA.applyImpulse(impulse_vector, tmp);
+				rbA.impulse(impulse_vector, tmp);
 
 				tmp.negate(impulse_vector);
 				tmp2.sub(pivotBInW, rbB.getCenterOfMassPosition(tmpVec));
-				rbB.applyImpulse(tmp, tmp2);
+				rbB.impulse(tmp, tmp2);
 			}
 		}
 
@@ -340,10 +340,10 @@ public class ConeTwistConstraint extends TypedConstraint {
             v3 impulse = new v3();
             impulse.scale(impulseMag, swingAxis);
 
-            rbA.applyTorqueImpulse(impulse);
+            rbA.torqueImpulse(impulse);
 
             tmp.negate(impulse);
-            rbB.applyTorqueImpulse(tmp);
+            rbB.torqueImpulse(tmp);
         }
 
         // solve twist limit
@@ -360,10 +360,10 @@ public class ConeTwistConstraint extends TypedConstraint {
             v3 impulse = new v3();
             impulse.scale(impulseMag, twistAxis);
 
-            rbA.applyTorqueImpulse(impulse);
+            rbA.torqueImpulse(impulse);
 
             tmp.negate(impulse);
-            rbB.applyTorqueImpulse(tmp);
+            rbB.torqueImpulse(tmp);
         }
     }
 

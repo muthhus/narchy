@@ -99,8 +99,8 @@ public class FastOrganicLayout<X> implements SpaceTransform<X> {
      */
     private static final boolean center = false;
 
-    private float nodeSpeed = 0.3f;
-    private float radiusScale = 3f;
+    private float nodeSpeed = 0.6f;
+    private float radiusScale = 4f;
 
     //private final FasterList<VDraw> cells = new FasterList<>();
 

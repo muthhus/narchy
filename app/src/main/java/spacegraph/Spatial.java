@@ -275,7 +275,7 @@ public class Spatial<O> implements BiConsumer<GL2, Dynamic> {
         //b.setLinearFactor(1,1,0); //restricts movement to a 2D plane
 
 
-        b.setDamping(0.99f, 0.5f);
+        b.setDamping(0.9f, 0.5f);
         b.setFriction(0.9f);
 
         return b;
@@ -365,7 +365,7 @@ public class Spatial<O> implements BiConsumer<GL2, Dynamic> {
         gl.glColor4f(e.r, e.g, e.b, e.a);
 
         float width = e.width * v.radius;
-        if (width <= 1.1f) {
+        if (width <= 0.1f) {
             renderLineEdge(gl, v, e, width);
         } else {
             renderHalfTriEdge(gl, v, e, width);
