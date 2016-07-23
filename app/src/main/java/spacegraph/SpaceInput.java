@@ -1,8 +1,5 @@
 package spacegraph;
 
-import nars.util.data.list.FasterList;
-
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -11,7 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 abstract public class SpaceInput<O, M extends Spatial<O>> implements Iterable<M> {
 
     final AtomicBoolean busy = new AtomicBoolean(true);
-    protected SpaceGraph space;
+    protected SpaceGraph<O> space;
     private long now;
     private float dt;
 
@@ -56,7 +53,9 @@ abstract public class SpaceInput<O, M extends Spatial<O>> implements Iterable<M>
     public void updateIfNotBusy() {
         if (!isBusy()) {
             synchronized (busy) {
-                update();
+                float last = this.now;
+                this.dt = (this.now = now()) - last;
+                updateImpl();
             }
         }
     }
@@ -67,7 +66,7 @@ abstract public class SpaceInput<O, M extends Spatial<O>> implements Iterable<M>
 
 
     /** needs to call update(space) for each active item */
-    abstract public void update(SpaceGraph<O> space);
+    abstract public void update(SpaceGraph<? extends O> space);
 
     public abstract int size();
 }

@@ -26,10 +26,8 @@ import nars.NAR;
 import nars.agent.NAgent;
 import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
-import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
-import nars.gui.ConceptBagInput;
-import nars.gui.STMView;
+import nars.gui.NARSpace;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -37,18 +35,12 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.vision.NARCamera;
-import nars.vision.SwingCamera;
 import spacegraph.SpaceGraph;
-import spacegraph.layout.FastOrganicLayout;
 import spacegraph.layout.Flatten;
-import spacegraph.layout.Spiral;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -339,13 +331,13 @@ public class Tetris extends TetrisState implements Environment {
                     //STMView.show(stm, 800, 600);
 
 
-                    new SpaceGraph<>(
-                            new ConceptBagInput(nar, 128, 4)
-                    ).with(
-                            //new Spiral()
-                            //new FastOrganicLayout()
-                            new Flatten()
-                    ).show(1300, 900);
+//                    new SpaceGraph<>(
+//                            new NARSpace(nar, 128, 4)
+//                    ).with(
+//                            //new Spiral()
+//                            //new FastOrganicLayout()
+//                            new Flatten()
+//                    ).show(1300, 900);
                 }
 
 

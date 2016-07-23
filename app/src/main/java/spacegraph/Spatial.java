@@ -126,7 +126,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     @Deprecated public transient int numEdges = 0;
 
 
-    public void start(SpaceGraph s) {
+    public void update(SpaceGraph<? extends O> s) {
         preactive = true;
 
         if (body == null) {

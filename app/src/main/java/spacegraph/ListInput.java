@@ -46,7 +46,7 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
     /**
      * rewinds the buffer of visible items, when collecting a new batch
      */
-    public List<Y> rewind(int capacity) {
+    public <Y extends Spatial> List<Y> rewind(int capacity) {
         active.forEach(Spatial::unpreactivate);
         return new FasterList<>(capacity);
     }
@@ -76,8 +76,8 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
     }
 
     @Override
-    public void update(SpaceGraph<X> space) {
-        active.forEach(a -> a.start(space));
+    public void update(SpaceGraph<? extends X> space) {
+        active.forEach(a -> a.update(space));
     }
 
 }

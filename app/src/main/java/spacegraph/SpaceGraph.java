@@ -9,7 +9,6 @@ import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.phys.collision.dispatch.Collidable;
-import spacegraph.phys.dynamics.RigidBody;
 import spacegraph.render.JoglPhysics;
 
 import javax.vecmath.Vector3f;
@@ -32,10 +31,10 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
     final List<SpaceInput<O,?>> inputs = new FasterList<>(1);
 
-    private Function<O, Spatial<O>> materialize = x -> (Spatial<O>)x;
+    private Function<O, Spatial> materialize = x -> (Spatial<O>)x;
 
     //final WeakValueHashMap<O, Spatial<O>> atoms = new WeakValueHashMap<>(1024);
-    final Cache<O, Spatial<O>> atoms = Caffeine.newBuilder()
+    final Cache<O, Spatial> atoms = Caffeine.newBuilder()
             .softValues().build();
             //.weakValues().build();
 
@@ -46,7 +45,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         super();
     }
 
-    public SpaceGraph(Function<O, Spatial<O>> materializer, O... c) {
+    public SpaceGraph(Function<O, Spatial> materializer, O... c) {
         this(materializer, new ListInput<>(c));
     }
 
@@ -54,7 +53,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         this(null, c);
     }
 
-    public SpaceGraph(Function<O, Spatial<O>> defaultMaterializer, SpaceInput<O, ?>... cc) {
+    public SpaceGraph(Function<O, Spatial> defaultMaterializer, SpaceInput<O, ?>... cc) {
         super();
 
         this.materialize = defaultMaterializer;
@@ -94,10 +93,10 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     public @NotNull Spatial update(O instance) {
         return getOrAdd(instance);
     }
-    public @NotNull Spatial<O> update(Function<? super O, Spatial<O>> materializer, O instance) {
+    public <Y extends Spatial> @NotNull Y update(O instance, Function<O, Y> materializer) {
         return getOrAdd(instance, materializer);
     }
-    public @NotNull Spatial<O> update(Spatial<O> t) {
+    public @NotNull <Y extends Spatial> Y update(Y t) {
         t.preactivate(true);
         return t;
     }
@@ -107,8 +106,8 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         return getOrAdd(t, materialize);
     }
 
-    public @NotNull Spatial<O> getOrAdd(O t, Function<? super O, ? extends Spatial<O>> materializer) {
-        return update(atoms.get(t, materializer));
+    public @NotNull <Y extends Spatial> Y getOrAdd(O t, Function<O, Y> materializer) {
+        return (Y) update(atoms.get(t, materializer));
     }
 
     public @Nullable Spatial getIfActive(O t) {
@@ -205,7 +204,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     public void add(Spatial s) {
 
         if (s.body == null) {
-            s.start(this);
+            s.update(this);
         }
 
     }
