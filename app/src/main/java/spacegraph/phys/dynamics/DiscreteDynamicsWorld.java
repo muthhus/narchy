@@ -97,12 +97,9 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		nextID = 0;
 		objects.removeIf(c-> {
 			if (valid(nextID,c)) {
-				update(c);
 				RigidBody body = RigidBody.upcast(c);
-				if (body != null) {
-					if (body.getActivationState() != Collidable.ISLAND_SLEEPING) {
-						body.saveKinematicState(timeStep); // to calculate velocities next frame
-					}
+				if (body.getActivationState() != Collidable.ISLAND_SLEEPING) {
+					body.saveKinematicState(timeStep); // to calculate velocities next frame
 				}
 				nextID++;
 				return false;
@@ -422,12 +419,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 	}
 
 	@Override
-	public void removeRigidBody(RigidBody body) {
-		remove(body);
-	}
-
-	@Override
-	public void addRigidBody(RigidBody body) {
+	public final void addRigidBody(RigidBody body) {
 		if (!body.isStaticOrKinematicObject()) {
 			body.setGravity(gravity);
 		}
@@ -441,7 +433,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		}
 	}
 
-	public void addRigidBody(RigidBody body, short group, short mask) {
+	public final void addRigidBody(RigidBody body, short group, short mask) {
 		if (!body.isStaticOrKinematicObject()) {
 			body.setGravity(gravity);
 		}
@@ -713,8 +705,8 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 									//ConvexShape convexShape = (ConvexShape)body.getCollisionShape();
 									SphereShape tmpSphere = new SphereShape(body.getCcdSweptSphereRadius()); //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
 
-									sweepResults.collisionFilterGroup = body.getBroadphaseProxy().collisionFilterGroup;
-									sweepResults.collisionFilterMask = body.getBroadphaseProxy().collisionFilterMask;
+									sweepResults.collisionFilterGroup = body.broadphase().collisionFilterGroup;
+									sweepResults.collisionFilterMask = body.broadphase().collisionFilterMask;
 
 									convexSweepTest(tmpSphere, body.getWorldTransform(tmpTrans), predictedTrans, sweepResults);
 									// JAVA NOTE: added closestHitFraction test to prevent objects being stuck

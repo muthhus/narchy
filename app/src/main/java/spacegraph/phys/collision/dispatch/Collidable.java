@@ -88,8 +88,7 @@ public class Collidable<X> {
 	protected float ccdMotionThreshold;
 	/// If some object should have elaborate collision filtering by sub-classes
 	protected boolean checkCollideWith;
-	public short collisionFilterMask;
-	public short collisionFilterGroup;
+
 
 	public Collidable() {
 		this(CollisionObjectType.COLLISION_OBJECT);

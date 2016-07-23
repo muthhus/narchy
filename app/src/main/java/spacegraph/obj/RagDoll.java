@@ -452,7 +452,7 @@ public class RagDoll extends Spatial {
 
         // Remove all bodies and shapes
         for (i = 0; i < BodyPart.BODYPART_COUNT.ordinal(); ++i) {
-            w.removeRigidBody(bodies[i]);
+            w.remove(bodies[i]);
 
             bodies[i] = null;
             shapes[i] = null;

@@ -53,8 +53,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
     /**
      * the draw order if being drawn
-     * order = -2: inactive
-     * order = -1: active but unsequenced
+     * order = -1: inactive
      * order > =0: live
      */
     transient public short order;
@@ -94,7 +93,6 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         //init physics
         center = motion.t.origin;
 
-        preactivate();
     }
 
     @Override
@@ -125,10 +123,16 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
 
     public void start(SpaceGraph s) {
+        preactive = true;
+
         if (body == null) {
             RigidBody b = body = newBody(s, newShape(), collidable());
             b.setUserPointer(this);
             b.setRenderer(this);
+        } else {
+            if (body.broadphase()==null)
+                throw new NullPointerException();
+            reactivate();
         }
     }
 
@@ -137,16 +141,20 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     public boolean active() {
-        return order >= -1;
+        return preactive || order > -1;
     }
 
-    public final void preactivate() {
-        this.order = -1;
-        reactivate();
+    public boolean preactive;
+
+    public final void unpreactivate() {
+        preactivate(false);
+    }
+    public final void preactivate(boolean b) {
+        this.preactive = b;
     }
 
     public final void inactivate() {
-        order = -2;
+        this.order = -1;
     }
 
     public void move(float x, float y, float z, float rate) {
@@ -222,6 +230,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     public void activate(short order) {
 
         this.order = order;
+        reactivate();
 
     }
 
@@ -261,6 +270,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
         b.setDamping(0.99f, 0.5f);
         b.setFriction(0.9f);
+
         return b;
     }
 
@@ -414,7 +424,8 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     public <O> void stop(SpaceGraph s) {
-        order = -2;
+        order = -1;
+        preactive = false;
         body = null;
     }
 }

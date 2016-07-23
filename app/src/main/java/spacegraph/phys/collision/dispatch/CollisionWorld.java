@@ -101,18 +101,6 @@ public class CollisionWorld<X> {
 		// check that the object isn't already added
 		//assert (!collisionObjects.contains(collisionObject));
 
-		c.collisionFilterGroup = collisionFilterGroup;
-		c.collisionFilterMask = collisionFilterMask;
-		objects.add(c);
-	}
-
-	public void update(Collidable c) {
-
-		// calculate new AABB
-		// TODO: check if it's overwritten or not
-
-
-
 		BroadphaseProxy currentBroadphase = c.broadphase();
 		if (currentBroadphase == null) {
 
@@ -127,11 +115,15 @@ public class CollisionWorld<X> {
 					maxAabb,
 					shape.getShapeType(),
 					c,
-					c.collisionFilterGroup,
-					c.collisionFilterMask,
+					collisionFilterGroup,
+					collisionFilterMask,
 					dispatcher1, null));
 		}
+
+		objects.add(c);
 	}
+
+
 
 	public void performDiscreteCollisionDetection() {
 		BulletStats.pushProfile("performDiscreteCollisionDetection");
@@ -189,7 +181,9 @@ public class CollisionWorld<X> {
 			broadphasePairCache.getOverlappingPairCache().cleanProxyFromPairs(bp, dispatcher1);
 			broadphasePairCache.destroyProxy(bp, dispatcher1);
             collidable.broadphase(null);
-        }
+        } else {
+        	System.err.println(collidable + " missing broadphase");
+		}
 	}
 
 	public void setBroadphase(BroadphaseInterface pairCache) {

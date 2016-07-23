@@ -555,10 +555,6 @@ public class RigidBody<X> extends Collidable<X> {
 
 		return deactivationTime > BulletGlobals.getDeactivationTime();
 	}
-	
-	public BroadphaseProxy getBroadphaseProxy() {
-		return broadphaseHandle;
-	}
 
 
 	public MotionState getMotionState() {

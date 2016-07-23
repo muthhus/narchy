@@ -35,7 +35,9 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     private Function<O, Spatial<O>> materialize = x -> (Spatial<O>)x;
 
     //final WeakValueHashMap<O, Spatial<O>> atoms = new WeakValueHashMap<>(1024);
-    final Cache<O, Spatial<O>> atoms = Caffeine.newBuilder().weakValues().build();
+    final Cache<O, Spatial<O>> atoms = Caffeine.newBuilder()
+            .softValues().build();
+            //.weakValues().build();
 
 
     final List<SpaceTransform<O>> transforms = $.newArrayList();
@@ -90,13 +92,13 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     }
 
     public @NotNull Spatial update(O instance) {
-        return update(getOrAdd(instance));
+        return getOrAdd(instance);
     }
     public @NotNull Spatial<O> update(Function<? super O, Spatial<O>> materializer, O instance) {
-        return update(getOrAdd(instance, materializer));
+        return getOrAdd(instance, materializer);
     }
     public @NotNull Spatial<O> update(Spatial<O> t) {
-        t.preactivate();
+        t.preactivate(true);
         return t;
     }
 
@@ -106,7 +108,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     }
 
     public @NotNull Spatial<O> getOrAdd(O t, Function<? super O, ? extends Spatial<O>> materializer) {
-        return atoms.get(t, materializer);
+        return update(atoms.get(t, materializer));
     }
 
     public @Nullable Spatial getIfActive(O t) {

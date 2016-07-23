@@ -1039,13 +1039,12 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     }
 
     public RigidBody newBody(float mass, Transform startTransform, CollisionShape shape) {
-        Motion myMotionState = new Motion(startTransform);
 
         boolean isDynamic = (mass != 0f);
         int collisionFilterGroup = isDynamic ? 1 : 2;
         int collisionFilterMask = isDynamic ? -1 : -3;
 
-        return newBody(mass, shape, myMotionState, collisionFilterGroup, collisionFilterMask);
+        return newBody(mass, shape, new Motion(startTransform), collisionFilterGroup, collisionFilterMask);
     }
 
 

@@ -23,6 +23,8 @@ import java.util.function.Predicate;
  */
 public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements ConceptMaterializer {
 
+    private List<ConceptWidget> nextActive;
+
     public static void main(String[] args) {
 
         Default n = new Default(256, 4, 2, 2);
@@ -33,15 +35,15 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
         new DeductiveMeshTest(n, new int[]{6,5}, 16384);
         //new ArithmeticInduction(n);
 
-        final int maxNodes = 16;
-        final int maxEdges = 4;
+        final int maxNodes = 64;
+        final int maxEdges = 2;
 
         new SpaceGraph<Term>(
                 new ConceptBagInput(n, maxNodes, maxEdges)
         ).with(
-                //new Flatten()
+                new Flatten()
                 //new Spiral()
-                new FastOrganicLayout()
+                //new FastOrganicLayout()
         ).show(1300, 900);
 
         n.loop(30f);
@@ -96,15 +98,30 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
         //final int maxNodes = this.maxNodes;
 
 
-        List<ConceptWidget> v = rewind(capacity);
+        List<ConceptWidget> prev = active;
+
+        List<ConceptWidget> v = this.nextActive = rewind(capacity);
         Bag<Concept> x = ((Default) nar).core.concepts;
         x.topWhile(this::accept, capacity);
+
+
+        for (ConceptWidget w : prev) {
+            if (!w.preactive) {
+                w.stop(space);
+            }
+        }
+
         //System.out.println(capacity + " " + active.size() + " " + space.dyn.objects().size());
 
         float now = now();
         for (int i1 = 0, toDrawSize = v.size(); i1 < toDrawSize; i1++) {
             update(now, v.get(i1));
         }
+
+        //System.out.println(active.size() + " " + nextActive.size());
+        this.active = nextActive;
+
+
     }
 
 
@@ -234,7 +251,7 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
 
         ConceptWidget w = (ConceptWidget) space.update(this, b.get().term());
         w.pri = pri;
-        return this.active.add(w);
+        return this.nextActive.add(w);
     }
 
 

@@ -114,7 +114,6 @@ public abstract class DynamicsWorld<X> extends CollisionWorld<X> {
 
 	public abstract void addRigidBody(RigidBody body);
 
-	public abstract void removeRigidBody(RigidBody body);
 
 	public abstract void setConstraintSolver(ConstraintSolver solver);
 

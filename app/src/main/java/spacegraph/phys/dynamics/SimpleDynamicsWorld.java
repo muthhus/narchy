@@ -173,10 +173,6 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 		}
 	}
 
-	@Override
-	public void removeRigidBody(RigidBody body) {
-		remove(body);
-	}
 
 	@Override
 	public void updateAabbs() {
