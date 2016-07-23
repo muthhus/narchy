@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.$;
+import nars.Param;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
@@ -17,8 +18,7 @@ import java.lang.ref.Reference;
 
 abstract public class DerivedTask extends MutableTask {
 
-    @NotNull
-    public final Reference<Premise> premise;
+    public transient Premise premise;
 
     //TODO should this also affect the Belief task?
 
@@ -27,7 +27,8 @@ abstract public class DerivedTask extends MutableTask {
 
         evidence(p.evidence());
 
-        this.premise = $.reference(p.premise);
+        if (Param.DEBUG)
+            this.premise = p.premise;
     }
 
     @Override
@@ -38,14 +39,14 @@ abstract public class DerivedTask extends MutableTask {
     @Override
     @Nullable
     public final Task getParentTask() {
-        Premise p = this.premise.get();
+        Premise p = this.premise;
         return p != null ? p.task() : null;
     }
 
     @Override
     @Nullable
     public final Task getParentBelief() {
-        Premise p = this.premise.get();
+        Premise p = this.premise;
         return p != null ? p.belief : null;
     }
 
@@ -105,7 +106,7 @@ abstract public class DerivedTask extends MutableTask {
         public boolean delete() {
             if (super.delete()) {
                 feedback(0);
-                this.premise.clear();
+                this.premise = null;
                 return true;
             }
             return false;
@@ -122,7 +123,7 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public boolean onConcept(@NotNull Concept c, float score) {
             if (super.onConcept(c, score)) {
-                Premise p = this.premise.get();
+                Premise p = this.premise;
                 if (p != null) {
                     Concept pc = p.conceptLink;
                     Concept.linkPeer(pc.termlinks(), p.termLink, budget(), qua());
@@ -136,14 +137,14 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public boolean delete() {
             if (super.delete()) {
-                Premise p = this.premise.get();
+                Premise p = this.premise;
                 if (p != null) {
                     Concept pc = p.conceptLink;
                     Concept.linkPeer(pc.termlinks(), p.termLink, UnitBudget.Zero, qua());
                     Concept.linkPeer(pc.tasklinks(), p.taskLink, UnitBudget.Zero, qua());
                 }
 
-                this.premise.clear();
+                this.premise = null;
 
                 return true;
             }

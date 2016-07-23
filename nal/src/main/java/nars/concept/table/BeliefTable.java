@@ -178,7 +178,10 @@ public interface BeliefTable extends TaskTable {
             return -1; //give up early since anything multiplied by relevance (<=1f) wont exceed the current best
         else {
             long dt = Math.abs(t.occurrence() - now) + Math.abs(when - now);
+
             float relevance = relevance(dt, ageFactor);
+            relevance = relevance * relevance; //pow2 sharpening curve, defining a temporal focus shape that is stronger closer to now
+
             float rank = c * relevance;
             //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);
             return rank;

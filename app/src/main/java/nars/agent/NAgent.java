@@ -8,9 +8,7 @@ import nars.Param;
 import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
-import nars.concept.table.BeliefTable;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.task.GeneratedTask;
@@ -101,7 +99,7 @@ public class NAgent implements Agent {
     private final float reinforcementAttention = 0.99f; //0.5f;
 
 
-    private final DecideAction decideAction;
+    private final Deciding deciding;
 
     private final boolean synchronousGoalInput = false;
 
@@ -121,14 +119,14 @@ public class NAgent implements Agent {
     public NAgent(NAR n) {
 
         this(n,
-            new DecideActionSoftmax(0.5f, 0.2f, 0.998f)
+            new DecidingSoftmax(0.6f, 0.4f, 0.999f)
             //new DecideActionEpsilonGreedy(0.05f)
         );
     }
 
-    public NAgent(NAR n, DecideAction decideAction) {
+    public NAgent(NAR n, Deciding deciding) {
         this.nar = n;
-        this.decideAction = decideAction;
+        this.deciding = deciding;
 
 
         sensorPriority = nar.priorityDefault(Symbols.BELIEF);
@@ -644,7 +642,11 @@ public class NAgent implements Agent {
 //            float preOff = (off+on*2f)/3f; //0.75f;
 //            float preOn = (on+off*2f)/3f; // 0.75f;
 
-            float onness = 1f;
+            float onness
+                    //= 1f;
+                    = Math.min((2f * nar.confMin.floatValue()) +
+                      ((DecidingSoftmax)deciding).decisiveness(), gamma);
+
                     //decisiveness(this.nextAction);
 
             if (lastAction != -1) {
@@ -653,10 +655,11 @@ public class NAgent implements Agent {
                 //nar.goal(goalPriority, lastActionMotor, now-1, preOff, conf); //downward step function top
 
                 float offness = onness;
+                float offFreq = 0.5f; //0 .. 0.5f
 
                 //float offness = 1f;
                 nar.goal(goalPriority, lastActionMotor, now-1,
-                        0.5f, max(Param.TRUTH_EPSILON, offness * gamma)); //downward step function bottom
+                        offFreq, max(Param.TRUTH_EPSILON, offness)); //downward step function bottom
             }
 
             //nar.goal(goalPriority, nextAction, now, preOn-1, conf); //upward step function bottom
@@ -664,7 +667,7 @@ public class NAgent implements Agent {
 
             //float onness = 1f;
             nar.goal(goalPriority, actions.get(this.nextAction), now,
-                    1, max(Param.TRUTH_EPSILON, onness * gamma)); //upward step function top
+                    1, max(Param.TRUTH_EPSILON, onness)); //upward step function top
         }
 
         //updateMotors();
@@ -718,7 +721,7 @@ public class NAgent implements Agent {
             motivation[i] = motivation(actions.get(i));
         }
 
-        return decideAction.decideAction(motivation.clone(), lastAction, nar.random);
+        return deciding.decide(motivation.clone(), lastAction, nar.random);
     }
 
     /** maps a concept's belief/goal state to a number */

@@ -17,6 +17,8 @@ import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.lang.StrictMath.abs;
 import static nars.nal.Tense.DTERNAL;
@@ -28,6 +30,7 @@ import static nars.truth.TruthFunctions.c2w;
  */
 public class Revision {
 
+    public static final Logger logger = LoggerFactory.getLogger(Revision.class);
 
     /**
      * Revision for Eternal tasks
@@ -207,20 +210,20 @@ public class Revision {
     }
 
     @NotNull
-    private static Compound dtMerge(@NotNull Compound a, @NotNull Compound b, float balance, @NotNull MutableFloat accumulatedDifference, float depth) {
-        int adt = a.dt();
+    private static Compound dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth) {
         if (a.size() != 2) {
             if (b.size() != a.size())
-                throw new RuntimeException(a + " and " + b + " can not be intermpolated");
-            return a;
+                logger.warn("{} and {} can not be intermpolated", a, b);
+            return strongest(a, b, aProp);
         }
 
         int newDT;
+        int adt = a.dt();
         if (adt != b.dt()) {
 
             int bdt = b.dt();
             if (adt != DTERNAL && bdt != DTERNAL) {
-                newDT = Math.round(Util.lerp(adt, bdt, balance));
+                newDT = Math.round(Util.lerp(adt, bdt, aProp));
                 accumulatedDifference.add(Math.abs(adt - bdt) * depth);
             } else if (bdt != DTERNAL) {
                 newDT = bdt;
@@ -242,13 +245,25 @@ public class Revision {
             throw new RuntimeException();
         }
 
-        return (Compound)$.compound(a.op(), newDT,
-                (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) (b.term(0)), balance, accumulatedDifference, depth / 2f) : a0,
-                (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) (b.term(1)), balance, accumulatedDifference, depth / 2f) : a1
+        Term r = $.compound(a.op(), newDT,
+                (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) (b.term(0)), aProp, accumulatedDifference, depth / 2f) : a0,
+                (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) (b.term(1)), aProp, accumulatedDifference, depth / 2f) : a1
         );
+        if (r instanceof Compound)
+            return (Compound) r;
+
+        //HACK TODO investigate why
+
+        logger.warn("{} and {} intermpolated to a non-Compound", a, b);
+        return strongest(a, b, aProp);
+
         //if (a.op().temporal) //when would it not be temporal? this happens though
             //d = d.dt(newDT);
         //return d;
+    }
+
+    private static Compound strongest(Compound a, Compound b, float balance) {
+        return (balance >= 0.5f) ? a : b;
     }
 
     /**
@@ -267,22 +282,32 @@ public class Revision {
     }
 
     /** assumes the compounds are the same except for possible numeric metadata differences */
-    public static @Nullable Termed<Compound> intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
-        if (a.equals(b)) return a;
+    public static @NotNull Compound intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
+        @NotNull Compound aterm = a.term();
+        if (a.equals(b))
+            return aterm;
 
         float aWeight = c2w(aConf);
         float bWeight = c2w(bConf);
+        float aProp = aWeight / (aWeight + bWeight);
+
+        @NotNull Compound bterm = b.term();
 
         int dt = DTERNAL;
-        int at = a.term().dt();
+        int at = aterm.dt();
         if (at != DTERNAL) {
-            int bt = b.term().dt();
+            int bt = bterm.dt();
             if (bt!= DTERNAL) {
-                dt = Math.round(Util.lerp(at, bt, aWeight/(aWeight+bWeight)));
+                dt = Math.round(Util.lerp(at, bt, aProp));
             }
         }
 
-        return $.compound(a.op(), dt, a.term().terms());
+        Term r = $.compound(a.op(), dt, aterm.terms());
+        if (!(r instanceof Compound)) {
+            return strongest(aterm, bterm, aProp);
+        } else {
+            return (Compound) r;
+        }
     }
 }
 

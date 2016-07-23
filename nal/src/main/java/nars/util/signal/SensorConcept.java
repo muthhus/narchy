@@ -62,7 +62,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
     /** originating from this sensor, or a future prediction */
     @Override
     public boolean validBelief(@NotNull Task belief, @NotNull NAR nar) {
-        return futureDerivationsOnly(belief, nar);
+        //return futureDerivationsOnly(belief, nar);
+        return true;
     }
 
     public static boolean futureDerivationsOnly(@NotNull Task belief, @NotNull NAR nar) {

@@ -85,7 +85,8 @@ public class MotorConcept extends WiredConcept  {
     @Override
     public boolean validBelief(@NotNull Task belief, @NotNull NAR nar) {
         //TODO only allow motor feedback?
-        return futureDerivationsOnly(belief, nar);
+        //return futureDerivationsOnly(belief, nar);
+        return true;
     }
 
     @Override

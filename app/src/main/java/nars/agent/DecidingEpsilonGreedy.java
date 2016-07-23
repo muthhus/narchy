@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * Created by me on 6/9/16.
  */
-public class DecideActionEpsilonGreedy implements DecideAction {
+public class DecidingEpsilonGreedy implements Deciding {
 
     float epsilonRandom; //0.01f;
 
@@ -18,14 +18,14 @@ public class DecideActionEpsilonGreedy implements DecideAction {
             epsilonRandom = Math.max(epsilonRandom, epsilonRandomMin);
      */
 
-    public DecideActionEpsilonGreedy(float epsilonRandom) {
+    public DecidingEpsilonGreedy(float epsilonRandom) {
         this.epsilonRandom = epsilonRandom;
     }
 
     int motivationOrder[];
 
     @Override
-    public int decideAction(float[] motivation, int lastAction, Random random) {
+    public int decide(float[] motivation, int lastAction, Random random) {
         int actions = motivation.length;
 
         if (motivationOrder == null) {

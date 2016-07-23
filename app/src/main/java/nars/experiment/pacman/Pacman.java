@@ -96,14 +96,14 @@ public class Pacman extends cpcman implements Environment {
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.6f);
-		nar.goalConfidence(0.6f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
-		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
+		nar.beliefConfidence(0.8f);
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(32);
-		nar.confMin.setValue(0.05f);
+		nar.cyclesPerFrame.set(64);
+		nar.confMin.setValue(0.1f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -131,7 +131,7 @@ public class Pacman extends cpcman implements Environment {
 		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
+		MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
 		MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 2);
 
 		new ArithmeticInduction(nar);
@@ -213,9 +213,9 @@ public class Pacman extends cpcman implements Environment {
 
 					new BeliefTableChart(nar, charted).show(700, 900);
 
-					//BagChart.show((Default) nar);
+					BagChart.show((Default) nar);
 
-					//STMView.show(stm, 500, 500);
+					STMView.show(stm, 500, 500);
 
 
 				}

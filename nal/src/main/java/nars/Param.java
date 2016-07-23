@@ -39,12 +39,14 @@ public abstract class Param extends Container implements Level {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_MAX_EVIDENCE = 10;
+
     /**
      * hard upper-bound limit on Compound term complexity;
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public static final MutableInteger compoundVolumeMax = new MutableInteger(192);
+    public static final MutableInteger compoundVolumeMax = new MutableInteger(128);
+
     /**
      * maximum changes logged in deriver's stack
      */
@@ -64,7 +66,7 @@ public abstract class Param extends Container implements Level {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.001f;
+    public static final float BUDGET_EPSILON = 0.0005f;
     /**
      * minimum durability and quality necessary for a derivation to form
      */
@@ -95,17 +97,6 @@ public abstract class Param extends Container implements Level {
     public static int QUERY_ANSWERS_PER_MATCH = 1;
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 
-    /**
-     * relates time and evidence (confidence); how past and future beliefs decay in rank
-     * across time; width of the temporal focus
-     */
-    public static final float TEMPORAL_DURATION = 1f;
-
-    /**
-     * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
-     */
-    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1.5f;
-
 
     /**
      * how much to multiply (shrink) the rank of a potential belief match if it overlaps with the task.
@@ -116,6 +107,21 @@ public abstract class Param extends Container implements Level {
      * if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression
      */
     public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = true;
+
+    /**
+     * relates time and evidence (confidence); how past and future beliefs decay in rank
+     * across time; width of the temporal focus relative to the min/max occurrence times
+     * of tasks contained in the belief table
+     */
+    public static final float TEMPORAL_DURATION = 0.9f;
+
+    /**
+     * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
+     * see: the microsphere interpolation paper for analysis on this parameter
+     */
+    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1f;
+
+
 
     /** confidence factor to multiply eternalizable temporal beliefs.
      *  displaced temporal beliefs and goals can be eternalized before being deleted, possibly preserving some of their truth value
@@ -136,7 +142,7 @@ public abstract class Param extends Container implements Level {
      */
     public static final float REVECTION_CONFIDENCE_FACTOR = 0.95f;
 
-    @Nullable
+
     private Truth defaultGoalTruth, defaultJudgmentTruth;
 
     public final MutableInteger cyclesPerFrame = new MutableInteger(1);

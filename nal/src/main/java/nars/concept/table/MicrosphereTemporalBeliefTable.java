@@ -18,8 +18,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.ETERNAL;
+import static nars.nal.UtilityFunctions.and;
+import static nars.truth.TruthFunctions.projection;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal
@@ -51,8 +54,8 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
     public static float rank(@NotNull Task t, long when, long now, float ageFactor) {
-        return rankTemporalByConfidenceAndOriginality(t, when, now, ageFactor, -1);
-        //return rankTemporalByConfidence(t, when, now, ageFactor, -1);
+        //return rankTemporalByConfidenceAndOriginality(t, when, now, ageFactor, -1);
+        return rankTemporalByConfidence(t, when, now, ageFactor, -1);
     }
 
     @Override
@@ -308,17 +311,35 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
         float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
 
-        float distanceFade = min!=ETERNAL ? TruthFunctions.projection(
-                //minTime(),
-                //maxTime(),
-                //mid
-                (a.occurrence()),
-                (b.occurrence()),
-                (now) //relative to current NAR time
-                //(mid) //relative to the midpoint of the tasks
-        ) : 1f;
+        /**
+         * compute an integration of the area under the trapezoid formed by
+         * computing the projected truth at the 'a' and 'b' time points
+         * and mixing them by their relative confidence.
+         * this is to represent a loss of confidence due to diffusion of
+         * truth across a segment of time spanned by these two tasks as
+         * they are merged into one.
+         */
+        float diffuseCost;
+        /*if (minTime()==ETERNAL) {
+            throw new RuntimeException(); //shouldnt happen
+        } else {*/
+        long aocc = a.occurrence();
+        long bocc = b.occurrence();
+        float aProj = projection(mid, now, aocc);
+        float bProj = projection(mid, now, bocc);
 
-        float confScale = Param.REVECTION_CONFIDENCE_FACTOR * distanceFade * (1f - overlap);
+        //TODO lerp blend these values ? avg? min?
+        diffuseCost =
+                //aveAri(aProj + bProj)/2f;
+                //Math.min(aProj, bProj);
+                and(aProj, bProj);
+
+        float relMin = projection(minTime(), mid, now);
+        float relMax = projection(maxTime(), mid, now);
+        float relevance = Math.max(relMin, relMax );
+
+
+        float confScale = Param.REVECTION_CONFIDENCE_FACTOR * diffuseCost * relevance * (1f - overlap);
 
         if (confScale < Param.BUDGET_EPSILON) //TODO use NAR.confMin which will be higher than this
             return null;
@@ -327,7 +348,10 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         if (truth!=null)
             truth = truth.confMultViaWeight(confScale);
 
-        return truth != null ? Revision.merge(a, b, mid, now, truth) : null;
+        if (truth != null)
+            return Revision.merge(a, b, mid, now, truth);
+
+        return null;
     }
 
 

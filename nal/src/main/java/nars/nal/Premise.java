@@ -19,6 +19,25 @@ import org.jetbrains.annotations.Nullable;
  *
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
+ *
+ * TODO Premise Cache
+ *  --memoizes the matching state and result procedure, effectively compiling a premise to an evaluable function
+ *          --completely
+ *          --partially (when > 0 termutations)
+ *  --use caffeine cache with a fixed size
+ *  --key = (task term, task punc, task time, beliefTerm, belief punc (or null), belief time )
+ *      avoid needing to store the generating concept; it is not really important
+ *      budget information is passed transiently per execution because this will fluctuate
+ *      truth values and evidence can also be passed transiently because the truth function can apply it each execution
+ *      same for time information
+ *  --value =
+ *      list of derive([transients]) -> Task functions
+ *      meter of about applied vs. total termutation permutations,
+ *          which can be used to evaluate the approximate completion of possibilities encountered
+ *      meter of past usefulness and other cost/benefit information
+ *
+ *      these metics can later be used to sort the estimated values of premise batches in a queue
+ *
  */
 public final class Premise implements Tasked {
 
