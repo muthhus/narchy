@@ -546,7 +546,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
      */
     @NotNull
     @Override
-    public final Task log(Object entry) {
+    public final AbstractTask log(Object entry) {
         if (!Param.DEBUG_TASK_LOG)
             return this;
 

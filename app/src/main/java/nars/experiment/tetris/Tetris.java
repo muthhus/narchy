@@ -51,7 +51,7 @@ import static nars.experiment.pong.Pong.numericSensor;
 public class Tetris extends TetrisState implements Environment {
 
     public static final int runCycles = 12000;
-    public static final int cyclesPerFrame = 128;
+    public static final int cyclesPerFrame = 32;
 
     private final TetrisVisualizer vis;
     private double currentScore;
@@ -237,11 +237,11 @@ public class Tetris extends TetrisState implements Environment {
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 ,new FrameClock());
-        nar.conceptActivation.setValue(0.1f);
+        nar.conceptActivation.setValue(0.04f);
 
 
-        nar.beliefConfidence(0.6f);
-        nar.goalConfidence(0.6f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f); //must be slightly higher than epsilon's eternal otherwise it overrides
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
@@ -341,7 +341,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, runCycles, 50);
+        t.run(n, runCycles, 1);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

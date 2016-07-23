@@ -21,6 +21,7 @@ import java.util.function.Consumer;
  * Has ability to measure (and cache) belief and desire state in order to execute Operations
  * and negations of Operations
 
+ * TODO inherit from WiredConcept which improves on this functionality
  */
 public class OperationConcept extends CompoundConcept<Compound> implements Consumer<NAR> {
 

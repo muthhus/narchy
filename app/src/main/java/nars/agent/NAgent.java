@@ -245,10 +245,10 @@ public class NAgent implements Agent {
             } else {
                 return null;
             }
-            if (b!=null && f!=null) {
-                if (b.equals(f)) {
-                    f = null; //no change from current belief state
-                }
+//            if (b!=null && f!=null) {
+//                if (b.equals(f)) {
+//                    f = null; //no change from current belief state
+//                }
 //                else {
 //                    //reduce feedback by similarity to existing belief state
 //                    float freqDiff = Math.abs(b.freq() - d.freq());
@@ -260,7 +260,7 @@ public class NAgent implements Agent {
 //                    else
 //                        return $.t(f.freq(), c);
 //                }
-            }
+//            }
 
             return f;
         };
@@ -644,8 +644,9 @@ public class NAgent implements Agent {
 
             float onness
                     //= 1f;
-                    = Math.min((2f * nar.confMin.floatValue()) +
-                      ((DecidingSoftmax)deciding).decisiveness(), gamma);
+                    = Math.min(
+                            (2f * nar.confMin.floatValue()) + ((DecidingSoftmax)deciding).decisiveness(),
+                            gamma);
 
                     //decisiveness(this.nextAction);
 

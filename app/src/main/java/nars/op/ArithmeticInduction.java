@@ -97,8 +97,8 @@ public class ArithmeticInduction implements Consumer<Task> {
 
                 compress(b, (features, pattern) -> {
 
-                    emit(
-                            task(b, $.conj(features, pattern)).log(getClass().getSimpleName())
+                    input(
+                        task(b, $.conj(features, pattern))
                     );
                         /*n.inputLater(
                                 (new MutableTask(
@@ -115,8 +115,8 @@ public class ArithmeticInduction implements Consumer<Task> {
                 compress(b, (features, pattern) -> {
 
                     //after variable introduction, such implication is self-referential and probably this conjunction captures the semantics:
-                    emit(
-                            /*print*/(task(b, $.conj(features, pattern)).log(getClass().getSimpleName()))
+                    input(
+                        task(b, $.conj(features, pattern))
                     );
 
                 });
@@ -144,12 +144,11 @@ public class ArithmeticInduction implements Consumer<Task> {
                         if (fp == null)
                             return;
 
-                        Term c = nar.index.transform(b.term(), pp, fp);
+                        Term c;
+                        if ((c = nar.index.transform(b.term(), pp, fp))!=null) {
 
-                        if (c!=null) {
-                            emit(
-                                    (task(b, c))
-                            );
+                                input( task(b, c) );
+
                         }
                     });
                 });
@@ -164,11 +163,13 @@ public class ArithmeticInduction implements Consumer<Task> {
         }
     }
 
-    void emit(Task task) {
-        count++;
-        nar.inputLater(
-            /*print*/(task)
-        );
+    final void input(@Nullable Task task) {
+        if (task!=null) {
+            count++;
+            nar.process(
+                /*print*/(task)
+            );
+        }
     }
 
     static Task print(Task t) {
@@ -334,12 +335,17 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
 
-    @NotNull MutableTask task(Task b, Term newTerm) {
+    @Nullable Task task(Task b, Term c) {
+        if ((c = Task.normalizeTaskTerm(c, b.punc(), nar, true))==null) {
+            return null;
+        }
         return new GeneratedTask(
-                newTerm,
+                c,
                 b.punc(), b.truth())
                 .time(nar.time(), b.occurrence())
                 .budget(b)
-                .evidence(b.evidence());
+                .evidence(b.evidence())
+                .log(getClass().getSimpleName())
+                ;
     }
 }

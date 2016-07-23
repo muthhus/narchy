@@ -6,7 +6,6 @@ import com.gs.collections.api.tuple.Twin;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
@@ -26,6 +25,7 @@ import nars.term.var.Variable;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
+import nars.util.data.list.FasterList;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
@@ -43,6 +43,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -105,9 +106,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final AtomicBoolean running = new AtomicBoolean();
 
 
-    private final transient Deque<Consumer<NAR>> nextTasks =
-            new ConcurrentLinkedDeque<>();
-    //new CopyOnWriteArrayList<>();
+
+    private transient final AtomicReference<List<Runnable>> nextTasks = new AtomicReference(new FasterList(0));
+
+            //new ConcurrentLinkedDeque<>();
+            //new CopyOnWriteArrayList<>();
 
     private NARLoop loop;
 
@@ -200,7 +203,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public synchronized void reset() {
 
-        nextTasks.clear();
+        nextTasks.get().clear();
 
         if (asyncs != null)
             asyncs.shutdown();
@@ -612,37 +615,37 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public final NAR run(int frames) {
 
-        AtomicBoolean r = this.running;
-        if (!r.compareAndSet(false, true))
-            throw new NAR.AlreadyRunningException();
+        AtomicBoolean r;
+        synchronized (r = this.running) {
 
-        _frame(frames);
+            if (!r.compareAndSet(false, true))
+                throw new RunStateException(true);
 
-        r.set(false);
+            next(frames);
+
+            if (!r.compareAndSet(true, false))
+                throw new RunStateException(false);
+        }
 
         return this;
     }
 
-    private final void _frame(int frames) {
+    private final void next(int frames) {
 
         Topic<NAR> frameStart = eventFrameStart;
 
         Clock clock = this.clock;
 
         for (; frames > 0; frames--) {
-//            if (asyncPerFrame != null) {
-//                runAsyncFrameTasks();
-//            }
 
             clock.tick();
             emotion.frame();
 
+            runNextTasks();
+
             frameStart.emit(this);
 
-            runNextTasks();
         }
-
-
     }
 
 //    private void runAsyncFrameTasks() {
@@ -790,26 +793,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * after the end of the current frame before the next frame.
      */
     public final boolean runLater(@NotNull Runnable t) {
-        if (running.get()) {
+        //if (running.get()) {
             //in a frame, so schedule for after it
-            return runLater(((NAR nn) -> t.run()));
-        } else {
+        return nextTasks.get().add(t);
+
+        /*} else {
             //not in a frame, can execute immediately
             t.run();
             return true;
-        }
+        }*/
     }
 
     public final boolean runLater(@NotNull Consumer<NAR> t) {
-        //if (running.get()) {
-        return nextTasks.add(t);
-        //} else {
-        //running.set(true); //prevents recursive invocation
-//            t.accept(this);
-        //running.set(false);
-        //  return true;
-        //}
+        return runLater(()->t.accept(this));
     }
+
+
+    private final static int MIN_NextTasks_BEFORE_PARALLELIZING = Runtime.getRuntime().availableProcessors()-1; //estimate
 
 
     /**
@@ -817,11 +817,26 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     private final void runNextTasks() {
 
-        Deque<Consumer<NAR>> n = this.nextTasks;
-        int s = n.size();
-        for (int i = 0; i < s; i++) {
-            n.removeFirst().accept(this);
+        List<Runnable> n = nextTasks.getAndSet( new FasterList(0) );
+        int num = n.size();
+        if (num == 0)
+            return;
+
+        //logger.info("Running {} pending tasks", num);
+
+        if (num < MIN_NextTasks_BEFORE_PARALLELIZING) {
+            //special case, avoids overhead of creating stream
+            n.forEach(Runnable::run);
+        } else {
+            n.parallelStream().parallel().forEach((r) -> {
+                try {
+                    r.run();
+                } catch (Throwable t) {
+                    logger.error("{} while running queued {}", t, r);
+                }
+            });
         }
+
 
     }
 
@@ -1188,9 +1203,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     }
 
-    public static class AlreadyRunningException extends RuntimeException {
-        public AlreadyRunningException() {
-            super("already running");
+    public static class RunStateException extends RuntimeException {
+        public RunStateException(boolean shouldRun) {
+            super(shouldRun ? "NAR already running" : "NAR already stopped");
         }
     }
 

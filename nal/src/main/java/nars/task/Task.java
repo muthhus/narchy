@@ -111,7 +111,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Nullable static Compound normalizeTaskTerm(@NotNull Term t, char punc, @NotNull Memory memory, boolean safe) {
 
         if (!(t instanceof Compound))
-            return test(t, "Task Term is not a Compound", safe);
+            return test(t, "Task Term is null or not a Compound", safe);
 
         t = memory.index.normalize(t, true);
 

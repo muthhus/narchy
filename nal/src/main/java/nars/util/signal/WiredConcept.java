@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 
 /**
  * base class for concepts which are more or less programmatically "hard-wired" into
@@ -33,8 +32,9 @@ import java.util.function.Consumer;
  * to make them directly reflect the sensor concept as the authority.
  *
  * */
-public abstract class WiredConcept extends CompoundConcept<Compound> implements Consumer<NAR> {
+public abstract class WiredConcept extends CompoundConcept<Compound> implements Runnable {
 
+    protected final NAR nar;
     int beliefCapacity = 16;
     int goalCapacity = 16;
 
@@ -43,6 +43,7 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
     public WiredConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
         n.on(this);
+        this.nar = n;
     }
 
     @Nullable protected Task process(@NotNull Task t, @NotNull BeliefTable table, @NotNull BiPredicate<Task,NAR> valid, @NotNull NAR nar, @NotNull List<Task> displaced) {
@@ -93,24 +94,21 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
 
     @Nullable
     private Task executeLater(@Nullable Task t, @NotNull NAR nar) {
-        if (t != null) {
-
-            if (runLater(t, nar) && pendingRun.compareAndSet(false,true)) {
-                nar.runLater(this);
-            }
+        if (t != null && runLater(t, nar) && pendingRun.compareAndSet(false, true)) {
+            nar.runLater(this);
         }
 
         return t;
     }
 
     @Override
-    public final void accept(NAR nar) {
-        update(nar);
-        pendingRun.set(false);
+    public final void run() {
+        pendingRun.set(false); //this needs to happen first in case update re-triggers a change in this concept
+        update();
     }
 
 
-    protected void update(NAR nar) {
+    protected void update() {
         //override in subclasses when used in combination with runLater(t,n)
     }
 

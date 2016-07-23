@@ -2,10 +2,7 @@ package nars.util.signal;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.Op;
 import nars.Symbols;
-import nars.budget.policy.ConceptPolicy;
-import nars.concept.OperationConcept;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -16,9 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.$.$;
-import static nars.budget.policy.DefaultConceptPolicy.beliefCapacityNonEternal;
 import static nars.budget.policy.DefaultConceptPolicy.goalCapacityOneEternal;
-import static nars.util.signal.SensorConcept.futureDerivationsOnly;
 
 
 public class MotorConcept extends WiredConcept  {
@@ -28,7 +23,7 @@ public class MotorConcept extends WiredConcept  {
     final int decisionDT = 0;
 
     /** relative temporal delta time for feedback occurrence */
-    final int feedbackDT = 1;
+    final int feedbackDT = 0;
 
 
 
@@ -129,7 +124,7 @@ public class MotorConcept extends WiredConcept  {
 
 
     @Override
-    protected final void update(@NotNull NAR nar) {
+    protected final void update() {
 
         long now = nar.time();
         @Nullable Truth d = this.desire(now+ decisionDT);
