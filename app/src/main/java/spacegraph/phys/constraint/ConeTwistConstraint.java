@@ -29,11 +29,12 @@ import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.math.QuaternionUtil;
 import spacegraph.phys.math.ScalarUtil;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.TransformUtil;
+import spacegraph.phys.solve.JacobianEntry;
 
 /**
  * ConeTwistConstraint can be used to simulate ragdoll joints (upper arm, leg etc).
@@ -76,7 +77,7 @@ public class ConeTwistConstraint extends TypedConstraint {
 		super(TypedConstraintType.CONETWIST_CONSTRAINT_TYPE);
 	}
 
-	public ConeTwistConstraint(Tangible rbA, Tangible rbB, Transform rbAFrame, Transform rbBFrame) {
+	public ConeTwistConstraint(Dynamic rbA, Dynamic rbB, Transform rbAFrame, Transform rbBFrame) {
 		super(TypedConstraintType.CONETWIST_CONSTRAINT_TYPE, rbA, rbB);
 		this.rbAFrame.set(rbAFrame);
 		this.rbBFrame.set(rbBFrame);
@@ -91,7 +92,7 @@ public class ConeTwistConstraint extends TypedConstraint {
 		solveSwingLimit = false;
 	}
 
-	public ConeTwistConstraint(Tangible rbA, Transform rbAFrame) {
+	public ConeTwistConstraint(Dynamic rbA, Transform rbAFrame) {
 		super(TypedConstraintType.CONETWIST_CONSTRAINT_TYPE, rbA);
 		this.rbAFrame.set(rbAFrame);
 		this.rbBFrame.set(this.rbAFrame);

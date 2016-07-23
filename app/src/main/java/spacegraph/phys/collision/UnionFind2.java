@@ -165,7 +165,7 @@ public class UnionFind2 {
         valid(x, numElements);
     }
 
-    void valid(int x, int numElements) {
+    static void valid(int x, int numElements) {
 
         if (x < 0 || (x >= numElements))
             throw new RuntimeException("overflow");

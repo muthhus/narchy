@@ -37,7 +37,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 	private static final int NULL_PAIR = 0xffffffff;
 
-	private final OArrayList<BroadphasePair> overlappingPairArray = new OArrayList<BroadphasePair>();
+	private final OArrayList<BroadphasePair> overlappingPairArray = new OArrayList<>();
 	private OverlapFilterCallback overlapFilterCallback;
 	//private boolean blockedForChanges;
 

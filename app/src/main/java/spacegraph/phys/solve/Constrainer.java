@@ -21,18 +21,35 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package spacegraph.phys.constraint;
+package spacegraph.phys.solve;
+
+import spacegraph.phys.Collidable;
+import spacegraph.phys.collision.broad.Intersecter;
+import spacegraph.phys.collision.narrow.PersistentManifold;
+import spacegraph.phys.constraint.TypedConstraint;
+import spacegraph.phys.util.OArrayList;
 
 /**
- * Solver flags.
+ * Abstract class for constraint solvers.
  * 
  * @author jezek2
  */
-public class SolverMode {
+public abstract class Constrainer {
 	
-	public static final int SOLVER_RANDMIZE_ORDER    = 1;
-	public static final int SOLVER_FRICTION_SEPARATE = 2;
-	public static final int SOLVER_USE_WARMSTARTING  = 4;
-	public static final int SOLVER_CACHE_FRIENDLY    = 8;
+	//protected final BulletStack stack = BulletStack.get();
 
+	public void prepareSolve (int numBodies, int numManifolds) {}
+
+	/**
+	 * Solve a group of constraints.
+	 */
+	public abstract float solveGroup(OArrayList<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifold, int manifold_offset, int numManifolds, OArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo info/*, btStackAlloc* stackAlloc*/, Intersecter intersecter);
+
+	public void allSolved(ContactSolverInfo info /*, btStackAlloc* stackAlloc*/) {}
+
+	/**
+	 * Clear internal cached data and reset random seed.
+	 */
+	public abstract void reset();
+	
 }

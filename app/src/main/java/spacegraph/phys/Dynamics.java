@@ -28,13 +28,13 @@ import spacegraph.math.v3;
 import spacegraph.phys.collision.CollisionConfiguration;
 import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.phys.collision.broad.Intersecter;
-import spacegraph.phys.constraint.Constrainer;
-import spacegraph.phys.constraint.ContactSolverInfo;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.dynamics.ActionInterface;
 import spacegraph.phys.dynamics.InternalTickCallback;
 import spacegraph.phys.dynamics.vehicle.RaycastVehicle;
 import spacegraph.phys.math.IDebugDraw;
+import spacegraph.phys.solve.Constrainer;
+import spacegraph.phys.solve.ContactSolverInfo;
 import spacegraph.phys.util.Animated;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 	protected InternalTickCallback internalTickCallback;
 	protected Object worldUserInfo;
 	
-	protected final ContactSolverInfo solverInfo = new ContactSolverInfo();
+	public final ContactSolverInfo solverInfo = new ContactSolverInfo();
 	
 	public Dynamics(Intersecter intersecter, Broadphase broadphasePairCache, CollisionConfiguration collisionConfiguration) {
 		super(intersecter, broadphasePairCache, collisionConfiguration);
@@ -113,10 +113,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
 	
 	public abstract v3 getGravity(v3 out);
 
-	public abstract void addRigidBody(Tangible body);
+	public abstract void addRigidBody(Dynamic body);
 
 
-	public abstract void setConstrainer(Constrainer solver);
 
 	public abstract Constrainer getConstrainer();
 
@@ -148,17 +147,13 @@ public abstract class Dynamics<X> extends Collisions<X> {
 		this.worldUserInfo = worldUserInfo;
 	}
 
-	public void setWorldUserInfo(Object worldUserInfo) {
-		this.worldUserInfo = worldUserInfo;
-	}
-
-	public Object getWorldUserInfo() {
-		return worldUserInfo;
-	}
-
-	public ContactSolverInfo getSolverInfo() {
-		return solverInfo;
-	}
+//	public void setWorldUserInfo(Object worldUserInfo) {
+//		this.worldUserInfo = worldUserInfo;
+//	}
+//
+//	public Object getWorldUserInfo() {
+//		return worldUserInfo;
+//	}
 
 	private final List<Animated> animations = new FasterList();
 
@@ -171,7 +166,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 		animations.removeIf(this::updateAnimation);
 	}
 
-	private final boolean updateAnimation(Animated animated) {
+	private boolean updateAnimation(Animated animated) {
 		return !animated.animate(curDT); //invert for the 'removeIf'
 	}
 

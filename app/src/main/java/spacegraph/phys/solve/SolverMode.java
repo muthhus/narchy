@@ -21,14 +21,18 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package spacegraph.phys.constraint;
+package spacegraph.phys.solve;
 
 /**
- * Solver constraint type.
+ * Solver flags.
  * 
  * @author jezek2
  */
-public enum SolverConstraintType {
-	SOLVER_CONTACT_1D,
-	SOLVER_FRICTION_1D
+public class SolverMode {
+	
+	public static final int SOLVER_RANDMIZE_ORDER    = 1;
+	public static final int SOLVER_FRICTION_SEPARATE = 2;
+	public static final int SOLVER_USE_WARMSTARTING  = 4;
+	public static final int SOLVER_CACHE_FRIENDLY    = 8;
+
 }

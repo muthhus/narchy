@@ -2,12 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package spacegraph.phys.constraint;
+package spacegraph.phys.constraint.generic;
 
 import spacegraph.math.v3;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
+import spacegraph.phys.solve.ContactSolverInfo;
 
 /**
  *
@@ -30,7 +31,7 @@ public class Generic6DofSpringConstraint extends Generic6DofConstraint {
     private final float[] springStiffness = new float[6];
     private final float[] springDamping = new float[6]; // between 0 and 1 (1 == no damping)
 
-    public Generic6DofSpringConstraint(Tangible rbA, Tangible rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA) {
+    public Generic6DofSpringConstraint(Dynamic rbA, Dynamic rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA) {
         super(rbA, rbB, frameInA, frameInB, useLinearReferenceFrameA, TypedConstraintType.D6_SPRING_CONSTRAINT_TYPE);
 
         for (int i = 0; i < 6; i++) {

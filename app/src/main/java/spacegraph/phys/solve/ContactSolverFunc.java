@@ -21,17 +21,18 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package spacegraph.phys.constraint;
+package spacegraph.phys.solve;
+
+import spacegraph.phys.Dynamic;
+import spacegraph.phys.collision.narrow.ManifoldPoint;
 
 /**
- * TODO: name
+ * Contact solving function.
  * 
  * @author jezek2
  */
-enum ContactConstraintEnum {
-	DEFAULT_CONTACT_SOLVER_TYPE,
-	CONTACT_SOLVER_TYPE1,
-	CONTACT_SOLVER_TYPE2,
-	USER_CONTACT_SOLVER_TYPE1,
-	MAX_CONTACT_SOLVER_TYPES
+public abstract class ContactSolverFunc {
+
+	public abstract float resolveContact(Dynamic body1, Dynamic body2, ManifoldPoint contactPoint, ContactSolverInfo info);
+	
 }

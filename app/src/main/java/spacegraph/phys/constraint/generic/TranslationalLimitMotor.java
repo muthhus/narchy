@@ -28,11 +28,11 @@ email: projectileman@yahoo.com
 http://gimpact.sf.net
 */
 
-package spacegraph.phys.constraint;
+package spacegraph.phys.constraint.generic;
 
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.math.VectorUtil;
 
 /**
@@ -141,7 +141,7 @@ public class TranslationalLimitMotor {
 
 
 
-	public float solveLinearAxis(float timeStep, float jacDiagABInv, Tangible body1, v3 pointInA, Tangible body2, v3 pointInB, int limit_index, v3 axis_normal_on_a, v3 anchorPos) {
+	public float solveLinearAxis(float timeStep, float jacDiagABInv, Dynamic body1, v3 pointInA, Dynamic body2, v3 pointInB, int limit_index, v3 axis_normal_on_a, v3 anchorPos) {
 		v3 tmp = new v3();
 		v3 tmpVec = new v3();
 		

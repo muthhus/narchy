@@ -29,11 +29,12 @@ import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.math.QuaternionUtil;
 import spacegraph.phys.math.ScalarUtil;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.TransformUtil;
+import spacegraph.phys.solve.JacobianEntry;
 
 /**
  * Hinge constraint between two rigid bodies each with a pivot point that descibes
@@ -75,7 +76,7 @@ public class HingeConstraint extends TypedConstraint {
 		enableAngularMotor = false;
 	}
 
-	public HingeConstraint(Tangible rbA, Tangible rbB, v3 pivotInA, v3 pivotInB, v3 axisInA, v3 axisInB) {
+	public HingeConstraint(Dynamic rbA, Dynamic rbB, v3 pivotInA, v3 pivotInB, v3 axisInA, v3 axisInB) {
 		super(TypedConstraintType.HINGE_CONSTRAINT_TYPE, rbA, rbB);
 		angularOnly = false;
 		enableAngularMotor = false;
@@ -125,7 +126,7 @@ public class HingeConstraint extends TypedConstraint {
 		solveLimit = false;
 	}
 
-	public HingeConstraint(Tangible rbA, v3 pivotInA, v3 axisInA) {
+	public HingeConstraint(Dynamic rbA, v3 pivotInA, v3 axisInA) {
 		super(TypedConstraintType.HINGE_CONSTRAINT_TYPE, rbA);
 		angularOnly = false;
 		enableAngularMotor = false;
@@ -177,7 +178,7 @@ public class HingeConstraint extends TypedConstraint {
 		solveLimit = false;
 	}
 
-	public HingeConstraint(Tangible rbA, Tangible rbB, Transform rbAFrame, Transform rbBFrame) {
+	public HingeConstraint(Dynamic rbA, Dynamic rbB, Transform rbAFrame, Transform rbBFrame) {
 		super(TypedConstraintType.HINGE_CONSTRAINT_TYPE, rbA, rbB);
 		this.rbAFrame.set(rbAFrame);
 		this.rbBFrame.set(rbBFrame);
@@ -198,7 +199,7 @@ public class HingeConstraint extends TypedConstraint {
 		solveLimit = false;
 	}
 
-	public HingeConstraint(Tangible rbA, Transform rbAFrame) {
+	public HingeConstraint(Dynamic rbA, Transform rbAFrame) {
 		super(TypedConstraintType.HINGE_CONSTRAINT_TYPE, rbA);
 		this.rbAFrame.set(rbAFrame);
 		this.rbBFrame.set(rbAFrame);

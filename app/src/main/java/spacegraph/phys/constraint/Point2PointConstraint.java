@@ -25,9 +25,10 @@ package spacegraph.phys.constraint;
 
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
+import spacegraph.phys.solve.JacobianEntry;
 
 /**
  * Point to point constraint between two rigid bodies each with a pivot point that
@@ -48,13 +49,13 @@ public class Point2PointConstraint extends TypedConstraint {
 		super(TypedConstraintType.POINT2POINT_CONSTRAINT_TYPE);
 	}
 
-	public Point2PointConstraint(Tangible rbA, Tangible rbB, v3 pivotInA, v3 pivotInB) {
+	public Point2PointConstraint(Dynamic rbA, Dynamic rbB, v3 pivotInA, v3 pivotInB) {
 		super(TypedConstraintType.POINT2POINT_CONSTRAINT_TYPE, rbA, rbB);
 		this.pivotInA.set(pivotInA);
 		this.pivotInB.set(pivotInB);
 	}
 
-	public Point2PointConstraint(Tangible rbA, v3 pivotInA) {
+	public Point2PointConstraint(Dynamic rbA, v3 pivotInA) {
 		super(TypedConstraintType.POINT2POINT_CONSTRAINT_TYPE, rbA);
 		this.pivotInA.set(pivotInA);
 		this.pivotInB.set(pivotInA);

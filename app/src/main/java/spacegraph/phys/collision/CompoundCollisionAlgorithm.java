@@ -42,7 +42,7 @@ import spacegraph.phys.util.OArrayList;
  */
 public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 
-	private final OArrayList<CollisionAlgorithm> childCollisionAlgorithms = new OArrayList<CollisionAlgorithm>();
+	private final OArrayList<CollisionAlgorithm> childCollisionAlgorithms = new OArrayList<>();
 	private boolean isSwapped;
 	
 	public void init(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1, boolean isSwapped) {

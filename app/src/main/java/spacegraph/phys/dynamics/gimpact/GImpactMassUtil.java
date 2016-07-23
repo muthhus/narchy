@@ -33,7 +33,7 @@ import spacegraph.math.v3;
  *
  * @author jezek2
  */
-class GImpactMassUtil {
+public class GImpactMassUtil {
 
 	public static v3 get_point_inertia(v3 point, float mass, v3 out) {
 		float x2 = point.x * point.x;

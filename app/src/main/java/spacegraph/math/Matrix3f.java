@@ -1083,7 +1083,7 @@ public final class Matrix3f implements java.io.Serializable, Cloneable {
      * Also note that since this routine is slow anyway, we won't worry
      * about allocating a little bit of garbage.
      */
-    private final void invertGeneral(Matrix3f m1) {
+    private void invertGeneral(Matrix3f m1) {
         double temp[] = new double[9];
         int r, c;
 

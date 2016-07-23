@@ -21,10 +21,10 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package spacegraph.phys.constraint;
+package spacegraph.phys.solve;
 
 import spacegraph.math.v3;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.TransformUtil;
 
@@ -42,7 +42,7 @@ public class SolverBody {
 	public float angularFactor;
 	public float invMass;
 	public float friction;
-	public Tangible body;
+	public Dynamic body;
 	public final v3 linearVelocity = new v3();
 	public final v3 centerOfMassPosition = new v3();
 

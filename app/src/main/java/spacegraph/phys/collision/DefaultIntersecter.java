@@ -40,7 +40,7 @@ public class DefaultIntersecter extends Intersecter {
 
 	private static final int MAX_BROADPHASE_COLLISION_TYPES = BroadphaseNativeType.MAX_BROADPHASE_COLLISION_TYPES.ordinal();
 	//private int count;
-	private final OArrayList<PersistentManifold> manifoldsPtr = new OArrayList<PersistentManifold>();
+	private final OArrayList<PersistentManifold> manifoldsPtr = new OArrayList<>();
 	//private final boolean useIslands = true;
 	private boolean staticWarningReported;
 	private ManifoldResult defaultManifoldResult;

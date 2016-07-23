@@ -41,7 +41,7 @@ class GeometryOperations {
 	public static final float PLANEDIREPSILON = 0.0000001f;
 	public static final float PARALELENORMALS = 0.000001f;
 	
-	public static final float CLAMP(float number, float minval, float maxval) {
+	public static float CLAMP(float number, float minval, float maxval) {
 		return (number < minval? minval : (number > maxval? maxval : number));
 	}
 

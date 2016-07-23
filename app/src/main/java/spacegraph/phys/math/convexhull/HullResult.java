@@ -45,7 +45,7 @@ public class HullResult {
 	public int numOutputVertices;
 	
 	/** Array of vertices. */
-	public final OArrayList<v3> outputVertices = new OArrayList<v3>();
+	public final OArrayList<v3> outputVertices = new OArrayList<>();
 	
 	/** Number of faces produced. */
 	public int numFaces;

@@ -28,15 +28,17 @@ email: projectileman@yahoo.com
 http://gimpact.sf.net
 */
 
-package spacegraph.phys.constraint;
+package spacegraph.phys.constraint.generic;
 
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
+import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.MatrixUtil;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
+import spacegraph.phys.solve.JacobianEntry;
 
 ///
 /*!
@@ -106,7 +108,7 @@ public class Generic6DofConstraint extends TypedConstraint {
 		useLinearReferenceFrameA = true;
 	}
 
-        public Generic6DofConstraint(Tangible rbB, Transform frameInB, boolean useLinearReferenceFrameB)
+        public Generic6DofConstraint(Dynamic rbB, Transform frameInB, boolean useLinearReferenceFrameB)
         {
             super(TypedConstraintType.D6_CONSTRAINT_TYPE, getFixed(), rbB);
             this.frameInB.set(frameInB);
@@ -118,11 +120,11 @@ public class Generic6DofConstraint extends TypedConstraint {
             // m_frameInA = rbB.getCenterOfMassTransform() * m_frameInB;
         }
 
-	public Generic6DofConstraint(Tangible rbA, Tangible rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA) {
+	public Generic6DofConstraint(Dynamic rbA, Dynamic rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA) {
 		this(rbA, rbB, frameInA, frameInB, useLinearReferenceFrameA, TypedConstraintType.D6_CONSTRAINT_TYPE);
 	}
 
-	protected Generic6DofConstraint(Tangible rbA, Tangible rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA, TypedConstraintType type) {
+	protected Generic6DofConstraint(Dynamic rbA, Dynamic rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA, TypedConstraintType type) {
 		super(type, rbA, rbB);
 		this.frameInA.set(frameInA);
 		this.frameInB.set(frameInB);
@@ -321,7 +323,7 @@ public class Generic6DofConstraint extends TypedConstraint {
 		return linearLimits.needApplyForces(axis_index);
 	}
 
-        
+
         @Override
 	public void buildJacobian() {
 		// Clear accumulated impulses for the next simulation step

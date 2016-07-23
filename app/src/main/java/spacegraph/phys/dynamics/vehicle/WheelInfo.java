@@ -24,7 +24,7 @@
 package spacegraph.phys.dynamics.vehicle;
 
 import spacegraph.math.v3;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.math.Transform;
 
 /**
@@ -96,7 +96,7 @@ public class WheelInfo {
 		return suspensionRestLength1;
 	}
 
-	public void updateWheel(Tangible chassis, RaycastInfo raycastInfo) {
+	public void updateWheel(Dynamic chassis, RaycastInfo raycastInfo) {
 		if (raycastInfo.isInContact) {
 			float project = raycastInfo.contactNormalWS.dot(raycastInfo.wheelDirectionWS);
 			v3 chassis_velocity_at_contactPoint = new v3();

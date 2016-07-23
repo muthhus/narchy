@@ -172,7 +172,7 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private class SupportVertexCallback extends TriangleCallback {
+	private static class SupportVertexCallback extends TriangleCallback {
 		private final v3 supportVertexLocal = new v3();
 		public final Transform worldTrans = new Transform();
 		public float maxDot = -1e30f;

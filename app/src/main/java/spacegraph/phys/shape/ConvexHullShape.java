@@ -38,7 +38,7 @@ import spacegraph.phys.util.OArrayList;
  */
 public class ConvexHullShape extends PolyhedralConvexShape {
 
-	private final OArrayList<v3> points = new OArrayList<v3>();
+	private final OArrayList<v3> points = new OArrayList<>();
 	
 	/**
 	 * TODO: This constructor optionally takes in a pointer to points. Each point is assumed to be 3 consecutive float (x,y,z), the striding defines the number of bytes between each point, in memory.

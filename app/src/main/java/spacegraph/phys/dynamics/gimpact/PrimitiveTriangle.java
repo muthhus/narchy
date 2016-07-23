@@ -38,9 +38,9 @@ import spacegraph.phys.util.OArrayList;
  */
 public class PrimitiveTriangle {
 
-	private final OArrayList<v3> tmpVecList1 = new OArrayList<v3>(TriangleContact.MAX_TRI_CLIPPING);
-	private final OArrayList<v3> tmpVecList2 = new OArrayList<v3>(TriangleContact.MAX_TRI_CLIPPING);
-	private final OArrayList<v3> tmpVecList3 = new OArrayList<v3>(TriangleContact.MAX_TRI_CLIPPING);
+	private final OArrayList<v3> tmpVecList1 = new OArrayList<>(TriangleContact.MAX_TRI_CLIPPING);
+	private final OArrayList<v3> tmpVecList2 = new OArrayList<>(TriangleContact.MAX_TRI_CLIPPING);
+	private final OArrayList<v3> tmpVecList3 = new OArrayList<>(TriangleContact.MAX_TRI_CLIPPING);
 	
 	{
 		for (int i = 0; i< TriangleContact.MAX_TRI_CLIPPING; i++) {
@@ -60,7 +60,7 @@ public class PrimitiveTriangle {
 		}
 	}
 	
-	public void set(PrimitiveTriangle tri) {
+	public static void set(PrimitiveTriangle tri) {
 		throw new UnsupportedOperationException();
 	}
 	

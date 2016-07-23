@@ -35,7 +35,7 @@ import spacegraph.phys.util.IntArrayList;
  *
  * @author jezek2
  */
-class GImpactBvh {
+public class GImpactBvh {
 
 	protected BvhTree box_tree = new BvhTree();
 	protected PrimitiveManagerBase primitive_manager;
@@ -208,7 +208,7 @@ class GImpactBvh {
 	/**
 	 * Tells if this set has hierarchy.
 	 */
-	public boolean hasHierarchy() {
+	public static boolean hasHierarchy() {
 		return true;
 	}
 
@@ -242,7 +242,7 @@ class GImpactBvh {
 		box_tree.setNodeBound(nodeindex, bound);
 	}
 
-	public int getLeftNode(int nodeindex) {
+	public static int getLeftNode(int nodeindex) {
 		return BvhTree.getLeftNode(nodeindex);
 	}
 
@@ -292,7 +292,7 @@ class GImpactBvh {
 				_find_collision_pairs_recursive(
 						boxset0, boxset1,
 						collision_pairs, trans_cache_1to0,
-						node0, boxset1.getLeftNode(node1), false);
+						node0, GImpactBvh.getLeftNode(node1), false);
 
 				// collide right recursive
 				_find_collision_pairs_recursive(
@@ -307,7 +307,7 @@ class GImpactBvh {
 				_find_collision_pairs_recursive(
 						boxset0, boxset1,
 						collision_pairs, trans_cache_1to0,
-						boxset0.getLeftNode(node0), node1, false);
+						GImpactBvh.getLeftNode(node0), node1, false);
 
 
 				// collide right recursive
@@ -321,19 +321,19 @@ class GImpactBvh {
 				_find_collision_pairs_recursive(
 						boxset0, boxset1,
 						collision_pairs, trans_cache_1to0,
-						boxset0.getLeftNode(node0), boxset1.getLeftNode(node1), false);
+						GImpactBvh.getLeftNode(node0), GImpactBvh.getLeftNode(node1), false);
 
 				// collide left0 right1
 				_find_collision_pairs_recursive(
 						boxset0, boxset1,
 						collision_pairs, trans_cache_1to0,
-						boxset0.getLeftNode(node0), boxset1.getRightNode(node1), false);
+						GImpactBvh.getLeftNode(node0), boxset1.getRightNode(node1), false);
 
 				// collide right0 left1
 				_find_collision_pairs_recursive(
 						boxset0, boxset1,
 						collision_pairs, trans_cache_1to0,
-						boxset0.getRightNode(node0), boxset1.getLeftNode(node1), false);
+						boxset0.getRightNode(node0), GImpactBvh.getLeftNode(node1), false);
 
 				// collide right0 right1
 				_find_collision_pairs_recursive(

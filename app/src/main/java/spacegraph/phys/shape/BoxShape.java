@@ -26,7 +26,7 @@ package spacegraph.phys.shape;
 import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.broad.BroadphaseNativeType;
 import spacegraph.phys.math.AabbUtil2;
 import spacegraph.phys.math.ScalarUtil;
@@ -36,7 +36,7 @@ import spacegraph.phys.math.VectorUtil;
 /**
  * BoxShape is a box primitive around the origin, its sides axis aligned with length
  * specified by half extents, in local shape coordinates. When used as part of a
- * {@link Collidable} or {@link Tangible} it will be an oriented box in world space.
+ * {@link Collidable} or {@link Dynamic} it will be an oriented box in world space.
  *
  * @author jezek2
  */

@@ -38,7 +38,7 @@ import spacegraph.phys.math.VectorUtil;
  *
  * @author jezek2
  */
-class BoxCollision {
+public class BoxCollision {
 	
 	public static final float BOX_PLANE_EPSILON = 0.000001f;
 
@@ -104,7 +104,7 @@ class BoxCollision {
 		public final Matrix3f R1to0 = new Matrix3f(); // Transforms Rotation of model1 to model 0, equal  to R0' * R1
 		public final Matrix3f AR = new Matrix3f();    // Absolute value of m_R1to0
 		
-		public void set(BoxBoxTransformCache cache) {
+		public static void set(BoxBoxTransformCache cache) {
 			throw new UnsupportedOperationException();
 		}
 		

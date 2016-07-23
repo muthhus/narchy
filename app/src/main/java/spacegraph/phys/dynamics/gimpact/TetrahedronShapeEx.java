@@ -35,7 +35,7 @@ import spacegraph.phys.shape.BU_Simplex1to4;
  * 
  * @author jezek2
  */
-class TetrahedronShapeEx extends BU_Simplex1to4 {
+public class TetrahedronShapeEx extends BU_Simplex1to4 {
 
 	public TetrahedronShapeEx() {
 		numVertices = 4;

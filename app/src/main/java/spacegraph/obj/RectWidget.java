@@ -6,7 +6,7 @@ import spacegraph.Spatial;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
 import spacegraph.math.v3;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.BoxShape;
@@ -80,7 +80,7 @@ public class RectWidget<X> extends Spatial<X> {
 
 
     @Override
-    protected final void renderRelative(GL2 gl, Tangible body) {
+    protected final void renderRelative(GL2 gl, Dynamic body) {
         super.renderRelative(gl, body);
 
         //float p = this.padding;

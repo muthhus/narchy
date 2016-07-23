@@ -38,7 +38,7 @@ public class UnionFind {
 
 	// Optimization: could use short ints instead of ints (halving memory, would limit the number of rigid bodies to 64k, sounds reasonable).
 
-	private final OArrayList<Element> elements = new OArrayList<Element>();
+	private final OArrayList<Element> elements = new OArrayList<>();
 
 	/**
 	 * This is a special operation, destroying the content of UnionFind.
@@ -155,11 +155,6 @@ public class UnionFind {
 		public int sz;
 	}
 
-	private static final Comparator<Element> elementComparator = new Comparator<Element>() {
-		@Override
-		public int compare(Element o1, Element o2) {
-			return o1.id < o2.id? -1 : +1;
-		}
-	};
+	private static final Comparator<Element> elementComparator = (o1, o2) -> o1.id < o2.id? -1 : +1;
 
 }

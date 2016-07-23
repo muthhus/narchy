@@ -63,7 +63,7 @@ import static spacegraph.render.JoglPhysics.defaultRenderer;
  * 
  * @author jezek2
  */
-public class Tangible<X> extends Collidable<X> {
+public class Dynamic<X> extends Collidable<X> {
 
 	private static final float MAX_ANGVEL = BulletGlobals.SIMD_HALF_PI;
 	
@@ -95,7 +95,7 @@ public class Tangible<X> extends Collidable<X> {
 	private MotionState optionalMotionState;
 
 	// keep track of typed constraints referencing this rigid body
-	private final OArrayList<TypedConstraint> constraintRefs = new OArrayList<TypedConstraint>();
+	private final OArrayList<TypedConstraint> constraintRefs = new OArrayList<>();
 
 	// for experimental overriding of friction/contact solver func
 	public int contactSolverType;
@@ -104,16 +104,16 @@ public class Tangible<X> extends Collidable<X> {
 	private static int uniqueId;
 	public int debugBodyId;
 
-	public Tangible(RigidBodyBuilder constructionInfo) {
+	public Dynamic(RigidBodyBuilder constructionInfo) {
 		super(CollidableType.RIGID_BODY);
 		setupRigidBody(constructionInfo);
 	}
 
-	public Tangible(float mass, MotionState motionState, CollisionShape collisionShape) {
+	public Dynamic(float mass, MotionState motionState, CollisionShape collisionShape) {
 		this(mass, motionState, collisionShape, new v3(0f, 0f, 0f));
 	}
 
-	public Tangible(float mass, MotionState motionState, CollisionShape collisionShape, v3 localInertia) {
+	public Dynamic(float mass, MotionState motionState, CollisionShape collisionShape, v3 localInertia) {
 		super(CollidableType.RIGID_BODY);
 		RigidBodyBuilder cinfo = new RigidBodyBuilder(mass, motionState, collisionShape, localInertia);
 		setupRigidBody(cinfo);
@@ -183,8 +183,13 @@ public class Tangible<X> extends Collidable<X> {
 	 * To keep collision detection and dynamics separate we don't store a rigidbody pointer,
 	 * but a rigidbody is derived from CollisionObject, so we can safely perform an upcast.
 	 */
-	public static <X> Tangible<X> upcast(Collidable<X> colObj) {
-		return colObj.getInternalType() == CollidableType.RIGID_BODY ? (Tangible) colObj : null;
+	public static <X> Dynamic<X> ifDynamic(Collidable<X> colObj) {
+		return colObj.getInternalType() == CollidableType.RIGID_BODY ? (Dynamic) colObj : null;
+	}
+
+	public static <X> Dynamic<X> ifDynamicAndActive(Collidable<X> colObj) {
+		Dynamic<X> d = ifDynamic(colObj);
+		return ((d == null) || !d.isActive()) ? null : d;
 	}
 
 	/**
@@ -583,7 +588,7 @@ public class Tangible<X> extends Collidable<X> {
 	@Override
 	public boolean checkCollideWithOverride(Collidable co) {
 		// TODO: change to cast
-		Tangible otherRb = upcast(co);
+		Dynamic otherRb = ifDynamic(co);
 		if (otherRb == null) {
 			return true;
 		}
@@ -623,13 +628,13 @@ public class Tangible<X> extends Collidable<X> {
 	}
 
 
-	private BiConsumer<GL2,Tangible> renderer = defaultRenderer;
+	private BiConsumer<GL2,Dynamic> renderer = defaultRenderer;
 
-	public final BiConsumer<GL2,Tangible> renderer() {
+	public final BiConsumer<GL2,Dynamic> renderer() {
 		return renderer;
 	}
 
-	public final void setRenderer(BiConsumer<GL2,Tangible> renderer) {
+	public final void setRenderer(BiConsumer<GL2,Dynamic> renderer) {
 		this.renderer = renderer;
 	}
 

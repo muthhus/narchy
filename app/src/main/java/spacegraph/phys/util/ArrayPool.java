@@ -130,32 +130,23 @@ public class ArrayPool<T> {
 	
 	////////////////////////////////////////////////////////////////////////////
 
-	private static final Comparator floatComparator = new Comparator() {
-		@Override
-		public int compare(Object o1, Object o2) {
-			int len1 = (o1 instanceof IntValue)? ((IntValue)o1).value : ((float[])o1).length;
-			int len2 = (o2 instanceof IntValue)? ((IntValue)o2).value : ((float[])o2).length;
-			return len1 > len2? 1 : len1 < len2 ? -1 : 0;
-		}
-	};
+	private static final Comparator floatComparator = (o1, o2) -> {
+        int len1 = (o1 instanceof IntValue)? ((IntValue)o1).value : ((float[])o1).length;
+        int len2 = (o2 instanceof IntValue)? ((IntValue)o2).value : ((float[])o2).length;
+        return len1 > len2? 1 : len1 < len2 ? -1 : 0;
+    };
 
-	private static final Comparator intComparator = new Comparator() {
-		@Override
-		public int compare(Object o1, Object o2) {
-			int len1 = (o1 instanceof IntValue)? ((IntValue)o1).value : ((int[])o1).length;
-			int len2 = (o2 instanceof IntValue)? ((IntValue)o2).value : ((int[])o2).length;
-			return len1 > len2? 1 : len1 < len2 ? -1 : 0;
-		}
-	};
+	private static final Comparator intComparator = (o1, o2) -> {
+        int len1 = (o1 instanceof IntValue)? ((IntValue)o1).value : ((int[])o1).length;
+        int len2 = (o2 instanceof IntValue)? ((IntValue)o2).value : ((int[])o2).length;
+        return len1 > len2? 1 : len1 < len2 ? -1 : 0;
+    };
 	
-	private static final Comparator objectComparator = new Comparator() {
-		@Override
-		public int compare(Object o1, Object o2) {
-			int len1 = (o1 instanceof IntValue)? ((IntValue)o1).value : ((Object[])o1).length;
-			int len2 = (o2 instanceof IntValue)? ((IntValue)o2).value : ((Object[])o2).length;
-			return len1 > len2? 1 : len1 < len2 ? -1 : 0;
-		}
-	};
+	private static final Comparator objectComparator = (o1, o2) -> {
+        int len1 = (o1 instanceof IntValue)? ((IntValue)o1).value : ((Object[])o1).length;
+        int len2 = (o2 instanceof IntValue)? ((IntValue)o2).value : ((Object[])o2).length;
+        return len1 > len2? 1 : len1 < len2 ? -1 : 0;
+    };
 	
 	private static class IntValue {
 		public int value;
@@ -163,7 +154,7 @@ public class ArrayPool<T> {
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	private static final ThreadLocal<Map> threadLocal = new ThreadLocal<Map>() {
+	private static final ThreadLocal<Map> threadLocal = new ThreadLocal<>() {
 		@Override
 		protected Map initialValue() {
 			return new HashMap();
@@ -182,7 +173,7 @@ public class ArrayPool<T> {
 		
 		ArrayPool<T> pool = (ArrayPool<T>)map.get(cls);
 		if (pool == null) {
-			pool = new ArrayPool<T>(cls);
+			pool = new ArrayPool<>(cls);
 			map.put(cls, pool);
 		}
 		

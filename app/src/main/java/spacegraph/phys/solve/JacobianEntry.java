@@ -21,7 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package spacegraph.phys.constraint;
+package spacegraph.phys.solve;
 
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;

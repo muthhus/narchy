@@ -1070,7 +1070,7 @@ public class Matrix3d implements java.io.Serializable, Cloneable {
      * Also note that since this routine is slow anyway, we won't worry
      * about allocating a little bit of garbage.
      */
-    private final void invertGeneral(Matrix3d m1) {
+    private void invertGeneral(Matrix3d m1) {
         int r, c;
         double[] tmp = new double[9];  // scratch matrix
 
@@ -3082,9 +3082,7 @@ public class Matrix3d implements java.io.Serializable, Cloneable {
         tmp[7] = m1[6] * m2[1] + m1[7] * m2[4] + m1[8] * m2[7];
         tmp[8] = m1[6] * m2[2] + m1[7] * m2[5] + m1[8] * m2[8];
 
-        for (int i = 0; i < 9; i++) {
-            m3[i] = tmp[i];
-        }
+        System.arraycopy(tmp, 0, m3, 0, 9);
     }
 
     static void transpose_mat(double[] in, double[] out) {
@@ -3107,7 +3105,7 @@ public class Matrix3d implements java.io.Serializable, Cloneable {
                     values[values[1] > values[2] ? 1 : 2];
     }
 
-    private static final boolean almostEqual(double a, double b) {
+    private static boolean almostEqual(double a, double b) {
         if (a == b)
             return true;
 

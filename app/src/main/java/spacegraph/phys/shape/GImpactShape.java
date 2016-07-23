@@ -25,29 +25,27 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package spacegraph.phys.dynamics.gimpact;
+package spacegraph.phys.shape;
 
 import spacegraph.math.v3;
 import spacegraph.phys.Collisions;
 import spacegraph.phys.collision.broad.BroadphaseNativeType;
+import spacegraph.phys.dynamics.gimpact.*;
 import spacegraph.phys.math.Transform;
-import spacegraph.phys.shape.CollisionShape;
-import spacegraph.phys.shape.ConcaveShape;
-import spacegraph.phys.shape.TriangleCallback;
 
 /**
  * Base class for gimpact shapes.
  * 
  * @author jezek2
  */
-public abstract class GImpactShapeInterface extends ConcaveShape {
+public abstract class GImpactShape extends ConcaveShape {
 
     protected BoxCollision.AABB localAABB = new BoxCollision.AABB();
     protected boolean needs_update;
     protected final v3 localScaling = new v3();
     GImpactBvh box_set = new GImpactBvh(); // optionally boxset
 
-	public GImpactShapeInterface() {
+	public GImpactShape() {
 		localAABB.invalidate();
 		needs_update = true;
 		localScaling.set(1f, 1f, 1f);
@@ -132,9 +130,9 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 	/**
 	 * Base method for determinig which kind of GIMPACT shape we get.
 	 */
-	abstract ShapeType getGImpactShapeType();
+	public abstract GImpactCollisionAlgorithm.ShapeType getGImpactShapeType();
 	
-	GImpactBvh getBoxSet() {
+	public GImpactBvh getBoxSet() {
 		return box_set;
 	}
 
@@ -172,7 +170,7 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 
 	public abstract void getBulletTriangle(int prim_index, TriangleShapeEx triangle);
 
-	abstract void getBulletTetrahedron(int prim_index, TetrahedronShapeEx tetrahedron);
+	public abstract void getBulletTetrahedron(int prim_index, TetrahedronShapeEx tetrahedron);
 
 	/**
 	 * Call when reading child shapes.
@@ -186,7 +184,7 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 	/**
 	 * If this trimesh.
 	 */
-	void getPrimitiveTriangle(int index, PrimitiveTriangle triangle) {
+	public void getPrimitiveTriangle(int index, PrimitiveTriangle triangle) {
 		getPrimitiveManager().get_primitive_triangle(index, triangle);
 	}
 	

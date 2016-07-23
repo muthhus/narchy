@@ -41,7 +41,7 @@ public class SliderSurface extends Surface {
 //    }
     public static void main(String[] args) {
         SpaceGraph<?> s = new SpaceGraph();
-        s.addAll(
+        s.add(
                 new RectWidget(
                         new GridSurface(
                             new GridSurface(newArrayList(
@@ -54,7 +54,7 @@ public class SliderSurface extends Surface {
                                     new SliderSurface(0.5f, 0, 1)
                             ), GridSurface.VERTICAL)
                         ),
-                        6,3 //TODO make sure works for non-square shape
+                        8,8 //TODO make sure works for non-square shape
                 )
         );
 

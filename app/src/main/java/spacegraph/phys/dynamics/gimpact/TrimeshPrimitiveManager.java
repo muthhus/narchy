@@ -37,7 +37,7 @@ import spacegraph.phys.shape.VertexData;
  *
  * @author jezek2
  */
-class TrimeshPrimitiveManager extends PrimitiveManagerBase {
+public class TrimeshPrimitiveManager extends PrimitiveManagerBase {
 
 	public float margin;
 	public StridingMeshInterface meshInterface;

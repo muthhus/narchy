@@ -7,6 +7,7 @@ import spacegraph.math.Vector2f;
 import spacegraph.math.v3;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * planar subspace.
@@ -39,7 +40,7 @@ public class Surface {
     }
 
     public void setChildren(List<? extends Surface> children) {
-        if (this.children == null || !this.children.equals(children)) {
+        if (!Objects.equals(this.children, children)) {
             this.children = children;
             layout();
         }

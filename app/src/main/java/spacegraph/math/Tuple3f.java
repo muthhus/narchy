@@ -31,6 +31,8 @@
 
 package spacegraph.math;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * A generic 3-element tuple that is represented by single precision-floating
  * point x,y,z coordinates.
@@ -334,12 +336,14 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      * @return true or false
      */
     @Deprecated
-    public boolean equals(Tuple3f t1) { //TODO add an epsilon tolerance
-        try {
-            return (this.x == t1.x && this.y == t1.y && this.z == t1.z);
-        } catch (NullPointerException e2) {
+    public boolean equals(@Nullable Tuple3f t1) { //TODO add an epsilon tolerance
+        if (t1 == null)
             return false;
-        }
+        //try {
+            return (this.x == t1.x && this.y == t1.y && this.z == t1.z);
+        /*} catch (NullPointerException e2) {
+            return false;
+        }*/
     }
 
     /**

@@ -26,9 +26,13 @@ package spacegraph.phys.constraint;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.narrow.ManifoldPoint;
 import spacegraph.phys.math.Transform;
+import spacegraph.phys.solve.ConstraintPersistentData;
+import spacegraph.phys.solve.ContactSolverFunc;
+import spacegraph.phys.solve.ContactSolverInfo;
+import spacegraph.phys.solve.JacobianEntry;
 
 /**
  * Functions for resolving contacts.
@@ -39,21 +43,21 @@ public class ContactConstraint {
 	
 	public static final ContactSolverFunc resolveSingleCollision = new ContactSolverFunc() {
 		@Override
-        public float resolveContact(Tangible body1, Tangible body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
+        public float resolveContact(Dynamic body1, Dynamic body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
 			return resolveSingleCollision(body1, body2, contactPoint, info);
 		}
 	};
 
 	public static final ContactSolverFunc resolveSingleFriction = new ContactSolverFunc() {
 		@Override
-        public float resolveContact(Tangible body1, Tangible body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
+        public float resolveContact(Dynamic body1, Dynamic body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
 			return resolveSingleFriction(body1, body2, contactPoint, info);
 		}
 	};
 
 	public static final ContactSolverFunc resolveSingleCollisionCombined = new ContactSolverFunc() {
 		@Override
-        public float resolveContact(Tangible body1, Tangible body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
+        public float resolveContact(Dynamic body1, Dynamic body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
 			return resolveSingleCollisionCombined(body1, body2, contactPoint, info);
 		}
 	};
@@ -61,9 +65,9 @@ public class ContactConstraint {
 	/**
 	 * Bilateral constraint between two dynamic objects.
 	 */
-	public static void resolveSingleBilateral(Tangible body1, v3 pos1,
-											  Tangible body2, v3 pos2,
-											  float distance, v3 normal, float[] impulse, float timeStep) {
+	public static void resolveSingleBilateral(Dynamic body1, v3 pos1,
+                                              Dynamic body2, v3 pos2,
+                                              float distance, v3 normal, float[] impulse, float timeStep) {
 		float normalLenSqr = normal.lengthSquared();
 		assert (Math.abs(normalLenSqr) < 1.1f);
 		if (normalLenSqr > 1.1f) {
@@ -139,8 +143,8 @@ public class ContactConstraint {
 	 * Response between two dynamic objects with friction.
 	 */
 	public static float resolveSingleCollision(
-			Tangible body1,
-			Tangible body2,
+			Dynamic body1,
+			Dynamic body2,
 			ManifoldPoint contactPoint,
 			ContactSolverInfo solverInfo) {
 
@@ -209,8 +213,8 @@ public class ContactConstraint {
 	}
 
 	public static float resolveSingleFriction(
-			Tangible body1,
-			Tangible body2,
+			Dynamic body1,
+			Dynamic body2,
 			ManifoldPoint contactPoint,
 			ContactSolverInfo solverInfo) {
 
@@ -303,8 +307,8 @@ public class ContactConstraint {
 	 * response between two dynamic objects with friction
 	 */
 	public static float resolveSingleCollisionCombined(
-			Tangible body1,
-			Tangible body2,
+			Dynamic body1,
+			Dynamic body2,
 			ManifoldPoint contactPoint,
 			ContactSolverInfo solverInfo) {
 
@@ -422,8 +426,8 @@ public class ContactConstraint {
 	}
 
 	public static float resolveSingleFrictionEmpty(
-			Tangible body1,
-			Tangible body2,
+			Dynamic body1,
+			Dynamic body2,
 			ManifoldPoint contactPoint,
 			ContactSolverInfo solverInfo) {
 		return 0f;

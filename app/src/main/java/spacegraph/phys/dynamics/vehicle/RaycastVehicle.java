@@ -26,10 +26,9 @@ package spacegraph.phys.dynamics.vehicle;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.constraint.ContactConstraint;
 import spacegraph.phys.constraint.TypedConstraint;
-import spacegraph.phys.constraint.TypedConstraintType;
 import spacegraph.phys.math.MatrixUtil;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.math.QuaternionUtil;
@@ -47,11 +46,11 @@ public class RaycastVehicle extends TypedConstraint {
 	
 	private final ArrayPool<float[]> floatArrays = ArrayPool.get(float.class);
 
-	private static final Tangible s_fixedObject = new Tangible(0, null, null);
+	private static final Dynamic s_fixedObject = new Dynamic(0, null, null);
 	private static final float sideFrictionStiffness2 = 1.0f;
 	
-	protected OArrayList<v3> forwardWS = new OArrayList<v3>();
-	protected OArrayList<v3> axle = new OArrayList<v3>();
+	protected OArrayList<v3> forwardWS = new OArrayList<>();
+	protected OArrayList<v3> axle = new OArrayList<>();
 	protected FloatArrayList forwardImpulse = new FloatArrayList();
 	protected FloatArrayList sideImpulse = new FloatArrayList();
 
@@ -62,16 +61,16 @@ public class RaycastVehicle extends TypedConstraint {
 	private float steeringValue;
 	private float currentVehicleSpeedKmHour;
 
-	private final Tangible chassisBody;
+	private final Dynamic chassisBody;
 
 	private int indexRightAxis;
 	private int indexUpAxis = 2;
 	private int indexForwardAxis = 1;
 
-	public OArrayList<WheelInfo> wheelInfo = new OArrayList<WheelInfo>();
+	public OArrayList<WheelInfo> wheelInfo = new OArrayList<>();
 
 	// constructor to create a car from an existing rigidbody
-	public RaycastVehicle(VehicleTuning tuning, Tangible chassis, VehicleRaycaster raycaster) {
+	public RaycastVehicle(VehicleTuning tuning, Dynamic chassis, VehicleRaycaster raycaster) {
 		super(TypedConstraintType.VEHICLE_CONSTRAINT_TYPE);
 		this.vehicleRaycaster = raycaster;
 		this.chassisBody = chassis;
@@ -495,7 +494,7 @@ public class RaycastVehicle extends TypedConstraint {
 		for (int i = 0; i < getNumWheels(); i++) {
 			//return array[index];
 			WheelInfo wheel_info = wheelInfo.get(i);
-			Tangible groundObject = (Tangible) wheel_info.raycastInfo.groundObject;
+			Dynamic groundObject = (Dynamic) wheel_info.raycastInfo.groundObject;
 			if (groundObject != null) {
 				numWheelsOnGround++;
 			}
@@ -509,7 +508,7 @@ public class RaycastVehicle extends TypedConstraint {
             //return array[index];
             WheelInfo wheel_info = wheelInfo.get(i);
 
-            Tangible groundObject = (Tangible) wheel_info.raycastInfo.groundObject;
+            Dynamic groundObject = (Dynamic) wheel_info.raycastInfo.groundObject;
 
             if (groundObject != null) {
                 getWheelTransformWS(i, wheelTrans);
@@ -555,7 +554,7 @@ public class RaycastVehicle extends TypedConstraint {
         for (int wheel = 0; wheel < getNumWheels(); wheel++) {
             //return array[index];
             WheelInfo wheel_info = wheelInfo.get(wheel);
-            Tangible groundObject = (Tangible) wheel_info.raycastInfo.groundObject;
+            Dynamic groundObject = (Dynamic) wheel_info.raycastInfo.groundObject;
 
             float rollingFriction = 0f;
 
@@ -635,7 +634,7 @@ public class RaycastVehicle extends TypedConstraint {
             }
             if (sideImpulse.get(wheel) != 0f) {
 				//return array[index];
-				Tangible groundObject = (Tangible) wheelInfo.get(wheel).raycastInfo.groundObject;
+				Dynamic groundObject = (Dynamic) wheelInfo.get(wheel).raycastInfo.groundObject;
 
                 v3 rel_pos2 = new v3();
                 rel_pos2.sub(wheel_info.raycastInfo.contactPointWS, groundObject.getCenterOfMassPosition(tmp));
@@ -672,7 +671,7 @@ public class RaycastVehicle extends TypedConstraint {
 		this.pitchControl = pitch;
 	}
 
-	public Tangible getRigidBody() {
+	public Dynamic getRigidBody() {
 		return chassisBody;
 	}
 
@@ -718,14 +717,14 @@ public class RaycastVehicle extends TypedConstraint {
 	////////////////////////////////////////////////////////////////////////////
 	
 	private static class WheelContactPoint {
-		public Tangible body0;
-		public Tangible body1;
+		public Dynamic body0;
+		public Dynamic body1;
 		public final v3 frictionPositionWorld = new v3();
 		public final v3 frictionDirectionWorld = new v3();
 		public float jacDiagABInv;
 		public float maxImpulse;
 
-		public WheelContactPoint(Tangible body0, Tangible body1, v3 frictionPosWorld, v3 frictionDirectionWorld, float maxImpulse) {
+		public WheelContactPoint(Dynamic body0, Dynamic body1, v3 frictionPosWorld, v3 frictionDirectionWorld, float maxImpulse) {
 			this.body0 = body0;
 			this.body1 = body1;
 			this.frictionPositionWorld.set(frictionPosWorld);

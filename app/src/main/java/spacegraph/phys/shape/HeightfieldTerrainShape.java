@@ -349,7 +349,7 @@ public class HeightfieldTerrainShape extends ConcaveShape
 	int[] quantizedAabbMax = new int[3];
 	v3[] vertices = new v3[3];
 
-	public void checkNormal(v3[] vertices1, TriangleCallback callback)
+	public static void checkNormal(v3[] vertices1, TriangleCallback callback)
 	{
 
 		v3 tmp1 = new v3();

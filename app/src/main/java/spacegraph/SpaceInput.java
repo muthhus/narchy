@@ -2,6 +2,7 @@ package spacegraph;
 
 import nars.$;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -21,8 +22,7 @@ abstract public class SpaceInput<X, Y extends Spatial<X>> implements Iterable<Y>
     final List<SpaceTransform> transforms = $.newArrayList();
 
     public SpaceInput with(SpaceTransform<X>... t) {
-        for (SpaceTransform g : t)
-            this.transforms.add(g);
+        Collections.addAll(this.transforms, t);
         return this;
     }
 

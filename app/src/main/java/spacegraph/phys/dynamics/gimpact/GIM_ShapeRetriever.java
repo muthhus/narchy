@@ -28,6 +28,7 @@
 package spacegraph.phys.dynamics.gimpact;
 
 import spacegraph.phys.shape.CollisionShape;
+import spacegraph.phys.shape.GImpactShape;
 
 /**
  *
@@ -35,7 +36,7 @@ import spacegraph.phys.shape.CollisionShape;
  */
 class GIM_ShapeRetriever {
 
-	public GImpactShapeInterface gim_shape;
+	public GImpactShape gim_shape;
 	public TriangleShapeEx trishape = new TriangleShapeEx();
 	public TetrahedronShapeEx tetrashape = new TetrahedronShapeEx();
 
@@ -44,7 +45,7 @@ class GIM_ShapeRetriever {
 	public TetraShapeRetriever tetra_retriever = new TetraShapeRetriever();
 	public ChildShapeRetriever current_retriever;
 
-	public GIM_ShapeRetriever(GImpactShapeInterface gim_shape) {
+	public GIM_ShapeRetriever(GImpactShape gim_shape) {
 		this.gim_shape = gim_shape;
 		
 		// select retriever

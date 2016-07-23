@@ -41,7 +41,7 @@ import spacegraph.phys.util.OArrayList;
  */
 public class CompoundShape extends CollisionShape {
 
-	private final OArrayList<CompoundShapeChild> children = new OArrayList<CompoundShapeChild>();
+	private final OArrayList<CompoundShapeChild> children = new OArrayList<>();
 	private final v3 localAabbMin = new v3(1e30f, 1e30f, 1e30f);
 	private final v3 localAabbMax = new v3(-1e30f, -1e30f, -1e30f);
 

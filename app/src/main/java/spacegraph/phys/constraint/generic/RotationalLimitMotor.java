@@ -28,11 +28,11 @@ email: projectileman@yahoo.com
 http://gimpact.sf.net
 */
 
-package spacegraph.phys.constraint;
+package spacegraph.phys.constraint.generic;
 
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 
 /**
  * Rotation limit structure for generic joints.
@@ -131,7 +131,7 @@ public class RotationalLimitMotor {
 	 * Apply the correction impulses for two bodies.
 	 */
 
-	public float solveAngularLimits(float timeStep, v3 axis, float jacDiagABInv, Tangible body0, Tangible body1) {
+	public float solveAngularLimits(float timeStep, v3 axis, float jacDiagABInv, Dynamic body0, Dynamic body1) {
 		if (!needApplyTorques()) {
 			return 0.0f;
 		}

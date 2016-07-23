@@ -26,12 +26,12 @@ package spacegraph.phys.collision.broad;
 import org.codehaus.commons.nullanalysis.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 
 /**
  * BroadphaseProxy is the main class that can be used with the Bullet broadphases.
  * It stores collision shape type information, collision filter information and
- * a client object, typically a {@link Collidable} or {@link Tangible}.
+ * a client object, typically a {@link Collidable} or {@link Dynamic}.
  * 
  * @author jezek2
  */

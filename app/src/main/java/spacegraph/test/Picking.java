@@ -96,7 +96,7 @@ public class Picking extends JoglSpace implements MouseListener {
         }
     }
 
-    public void processHits(int hits, IntBuffer buffer) {
+    public static void processHits(int hits, IntBuffer buffer) {
         System.out.println("---------------------------------");
         System.out.println(" HITS: " + hits);
         int offset = 0;
@@ -129,13 +129,13 @@ public class Picking extends JoglSpace implements MouseListener {
         System.out.println("---------------------------------");
     }
 
-    public int viewPortWidth(GL2 gl) {
+    public static int viewPortWidth(GL2 gl) {
         int[] viewPort = new int[4];
         gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
         return viewPort[2];
     }
 
-    public int viewPortHeight(GL2 gl) {
+    public static int viewPortHeight(GL2 gl) {
         int[] viewPort = new int[4];
         gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
         return viewPort[3];

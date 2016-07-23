@@ -42,12 +42,12 @@ import spacegraph.phys.util.OArrayList;
  */
 public class ShapeHull {
 
-	protected OArrayList<v3> vertices = new OArrayList<v3>();
+	protected OArrayList<v3> vertices = new OArrayList<>();
 	protected IntArrayList indices = new IntArrayList();
 	protected int numIndices;
 	protected ConvexShape shape;
 
-	protected OArrayList<v3> unitSpherePoints = new OArrayList<v3>();
+	protected OArrayList<v3> unitSpherePoints = new OArrayList<>();
 
 	public ShapeHull(ConvexShape shape) {
 		this.shape = shape;
@@ -77,7 +77,7 @@ public class ShapeHull {
             }
         }
 
-		OArrayList<v3> supportPoints = new OArrayList<v3>();
+		OArrayList<v3> supportPoints = new OArrayList<>();
 		MiscUtil.resize(supportPoints, NUM_UNITSPHERE_POINTS + ConvexShape.MAX_PREFERRED_PENETRATION_DIRECTIONS * 2, v3.class);
 
 		for (int i=0; i<numSampleDirections; i++) {
@@ -147,7 +147,7 @@ public class ShapeHull {
 	
 	private static final int NUM_UNITSPHERE_POINTS = 42;
 	
-	private static final OArrayList<v3> constUnitSpherePoints = new OArrayList<v3>();
+	private static final OArrayList<v3> constUnitSpherePoints = new OArrayList<>();
 	
 	static {
 		constUnitSpherePoints.add(new v3(0.000000f, -0.000000f, -1.000000f));

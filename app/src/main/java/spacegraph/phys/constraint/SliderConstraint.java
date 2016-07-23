@@ -34,9 +34,10 @@ package spacegraph.phys.constraint;
 
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
+import spacegraph.phys.solve.JacobianEntry;
 
 // JAVA NOTE: SliderConstraint from 2.71
 
@@ -128,7 +129,7 @@ public class SliderConstraint extends TypedConstraint {
 		initParams();
 	}
 
-    public SliderConstraint(Tangible rbA, Tangible rbB, Transform frameInA, Transform frameInB , boolean useLinearReferenceFrameA) {
+    public SliderConstraint(Dynamic rbA, Dynamic rbB, Transform frameInA, Transform frameInB , boolean useLinearReferenceFrameA) {
 		super(TypedConstraintType.SLIDER_CONSTRAINT_TYPE, rbA, rbB);
         this.frameInA.set(frameInA);
         this.frameInB.set(frameInB);
@@ -464,7 +465,7 @@ public class SliderConstraint extends TypedConstraint {
 	
 	// internal
 	
-	public void buildJacobianInt(Tangible rbA, Tangible rbB, Transform frameInA, Transform frameInB) {
+	public void buildJacobianInt(Dynamic rbA, Dynamic rbB, Transform frameInA, Transform frameInB) {
 		Transform tmpTrans = new Transform();
 		Transform tmpTrans1 = new Transform();
 		Transform tmpTrans2 = new Transform();
@@ -536,7 +537,7 @@ public class SliderConstraint extends TypedConstraint {
 		accumulatedAngMotorImpulse = 0f;
 	}
 	
-	public void solveConstraintInt(Tangible rbA, Tangible rbB) {
+	public void solveConstraintInt(Dynamic rbA, Dynamic rbB) {
 		v3 tmp = new v3();
 
 		// linear

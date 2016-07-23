@@ -26,7 +26,7 @@ public class TreemapChart<X> extends Surface {
 	protected int limit = -1;
 
 	public static void main(String[] args) {
-		SpaceGraph<VirtualTerminal> s = new SpaceGraph<VirtualTerminal>();
+		SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
 		s.show(800, 800);
 		TreemapChart<WeightedString> tc = new TreemapChart<>(500, 400,
 				(w, v) -> {

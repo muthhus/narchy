@@ -9,7 +9,7 @@ import spacegraph.math.AxisAngle4f;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Matrix4f;
 import spacegraph.math.v3;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.BoxShape;
@@ -23,7 +23,7 @@ import java.util.function.BiConsumer;
  * volumetric subspace.
  * an atom (base unit) of spacegraph physics-simulated virtual matter
  */
-public class Spatial<O> implements BiConsumer<GL2, Tangible> {
+public class Spatial<O> implements BiConsumer<GL2, Dynamic> {
 
 
     public final O key;
@@ -34,7 +34,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
 
 
 
-    public Tangible body;
+    public Dynamic body;
 
     /** cached center reference */
     public transient final v3 center; //references a field in MotionState's transform
@@ -126,7 +126,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
         preactive = true;
 
         if (body == null) {
-            Tangible b = body = newBody(s, newShape(), collidable());
+            Dynamic b = body = newBody(s, newShape(), collidable());
             b.setUserPointer(this);
             b.setRenderer(this);
         } else {
@@ -167,7 +167,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
     public void move(float x, float y, float z) {
         if (!motionLock) {
 
-            Tangible b = this.body;
+            Dynamic b = this.body;
             if (b !=null) {
                 b.transform().set(x,y,z);
 
@@ -189,7 +189,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
     }
 
     public void reactivate() {
-        Tangible b = body;
+        Dynamic b = body;
         if (b !=null/* && !b.isActive()*/)
             b.activate(collidable());
     }
@@ -256,8 +256,8 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
 
 
 
-    public Tangible newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
-        Tangible b;
+    public Dynamic newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
+        Dynamic b;
         b = graphSpace.newBody(
                 1f, //mass
                 shape, motion,
@@ -275,7 +275,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
     }
 
 
-    @Override public final void accept(GL2 gl, Tangible body) {
+    @Override public final void accept(GL2 gl, Dynamic body) {
 
         renderAbsolute(gl);
 
@@ -308,7 +308,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
         gl.glPopMatrix();
     }
 
-    protected void renderRelative(GL2 gl, Tangible body) {
+    protected void renderRelative(GL2 gl, Dynamic body) {
 
         renderShape(gl, body);
 
@@ -324,7 +324,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
         Draw.renderLabel(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
     }
 
-    protected void renderShape(GL2 gl, Tangible body) {
+    protected void renderShape(GL2 gl, Dynamic body) {
         colorshape(gl);
         Draw.draw(gl, body.shape());
     }
@@ -423,7 +423,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
         gl.glEnd();
     }
 
-    public <O> void stop(SpaceGraph s) {
+    public void stop(SpaceGraph s) {
         order = -1;
         preactive = false;
         body = null;

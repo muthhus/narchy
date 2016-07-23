@@ -43,7 +43,7 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
     /**
      * rewinds the buffer of visible items, when collecting a new batch
      */
-    public <Y extends Spatial> List<Y> rewind(int capacity) {
+    public <Z extends Spatial> List<Z> rewind(int capacity) {
         active.forEach(Spatial::unpreactivate);
         return new FasterList<>(capacity);
     }

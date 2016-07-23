@@ -29,6 +29,7 @@ package spacegraph.phys.dynamics.gimpact;
 
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
+import spacegraph.phys.shape.GImpactShape;
 import spacegraph.phys.shape.TriangleCallback;
 
 /**
@@ -40,7 +41,7 @@ class GImpactTriangleCallback extends TriangleCallback {
 	public GImpactCollisionAlgorithm algorithm;
 	public Collidable body0;
 	public Collidable body1;
-	public GImpactShapeInterface gimpactshape0;
+	public GImpactShape gimpactshape0;
 	public boolean swapped;
 	public float margin;
 

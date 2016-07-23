@@ -79,17 +79,24 @@ class Int3 {
 	}
 	
 	public IntRef getRef(final int coord) {
-		return new IntRef() {
-			@Override
-			public int get() {
-				return getCoord(coord);
-			}
-
-			@Override
-			public void set(int value) {
-				setCoord(coord, value);
-			}
-		};
+		return new MyIntRef(coord);
 	}
 
+	private final class MyIntRef extends IntRef {
+		private final int coord;
+
+		public MyIntRef(int coord) {
+			this.coord = coord;
+		}
+
+		@Override
+        public int get() {
+            return getCoord(coord);
+        }
+
+		@Override
+        public void set(int value) {
+            setCoord(coord, value);
+        }
+	}
 }

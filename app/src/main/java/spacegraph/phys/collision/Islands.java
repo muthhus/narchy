@@ -44,8 +44,8 @@ public class Islands {
 
 	private final UnionFind unionFind = new UnionFind();
 
-	private final OArrayList<PersistentManifold> islandmanifold = new OArrayList<PersistentManifold>();
-	private final OArrayList<Collidable> islandBodies = new OArrayList<Collidable>();
+	private final OArrayList<PersistentManifold> islandmanifold = new OArrayList<>();
+	private final OArrayList<Collidable> islandBodies = new OArrayList<>();
 
 	public void initUnionFind(int n) {
 		unionFind.reset(n);
@@ -340,11 +340,6 @@ public class Islands {
 		public abstract void processIsland(OArrayList<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId);
 	}
 	
-	private static final Comparator<PersistentManifold> persistentManifoldComparator = new Comparator<PersistentManifold>() {
-		@Override
-        public int compare(PersistentManifold lhs, PersistentManifold rhs) {
-			return getIslandId(lhs) < getIslandId(rhs)? -1 : +1;
-		}
-	};
+	private static final Comparator<PersistentManifold> persistentManifoldComparator = (lhs, rhs) -> getIslandId(lhs) < getIslandId(rhs)? -1 : +1;
 	
 }

@@ -46,12 +46,12 @@ import spacegraph.phys.collision.DefaultIntersecter;
 import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.phys.collision.broad.Intersecter;
 import spacegraph.phys.collision.broad.SimpleBroadphase;
-import spacegraph.phys.constraint.Constrainer;
 import spacegraph.phys.constraint.Point2PointConstraint;
-import spacegraph.phys.constraint.SequentialImpulseConstrainer;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.*;
 import spacegraph.phys.shape.CollisionShape;
+import spacegraph.phys.solve.Constrainer;
+import spacegraph.phys.solve.SequentialImpulseConstrainer;
 import spacegraph.phys.util.AnimFloat;
 import spacegraph.phys.util.AnimFloatAngle;
 import spacegraph.phys.util.AnimVector3f;
@@ -83,7 +83,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     //protected final BulletStack stack = BulletStack.get();
 
 
-    public Tangible pickedBody = null; // for deactivation state
+    public Dynamic pickedBody = null; // for deactivation state
 
 
     protected final Clock clock = new Clock();
@@ -93,7 +93,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
     // constraint for mouse picking
     protected TypedConstraint pickConstraint = null;
-    protected Tangible directDrag;
+    protected Dynamic directDrag;
 
 
     protected int debug = 0;
@@ -814,7 +814,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         ClosestRay rayCallback = mousePick(sx, sy);
 
         if (rayCallback.hasHit()) {
-            Tangible body = Tangible.upcast(rayCallback.collidable);
+            Dynamic body = Dynamic.ifDynamic(rayCallback.collidable);
             if (body != null) {
 
                 body.setActivationState(Collidable.DISABLE_DEACTIVATION);
@@ -1038,7 +1038,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
     }
 
-    public Tangible newBody(float mass, Transform startTransform, CollisionShape shape) {
+    public Dynamic newBody(float mass, Transform startTransform, CollisionShape shape) {
 
         boolean isDynamic = (mass != 0f);
         int collisionFilterGroup = isDynamic ? 1 : 2;
@@ -1048,7 +1048,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     }
 
 
-    public Tangible newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
+    public Dynamic newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
         // rigidbody is dynamic if and only if mass is non zero, otherwise static
         boolean isDynamic = (mass != 0f);
         v3 localInertia = v(0, 0, 0);
@@ -1058,7 +1058,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         RigidBodyBuilder c = new RigidBodyBuilder(mass, motion, shape, localInertia);
 
-        Tangible body = new Tangible(c);
+        Dynamic body = new Dynamic(c);
 
         ((DiscreteDynamics) dyn).addRigidBody(body, (short) group, (short) mask);
 
@@ -1097,7 +1097,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     }
 
 
-    public static final BiConsumer<GL2,Tangible> defaultRenderer = (gl, body) -> {
+    public static final BiConsumer<GL2,Dynamic> defaultRenderer = (gl, body) -> {
 
         gl.glPushMatrix();
         Draw.transform(gl, body.transform());
@@ -1116,9 +1116,9 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     };
 
     public final void render(Collidable<X> c) {
-        Tangible<X> body = Tangible.upcast(c);
+        Dynamic<X> body = Dynamic.ifDynamic(c);
         if (body != null) {
-            BiConsumer<GL2,Tangible> r = body.renderer();
+            BiConsumer<GL2,Dynamic> r = body.renderer();
             if (r != null)
                 r.accept(gl, body);
         }

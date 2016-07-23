@@ -24,7 +24,8 @@
 package spacegraph.phys.constraint;
 
 import spacegraph.math.v3;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
+import spacegraph.phys.solve.ContactSolverInfo;
 
 /**
  * TypedConstraint is the base class for Bullet constraints and vehicles.
@@ -36,9 +37,9 @@ public abstract class TypedConstraint {
 	//protected final BulletStack stack = BulletStack.get();
 	
 	// TODO: stack allocation
-	private static final Tangible s_fixed = new Tangible(0, null, null);
+	private static final Dynamic s_fixed = new Dynamic(0, null, null);
 	
-	@Deprecated protected static /*synchronized*/ Tangible getFixed() {
+	@Deprecated protected static /*synchronized*/ Dynamic getFixed() {
 //		if (s_fixed == null) {
 //			s_fixed = new RigidBody(0, null, null);
 //		}
@@ -50,19 +51,19 @@ public abstract class TypedConstraint {
 
 	protected final TypedConstraintType constraintType;
 	
-	protected final Tangible rbA;
-	protected final Tangible rbB;
+	protected final Dynamic rbA;
+	protected final Dynamic rbB;
 	protected float appliedImpulse;
 
 	public TypedConstraint(TypedConstraintType type) {
 		this(type, getFixed(), getFixed());
 	}
 	
-	public TypedConstraint(TypedConstraintType type, Tangible rbA) {
+	public TypedConstraint(TypedConstraintType type, Dynamic rbA) {
 		this(type, rbA, getFixed());
 	}
 	
-	public TypedConstraint(TypedConstraintType type, Tangible rbA, Tangible rbB) {
+	public TypedConstraint(TypedConstraintType type, Dynamic rbA, Dynamic rbB) {
 		this.constraintType = type;
 		this.rbA = rbA;
 		this.rbB = rbB;
@@ -73,11 +74,11 @@ public abstract class TypedConstraint {
 
 	public abstract void solveConstraint(float timeStep);
 	
-	public Tangible getRigidBodyA() {
+	public Dynamic getRigidBodyA() {
 		return rbA;
 	}
 
-	public Tangible getRigidBodyB() {
+	public Dynamic getRigidBodyB() {
 		return rbB;
 	}
 
@@ -115,5 +116,19 @@ public abstract class TypedConstraint {
         // even though the name doesn't properly reflect function here
         public void getInfo2(ContactSolverInfo infoGlobal) {
         }
-	
+
+	/**
+     * Typed constraint type.
+     *
+     * @author jezek2
+     */
+    public enum TypedConstraintType {
+        POINT2POINT_CONSTRAINT_TYPE,
+        HINGE_CONSTRAINT_TYPE,
+        CONETWIST_CONSTRAINT_TYPE,
+        D6_CONSTRAINT_TYPE,
+        VEHICLE_CONSTRAINT_TYPE,
+        SLIDER_CONSTRAINT_TYPE,
+            D6_SPRING_CONSTRAINT_TYPE
+    }
 }

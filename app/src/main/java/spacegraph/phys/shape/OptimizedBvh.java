@@ -59,8 +59,8 @@ public class OptimizedBvh implements Serializable {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private final OArrayList<OptimizedBvhNode> leafNodes = new OArrayList<OptimizedBvhNode>();
-	private final OArrayList<OptimizedBvhNode> contiguousNodes = new OArrayList<OptimizedBvhNode>();
+	private final OArrayList<OptimizedBvhNode> leafNodes = new OArrayList<>();
+	private final OArrayList<OptimizedBvhNode> contiguousNodes = new OArrayList<>();
 
 	private final QuantizedBvhNodes quantizedLeafNodes = new QuantizedBvhNodes();
 	private final QuantizedBvhNodes quantizedContiguousNodes = new QuantizedBvhNodes();
@@ -74,7 +74,7 @@ public class OptimizedBvh implements Serializable {
 	private final v3 bvhQuantization = new v3();
 	
 	protected TraversalMode traversalMode = TraversalMode.STACKLESS;
-	protected final OArrayList<BvhSubtreeInfo> SubtreeHeaders = new OArrayList<BvhSubtreeInfo>();
+	protected final OArrayList<BvhSubtreeInfo> SubtreeHeaders = new OArrayList<>();
 	// This is only used for serialization so we don't have to add serialization directly to btAlignedObjectArray
 	protected int subtreeHeaderCount;
 

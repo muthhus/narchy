@@ -21,18 +21,21 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package spacegraph.phys.constraint;
+package spacegraph.phys.solve;
 
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.BulletStats;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.Tangible;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ContactDestroyedCallback;
 import spacegraph.phys.collision.broad.Intersecter;
 import spacegraph.phys.collision.narrow.ManifoldPoint;
 import spacegraph.phys.collision.narrow.PersistentManifold;
+import spacegraph.phys.constraint.ContactConstraint;
+import spacegraph.phys.constraint.SolverConstraint;
+import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.TransformUtil;
@@ -67,9 +70,9 @@ public class SequentialImpulseConstrainer extends Constrainer {
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	private final OArrayList<SolverBody> tmpSolverBodyPool = new OArrayList<SolverBody>();
-	private final OArrayList<SolverConstraint> tmpSolverConstraintPool = new OArrayList<SolverConstraint>();
-	private final OArrayList<SolverConstraint> tmpSolverFrictionConstraintPool = new OArrayList<SolverConstraint>();
+	private final OArrayList<SolverBody> tmpSolverBodyPool = new OArrayList<>();
+	private final OArrayList<SolverConstraint> tmpSolverConstraintPool = new OArrayList<>();
+	private final OArrayList<SolverConstraint> tmpSolverFrictionConstraintPool = new OArrayList<>();
 	private final IntArrayList orderTmpConstraintPool = new IntArrayList();
 	private final IntArrayList orderFrictionConstraintPool = new IntArrayList();
 	
@@ -135,7 +138,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 	}
 	
 	private static void initSolverBody(SolverBody solverBody, Collidable collidable) {
-		Tangible rb = Tangible.upcast(collidable);
+		Dynamic rb = Dynamic.ifDynamic(collidable);
 		if (rb != null) {
 			rb.getAngularVelocity(solverBody.angularVelocity);
 			solverBody.centerOfMassPosition.set(collidable.getWorldTransform(new Transform()));
@@ -226,48 +229,46 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
 		float normalImpulse;
 
-		{
-			//  Optimized version of projected relative velocity, use precomputed cross products with normal
-			//	body1.getVelocityInLocalPoint(contactConstraint.m_rel_posA,vel1);
-			//	body2.getVelocityInLocalPoint(contactConstraint.m_rel_posB,vel2);
-			//	btVector3 vel = vel1 - vel2;
-			//	btScalar  rel_vel = contactConstraint.m_contactNormal.dot(vel);
+		//  Optimized version of projected relative velocity, use precomputed cross products with normal
+		//	body1.getVelocityInLocalPoint(contactConstraint.m_rel_posA,vel1);
+		//	body2.getVelocityInLocalPoint(contactConstraint.m_rel_posB,vel2);
+		//	btVector3 vel = vel1 - vel2;
+		//	btScalar  rel_vel = contactConstraint.m_contactNormal.dot(vel);
 
-			float rel_vel;
-			float vel1Dotn = contactConstraint.contactNormal.dot(body1.linearVelocity) + contactConstraint.relpos1CrossNormal.dot(body1.angularVelocity);
-			float vel2Dotn = contactConstraint.contactNormal.dot(body2.linearVelocity) + contactConstraint.relpos2CrossNormal.dot(body2.angularVelocity);
+		float rel_vel;
+		float vel1Dotn = contactConstraint.contactNormal.dot(body1.linearVelocity) + contactConstraint.relpos1CrossNormal.dot(body1.angularVelocity);
+		float vel2Dotn = contactConstraint.contactNormal.dot(body2.linearVelocity) + contactConstraint.relpos2CrossNormal.dot(body2.angularVelocity);
 
-			rel_vel = vel1Dotn - vel2Dotn;
+		rel_vel = vel1Dotn - vel2Dotn;
 
-			float positionalError = 0.f;
-			if (!solverInfo.splitImpulse || (contactConstraint.penetration > solverInfo.splitImpulsePenetrationThreshold)) {
-				positionalError = -contactConstraint.penetration * solverInfo.erp / solverInfo.timeStep;
-			}
+		float positionalError = 0.f;
+		if (!solverInfo.splitImpulse || (contactConstraint.penetration > solverInfo.splitImpulsePenetrationThreshold)) {
+            positionalError = -contactConstraint.penetration * solverInfo.erp / solverInfo.timeStep;
+        }
 
-			float velocityError = contactConstraint.restitution - rel_vel;// * damping;
+		float velocityError = contactConstraint.restitution - rel_vel;// * damping;
 
-			float penetrationImpulse = positionalError * contactConstraint.jacDiagABInv;
-			float velocityImpulse = velocityError * contactConstraint.jacDiagABInv;
-			normalImpulse = penetrationImpulse + velocityImpulse;
+		float penetrationImpulse = positionalError * contactConstraint.jacDiagABInv;
+		float velocityImpulse = velocityError * contactConstraint.jacDiagABInv;
+		normalImpulse = penetrationImpulse + velocityImpulse;
 
 
-			// See Erin Catto's GDC 2006 paper: Clamp the accumulated impulse
-			float oldNormalImpulse = contactConstraint.appliedImpulse;
-			float sum = oldNormalImpulse + normalImpulse;
-			contactConstraint.appliedImpulse = 0f > sum ? 0f : sum;
+		// See Erin Catto's GDC 2006 paper: Clamp the accumulated impulse
+		float oldNormalImpulse = contactConstraint.appliedImpulse;
+		float sum = oldNormalImpulse + normalImpulse;
+		contactConstraint.appliedImpulse = 0f > sum ? 0f : sum;
 
-			normalImpulse = contactConstraint.appliedImpulse - oldNormalImpulse;
+		normalImpulse = contactConstraint.appliedImpulse - oldNormalImpulse;
 
-			v3 tmp = new v3();
+		v3 tmp = new v3();
 
-			tmp.scale(body1.invMass, contactConstraint.contactNormal);
-			//tmp.scale(body1.linearFactor);
-			body1.internalApplyImpulse(tmp, contactConstraint.angularComponentA, normalImpulse);
+		tmp.scale(body1.invMass, contactConstraint.contactNormal);
+		//tmp.scale(body1.linearFactor);
+		body1.internalApplyImpulse(tmp, contactConstraint.angularComponentA, normalImpulse);
 
-			tmp.scale(body2.invMass, contactConstraint.contactNormal);
-			//tmp.scale(body2.linearFactor);
-			body2.internalApplyImpulse(tmp, contactConstraint.angularComponentB, -normalImpulse);
-		}
+		tmp.scale(body2.invMass, contactConstraint.contactNormal);
+		//tmp.scale(body2.linearFactor);
+		body2.internalApplyImpulse(tmp, contactConstraint.angularComponentB, -normalImpulse);
 
 		return normalImpulse;
 	}
@@ -286,43 +287,41 @@ public class SequentialImpulseConstrainer extends Constrainer {
 		{
 
 			float j1;
-			{
 
-				float rel_vel;
-				float vel1Dotn = contactConstraint.contactNormal.dot(body1.linearVelocity) + contactConstraint.relpos1CrossNormal.dot(body1.angularVelocity);
-				float vel2Dotn = contactConstraint.contactNormal.dot(body2.linearVelocity) + contactConstraint.relpos2CrossNormal.dot(body2.angularVelocity);
-				rel_vel = vel1Dotn - vel2Dotn;
+			float rel_vel;
+			float vel1Dotn = contactConstraint.contactNormal.dot(body1.linearVelocity) + contactConstraint.relpos1CrossNormal.dot(body1.angularVelocity);
+			float vel2Dotn = contactConstraint.contactNormal.dot(body2.linearVelocity) + contactConstraint.relpos2CrossNormal.dot(body2.angularVelocity);
+			rel_vel = vel1Dotn - vel2Dotn;
 
-				// calculate j that moves us to zero relative velocity
-				j1 = -rel_vel * contactConstraint.jacDiagABInv;
-				//#define CLAMP_ACCUMULATED_FRICTION_IMPULSE 1
-				//#ifdef CLAMP_ACCUMULATED_FRICTION_IMPULSE
-				float oldTangentImpulse = contactConstraint.appliedImpulse;
-				contactConstraint.appliedImpulse = oldTangentImpulse + j1;
+			// calculate j that moves us to zero relative velocity
+			j1 = -rel_vel * contactConstraint.jacDiagABInv;
+			//#define CLAMP_ACCUMULATED_FRICTION_IMPULSE 1
+			//#ifdef CLAMP_ACCUMULATED_FRICTION_IMPULSE
+			float oldTangentImpulse = contactConstraint.appliedImpulse;
+			contactConstraint.appliedImpulse = oldTangentImpulse + j1;
 
-				if (limit < contactConstraint.appliedImpulse) {
-					contactConstraint.appliedImpulse = limit;
-				}
-				else {
-					if (contactConstraint.appliedImpulse < -limit) {
-						contactConstraint.appliedImpulse = -limit;
-					}
-				}
-				j1 = contactConstraint.appliedImpulse - oldTangentImpulse;
-				//	#else
-				//	if (limit < j1)
-				//	{
-				//		j1 = limit;
-				//	} else
-				//	{
-				//		if (j1 < -limit)
-				//			j1 = -limit;
-				//	}
-				//	#endif
+			if (limit < contactConstraint.appliedImpulse) {
+                contactConstraint.appliedImpulse = limit;
+            }
+            else {
+                if (contactConstraint.appliedImpulse < -limit) {
+                    contactConstraint.appliedImpulse = -limit;
+                }
+            }
+			j1 = contactConstraint.appliedImpulse - oldTangentImpulse;
+			//	#else
+			//	if (limit < j1)
+			//	{
+			//		j1 = limit;
+			//	} else
+			//	{
+			//		if (j1 < -limit)
+			//			j1 = -limit;
+			//	}
+			//	#endif
 
-				//GEN_set_min(contactConstraint.m_appliedImpulse, limit);
-				//GEN_set_max(contactConstraint.m_appliedImpulse, -limit);
-			}
+			//GEN_set_min(contactConstraint.m_appliedImpulse, limit);
+			//GEN_set_max(contactConstraint.m_appliedImpulse, -limit);
 
 			v3 tmp = new v3();
 
@@ -337,8 +336,8 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
 
 	protected void addFrictionConstraint(v3 normalAxis, int solverBodyIdA, int solverBodyIdB, int frictionIndex, ManifoldPoint cp, v3 rel_pos1, v3 rel_pos2, Collidable colObj0, Collidable colObj1, float relaxation) {
-		Tangible body0 = Tangible.upcast(colObj0);
-		Tangible body1 = Tangible.upcast(colObj1);
+		Dynamic body0 = Dynamic.ifDynamic(colObj0);
+		Dynamic body1 = Dynamic.ifDynamic(colObj1);
 
 		SolverConstraint solverConstraint = new SolverConstraint();
 		tmpSolverFrictionConstraintPool.add(solverConstraint);
@@ -347,7 +346,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
 		solverConstraint.solverBodyIdA = solverBodyIdA;
 		solverConstraint.solverBodyIdB = solverBodyIdB;
-		solverConstraint.constraintType = SolverConstraintType.SOLVER_FRICTION_1D;
+		solverConstraint.constraintType = SolverConstraint.SolverConstraintType.SOLVER_FRICTION_1D;
 		solverConstraint.frictionIndex = frictionIndex;
 
 		solverConstraint.friction = cp.combinedFriction;
@@ -360,28 +359,24 @@ public class SequentialImpulseConstrainer extends Constrainer {
 		v3 ftorqueAxis1 = new v3();
 		Matrix3f tmpMat = new Matrix3f();
 
-		{
-			ftorqueAxis1.cross(rel_pos1, solverConstraint.contactNormal);
-			solverConstraint.relpos1CrossNormal.set(ftorqueAxis1);
-			if (body0 != null) {
-				solverConstraint.angularComponentA.set(ftorqueAxis1);
-				body0.getInvInertiaTensorWorld(tmpMat).transform(solverConstraint.angularComponentA);
-			}
-			else {
-				solverConstraint.angularComponentA.set(0f, 0f, 0f);
-			}
-		}
-		{
-			ftorqueAxis1.cross(rel_pos2, solverConstraint.contactNormal);
-			solverConstraint.relpos2CrossNormal.set(ftorqueAxis1);
-			if (body1 != null) {
-				solverConstraint.angularComponentB.set(ftorqueAxis1);
-				body1.getInvInertiaTensorWorld(tmpMat).transform(solverConstraint.angularComponentB);
-			}
-			else {
-				solverConstraint.angularComponentB.set(0f, 0f, 0f);
-			}
-		}
+		ftorqueAxis1.cross(rel_pos1, solverConstraint.contactNormal);
+		solverConstraint.relpos1CrossNormal.set(ftorqueAxis1);
+		if (body0 != null) {
+            solverConstraint.angularComponentA.set(ftorqueAxis1);
+            body0.getInvInertiaTensorWorld(tmpMat).transform(solverConstraint.angularComponentA);
+        }
+        else {
+            solverConstraint.angularComponentA.set(0f, 0f, 0f);
+        }
+		ftorqueAxis1.cross(rel_pos2, solverConstraint.contactNormal);
+		solverConstraint.relpos2CrossNormal.set(ftorqueAxis1);
+		if (body1 != null) {
+            solverConstraint.angularComponentB.set(ftorqueAxis1);
+            body1.getInvInertiaTensorWorld(tmpMat).transform(solverConstraint.angularComponentB);
+        }
+        else {
+            solverConstraint.angularComponentB.set(0f, 0f, 0f);
+        }
 
 		//#ifdef COMPUTE_IMPULSE_DENOM
 		//	btScalar denom0 = rb0->computeImpulseDenominator(pos1,solverConstraint.m_contactNormal);
@@ -569,12 +564,12 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
                             SolverConstraint solverConstraint = new SolverConstraint();
                             tmpSolverConstraintPool.add(solverConstraint);
-                            Tangible rb0 = Tangible.upcast(colObj0);
-                            Tangible rb1 = Tangible.upcast(colObj1);
+                            Dynamic rb0 = Dynamic.ifDynamic(colObj0);
+                            Dynamic rb1 = Dynamic.ifDynamic(colObj1);
 
                             solverConstraint.solverBodyIdA = solverBodyIdA;
                             solverConstraint.solverBodyIdB = solverBodyIdB;
-                            solverConstraint.constraintType = SolverConstraintType.SOLVER_CONTACT_1D;
+                            solverConstraint.constraintType = SolverConstraint.SolverConstraintType.SOLVER_CONTACT_1D;
 
                             solverConstraint.originalContactPoint = cp;
 
@@ -598,28 +593,26 @@ public class SequentialImpulseConstrainer extends Constrainer {
                                 solverConstraint.angularComponentB.set(0f, 0f, 0f);
                             }
 
-                            {
-                                //#ifdef COMPUTE_IMPULSE_DENOM
-                                //btScalar denom0 = rb0->computeImpulseDenominator(pos1,cp.m_normalWorldOnB);
-                                //btScalar denom1 = rb1->computeImpulseDenominator(pos2,cp.m_normalWorldOnB);
-                                //#else
-                                float denom0 = 0f;
-                                float denom1 = 0f;
-                                if (rb0 != null) {
-                                    vec.cross(solverConstraint.angularComponentA, rel_pos1);
-                                    denom0 = rb0.getInvMass() + cp.normalWorldOnB.dot(vec);
-                                }
-                                if (rb1 != null) {
-                                    vec.cross(solverConstraint.angularComponentB, rel_pos2);
-                                    denom1 = rb1.getInvMass() + cp.normalWorldOnB.dot(vec);
-                                }
-                                //#endif //COMPUTE_IMPULSE_DENOM
-
-                                float denom = relaxation / (denom0 + denom1);
-                                solverConstraint.jacDiagABInv = denom;
+							//#ifdef COMPUTE_IMPULSE_DENOM
+							//btScalar denom0 = rb0->computeImpulseDenominator(pos1,cp.m_normalWorldOnB);
+							//btScalar denom1 = rb1->computeImpulseDenominator(pos2,cp.m_normalWorldOnB);
+							//#else
+							float denom0 = 0f;
+							float denom1 = 0f;
+							if (rb0 != null) {
+                                vec.cross(solverConstraint.angularComponentA, rel_pos1);
+                                denom0 = rb0.getInvMass() + cp.normalWorldOnB.dot(vec);
                             }
+							if (rb1 != null) {
+                                vec.cross(solverConstraint.angularComponentB, rel_pos2);
+                                denom1 = rb1.getInvMass() + cp.normalWorldOnB.dot(vec);
+                            }
+							//#endif //COMPUTE_IMPULSE_DENOM
 
-                            solverConstraint.contactNormal.set(cp.normalWorldOnB);
+							float denom = relaxation / (denom0 + denom1);
+							solverConstraint.jacDiagABInv = denom;
+
+							solverConstraint.contactNormal.set(cp.normalWorldOnB);
                             solverConstraint.relpos1CrossNormal.cross(rel_pos1, cp.normalWorldOnB);
                             solverConstraint.relpos2CrossNormal.cross(rel_pos2, cp.normalWorldOnB);
 
@@ -707,47 +700,43 @@ public class SequentialImpulseConstrainer extends Constrainer {
                                 addFrictionConstraint(cp.lateralFrictionDir2, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
                             }
 
-                            {
-                                //return array[index];
-                                SolverConstraint frictionConstraint1 = tmpSolverFrictionConstraintPool.get(solverConstraint.frictionIndex);
-                                if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
-                                    frictionConstraint1.appliedImpulse = cp.appliedImpulseLateral1 * infoGlobal.warmstartingFactor;
-                                    if (rb0 != null) {
-                                        tmp.scale(rb0.getInvMass(), frictionConstraint1.contactNormal);
-                                        //return array[index];
-                                        tmpSolverBodyPool.get(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, frictionConstraint1.angularComponentA, frictionConstraint1.appliedImpulse);
-                                    }
-                                    if (rb1 != null) {
-                                        tmp.scale(rb1.getInvMass(), frictionConstraint1.contactNormal);
-                                        //return array[index];
-                                        tmpSolverBodyPool.get(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, frictionConstraint1.angularComponentB, -frictionConstraint1.appliedImpulse);
-                                    }
+							//return array[index];
+							SolverConstraint frictionConstraint1 = tmpSolverFrictionConstraintPool.get(solverConstraint.frictionIndex);
+							if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
+                                frictionConstraint1.appliedImpulse = cp.appliedImpulseLateral1 * infoGlobal.warmstartingFactor;
+                                if (rb0 != null) {
+                                    tmp.scale(rb0.getInvMass(), frictionConstraint1.contactNormal);
+                                    //return array[index];
+                                    tmpSolverBodyPool.get(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, frictionConstraint1.angularComponentA, frictionConstraint1.appliedImpulse);
                                 }
-                                else {
-                                    frictionConstraint1.appliedImpulse = 0f;
+                                if (rb1 != null) {
+                                    tmp.scale(rb1.getInvMass(), frictionConstraint1.contactNormal);
+                                    //return array[index];
+                                    tmpSolverBodyPool.get(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, frictionConstraint1.angularComponentB, -frictionConstraint1.appliedImpulse);
                                 }
                             }
-                            {
-                                //return array[index];
-                                SolverConstraint frictionConstraint2 = tmpSolverFrictionConstraintPool.get(solverConstraint.frictionIndex + 1);
-                                if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
-                                    frictionConstraint2.appliedImpulse = cp.appliedImpulseLateral2 * infoGlobal.warmstartingFactor;
-                                    if (rb0 != null) {
-                                        tmp.scale(rb0.getInvMass(), frictionConstraint2.contactNormal);
-                                        //return array[index];
-                                        tmpSolverBodyPool.get(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, frictionConstraint2.angularComponentA, frictionConstraint2.appliedImpulse);
-                                    }
-                                    if (rb1 != null) {
-                                        tmp.scale(rb1.getInvMass(), frictionConstraint2.contactNormal);
-                                        //return array[index];
-                                        tmpSolverBodyPool.get(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, frictionConstraint2.angularComponentB, -frictionConstraint2.appliedImpulse);
-                                    }
+                            else {
+                                frictionConstraint1.appliedImpulse = 0f;
+                            }
+							//return array[index];
+							SolverConstraint frictionConstraint2 = tmpSolverFrictionConstraintPool.get(solverConstraint.frictionIndex + 1);
+							if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
+                                frictionConstraint2.appliedImpulse = cp.appliedImpulseLateral2 * infoGlobal.warmstartingFactor;
+                                if (rb0 != null) {
+                                    tmp.scale(rb0.getInvMass(), frictionConstraint2.contactNormal);
+                                    //return array[index];
+                                    tmpSolverBodyPool.get(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, frictionConstraint2.angularComponentA, frictionConstraint2.appliedImpulse);
                                 }
-                                else {
-                                    frictionConstraint2.appliedImpulse = 0f;
+                                if (rb1 != null) {
+                                    tmp.scale(rb1.getInvMass(), frictionConstraint2.contactNormal);
+                                    //return array[index];
+                                    tmpSolverBodyPool.get(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, frictionConstraint2.angularComponentB, -frictionConstraint2.appliedImpulse);
                                 }
                             }
-                        }
+                            else {
+                                frictionConstraint2.appliedImpulse = 0f;
+                            }
+						}
                     }
                 }
             }
@@ -761,12 +750,10 @@ public class SequentialImpulseConstrainer extends Constrainer {
 				}
 			}
 
-			{
-				int j;
-				for (j = 0; j < numConstraints; j++) {
-					constraints.get(constraints_offset + j).getInfo2(infoGlobal);
-				}
-			}
+			int j;
+			for (j = 0; j < numConstraints; j++) {
+                constraints.get(constraints_offset + j).getInfo2(infoGlobal);
+            }
 
 
 			int numConstraintPool = tmpSolverConstraintPool.size();
@@ -775,15 +762,13 @@ public class SequentialImpulseConstrainer extends Constrainer {
 			// todo: use stack allocator for such temporarily memory, same for solver bodies/constraints
 			MiscUtil.resize(orderTmpConstraintPool, numConstraintPool, 0);
 			MiscUtil.resize(orderFrictionConstraintPool, numFrictionPool, 0);
-			{
-				int i;
-				for (i = 0; i < numConstraintPool; i++) {
-					orderTmpConstraintPool.setBoth(i);
-				}
-				for (i = 0; i < numFrictionPool; i++) {
-					orderFrictionConstraintPool.setBoth(i);
-				}
-			}
+			int i;
+			for (i = 0; i < numConstraintPool; i++) {
+                orderTmpConstraintPool.setBoth(i);
+            }
+			for (i = 0; i < numFrictionPool; i++) {
+                orderFrictionConstraintPool.setBoth(i);
+            }
 
 			return 0f;
 		}
@@ -800,101 +785,93 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
 			// should traverse the contacts random order...
 			int iteration;
-			{
-				IntArrayList constraintPool = this.orderTmpConstraintPool;
-				IntArrayList frictionPool = this.orderFrictionConstraintPool;
-				for (iteration = 0; iteration < infoGlobal.numIterations; iteration++) {
+			IntArrayList constraintPool = this.orderTmpConstraintPool;
+			IntArrayList frictionPool = this.orderFrictionConstraintPool;
+			for (iteration = 0; iteration < infoGlobal.numIterations; iteration++) {
 
-					int j;
-					if ((infoGlobal.solverMode & SolverMode.SOLVER_RANDMIZE_ORDER) != 0) {
-						if ((iteration & 7) == 0) {
-							for (j = 0; j < numConstraintPool; ++j) {
-								orderPool(j, constraintPool);
-							}
+                int j;
+                if ((infoGlobal.solverMode & SolverMode.SOLVER_RANDMIZE_ORDER) != 0) {
+                    if ((iteration & 7) == 0) {
+                        for (j = 0; j < numConstraintPool; ++j) {
+                            orderPool(j, constraintPool);
+                        }
 
-							for (j = 0; j < numFrictionPool; ++j) {
-								orderPool(j, frictionPool);
-							}
-						}
-					}
+                        for (j = 0; j < numFrictionPool; ++j) {
+                            orderPool(j, frictionPool);
+                        }
+                    }
+                }
 
-					for (j = 0; j < numConstraints; j++) {
-						//return array[index];
-						TypedConstraint constraint = constraints.get(constraints_offset + j);
-						// todo: use solver bodies, so we don't need to copy from/to btRigidBody
+                for (j = 0; j < numConstraints; j++) {
+                    //return array[index];
+                    TypedConstraint constraint = constraints.get(constraints_offset + j);
+                    // todo: use solver bodies, so we don't need to copy from/to btRigidBody
 
-						if ((constraint.getRigidBodyA().getIslandTag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
-							//return array[index];
-							tmpSolverBodyPool.get(constraint.getRigidBodyA().getCompanionId()).writebackVelocity();
-						}
-						if ((constraint.getRigidBodyB().getIslandTag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
-							//return array[index];
-							tmpSolverBodyPool.get(constraint.getRigidBodyB().getCompanionId()).writebackVelocity();
-						}
+                    if ((constraint.getRigidBodyA().getIslandTag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
+                        //return array[index];
+                        tmpSolverBodyPool.get(constraint.getRigidBodyA().getCompanionId()).writebackVelocity();
+                    }
+                    if ((constraint.getRigidBodyB().getIslandTag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
+                        //return array[index];
+                        tmpSolverBodyPool.get(constraint.getRigidBodyB().getCompanionId()).writebackVelocity();
+                    }
 
-						constraint.solveConstraint(infoGlobal.timeStep);
+                    constraint.solveConstraint(infoGlobal.timeStep);
 
-						if ((constraint.getRigidBodyA().getIslandTag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
-							//return array[index];
-							tmpSolverBodyPool.get(constraint.getRigidBodyA().getCompanionId()).readVelocity();
-						}
-						if ((constraint.getRigidBodyB().getIslandTag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
-							//return array[index];
-							tmpSolverBodyPool.get(constraint.getRigidBodyB().getCompanionId()).readVelocity();
-						}
-					}
+                    if ((constraint.getRigidBodyA().getIslandTag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
+                        //return array[index];
+                        tmpSolverBodyPool.get(constraint.getRigidBodyA().getCompanionId()).readVelocity();
+                    }
+                    if ((constraint.getRigidBodyB().getIslandTag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
+                        //return array[index];
+                        tmpSolverBodyPool.get(constraint.getRigidBodyB().getCompanionId()).readVelocity();
+                    }
+                }
 
-					{
-						int numPoolConstraints = tmpSolverConstraintPool.size();
-						for (j = 0; j < numPoolConstraints; j++) {
-							//return array[index];
-							SolverConstraint solveManifold = tmpSolverConstraintPool.get(constraintPool.get(j));
-							//return array[index];
-							//return array[index];
-							resolveSingleCollisionCombinedCacheFriendly(tmpSolverBodyPool.get(solveManifold.solverBodyIdA),
-									tmpSolverBodyPool.get(solveManifold.solverBodyIdB), solveManifold, infoGlobal);
-						}
-					}
+                int numPoolConstraints = tmpSolverConstraintPool.size();
+                for (j = 0; j < numPoolConstraints; j++) {
+//return array[index];
+SolverConstraint solveManifold = tmpSolverConstraintPool.get(constraintPool.get(j));
+//return array[index];
+//return array[index];
+resolveSingleCollisionCombinedCacheFriendly(tmpSolverBodyPool.get(solveManifold.solverBodyIdA),
+tmpSolverBodyPool.get(solveManifold.solverBodyIdB), solveManifold, infoGlobal);
+}
 
-					{
-						int numFrictionPoolConstraints = tmpSolverFrictionConstraintPool.size();
+                int numFrictionPoolConstraints = tmpSolverFrictionConstraintPool.size();
 
-						for (j = 0; j < numFrictionPoolConstraints; j++) {
-							//return array[index];
-							SolverConstraint solveManifold = tmpSolverFrictionConstraintPool.get(frictionPool.get(j));
+                for (j = 0; j < numFrictionPoolConstraints; j++) {
+//return array[index];
+SolverConstraint solveManifold = tmpSolverFrictionConstraintPool.get(frictionPool.get(j));
 
-							//return array[index];
-							//return array[index];
-							float totalImpulse = tmpSolverConstraintPool.get(solveManifold.frictionIndex).appliedImpulse +
-									tmpSolverConstraintPool.get(solveManifold.frictionIndex).appliedPushImpulse;
+//return array[index];
+//return array[index];
+float totalImpulse = tmpSolverConstraintPool.get(solveManifold.frictionIndex).appliedImpulse +
+tmpSolverConstraintPool.get(solveManifold.frictionIndex).appliedPushImpulse;
 
-							//return array[index];
-							//return array[index];
-							resolveSingleFrictionCacheFriendly(tmpSolverBodyPool.get(solveManifold.solverBodyIdA),
-									tmpSolverBodyPool.get(solveManifold.solverBodyIdB), solveManifold, infoGlobal,
-									totalImpulse);
-						}
-					}
-				}
+//return array[index];
+//return array[index];
+resolveSingleFrictionCacheFriendly(tmpSolverBodyPool.get(solveManifold.solverBodyIdA),
+tmpSolverBodyPool.get(solveManifold.solverBodyIdB), solveManifold, infoGlobal,
+totalImpulse);
+}
+            }
 
-				if (infoGlobal.splitImpulse) {
-					for (iteration = 0; iteration < infoGlobal.numIterations; iteration++) {
-						{
-							int numPoolConstraints = tmpSolverConstraintPool.size();
-							int j;
-							for (j = 0; j < numPoolConstraints; j++) {
-								//return array[index];
-								SolverConstraint solveManifold = tmpSolverConstraintPool.get(constraintPool.get(j));
+			if (infoGlobal.splitImpulse) {
+                for (iteration = 0; iteration < infoGlobal.numIterations; iteration++) {
+                    int numPoolConstraints = tmpSolverConstraintPool.size();
+                    int j;
+                    for (j = 0; j < numPoolConstraints; j++) {
+//return array[index];
+SolverConstraint solveManifold = tmpSolverConstraintPool.get(constraintPool.get(j));
 
-								//return array[index];
-								//return array[index];
-								resolveSplitPenetrationImpulseCacheFriendly(tmpSolverBodyPool.get(solveManifold.solverBodyIdA),
-										tmpSolverBodyPool.get(solveManifold.solverBodyIdB), solveManifold, infoGlobal);
-							}
-						}
-					}
-				}
-			}
+//return array[index];
+//return array[index];
+resolveSplitPenetrationImpulseCacheFriendly(tmpSolverBodyPool.get(solveManifold.solverBodyIdA),
+tmpSolverBodyPool.get(solveManifold.solverBodyIdB), solveManifold, infoGlobal);
+}
+                }
+            }
 
 			return 0f;
 		}
@@ -1015,45 +992,43 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
 			// should traverse the contacts random order...
 			int iteration;
-			{
-				for (iteration = 0; iteration < numiter; iteration++) {
-					int j;
-					if ((infoGlobal.solverMode & SolverMode.SOLVER_RANDMIZE_ORDER) != 0) {
-						if ((iteration & 7) == 0) {
-							for (j = 0; j < totalPoints; ++j) {
-								// JAVA NOTE: swaps references instead of copying values (but that's fine in this context)
-								OrderIndex tmp = gOrder[j];
-								int swapi = randInt2(j + 1);
-								gOrder[j] = gOrder[swapi];
-								gOrder[swapi] = tmp;
-							}
-						}
-					}
+            for (iteration = 0; iteration < numiter; iteration++) {
+                int j;
+                if ((infoGlobal.solverMode & SolverMode.SOLVER_RANDMIZE_ORDER) != 0) {
+                    if ((iteration & 7) == 0) {
+                        for (j = 0; j < totalPoints; ++j) {
+                            // JAVA NOTE: swaps references instead of copying values (but that's fine in this context)
+                            OrderIndex tmp = gOrder[j];
+                            int swapi = randInt2(j + 1);
+                            gOrder[j] = gOrder[swapi];
+                            gOrder[swapi] = tmp;
+                        }
+                    }
+                }
 
-					for (j = 0; j < numConstraints; j++) {
-						//return array[index];
-						TypedConstraint constraint = constraints.get(constraints_offset + j);
-						constraint.solveConstraint(info.timeStep);
-					}
+                for (j = 0; j < numConstraints; j++) {
+                    //return array[index];
+                    TypedConstraint constraint = constraints.get(constraints_offset + j);
+                    constraint.solveConstraint(info.timeStep);
+                }
 
-					for (j = 0; j < totalPoints; j++) {
-						//return array[index];
-						PersistentManifold manifold = manifoldPtr.get(manifold_offset + gOrder[j].manifoldIndex);
-						solve((Tangible) manifold.getBody0(),
-								(Tangible) manifold.getBody1(), manifold.getContactPoint(gOrder[j].pointIndex), info, iteration);
-					}
+                for (j = 0; j < totalPoints; j++) {
+                    //return array[index];
+                    PersistentManifold manifold = manifoldPtr.get(manifold_offset + gOrder[j].manifoldIndex);
+                    solve((Dynamic) manifold.getBody0(),
+                            (Dynamic) manifold.getBody1(), manifold.getContactPoint(gOrder[j].pointIndex), info, iteration);
+                }
 
-					for (j = 0; j < totalPoints; j++) {
-						//return array[index];
-						PersistentManifold manifold = manifoldPtr.get(manifold_offset + gOrder[j].manifoldIndex);
-						solveFriction((Tangible) manifold.getBody0(),
-								(Tangible) manifold.getBody1(), manifold.getContactPoint(gOrder[j].pointIndex), info, iteration);
-					}
+                for (j = 0; j < totalPoints; j++) {
+                    //return array[index];
+                    PersistentManifold manifold = manifoldPtr.get(manifold_offset + gOrder[j].manifoldIndex);
+                    solveFriction((Dynamic) manifold.getBody0(),
+                            (Dynamic) manifold.getBody1(), manifold.getContactPoint(gOrder[j].pointIndex), info, iteration);
+                }
 
-				}
-			}
+            }
 
-			return 0f;
+            return 0f;
 		}
 		finally {
 			BulletStats.popProfile();
@@ -1061,8 +1036,8 @@ public class SequentialImpulseConstrainer extends Constrainer {
 	}
 
 	protected void prepareConstraints(PersistentManifold manifoldPtr, ContactSolverInfo info) {
-		Tangible body0 = (Tangible) manifoldPtr.getBody0();
-		Tangible body1 = (Tangible) manifoldPtr.getBody1();
+		Dynamic body0 = (Dynamic) manifoldPtr.getBody0();
+		Dynamic body1 = (Dynamic) manifoldPtr.getBody1();
 
 		// only necessary to refresh the manifold once (first iteration). The integration is done outside the loop
 		//#ifdef FORCE_REFESH_CONTACT_MANIFOLDS
@@ -1251,7 +1226,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
         }
 	}
 
-	public static float solveCombinedContactFriction(Tangible body0, Tangible body1, ManifoldPoint cp, ContactSolverInfo info, int iter) {
+	public static float solveCombinedContactFriction(Dynamic body0, Dynamic body1, ManifoldPoint cp, ContactSolverInfo info, int iter) {
 		float maxImpulse = 0f;
 
 		if (cp.getDistance() <= 0f) {
@@ -1265,7 +1240,7 @@ maxImpulse = impulse;
 		return maxImpulse;
 	}
 
-	protected static float solve(Tangible body0, Tangible body1, ManifoldPoint cp, ContactSolverInfo info, int iter) {
+	protected static float solve(Dynamic body0, Dynamic body1, ManifoldPoint cp, ContactSolverInfo info, int iter) {
 		float maxImpulse = 0f;
 
         if (cp.getDistance() <= 0f) {
@@ -1280,7 +1255,7 @@ maxImpulse = impulse;
         return maxImpulse;
 	}
 
-	protected static float solveFriction(Tangible body0, Tangible body1, ManifoldPoint cp, ContactSolverInfo info, int iter) {
+	protected static float solveFriction(Dynamic body0, Dynamic body1, ManifoldPoint cp, ContactSolverInfo info, int iter) {
         if (cp.getDistance() <= 0f) {
             ConstraintPersistentData cpd = (ConstraintPersistentData) cp.userPersistentData;
             cpd.frictionSolverFunc.resolveContact(body0, body1, cp, info);
@@ -1324,4 +1299,16 @@ maxImpulse = impulse;
 		public int pointIndex;
 	}
 
+	/**
+     * TODO: name
+     *
+     * @author jezek2
+     */
+    public enum ContactConstraintEnum {
+        DEFAULT_CONTACT_SOLVER_TYPE,
+        CONTACT_SOLVER_TYPE1,
+        CONTACT_SOLVER_TYPE2,
+        USER_CONTACT_SOLVER_TYPE1,
+        MAX_CONTACT_SOLVER_TYPES
+    }
 }

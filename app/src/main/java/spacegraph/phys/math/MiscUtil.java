@@ -118,13 +118,10 @@ public class MiscUtil {
 				list.removeQuick(--ls);
 			}
 		}
-		catch (IllegalAccessException e) {
+		catch (IllegalAccessException | InstantiationException e) {
 			throw new IllegalStateException(e);
 		}
-		catch (InstantiationException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    }
 	
 	/**
 	 * Searches object in array.

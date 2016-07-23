@@ -97,7 +97,7 @@ public class GjkEpaSolver {
 		public He n;
 	}
 	
-	protected class GJK {
+	protected static class GJK {
 		//protected final BulletStack stack = BulletStack.get();
 		
 		//public btStackAlloc sa;

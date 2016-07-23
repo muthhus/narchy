@@ -87,7 +87,7 @@ public final class Transform extends v3 {
 
 	public void set(Transform tr) {
 		basis.set(tr.basis);
-		super.set((v3) tr);
+		super.set(tr);
 	}
 	
 	public void set(Matrix3f mat) {

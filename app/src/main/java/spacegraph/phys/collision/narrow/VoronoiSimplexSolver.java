@@ -412,7 +412,7 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 	}
 	
 
-	public boolean closestPtPointTetrahedron(v3 p, v3 a, v3 b, v3 c, v3 d, SubSimplexClosestResult finalResult) {
+	public static boolean closestPtPointTetrahedron(v3 p, v3 a, v3 b, v3 c, v3 d, SubSimplexClosestResult finalResult) {
 		SubSimplexClosestResult tempResult = new SubSimplexClosestResult();
 		tempResult.reset();
 		try {

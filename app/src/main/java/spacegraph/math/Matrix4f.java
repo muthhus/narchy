@@ -3292,7 +3292,7 @@ public class Matrix4f implements java.io.Serializable, Cloneable {
         this.m33 = -m1.m33;
     }
 
-    private final void getScaleRotate(double scales[], double rots[]) {
+    private void getScaleRotate(double scales[], double rots[]) {
 
         double[] tmp = new double[9];  // scratch matrix
         tmp[0] = m00;

@@ -24,8 +24,8 @@
 package spacegraph.phys.dynamics.vehicle;
 
 import spacegraph.math.v3;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
-import spacegraph.phys.Tangible;
 import spacegraph.phys.collision.ClosestRay;
 
 /**
@@ -50,7 +50,7 @@ public class DefaultVehicleRaycaster extends VehicleRaycaster {
 		dynamics.rayTest(from, to, rayCallback);
 
 		if (rayCallback.hasHit()) {
-			Tangible body = Tangible.upcast(rayCallback.collidable);
+			Dynamic body = Dynamic.ifDynamic(rayCallback.collidable);
 			if (body != null && body.hasContactResponse()) {
 				result.hitPointInWorld.set(rayCallback.hitPointWorld);
 				result.hitNormalInWorld.set(rayCallback.hitNormalWorld);
