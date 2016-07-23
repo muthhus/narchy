@@ -41,22 +41,16 @@ public class SliderSurface extends Surface {
 //    }
     public static void main(String[] args) {
         SpaceGraph<?> s = new SpaceGraph();
-        s.add(
-                new RectWidget(
-                        new GridSurface(
-                            new GridSurface(newArrayList(
-                                    new XYSlider(),
-                                    new XYSlider()
-                            ), GridSurface.HORIZONTAL),
-                            new GridSurface(newArrayList(
-                                    new SliderSurface(0.75f, 0, 1),
-                                    new SliderSurface(0.25f, 0, 1),
-                                    new SliderSurface(0.5f, 0, 1)
-                            ), GridSurface.VERTICAL)
-                        ),
-                        8,8 //TODO make sure works for non-square shape
-                )
-        );
+        s.add( new RectWidget(
+                new GridSurface(
+                    new GridSurface(GridSurface.HORIZONTAL,
+                        new XYSlider(), new XYSlider()
+                    ),
+                    new GridSurface(GridSurface.VERTICAL,
+                        new SliderSurface(0.75f, 0, 1), new SliderSurface(0.25f, 0, 1), new SliderSurface(0.5f, 0, 1)
+                    )
+                ), 8f /* width */, 6 /* height */
+        ) );
 
         s.add(new Facial(new ConsoleSurface(new ConsoleSurface.DummyTerminal(80, 25))).scale(500f, 400f));
         s.add(new Facial(new CrosshairSurface(s)));

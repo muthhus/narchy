@@ -50,7 +50,7 @@ public class ConceptWidget extends Spatial<Term> {
 
         float nodeScale = 1f + p * 3f;//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
-        scale(nodeScale, nodeScale, nodeScale * 1.5f);
+        scale(nodeScale, nodeScale, nodeScale / 4f);
 
 
         Concept cc = nar.concept(tt);

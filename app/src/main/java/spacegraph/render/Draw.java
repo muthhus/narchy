@@ -420,18 +420,23 @@ public enum Draw {
         gl.glEnd();
     }
 
+    /** thickness of font to avoid z-fighting */
+    final static float zStep = 0.05f;
+
     static public void renderLabel(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
         gl.glPushMatrix();
         gl.glNormal3f(0, 0, 1f);
-        gl.glTranslatef(dx, dy, dz);
+        gl.glTranslatef(dx, dy, dz + zStep);
 
         float fontThick = 1f;
         gl.glLineWidth(fontThick);
 
+
+
         //float r = v.radius;
         renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, label,
                 scaleX, scaleY,
-                0, 0, (1 / 1.9f) / (Math.max(scaleX, scaleY))); // Print GL Text To The Screen
+                0, 0, dz); // Print GL Text To The Screen
         gl.glPopMatrix();
     }
 

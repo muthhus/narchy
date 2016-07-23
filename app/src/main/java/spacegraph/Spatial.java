@@ -5,10 +5,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.math.AxisAngle4f;
-import spacegraph.math.Matrix3f;
-import spacegraph.math.Matrix4f;
-import spacegraph.math.v3;
+import spacegraph.math.*;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
@@ -105,7 +102,10 @@ public class Spatial<O> implements BiConsumer<GL2, Dynamic> {
                 ">";
     }
 
-    public final Transform transform() { return body.transform(); }
+    public final Transform transform() {
+        Dynamic b = this.body;
+        return b == null ? motion.t : b.transform();
+    }
 
 
     @Override
@@ -165,28 +165,35 @@ public class Spatial<O> implements BiConsumer<GL2, Dynamic> {
         );
     }
     public void move(float x, float y, float z) {
-        if (!motionLock) {
+        if (motionLock)
+            return;
 
-            Dynamic b = this.body;
-            if (b !=null) {
-                b.transform().set(x,y,z);
-
-//                    com.Transform t = new com.Transform();
-//                    body.getCenterOfMassTransform(t);
-//                    t.origin.set(x, y, z);
-//                    body.setCenterOfMassTransform(t);
-
-                reactivate();
-            } else {
-                motion.t.set(x, y, z);
-            }
-        }
-
-//            float[] p = this.p;
-//            p[0] = x;
-//            p[1] = y;
-//            p[2] = z;
+        transform().set(x,y,z);
+        reactivate();
     }
+
+    /** interpolates rotation to the specified axis vector and rotation angle around it */
+    public void rotate(float nx, float ny, float nz, float angle, float speed) {
+        if (motionLock)
+            return;
+
+        Quat4f tmp = new Quat4f();
+
+        Quat4f target = new Quat4f();
+        target.setAngle(nx,ny,nz,angle);
+
+        rotate(target, speed, tmp);
+    }
+
+    public void rotate(Quat4f target, float speed, Quat4f tmp) {
+        if (motionLock)
+            return;
+
+        Quat4f current = transform().getRotation(tmp);
+        current.interpolate(target, speed);
+        transform().setRotation(current);
+    }
+
 
     public void reactivate() {
         Dynamic b = body;
@@ -428,4 +435,5 @@ public class Spatial<O> implements BiConsumer<GL2, Dynamic> {
         preactive = false;
         body = null;
     }
+
 }

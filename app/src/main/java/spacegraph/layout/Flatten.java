@@ -4,6 +4,8 @@ import spacegraph.SpaceGraph;
 import spacegraph.SpaceInput;
 import spacegraph.SpaceTransform;
 import spacegraph.Spatial;
+import spacegraph.math.Quat4f;
+import spacegraph.math.v3;
 
 import java.util.function.Consumer;
 
@@ -12,6 +14,13 @@ import java.util.function.Consumer;
  */
 public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
 
+    private Quat4f up = new Quat4f();
+    private final Quat4f tmp = new Quat4f();
+
+    public Flatten() {
+        up = Quat4f.angle(0,0,1,0);
+    }
+
     @Override
     public void update(SpaceGraph<O> g, SpaceInput<O, ?> src, float dt) {
         src.forEach(this);
@@ -19,6 +28,8 @@ public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
 
     @Override
     public void accept(Spatial<O> s) {
+
         s.move(s.x(), s.y(), 0, 0.9f);
+        s.rotate(up, 0.9f, tmp);
     }
 }
