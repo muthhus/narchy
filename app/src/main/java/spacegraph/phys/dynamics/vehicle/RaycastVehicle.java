@@ -158,7 +158,7 @@ public class RaycastVehicle extends TypedConstraint {
 		wheelBasis.mul(steeringMat, rotatingMat);
 		wheelBasis.mul(basis2);
 
-		Transform.this.scaleAdd(wheel.raycastInfo.suspensionLength, wheel.raycastInfo.wheelDirectionWS, wheel.raycastInfo.hardPointWS);
+		wheel.worldTransform.scaleAdd(wheel.raycastInfo.suspensionLength, wheel.raycastInfo.wheelDirectionWS, wheel.raycastInfo.hardPointWS);
 	}
 
 	public void resetSuspension() {

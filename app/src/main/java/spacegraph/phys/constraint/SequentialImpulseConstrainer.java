@@ -138,7 +138,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 		Tangible rb = Tangible.upcast(collidable);
 		if (rb != null) {
 			rb.getAngularVelocity(solverBody.angularVelocity);
-			solverBody.centerOfMassPosition.set(Transform.this);
+			solverBody.centerOfMassPosition.set(collidable.getWorldTransform(new Transform()));
 			solverBody.friction = collidable.getFriction();
 			solverBody.invMass = rb.getInvMass();
 			rb.getLinearVelocity(solverBody.linearVelocity);
@@ -147,7 +147,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 		}
 		else {
 			solverBody.angularVelocity.set(0f, 0f, 0f);
-			solverBody.centerOfMassPosition.set(Transform.this);
+			solverBody.centerOfMassPosition.set(collidable.getWorldTransform(new Transform()));
 			solverBody.friction = collidable.getFriction();
 			solverBody.invMass = 0f;
 			solverBody.linearVelocity.set(0f, 0f, 0f);
@@ -559,8 +559,8 @@ public class SequentialImpulseConstrainer extends Constrainer {
                             cp.getPositionWorldOnA(pos1);
                             cp.getPositionWorldOnB(pos2);
 
-                            rel_pos1.sub(pos1, Transform.this);
-                            rel_pos2.sub(pos2, Transform.this);
+                            rel_pos1.sub(pos1, colObj0.getWorldTransform(tmpTrans));
+                            rel_pos2.sub(pos2, colObj1.getWorldTransform(tmpTrans));
 
                             relaxation = 1f;
                             float rel_vel;

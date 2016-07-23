@@ -106,7 +106,7 @@ public class TranslationalLimitMotor {
 	 */
         public boolean needApplyForces(int idx)
         {
-            return !(currentLimit[idx] == 0 && enableMotor[idx] == false);
+            return !(currentLimit[idx] == 0 && !enableMotor[idx]);
         }
 
         public int testLimitValue(int limitIndex, float test_value)
@@ -126,7 +126,7 @@ public class TranslationalLimitMotor {
                 VectorUtil.setCoord(currentLimitError, limitIndex, test_value - loLimit);
                 return 2;
             }
-            else if (test_value > hiLimit)
+            if (test_value > hiLimit)
             {
                 currentLimit[limitIndex] = 1;//High limit violation
                 VectorUtil.setCoord(currentLimitError, limitIndex, test_value - hiLimit);

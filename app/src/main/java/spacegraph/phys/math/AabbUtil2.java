@@ -151,7 +151,7 @@ public class AabbUtil2 {
 
 		v3 tmp = new v3();
 
-		v3 center = new v3(Transform.this);
+		v3 center = new v3(t);
 		v3 extent = new v3();
 		abs_b.getRow(0, tmp);
 		extent.x = tmp.dot(halfExtentsWithMargin);

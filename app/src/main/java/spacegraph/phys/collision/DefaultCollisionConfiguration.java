@@ -199,11 +199,9 @@ public class DefaultCollisionConfiguration extends CollisionConfiguration {
 		if (proxyType0.isCompound()) {
 			return compoundCreateFunc;
 		}
-		else {
-			if (proxyType1.isCompound()) {
-				return swappedCompoundCreateFunc;
-			}
-		}
+		if (proxyType1.isCompound()) {
+            return swappedCompoundCreateFunc;
+        }
 
 		// failed to find an algorithm
 		return emptyCreateFunc;

@@ -80,7 +80,7 @@ public class HingeConstraint extends TypedConstraint {
 		angularOnly = false;
 		enableAngularMotor = false;
 
-		Transform.this.set(pivotInA);
+		rbAFrame.set(pivotInA);
 
 		// since no frame is given, assume this to be zero angle and just pick rb transform axis
 		v3 rbAxisA1 = new v3();
@@ -111,7 +111,7 @@ public class HingeConstraint extends TypedConstraint {
 		v3 rbAxisB2 = new v3();
 		rbAxisB2.cross(axisInB, rbAxisB1);
 
-		Transform.this.set(pivotInB);
+		rbBFrame.set(pivotInB);
 		rbBFrame.basis.setRow(0, rbAxisB1.x, rbAxisB2.x, -axisInB.x);
 		rbBFrame.basis.setRow(1, rbAxisB1.y, rbAxisB2.y, -axisInB.y);
 		rbBFrame.basis.setRow(2, rbAxisB1.z, rbAxisB2.z, -axisInB.z);
@@ -148,7 +148,7 @@ public class HingeConstraint extends TypedConstraint {
 		v3 rbAxisA2 = new v3();
 		rbAxisA2.cross(axisInA, rbAxisA1);
 
-		Transform.this.set(pivotInA);
+		rbAFrame.set(pivotInA);
 		rbAFrame.basis.setRow(0, rbAxisA1.x, rbAxisA2.x, axisInA.x);
 		rbAFrame.basis.setRow(1, rbAxisA1.y, rbAxisA2.y, axisInA.y);
 		rbAFrame.basis.setRow(2, rbAxisA1.z, rbAxisA2.z, axisInA.z);
@@ -162,8 +162,8 @@ public class HingeConstraint extends TypedConstraint {
 		v3 rbAxisB2 = new v3();
 		rbAxisB2.cross(axisInB, rbAxisB1);
 
-		Transform.this.set(pivotInA);
-		centerOfMassA.transform(Transform.this);
+		rbBFrame.set(pivotInA);
+		centerOfMassA.transform(rbBFrame);
 		rbBFrame.basis.setRow(0, rbAxisB1.x, rbAxisB2.x, axisInB.x);
 		rbBFrame.basis.setRow(1, rbAxisB1.y, rbAxisB2.y, axisInB.y);
 		rbBFrame.basis.setRow(2, rbAxisB1.z, rbAxisB2.z, axisInB.z);
@@ -212,8 +212,8 @@ public class HingeConstraint extends TypedConstraint {
 		this.rbBFrame.basis.m12 *= -1f;
 		this.rbBFrame.basis.m22 *= -1f;
 
-		Transform.this.set((v3)Transform.this);
-		rbA.getCenterOfMassTransform(new Transform()).transform(Transform.this);
+		this.rbBFrame.set(this.rbAFrame);
+		rbA.getCenterOfMassTransform(new Transform()).transform(this.rbBFrame);
 
 		// start with free
 		lowerLimit = 1e30f;
@@ -239,10 +239,10 @@ public class HingeConstraint extends TypedConstraint {
 		appliedImpulse = 0f;
 
 		if (!angularOnly) {
-			v3 pivotAInW = new v3(Transform.this);
+			v3 pivotAInW = new v3(rbAFrame);
 			centerOfMassA.transform(pivotAInW);
 
-			v3 pivotBInW = new v3(Transform.this);
+			v3 pivotBInW = new v3(rbBFrame);
 			centerOfMassB.transform(pivotBInW);
 
 			v3 relPos = new v3();
@@ -364,10 +364,10 @@ public class HingeConstraint extends TypedConstraint {
 		Transform centerOfMassA = rbA.getCenterOfMassTransform(new Transform());
 		Transform centerOfMassB = rbB.getCenterOfMassTransform(new Transform());
 		
-		v3 pivotAInW = new v3(Transform.this);
+		v3 pivotAInW = new v3(rbAFrame);
 		centerOfMassA.transform(pivotAInW);
 
-		v3 pivotBInW = new v3(Transform.this);
+		v3 pivotBInW = new v3(rbBFrame);
 		centerOfMassB.transform(pivotBInW);
 
 		float tau = 0.3f;
@@ -454,7 +454,7 @@ public class HingeConstraint extends TypedConstraint {
 
         // solve angular positional correction
         // TODO: check
-        //Vector3f angularError = -axisA.cross(axisB) *(btScalar(1.)/timeStep);
+        //v3 angularError = -axisA.cross(axisB) *(btScalar(1.)/timeStep);
         v3 angularError = new v3();
         angularError.cross(axisA, axisB);
         angularError.negate();

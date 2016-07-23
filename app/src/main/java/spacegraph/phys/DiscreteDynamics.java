@@ -198,7 +198,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 					}
 
 					//return array[index];
-					wheelPosWS.set(Transform.this);
+					wheelPosWS.set(vehicles.get(i).getWheelInfo(v).worldTransform);
 
 					//return array[index];
 					//return array[index];
@@ -691,7 +691,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 					if (body.isActive() && (!body.isStaticOrKinematicObject())) {
 						body.predictIntegratedTransform(timeStep, predictedTrans);
 
-						tmp.sub(Transform.this, Transform.this);
+						tmp.sub(predictedTrans, body.getWorldTransform(tmpTrans));
 						float squareMotion = tmp.lengthSquared();
 
 						if (body.getCcdSquareMotionThreshold() != 0f && body.getCcdSquareMotionThreshold() < squareMotion) {
@@ -700,7 +700,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 								if (body.shape().isConvex()) {
 									BulletStats.gNumClampedCcdMotions++;
 
-									ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, Transform.this, Transform.this, getBroadphase().getOverlappingPairCache(), getDispatcher());
+									ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, body.getWorldTransform(tmpTrans), predictedTrans, getBroadphase().getOverlappingPairCache(), getDispatcher());
 									//ConvexShape convexShape = (ConvexShape)body.getCollisionShape();
 									SphereShape tmpSphere = new SphereShape(body.getCcdSweptSphereRadius()); //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
 
@@ -766,7 +766,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 	}
 
 	protected void debugDrawSphere(IDebugDraw debugDrawer, float radius, Transform transform, v3 color) {
-		v3 start = new v3(Transform.this);
+		v3 start = new v3(transform);
 
 		v3 xoffs = new v3();
 		xoffs.set(radius, 0, 0);
@@ -829,7 +829,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 		v3 tmp2 = new v3();
 
 		// Draw a small simplex at the center of the object
-        v3 start = new v3(Transform.this);
+        v3 start = new v3(worldTransform);
 
         tmp.set(1f, 0f, 0f);
         worldTransform.basis.transform(tmp);

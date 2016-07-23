@@ -57,7 +57,7 @@ class PlaneShape {
 		trans.basis.getRow(2, tmp);
 		float z = VectorUtil.dot3(tmp, equation);
 
-		float w = VectorUtil.dot3(Transform.this, equation) + equation.w;
+		float w = VectorUtil.dot3(trans, equation) + equation.w;
 
 		equation.set(x, y, z, w);
 	}

@@ -159,12 +159,10 @@ public class Generic6DofConstraint extends TypedConstraint {
 				return false;
 			}
 		}
-		else {
-			// WARNING.  Not unique.  XAngle + ZAngle = atan2(r10,r11)
-			xyz.x = (float) Math.atan2(getMatrixElem(mat, 3), getMatrixElem(mat, 4));
-			xyz.y = BulletGlobals.SIMD_HALF_PI;
-			xyz.z = 0.0f;
-		}
+		// WARNING.  Not unique.  XAngle + ZAngle = atan2(r10,r11)
+		xyz.x = (float) Math.atan2(getMatrixElem(mat, 3), getMatrixElem(mat, 4));
+		xyz.y = BulletGlobals.SIMD_HALF_PI;
+		xyz.z = 0.0f;
 
 		return false;
 	}
@@ -174,7 +172,7 @@ public class Generic6DofConstraint extends TypedConstraint {
 	 */
         void calculateLinearInfo()
         {
-            calculatedLinearDiff.sub(Transform.this, Transform.this);
+            calculatedLinearDiff.sub(calculatedTransformB, calculatedTransformA);
 
             Matrix3f basisInv = new Matrix3f();
             basisInv.invert(calculatedTransformA.basis);
@@ -387,8 +385,8 @@ public class Generic6DofConstraint extends TypedConstraint {
 
 		// linear
 
-		v3 pointInA = new v3(Transform.this);
-		v3 pointInB = new v3(Transform.this);
+		v3 pointInA = new v3(calculatedTransformA);
+		v3 pointInB = new v3(calculatedTransformB);
 
 		float jacDiagABInv;
 		v3 linear_axis = new v3();
@@ -555,8 +553,8 @@ public class Generic6DofConstraint extends TypedConstraint {
 		else {
 			weight = imA / (imA + imB);
 		}
-		v3 pA = Transform.this;
-		v3 pB = Transform.this;
+		v3 pA = calculatedTransformA;
+		v3 pB = calculatedTransformB;
 
 		v3 tmp1 = new v3();
 		v3 tmp2 = new v3();

@@ -53,6 +53,8 @@ public final class Transform extends v3 {
 		this.set(v);
 	}
 
+
+
 	public static Transform t() {
 		return new Transform();
 	}
@@ -79,13 +81,13 @@ public final class Transform extends v3 {
 	@Override
 	public String toString() {
 		return "t(" +
-				this + "," + basis.toStringCompact() +
+				super.toString() + "," + basis.toStringCompact() +
 				')';
 	}
 
 	public void set(Transform tr) {
 		basis.set(tr.basis);
-		this.set((v3) this);
+		super.set((v3) tr);
 	}
 	
 	public void set(Matrix3f mat) {
@@ -123,7 +125,7 @@ public final class Transform extends v3 {
 	}
 	
 	public void mul(Transform tr) {
-		v3 vec = new v3(this);
+		v3 vec = new v3(tr);
 		transform(vec);
 
 		basis.mul(tr.basis);
@@ -131,7 +133,7 @@ public final class Transform extends v3 {
 	}
 
 	public void mul(Transform tr1, Transform tr2) {
-		v3 vec = new v3(this);
+		v3 vec = new v3(tr2);
 		tr1.transform(vec);
 
 		basis.mul(tr1.basis, tr2.basis);
@@ -189,14 +191,14 @@ public final class Transform extends v3 {
 		if (this == obj) return true;
 		if (obj == null || !(obj instanceof Transform)) return false;
 		Transform tr = (Transform)obj;
-		return basis.equals(tr.basis) && this.equals(this);
+		return basis.equals(tr.basis) && super.equals(tr);
 	}
 
 	@Override
 	public int hashCode() {
 		int hash = 3;
 		hash = 41 * hash + basis.hashCode();
-		hash = 41 * hash + this.hashCode();
+		hash = 41 * hash + super.hashCode();
 		return hash;
 	}
 

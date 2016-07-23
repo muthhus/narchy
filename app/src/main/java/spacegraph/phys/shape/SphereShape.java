@@ -57,7 +57,7 @@ public class SphereShape extends ConvexInternalShape {
 		float margin = getMargin();
 		v3 extent = new v3(margin, margin, margin);
 
-		v3 center = Transform.this;
+		v3 center = t;
 		aabbMin.sub(center, extent);
 		aabbMax.add(center, extent);
 	}

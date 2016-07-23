@@ -814,8 +814,8 @@ public class GjkEpaSolver {
 		results.gjk_iterations = 0;
 		/* Use GJK to locate origin		*/
 		gjk.init(/*stackAlloc,*/
-				wtrs0.basis, Transform.this, shape0,
-				wtrs1.basis, Transform.this, shape1,
+				wtrs0.basis, wtrs0, shape0,
+				wtrs1.basis, wtrs1, shape1,
 				radialmargin + EPA_accuracy);
 		try {
 			boolean collide = gjk.SearchOrigin();

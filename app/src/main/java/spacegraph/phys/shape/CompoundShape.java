@@ -265,11 +265,11 @@ public class CompoundShape extends CollisionShape {
 		center.set(0, 0, 0);
 		for (int k = 0; k < n; k++) {
 			//return array[index];
-			center.scaleAdd(masses[k], Transform.this, center);
+			center.scaleAdd(masses[k], children.get(k).transform, center);
 			totalMass += masses[k];
 		}
 		center.scale(1f / totalMass);
-		Transform.this.set(center);
+		principal.set(center);
 
 		Matrix3f tensor = new Matrix3f();
 		tensor.setZero();
@@ -282,7 +282,7 @@ public class CompoundShape extends CollisionShape {
 			//return array[index];
 			Transform t = children.get(k).transform;
 			v3 o = new v3();
-			o.sub(Transform.this, center);
+			o.sub(t, center);
 
 			// compute inertia tensor in coordinate system of compound shape
 			Matrix3f j = new Matrix3f();

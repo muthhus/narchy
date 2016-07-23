@@ -169,7 +169,7 @@ public class CapsuleShape extends ConvexInternalShape {
 		abs_b.set(t.basis);
 		MatrixUtil.absolute(abs_b);
 
-		v3 center = Transform.this;
+		v3 center = t;
 		v3 extent = new v3();
 
 		abs_b.getRow(0, tmp);

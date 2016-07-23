@@ -474,8 +474,8 @@ public class SliderConstraint extends TypedConstraint {
 		// calculate transforms
 		calculatedTransformA.mul(rbA.getCenterOfMassTransform(tmpTrans), frameInA);
 		calculatedTransformB.mul(rbB.getCenterOfMassTransform(tmpTrans), frameInB);
-		realPivotAInW.set(Transform.this);
-		realPivotBInW.set(Transform.this);
+		realPivotAInW.set(calculatedTransformA);
+		realPivotBInW.set(calculatedTransformB);
 		calculatedTransformA.basis.getColumn(0, tmp);
 		sliderAxis.set(tmp); // along X
 		delta.sub(realPivotBInW, realPivotAInW);
@@ -706,8 +706,8 @@ public class SliderConstraint extends TypedConstraint {
 			calculatedTransformA.mul(rbB.getCenterOfMassTransform(tmpTrans), frameInB);
 			calculatedTransformB.mul(rbA.getCenterOfMassTransform(tmpTrans), frameInA);
 		}
-		realPivotAInW.set(Transform.this);
-		realPivotBInW.set(Transform.this);
+		realPivotAInW.set(calculatedTransformA);
+		realPivotBInW.set(calculatedTransformB);
 		calculatedTransformA.basis.getColumn(0, sliderAxis); // along X
 		delta.sub(realPivotBInW, realPivotAInW);
 		projPivotInW.scaleAdd(sliderAxis.dot(delta), sliderAxis, realPivotAInW);
@@ -778,7 +778,7 @@ public class SliderConstraint extends TypedConstraint {
 
 	public v3 getAncorInB(v3 out) {
 		v3 ancorInB = out;
-		ancorInB.set(Transform.this);
+		ancorInB.set(frameInB);
 		return ancorInB;
 	}
 

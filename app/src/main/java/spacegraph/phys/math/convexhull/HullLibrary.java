@@ -710,23 +710,21 @@ public class HullLibrary {
 
 			return true; // return cube
 		}
-		else {
-			if (scale != null) {
-				scale.x = dx;
-				scale.y = dy;
-				scale.z = dz;
+        if (scale != null) {
+            scale.x = dx;
+            scale.y = dy;
+            scale.z = dz;
 
-				recip[0] = 1f / dx;
-				recip[1] = 1f / dy;
-				recip[2] = 1f / dz;
+            recip[0] = 1f / dx;
+            recip[1] = 1f / dy;
+            recip[2] = 1f / dz;
 
-				center.x *= recip[0];
-				center.y *= recip[1];
-				center.z *= recip[2];
-			}
-		}
+            center.x *= recip[0];
+            center.y *= recip[1];
+            center.z *= recip[2];
+        }
 
-		vtx_ptr = svertices;
+        vtx_ptr = svertices;
 		vtx_idx = 0;
 
 		for (int i=0; i<svcount; i++) {

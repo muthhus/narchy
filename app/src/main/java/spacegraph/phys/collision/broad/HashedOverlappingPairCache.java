@@ -251,7 +251,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 		int index = table.get(hash);
 		//return array[index];
-		while (index != NULL_PAIR && equalsPair(overlappingPairArray.get(index), proxyId1, proxyId2) == false)
+		while (index != NULL_PAIR && !equalsPair(overlappingPairArray.get(index), proxyId1, proxyId2))
 		{
 			index = next.get(index);
 		}
@@ -415,7 +415,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		int index = hashTable.get(hash);
 
 		//return array[index];
-		while (index != NULL_PAIR && equalsPair(overlappingPairArray.get(index), proxyId1, proxyId2) == false) {
+		while (index != NULL_PAIR && !equalsPair(overlappingPairArray.get(index), proxyId1, proxyId2)) {
 			index = next.get(index);
 		}
 

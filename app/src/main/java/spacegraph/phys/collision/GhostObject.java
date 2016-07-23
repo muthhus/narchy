@@ -119,7 +119,7 @@ public class GhostObject extends Collidable {
 				AabbUtil2.aabbExpand(collisionObjectAabbMin, collisionObjectAabbMax, castShapeAabbMin, castShapeAabbMax);
 				float[] hitLambda = new float[]{1f}; // could use resultCallback.closestHitFraction, but needs testing
 				v3 hitNormal = new v3();
-				if (AabbUtil2.rayAabb(Transform.this, Transform.this, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
+				if (AabbUtil2.rayAabb(convexFromWorld, convexToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
 					Collisions.objectQuerySingle(castShape, convexFromTrans, convexToTrans,
                             collidable,
 					                                 collidable.shape(),
@@ -134,10 +134,10 @@ public class GhostObject extends Collidable {
 	public void rayTest(v3 rayFromWorld, v3 rayToWorld, Collisions.RayResultCallback resultCallback) {
 		Transform rayFromTrans = new Transform();
 		rayFromTrans.setIdentity();
-		Transform.this.set(rayFromWorld);
+		rayFromTrans.set(rayFromWorld);
 		Transform rayToTrans = new Transform();
 		rayToTrans.setIdentity();
-		Transform.this.set(rayToWorld);
+		rayToTrans.set(rayToWorld);
 
 		Transform tmpTrans = new Transform();
 

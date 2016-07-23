@@ -190,7 +190,7 @@ public class KinematicCharacterController extends ActionInterface {
 	public void warp(v3 origin) {
 		Transform xform = new Transform();
 		xform.setIdentity();
-		Transform.this.set(origin);
+		xform.set(origin);
 		ghostObject.setWorldTransform(xform);
 	}
 
@@ -206,7 +206,7 @@ public class KinematicCharacterController extends ActionInterface {
 			}
 		}
 
-		currentPosition.set(Transform.this);
+		currentPosition.set(ghostObject.getWorldTransform(new Transform()));
 		targetPosition.set(currentPosition);
 		//printf("m_targetPosition=%f,%f,%f\n",m_targetPosition[0],m_targetPosition[1],m_targetPosition[2]);
 	}
@@ -266,7 +266,7 @@ public class KinematicCharacterController extends ActionInterface {
 
 		//printf("\n");
 
-		Transform.this.set(currentPosition);
+		xform.set(currentPosition);
 		ghostObject.setWorldTransform(xform);
 	}
 
@@ -376,7 +376,7 @@ public class KinematicCharacterController extends ActionInterface {
 		collisions.getDispatcher().dispatchAllCollisionPairs(
 				ghostObject.getOverlappingPairCache(), collisions.getDispatchInfo(), collisions.getDispatcher());
 
-		currentPosition.set(Transform.this);
+		currentPosition.set(ghostObject.getWorldTransform(new Transform()));
 
 		float maxPen = 0.0f;
 		for (int i=0; i<ghostObject.getOverlappingPairCache().getNumOverlappingPairs(); i++) {
@@ -421,7 +421,7 @@ public class KinematicCharacterController extends ActionInterface {
 		}
 		
 		Transform newTrans = ghostObject.getWorldTransform(new Transform());
-		Transform.this.set(currentPosition);
+		newTrans.set(currentPosition);
 		ghostObject.setWorldTransform(newTrans);
 		//printf("m_touchingNormal = %f,%f,%f\n",m_touchingNormal[0],m_touchingNormal[1],m_touchingNormal[2]);
 
@@ -440,8 +440,8 @@ public class KinematicCharacterController extends ActionInterface {
 		end.setIdentity ();
 
 		/* FIXME: Handle penetration properly */
-		Transform.this.scaleAdd(convexShape.getMargin() + addedMargin, upAxisDirection[upAxis], currentPosition);
-		Transform.this.set(targetPosition);
+		start.scaleAdd(convexShape.getMargin() + addedMargin, upAxisDirection[upAxis], currentPosition);
+		end.set(targetPosition);
 		
 		// Find only sloped/flat surface hits, avoid wall and ceiling hits...
 		v3 up = new v3();
@@ -536,8 +536,8 @@ public class KinematicCharacterController extends ActionInterface {
 		int maxIter = 10;
 
 		while (fraction > 0.01f && maxIter-- > 0) {
-			Transform.this.set(currentPosition);
-			Transform.this.set(targetPosition);
+			start.set(currentPosition);
+			end.set(targetPosition);
                         v3 sweepDirNegative = new v3();
                         sweepDirNegative.sub(currentPosition, targetPosition);
 
@@ -626,8 +626,8 @@ public class KinematicCharacterController extends ActionInterface {
 		start.setIdentity ();
 		end.setIdentity ();
 
-		Transform.this.set(currentPosition);
-		Transform.this.set(targetPosition);
+		start.set(currentPosition);
+		end.set(targetPosition);
 
 		KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, upAxisDirection[upAxis], maxSlopeCosine);
         callback.collisionFilterGroup = ghostObject.broadphase().collisionFilterGroup;

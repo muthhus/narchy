@@ -51,6 +51,6 @@ public class Motion extends MotionState {
     }
 
     public void center(v3 v) {
-        Transform.this.set(v);
+        t.set(v);
     }
 }

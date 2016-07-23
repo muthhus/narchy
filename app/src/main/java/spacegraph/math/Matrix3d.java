@@ -3102,11 +3102,9 @@ public class Matrix3d implements java.io.Serializable, Cloneable {
     }
 
     static double max3(double[] values) {
-        if (values[0] > values[1]) {
-            return values[values[0] > values[2] ? 0 : 2];
-        } else {
-            return values[values[1] > values[2] ? 1 : 2];
-        }
+        return values[0] > values[1] ?
+                    values[values[0] > values[2] ? 0 : 2] :
+                    values[values[1] > values[2] ? 1 : 2];
     }
 
     private static final boolean almostEqual(double a, double b) {

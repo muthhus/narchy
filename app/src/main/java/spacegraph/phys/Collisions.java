@@ -339,9 +339,9 @@ public class Collisions<X> {
 					BvhTriangleMeshShape triangleMesh = (BvhTriangleMeshShape)collisionShape;
 					Transform worldTocollisionObject = new Transform();
 					worldTocollisionObject.inverse(colObjWorldTransform);
-					v3 rayFromLocal = new v3(Transform.this);
+					v3 rayFromLocal = new v3(rayFromTrans);
 					worldTocollisionObject.transform(rayFromLocal);
-					v3 rayToLocal = new v3(Transform.this);
+					v3 rayToLocal = new v3(rayToTrans);
 					worldTocollisionObject.transform(rayToLocal);
 
 					BridgeTriangleRaycastCallback rcb = new BridgeTriangleRaycastCallback(rayFromLocal, rayToLocal, resultCallback, collidable, triangleMesh);
@@ -354,9 +354,9 @@ public class Collisions<X> {
 					Transform worldTocollisionObject = new Transform();
 					worldTocollisionObject.inverse(colObjWorldTransform);
 
-					v3 rayFromLocal = new v3(Transform.this);
+					v3 rayFromLocal = new v3(rayFromTrans);
 					worldTocollisionObject.transform(rayFromLocal);
-					v3 rayToLocal = new v3(Transform.this);
+					v3 rayToLocal = new v3(rayToTrans);
 					worldTocollisionObject.transform(rayToLocal);
 
 					BridgeTriangleRaycastCallback rcb = new BridgeTriangleRaycastCallback(rayFromLocal, rayToLocal, resultCallback, collidable, triangleMesh);
@@ -464,11 +464,11 @@ public class Collisions<X> {
 					worldTocollisionObject.inverse(colObjWorldTransform);
 
 					v3 convexFromLocal = new v3();
-					convexFromLocal.set(Transform.this);
+					convexFromLocal.set(convexFromTrans);
 					worldTocollisionObject.transform(convexFromLocal);
 
 					v3 convexToLocal = new v3();
-					convexToLocal.set(Transform.this);
+					convexToLocal.set(convexToTrans);
 					worldTocollisionObject.transform(convexToLocal);
 
 					// rotation of box in local mesh space = MeshRotation^-1 * ConvexToRotation
@@ -492,11 +492,11 @@ public class Collisions<X> {
 					worldTocollisionObject.inverse(colObjWorldTransform);
 
 					v3 convexFromLocal = new v3();
-					convexFromLocal.set(Transform.this);
+					convexFromLocal.set(convexFromTrans);
 					worldTocollisionObject.transform(convexFromLocal);
 
 					v3 convexToLocal = new v3();
-					convexToLocal.set(Transform.this);
+					convexToLocal.set(convexToTrans);
 					worldTocollisionObject.transform(convexToLocal);
 
 					// rotation of box in local mesh space = MeshRotation^-1 * ConvexToRotation
@@ -644,7 +644,7 @@ public class Collisions<X> {
 				AabbUtil2.aabbExpand(collisionObjectAabbMin, collisionObjectAabbMax, castShapeAabbMin, castShapeAabbMax);
 				hitLambda[0] = 1f; // could use resultCallback.closestHitFraction, but needs testing
 				v3 hitNormal = new v3();
-				if (AabbUtil2.rayAabb(Transform.this, Transform.this, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
+				if (AabbUtil2.rayAabb(convexFromWorld, convexToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
 					objectQuerySingle(castShape, convexFromTrans, convexToTrans,
 							collidable,
 					                  collidable.shape(),

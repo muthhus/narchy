@@ -125,10 +125,10 @@ public class ConeTwistConstraint extends TypedConstraint {
 		accSwingLimitImpulse = 0f;
 
 		if (!angularOnly) {
-			v3 pivotAInW = new v3(Transform.this);
+			v3 pivotAInW = new v3(rbAFrame);
 			rbA.getCenterOfMassTransform(tmpTrans).transform(pivotAInW);
 
-			v3 pivotBInW = new v3(Transform.this);
+			v3 pivotBInW = new v3(rbBFrame);
 			rbB.getCenterOfMassTransform(tmpTrans).transform(pivotBInW);
 
 			v3 relPos = new v3();
@@ -277,10 +277,10 @@ public class ConeTwistConstraint extends TypedConstraint {
 		v3 tmpVec = new v3();
 		Transform tmpTrans = new Transform();
 
-		v3 pivotAInW = new v3(Transform.this);
+		v3 pivotAInW = new v3(rbAFrame);
 		rbA.getCenterOfMassTransform(tmpTrans).transform(pivotAInW);
 
-		v3 pivotBInW = new v3(Transform.this);
+		v3 pivotBInW = new v3(rbBFrame);
 		rbB.getCenterOfMassTransform(tmpTrans).transform(pivotBInW);
 
 		float tau = 0.3f;

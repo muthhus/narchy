@@ -70,8 +70,8 @@ public class SubsimplexConvexCast extends ConvexCast {
 
 		v3 linVelA = new v3();
 		v3 linVelB = new v3();
-		linVelA.sub(Transform.this, Transform.this);
-		linVelB.sub(Transform.this, Transform.this);
+		linVelA.sub(toA, fromA);
+		linVelB.sub(toB, fromB);
 		
 		float lambda = 0f;
 		
@@ -142,8 +142,8 @@ public class SubsimplexConvexCast extends ConvexCast {
 					
 					// interpolate to next lambda
 					//	x = s + lambda * r;
-					VectorUtil.setInterpolate3(Transform.this, Transform.this, Transform.this, lambda);
-					VectorUtil.setInterpolate3(Transform.this, Transform.this, Transform.this, lambda);
+					VectorUtil.setInterpolate3(interpolatedTransA, fromA, toA, lambda);
+					VectorUtil.setInterpolate3(interpolatedTransB, fromB, toB, lambda);
 					//m_simplexSolver->reset();
 					// check next line
 					w.sub(supVertexA, supVertexB);

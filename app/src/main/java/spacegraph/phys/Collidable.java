@@ -331,7 +331,7 @@ public class Collidable<X> {
 	}
 
 	public v3 getWorldOrigin() {
-		return Transform.this;
+		return worldTransform;
 	}
 
 	@Override

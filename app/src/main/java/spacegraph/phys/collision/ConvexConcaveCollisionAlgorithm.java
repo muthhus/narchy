@@ -103,7 +103,7 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 
 		// only perform CCD above a certain threshold, this prevents blocking on the long run
 		// because object in a blocked ccd state (hitfraction<1) get their linear velocity halved each frame...
-		tmp.sub(Transform.this, Transform.this);
+		tmp.sub(convexbody.getInterpolationWorldTransform(new Transform()), convexbody.getWorldTransform(new Transform()));
 		float squareMot0 = tmp.lengthSquared();
 		if (squareMot0 < convexbody.getCcdSquareMotionThreshold()) {
 			return 1f;
@@ -125,11 +125,11 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 		convexToLocal.mul(triInv, convexbody.getInterpolationWorldTransform(tmpTrans));
 
 		if (triBody.shape().isConcave()) {
-			v3 rayAabbMin = new v3(Transform.this);
-			VectorUtil.setMin(rayAabbMin, Transform.this);
+			v3 rayAabbMin = new v3(convexFromLocal);
+			VectorUtil.setMin(rayAabbMin, convexToLocal);
 
-			v3 rayAabbMax = new v3(Transform.this);
-			VectorUtil.setMax(rayAabbMax, Transform.this);
+			v3 rayAabbMax = new v3(convexFromLocal);
+			VectorUtil.setMax(rayAabbMax, convexToLocal);
 
 			float ccdRadius0 = convexbody.getCcdSweptSphereRadius();
 

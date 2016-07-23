@@ -100,7 +100,7 @@ public class RotationalLimitMotor {
 	 */
     public boolean needApplyTorques()
     {
-        return !(currentLimit == 0 && enableMotor == false);
+        return !(currentLimit == 0 && !enableMotor);
     }
 
 	/**
@@ -117,13 +117,13 @@ public class RotationalLimitMotor {
 			currentLimitError = test_value - loLimit;
 			return 1;
 		}
-		else if (test_value > hiLimit) {
-			currentLimit = 2; // High limit violation
-			currentLimitError = test_value - hiLimit;
-			return 2;
-		}
+        if (test_value > hiLimit) {
+            currentLimit = 2; // High limit violation
+            currentLimitError = test_value - hiLimit;
+            return 2;
+        }
 
-		currentLimit = 0; // Free from violation
+        currentLimit = 0; // Free from violation
 		return 0;
 	}
 
@@ -132,7 +132,7 @@ public class RotationalLimitMotor {
 	 */
 
 	public float solveAngularLimits(float timeStep, v3 axis, float jacDiagABInv, Tangible body0, Tangible body1) {
-		if (needApplyTorques() == false) {
+		if (!needApplyTorques()) {
 			return 0.0f;
 		}
 

@@ -446,7 +446,7 @@ public class Tangible<X> extends Collidable<X> {
 	}
 	
 	public v3 getCenterOfMassPosition(v3 out) {
-		out.set(Transform.this);
+		out.set(worldTransform);
 		return out;
 	}
 
@@ -492,7 +492,7 @@ public class Tangible<X> extends Collidable<X> {
 	}
 
 	public void translate(v3 v) {
-		Transform.this.add(v);
+		worldTransform.add(v);
 	}
 	
 	public void getAabb(v3 aabbMin, v3 aabbMax) {

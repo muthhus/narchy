@@ -144,10 +144,6 @@ public class HeightfieldTerrainShape extends ConcaveShape
             short hfValue = 0;//BitConverter.ToInt16(m_heightFieldDataByte, index);
             val = hfValue * m_heightScale;
             break;
-
-            default:
-            assert false : "Bad m_heightDataType";
-            break;
         }
 
 		return val;
@@ -324,7 +320,7 @@ public class HeightfieldTerrainShape extends ConcaveShape
 		Matrix3f abs_b = new Matrix3f(trans.basis);
 		MatrixUtil.absolute(abs_b);
 
-		v3 center = new v3(Transform.this);
+		v3 center = new v3(trans);
 		v3 extent = new v3();
 		abs_b.getRow(0, tmp);
 		extent.x = tmp.dot(localHalfExtents);

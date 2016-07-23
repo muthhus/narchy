@@ -63,7 +63,7 @@ public class TransformUtil {
 	
 
 	public static void integrateTransform(Transform curTrans, v3 linvel, v3 angvel, float timeStep, Transform predictedTransform) {
-		Transform.this.scaleAdd(timeStep, linvel, Transform.this);
+		predictedTransform.scaleAdd(timeStep, linvel, curTrans);
 //	//#define QUATERNION_DERIVATIVE
 //	#ifdef QUATERNION_DERIVATIVE
 //		btQuaternion predictedOrn = curTrans.getRotation();
@@ -101,7 +101,7 @@ public class TransformUtil {
 	}
 
 	public static void calculateVelocity(Transform transform0, Transform transform1, float timeStep, v3 linVel, v3 angVel) {
-		linVel.sub(Transform.this, Transform.this);
+		linVel.sub(transform1, transform0);
 		linVel.scale(1f / timeStep);
 
 		v3 axis = new v3();

@@ -228,7 +228,7 @@ public class DbvtAabbMm {
 
 		float[] s0 = new float[] { 0, 0 };
 		float[] s1 = new float[2];
-		s1[0] = Transform.this.dot(d0);
+		s1[0] = xform.dot(d0);
 		s1[1] = s1[0];
 
 		a.AddSpan(d0, s0, 0, s0, 1);

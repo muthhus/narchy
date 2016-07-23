@@ -78,10 +78,10 @@ public class GjkPairDetector extends DiscreteCollisionDetectorInterface {
 		Transform localTransA = new Transform(input.transformA);
 		Transform localTransB = new Transform(input.transformB);
 		v3 positionOffset = new v3();
-		positionOffset.add(Transform.this, Transform.this);
+        positionOffset.add(localTransA, localTransB);
 		positionOffset.scale(0.5f);
-		Transform.this.sub(positionOffset);
-		Transform.this.sub(positionOffset);
+		localTransA.sub(positionOffset);
+		localTransB.sub(positionOffset);
 
 		float marginA = minkowskiA.getMargin();
 		float marginB = minkowskiB.getMargin();

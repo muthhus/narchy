@@ -42,7 +42,7 @@ public class TransformStackList extends StackList<Transform> {
 	public Transform get(Matrix3f mat) {
 		Transform obj = get();
 		obj.basis.set(mat);
-		Transform.this.set(0f, 0f, 0f);
+		obj.set(0f, 0f, 0f);
 		return obj;
 	}
 

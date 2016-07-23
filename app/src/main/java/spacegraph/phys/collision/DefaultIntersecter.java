@@ -186,10 +186,7 @@ public class DefaultIntersecter extends Intersecter {
 		}
 		//#endif //BT_DEBUG
 
-		if ((!body0.isActive()) && (!body1.isActive())) {
-			needsCollision = false;
-		}
-		else if (!body0.checkCollideWith(body1)) {
+		if ((!body0.isActive()) && (!body1.isActive()) || !body0.checkCollideWith(body1)) {
 			needsCollision = false;
 		}
 

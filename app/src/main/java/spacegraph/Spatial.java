@@ -91,7 +91,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
             this.edges[i] = new EDraw();
 
         //init physics
-        center = Transform.this;
+        center = motion.t;
 
     }
 
@@ -169,7 +169,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
 
             Tangible b = this.body;
             if (b !=null) {
-                Transform.this.set(x,y,z);
+                b.transform().set(x,y,z);
 
 //                    com.Transform t = new com.Transform();
 //                    body.getCenterOfMassTransform(t);
@@ -178,7 +178,7 @@ public class Spatial<O> implements BiConsumer<GL2, Tangible> {
 
                 reactivate();
             } else {
-                Transform.this.set(x, y, z);
+                motion.t.set(x, y, z);
             }
         }
 

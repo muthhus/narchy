@@ -63,8 +63,8 @@ public class GjkConvexCast extends ConvexCast {
 		v3 linVelA = new v3();
 		v3 linVelB = new v3();
 
-		linVelA.sub(Transform.this, Transform.this);
-		linVelB.sub(Transform.this, Transform.this);
+		linVelA.sub(toA, fromA);
+		linVelB.sub(toB, fromB);
 
 		float radius = 0.001f;
 		float lambda = 0f;
@@ -142,8 +142,8 @@ public class GjkConvexCast extends ConvexCast {
 
 					// interpolate to next lambda
 					result.debugDraw(lambda);
-					VectorUtil.setInterpolate3(Transform.this, Transform.this, Transform.this, lambda);
-					VectorUtil.setInterpolate3(Transform.this, Transform.this, Transform.this, lambda);
+					VectorUtil.setInterpolate3(input.transformA, fromA, toA, lambda);
+					VectorUtil.setInterpolate3(input.transformB, fromB, toB, lambda);
 
 					gjk.getClosestPoints(input, pointCollector);
 					if (pointCollector.hasResult) {

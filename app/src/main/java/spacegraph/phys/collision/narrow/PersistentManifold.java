@@ -235,14 +235,7 @@ public class PersistentManifold {
         int insertIndex = cachedPoints;
 		if (insertIndex == MANIFOLD_CACHE_SIZE) {
 			//#if MANIFOLD_CACHE_SIZE >= 4
-			if (MANIFOLD_CACHE_SIZE >= 4) {
-				//sort cache so best points come first, based on area
-				insertIndex = sortCachedPoints(newPoint);
-			}
-			else {
-				//#else
-				insertIndex = 0;
-			}
+			insertIndex = MANIFOLD_CACHE_SIZE >= 4 ? sortCachedPoints(newPoint) : 0;
 			//#endif
 			
 			clearUserCache(pointCache[insertIndex]);

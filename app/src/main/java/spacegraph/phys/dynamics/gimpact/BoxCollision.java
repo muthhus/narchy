@@ -129,7 +129,7 @@ class BoxCollision {
 			temp_trans.inverse(trans0);
 			temp_trans.mul(trans1);
 
-			T1to0.set(Transform.this);
+			T1to0.set(temp_trans);
 			R1to0.set(temp_trans.basis);
 
 			calc_absolute_matrix();
@@ -140,11 +140,11 @@ class BoxCollision {
 		 */
 		public void calc_from_full_invert(Transform trans0, Transform trans1) {
 			R1to0.invert(trans0.basis);
-			T1to0.negate(Transform.this);
+			T1to0.negate(trans0);
 			R1to0.transform(T1to0);
 
 			v3 tmp = new v3();
-			tmp.set(Transform.this);
+			tmp.set(trans1);
 			R1to0.transform(tmp);
 			T1to0.add(tmp);
 

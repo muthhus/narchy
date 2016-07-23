@@ -277,16 +277,15 @@ class GImpactBvh {
 	 * Stackless recursive collision routine.
 	 */
 	private static void _find_collision_pairs_recursive(GImpactBvh boxset0, GImpactBvh boxset1, PairSet collision_pairs, BoxCollision.BoxBoxTransformCache trans_cache_1to0, int node0, int node1, boolean complete_primitive_tests) {
-		if (_node_collision(
+		if (!_node_collision(
 				boxset0, boxset1, trans_cache_1to0,
-				node0, node1, complete_primitive_tests) == false) {
+				node0, node1, complete_primitive_tests)) {
 			return;//avoid colliding internal nodes
 		}
 		if (boxset0.isLeafNode(node0)) {
 			if (boxset1.isLeafNode(node1)) {
 				// collision result
 				collision_pairs.push_pair(boxset0.getNodeData(node0), boxset1.getNodeData(node1));
-				return;
 			}
 			else {
 				// collide left recursive

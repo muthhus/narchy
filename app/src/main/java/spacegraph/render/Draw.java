@@ -100,7 +100,7 @@ public enum Draw {
     private static final v3 a = new v3(), b = new v3();
 
     public static void translate(GL2 gl, Transform trans) {
-        v3 o = Transform.this;
+        v3 o = trans;
         gl.glTranslatef(o.x, o.y, o.z);
     }
 
