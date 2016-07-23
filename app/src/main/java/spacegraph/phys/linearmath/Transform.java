@@ -25,10 +25,7 @@ package spacegraph.phys.linearmath;
 
 import com.jogamp.opengl.math.Quaternion;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import javax.vecmath.*;
 
 /**
  * Transform represents translation and rotation (rigid transform). Scaling and
@@ -203,5 +200,11 @@ public class Transform {
 		hash = 41 * hash + origin.hashCode();
 		return hash;
 	}
-	
+
+	public final AxisAngle4f toAngleAxis(Quaternion tmpQ, AxisAngle4f tmpA, Vector3f angle) {
+		getRotation(tmpQ);
+		tmpA.set(tmpQ, false);
+		tmpA.get(angle);
+		return tmpA;
+	}
 }

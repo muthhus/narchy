@@ -96,7 +96,9 @@ public enum ShapeDrawer {
     }
 
     private static final float[] glMat = new float[16];
-    final static BulletStack stack = new BulletStack();
+
+    @Deprecated final static BulletStack stack = new BulletStack();
+    private static final Vector3f a = new Vector3f(), b = new Vector3f();
 
     public static void translate(GL2 gl, Transform trans) {
         Vector3f o = trans.origin;
@@ -159,8 +161,9 @@ public enum ShapeDrawer {
                 switch (shape.getShapeType()) {
                     case BOX_SHAPE_PROXYTYPE: {
                         BoxShape boxShape = (BoxShape) shape;
-                        Vector3f halfExtent = stack.vectors.get(boxShape.getHalfExtentsWithoutMargin(new Vector3f()));
-                        gl.glScalef(2f * halfExtent.x, 2f * halfExtent.y, 2f * halfExtent.z);
+                        boxShape.getHalfExtentsWithoutMargin(a);
+                        //Vector3f halfExtent = stack.vectors.get();
+                        gl.glScalef(2f * a.x, 2f * a.y, 2f * a.z);
                         //glsrt.drawCube(gl, 1f);
                         glut.glutSolidCube(1f);
 
@@ -276,7 +279,7 @@ public enum ShapeDrawer {
 
                         vbo.glBegin(gl.GL_LINES);
 
-                        Vector3f a = stack.vectors.get(), b = stack.vectors.get();
+                        //Vector3f a = stack.vectors.get(), b = stack.vectors.get();
                         int i;
                         for (i = 0; i < polyshape.getNumEdges(); i++) {
                             polyshape.getEdge(i, a, b);
@@ -341,13 +344,15 @@ public enum ShapeDrawer {
                     //btVector3 aabbMax(100,100,100);//btScalar(1e30),btScalar(1e30),btScalar(1e30));
 
                     //todo pass camera, for some culling
-                    Vector3f aabbMax = stack.vectors.get(1e30f, 1e30f, 1e30f);
-                    Vector3f aabbMin = stack.vectors.get(-1e30f, -1e30f, -1e30f);
+//                    Vector3f aabbMax = stack.vectors.get(1e30f, 1e30f, 1e30f);
+//                    Vector3f aabbMin = stack.vectors.get(-1e30f, -1e30f, -1e30f);
+                    a.set(1e30f, 1e30f, 1e30f);
+                    b.set(-1e30f, -1e30f, -1e30f);
 
                     GlDrawcallback drawCallback = new GlDrawcallback(gl);
                     drawCallback.wireframe = false; //(debugMode & DebugDrawModes.DRAW_WIREFRAME) != 0;
 
-                    concaveMesh.processAllTriangles(drawCallback, aabbMin, aabbMax);
+                    concaveMesh.processAllTriangles(drawCallback, b, a);
                 }
             }
             //#endif

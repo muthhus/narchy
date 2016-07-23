@@ -208,9 +208,9 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 					//return array[index];
 					//return array[index];
 					axle.set(
-							vehicles.get(i).getWheelInfo(v).worldTransform.basis.getElement(0, vehicles.get(i).getRightAxis()),
-							vehicles.get(i).getWheelInfo(v).worldTransform.basis.getElement(1, vehicles.get(i).getRightAxis()),
-							vehicles.get(i).getWheelInfo(v).worldTransform.basis.getElement(2, vehicles.get(i).getRightAxis()));
+							vehicles.get(i).getWheelInfo(v).worldTransform.basis.get(0, vehicles.get(i).getRightAxis()),
+							vehicles.get(i).getWheelInfo(v).worldTransform.basis.get(1, vehicles.get(i).getRightAxis()),
+							vehicles.get(i).getWheelInfo(v).worldTransform.basis.get(2, vehicles.get(i).getRightAxis()));
 
 
 					//m_vehicles[i]->getWheelInfo(v).m_raycastInfo.m_wheelAxleWS

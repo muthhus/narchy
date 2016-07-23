@@ -35,15 +35,15 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
         new DeductiveMeshTest(n, new int[]{6,5}, 16384);
         //new ArithmeticInduction(n);
 
-        final int maxNodes = 64;
-        final int maxEdges = 2;
+        final int maxNodes = 128;
+        final int maxEdges = 16;
 
         new SpaceGraph<Term>(
                 new ConceptBagInput(n, maxNodes, maxEdges)
         ).with(
-                new Flatten()
+                //new Flatten()
                 //new Spiral()
-                //new FastOrganicLayout()
+                new FastOrganicLayout()
         ).show(1300, 900);
 
         n.loop(30f);

@@ -25,7 +25,6 @@ package spacegraph.phys.linearmath;
 
 import com.jogamp.opengl.math.Quaternion;
 import spacegraph.phys.BulletGlobals;
-import spacegraph.phys.util.ArrayPool;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
@@ -111,12 +110,9 @@ public class MatrixUtil {
 	}
 	
 	public static void transposeTransform(Vector3f dest, Vector3f vec, Matrix3f mat) {
-		float x = tdotx(mat, vec);
-		float y = tdoty(mat, vec);
-		float z = tdotz(mat, vec);
-		dest.x = x;
-		dest.y = y;
-		dest.z = z;
+		dest.x = tdotx(mat, vec);
+		dest.y = tdoty(mat, vec);
+		dest.z = tdotz(mat, vec);
 	}
 	
 	public static void setRotation(Matrix3f dest, Quat4f q) {
@@ -166,10 +162,10 @@ public class MatrixUtil {
 	}
 
 	public static void getRotation(Matrix3f mat, Quat4f dest) {
-		ArrayPool<float[]> floatArrays = ArrayPool.get(float.class);
+		//ArrayPool<float[]> floatArrays = ArrayPool.get(float.class);
 		
 		float trace = mat.m00 + mat.m11 + mat.m22;
-		float[] temp = floatArrays.getFixed(4);
+		float[] temp = new float[4]; //floatArrays.getFixed(4);
 
 		if (trace > 0f) {
 			float s = (float) Math.sqrt(trace + 1f);
@@ -185,18 +181,19 @@ public class MatrixUtil {
 			int j = (i + 1) % 3;
 			int k = (i + 2) % 3;
 
-			float s = (float) Math.sqrt(mat.getElement(i, i) - mat.getElement(j, j) - mat.getElement(k, k) + 1f);
+			float s = (float) Math.sqrt(mat.get(i, i) - mat.get(j, j) - mat.get(k, k) + 1f);
 			temp[i] = s * 0.5f;
 			s = 0.5f / s;
 
-			temp[3] = (mat.getElement(k, j) - mat.getElement(j, k)) * s;
-			temp[j] = (mat.getElement(j, i) + mat.getElement(i, j)) * s;
-			temp[k] = (mat.getElement(k, i) + mat.getElement(i, k)) * s;
+			temp[3] = (mat.get(k, j) - mat.get(j, k)) * s;
+			temp[j] = (mat.get(j, i) + mat.get(i, j)) * s;
+			temp[k] = (mat.get(k, i) + mat.get(i, k)) * s;
 		}
-		dest.set(temp[0], temp[1], temp[2], temp[3]);
+		dest.set(temp);
 		
-		floatArrays.release(temp);
+		//floatArrays.release(temp);
 	}
+
 	public static void setQuat(Quaternion q, int i, float v) {
 		switch (i) {
 			case 0: q.setX(v); break;
@@ -225,19 +222,19 @@ public class MatrixUtil {
 			int j = (i + 1) % 3;
 			int k = (i + 2) % 3;
 
-			float s = (float) Math.sqrt(mat.getElement(i, i) - mat.getElement(j, j) - mat.getElement(k, k) + 1f);
+			float s = (float) Math.sqrt(mat.get(i, i) - mat.get(j, j) - mat.get(k, k) + 1f);
 			setQuat(q, i, s * 0.5f);
 			s = 0.5f / s;
 
-			setQuat(q, 3, (mat.getElement(k, j) - mat.getElement(j, k)) * s);
-			setQuat(q, j, (mat.getElement(j, i) + mat.getElement(i, j)) * s);
-			setQuat(q, k, (mat.getElement(k, i) + mat.getElement(i, k)) * s);
+			setQuat(q, 3, (mat.get(k, j) - mat.get(j, k)) * s);
+			setQuat(q, j, (mat.get(j, i) + mat.get(i, j)) * s);
+			setQuat(q, k, (mat.get(k, i) + mat.get(i, k)) * s);
 		}
 
 	}
 
 	private static float cofac(Matrix3f mat, int r1, int c1, int r2, int c2) {
-		return mat.getElement(r1, c1) * mat.getElement(r2, c2) - mat.getElement(r1, c2) * mat.getElement(r2, c1);
+		return mat.get(r1, c1) * mat.get(r2, c2) - mat.get(r1, c2) * mat.get(r2, c1);
 	}
 	
 	public static void invert(Matrix3f mat) {
@@ -312,8 +309,8 @@ public class MatrixUtil {
 			}
 
 			// compute Jacobi rotation J which leads to a zero for element [p][q]
-			float mpq = mat.getElement(p, q);
-			float theta = (mat.getElement(q, q) - mat.getElement(p, p)) / (2 * mpq);
+			float mpq = mat.get(p, q);
+			float theta = (mat.get(q, q) - mat.get(p, p)) / (2 * mpq);
 			float theta2 = theta * theta;
 			float cos;
 			float sin;
@@ -332,10 +329,10 @@ public class MatrixUtil {
 			// apply rotation to matrix (this = J^T * this * J)
 			mat.setElement(p, q, 0f);
 			mat.setElement(q, p, 0f);
-			mat.setElement(p, p, mat.getElement(p, p) - t * mpq);
-			mat.setElement(q, q, mat.getElement(q, q) + t * mpq);
-			float mrp = mat.getElement(r, p);
-			float mrq = mat.getElement(r, q);
+			mat.setElement(p, p, mat.get(p, p) - t * mpq);
+			mat.setElement(q, q, mat.get(q, q) + t * mpq);
+			float mrp = mat.get(r, p);
+			float mrq = mat.get(r, q);
 			mat.setElement(r, p, cos * mrp - sin * mrq);
 			mat.setElement(p, r, cos * mrp - sin * mrq);
 			mat.setElement(r, q, cos * mrq + sin * mrp);

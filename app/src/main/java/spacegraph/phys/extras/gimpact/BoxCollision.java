@@ -88,7 +88,7 @@ class BoxCollision {
 	 * Returns the dot product between a vec3f and the col of a matrix.
 	 */
 	public static float bt_mat3_dot_col(Matrix3f mat, Vector3f vec3, int colindex) {
-		return vec3.x*mat.getElement(0, colindex) + vec3.y*mat.getElement(1, colindex) + vec3.z*mat.getElement(2, colindex);
+		return vec3.x*mat.get(0, colindex) + vec3.y*mat.get(1, colindex) + vec3.z*mat.get(2, colindex);
 	}
 
 	/**
@@ -117,7 +117,7 @@ class BoxCollision {
 
 			for (int i=0; i<3; i++) {
 				for (int j=0; j<3; j++) {
-					AR.setElement(i, j, 1e-6f + Math.abs(R1to0.getElement(i, j)));
+					AR.setElement(i, j, 1e-6f + Math.abs(R1to0.get(i, j)));
 				}
 			}
 		}
@@ -499,9 +499,9 @@ class BoxCollision {
 					for (int j=0; j<3; j++) {
 						q = j == 2 ? 1 : 2;
 						r = j == 0 ? 1 : 0;
-						t = VectorUtil.getCoord(T, n) * transcache.R1to0.getElement(m, j) - VectorUtil.getCoord(T, m) * transcache.R1to0.getElement(n, j);
-						t2 = VectorUtil.getCoord(ea, o) * transcache.AR.getElement(p, j) + VectorUtil.getCoord(ea, p) * transcache.AR.getElement(o, j) +
-								VectorUtil.getCoord(eb, r) * transcache.AR.getElement(i, q) + VectorUtil.getCoord(eb, q) * transcache.AR.getElement(i, r);
+						t = VectorUtil.getCoord(T, n) * transcache.R1to0.get(m, j) - VectorUtil.getCoord(T, m) * transcache.R1to0.get(n, j);
+						t2 = VectorUtil.getCoord(ea, o) * transcache.AR.get(p, j) + VectorUtil.getCoord(ea, p) * transcache.AR.get(o, j) +
+								VectorUtil.getCoord(eb, r) * transcache.AR.get(i, q) + VectorUtil.getCoord(eb, q) * transcache.AR.get(i, r);
 						if (BT_GREATER(t, t2)) {
 							return false;
 						}

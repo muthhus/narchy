@@ -13,6 +13,9 @@ import spacegraph.phys.linearmath.Transform;
 import spacegraph.phys.util.Motion;
 import spacegraph.render.ShapeDrawer;
 
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
 
@@ -21,6 +24,7 @@ import java.util.function.BiConsumer;
  * an atom (base unit) of spacegraph physics-simulated virtual matter
  */
 public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
+
 
     public final O key;
     public final int hash;
@@ -369,17 +373,20 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     static final Quaternion tmpQ = new Quaternion();
+    static final Matrix4f tmpM4 = new Matrix4f();
+    static final Matrix3f tmpM3 = new Matrix3f();
+
     static final float[] tmpV = new float[3];
     static final Vector3f ww = new Vector3f();
     static final Vector3f vv = new Vector3f();
+    static final AxisAngle4f tmpA = new AxisAngle4f();
 
     static public void renderHalfTriEdge(GL2 gl, Spatial src, EDraw e, float width) {
         Spatial tgt = e.target;
 
         gl.glPushMatrix();
 
-        float a = src.transform().getRotation(tmpQ).toAngleAxis(tmpV);
-        ww.set(tmpV);
+        src.transform().toAngleAxis(tmpQ, tmpA, ww);
         ww.normalize(); //used for the normal3f below
         float sx = src.x();
         float tx = tgt.x();

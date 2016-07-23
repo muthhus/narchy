@@ -34,8 +34,9 @@ package javax.vecmath;
 /**
  * A single precision floating point 3 by 3 matrix.
  * Primarily to support 3D rotations.
+ * TODO make a float[][] version of this
  */
-public class Matrix3f implements java.io.Serializable, Cloneable {
+public final class Matrix3f implements java.io.Serializable, Cloneable {
 
     // Compatible with 1.1
     static final long serialVersionUID = 329697160112089834L;
@@ -441,7 +442,7 @@ public class Matrix3f implements java.io.Serializable, Cloneable {
      * @param column the column number to be retrieved (zero indexed)
      * @return the value at the indexed element.
      */
-    public final float getElement(int row, int column) {
+    public final float get(int row, int column) {
         switch (row) {
             case 0:
                 switch (column) {

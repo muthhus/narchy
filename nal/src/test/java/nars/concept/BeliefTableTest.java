@@ -53,8 +53,8 @@ public class BeliefTableTest  {
     @Test
     public void testExpectation() {
 
-        assertEquals(0.859f, new DefaultTruth(0.9f,0.9f).expectationPositive(), 0.001f);
-        assertEquals(0.859f, new DefaultTruth(0.1f,0.9f).expectationNegative(), 0.001f);
+        assertEquals(0.859f, new DefaultTruth(0.9f,0.9f).expectation(), 0.001f);
+
 
 
         NAR n = newNAR(12);
@@ -69,8 +69,7 @@ public class BeliefTableTest  {
         n.next();
         b.print();
 
-        assertEquals(0.86f, b.beliefs().top(n.time()).expectation(true), 0.1f);
-        //assertEquals(0.2f, b.beliefs().top(n).expectation(false), 0.01f);
+        assertEquals(0.86f, b.beliefs().top(n.time()).expectation(), 0.1f);
 
         n.input("a:b. %0.2|0.7%");
         n.input("a:b. %0.1|0.8%"); //highest negative

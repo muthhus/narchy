@@ -578,4 +578,7 @@ public final class TruthFunctions extends UtilityFunctions {
         }
     }
 
+    public static float expectation(float frequency, float confidence) {
+        return (confidence * (frequency - 0.5f) + 0.5f);
+    }
 }

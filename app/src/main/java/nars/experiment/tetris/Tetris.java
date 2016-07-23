@@ -45,6 +45,7 @@ import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.FastOrganicLayout;
+import spacegraph.layout.Flatten;
 import spacegraph.layout.Spiral;
 
 import javax.swing.*;
@@ -244,7 +245,7 @@ public class Tetris extends TetrisState implements Environment {
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 ,new FrameClock());
-        nar.conceptActivation.setValue(0.1f);
+        nar.conceptActivation.setValue(0.01f);
 
 
         nar.beliefConfidence(0.6f);
@@ -339,10 +340,11 @@ public class Tetris extends TetrisState implements Environment {
 
 
                     new SpaceGraph<>(
-                            new ConceptBagInput(nar, 32, 4)
+                            new ConceptBagInput(nar, 128, 4)
                     ).with(
-                            new Spiral()
+                            //new Spiral()
                             //new FastOrganicLayout()
+                            new Flatten()
                     ).show(1300, 900);
                 }
 
@@ -353,7 +355,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, runCycles, 10);
+        t.run(n, runCycles, 0);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

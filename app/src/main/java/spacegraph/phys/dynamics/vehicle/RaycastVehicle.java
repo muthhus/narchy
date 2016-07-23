@@ -303,9 +303,9 @@ public class RaycastVehicle extends TypedConstraint {
 
 		Vector3f forwardW = new Vector3f();
 		forwardW.set(
-				chassisTrans.basis.getElement(0, indexForwardAxis),
-				chassisTrans.basis.getElement(1, indexForwardAxis),
-				chassisTrans.basis.getElement(2, indexForwardAxis));
+				chassisTrans.basis.get(0, indexForwardAxis),
+				chassisTrans.basis.get(1, indexForwardAxis),
+				chassisTrans.basis.get(2, indexForwardAxis));
 
         if (forwardW.dot(chassisBody.getLinearVelocity(tmp)) < 0f) {
 			currentVehicleSpeedKmHour *= -1f;
@@ -356,9 +356,9 @@ public class RaycastVehicle extends TypedConstraint {
 
 				Vector3f fwd = new Vector3f();
 				fwd.set(
-						chassisWorldTransform.basis.getElement(0, indexForwardAxis),
-						chassisWorldTransform.basis.getElement(1, indexForwardAxis),
-						chassisWorldTransform.basis.getElement(2, indexForwardAxis));
+						chassisWorldTransform.basis.get(0, indexForwardAxis),
+						chassisWorldTransform.basis.get(1, indexForwardAxis),
+						chassisWorldTransform.basis.get(2, indexForwardAxis));
 
 				float proj = fwd.dot(wheel.raycastInfo.contactNormalWS);
 				tmp.scale(proj, wheel.raycastInfo.contactNormalWS);
@@ -524,9 +524,9 @@ public class RaycastVehicle extends TypedConstraint {
                 Matrix3f wheelBasis0 = new Matrix3f(wheelTrans.basis);
                 //return array[index];
                 axle.get(i).set(
-                        wheelBasis0.getElement(0, indexRightAxis),
-                        wheelBasis0.getElement(1, indexRightAxis),
-                        wheelBasis0.getElement(2, indexRightAxis));
+                        wheelBasis0.get(0, indexRightAxis),
+                        wheelBasis0.get(1, indexRightAxis),
+                        wheelBasis0.get(2, indexRightAxis));
 
                 Vector3f surfNormalWS = wheel_info.raycastInfo.contactNormalWS;
                 //return array[index];
@@ -702,9 +702,9 @@ public class RaycastVehicle extends TypedConstraint {
 		Transform chassisTrans = getChassisWorldTransform(new Transform());
 
 		out.set(
-				chassisTrans.basis.getElement(0, indexForwardAxis),
-				chassisTrans.basis.getElement(1, indexForwardAxis),
-				chassisTrans.basis.getElement(2, indexForwardAxis));
+				chassisTrans.basis.get(0, indexForwardAxis),
+				chassisTrans.basis.get(1, indexForwardAxis),
+				chassisTrans.basis.get(2, indexForwardAxis));
 
 		return out;
 	}

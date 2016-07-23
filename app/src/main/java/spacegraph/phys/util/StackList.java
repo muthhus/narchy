@@ -62,8 +62,7 @@ public abstract class StackList<T> {
 		returnObj = create();
 	}
 	
-	protected StackList(boolean unused) {
-	}
+
 	
 	/**
 	 * Pushes the stack.

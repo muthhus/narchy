@@ -133,7 +133,7 @@ public class Generic6DofConstraint extends TypedConstraint {
 	private static float getMatrixElem(Matrix3f mat, int index) {
 		int i = index % 3;
 		int j = index / 3;
-		return mat.getElement(i, j);
+		return mat.get(i, j);
 	}
 
 	/**

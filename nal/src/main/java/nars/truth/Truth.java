@@ -67,28 +67,8 @@ public interface Truth extends Truthed {
      *
      * @return The expectation value
      */
-    @Override
     default float expectation() {
-        return expectationPositive();
-    }
-    @Override
-    default float expectation(boolean positive) {
-        return positive ? expectationPositive() : expectationNegative();
-    }
-
-    /** expectation, the expectation of freq=1 */
-    default float expectationPositive() {
-        return expectation(freq(), conf());
-    }
-
-
-    /** expectation inverse, the expectation of freq=0  */
-    default float expectationNegative() {
-        return expectation(1.0f - freq(), conf());
-    }
-
-    static float expectation(float frequency, float confidence) {
-        return (confidence * (frequency - 0.5f) + 0.5f);
+        return TruthFunctions.expectation(freq(), conf());
     }
 
     //DONT USE THIS IT IS BIASED AGAINST NEGATIVE FREQUENCY TRUTH
@@ -206,7 +186,7 @@ public interface Truth extends Truthed {
     
     @NotNull
     default Term toWordTerm(float trueExpectationThreshold, boolean negated) {
-        float e = !negated ? expectationPositive() : expectationNegative();
+        float e = !negated ? expectation() : (1f-expectation());
 
         if (e > trueExpectationThreshold) {
             return Truth_TRUE;
