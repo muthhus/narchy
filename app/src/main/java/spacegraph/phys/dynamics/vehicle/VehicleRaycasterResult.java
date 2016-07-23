@@ -23,7 +23,7 @@
 
 package spacegraph.phys.dynamics.vehicle;
 
-import javax.vecmath.Vector3f;
+import spacegraph.math.v3;
 
 /**
  * Vehicle raycaster result.
@@ -32,8 +32,8 @@ import javax.vecmath.Vector3f;
  */
 public class VehicleRaycasterResult {
 	
-	public final Vector3f hitPointInWorld  = new Vector3f();
-	public final Vector3f hitNormalInWorld  = new Vector3f();
+	public final v3 hitPointInWorld  = new v3();
+	public final v3 hitNormalInWorld  = new v3();
 	public float distFraction = -1f;
 
 }

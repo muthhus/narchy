@@ -37,7 +37,7 @@ import java.util.Map;
 public class ArrayPool<T> {
 
 	private final Class componentType;
-	private final ObjectArrayList list = new ObjectArrayList();
+	private final OArrayList list = new OArrayList();
 	private final Comparator comparator;
 	private final IntValue key = new IntValue();
 	

@@ -27,13 +27,12 @@ package spacegraph.render;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
-import spacegraph.phys.collision.broadphase.BroadphaseNativeType;
-import spacegraph.phys.collision.shapes.*;
-import spacegraph.phys.linearmath.Transform;
-import spacegraph.phys.linearmath.VectorUtil;
+import spacegraph.math.v3;
+import spacegraph.phys.collision.broad.BroadphaseNativeType;
+import spacegraph.phys.math.Transform;
+import spacegraph.phys.math.VectorUtil;
+import spacegraph.phys.shape.*;
 import spacegraph.phys.util.BulletStack;
-
-import javax.vecmath.Vector3f;
 
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.render.JoglSpace.glut;
@@ -98,10 +97,10 @@ public enum Draw {
 
     @Deprecated
     final static BulletStack stack = new BulletStack();
-    private static final Vector3f a = new Vector3f(), b = new Vector3f();
+    private static final v3 a = new v3(), b = new v3();
 
     public static void translate(GL2 gl, Transform trans) {
-        Vector3f o = trans.origin;
+        v3 o = Transform.this;
         gl.glTranslatef(o.x, o.y, o.z);
     }
 
@@ -247,7 +246,7 @@ public enum Draw {
                     int upAxis = cylinder.getUpAxis();
 
                     float radius = cylinder.getRadius();
-                    float halfHeight = VectorUtil.getCoord(cylinder.getHalfExtentsWithMargin(new Vector3f()), upAxis);
+                    float halfHeight = VectorUtil.getCoord(cylinder.getHalfExtentsWithMargin(new v3()), upAxis);
 
                     glsrt.drawCylinder(gl, radius, halfHeight, upAxis);
 
@@ -446,15 +445,15 @@ public enum Draw {
     private static class GlDisplaylistDrawcallback extends TriangleCallback {
         private final GL gl;
 
-        private final Vector3f diff1 = new Vector3f();
-        private final Vector3f diff2 = new Vector3f();
-        private final Vector3f normal = new Vector3f();
+        private final v3 diff1 = new v3();
+        private final v3 diff2 = new v3();
+        private final v3 normal = new v3();
 
         public GlDisplaylistDrawcallback(GL gl) {
             this.gl = gl;
         }
 
-        public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
+        public void processTriangle(v3[] triangle, int partId, int triangleIndex) {
             diff1.sub(triangle[1], triangle[0]);
             diff2.sub(triangle[2], triangle[0]);
             normal.cross(diff1, diff2);
@@ -509,7 +508,7 @@ public enum Draw {
             this.gl = gl;
         }
 
-        public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
+        public void processTriangle(v3[] triangle, int partId, int triangleIndex) {
             ImmModeSink vbo = ImmModeSink.createFixed(GL.GL_STATIC_DRAW, 10,
                     3, GL.GL_FLOAT,  // vertex
                     4, GL.GL_FLOAT,  // color
@@ -547,7 +546,7 @@ public enum Draw {
             this.gl = gl;
         }
 
-        public void internalProcessTriangleIndex(Vector3f[] triangle, int partId, int triangleIndex) {
+        public void internalProcessTriangleIndex(v3[] triangle, int partId, int triangleIndex) {
             ImmModeSink vbo = ImmModeSink.createFixed(GL.GL_STATIC_DRAW, 10,
                     3, GL.GL_FLOAT,  // vertex
                     4, GL.GL_FLOAT,  // color

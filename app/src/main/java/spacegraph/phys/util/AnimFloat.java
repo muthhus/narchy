@@ -2,7 +2,7 @@ package spacegraph.phys.util;
 
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import spacegraph.phys.dynamics.DynamicsWorld;
+import spacegraph.phys.Dynamics;
 
 
 public class AnimFloat extends MutableFloat implements Animated {
@@ -11,11 +11,11 @@ public class AnimFloat extends MutableFloat implements Animated {
     final MutableFloat speed;
     private boolean running = true;
 
-    public AnimFloat(DynamicsWorld w, float speed) {
+    public AnimFloat(Dynamics w, float speed) {
         this(Float.NaN, w, speed);
     }
 
-    public AnimFloat(float current, DynamicsWorld w, float speed) {
+    public AnimFloat(float current, Dynamics w, float speed) {
         super(Float.NaN);
         setValue(current);
         target = current;

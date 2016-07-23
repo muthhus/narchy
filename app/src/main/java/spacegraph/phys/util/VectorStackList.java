@@ -24,34 +24,34 @@
 package spacegraph.phys.util;
 
 
-import javax.vecmath.Vector3f;
+import spacegraph.math.v3;
 
 /**
- * Stack-based object pool for {@link Vector3f}.
+ * Stack-based object pool for {@link v3}.
  *
  * @author jezek2
  */
-public class VectorStackList extends StackList<Vector3f> {
+public class VectorStackList extends StackList<v3> {
 
-	public Vector3f get(float x, float y, float z) {
-		Vector3f v = get();
+	public v3 get(float x, float y, float z) {
+		v3 v = get();
 		v.set(x, y, z);
 		return v;
 	}
 
-	public Vector3f get(Vector3f vec) {
-		Vector3f v = get();
+	public v3 get(v3 vec) {
+		v3 v = get();
 		v.set(vec);
 		return v;
 	}
 
 	@Override
-	protected Vector3f create() {
-		return new Vector3f();
+	protected v3 create() {
+		return new v3();
 	}
 
 	@Override
-	protected void copy(Vector3f dest, Vector3f src) {
+	protected void copy(v3 dest, v3 src) {
 		dest.set(src);
 	}
 

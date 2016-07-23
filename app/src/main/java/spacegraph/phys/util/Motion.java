@@ -1,9 +1,8 @@
 package spacegraph.phys.util;
 
-import spacegraph.phys.linearmath.MotionState;
-import spacegraph.phys.linearmath.Transform;
-
-import javax.vecmath.Vector3f;
+import spacegraph.math.v3;
+import spacegraph.phys.math.MotionState;
+import spacegraph.phys.math.Transform;
 
 
 public class Motion extends MotionState {
@@ -51,7 +50,7 @@ public class Motion extends MotionState {
         }
     }
 
-    public void center(Vector3f v) {
-        t.origin.set(v);
+    public void center(v3 v) {
+        Transform.this.set(v);
     }
 }

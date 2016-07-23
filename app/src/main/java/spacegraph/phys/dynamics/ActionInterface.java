@@ -23,18 +23,19 @@
 
 package spacegraph.phys.dynamics;
 
-import spacegraph.phys.collision.dispatch.CollisionWorld;
-import spacegraph.phys.linearmath.IDebugDraw;
+import spacegraph.phys.Collisions;
+import spacegraph.phys.Dynamics;
+import spacegraph.phys.math.IDebugDraw;
 
 /**
  * Basic interface to allow actions such as vehicles and characters to be
- * updated inside a {@link DynamicsWorld}.
+ * updated inside a {@link Dynamics}.
  *
  * @author tomrbryn
  */
 public abstract class ActionInterface {
 
-	public abstract void updateAction(CollisionWorld collisionWorld, float deltaTimeStep);
+	public abstract void updateAction(Collisions collisions, float deltaTimeStep);
 
 	public abstract void debugDraw(IDebugDraw debugDrawer);
 

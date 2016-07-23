@@ -2,9 +2,8 @@ package spacegraph.obj;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
+import spacegraph.math.Vector2f;
 import spacegraph.render.Draw;
-
-import javax.vecmath.Vector2f;
 
 /**
  * Created by me on 6/26/16.
@@ -12,7 +11,7 @@ import javax.vecmath.Vector2f;
 public class XYSlider extends Surface {
 
     final Vector2f knob = new Vector2f(0.5f, 0.5f);
-    private float knobSize = 0.25f;
+    private final float knobSize = 0.25f;
 
     public XYSlider() {
         super();

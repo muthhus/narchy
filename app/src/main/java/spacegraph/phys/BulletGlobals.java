@@ -23,6 +23,9 @@
 
 package spacegraph.phys;
 
+import spacegraph.phys.collision.ContactAddedCallback;
+import spacegraph.phys.collision.ContactDestroyedCallback;
+import spacegraph.phys.collision.ContactProcessedCallback;
 import spacegraph.phys.util.ArrayPool;
 
 

@@ -23,9 +23,8 @@
 
 package spacegraph.phys.util;
 
-import spacegraph.phys.linearmath.Transform;
-
-import javax.vecmath.Matrix3f;
+import spacegraph.math.Matrix3f;
+import spacegraph.phys.math.Transform;
 
 /**
  * Stack-based object pool for {@link Transform}.
@@ -43,7 +42,7 @@ public class TransformStackList extends StackList<Transform> {
 	public Transform get(Matrix3f mat) {
 		Transform obj = get();
 		obj.basis.set(mat);
-		obj.origin.set(0f, 0f, 0f);
+		Transform.this.set(0f, 0f, 0f);
 		return obj;
 	}
 

@@ -8,10 +8,10 @@ import nars.$;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.phys.collision.dispatch.Collidable;
+import spacegraph.math.v3;
+import spacegraph.phys.Collidable;
 import spacegraph.render.JoglPhysics;
 
-import javax.vecmath.Vector3f;
 import java.util.List;
 import java.util.function.Function;
 
@@ -114,7 +114,7 @@ public class SpaceGraph<X> extends JoglPhysics<Spatial<X>> {
 
 
 
-    public void setGravity(Vector3f v) {
+    public void setGravity(v3 v) {
         dyn.setGravity(v);
     }
 

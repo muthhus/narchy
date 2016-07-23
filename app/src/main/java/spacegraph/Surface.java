@@ -3,9 +3,9 @@ package spacegraph;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.math.Vector2f;
+import spacegraph.math.v3;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**
@@ -15,14 +15,14 @@ import java.util.List;
 public class Surface {
 
 
-    public Vector3f translateLocal;
+    public v3 translateLocal;
     public Vector2f scaleLocal;
 
     public Surface parent;
     public List<? extends Surface> children;
 
     public Surface() {
-        translateLocal = new Vector3f();
+        translateLocal = new v3();
         scaleLocal = new Vector2f(1f,1f);
     }
 
@@ -111,7 +111,7 @@ public class Surface {
     public void transform(GL2 gl) {
         final Surface c = this;
 
-        Vector3f translate = c.translateLocal;
+        v3 translate = c.translateLocal;
         if (translate!=null)
             gl.glTranslatef(translate.x, translate.y, translate.z);
 

@@ -51,7 +51,7 @@ import java.util.ArrayList;
 public abstract class StackList<T> {
 
 	private final ArrayList<T> list = new ArrayList<T>();
-	private T returnObj;
+	private final T returnObj;
 	
 	private final int[] stack = new int[512];
 	private int stackCount;

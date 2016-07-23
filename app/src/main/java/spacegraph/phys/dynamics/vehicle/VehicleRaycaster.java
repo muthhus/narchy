@@ -23,7 +23,7 @@
 
 package spacegraph.phys.dynamics.vehicle;
 
-import javax.vecmath.Vector3f;
+import spacegraph.math.v3;
 
 /**
  * VehicleRaycaster is provides interface for between vehicle simulation and raycasting.
@@ -32,6 +32,6 @@ import javax.vecmath.Vector3f;
  */
 public abstract class VehicleRaycaster {
 
-	public abstract Object castRay(Vector3f from, Vector3f to, VehicleRaycasterResult result);
+	public abstract Object castRay(v3 from, v3 to, VehicleRaycasterResult result);
 	
 }

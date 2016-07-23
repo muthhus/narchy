@@ -23,11 +23,10 @@
 
 package spacegraph.phys.dynamics.vehicle;
 
-import spacegraph.phys.collision.dispatch.ClosestRay;
-import spacegraph.phys.dynamics.DynamicsWorld;
-import spacegraph.phys.dynamics.RigidBody;
-
-import javax.vecmath.Vector3f;
+import spacegraph.math.v3;
+import spacegraph.phys.Dynamics;
+import spacegraph.phys.Tangible;
+import spacegraph.phys.collision.ClosestRay;
 
 /**
  * Default implementation of {@link VehicleRaycaster}.
@@ -36,22 +35,22 @@ import javax.vecmath.Vector3f;
  */
 public class DefaultVehicleRaycaster extends VehicleRaycaster {
 
-	protected DynamicsWorld dynamicsWorld;
+	protected Dynamics dynamics;
 
-	public DefaultVehicleRaycaster(DynamicsWorld world) {
-		this.dynamicsWorld = world;
+	public DefaultVehicleRaycaster(Dynamics world) {
+		this.dynamics = world;
 	}
 
 	@Override
-	public Object castRay(Vector3f from, Vector3f to, VehicleRaycasterResult result) {
+	public Object castRay(v3 from, v3 to, VehicleRaycasterResult result) {
 		//RayResultCallback& resultCallback;
 
 		ClosestRay rayCallback = new ClosestRay(from, to);
 
-		dynamicsWorld.rayTest(from, to, rayCallback);
+		dynamics.rayTest(from, to, rayCallback);
 
 		if (rayCallback.hasHit()) {
-			RigidBody body = RigidBody.upcast(rayCallback.collidable);
+			Tangible body = Tangible.upcast(rayCallback.collidable);
 			if (body != null && body.hasContactResponse()) {
 				result.hitPointInWorld.set(rayCallback.hitPointWorld);
 				result.hitNormalInWorld.set(rayCallback.hitNormalWorld);

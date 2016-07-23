@@ -23,7 +23,7 @@
 
 package spacegraph.phys.util;
 
-import javax.vecmath.Vector4f;
+import spacegraph.math.Vector4f;
 
 /**
  * Stack-based object pool for {@link Vector4f}.

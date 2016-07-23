@@ -3,7 +3,6 @@ package spacegraph;
 import nars.$;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 

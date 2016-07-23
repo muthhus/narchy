@@ -35,29 +35,32 @@ import com.jogamp.opengl.math.FloatUtil;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
-import spacegraph.phys.collision.broadphase.BroadphaseInterface;
-import spacegraph.phys.collision.broadphase.SimpleBroadphase;
-import spacegraph.phys.collision.dispatch.*;
-import spacegraph.phys.collision.shapes.CollisionShape;
-import spacegraph.phys.dynamics.DiscreteDynamicsWorld;
-import spacegraph.phys.dynamics.DynamicsWorld;
-import spacegraph.phys.dynamics.RigidBody;
-import spacegraph.phys.dynamics.RigidBodyConstructionInfo;
-import spacegraph.phys.dynamics.constraintsolver.ConstraintSolver;
-import spacegraph.phys.dynamics.constraintsolver.Point2PointConstraint;
-import spacegraph.phys.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
-import spacegraph.phys.dynamics.constraintsolver.TypedConstraint;
-import spacegraph.phys.linearmath.*;
-import spacegraph.phys.util.*;
+import spacegraph.math.Color3f;
+import spacegraph.math.Matrix3f;
+import spacegraph.math.Quat4f;
+import spacegraph.math.v3;
+import spacegraph.phys.*;
+import spacegraph.phys.collision.ClosestRay;
+import spacegraph.phys.collision.DefaultCollisionConfiguration;
+import spacegraph.phys.collision.DefaultIntersecter;
+import spacegraph.phys.collision.broad.Broadphase;
+import spacegraph.phys.collision.broad.Intersecter;
+import spacegraph.phys.collision.broad.SimpleBroadphase;
+import spacegraph.phys.constraint.Constrainer;
+import spacegraph.phys.constraint.Point2PointConstraint;
+import spacegraph.phys.constraint.SequentialImpulseConstrainer;
+import spacegraph.phys.constraint.TypedConstraint;
+import spacegraph.phys.math.*;
+import spacegraph.phys.shape.CollisionShape;
+import spacegraph.phys.util.AnimFloat;
+import spacegraph.phys.util.AnimFloatAngle;
+import spacegraph.phys.util.AnimVector3f;
+import spacegraph.phys.util.Motion;
 
-import javax.vecmath.Color3f;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
 
 import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
-import static javax.vecmath.Vector3f.v;
+import static spacegraph.math.v3.v;
 
 /**
  * @author jezek2
@@ -80,26 +83,26 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     //protected final BulletStack stack = BulletStack.get();
 
 
-    public RigidBody pickedBody = null; // for deactivation state
+    public Tangible pickedBody = null; // for deactivation state
 
 
     protected final Clock clock = new Clock();
 
     // this is the most important class
-    public final @NotNull DynamicsWorld<X> dyn;
+    public final @NotNull Dynamics<X> dyn;
 
     // constraint for mouse picking
     protected TypedConstraint pickConstraint = null;
-    protected RigidBody directDrag;
+    protected Tangible directDrag;
 
 
     protected int debug = 0;
 
 
-    protected final Vector3f camPos = new Vector3f();
-    protected final Vector3f camPosTarget;
-    protected final Vector3f camDir = new Vector3f();
-    protected final Vector3f camUp;
+    protected final v3 camPos = new v3();
+    protected final v3 camPosTarget;
+    protected final v3 camDir = new v3();
+    protected final v3 camUp;
     protected final MutableFloat cameraDistance;
     protected final MutableFloat ele;
     protected final MutableFloat azi;
@@ -135,17 +138,17 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         // Setup the basic world
         DefaultCollisionConfiguration collision_config = new DefaultCollisionConfiguration();
 
-        CollisionDispatcher dispatcher = new CollisionDispatcher(collision_config);
+        Intersecter dispatcher = new DefaultIntersecter(collision_config);
 
         //btPoint3 worldAabbMin(-10000,-10000,-10000);
         //btPoint3 worldAabbMax(10000,10000,10000);
         //btBroadphaseInterface* overlappingPairCache = new btAxisSweep3 (worldAabbMin, worldAabbMax);
-        BroadphaseInterface overlappingPairCache = new SimpleBroadphase();
+        Broadphase overlappingPairCache = new SimpleBroadphase();
 
 
-        ConstraintSolver constraintSolver = new SequentialImpulseConstraintSolver();
+        Constrainer constrainer = new SequentialImpulseConstrainer();
 
-        dyn = new DiscreteDynamicsWorld<>(dispatcher, overlappingPairCache, constraintSolver, collision_config) {
+        dyn = new DiscreteDynamics<>(dispatcher, overlappingPairCache, constrainer, collision_config) {
             @Override
             protected boolean valid(int nextID, Collidable<X> c) {
                 return JoglPhysics.this.valid(nextID, c);
@@ -157,7 +160,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         ele = new AnimFloatAngle(20, dyn, 30f);
 
         camPosTarget = new AnimVector3f(0,0,0,dyn, 10f);
-        camUp = new Vector3f(0, 1, 0); //new AnimVector3f(0f, 1f, 0f, dyn, 1f);
+        camUp = new v3(0, 1, 0); //new AnimVector3f(0f, 1f, 0f, dyn, 1f);
 
         dyn.setGravity(v(0, 0, 0));
 
@@ -376,15 +379,15 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         QuaternionUtil.setRotation(rot, camUp, razi);
 
-        Vector3f eyePos = v();
+        v3 eyePos = v();
         VectorUtil.setCoord(eyePos, forwardAxis, -cameraDistance.floatValue());
 
-        Vector3f forward = v(eyePos.x, eyePos.y, eyePos.z);
+        v3 forward = v(eyePos.x, eyePos.y, eyePos.z);
         if (forward.lengthSquared() < ExtraGlobals.FLT_EPSILON) {
             forward.set(1f, 0f, 0f);
         }
 
-        Vector3f camRight = v();
+        v3 camRight = v();
         camRight.cross(camUp, forward);
         camRight.normalize();
         QuaternionUtil.setRotation(roll, camRight, -rele);
@@ -644,19 +647,19 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 //        }
 //    }
 
-    public Vector3f rayTo(int x, int y) {
+    public v3 rayTo(int x, int y) {
 
 
-        Vector3f rayFrom = v(camPos);
-        Vector3f rayForward = v();
+        v3 rayFrom = v(camPos);
+        v3 rayForward = v();
         rayForward.sub(camPosTarget, camPos);
         rayForward.normalize();
         rayForward.scale(farPlane);
 
         //Vector3f rightOffset = new Vector3f();
-        Vector3f vertical = v(camUp);
+        v3 vertical = v(camUp);
 
-        Vector3f hor = v();
+        v3 hor = v();
         // TODO: check: hor = rayForward.cross(vertical);
         hor.cross(rayForward, vertical);
         hor.normalize();
@@ -667,21 +670,21 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         hor.scale(2f * farPlane * tanFovH);
         vertical.scale(2f * farPlane * tanFovV);
 
-        Vector3f rayToCenter = v();
+        v3 rayToCenter = v();
         rayToCenter.add(rayFrom, rayForward);
 
-        Vector3f dHor = v(hor);
+        v3 dHor = v(hor);
         dHor.scale(1f / (float) screenWidth);
 
-        Vector3f dVert = v(vertical);
+        v3 dVert = v(vertical);
         dVert.scale(1.f / (float) screenHeight);
 
-        Vector3f tmp1 = v();
-        Vector3f tmp2 = v();
+        v3 tmp1 = v();
+        v3 tmp2 = v();
         tmp1.scale(0.5f, hor);
         tmp2.scale(0.5f, vertical);
 
-        Vector3f rayTo = v();
+        v3 rayTo = v();
         rayTo.sub(rayToCenter, tmp1);
         rayTo.add(tmp2);
 
@@ -714,7 +717,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
                     //TODO compute new azi and ele that match the current viewing angle values by backcomputing the vector delta
 
 
-                    Vector3f objTarget = co.getWorldOrigin();
+                    v3 objTarget = co.getWorldOrigin();
                     camPosTarget.set(objTarget);
 
                     setCameraDistance(
@@ -803,7 +806,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         }
     }
 
-    final Vector3f gOldPickingPos = v();
+    final v3 gOldPickingPos = v();
     float gOldPickingDist = 0.f;
 
     private void mouseGrabOn(int sx, int sy) {
@@ -811,20 +814,20 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         ClosestRay rayCallback = mousePick(sx, sy);
 
         if (rayCallback.hasHit()) {
-            RigidBody body = RigidBody.upcast(rayCallback.collidable);
+            Tangible body = Tangible.upcast(rayCallback.collidable);
             if (body != null) {
 
                 body.setActivationState(Collidable.DISABLE_DEACTIVATION);
-                Vector3f pickPos = v(rayCallback.hitPointWorld);
+                v3 pickPos = v(rayCallback.hitPointWorld);
 
                 Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
                 tmpTrans.inverse();
-                Vector3f localPivot = v(pickPos);
+                v3 localPivot = v(pickPos);
                 tmpTrans.transform(localPivot);
                 // save mouse position for dragging
                 gOldPickingPos.set(rayCallback.rayToWorld);
-                Vector3f eyePos = v(camPos);
-                Vector3f tmp = v();
+                v3 eyePos = v(camPos);
+                v3 tmp = v();
                 tmp.sub(pickPos, eyePos);
                 gOldPickingDist = tmp.length();
 
@@ -856,16 +859,16 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         return mousePick(v(rayTo(sx, sy)));
     }
 
-    public ClosestRay mousePick(Vector3f rayTo) {
+    public ClosestRay mousePick(v3 rayTo) {
         ClosestRay r = this.rayCallback;
-        Vector3f camPos = this.camPos;
+        v3 camPos = this.camPos;
         dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo));
         return r;
     }
 
     private boolean mouseMotionFunc(int x, int y, short[] buttons) {
 
-        Vector3f ray = v(rayTo(x, y));
+        v3 ray = v(rayTo(x, y));
 
         //if (mouseDragDX == 0) { //if not already dragging somewhere "outside"
 
@@ -892,13 +895,13 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         if ((pickConstraint != null) || (directDrag != null)) {
 
             // keep it at the same picking distance
-            Vector3f eyePos = v(camPos);
-            Vector3f dir = v();
+            v3 eyePos = v(camPos);
+            v3 dir = v();
             dir.sub(ray, eyePos);
             dir.normalize();
             dir.scale(gOldPickingDist);
 
-            Vector3f newPos = v();
+            v3 newPos = v();
             newPos.add(eyePos, dir);
 
             if (directDrag != null) {
@@ -1035,7 +1038,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
     }
 
-    public RigidBody newBody(float mass, Transform startTransform, CollisionShape shape) {
+    public Tangible newBody(float mass, Transform startTransform, CollisionShape shape) {
 
         boolean isDynamic = (mass != 0f);
         int collisionFilterGroup = isDynamic ? 1 : 2;
@@ -1045,19 +1048,19 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     }
 
 
-    public RigidBody newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
+    public Tangible newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
         // rigidbody is dynamic if and only if mass is non zero, otherwise static
         boolean isDynamic = (mass != 0f);
-        Vector3f localInertia = v(0, 0, 0);
+        v3 localInertia = v(0, 0, 0);
         if (isDynamic) {
             shape.calculateLocalInertia(mass, localInertia);
         }
 
-        RigidBodyConstructionInfo c = new RigidBodyConstructionInfo(mass, motion, shape, localInertia);
+        RigidBodyBuilder c = new RigidBodyBuilder(mass, motion, shape, localInertia);
 
-        RigidBody body = new RigidBody(c);
+        Tangible body = new Tangible(c);
 
-        ((DiscreteDynamicsWorld) dyn).addRigidBody(body, (short) group, (short) mask);
+        ((DiscreteDynamics) dyn).addRigidBody(body, (short) group, (short) mask);
 
 
         return body;
@@ -1094,7 +1097,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     }
 
 
-    public static final BiConsumer<GL2,RigidBody> defaultRenderer = (gl, body) -> {
+    public static final BiConsumer<GL2,Tangible> defaultRenderer = (gl, body) -> {
 
         gl.glPushMatrix();
         Draw.transform(gl, body.transform());
@@ -1113,9 +1116,9 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     };
 
     public final void render(Collidable<X> c) {
-        RigidBody<X> body = RigidBody.upcast(c);
+        Tangible<X> body = Tangible.upcast(c);
         if (body != null) {
-            BiConsumer<GL2,RigidBody> r = body.renderer();
+            BiConsumer<GL2,Tangible> r = body.renderer();
             if (r != null)
                 r.accept(gl, body);
         }
@@ -1165,11 +1168,11 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 //        }
 //    }
 
-    public DynamicsWorld<X> getDyn() {
+    public Dynamics<X> getDyn() {
         return dyn;
     }
 
-    public void setCamUp(Vector3f camUp) {
+    public void setCamUp(v3 camUp) {
         this.camUp.set(camUp);
     }
 
@@ -1177,11 +1180,11 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         forwardAxis = axis;
     }
 
-    public Vector3f getCamPos() {
+    public v3 getCamPos() {
         return camPos;
     }
 
-    public Vector3f getCamPosTarget() {
+    public v3 getCamPosTarget() {
         return camPosTarget;
     }
 

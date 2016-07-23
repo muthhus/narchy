@@ -5,26 +5,25 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.phys.collision.dispatch.ClosestRay;
-import spacegraph.phys.collision.shapes.BoxShape;
-import spacegraph.phys.collision.shapes.CollisionShape;
-import spacegraph.phys.collision.shapes.ConvexInternalShape;
-import spacegraph.phys.dynamics.RigidBody;
-import spacegraph.phys.linearmath.Transform;
+import spacegraph.math.AxisAngle4f;
+import spacegraph.math.Matrix3f;
+import spacegraph.math.Matrix4f;
+import spacegraph.math.v3;
+import spacegraph.phys.Tangible;
+import spacegraph.phys.collision.ClosestRay;
+import spacegraph.phys.math.Transform;
+import spacegraph.phys.shape.BoxShape;
+import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.Motion;
 import spacegraph.render.Draw;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
 
 /**
  * volumetric subspace.
  * an atom (base unit) of spacegraph physics-simulated virtual matter
  */
-public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
+public class Spatial<O> implements BiConsumer<GL2, Tangible> {
 
 
     public final O key;
@@ -35,10 +34,10 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
 
 
-    public RigidBody body;
+    public Tangible body;
 
     /** cached center reference */
-    public transient final Vector3f center; //references a field in MotionState's transform
+    public transient final v3 center; //references a field in MotionState's transform
 
     /** physics motion state */
     public final Motion motion = new Motion();
@@ -92,7 +91,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
             this.edges[i] = new EDraw();
 
         //init physics
-        center = motion.t.origin;
+        center = Transform.this;
 
     }
 
@@ -120,14 +119,14 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
 
-    @Deprecated public transient int numEdges = 0;
+    @Deprecated public transient int numEdges;
 
 
     public void update(SpaceGraph<O> s) {
         preactive = true;
 
         if (body == null) {
-            RigidBody b = body = newBody(s, newShape(), collidable());
+            Tangible b = body = newBody(s, newShape(), collidable());
             b.setUserPointer(this);
             b.setRenderer(this);
         } else {
@@ -168,9 +167,9 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     public void move(float x, float y, float z) {
         if (!motionLock) {
 
-            RigidBody b = this.body;
+            Tangible b = this.body;
             if (b !=null) {
-                b.transform().origin.set(x,y,z);
+                Transform.this.set(x,y,z);
 
 //                    com.Transform t = new com.Transform();
 //                    body.getCenterOfMassTransform(t);
@@ -179,7 +178,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
                 reactivate();
             } else {
-                motion.t.origin.set(x, y, z);
+                Transform.this.set(x, y, z);
             }
         }
 
@@ -190,7 +189,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     public void reactivate() {
-        RigidBody b = body;
+        Tangible b = body;
         if (b !=null/* && !b.isActive()*/)
             b.activate(collidable());
     }
@@ -245,20 +244,20 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
-    public boolean onKey(Vector3f hitPoint, char charCode) {
+    public boolean onKey(v3 hitPoint, char charCode) {
         return false;
     }
 
 
     //TODO make abstract
     protected CollisionShape newShape() {
-        return new BoxShape(Vector3f.v(1, 1, 1));
+        return new BoxShape(v3.v(1, 1, 1));
     }
 
 
 
-    public RigidBody newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
-        RigidBody b;
+    public Tangible newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
+        Tangible b;
         b = graphSpace.newBody(
                 1f, //mass
                 shape, motion,
@@ -276,7 +275,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
 
-    @Override public final void accept(GL2 gl, RigidBody body) {
+    @Override public final void accept(GL2 gl, Tangible body) {
 
         renderAbsolute(gl);
 
@@ -287,31 +286,29 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         renderRelative(gl, body);
 
         gl.glPushMatrix();
-        {
-            BoxShape shape = (BoxShape) body.shape();
-            float sx = shape.x(); //HACK
-            float sy = shape.y(); //HACK
-            float tx, ty;
-            //if (sx > sy) {
-                ty = sy;
-                tx = sy/sx;
-            //} else {
-              //  tx = sx;
-              //  ty = sx/sy;
-            //}
+        BoxShape shape = (BoxShape) body.shape();
+        float sx = shape.x(); //HACK
+        float sy = shape.y(); //HACK
+        float tx, ty;
+        //if (sx > sy) {
+        ty = sy;
+        tx = sy/sx;
+        //} else {
+        //  tx = sx;
+        //  ty = sx/sy;
+        //}
 
-            //gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
+        //gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
 
-            gl.glScalef(tx, ty, 1f);
+        gl.glScalef(tx, ty, 1f);
 
-            renderRelativeAspect(gl);
-        }
+        renderRelativeAspect(gl);
         gl.glPopMatrix();
 
         gl.glPopMatrix();
     }
 
-    protected void renderRelative(GL2 gl, RigidBody body) {
+    protected void renderRelative(GL2 gl, Tangible body) {
 
         renderShape(gl, body);
 
@@ -327,7 +324,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         Draw.renderLabel(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
     }
 
-    protected void renderShape(GL2 gl, RigidBody body) {
+    protected void renderShape(GL2 gl, Tangible body) {
         colorshape(gl);
         Draw.draw(gl, body.shape());
     }
@@ -373,8 +370,8 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     static final Matrix3f tmpM3 = new Matrix3f();
 
     static final float[] tmpV = new float[3];
-    static final Vector3f ww = new Vector3f();
-    static final Vector3f vv = new Vector3f();
+    static final v3 ww = new v3();
+    static final v3 vv = new v3();
     static final AxisAngle4f tmpA = new AxisAngle4f();
 
     static public void renderHalfTriEdge(GL2 gl, Spatial src, EDraw e, float width) {
@@ -419,9 +416,9 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         Spatial tgt = e.target;
         gl.glLineWidth(width);
         gl.glBegin(GL.GL_LINES);
-        Vector3f s = src.center;
+        v3 s = src.center;
         gl.glVertex3f(s.x, s.y, s.z);
-        Vector3f t = tgt.center;
+        v3 t = tgt.center;
         gl.glVertex3f(t.x, t.y, t.z);
         gl.glEnd();
     }

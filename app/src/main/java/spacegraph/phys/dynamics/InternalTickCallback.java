@@ -23,14 +23,16 @@
 
 package spacegraph.phys.dynamics;
 
+import spacegraph.phys.Dynamics;
+
 /**
  * Callback called for each internal tick.
  * 
- * @see DynamicsWorld#setInternalTickCallback
+ * @see Dynamics#setInternalTickCallback
  * @author jezek2
  */
 public abstract class InternalTickCallback {
 
-	public abstract void internalTick(DynamicsWorld world, float timeStep);
+	public abstract void internalTick(Dynamics world, float timeStep);
 	
 }

@@ -63,8 +63,7 @@ public class ItemVis<X> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        return false;
+        return this == o;
 
         //if (o == null || getClass() != o.getClass()) return false;
 

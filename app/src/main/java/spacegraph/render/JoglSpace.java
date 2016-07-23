@@ -1,15 +1,11 @@
 package spacegraph.render;
 
-import alice.util.OutputStreamAdapter;
-import alice.util.jedit.InputHandler;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
-import infinispan.com.google.common.io.NullOutputStream;
-import jogamp.opengl.FPSCounterImpl;
 import nars.util.Util;
 import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 import org.slf4j.Logger;
@@ -19,8 +15,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {

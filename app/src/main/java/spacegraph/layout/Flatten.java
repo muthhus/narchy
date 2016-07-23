@@ -5,7 +5,6 @@ import spacegraph.SpaceInput;
 import spacegraph.SpaceTransform;
 import spacegraph.Spatial;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 /**

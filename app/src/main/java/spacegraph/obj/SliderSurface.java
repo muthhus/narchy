@@ -5,9 +5,8 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.math.Vector2f;
 import spacegraph.render.Draw;
-
-import javax.vecmath.Vector2f;
 
 import static com.google.common.collect.Lists.newArrayList;
 

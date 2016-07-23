@@ -23,7 +23,7 @@
 
 package spacegraph.phys.util;
 
-import javax.vecmath.Matrix3f;
+import spacegraph.math.Matrix3f;
 
 /**
  * Stack-based object pool for {@link Matrix3f}.

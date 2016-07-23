@@ -2,25 +2,24 @@ package spacegraph.phys.util;
 
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import spacegraph.phys.dynamics.DynamicsWorld;
+import spacegraph.math.v3;
+import spacegraph.phys.Dynamics;
 
-import javax.vecmath.Vector3f;
+public class AnimVector3f extends v3 implements Animated {
 
-public class AnimVector3f extends Vector3f implements Animated {
-
-    final Vector3f target = new Vector3f();
+    final v3 target = new v3();
     final MutableFloat speed;
     private boolean running = true;
 
-    public AnimVector3f(DynamicsWorld w, float speed) {
+    public AnimVector3f(Dynamics w, float speed) {
         this(Float.NaN, Float.NaN, Float.NaN, w, speed);
     }
 
-    public AnimVector3f(Vector3f current, DynamicsWorld w, float speed) {
+    public AnimVector3f(v3 current, Dynamics w, float speed) {
         this(current.x, current.y, current.z, w, speed);
     }
 
-    public AnimVector3f(float x, float y, float z, DynamicsWorld w, float speed) {
+    public AnimVector3f(float x, float y, float z, Dynamics w, float speed) {
         super(x, y, z);
         target.set(this);
         this.speed = new MutableFloat(speed);
@@ -83,7 +82,7 @@ public class AnimVector3f extends Vector3f implements Animated {
         }
     }
 
-    public void set(Vector3f v) {
+    public void set(v3 v) {
         //if invalidated, use the target value immediately
         if (x != x) super.set(v);
         target.set(v);

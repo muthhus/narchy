@@ -23,10 +23,9 @@
 
 package spacegraph.phys;
 
-import spacegraph.phys.linearmath.CProfileManager;
-import spacegraph.phys.linearmath.Clock;
-
-import javax.vecmath.Vector3f;
+import spacegraph.math.v3;
+import spacegraph.phys.math.CProfileManager;
+import spacegraph.phys.math.Clock;
 
 /**
  * Bullet statistics and profile support.
@@ -48,7 +47,7 @@ public class BulletStats {
 	public static int gTotalBytesAlignedAllocs;	
 	
 	public static int gPickingConstraintId;
-	public static final Vector3f gOldPickingPos = new Vector3f();
+	public static final v3 gOldPickingPos = new v3();
 	public static float gOldPickingDist;
 	
 	public static int gOverlappingPairs;

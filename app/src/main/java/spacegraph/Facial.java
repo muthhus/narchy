@@ -6,8 +6,6 @@ import com.jogamp.newt.event.WindowListener;
 import com.jogamp.newt.event.WindowUpdateEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
-import jogamp.newt.driver.bcm.vc.iv.WindowDriver;
-import spacegraph.obj.ConsoleSurface;
 
 /**
  * orthographic widget adapter. something which goes on the "face" of a HUD ("head"s-up-display)
@@ -24,7 +22,7 @@ public class Facial implements WindowListener {
 //    }
 
     final Surface surface;
-    private boolean maximize = false;
+    private boolean maximize;
 
     public Facial(Surface surface) {
         this.surface = surface;

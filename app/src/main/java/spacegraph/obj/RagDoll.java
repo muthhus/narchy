@@ -28,24 +28,21 @@ package spacegraph.obj;
 
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
-import spacegraph.phys.collision.shapes.BoxShape;
-import spacegraph.phys.collision.shapes.CapsuleShape;
-import spacegraph.phys.collision.shapes.CollisionShape;
-import spacegraph.phys.dynamics.DynamicsWorld;
-import spacegraph.phys.dynamics.RigidBody;
-import spacegraph.phys.dynamics.RigidBodyConstructionInfo;
-import spacegraph.phys.dynamics.constraintsolver.Generic6DofConstraint;
-import spacegraph.phys.dynamics.constraintsolver.TypedConstraint;
-import spacegraph.phys.linearmath.MatrixUtil;
-import spacegraph.phys.linearmath.Transform;
+import spacegraph.math.v3;
+import spacegraph.phys.Dynamics;
+import spacegraph.phys.RigidBodyBuilder;
+import spacegraph.phys.Tangible;
+import spacegraph.phys.constraint.Generic6DofConstraint;
+import spacegraph.phys.constraint.TypedConstraint;
+import spacegraph.phys.math.MatrixUtil;
+import spacegraph.phys.math.Transform;
+import spacegraph.phys.shape.BoxShape;
+import spacegraph.phys.shape.CapsuleShape;
+import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.BulletStack;
 import spacegraph.phys.util.Motion;
 import spacegraph.render.JoglPhysics;
 import spacegraph.render.JoglPhysics.ExtraGlobals;
-
-import javax.vecmath.Vector3f;
-
-import static javax.vecmath.Vector3f.v;
 
 /**
  * @author jezek2
@@ -77,10 +74,10 @@ public class RagDoll extends Spatial {
 
     public static void spawnGround(JoglPhysics d) {
         // Setup a big ground box
-        CollisionShape groundShape = new BoxShape(new Vector3f(200f, 10f, 200f));
+        CollisionShape groundShape = new BoxShape(new v3(200f, 10f, 200f));
         Transform groundTransform = new Transform();
         groundTransform.setIdentity();
-        groundTransform.origin.set(0f, -15f, 0f);
+        Transform.this.set(0f, -15f, 0f);
         d.newBody(0f, groundTransform, groundShape);
     }
 
@@ -128,11 +125,11 @@ public class RagDoll extends Spatial {
 
 
     private final CollisionShape[] shapes = new CollisionShape[BodyPart.BODYPART_COUNT.ordinal()];
-    private final RigidBody[] bodies = new RigidBody[BodyPart.BODYPART_COUNT.ordinal()];
+    private final Tangible[] bodies = new Tangible[BodyPart.BODYPART_COUNT.ordinal()];
     private final TypedConstraint[] joints = new TypedConstraint[JointType.JOINT_COUNT.ordinal()];
 
 
-    public RigidBody newRagDoll(DynamicsWorld world, Vector3f positionOffset, float scale_ragdoll) {
+    public Tangible newRagDoll(Dynamics world, v3 positionOffset, float scale_ragdoll) {
 
 
         stack.pushCommonMath();
@@ -155,64 +152,64 @@ public class RagDoll extends Spatial {
         // Setup all the rigid bodies
         Transform offset = stack.transforms.get();
         offset.setIdentity();
-        offset.origin.set(positionOffset);
+        Transform.this.set(positionOffset);
 
         Transform transform = stack.transforms.get();
         transform.setIdentity();
-        transform.origin.set(0f, scale_ragdoll * 1f, 0f);
+        Transform.this.set(0f, scale_ragdoll * 1f, 0f);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_PELVIS.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_PELVIS.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(0f, scale_ragdoll * 1.2f, 0f);
+        Transform.this.set(0f, scale_ragdoll * 1.2f, 0f);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_SPINE.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_SPINE.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(0f, scale_ragdoll * 1.6f, 0f);
+        Transform.this.set(0f, scale_ragdoll * 1.6f, 0f);
         tmpTrans.mul(offset, transform);
-        RigidBody head = bodies[BodyPart.BODYPART_HEAD.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_HEAD.ordinal()]);
+        Tangible head = bodies[BodyPart.BODYPART_HEAD.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_HEAD.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(-0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
+        Transform.this.set(-0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(-0.18f * scale_ragdoll, 0.2f * scale_ragdoll, 0f);
+        Transform.this.set(-0.18f * scale_ragdoll, 0.2f * scale_ragdoll, 0f);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_LEFT_LOWER_LEG.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_LOWER_LEG.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
+        Transform.this.set(0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(0.18f * scale_ragdoll, 0.2f * scale_ragdoll, 0f);
+        Transform.this.set(0.18f * scale_ragdoll, 0.2f * scale_ragdoll, 0f);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_RIGHT_LOWER_LEG.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_LOWER_LEG.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(-0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
+        Transform.this.set(-0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
         MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, ExtraGlobals.SIMD_HALF_PI);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(-0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
+        Transform.this.set(-0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
         MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, ExtraGlobals.SIMD_HALF_PI);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
+        Transform.this.set(0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
         MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, -ExtraGlobals.SIMD_HALF_PI);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()]);
 
         transform.setIdentity();
-        transform.origin.set(0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
+        Transform.this.set(0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
         MatrixUtil.setEulerZYX(transform.basis, 0, 0, -ExtraGlobals.SIMD_HALF_PI);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()] = localCreateRigidBody(world, 1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()]);
@@ -233,9 +230,9 @@ public class RagDoll extends Spatial {
         localA.setIdentity();
         localB.setIdentity();
 
-        localA.origin.set(0f, 0.30f * scale_ragdoll, 0f);
+        Transform.this.set(0f, 0.30f * scale_ragdoll, 0f);
 
-        localB.origin.set(0f, -0.14f * scale_ragdoll, 0f);
+        Transform.this.set(0f, -0.14f * scale_ragdoll, 0f);
 
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_HEAD.ordinal()], localA, localB, useLinearReferenceFrameA);
 
@@ -254,10 +251,10 @@ public class RagDoll extends Spatial {
         localA.setIdentity();
         localB.setIdentity();
 
-        localA.origin.set(-0.2f * scale_ragdoll, 0.15f * scale_ragdoll, 0f);
+        Transform.this.set(-0.2f * scale_ragdoll, 0.15f * scale_ragdoll, 0f);
 
         MatrixUtil.setEulerZYX(localB.basis, ExtraGlobals.SIMD_HALF_PI, (float) 0, -ExtraGlobals.SIMD_HALF_PI);
-        localB.origin.set(0f, -0.18f * scale_ragdoll, 0f);
+        Transform.this.set(0f, -0.18f * scale_ragdoll, 0f);
 
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()], localA, localB, useLinearReferenceFrameA);
 
@@ -276,9 +273,9 @@ public class RagDoll extends Spatial {
         localA.setIdentity();
         localB.setIdentity();
 
-        localA.origin.set(0.2f * scale_ragdoll, 0.15f * scale_ragdoll, 0f);
+        Transform.this.set(0.2f * scale_ragdoll, 0.15f * scale_ragdoll, 0f);
         MatrixUtil.setEulerZYX(localB.basis, 0f, 0f, ExtraGlobals.SIMD_HALF_PI);
-        localB.origin.set(0f, -0.18f * scale_ragdoll, 0f);
+        Transform.this.set(0f, -0.18f * scale_ragdoll, 0f);
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()], localA, localB, useLinearReferenceFrameA);
 
         //#ifdef RIGID
@@ -296,8 +293,8 @@ public class RagDoll extends Spatial {
         localA.setIdentity();
         localB.setIdentity();
 
-        localA.origin.set(0f, 0.18f * scale_ragdoll, 0f);
-        localB.origin.set(0f, -0.14f * scale_ragdoll, 0f);
+        Transform.this.set(0f, 0.18f * scale_ragdoll, 0f);
+        Transform.this.set(0f, -0.14f * scale_ragdoll, 0f);
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()], bodies[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()], localA, localB, useLinearReferenceFrameA);
 
         //#ifdef RIGID
@@ -315,8 +312,8 @@ public class RagDoll extends Spatial {
         localA.setIdentity();
         localB.setIdentity();
 
-        localA.origin.set(0f, 0.18f * scale_ragdoll, 0f);
-        localB.origin.set(0f, -0.14f * scale_ragdoll, 0f);
+        Transform.this.set(0f, 0.18f * scale_ragdoll, 0f);
+        Transform.this.set(0f, -0.14f * scale_ragdoll, 0f);
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()], bodies[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()], localA, localB, useLinearReferenceFrameA);
 
         //#ifdef RIGID
@@ -337,9 +334,9 @@ public class RagDoll extends Spatial {
         localB.setIdentity();
 
         MatrixUtil.setEulerZYX(localA.basis, (float) 0, ExtraGlobals.SIMD_HALF_PI, 0);
-        localA.origin.set(0f, 0.15f * scale_ragdoll, 0f);
+        Transform.this.set(0f, 0.15f * scale_ragdoll, 0f);
         MatrixUtil.setEulerZYX(localB.basis, (float) 0, ExtraGlobals.SIMD_HALF_PI, 0);
-        localB.origin.set(0f, -0.15f * scale_ragdoll, 0f);
+        Transform.this.set(0f, -0.15f * scale_ragdoll, 0f);
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_PELVIS.ordinal()], bodies[BodyPart.BODYPART_SPINE.ordinal()], localA, localB, useLinearReferenceFrameA);
 
         //#ifdef RIGID
@@ -357,9 +354,9 @@ public class RagDoll extends Spatial {
         localA.setIdentity();
         localB.setIdentity();
 
-        localA.origin.set(-0.18f * scale_ragdoll, -0.10f * scale_ragdoll, 0f);
+        Transform.this.set(-0.18f * scale_ragdoll, -0.10f * scale_ragdoll, 0f);
 
-        localB.origin.set(0f, 0.225f * scale_ragdoll, 0f);
+        Transform.this.set(0f, 0.225f * scale_ragdoll, 0f);
 
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_PELVIS.ordinal()], bodies[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()], localA, localB, useLinearReferenceFrameA);
 
@@ -379,8 +376,8 @@ public class RagDoll extends Spatial {
         localA.setIdentity();
         localB.setIdentity();
 
-        localA.origin.set(0.18f * scale_ragdoll, -0.10f * scale_ragdoll, 0f);
-        localB.origin.set(0f, 0.225f * scale_ragdoll, 0f);
+        Transform.this.set(0.18f * scale_ragdoll, -0.10f * scale_ragdoll, 0f);
+        Transform.this.set(0f, 0.225f * scale_ragdoll, 0f);
 
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_PELVIS.ordinal()], bodies[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()], localA, localB, useLinearReferenceFrameA);
 
@@ -400,8 +397,8 @@ public class RagDoll extends Spatial {
         localA.setIdentity();
         localB.setIdentity();
 
-        localA.origin.set(0f, -0.225f * scale_ragdoll, 0f);
-        localB.origin.set(0f, 0.185f * scale_ragdoll, 0f);
+        Transform.this.set(0f, -0.225f * scale_ragdoll, 0f);
+        Transform.this.set(0f, 0.185f * scale_ragdoll, 0f);
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()], bodies[BodyPart.BODYPART_LEFT_LOWER_LEG.ordinal()], localA, localB, useLinearReferenceFrameA);
         //
         //#ifdef RIGID
@@ -419,8 +416,8 @@ public class RagDoll extends Spatial {
         localA.setIdentity();
         localB.setIdentity();
 
-        localA.origin.set(0f, -0.225f * scale_ragdoll, 0f);
-        localB.origin.set(0f, 0.185f * scale_ragdoll, 0f);
+        Transform.this.set(0f, -0.225f * scale_ragdoll, 0f);
+        Transform.this.set(0f, 0.185f * scale_ragdoll, 0f);
         joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()], bodies[BodyPart.BODYPART_RIGHT_LOWER_LEG.ordinal()], localA, localB, useLinearReferenceFrameA);
 
         //#ifdef RIGID
@@ -439,7 +436,7 @@ public class RagDoll extends Spatial {
         return head;
     }
 
-    public void destroy(DynamicsWorld w) {
+    public void destroy(Dynamics w) {
         int i;
 
         // Remove all constraints
@@ -458,20 +455,20 @@ public class RagDoll extends Spatial {
         }
     }
 
-    private RigidBody localCreateRigidBody(DynamicsWorld world, float mass, Transform startTransform, CollisionShape shape) {
+    private Tangible localCreateRigidBody(Dynamics world, float mass, Transform startTransform, CollisionShape shape) {
         stack.vectors.push();
         try {
             boolean isDynamic = (mass != 0f);
 
-            Vector3f localInertia = stack.vectors.get(0f, 0f, 0f);
+            v3 localInertia = stack.vectors.get(0f, 0f, 0f);
             if (isDynamic) {
                 shape.calculateLocalInertia(mass, localInertia);
             }
 
             Motion myMotionState = new Motion(startTransform);
-            RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, myMotionState, shape, localInertia);
+            RigidBodyBuilder rbInfo = new RigidBodyBuilder(mass, myMotionState, shape, localInertia);
             rbInfo.additionalDamping = true;
-            RigidBody body = new RigidBody(rbInfo);
+            Tangible body = new Tangible(rbInfo);
 
             world.addRigidBody(body);
 

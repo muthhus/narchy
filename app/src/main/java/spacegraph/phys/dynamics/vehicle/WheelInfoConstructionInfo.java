@@ -23,7 +23,7 @@
 
 package spacegraph.phys.dynamics.vehicle;
 
-import javax.vecmath.Vector3f;
+import spacegraph.math.v3;
 
 /**
  * 
@@ -31,9 +31,9 @@ import javax.vecmath.Vector3f;
  */
 public class WheelInfoConstructionInfo {
 
-	public final Vector3f chassisConnectionCS = new Vector3f();
-	public final Vector3f wheelDirectionCS = new Vector3f();
-	public final Vector3f wheelAxleCS = new Vector3f();
+	public final v3 chassisConnectionCS = new v3();
+	public final v3 wheelDirectionCS = new v3();
+	public final v3 wheelAxleCS = new v3();
 	public float suspensionRestLength;
 	public float maxSuspensionTravelCm;
 	public float maxSuspensionForce;

@@ -1,6 +1,5 @@
 package spacegraph.obj;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Surface;
 

@@ -4,16 +4,15 @@ import com.jogamp.opengl.GL2;
 import nars.util.Util;
 import spacegraph.Spatial;
 import spacegraph.Surface;
-import spacegraph.phys.collision.dispatch.ClosestRay;
-import spacegraph.phys.collision.shapes.BoxShape;
-import spacegraph.phys.collision.shapes.CollisionShape;
-import spacegraph.phys.dynamics.RigidBody;
-import spacegraph.phys.linearmath.Transform;
+import spacegraph.math.Vector2f;
+import spacegraph.math.v3;
+import spacegraph.phys.Tangible;
+import spacegraph.phys.collision.ClosestRay;
+import spacegraph.phys.math.Transform;
+import spacegraph.phys.shape.BoxShape;
+import spacegraph.phys.shape.CollisionShape;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-
-import static javax.vecmath.Vector3f.v;
+import static spacegraph.math.v3.v;
 
 /**
  * A mount for a 2D surface (embeds a surface in 3D space)
@@ -21,7 +20,7 @@ import static javax.vecmath.Vector3f.v;
 public class RectWidget<X> extends Spatial<X> {
 
     public final Surface surface;
-    private BoxShape shape;
+    private final BoxShape shape;
     final float zOffset = 0.05f; //relative to scale
 
     //private float padding;
@@ -50,7 +49,7 @@ public class RectWidget<X> extends Spatial<X> {
 
 
             Transform it = Transform.t(transform()).inverse();
-            Vector3f localPoint = it.transform(v(r.hitPointWorld));
+            v3 localPoint = it.transform(v(r.hitPointWorld));
 
 
 //            //TODO maybe do this test with the normal vector of the hit ray
@@ -81,7 +80,7 @@ public class RectWidget<X> extends Spatial<X> {
 
 
     @Override
-    protected final void renderRelative(GL2 gl, RigidBody body) {
+    protected final void renderRelative(GL2 gl, Tangible body) {
         super.renderRelative(gl, body);
 
         //float p = this.padding;
