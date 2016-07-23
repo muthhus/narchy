@@ -18,49 +18,54 @@ import java.util.function.Function;
 /**
  * Created by me on 6/20/16.
  */
-public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
-
-    public SpaceGraph with(SpaceTransform<O>... t) {
-        for (SpaceTransform g : t)
-            this.transforms.add(g);
-        return this;
-    }
+public class SpaceGraph<X> extends JoglPhysics<Spatial<X>> {
 
 
     final List<Facial> facials = new FasterList<>(1);
 
-    final List<SpaceInput<O,?>> inputs = new FasterList<>(1);
+    final List<SpaceInput<X,?>> inputs = new FasterList<>(1);
 
-    private Function<O, Spatial> materialize = x -> (Spatial<O>)x;
-
-    //final WeakValueHashMap<O, Spatial<O>> atoms = new WeakValueHashMap<>(1024);
-    final Cache<O, Spatial> atoms = Caffeine.newBuilder()
-            .softValues().build();
-            //.weakValues().build();
-
-
-    final List<SpaceTransform<O>> transforms = $.newArrayList();
+    final Cache<X, Spatial> atoms;
 
     public SpaceGraph() {
-        super();
+        this(64 * 1024);
     }
 
-    public SpaceGraph(Function<O, Spatial> materializer, O... c) {
-        this(materializer, new ListInput<>(c));
-    }
-
-    public SpaceGraph(SpaceInput<O,?> c) {
-        this(null, c);
-    }
-
-    public SpaceGraph(Function<O, Spatial> defaultMaterializer, SpaceInput<O, ?>... cc) {
+    /**
+     * number of items that will remain cached, some (ideally most)
+     * will not be visible but once were and may become visible again
+     */
+    public SpaceGraph(int cacheCapacity) {
         super();
 
-        this.materialize = defaultMaterializer;
+        this.atoms = Caffeine.newBuilder()
+                //.softValues().build();
+                //.removalListener(this::onEvicted)
+                .maximumSize(cacheCapacity)
+                .weakValues()
+                .build();
+
+    }
+
+
+    public SpaceGraph(SpaceInput<X, ?>... cc) {
+        this();
 
         for (SpaceInput c : cc)
             add(c);
     }
+
+    public SpaceGraph(Spatial<X>... cc) {
+        this();
+
+        for (Spatial s : cc)
+            add(s);
+    }
+
+
+//    private void onEvicted(O k1, Spatial<O> v1, RemovalCause removalCause) {
+//        //..
+//    }
 
     final List<Facial> preAdd = $.newArrayList();
 
@@ -79,21 +84,18 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
             c.start(this);
     }
 
-    public void add(SpaceInput<O,?> c) {
+    public void add(SpaceInput<X,?> c) {
         if (inputs.add(c))
             c.start(this);
     }
 
-    public void remove(SpaceInput<O,?> c) {
+    public void remove(SpaceInput<X,?> c) {
         if (inputs.remove(c)) {
             c.stop();
         }
     }
 
-    public @NotNull Spatial update(O instance) {
-        return getOrAdd(instance);
-    }
-    public <Y extends Spatial> @NotNull Y update(O instance, Function<O, Y> materializer) {
+    public <Y extends Spatial<?>> @NotNull Y update(X instance, Function<X, Y> materializer) {
         return getOrAdd(instance, materializer);
     }
     public @NotNull <Y extends Spatial> Y update(Y t) {
@@ -101,16 +103,11 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         return t;
     }
 
-
-    public @NotNull Spatial getOrAdd(O t) {
-        return getOrAdd(t, materialize);
-    }
-
-    public @NotNull <Y extends Spatial> Y getOrAdd(O t, Function<O, Y> materializer) {
+    public @NotNull <Y extends Spatial> Y getOrAdd(X t, Function<X, Y> materializer) {
         return (Y) update(atoms.get(t, materializer));
     }
 
-    public @Nullable Spatial getIfActive(O t) {
+    public @Nullable Spatial getIfActive(X t) {
         Spatial v = atoms.getIfPresent(t);
         return v != null && v.active() ? v : null;
     }
@@ -122,7 +119,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     }
 
 
-    static float r(float range) {
+    public static float r(float range) {
         return (-0.5f + (float)Math.random()*range)*2f;
     }
 
@@ -160,7 +157,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 //        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
     }
 
-    @Override protected final boolean valid(int nextID, Collidable<Spatial<O>> c) {
+    @Override protected final boolean valid(int nextID, Collidable<Spatial<X>> c) {
 
         Spatial vd = c.getUserPointer();
         if (vd!=null) {
@@ -176,7 +173,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
     public void display(GLAutoDrawable drawable) {
 
-        List<SpaceInput<O,?>> ss = this.inputs;
+        List<SpaceInput<X,?>> ss = this.inputs;
 
         ss.forEach( this::update );
 
@@ -215,12 +212,6 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
         s.update(this);
 
-        List<SpaceTransform<O>> ll = this.transforms;
-        for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
-            ll.get(i1).update(this, ((ListInput)s).active, dt);
-        }
-
-
     }
 
     void print(SpaceInput s) {
@@ -234,4 +225,8 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         System.out.println();
     }
 
+    public void addAll(Spatial<X>... s) {
+        for (Spatial t : s)
+            add(t);
+    }
 }

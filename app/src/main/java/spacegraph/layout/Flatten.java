@@ -1,6 +1,7 @@
 package spacegraph.layout;
 
 import spacegraph.SpaceGraph;
+import spacegraph.SpaceInput;
 import spacegraph.SpaceTransform;
 import spacegraph.Spatial;
 
@@ -13,8 +14,8 @@ import java.util.function.Consumer;
 public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
 
     @Override
-    public void update(SpaceGraph<O> g, List<Spatial<O>> verts, float dt) {
-        verts.forEach(this);
+    public void update(SpaceGraph<O> g, SpaceInput<O, ?> src, float dt) {
+        src.forEach(this);
     }
 
     @Override

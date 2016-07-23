@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import nars.util.Util;
 import spacegraph.Spatial;
 import spacegraph.Surface;
+import spacegraph.phys.collision.dispatch.ClosestRay;
 import spacegraph.phys.collision.shapes.BoxShape;
 import spacegraph.phys.collision.shapes.CollisionShape;
 import spacegraph.phys.dynamics.RigidBody;
@@ -17,34 +18,37 @@ import static javax.vecmath.Vector3f.v;
 /**
  * A mount for a 2D surface (embeds a surface in 3D space)
  */
-public class SurfaceMount<X> extends Spatial<X> {
+public class RectWidget<X> extends Spatial<X> {
 
-    private final float thick = 0.1f;
     public final Surface surface;
+    private BoxShape shape;
     //private float padding;
 
 
-    public SurfaceMount(X x, Surface s) {
+    public RectWidget(Surface s, float w, float h) {
+        this((X)s,s, w, h);
+    }
+
+    public RectWidget(X x, Surface s, float w, float h) {
         super(x);
 
         this.surface = s;
 
-
-        //scale(4f,3f,0.1f);
-        this.radius = 0.5f; //HACK
-
-        //this.padding = 0.04f;
+        final float thick = 0.1f;
+        this.shape = new BoxShape(w, h, thick * (Math.min(w,h)));
 
         s.setParent(null);
     }
 
 
     @Override
-    public boolean onTouch(Vector3f hitPoint, short[] buttons) {
-        if (!super.onTouch(hitPoint, buttons)) {
+    public boolean onTouch(ClosestRay r, short[] buttons) {
+        if (!super.onTouch(r, buttons)) {
+
 
             Transform it = Transform.t(transform()).inverse();
-            Vector3f localPoint = it.transform(v(hitPoint));
+            Vector3f localPoint = it.transform(v(r.hitPointWorld));
+
 
 //            //TODO maybe do this test with the normal vector of the hit ray
 //            if (this.thick!=this.thick) {
@@ -52,7 +56,8 @@ public class SurfaceMount<X> extends Spatial<X> {
 //                this.thick = h.z;
 //            }
 
-            float depthEpsilon = thick/4f;
+            float thick = ((BoxShape) body.shape()).z();
+            float depthEpsilon = thick /4f;
 
             if (Util.equals(localPoint.z, thick, depthEpsilon)) { //top surface only, ignore sides and back
                 return surface.onTouch(new Vector2f(localPoint.x / 2f + 0.5f, localPoint.y / 2f + 0.5f), buttons);
@@ -63,7 +68,7 @@ public class SurfaceMount<X> extends Spatial<X> {
 
     @Override
     protected CollisionShape newShape() {
-        return new BoxShape(v(1, 1, thick));
+        return shape;
     }
 
 

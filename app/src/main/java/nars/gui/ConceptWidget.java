@@ -39,7 +39,7 @@ public class ConceptWidget extends Spatial<Term> {
     }
 
     @Override
-    public void update(SpaceGraph<? extends Term> s) {
+    public void update(SpaceGraph<Term> s) {
         super.update(s);
 
         Term tt = key;
@@ -48,7 +48,7 @@ public class ConceptWidget extends Spatial<Term> {
 
         float p = pri;// = 1; //pri = key.priIfFiniteElseZero();
 
-        float nodeScale = 1f + p * 5f;//1f + 2f * p;
+        float nodeScale = 1f + p * 3f;//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
         scale(nodeScale, nodeScale, nodeScale * 1.5f);
 

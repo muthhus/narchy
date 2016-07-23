@@ -4,12 +4,11 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.*;
 
 import java.awt.*;
-import java.util.List;
 
 /**
  * Fast organic layout algorithm, adapted from JGraph
  */
-public class FastOrganicLayout<O> implements SpaceTransform<O> {
+public class FastOrganicLayout<X> implements SpaceTransform<X> {
 
 //    @Range(min = 0, max = 1f)
 //    public final MutableFloat nodeSpeed = new MutableFloat(0.02);
@@ -214,12 +213,13 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
     }
 
     @Override
-    public void update(SpaceGraph<O> g, List<Spatial<O>> vertices, float dt) {
+    public void update(SpaceGraph<X> g, SpaceInput<X,?> src, float dt) {
 
+        int n = src.size();
 
         //? graph.getBoundsForCells(vertexArray, false, false, true) : null;
 
-        int n = vertices.size();
+
 
 
         if ((cellLocation == null) || (cellLocation.length != n)) {
@@ -245,7 +245,7 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
         for (int ii = 0; ii < n; ii++) {
             final int i = ii;
 
-            Spatial V = vertices.get(i);
+            Spatial V = src.get(i);
 
             //TODO is this necessary?
             /*if (!graph.containsVertex(vd.getVertex()))
@@ -339,7 +339,7 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
         float[] radius = this.radius;
 
         for (int i = 0; i < n; i++) {
-            Spatial vd = vertices.get(i);
+            Spatial vd = src.get(i);
             float[] ci = cl[i];
 
             //cellLocation[i][0] -= 1/2.0; //geo.getWidth() / 2.0;
@@ -379,7 +379,7 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
             }
 
             for (int i = 0; i < n; i++) {
-                vertices.get(i).moveDelta((float) dx, (float) dy, 0);
+                src.get(i).moveDelta((float) dx, (float) dy, 0);
             }
         }
     }

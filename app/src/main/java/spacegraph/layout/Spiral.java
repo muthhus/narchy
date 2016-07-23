@@ -1,6 +1,7 @@
 package spacegraph.layout;
 
 import spacegraph.SpaceGraph;
+import spacegraph.SpaceInput;
 import spacegraph.SpaceTransform;
 import spacegraph.Spatial;
 
@@ -14,10 +15,11 @@ public class Spiral<O> implements SpaceTransform<O> {
     float nodeSpeed = 0.3f;
     private int order;
 
+
     @Override
-    public void update(SpaceGraph<O> g, List<Spatial<O>> verts, float dt) {
+    public void update(SpaceGraph<O> g, SpaceInput<O, ?> src, float dt) {
         this.order = 0;
-        verts.forEach(this::update);
+        src.forEach(this::update);
     }
 
 

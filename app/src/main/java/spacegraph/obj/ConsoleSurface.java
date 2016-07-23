@@ -41,8 +41,7 @@ public class ConsoleSurface extends Surface {
 
 
         new SpaceGraph<VirtualTerminal>(
-                vt -> ConsoleSurface.widget(vt),
-                vt1
+                new RectWidget(new ConsoleSurface(vt1), 8, 8)
         ).show(800, 800);
     }
 
@@ -65,16 +64,16 @@ public class ConsoleSurface extends Surface {
         this(new DefaultVirtualTerminal(cols, rows));
     }
 
-    public static SurfaceMount<VirtualTerminal> widget(int cols, int rows) {
+    public static RectWidget<VirtualTerminal> widget(int cols, int rows) {
         return widget(new DefaultVirtualTerminal(cols, rows));
     }
 
-    public static SurfaceMount<VirtualTerminal> widget(VirtualTerminal vt) {
+    public static RectWidget<VirtualTerminal> widget(VirtualTerminal vt) {
         return widget(new ConsoleSurface(vt));
     }
 
-    public static SurfaceMount<VirtualTerminal> widget(ConsoleSurface s) {
-        return new SurfaceMount(s.term, s);
+    public static RectWidget<VirtualTerminal> widget(ConsoleSurface s) {
+        return new RectWidget(s.term, s, 1, 1);
     }
 
     public ConsoleSurface(VirtualTerminal term) {

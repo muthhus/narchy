@@ -5,6 +5,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.phys.collision.dispatch.ClosestRay;
 import spacegraph.phys.collision.shapes.BoxShape;
 import spacegraph.phys.collision.shapes.CollisionShape;
 import spacegraph.phys.collision.shapes.ConvexInternalShape;
@@ -86,10 +87,6 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         this.radius = 0;
         this.pri = 0.5f;
 
-        final float initDistanceEpsilon = 0.5f;
-        move(SpaceGraph.r(initDistanceEpsilon),
-             SpaceGraph.r(initDistanceEpsilon),
-             SpaceGraph.r(initDistanceEpsilon));
 
         for (int i = 0; i < edges; i++)
             this.edges[i] = new EDraw();
@@ -126,7 +123,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     @Deprecated public transient int numEdges = 0;
 
 
-    public void update(SpaceGraph<? extends O> s) {
+    public void update(SpaceGraph<O> s) {
         preactive = true;
 
         if (body == null) {
@@ -243,7 +240,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
-    public boolean onTouch(Vector3f hitPoint, short[] buttons) {
+    public boolean onTouch(ClosestRay hitPoint, short[] buttons) {
         return false;
     }
 

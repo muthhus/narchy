@@ -34,6 +34,8 @@ import spacegraph.phys.linearmath.VectorUtil;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
+import static javax.vecmath.Vector3f.v;
+
 /**
  * BoxShape is a box primitive around the origin, its sides axis aligned with length
  * specified by half extents, in local shape coordinates. When used as part of a
@@ -44,10 +46,14 @@ import javax.vecmath.Vector4f;
 public class BoxShape extends PolyhedralConvexShape {
 
 	public BoxShape(Vector3f boxHalfExtents) {
+		this(boxHalfExtents.x*2f, boxHalfExtents.y*2f, boxHalfExtents.z*2f);
+	}
+
+	public BoxShape(float w, float h, float d) {
 		super();
 
 		//VectorUtil.mul(implicitShapeDimensions, boxHalfExtents, localScaling);
-		implicitShapeDimensions.set(boxHalfExtents); //localscaling is by default 1,1,1 anyway
+		implicitShapeDimensions.set(w/2f, h/2f, d/2f); //localscaling is by default 1,1,1 anyway
 
 		float m = getMargin();
 
@@ -364,4 +370,15 @@ public class BoxShape extends PolyhedralConvexShape {
 		}
 	}
 
+	public final float x() {
+		return implicitShapeDimensions.x;
+	}
+
+	public final float y() {
+		return implicitShapeDimensions.y;
+	}
+
+	public final float z() {
+		return implicitShapeDimensions.z;
+	}
 }

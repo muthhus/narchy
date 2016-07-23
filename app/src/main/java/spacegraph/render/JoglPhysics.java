@@ -37,10 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
 import spacegraph.phys.collision.broadphase.BroadphaseInterface;
 import spacegraph.phys.collision.broadphase.SimpleBroadphase;
-import spacegraph.phys.collision.dispatch.CollisionDispatcher;
-import spacegraph.phys.collision.dispatch.Collidable;
-import spacegraph.phys.collision.dispatch.CollisionWorld;
-import spacegraph.phys.collision.dispatch.DefaultCollisionConfiguration;
+import spacegraph.phys.collision.dispatch.*;
 import spacegraph.phys.collision.shapes.CollisionShape;
 import spacegraph.phys.dynamics.DiscreteDynamicsWorld;
 import spacegraph.phys.dynamics.DynamicsWorld;
@@ -112,7 +109,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     int zFar = 500;
 
 
-    final CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(((short)(1 << 7)));
+    final ClosestRay rayCallback = new ClosestRay(((short)(1 << 7)));
 
     protected int forwardAxis = 2;
 
@@ -709,7 +706,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         switch (button) {
             case MouseEvent.BUTTON3: {
-                CollisionWorld.ClosestRayResultCallback c = mousePick(x, y);
+                ClosestRay c = mousePick(x, y);
                 if (c.hasHit()) {
                     Collidable co = c.collidable;
                     System.out.println("zooming to " + co);
@@ -811,7 +808,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
     private void mouseGrabOn(int sx, int sy) {
         // add a point to point constraint for picking
-        CollisionWorld.ClosestRayResultCallback rayCallback = mousePick(sx, sy);
+        ClosestRay rayCallback = mousePick(sx, sy);
 
         if (rayCallback.hasHit()) {
             RigidBody body = RigidBody.upcast(rayCallback.collidable);
@@ -855,12 +852,12 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         //}
     }
 
-    public CollisionWorld.ClosestRayResultCallback mousePick(int sx, int sy) {
+    public ClosestRay mousePick(int sx, int sy) {
         return mousePick(v(rayTo(sx, sy)));
     }
 
-    public CollisionWorld.ClosestRayResultCallback mousePick(Vector3f rayTo) {
-        CollisionWorld.ClosestRayResultCallback r = this.rayCallback;
+    public ClosestRay mousePick(Vector3f rayTo) {
+        ClosestRay r = this.rayCallback;
         Vector3f camPos = this.camPos;
         dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo));
         return r;
@@ -872,17 +869,17 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         //if (mouseDragDX == 0) { //if not already dragging somewhere "outside"
 
-            CollisionWorld.ClosestRayResultCallback mouseTouch = mousePick(ray);
+            ClosestRay cray = mousePick(ray);
 
             /*System.out.println(mouseTouch.collisionObject + " touched with " +
                 Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
             );*/
 
-            if (mouseTouch.collidable != null) {
-                Object t = mouseTouch.collidable.getUserPointer();
+            if (cray.collidable != null) {
+                Object t = cray.collidable.getUserPointer();
                 if (t instanceof Spatial) {
                     Spatial a = ((Spatial) t);
-                    if (a.onTouch(mouseTouch.hitPointWorld, buttons)) {
+                    if (a.onTouch(cray, buttons)) {
                         //absorbed
                         mouseDragDX = mouseDragDY = 0;
                         mouseDragPrevX = mouseDragPrevY = -1; //cancel any drag being enabled
@@ -956,7 +953,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
                     for (short b : buttons) {
                         switch (b) {
                             case 1:
-                                CollisionWorld.ClosestRayResultCallback m = mousePick(x, y);
+                                ClosestRay m = mousePick(x, y);
                                 if (!m.hasHit()) {
                                     //drag on background space
                                     float px = mouseDragDX * 0.1f;

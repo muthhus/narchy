@@ -59,7 +59,6 @@ public class RagDoll extends Spatial {
     public static void main(String[] args) {
 
         SpaceGraph<RagDoll> gs = new SpaceGraph(
-                x -> x,
                 new RagDoll()
         );
         //gs.setGravity(v(0f, -30f, 0f));

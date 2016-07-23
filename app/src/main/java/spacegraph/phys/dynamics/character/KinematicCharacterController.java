@@ -25,10 +25,7 @@ package spacegraph.phys.dynamics.character;
 
 import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.collision.broadphase.BroadphasePair;
-import spacegraph.phys.collision.dispatch.Collidable;
-import spacegraph.phys.collision.dispatch.CollisionWorld;
-import spacegraph.phys.collision.dispatch.GhostObject;
-import spacegraph.phys.collision.dispatch.PairCachingGhostObject;
+import spacegraph.phys.collision.dispatch.*;
 import spacegraph.phys.collision.narrowphase.ManifoldPoint;
 import spacegraph.phys.collision.narrowphase.PersistentManifold;
 import spacegraph.phys.collision.shapes.ConvexShape;
@@ -656,7 +653,7 @@ public class KinematicCharacterController extends ActionInterface {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private static class KinematicClosestNotMeRayResultCallback extends CollisionWorld.ClosestRayResultCallback {
+	private static class KinematicClosestNotMeRayResultCallback extends ClosestRay {
 		protected Collidable me;
 
 		public KinematicClosestNotMeRayResultCallback(Collidable me) {

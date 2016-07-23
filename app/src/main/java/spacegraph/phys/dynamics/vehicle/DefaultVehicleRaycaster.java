@@ -23,7 +23,7 @@
 
 package spacegraph.phys.dynamics.vehicle;
 
-import spacegraph.phys.collision.dispatch.CollisionWorld;
+import spacegraph.phys.collision.dispatch.ClosestRay;
 import spacegraph.phys.dynamics.DynamicsWorld;
 import spacegraph.phys.dynamics.RigidBody;
 
@@ -46,7 +46,7 @@ public class DefaultVehicleRaycaster extends VehicleRaycaster {
 	public Object castRay(Vector3f from, Vector3f to, VehicleRaycasterResult result) {
 		//RayResultCallback& resultCallback;
 
-		CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(from, to);
+		ClosestRay rayCallback = new ClosestRay(from, to);
 
 		dynamicsWorld.rayTest(from, to, rayCallback);
 

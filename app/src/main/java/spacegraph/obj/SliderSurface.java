@@ -8,7 +8,6 @@ import spacegraph.Surface;
 import spacegraph.render.ShapeDrawer;
 
 import javax.vecmath.Vector2f;
-import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -32,7 +31,7 @@ public class SliderSurface extends Surface {
         this.max = max;
     }
 
-//    public static void main(String[] args) {
+    //    public static void main(String[] args) {
 //        new GraphSpace<Surface>(
 //
 //                (Surface vt) -> new SurfaceMount(null, vt),
@@ -42,27 +41,27 @@ public class SliderSurface extends Surface {
 //        ).show(800,800);
 //    }
     public static void main(String[] args) {
-        SpaceGraph s = new SpaceGraph<>(
-
-                (List<Surface> vt) -> new SurfaceMount<>(null,
-                    new GridSurface(vt, GridSurface.VERTICAL)),
-
-                newArrayList(
-                    new GridSurface(newArrayList(
-                        new XYPadSurface(),
-                        new XYPadSurface()
-                    ), GridSurface.HORIZONTAL),
-                    new GridSurface(newArrayList(
-                            new SliderSurface(0.75f,  0, 1),
-                            new SliderSurface(0.25f,  0, 1),
-                            new SliderSurface(0.5f,  0, 1)
-                    ), GridSurface.VERTICAL)
+        SpaceGraph<?> s = new SpaceGraph();
+        s.addAll(
+                new RectWidget(
+                        new GridSurface(
+                            new GridSurface(newArrayList(
+                                    new XYPadSurface(),
+                                    new XYPadSurface()
+                            ), GridSurface.HORIZONTAL),
+                            new GridSurface(newArrayList(
+                                    new SliderSurface(0.75f, 0, 1),
+                                    new SliderSurface(0.25f, 0, 1),
+                                    new SliderSurface(0.5f, 0, 1)
+                            ), GridSurface.VERTICAL)
+                        ),
+                        4,3
                 )
         );
 
         s.add(new Facial(new ConsoleSurface(new ConsoleSurface.DummyTerminal(80, 25))).scale(500f, 400f));
         s.add(new Facial(new CrosshairSurface(s)));
-        s.show(800,800);
+        s.show(800, 800);
     }
 
 
@@ -120,7 +119,9 @@ public class SliderSurface extends Surface {
         return (v - min) / (max - min);
     }
 
-    /** unnormalize */
+    /**
+     * unnormalize
+     */
     public final float r(float nn) {
         float mn = this.min.floatValue();
         float mx = this.max.floatValue();

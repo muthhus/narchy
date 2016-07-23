@@ -5,6 +5,7 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
+import nars.util.event.On;
 import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
 import spacegraph.*;
@@ -18,8 +19,10 @@ import java.util.List;
 public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
 
     private final TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect;
+    private On on;
 
     private List<Y> next;
+    private NAR nar;
 
     public static void main(String[] args) {
 
@@ -32,10 +35,10 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
         //new ArithmeticInduction(n);
 
         final int maxNodes = 128;
-        final int maxEdges = 16;
+        final int maxEdges = 4;
 
         new SpaceGraph<Term>(
-                new NARSpace<>(n, (nar,space,target) -> {
+                new NARSpace<Term,Spatial<Term>>(n, (nar,space,target) -> {
                     Bag<Concept> x = ((Default) nar).core.concepts;
                     x.topWhile(b -> {
 
@@ -44,17 +47,22 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
 
                         w.pri = b.priIfFiniteElseZero();
 
+                        final float initDistanceEpsilon = 5f;
+                        w.move(SpaceGraph.r(initDistanceEpsilon),
+                                SpaceGraph.r(initDistanceEpsilon),
+                                SpaceGraph.r(initDistanceEpsilon));
+
                         target.add(w);
 
                         return true;
 
                     }, maxNodes);
 
-                }, maxNodes)
-        ).with(
-                new Flatten()
-                //new Spiral()
-                //new FastOrganicLayout()
+                }, maxNodes).with(
+                    new Flatten()
+                    //new Spiral()
+                    //new FastOrganicLayout()
+                )
         ).show(1300, 900);
 
         n.loop(30f);
@@ -63,7 +71,6 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
 
 
 
-    public final NAR nar;
     private final int capacity;
 
     //public final MutableFloat maxPri = new MutableFloat(1.0f);
@@ -74,11 +81,30 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
     //private final ConceptFilter eachConcept = new ConceptFilter();
 
 
-    public NARSpace(NAR nar, TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect, int capacity) {
-        this.nar = nar;
+    public NARSpace(TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect, int capacity) {
+        super();
         this.capacity = capacity;
         this.collect = collect;
-        nar.onFrame(nn -> updateIfNotBusy());
+    }
+
+    public NARSpace(NAR nar, TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect, int capacity) {
+        this(collect, capacity);
+        start(nar);
+    }
+
+    public final synchronized void start(NAR nar) {
+        if (on != null)
+            throw new RuntimeException("already running");
+        this.nar = nar;
+        on = nar.onFrame(nn -> updateIfNotBusy(this::update));
+    }
+    public final synchronized void stop() {
+        on.off();
+        on = null;
+    }
+
+    public final boolean running() {
+        return on!=null;
     }
 
 
@@ -88,8 +114,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y>  {
         return nar.time();
     }
 
-    @Override
-    protected void updateImpl() {
+
+    protected void update(SpaceInput _notused) {
 
         //String _keywordFilter = includeString.get();
         //this.keywordFilter = _keywordFilter != null && _keywordFilter.isEmpty() ? null : _keywordFilter;

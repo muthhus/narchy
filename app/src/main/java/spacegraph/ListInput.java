@@ -1,11 +1,13 @@
 package spacegraph;
 
+import com.google.common.collect.Lists;
 import nars.$;
 import nars.util.data.list.FasterList;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by me on 6/26/16.
@@ -14,11 +16,13 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
 
     protected List<Y> active = new FasterList<>(0);
 
-    private X[] items;
-
-    public ListInput(X... xx) {
+    public ListInput() {
         super();
-        this.items = xx;
+    }
+
+    public ListInput(Function<X,Y> materialize, X... xx) {
+        this();
+        set(materialize, xx);
     }
 
     @Override
@@ -31,16 +35,9 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
         active.forEach(action);
     }
 
-    public void commit(X... xx) {
-        this.items = xx;
-        if (space!=null)
-            refresh();
-    }
-
     @Override
     public void start(SpaceGraph space) {
         super.start(space);
-        commit(items);
     }
 
     /**
@@ -51,33 +48,33 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
         return new FasterList<>(capacity);
     }
 
-    @Override
-    protected void updateImpl() {
-
+    public void set(Function<X, Y> materializer, X... items) {
+        set(Lists.newArrayList(items), materializer);
     }
 
-    private void refresh() {
+    public void set(List<X> items, Function<X, Y> materializer) {
         int n = 0;
-        this.active = $.newArrayList(items.length);
+        FasterList<Y> v = $.newArrayList(items.size());
         for (X x : items) {
-            active.add((Y) space.update(x));
+            v.add(space.update(x, materializer));
         }
+        this.active = v;
     }
 
     @Override
-    public int size() {
+    public final int size() {
         return active.size();
     }
 
+    @Override
+    public final Y get(int i) {
+        return active.get(i);
+    }
 
     @Override
     public long now() {
         return 0;
     }
 
-    @Override
-    public void update(SpaceGraph<? extends X> space) {
-        active.forEach(a -> a.update(space));
-    }
 
 }

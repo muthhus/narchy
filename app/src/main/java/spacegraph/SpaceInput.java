@@ -1,17 +1,31 @@
 package spacegraph;
 
+import nars.$;
+
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * maintains a set of objects which are used as input for representation in a SpaceGraph
+ * @param X input "key" object type
+ * @param Y visualized "value" spatial type
  */
-abstract public class SpaceInput<O, M extends Spatial<O>> implements Iterable<M> {
+abstract public class SpaceInput<X, Y extends Spatial<X>> implements Iterable<Y> {
 
     final AtomicBoolean busy = new AtomicBoolean(true);
-    protected SpaceGraph<O> space;
+    protected SpaceGraph<X> space;
     private long now;
     private float dt;
 
+    final List<SpaceTransform> transforms = $.newArrayList();
+
+    public SpaceInput with(SpaceTransform<X>... t) {
+        for (SpaceTransform g : t)
+            this.transforms.add(g);
+        return this;
+    }
 
     public void start(SpaceGraph space) {
         this.space = space;
@@ -38,35 +52,40 @@ abstract public class SpaceInput<O, M extends Spatial<O>> implements Iterable<M>
         return dt;
     }
 
-
-
-
-    public void update() {
-        float last = this.now;
-        this.dt = (this.now = now()) - last;
-        updateImpl();
-    }
-
     /**
      * for thread-safe usage
      */
-    public void updateIfNotBusy() {
+    public void updateIfNotBusy(Consumer<SpaceInput<X,Y>> proc) {
         if (!isBusy()) {
             synchronized (busy) {
                 float last = this.now;
                 this.dt = (this.now = now()) - last;
-                updateImpl();
+                proc.accept(this);
             }
         }
     }
-
-    abstract protected void updateImpl();
 
     abstract public long now();
 
 
     /** needs to call update(space) for each active item */
-    abstract public void update(SpaceGraph<? extends O> space);
+    public void update(SpaceGraph<X> s) {
+
+
+        this.forEach(a -> a.update(s));
+
+        List<SpaceTransform> ll = this.transforms;
+        int size = size();
+        for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
+            ll.get(i1).update(s, this, dt);
+        }
+
+    }
+
 
     public abstract int size();
+
+    /** get the i'th object in the display list; the order is allowed to change each frame but not in-between updates */
+    public abstract Y get(int i);
+
 }

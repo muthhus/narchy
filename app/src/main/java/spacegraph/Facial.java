@@ -10,7 +10,7 @@ import jogamp.newt.driver.bcm.vc.iv.WindowDriver;
 import spacegraph.obj.ConsoleSurface;
 
 /**
- * orthographic widget adapter
+ * orthographic widget adapter. something which goes on the "face" of a HUD ("head"s-up-display)
  */
 public class Facial implements WindowListener {
 
