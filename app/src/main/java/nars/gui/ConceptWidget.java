@@ -37,8 +37,8 @@ public class ConceptWidget extends Spatial<Term> {
     }
 
     @Override
-    public void update(SpaceGraph<Term> s) {
-        super.update(s);
+    public boolean update(SpaceGraph<Term> s) {
+        boolean result = super.update(s);
 
         Term tt = key;
 
@@ -54,7 +54,6 @@ public class ConceptWidget extends Spatial<Term> {
         Concept cc = nar.concept(tt);
         if (cc == null) {
             //remove? hide?
-            return;
         }
 //            float lastConceptForget = instance.getLastForgetTime();
 //            if (lastConceptForget != lastConceptForget)
@@ -80,6 +79,7 @@ public class ConceptWidget extends Spatial<Term> {
         tasklinks.topWhile(linkAdder, maxEdges / 2);
         termlinks.topWhile(linkAdder, maxEdges - edgeCount()); //fill remaining edges
 
+        return result;
     }
 
 

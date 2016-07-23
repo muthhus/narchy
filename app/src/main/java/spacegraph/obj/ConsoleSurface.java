@@ -312,14 +312,16 @@ public class ConsoleSurface extends Surface {
 
 
                     new Thread(() -> {
-                        Util.pause(1500);
-                        for (int i = 0; i < 100; i++) {
+
+                        while(true) {
                             try {
-                                put(Integer.toString(i, 2) + "\n");
+                                put(Integer.toString((int)(10000 * Math.random()), 36));
+                                if (Math.random() < 0.5f)
+                                    put(' ');
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            Util.pause(1000);
+                            Util.pause(100);
                         }
                     }).start();
                 } catch (Exception e) {

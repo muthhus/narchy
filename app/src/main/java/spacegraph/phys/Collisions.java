@@ -53,7 +53,7 @@ public class Collisions<X> {
 
 	protected final OArrayList<Collidable<X>> objects = new OArrayList<>();
 
-	protected Intersecter intersecter1;
+	public final Intersecter intersecter;
 	protected final DispatcherInfo dispatchInfo = new DispatcherInfo();
 	//protected btStackAlloc*	m_stackAlloc;
 	protected Broadphase broadphasePairCache;
@@ -62,7 +62,7 @@ public class Collisions<X> {
 	 * This constructor doesn't own the dispatcher and paircache/broadphase.
 	 */
 	public Collisions(Intersecter intersecter, Broadphase broadphasePairCache, CollisionConfiguration collisionConfiguration) {
-		this.intersecter1 = intersecter;
+		this.intersecter = intersecter;
 		this.broadphasePairCache = broadphasePairCache;
 	}
 	
@@ -77,8 +77,8 @@ public class Collisions<X> {
 				//
 				// only clear the cached algorithms
 				//
-				broadphasePairCache.getOverlappingPairCache().cleanProxyFromPairs(bp, intersecter1);
-				broadphasePairCache.destroyProxy(bp, intersecter1);
+				broadphasePairCache.getOverlappingPairCache().cleanProxyFromPairs(bp, intersecter);
+				broadphasePairCache.destroyProxy(bp, intersecter);
 			}
 		}
 	}
@@ -116,7 +116,7 @@ public class Collisions<X> {
 					c,
 					collisionFilterGroup,
 					collisionFilterMask,
-					intersecter1, null));
+					intersecter, null));
 		}
 
 		objects.add(c);
@@ -133,17 +133,17 @@ public class Collisions<X> {
 
 			BulletStats.pushProfile("calculateOverlappingPairs");
 			try {
-				broadphasePairCache.calculateOverlappingPairs(intersecter1);
+				broadphasePairCache.calculateOverlappingPairs(intersecter);
 			}
 			finally {
 				BulletStats.popProfile();
 			}
 
-			Intersecter intersecter = intersecter1;
+			Intersecter intersecter = this.intersecter;
             BulletStats.pushProfile("dispatchAllCollisionPairs");
             try {
                 if (intersecter != null) {
-                    intersecter.dispatchAllCollisionPairs(broadphasePairCache.getOverlappingPairCache(), dispatchInfo, intersecter1);
+                    intersecter.dispatchAllCollisionPairs(broadphasePairCache.getOverlappingPairCache(), dispatchInfo, this.intersecter);
                 }
             }
             finally {
@@ -177,8 +177,8 @@ public class Collisions<X> {
             //
             // only clear the cached algorithms
             //
-			broadphasePairCache.getOverlappingPairCache().cleanProxyFromPairs(bp, intersecter1);
-			broadphasePairCache.destroyProxy(bp, intersecter1);
+			broadphasePairCache.getOverlappingPairCache().cleanProxyFromPairs(bp, intersecter);
+			broadphasePairCache.destroyProxy(bp, intersecter);
             collidable.broadphase(null);
         } else {
         	System.err.println(collidable + " missing broadphase");
@@ -195,10 +195,6 @@ public class Collisions<X> {
 	
 	public OverlappingPairCache getPairCache() {
 		return broadphasePairCache.getOverlappingPairCache();
-	}
-
-	public Intersecter getDispatcher() {
-		return intersecter1;
 	}
 
 	public DispatcherInfo getDispatchInfo() {
@@ -228,7 +224,7 @@ public class Collisions<X> {
 			Broadphasing broadphase = colObj.broadphase();
 			if (broadphase == null)
 				throw new RuntimeException();
-			bp.setAabb(broadphase, minAabb, maxAabb, intersecter1);
+			bp.setAabb(broadphase, minAabb, maxAabb, intersecter);
 		}
 		else {
 			// something went wrong, investigate

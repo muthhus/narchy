@@ -42,6 +42,7 @@ import spacegraph.phys.solve.SequentialImpulseConstrainer;
 import spacegraph.phys.util.OArrayList;
 
 import java.util.Comparator;
+import java.util.function.Consumer;
 
 import static spacegraph.phys.Dynamic.ifDynamic;
 import static spacegraph.phys.Dynamic.ifDynamicAndActive;
@@ -120,11 +121,11 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
     public void debugDrawWorld(IDebugDraw debugDrawer) {
 
         if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_CONTACT_POINTS) != 0) {
-            int numManifolds = getDispatcher().getNumManifolds();
+            int numManifolds = intersecter.getNumManifolds();
             v3 color = new v3();
             color.set(0f, 0f, 0f);
             for (int i = 0; i < numManifolds; i++) {
-                PersistentManifold contactManifold = getDispatcher().getManifoldByIndexInternal(i);
+                PersistentManifold contactManifold = intersecter.getManifoldByIndexInternal(i);
                 //btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
                 //btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
 
@@ -387,7 +388,6 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
     public void setGravity(v3 gravity) {
         this.gravity.set(gravity);
         for (int i = 0; i < objects.size(); i++) {
-            //return array[index];
             Collidable colObj = objects.get(i);
             Dynamic body = ifDynamic(colObj);
             if (body != null) {
@@ -400,21 +400,6 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
     public v3 getGravity(v3 out) {
         out.set(gravity);
         return out;
-    }
-
-    @Override
-    public final void addRigidBody(Dynamic body) {
-        if (!body.isStaticOrKinematicObject()) {
-            body.setGravity(gravity);
-        }
-
-        if (body.shape() != null) {
-            boolean isDynamic = !(body.isStaticObject() || body.isKinematicObject());
-            short collisionFilterGroup = isDynamic ? CollisionFilterGroups.DEFAULT_FILTER : CollisionFilterGroups.STATIC_FILTER;
-            short collisionFilterMask = isDynamic ? CollisionFilterGroups.ALL_FILTER : (short) (CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER);
-
-            add(body, collisionFilterGroup, collisionFilterMask);
-        }
     }
 
     public final void addRigidBody(Dynamic body, short group, short mask) {
@@ -589,6 +574,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
         }
     }
 
+
     private final OArrayList<TypedConstraint> sortedConstraints = new OArrayList<TypedConstraint>();
     private final InplaceSolverIslandCallback solverCallback = new InplaceSolverIslandCallback();
 
@@ -596,22 +582,26 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
         BulletStats.pushProfile("solveConstraints");
         try {
             // sorted version of all btTypedConstraint, based on islandId
+
             sortedConstraints.clear();
-            for (int i = 0; i < constraints.size(); i++) {
-                //return array[index];
-                sortedConstraints.add(constraints.get(i));
-            }
+            constraints.forEach((TypedConstraint c) -> {
+                sortedConstraints.add(c);
+            });
+
             //Collections.sort(sortedConstraints, sortConstraintOnIslandPredicate);
             MiscUtil.quickSort(sortedConstraints, sortConstraintOnIslandPredicate);
 
-            OArrayList<TypedConstraint> constraintsPtr = getNumConstraints() != 0 ? sortedConstraints : null;
+            int num = sortedConstraints.size();
+            solverCallback.init(solverInfo, 
+                    constrainer,
+                    num != 0 ? sortedConstraints : null,
+                    num, 
+                    /*,m_stackAlloc*/ intersecter);
 
-            solverCallback.init(solverInfo, constrainer, constraintsPtr, sortedConstraints.size(), /*,m_stackAlloc*/ intersecter1);
-
-            constrainer.prepareSolve(getCollisionWorld().getNumCollisionObjects(), getCollisionWorld().getDispatcher().getNumManifolds());
+            constrainer.prepareSolve(getNumCollisionObjects(), ((Collisions) this).intersecter.getNumManifolds());
 
             // solve all the constraints for this island
-            islands.buildAndProcessIslands(getCollisionWorld().getDispatcher(), getCollisionWorld().objects(), solverCallback);
+            islands.buildAndProcessIslands(intersecter, objects, solverCallback);
 
             constrainer.allSolved(solverInfo /*, m_stackAlloc*/);
         } finally {
@@ -622,32 +612,31 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
     protected void calculateSimulationIslands() {
         BulletStats.pushProfile("calculateSimulationIslands");
         try {
-            islands.updateActivationState(getCollisionWorld(), getCollisionWorld().getDispatcher());
 
-            int i;
-            int numConstraints = constraints.size();
-            for (i = 0; i < numConstraints; i++) {
-                //return array[index];
-                TypedConstraint constraint = constraints.get(i);
+            islands.updateActivationState(this, intersecter);
 
+            forEachConstraint((TypedConstraint constraint) -> {
                 Dynamic colObj0 = constraint.getRigidBodyA();
-                Dynamic colObj1 = constraint.getRigidBodyB();
+                if (colObj0 == null || !colObj0.isActive() || colObj0.isStaticOrKinematicObject())
+                    return;
 
-                if (((colObj0 != null) && (!colObj0.isStaticOrKinematicObject())) &&
-                        ((colObj1 != null) && (!colObj1.isStaticOrKinematicObject()))) {
-                    if (colObj0.isActive() || colObj1.isActive()) {
-                        islands.getUnionFind().unite((colObj0).getIslandTag(), (colObj1).getIslandTag());
-                    }
-                }
-            }
+                Dynamic colObj1 = constraint.getRigidBodyB();
+                if (colObj1 == null || !colObj1.isActive() || colObj1.isStaticOrKinematicObject())
+                    return;
+
+                islands.find.unite(colObj0.getIslandTag(), colObj1.getIslandTag());
+            });
+
 
             // Store the island id in each body
-            islands.storeIslandActivationState(getCollisionWorld());
-        } catch (Exception e) {
-            e.printStackTrace();
+            islands.storeIslandActivationState(this);
         } finally {
             BulletStats.popProfile();
         }
+    }
+
+    public void forEachConstraint(Consumer<TypedConstraint> e) {
+        constraints.forEach(e);
     }
 
     protected void integrateTransforms(float timeStep) {
@@ -676,7 +665,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
                                 if (body.shape().isConvex()) {
                                     BulletStats.gNumClampedCcdMotions++;
 
-                                    ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, body.getWorldTransform(tmpTrans), predictedTrans, getBroadphase().getOverlappingPairCache(), getDispatcher());
+                                    ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, body.getWorldTransform(tmpTrans), predictedTrans, getBroadphase().getOverlappingPairCache(), intersecter);
                                     //ConvexShape convexShape = (ConvexShape)body.getCollisionShape();
                                     SphereShape tmpSphere = new SphereShape(body.getCcdSweptSphereRadius()); //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
 
@@ -994,16 +983,6 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
         return constrainer;
     }
 
-    @Override
-    public int getNumConstraints() {
-        return constraints.size();
-    }
-
-    @Override
-    public TypedConstraint getConstraint(int index) {
-        return constraints.get(index);
-        //return array[index];
-    }
 
     // JAVA NOTE: not part of the original api
     @Override
@@ -1021,10 +1000,6 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 //	public SimulationIslandManager getSimulationIslandManager() {
 //		return islandManager;
 //	}
-
-    public Collisions getCollisionWorld() {
-        return this;
-    }
 
 
 //	public void setNumTasks(int numTasks) {

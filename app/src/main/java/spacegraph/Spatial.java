@@ -122,18 +122,30 @@ public class Spatial<O> implements BiConsumer<GL2, Dynamic> {
     @Deprecated public transient int numEdges;
 
 
-    public void update(SpaceGraph<O> s) {
+    /** returns true if this is an initialization cycle, or false if it is a subsequent one (already initialized) */
+    public boolean update(SpaceGraph<O> s) {
         preactive = true;
 
         if (body == null) {
-            Dynamic b = body = newBody(s, newShape(), collidable());
-            b.setUserPointer(this);
-            b.setRenderer(this);
+            updateStart(s);
+            return true;
         } else {
-            if (body.broadphase()==null)
-                throw new NullPointerException();
-            reactivate();
+            updateContinue();
+            return false;
         }
+    }
+
+    public void updateContinue() {
+        //if (body.broadphase()==null)
+            //throw new NullPointerException();
+        //reactivate();
+
+    }
+
+    public void updateStart(SpaceGraph<O> s) {
+        Dynamic b = body = newBody(s, newShape(), collidable());
+        b.setUserPointer(this);
+        b.setRenderer(this);
     }
 
     public void clearEdges() {

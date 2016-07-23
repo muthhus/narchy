@@ -87,11 +87,8 @@ public abstract class Dynamics<X> extends Collisions<X> {
 		addConstraint(constraint, false);
 	}
 	
-	public void addConstraint(TypedConstraint constraint, boolean disableCollisionsBetweenLinkedBodies) {
-	}
-
-	public void removeConstraint(TypedConstraint constraint) {
-	}
+	abstract public void addConstraint(TypedConstraint constraint, boolean disableCollisionsBetweenLinkedBodies);
+	abstract public void removeConstraint(TypedConstraint constraint);
 
 	public void addAction(ActionInterface action) {
 	}
@@ -113,19 +110,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
 	
 	public abstract v3 getGravity(v3 out);
 
-	public abstract void addRigidBody(Dynamic body);
-
-
 
 	public abstract Constrainer getConstrainer();
 
-	public int getNumConstraints() {
-		return 0;
-	}
-
-	public TypedConstraint getConstraint(int index) {
-		return null;
-	}
 
 	// JAVA NOTE: not part of the original api
 	public int getNumActions() {

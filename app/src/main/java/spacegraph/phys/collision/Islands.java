@@ -42,17 +42,13 @@ import java.util.List;
  */
 public class Islands {
 
-	private final UnionFind unionFind = new UnionFind();
+	public final UnionFind find = new UnionFind();
 
 	private final OArrayList<PersistentManifold> islandmanifold = new OArrayList<>();
 	private final OArrayList<Collidable> islandBodies = new OArrayList<>();
 
 	public void initUnionFind(int n) {
-		unionFind.reset(n);
-	}
-
-	public UnionFind getUnionFind() {
-		return unionFind;
+		find.reset(n);
 	}
 
 	public void findUnions(Intersecter intersecter, Collisions colWorld) {
@@ -71,7 +67,7 @@ public class Islands {
 			if (( ((colObj0).mergesSimulationIslands())) &&
 					( ((colObj1).mergesSimulationIslands()))) {
 
-				unionFind.unite((colObj0).getIslandTag(), (colObj1).getIslandTag());
+				find.unite((colObj0).getIslandTag(), (colObj1).getIslandTag());
 			}
 		}
 	}
@@ -98,7 +94,7 @@ public class Islands {
 
 	final boolean storeIslandActivationState(int i, Collidable c) {
 		if (!c.isStaticOrKinematicObject()) {
-			c.setIslandTag(unionFind.find(i));
+			c.setIslandTag(find.find(i));
 			c.setCompanionId(-1);
 		} else {
 			c.setIslandTag(-1);
@@ -115,7 +111,7 @@ public class Islands {
 		return islandId;
 	}
 
-	public void buildIslands(Intersecter intersecter, List<Collidable> collidables) {
+	public <X> void buildIslands(Intersecter intersecter, OArrayList<Collidable<X>> collidables) {
 		BulletStats.pushProfile("islandUnionFindAndQuickSort");
 		try {
 			islandmanifold.clear();
@@ -123,16 +119,16 @@ public class Islands {
 			// we are going to sort the unionfind array, and store the element id in the size
 			// afterwards, we clean unionfind, to make sure no-one uses it anymore
 
-            unionFind.sortIslands();
-            int numElem = unionFind.size();
+            find.sortIslands();
+            int numElem = find.size();
 
 			int endIslandIndex = 1;
 			int startIslandIndex;
 
 			// update the sleeping state for bodies, if all are sleeping
 			for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
-                int islandId = unionFind.get(startIslandIndex).id;
-                for (endIslandIndex = startIslandIndex + 1; (endIslandIndex < numElem) && (unionFind.get(endIslandIndex).id == islandId); endIslandIndex++) {
+                int islandId = find.get(startIslandIndex).id;
+                for (endIslandIndex = startIslandIndex + 1; (endIslandIndex < numElem) && (find.get(endIslandIndex).id == islandId); endIslandIndex++) {
 				}
 
 				//int numSleeping = 0;
@@ -141,7 +137,7 @@ public class Islands {
 
 				int idx;
 				for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                    int i = unionFind.get(idx).sz;
+                    int i = find.get(idx).sz;
 
 					//return array[index];
 					Collidable colObj0 = collidables.get(i);
@@ -164,7 +160,7 @@ public class Islands {
 				if (allSleeping) {
 					//int idx;
 					for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                        int i = unionFind.get(idx).sz;
+                        int i = find.get(idx).sz;
 						//return array[index];
 						Collidable colObj0 = collidables.get(i);
 						if ((colObj0.getIslandTag() != islandId) && (colObj0.getIslandTag() != -1)) {
@@ -182,7 +178,7 @@ public class Islands {
 
 					//int idx;
 					for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                        int i = unionFind.get(idx).sz;
+                        int i = find.get(idx).sz;
 
 						//return array[index];
 						Collidable colObj0 = collidables.get(i);
@@ -241,12 +237,12 @@ public class Islands {
 		}
 	}
 
-	public void buildAndProcessIslands(Intersecter intersecter, List<Collidable> collidables, IslandCallback callback) {
+	public <X> void buildAndProcessIslands(Intersecter intersecter, OArrayList<Collidable<X>> collidables, IslandCallback callback) {
 		buildIslands(intersecter, collidables);
 
 		int endIslandIndex = 1;
 		int startIslandIndex;
-        int numElem = unionFind.size();
+        int numElem = find.size();
 
 		BulletStats.pushProfile("processIslands");
 		try {
@@ -279,11 +275,11 @@ public class Islands {
 
 			// traverse the simulation islands, and call the solver, unless all objects are sleeping/deactivated
 			for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
-                int islandId = unionFind.get(startIslandIndex).id;
+                int islandId = find.get(startIslandIndex).id;
 				boolean islandSleeping = false;
 
-				for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((unionFind.get(endIslandIndex).id == islandId)); endIslandIndex++) {
-					int i = unionFind.get(endIslandIndex).sz;
+				for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((find.get(endIslandIndex).id == islandId)); endIslandIndex++) {
+					int i = find.get(endIslandIndex).sz;
 					//return array[index];
 					Collidable colObj0 = collidables.get(i);
 					islandBodies.add(colObj0);

@@ -373,8 +373,8 @@ public class KinematicCharacterController extends ActionInterface {
 	protected boolean recoverFromPenetration(Collisions collisions) {
 		boolean penetration = false;
 
-		collisions.getDispatcher().dispatchAllCollisionPairs(
-				ghostObject.getOverlappingPairCache(), collisions.getDispatchInfo(), collisions.getDispatcher());
+        collisions.intersecter.dispatchAllCollisionPairs(
+				ghostObject.getOverlappingPairCache(), collisions.getDispatchInfo(), collisions.intersecter);
 
 		currentPosition.set(ghostObject.getWorldTransform(new Transform()));
 
