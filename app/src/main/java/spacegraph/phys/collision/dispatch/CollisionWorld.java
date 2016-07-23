@@ -582,18 +582,17 @@ public class CollisionWorld<X> {
 					//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
 					CollisionShape shape = collidable.shape();
 
-					Transform collisionObjWorld = collidable.getWorldTransform(tmpTrans);
+					Transform worldTransform = collidable.worldTransform;
 
-					shape.getAabb(collisionObjWorld, collisionObjectAabbMin, collisionObjectAabbMax);
+					shape.getAabb(worldTransform, collisionObjectAabbMin, collisionObjectAabbMax);
 
 					hitLambda[0] = resultCallback.closestHitFraction;
-
 
 					if (AabbUtil2.rayAabb(rayFromWorld, rayToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda)) {
 						rayTestSingle(rayFromTrans, rayToTrans,
 								collidable,
 								shape,
-								collisionObjWorld,
+								worldTransform,
 								resultCallback);
 					}
 				}
@@ -675,11 +674,11 @@ public class CollisionWorld<X> {
 		//const btTransform*	m_shapeLocalTransform;
 	}
 	
-	public static class LocalRayResult {
-		public Collidable collidable;
-		public LocalShapeInfo localShapeInfo;
+	public static final class LocalRayResult {
+		public final Collidable collidable;
+		public final LocalShapeInfo localShapeInfo;
 		public final Vector3f hitNormalLocal = new Vector3f();
-		public float hitFraction;
+		public final float hitFraction;
 
 		public LocalRayResult(Collidable collidable, LocalShapeInfo localShapeInfo, Vector3f hitNormalLocal, float hitFraction) {
 			this.collidable = collidable;

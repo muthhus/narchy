@@ -3,7 +3,6 @@ package nars.gui;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
-import nars.Op;
 import nars.learn.gng.NeuralGasNet;
 import nars.link.BLink;
 import nars.op.time.MySTMClustered;
@@ -17,7 +16,7 @@ import spacegraph.layout.treechart.ItemVis;
 import spacegraph.obj.ConsoleSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.LayerSurface;
-import spacegraph.render.ShapeDrawer;
+import spacegraph.render.Draw;
 
 
 /**
@@ -69,7 +68,7 @@ public class STMView  {
 
                 float r = w * (float)Math.sqrt(size);
 
-                ShapeDrawer.rect(gl, x * s, y * s, r, r);
+                Draw.rect(gl, x * s, y * s, r, r);
             }
 
         }

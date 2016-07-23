@@ -29,7 +29,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
 import spacegraph.phys.collision.broadphase.BroadphaseNativeType;
 import spacegraph.phys.collision.shapes.*;
-import spacegraph.phys.dynamics.RigidBody;
 import spacegraph.phys.linearmath.Transform;
 import spacegraph.phys.linearmath.VectorUtil;
 import spacegraph.phys.util.BulletStack;
@@ -43,7 +42,7 @@ import static spacegraph.test.Lesson14.renderString;
 /**
  * @author jezek2
  */
-public enum ShapeDrawer {
+public enum Draw {
     ;
 
     public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
@@ -97,7 +96,8 @@ public enum ShapeDrawer {
 
     private static final float[] glMat = new float[16];
 
-    @Deprecated final static BulletStack stack = new BulletStack();
+    @Deprecated
+    final static BulletStack stack = new BulletStack();
     private static final Vector3f a = new Vector3f(), b = new Vector3f();
 
     public static void translate(GL2 gl, Transform trans) {
@@ -109,9 +109,6 @@ public enum ShapeDrawer {
         gl.glMultMatrixf(trans.getOpenGLMatrix(glMat), 0);
     }
 
-    public static void draw(GL2 gl, RigidBody b) {
-        draw(gl, b.shape());
-    }
 
     public static void draw(GL2 gl, CollisionShape shape) {
 
@@ -153,230 +150,226 @@ public enum ShapeDrawer {
                 gl.glPopMatrix();
             }
         } else {
-
             boolean useWireframeFallback = true;
+            switch (shape.getShapeType()) {
+                case BOX_SHAPE_PROXYTYPE: {
+                    BoxShape boxShape = (BoxShape) shape;
+                    boxShape.getHalfExtentsWithoutMargin(a);
+                    //Vector3f halfExtent = stack.vectors.get();
+                    gl.glScalef(2f * a.x, 2f * a.y, 2f * a.z);
+                    //glsrt.drawCube(gl, 1f);
+                    glut.glutSolidCube(1f);
 
-            //if ((debugMode & DebugDrawModes.DRAW_WIREFRAME) == 0) {
-            {
-                switch (shape.getShapeType()) {
-                    case BOX_SHAPE_PROXYTYPE: {
-                        BoxShape boxShape = (BoxShape) shape;
-                        boxShape.getHalfExtentsWithoutMargin(a);
-                        //Vector3f halfExtent = stack.vectors.get();
-                        gl.glScalef(2f * a.x, 2f * a.y, 2f * a.z);
-                        //glsrt.drawCube(gl, 1f);
-                        glut.glutSolidCube(1f);
-
-                        useWireframeFallback = false;
-                        break;
-                    }
-                    case TRIANGLE_SHAPE_PROXYTYPE:
-                    case TETRAHEDRAL_SHAPE_PROXYTYPE: {
-                        //todo:
-                        //					useWireframeFallback = false;
-                        break;
-                    }
-                    case CONVEX_HULL_SHAPE_PROXYTYPE:
-                        break;
-                    case SPHERE_SHAPE_PROXYTYPE: {
-                        SphereShape sphereShape = (SphereShape) shape;
-                        float radius = sphereShape.getMargin(); // radius doesn't include the margin, so draw with margin
-                        // TODO: glutSolidSphere(radius,10,10);
-                        //sphere.draw(radius, 8, 8);
-                        glsrt.drawSphere(gl, radius);
-							/*
+                    useWireframeFallback = false;
+                    break;
+                }
+                case TRIANGLE_SHAPE_PROXYTYPE:
+                case TETRAHEDRAL_SHAPE_PROXYTYPE: {
+                    //todo:
+                    //					useWireframeFallback = false;
+                    break;
+                }
+                case CONVEX_HULL_SHAPE_PROXYTYPE:
+                    break;
+                case SPHERE_SHAPE_PROXYTYPE: {
+                    SphereShape sphereShape = (SphereShape) shape;
+                    float radius = sphereShape.getMargin(); // radius doesn't include the margin, so draw with margin
+                    // TODO: glutSolidSphere(radius,10,10);
+                    //sphere.draw(radius, 8, 8);
+                    glsrt.drawSphere(gl, radius);
+                            /*
 							glPointSize(10f);
 							glBegin(gl.GL_POINTS);
 							glVertex3f(0f, 0f, 0f);
 							glEnd();
 							glPointSize(1f);
 							*/
-                        useWireframeFallback = false;
-                        break;
-                    }
-                    case CAPSULE_SHAPE_PROXYTYPE: {
-                        CapsuleShape capsuleShape = (CapsuleShape) shape;
-                        float radius = capsuleShape.getRadius();
-                        float halfHeight = capsuleShape.getHalfHeight();
-                        int upAxis = 1;
-
-                        glsrt.drawCylinder(gl, radius, halfHeight, upAxis);
-
-                        gl.glTranslatef(0f, -halfHeight, 0f);
-                        //glutSolidSphere(radius,10,10);
-                        //sphere.draw(radius, 10, 10);
-                        glsrt.drawSphere(gl, radius);
-                        gl.glTranslatef(0f, 2f * halfHeight, 0f);
-                        //glutSolidSphere(radius,10,10);
-                        //sphere.draw(radius, 10, 10);
-                        glsrt.drawSphere(gl, radius);
-                        useWireframeFallback = false;
-                        break;
-                    }
-                    case MULTI_SPHERE_SHAPE_PROXYTYPE: {
-                        break;
-                    }
-                    //				case CONE_SHAPE_PROXYTYPE:
-                    //					{
-                    //						const btConeShape* coneShape = static_cast<const btConeShape*>(shape);
-                    //						int upIndex = coneShape->getConeUpIndex();
-                    //						float radius = coneShape->getRadius();//+coneShape->getMargin();
-                    //						float height = coneShape->getHeight();//+coneShape->getMargin();
-                    //						switch (upIndex)
-                    //						{
-                    //						case 0:
-                    //							glRotatef(90.0, 0.0, 1.0, 0.0);
-                    //							break;
-                    //						case 1:
-                    //							glRotatef(-90.0, 1.0, 0.0, 0.0);
-                    //							break;
-                    //						case 2:
-                    //							break;
-                    //						default:
-                    //							{
-                    //							}
-                    //						};
-                    //
-                    //						glTranslatef(0.0, 0.0, -0.5*height);
-                    //						glutSolidCone(radius,height,10,10);
-                    //						useWireframeFallback = false;
-                    //						break;
-                    //
-                    //					}
-                    case CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE: {
-                        useWireframeFallback = false;
-                        break;
-                    }
-
-                    case CONVEX_SHAPE_PROXYTYPE:
-                    case CYLINDER_SHAPE_PROXYTYPE: {
-                        CylinderShape cylinder = (CylinderShape) shape;
-                        int upAxis = cylinder.getUpAxis();
-
-                        float radius = cylinder.getRadius();
-                        float halfHeight = VectorUtil.getCoord(cylinder.getHalfExtentsWithMargin(new Vector3f()), upAxis);
-
-                        glsrt.drawCylinder(gl, radius, halfHeight, upAxis);
-
-                        break;
-                    }
-                    default: {
-                    }
-
+                    useWireframeFallback = false;
+                    break;
                 }
+                case CAPSULE_SHAPE_PROXYTYPE: {
+                    CapsuleShape capsuleShape = (CapsuleShape) shape;
+                    float radius = capsuleShape.getRadius();
+                    float halfHeight = capsuleShape.getHalfHeight();
+                    int upAxis = 1;
 
+                    glsrt.drawCylinder(gl, radius, halfHeight, upAxis);
 
-                if (useWireframeFallback) {
-                    // for polyhedral shapes
-                    if (shape.isPolyhedral()) {
-                        PolyhedralConvexShape polyshape = (PolyhedralConvexShape) shape;
-
-                        ImmModeSink vbo = ImmModeSink.createFixed(polyshape.getNumEdges() + 3,
-                                3, GL.GL_FLOAT,  // vertex
-                                0, GL.GL_FLOAT,  // color
-                                0, GL.GL_FLOAT,  // normal
-                                0, GL.GL_FLOAT, GL.GL_STATIC_DRAW); // texture
-
-                        vbo.glBegin(gl.GL_LINES);
-
-                        //Vector3f a = stack.vectors.get(), b = stack.vectors.get();
-                        int i;
-                        for (i = 0; i < polyshape.getNumEdges(); i++) {
-                            polyshape.getEdge(i, a, b);
-
-                            vbo.glVertex3f(a.x, a.y, a.z);
-                            vbo.glVertex3f(b.x, b.y, b.z);
-                        }
-                        vbo.glEnd(gl);
-
-                        //					if (debugMode==btIDebugDraw::DBG_DrawFeaturesText)
-                        //					{
-                        //						glRasterPos3f(0.0,  0.0,  0.0);
-                        //						//BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),polyshape->getExtraDebugInfo());
-                        //
-                        //						glColor3f(1.f, 1.f, 1.f);
-                        //						for (i=0;i<polyshape->getNumVertices();i++)
-                        //						{
-                        //							btPoint3 vtx;
-                        //							polyshape->getVertex(i,vtx);
-                        //							glRasterPos3f(vtx.x(),  vtx.y(),  vtx.z());
-                        //							char buf[12];
-                        //							sprintf(buf," %d",i);
-                        //							BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
-                        //						}
-                        //
-                        //						for (i=0;i<polyshape->getNumPlanes();i++)
-                        //						{
-                        //							btVector3 normal;
-                        //							btPoint3 vtx;
-                        //							polyshape->getPlane(normal,vtx,i);
-                        //							btScalar d = vtx.dot(normal);
-                        //
-                        //							glRasterPos3f(normal.x()*d,  normal.y()*d, normal.z()*d);
-                        //							char buf[12];
-                        //							sprintf(buf," plane %d",i);
-                        //							BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
-                        //
-                        //						}
-                        //					}
-
-
-                    }
+                    gl.glTranslatef(0f, -halfHeight, 0f);
+                    //glutSolidSphere(radius,10,10);
+                    //sphere.draw(radius, 10, 10);
+                    glsrt.drawSphere(gl, radius);
+                    gl.glTranslatef(0f, 2f * halfHeight, 0f);
+                    //glutSolidSphere(radius,10,10);
+                    //sphere.draw(radius, 10, 10);
+                    glsrt.drawSphere(gl, radius);
+                    useWireframeFallback = false;
+                    break;
                 }
-
-                //		#ifdef USE_DISPLAY_LISTS
+                case MULTI_SPHERE_SHAPE_PROXYTYPE: {
+                    break;
+                }
+                //				case CONE_SHAPE_PROXYTYPE:
+                //					{
+                //						const btConeShape* coneShape = static_cast<const btConeShape*>(shape);
+                //						int upIndex = coneShape->getConeUpIndex();
+                //						float radius = coneShape->getRadius();//+coneShape->getMargin();
+                //						float height = coneShape->getHeight();//+coneShape->getMargin();
+                //						switch (upIndex)
+                //						{
+                //						case 0:
+                //							glRotatef(90.0, 0.0, 1.0, 0.0);
+                //							break;
+                //						case 1:
+                //							glRotatef(-90.0, 1.0, 0.0, 0.0);
+                //							break;
+                //						case 2:
+                //							break;
+                //						default:
+                //							{
+                //							}
+                //						};
                 //
-                //		if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE||shape->getShapeType() == GIMPACT_SHAPE_PROXYTYPE)
-                //			{
-                //				GLuint dlist =   OGL_get_displaylist_for_shape((btCollisionShape * )shape);
-                //				if (dlist)
-                //				{
-                //					glCallList(dlist);
-                //				}
-                //				else
-                //				{
-                //		#else
-                if (shape.isConcave())//>getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE||shape->getShapeType() == GIMPACT_SHAPE_PROXYTYPE)
-                //		if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE)
-                {
-                    ConcaveShape concaveMesh = (ConcaveShape) shape;
-                    //btVector3 aabbMax(btScalar(1e30),btScalar(1e30),btScalar(1e30));
-                    //btVector3 aabbMax(100,100,100);//btScalar(1e30),btScalar(1e30),btScalar(1e30));
+                //						glTranslatef(0.0, 0.0, -0.5*height);
+                //						glutSolidCone(radius,height,10,10);
+                //						useWireframeFallback = false;
+                //						break;
+                //
+                //					}
+                case CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE: {
+                    useWireframeFallback = false;
+                    break;
+                }
 
-                    //todo pass camera, for some culling
-//                    Vector3f aabbMax = stack.vectors.get(1e30f, 1e30f, 1e30f);
-//                    Vector3f aabbMin = stack.vectors.get(-1e30f, -1e30f, -1e30f);
-                    a.set(1e30f, 1e30f, 1e30f);
-                    b.set(-1e30f, -1e30f, -1e30f);
+                case CONVEX_SHAPE_PROXYTYPE:
+                case CYLINDER_SHAPE_PROXYTYPE: {
+                    CylinderShape cylinder = (CylinderShape) shape;
+                    int upAxis = cylinder.getUpAxis();
 
-                    GlDrawcallback drawCallback = new GlDrawcallback(gl);
-                    drawCallback.wireframe = false; //(debugMode & DebugDrawModes.DRAW_WIREFRAME) != 0;
+                    float radius = cylinder.getRadius();
+                    float halfHeight = VectorUtil.getCoord(cylinder.getHalfExtentsWithMargin(new Vector3f()), upAxis);
 
-                    concaveMesh.processAllTriangles(drawCallback, b, a);
+                    glsrt.drawCylinder(gl, radius, halfHeight, upAxis);
+
+                    break;
+                }
+                default: {
+                }
+
+            }
+
+
+            if (useWireframeFallback) {
+                // for polyhedral shapes
+                if (shape.isPolyhedral()) {
+                    PolyhedralConvexShape polyshape = (PolyhedralConvexShape) shape;
+
+                    ImmModeSink vbo = ImmModeSink.createFixed(polyshape.getNumEdges() + 3,
+                            3, GL.GL_FLOAT,  // vertex
+                            0, GL.GL_FLOAT,  // color
+                            0, GL.GL_FLOAT,  // normal
+                            0, GL.GL_FLOAT, GL.GL_STATIC_DRAW); // texture
+
+                    vbo.glBegin(gl.GL_LINES);
+
+                    //Vector3f a = stack.vectors.get(), b = stack.vectors.get();
+                    int i;
+                    for (i = 0; i < polyshape.getNumEdges(); i++) {
+                        polyshape.getEdge(i, a, b);
+
+                        vbo.glVertex3f(a.x, a.y, a.z);
+                        vbo.glVertex3f(b.x, b.y, b.z);
+                    }
+                    vbo.glEnd(gl);
+
+                    //					if (debugMode==btIDebugDraw::DBG_DrawFeaturesText)
+                    //					{
+                    //						glRasterPos3f(0.0,  0.0,  0.0);
+                    //						//BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),polyshape->getExtraDebugInfo());
+                    //
+                    //						glColor3f(1.f, 1.f, 1.f);
+                    //						for (i=0;i<polyshape->getNumVertices();i++)
+                    //						{
+                    //							btPoint3 vtx;
+                    //							polyshape->getVertex(i,vtx);
+                    //							glRasterPos3f(vtx.x(),  vtx.y(),  vtx.z());
+                    //							char buf[12];
+                    //							sprintf(buf," %d",i);
+                    //							BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
+                    //						}
+                    //
+                    //						for (i=0;i<polyshape->getNumPlanes();i++)
+                    //						{
+                    //							btVector3 normal;
+                    //							btPoint3 vtx;
+                    //							polyshape->getPlane(normal,vtx,i);
+                    //							btScalar d = vtx.dot(normal);
+                    //
+                    //							glRasterPos3f(normal.x()*d,  normal.y()*d, normal.z()*d);
+                    //							char buf[12];
+                    //							sprintf(buf," plane %d",i);
+                    //							BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
+                    //
+                    //						}
+                    //					}
+
+
                 }
             }
-            //#endif
 
-            //#ifdef USE_DISPLAY_LISTS
-            //		}
-            //	}
-            //#endif
-
-            //			if (shape->getShapeType() == CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE)
+            //		#ifdef USE_DISPLAY_LISTS
+            //
+            //		if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE||shape->getShapeType() == GIMPACT_SHAPE_PROXYTYPE)
             //			{
-            //				btConvexTriangleMeshShape* convexMesh = (btConvexTriangleMeshShape*) shape;
-            //
-            //				//todo: pass camera for some culling
-            //				btVector3 aabbMax(btScalar(1e30),btScalar(1e30),btScalar(1e30));
-            //				btVector3 aabbMin(-btScalar(1e30),-btScalar(1e30),-btScalar(1e30));
-            //				TriangleGlDrawcallback drawCallback;
-            //				convexMesh->getMeshInterface()->InternalProcessAllTriangles(&drawCallback,aabbMin,aabbMax);
-            //
-            //			}
+            //				GLuint dlist =   OGL_get_displaylist_for_shape((btCollisionShape * )shape);
+            //				if (dlist)
+            //				{
+            //					glCallList(dlist);
+            //				}
+            //				else
+            //				{
+            //		#else
+            if (shape.isConcave())//>getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE||shape->getShapeType() == GIMPACT_SHAPE_PROXYTYPE)
+            //		if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE)
+            {
+                ConcaveShape concaveMesh = (ConcaveShape) shape;
+                //btVector3 aabbMax(btScalar(1e30),btScalar(1e30),btScalar(1e30));
+                //btVector3 aabbMax(100,100,100);//btScalar(1e30),btScalar(1e30),btScalar(1e30));
 
-            // TODO: error in original sources GL_DEPTH_BUFFER_BIT instead of GL_DEPTH_TEST
-            //gl.glDisable(GL_DEPTH_TEST);
-            //glRasterPos3f(0, 0, 0);//mvtx.x(),  vtx.y(),  vtx.z());
+                //todo pass camera, for some culling
+//                    Vector3f aabbMax = stack.vectors.get(1e30f, 1e30f, 1e30f);
+//                    Vector3f aabbMin = stack.vectors.get(-1e30f, -1e30f, -1e30f);
+                a.set(1e30f, 1e30f, 1e30f);
+                b.set(-1e30f, -1e30f, -1e30f);
+
+                GlDrawcallback drawCallback = new GlDrawcallback(gl);
+                drawCallback.wireframe = false; //(debugMode & DebugDrawModes.DRAW_WIREFRAME) != 0;
+
+                concaveMesh.processAllTriangles(drawCallback, b, a);
+            }
+        }
+        //#endif
+
+        //#ifdef USE_DISPLAY_LISTS
+        //		}
+        //	}
+        //#endif
+
+        //			if (shape->getShapeType() == CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE)
+        //			{
+        //				btConvexTriangleMeshShape* convexMesh = (btConvexTriangleMeshShape*) shape;
+        //
+        //				//todo: pass camera for some culling
+        //				btVector3 aabbMax(btScalar(1e30),btScalar(1e30),btScalar(1e30));
+        //				btVector3 aabbMin(-btScalar(1e30),-btScalar(1e30),-btScalar(1e30));
+        //				TriangleGlDrawcallback drawCallback;
+        //				convexMesh->getMeshInterface()->InternalProcessAllTriangles(&drawCallback,aabbMin,aabbMax);
+        //
+        //			}
+
+        // TODO: error in original sources GL_DEPTH_BUFFER_BIT instead of GL_DEPTH_TEST
+        //gl.glDisable(GL_DEPTH_TEST);
+        //glRasterPos3f(0, 0, 0);//mvtx.x(),  vtx.y(),  vtx.z());
 //				if ((debugMode & DebugDrawModes.DRAW_TEXT) != 0) {
 //					// TODO: BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),shape->getName());
 //				}
@@ -384,18 +377,14 @@ public enum ShapeDrawer {
 //				if ((debugMode & DebugDrawModes.DRAW_FEATURES_TEXT) != 0) {
 //					//BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),shape->getExtraDebugInfo());
 //				}
-            //gl.glEnable(GL_DEPTH_TEST);
-
-        }
-
-
+        //gl.glEnable(GL_DEPTH_TEST);
 
 
     }
 
     @Deprecated
     public static void line(GL2 gl, double x1, double y1, double x2, double y2) {
-        line(gl, (float)x1, (float)y1, (float)x2, (float)y2 );
+        line(gl, (float) x1, (float) y1, (float) x2, (float) y2);
     }
 
     public static void line(GL2 gl, float x1, float y1, float x2, float y2) {
@@ -408,32 +397,33 @@ public enum ShapeDrawer {
     public static void strokeRect(GL2 gl, float x1, float y1, float w, float h) {
         line(gl, x1, y1, x1 + w, y1);
         line(gl, x1, y1, x1, y1 + h);
-        line(gl, x1, y1+h, x1+w, y1 + h);
-        line(gl, x1+w, y1, x1+w, y1 + h);
+        line(gl, x1, y1 + h, x1 + w, y1 + h);
+        line(gl, x1 + w, y1, x1 + w, y1 + h);
     }
 
     public static void rect(GL2 gl, float x1, float y1, float w, float h) {
 
         gl.glBegin(GL2.GL_QUADS);
         gl.glVertex3f(x1, y1, 0);
-        gl.glVertex3f(x1+w, y1, 0);
-        gl.glVertex3f(x1+w, y1+h, 0);
-        gl.glVertex3f(x1, y1+h, 0);
+        gl.glVertex3f(x1 + w, y1, 0);
+        gl.glVertex3f(x1 + w, y1 + h, 0);
+        gl.glVertex3f(x1, y1 + h, 0);
         gl.glEnd();
     }
+
     public static void rect(GL2 gl, float x1, float y1, float w, float h, float z) {
 
         gl.glBegin(GL2.GL_QUADS);
         gl.glVertex3f(x1, y1, z);
-        gl.glVertex3f(x1+w, y1, z);
-        gl.glVertex3f(x1+w, y1+h, z);
-        gl.glVertex3f(x1, y1+h, z);
+        gl.glVertex3f(x1 + w, y1, z);
+        gl.glVertex3f(x1 + w, y1 + h, z);
+        gl.glVertex3f(x1, y1 + h, z);
         gl.glEnd();
     }
 
     static public void renderLabel(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
         gl.glPushMatrix();
-        gl.glNormal3f(0,0,1f);
+        gl.glNormal3f(0, 0, 1f);
         gl.glTranslatef(dx, dy, dz);
 
         float fontThick = 1f;
@@ -442,7 +432,7 @@ public enum ShapeDrawer {
         //float r = v.radius;
         renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, label,
                 scaleX, scaleY,
-                0, 0, (1/1.9f)/(Math.max(scaleX,scaleY))); // Print GL Text To The Screen
+                0, 0, (1 / 1.9f) / (Math.max(scaleX, scaleY))); // Print GL Text To The Screen
         gl.glPopMatrix();
     }
 

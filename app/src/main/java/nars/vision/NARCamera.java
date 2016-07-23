@@ -20,7 +20,7 @@ import nars.util.signal.MotorConcept;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.render.ShapeDrawer;
+import spacegraph.render.Draw;
 
 import java.awt.image.BufferedImage;
 import java.util.Collections;
@@ -362,10 +362,10 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
             gl.glColor3f(0.5f,0.5f,0.5f);
             int hh = camera.inHeight();
             int ww = camera.inWidth();
-            ShapeDrawer.strokeRect(gl,0,0, ww, hh);
+            Draw.strokeRect(gl,0,0, ww, hh);
 
             if (camera.out!=null)
-                ShapeDrawer.strokeRect(gl,camera.input.x,camera.input.y, camera.input.width, camera.input.height);
+                Draw.strokeRect(gl,camera.input.x,camera.input.y, camera.input.width, camera.input.height);
 
             gl.glPopMatrix();
 
@@ -398,7 +398,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
                     float bl = decodeBlue(p);
 
                     gl.glColor3f(r, g, bl);
-                    ShapeDrawer.rect(gl, x * dw, th - y * dh, dw, dh);
+                    Draw.rect(gl, x * dw, th - y * dh, dw, dh);
 
                 }
             }
@@ -406,7 +406,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
             //border
             gl.glColor4f(1f, 1f, 1f, 1f);
-            ShapeDrawer.strokeRect(gl, 0, 0, tw + dw, th + dh);
+            Draw.strokeRect(gl, 0, 0, tw + dw, th + dh);
         }
 
 

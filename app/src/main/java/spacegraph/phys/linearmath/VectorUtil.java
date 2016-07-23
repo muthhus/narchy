@@ -110,9 +110,11 @@ public class VectorUtil {
 
 	public static void setInterpolate3(Vector3f dest, Vector3f v0, Vector3f v1, float rt) {
 		float s = 1f - rt;
-		dest.x = s * v0.x + rt * v1.x;
-		dest.y = s * v0.y + rt * v1.y;
-		dest.z = s * v0.z + rt * v1.z;
+		dest.set(
+		s * v0.x + rt * v1.x,
+		s * v0.y + rt * v1.y,
+		s * v0.z + rt * v1.z);
+
 		// don't do the unused w component
 		//		m_co[3] = s * v0[3] + rt * v1[3];
 	}

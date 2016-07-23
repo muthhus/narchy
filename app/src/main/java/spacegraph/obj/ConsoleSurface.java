@@ -14,7 +14,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import nars.util.Util;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.render.ShapeDrawer;
+import spacegraph.render.Draw;
 
 import java.io.IOException;
 import java.util.List;
@@ -142,7 +142,7 @@ public class ConsoleSurface extends Surface {
                         gl.glColor4f(
                                 backColor.red(),
                                 backColor.green(), backColor.blue(), bgAlpha);
-                        ShapeDrawer.rect(gl,
+                        Draw.rect(gl,
                                 cw * i, 0,
                                 cw, ch
                                 ,-dz
@@ -170,7 +170,7 @@ public class ConsoleSurface extends Surface {
                     float p = (1f + (float)Math.sin(t/100.0)) * 0.5f;
                     gl.glColor4f( 1f, 0.5f,0f, 0.3f + p * 0.4f);
                     float m = -(0.1f + 0.3f * p);
-                    ShapeDrawer.rect(gl,
+                    Draw.rect(gl,
                             cw * i + m, 0+m,
                             cw-m, ch-m
                             ,-dz-m

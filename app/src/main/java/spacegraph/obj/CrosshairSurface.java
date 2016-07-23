@@ -6,7 +6,7 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.render.ShapeDrawer;
+import spacegraph.render.Draw;
 
 /**
  * Created by me on 6/27/16.
@@ -62,11 +62,11 @@ public class CrosshairSurface extends Surface implements MouseListener {
         gl.glColor4f(r, g, b, 0.6f);
 
         gl.glLineWidth(4f);
-        ShapeDrawer.strokeRect(gl, smx-cw/2f, smy-ch/2f, cw, ch);
+        Draw.strokeRect(gl, smx-cw/2f, smy-ch/2f, cw, ch);
 
         float hl = 1.25f; //cross hair length
-        ShapeDrawer.line(gl, smx, smy-ch*hl, smx, smy+ch*hl);
-        ShapeDrawer.line(gl, smx-cw*hl, smy, smx+cw*hl, smy);
+        Draw.line(gl, smx, smy-ch*hl, smx, smy+ch*hl);
+        Draw.line(gl, smx-cw*hl, smy, smx+cw*hl, smy);
 
         gl.glPopMatrix();
     }

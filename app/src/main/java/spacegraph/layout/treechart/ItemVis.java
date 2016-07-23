@@ -1,7 +1,7 @@
 package spacegraph.layout.treechart;
 
 import com.jogamp.opengl.GL2;
-import spacegraph.render.ShapeDrawer;
+import spacegraph.render.Draw;
 
 /**
  * @author Tadas Subonis <tadas.subonis@gmail.com>
@@ -94,14 +94,14 @@ public class ItemVis<X> {
 
         gl.glColor3f(r, g, b);
 
-        ShapeDrawer.rect(gl,
+        Draw.rect(gl,
             (float)left, (float)top,
             (float)width, (float)height
         );
 
         gl.glColor3f(1,1,1);
         float labelSize = (float) (height / 4f * Math.min(0.005f,percent));
-        ShapeDrawer.renderLabel(gl,
+        Draw.renderLabel(gl,
                 labelSize, labelSize, //label size
                 label, (float)(left+width/2f), (float)(top+height/2f), 0.5f);
 

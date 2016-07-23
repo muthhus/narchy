@@ -52,15 +52,18 @@ public class BoxShape extends PolyhedralConvexShape {
 	public BoxShape(float w, float h, float d) {
 		super();
 
+		setMargin(0f);
+
 		//VectorUtil.mul(implicitShapeDimensions, boxHalfExtents, localScaling);
 		implicitShapeDimensions.set(w/2f, h/2f, d/2f); //localscaling is by default 1,1,1 anyway
 
-		float m = getMargin();
+		/*float m = getMargin();
 
-		implicitShapeDimensions.add(-m, -m, -m);
+		implicitShapeDimensions.add(-m, -m, -m);*/
 	}
 
 	public void size(float x, float y, float z) {
+		setMargin(0f); //is margin helpful?
 		implicitShapeDimensions.set(x/2f, y/2f, z/2f);
 	}
 
@@ -371,14 +374,14 @@ public class BoxShape extends PolyhedralConvexShape {
 	}
 
 	public final float x() {
-		return implicitShapeDimensions.x;
+		return implicitShapeDimensions.x*2f;
 	}
 
 	public final float y() {
-		return implicitShapeDimensions.y;
+		return implicitShapeDimensions.y*2f;
 	}
 
 	public final float z() {
-		return implicitShapeDimensions.z;
+		return implicitShapeDimensions.z*2f;
 	}
 }

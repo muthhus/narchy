@@ -22,6 +22,8 @@ public class RectWidget<X> extends Spatial<X> {
 
     public final Surface surface;
     private BoxShape shape;
+    final float zOffset = 0.05f; //relative to scale
+
     //private float padding;
 
 
@@ -34,11 +36,12 @@ public class RectWidget<X> extends Spatial<X> {
 
         this.surface = s;
 
-        final float thick = 0.1f;
+        final float thick = 0.2f;
         this.shape = new BoxShape(w, h, thick * (Math.min(w,h)));
 
         s.setParent(null);
     }
+
 
 
     @Override
@@ -56,11 +59,14 @@ public class RectWidget<X> extends Spatial<X> {
 //                this.thick = h.z;
 //            }
 
-            float thick = ((BoxShape) body.shape()).z();
-            float depthEpsilon = thick /4f;
+            BoxShape shape = (BoxShape) body.shape();
+            float frontZ = shape.z()/2;
+            float zTolerance = frontZ/4f;
 
-            if (Util.equals(localPoint.z, thick, depthEpsilon)) { //top surface only, ignore sides and back
-                return surface.onTouch(new Vector2f(localPoint.x / 2f + 0.5f, localPoint.y / 2f + 0.5f), buttons);
+            if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
+
+                //System.out.println(localPoint + " " + thick);
+                return surface.onTouch(new Vector2f(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
             }
         }
         return false;
@@ -70,6 +76,7 @@ public class RectWidget<X> extends Spatial<X> {
     protected CollisionShape newShape() {
         return shape;
     }
+
 
 
 
@@ -84,7 +91,7 @@ public class RectWidget<X> extends Spatial<X> {
         //float pp = 1f - (p / 2f);
         //float pp = 1f;
 
-        gl.glTranslatef(-0.5f, -0.5f, radius*1.05f);
+        gl.glTranslatef(-0.5f, -0.5f, 0.5f + zOffset);
         //gl.glScalef(pp, pp, 1f);
 
 

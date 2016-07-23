@@ -12,7 +12,7 @@ import spacegraph.phys.collision.shapes.ConvexInternalShape;
 import spacegraph.phys.dynamics.RigidBody;
 import spacegraph.phys.linearmath.Transform;
 import spacegraph.phys.util.Motion;
-import spacegraph.render.ShapeDrawer;
+import spacegraph.render.Draw;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix3f;
@@ -106,7 +106,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
                 ">";
     }
 
-    public final Transform transform() { return motion.t; }
+    public final Transform transform() { return body.transform(); }
 
 
     @Override
@@ -281,16 +281,16 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         renderAbsolute(gl);
 
         gl.glPushMatrix();
-        ShapeDrawer.transform(gl, body.transform());
+
+        Draw.transform(gl, body.transform());
+
         renderRelative(gl, body);
 
         gl.glPushMatrix();
         {
-            Vector3f v = ((ConvexInternalShape) body.shape()).implicitShapeDimensions; //HACK
-            //adjust aspect ratio
-            float r = 2f;
-            float sx = v.x * r;
-            float sy = v.y * r;
+            BoxShape shape = (BoxShape) body.shape();
+            float sx = shape.x(); //HACK
+            float sy = shape.y(); //HACK
             float tx, ty;
             //if (sx > sy) {
                 ty = sy;
@@ -300,10 +300,9 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
               //  ty = sx/sy;
             //}
 
-            gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
+            //gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
 
             gl.glScalef(tx, ty, 1f);
-
 
             renderRelativeAspect(gl);
         }
@@ -317,20 +316,20 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         renderShape(gl, body);
 
     }
-    protected void renderRelativeAspect(GL2 gl) {
 
+    protected void renderRelativeAspect(GL2 gl) {
 
 
     }
 
     protected void renderLabel(GL2 gl, float scale) {
         final float charAspect = 1.5f;
-        ShapeDrawer.renderLabel(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
+        Draw.renderLabel(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
     }
 
     protected void renderShape(GL2 gl, RigidBody body) {
         colorshape(gl);
-        ShapeDrawer.draw(gl, body);
+        Draw.draw(gl, body.shape());
     }
 
     static float h(float p) {

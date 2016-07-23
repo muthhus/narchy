@@ -19,7 +19,7 @@
 package nars.experiment.tetris.visualizer;
 
 import com.jogamp.opengl.GL2;
-import spacegraph.render.ShapeDrawer;
+import spacegraph.render.Draw;
 
 import java.awt.*;
 
@@ -108,7 +108,7 @@ public class TetrisBlocksComponent {
 
 
 					gl.glColor3f(c.getRed()/256f, c.getGreen()/256f, c.getBlue()/256f);
-					ShapeDrawer.rect(gl, x, 1f - y - h, w, h);
+					Draw.rect(gl, x, 1f - y - h, w, h);
 				}
 
 			}

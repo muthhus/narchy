@@ -5,7 +5,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.render.ShapeDrawer;
+import spacegraph.render.Draw;
 
 import javax.vecmath.Vector2f;
 
@@ -46,8 +46,8 @@ public class SliderSurface extends Surface {
                 new RectWidget(
                         new GridSurface(
                             new GridSurface(newArrayList(
-                                    new XYPadSurface(),
-                                    new XYPadSurface()
+                                    new XYSlider(),
+                                    new XYSlider()
                             ), GridSurface.HORIZONTAL),
                             new GridSurface(newArrayList(
                                     new SliderSurface(0.75f, 0, 1),
@@ -55,7 +55,7 @@ public class SliderSurface extends Surface {
                                     new SliderSurface(0.5f, 0, 1)
                             ), GridSurface.VERTICAL)
                         ),
-                        4,3
+                        6,3 //TODO make sure works for non-square shape
                 )
         );
 
@@ -89,7 +89,7 @@ public class SliderSurface extends Surface {
 
         float barSize = W * p;
         //ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
-        ShapeDrawer.rect(gl, 0, 0, barSize, H);
+        Draw.rect(gl, 0, 0, barSize, H);
     }
 
 

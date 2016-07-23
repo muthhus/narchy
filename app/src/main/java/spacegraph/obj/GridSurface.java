@@ -50,7 +50,7 @@ public class GridSurface extends LayoutSurface {
 
         float a = aspect.floatValue();
 
-        float margin = 0.1f;
+        float margin = 0.05f;
 
         if (a == 0) {
             layoutLinear(1f/n, 0f, margin);

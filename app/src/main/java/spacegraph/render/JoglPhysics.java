@@ -1097,8 +1097,8 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     public static final BiConsumer<GL2,RigidBody> defaultRenderer = (gl, body) -> {
 
         gl.glPushMatrix();
-        ShapeDrawer.transform(gl, body.transform());
-        ShapeDrawer.draw(gl, body);
+        Draw.transform(gl, body.transform());
+        Draw.draw(gl, body.shape());
         gl.glPopMatrix();
 
 /*
