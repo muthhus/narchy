@@ -237,10 +237,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
     public void delete() {
         termlinks().clear();
         tasklinks().clear();
-        beliefs().clear();
-        goals().clear();
-        questions().clear();
-        quests().clear();
+        beliefs = null;
+        goals = null;
+        questions = null;
+        quests = null;
     }
 
 

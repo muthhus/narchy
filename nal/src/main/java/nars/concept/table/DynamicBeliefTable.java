@@ -90,10 +90,6 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         return isEmpty() ? 0 : 1;
     }
 
-    @Override
-    public void clear() {
-        current = null;
-    }
 
     @Override
     public boolean isEmpty() {

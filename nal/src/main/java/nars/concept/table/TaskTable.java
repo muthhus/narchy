@@ -26,8 +26,6 @@ public interface TaskTable extends Iterable<Task> {
      */
     int size();
 
-    void clear();
-
     boolean isEmpty();
 
 

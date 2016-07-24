@@ -32,13 +32,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         capacity(initialCapacity, null);
     }
 
-    @Override
-    public void clear() {
-        synchronized(builder) {
-            super.clear();
-        }
-    }
-
     public void capacity(int c, List<Task> displ) {
         if (this.capacity != c) {
 

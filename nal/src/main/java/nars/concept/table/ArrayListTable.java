@@ -123,15 +123,12 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
     /** returns whether the capacity has changed */
     @Override public boolean setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
-            this.capacity = newCapacity;
-
-            int toRemove = size() - newCapacity;
-            if (toRemove > 0) {
-                synchronized (this.map) {
-                    while (toRemove > 0) {
-                        removeWeakest("Shrink");
-                        toRemove--;
-                    }
+            synchronized (this.map) {
+                this.capacity = newCapacity;
+                int toRemove = size() - newCapacity;
+                while (toRemove > 0) {
+                    removeWeakest("Shrink");
+                    toRemove--;
                 }
             }
             return true;

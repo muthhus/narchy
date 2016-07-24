@@ -142,10 +142,10 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
         ));
     }
 
-    /** clear all sensor's belief state */
-    public void clear() {
-        sensors.forEach(s -> s.beliefs().clear());
-    }
+//    /** clear all sensor's belief state */
+//    public void clear() {
+//        sensors.forEach(s -> s.beliefs().clear());
+//    }
 
 
     @NotNull

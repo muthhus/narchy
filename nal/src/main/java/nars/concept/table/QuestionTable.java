@@ -66,11 +66,6 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public void clear() {
-
-        }
-
-        @Override
         public boolean isEmpty() {
             return true;
         }

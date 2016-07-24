@@ -69,10 +69,6 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         return list.size();
     }
 
-    @Override
-    public void clear() {
-        list.clear();
-    }
 
     @Override
     public final boolean isEmpty() {

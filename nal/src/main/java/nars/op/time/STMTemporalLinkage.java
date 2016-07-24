@@ -1,15 +1,21 @@
 package nars.op.time;
 
+import com.gs.collections.api.tuple.Twin;
+import com.gs.collections.impl.tuple.Tuples;
+import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
 import nars.task.Task;
 import nars.util.data.MutableInteger;
+import nars.util.data.list.FasterList;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Short-term Memory Belief Event Induction.
@@ -19,7 +25,7 @@ import java.util.Iterator;
 public final class STMTemporalLinkage extends STM {
 
     @NotNull public final Deque<Task> stm;
-
+    float strength = 1f;
 
     public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
         super(nar, new MutableInteger(capacity));
@@ -61,6 +67,7 @@ public final class STMTemporalLinkage extends STM {
         //final long now = nal.memory.time();
 
 
+        FasterList<Task> queued = null;
 
         synchronized (stm) {
             int numExtra = Math.max(0, stm.size() - stmSize);
@@ -83,15 +90,17 @@ public final class STMTemporalLinkage extends STM {
                     //                    continue;
                     //                }
 
-                    if (previousTask.term().equals(t.term()))
+                    if ($.unneg(previousTask.term()).equals($.unneg(t.term())))
                         continue;
 
-                    float strength =
-                            1f;
+
                     //t.conf() * previousTask.conf(); //scale strength of the tasklink by the confidence intersection
 
-                    if (strength > 0)
-                        concept.crossLink(t, previousTask, strength, nar);
+                    if (strength > 0) {
+                        if (queued == null)
+                            queued = $.newArrayList(stm.size());
+                        queued.add(previousTask);
+                    }
 
                 }
 
@@ -100,6 +109,18 @@ public final class STMTemporalLinkage extends STM {
 
             stm.add(t);
 
+            if (queued!=null) {
+
+                Object[] x = queued.array();
+                nar.runLater(()-> {
+                    for (Object u : x) {
+                        if (u == null)
+                            break; //null terminated array
+
+                        concept.crossLink(t, (Task)u, strength, nar);
+                    }
+                });
+            }
         }
     }
 

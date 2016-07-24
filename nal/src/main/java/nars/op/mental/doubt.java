@@ -74,12 +74,12 @@ public class doubt extends AbstractOperator {
                 return;
         }
 
-        List<Task> tt = Lists.newArrayList(table);
-        table.clear();
-        tt.forEach(t-> {
-            t.setTruth(t.truth().confMult(confMultiplied));
-            table.add(t, null, new FasterList() /* HACK */, nar);
-        });
+//        List<Task> tt = Lists.newArrayList(table);
+//        table.clear();
+//        tt.forEach(t-> {
+//            t.setTruth(t.truth().confMult(confMultiplied));
+//            table.add(t, null, new FasterList() /* HACK */, nar);
+//        });
 
     }
 

@@ -179,11 +179,13 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     public boolean addLinear(E element, int s, Comparator<E> cmp) {
-        for (int i = 0; i < s; i++) {
-            final E current = list[i];
-            if (0 <= cmp.compare(current, element)) {
-                addInternal(i, element);
-                return true;
+        if (list.length > 0) {
+            for (int i = 0; i < s; i++) {
+                final E current = list[i];
+                if (0 <= cmp.compare(current, element)) {
+                    addInternal(i, element);
+                    return true;
+                }
             }
         }
         return addInternal(element); //add to end

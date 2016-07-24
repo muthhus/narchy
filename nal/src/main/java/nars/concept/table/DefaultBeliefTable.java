@@ -107,12 +107,6 @@ public class DefaultBeliefTable implements BeliefTable {
 //        ((belief.isEternal()) ? eternal : temporal).remove(belief, displ);
 //    }
 
-    @Override
-    public void clear() {
-        eternal.clear();
-        temporal.clear();
-    }
-
     /** calculates the max confidence of a belief within the given frequency range */
     public float confMax(float minFreq, float maxFreq) {
         float max = 0;

@@ -640,8 +640,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     public void clear() {
-        pending.clear();
-        super.clear();
+        synchronized (map) {
+            pending.clear();
+            super.clear();
+        }
     }
 
 

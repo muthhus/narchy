@@ -50,10 +50,6 @@ public interface BeliefTable extends TaskTable {
             return 0;
         }
 
-        @Override
-        public void clear() {
-
-        }
 
         @Override
         public boolean isEmpty() {

@@ -174,7 +174,6 @@ public abstract class TermFunction<O> extends AbstractOperator {
         //prevent re-occurring goals
         @NotNull BeliefTable g = exec.goals();
         g.forEach(Budgeted::delete);
-        g.clear();
     }
 
     /** if true, then an operation without a trailing variable will be replaced with it appended */

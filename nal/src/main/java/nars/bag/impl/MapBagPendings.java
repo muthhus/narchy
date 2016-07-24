@@ -1,7 +1,6 @@
 package nars.bag.impl;
 
-import com.gs.collections.impl.map.mutable.ConcurrentHashMap;
-import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
@@ -9,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by me on 7/3/16.

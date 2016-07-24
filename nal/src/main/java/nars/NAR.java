@@ -169,7 +169,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             });
         };
         async.handleEventsWithWorkerPool(
-                newRunner.get()
+                newRunner.get(), newRunner.get(),
+                newRunner.get(), newRunner.get()
                 //,newRunner.get(),newRunner.get()
         );
 
