@@ -8,6 +8,7 @@ import nars.Param;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +45,12 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     @Nullable
     public Truth truth(long when, Task... tasks) {
-        return truth(when, Lists.newArrayList(tasks), null);
+        return truth(when, null, tasks);
+    }
+
+    @Nullable
+    public Truth truth(long when, @Nullable Truthed topEternal, Task... tasks) {
+        return truth(when, new FasterList<Task>((Task[])tasks), topEternal);
     }
 
     @Nullable
@@ -80,6 +86,10 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
         for (int i = 0; i < n; i++) {
             Task t = tasks.get(i);
+            if (t == null) {
+                n--;
+                continue;
+            }
             //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
 
             //offset the specified occurence time to a small window around the pure occurrence time,

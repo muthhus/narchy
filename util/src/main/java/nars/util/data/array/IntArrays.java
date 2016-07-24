@@ -20,8 +20,8 @@
 /* Object/Reference-only definitions (keys) */
 /* Primitive-type-only definitions (keys) */
 /* Object/Reference-only definitions (values) */
-/*		 
- * Copyright (C) 2002-2014 Sebastiano Vigna 
+/*
+ * Copyright (C) 2002-2014 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  *
  *
  *
@@ -47,7 +47,7 @@
  *   both that copyright notice and this permission notice appear in
  *   supporting documentation. CERN makes no representations about the
  *   suitability of this software for any purpose. It is provided "as is"
- *   without expressed or implied warranty. 
+ *   without expressed or implied warranty.
  */
 package nars.util.data.array;
 
@@ -78,7 +78,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * {@link java.util.Arrays} are about 50% faster than the classical single-pivot implementation used here.
  *
  * <p>In any case, if sorting time is important I suggest that you benchmark your sorting load with your data distribution and on your architecture.
- * 
+ *
  * @see java.util.Arrays */
 public enum IntArrays {
 	;
@@ -355,13 +355,13 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements according to the order induced by the specified comparator using quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
 	 *
 	 * <p>Note that this implementation does not allocate any object, contrarily to the implementation used to sort primitive types in {@link java.util.Arrays}, which switches to mergesort on large
 	 * inputs.
-	 * 
+	 *
 	 * @param x the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted.
@@ -412,13 +412,13 @@ public enum IntArrays {
 	}
 
 	/** Sorts an array according to the order induced by the specified comparator using quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>Note that this implementation does not allocate any object, contrarily to the implementation used to sort primitive types in {@link java.util.Arrays}, which switches to mergesort on large
 	 * inputs.
-	 * 
+	 *
 	 * @param x the array to be sorted.
 	 * @param comp the comparator to determine the sorting order. */
 	public static void quickSort( int[] x, IntComparator comp ) {
@@ -488,12 +488,12 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements according to the order induced by the specified comparator using a parallel quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
-	 * 
+	 *
 	 * @param x the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted.
@@ -505,12 +505,12 @@ public enum IntArrays {
 	}
 
 	/** Sorts an array according to the order induced by the specified comparator using a parallel quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
-	 * 
+	 *
 	 * @param x the array to be sorted.
 	 * @param comp the comparator to determine the sorting order. */
 	public static void parallelQuickSort( int[] x, IntComparator comp ) {
@@ -555,13 +555,13 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements according to the natural ascending order using quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>Note that this implementation does not allocate any object, contrarily to the implementation used to sort primitive types in {@link java.util.Arrays}, which switches to mergesort on large
 	 * inputs.
-	 * 
+	 *
 	 * @param x the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted. */
@@ -612,13 +612,13 @@ public enum IntArrays {
 	}
 
 	/** Sorts an array according to the natural ascending order using quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>Note that this implementation does not allocate any object, contrarily to the implementation used to sort primitive types in {@link java.util.Arrays}, which switches to mergesort on large
 	 * inputs.
-	 * 
+	 *
 	 * @param x the array to be sorted. */
 	public static void quickSort( int[] x ) {
 		quickSort( x, 0, x.length );
@@ -685,12 +685,12 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements according to the natural ascending order using a parallel quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
-	 * 
+	 *
 	 * @param x the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted. */
@@ -701,12 +701,12 @@ public enum IntArrays {
 	}
 
 	/** Sorts an array according to the natural ascending order using a parallel quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
-	 * 
+	 *
 	 * @param x the array to be sorted. */
 	public static void parallelQuickSort( int[] x ) {
 		parallelQuickSort( x, 0, x.length );
@@ -740,16 +740,16 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements according to the natural ascending order using indirect quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This method implement an <em>indirect</em> sort. The elements of <code>perm</code> (which must be exactly the numbers in the interval <code>[0..perm.length)</code>) will be permuted so that
 	 * <code>x[ perm[ i ] ] &le; x[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>Note that this implementation does not allocate any object, contrarily to the implementation used to sort primitive types in {@link java.util.Arrays}, which switches to mergesort on large
 	 * inputs.
-	 * 
+	 *
 	 * @param perm a permutation array indexing {@code x}.
 	 * @param x the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
@@ -801,16 +801,16 @@ public enum IntArrays {
 	}
 
 	/** Sorts an array according to the natural ascending order using indirect quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This method implement an <em>indirect</em> sort. The elements of <code>perm</code> (which must be exactly the numbers in the interval <code>[0..perm.length)</code>) will be permuted so that
 	 * <code>x[ perm[ i ] ] &le; x[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>Note that this implementation does not allocate any object, contrarily to the implementation used to sort primitive types in {@link java.util.Arrays}, which switches to mergesort on large
 	 * inputs.
-	 * 
+	 *
 	 * @param perm a permutation array indexing {@code x}.
 	 * @param x the array to be sorted. */
 	public static void quickSortIndirect(int[] perm, int[] x ) {
@@ -880,15 +880,15 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements according to the natural ascending order using a parallel indirect quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This method implement an <em>indirect</em> sort. The elements of <code>perm</code> (which must be exactly the numbers in the interval <code>[0..perm.length)</code>) will be permuted so that
 	 * <code>x[ perm[ i ] ] &le; x[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
-	 * 
+	 *
 	 * @param perm a permutation array indexing {@code x}.
 	 * @param x the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
@@ -900,15 +900,15 @@ public enum IntArrays {
 	}
 
 	/** Sorts an array according to the natural ascending order using a parallel indirect quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This method implement an <em>indirect</em> sort. The elements of <code>perm</code> (which must be exactly the numbers in the interval <code>[0..perm.length)</code>) will be permuted so that
 	 * <code>x[ perm[ i ] ] &le; x[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
-	 * 
+	 *
 	 * @param perm a permutation array indexing {@code x}.
 	 * @param x the array to be sorted. */
 	public static void parallelQuickSortIndirect(int[] perm, int[] x ) {
@@ -997,10 +997,10 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements of two arrays according to the natural lexicographical ascending order using quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This method implements a <em>lexicographical</em> sorting of the arguments. Pairs of elements in the same position in the two provided arrays will be considered a single key, and permuted
 	 * accordingly. In the end, either <code>x[ i ] &lt; x[ i + 1 ]</code> or <code>x[ i ] == x[ i + 1 ]</code> and <code>y[ i ] &le; y[ i + 1 ]</code>.
 	 *
@@ -1054,10 +1054,10 @@ public enum IntArrays {
 	}
 
 	/** Sorts two arrays according to the natural lexicographical ascending order using quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This method implements a <em>lexicographical</em> sorting of the arguments. Pairs of elements in the same position in the two provided arrays will be considered a single key, and permuted
 	 * accordingly. In the end, either <code>x[ i ] &lt; x[ i + 1 ]</code> or <code>x[ i ] == x[ i + 1 ]</code> and <code>y[ i ] &le; y[ i + 1 ]</code>.
 	 *
@@ -1131,15 +1131,15 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements of two arrays according to the natural lexicographical ascending order using a parallel quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This method implements a <em>lexicographical</em> sorting of the arguments. Pairs of elements in the same position in the two provided arrays will be considered a single key, and permuted
 	 * accordingly. In the end, either <code>x[ i ] &lt; x[ i + 1 ]</code> or <code>x[ i ] == x[ i + 1 ]</code> and <code>y[ i ] &le; y[ i + 1 ]</code>.
 	 *
 	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
-	 * 
+	 *
 	 * @param x the first array to be sorted.
 	 * @param y the second array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
@@ -1151,15 +1151,15 @@ public enum IntArrays {
 	}
 
 	/** Sorts two arrays according to the natural lexicographical ascending order using a parallel quicksort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned quicksort adapted from Jon L. Bentley and M. Douglas McIlroy, &ldquo;Engineering a Sort Function&rdquo;, <i>Software: Practice and Experience</i>, 23(11),
 	 * pages 1249&minus;1265, 1993.
-	 * 
+	 *
 	 * <p>This method implements a <em>lexicographical</em> sorting of the arguments. Pairs of elements in the same position in the two provided arrays will be considered a single key, and permuted
 	 * accordingly. In the end, either <code>x[ i ] &lt; x[ i + 1 ]</code> or <code>x[ i ] == x[ i + 1 ]</code> and <code>y[ i ] &le; y[ i + 1 ]</code>.
 	 *
 	 * <p>This implementation uses a {@link ForkJoinPool} executor service with {@link Runtime#availableProcessors()} parallel threads.
-	 * 
+	 *
 	 * @param x the first array to be sorted.
 	 * @param y the second array to be sorted. */
 	public static void parallelQuickSort( int[] x, int[] y ) {
@@ -1168,9 +1168,9 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements according to the natural ascending order using mergesort, using a given pre-filled support array.
-	 * 
+	 *
 	 * <p>This sort is guaranteed to be <i>stable</i>: equal elements will not be reordered as a result of the sort. Moreover, no support arrays will be allocated.
-	 * 
+	 *
 	 * @param a the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted.
@@ -1200,9 +1200,9 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements according to the natural ascending order using mergesort.
-	 * 
+	 *
 	 * <p>This sort is guaranteed to be <i>stable</i>: equal elements will not be reordered as a result of the sort. An array as large as <code>a</code> will be allocated by this method.
-	 * 
+	 *
 	 * @param a the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted. */
@@ -1211,18 +1211,18 @@ public enum IntArrays {
 	}
 
 	/** Sorts an array according to the natural ascending order using mergesort.
-	 * 
+	 *
 	 * <p>This sort is guaranteed to be <i>stable</i>: equal elements will not be reordered as a result of the sort. An array as large as <code>a</code> will be allocated by this method.
-	 * 
+	 *
 	 * @param a the array to be sorted. */
 	public static void mergeSort(int[] a ) {
 		mergeSort( a, 0, a.length );
 	}
 
 	/** Sorts the specified range of elements according to the order induced by the specified comparator using mergesort, using a given pre-filled support array.
-	 * 
+	 *
 	 * <p>This sort is guaranteed to be <i>stable</i>: equal elements will not be reordered as a result of the sort. Moreover, no support arrays will be allocated.
-	 * 
+	 *
 	 * @param a the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted.
@@ -1252,7 +1252,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements according to the order induced by the specified comparator using mergesort.
-	 * 
+	 *
 	 * <p>This sort is guaranteed to be <i>stable</i>: equal elements will not be reordered as a result of the sort. An array as large as <code>a</code> will be allocated by this method.
 	 *
 	 * @param a the array to be sorted.
@@ -1264,9 +1264,9 @@ public enum IntArrays {
 	}
 
 	/** Sorts an array according to the order induced by the specified comparator using mergesort.
-	 * 
+	 *
 	 * <p>This sort is guaranteed to be <i>stable</i>: equal elements will not be reordered as a result of the sort. An array as large as <code>a</code> will be allocated by this method.
-	 * 
+	 *
 	 * @param a the array to be sorted.
 	 * @param comp the comparator to determine the sorting order. */
 	public static void mergeSort(int[] a, IntComparator comp ) {
@@ -1362,24 +1362,24 @@ public enum IntArrays {
 
 	/** This method fixes negative numbers so that the combination exponent/significand is lexicographically sorted. */
 	/** Sorts the specified array using radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
 	 * <p>This implementation is significantly faster than quicksort already at small sizes (say, more than 10000 elements), but it can only sort in ascending order.
-	 * 
+	 *
 	 * @param a the array to be sorted. */
 	public static void radixSort( int[] a ) {
 		radixSort( a, 0, a.length );
 	}
 
 	/** Sorts the specified range of an array using radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
 	 * <p>This implementation is significantly faster than quicksort already at small sizes (say, more than 10000 elements), but it can only sort in ascending order.
-	 * 
+	 *
 	 * @param a the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted. */
@@ -1460,12 +1460,12 @@ public enum IntArrays {
 	protected static final Segment POISON_PILL = new Segment( -1, -1, -1 );
 
 	/** Sorts the specified range of an array using parallel radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
 	 * <p>This implementation uses a pool of {@link Runtime#availableProcessors()} threads.
-	 * 
+	 *
 	 * @param a the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
 	 * @param to the index of the last element (exclusive) to be sorted. */
@@ -1542,19 +1542,19 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified array using parallel radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
 	 * <p>This implementation uses a pool of {@link Runtime#availableProcessors()} threads.
-	 * 
+	 *
 	 * @param a the array to be sorted. */
 	public static void parallelRadixSort( int[] a ) {
 		parallelRadixSort( a, 0, a.length );
 	}
 
 	/** Sorts the specified array using indirect radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -1562,7 +1562,7 @@ public enum IntArrays {
 	 * <code>a[ perm[ i ] ] &le; a[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>This implementation will allocate, in the stable case, a support array as large as <code>perm</code> (note that the stable version is slightly faster).
-	 * 
+	 *
 	 * @param perm a permutation array indexing <code>a</code>.
 	 * @param a the array to be sorted.
 	 * @param stable whether the sorting algorithm should be stable. */
@@ -1571,7 +1571,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified array using indirect radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -1579,7 +1579,7 @@ public enum IntArrays {
 	 * <code>a[ perm[ i ] ] &le; a[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>This implementation will allocate, in the stable case, a support array as large as <code>perm</code> (note that the stable version is slightly faster).
-	 * 
+	 *
 	 * @param perm a permutation array indexing <code>a</code>.
 	 * @param a the array to be sorted.
 	 * @param from the index of the first element of <code>perm</code> (inclusive) to be permuted.
@@ -1665,7 +1665,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of an array using parallel indirect radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -1673,7 +1673,7 @@ public enum IntArrays {
 	 * <code>a[ perm[ i ] ] &le; a[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>This implementation uses a pool of {@link Runtime#availableProcessors()} threads.
-	 * 
+	 *
 	 * @param perm a permutation array indexing <code>a</code>.
 	 * @param a the array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
@@ -1772,7 +1772,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified array using parallel indirect radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -1780,7 +1780,7 @@ public enum IntArrays {
 	 * <code>a[ perm[ i ] ] &le; a[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>This implementation uses a pool of {@link Runtime#availableProcessors()} threads.
-	 * 
+	 *
 	 * @param perm a permutation array indexing <code>a</code>.
 	 * @param a the array to be sorted.
 	 * @param stable whether the sorting algorithm should be stable. */
@@ -1802,7 +1802,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements of two arrays using radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -1880,7 +1880,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified range of elements of two arrays using a parallel radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -1888,7 +1888,7 @@ public enum IntArrays {
 	 * accordingly. In the end, either <code>a[ i ] &lt; a[ i + 1 ]</code> or <code>a[ i ] == a[ i + 1 ]</code> and <code>b[ i ] &le; b[ i + 1 ]</code>.
 	 *
 	 * <p>This implementation uses a pool of {@link Runtime#availableProcessors()} threads.
-	 * 
+	 *
 	 * @param a the first array to be sorted.
 	 * @param b the second array to be sorted.
 	 * @param from the index of the first element (inclusive) to be sorted.
@@ -1973,7 +1973,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts two arrays using a parallel radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -1981,7 +1981,7 @@ public enum IntArrays {
 	 * accordingly. In the end, either <code>a[ i ] &lt; a[ i + 1 ]</code> or <code>a[ i ] == a[ i + 1 ]</code> and <code>b[ i ] &le; b[ i + 1 ]</code>.
 	 *
 	 * <p>This implementation uses a pool of {@link Runtime#availableProcessors()} threads.
-	 * 
+	 *
 	 * @param a the first array to be sorted.
 	 * @param b the second array to be sorted. */
 	public static void parallelRadixSort( int[] a, int[] b ) {
@@ -2005,7 +2005,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified pair of arrays lexicographically using indirect radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -2013,7 +2013,7 @@ public enum IntArrays {
 	 * <code>a[ perm[ i ] ] &le; a[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>This implementation will allocate, in the stable case, a further support array as large as <code>perm</code> (note that the stable version is slightly faster).
-	 * 
+	 *
 	 * @param perm a permutation array indexing <code>a</code>.
 	 * @param a the array to be sorted.
 	 * @param b the second array to be sorted.
@@ -2024,7 +2024,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified pair of arrays lexicographically using indirect radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -2032,7 +2032,7 @@ public enum IntArrays {
 	 * <code>a[ perm[ i ] ] &le; a[ perm[ i + 1 ] ]</code>.
 	 *
 	 * <p>This implementation will allocate, in the stable case, a further support array as large as <code>perm</code> (note that the stable version is slightly faster).
-	 * 
+	 *
 	 * @param perm a permutation array indexing <code>a</code>.
 	 * @param a the array to be sorted.
 	 * @param b the second array to be sorted.
@@ -2145,7 +2145,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified array of arrays lexicographically using radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -2157,7 +2157,7 @@ public enum IntArrays {
 	}
 
 	/** Sorts the specified array of arrays lexicographically using radix sort.
-	 * 
+	 *
 	 * <p>The sorting algorithm is a tuned radix sort adapted from Peter M. McIlroy, Keith Bostic and M. Douglas McIlroy, &ldquo;Engineering radix sort&rdquo;, <i>Computing Systems</i>, 6(1), pages
 	 * 5&minus;27 (1993).
 	 *
@@ -2235,7 +2235,7 @@ public enum IntArrays {
 	}
 
 	/** Shuffles the specified array fragment using the specified pseudorandom number generator.
-	 * 
+	 *
 	 * @param a the array to be shuffled.
 	 * @param from the index of the first element (inclusive) to be shuffled.
 	 * @param to the index of the last element (exclusive) to be shuffled.
@@ -2252,7 +2252,7 @@ public enum IntArrays {
 	}
 
 	/** Shuffles the specified array using the specified pseudorandom number generator.
-	 * 
+	 *
 	 * @param a the array to be shuffled.
 	 * @param random a pseudorandom number generator (please use a <a href="http://dsiutils.dsi.unimi.it/docs/it/unimi/dsi/util/XorShiftStarRandom.html">XorShift*</a> generator).
 	 * @return <code>a</code>. */
@@ -2267,7 +2267,7 @@ public enum IntArrays {
 	}
 
 	/** Reverses the order of the elements in the specified array.
-	 * 
+	 *
 	 * @param a the array to be reversed.
 	 * @return <code>a</code>. */
 	public static int[] reverse( int[] a ) {
@@ -2281,7 +2281,7 @@ public enum IntArrays {
 	}
 
 	/** Reverses the order of the elements in the specified array fragment.
-	 * 
+	 *
 	 * @param a the array to be reversed.
 	 * @param from the index of the first element (inclusive) to be reversed.
 	 * @param to the index of the last element (exclusive) to be reversed.

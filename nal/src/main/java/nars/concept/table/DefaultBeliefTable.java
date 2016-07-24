@@ -44,22 +44,15 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public final Truth truth(long when, long now) {
 
-        final Truth ee = eternal.truth();
-
-
         final Truth tt;
-        synchronized (temporal) {
+
             tt = temporal.truth(when, now, eternal);
-        }
+
 
         if (tt!=null) {
-            if (ee != null) {
-                return (ee.conf() > tt.conf()) ? ee : tt;
-            } else {
-                return tt;
-            }
+            return tt;
         } else {
-            return ee!=null ? ee : null;
+            return eternal.truth();
         }
 
     }
@@ -99,7 +92,9 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public final void capacity(int eternals, int temporals, List<Task> displ) {
         eternal.capacity(eternals, displ);
-        temporal.capacity(temporals, displ);
+        synchronized (temporal) {
+            temporal.capacity(temporals, displ);
+        }
     }
 
 //    @Override

@@ -46,7 +46,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -109,16 +111,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     final Disruptor<Object[]> async =
             new Disruptor<Object[]>(
-                    () -> new Object[2], 4096,
+                    () -> new Object[2], 2048,
                     //new BasicExecutor(Executors.defaultThreadFactory()),
                     Executors.newCachedThreadPool(),
                     //ForkJoinPool.commonPool(),
                     ProducerType.MULTI,
-                    new BlockingWaitStrategy()
+                    new LiteTimeoutBlockingWaitStrategy(100, TimeUnit.MILLISECONDS)
+                    //new BlockingWaitStrategy()
                     //new YieldingWaitStrategy()
                     //Executors.newCachedThreadPool()
             );
-    private final SequenceBarrier asyncBarrier;
 
     private NARLoop loop;
 
@@ -126,6 +128,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
+        this(clock, index, rng, self, 1);
+    }
+
+    public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, int concurrency) {
         super(clock, rng, index);
 
         the(NAR.class, this);
@@ -168,15 +174,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     logger.error("unsupported {}", tt[0]);
             });
         };
-        async.handleEventsWithWorkerPool(
-                newRunner.get(), newRunner.get(),
-                newRunner.get(), newRunner.get()
-                //,newRunner.get(),newRunner.get()
-        );
 
+        WorkHandler[] workers = new WorkHandler[concurrency];
+        for (int i = 0; i < concurrency; i++)
+            workers[i] = newRunner.get();
 
-        asyncBarrier = async.getRingBuffer().newBarrier();
-        async.start();
+        async.handleEventsWithWorkerPool(workers);
+
+        //asyncBarrier = async.getRingBuffer().newBarrier();
 
         index.loadBuiltins();
 
@@ -184,6 +189,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //    private void addTransform(Class c, ImmediateTermTransform i) {
         //        transforms.put((Atomic) index.the($.operator(c.getSimpleName())).term(), i);
         //    }
+
+        async.start();
 
     }
 
@@ -684,9 +691,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             //long used = size - ring.remainingCapacity();
             long cap;
-            while ((cap = ring.remainingCapacity()) < 16) {
+            while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
                 long now = async.getCursor();
-                logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
+                //logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
                 //Util.pause(1);
                 Thread.yield();
             }
@@ -857,6 +864,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     public final void runLater(@NotNull Runnable t) {
         //synchronized (async) {
+
         async.publishEvent((Object[] x, long seq, Runnable b) -> x[0] = b, t);
         //}
     }

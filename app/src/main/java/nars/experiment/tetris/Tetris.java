@@ -26,6 +26,7 @@ import nars.NAR;
 import nars.agent.NAgent;
 import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.gui.NARSpace;
 import nars.index.CaffeineIndex;
@@ -51,7 +52,7 @@ import static nars.experiment.pong.Pong.numericSensor;
 public class Tetris extends TetrisState implements Environment {
 
     public static final int runCycles = 12000;
-    public static final int cyclesPerFrame = 32;
+    public static final int cyclesPerFrame = 64;
 
     private final TetrisVisualizer vis;
     private double currentScore;
@@ -237,7 +238,7 @@ public class Tetris extends TetrisState implements Environment {
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 ,new FrameClock());
-        nar.conceptActivation.setValue(0.04f);
+        nar.conceptActivation.setValue(0.02f);
 
 
         nar.beliefConfidence(0.75f);
@@ -284,15 +285,15 @@ public class Tetris extends TetrisState implements Environment {
         MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
-        new ArithmeticInduction(nar);
+        //new ArithmeticInduction(nar);
 
 
 
         Tetris t = new Tetris(6, 10, 5) {
             @Override
             protected int nextBlock() {
-                //return super.nextBlock(); //all blocks
-                return 1; //square blocks
+                return super.nextBlock(); //all blocks
+                //return 1; //square blocks
                 //return 0; //long blocks
             }
         };
@@ -326,12 +327,12 @@ public class Tetris extends TetrisState implements Environment {
 
                     new BeliefTableChart(nar, charted).show(600, 900);
 
-                    //BagChart.show((Default) nar, 128);
+                    BagChart.show((Default) nar, 128);
 
                     //STMView.show(stm, 800, 600);
 
 
-                    NARSpace.newConceptWindow((Default) nar, 128, 4);
+                    //NARSpace.newConceptWindow((Default) nar, 128, 4);
                 }
 
 
@@ -341,7 +342,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, runCycles, 10);
+        t.run(n, runCycles);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

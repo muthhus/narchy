@@ -10,6 +10,7 @@ import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
+import nars.truth.Truthed;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
@@ -413,15 +414,22 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     @Nullable
     @Override
     public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
-        int s = size();
-        switch (s) {
-            case 0:
-                return null;
-            case 1:
-                return get(0).projectTruth(when, now, false);
-            default:
-                return truthpolations.get().truth(when, this, eternal != null ? eternal.first() : null);
+
+        //make a copy so that truthpolation can freely operate asynchronously
+        int s;
+        Task[] copy;
+        synchronized (this) {
+            s = size();
+            if (s == 0) return null;
+
+            copy = toArray(new Task[s]);
         }
+
+        if (s == 1)
+            return copy[0].projectTruth(when, now, false);
+        else
+            return truthpolations.get().truth(when, eternal != null ? eternal.strongest() : null, copy);
+
     }
 
 
