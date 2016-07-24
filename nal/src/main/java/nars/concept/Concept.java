@@ -104,7 +104,7 @@ public interface Concept extends Termed {
     }
 
 
-    boolean contains(Task t);
+//    boolean contains(Task t);
 
 
     default boolean hasGoals() {
@@ -158,7 +158,7 @@ public interface Concept extends Termed {
      * @param displaced collects tasks which have been displaced by the potential insertion of this task
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    Task process(@NotNull Task task, @NotNull NAR nar, List<Task> displaced);
+    Task process(@NotNull Task task, @NotNull NAR nar);
 
 
     /**

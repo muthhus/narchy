@@ -101,10 +101,10 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
 
-    @Override
-    public boolean contains(@NotNull Task t) {
-        return target.contains(t);
-    }
+//    @Override
+//    public boolean contains(@NotNull Task t) {
+//        return target.contains(t);
+//    }
 
     @Override
     public void linkTask(@NotNull Task t, float scale) {
@@ -121,8 +121,8 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public Task process(@NotNull Task task, @NotNull NAR nar, List displaced) {
-        return target.process(task, nar, displaced);
+    public Task process(@NotNull Task task, @NotNull NAR nar) {
+        return target.process(task, nar);
     }
 
     @NotNull

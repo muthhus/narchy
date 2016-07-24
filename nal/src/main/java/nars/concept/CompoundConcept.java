@@ -1,5 +1,9 @@
 package nars.concept;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.bag.Bag;
@@ -22,14 +26,12 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 
-public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,Termlike {
+public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, Termlike {
 
     @NotNull
     private final Bag<Task> taskLinks;
@@ -59,11 +61,12 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     private transient ConceptPolicy policy;
 
 
-    final Map<Task,Task> tasks = new HashMap<>();
+    final Map<Task, Task> tasks = new HashMap<>();
 
     /**
      * Constructor, called in Memory.getConcept only
-     *  @param term      A term corresponding to the concept
+     *
+     * @param term      A term corresponding to the concept
      * @param termLinks
      * @param taskLinks
      */
@@ -112,21 +115,25 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     }
 
 
-    /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
+    /**
+     * used for setting an explicit OperationConcept instance via java; activates it on initialization
+     */
     public CompoundConcept(@NotNull T term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder)n.index.conceptBuilder(), new HashMap());
+        this(term, (DefaultConceptBuilder) n.index.conceptBuilder(), new HashMap());
     }
 
-    /** default construction by a NAR on conceptualization */
+    /**
+     * default construction by a NAR on conceptualization
+     */
     CompoundConcept(@NotNull T term, @NotNull DefaultConceptBuilder b, Map bagMap) {
         this(term, b.termbag(bagMap), b.taskbag(bagMap));
     }
 
 
-    @Override
-    public final boolean contains(@NotNull Task t) {
-        return tasks.containsKey(t);
-    }
+//    @Override
+//    public final boolean contains(@NotNull Task t) {
+//        return tasks.containsKey(t);
+//    }
 
 
     /**
@@ -147,21 +154,24 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
     @NotNull
     static QuestionTable questionTableOrEmpty(@Nullable QuestionTable q) {
-        return q !=null ? q : QuestionTable.EMPTY;
+        return q != null ? q : QuestionTable.EMPTY;
     }
+
     @NotNull
     static BeliefTable beliefTableOrEmpty(@Nullable BeliefTable b) {
-        return b !=null ? b : BeliefTable.EMPTY;
+        return b != null ? b : BeliefTable.EMPTY;
     }
 
     @NotNull
     final QuestionTable questionsOrNew() {
         return questions == null ? (questions = new ArrayQuestionTable(policy.questionCap(true))) : questions;
     }
+
     @NotNull
     final QuestionTable questsOrNew() {
         return quests == null ? (quests = new ArrayQuestionTable(policy.questionCap(false))) : quests;
     }
+
     @NotNull
     final BeliefTable beliefsOrNew() {
         return beliefs == null ? (beliefs = newBeliefTable()) : beliefs;
@@ -223,7 +233,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         return processQuestion(task, nar, displaced);
     }
 
-    @Override public void delete() {
+    @Override
+    public void delete() {
         termlinks().clear();
         tasklinks().clear();
         beliefs().clear();
@@ -231,7 +242,6 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         questions().clear();
         quests().clear();
     }
-
 
 
     /**
@@ -255,7 +265,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
      * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      * TODO remove synchronized by lock-free technique
      */
-    synchronized private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions, List<Task> displaced) {
+    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions, List<Task> displaced) {
 
         //this may be helpful but we need a different way of applying it to keep the two table's ranges consistent
 
@@ -282,10 +292,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 //        }
 
         //synchronized (target) {
-            Task b = target.add(belief, questions, displaced, nar);
-            if (b != null)
-                updateSatisfaction(nar);
-            return b;
+        Task b = target.add(belief, questions, displaced, nar);
+        if (b != null)
+            updateSatisfaction(nar);
+        return b;
         //}
     }
 
@@ -310,35 +320,83 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         return policy;
     }
 
-    @Override public final void policy(@Nullable ConceptPolicy p) {
+    @Override
+    public final void policy(@Nullable ConceptPolicy p) {
+
+
         this.policy = p;
-        if (p!=null) {
-            linkCapacity(p);
-            beliefCapacity(p);
-            questionCapacity(p);
+        if (p != null) {
+            synchronized (tasks) {
+                linkCapacity(p);
+                beliefCapacity(p);
+                questionCapacity(p);
+            }
         }
+
     }
 
-    protected void questionCapacity(@NotNull ConceptPolicy p) {
-        questions().capacity((byte)p.questionCap(true));
-        quests().capacity((byte)p.questionCap(false));
+
+    private final void removeAndDelete(@NotNull List<Task> tt) {
+
+        int s = tt.size();
+        if (s == 0)
+            return;
+
+        synchronized (this.tasks) {
+            for (int i = 0; i < s; i++) {
+                Task x = tt.get(i);
+                if (null == this.tasks.remove(x))
+                    throw new RuntimeException(x + " not in tasks map");
+
+                /*
+                TODO eternalization for non-deleted temporal tasks that reach here:
+
+                float eternalizationFactor = Param.ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR;
+                if (eternalizationFactor > 0f && displaced.size() > 0 && eternal.capacity() > 0) {
+                    eternalizeForgottenTemporals(displaced, nar, eternalizationFactor);
+                }
+                 */
+
+                x.delete();
+            }
+        }
+
+
+
+
     }
 
     protected void beliefCapacity(@NotNull ConceptPolicy p) {
-        beliefs().capacity(
-                (byte)p.beliefCap(this, true, true),
-                p.beliefCap(this, true, false));
-        goals().capacity(
-                (byte)p.beliefCap(this, false, true),
-                p.beliefCap(this, false, false));
+
+        int be = p.beliefCap(this, true, true);
+        int bt = p.beliefCap(this, true, false);
+
+        int ge = p.beliefCap(this, false, true);
+        int gt = p.beliefCap(this, false, false);
+
+        beliefCapacity(be, bt, ge, gt);
     }
 
+    protected final void beliefCapacity(int be, int bt, int ge, int gt) {
+        List<Task> displ = $.newArrayList(0);
 
+        beliefs().capacity(be, bt, displ);
+        goals().capacity(ge, gt, displ);
+
+        removeAndDelete(displ);
+    }
+
+    protected void questionCapacity(@NotNull ConceptPolicy p) {
+        List<Task> displ = $.newArrayList(0);
+        questions().capacity((byte) p.questionCap(true), displ);
+        quests().capacity((byte) p.questionCap(false), displ);
+        removeAndDelete(displ);
+    }
 
     /**
      * To answer a quest or q by existing beliefs
      *
-     * @param q   The task to be processed
+     * @param q         The task to be processed
      * @param nar
      * @param displaced
      * @return the relevant task
@@ -368,9 +426,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     }
 
 
-    /** link to subterms, hierarchical downward */
+    /**
+     * link to subterms, hierarchical downward
+     */
     public void linkSubs(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-
 
 
         linkDistribute(b, scale, minScale, nar, templates, conceptOverflow);
@@ -429,7 +488,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     final void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull TermSet templates, MutableFloat subConceptOverflow) {
 
         int n = templates.size();
-        float tStrength = 1f/n;
+        float tStrength = 1f / n;
 
         Term[] t = templates.terms();
         for (int i = 0; i < n; i++) {
@@ -440,9 +499,9 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
             if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
                 Concept target = AbstractConcept.linkSub(this, tt, b, subScale, true, subConceptOverflow, null, nar);
 
-                if (target!=null && b instanceof Task) {
+                if (target != null && b instanceof Task) {
                     //insert 2nd-order tasklink
-                    target.linkTask((Task)b, subScale);
+                    target.linkTask((Task) b, subScale);
                 }
             }
         }
@@ -464,47 +523,89 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
      * --a revised/projected task which may or may not remain in the belief table
      */
     @Override
-    public final Task process(@NotNull final Task input, @NotNull NAR nar, List<Task> displaced) {
+    public final Task process(@NotNull Task input, @NotNull NAR nar) {
+
+
+        List<Task> displaced = $.newArrayList(1);
+
+        Task output;
 
         /* if a duplicate exists, it will merge the incoming task and return true.
           otherwise false */
-        Task existing = tasks.putIfAbsent(input,input);
-        if (existing!=null) {
-            if (existing!=input) {
-                DuplicateMerge.merge(existing.budget(), input, 1f);
-                input.delete(DUPLICATE_BELIEF_GOAL);
+        synchronized (tasks) {
+
+            checkConsistency(); //TEMPORARY =-=============
+
+            Task existing = tasks.putIfAbsent(input, input);
+            if (existing != null) {
+                if (existing != input) {
+                    DuplicateMerge.merge(existing.budget(), input, 1f);
+                    input.delete(DUPLICATE_BELIEF_GOAL);
+                }
+
+                checkConsistency(); //TEMPORARY =-=============
+
+                return existing;
             }
-            return null;
+
+
+            switch (input.punc()) {
+                case Symbols.BELIEF:
+                    output = processBelief(input, nar, displaced);
+                    break;
+
+                case Symbols.GOAL:
+                    output = processGoal(input, nar, displaced);
+                    break;
+
+                case Symbols.QUESTION:
+                    output = processQuestion(input, nar, displaced);
+                    break;
+
+                case Symbols.QUEST:
+                    output = processQuest(input, nar, displaced);
+                    break;
+
+                default:
+                    throw new RuntimeException("Invalid sentence type: " + input);
+            }
+
+
+            if (output == null) {
+                //which was added above
+                displaced.add(input);
+            }
+
+            removeAndDelete(displaced);
+
+
+            checkConsistency(); //TEMPORARY =-=============
+
         }
 
 
-        Task r;
-        switch (input.punc()) {
-            case Symbols.BELIEF:
-                r = processBelief(input, nar, displaced);
-                break;
+        return output;
+    }
 
-            case Symbols.GOAL:
-                r = processGoal(input, nar, displaced);
-                break;
+    private void checkConsistency() {
+        synchronized (tasks) {
+            int mapSize = tasks.size();
+            int tableSize = beliefs().size() + goals().size() + questions().size() + quests().size();
+            if (mapSize != tableSize) {
+                List<Task> mapTasks = new ArrayList(tasks.keySet());
+                ArrayList<Task> tableTasks = Lists.newArrayList(
+                        Iterables.concat(beliefs(), goals(), questions(), quests())
+                );
+                Collections.sort(mapTasks);
+                Collections.sort(tableTasks);
 
-            case Symbols.QUESTION:
-                r = processQuestion(input, nar, displaced);
-                break;
-
-            case Symbols.QUEST:
-                r = processQuest(input, nar, displaced);
-                break;
-
-            default:
-                throw new RuntimeException("Invalid sentence type: " + input);
+                System.err.println(mapSize + " vs " + tableSize + "\t\t" + mapTasks.size() + " vs " + tableTasks.size());
+                System.err.println(Joiner.on('\n').join(mapTasks));
+                System.err.println("----");
+                System.err.println(Joiner.on('\n').join(tableTasks));
+                System.err.println("----");
+            }
         }
-
-        for (int j = 0, displacedSize = displaced.size(); j < displacedSize; j++) {
-            tasks.remove(displaced.get(j));
-        }
-
-        return r;
     }
 
     @Override
@@ -532,63 +633,75 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         return term.size();
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public boolean containsTerm(@NotNull Termlike t) {
         return term.containsTerm(t);
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public boolean hasTemporal() {
         return term.hasTemporal();
     }
 
     @Nullable
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public Term termOr(int i, @Nullable Term ifOutOfBounds) {
         return term.termOr(i, ifOutOfBounds);
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public boolean and(@NotNull Predicate<Term> v) {
         return term.and(v);
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public boolean or(@NotNull Predicate<Term> v) {
         return term.or(v);
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public int vars() {
         return term.vars();
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public int varIndep() {
         return term.varIndep();
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public int varDep() {
         return term.varDep();
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public int varQuery() {
         return term.varQuery();
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public int varPattern() {
         return term.varPattern();
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public int complexity() {
         return term.complexity();
     }
 
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public int structure() {
         return term.structure();
     }

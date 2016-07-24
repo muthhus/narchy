@@ -231,13 +231,13 @@ public class BooleanConcept extends CompoundConcept {
             return result != null ? result.present(now).normalize(nar) : null;
         }
 
-        @Override
-        public void remove(@NotNull Task belief, List<Task> displ) {
-            //nothing, maybe force update
-            if (belief == this.current) {
-                current = null;
-            }
-        }
+//        @Override
+//        public void remove(@NotNull Task belief, List<Task> displ) {
+//            //nothing, maybe force update
+//            if (belief == this.current) {
+//                current = null;
+//            }
+//        }
 
 
         @Override

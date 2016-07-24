@@ -86,8 +86,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
 
     @Override
     final protected void beliefCapacity(ConceptPolicy p) {
-        beliefs().capacity(0, beliefCapacity);
-        goals().capacity(desire!=null ? 1 : 0, goalCapacity);
+        beliefCapacity(0, beliefCapacity, desire!=null ? 1 : 0, goalCapacity);
     }
 
     @Override
@@ -138,7 +137,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
 
             if (t!=null) {
                 this.desire = new MutableTask(term(), Symbols.GOAL, t).log("Sensor Goal");
-                beliefCapacity(null); //trigger capacity update
+                policy(policy()); //trigger capacity update
                 sensor.nar.input(this.desire);
             }
         }

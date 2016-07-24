@@ -108,14 +108,14 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
 
 
     @Override
-    public Task process(@NotNull Task task, @NotNull NAR nar, List displaced) {
+    public Task process(@NotNull Task task, @NotNull NAR nar) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public final boolean contains(Task t) {
-        return false;
-    }
+//    @Override
+//    public final boolean contains(Task t) {
+//        return false;
+//    }
 
     @Override
     public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {

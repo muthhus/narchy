@@ -41,7 +41,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void capacity(int eternals, int temporals) {
+        public void capacity(int eternals, int temporals, List<Task> displ) {
 
         }
 
@@ -58,11 +58,6 @@ public interface BeliefTable extends TaskTable {
         @Override
         public boolean isEmpty() {
             return true;
-        }
-
-        @Override
-        public void remove(@NotNull Task belief, List<Task> displ) {
-            throw new UnsupportedOperationException();
         }
 
 
@@ -100,7 +95,7 @@ public interface BeliefTable extends TaskTable {
 
     };
 
-    void capacity(int eternals, int temporals);
+    void capacity(int eternals, int temporals, List<Task> displ);
 
 
 //    /**
@@ -171,7 +166,7 @@ public interface BeliefTable extends TaskTable {
      * @return
      */
     static float rankTemporalByConfidence(@NotNull Task t, long when, long now, float ageFactor, float bestSoFar) {
-        float c = t.conf();
+        float c = t.truth().conf();
         //float c = t.confWeight(); //<- doesnt seem to work, produces values too high
 
         if (c < bestSoFar)

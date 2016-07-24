@@ -9,6 +9,7 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
+import nars.task.AnswerTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -177,11 +178,14 @@ public enum PremiseBuilder {
 //    }
 
     static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a) {
+        if (a instanceof AnswerTask)
+            return; //already an answer
+
         @Nullable Concept c = nar.concept(q);
-        if (c != null)
-            ((QuestionTable)c.tableFor(q.punc())).answer(a, nar,
-                    /*@Deprecated HACK*/ new FasterList(0)
-        );
+        if (c != null) {
+            List<Task> displ = $.newArrayList(0);
+            ((QuestionTable)c.tableFor(q.punc())).answer(a, nar, displ );
+        }
     }
 
     static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief) {

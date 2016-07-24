@@ -13,9 +13,9 @@ import java.util.function.Consumer;
  */
 public interface TaskTable extends Iterable<Task> {
 
-    static void removeTask(@NotNull Task t, @Nullable String reason, List<Task> queueForRemoval) {
+    @Deprecated static void removeTask(@NotNull Task t, @Nullable String reason, List<Task> displ) {
         t.log(reason);
-        queueForRemoval.add(t);
+        displ.add(t);
     }
 
     int capacity();
@@ -118,9 +118,9 @@ public interface TaskTable extends Iterable<Task> {
 //
 //    };
 
-    /** forcibly remove a held Task
-     *  should eventually invoke TaskTable.removeTask() */
-    void remove(@NotNull Task belief, List<Task> displ);
+//    /** forcibly remove a held Task
+//     *  should eventually invoke TaskTable.removeTask() */
+//    void remove(@NotNull Task belief, List<Task> displ);
 
 
     //void add(Task incoming, List<Task> displaced);

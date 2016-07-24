@@ -55,8 +55,8 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
                 if (c instanceof Atomic) {
                     r = g = b = ph * 0.5f;
                 } else {
-                    float belief = c.hasBeliefs() ? c.beliefs().top(now).conf() : 0f;
-                    float goal = c.hasGoals() ? c.goals().top(now).conf() : 0f;
+                    float belief = c.hasBeliefs() ? c.beliefs().truth(now).conf() : 0f;
+                    float goal = c.hasGoals() ? c.goals().truth(now).conf() : 0f;
                     r = 0;
                     g = belief;
                     b = goal;

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
-import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.and;
 import static nars.truth.TruthFunctions.projection;
@@ -41,11 +40,16 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
     public MicrosphereTemporalBeliefTable(int initialCapacity) {
         super();
-        capacity(initialCapacity);
+        capacity(initialCapacity, null);
     }
 
-    public void capacity(int initialCapacity) {
-        this.capacity = initialCapacity;
+
+    public void capacity(int newCapacity, List<Task> displaced) {
+        this.capacity = newCapacity;
+        while (this.size() > newCapacity) {
+            removeWeakest(displaced);
+        }
+
     }
 
     @Override
@@ -77,23 +81,22 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         } else if (next != input) {
             // else: the result of compression has freed a space for the incoming input
             //nar.runLater(()->{
-            nar.process(next);
+            //nar.input
+            nar.inputLater(next);
             //});
         } else {
             //space has been freed for the input, no merging resulted
 
         }
 
-        if (isFull()) {
-            //WHY DOES THIS HAPPEN, IS IT DANGEROUS
+        if (!isFull() && add(input)) {
+            return input;
+        } else {
+            //HACK DOES THIS HAPPEN and WHY, IS IT DANGEROUS
             //if (Global.DEBUG)
             //throw new RuntimeException(this + " compression failed");
             return null;
         }
-
-        add(input);
-
-        return input;
     }
 
     @Override public final boolean isFull() {
@@ -134,19 +137,22 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-
     @Override
-    public void remove(@NotNull Task removed, List<Task> displ) {
-        @Nullable Task actuallyRemoved = super.removed(removed);
+    public boolean remove(Object object) {
+        return super.remove(object);
+    }
 
-        if (actuallyRemoved != removed) {
-            removed.delete(); //ensure this extra copy is deleted
+
+
+    private final void remove(@NotNull Task removed, List<Task> displ) {
+        int i = indexOf(removed);
+        if (i == -1)
+            return;
+
+        Task x = remove(i, displ);
+        if (x!=removed) {
+            throw new RuntimeException("equal but different instances: " + removed);
         }
-
-        displ.add(actuallyRemoved);
-
-        invalidRangeIfLimit(removed);
-
     }
 
     private void invalidRangeIfLimit(@NotNull Task removed) {
@@ -157,19 +163,20 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    @Override
-    public final boolean remove(Object object) {
-        if (super.remove(object)) {
-            invalidRangeIfLimit((Task)object);
-            return true;
-        }
-        return false;
-    }
+//    @Override
+//    public final boolean remove(Object object) {
+//        if (super.remove(object)) {
+//            invalidRangeIfLimit((Task)object);
+//            return true;
+//        }
+//        return false;
+//    }
 
-    @Override
-    public final Task remove(int index) {
-        Task t = super.remove(index);
+
+    private final Task remove(int index, List<Task> displ) {
+        @Nullable Task t = this.remove(index);
         if (t!=null) {
+            displ.add(t);
             invalidRangeIfLimit(t);
         }
         return t;
@@ -187,14 +194,14 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    protected final void removeWeakest(@Nullable Object reason) {
+    protected final void removeWeakest(List<Task> displ) {
 
         int sizeBefore = size();
-        compress();
+        compress(displ);
         if (size() < sizeBefore)
             return; //compression successful
 
-        removed(weakest()).delete(reason);
+        remove(weakest(), displ);
     }
 
     @Nullable
@@ -256,8 +263,8 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
     @Nullable
-    protected Task compress() {
-        return compress(null, lastUpdate, null, new FasterList() /* HACK unnecessary */);
+    protected Task compress(List<Task> displ) {
+        return compress(null, lastUpdate, null, displ);
     }
 
     /**
@@ -266,7 +273,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, List<Task> displ) {
 
         int cap = capacity();
-        if (size() < cap || removeAlreadyDeleted() < cap) {
+        if (size() < cap || removeAlreadyDeleted(displ) < cap) {
             return input; //no need for compression
         }
 
@@ -285,14 +292,14 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         if (b != null) {
             merged = merge(a, b, now, eternal);
 
-            remove(b);
-            TaskTable.removeTask(b, "Revection Revision", displ);
+            remove(b, displ);
+            //TaskTable.removeTask(b, "Revection Revision", displ);
         } else {
             merged = null;
         }
 
-        remove(a);
-        TaskTable.removeTask(a, (b == null) ? "Revection Forget" : "Revection Revision", displ);
+        remove(a, displ);
+        //TaskTable.removeTask(a, (b == null) ? "Revection Forget" : "Revection Revision", displ);
 
 
         return merged != null ? merged : input;
@@ -418,12 +425,12 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    private int removeAlreadyDeleted() {
+    private int removeAlreadyDeleted(@NotNull List<Task> displ) {
         int s = size();
         for (int i = 0; i < s; ) {
             Task x = get(i);
             if (x == null || x.isDeleted()) {
-                remove(i);
+                remove(i, displ);
                 s--;
             } else {
                 i++;

@@ -398,6 +398,13 @@ public enum Texts {
             case 2: return i2(s, ifMissing);
             case 3: return i3(s, ifMissing);
             default:
+
+                //attempt to avoid throwing a stack trace
+                for (int i = 0; i < s.length(); i++)
+                    if (!Character.isDigit(s.charAt(i)))
+                        return ifMissing;
+
+
                 try {
                     return Integer.parseInt(s);
                 }

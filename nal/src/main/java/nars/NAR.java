@@ -1314,7 +1314,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * process a Task through its Concept
      */
     @Nullable
-    public final Concept process(@NotNull Task input, float activation) {
+    protected final Concept process(@NotNull Task input, float activation) {
 
         if (input.isDeleted()) {
             throw new RuntimeException(input + " deleted");
@@ -1338,68 +1338,44 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             c.policy(index.conceptBuilder().initialized());
         }
 
-        List<Task> displaced = $.newArrayList();
 
-        Task t = c.process(input, this, displaced);
+        Task inputted = c.process(input, this);
 
-        //measure and delete the displaced tasks
-        float displacedPri = 0, displacedConf = 0;
-        for (int i = 0, displacedSize = displaced.size(); i < displacedSize; i++) {
-            Task d = displaced.get(i);
-            displacedPri += d.priIfFiniteElseZero();
-            if (d.isBeliefOrGoal())
-                displacedConf += d.conf();
-            else
-                displacedConf += 1f; //for questions, lack of confidence will not be applied
-            d.delete();
-        }
-
-        if (t != null && !t.isDeleted()) {
+        if (inputted != null && !inputted.isDeleted()) {
 
             if (clock instanceof FrameClock) {
                 //HACK for unique serial number w/ frameclock
-                ((FrameClock) clock).ensureStampSerialGreater(t.evidence());
+                ((FrameClock) clock).ensureStampSerialGreater(inputted.evidence());
             }
 
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
-
-
-            //heuristic
-            float dynamicRange = 2f;
-            float score = 1 +
-                    Math.max(0, displacedPri - t.pri()) +  //economic bonus
-                    displacedConf; //knowledge bonus
-
-            score = Math.max(0f, Math.min(dynamicRange, score));
-            t.budget().priMult(score);
-            if (t.pri() > Param.BUDGET_EPSILON) {
+            if (inputted.pri() > Param.BUDGET_EPSILON) {
                 //propagate budget
                 MutableFloat overflow = new MutableFloat();
-                activate(c, t, activation, 1f, overflow);
+                activate(c, inputted, activation, 1f, overflow);
                 emotion.stress(overflow);
             }
 
-            t.onConcept(c, score);
+            inputted.onConcept(c, 0);
 
-            eventTaskProcess.emit(t); //signal any additional processes
+            eventTaskProcess.emit(inputted); //signal any additional processes
 
         } else {
             emotion.frustration(business);
         }
 
-
         return c;
     }
 
     @Nullable
-    public final Concept process(@NotNull Task input) {
+    protected final Concept process(@NotNull Task input) {
         return process(input, conceptActivation.floatValue());
     }
 
     /**
      * accepts null-terminated array
      */
-    public final void process(@NotNull Task... input) {
+    protected final void process(@NotNull Task... input) {
         float activation = conceptActivation.floatValue();
         for (Task t : input) {
             if (t == null) //for null-terminated arrays

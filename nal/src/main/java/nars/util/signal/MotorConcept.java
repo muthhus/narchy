@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.$.$;
-import static nars.budget.policy.DefaultConceptPolicy.goalCapacityOneEternal;
 
 
 public class MotorConcept extends WiredConcept  {

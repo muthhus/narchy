@@ -38,25 +38,8 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         this.taskLinksCapacity = taskLinksCapacity;
     }
 
-    /** no eternal; use allocated eternal capacity added to temporals */
-    public static void beliefCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p, int multiplier) {
-        c.beliefs().capacity(0,
-                Math.max(p.beliefCap(c, true, true),p.beliefCap(c, true, false)) * multiplier
-        );
-    }
 
-    /** no eternal; use allocated eternal capacity added to temporals */
-    public static void goalCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p) {
-        c.goals().capacity(0, p.beliefCap(c, false, true) + p.beliefCap(c, false, false));
-    }
-    /** no eternal; use allocated eternal capacity added to temporals */
-    public static void goalCapacityOneEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p) {
-        c.goals().capacity(1, p.beliefCap(c, false, true) + p.beliefCap(c, false, false));
-    }
-    /** no eternal; use allocated eternal capacity added to temporals */
-    public static void goalCapacityOneEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p, int multiplier) {
-        c.goals().capacity(1, Math.max(p.beliefCap(c, false, true), p.beliefCap(c, false, false)) * multiplier);
-    }
+
 
     @Override
     public int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {

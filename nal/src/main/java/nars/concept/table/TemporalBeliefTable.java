@@ -28,7 +28,7 @@ public interface TemporalBeliefTable extends TaskTable {
 //    void minTime(long minT);
 //    void maxTime(long maxT);
 
-    void capacity(int c);
+    void capacity(int c, List<Task> displaced);
 
     boolean isFull();
 }

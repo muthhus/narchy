@@ -29,7 +29,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
     public EternalTable(int initialCapacity) {
         super(Task[]::new);
-        capacity(initialCapacity);
+        capacity(initialCapacity, null);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         }
     }
 
-    public void capacity(int c) {
+    public void capacity(int c, List<Task> displ) {
         if (this.capacity != c) {
 
             this.capacity = c;
@@ -48,7 +48,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
             //TODO can be accelerated by batch remove operation
             while (c < s--) {
-                removeWeakest();
+                Task x = removeWeakest();
+                displ.add(x);
             }
         }
     }
@@ -209,13 +210,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         return capacity;
     }
 
-    @Override
-    public void remove(@NotNull Task belief, List<Task> displ) {
-        synchronized(builder) {
-            /* removed = */ remove(indexOf(belief, this));
-        }
-        TaskTable.removeTask(belief, null, displ);
-    }
+//    @Override
+//    public void remove(@NotNull Task belief, List<Task> displ) {
+//        synchronized(builder) {
+//            /* removed = */ remove(indexOf(belief, this));
+//        }
+//        TaskTable.removeTask(belief, null, displ);
+//    }
 
     public Task add(@NotNull Task input, List<Task> displaced, @NotNull NAR nar) {
 
@@ -233,7 +234,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
                 return input;
             }
 
-            removeDeleted();
+            removeDeleted(displaced);
 
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
             Task revised;
@@ -279,7 +280,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
                 //                }
                 //            }
                 //result = insert(revised, et) ? revised : result;
-                nar.input(revised);
+                nar.inputLater(revised);
                 //            nar.runLater(() -> {
                 //                if (!revised.isDeleted())
                 //                    nar.input(revised);
@@ -316,7 +317,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden", displ);
         et.forEach(overridden);
         et.clear();
-        et.capacity(1);
+        et.capacity(1, displ);
 
 //        //2. clear the other table, set capcity to zero preventing temporal tasks
         //TODO
@@ -340,14 +341,14 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
     }
 
     /** TODO abstract into removeIf(Predicate<> p) ... */
-    public void removeDeleted() {
+    public void removeDeleted(List<Task> displ) {
 
         synchronized (builder) {
             int s = size();
             for (int i = 0; i < s; ) {
                 Task n = list[i];
                 if (n == null || n.isDeleted()) {
-                    remove(i);
+                    displ.add( remove(i) );
                     s--;
                 } else {
                     i++;

@@ -1,11 +1,11 @@
 package nars.concept.table;
 
+
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.budget.BudgetFunctions;
-import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
-import nars.nal.Stamp;
 import nars.task.AnswerTask;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +21,7 @@ import java.util.function.Consumer;
  * implements a Task table suitable for Questions and Quests using an ArrayList.
  * uses a List and assumes that it is an ArrayList that can be
  * accessed by index.
- *
+ * <p>
  * TODO use a ring-buffer deque slightly faster than basic ArrayList modification
  */
 public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
@@ -45,18 +45,23 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         return capacity;
     }
 
-    @Override public final void capacity(int newCapacity) {
+    @Override
+    public final void capacity(int newCapacity, @NotNull List<Task> displ) {
 
-        if (this.capacity==newCapacity)
+        if (this.capacity == newCapacity)
             return;
 
         this.capacity = newCapacity;
 
-        int s = size();
+        synchronized (list) {
+            int s = size();
 
-        int toRemove = s - newCapacity;
-        while (toRemove-- > 0)
-            list.remove( --s ); //last element
+            int toRemove = s - newCapacity;
+            while (toRemove > 0) {
+                displ.add(list.remove(--s)); //last element
+                toRemove--;
+            }
+        }
     }
 
     @Override
@@ -70,33 +75,16 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     }
 
     @Override
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return list.isEmpty();
     }
 
-    @Override
-    public void remove(@NotNull Task belief, List<Task> displ) {
+    @Deprecated public final void remove(@NotNull Task belief, List<Task> displ) {
+        //this list removal is slow; indexed or iterator is better
         if (list.remove(belief)) {
             TaskTable.removeTask(belief, null, displ);
         }
     }
-
-
-//    /**
-//     * iterator-less implementation
-//     */
-//    @Nullable
-//    @Override
-//    public final Task get(Task t) {
-//        List<Task> ll = this.list;
-//        int s = ll.size();
-//        for (int i = 0; i < s; i++) {
-//            Task a = ll.get(i);
-//            if (a.equals(t))
-//                return a;
-//        }
-//        return null;
-//    }
 
 
     @Override
@@ -105,27 +93,24 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         if (a instanceof AnswerTask)
             return; //already an answer
 
-        int listSize = list.size();
-        if (listSize == 0)
-            return;
+        synchronized (list) {
 
-        for (int i = 0; i < listSize; i++) {
-            Task q = list.get(i);
-            if (q.isDeleted())
-                remove(i, "Discovered Deleted");
-            else if (a.isDeleted())
-                break;
-            else
-                answer(q, a, nar, displ);
+            for (int i = 0; !a.isDeleted() && i < list.size(); ) {
+                Task q = list.get(i);
+                if (!q.isDeleted()) {
+                    answer(q, a, nar);
+                    i++;
+                } else {
+                    remove(i, null, displ);
+                }
+            }
         }
     }
 
-    protected void sort() {
-        Collections.sort(list, this);
-    }
-
-    /** returns true if a quality was modified as a signal whether the list needs sorted */
-    public void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar, List<Task> displ) {
+    /**
+     * returns false if the question should be removed after retuning
+     */
+    private void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar) {
 //        if (Stamp.overlapping(q.evidence(), a.evidence()))
 //            return;
 
@@ -137,11 +122,11 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         float factor = 1f;
         if (aEtern) {
             if (qEtern)
-                factor = 1f-a.conf();
+                factor = 1f - a.conf();
         } else {
             if (!qEtern) {
                 //TODO BeliefTable.rankTemporalByConfidence()
-                factor = 1f-a.conf();
+                factor = 1f - a.conf();
             }
         }
 
@@ -155,7 +140,6 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         if (!q.onAnswered(a)) {
             //the qustion requested for it to be deleted
-            remove(q, displ);
             return;
         } else {
 
@@ -168,6 +152,9 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
                     qc.crossLink(q, a, aConf, nar);
                 }
             }
+            nar.activate(a, qBudget);
+
+
 
             //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly
             //BudgetFunctions.transferPri(q.budget(), a.budget(), (1f - q.qua()) * aConf);
@@ -175,7 +162,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         }
 
 //        //generate a projected answer
-          //WARNING this creates a huge amount of useless answers
+        //WARNING this creates a huge amount of useless answers
 //        if (!qEtern && !aEtern && q.occurrence()!=a.occurrence()) {
 //            Concept ac = nar.concept(a);
 //            if (ac != null) { //??
@@ -191,67 +178,80 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 //            }
 //        }
 
-        nar.activate(a, qBudget);
     }
 
     @Override
-    public Task add(@NotNull Task q, @NotNull BeliefTable answers, List<Task> displ, @NotNull NAR n) {
+    public final Task add(@NotNull Task question, @NotNull BeliefTable answers, List<Task> displ, @NotNull NAR n) {
 
-        q = insert(q);
-        if (q != null && !answers.isEmpty()) {
-            Task a = answers.top(q.occurrence());
-            if (a != null && !a.isDeleted()) {
-                answer(q, a, n, displ);
+        Task questioned;
+
+        synchronized (list) {
+            questioned = insert(question, displ);
+            if (questioned != null) {
+                //inserted
+                if (!answers.isEmpty()) {
+                    Task a = answers.top(questioned.occurrence());
+                    if (a != null && !a.isDeleted()) {
+                        answer(questioned, a, n);
+                    }
+                }
+            } else {
+                //reject input
+                questioned = question;
             }
         }
 
-        return q;
+        return questioned;
     }
 
     public Task last() {
-        return list.get(list.size()-1);
+        return list.get(list.size() - 1);
     }
 
     @Nullable
-    public Task insert(@NotNull Task t) {
+    private Task insert(@NotNull Task t, @NotNull List<Task> displaced) {
 
         int siz = size();
 
         float tp = t.pri();
 
 
-        if (siz==capacity()) {
+            if (siz == capacity()) {
 
-            sort(); //sorting only needs to be applied if at capacity
 
-            if (last().qua() > tp) {
-                t.delete("Insufficient Priority");
-                return null;
-            } else {
-                // FIFO, remove oldest question (last)
-                float removedPri = remove(siz-1, "Table Pop");
-                if (removedPri==removedPri) //not deleted
-                    t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
+                Collections.sort(list, this);
+
+                if (last().qua() > tp) {
+                    t.delete("Insufficient Priority");
+                    return null;
+                } else {
+                    // FIFO, remove oldest question (last)
+                    float removedPri = remove(siz - 1, "Table Pop", displaced);
+                    if (removedPri == removedPri) //not deleted
+                        t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
+                }
             }
-        }
 
-        //insert in sorted order by qua
-        List<Task> list = this.list;
+            //insert in sorted order by qua
+            List<Task> list = this.list;
 
-        int i = 0;
-        for (; i < siz-1; i++) {
-            if (list.get(i).qua() < tp)
-                break;
-        }
-        list.add(i, t);
+            int i = 0;
+            for (; i < siz - 1; i++) {
+                if (list.get(i).qua() < tp)
+                    break;
+            }
+            list.add(i, t);
+
         return t;
     }
 
-    public float remove(int n, Object reason) {
+    private float remove(int n, Object reason, List<Task> displaced) {
+
         Task removed = list.remove(n);
-        float p = removed.pri();
-        removed.delete(reason);
-        return p;
+        if (Param.DEBUG)
+            removed.log(reason);
+        displaced.add(removed);
+        return removed.pri();
 
         /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
             task.log(Premise.getStack());*/

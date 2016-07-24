@@ -275,8 +275,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             occ = ETERNAL;
         }
 
-        //nar.input(
-        nar.process( //we should not need to normalize the task, so process directly is preferred
+        nar.input( //TODO we should not need to normalize the task, so process directly is preferred
             derive(content, truth, budget, nar.time(), occ, m, this)
         );
 
@@ -291,7 +290,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 .time(now, occ)
                 .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
-                .log(Param.DEBUG ? d.rule : "Derived");
+                .log(Param.DEBUG ? d.rule : null);
 
 
         //ETERNALIZE: (CURRENTLY DISABLED)

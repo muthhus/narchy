@@ -67,7 +67,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @NotNull
     @Override
-    @Deprecated public Iterator<Task> iterator() {
+    @Deprecated public final Iterator<Task> iterator() {
         return Iterators.concat(
             eternal.iterator(),
             temporal.iterator()
@@ -97,15 +97,15 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public void capacity(int eternals, int temporals) {
-        eternal.capacity(eternals);
-        temporal.capacity(temporals);
+    public final void capacity(int eternals, int temporals, List<Task> displ) {
+        eternal.capacity(eternals, displ);
+        temporal.capacity(temporals, displ);
     }
 
-    @Override
-    public void remove(@NotNull Task belief, List<Task> displ) {
-        ((belief.isEternal()) ? eternal : temporal).remove(belief, displ);
-    }
+//    @Override
+//    public void remove(@NotNull Task belief, List<Task> displ) {
+//        ((belief.isEternal()) ? eternal : temporal).remove(belief, displ);
+//    }
 
     @Override
     public void clear() {
@@ -178,10 +178,6 @@ public class DefaultBeliefTable implements BeliefTable {
 
                 result = temporal.add(input, eternal, displaced, nar);
 
-                float eternalizationFactor = Param.ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR;
-                if (eternalizationFactor > 0f && displaced.size() > 0 && eternal.capacity() > 0) {
-                    eternalizeForgottenTemporals(displaced, nar, eternalizationFactor);
-                }
             }
         }
 
@@ -221,16 +217,7 @@ public class DefaultBeliefTable implements BeliefTable {
                                 .budget(d.budget())
                                 .log("Eternalized");
 
-                        Task ff = eternal.add(ee, displaced, nar);
-                        if (ff == null) {
-                            throw new RuntimeException("eternal rejected " + ee + " but this could have been prevented before constructing and inserting it");
-                        } else {
-                            if (d.term().toString().equals("I(a0)")) {
-                                System.out.println(eternal.size() + " / " + eternal.capacity());
-                                System.out.println(temporal.size() + " / " + temporal.capacity());
-                                System.out.println("eternalize: " + d + "\n\t" + ee + "\n\t\t" + ff);
-                            }
-                        }
+                        nar.inputLater(ee);
                     }
 
                 }

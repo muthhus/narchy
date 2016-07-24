@@ -306,8 +306,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @NotNull @Override Compound<?> term();
 
-    @Nullable @Override
-    Truth truth();
 
     default boolean isQuestOrQuestion() {
         return isQuestion() || isQuest();

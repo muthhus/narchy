@@ -69,8 +69,9 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
     @Nullable
-    public static Integer intOrNull(Term term) {
+    @Deprecated public static Integer intOrNull(Term term) {
         if (term instanceof Atomic) {
+
             int i = Texts.i(term.toString(), Integer.MIN_VALUE);
             if (i == Integer.MIN_VALUE)
                 return null;
@@ -166,7 +167,7 @@ public class ArithmeticInduction implements Consumer<Task> {
     final void input(@Nullable Task task) {
         if (task!=null) {
             count++;
-            nar.process(
+            nar.input(
                 /*print*/(task)
             );
         }

@@ -42,8 +42,7 @@ public class PremiseEval extends FindSubst {
     /** the current premise being evaluated in this context TODO make private again */
     public transient Premise premise;
 
-    @NotNull
-    public final Versioned<Truth> truth;
+
     @NotNull
     public final Versioned<Character> punct;
 
@@ -93,7 +92,6 @@ public class PremiseEval extends FindSubst {
         this.deriver = deriver;
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);
-        truth = new Versioned(versioning);
         punct = new Versioned(versioning);
 
         put(new substitute(this));
@@ -169,7 +167,6 @@ public class PremiseEval extends FindSubst {
                 "premise:" + premise +
                 ", subst:" + super.toString() +
                 (forEachMatch !=null ? (", derived:" + forEachMatch) : "")+
-                (truth.get()!=null ? (", truth:" + truth) : "")+
                 //(!secondary.isEmpty() ? (", secondary:" + secondary) : "")+
                 //(occurrenceShift.get()!=null ? (", occShift:" + occurrenceShift) : "")+
                 //(branchPower.get()!=null ? (", derived:" + branchPower) : "")+
