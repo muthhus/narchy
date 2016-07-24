@@ -131,11 +131,11 @@ public class MotorConcept extends WiredConcept  {
 
         Truth feedback = motor.motor(b, d);
         if (feedback!=null)
-            nar.input(feedback(feedback, now));
+            nar.inputLater(feedback(feedback, now));
     }
 
     protected final Task feedback(Truth t, long when) {
-        return new MutableTask(term(), Symbols.BELIEF, t)
+        return new MutableTask(this, Symbols.BELIEF, t)
                 .time(when, when+ feedbackDT)
                 .budget(feedbackPriority, feedbackDurability)
                 .log("Motor Feedback");

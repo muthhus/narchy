@@ -120,17 +120,23 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
         return capacity;
     }
 
-    @Override
-    public void setCapacity(int newCapacity) {
+    /** returns whether the capacity has changed */
+    @Override public boolean setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
             this.capacity = newCapacity;
 
-            //int excess = size() - newCapacity;
-            //while (excess-- > 0)
-
+            int toRemove = size() - newCapacity;
+            if (toRemove > 0) {
+                synchronized (this.map) {
+                    while (toRemove > 0) {
+                        removeWeakest("Shrink");
+                        toRemove--;
+                    }
+                }
+            }
+            return true;
         }
-        while (size() - newCapacity > 0)
-            removeWeakest("Shrink");
+        return false;
     }
 
     protected abstract void removeWeakest(Object reason);

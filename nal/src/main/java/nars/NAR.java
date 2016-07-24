@@ -3,6 +3,8 @@ package nars;
 
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
+import com.lmax.disruptor.WorkHandler;
+import com.lmax.disruptor.dsl.Disruptor;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -25,10 +27,10 @@ import nars.term.var.Variable;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
-import nars.util.data.list.FasterList;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
+import net.bytebuddy.implementation.bytecode.collection.ArrayFactory;
 import net.openhft.affinity.AffinityLock;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
@@ -43,10 +45,10 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static nars.Symbols.*;
@@ -107,10 +109,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
 
-    private transient final AtomicReference<List<Runnable>> nextTasks = new AtomicReference(new FasterList(0));
-
-            //new ConcurrentLinkedDeque<>();
-            //new CopyOnWriteArrayList<>();
+    final Disruptor<Object[]> inputTaskAsync =
+            new Disruptor<Object[]>(
+                    ()->new Object[2], 1024,
+                    Executors.defaultThreadFactory()
+            );
 
     private NARLoop loop;
 
@@ -143,6 +146,27 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 logger.error(e.toString());
             }
         });
+
+        Supplier<WorkHandler<Object[]>> newRunner = () -> {
+            return ((Object[] tt) -> {
+                Object x = tt[0];
+                if (x instanceof Task) {
+                    Task t = (Task) x;
+                    if (!t.isDeleted()) {
+                        input(t);
+                    } else {
+                        logger.info("deleted input: {}", t);
+                    }
+                } else if (x instanceof Runnable) {
+                    ((Runnable) x).run();
+                } else
+                    logger.error("unsupported {}", tt[0]);
+            });
+        };
+        inputTaskAsync.handleEventsWithWorkerPool(
+            newRunner.get(),newRunner.get()
+        );
+        inputTaskAsync.start();
 
         index.loadBuiltins();
 
@@ -203,7 +227,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public synchronized void reset() {
 
-        nextTasks.get().clear();
+        inputTaskAsync.shutdown();
 
         if (asyncs != null)
             asyncs.shutdown();
@@ -641,8 +665,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             clock.tick();
             emotion.frame();
 
-            runNextTasks();
-
             frameStart.emit(this);
 
         }
@@ -792,53 +814,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * adds a task to the queue of task which will be executed in batch
      * after the end of the current frame before the next frame.
      */
-    public final boolean runLater(@NotNull Runnable t) {
-        //if (running.get()) {
-            //in a frame, so schedule for after it
-        return nextTasks.get().add(t);
-
-        /*} else {
-            //not in a frame, can execute immediately
-            t.run();
-            return true;
-        }*/
+    public final void runLater(@NotNull Runnable t) {
+        inputTaskAsync.publishEvent((Object[] x, long seq, Runnable b) -> x[0] = b, t);
     }
 
-    public final boolean runLater(@NotNull Consumer<NAR> t) {
-        return runLater(()->t.accept(this));
+    public final void runLater(@NotNull Consumer<NAR> t) {
+        //TODO lambda may be optimized slightly
+        runLater(()->t.accept(this));
     }
 
 
-    private final static int MIN_NextTasks_BEFORE_PARALLELIZING = Runtime.getRuntime().availableProcessors()-1; //estimate
 
-
-    /**
-     * runs all the tasks in the 'Next' queue
-     */
-    private final void runNextTasks() {
-
-        List<Runnable> n = nextTasks.getAndSet( new FasterList(0) );
-        int num = n.size();
-        if (num == 0)
-            return;
-
-        //logger.info("Running {} pending tasks", num);
-
-        if (num < MIN_NextTasks_BEFORE_PARALLELIZING) {
-            //special case, avoids overhead of creating stream
-            n.forEach(Runnable::run);
-        } else {
-            n.parallelStream().parallel().forEach((r) -> {
-                try {
-                    r.run();
-                } catch (Throwable t) {
-                    logger.error("{} while running queued {}", t, r);
-                }
-            });
-        }
-
-
-    }
 
     /**
      * signals an error through one or more event notification systems
@@ -1155,19 +1141,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * processes the input before the next frame has run
      */
-    public final void inputLater(@NotNull Task ap) {
-        if (!running.get()) {
-            input(ap);
-        } else {
-            runLater((n) -> {
-                try {
-                    n.input(ap);
-                } catch (InvalidTaskException e) {
-                    logger.error("inputLater: {}", e);
-                    //e.printStackTrace();
-                }
-            });
-        }
+    public final void inputLater(@NotNull Task... t) {
+        inputTaskAsync.publishEvents((Object[] f, long s, Task x)->{
+            f[0]=x;
+        }, t);
+
+//        if (!running.get()) {
+//            input(ap);
+//        } else {
+//            runLater((n) -> {
+//                try {
+//                    n.input(ap);
+//                } catch (InvalidTaskException e) {
+//                    logger.error("inputLater: {}", e);
+//                    //e.printStackTrace();
+//                }
+//            });
+//        }
     }
 
 
@@ -1305,10 +1295,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         activate(t, 1f);
     }
 
-    /**
-     * called for new concepts
-     */
-    abstract protected void init(@NotNull Concept c);
 
     /**
      * process a Task through its Concept
@@ -1322,16 +1308,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         Concept c = concept(input, true);
         if (c == null) {
-            if (Param.DEBUG) {
-                //throw new InvalidTaskException(input, "Inconceivable");
-                logger.error("Inconceivable: {}", input);
-            }
+            logger.warn("inconceivable task: {}", input);
             input.delete("Inconceivable");
             return null;
         }
 
-        float business = input.pri();
-        emotion.busy(business);
+        float cost = input.pri(); //the priority demanded by this task
+
+        emotion.busy(cost);
 
 
         if (c.policy() == null) {
@@ -1361,7 +1345,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             eventTaskProcess.emit(inputted); //signal any additional processes
 
         } else {
-            emotion.frustration(business);
+            emotion.frustration(cost);
         }
 
         return c;

@@ -328,7 +328,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
 
     @Override
-    void setCapacity(int c);
+    boolean setCapacity(int c);
 
 
 //    /**
@@ -501,8 +501,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
 
         @Override
-        public void setCapacity(int c) {
-
+        public boolean setCapacity(int c) {
+            return false;
         }
 
         @NotNull

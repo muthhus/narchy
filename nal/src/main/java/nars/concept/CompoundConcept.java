@@ -322,17 +322,16 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
 
     @Override
     public final void policy(@Nullable ConceptPolicy p) {
-
-
-        this.policy = p;
-        if (p != null) {
-            synchronized (tasks) {
+        ConceptPolicy current = this.policy;
+        if (current!=p) {
+            if ((this.policy = p) != null) {
                 linkCapacity(p);
+                //synchronized (tasks) {
                 beliefCapacity(p);
                 questionCapacity(p);
+                //}
             }
         }
-
     }
 
 
@@ -534,7 +533,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
           otherwise false */
         synchronized (tasks) {
 
-            checkConsistency(); //TEMPORARY =-=============
+            //checkConsistency(); //TEMPORARY =-=============
 
             Task existing = tasks.putIfAbsent(input, input);
             if (existing != null) {
@@ -543,7 +542,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
                     input.delete(DUPLICATE_BELIEF_GOAL);
                 }
 
-                checkConsistency(); //TEMPORARY =-=============
+                //checkConsistency(); //TEMPORARY =-=============
 
                 return existing;
             }
@@ -579,7 +578,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
             removeAndDelete(displaced);
 
 
-            checkConsistency(); //TEMPORARY =-=============
+            //checkConsistency(); //TEMPORARY =-=============
 
         }
 

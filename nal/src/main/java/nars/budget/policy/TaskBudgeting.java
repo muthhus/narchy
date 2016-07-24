@@ -39,7 +39,12 @@ public class TaskBudgeting {
         Premise pp = p.premise;
 
         BLink<? extends Task> taskLink = pp.tasklink();
+        if (taskLink == null)
+            return null;
+
         BLink<? extends Termed> termLink = pp.termlink();
+        if (termLink == null)
+            return null;
 
         float linkDur = aveAri( taskLink.dur(), termLink.dur() );
         final float durability = linkDur * volRatioScale;

@@ -93,7 +93,7 @@ public interface TermIndex {
 
     @NotNull TermBuilder builder();
 
-    @Nullable Concept.@Nullable ConceptBuilder conceptBuilder();
+    @Nullable Concept.ConceptBuilder conceptBuilder();
 
 
     @Nullable

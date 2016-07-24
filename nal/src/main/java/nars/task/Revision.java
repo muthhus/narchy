@@ -214,7 +214,7 @@ public class Revision {
         if (a.size() != 2) {
             if (b.size() != a.size())
                 logger.warn("{} and {} can not be intermpolated", a, b);
-            return strongest(a, b, aProp);
+            return failStrongest(a, b, aProp);
         }
 
         int newDT;
@@ -242,7 +242,8 @@ public class Revision {
         Term a0 = a.term(0);
         Term a1 = a.term(1);
         if (a0.op() != b.term(0).op() || (a1.op() != b.term(1).op())) {
-            throw new RuntimeException();
+            //throw new RuntimeException();
+            return failStrongest(a, b, aProp);
         }
 
         Term r = $.compound(a.op(), newDT,
@@ -254,12 +255,17 @@ public class Revision {
 
         //HACK TODO investigate why
 
-        logger.warn("{} and {} intermpolated to a non-Compound", a, b);
-        return strongest(a, b, aProp);
+
+        return failStrongest(a, b, aProp);
 
         //if (a.op().temporal) //when would it not be temporal? this happens though
             //d = d.dt(newDT);
         //return d;
+    }
+
+    private static Compound failStrongest(Compound a, Compound b, float aProp) {
+        logger.warn("interpolation failure: {} and {}", a, b);
+        return strongest(a, b, aProp);
     }
 
     private static Compound strongest(Compound a, Compound b, float balance) {

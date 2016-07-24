@@ -128,11 +128,6 @@ public abstract class AbstractNAR extends NAR {
 
 
 
-    /** initialize a new concept: set initial capacity policy, etc */
-    @Override final protected void init(@NotNull Concept c) {
-        c.policy(conceptCold);
-    }
-
 //    public static final AbstractOperator[] exampleOperators = {
 //            //new Wait(),
 //            new NullOperator("break"),

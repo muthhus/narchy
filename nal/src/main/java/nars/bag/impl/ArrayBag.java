@@ -70,13 +70,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return new ListBagPendings(mergeFunction);
     }
 
-    public void setCapacity(int newCapacity) {
-        int current = capacity();
-        if (current != newCapacity) {
+    public boolean setCapacity(int newCapacity) {
+        if (super.setCapacity(newCapacity)) {
             pending.capacity(newCapacity);
-            super.setCapacity(newCapacity);
+            return true;
         }
-
+        return false;
     }
 
 
@@ -87,10 +86,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     protected final void removeWeakest(Object reason) {
-        synchronized(map) {
-            if (!removeDeletedAtBottom()) {
-                remove(weakest()).delete(reason);
-            }
+        if (!removeDeletedAtBottom()) {
+            remove(weakest()).delete(reason);
         }
     }
 
