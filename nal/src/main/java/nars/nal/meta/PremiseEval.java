@@ -7,10 +7,12 @@ import nars.Param;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.index.TermIndex;
+import nars.nal.Conclusion;
 import nars.nal.Premise;
 import nars.nal.Deriver;
 import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
+import nars.nal.op.Solve;
 import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
 import nars.task.Task;
@@ -62,7 +64,7 @@ public class PremiseEval extends FindSubst {
     public float confMin = Param.TRUTH_EPSILON;
     public int termSub0op, termSub1op;
     public int termSub0Struct, termSub1Struct;
-    @Deprecated public boolean cyclic; //TODO if this is necessary, encode this in the stamp as a -1 element prefix which will indicate that it inherited evidence directly from a parent in a single-premise derivation
+    //@Deprecated public boolean cyclic; //TODO if this is necessary, encode this in the stamp as a -1 element prefix which will indicate that it inherited evidence directly from a parent in a single-premise derivation
     public boolean overlap;
 
     @Nullable public Truth taskTruth, beliefTruth;
@@ -78,6 +80,8 @@ public class PremiseEval extends FindSubst {
     /** whether the premise involves temporality that must be calculated upon derivation */
     public boolean temporal;
     private long[] evidence;
+
+    public Conclusion conclusion;
 
 
     /** initializes with the default static term index/builder */
@@ -183,22 +187,17 @@ public class PremiseEval extends FindSubst {
     /**
      * execute the next premise, be sure to call init() before a batch of run()'s
      */
-    public final boolean run(@NotNull Premise p) {
+    public final Conclusion run(@NotNull Premise p, @NotNull Conclusion c) {
 
-        Task task = p.task();
-        if (task == null)
-            return false;
+        Task task;
+        this.task = task = p.task();
 
-        this.task = task;
-        this.taskPunct = task.punc();
+        this.punct.set(this.taskPunct = task.punc());
 
         this.premise = p;
 
-
-        this.punct.set(task.punc());
-
-        Task belief = p.belief();
-        this.belief = belief;
+        Task belief;
+        this.belief = belief = p.belief();
 
         Compound tt = task.term();
 
@@ -222,10 +221,10 @@ public class PremiseEval extends FindSubst {
 //            this.beliefInverted = false;
 //        }
 
-        this.beliefTerm = p.beliefTerm().term();
-        this.taskTerm = tt;
+        Term beliefTerm = this.beliefTerm = p.beliefTerm().term();
+        Term taskTerm = this.taskTerm = tt;
 
-        this.cyclic = task.cyclic();
+        //this.cyclic = task.cyclic();
         this.overlap = belief != null && Stamp.overlapping(task, belief);
 
         this.termSub0Struct = taskTerm.structure();
@@ -236,13 +235,16 @@ public class PremiseEval extends FindSubst {
         this.temporal = temporal(task, belief);
 
 
-        deriver.run(this);
+        this.conclusion = c;
 
+        deriver.run(this);
         revert(start);
+
+        this.conclusion = null; //forget a reference to the local field copy but return this instance
         this.evidence = null;
         this.premise = null;
 
-        return true;
+        return c;
     }
 
     private static boolean temporal(@NotNull Task task, @Nullable Task belief) {
@@ -267,8 +269,9 @@ public class PremiseEval extends FindSubst {
     public final long occurrenceTarget(@NotNull OccurrenceSolver s) {
         long tOcc = task.occurrence();
         Task b = belief;
-        if (b == null) return tOcc;
-        else {
+        if (b == null) {
+            return tOcc;
+        } else {
             long bOcc = b.occurrence();
             return s.compute(tOcc, bOcc);
 

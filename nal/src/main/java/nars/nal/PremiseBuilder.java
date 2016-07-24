@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import static nars.nal.Tense.ETERNAL;
 
@@ -41,41 +42,34 @@ import static nars.nal.Tense.ETERNAL;
 public enum PremiseBuilder {
     ;
 
-
     /**
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static int run(@NotNull NAR nar, Concept conceptLink, @NotNull List<Term> termsArray, @NotNull Task taskLink, @NotNull PremiseEval matcher) {
+    public static int run(@NotNull NAR nar, Concept conceptLink, @NotNull List<Term> termsArray, @NotNull Task task, @NotNull PremiseEval matcher, BiConsumer<Premise,Conclusion> each) {
 
         int count = 0;
         long now = nar.time();
 
-        if (taskLink != null) {
+        Compound taskTerm = task.term();
 
-            Compound taskTerm = taskLink.term();
+        for (int i = 0, termsArraySize = termsArray.size(); i < termsArraySize; i++) {
+
+            if (task.isDeleted())
+                break;
+
+            Term termLink;
+            if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLink = termsArray.get(i)))
+                continue;
 
 
-            for (int i = 0, termsArraySize = termsArray.size(); i < termsArraySize; i++) {
+            Premise p = newPremise(nar, now, conceptLink, task, termLink);
 
-                if (taskLink.isDeleted())
-                    break;
+            Conclusion c = matcher.run( p, new Conclusion() );
 
-                Term termLink = termsArray.get(i);
+            each.accept(p, c);
 
-
-                if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLink)) {
-                //if (!taskTerm.equals( termLinkTerm )) {
-                    if (matcher.run(
-                        newPremise(nar, now, conceptLink, taskLink, termLink)
-                    )) {
-                        count++;
-                    }
-                } /*else {
-                    if (!taskTerm.equals(termLinkTerm))
-                        System.err.println(taskTerm + "\n" + termLinkTerm + "\n\tunmatchable");
-                }*/
-            }
+            count++;
         }
 
         return count;
@@ -94,7 +88,7 @@ public enum PremiseBuilder {
      patham9 especially try to understand the "temporal temporal" case
      patham9 its using the result of higher confidence
      */
-    static @Nullable Premise newPremise(@NotNull NAR nar, long now, Concept conceptLink, @NotNull Task taskLink, @NotNull Term termLink) {
+    static @NotNull Premise newPremise(@NotNull NAR nar, long now, Concept conceptLink, @NotNull Task taskLink, @NotNull Term termLink) {
 
 
         Task belief = null;
@@ -125,7 +119,7 @@ public enum PremiseBuilder {
             }
         }
 
-        return new Premise(conceptLink, taskLink, termLink, belief);
+        return new Premise(conceptLink.term(), taskLink, termLink, belief);
     }
 
     private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {

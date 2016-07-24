@@ -211,6 +211,9 @@ public class Revision {
 
     @NotNull
     private static Compound dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth) {
+        if (a.equals(b))
+            return a;
+
         if (a.size() != 2) {
             if (b.size() != a.size())
                 logger.warn("{} and {} can not be intermpolated", a, b);

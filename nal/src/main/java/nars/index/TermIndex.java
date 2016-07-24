@@ -517,49 +517,54 @@ public interface TermIndex {
     @Nullable
     default Concept concept(@NotNull Termed term, boolean createIfMissing) {
 
-
-        if (term.op() == NEG) {
-            //unwrap negation
-            term = ((Compound)term).term(0);
-            if (term instanceof Atomic) {
-                //negations of non-DepVar atomics are invalid
-                if (term.op() != Op.VAR_DEP) {
-                    throw new InvalidConceptTerm(term);
-                }
-            }
-
-        }
-
-
-        if (term instanceof Atomic) {
-
-            if (term instanceof Variable)
-                throw new InvalidConceptTerm(term);
-
-
+        if (term instanceof Concept) {
+            //its already a key for a Concept
+            //but we need to look it up
         } else {
 
-            Termed prenormalized = term;
+            if (term.op() == NEG) {
+                //unwrap negation
+                term = ((Compound) term).term(0);
+                if (term instanceof Atomic) {
+                    //negations of non-DepVar atomics are invalid
+                    if (term.op() != Op.VAR_DEP) {
+                        throw new InvalidConceptTerm(term);
+                    }
+                }
 
-            //unwrap negation again if necessary?
-
-            term = unneg(term);
-
-            if ((term = normalize(term, createIfMissing)) == null)
-                throw new InvalidTerm(prenormalized);
-
-            @NotNull Termed aterm = atemporalize((Compound) term);
-
-            //optimization: atemporalization was unnecessary, normalization may have already provided the concept
-            if ((aterm == term) && (term instanceof Concept)) {
-                return (Concept)term;
             }
 
-            if (aterm == null)
-                return null; //probably unforseeable
+
+            if (term instanceof Atomic) {
+
+                if (term instanceof Variable)
+                    throw new InvalidConceptTerm(term);
+
+
+            } else {
+
+                Termed prenormalized = term;
+
+                //unwrap negation again if necessary?
+
+                term = unneg(term);
+
+                if ((term = normalize(term, createIfMissing)) == null)
+                    throw new InvalidTerm(prenormalized);
+
+                Term aterm = atemporalize((Compound) term);
+
+                //optimization: atemporalization was unnecessary, normalization may have already provided the concept
+                if ((aterm == term) && (term instanceof Concept)) {
+                    return (Concept) term;
+                }
+
+                if (!(aterm instanceof Compound))
+                    return null; //probably unforseeable
                 //throw new InvalidTerm(prenormalizetd);
 
-            term = unneg(aterm); //it can happen that atemporalization will result in a negation that was not unwrapped to begin with?
+                term = unneg(aterm); //it can happen that atemporalization will result in a negation that was not unwrapped to begin with?
+            }
         }
 
 
@@ -643,7 +648,7 @@ public interface TermIndex {
     }
 
     @Nullable
-    default Compound atemporalize(@NotNull Compound c) {
+    default Term atemporalize(@NotNull Compound c) {
         if (!possiblyTemporal(c))
             return c;
         return new CompoundAtemporalizer(this, c).result;
@@ -656,28 +661,32 @@ public interface TermIndex {
 
         private final TermIndex index;
         @Nullable
-        private final Compound result;
+        private final Term result;
 
-        public CompoundAtemporalizer(TermIndex index, @NotNull Compound c) {
+        public CompoundAtemporalizer(@NotNull TermIndex index, @NotNull Compound c) {
             this.index = index;
-            result = _atemporalize(c);
+            this.result = _atemporalize(c);
         }
 
         @Nullable
-        Compound _atemporalize(@NotNull Compound c) {
+        Term _atemporalize(@NotNull Compound c) {
             TermIndex i = index;
 
-            Compound x;
+            Term x;
             if (c.op().temporal && c.dt() != DTERNAL) {
                 Term xx = i.builder().build(c.op(), DTERNAL, c.subterms().terms());
                 if (xx == null)
                     return null;
 
-                x = compoundOrNull(i.the( xx ).term());
+                x = i.the( xx ).term();
             } else {
                 x = c;
             }
-            return compoundOrNull(i.transform(x,this));
+
+            if (x instanceof Compound)
+                return i.transform((Compound)x,this);
+            else
+                return x;
         }
 
         @Override
@@ -686,8 +695,11 @@ public interface TermIndex {
         }
 
         @Override
-        public @Nullable Termed apply(Compound parent, @NotNull Term subterm) {
-            return _atemporalize((Compound)subterm);
+        public @Nullable Term apply(Compound parent, @NotNull Term subterm) {
+            if (subterm instanceof Compound)
+                return _atemporalize((Compound)subterm);
+            else
+                return subterm;
         }
     }
 }

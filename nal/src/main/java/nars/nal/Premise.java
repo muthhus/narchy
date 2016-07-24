@@ -4,6 +4,7 @@
  */
 package nars.nal;
 
+import nars.NAR;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.task.Task;
@@ -20,39 +21,22 @@ import org.jetbrains.annotations.Nullable;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  *
- * TODO Premise Cache
- *  --memoizes the matching state and result procedure, effectively compiling a premise to an evaluable function
- *          --completely
- *          --partially (when > 0 termutations)
- *  --use caffeine cache with a fixed size
- *  --key = (task term, task punc, task time, beliefTerm, belief punc (or null), belief time )
- *      avoid needing to store the generating concept; it is not really important
- *      budget information is passed transiently per execution because this will fluctuate
- *      truth values and evidence can also be passed transiently because the truth function can apply it each execution
- *      same for time information
- *  --value =
- *      list of derive([transients]) -> Task functions
- *      meter of about applied vs. total termutation permutations,
- *          which can be used to evaluate the approximate completion of possibilities encountered
- *      meter of past usefulness and other cost/benefit information
- *
- *      these metics can later be used to sort the estimated values of premise batches in a queue
  *
  */
 public final class Premise implements Tasked {
 
-    //@NotNull public final BLink<? extends Task> taskLink;
+
     @NotNull public final Task taskLink;
 
-    //@NotNull public final BLink<? extends Term> termLink;
+
     @NotNull public final Term termLink;
 
     @Nullable public final Task belief;
 
-    //@NotNull public final BLink<? extends Concept> conceptLink;
-    @NotNull public final Concept conceptLink;
+    /** not used in creating a Premise key, because the same premise components may be generated from different originating concepts or even other methods of forming them*/
+    @NotNull transient private final Term conceptLink;
 
-    public Premise(@NotNull Concept conceptLink,
+    public Premise(@NotNull Term conceptLink,
                    @NotNull Task taskLink,
                    @NotNull Term termLink,
                    @Nullable Task belief) {
@@ -67,7 +51,7 @@ public final class Premise implements Tasked {
     }
 
 
-    @Nullable
+    @NotNull
     @Override
     public final Task task() {
         return taskLink;
@@ -108,11 +92,15 @@ public final class Premise implements Tasked {
         return (b!=null) && (!task().isEternal()) && (!b.isEternal());
     }
 
-    @Nullable public BLink<? extends Termed> termlink() {
-        return conceptLink.termlinks().get(termLink);
+    @Nullable public final Concept concept(NAR n) {
+        return n.concept(conceptLink);
     }
 
-    public BLink<? extends Task> tasklink() {
-        return conceptLink.tasklinks().get(taskLink);
+    @Nullable public final BLink<? extends Termed> termlink(@NotNull Concept c) {
+        return c.termlinks().get(termLink);
+    }
+
+    @Nullable public final BLink<? extends Task> tasklink(@NotNull Concept c) {
+        return c.tasklinks().get(taskLink);
     }
 }

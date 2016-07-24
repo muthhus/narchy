@@ -29,9 +29,8 @@ import java.util.function.Predicate;
 public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
 
-
-    @NotNull final CurveSampler sampler;
-
+    @NotNull
+    final CurveSampler sampler;
 
 
     public CurveBag(@NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction) {
@@ -42,7 +41,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         this(initialCapacity, c, mergeFunction, new HashMap<>(initialCapacity));
     }
 
-    public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, Map<V,BLink<V>> map) {
+    public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
         super(initialCapacity, mergeFunction, map);
         this.sampler = c;
     }
@@ -53,7 +52,6 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 //    public BLink<V> pop() {
 //        return peekNext(true);
 //    }
-
 
 
     @NotNull
@@ -88,11 +86,10 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     }
 
 
-
-
-    /** optimized batch fill, using consecutive array elements, also ensuring uniqueness
+    /**
+     * optimized batch fill, using consecutive array elements, also ensuring uniqueness
      * returns the instance for fluentcy
-     * */
+     */
     @NotNull
     @Override
     public CurveBag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
@@ -100,6 +97,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         int ss = size();
         if (ss == 0)
             return this;
+
 
         final int begin, end;
         if (ss <= n) {
@@ -125,13 +123,13 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
                 n--;
         }
 
-        for (int i = begin-1; n > 0 && i >= 0; i--) {
+        for (int i = begin - 1; n > 0 && i >= 0; i--) {
             //scan upwards for any remaining
             if (trySample(target, l[i]))
                 n--;
         }
 
-        for (int i = end+1; n > 0 && i < ss; i++) {
+        for (int i = end + 1; n > 0 && i < ss; i++) {
             //scan downwards for any remaining
             if (trySample(target, l[i]))
                 n--;
@@ -153,7 +151,6 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     public final @Nullable BLink<V> sample() {
         return peekNext(false);
     }
-
 
 
     //    public static long fastRound(final double d) {
@@ -354,8 +351,8 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         size--;
 
         return Math.max(Math.min(
-            Math.round(y * size - 0.5f),
-            size), 0);
+                Math.round(y * size - 0.5f),
+                size), 0);
     }
 
 
@@ -378,8 +375,6 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 //    }
 
 
-
-
     public final int sampleIndex() {
         int s = size();
         return s <= 1 ? 0 : index(sampler.sample(s), s);
@@ -397,7 +392,9 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 //    }
 
 
-    /** flat, gives equal attention to items in the bag */
+    /**
+     * flat, gives equal attention to items in the bag
+     */
     public static final BagCurve linearBagCurve = new BagCurve() {
 
         @Override
@@ -418,10 +415,11 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     public static final BagCurve power6BagCurve = new Power6BagCurve();
 
 
-
-    /** LERPs between the curve and a flat line (y=x) in proportion to the amount the dynamic range falls short of 1.0;
-     *  this is probably equivalent to a naive 1st-order approximation of a way
-     *  to convert percentile to probability but it should suffice for now */
+    /**
+     * LERPs between the curve and a flat line (y=x) in proportion to the amount the dynamic range falls short of 1.0;
+     * this is probably equivalent to a naive 1st-order approximation of a way
+     * to convert percentile to probability but it should suffice for now
+     */
     public static final class NormalizedSampler extends CurveSampler {
 
         private float range;
@@ -444,7 +442,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
             float uniform = random.nextFloat();
             float curved = curve.valueOf(uniform);
 
-            return ((1f-dynamicRange) * uniform) +
+            return ((1f - dynamicRange) * uniform) +
                     (dynamicRange * curved);
         }
     }
@@ -457,11 +455,11 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
         @Override
         float sample(int size) {
-            return this.curve.valueOf( random.nextFloat() );
+            return this.curve.valueOf(random.nextFloat());
         }
     }
 
-    public static abstract class CurveSampler  {
+    public static abstract class CurveSampler {
         public final CurveBag.BagCurve curve;
         public final Random random;
 
@@ -470,7 +468,9 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
             this.random = random;
         }
 
-        /** called at the end of each commit */
+        /**
+         * called at the end of each commit
+         */
         protected void commit(CurveBag bag) {
 
         }

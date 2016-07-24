@@ -99,17 +99,8 @@ public class Default extends AbstractNAR {
 
     @Override
     public final float conceptPriority(@NotNull Termed termed) {
-        if (termed == null)
-            throw new NullPointerException();
-        //if (termed!=null) {
-            //Concept cc = concept(termed);
-            //if (cc != null) {
-                BLink<Concept> c = core.concepts.get(termed);
-                if (c != null)
-                    return c.priIfFiniteElseZero();
-            //}
-        //}
-        return 0;
+        BLink<Concept> c = core.concepts.get(termed);
+        return c != null ? c.priIfFiniteElseZero() : 0;
     }
 
 
@@ -135,7 +126,11 @@ public class Default extends AbstractNAR {
         core.concepts.clear();
     }
 
-    /** faster access from active concept bag than the index */
+    /** faster access from active concept bag than the index
+     * TODO faster access by providing a Concept instance, instead of its key.
+     * this indicates the term is already known to be a key and does not need
+     * atemporalized etc
+     * */
     @Nullable @Override public final Concept concept(@NotNull Term t, boolean createIfMissing) {
         @Nullable BLink<Concept> activeLink = core.concepts.get(t);
         if (activeLink!=null) {

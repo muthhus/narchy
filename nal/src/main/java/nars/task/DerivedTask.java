@@ -113,44 +113,44 @@ abstract public class DerivedTask extends MutableTask {
         }
     }
 
-    public static class CompetingDerivedTask extends DerivedTask {
-
-
-        public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise) {
-            super(tc, punct, truth, premise);
-        }
-
-        @Override
-        public boolean onConcept(@NotNull Concept c, float score) {
-            if (super.onConcept(c, score)) {
-                Premise p = this.premise;
-                if (p != null) {
-                    Concept pc = p.conceptLink;
-                    Concept.linkPeer(pc.termlinks(), p.termLink, budget(), qua());
-                    Concept.linkPeer(pc.tasklinks(), p.taskLink, budget(), qua());
-                }
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean delete() {
-            if (super.delete()) {
-                Premise p = this.premise;
-                if (p != null) {
-                    Concept pc = p.conceptLink;
-                    Concept.linkPeer(pc.termlinks(), p.termLink, UnitBudget.Zero, qua());
-                    Concept.linkPeer(pc.tasklinks(), p.taskLink, UnitBudget.Zero, qua());
-                }
-
-                this.premise = null;
-
-                return true;
-            }
-            return false;
-        }
-    }
+//    public static class CompetingDerivedTask extends DerivedTask {
+//
+//
+//        public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise) {
+//            super(tc, punct, truth, premise);
+//        }
+//
+//        @Override
+//        public boolean onConcept(@NotNull Concept c, float score) {
+//            if (super.onConcept(c, score)) {
+//                Premise p = this.premise;
+//                if (p != null) {
+//                    Concept pc = p.conceptLink;
+//                    Concept.linkPeer(pc.termlinks(), p.termLink, budget(), qua());
+//                    Concept.linkPeer(pc.tasklinks(), p.taskLink, budget(), qua());
+//                }
+//                return true;
+//            }
+//            return false;
+//        }
+//
+//        @Override
+//        public boolean delete() {
+//            if (super.delete()) {
+//                Premise p = this.premise;
+//                if (p != null) {
+//                    Concept pc = p.concept();
+//                    Concept.linkPeer(pc.termlinks(), p.termLink, UnitBudget.Zero, qua());
+//                    Concept.linkPeer(pc.tasklinks(), p.taskLink, UnitBudget.Zero, qua());
+//                }
+//
+//                this.premise = null;
+//
+//                return true;
+//            }
+//            return false;
+//        }
+//    }
 
 }
 //scratch

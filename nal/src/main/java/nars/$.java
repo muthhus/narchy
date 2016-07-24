@@ -862,14 +862,14 @@ public enum $ {
     }
 
     public static @NotNull <X> Set<X> newHashSet(int capacity) {
-        if (capacity < 4) {
-            return new UnifiedSet(0);
-        } else {
+        //if (capacity < 4) {
+        //    return new UnifiedSet(0);
+        //} else {
             //return new UnifiedSet(capacity);
             //return new SimpleHashSet(capacity);
             return new HashSet(capacity);
             //return new LinkedHashSet(capacity);
-        }
+        //}
     }
 
     @NotNull

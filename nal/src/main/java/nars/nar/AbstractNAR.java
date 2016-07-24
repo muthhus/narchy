@@ -54,9 +54,6 @@ public abstract class AbstractNAR extends NAR {
         termLinkThreshold.setValue(Param.BUDGET_EPSILON);
         taskLinkThreshold.setValue(Param.BUDGET_EPSILON);
 
-        executionThreshold.setValue(Param.TRUTH_EPSILON);
-
-
 
     }
 

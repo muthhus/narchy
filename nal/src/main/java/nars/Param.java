@@ -239,12 +239,6 @@ public abstract class Param extends Container implements Level {
      */
     public final MutableFloat termLinkThreshold = new MutableFloat(0);
 
-    /**
-     * Minimum expectation for a desire value.
-     * the range of "now" is [-DURATION, DURATION];
-     */
-    public final MutableFloat executionThreshold = new MutableFloat();
-
 
 //    /** Maximum number of beliefs kept in a Concept */
 //    public final AtomicInteger conceptBeliefsMax = new AtomicInteger();

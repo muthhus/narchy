@@ -9,21 +9,28 @@ import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.data.Range;
 import nars.link.BLink;
+import nars.nal.Conclusion;
+import nars.nal.Premise;
 import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Term;
+import nars.util.Util;
 import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * The original deterministic memory cycle implementation that is currently used as a standard
  * for development and testing.
  */
-public abstract class AbstractCore {
+public abstract class AbstractCore implements BiConsumer<Premise, Conclusion> {
     /**
      * How many concepts to fire each cycle; measures degree of parallelism in each cycle
      */
@@ -73,6 +80,9 @@ public abstract class AbstractCore {
      */
     transient private final List<Term> terms = $.newArrayList();
     transient private final List<Task> tasks = $.newArrayList();
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
+
 
     protected final boolean queueTaskLink(BLink<Task> b) {
         tasks.add(b.get());
@@ -129,6 +139,13 @@ public abstract class AbstractCore {
             conceptUpdate.commit(concepts);
 
             concepts.sample(cpf, this::fireConcept);
+
+
+            Util.time(logger, "processing " + pending.size() + " derivations", ()-> {
+                nar.input(pending);
+            });
+            pending.clear();
+
         }
 
     }
@@ -177,7 +194,7 @@ public abstract class AbstractCore {
                             c,
                             termsBuffer,
                             tasksBuffer.get(i),
-                            matcher);
+                            matcher, this);
 
                 }
 
@@ -196,11 +213,19 @@ public abstract class AbstractCore {
     public void conceptualize(@NotNull Concept c, @NotNull Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
 
         concepts.put(c, b, conceptActivation, conceptOverflow);
-        if (b.isDeleted())
-            return;
+        //if (b.isDeleted())
+            //return;
             //throw new RuntimeException("Concept rejected: " + b);
         if (linkActivation > 0)
             c.link(b, linkActivation, nar, conceptOverflow);
+    }
+
+    final Set<Task> pending = $.newHashSet(256);
+
+    @Override
+    public void accept(Premise premise, Conclusion conclusion) {
+        //HACK for now just collect all conclusion's tasks into the pending set
+        pending.addAll(conclusion.derive);
     }
 
 

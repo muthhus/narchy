@@ -112,16 +112,17 @@ public class ArithmeticInduction implements Consumer<Task> {
 
 
                 });
-            } else if ( ((b.op() == IMPL) /*|| (b.op() == EQUI)*/) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
-                compress(b, (features, pattern) -> {
-
-                    //after variable introduction, such implication is self-referential and probably this conjunction captures the semantics:
-                    input(
-                        task(b, $.conj(features, pattern))
-                    );
-
-                });
             }
+//            else if ( ((b.op() == IMPL) /*|| (b.op() == EQUI)*/) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
+//                compress(b, (features, pattern) -> {
+//
+//                    //after variable introduction, such implication is self-referential and probably this conjunction captures the semantics:
+//                    input(
+//                        task(b, $.conj(features, pattern))
+//                    );
+//
+//                });
+//            }
 
             if (b.op()!=CONJ && b.term().hasAny(CONJ)) {
 

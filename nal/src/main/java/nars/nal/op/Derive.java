@@ -25,6 +25,7 @@ import java.util.Map;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
+import static nars.Op.VAR_PATTERN;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 
@@ -44,8 +45,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     /**
      * result pattern
      */
-    @NotNull
-    public final Term conclusionPattern, conclusionPatternNP, conclusionPatternPN, conclusionPatternNN;
+    @NotNull public final Term conclusionPattern;
+    @Nullable public final Term  conclusionPatternNP, conclusionPatternPN, conclusionPatternNN;
 
 
     /**
@@ -74,11 +75,33 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         this.belief = belief;
         this.goal = goal;
 
-
         this.conclusionPattern = term;
-        this.conclusionPatternNP = negateConclusion(true, false);
-        this.conclusionPatternPN = negateConclusion(false, true);
-        this.conclusionPatternNN = negateConclusion(true, true);
+
+        //to be safe, exclude any rules which have an immediate transform (in the form of an operator) in the conclusion,
+        //because negating its parameters may have unpredictable effects depending on the operation
+        if (conclusionPattern.hasAny(Op.OPER)) {
+            this.conclusionPatternNP = this.conclusionPatternPN = this.conclusionPatternNN = null;
+        } else {
+
+            if (rule.taskPunc != '?') {
+                this.conclusionPatternNP = negateConclusion(true, false);
+            } else {
+                //if the task is a question or quest, it is meaningless to handle that inverted term
+                this.conclusionPatternNP = null;
+            }
+
+            if ((belief == null || belief.single()) && (goal == null || goal.single())) {
+                //there will be no belief to negate, so these patterns
+                //should never be attempted.
+                //however this conditoin will be tested during derivation,
+                // in case EITHER the belief OR the goal are single
+                this.conclusionPatternPN = this.conclusionPatternNN = null;
+            } else {
+                this.conclusionPatternPN = negateConclusion(false, true);
+                this.conclusionPatternNN = negateConclusion(true, true);
+            }
+
+        }
 
 
         //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
@@ -88,16 +111,23 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     }
 
-    private Term negateConclusion(boolean task, boolean belief) {
+    private Term negateConclusion(boolean negTask, boolean negBelief) {
 
         @NotNull Term cp = this.conclusionPattern;
 
-        if (cp.op().atomic)
+
+        if ( (negBelief^negTask) && (negTask && cp.equals(rule.getTask())) || (negBelief && cp.equals(rule.getBelief())) ) {
+            return $.neg(cp);
+        }
+        if (cp.op().atomic) {
             return null;
+        }
+
+
         if (cp.vars() > 0) //exclude vars for now, but this may be allowed if unification on the variable-containing superterm matches the task/belief pattern being negated, etc.
             return null;
 
-        if (task) {
+        if (negTask) {
             Map<Term, Term> cc = new HashMap();
             Term taskPattern = this.rule.getTask();
             cc.put(taskPattern, $.neg(taskPattern));
@@ -107,7 +137,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             }
             cp = ccp;
         }
-        if (belief) {
+        if (negBelief) {
             Map<Term, Term> cc = new HashMap();
             @NotNull Term beliefPattern = this.rule.getBelief();
             cc.put(beliefPattern, $.neg(beliefPattern));
@@ -140,17 +170,32 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     public final void accept(@NotNull PremiseEval m) {
 
 
-        Truth taskTruth = m.taskTruth, beliefTruth = m.beliefTruth;
+        char c = m.punct.get();
 
-        char punct = m.punct.get();
+        TruthOperator f;
+        if (c == Symbols.BELIEF)
+            f = belief;
+        else if (c == Symbols.GOAL)
+            f = goal;
+        else
+            f = null;
+
+        Truth taskTruth, beliefTruth;
+
+        //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
+        taskTruth = (f == null) ? null : m.taskTruth;
+
+        //truth function is single premise so set belief truth to be null to prevent any negations below:
+        beliefTruth = ((f == null) || f.single()) ? null : m.beliefTruth;
 
         Term cp = this.conclusionPattern;
 
-        if (!cp.op().atomic && (punct!=Symbols.QUEST && punct!=Symbols.QUESTION)) {
 
             boolean tn = taskTruth != null && taskTruth.isNegative();
             boolean bn = beliefTruth != null && beliefTruth.isNegative();
-            if (bn && tn) {
+            if (!bn && !tn) {
+                //continue below
+            } else if (bn && tn) {
                 if (conclusionPatternNN!=null) {
                     cp = conclusionPatternNN;
                     taskTruth = taskTruth.negated();
@@ -167,7 +212,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                     taskTruth = taskTruth.negated();
                 }
             }
-        }
+
 
 
         Term r = m.index.resolve(cp, m);
@@ -177,15 +222,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         if (r instanceof Compound) { //includes null test
 
-            char c = punct;
-            TruthOperator f;
-            if (c == Symbols.BELIEF)
-                f = belief;
-            else if (c == Symbols.GOAL)
-                f = goal;
-            else
-                f = null;
-
             Truth t = (f == null) ?
                 null :
                 f.apply(
@@ -194,7 +230,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                      m.nar,
                      m.confMin
                     );
-
 
             if (f==null || t!=null)
                 derive(m, (Compound)r, t);
@@ -275,7 +310,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             occ = ETERNAL;
         }
 
-        nar.input( //TODO we should not need to normalize the task, so process directly is preferred
+
+        m.conclusion.derive.add( //TODO we should not need to normalize the task, so process directly is preferred
             derive(content, truth, budget, nar.time(), occ, m, this)
         );
 

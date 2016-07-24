@@ -111,8 +111,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     final Disruptor<Object[]> inputTaskAsync =
             new Disruptor<Object[]>(
-                    ()->new Object[2], 1024,
-                    Executors.defaultThreadFactory()
+                    ()->new Object[2], 8192,
+                    Executors.newWorkStealingPool()
             );
 
     private NARLoop loop;

@@ -7,6 +7,7 @@ import nars.Param;
 import nars.index.TermIndex;
 import nars.nal.meta.match.Ellipsislike;
 import nars.nal.op.TermTransform;
+import nars.op.data.differ;
 import nars.term.Compound;
 import nars.term.InvalidTerm;
 import nars.term.Term;
@@ -185,7 +186,7 @@ public abstract class TermBuilder {
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if ((et0.op() == set && et1.op() == set))
-                    return subtractSet(set, (Compound) et0, (Compound) et1);
+                    return differ.difference(this, set, (Compound) et0, (Compound) et1);
                 else
                     return et0.equals(et1) ?
                             empty(set) :
@@ -597,7 +598,7 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
-        return TermContainer.difference(this, setType, A, B);
+        return differ.difference(this, setType, A, B);
     }
 
     @Nullable

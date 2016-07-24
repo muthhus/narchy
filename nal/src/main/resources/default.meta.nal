@@ -39,13 +39,13 @@
 
 //Inheritance to Similarity
 
-    (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief)
+    (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief, Derive:NoSwap)
 
 //If S can stand for P, P can to a certain low degree also represent the class S
 //If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
 
-    (P --> S), (S --> P), task("?") |- (P --> S), (Belief:Conversion, Punctuation:Belief)
-    (P ==> S), (S ==> P), task("?") |- (P ==> S), (Belief:Conversion, Punctuation:Belief)
+    (P --> S), (S --> P), task("?") |- (P --> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
+    (P ==> S), (S ==> P), task("?") |- (P ==> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
 //    ( --S ==> P),   P, time(dtTask) |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
@@ -62,10 +62,10 @@
 //                (A --> C)
 //If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
 
-(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Desire:Strong, Derive:AllowBackward)
-(A --> B), (A --> C), neq(B,C) |- (C --> B), (Belief:Abduction, Desire:Weak, Derive:AllowBackward)
-(A --> C), (B --> C), neq(A,B) |- (A --> B), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
-(A --> B), (B --> C), neq(C,A) |- (C --> A), (Belief:Exemplification, Desire:Weak, Derive:AllowBackward)
+(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
+(A --> B), (A --> C), neq(B,C) |- (C --> B), (Belief:Abduction, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
+(A --> C), (B --> C), neq(A,B) |- (A --> B), (Belief:Induction, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
+(A --> B), (B --> C), neq(C,A) |- (C --> A), (Belief:Exemplification, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
 
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
@@ -74,7 +74,7 @@
 
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
-    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Desire:Strong, Derive:AllowBackward)
+    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
@@ -85,20 +85,20 @@
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
-    (M --> P), (S <-> M), neq(S,P) |- (S --> P), (Belief:Analogy, Desire:Strong, Derive:AllowBackward)
-    (P --> M), (S <-> M), neq(S,P) |- (P --> S), (Belief:Analogy, Desire:Strong, Derive:AllowBackward)
+    (M --> P), (S <-> M), neq(S,P) |- (S --> P), (Belief:Analogy, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (P --> M), (S <-> M), neq(S,P) |- (P --> S), (Belief:Analogy, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
     (M <-> P), (S <-> M), neq(S,P) |- (S <-> P), (Belief:Resemblance, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
 
 //// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection, Desire:Intersection, Derive:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection, Derive:NoSwap)
     (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S & P) --> M), (Belief:Union, Derive:NoSwap)
-    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((P ~ S) --> M), (Belief:Difference)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((P ~ S) --> M), (Belief:Difference, Derive:NoSwap)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P & S)), (Belief:Intersection, Desire:Intersection, Derive:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P & S)), (Belief:Intersection, Derive:NoSwap)
     (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P | S)), (Belief:Union, Derive:NoSwap)
-    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P - S)), (Belief:Difference)
+    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P - S)), (Belief:Difference, Derive:NoSwap)
 
 //// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
 //if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
@@ -481,8 +481,8 @@
     (W --> (|,B,A..+)), (W --> B), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
     ((&,B,A..+) --> W), (B --> W), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
-    (W --> (-,S,B)), (W --> B), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief)
-    ((~,S,B) --> W), (B --> W), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief)
+    (W --> (-,S,B)), (W --> B), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
+    ((~,S,B) --> W), (B --> W), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
 
 ////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
 //Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate

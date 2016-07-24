@@ -6,6 +6,7 @@ import nars.Param;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
+import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.Tense;
@@ -38,11 +39,15 @@ public class TaskBudgeting {
 
         Premise pp = p.premise;
 
-        BLink<? extends Task> taskLink = pp.tasklink();
+        Concept c = pp.concept(p.nar);
+        if (c == null)
+            return null;
+
+        BLink<? extends Task> taskLink = pp.tasklink(c);
         if (taskLink == null)
             return null;
 
-        BLink<? extends Termed> termLink = pp.termlink();
+        BLink<? extends Termed> termLink = pp.termlink(c);
         if (termLink == null)
             return null;
 

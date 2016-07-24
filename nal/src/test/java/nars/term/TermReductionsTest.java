@@ -2,7 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
-import nars.term.container.TermContainer;
+import nars.op.data.differ;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
@@ -214,7 +214,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
                 new Term[]{r, s},
-                TermContainer.difference(Op.SETe, sete(r, p, q, s), sete(p, q)).terms()
+                differ.difference(Op.SETe, sete(r, p, q, s), sete(p, q)).terms()
         );
     }
 
@@ -227,7 +227,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertEquals(
                 null,
-                TermContainer.difference(Op.SETe, sete(p, q), sete(p, q))
+                differ.difference(Op.SETe, sete(p, q), sete(p, q))
         );
     }
 
@@ -241,7 +241,7 @@ public class TermReductionsTest {
 
         assertEquals(
                 $("{Mars,Venus}"),
-                TermContainer.difference(
+                differ.difference(
                         Op.SETe,
                         $("{Mars,Pluto,Venus}"),
                         $("{Pluto,Saturn}")
@@ -249,7 +249,7 @@ public class TermReductionsTest {
         );
         assertEquals(
                 $("{Saturn}"),
-                TermContainer.difference(
+                differ.difference(
                         Op.SETe,
                         $("{Pluto,Saturn}"),
                         $("{Mars,Pluto,Venus}")

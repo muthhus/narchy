@@ -229,50 +229,6 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     }
 
 
-    /**
-     * returns null if empty set
-     */
-    @Nullable
-    static Compound difference(@NotNull Op op, @NotNull Compound a, @NotNull Compound b) {
-        return difference($.terms, op, a, b);
-    }
-
-    @Nullable
-    static Compound difference(@NotNull TermBuilder t, @NotNull Compound a, @NotNull TermContainer b) {
-        return difference(t, a.op(), a, b);
-    }
-
-    @Nullable
-    static Compound difference(@NotNull TermBuilder t, @NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
-
-        //intersect the mask
-        if ((a.structure() & b.structure()) == 0)
-            return null;
-
-        Term[] aa = a.terms();
-
-        List<Term> terms = $.newArrayList(aa.length);
-
-        int retained = 0, size = a.size();
-        for (int i = 0; i < size; i++) {
-            Term x = a.term(i);
-            if (!b.containsTerm(x)) {
-                terms.add(x);
-                retained++;
-            }
-        }
-
-        if (retained == size) { //same as 'a'
-            return a;
-        } else if (retained == 0) {
-            return null;
-        } else {
-            return (Compound) t.build(o, terms.toArray(new Term[retained]));
-        }
-
-    }
-
-
     void copyInto(Collection<Term> target);
 
 
