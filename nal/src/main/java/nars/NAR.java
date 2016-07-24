@@ -3,8 +3,10 @@ package nars;
 
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
-import com.lmax.disruptor.WorkHandler;
+import com.lmax.disruptor.*;
+import com.lmax.disruptor.dsl.BasicExecutor;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -26,11 +28,11 @@ import nars.term.atom.Operator;
 import nars.term.var.Variable;
 import nars.time.Clock;
 import nars.time.FrameClock;
+import nars.util.Util;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
-import net.bytebuddy.implementation.bytecode.collection.ArrayFactory;
 import net.openhft.affinity.AffinityLock;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
@@ -43,7 +45,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -86,16 +89,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
 
 
-    private static final ExecutorService asyncs = //shared
-            ForkJoinPool.commonPool();
-    //(ThreadPoolExecutor) Executors.newCachedThreadPool();
-
     static final Set<String> logEvents = Sets.newHashSet(
             "eventTaskProcess", "eventAnswer",
             "eventExecute", //"eventRevision", /* eventDerive */ "eventError",
             "eventSpeak"
-
     );
+
     /**
      * The id/name of the reasoner
      * TODO
@@ -108,12 +107,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final AtomicBoolean running = new AtomicBoolean();
 
 
-
-    final Disruptor<Object[]> inputTaskAsync =
+    final Disruptor<Object[]> async =
             new Disruptor<Object[]>(
-                    ()->new Object[2], 8192,
-                    Executors.newWorkStealingPool()
+                    () -> new Object[2], 4096,
+                    //new BasicExecutor(Executors.defaultThreadFactory()),
+                    Executors.newCachedThreadPool(),
+                    //ForkJoinPool.commonPool(),
+                    ProducerType.MULTI,
+                    new BlockingWaitStrategy()
+                    //new YieldingWaitStrategy()
+                    //Executors.newCachedThreadPool()
             );
+    private final SequenceBarrier asyncBarrier;
 
     private NARLoop loop;
 
@@ -163,10 +168,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     logger.error("unsupported {}", tt[0]);
             });
         };
-        inputTaskAsync.handleEventsWithWorkerPool(
-            newRunner.get(),newRunner.get()
+        async.handleEventsWithWorkerPool(
+                newRunner.get()
+                //,newRunner.get(),newRunner.get()
         );
-        inputTaskAsync.start();
+
+
+        asyncBarrier = async.getRingBuffer().newBarrier();
+        async.start();
 
         index.loadBuiltins();
 
@@ -227,10 +236,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public synchronized void reset() {
 
-        inputTaskAsync.shutdown();
-
-        if (asyncs != null)
-            asyncs.shutdown();
+        async.shutdown();
 
         super.reset();
 
@@ -660,12 +666,46 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         Clock clock = this.clock;
 
+        long size = async.getBufferSize();
+        RingBuffer<Object[]> ring = async.getRingBuffer();
+
         for (; frames > 0; frames--) {
+
+
+//            final long[] last = new long[1];
+//            inputTaskAsync.publishEvent((t, seq)->{
+//                System.out.println("frame end: " + t + " " + seq);
+//                last[0] = seq;
+//            });
+
+
+
+
+            //long used = size - ring.remainingCapacity();
+            long cap;
+            while ((cap = ring.remainingCapacity()) < 16) {
+                long now = async.getCursor();
+                logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
+                //Util.pause(1);
+                Thread.yield();
+            }
 
             clock.tick();
             emotion.frame();
 
             frameStart.emit(this);
+
+
+
+
+//                    asyncBarrier.waitFor(now );
+//                }
+//
+//                //}
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+
 
         }
     }
@@ -815,15 +855,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * after the end of the current frame before the next frame.
      */
     public final void runLater(@NotNull Runnable t) {
-        inputTaskAsync.publishEvent((Object[] x, long seq, Runnable b) -> x[0] = b, t);
+        //synchronized (async) {
+        async.publishEvent((Object[] x, long seq, Runnable b) -> x[0] = b, t);
+        //}
     }
 
     public final void runLater(@NotNull Consumer<NAR> t) {
         //TODO lambda may be optimized slightly
-        runLater(()->t.accept(this));
+        runLater(() -> t.accept(this));
     }
-
-
 
 
     /**
@@ -838,38 +878,40 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * in its own thread in a thread pool
      */
     @Nullable
-    public static Future runAsync(@NotNull Runnable t) {
+    public Future runAsync(@NotNull Runnable t) {
+        runLater(t);
+        return null;
 
-        logger.trace("runAsyncs run {}", t);
-
-        try {
-            return asyncs.submit(t);
-        } catch (RejectedExecutionException e) {
-            logger.error("runAsync error {} in {}", t, e);
-            return null;
-        }
+//        logger.trace("runAsyncs run {}", t);
+//
+//        try {
+//            return asyncs.submit(t);
+//        } catch (RejectedExecutionException e) {
+//            logger.error("runAsync error {} in {}", t, e);
+//            return null;
+//        }
     }
 
-    @Nullable
-    public Future runAsync(@NotNull Runnable t, int maxRunsPerFrame) {
-        final Semaphore s = new Semaphore(0);
-        onFrame(nn -> {
-            int a = s.availablePermits();
-            if (a < maxRunsPerFrame)
-                s.release(1); //maxRunsPerFrame-a);
-        });
-        return runAsync(() -> {
-            while (true) {
-                try {
-                    s.acquire();
-                    t.run();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    //...then try again
-                }
-            }
-        });
-    }
+//    @Nullable
+//    public Future runAsync(@NotNull Runnable t, int maxRunsPerFrame) {
+//        final Semaphore s = new Semaphore(0);
+//        onFrame(nn -> {
+//            int a = s.availablePermits();
+//            if (a < maxRunsPerFrame)
+//                s.release(1); //maxRunsPerFrame-a);
+//        });
+//        return runAsync(() -> {
+//            while (true) {
+//                try {
+//                    s.acquire();
+//                    t.run();
+//                } catch (Throwable e) {
+//                    e.printStackTrace();
+//                    //...then try again
+//                }
+//            }
+//        });
+//    }
 
     @NotNull
     @Override
@@ -1034,7 +1076,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public abstract Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
 
     /* zero avoids direct recursive linking, it should go through the target concept though and happen through there */
-    @Nullable final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float activation, @Nullable MutableFloat overflow) {
+    @Nullable
+    final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float activation, @Nullable MutableFloat overflow) {
         return activate(termed, b, activation * conceptActivation.floatValue(), 0f, overflow);
     }
 
@@ -1141,23 +1184,29 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * processes the input before the next frame has run
      */
-    public final void inputLater(@NotNull Task... t) {
-        inputTaskAsync.publishEvents((Object[] f, long s, Task x)->{
-            f[0]=x;
-        }, t);
 
-//        if (!running.get()) {
-//            input(ap);
-//        } else {
-//            runLater((n) -> {
-//                try {
-//                    n.input(ap);
-//                } catch (InvalidTaskException e) {
-//                    logger.error("inputLater: {}", e);
-//                    //e.printStackTrace();
-//                }
-//            });
-//        }
+    public static final com.lmax.disruptor.EventTranslatorOneArg<Object[], Task> TASK_EVENT_TRANSLATOR_ONE_ARG = (Object[] f, long s, Task x) -> {
+        f[0] = x;
+    };
+
+    public final void inputLater(@NotNull Task... t) {
+        //synchronized (async) {
+
+        async.publishEvents(TASK_EVENT_TRANSLATOR_ONE_ARG, t);
+        //}
+    }
+
+    public final void inputLater(@NotNull Collection<Task> tt) {
+
+
+        int s = tt.size();
+        if (s == 0)
+            return;
+
+        Task[] a = new Task[s];
+        tt.toArray(a);
+
+        inputLater(a);
     }
 
 

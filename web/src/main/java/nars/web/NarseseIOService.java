@@ -55,7 +55,7 @@ public class NarseseIOService extends WebsocketService {
         FastConcurrentDirectDeque b = buffer;
         buffer = new FastConcurrentDirectDeque();
         CharSequence x = Json.collectionToJson(b, new StringBuilder());
-        NAR.runAsync(()-> send(x));
+        nar.runLater(()-> send(x));
     }
 
     protected void queue(Task t) {

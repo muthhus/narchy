@@ -23,6 +23,7 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -342,10 +343,16 @@ public class STMClustered extends STM {
         start();
     }
 
+    final AtomicBoolean ready = new AtomicBoolean(true);
+
     @Override
     protected void start() {
         super.start();
-        nar.runAsync(this::iterate, 1);
+        nar.onFrame((nn) -> {
+            if (ready.compareAndSet(true, false)) {
+                nn.runLater(this::iterate);
+            }
+        });
     }
 
     protected void iterate() {
@@ -368,6 +375,8 @@ public class STMClustered extends STM {
 
 
         bagForget.commit(input);
+
+        ready.set(true);
 
     }
 
@@ -424,38 +433,38 @@ public class STMClustered extends STM {
     }
 
 
-    abstract static class EventGenerator implements Consumer<NAR> {
-
-        @NotNull
-        private final NAR n;
-        private final float averageTasksPerFrame;
-        //private final float variation;
-        private final int uniques;
-        protected long now;
-
-        public EventGenerator(@NotNull NAR n, float averageTasksPerFrame, /*float variation,*/ int uniques) {
-            this.n = n;
-            this.averageTasksPerFrame = averageTasksPerFrame;
-            //this.variation = variation;
-            this.uniques = uniques;
-
-            n.onFrame(this);
-        }
-
-        @Override
-        public void accept(@NotNull NAR nar) {
-            now = n.time();
-
-            int numInputs = (int) Math.round(Math.random() * averageTasksPerFrame);
-            for (int i = 0; i < numInputs; i++) {
-                int u = (int) Math.floor(Math.random() * uniques);
-                nar.input(task(u));
-            }
-        }
-
-        @NotNull
-        abstract Task task(int u);
-    }
+//    abstract static class EventGenerator implements Consumer<NAR> {
+//
+//        @NotNull
+//        private final NAR n;
+//        private final float averageTasksPerFrame;
+//        //private final float variation;
+//        private final int uniques;
+//        protected long now;
+//
+//        public EventGenerator(@NotNull NAR n, float averageTasksPerFrame, /*float variation,*/ int uniques) {
+//            this.n = n;
+//            this.averageTasksPerFrame = averageTasksPerFrame;
+//            //this.variation = variation;
+//            this.uniques = uniques;
+//
+//            n.onFrame(this);
+//        }
+//
+//        @Override
+//        public void accept(@NotNull NAR nar) {
+//            now = n.time();
+//
+//            int numInputs = (int) Math.round(Math.random() * averageTasksPerFrame);
+//            for (int i = 0; i < numInputs; i++) {
+//                int u = (int) Math.floor(Math.random() * uniques);
+//                nar.input(task(u));
+//            }
+//        }
+//
+//        @NotNull
+//        abstract Task task(int u);
+//    }
 
 //    public static void main(String[] args) {
 //        Default n = new Default();

@@ -33,7 +33,7 @@ public class sys extends TermFunction {
 //                    final long pidCopy = pid =
 //                            p.hashCode(); //HACK temporary
 //                            //p.getPid();
-                    NAR.runAsync(()-> {
+                    nar.runAsync(()-> {
                         try {
 
                             Scanner s = new Scanner(p.getInputStream());

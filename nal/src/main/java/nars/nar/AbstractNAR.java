@@ -71,7 +71,7 @@ public abstract class AbstractNAR extends NAR {
 
 
     @NotNull
-    protected PremiseEval newMatcher() {
+    @Deprecated protected PremiseEval newMatcher() {
         return new PremiseEval(random, newDeriver());
     }
 

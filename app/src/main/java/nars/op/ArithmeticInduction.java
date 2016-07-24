@@ -168,7 +168,7 @@ public class ArithmeticInduction implements Consumer<Task> {
     final void input(@Nullable Task task) {
         if (task!=null) {
             count++;
-            nar.input(
+            nar.inputLater(
                 /*print*/(task)
             );
         }
@@ -302,7 +302,7 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
     protected final GenericVariable var(int i) {
-        return new GenericVariable(Op.VAR_INDEP, Integer.toString(i));
+        return new GenericVariable(Op.VAR_DEP, Integer.toString(i));
     }
 
     private List<Term> features(IntArrayList numbers, Term relatingVar) {

@@ -83,7 +83,7 @@ public class Pacman extends cpcman implements Environment {
 
 		//Multi nar = new Multi(4,512,
 		Default nar = new Default(1024,
-				4, 2, 2, rng,
+				4, 3, 2, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 20000000, false)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
@@ -92,7 +92,7 @@ public class Pacman extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.05f);
+		nar.conceptActivation.setValue(0.02f);
 
 		//new MemoryManager(nar);
 
@@ -102,7 +102,7 @@ public class Pacman extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(32);
+		nar.cyclesPerFrame.set(64);
 		nar.confMin.setValue(0.04f);
 
 
@@ -131,10 +131,10 @@ public class Pacman extends cpcman implements Environment {
 		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		MySTMClustered stm = new MySTMClustered(nar, 64, '.', 2);
-		MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
+		MySTMClustered stm = new MySTMClustered(nar, 96, '.', 2);
+		MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 2);
 
-		new ArithmeticInduction(nar);
+		//new ArithmeticInduction(nar);
 
 		Pacman pacman = new Pacman(1 /* ghosts  */, 4 /* visionRadius */);
 
@@ -211,11 +211,11 @@ public class Pacman extends cpcman implements Environment {
 
 				if (nar instanceof Default) {
 
-					new BeliefTableChart(nar, charted).show(700, 900);
-
-					BagChart.show((Default) nar);
-
-					STMView.show(stm, 500, 500);
+//					new BeliefTableChart(nar, charted).show(700, 900);
+//
+//					BagChart.show((Default) nar);
+//
+//					STMView.show(stm, 500, 500);
 
 
 				}

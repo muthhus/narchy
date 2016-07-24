@@ -141,7 +141,7 @@ public class MySTMClustered extends STMClustered {
 						generate.emit(m);
 
 						//System.err.println(m + " " + Arrays.toString(m.evidence()));
-						nar.input(m);
+						nar.inputLater(m);
 
 						node.remove(uu);
 					}

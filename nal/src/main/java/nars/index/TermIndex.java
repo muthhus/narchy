@@ -606,6 +606,7 @@ public interface TermIndex {
     }
 
     default void activate(@NotNull Concept c, @NotNull ConceptPolicy warm) {
+
         if (c.policy() == warm)
             return;
         c.policy(warm);

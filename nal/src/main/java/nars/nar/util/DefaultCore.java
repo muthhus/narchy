@@ -38,7 +38,9 @@ public class DefaultCore extends AbstractCore {
 
         NAR n = this.nar;
 
-        n.index.deactivate(c, cold);
+        synchronized (n.index) {
+            n.index.deactivate(c, cold);
+        }
 
         n.emotion.alert(1f / concepts.size());
     }
@@ -48,8 +50,10 @@ public class DefaultCore extends AbstractCore {
      * */
     protected boolean activate(@NotNull Concept c) {
 
-        //set capacity first in case there are any queued items, they may join during the commit */
-        nar.index.activate(c, warm);
+        synchronized (nar.index) {
+            //set capacity first in case there are any queued items, they may join during the commit */
+            nar.index.activate(c, warm);
+        }
 
         return true;
     }

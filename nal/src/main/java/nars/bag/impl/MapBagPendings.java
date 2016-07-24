@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import com.gs.collections.impl.map.mutable.ConcurrentHashMap;
 import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
@@ -21,7 +22,9 @@ public class MapBagPendings<X> extends ArrayBag.BagPendings<X> {
 
     public MapBagPendings(BudgetMerge merge) {
         this.merge = merge;
-        this.pending = new ConcurrentHashMapUnsafe<>(capacity);
+        this.pending =
+                new ConcurrentHashMap(capacity);
+                //new ConcurrentHashMapUnsafe<>(capacity);
     }
 
     @Override

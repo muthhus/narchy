@@ -66,7 +66,7 @@ public abstract class Param extends Container implements Level {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.0005f;
+    public static final float BUDGET_EPSILON = 0.0001f;
     /**
      * minimum durability and quality necessary for a derivation to form
      */
@@ -93,7 +93,7 @@ public abstract class Param extends Container implements Level {
     /**
      * upper limit for # of termutations derived, determined by premise's priority
      */
-    public static float matchTermutationsMax = 3;
+    public static float matchTermutationsMax = 6;
     public static int QUERY_ANSWERS_PER_MATCH = 1;
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 

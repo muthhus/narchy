@@ -191,7 +191,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 			// now we can start timer
 			startGame();
 
-			startTimer();
+			//startTimer();
 
 		}
 
@@ -632,7 +632,8 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 		}
 
 		if (ready.compareAndSet(true,false))
-			SwingUtilities.invokeLater(this::repaint);
+			repaint();
+			//SwingUtilities.invokeLater(this::repaint);
 
 
 
@@ -646,7 +647,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	{
 		//      timer.stop();	// deprecated
 		// kill the thread
-		timer.interrupt();
+		//timer.interrupt();
 
 		// the off screen canvas
 //		Image offScreen=null;

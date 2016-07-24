@@ -58,8 +58,9 @@ public enum PremiseBuilder {
             if (task.isDeleted())
                 break;
 
-            Term termLink;
-            if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLink = termsArray.get(i)))
+            Term termLink = termsArray.get(i);
+
+            if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLink))
                 continue;
 
 

@@ -56,7 +56,7 @@ abstract public class TopConceptService<O> extends SynchWebsocketService {
 
                     lPrev = l;
 
-                    NAR.runAsync(() -> {
+                    nar.runAsync(() -> {
                         send(l.toArray(new Object[l.size()]));
                         ready.set(true);
                     });

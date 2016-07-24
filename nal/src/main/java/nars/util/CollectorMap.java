@@ -60,32 +60,34 @@ public abstract class CollectorMap<K, V> {
     @Nullable
     public V put(@NotNull K key, @NotNull V value) {
 
-        V removed = map.put(key, value);
-        if (removed != null) {
-
-            if (removed == value) {
-                //rejected input
-                return value;
-            } else {
-                //displaced other
-                V remd = removeItem(removed);
-                if (remd == null)
-                    throw new RuntimeException("unable to remove item corresponding to key " + key);
-
-            }
-        }
-
-        V displaced = addItem(value);
-
-        if (displaced != null) { //&& (!key(removed2).equals(key))) {
+        synchronized (map) {
+            V removed = map.put(key, value);
             if (removed != null) {
-                throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + displaced);
-            }
-            removeKeyForValue(displaced);
-            removed = displaced;
-        }
 
-        return removed;
+                if (removed == value) {
+                    //rejected input
+                    return value;
+                } else {
+                    //displaced other
+                    V remd = removeItem(removed);
+                    if (remd == null)
+                        throw new RuntimeException("unable to remove item corresponding to key " + key);
+
+                }
+            }
+
+            V displaced = addItem(value);
+
+            if (displaced != null) { //&& (!key(removed2).equals(key))) {
+                if (removed != null && removed != displaced) {
+                    throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + displaced);
+                }
+                removeKeyForValue(displaced);
+                removed = displaced;
+            }
+
+            return removed;
+        }
 
 
     }
@@ -93,19 +95,21 @@ public abstract class CollectorMap<K, V> {
     @Nullable
     public V remove(@NotNull K x) {
 
-        V e = removeKey(x);
-        if (e != null) {
-            V removed = removeItem(e);
-//            if (removed == null) {
-//                /*if (Global.DEBUG)
-//                    throw new RuntimeException(key + " removed from index but not from items list");*/
-//                //return null;
-//            }
-            if (removed != e) {
-                removeItem(e);
-                throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
+        synchronized(map) {
+            V e = removeKey(x);
+            if (e != null) {
+                V removed = removeItem(e);
+                //            if (removed == null) {
+                //                /*if (Global.DEBUG)
+                //                    throw new RuntimeException(key + " removed from index but not from items list");*/
+                //                //return null;
+                //            }
+                if (removed != e) {
+                    removeItem(e);
+                    throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
+                }
+                return removed;
             }
-            return removed;
         }
 
         return null;

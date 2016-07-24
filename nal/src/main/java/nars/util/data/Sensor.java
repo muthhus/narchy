@@ -158,7 +158,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         @Nullable Task t = this.next = newInputTask(v, now);
         if (t!=null)
-            nar.inputTask(t);
+            nar.inputLater(t);
     }
 
 

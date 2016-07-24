@@ -1,5 +1,7 @@
 package nars.nar.util;
 
+import com.gs.collections.impl.factory.Sets;
+import com.gs.collections.impl.set.mutable.MultiReaderUnifiedSet;
 import nars.$;
 import nars.Memory;
 import nars.NAR;
@@ -15,8 +17,8 @@ import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Term;
-import nars.util.Util;
 import nars.util.data.MutableInteger;
+import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -78,19 +80,21 @@ public abstract class AbstractCore implements BiConsumer<Premise, Conclusion> {
     /**
      * temporary re-usable array for batch firing
      */
-    transient private final List<Term> terms = $.newArrayList();
-    transient private final List<Task> tasks = $.newArrayList();
+    transient private final FasterList<Term> terms = $.newArrayList();
+    transient private final FasterList<Task> tasks = $.newArrayList();
+    transient private final FasterList<Concept> qoncepts = $.newArrayList();
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
 
-    protected final boolean queueTaskLink(BLink<Task> b) {
-        tasks.add(b.get());
-        return true;
+    private final boolean queueConcept(BLink<Concept> b) {
+        return qoncepts.addIfNotNull(b.get());
     }
-    protected final boolean queueTermLink(BLink<Term> b) {
-        terms.add(b.get());
-        return true;
+    private final boolean queueTaskLink(BLink<Task> b) {
+        return tasks.addIfNotNull(b.get());
+    }
+    private final boolean queueTermLink(BLink<Term> b) {
+        return terms.addIfNotNull(b.get());
     }
 
     protected AbstractCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {
@@ -121,10 +125,7 @@ public abstract class AbstractCore implements BiConsumer<Premise, Conclusion> {
         conceptUpdate.update(nar);
 
 
-        run(nar.cyclesPerFrame.intValue());
-    }
-
-    protected final void run(int cycles) {
+        int cycles = nar.cyclesPerFrame.intValue();
 
         int cpf = conceptsFiredPerCycle.intValue();
         float dCycle = 1f / cycles;
@@ -138,30 +139,35 @@ public abstract class AbstractCore implements BiConsumer<Premise, Conclusion> {
 
             conceptUpdate.commit(concepts);
 
-            concepts.sample(cpf, this::fireConcept);
+            concepts.sample(cpf, this::queueConcept);
+            //nar.runLater(()->fireConcept(c));
+            qoncepts.forEach(this::fireConcept);
+            qoncepts.clear();
 
-
-            Util.time(logger, "processing " + pending.size() + " derivations", ()-> {
-                nar.input(pending);
-            });
-            pending.clear();
+//            if (!pending.isEmpty()) {
+//                //Util.time(logger, "processing " + pending.size() + " derivations", () -> {
+//                    //this.nar.input(pending);
+//                    nar.inputDrain(pending);
+//                //});
+//            }
 
         }
 
     }
 
+
     public void reset(Memory m) {
         concepts.clear();
     }
 
-    protected final boolean fireConcept(@NotNull BLink<Concept> conceptLink) {
-        Concept concept = conceptLink.get();
+    protected final boolean fireConcept(@NotNull Concept concept) {
+        //Concept concept = conceptLink.get();
 
         tasklinkUpdate.commit(concept.tasklinks());
         termlinkUpdate.commit(concept.termlinks());
 
         return firePremiseSquared(
-                conceptLink,
+                concept,
                 tasklinksFiredPerFiredConcept.intValue(),
                 termlinksFiredPerFiredConcept.intValue()
         ) > 0;
@@ -171,9 +177,9 @@ public abstract class AbstractCore implements BiConsumer<Premise, Conclusion> {
      * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
      * (recycles buffers, non-thread safe, one thread use this at a time)
      */
-    public final int firePremiseSquared(@NotNull BLink<? extends Concept> conceptLink, int tasklinks, int termlinks) {
+    public final int firePremiseSquared(@NotNull Concept c, int tasklinks, int termlinks) {
 
-        Concept c = conceptLink.get();
+        //Concept c = conceptLink.get();
 
         matcher.init(nar);
 
@@ -220,12 +226,12 @@ public abstract class AbstractCore implements BiConsumer<Premise, Conclusion> {
             c.link(b, linkActivation, nar, conceptOverflow);
     }
 
-    final Set<Task> pending = $.newHashSet(256);
 
     @Override
     public void accept(Premise premise, Conclusion conclusion) {
         //HACK for now just collect all conclusion's tasks into the pending set
-        pending.addAll(conclusion.derive);
+        //pending.addAll(conclusion.derive);
+        nar.inputLater(conclusion.derive);
     }
 
 
