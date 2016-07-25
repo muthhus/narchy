@@ -1,19 +1,12 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.math.Quaternion;
-import nars.util.Util;
-import org.jetbrains.annotations.NotNull;
 import spacegraph.math.*;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.constraint.TypedConstraint;
-import spacegraph.phys.math.Transform;
-import spacegraph.phys.shape.BoxShape;
-import spacegraph.phys.shape.CollisionShape;
-import spacegraph.render.Draw;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -22,10 +15,10 @@ import java.util.function.BiConsumer;
  * volumetric subspace.
  * an atom (base unit) of spacegraph physics-simulated virtual matter
  */
-public abstract class Spatial<O> implements BiConsumer<GL2, Dynamic> {
+public abstract class Spatial<X> implements BiConsumer<GL2, Dynamic> {
 
 
-    public final O key;
+    public final X key;
     public final int hash;
 
 
@@ -42,8 +35,8 @@ public abstract class Spatial<O> implements BiConsumer<GL2, Dynamic> {
         this(null);
     }
 
-    public Spatial(O k) {
-        this.key = k!=null ? k : (O) this;
+    public Spatial(X k) {
+        this.key = k!=null ? k : (X) this;
         this.hash = k!=null ? k.hashCode() : super.hashCode();
     }
 
@@ -70,13 +63,18 @@ public abstract class Spatial<O> implements BiConsumer<GL2, Dynamic> {
 
 
     /** returns true if this is an initialization cycle, or false if it is a subsequent one (already initialized) */
-    public final void update(SpaceGraph<O> s) {
+    public void update(SpaceGraph<X> s) {
         preactive = true;
     }
 
-    public final boolean active(short nextOrder) {
+    public void update(Dynamics world) {
+        //create and update any bodies and constraints
+    }
+
+    public final boolean active(short nextOrder, Dynamics world) {
         if (active()) {
             this.order = nextOrder;
+            update(world);
             return true;
         } else {
             return false;
@@ -118,7 +116,7 @@ public abstract class Spatial<O> implements BiConsumer<GL2, Dynamic> {
         order = -1;
     }
 
-    abstract public List<Collidable> bodies();
+    abstract public List<Collidable<X>> bodies();
     abstract public List<TypedConstraint> constraints();
 
 }

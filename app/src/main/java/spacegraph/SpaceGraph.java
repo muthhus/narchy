@@ -2,6 +2,7 @@ package spacegraph;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.$;
@@ -10,20 +11,24 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
+import spacegraph.phys.util.OArrayList;
 import spacegraph.render.JoglPhysics;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
  * Created by me on 6/20/16.
  */
-public class SpaceGraph<X> extends JoglPhysics<Spatial<X>> {
+public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
     final List<Facial> facials = new FasterList<>(1);
 
     final List<SpaceInput<X,?>> inputs = new FasterList<>(1);
+
+    final OArrayList<Spatial<X>> active = new OArrayList<>(512);
 
     final Cache<X, Spatial> atoms;
 
@@ -157,10 +162,14 @@ public class SpaceGraph<X> extends JoglPhysics<Spatial<X>> {
 //        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
     }
 
-    @Override protected final boolean valid(int nextID, Collidable<Spatial<X>> c) {
 
-        return true;
+
+
+    @Override final public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each) {
+        active.forEachWithIndex(each);
     }
+
+
 
     public void display(GLAutoDrawable drawable) {
 
@@ -190,7 +199,7 @@ public class SpaceGraph<X> extends JoglPhysics<Spatial<X>> {
 
 
     public void add(Spatial s) {
-        dyn.add(s);
+        active.add(s);
     }
 
     public final synchronized void update(SpaceInput s) {

@@ -70,7 +70,6 @@ abstract public class SpaceInput<X, Y extends Spatial<X>> implements Iterable<Y>
     /** needs to call update(space) for each active item */
     public void update(SpaceGraph<X> s) {
 
-
         this.forEach(a -> a.update(s));
 
         List<SpaceTransform> ll = this.transforms;

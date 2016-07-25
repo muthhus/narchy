@@ -23,6 +23,7 @@
 
 package spacegraph.render;
 
+import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseEvent;
@@ -59,6 +60,7 @@ import spacegraph.phys.util.AnimVector3f;
 import spacegraph.phys.util.Motion;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
 import static spacegraph.math.v3.v;
@@ -67,7 +69,7 @@ import static spacegraph.math.v3.v;
  * @author jezek2
  */
 
-public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
+abstract public class JoglPhysics<X> extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
 
 
     private boolean simulating = true;
@@ -149,7 +151,14 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         Constrainer constrainer = new SequentialImpulseConstrainer();
 
-        dyn = new DiscreteDynamics<>(dispatcher, overlappingPairCache, constrainer, collision_config);
+        dyn = new DiscreteDynamics<X>(dispatcher, overlappingPairCache, constrainer, collision_config) {
+
+            @Override
+            public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each) {
+                JoglPhysics.this.forEachIntSpatial(each);
+            }
+
+        };
 
         cameraDistance = new AnimFloat(55f, dyn, 4f);
         azi = new AnimFloatAngle(-180, dyn, 30f);
@@ -160,6 +169,16 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         dyn.setGravity(v(0, 0, 0));
 
+    }
+
+    /** supplies the physics engine set of active physics objects at the beginning of each cycle */
+    public abstract void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each);
+
+    public final void forEachSpatial(Consumer<Spatial<X>> each) {
+        forEachIntSpatial((i,x)->{
+            each.accept(x);
+            return true;
+        });
     }
 
     /**
@@ -276,8 +295,12 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         }
 
         updateCamera();
-        dyn.objects().forEach(this::render);
+
+
+        forEachSpatial(x -> render(x));
     }
+
+
 
 
     public void mouseClicked(MouseEvent e) {
@@ -1040,27 +1063,11 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         int collisionFilterGroup = isDynamic ? 1 : 2;
         int collisionFilterMask = isDynamic ? -1 : -3;
 
-        return newBody(mass, shape, new Motion(startTransform), collisionFilterGroup, collisionFilterMask);
+        return Dynamics.newBody(mass, shape, new Motion(startTransform), collisionFilterGroup, collisionFilterMask);
     }
 
 
-    public Dynamic newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
-        // rigidbody is dynamic if and only if mass is non zero, otherwise static
-        boolean isDynamic = (mass != 0f);
-        v3 localInertia = v(0, 0, 0);
-        if (isDynamic) {
-            shape.calculateLocalInertia(mass, localInertia);
-        }
-
-        RigidBodyBuilder c = new RigidBodyBuilder(mass, motion, shape, localInertia);
-
-        Dynamic body = new Dynamic(c);
-
-        return body;
-    }
-
-
-        // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
+    // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
     public void ortho() {
         gl.glViewport(0, 0, screenWidth, screenHeight);
         gl.glMatrixMode(GL2.GL_PROJECTION);
@@ -1108,7 +1115,11 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
     };
 
-    public final void render(Collidable<X> c) {
+    public final void render(Spatial<?> s) {
+        s.bodies().forEach(this::render);
+    }
+
+    public final void render(Collidable<?> c) {
         if (c instanceof Dynamic) {
             ((Dynamic)c).renderer(gl);
         }

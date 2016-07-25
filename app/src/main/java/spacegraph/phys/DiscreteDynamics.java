@@ -23,7 +23,7 @@
 
 package spacegraph.phys;
 
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import com.gs.collections.api.block.procedure.primitive.IntObjectProcedure;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
 import spacegraph.phys.collision.CollisionConfiguration;
@@ -53,7 +53,7 @@ import static spacegraph.phys.Dynamic.ifDynamic;
  *
  * @author jezek2
  */
-public class DiscreteDynamics<X> extends Dynamics<X> {
+abstract public class DiscreteDynamics<X> extends Dynamics<X> {
 
     protected final Constrainer constrainer;
     protected final Islands islands;
@@ -94,16 +94,17 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 
     private int nextID;
 
-    protected final void saveKinematicState() {
+    protected final void updateObjects() {
         nextID = 0;
-        objects.removeIf(vd -> {
+        collidable.clear(); //populate in 'saveKinematicState'
+        forEachIntSpatial((i, s) -> {
 
-            if (vd.active((short) nextID)) {
+            if (s.active((short) nextID, this)) {
                 nextID++;
-                reactivate(vd);
+                reactivate(s);
                 return false; //dont remove
             } else {
-                inactivate(vd);
+                inactivate(s);
                 return true; //remove
             }
 
@@ -115,13 +116,15 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
     private final OArrayList<Collidable<X>> collidable = new OArrayList<>();
 
     @Override
-    public final void forEachCollidable(IntObjectPredicate<Collidable> each) {
+    public final void forEachCollidable(IntObjectProcedure<Collidable<X>> each) {
 
         OArrayList<Collidable<X>> o = this.collidable;
         int s = o.size();
+        Collidable[] cc = o.array;
         for (int i = 0; i < s; i++) {
-            if (!each.accept(i, o.get(i)))
-                break;
+            each.value(i, cc[i]);
+            //if (!each.(i, o.get(i)))
+              //  break;
         }
 
     }
@@ -130,17 +133,8 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
      * re-activates the spatial's components for this cycle
      */
     private void reactivate(Spatial<X> s) {
-        s.bodies().forEach(c -> {
-            Dynamic body = ifDynamic(c);
-            if (body != null) {
-                collidable.add(body);
-                if (body.getActivationState() != Collidable.ISLAND_SLEEPING)
-                    body.saveKinematicState(dt); // to calculate velocities next frame
 
-                if (body.isActive())
-                    body.applyGravity();
-            }
-        });
+        s.bodies().forEach(this::on);
     }
 
     protected final void inactivate(Spatial<X> s) {
@@ -149,6 +143,10 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
         s.stop(this);
     }
 
+    @Override
+    public OArrayList<Collidable<X>> collidables() {
+        return collidable;
+    }
 
     public void debugDrawWorld(IDebugDraw debugDrawer) {
 
@@ -335,8 +333,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 
             if (numSimulationSubSteps != 0) {
 
-                collidable.clear(); //populate in 'saveKinematicState'
-                saveKinematicState();
+                updateObjects();
 
                 // clamp the number of substeps, to prevent simulation grinding spiralling down to a halt
                 int clampedSimulationSteps = (numSimulationSubSteps > maxSubSteps) ? maxSubSteps : numSimulationSubSteps;
@@ -358,6 +355,16 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
             BulletStats.stepSimulationTime = (System.nanoTime() - t0) / 1000000;
         }
     }
+
+//    private final void addPending() {
+//        FasterList<Spatial<X>> p = this.pendingAdd;
+//        if (p.isEmpty())
+//            return;
+//
+//        this.pendingAdd = $.newArrayList(); //new copy, thread-safe
+//
+//        objects().addAll(p);
+//    }
 
     protected void internalSingleStepSimulation(float timeStep) {
         BulletStats.pushProfile("internalSingleStepSimulation");
@@ -415,13 +422,24 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
     /**
      * enable/register the body in the engine
      */
-    protected final void on(Dynamic body, short group, short mask) {
-        if (!body.isStaticOrKinematicObject()) {
-            body.setGravity(gravity);
+    protected final void on(Collidable c) {
+        collidable.add(c);
+
+        Dynamic d = ifDynamic(c);
+        if (d != null) {
+            if (d.getActivationState() != Collidable.ISLAND_SLEEPING)
+                d.saveKinematicState(dt); // to calculate velocities next frame
+
+            if (d.isActive())
+                d.applyGravity();
         }
 
-        if (body.shape() != null) {
-            super.on(body, group, mask);
+        if (d.shape() != null) {
+            super.on(d);
+        }
+
+        if (!d.isStaticOrKinematicObject()) {
+            d.setGravity(gravity);
         }
     }
 

@@ -33,11 +33,14 @@ import spacegraph.phys.dynamics.ActionInterface;
 import spacegraph.phys.dynamics.InternalTickCallback;
 import spacegraph.phys.dynamics.vehicle.RaycastVehicle;
 import spacegraph.phys.math.IDebugDraw;
-import spacegraph.phys.solve.Constrainer;
+import spacegraph.phys.math.MotionState;
+import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.solve.ContactSolverInfo;
 import spacegraph.phys.util.Animated;
 
 import java.util.List;
+
+import static spacegraph.math.v3.v;
 
 /**
  * DynamicsWorld is the interface class for several dynamics implementation,
@@ -53,10 +56,27 @@ public abstract class Dynamics<X> extends Collisions<X> {
 	public final ContactSolverInfo solverInfo = new ContactSolverInfo();
 	
 	public Dynamics(Intersecter intersecter, Broadphase broadphasePairCache, CollisionConfiguration collisionConfiguration) {
-		super(intersecter, broadphasePairCache, collisionConfiguration);
+		super(intersecter, broadphasePairCache);
 	}
 
-	public final int stepSimulation(float timeStep) {
+    public static Dynamic newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
+        // rigidbody is dynamic if and only if mass is non zero, otherwise static
+        boolean isDynamic = (mass != 0f);
+        v3 localInertia = v(0, 0, 0);
+        if (isDynamic) {
+            shape.calculateLocalInertia(mass, localInertia);
+        }
+
+        RigidBodyBuilder c = new RigidBodyBuilder(mass, motion, shape, localInertia);
+
+        Dynamic body = new Dynamic(c);
+        body.group = (short)group;
+        body.mask = (short)mask;
+
+        return body;
+    }
+
+    public final int stepSimulation(float timeStep) {
 		return stepSimulation(timeStep, 0);
 	}
 
@@ -153,6 +173,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
 	}
 
 	public String summary() {
-		return this.toString() + "[" + this.objects().size() + " objects]" ;
+		return this.toString() ;
 	}
 }

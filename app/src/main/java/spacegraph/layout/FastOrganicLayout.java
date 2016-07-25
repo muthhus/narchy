@@ -1,5 +1,6 @@
 package spacegraph.layout;
 
+import nars.gui.ConceptWidget;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.*;
 
@@ -245,7 +246,7 @@ public class FastOrganicLayout<X> implements SpaceTransform<X> {
         for (int ii = 0; ii < n; ii++) {
             final int i = ii;
 
-            Spatial V = src.get(i);
+            ConceptWidget V = (ConceptWidget)src.get(i); //HACK
 
             //TODO is this necessary?
             /*if (!graph.containsVertex(vd.getVertex()))
@@ -339,7 +340,7 @@ public class FastOrganicLayout<X> implements SpaceTransform<X> {
         float[] radius = this.radius;
 
         for (int i = 0; i < n; i++) {
-            Spatial vd = src.get(i);
+            ConceptWidget vd = (ConceptWidget) src.get(i); //HACK
             float[] ci = cl[i];
 
             //cellLocation[i][0] -= 1/2.0; //geo.getWidth() / 2.0;
@@ -379,7 +380,7 @@ public class FastOrganicLayout<X> implements SpaceTransform<X> {
             }
 
             for (int i = 0; i < n; i++) {
-                src.get(i).moveDelta((float) dx, (float) dy, 0);
+                ((ConceptWidget)src.get(i)).moveDelta((float) dx, (float) dy, 0);
             }
         }
     }

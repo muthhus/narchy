@@ -63,8 +63,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y> {
                         ConceptWidget w = space.update(b.get().term(),
                                 t -> new ConceptWidget(t, maxEdges, nar) {
                                     @Override
-                                    public Dynamic newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
-                                        Dynamic x = super.newBody(graphSpace, shape, collidesWithOthersLikeThis);
+                                    public Dynamic newBody(CollisionShape shape, boolean collidesWithOthersLikeThis) {
+                                        Dynamic x = super.newBody(shape, collidesWithOthersLikeThis);
 
                                         //impulse in a random direction
                                         x.impulse(v(SpaceGraph.r(initImpulseEpsilon),

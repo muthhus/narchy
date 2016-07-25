@@ -2,6 +2,7 @@ package spacegraph.obj;
 
 import com.jogamp.nativewindow.WindowClosingProtocol;
 import spacegraph.ListInput;
+import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
 import spacegraph.layout.Flatten;
@@ -24,10 +25,10 @@ public class TestP2PNode extends RectWidget {
 
     public static class TestP2PLink extends RectWidget {
 
-        private final Spatial a;
-        private final Spatial b;
+        private final SimpleSpatial a;
+        private final SimpleSpatial b;
 
-        public TestP2PLink(Spatial<?> a, Spatial<?> b) {
+        public TestP2PLink(SimpleSpatial<?> a, SimpleSpatial<?> b) {
             super(new XYSlider(), 10, 1);
             this.a = a;
             this.b = b;

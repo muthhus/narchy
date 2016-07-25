@@ -60,6 +60,8 @@ public class Collidable<X> {
 	protected Broadphasing broadphaseHandle;
 	protected CollisionShape collisionShape;
 
+	public short mask, group;
+
 	// rootCollisionShape is temporarily used to store the original collision shape
 	// The collisionShape might be temporarily replaced by a child collision shape during collision detection purposes
 	// If it is null, the collisionShape is not temporarily replaced.
@@ -340,5 +342,9 @@ public class Collidable<X> {
 				collisionShape +
 				" @ " + worldTransform +
 				'}';
+	}
+
+	public void setGravity(v3 gravity) {
+
 	}
 }

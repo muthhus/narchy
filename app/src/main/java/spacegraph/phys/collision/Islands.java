@@ -73,7 +73,7 @@ public class Islands {
 	}
 
 	public final void updateActivationState(Collisions<?> colWorld, Intersecter intersecter) {
-		int num = colWorld.objects().size();
+		int num = colWorld.getNumCollisionObjects();
 
 		initUnionFind(num);
 
@@ -81,7 +81,6 @@ public class Islands {
 			collidable.setIslandTag(i);
 			collidable.setCompanionId(-1);
 			collidable.setHitFraction(1f);
-			return true;
 		});
 
 		findUnions(intersecter, colWorld);

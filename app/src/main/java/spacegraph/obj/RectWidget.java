@@ -2,6 +2,7 @@ package spacegraph.obj;
 
 import com.jogamp.opengl.GL2;
 import nars.util.Util;
+import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
@@ -18,7 +19,7 @@ import static spacegraph.math.v3.v;
 /**
  * A mount for a 2D surface (embeds a surface in 3D space)
  */
-public class RectWidget<X> extends Spatial<X> {
+public class RectWidget<X> extends SimpleSpatial<X> {
 
     public final Surface surface;
     private final BoxShape shape;

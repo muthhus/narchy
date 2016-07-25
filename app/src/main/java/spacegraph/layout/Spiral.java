@@ -1,9 +1,6 @@
 package spacegraph.layout;
 
-import spacegraph.SpaceGraph;
-import spacegraph.SpaceInput;
-import spacegraph.SpaceTransform;
-import spacegraph.Spatial;
+import spacegraph.*;
 
 /**
  * Created by me on 6/21/16.
@@ -40,7 +37,7 @@ public class Spiral<O> implements SpaceTransform<O> {
 
         float angle = o * angleRate;
         float r = baseRad + o * angleRate * 1.6f /* ~phi */ ;
-        v.move(
+        ((SimpleSpatial)v).move(
             (float) (Math.sin(angle) * r),
             (float) (Math.cos(angle) * r),
             0,

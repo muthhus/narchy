@@ -24,6 +24,7 @@
 package spacegraph.phys;
 
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import com.gs.collections.api.block.procedure.primitive.IntObjectProcedure;
 import nars.$;
 import nars.util.data.list.FasterList;
 import spacegraph.Spatial;
@@ -53,10 +54,10 @@ public abstract class Collisions<X> {
 	public static final float maxAABBLength = 1e12f;
 
 
-	protected final OArrayList<Spatial<X>> objects = new OArrayList<>();
+	//protected final OArrayList<Spatial<X>> objects = new OArrayList<>();
 
 	/** holds spatials which have not been added to 'objects' yet (beginning of next cycle) */
-	protected final FasterList<Spatial<X>> pendingAdd = $.newArrayList();
+	//protected FasterList<Spatial<X>> pendingAdd = $.newArrayList();
 
 	public final Intersecter intersecter;
 	protected final DispatcherInfo dispatchInfo = new DispatcherInfo();
@@ -66,7 +67,7 @@ public abstract class Collisions<X> {
 	/**
 	 * This constructor doesn't own the dispatcher and paircache/broadphase.
 	 */
-	public Collisions(Intersecter intersecter, Broadphase broadphasePairCache, CollisionConfiguration collisionConfiguration) {
+	public Collisions(Intersecter intersecter, Broadphase broadphasePairCache) {
 		this.intersecter = intersecter;
 		this.broadphasePairCache = broadphasePairCache;
 	}
@@ -88,19 +89,16 @@ public abstract class Collisions<X> {
 //		}
 //	}
 
-	public final void forEach(IntObjectPredicate<Spatial> each) {
-		OArrayList<Spatial<X>> o = this.objects;
-		int s = o.size();
-		for (int i = 0; i < s; i++) {
-			if (!each.accept(i, o.get(i)))
-				break;
-		}
-	}
+	/** the boolean returned by the predicate decides if the value will remain in the source that provides the impl */
+	abstract public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each);
 
-	abstract public void forEachCollidable(IntObjectPredicate<Collidable> each);
+	/** list of current colidables in the engine, aggregated from the spatials that are present */
+	abstract public OArrayList<Collidable<X>> collidables();
+
+	abstract public void forEachCollidable(IntObjectProcedure<Collidable<X>> each);
 
 
-	protected void on(Collidable c, short collisionFilterGroup, short collisionFilterMask) {
+	protected void on(Collidable c) {
 		// check that the object isn't already added
 		//assert (!collisionObjects.contains(collisionObject));
 
@@ -118,8 +116,8 @@ public abstract class Collisions<X> {
 					maxAabb,
 					shape.getShapeType(),
 					c,
-					collisionFilterGroup,
-					collisionFilterMask,
+					c.group,
+					c.mask,
 					intersecter, null));
 		}
 
@@ -170,7 +168,6 @@ public abstract class Collisions<X> {
 
 	public final void removeBody(Collidable collidable) {
 		removing(collidable);
-		objects.remove(collidable);
 	}
 
 	/** must be called before removing from objects list */
@@ -204,7 +201,7 @@ public abstract class Collisions<X> {
 		return dispatchInfo;
 	}
 	
-	private static final boolean updateAabbs_reportMe = true;
+
 
 	protected final void updateSingleAabbIfActive(Collidable colObj) {
 		if (colObj.isActive())
@@ -252,26 +249,23 @@ public abstract class Collisions<X> {
 	public void updateAabbs() {
 		BulletStats.pushProfile("updateAabbs");
 		try {
-			for (int i = 0; i< objects.size(); i++) {
-				//return array[index];
-				Spatial colObj = objects.get(i);
-
-				colObj.bodies().forEach(this::updateAabbsIfActive);
-
-				// only update aabb of active objects
-				if (colObj.isActive()) {
-					updateSingleAabb(colObj);
-				}
-			}
+			forEachCollidable((i,b) -> updateAabbsIfActive(b));
 		}
 		finally {
 			BulletStats.popProfile();
 		}
 	}
 
-	
+	private final void updateAabbsIfActive(Collidable<X> colObj) {
+		// only update aabb of active objects
+		if (colObj.isActive()) {
+			updateSingleAabb(colObj);
+		}
+	}
+
+
 	public int getNumCollisionObjects() {
-		return objects.size();
+		return collidables().size();
 	}
 
 	// TODO
@@ -401,10 +395,6 @@ public abstract class Collisions<X> {
 				}
 			}
 		}
-	}
-
-	public <X> void add(X s) {
-		pendingAdd.add(s);
 	}
 
 	private static class BridgeTriangleConvexcastCallback extends TriangleConvexcastCallback {
@@ -572,7 +562,7 @@ public abstract class Collisions<X> {
 
 		Transform tmpTrans = new Transform();
 
-		OArrayList<Collidable<X>> objs = this.objects;
+		OArrayList<Collidable<X>> objs = collidables();
 		int n = objs.size();
 		for (int i = 0; i < n; i++) {
 			// terminate further ray tests, once the closestHitFraction reached zero
@@ -642,9 +632,11 @@ public abstract class Collisions<X> {
 
 		// go over all objects, and if the ray intersects their aabb + cast shape aabb,
 		// do a ray-shape query using convexCaster (CCD)
-		for (int i = 0; i < objects.size(); i++) {
+
+		OArrayList<Collidable<X>> ccc = collidables();
+		for (int i = 0; i < ccc.size(); i++) {
 			//return array[index];
-			Collidable collidable = objects.get(i);
+			Collidable collidable = ccc.get(i);
 
 			// only perform raycast if filterMask matches
 			if (resultCallback.needsCollision(collidable.broadphase())) {
@@ -666,10 +658,7 @@ public abstract class Collisions<X> {
 		}
 	}
 
-	public OArrayList<Collidable<X>> objects() {
-		return objects;
-	}
-	
+
 	////////////////////////////////////////////////////////////////////////////
 	
 	/**

@@ -104,6 +104,7 @@ public class Dynamic<X> extends Collidable<X> {
 	private static int uniqueId;
 	public int debugBodyId;
 
+
 	public Dynamic(RigidBodyBuilder constructionInfo) {
 		super(CollidableType.RIGID_BODY);
 		setupRigidBody(constructionInfo);

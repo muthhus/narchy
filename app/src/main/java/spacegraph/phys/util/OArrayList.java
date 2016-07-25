@@ -23,6 +23,9 @@
 
 package spacegraph.phys.util;
 
+import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import spacegraph.Spatial;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -38,7 +41,7 @@ import java.util.function.Predicate;
  */
 public final class OArrayList<T> extends AbstractList<T> implements RandomAccess, Externalizable {
 
-	private T[] array;
+	public T[] array;
 	private int size;
 
 	public OArrayList() {
@@ -60,6 +63,15 @@ public final class OArrayList<T> extends AbstractList<T> implements RandomAccess
 		T[] array = this.array;
 		for (T x : v) {
 			array[size++] = x;
+		}
+	}
+
+	public final void forEachWithIndex(IntObjectPredicate<? super T> each) {
+		int s = size();
+		T[] array = this.array;
+		for (int i = 0; i < s; i++) {
+			if (!each.accept(i, array[i]))
+				break;
 		}
 	}
 

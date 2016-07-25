@@ -97,6 +97,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     @Override
     public void update(SpaceGraph<X> s) {
+        super.update(s);
         if (body == null) {
             updateStart(s);
         } else {
@@ -128,11 +129,9 @@ public class SimpleSpatial<X> extends Spatial<X> {
         return new BoxShape(v3.v(1, 1, 1));
     }
 
-
-
-    public Dynamic newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
+    public Dynamic newBody(CollisionShape shape, boolean collidesWithOthersLikeThis) {
         Dynamic b;
-        b = graphSpace.newBody(
+        b = Dynamics.newBody(
                 1f, //mass
                 shape, motion,
                 +1, //group
@@ -194,7 +193,6 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     protected void renderRelativeAspect(GL2 gl) {
 
-
     }
 
     protected void renderLabel(GL2 gl, float scale) {
@@ -206,11 +204,6 @@ public class SimpleSpatial<X> extends Spatial<X> {
         //colorshape(gl);
         Draw.draw(gl, body.shape());
     }
-
-
-
-
-
 
 //    @Override
 //    public void start(short order) {
@@ -232,10 +225,15 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     }
 
-    protected void updateStart(SpaceGraph<X> s) {
-        Dynamic b = body = newBody(s, newShape(), collidable());
+    @Override
+    public void update(Dynamics world) {
+        Dynamic b = body = newBody(newShape(), collidable());
         b.setUserPointer(this);
         b.setRenderer(this);
+    }
+
+    protected void updateStart(SpaceGraph<X> s) {
+
     }
 
     @Override
@@ -244,8 +242,9 @@ public class SimpleSpatial<X> extends Spatial<X> {
         body = null;
     }
 
+
     @Override
-    public List<Collidable> bodies() {
+    public List<Collidable<X>> bodies() {
         return Collections.singletonList(body);
     }
 
