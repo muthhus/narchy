@@ -334,7 +334,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     /** GLOBAL TERM COMPARATOR FUNCTION */
     @Override
     default int compareTo(@NotNull Termlike y) {
-        if (this.equals(y)) return 0;
+        if (this == y || this.equals(y)) return 0;
 
         int d = this.op().compareTo(((Term)y).op()); //HACK
         if (d!=0)

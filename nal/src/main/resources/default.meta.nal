@@ -289,7 +289,7 @@
 
     //decompose (only) the leading event in a conjunction goal
     (&&,X,A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- X, (Desire:StructuralStrong)
-        (&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- (--,%X), (Desire:StructuralStrong)
+        //(&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- (--,%X), (Desire:StructuralStrong)
     (&&,X,A), X, time(decomposeTaskIfBeliefBefore), task("!") |- A, (Desire:StructuralStrong)
         (&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- A, (Desire:StructuralStrong)
     (&&,X,A), B, time(decomposeTask), task("!")            |- substituteOnlyIfUnifiesDep(A,X,B), (Desire:Deduction)

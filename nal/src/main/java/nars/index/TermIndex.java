@@ -509,9 +509,6 @@ public interface TermIndex {
     @Nullable
     default Concept concept(@NotNull Termed term, boolean createIfMissing) throws InvalidConceptException {
 
-
-        term = $.unneg(term); //unwrap negation
-
         if (term instanceof Atomic) {
 
             if (term instanceof Variable)
@@ -535,11 +532,10 @@ public interface TermIndex {
                 return (Concept) term;
             }
 
-            //term = unneg(aterm); //it can happen that atemporalization will result in a negation that was not unwrapped to begin with?
             if (term.op() == NEG)
                 throw new InvalidConceptException(term, "Negation re-appeared");
 
-            term = aterm;
+            term = unneg(aterm);
         }
 
 

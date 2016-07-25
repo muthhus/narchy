@@ -53,7 +53,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         if (Param.DEBUG && dt != DTERNAL) {
             if (!((op.isImage() && ((dt >= 0) || (dt < subterms.size()))) ||
                     (Op.isTemporal(op, dt, subterms.size()))))
-                throw new InvalidTermException(op, dt, subterms.terms());
+                throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for operator " + op);
         }
 
         this.subterms = subterms;

@@ -525,7 +525,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * return true if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    protected final Concept input(@NotNull Task input) {
+    @Nullable protected final Concept input(@NotNull Task input) {
 
         if (input.isDeleted()) {
             throw new InvalidTaskException(input, "Deleted");
@@ -536,9 +536,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         try {
             c = input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
-            logger.error("{} invalid: {}", input, e);
-            e.printStackTrace();
-            throw e;
+            logger.warn("invalid input: {}", e.toString());
+            //e.printStackTrace();
+            //throw e;
+            return null;
         }
 
         //input.onInput(c);

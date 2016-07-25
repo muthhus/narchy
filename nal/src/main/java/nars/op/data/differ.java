@@ -24,15 +24,15 @@ public class differ extends BinaryTermOperator {
         return difference($.terms, op, a, b);
     }
 
-    @Nullable
+    @NotNull
     public static Compound difference(@NotNull TermBuilder t, @NotNull Compound a, @NotNull TermContainer b) {
         return difference(t, a.op(), a, b);
     }
 
-    @Nullable
+    @NotNull
     public static Compound difference(@NotNull TermBuilder t, @NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
 
-        //intersect the mask: if nothing in common, then it's entirely the first term
+        //quick test: intersect the mask: if nothing in common, then it's entirely the first term
         if ((a.structure() & b.structure()) == 0) {
             return a;
         }
@@ -53,21 +53,18 @@ public class differ extends BinaryTermOperator {
         if (retained == size) { //same as 'a'
             return a;
         } else if (retained == 0) {
-            return null;
+            throw new RuntimeException("empty set");
         } else {
             return (Compound) t.build(o, terms.toArray(new Term[retained]));
         }
 
     }
 
-    @Nullable
+    @NotNull
     @Override
-    public Term apply(@NotNull Term a, Term b) {
-        if (!(a instanceof Compound) || !(b instanceof Compound))
-            return null;
+    public Term apply(@NotNull Term a, @NotNull Term b) {
+        ensureCompounds(a, b);
 
-        return difference($.terms.builder(),
-                (Compound) a, (Compound) b
-        );
+        return difference($.terms.builder(), (Compound) a, (Compound) b );
     }
 }

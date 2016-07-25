@@ -35,7 +35,7 @@ public final class TransformConcept extends AtomConcept implements TermTransform
         this(o.getClass().getSimpleName(), o);
     }
 
-    @Nullable
+    @NotNull
     @Override
     public Term function(Compound args) {
 //            if (args.varPattern() > 0) {

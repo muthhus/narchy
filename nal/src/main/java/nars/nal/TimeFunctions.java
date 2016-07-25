@@ -510,7 +510,6 @@ public interface TimeFunctions {
      * combine any existant DT's in the premise (assumes both task and belief are present)
      */
     @Nullable TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
-        Premise premise = p.premise;
 
         Task task = p.task;
         int taskDT = ((Compound)$.pos(p.taskTerm)).dt();

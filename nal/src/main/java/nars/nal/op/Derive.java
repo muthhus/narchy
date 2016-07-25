@@ -11,6 +11,7 @@ import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
@@ -19,6 +20,8 @@ import nars.truth.TruthFunctions;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +37,8 @@ import static nars.nal.Tense.ETERNAL;
  */
 public final class Derive extends AtomicStringConstant implements ProcTerm {
 
+
+    final static Logger logger = LoggerFactory.getLogger(Derive.class);
 
     public final boolean eternalize;
 
@@ -214,7 +219,15 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         }
 
 
-        Term r = m.index.resolve(cp, m);
+        Term r;
+        try {
+            r = m.index.resolve(cp, m);
+        } catch (InvalidTermException e) {
+            logger.warn("{}", e.toString());
+            //e.printStackTrace();
+            return;
+        }
+
         /*if (r == Imdex)
             System.err.println(r + " " + this.rule.source);*/ //<- finds rules which may help to add a neq(x,y) constraint
 

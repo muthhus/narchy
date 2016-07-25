@@ -38,6 +38,7 @@ import static nars.$.$;
 import static nars.$.inh;
 import static nars.Op.IMGe;
 import static nars.Op.IMGi;
+import static nars.Op.INH;
 import static org.junit.Assert.*;
 
 /**
@@ -165,7 +166,7 @@ public class TermTest {
         assertTrue(term1.complexity() > 1);
         assertTrue(term1.complexity() == term2.complexity());
 
-        assertTrue(term1.op() == Op.INH);
+        assertTrue(term1.op() == INH);
 
 
         //System.out.println("t1: " + term1 + ", complexity=" + term1.getComplexity());
@@ -340,7 +341,7 @@ public class TermTest {
 
         try {
             Term x = n.term("wonder(a,b)").term();
-            assertEquals(Op.INH, x.op());
+            assertEquals(INH, x.op());
             assertTrue(Op.isOperation(x));
             assertEquals("wonder(a,b)", x.toString());
 
@@ -494,7 +495,7 @@ public class TermTest {
     @Test
     public void validStatement() {
         Compound t = $("<({tom},{vienna}) --> livingIn>");
-        assertEquals(+1, Statement.validStatement(t.term(0), t.term(1)));
+        assertEquals(+1, Statement.validStatement(INH, t.term(0), t.term(1)));
 
     }
 

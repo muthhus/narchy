@@ -116,7 +116,9 @@ public abstract class TermBuilder {
                 imdices++;
             } else if (x == False)  {
                 if (o != DISJ) {
-                    return null; //false subterm in conjunction makes the entire condition false
+                    //false subterm in conjunction makes the entire condition false
+                    //this will eventually reduce diectly to false in this method's only callee HACK
+                    return new Term[] { False };
                 } else { //DISJ
                     imdices++; //false subterm in disjunction (or) has no effect
                 }
@@ -213,7 +215,8 @@ public abstract class TermBuilder {
     public final Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
         for (Term x : args) {
             if ((x == True) || (x == False)) {
-                throw new RuntimeException(op + " term with imdex in subterms: " + args);
+                if (!Param.ALLOW_SINGULARITY_LEAK)
+                    throw new InvalidTermException(op, dt, args, "singularity leak");
             }
         }
         return finish(op, dt, TermContainer.the(op, args));
@@ -277,20 +280,29 @@ public abstract class TermBuilder {
         return u;
     }
 
-    @Nullable
+    @NotNull
     public final Term negation(@NotNull Term t) {
-        if (t == True)
-            return False;
-        else if (t == False)
-            return True;
+
+        //HACK testing for equality like this is not a complete solution. for that we need a new special term type
+
+        if (t.equals(True)) return False;
+        else if (t.equals(False)) return True;
 
         if (t.op() == NEG) {
             // (--,(--,P)) = P
-            return ((TermContainer) t).term(0);
+            t = ((TermContainer) t).term(0);
+
+            if (t.equals(True)) return False;
+            else if (t.equals(False)) return True;
+
+            return t;
+
         } else {
-            return ((t instanceof Compound) || (t.op() == VAR_PATTERN)) ?
-                    finish(NEG, t) :
-                    null;
+            if ((t instanceof Compound) || (t.op() == VAR_PATTERN))
+                return finish(NEG, t);
+
+
+            throw new InvalidTermException(NEG, new Term[] { t }, "Non-compound negation content");
         }
     }
 
@@ -317,18 +329,12 @@ public abstract class TermBuilder {
         return finish( o, index, ser);
     }
 
-    @Nullable
-    public Term junction(@NotNull Op op, int dt, final @Nullable Term... u) {
-
-        if (u == null)
-            return null;
-            //return False;
-
+    @NotNull
+    public Term junction(@NotNull Op op, int dt, final @NotNull Term... u) {
 
         int ul = u.length;
         if (ul == 0)
-            return null;
-            //return True;
+            return True;
 
         if (ul == 1) {
             Term only = u[0];
@@ -357,11 +363,11 @@ public abstract class TermBuilder {
         } else {
 
             if (dt == 0) {
-                //special case: 0
                 Compound x = (Compound) junctionFlat(op, 0, u);
-                if (x == null) {
-                    return null;
-                } else if (x.size() == 1) {
+                if (x.size() == 0)
+                    return True;
+
+                if (x.size() == 1) {
                     return x.term(0);
                 } else {
                     return x.op().temporal ? finish(x.op(), 0, TermSet.the(x.subterms().terms())) : x;
@@ -372,7 +378,7 @@ public abstract class TermBuilder {
                     //if (Global.DEBUG)
                     //throw new InvalidTerm(op, DTERNAL, t, u);
                     //else
-                    return null;
+                    throw new InvalidTermException(op, dt, u, "temporal conjunction requires exactly 2 arguments");
                 } else {
 
                     return finish(op,
@@ -387,7 +393,7 @@ public abstract class TermBuilder {
     /**
      * flattening junction builder, for multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
      */
-    @Nullable
+    @NotNull
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
 
@@ -510,33 +516,38 @@ public abstract class TermBuilder {
 
                 case INH:
                     if (predicate instanceof TermTransform && transformImmediates() && subject.op() == PROD) {
-                        return ((TermTransform) predicate).function((Compound) subject);
+                        return ((TermTransform) predicate).function((Compound<?>) subject);
                     }
                     break;
 
 
                 case EQUI:
-                    if (!validEquivalenceTerm(subject))
+                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS && !validEquivalenceTerm(subject))
                         throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Invalid equivalence subject");
-                    if (!validEquivalenceTerm(predicate))
+                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS &&!validEquivalenceTerm(predicate))
                         throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Invalid equivalence predicate");
                     break;
 
                 case IMPL:
-                    if (subject.isAny(TermIndex.InvalidEquivalenceTerm) ||
-                            predicate.isAny(TermIndex.InvalidImplicationPredicate))
-                        return null;
+                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
+                        if (subject.isAny(TermIndex.InvalidEquivalenceTerm))
+                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
+                        if (predicate.isAny(TermIndex.InvalidEquivalenceTerm))
+                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
+                    }
+
 
                     if (subject == True) {
                         return predicate;
                     } else if (subject == False) {
-                        throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
+                        return False;
+                        //throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
                         //return negation(predicate); /??
                     }
 
                     if (predicate.op() == IMPL) {
                         Term oldCondition = subj(predicate);
-                        if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
+                        if (!Param.ALLOW_RECURSIVE_IMPLICATIONS && (oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
                             throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication circularity");
                         else
                             return impl2Conj(dt, subject, predicate, oldCondition);
@@ -572,7 +583,7 @@ public abstract class TermBuilder {
 
             }
 
-            int validity = Statement.validStatement(subject, predicate);
+            int validity = Statement.validStatement(op, subject, predicate);
             switch (validity) {
 
                 case -1:
@@ -696,15 +707,20 @@ public abstract class TermBuilder {
     }
 
 
-    @Nullable
-    public Compound intersect(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
+
+    @NotNull
+    public Term intersect(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
         if (a.equals(b))
             return a;
 
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s.isEmpty() ? null : (Compound) finish(o, TermContainer.the(o, s));
+        return s.isEmpty() ? emptySet(o) : (Compound) finish(o, TermContainer.the(o, s));
+    }
+
+    public static Term emptySet(Op o) {
+        return True; //use the True for empty set
     }
 
     @Nullable

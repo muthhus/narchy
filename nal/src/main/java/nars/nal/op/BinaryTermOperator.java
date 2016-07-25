@@ -10,9 +10,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class BinaryTermOperator implements TermTransform {
 
+    protected static void ensureCompounds(@NotNull Term a, @NotNull Term b) {
+        if (!(a instanceof Compound) || !(b instanceof Compound))
+            throw new RuntimeException("only applies to compounds");
+    }
 
 
-    @Nullable
+    @NotNull
     @Override public final Term function(@NotNull Compound x) {
         if (x.size()!=2)
             return null;
@@ -20,6 +24,6 @@ public abstract class BinaryTermOperator implements TermTransform {
         return apply(x.term(0), x.term(1));
     }
 
-    @Nullable
+    @NotNull
     public abstract Term apply(Term a, Term b);
 }

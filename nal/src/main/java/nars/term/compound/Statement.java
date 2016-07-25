@@ -20,10 +20,9 @@
  */
 package nars.term.compound;
 
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
-import nars.term.Terms;
+import nars.Op;
+import nars.Param;
+import nars.term.*;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +55,7 @@ public interface Statement {
      *      +1 valid for statement
      *
      */
-    static int validStatement(@NotNull Term subject, @NotNull Term predicate) {
+    static int validStatement(Op o, @NotNull Term subject, @NotNull Term predicate) throws InvalidTermException {
 
 
         Compound sc = subject instanceof Compound ? (Compound)subject : null;
@@ -72,22 +71,20 @@ public interface Statement {
 
         //TODO its possible to disqualify invalid statement if there is no structural overlap here
 
-        if (sc!=null &&
-                sc.containsTermRecursively(predicate)
-                //sc.containsTerm(predicate)
-            ) {
-            return -1;
+        if (!Param.ALLOW_RECURSIVE_STATEMENTS && sc!=null && sc.containsTerm(predicate)) { //non-recursive
+            throw new InvalidTermException(o, new Term[] { subject, predicate }, "subject contains predicate");
         }
 
         if (pc!=null) {
-            if (
-                    pc.containsTermRecursively(subject)
-                    //pc.containsTerm(subject)
-               )
-                return -1;
+            if (!Param.ALLOW_RECURSIVE_STATEMENTS && pc.containsTerm(subject)) //non-recursive
+                throw new InvalidTermException(o, new Term[] { subject, predicate }, "predicate contains subject");
 
             if (sc!=null && subject.op().statement && predicate.op().statement) {
-                return (!sc.term(0).equals(pc.term(1)) && !sc.term(1).equals(pc.term(0))) ? +1 : -1;
+                if ( (sc.term(0).equals(pc.term(1))) ||
+                     (sc.term(1).equals(pc.term(0))) )
+                    throw new InvalidTermException(o, new Term[] { subject, predicate }, "inner subject cross-linked with predicate");
+
+                return +1;
             }
         }
 

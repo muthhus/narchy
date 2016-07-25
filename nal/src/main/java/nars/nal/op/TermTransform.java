@@ -2,11 +2,12 @@ package nars.nal.op;
 
 import nars.term.Compound;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
 @FunctionalInterface  public interface TermTransform {
 
-    @Nullable Term function(Compound args);
+    @NotNull Term function(@NotNull Compound args);
 
 }

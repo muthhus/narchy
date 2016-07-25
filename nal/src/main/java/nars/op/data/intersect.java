@@ -9,12 +9,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class intersect extends BinaryTermOperator {
 
-    @Nullable
-    @Override public Term apply(@NotNull Term a, Term b) {
-        if (!(a instanceof Compound) || !(b instanceof Compound))
-            return null;
+    @NotNull
+    @Override public Term apply(@NotNull Term a, @NotNull Term b) {
+        ensureCompounds(a, b);
 
         return $.terms.builder().intersect(a.op(), (Compound)a, (Compound) b);
     }
+
 
 }

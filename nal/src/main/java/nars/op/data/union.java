@@ -9,9 +9,8 @@ import org.jetbrains.annotations.NotNull;
 public class union extends BinaryTermOperator {
 
     @NotNull
-    @Override public Term apply(@NotNull Term a, Term b) {
-        if (!(a instanceof Compound) || !(b instanceof Compound))
-            return null;
+    @Override public Term apply(@NotNull Term a, @NotNull Term b) {
+        ensureCompounds(a, b);
 
         return $.terms.builder().union(a.op(), (Compound) a, (Compound) b );
     }

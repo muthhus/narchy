@@ -38,7 +38,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     @NotNull
     abstract protected Op unifying();
 
-    @Nullable
+    @NotNull
     @Override
     //public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
     public Term function(@NotNull Compound p) {
@@ -57,18 +57,18 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         boolean hasAnyOp = term.hasAny(op);
 
         if (!hasAnyOp && mustSubstitute()) {
-            return null;
+            return term; //FAILED?
         }
 
         //boolean equals = Term.equalAtemporally(x, y);
         boolean equals = x.equals(y);
         if (!equals && hasAnyOp) {
             OneMatchFindSubst m = this.subMatcher;
-            term = m.tryMatch(op, parent, term, x, y);
+            Term newTerm = m.tryMatch(op, parent, term, x, y);
             m.clear();
-            return term;
+            return (newTerm!=null) ? newTerm : term;
         } else {
-            return equals ? term : null;
+            return term; //FAILED?
         }
     }
 

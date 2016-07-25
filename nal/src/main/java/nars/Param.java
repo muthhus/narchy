@@ -75,6 +75,7 @@ public abstract class Param extends Container implements Level {
     public static final int CONCURRENCY_DEFAULT = 1;
 
 
+
     public static int DEFAULT_NAL_LEVEL = 8;
     public static boolean EXIT_ON_EXCEPTION = true;
     /**
@@ -157,6 +158,11 @@ public abstract class Param extends Container implements Level {
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
     public static final int TRUTH_DISCRETION = (int) (1f / TRUTH_EPSILON);
 
+
+
+    public static final boolean ALLOW_RECURSIVE_IMPLICATIONS = true;
+    public static final boolean ALLOW_RECURSIVE_STATEMENTS = true;
+    public static final boolean ALLOW_SINGULARITY_LEAK = true;
 
     ///** extra debugging checks */
     //public static final boolean DEBUG_PARANOID = false;
