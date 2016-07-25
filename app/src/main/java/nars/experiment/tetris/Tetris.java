@@ -29,6 +29,7 @@ import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.gui.NARSpace;
+import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -235,7 +236,7 @@ public class Tetris extends TetrisState implements Environment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 30000000, false)
 
                 ,new FrameClock());
         nar.conceptActivation.setValue(0.02f);
@@ -327,9 +328,9 @@ public class Tetris extends TetrisState implements Environment {
 
                     new BeliefTableChart(nar, charted).show(600, 900);
 
-                    BagChart.show((Default) nar, 128);
+                    //BagChart.show((Default) nar, 128);
 
-                    //STMView.show(stm, 800, 600);
+                    STMView.show(stm, 800, 600);
 
 
                     //NARSpace.newConceptWindow((Default) nar, 128, 4);

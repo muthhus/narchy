@@ -71,6 +71,7 @@ public abstract class Param extends Container implements Level {
      * minimum durability and quality necessary for a derivation to form
      */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON * 2f;
+    public static final int CONCURRENCY_DEFAULT = 2;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;

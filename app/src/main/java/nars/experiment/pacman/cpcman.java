@@ -125,7 +125,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 	public void init() {
 
-		//setIgnoreRepaint(true);
+		setIgnoreRepaint(true);
 
 		// init variables
 		hiScore=0;
@@ -310,6 +310,11 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 	}
 
+
+	@Override
+	public void paintComponents(Graphics g) {
+
+	}
 
 	@Override
 	public void paint(Graphics g) {
@@ -632,8 +637,8 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 		}
 
 		if (ready.compareAndSet(true,false))
-			repaint();
-			//SwingUtilities.invokeLater(this::repaint);
+			//repaint();
+			SwingUtilities.invokeLater(this::repaint);
 
 
 

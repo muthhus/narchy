@@ -61,7 +61,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
     private transient ConceptPolicy policy;
 
 
-    final Map<Task, Task> tasks = new HashMap<>();
+    final HashMap<Task, Task> tasks = new HashMap<>();
 
     /**
      * Constructor, called in Memory.getConcept only
@@ -343,9 +343,12 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
 
         synchronized (this.tasks) {
             for (int i = 0; i < s; i++) {
-                Task x = tt.get(i);
-                if (null == this.tasks.remove(x))
+                Task x = tt.get(i), y;
+                if ((y = this.tasks.remove(x)) == null)
                     throw new RuntimeException(x + " not in tasks map");
+                y.delete();
+                if (x!=y)
+                    x.delete();
 
                 /*
                 TODO eternalization for non-deleted temporal tasks that reach here:
@@ -356,12 +359,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
                 }
                  */
 
-                x.delete();
             }
         }
-
-
-
 
     }
 
@@ -533,7 +532,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
           otherwise false */
         synchronized (tasks) {
 
-            checkConsistency(); //TEMPORARY =-=============
+            //checkConsistency(); //TEMPORARY =-=============
 
             Task existing = tasks.putIfAbsent(input, input);
             if (existing != null) {
@@ -583,8 +582,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
 
             removeAndDelete(displaced);
 
-
-            checkConsistency(); //TEMPORARY =-=============
+            //checkConsistency(); //TEMPORARY =-=============
 
         }
 

@@ -49,7 +49,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
     @Override
     public void forEach(Consumer<? super Task> action) {
-        synchronized(builder) {
+        synchronized (builder) {
             super.forEach(action);
         }
     }
@@ -62,26 +62,32 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 //    }
 
 
-    //TODO use first() and last()
-    @Deprecated public final Task strongest() {
-        synchronized(builder) {
-            if (isEmpty()) return null;
-            return list[0];
-        }
+    @Deprecated
+    public final Task strongest() {
+        Object[] l = this.list;
+        if (l.length == 0) return null;
+        return (Task) l[0];
     }
 
-    @Deprecated public final Task weakest() {
-        synchronized(builder) {
-            int s = size();
-            if (s==0) return null;
-            return list[s - 1];
-        }
+    @Deprecated
+    public final Task weakest() {
+        Object[] l = this.list;
+        if (l.length == 0) return null;
+        int n = l.length - 1;
+        Task w;
+        while ((w = (Task) l[n]) != null) n--; //scan upwards for first non-null
+        return w;
+
+//        synchronized(builder) {
+//            int s = size();
+//            if (s==0) return null;
+//            return list[s - 1];
+//        }
     }
 
-    public float minRank() {
+    public final float minRank() {
         Task w = weakest();
-        if ( w== null) return 0;
-        return rankEternalByConfAndOriginality(w);
+        return w == null ? 0 : rankEternalByConfAndOriginality(w);
     }
 
     @Override
@@ -98,84 +104,77 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
     @Nullable
     public /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull NAR nar) {
 
-        synchronized(builder) {
-            int bsize = size();
-            if (bsize == 0)
-                return null; //nothing to revise with
-
-            //Try to select a best revision partner from existing beliefs:
-            Task oldBelief = null;
-            float bestRank = 0f, bestConf = 0f;
-            Truth conclusion = null;
-            final float newBeliefConf = newBelief.conf();
-            Truth newBeliefTruth = newBelief.truth();
+        Object[] list = this.list;
+        int bsize = list.length;
+        if (bsize == 0)
+            return null; //nothing to revise with
 
 
-            for (int i = 0; i < bsize; i++) {
-                Task x = list[i];
+        //Try to select a best revision partner from existing beliefs:
+        Task oldBelief = null;
+        float bestRank = 0f, bestConf = 0f;
+        Truth conclusion = null;
+        final float newBeliefConf = newBelief.conf();
+        Truth newBeliefTruth = newBelief.truth();
 
-                if (!Revision.isRevisible(newBelief, x))
-                    continue;
+
+        for (int i = 0; i < bsize; i++) {
+            Task x = (Task) list[i];
+
+            if (x == null) //the array has trailing nulls from having extra capacity
+                break;
+
+            if (!Revision.isRevisible(newBelief, x))
+                continue;
 
 
-                //
-                //            float factor = tRel * freqMatch;
-                //            if (factor < best) {
-                //                //even with conf=1.0 it wouldnt be enough to exceed existing best match
-                //                continue;
-                //            }
+            //
+            //            float factor = tRel * freqMatch;
+            //            if (factor < best) {
+            //                //even with conf=1.0 it wouldnt be enough to exceed existing best match
+            //                continue;
+            //            }
 
-                //            float minValidConf = Math.min(newBeliefConf, x.conf());
-                //            if (minValidConf < bestConf) continue;
-                //            float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);
-                //            if (minValidRank < bestRank) continue;
+            //            float minValidConf = Math.min(newBeliefConf, x.conf());
+            //            if (minValidConf < bestConf) continue;
+            //            float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);
+            //            if (minValidRank < bestRank) continue;
 
-                Truth oldBeliefTruth = x.truth();
+            Truth oldBeliefTruth = x.truth();
 
-                Truth c = Revision.revisionEternal(newBeliefTruth, oldBeliefTruth, 1f, bestConf);
-                if (c == null)
-                    continue;
+            Truth c = Revision.revisionEternal(newBeliefTruth, oldBeliefTruth, 1f, bestConf);
 
-                //avoid a duplicate truth
-                if (c.equals(oldBeliefTruth) || c.equals(newBeliefTruth))
-                    continue;
+            //avoid a weak or duplicate truth
+            if (c == null || c.equals(oldBeliefTruth) || c.equals(newBeliefTruth))
+                continue;
 
-                float cconf = c.conf();
-                final int totalEvidence = 1; //newBelief.evidence().length + x.evidence().length; //newBelief.evidence().length + x.evidence().length;
-                float rank = rank(cconf, totalEvidence);
+            float cconf = c.conf();
+            final int totalEvidence = 1; //newBelief.evidence().length + x.evidence().length; //newBelief.evidence().length + x.evidence().length;
+            float rank = rank(cconf, totalEvidence);
 
-                if (rank > bestRank) {
-                    bestRank = rank;
-                    bestConf = cconf;
-                    oldBelief = x;
-                    conclusion = c;
-                }
-            }
-
-            if (oldBelief != null) {
-                @Nullable Termed<Compound> t = Revision.intermpolate(
-                        newBelief, oldBelief,
-                        newBeliefConf, oldBelief.conf()
-                );
-
-                if (t == null) {
-                    //throw new RuntimeException("null interpolation " + newBelief + " with " + oldBelief);
-
-                    //HACK just use the strongest belief's term
-                    t = (newBelief.conf() > oldBelief.conf()) ? newBelief.term() : oldBelief.term();
-                }
-
-                return new RevisionTask(
-                        t,
-                        newBelief, oldBelief,
-                        conclusion,
-                        nar.time(), ETERNAL).
-                        budget(oldBelief, newBelief).
-                        log("Insertion Revision");
+            if (rank > bestRank) {
+                bestRank = rank;
+                bestConf = cconf;
+                oldBelief = x;
+                conclusion = c;
             }
         }
 
-        return null;
+        if (oldBelief == null) {
+            return null;
+        }
+        Compound t = Revision.intermpolate(
+                newBelief, oldBelief,
+                newBeliefConf, oldBelief.conf()
+        );
+
+        return new RevisionTask( t,
+                newBelief, oldBelief,
+                conclusion,
+                nar.time(),
+                ETERNAL
+            ).budget(oldBelief, newBelief)
+             .log("Insertion Revision");
     }
 
     public final Task put(final Task t) {
@@ -183,8 +182,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
         if (size() == capacity()) {
             Task l = weakest();
-            if (l.conf() <= t.conf()) {
+            float lc = rankEternalByConfAndOriginality(l);
+            float tc = rankEternalByConfAndOriginality(t);
+            if (lc <= tc) {
                 displaced = removeWeakest();
+            } else {
+                return null; //insufficient confidence
             }
         }
 
@@ -195,7 +198,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
     public final Truth truth() {
         Task s = strongest();
-        return s!=null ? s.truth() : null;
+        return s != null ? s.truth() : null;
     }
 
     @Override
@@ -285,15 +288,15 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
     }
 
 
-
-    /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
-     *  returns true if it was inserted, false if not
-     * */
+    /**
+     * try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
+     * returns true if it was inserted, false if not
+     */
     private boolean insert(@NotNull Task incoming, List<Task> displ) {
 
         Task displaced = put(incoming);
 
-        if (displaced!=null && !displaced.isDeleted()) {
+        if (displaced != null && !displaced.isDeleted()) {
             TaskTable.removeTask(displaced,
                     "Displaced", displ
                     //"Displaced by " + incoming,
@@ -333,7 +336,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         return size() == capacity();
     }
 
-    /** TODO abstract into removeIf(Predicate<> p) ... */
+    /**
+     * TODO abstract into removeIf(Predicate<> p) ...
+     */
     public void removeDeleted(List<Task> displ) {
 
         synchronized (builder) {
@@ -341,7 +346,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
             for (int i = 0; i < s; ) {
                 Task n = list[i];
                 if (n == null || n.isDeleted()) {
-                    displ.add( remove(i) );
+                    displ.add(remove(i));
                     s--;
                 } else {
                     i++;

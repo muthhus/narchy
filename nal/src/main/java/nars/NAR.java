@@ -27,7 +27,6 @@ import nars.term.atom.Operator;
 import nars.term.var.Variable;
 import nars.time.Clock;
 import nars.time.FrameClock;
-import nars.util.Util;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -49,7 +48,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
@@ -95,8 +93,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     );
 
 
-
-
     /**
      * The id/name of the reasoner
      * TODO
@@ -118,7 +114,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
-        this(clock, index, rng, self, 2);
+        this(clock, index, rng, self, CONCURRENCY_DEFAULT);
     }
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, int concurrency) {

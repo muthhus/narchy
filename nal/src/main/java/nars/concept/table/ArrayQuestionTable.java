@@ -191,9 +191,6 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
                         answer(questioned, a, n);
                     }
                 }
-            } else {
-                //reject input
-                questioned = question;
             }
         }
 
