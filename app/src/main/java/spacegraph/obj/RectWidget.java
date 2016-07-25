@@ -6,6 +6,7 @@ import spacegraph.Spatial;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
 import spacegraph.math.v3;
+import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
@@ -44,8 +45,8 @@ public class RectWidget<X> extends Spatial<X> {
 
 
     @Override
-    public boolean onTouch(ClosestRay r, short[] buttons) {
-        if (!super.onTouch(r, buttons)) {
+    public boolean onTouch(Collidable body, ClosestRay r, short[] buttons) {
+        if (!super.onTouch(body, r, buttons)) {
 
 
             Transform it = Transform.t(transform()).inverse();

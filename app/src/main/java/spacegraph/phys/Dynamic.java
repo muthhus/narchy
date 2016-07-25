@@ -634,6 +634,11 @@ public class Dynamic<X> extends Collidable<X> {
 	public final BiConsumer<GL2,Dynamic> renderer() {
 		return renderer;
 	}
+	public final void renderer(GL2 gl) {
+		BiConsumer<GL2, Dynamic> r = this.renderer;
+		if (r !=null)
+			r.accept(gl, this);
+	}
 
 	public final void setRenderer(BiConsumer<GL2,Dynamic> renderer) {
 		this.renderer = renderer;

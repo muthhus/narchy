@@ -10,25 +10,48 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.EDraw;
+import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
+import spacegraph.render.Draw;
 
 import java.util.function.Predicate;
 
 
-public class ConceptWidget extends Spatial<Term> {
+public class ConceptWidget extends SimpleSpatial<Term> {
 
     private final NAR nar;
 
-    /**
-     * measure of inactivity, in time units
-     */
-    //public float lag;
 
-    public ConceptWidget(Term x, int maxEdges, NAR nar) {
-        super(x, maxEdges);
+    /** cached .toString() of the key */
+    public String label;
+
+    public float pri;
+
+    @NotNull
+    public final EDraw[] edges;
+    @Deprecated public transient int numEdges;
+
+
+    public ConceptWidget(Term x, int edges, NAR nar) {
+        super(x);
         this.nar = nar;
+
+        this.pri = 0.5f;
+        this.edges = new EDraw[edges];
+        for (int i = 0; i < edges; i++)
+            this.edges[i] = new EDraw();
+
     }
+
+
+    public void clearEdges() {
+        this.numEdges = 0;
+    }
+    public int edgeCount() {
+        return numEdges;
+    }
+
 
     @Override
     protected void renderRelativeAspect(GL2 gl) {
@@ -36,9 +59,18 @@ public class ConceptWidget extends Spatial<Term> {
         renderLabel(gl, 0.0005f);
     }
 
+    protected void colorshape(GL2 gl) {
+        float p = pri/2f;
+        gl.glColor4f(p,
+                //pri * Math.min(1f),
+                p, //1f / (1f + (v.lag / (activationPeriods * dt)))),
+                p,
+                1f);
+    }
+
     @Override
-    public boolean update(SpaceGraph<Term> s) {
-        boolean result = super.update(s);
+    public void update(SpaceGraph<Term> s) {
+        super.update(s);
 
         Term tt = key;
 
@@ -79,7 +111,6 @@ public class ConceptWidget extends Spatial<Term> {
         tasklinks.topWhile(linkAdder, maxEdges / 2);
         termlinks.topWhile(linkAdder, maxEdges - edgeCount()); //fill remaining edges
 
-        return result;
     }
 
 
@@ -89,7 +120,7 @@ public class ConceptWidget extends Spatial<Term> {
         Termed gg = ll.get();
         if (gg == null)
             return true;
-        Spatial target = space.getIfActive(gg.term());
+        SimpleSpatial target = (SimpleSpatial) space.getIfActive(gg.term());
         if (target == null)
             return true;
 
@@ -98,7 +129,7 @@ public class ConceptWidget extends Spatial<Term> {
     }
 
 
-    public boolean addEdge(BLink l, Spatial target, boolean task) {
+    public boolean addEdge(BLink l, SimpleSpatial target, boolean task) {
 
         EDraw[] ee = edges;
 
@@ -150,6 +181,30 @@ public class ConceptWidget extends Spatial<Term> {
         return (n - 1 <= ee.length);
     }
 
+    @Override
+    protected void renderAbsolute(GL2 gl) {
+        renderEdges(gl);
+    }
+
+
+    void renderEdges(GL2 gl) {
+        int n = numEdges;
+        EDraw[] eee = edges;
+        for (int en = 0; en < n; en++)
+            render(gl, eee[en]);
+    }
+
+    public void render(GL2 gl, EDraw e) {
+
+        gl.glColor4f(e.r, e.g, e.b, e.a);
+
+        float width = e.width * radius;
+        if (width <= 0.1f) {
+            Draw.renderLineEdge(gl, this, e, width);
+        } else {
+            Draw.renderHalfTriEdge(gl, this, e, width);
+        }
+    }
 
 //        private class ConceptFilter implements Predicate<BLink<Concept>> {
 //

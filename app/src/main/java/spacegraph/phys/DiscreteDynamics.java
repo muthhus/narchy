@@ -23,6 +23,8 @@
 
 package spacegraph.phys;
 
+import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import spacegraph.Spatial;
 import spacegraph.math.v3;
 import spacegraph.phys.collision.CollisionConfiguration;
 import spacegraph.phys.collision.Islands;
@@ -45,7 +47,6 @@ import java.util.Comparator;
 import java.util.function.Consumer;
 
 import static spacegraph.phys.Dynamic.ifDynamic;
-import static spacegraph.phys.Dynamic.ifDynamicAndActive;
 
 /**
  * DiscreteDynamicsWorld provides discrete rigid body simulation.
@@ -73,6 +74,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
     protected int profileTimings = 0;
 
     protected InternalTickCallback preTickCallback;
+    private float dt;
 
     public DiscreteDynamics(Intersecter intersecter, Broadphase pairCache, Constrainer constrainer, CollisionConfiguration collisionConfiguration) {
         super(intersecter, pairCache, collisionConfiguration);
@@ -92,29 +94,59 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 
     private int nextID;
 
-    protected void saveKinematicState(float timeStep) {
+    protected final void saveKinematicState() {
         nextID = 0;
-        objects.removeIf(c -> {
-            if (valid(nextID, c)) {
-                Dynamic body = ifDynamic(c);
-                if (body.getActivationState() != Collidable.ISLAND_SLEEPING) {
-                    body.saveKinematicState(timeStep); // to calculate velocities next frame
-                }
+        objects.removeIf(vd -> {
+
+            if (vd.active((short) nextID)) {
                 nextID++;
-                return false;
+                reactivate(vd);
+                return false; //dont remove
             } else {
-                removing(c);
-                return true;
+                inactivate(vd);
+                return true; //remove
             }
+
         });
 
     }
 
+    //hold sthe current list of active bodies
+    private final OArrayList<Collidable<X>> collidable = new OArrayList<>();
+
+    @Override
+    public final void forEachCollidable(IntObjectPredicate<Collidable> each) {
+
+        OArrayList<Collidable<X>> o = this.collidable;
+        int s = o.size();
+        for (int i = 0; i < s; i++) {
+            if (!each.accept(i, o.get(i)))
+                break;
+        }
+
+    }
+
     /**
-     * override to remove objects at the beginning of each physics frame by returning false
+     * re-activates the spatial's components for this cycle
      */
-    protected boolean valid(int nextID, Collidable<X> c) {
-        return true;
+    private void reactivate(Spatial<X> s) {
+        s.bodies().forEach(c -> {
+            Dynamic body = ifDynamic(c);
+            if (body != null) {
+                collidable.add(body);
+                if (body.getActivationState() != Collidable.ISLAND_SLEEPING)
+                    body.saveKinematicState(dt); // to calculate velocities next frame
+
+                if (body.isActive())
+                    body.applyGravity();
+            }
+        });
+    }
+
+    protected final void inactivate(Spatial<X> s) {
+        s.constraints().forEach(b -> removeConstraint(b));
+        s.bodies().forEach(b -> removeBody(b));
+        s.stop(this);
     }
 
 
@@ -146,9 +178,9 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
             v3 colorvec = new v3();
 
             // todo: iterate over awake simulation islands!
-            for (i = 0; i < objects.size(); i++) {
+            for (i = 0; i < collidable.size(); i++) {
                 //return array[index];
-                Collidable colObj = objects.get(i);
+                Collidable colObj = collidable.get(i);
                 if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_WIREFRAME) != 0) {
                     v3 color = new v3();
                     color.set(255f, 255f, 255f);
@@ -232,19 +264,6 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
     }
 
 
-    /**
-     * Apply gravity, call this once per timestep.
-     */
-    public void applyGravity() {
-        objects.forEach(this::applyGravity); // todo: iterate over awake simulation islands!
-    }
-
-    private final void applyGravity(Collidable c) {
-        Dynamic body = ifDynamicAndActive(c);
-        if (body != null)
-            body.applyGravity();
-    }
-
     protected void synchronizeMotionStates(boolean clear) {
         Transform interpolatedTransform = new Transform();
 
@@ -253,28 +272,29 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
         v3 tmpAngVel = new v3();
 
         // todo: iterate over awake simulation islands!
-        for (int i = 0; i < objects.size(); i++) {
-            //return array[index];
-            Collidable colObj = objects.get(i);
+        OArrayList<Collidable<X>> colliding = this.collidable;
+        for (int i = 0, collidingSize = colliding.size(); i < collidingSize; i++) {
+            Dynamic body = ifDynamic(colliding.get(i));
 
-            Dynamic body = ifDynamic(colObj);
+            if (body == null) {
+                continue;
+            }
 
-            if (body != null) {
-                if (body.getMotionState() != null && !body.isStaticOrKinematicObject()) {
-                    // we need to call the update at least once, even for sleeping objects
-                    // otherwise the 'graphics' transform never updates properly
-                    // so todo: add 'dirty' flag
-                    //if (body->getActivationState() != ISLAND_SLEEPING)
-                    TransformUtil.integrateTransform(
-                            body.getInterpolationWorldTransform(tmpTrans),
-                            body.getInterpolationLinearVelocity(tmpLinVel),
-                            body.getInterpolationAngularVelocity(tmpAngVel),
-                            localTime * body.getHitFraction(), interpolatedTransform);
-                    body.getMotionState().setWorldTransform(interpolatedTransform);
-                }
-                if (clear) {
-                    body.clearForces();
-                }
+            if (body.getMotionState() != null && !body.isStaticOrKinematicObject()) {
+                // we need to call the update at least once, even for sleeping objects
+                // otherwise the 'graphics' transform never updates properly
+                // so todo: add 'dirty' flag
+                //if (body->getActivationState() != ISLAND_SLEEPING)
+                TransformUtil.integrateTransform(
+                        body.getInterpolationWorldTransform(tmpTrans),
+                        body.getInterpolationLinearVelocity(tmpLinVel),
+                        body.getInterpolationAngularVelocity(tmpAngVel),
+                        localTime * body.getHitFraction(), interpolatedTransform);
+                body.getMotionState().setWorldTransform(interpolatedTransform);
+            }
+
+            if (clear) {
+                body.clearForces();
             }
         }
 
@@ -311,10 +331,12 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
                 }
             }
 
-            if (numSimulationSubSteps != 0) {
-                saveKinematicState(fixedTimeStep);
+            this.dt = fixedTimeStep;
 
-                applyGravity();
+            if (numSimulationSubSteps != 0) {
+
+                collidable.clear(); //populate in 'saveKinematicState'
+                saveKinematicState();
 
                 // clamp the number of substeps, to prevent simulation grinding spiralling down to a halt
                 int clampedSimulationSteps = (numSimulationSubSteps > maxSubSteps) ? maxSubSteps : numSimulationSubSteps;
@@ -387,28 +409,19 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
     @Override
     public void setGravity(v3 gravity) {
         this.gravity.set(gravity);
-        for (int i = 0; i < objects.size(); i++) {
-            Collidable colObj = objects.get(i);
-            Dynamic body = ifDynamic(colObj);
-            if (body != null) {
-                body.setGravity(gravity);
-            }
-        }
     }
 
-    @Override
-    public v3 getGravity(v3 out) {
-        out.set(gravity);
-        return out;
-    }
 
-    public final void addRigidBody(Dynamic body, short group, short mask) {
+    /**
+     * enable/register the body in the engine
+     */
+    protected final void on(Dynamic body, short group, short mask) {
         if (!body.isStaticOrKinematicObject()) {
             body.setGravity(gravity);
         }
 
         if (body.shape() != null) {
-            add(body, group, mask);
+            super.on(body, group, mask);
         }
     }
 
@@ -442,9 +455,9 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
         try {
             v3 tmp = new v3();
 
-            for (int i = 0; i < objects.size(); i++) {
+            for (int i = 0; i < collidable.size(); i++) {
                 //return array[index];
-                Collidable colObj = objects.get(i);
+                Collidable colObj = collidable.get(i);
                 Dynamic body = ifDynamic(colObj);
                 if (body != null) {
                     body.updateDeactivation(timeStep);
@@ -592,7 +605,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
             MiscUtil.quickSort(sortedConstraints, sortConstraintOnIslandPredicate);
 
             int num = sortedConstraints.size();
-            solverCallback.init(solverInfo, 
+            solverCallback.init(solverInfo,
                     constrainer,
                     num != 0 ? sortedConstraints : null,
                     num, 
@@ -601,7 +614,7 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
             constrainer.prepareSolve(getNumCollisionObjects(), ((Collisions) this).intersecter.getNumManifolds());
 
             // solve all the constraints for this island
-            islands.buildAndProcessIslands(intersecter, objects, solverCallback);
+            islands.buildAndProcessIslands(intersecter, collidable, solverCallback);
 
             constrainer.allSolved(solverInfo /*, m_stackAlloc*/);
         } finally {
@@ -646,9 +659,9 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
             Transform tmpTrans = new Transform();
 
             Transform predictedTrans = new Transform();
-            for (int i = 0; i < objects.size(); i++) {
+            for (int i = 0; i < collidable.size(); i++) {
                 //return array[index];
-                Collidable colObj = objects.get(i);
+                Collidable colObj = collidable.get(i);
                 Dynamic body = ifDynamic(colObj);
                 if (body != null) {
                     body.setHitFraction(1f);
@@ -700,9 +713,9 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
         try {
             Transform tmpTrans = new Transform();
 
-            for (int i = 0; i < objects.size(); i++) {
+            for (int i = 0; i < collidable.size(); i++) {
                 //return array[index];
-                Collidable colObj = objects.get(i);
+                Collidable colObj = collidable.get(i);
                 Dynamic body = ifDynamic(colObj);
                 if (body != null) {
                     if (!body.isStaticOrKinematicObject()) {
@@ -978,10 +991,6 @@ public class DiscreteDynamics<X> extends Dynamics<X> {
 //        ownsConstrainer = false;
 //        constrainer = solver;
 //    }
-
-    public Constrainer getConstrainer() {
-        return constrainer;
-    }
 
 
     // JAVA NOTE: not part of the original api

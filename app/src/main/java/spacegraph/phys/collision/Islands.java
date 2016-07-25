@@ -77,7 +77,7 @@ public class Islands {
 
 		initUnionFind(num);
 
-		colWorld.forEach((i, collidable)->{
+		colWorld.forEachCollidable((i, collidable)->{
 			collidable.setIslandTag(i);
 			collidable.setCompanionId(-1);
 			collidable.setHitFraction(1f);
@@ -89,7 +89,7 @@ public class Islands {
 
 	public final void storeIslandActivationState(Collisions<?> world) {
 		// put the islandId ('find' value) into m_tag
-		world.forEach(this::storeIslandActivationState);
+		world.forEachCollidable(this::storeIslandActivationState);
     }
 
 	final boolean storeIslandActivationState(int i, Collidable c) {

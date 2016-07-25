@@ -37,20 +37,23 @@ public class TestP2PNode extends RectWidget {
         @Override
         public void updateStart(SpaceGraph s) {
             super.updateStart(s);
-//            s.dyn.addConstraint(new Point2PointConstraint(
-//                a.body, b.body, v(), v()
-//            ));
 
             float w = ((BoxShape)body.shape()).x();
-
-            v3 axis = v(0, 0, 1);
-
-            s.dyn.addConstraint(
-                new HingeConstraint(body, a.body, v(+w/2,0,0), v(-a.radius/2f,0,0), axis, axis
+            s.dyn.addConstraint(new Point2PointConstraint(
+                body, a.body, v(+w/2,0,0), v(-a.radius/2f,0,0)
             ), true);
-            s.dyn.addConstraint(
-                new HingeConstraint(body, b.body, v(-w/2,0,0), v(+b.radius/2f,0,0), axis, axis
+            s.dyn.addConstraint(new Point2PointConstraint(
+                body, b.body, v(-w/2,0,0), v(+a.radius/2f,0,0)
             ), true);
+
+//            float w = ((BoxShape)body.shape()).x();
+//            v3 axis = v(0, 0, 1);
+//            s.dyn.addConstraint(
+//                new HingeConstraint(body, a.body, v(+w/2,0,0), v(-a.radius/2f,0,0), axis, axis
+//            ), true);
+//            s.dyn.addConstraint(
+//                new HingeConstraint(body, b.body, v(-w/2,0,0), v(+b.radius/2f,0,0), axis, axis
+//            ), true);
         }
 
     }

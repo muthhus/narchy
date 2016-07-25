@@ -52,6 +52,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -109,7 +110,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     final Executor runWorker;
-    final Executor taskWorker;
+    final ForkJoinPool taskWorker;
 
     private NARLoop loop;
 
@@ -150,15 +151,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
         this.runWorker = ForkJoinPool.commonPool();
-        this.taskWorker = Executors.newWorkStealingPool(concurrency);
+        this.taskWorker =
+                new ForkJoinPool(concurrency,
+                        defaultForkJoinWorkerThreadFactory, null, false);
 
-
-
-
-
-
-
-        //asyncBarrier = async.getRingBuffer().newBarrier();
 
         index.loadBuiltins();
 

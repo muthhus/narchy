@@ -26,7 +26,14 @@ package spacegraph.render;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.util.ImmModeSink;
+import spacegraph.EDraw;
+import spacegraph.SimpleSpatial;
+import spacegraph.Spatial;
+import spacegraph.math.AxisAngle4f;
+import spacegraph.math.Matrix3f;
+import spacegraph.math.Matrix4f;
 import spacegraph.math.v3;
 import spacegraph.phys.collision.broad.BroadphaseNativeType;
 import spacegraph.phys.math.Transform;
@@ -438,6 +445,62 @@ public enum Draw {
                 scaleX, scaleY,
                 0, 0, dz); // Print GL Text To The Screen
         gl.glPopMatrix();
+    }
+
+    static final float[] tmpV = new float[3];
+    static final v3 ww = new v3();
+    static final v3 vv = new v3();
+    static final Quaternion tmpQ = new Quaternion();
+    static final Matrix4f tmpM4 = new Matrix4f();
+    static final Matrix3f tmpM3 = new Matrix3f();
+    static final AxisAngle4f tmpA = new AxisAngle4f();
+
+    static public void renderHalfTriEdge(GL2 gl, SimpleSpatial src, EDraw e, float width) {
+        SimpleSpatial tgt = e.target;
+
+        gl.glPushMatrix();
+
+        src.transform().toAngleAxis(tmpQ, tmpA, ww);
+        ww.normalize(); //used for the normal3f below
+        float sx = src.x();
+        float tx = tgt.x();
+        float dx = tx - sx;
+        float sy = src.y();
+        float ty = tgt.y();
+        float dy = ty - sy;
+        float sz = src.z();
+        float tz = tgt.z();
+        float dz = tz - sz;
+
+        vv.set(dx,dy,dz);
+        vv.cross(ww, vv);
+        vv.normalize();
+        vv.scale(width);
+
+
+        gl.glBegin(GL2.GL_TRIANGLES);
+
+
+        gl.glVertex3f(sx+ vv.x, sy+ vv.y, sz+ vv.z); //right base
+        gl.glVertex3f( //right base
+                //sx+-vv.x, sy+-vv.y, sz+-vv.z
+                sx, sy, sz
+        );
+        gl.glVertex3f(tx, ty, tz); //right base
+        gl.glEnd();
+
+        gl.glPopMatrix();
+
+    }
+
+    public static void renderLineEdge(GL2 gl, SimpleSpatial src, EDraw e, float width) {
+        gl.glLineWidth(width);
+        gl.glBegin(GL.GL_LINES);
+        v3 s = src.center;
+        gl.glVertex3f(s.x, s.y, s.z);
+        v3 t = e.target.center;
+        gl.glVertex3f(t.x, t.y, t.z);
+        gl.glEnd();
     }
 
     ////////////////////////////////////////////////////////////////////////////

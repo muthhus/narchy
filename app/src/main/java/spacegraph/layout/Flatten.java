@@ -1,9 +1,6 @@
 package spacegraph.layout;
 
-import spacegraph.SpaceGraph;
-import spacegraph.SpaceInput;
-import spacegraph.SpaceTransform;
-import spacegraph.Spatial;
+import spacegraph.*;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 
@@ -27,9 +24,12 @@ public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
     }
 
     @Override
-    public void accept(Spatial<O> s) {
+    public void accept(Spatial<O> ss) {
 
-        s.move(s.x(), s.y(), 0, 0.9f);
-        s.rotate(up, 0.9f, tmp);
+        if (ss instanceof SimpleSpatial) {
+            SimpleSpatial s = (SimpleSpatial) ss;
+            s.move(s.x(), s.y(), 0, 0.9f);
+            s.rotate(up, 0.9f, tmp);
+        }
     }
 }

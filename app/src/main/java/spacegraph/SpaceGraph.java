@@ -159,15 +159,6 @@ public class SpaceGraph<X> extends JoglPhysics<Spatial<X>> {
 
     @Override protected final boolean valid(int nextID, Collidable<Spatial<X>> c) {
 
-        Spatial vd = c.getUserPointer();
-        if (vd!=null) {
-            if (vd.active()) {
-                vd.activate((short)nextID);
-            } else {
-                vd.stop(this);
-                return false; //remove
-            }
-        }
         return true;
     }
 
@@ -199,11 +190,7 @@ public class SpaceGraph<X> extends JoglPhysics<Spatial<X>> {
 
 
     public void add(Spatial s) {
-
-        if (s.body == null) {
-            s.update(this);
-        }
-
+        dyn.add(s);
     }
 
     public final synchronized void update(SpaceInput s) {

@@ -107,11 +107,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
 	 * Existing rigidbodies in the world get gravity assigned too, during this method.
 	 */
 	public abstract void setGravity(v3 gravity);
-	
-	public abstract v3 getGravity(v3 out);
-
-
-	public abstract Constrainer getConstrainer();
 
 
 	// JAVA NOTE: not part of the original api

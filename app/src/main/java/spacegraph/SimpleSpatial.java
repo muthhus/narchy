@@ -1,0 +1,257 @@
+package spacegraph;
+
+import com.jogamp.opengl.GL2;
+import nars.$;
+import nars.util.Util;
+import spacegraph.math.Quat4f;
+import spacegraph.math.v3;
+import spacegraph.phys.Collidable;
+import spacegraph.phys.Dynamic;
+import spacegraph.phys.Dynamics;
+import spacegraph.phys.constraint.TypedConstraint;
+import spacegraph.phys.math.Transform;
+import spacegraph.phys.shape.BoxShape;
+import spacegraph.phys.shape.CollisionShape;
+import spacegraph.phys.util.Motion;
+import spacegraph.render.Draw;
+
+import java.util.Collections;
+import java.util.List;
+
+/** simplified implementation which manages one body and N constraints. useful for simple objects */
+public class SimpleSpatial<X> extends Spatial<X> {
+
+
+    /** cached center reference */
+    public transient final v3 center; //references a field in MotionState's transform
+
+    /** physics motion state */
+    public final Motion motion = new Motion();
+    private final String label;
+
+    /** prevents physics movement */
+    public boolean motionLock;
+
+    public float radius = 0;
+
+
+    public SimpleSpatial(X x) {
+        super(x);
+
+        this.label = key!=null ? key.toString() : super.toString();
+        center = motion.t;
+    }
+
+    public Dynamic body;
+    private final List<TypedConstraint> constraints = $.newArrayList(0);
+
+
+    public final Transform transform() {
+        Dynamic b = this.body;
+        return b == null ? motion.t : b.transform();
+    }
+
+    public void move(float x, float y, float z, float rate) {
+        move(
+                Util.lerp(x, center.x, rate),
+                Util.lerp(y, center.y, rate),
+                Util.lerp(z, center.z, rate)
+        );
+    }
+    public void move(float x, float y, float z) {
+        if (motionLock)
+            return;
+
+        transform().set(x,y,z);
+        reactivate();
+    }
+
+    /** interpolates rotation to the specified axis vector and rotation angle around it */
+    public void rotate(float nx, float ny, float nz, float angle, float speed) {
+        if (motionLock)
+            return;
+
+        Quat4f tmp = new Quat4f();
+
+        Quat4f target = new Quat4f();
+        target.setAngle(nx,ny,nz,angle);
+
+        rotate(target, speed, tmp);
+    }
+
+    public void rotate(Quat4f target, float speed, Quat4f tmp) {
+        if (motionLock)
+            return;
+
+        Quat4f current = transform().getRotation(tmp);
+        current.interpolate(target, speed);
+        transform().setRotation(current);
+    }
+
+
+    public void reactivate() {
+        Dynamic b = body;
+        if (b !=null/* && !b.isActive()*/)
+            b.activate(collidable());
+    }
+
+    @Override
+    public void update(SpaceGraph<X> s) {
+        if (body == null) {
+            updateStart(s);
+        } else {
+            updateContinue();
+        }
+    }
+
+
+    public void moveDelta(float dx, float dy, float dz) {
+        move(
+                x() + dx,
+                y() + dy,
+                z() + dz);
+    }
+
+    public void scale(float sx, float sy, float sz) {
+
+        if (body!=null) {
+            ((BoxShape) this.body.shape()).size(sx, sy, sz);
+            this.radius = Math.max(sx, Math.max(sy, sz));
+        } else {
+            this.radius = 0;
+        }
+
+    }
+
+    //TODO make abstract
+    protected CollisionShape newShape() {
+        return new BoxShape(v3.v(1, 1, 1));
+    }
+
+
+
+    public Dynamic newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
+        Dynamic b;
+        b = graphSpace.newBody(
+                1f, //mass
+                shape, motion,
+                +1, //group
+                collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
+        );
+
+        //b.setLinearFactor(1,1,0); //restricts movement to a 2D plane
+
+
+        b.setDamping(0.9f, 0.5f);
+        b.setFriction(0.9f);
+
+        return b;
+    }
+
+
+    protected void renderAbsolute(GL2 gl) {
+        //blank
+    }
+
+    @Override public final void accept(GL2 gl, Dynamic body) {
+
+        renderAbsolute(gl);
+
+        gl.glPushMatrix();
+
+        Draw.transform(gl, body.transform());
+
+        renderRelative(gl, body);
+
+        gl.glPushMatrix();
+        BoxShape shape = (BoxShape) body.shape();
+        float sx = shape.x(); //HACK
+        float sy = shape.y(); //HACK
+        float tx, ty;
+        //if (sx > sy) {
+        ty = sy;
+        tx = sy/sx;
+        //} else {
+        //  tx = sx;
+        //  ty = sx/sy;
+        //}
+
+        //gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
+
+        gl.glScalef(tx, ty, 1f);
+
+        renderRelativeAspect(gl);
+        gl.glPopMatrix();
+
+        gl.glPopMatrix();
+    }
+
+    protected void renderRelative(GL2 gl, Dynamic body) {
+
+        renderShape(gl, body);
+
+    }
+
+    protected void renderRelativeAspect(GL2 gl) {
+
+
+    }
+
+    protected void renderLabel(GL2 gl, float scale) {
+        final float charAspect = 1.5f;
+        Draw.renderLabel(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
+    }
+
+    protected void renderShape(GL2 gl, Dynamic body) {
+        //colorshape(gl);
+        Draw.draw(gl, body.shape());
+    }
+
+
+
+
+
+
+//    @Override
+//    public void start(short order) {
+//        super.start(order);
+//        reactivate();
+//    }
+
+    public void motionLock(boolean b) {
+        motionLock = b;
+    }
+    public float x() {  return center.x;        }
+    public float y() {  return center.y;        }
+    public float z() {  return center.z;        }
+
+    protected void updateContinue() {
+        //if (body.broadphase()==null)
+        //throw new NullPointerException();
+        //reactivate();
+
+    }
+
+    protected void updateStart(SpaceGraph<X> s) {
+        Dynamic b = body = newBody(s, newShape(), collidable());
+        b.setUserPointer(this);
+        b.setRenderer(this);
+    }
+
+    @Override
+    public void stop(Dynamics s) {
+        super.stop(s);
+        body = null;
+    }
+
+    @Override
+    public List<Collidable> bodies() {
+        return Collections.singletonList(body);
+    }
+
+    @Override
+    public List<TypedConstraint> constraints() {
+        return constraints;
+    }
+
+}

@@ -74,7 +74,6 @@ abstract public class SpaceInput<X, Y extends Spatial<X>> implements Iterable<Y>
         this.forEach(a -> a.update(s));
 
         List<SpaceTransform> ll = this.transforms;
-        int size = size();
         for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
             ll.get(i1).update(s, this, dt);
         }

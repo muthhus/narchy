@@ -34,6 +34,7 @@ import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.Color3f;
 import spacegraph.math.Matrix3f;
@@ -148,12 +149,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         Constrainer constrainer = new SequentialImpulseConstrainer();
 
-        dyn = new DiscreteDynamics<>(dispatcher, overlappingPairCache, constrainer, collision_config) {
-            @Override
-            protected boolean valid(int nextID, Collidable<X> c) {
-                return JoglPhysics.this.valid(nextID, c);
-            }
-        };
+        dyn = new DiscreteDynamics<>(dispatcher, overlappingPairCache, constrainer, collision_config);
 
         cameraDistance = new AnimFloat(55f, dyn, 4f);
         azi = new AnimFloatAngle(-180, dyn, 30f);
@@ -796,10 +792,10 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         if (directDrag != null) {
             Object u = directDrag.getUserPointer();
 
-            System.out.println("UNDRAG: " + directDrag);
+            //System.out.println("UNDRAG: " + directDrag);
 
-            if (u instanceof Spatial) {
-                ((Spatial) u).motionLock(false);
+            if (u instanceof SimpleSpatial) {
+                ((SimpleSpatial) u).motionLock(false);
             }
 
             directDrag = null;
@@ -882,7 +878,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
                 Object t = cray.collidable.getUserPointer();
                 if (t instanceof Spatial) {
                     Spatial a = ((Spatial) t);
-                    if (a.onTouch(cray, buttons)) {
+                    if (a.onTouch(cray.collidable, cray, buttons)) {
                         //absorbed
                         mouseDragDX = mouseDragDY = 0;
                         mouseDragPrevX = mouseDragPrevY = -1; //cancel any drag being enabled
@@ -911,8 +907,8 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
                 //System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
 
-                if (u instanceof Spatial) {
-                    ((Spatial) u).motionLock(true);
+                if (u instanceof SimpleSpatial) {
+                    ((SimpleSpatial) u).motionLock(true);
                 }
 
                 MotionState mm = directDrag.getMotionState();
@@ -1060,9 +1056,6 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         Dynamic body = new Dynamic(c);
 
-        ((DiscreteDynamics) dyn).addRigidBody(body, (short) group, (short) mask);
-
-
         return body;
     }
 
@@ -1116,11 +1109,8 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     };
 
     public final void render(Collidable<X> c) {
-        Dynamic<X> body = Dynamic.ifDynamic(c);
-        if (body != null) {
-            BiConsumer<GL2,Dynamic> r = body.renderer();
-            if (r != null)
-                r.accept(gl, body);
+        if (c instanceof Dynamic) {
+            ((Dynamic)c).renderer(gl);
         }
     }
 
