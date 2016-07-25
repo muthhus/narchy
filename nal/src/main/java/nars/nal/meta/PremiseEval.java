@@ -8,11 +8,10 @@ import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.index.TermIndex;
 import nars.nal.Conclusion;
-import nars.nal.Premise;
 import nars.nal.Deriver;
+import nars.nal.Premise;
 import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.op.Solve;
 import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
 import nars.task.Task;
@@ -37,11 +36,14 @@ import static nars.nal.Tense.DTERNAL;
  */
 public class PremiseEval extends FindSubst {
 
-    @NotNull private final Deriver deriver;
+    @NotNull
+    private final Deriver deriver;
     private final int start;
 
 
-    /** the current premise being evaluated in this context TODO make private again */
+    /**
+     * the current premise being evaluated in this context TODO make private again
+     */
     public transient Premise premise;
 
 
@@ -49,48 +51,61 @@ public class PremiseEval extends FindSubst {
     public final Versioned<Character> punct;
 
 
-    /** current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee */
+    /**
+     * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
+     */
     @Nullable
-    @Deprecated public ProcTerm forEachMatch;
+    @Deprecated
+    public ProcTerm forEachMatch;
 
 
-
-    /** run parameters */
+    /**
+     * run parameters
+     */
     int termutes;
     private int termutesMax;
 
 
-    /** cached value */
+    /**
+     * cached value
+     */
     public float confMin = Param.TRUTH_EPSILON;
     public int termSub0op, termSub1op;
     public int termSub0Struct, termSub1Struct;
     //@Deprecated public boolean cyclic; //TODO if this is necessary, encode this in the stamp as a -1 element prefix which will indicate that it inherited evidence directly from a parent in a single-premise derivation
     public boolean overlap;
 
-    @Nullable public Truth taskTruth, beliefTruth;
+    @Nullable
+    public Truth taskTruth, beliefTruth;
 
     public Compound taskTerm;
     public Term beliefTerm;
     public NAR nar;
 
     public Task task;
-    @Nullable public Task belief;
+    @Nullable
+    public Task belief;
     public char taskPunct;
 
-    /** whether the premise involves temporality that must be calculated upon derivation */
+    /**
+     * whether the premise involves temporality that must be calculated upon derivation
+     */
     public boolean temporal;
-    private long[] evidence;
+    private long[] evidenceDouble, evidenceSingle;
 
     public Conclusion conclusion;
+    private boolean cyclic;
 
 
-    /** initializes with the default static term index/builder */
+    /**
+     * initializes with the default static term index/builder
+     */
     public PremiseEval(Random r, @NotNull Deriver deriver) {
         this($.terms, r, deriver);
     }
 
     public PremiseEval(TermIndex index, Random r, @NotNull Deriver deriver) {
-        super(index, VAR_PATTERN, r );
+        super(index, VAR_PATTERN, r);
 
 
         this.deriver = deriver;
@@ -111,7 +126,7 @@ public class PremiseEval extends FindSubst {
     }
 
     protected void put(@NotNull Term t) {
-        putXY(t,t);
+        putXY(t, t);
     }
 
     public int matchesMax(float p) {
@@ -120,14 +135,16 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    /** only one thread should be in here at a time */
+    /**
+     * only one thread should be in here at a time
+     */
     public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable ProcTerm eachMatch, @Nullable MatchConstraint constraints, int matchFactor) {
 
         int t = now();
 
         this.forEachMatch = eachMatch; //to notify of matches
         boolean finish;
-        if (eachMatch!=null) {
+        if (eachMatch != null) {
             //set the # of matches according to the # of conclusions in this branch
             //each matched termutation will be used to derive F=matchFactor conclusions,
             //so divide the premiseMatches value by it to equalize the derivation quantity
@@ -138,8 +155,8 @@ public class PremiseEval extends FindSubst {
             finish = false;
         }
 
-        if (constraints!=null)
-            this.constraints.set( constraints );
+        if (constraints != null)
+            this.constraints.set(constraints);
 
         matchAll(x, y, finish);
 
@@ -162,15 +179,13 @@ public class PremiseEval extends FindSubst {
     }
 
 
-
-
     @NotNull
     @Override
     public String toString() {
         return "RuleMatch:{" +
                 "premise:" + premise +
                 ", subst:" + super.toString() +
-                (forEachMatch !=null ? (", derived:" + forEachMatch) : "")+
+                (forEachMatch != null ? (", derived:" + forEachMatch) : "") +
                 //(!secondary.isEmpty() ? (", secondary:" + secondary) : "")+
                 //(occurrenceShift.get()!=null ? (", occShift:" + occurrenceShift) : "")+
                 //(branchPower.get()!=null ? (", derived:" + branchPower) : "")+
@@ -224,7 +239,7 @@ public class PremiseEval extends FindSubst {
         Term beliefTerm = this.beliefTerm = p.beliefTerm().term();
         Term taskTerm = this.taskTerm = tt;
 
-        //this.cyclic = task.cyclic();
+        this.cyclic = task.cyclic();
         this.overlap = belief != null && Stamp.overlapping(task, belief);
 
         this.termSub0Struct = taskTerm.structure();
@@ -241,28 +256,30 @@ public class PremiseEval extends FindSubst {
         revert(start);
 
         this.conclusion = null; //forget a reference to the local field copy but return this instance
-        this.evidence = null;
+        this.evidenceDouble = this.evidenceSingle = null;
         this.premise = null;
 
         return c;
     }
 
     private static boolean temporal(@NotNull Task task, @Nullable Task belief) {
-        if (!task.isEternal() || task.dt()!= DTERNAL)
+        if (!task.isEternal() || task.dt() != DTERNAL)
             return true;
 
         return belief != null && (!belief.isEternal() || belief.dt() != DTERNAL);
     }
 
 
-    /** calculates Budget used in a derived task,
-     *  returns null if invalid / insufficient */
+    /**
+     * calculates Budget used in a derived task,
+     * returns null if invalid / insufficient
+     */
     @Nullable
     public final Budget budget(@Nullable Truth truth, @NotNull Termed derived) {
         float minDur = nar.durMin.floatValue();
         return (truth != null) ?
-                    TaskBudgeting.compoundForward(truth, derived, this, minDur) :
-                    TaskBudgeting.compoundQuestion(derived, this, minDur);
+                TaskBudgeting.derivationForward(truth, derived, this, minDur) :
+                TaskBudgeting.derivationBackward(derived, this, minDur);
     }
 
 
@@ -301,9 +318,11 @@ public class PremiseEval extends FindSubst {
 //        return confMin;
 //    }
 
-    /** gets the op of the (top-level) pattern being compared
+    /**
+     * gets the op of the (top-level) pattern being compared
+     *
      * @param subterm 0 or 1, indicating task or belief
-     * */
+     */
     /*public final boolean subTermIs(int subterm, int op) {
         return (subterm==0 ? termSub0op : termSub1op) == op;
     }*/
@@ -311,7 +330,9 @@ public class PremiseEval extends FindSubst {
         return (i == 0 ? termSub0op : termSub1op);
     }
 
-    /** @param subterm 0 or 1, indicating task or belief */
+    /**
+     * @param subterm 0 or 1, indicating task or belief
+     */
     public final boolean subTermMatch(int subterm, int bits) {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
@@ -319,7 +340,9 @@ public class PremiseEval extends FindSubst {
         return Op.hasAll((subterm == 0 ? termSub0Struct : termSub1Struct), bits);
     }
 
-    /** both */
+    /**
+     * both
+     */
     public final boolean subTermsMatch(int bits) {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
@@ -328,7 +351,7 @@ public class PremiseEval extends FindSubst {
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
         return Op.hasAll(termSub0Struct, bits) &&
-               Op.hasAll(termSub1Struct, bits);
+                Op.hasAll(termSub1Struct, bits);
     }
 
 //    /** returns whether the put operation was successful */
@@ -357,20 +380,39 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    public long[] evidence() {
+    public long[] evidence(boolean single) {
 
-        if (evidence == null) {
+        if (single) {
+            return evidenceSingle();
+        } else {
+            return evidenceDouble();
+        }
+    }
+
+    public long[] evidenceSingle() {
+        if (evidenceSingle == null) {
+            evidenceSingle = Stamp.cyclic(task.evidence());
+        }
+        return evidenceSingle;
+    }
+
+    public long[] evidenceDouble() {
+        if (evidenceDouble == null) {
             long[] pte = task.evidence();
 
             Task b = belief;
-            evidence =
+            evidenceDouble =
                     b != null ?
                             Stamp.zip(pte, b.evidence()) : //double
                             pte //single
             ;
         }
 
-        return evidence;
+        return evidenceDouble;
+    }
+
+    public boolean overlap(boolean single) {
+        return single ? cyclic : overlap;
     }
 }
 

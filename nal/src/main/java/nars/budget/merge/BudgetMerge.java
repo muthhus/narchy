@@ -9,6 +9,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiFunction;
 
 import static nars.Param.BUDGET_EPSILON;
+import static nars.budget.merge.BudgetMerge.PriMerge.AND;
+import static nars.budget.merge.BudgetMerge.PriMerge.AVERAGE;
+import static nars.budget.merge.BudgetMerge.PriMerge.PLUS;
 import static nars.nal.UtilityFunctions.or;
 
 /**
@@ -34,37 +37,55 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     }
 
     @Nullable
-    default Budget apply(@Nullable Budget existing, Budget incoming, float scale) {
-        if (existing == null)
-            return incoming;
-        else {
-            merge(existing, incoming, scale);
-            return existing;
-        }
+    default Budget apply(@NotNull Budget target, @NotNull Budget incoming, float scale) {
+        merge(target, incoming, scale);
+        return target;
     }
 
-    static float dqBlendByOrDurQua(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean plusOrAvg) {
-        float incomingPri = src.priIfFiniteElseZero() * srcScale;
-        float incomingScore = or(src.dur(), src.qua()) * srcScale;
+    enum PriMerge {
+        PLUS,
+        AVERAGE,
+        AND
+    }
 
-        float currentPri = tgt.priIfFiniteElseZero();
-        float currentScore = or(tgt.dur(), tgt.qua());
+    /** srcScale only affects the amount of priority adjusted; for the other components, the 'score'
+     * calculations are used to interpolate */
+    static float blend(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, PriMerge priMerge) {
 
-        float cp;
-        if(currentScore > BUDGET_EPSILON && incomingScore > BUDGET_EPSILON) {
-            cp = currentScore / (currentScore + incomingScore);
-        } else if (currentScore < BUDGET_EPSILON) {
-            cp = 0f;
-        } else if (incomingScore < BUDGET_EPSILON) {
-            cp = 1f;
+        float srcPri = src.priIfFiniteElseZero();
+        float srcScore =
+                or(src.dur(), src.qua());
+
+        float targetPri = tgt.priIfFiniteElseZero();
+        float targetScore =
+                or(tgt.dur(), tgt.qua());
+
+
+        float targetProp;
+        if(targetScore > BUDGET_EPSILON && srcScore > BUDGET_EPSILON) {
+            targetProp = targetScore / (targetScore + srcScore);
+        } else if (targetScore < BUDGET_EPSILON) {
+            targetProp = 0f;
+        } else if (srcScore < BUDGET_EPSILON) {
+            targetProp = 1f;
         } else {
-            cp = 0.5f;
+            targetProp = 0.5f;
         }
 
-        return dqBlend(tgt, src, plusOrAvg ?
-                    (currentPri + incomingPri) :
-                    ((cp * currentPri) + ((1f-cp) * incomingPri)),
-                cp);
+
+        float newPri = Float.NaN;
+        switch (priMerge) {
+            case PLUS:
+                newPri = targetPri + srcPri * srcScale;
+                break;
+            case AND:
+                newPri = Util.lerp(targetPri * srcPri, targetPri, srcScale);
+                break;
+            case AVERAGE:
+                newPri = Util.lerp((srcPri + targetPri)/2f, targetPri, srcScale);
+                break;
+        }
+        return dqBlend(tgt, src, newPri, targetProp);
     }
     static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
         float incomingPri = src.priIfFiniteElseZero() * srcScale;
@@ -95,7 +116,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
     }
 
-    static float dqBlend(@NotNull Budget tgt, @NotNull Budgeted src, float nextPri, float cp) {
+    static float dqBlend(@NotNull Budget tgt, @NotNull Budgeted src, float nextPri, float targetProp) {
 
         float overflow;
         if (nextPri > 1f) {
@@ -105,11 +126,11 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
             overflow = 0;
         }
 
-        float ip = 1f - cp; // inverse proportion
+        float srcprop = 1f - targetProp; // inverse proportion
 
         tgt.budget(nextPri,
-                (cp * tgt.dur()) + (ip * src.dur()),
-                (cp * tgt.qua()) + (ip * src.qua()));
+                (targetProp * tgt.dur()) + (srcprop * src.dur()),
+                (targetProp * tgt.qua()) + (srcprop * src.qua()));
 
         return overflow;
     }
@@ -124,26 +145,16 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     };
 
     /** sum priority, LERP other components in proportion to the priorities */
-    BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
-        //return dqBlendByPri(tgt, src, srcScale, true);
-        return dqBlendByOrDurQua(tgt, src, srcScale, true);
-        //dqBlendBySummary(tgt, src, srcScale, true);
-    };
-//    BudgetMerge plusDQBlendOld = (tgt, src, srcScale) -> {
-//        return dqBlendByPri(tgt, src, srcScale, true);
-//        //return dqBlendByOrDurQua(tgt, src, srcScale, true);
-//        //dqBlendBySummary(tgt, src, srcScale, true);
-//    };
+    BudgetMerge plusBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, PLUS);
 
     /** avg priority, LERP other components in proportion to the priorities */
-    BudgetMerge avgDQBlend = (tgt, src, srcScale) -> {
-        //return dqBlendByDurQua(tgt, src, srcScale);
-        return dqBlendByOrDurQua(tgt, src, srcScale, false);
-        //dqBlendBySummary(tgt, src, srcScale, false);
-    };
+    BudgetMerge avgBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVERAGE);
+
+    /** AND priority, LERP other components in proportion to the priorities */
+    BudgetMerge andBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AND);
 
 
-    BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {
+    @Deprecated BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {
         float nextPriority = src.priIfFiniteElseZero() * srcScale;
 
         float currentPriority = tgt.priIfFiniteElseZero();

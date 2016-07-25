@@ -39,7 +39,7 @@ public class RevisionTest {
         */
 
         //}
-        ((DefaultConceptPolicy)d.conceptWarm).beliefsMaxEte.set(maxBeliefs);
+        ((DefaultConceptPolicy)d.index.conceptBuilder().awake()).beliefsMaxEte.set(maxBeliefs);
         return d;
     }
 

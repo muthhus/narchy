@@ -79,7 +79,7 @@ public class Default extends AbstractNAR {
 
     protected @NotNull DefaultCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, @NotNull PremiseEval matcher) {
 
-        DefaultCore c = new DefaultCore(this, matcher, conceptWarm, conceptCold);
+        DefaultCore c = new DefaultCore(this, matcher);
         c.concepts.setCapacity(activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies

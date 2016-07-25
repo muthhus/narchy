@@ -237,7 +237,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         for (Task t : tt) {
             @NotNull Budget tbudget = t.budget();
             if (!tbudget.isDeleted()) {
-                BudgetMerge.plusDQBlend.merge(u, tbudget, paymentProportion);
+                BudgetMerge.plusBlend.merge(u, tbudget, paymentProportion);
                 tbudget.priMult(1f-paymentProportion);
             }
         }

@@ -31,12 +31,10 @@ import nars.budget.UnitBudget;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
-import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
 import nars.term.Termed;
@@ -92,7 +90,7 @@ public class Pacman extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.02f);
+		nar.inputActivation.setValue(0.02f);
 
 		//new MemoryManager(nar);
 
@@ -211,9 +209,9 @@ public class Pacman extends cpcman implements Environment {
 
 				if (nar instanceof Default) {
 
-//					new BeliefTableChart(nar, charted).show(700, 900);
+					new BeliefTableChart(nar, charted).show(700, 900);
 //
-//					BagChart.show((Default) nar);
+					BagChart.show((Default) nar, 256);
 //
 //					STMView.show(stm, 500, 500);
 

@@ -72,17 +72,16 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
 
-//    /**
-//     * {<A ==> B>} |- <(--, B) ==> (--, A)>
-//     * @param v1 Truth value of the premise
-//     * @return Truth value of the conclusion
-//     */
-//    @Nullable
-//    public static Truth contraposition(@NotNull Truth v1, float minConf) {
-//        float w = and(1 - v1.freq(), v1.conf());
-//        float c = w2c(w);
-//        return (c < minConf) ? null : t(0, c);
-//    }
+    /**
+     * {<A ==> B>} |- <(--, B) ==> (--, A)>
+     * @param t Truth value of the premise
+     * @return Truth value of the conclusion
+     */
+    @Nullable
+    public static Truth contraposition(@NotNull Truth t, float minConf) {
+        float c = w2c(and(1 - t.freq(), t.conf()));
+        return (c < minConf) ? null : t(0, c);
+    }
 
     /* ----- double argument functions, called in MatchingRules ----- */
 

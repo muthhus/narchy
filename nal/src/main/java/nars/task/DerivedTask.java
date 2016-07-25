@@ -1,8 +1,6 @@
 package nars.task;
 
-import nars.$;
 import nars.Param;
-import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.Premise;
@@ -13,8 +11,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.Reference;
-
 
 abstract public class DerivedTask extends MutableTask {
 
@@ -22,10 +18,10 @@ abstract public class DerivedTask extends MutableTask {
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, PremiseEval p) {
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, PremiseEval p, long[] evidence) {
         super(tc, punct, truth);
 
-        evidence(p.evidence());
+        evidence(evidence);
 
         if (Param.DEBUG)
             this.premise = p.premise;
@@ -73,43 +69,36 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
-        static final float feedbackRate = 0.1f;
-
-        public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise) {
-            super(tc, punct, truth, premise);
+        public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise, long[] evidence) {
+            super(tc, punct, truth, premise, evidence);
         }
 
         @Override
-        public boolean onConcept(@NotNull Concept c, float score) {
-            if (super.onConcept(c, score)) {
-                feedback(score);
+        public boolean onConcept(@NotNull Concept c) {
+            if (super.onConcept(c)) {
                 return true;
             }
             return false;
         }
 
-        void feedback(float score) {
-//            ConceptProcess p = this.premise.get();
-//            if (p != null) {
-//                BLink<? extends Term> termlink = p.termLink;
-//                BLink<? extends Task> tasklink = p.taskLink;
-//                //BLink<? extends Concept> pc = p.conceptLink;
-//                if (!termlink.isDeleted())
-//                    termlink.priLerpMult(score, feedbackRate);
-//                if (!tasklink.isDeleted())
-//                    tasklink.priLerpMult(score, feedbackRate);
-//
-//            }
-        }
+//        void feedback(float score) {
+////            ConceptProcess p = this.premise.get();
+////            if (p != null) {
+////                BLink<? extends Term> termlink = p.termLink;
+////                BLink<? extends Task> tasklink = p.taskLink;
+////                //BLink<? extends Concept> pc = p.conceptLink;
+////                if (!termlink.isDeleted())
+////                    termlink.priLerpMult(score, feedbackRate);
+////                if (!tasklink.isDeleted())
+////                    tasklink.priLerpMult(score, feedbackRate);
+////
+////            }
+//        }
 
         @Override
         public boolean delete() {
-            if (super.delete()) {
-                feedback(0);
-                this.premise = null;
-                return true;
-            }
-            return false;
+            this.premise = null;
+            return super.delete();
         }
     }
 

@@ -5,6 +5,7 @@
 package nars.nal;
 
 import nars.NAR;
+import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.task.Task;
@@ -23,45 +24,45 @@ import org.jetbrains.annotations.Nullable;
  *
  *
  */
-public final class Premise implements Tasked {
+public final class Premise extends RawBudget implements Tasked {
 
 
-    @NotNull public final Task taskLink;
+    @NotNull public final Task task;
 
-
-    @NotNull public final Term termLink;
+    @NotNull public final Term term;
 
     @Nullable public final Task belief;
 
-    /** not used in creating a Premise key, because the same premise components may be generated from different originating concepts or even other methods of forming them*/
-    @NotNull transient private final Term conceptLink;
+    ///** not used in creating a Premise key, because the same premise components may be generated from different originating concepts or even other methods of forming them*/
+    //@NotNull transient private final Term conceptLink;
 
-    public Premise(@NotNull Term conceptLink,
-                   @NotNull Task taskLink,
-                   @NotNull Term termLink,
+
+    public Premise(@NotNull BLink<Task> taskLink,
+                   @NotNull BLink<Term> termLink,
                    @Nullable Task belief) {
 
-        this.taskLink = taskLink;
+        this.task = taskLink.get();
 
-        this.conceptLink = conceptLink;
+        //this.conceptLink = conceptLink;
 
-        this.termLink = termLink;
+        this.term = termLink.get();
 
         this.belief = belief;
     }
 
 
+
     @NotNull
     @Override
     public final Task task() {
-        return taskLink;
+        return task;
     }
 
 
     @NotNull
-    public final Termed beliefTerm() {
+    public final Termed<?> beliefTerm() {
         Task x = belief();
-        return x == null ? termLink : x;
+        return x == null ? term : x;
     }
 
     @Nullable
@@ -73,15 +74,7 @@ public final class Premise implements Tasked {
     @NotNull
     @Override
     public String toString() {
-        return new StringBuilder().append(
-                getClass().getSimpleName())
-                .append('[')
-                //.append(conceptLink).append(',')
-                .append(taskLink).append(',')
-                .append(termLink).append(',')
-                .append(belief())
-                .append(']')
-                .toString();
+        return task + " | " + term + " | " + (belief!=null ?  belief : "");
     }
 
 
@@ -92,15 +85,15 @@ public final class Premise implements Tasked {
         return (b!=null) && (!task().isEternal()) && (!b.isEternal());
     }
 
-    @Nullable public final Concept concept(NAR n) {
-        return n.concept(conceptLink);
-    }
+//    @Nullable public final Concept concept(NAR n) {
+//        return n.concept(conceptLink);
+//    }
 
     @Nullable public final BLink<? extends Termed> termlink(@NotNull Concept c) {
-        return c.termlinks().get(termLink);
+        return c.termlinks().get(term);
     }
 
     @Nullable public final BLink<? extends Task> tasklink(@NotNull Concept c) {
-        return c.tasklinks().get(taskLink);
+        return c.tasklinks().get(task);
     }
 }

@@ -688,8 +688,8 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = TimeFunctions.decomposeTask;
                             break;
 
-                        case "decomposeTaskIfTemporal":
-                            pres.add(events.taskIsTemporal);
+                        case "taskConjDecomposable":
+                            pres.add(events.taskConjDecomposable);
                             timeFunction = TimeFunctions.decomposeTask;
                             break;
 

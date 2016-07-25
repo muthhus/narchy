@@ -34,7 +34,7 @@ public class InterNAR extends Peer implements PeerModel {
     public float broadcastPriorityThreshold = 0.5f;
     public float broadcastConfidenceThreshold = 0.9f;
 
-    final ArrayBag<Term> asked = new ArrayBag(64, BudgetMerge.plusDQBlend, new HashMap<>(64));
+    final ArrayBag<Term> asked = new ArrayBag(64, BudgetMerge.plusBlend, new HashMap<>(64));
     private boolean paranoid = false;
 
     public InterNAR(NAR n) throws IOException {

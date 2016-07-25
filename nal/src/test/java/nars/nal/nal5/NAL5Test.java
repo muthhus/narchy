@@ -10,6 +10,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.nal.Tense.ETERNAL;
+
 @RunWith(Parameterized.class)
 public class NAL5Test extends AbstractNALTest {
 
@@ -20,7 +22,7 @@ public class NAL5Test extends AbstractNALTest {
         return AbstractNALTest.nars(5, true, true);
     }
 
-    final int cycles = 55;
+    final int cycles = 70;
 
     @Test public void revision(){
         test()
@@ -222,7 +224,7 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void compound_composition_one_premises(){
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<robin --> [flying]>"); //.en("Robin can fly.");
         tester.ask("(||,<robin --> [flying]>,<robin --> swimmer>)"); //.en("Can robin fly or swim?");
         tester.mustBelieve(cycles," (||,<robin --> swimmer>,<robin --> [flying]>)",1.00f,0.81f); //.en("Robin can fly or swim.");
@@ -427,19 +429,49 @@ public class NAL5Test extends AbstractNALTest {
 //    }
 
 
-    @Test public void testNegatedImplicationTerm4() {
+    @Test public void testPosPosImplicationConc() {
         test()
-                .input("a:b. %0.0;0.90%")
-                .input("((--,a:b) ==> (--,(R))).")
-                //.mustDesire(cycles, "a:b", 0.0f, 0.81f)
-                .mustBelieve(cycles, "(R)", 0.0f, 0.81f);
+                .input("(x). %1.0;0.90%")
+                .input("((x) ==> (y)).")
+                .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
+                .mustNotOutput(cycles, "(y)", '.', 0f, 0.5f, 0, 1, ETERNAL);
+
     }
+    @Test public void testNegPosImplicationConc() {
+        test()
+                .log()
+                .input("(x). %0.0;0.90%")
+                .input("((--,(x)) ==> (y)).")
+                .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
+                .mustNotOutput(cycles, "(y)", '.', 0f, 0.5f, 0, 1, ETERNAL)
+        ;
+    }
+    @Test public void testPosNegImplicationConc() {
+        test()
+                .input("(x). %1.0;0.90%")
+                .input("((x) ==> (--,(y))).")
+                .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL);
+    }
+    @Test public void testNegNegImplicationConc() {
+        test()
+                .log()
+                .input("(x). %0.0;0.90%")
+                .input("((--,(x)) ==> (--,(y))).")
+                .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL)
+        ;
+    }
+
 
     @Test public void testNegatedImplicationTerm5() {
         test()
-                .input("(R). %0.0;0.90%")
-                .input("((--,a:b) ==> (--,(R))).")
-                .mustBelieve(cycles, "a:b", 0.0f, 0.45f);
+                .log()
+                .input("(x). %0.0;0.90%")
+                .input("((--,(x)) ==> (--,(y))).")
+                .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL)
+        ;
     }
     //NO	((<(--,p1) ==> p2>, p2), (<(--,p2) ==> p1>, (<Contraposition --> Truth>, <AllowBackward --> Derive>)))
 

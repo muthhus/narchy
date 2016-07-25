@@ -81,7 +81,7 @@ public class Pong extends Player implements Environment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(32);
-        nar.conceptActivation.setValue(0.1f);
+        nar.inputActivation.setValue(0.1f);
         nar.confMin.setValue(0.05f);
 
 

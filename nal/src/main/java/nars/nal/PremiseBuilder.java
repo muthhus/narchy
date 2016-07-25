@@ -4,6 +4,9 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
+import nars.budget.Budget;
+import nars.budget.RawBudget;
+import nars.budget.policy.TaskBudgeting;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
@@ -16,7 +19,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.subst.UnifySubst;
-import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,34 +48,49 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static int run(@NotNull NAR nar, Concept conceptLink, @NotNull List<Term> termsArray, @NotNull Task task, @NotNull PremiseEval matcher, BiConsumer<Premise,Conclusion> each) {
+    public static int run(@NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, BiConsumer<Premise, Conclusion> each) {
 
         int count = 0;
         long now = nar.time();
 
+        float minDur = nar.durMin.floatValue();
+
+        Task task = taskLink.get();
         Compound taskTerm = task.term();
 
-        for (int i = 0, termsArraySize = termsArray.size(); i < termsArraySize; i++) {
+        RawBudget pBudget = new RawBudget(); //recycled temporary budget for calculating premise budget
 
-            if (task.isDeleted())
+        for (int i = 0, termsArraySize = termLinks.size(); i < termsArraySize; i++) {
+
+            if (taskLink.isDeleted() || task.isDeleted())
                 break;
 
-            Term termLink = termsArray.get(i);
+            BLink<Term> termLink = termLinks.get(i);
+            Term term = termLink.get();
 
-            if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLink))
+            if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
                 continue;
 
+            if (budget(pBudget, taskLink, termLink, minDur)) {
 
-            Premise p = newPremise(nar, now, conceptLink, task, termLink);
+                Premise p = newPremise(nar, now, taskLink, termLink, pBudget);
 
-            Conclusion c = matcher.run( p, new Conclusion() );
+                Conclusion c = matcher.run(p, new Conclusion());
 
-            each.accept(p, c);
+                each.accept(p, c);
 
-            count++;
+                count++;
+
+            }
         }
 
         return count;
+    }
+
+    private static boolean budget(RawBudget pBudget, BLink<Task>taskLink, BLink<Term> termLink, float minDur) {
+        TaskBudgeting.premise(pBudget, taskLink, termLink);
+        //return pBudget.dur() >= minDur;
+        return true;
     }
 
     /**
@@ -89,38 +106,41 @@ public enum PremiseBuilder {
      patham9 especially try to understand the "temporal temporal" case
      patham9 its using the result of higher confidence
      */
-    static @NotNull Premise newPremise(@NotNull NAR nar, long now, Concept conceptLink, @NotNull Task taskLink, @NotNull Term termLink) {
+    static @NotNull Premise newPremise(@NotNull NAR nar, long now, @NotNull BLink<Task> taskLink, @NotNull BLink<Term> termLink, Budget b) {
 
-
+        Task task = taskLink.get();
         Task belief = null;
+        Term termLinkTerm = termLink.get();
 
-        if (termLink instanceof Compound) { //atomic concepts will have no beliefs to match
+        if (termLinkTerm instanceof Compound) { //atomic concepts will have no beliefs to match
 
-            Concept beliefConcept = nar.concept(termLink);
+            Concept beliefConcept = nar.concept(termLinkTerm);
             if (beliefConcept != null) {
 
-                if ( taskLink.isQuestOrQuestion()) {
+                if ( task.isQuestOrQuestion()) {
 
                     //TODO is this correct handling for quests? this means a belief task may be a goal which may contradict deriver semantics
-                    BeliefTable table = taskLink.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
+                    BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
 
-                    Task solution = table.match(taskLink, now);
+                    Task solution = table.match(task, now);
                     if (solution!=null) {
-                        Task answered = answer(nar, taskLink, solution, beliefConcept);
-                        if (taskLink.isQuestion())
+                        Task answered = answer(nar, task, solution, beliefConcept);
+                        if (task.isQuestion())
                             belief = answered;
                     }
 
 
                 } else {
 
-                    belief = beliefConcept.beliefs().match(taskLink, now);
+                    belief = beliefConcept.beliefs().match(task, now);
 
                 }
             }
         }
 
-        return new Premise(conceptLink.term(), taskLink, termLink, belief);
+        Premise p = new Premise(taskLink, termLink, belief);
+        p.budget(b);
+        return p;
     }
 
     private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {

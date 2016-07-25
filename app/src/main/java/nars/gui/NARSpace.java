@@ -36,17 +36,17 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(256, 4, 2, 2);
-        n.conceptActivation.setValue(0.5f);
+        Default n = new Default(512, 4, 2, 2);
+        //n.conceptActivation.setValue(0.5f);
         //n.nal(4);
 
 
-        new DeductiveMeshTest(n, new int[]{6, 5}, 16384);
+        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 128, 6);
+        newConceptWindow(n, 256, 32);
 
-        n.loop(30f);
+        n.loop(10f);
 
     }
 

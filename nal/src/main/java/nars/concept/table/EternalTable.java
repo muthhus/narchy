@@ -74,8 +74,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         Object[] l = this.list;
         if (l.length == 0) return null;
         int n = l.length - 1;
-        Task w;
-        while ((w = (Task) l[n]) != null) n--; //scan upwards for first non-null
+        Task w = null;
+        while (n > 0 && (w = (Task) l[n]) != null) n--; //scan upwards for first non-null
         return w;
 
 //        synchronized(builder) {
@@ -182,12 +182,14 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
         if (size() == capacity()) {
             Task l = weakest();
-            float lc = rankEternalByConfAndOriginality(l);
-            float tc = rankEternalByConfAndOriginality(t);
-            if (lc <= tc) {
-                displaced = removeWeakest();
-            } else {
-                return null; //insufficient confidence
+            if (l!=null) {
+                float lc = rankEternalByConfAndOriginality(l);
+                float tc = rankEternalByConfAndOriginality(t);
+                if (lc <= tc) {
+                    displaced = removeWeakest();
+                } else {
+                    return null; //insufficient confidence
+                }
             }
         }
 

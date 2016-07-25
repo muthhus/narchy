@@ -1,7 +1,5 @@
 package nars.nar.util;
 
-import com.gs.collections.impl.factory.Sets;
-import com.gs.collections.impl.set.mutable.MultiReaderUnifiedSet;
 import nars.$;
 import nars.Memory;
 import nars.NAR;
@@ -11,9 +9,7 @@ import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.data.Range;
 import nars.link.BLink;
-import nars.nal.Conclusion;
 import nars.nal.Deriver;
-import nars.nal.Premise;
 import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
@@ -26,9 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
 /**
  * The original deterministic memory cycle implementation that is currently used as a standard
@@ -185,12 +179,12 @@ public abstract class AbstractCore {
 
 
         int count = 0;
-        FasterList<Term> termsBuffer = $.newArrayList();;
+        FasterList<BLink<Term>> termsBuffer = $.newArrayList();;
         c.termlinks().sample(termlinks, termsBuffer::addIfNotNull);
         if (!termsBuffer.isEmpty()) {
 
 
-            FasterList<Task> tasksBuffer = $.newArrayList();;
+            FasterList<BLink<Task>> tasksBuffer = $.newArrayList();;
             c.tasklinks().sample(tasklinks, tasksBuffer::addIfNotNull);
 
             if (!tasksBuffer.isEmpty()) {
@@ -201,7 +195,6 @@ public abstract class AbstractCore {
                 for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
                     count += PremiseBuilder.run(
                             nar,
-                            c,
                             termsBuffer,
                             tasksBuffer.get(i),
                             mm,

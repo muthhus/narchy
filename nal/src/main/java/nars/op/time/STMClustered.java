@@ -1,17 +1,14 @@
 package nars.op.time;
 
-import com.gs.collections.impl.factory.Sets;
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.AutoBag;
 import nars.bag.impl.MapBagPendings;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
-import nars.concept.Concept;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
-import nars.link.DefaultBLink;
 import nars.link.StrongBLink;
 import nars.task.Task;
 import nars.util.Util;
@@ -22,10 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -301,7 +296,7 @@ public class STMClustered extends STM {
         clusters = (short)Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.input = new ArrayBag<>(1, BudgetMerge.avgDQBlend, new HashMap<>(capacity.intValue())) {
+        this.input = new ArrayBag<>(1, BudgetMerge.avgBlend, new HashMap<>(capacity.intValue())) {
 
             @NotNull
             @Override

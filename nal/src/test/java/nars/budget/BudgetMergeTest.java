@@ -19,7 +19,7 @@ public class BudgetMergeTest {
 
     @Test
     public void testPlusDQBlend() {
-        BudgetMerge m = BudgetMerge.plusDQBlend;
+        BudgetMerge m = BudgetMerge.plusBlend;
 
         testMerge(m, z(), a, 1f, 1, 0.7f, 0.3f, 0 /*overflow*/);  //adding to zero equals the incoming
         testMerge(m, z(), a, 0.5f, 0.5f, 0.7f, 0.3f); //scale of half should affect priority only
@@ -42,7 +42,7 @@ public class BudgetMergeTest {
 
     @Test
     public void testPlusDQBlendOld() {
-        BudgetMerge m = BudgetMerge.plusDQBlend;
+        BudgetMerge m = BudgetMerge.plusBlend;
 
         testMerge(m, z(), a, 1f, 1, 0.7f, 0.3f, 0 /*overflow*/);  //adding to zero equals the incoming
         testMerge(m, z(), a, 0.5f, 0.5f, 0.7f, 0.3f); //scale of half should affect priority only
@@ -65,7 +65,7 @@ public class BudgetMergeTest {
 
     @Test
     public void testAvg() {
-        BudgetMerge m = BudgetMerge.avgDQBlend;
+        BudgetMerge m = BudgetMerge.avgBlend;
 
         testMerge(m, z(), a, 1f, 1, 0.7f, 0.3f);  //adding to zero equals the incoming
         testMerge(m, z(), a, 0.5f, 0.5f, 0.7f, 0.3f); //scale of half should affect priority only

@@ -47,10 +47,10 @@ abstract public class events extends AtomicBoolCondition {
     };
 
     /** rejects any task term with dt==DTERNAL and if task and belief are both eternal */
-    public static final BoolCondition taskIsTemporal = new AtomicBoolCondition() {
+    public static final BoolCondition taskConjDecomposable = new AtomicBoolCondition() {
         @Override
         public @NotNull String toString() {
-            return "taskIsTemporal";
+            return "taskConjDecomposable";
         }
 
         @Override
@@ -60,11 +60,10 @@ abstract public class events extends AtomicBoolCondition {
                 if (!t.isEternal())
                     return true;
                 Task b = p.belief;
-                if (b!=null && !p.belief.isEternal())
-                    return true;
+                return (b!=null && !p.belief.isEternal());
+            } else {
+                return true; //dternal
             }
-
-            return false;
         }
     };
 

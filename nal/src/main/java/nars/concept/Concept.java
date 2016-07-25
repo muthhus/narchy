@@ -432,9 +432,8 @@ public interface Concept extends Termed {
 //        Bag<Task> taskbag();
 //        Bag<Term> termbag(Map<Term, Term> map);
 
-        ConceptPolicy initialized();
-
-        ConceptPolicy activated();
-
+        ConceptPolicy init();
+        ConceptPolicy awake();
+        ConceptPolicy sleep();
     }
 }

@@ -20,7 +20,6 @@
  */
 package nars.nal;
 
-import com.gs.collections.impl.factory.primitive.LongSets;
 import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import nars.Param;
@@ -42,7 +41,7 @@ public interface Stamp {
 
     @NotNull static long[] zip(@NotNull long[] a, @NotNull long[] b, float aToB) {
         return zip(a, b, aToB,
-                Param.STAMP_MAX_EVIDENCE,
+                Param.STAMP_CAPACITY,
                 true);
     }
 
@@ -264,7 +263,7 @@ public interface Stamp {
     }
 
     static int evidenceLength(int aLen, int bLen) {
-        return Math.max(Param.STAMP_MAX_EVIDENCE, aLen + bLen);
+        return Math.max(Param.STAMP_CAPACITY, aLen + bLen);
     }
     static int evidenceLength(@NotNull Task a, @NotNull Task b) {
         return evidenceLength(a.evidence().length, b.evidence().length);
@@ -286,4 +285,27 @@ public interface Stamp {
     }
 
 
+    /** cyclic tasks are indicated with a final value of Long.MAX_VALUE */
+    static boolean isCyclic(long[] e) {
+        return (e[e.length-1] == Long.MAX_VALUE);
+    }
+
+    static long[] cyclic(long[] e) {
+        int l = e.length;
+        if (isCyclic(e))
+            return e;
+
+        long[] x;
+        if (l == Param.STAMP_CAPACITY) {
+            x = new long[l];
+            //shift left by one to leave the last entry free
+            System.arraycopy(e, 1, x, 0, l-1);
+        } else {
+            x = new long[l+1];
+            System.arraycopy(e, 0, x, 0, l);
+        }
+
+        x[x.length-1] = Long.MAX_VALUE;
+        return x;
+    }
 }

@@ -18,8 +18,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 /**
  * Dynamically updates a truth value based on truth aggregation of the concepts referred by parameters
  */
@@ -62,8 +60,8 @@ public class BooleanConcept extends CompoundConcept {
             float c = mode ? 1f : 0f;
 
 
-            LongArrayList ev = new LongArrayList(Param.STAMP_MAX_EVIDENCE);
-            int evidencePerArg = Math.max(Param.STAMP_MAX_EVIDENCE / args.length, 1);
+            LongArrayList ev = new LongArrayList(Param.STAMP_CAPACITY);
+            int evidencePerArg = Math.max(Param.STAMP_CAPACITY / args.length, 1);
 
             for (Termed t : args) {
 
@@ -129,7 +127,7 @@ public class BooleanConcept extends CompoundConcept {
 
         if (args.length < 2)
             throw new RuntimeException("too few args");
-        if (args.length > Param.STAMP_MAX_EVIDENCE)
+        if (args.length > Param.STAMP_CAPACITY)
             throw new RuntimeException("too many args");
 
         this.params = (Compound) term().subterm(0,0);// (({...}) --> ^...)

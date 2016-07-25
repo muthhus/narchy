@@ -66,8 +66,8 @@ public class RevisionTask extends AnswerTask  {
 
 
     /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
-    @Override public boolean onConcept(@NotNull Concept c, float score) {
-        super.onConcept(c, score);
+    @Override public boolean onConcept(@NotNull Concept c) {
+        super.onConcept(c);
 
         //TODO reimplement again
 

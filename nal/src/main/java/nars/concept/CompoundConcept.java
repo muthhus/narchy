@@ -43,7 +43,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
      */
 
     @NotNull
-    final TermSet templates;
+    public final TermSet templates;
     @NotNull
     private final T term;
 
@@ -543,7 +543,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
 
                 //checkConsistency(); //TEMPORARY =-=============
 
-                return existing;
+                return null;
             }
 
 

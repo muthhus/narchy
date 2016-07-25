@@ -524,7 +524,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * return true if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    protected final Concept input(@NotNull Task input, float conceptActivation, float linkActivation) {
+    protected final Concept input(@NotNull Task input) {
 
         if (input.isDeleted()) {
             throw new InvalidTaskException(input, "Deleted");
@@ -539,18 +539,19 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             return null;
         }
 
-        float cost = input.pri(); //the priority demanded by this task
+        float conceptActivation = input.isInput() ? this.inputActivation.floatValue() : this.derivedActivation.floatValue();
+        float linkActivation = 1f;
 
-        emotion.busy(cost);
-
+        float cost = input.pri() * conceptActivation; //the concept priority demanded by this task
 
         if (c.policy() == null) {
-            c.policy(index.conceptBuilder().initialized());
+            c.policy(index.conceptBuilder().init());
         }
 
 
         Task inputted = c.process(input, this);
 
+        //decides if TaskProcess was successful in somehow affecting its concept's state
         if (inputted != null && !inputted.isDeleted()) {
 
             if (clock instanceof FrameClock) {
@@ -558,15 +559,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 ((FrameClock) clock).ensureStampSerialGreater(inputted.evidence());
             }
 
-            //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
-            if (inputted.pri() > Param.BUDGET_EPSILON) {
-                //propagate budget
-                MutableFloat overflow = new MutableFloat();
+
+
+            //propagate budget
+            MutableFloat overflow = new MutableFloat();
+            {
                 activate(c, inputted, conceptActivation, linkActivation, overflow);
-                emotion.stress(overflow);
+                emotion.busy(cost);
             }
 
-            inputted.onConcept(c, 0);
+            emotion.stress(overflow);
+
+            inputted.onConcept(c);
 
             eventTaskProcess.emit(inputted); //signal any additional processes
 
@@ -575,8 +579,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
         return c;
-
-
     }
 
     @Override
@@ -595,12 +597,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @NotNull
     public void input(@NotNull Task... t) {
-//        TaskQueue tq = new TaskQueue(t);
-//        input((Input) tq);
-//        return tq;
-        float conceptActivation = this.conceptActivation.floatValue();
         for (Task x : t)
-            input(x, conceptActivation, 1f);
+            input(x);
     }
 
 
@@ -1079,7 +1077,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /* zero avoids direct recursive linking, it should go through the target concept though and happen through there */
     @Nullable
     final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float activation, @Nullable MutableFloat overflow) {
-        return activate(termed, b, activation * conceptActivation.floatValue(), 0f, overflow);
+        return activate(termed, b, activation, 0f, overflow);
     }
 
     @Nullable
@@ -1329,7 +1327,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * (a normal duplicate task going through process() will not have this behavior.)
      */
     public final void activate(@NotNull Task t, float scale) {
-        activate(t.concept(this), t, conceptActivation.floatValue() * scale, scale, null);
+        activate(t.concept(this), t, inputActivation.floatValue() * scale, scale, null);
     }
 
     public final void activate(@NotNull Task t) {

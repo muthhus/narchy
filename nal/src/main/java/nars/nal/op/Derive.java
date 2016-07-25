@@ -25,7 +25,6 @@ import java.util.Map;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
-import static nars.Op.VAR_PATTERN;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 
@@ -45,8 +44,10 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     /**
      * result pattern
      */
-    @NotNull public final Term conclusionPattern;
-    @Nullable public final Term  conclusionPatternNP, conclusionPatternPN, conclusionPatternNN;
+    @NotNull
+    public final Term conclusionPattern;
+    @Nullable
+    public final Term conclusionPatternNP, conclusionPatternPN, conclusionPatternNN;
 
 
     /**
@@ -66,8 +67,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 Joiner.on(',').join(
                         term,
                         "temporal" + Integer.toHexString(temporalizer.hashCode()), //HACK todo until names are given to unique classes
-                        belief!=null ? belief : "_",
-                        goal !=null ? goal : "_",
+                        belief != null ? belief : "_",
+                        goal != null ? goal : "_",
                         eternalize ? "Et" : "_") +
                 ')');
         this.rule = rule;
@@ -77,11 +78,11 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         this.conclusionPattern = term;
 
-        //to be safe, exclude any rules which have an immediate transform (in the form of an operator) in the conclusion,
-        //because negating its parameters may have unpredictable effects depending on the operation
-        if (conclusionPattern.hasAny(Op.OPER)) {
-            this.conclusionPatternNP = this.conclusionPatternPN = this.conclusionPatternNN = null;
-        } else {
+//        //to be safe, exclude any rules which have an immediate transform (in the form of an operator) in the conclusion,
+//        //because negating its parameters may have unpredictable effects depending on the operation
+//        if (conclusionPattern.hasAny(Op.OPER)) {
+//            this.conclusionPatternNP = this.conclusionPatternPN = this.conclusionPatternNN = null;
+//        } else {
 
             if (rule.taskPunc != '?') {
                 this.conclusionPatternNP = negateConclusion(true, false);
@@ -101,7 +102,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 this.conclusionPatternNN = negateConclusion(true, true);
             }
 
-        }
+        //}
 
 
         //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
@@ -116,8 +117,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         @NotNull Term cp = this.conclusionPattern;
 
 
-        if ( (negBelief^negTask) && (negTask && cp.equals(rule.getTask())) || (negBelief && cp.equals(rule.getBelief())) ) {
-            return $.neg(cp);
+        if (!(negBelief ^ negTask) && (negTask && cp.equals(rule.getTask())) || (negBelief && cp.equals(rule.getBelief()))) {
+            return cp; //double negative of the conclusion term which is present in both negated task and belief
         }
         if (cp.op().atomic) {
             return null;
@@ -158,8 +159,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
 
-
-
     /**
      * main entry point for derivation result handler.
      *
@@ -186,33 +185,33 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         taskTruth = (f == null) ? null : m.taskTruth;
 
         //truth function is single premise so set belief truth to be null to prevent any negations below:
-        beliefTruth = ((f == null) || f.single()) ? null : m.beliefTruth;
+        boolean single = f == null || f.single();
+        beliefTruth = ((f == null) || single) ? null : m.beliefTruth;
 
         Term cp = this.conclusionPattern;
 
 
-            boolean tn = taskTruth != null && taskTruth.isNegative();
-            boolean bn = beliefTruth != null && beliefTruth.isNegative();
-            if (!bn && !tn) {
-                //continue below
-            } else if (bn && tn) {
-                if (conclusionPatternNN!=null) {
-                    cp = conclusionPatternNN;
-                    taskTruth = taskTruth.negated();
-                    beliefTruth = beliefTruth.negated();
-                }
-            } else if (bn) {
-                if (conclusionPatternPN!=null) {
-                    cp = conclusionPatternPN;
-                    beliefTruth = beliefTruth.negated();
-                }
-            } else if (tn) {
-                if (conclusionPatternNP!=null) {
-                    cp = conclusionPatternNP;
-                    taskTruth = taskTruth.negated();
-                }
+        boolean tn = taskTruth != null && taskTruth.isNegative();
+        boolean bn = beliefTruth != null && beliefTruth.isNegative();
+        if (!bn && !tn) {
+            //continue below
+        } else if (bn && tn) {
+            if (conclusionPatternNN != null) {
+                cp = conclusionPatternNN;
+                taskTruth = taskTruth.negated();
+                beliefTruth = beliefTruth.negated();
             }
-
+        } else if (bn) {
+            if (conclusionPatternPN != null) {
+                cp = conclusionPatternPN;
+                beliefTruth = beliefTruth.negated();
+            }
+        } else if (tn) {
+            if (conclusionPatternNP != null) {
+                cp = conclusionPatternNP;
+                taskTruth = taskTruth.negated();
+            }
+        }
 
 
         Term r = m.index.resolve(cp, m);
@@ -223,29 +222,29 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         if (r instanceof Compound) { //includes null test
 
             Truth t = (f == null) ?
-                null :
-                f.apply(
-                     taskTruth,
-                     beliefTruth,
-                     m.nar,
-                     m.confMin
+                    null :
+                    f.apply(
+                            taskTruth,
+                            beliefTruth,
+                            m.nar,
+                            m.confMin
                     );
 
-            if (f==null || t!=null)
-                derive(m, (Compound)r, t);
+            if (f == null || t != null)
+                derive(m, (Compound) r, t, single);
         }
 
     }
 
-    final void derive(@NotNull PremiseEval m, @NotNull Compound raw, @Nullable Truth truth) {
+    final void derive(@NotNull PremiseEval m, @NotNull Compound raw, @Nullable Truth truth, boolean single) {
 
         if (raw.op() == NEG) {
             //negations cant term concepts or tasks, so we unwrap and invert the truth (fi
             Term raw2 = raw.term(0);
             if (!(raw2 instanceof Compound))
                 return; //unwrapped to a variable (negations of atomics are not allowed)
-            raw = (Compound)raw2;
-            if (truth!=null)
+            raw = (Compound) raw2;
+            if (truth != null)
                 truth = truth.negated();
         }
 
@@ -254,7 +253,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             return; //INSUFFICIENT BUDGET
 
         NAR nar = m.nar;
-        Termed<Compound> content = Task.normalizeTaskTerm(raw,m.punct.get(),nar, true);
+        Termed<Compound> content = Task.normalizeTaskTerm(raw, m.punct.get(), nar, true);
         if (content == null)
             return; //INVALID TERM FOR TASK
 
@@ -264,7 +263,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         if ((nar.nal() >= 7) && (m.temporal)) {
 
             long[] occReturn = new long[]{ETERNAL};
-            float[] confScale = new float[] { 1f };
+            float[] confScale = new float[]{1f};
 
             Term temporalized = this.temporalizer.compute(content.term(),
                     m, this, occReturn, confScale
@@ -286,7 +285,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             }
 
             //apply the confidence scale
-            if (truth!=null) {
+            if (truth != null) {
                 float projection;
                 if (Param.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent()) {
                     projection = TruthFunctions.projection(m.task.occurrence(), m.belief.occurrence(), nar.time());
@@ -312,17 +311,20 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
         m.conclusion.derive.add( //TODO we should not need to normalize the task, so process directly is preferred
-            derive(content, truth, budget, nar.time(), occ, m, this)
+                derive(content, truth, budget, nar.time(), occ, m, this, single)
         );
 
 
     }
 
-    /** part 2 */
-    @NotNull public final Task derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
+    /**
+     * part 2
+     */
+    @NotNull
+    public final Task derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d, boolean single) {
 
 
-        return newDerivedTask(c, p.punct.get(), truth, p)
+        return newDerivedTask(c, p.punct.get(), truth, p, single)
                 .time(now, occ)
                 .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
@@ -354,12 +356,9 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
 
-    public @NotNull DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, @Nullable Truth truth, PremiseEval p) {
-        return new DerivedTask.DefaultDerivedTask(c, punct, truth, p);
-        //return new DerivedTask.CompetingDerivedTask(c, punct, truth, p);
+    public @NotNull DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, @Nullable Truth truth, PremiseEval p, boolean single) {
+        return new DerivedTask.DefaultDerivedTask(c, punct, truth, p, p.evidence(single));
     }
-
-
 
 
 }

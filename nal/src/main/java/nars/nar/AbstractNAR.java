@@ -3,7 +3,6 @@ package nars.nar;
 import nars.NAR;
 import nars.Param;
 import nars.budget.policy.ConceptPolicy;
-import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
@@ -32,8 +31,6 @@ import java.util.Random;
  */
 public abstract class AbstractNAR extends NAR {
 
-    public final @NotNull ConceptPolicy conceptWarm, conceptCold;
-
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 4;
 
     public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random random) {
@@ -42,9 +39,6 @@ public abstract class AbstractNAR extends NAR {
 
     public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, index, rng, self);
-
-        conceptWarm = index.conceptBuilder().activated();
-        conceptCold = index.conceptBuilder().initialized();
 
         durMin.setValue(Param.DERIVATION_DURABILITY_THRESHOLD);
 

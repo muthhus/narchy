@@ -202,9 +202,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime);
 
     /** called when a Concept processes this Task; return false to cancel pocessing
-     *  @param c null for command tasks, otherwise it is the concept which has has been changed by this task after its processing
+     * @param c null for command tasks, otherwise it is the concept which has has been changed by this task after its processing
      * */
-    boolean onConcept(@Nullable Concept c, float score);
+    boolean onConcept(@Nullable Concept c);
 
 
 //
@@ -795,14 +795,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     default boolean cyclic() {
-        Task parent = getParentTask();
-        return parent != null && Stamp.overlapping(evidence(), parent.evidence());
-        //return Arrays.equals(evidence(), parent.evidence());
-
-//        Task belief = getParentBelief();
-//        if (belief!=null && Stamp.overlapping(evidence(),belief.evidence()))
-//            return true;
-
+        return Stamp.isCyclic(evidence());
     }
 
     @Override

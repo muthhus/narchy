@@ -4,7 +4,6 @@ import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.NAR;
 import nars.Param;
 import nars.budget.Budgeted;
-import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
@@ -134,26 +133,26 @@ public class Multi extends AbstractNAR {
         private boolean stopped;
 
 
-        public WorkerCore(int n, @NotNull PremiseEval matcher, ConceptPolicy warm, ConceptPolicy cold) {
-            super(Multi.this, matcher, warm, cold);
+        public WorkerCore(int n, @NotNull PremiseEval matcher) {
+            super(Multi.this, matcher);
             this.thread = new Thread(this);
             thread.setName(nar.toString() + ".Worker" + n);
             thread.start();
         }
 
         @Override
-        protected boolean activate(@NotNull Concept c) {
+        protected boolean awake(@NotNull Concept c) {
             if (Multi.this.active.putIfAbsent(c, this) == null) {
-                super.activate(c);
+                super.awake(c);
                 return true;
             }
             return false;
         }
 
         @Override
-        protected void deactivate(@NotNull Concept c) {
+        protected void sleep(@NotNull Concept c) {
             if (Multi.this.active.remove(c) == c) {
-                super.deactivate(c);
+                super.sleep(c);
             }
         }
 
@@ -222,7 +221,7 @@ public class Multi extends AbstractNAR {
 
     protected @NotNull WorkerCore newCore(int id, int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, @NotNull PremiseEval matcher) {
 
-        WorkerCore c = new WorkerCore(id, matcher, conceptWarm, conceptCold);
+        WorkerCore c = new WorkerCore(id, matcher);
         c.concepts.setCapacity(activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies

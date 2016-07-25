@@ -593,16 +593,18 @@ public interface TermIndex {
         throw new UnsupportedOperationException();
     }
 
-    default void deactivate(@NotNull Concept c, @NotNull ConceptPolicy cold) {
-        if (c.policy() != cold) {
-            c.policy(cold);
+    default void policy(@NotNull Concept c, ConceptPolicy p) {
 
-            c.tasklinks().commit();
-            c.termlinks().commit();
+        synchronized(c) {
+            if (c.policy() != p) {
+                c.policy(p);
+
+                c.tasklinks().commit();
+                c.termlinks().commit();
+            }
+            set(c); //update in the cache (weight, etc.)
         }
 
-        c.policy(null);
-        set(c); //update in the cache (weight, etc.)
     }
 
     default void activate(@NotNull Concept c, @NotNull ConceptPolicy warm) {

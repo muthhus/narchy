@@ -113,7 +113,7 @@ public class MySTMClustered extends STMClustered {
 					if (conf < confMin)
 						return;
 
-					long[] evidence = Stamp.zip(Stream.of(uu), uu.length, Param.STAMP_MAX_EVIDENCE);
+					long[] evidence = Stamp.zip(Stream.of(uu), uu.length, Param.STAMP_CAPACITY);
 
 					@Nullable Term conj = conj(negated, uu);
 

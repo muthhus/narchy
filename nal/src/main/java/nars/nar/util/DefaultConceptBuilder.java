@@ -37,7 +37,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                 return new AtomConcept(a, termbag(map), taskbag(map));
             };
 
-    private final ConceptPolicy conceptInitialize, conceptActivate;
+    private final ConceptPolicy init, awake, sleep;
 
 
     //private static volatile int serial = 0;
@@ -64,7 +64,8 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
         }
 
-        return new CompoundConcept(t, termbag, taskbag);
+        Concept c = new CompoundConcept(t, termbag, taskbag);
+        return c;
     }
 
 
@@ -84,7 +85,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     }
 
 
-    private final BudgetMerge mergeDefault = BudgetMerge.plusDQBlend;
+    private final BudgetMerge mergeDefault = BudgetMerge.plusBlend;
 
 
 
@@ -101,8 +102,9 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     public DefaultConceptBuilder(@NotNull Random r) {
         this.rng = r;
 
-        this.conceptInitialize = new DefaultConceptPolicy(10, 8, 1, 8, 4);
-        this.conceptActivate = new DefaultConceptPolicy(12, 10, 4, 24, 12);
+        this.init =  new DefaultConceptPolicy(2, 2, 1, 8, 4);
+        this.sleep = new DefaultConceptPolicy(10, 8, 2, 16, 8);
+        this.awake = new DefaultConceptPolicy(12, 10, 4, 24, 12);
 
         this.defaultCurveSampler =
                 new CurveBag.NormalizedSampler(
@@ -153,12 +155,17 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     }
 
     @Override
-    public ConceptPolicy initialized() {
-        return conceptInitialize;
+    public ConceptPolicy init() {
+        return init;
     }
     @Override
-    public ConceptPolicy activated() {
-        return conceptActivate;
+    public ConceptPolicy awake() {
+        return awake;
+    }
+
+    @Override
+    public ConceptPolicy sleep() {
+        return sleep;
     }
 
 }

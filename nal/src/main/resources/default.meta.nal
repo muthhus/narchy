@@ -48,8 +48,8 @@
     (P ==> S), (S ==> P), task("?") |- (P ==> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
-//    ( --S ==> P),   P, time(dtTask) |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
-//    ( --S ==> P), --S, time(dtTask) |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
+    ( (--,%S) ==> P),   P, time(dtTask) |- ( (--,%P) ==> S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),   S, time(dtTask) |- ( (--,%P) ==> S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
 
 
 
@@ -280,10 +280,10 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //decompose any event in a conjunction belief
-     (&&,X,A..+), X, time(decomposeTaskIfTemporal) |- X, (Belief:StructuralDeduction)
-        (&&,(--,%X),A..+), X, time(decomposeTaskIfTemporal) |- (--,%X), (Belief:StructuralDeduction)
-     (&&,X,A..+), X, time(decomposeTaskIfTemporal) |- (&&,A..+), (Belief:StructuralDeduction)
-        (&&,(--,%X),A..+), X, time(decomposeTaskIfTemporal) |- (&&,A..+), (Belief:StructuralDeduction)
+     (&&,X,A..+), X, time(taskConjDecomposable) |- X, (Belief:StructuralDeduction)
+        (&&,(--,%X),A..+), X, time(taskConjDecomposable) |- (--,%X), (Belief:StructuralDeduction)
+     (&&,X,A..+), X, time(taskConjDecomposable) |- (&&,A..+), (Belief:StructuralDeduction)
+        (&&,(--,%X),A..+), X, time(taskConjDecomposable) |- (&&,A..+), (Belief:StructuralDeduction)
      (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
         //TODO as above
 

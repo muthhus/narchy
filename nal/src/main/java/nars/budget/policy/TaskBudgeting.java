@@ -2,17 +2,17 @@ package nars.budget.policy;
 
 import nars.$;
 import nars.Memory;
-import nars.Param;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
-import nars.concept.Concept;
+import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -25,34 +25,31 @@ import static nars.nal.UtilityFunctions.aveAri;
  */
 public class TaskBudgeting {
 
-    public static @Nullable Budget budgetInference(float qual, @NotNull Termed derived, @NotNull PremiseEval p, float minDur) {
 
+    /** combines the tasklinks and termlink budgets to arrive at a Premise budget, used in budgeting its derivations */
+    public static void premise(@NotNull Budget p, @NotNull BLink<Task> taskLink, @NotNull BLink<Term> termLink) {
+        p.budget(taskLink);
+        BudgetMerge.plusBlend.apply(p, termLink, 1f);
+    }
 
-        Task parentTask = p.task;
-
-        //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
-        float parentVol = aveAri(parentTask.complexity(), p.beliefTerm.complexity());
-        //float volRatioScale = parentVol / ((float) (parentVol + derived.complexity()));
-        float volRatioScale = Math.min(1, parentVol / derived.complexity() );
-        //volRatioScale = volRatioScale * volRatioScale; //sharpen
-
+    public static @Nullable Budget derivation(float qual, @NotNull Termed derived, @NotNull PremiseEval p, float minDur) {
 
         Premise pp = p.premise;
 
-        Concept c = pp.concept(p.nar);
-        if (c == null)
-            return null;
+        Task parentTask = pp.task;
 
-        BLink<? extends Task> taskLink = pp.tasklink(c);
-        if (taskLink == null)
-            return null;
+        //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
 
-        BLink<? extends Termed> termLink = pp.termlink(c);
-        if (termLink == null)
-            return null;
+        float parentComplexity = Math.max(parentTask.complexity(), pp.term.complexity());
+        int derivedComplexity = derived.complexity();
 
-        float linkDur = aveAri( taskLink.dur(), termLink.dur() );
-        final float durability = linkDur * volRatioScale;
+        float volRatioScale = 1f / (1f + (derivedComplexity / (derivedComplexity + parentComplexity)));
+
+        //volRatioScale = volRatioScale * volRatioScale; //sharpen
+
+
+
+        final float durability = pp.dur() * volRatioScale;
         if (durability < minDur)
             return null;
 
@@ -60,11 +57,11 @@ public class TaskBudgeting {
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                aveAri(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero())
+                pp.pri()
                     * volRatioScale
         ;
-        if (priority * durability < Param.BUDGET_EPSILON)
-            return null;
+        //if (priority * durability < Param.BUDGET_EPSILON)
+            //return null;
 
         final float quality = qual * volRatioScale;
 
@@ -94,26 +91,18 @@ public class TaskBudgeting {
 
     /**
      * Backward logic with CompoundTerm conclusion, stronger case
-     *
-     * @param content The content of the conclusion
-     * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundQuestion(@NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
-        return budgetInference(1.0f, content, premise, minDur);
+    public static Budget derivationBackward(@NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
+        return derivation(premise.premise.qua(), content, premise, minDur);
     }
 
     /**
      * Forward logic with CompoundTerm conclusion
-     *
-     * @param truth   The truth value of the conclusion
-     * @param content The content of the conclusion
-     * @param premise     Reference to the memory
-     * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
-        return budgetInference(
+    public static Budget derivationForward(@NotNull Truth truth, @NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
+        return derivation(
                 BudgetFunctions.truthToQuality(truth),
                 content,
                 premise, minDur);
@@ -166,6 +155,7 @@ public class TaskBudgeting {
         }*/
         return budget;
     }
+
 
 //    public static float solutionQuality(Task problem, Task solution, Truth truth, long time) {
 //        return Tense.solutionQuality(problem.hasQueryVar(), problem.getOccurrenceTime(), solution, truth, time);

@@ -34,14 +34,11 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
-import spacegraph.SpaceGraph;
-import spacegraph.layout.Flatten;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -239,13 +236,14 @@ public class Tetris extends TetrisState implements Environment {
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 30000000, false)
 
                 ,new FrameClock());
-        nar.conceptActivation.setValue(0.02f);
+        nar.inputActivation.setValue(0.01f);
+        nar.derivedActivation.setValue(0.25f);
 
 
         nar.beliefConfidence(0.75f);
         nar.goalConfidence(0.75f); //must be slightly higher than epsilon's eternal otherwise it overrides
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.7f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
@@ -328,12 +326,12 @@ public class Tetris extends TetrisState implements Environment {
 
                     new BeliefTableChart(nar, charted).show(600, 900);
 
-                    //BagChart.show((Default) nar, 128);
+                    BagChart.show((Default) nar, 128);
 
-                    STMView.show(stm, 800, 600);
+                    //STMView.show(stm, 800, 600);
 
 
-                    //NARSpace.newConceptWindow((Default) nar, 128, 4);
+                    NARSpace.newConceptWindow((Default) nar, 64, 16);
                 }
 
 
@@ -343,7 +341,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, runCycles);
+        t.run(n, runCycles, 100);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

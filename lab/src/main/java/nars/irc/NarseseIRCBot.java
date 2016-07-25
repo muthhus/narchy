@@ -182,7 +182,7 @@ public class NarseseIRCBot extends Talk {
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 
 
-        nar.conceptActivation.setValue(0.1f);
+        nar.inputActivation.setValue(0.1f);
         nar.cyclesPerFrame.set(16);
 
         nar.logSummaryGT(System.out, 0.75f);

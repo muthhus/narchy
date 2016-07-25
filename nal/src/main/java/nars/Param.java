@@ -38,7 +38,7 @@ public abstract class Param extends Container implements Level {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_MAX_EVIDENCE = 10;
+    public static final int STAMP_CAPACITY = 10;
 
     /**
      * hard upper-bound limit on Compound term complexity;
@@ -71,7 +71,8 @@ public abstract class Param extends Container implements Level {
      * minimum durability and quality necessary for a derivation to form
      */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON * 2f;
-    public static final int CONCURRENCY_DEFAULT = 2;
+
+    public static final int CONCURRENCY_DEFAULT = 1;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;
@@ -200,10 +201,14 @@ public abstract class Param extends Container implements Level {
 
 
     /**
-     * factor for concept activation [0 <= c <= 1]
+     * factor for concept activation [0 <= c <= 1] by input tasks
      */
-    public final MutableFloat conceptActivation = new MutableFloat(1f);
+    public final MutableFloat inputActivation = new MutableFloat(1f);
 
+    /**
+     * factor for concept activation [0 <= c <= 1] by derived tasks
+     */
+    public final MutableFloat derivedActivation = new MutableFloat(1f);
 
      /*
      BUDGET THRESHOLDS

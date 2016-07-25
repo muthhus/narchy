@@ -5,7 +5,6 @@ import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.bag.impl.MapBagPendings;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
@@ -22,25 +21,17 @@ import org.jetbrains.annotations.Nullable;
  */
 public class DefaultCore extends AbstractCore {
 
-    private final ConceptPolicy cold;
-    private final ConceptPolicy warm;
 
-
-    public DefaultCore(@NotNull NAR nar, @NotNull PremiseEval matcher, ConceptPolicy warm, ConceptPolicy cold) {
+    public DefaultCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {
         super(nar, matcher);
-        this.warm = warm;
-        this.cold = cold;
     }
 
 
     /** called when a concept is displaced from the concept bag */
-    protected void deactivate(@NotNull Concept c) {
-
+    protected void sleep(@NotNull Concept c) {
         NAR n = this.nar;
 
-        synchronized (n.index) {
-            n.index.deactivate(c, cold);
-        }
+        n.index.policy(c, n.index.conceptBuilder().sleep());
 
         n.emotion.alert(1f / concepts.size());
     }
@@ -48,12 +39,10 @@ public class DefaultCore extends AbstractCore {
     /** called when a concept enters the concept bag
      * @return whether to accept the item into the bag
      * */
-    protected boolean activate(@NotNull Concept c) {
+    protected boolean awake(@NotNull Concept c) {
 
-        synchronized (nar.index) {
-            //set capacity first in case there are any queued items, they may join during the commit */
-            nar.index.activate(c, warm);
-        }
+        NAR n = this.nar;
+        n.index.policy(c, n.index.conceptBuilder().awake());
 
         return true;
     }
@@ -72,7 +61,7 @@ public class DefaultCore extends AbstractCore {
         final NAR nar;
 
         public MonitoredCurveBag(NAR nar, int capacity, @NotNull CurveSampler sampler) {
-            super(capacity, sampler, BudgetMerge.plusDQBlend);
+            super(capacity, sampler, BudgetMerge.plusBlend);
             this.nar = nar;
             setCapacity(capacity);
         }
@@ -85,7 +74,7 @@ public class DefaultCore extends AbstractCore {
 
         @Override
         public void clear() {
-            forEach((BLink<Concept> v) -> { if (v!=null) deactivate(v.get()); }); //HACK allow opportunity to process removals
+            forEach((BLink<Concept> v) -> { if (v!=null) sleep(v.get()); }); //HACK allow opportunity to process removals
             super.clear();
         }
 
@@ -93,25 +82,25 @@ public class DefaultCore extends AbstractCore {
         @Nullable
         @Override
         protected BLink<Concept> putNew(@NotNull Concept i, @NotNull BLink<Concept> b) {
-            if (!activate(i))
+            if (!awake(i))
                 return b;
             BLink<Concept> displaced = super.putNew(i, b);
             if (displaced!=null) {
-                deactivate(displaced.get());
+                sleep(displaced.get());
             }
             return displaced;
         }
 
         @Override
         protected void putFail(@NotNull Concept c) {
-            deactivate(c);
+            sleep(c);
         }
 
         @Override
         public @Nullable BLink<Concept> remove(@NotNull Concept x) {
             BLink<Concept> r = super.remove(x);
             if (r!=null) {
-                deactivate(x);
+                sleep(x);
             }
             return r;
         }

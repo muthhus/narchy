@@ -33,8 +33,8 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         this.goalsMaxEte = goalsMaxEte;
         this.goalsMaxTemp = goalsMaxEte;
         this.questionsMax = questionsMax;
-        this.termlinksCapacityMin = termlinksCapacity;
-        this.termlinksCapacityMax = new MutableInteger(termlinksCapacity.intValue()); //HACK
+        this.termlinksCapacityMin = new MutableInteger(Math.max(1,termlinksCapacity.intValue()/2));
+        this.termlinksCapacityMax = termlinksCapacity;
         this.taskLinksCapacity = taskLinksCapacity;
     }
 
@@ -59,15 +59,19 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     @Override
     public int linkCap(@NotNull AbstractConcept c, boolean termOrTask) {
         if (termOrTask) {
+
             int min = termlinksCapacityMin.intValue();
             int max = termlinksCapacityMax.intValue();
-            int v = Math.max(1, c.volume());
 
-            int tl = (int)Math.ceil(Util.lerp(min, max, 1f - 1f/(v)));
-            //System.out.println(c + " " + min + " " + max + " " + c.volume() + " " + ":" + tl);
-            return tl;
+            int v = Math.max(1, c.complexity());
+            float complexityFactor = 1f - 1f / (1 + v); //smaller concepts get more termlinks
 
-            //return termlinksCapacity.intValue();
+            int l = Math.round(Util.lerp(min, max, complexityFactor));
+            if (c instanceof CompoundConcept)
+                l = Math.max(l, ((CompoundConcept)c).templates.size()); //at least enough for its templates
+
+            return l;
+
         } else {
             return taskLinksCapacity.intValue();
         }

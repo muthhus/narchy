@@ -13,7 +13,6 @@ import nars.learn.Agent;
 import nars.nar.Default;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -557,7 +556,7 @@ public class NAgent implements Agent {
 
     public @Nullable Concept boost(Concept c) {
 
-        return nar.activate(c, UnitBudget.One, nar.conceptActivation.floatValue() * reinforcementAttention, reinforcementAttention, null);
+        return nar.activate(c, UnitBudget.One, nar.inputActivation.floatValue() * reinforcementAttention, reinforcementAttention, null);
     }
 
     public void observe(float[] nextObservation) {

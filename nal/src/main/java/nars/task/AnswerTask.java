@@ -59,7 +59,7 @@ public class AnswerTask extends MutableTask {
     public AnswerTask budget(@NotNull Task a, @NotNull Task b, float aMix) {
         if (!b.isDeleted() && !a.isDeleted()) {
             budget(b.budget());
-            BudgetMerge.plusDQBlend.merge(budget(), a.budget(), aMix);
+            BudgetMerge.plusBlend.merge(budget(), a.budget(), aMix);
         } else {
             delete();
         }

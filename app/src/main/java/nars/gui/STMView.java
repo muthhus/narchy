@@ -9,6 +9,7 @@ import nars.op.time.MySTMClustered;
 import nars.op.time.STMClustered;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -84,7 +85,14 @@ public class STMView  {
                     new GridSurface(
                         inputBagChart = new BagChart<Task>(stm.input, -1) {
                             protected ItemVis<BLink<Task>> newItem(BLink<Task> i) {
-                                return new ItemVis<>(i, label(i.get().toStringWithoutBudget(), 16));
+                                @Nullable Task ii = i.get();
+                                String label;
+                                if (ii != null)
+                                    label =  ii.toStringWithoutBudget();
+                                else
+                                    label = "?";
+
+                                return new ItemVis<>(i, label(label, 16));
                             }
                         },
 
