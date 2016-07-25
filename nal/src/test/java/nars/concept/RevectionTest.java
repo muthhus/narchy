@@ -93,6 +93,8 @@ public class RevectionTest {
         int maxBeliefs = repeats*4;
         NAR n = newNAR(maxBeliefs);
 
+        n.log();
+
         long at = 5;
 
         float outConf = w2c( c2w(inConf)*repeats );
@@ -103,8 +105,8 @@ public class RevectionTest {
         }
 
         b.run(1);
-        assertEquals(repeats, b.size());
         b.print();
+        assertEquals(repeats, b.size());
 
         assertEquals(outConf, b.beliefs().truth(at).conf(), 0.01f);
     }

@@ -56,6 +56,9 @@ public enum PremiseBuilder {
         float minDur = nar.durMin.floatValue();
 
         Task task = taskLink.get();
+        if (task == null)
+            return 0;
+
         Compound taskTerm = task.term();
 
         RawBudget pBudget = new RawBudget(); //recycled temporary budget for calculating premise budget
@@ -67,13 +70,15 @@ public enum PremiseBuilder {
 
             BLink<Term> termLink = termLinks.get(i);
             Term term = termLink.get();
+            if (term == null)
+                continue;
 
             if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
                 continue;
 
             if (budget(pBudget, taskLink, termLink, minDur)) {
 
-                Premise p = newPremise(nar, now, taskLink, termLink, pBudget);
+                Premise p = newPremise(nar, now, task, termLink, pBudget);
 
                 Conclusion c = matcher.run(p, new Conclusion());
 
@@ -106,9 +111,9 @@ public enum PremiseBuilder {
      patham9 especially try to understand the "temporal temporal" case
      patham9 its using the result of higher confidence
      */
-    static @NotNull Premise newPremise(@NotNull NAR nar, long now, @NotNull BLink<Task> taskLink, @NotNull BLink<Term> termLink, Budget b) {
+    static @NotNull Premise newPremise(@NotNull NAR nar, long now, @NotNull Task task, @NotNull BLink<Term> termLink, Budget b) {
 
-        Task task = taskLink.get();
+
         Task belief = null;
         Term termLinkTerm = termLink.get();
 
@@ -138,7 +143,7 @@ public enum PremiseBuilder {
             }
         }
 
-        Premise p = new Premise(taskLink, termLink, belief);
+        Premise p = new Premise(task, termLinkTerm, belief);
         p.budget(b);
         return p;
     }
@@ -213,37 +218,6 @@ public enum PremiseBuilder {
         }
     }
 
-
-//    /** uses the query-unified term to complete a premise */
-//    @Override public final boolean accept(@NotNull Term beliefTerm, Term unifiedBeliefTerm) {
-//
-//        Task belief = beliefTerm instanceof Compound ?
-//
-//                //beliefCache.computeIfAbsent(beliefTerm, this) :
-//                apply(beliefTerm) :
-//
-//                null; //atomic terms will have no beliefs anyway
-//
-//        //if the unified belief term is different, then clone the known belief with it as the new belief
-//        if (belief!=null && (unifiedBeliefTerm instanceof Compound) && !beliefTerm.equals(unifiedBeliefTerm)) {
-//            Task unifiedBelief = new MutableTask(belief, (Compound)unifiedBeliefTerm).normalize(memory);
-//            if (unifiedBelief!=null) {
-//                belief = unifiedBelief;
-//            }
-//
-//        }
-//
-//        //TODO also modify the termlink / "belief term" in the premise? or leave as variable
-//
-//        premise(concept, taskLink, termLink, belief);
-//
-////        Task task = taskLink.get();
-////        //Report questions/solution pairs involving query variable that have been matched
-////        if (belief != null && task.isQuestOrQuestion() && !belief.isQuestOrQuestion())
-////            memory.onSolve(task, belief);
-//
-//        return true;
-//    }
 
 
 }

@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 
 
+import jdk.nashorn.internal.objects.Global;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -239,7 +240,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     @Nullable
     public Task task(@NotNull String taskText) throws NarseseException {
-        return Narsese.the().task(taskText, this).normalize(this);
+        Task task = Narsese.the().task(taskText, this);
+        task.normalize(this);
+        return task;
     }
 
     @NotNull
@@ -530,14 +533,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             throw new InvalidTaskException(input, "Deleted");
         }
 
-        input = input.normalize(this); //accept into input buffer for eventual processing
+        Concept c;
 
-        Concept c = concept(input, true);
-        if (c == null) {
-            logger.warn("inconceivable task: {}", input);
-            input.delete();
-            return null;
+        try {
+            c = input.normalize(this); //accept into input buffer for eventual processing
+        } catch (Exception e) {
+            logger.error("{} invalid: {}", input, e);
+            e.printStackTrace();
+            if (Param.DEBUG)
+                throw e;
         }
+
+        //input.onInput(c);
 
         float conceptActivation = input.isInput() ? this.inputActivation.floatValue() : this.derivedActivation.floatValue();
         float linkActivation = 1f;
@@ -1046,10 +1053,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return concept(t, createIfMissing);
     }
 
-    public @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) {
-        if (t instanceof Variable)
-            return null;
-
+    public @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) throws TermIndex.InvalidConceptTermException {
         return index.concept(t, createIfMissing);
     }
 

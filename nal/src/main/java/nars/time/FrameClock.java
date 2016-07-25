@@ -50,6 +50,9 @@ public class FrameClock implements Clock {
         if (s == Long.MAX_VALUE) //ignore cyclic indicator
             return;
         long nextStamp = this.nextStamp.longValue();
+        if (s == Long.MAX_VALUE) //ignore cyclic indicator
+            s = 0; //wraparound skipping MAX_VALUE which is reserved for cyclic, but ignore the negative spectrum
+
         if (nextStamp < s)
             this.nextStamp.set(s+1);
     }

@@ -102,8 +102,10 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     public DefaultConceptBuilder(@NotNull Random r) {
         this.rng = r;
 
-        this.init =  new DefaultConceptPolicy(2, 2, 1, 8, 4);
+
         this.sleep = new DefaultConceptPolicy(10, 8, 2, 16, 8);
+        this.init = sleep;
+
         this.awake = new DefaultConceptPolicy(12, 10, 4, 24, 12);
 
         this.defaultCurveSampler =

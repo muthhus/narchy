@@ -3,7 +3,6 @@ package nars.index;
 import com.gs.collections.api.list.primitive.ByteList;
 import nars.$;
 import nars.Narsese;
-import nars.Op;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.nal.TermBuilder;
@@ -11,7 +10,10 @@ import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.op.TermTransform;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
@@ -34,13 +36,14 @@ import static nars.$.unneg;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.term.Termed.termOrNull;
-import static nars.term.Terms.compoundOrNull;
 
 /**
  *
  */
 public interface TermIndex {
 
+
+    String VARIABLES_ARE_NOT_CONCEPTUALIZABLE = "Variables are not conceptualizable";
 
     /**
      * getOrAdd the term
@@ -149,12 +152,9 @@ public interface TermIndex {
     default Term resolve(@NotNull Term src, @NotNull Subst f) {
 
 
-
         Term y = f.term(src);
         if (y != null)
             return y; //an assigned substitution, whether a variable or other type of term
-
-
 
 
         if (src instanceof Variable) {
@@ -229,7 +229,6 @@ public interface TermIndex {
 //        }
 //        return result;
 //    }
-
 
 
     @Nullable
@@ -362,8 +361,6 @@ public interface TermIndex {
     }
 
 
-
-
     @Nullable
     default Compound normalize(@NotNull Termed<Compound> t, boolean insert) {
         Compound r;
@@ -385,8 +382,8 @@ public interface TermIndex {
             }*/
 
 
-            ((GenericCompound)t2).setNormalized();
-            r = (Compound)t2;
+            ((GenericCompound) t2).setNormalized();
+            r = (Compound) t2;
 
         } else {
             r = t.term();
@@ -398,17 +395,15 @@ public interface TermIndex {
     }
 
 
-
-
     @Nullable
     default Term build(@NotNull Compound src, @NotNull List<Term> newSubs) {
-        return build(src, newSubs.toArray(new Term[newSubs.size()]) );
+        return build(src, newSubs.toArray(new Term[newSubs.size()]));
     }
 
 
     @Nullable
     default Term transform(@Nullable Compound src, @NotNull CompoundTransform t) {
-        return src==null || !t.testSuperTerm(src) ? src : _transform(src, t);
+        return src == null || !t.testSuperTerm(src) ? src : _transform(src, t);
     }
 
 
@@ -429,18 +424,18 @@ public interface TermIndex {
             return src; //path wont continue inside an atom
 
         int n = src.size();
-        Compound csrc = (Compound)src;
+        Compound csrc = (Compound) src;
 
         Term[] target = new Term[n];
 
         for (int i = 0; i < n; i++) {
             Term x = csrc.term(i);
-            if (path.get(depth)!=i)
+            if (path.get(depth) != i)
                 //unchanged subtree
                 target[i] = x;
             else {
                 //replacement is in this subtree
-                target[i] = transform(x, path, depth+1, replacement);
+                target[i] = transform(x, path, depth + 1, replacement);
             }
 
         }
@@ -489,7 +484,6 @@ public interface TermIndex {
     }
 
 
-
     @NotNull
     default Term parseRaw(@NotNull String termToParse) throws Narsese.NarseseException {
         return Narsese.the().term(termToParse, this, false);
@@ -515,62 +509,49 @@ public interface TermIndex {
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
     @Nullable
-    default Concept concept(@NotNull Termed term, boolean createIfMissing) {
+    default Concept concept(@NotNull Termed term, boolean createIfMissing) throws InvalidConceptTermException {
 
-        if (term instanceof Concept) {
-            //its already a key for a Concept
-            //but we need to look it up
+
+        term = $.unneg(term); //unwrap negation
+
+        if (term instanceof Atomic) {
+
+            if (term instanceof Variable)
+                throw new InvalidConceptTermException(term, VARIABLES_ARE_NOT_CONCEPTUALIZABLE);
+
         } else {
 
-            if (term.op() == NEG) {
-                //unwrap negation
-                term = ((Compound) term).term(0);
-                if (term instanceof Atomic) {
-                    //negations of non-DepVar atomics are invalid
-                    if (term.op() != Op.VAR_DEP) {
-                        throw new InvalidConceptTerm(term);
-                    }
-                }
+            term = unneg(term);
 
+            Termed prenormalized = term;
+
+            if ((term = normalize(term, createIfMissing)) == null)
+                throw new InvalidConceptTermException(prenormalized, "Failed normalization");
+
+            Term aterm = atemporalize((Compound) term);
+            if (!(aterm instanceof Compound))
+                throw new InvalidConceptTermException(term, "Failed atemporalization");
+
+            //optimization: atemporalization was unnecessary, normalization may have already provided the concept
+            if ((aterm == term) && (term instanceof Concept)) {
+                return (Concept) term;
             }
 
+            //term = unneg(aterm); //it can happen that atemporalization will result in a negation that was not unwrapped to begin with?
+            if (term.op() == NEG)
+                throw new InvalidConceptTermException(term, "Negation re-appeared");
 
-            if (term instanceof Atomic) {
-
-                if (term instanceof Variable)
-                    throw new InvalidConceptTerm(term);
-
-
-            } else {
-
-                Termed prenormalized = term;
-
-                //unwrap negation again if necessary?
-
-                term = unneg(term);
-
-                if ((term = normalize(term, createIfMissing)) == null)
-                    throw new InvalidTerm(prenormalized);
-
-                Term aterm = atemporalize((Compound) term);
-
-                //optimization: atemporalization was unnecessary, normalization may have already provided the concept
-                if ((aterm == term) && (term instanceof Concept)) {
-                    return (Concept) term;
-                }
-
-                if (!(aterm instanceof Compound))
-                    return null; //probably unforseeable
-                //throw new InvalidTerm(prenormalizetd);
-
-                term = unneg(aterm); //it can happen that atemporalization will result in a negation that was not unwrapped to begin with?
-            }
+            term = aterm;
         }
 
 
         @Nullable Termed c = get(term, createIfMissing);
-        if (c == null)
+        if (!(c instanceof Concept)) {
+            if (createIfMissing) {
+                throw new InvalidConceptTermException(term, "Failed to build concept");
+            }
             return null;
+        }
 
 
         return (Concept) c;
@@ -595,7 +576,7 @@ public interface TermIndex {
 
     default void policy(@NotNull Concept c, ConceptPolicy p) {
 
-        synchronized(c) {
+        synchronized (c) {
             if (c.policy() != p) {
                 c.policy(p);
 
@@ -620,24 +601,22 @@ public interface TermIndex {
     }
 
 
-    final class InvalidConceptTerm extends RuntimeException {
+    final class InvalidConceptTermException extends RuntimeException {
 
         public final Termed term;
+        private final String reason;
 
-        public InvalidConceptTerm(Termed term) {
+        public InvalidConceptTermException(Termed term, String reason) {
             this.term = term;
+            this.reason = reason;
         }
 
         @NotNull
         @Override
         public String toString() {
-            return "InvalidConceptTerm: " + term + " (" + term.getClass() + ")";
+            return "InvalidConceptTerm: " + term + " (" + term.getClass() + "): " + reason;
         }
     }
-
-
-
-
 
 
     default void loadBuiltins() {
@@ -658,9 +637,7 @@ public interface TermIndex {
     }
 
 
-
-
-    final class CompoundAtemporalizer implements CompoundTransform<Compound,Term> {
+    final class CompoundAtemporalizer implements CompoundTransform<Compound, Term> {
 
         private final TermIndex index;
         @Nullable
@@ -681,13 +658,13 @@ public interface TermIndex {
                 if (xx == null)
                     return null;
 
-                x = i.the( xx ).term();
+                x = i.the(xx).term();
             } else {
                 x = c;
             }
 
             if (x instanceof Compound)
-                return i.transform((Compound)x,this);
+                return i.transform((Compound) x, this);
             else
                 return x;
         }
@@ -700,7 +677,7 @@ public interface TermIndex {
         @Override
         public @Nullable Term apply(Compound parent, @NotNull Term subterm) {
             if (subterm instanceof Compound)
-                return _atemporalize((Compound)subterm);
+                return _atemporalize((Compound) subterm);
             else
                 return subterm;
         }

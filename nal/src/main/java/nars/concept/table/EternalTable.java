@@ -240,13 +240,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
                 revised = tryRevision(input, nar);
                 if (revised != null) {
 
-                    try {
-                        revised = revised.normalize(nar); //may throw an exception
-                    } catch (NAR.InvalidTaskException e) {
-                        e.printStackTrace();
-                        revised = null;
-                    }
-
                     if (Param.DEBUG) {
 
                         if (revised.isDeleted())

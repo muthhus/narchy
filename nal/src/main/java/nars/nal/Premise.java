@@ -37,15 +37,15 @@ public final class Premise extends RawBudget implements Tasked {
     //@NotNull transient private final Term conceptLink;
 
 
-    public Premise(@NotNull BLink<Task> taskLink,
-                   @NotNull BLink<Term> termLink,
+    public Premise(@NotNull Task taskLink,
+                   @NotNull Term termLink,
                    @Nullable Task belief) {
 
-        this.task = taskLink.get();
+        this.task = taskLink;
 
         //this.conceptLink = conceptLink;
 
-        this.term = termLink.get();
+        this.term = termLink;
 
         this.belief = belief;
     }

@@ -3,6 +3,7 @@ package nars.task;
 import nars.*;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
+import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Term;
@@ -134,15 +135,15 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
 
-    @Override @NotNull
-    public final Task normalize(@NotNull Memory memory) {
+    @NotNull @Override
+    public final Concept normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptTermException, NAR.InvalidTaskException  {
 
         if (isDeleted())
             throw new NAR.InvalidTaskException(this, "Deleted");
 
         Compound t = term();
 
-        if (!t.levelValid( memory.nal() ))
+        if (!t.levelValid( nar.nal() ))
             throw new NAR.InvalidTaskException(this, "Unsupported NAL level");
 
         char punc = punc();
@@ -160,7 +161,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             case Symbols.GOAL:
                 if (truth == null) {
                     //apply the default truth value for specified punctuation
-                    truth = memory.truthDefault(punc);
+                    truth = nar.truthDefault(punc);
                 }
                 break;
             case Symbols.QUEST:
@@ -176,7 +177,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
         }
 
-        Termed<Compound> ntt = Task.normalizeTaskTerm(t, punc, memory);
+        Termed<Compound> ntt = Task.normalizeTaskTerm(t, punc, nar);
         setTerm(ntt);
 
         // if a task has an unperceived creationTime,
@@ -184,7 +185,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         // and adjust occurenceTime if it's not eternal
 
         if (creation() <= Tense.TIMELESS) {
-            long now = memory.time();
+            long now = nar.time();
             long oc = occurrence();
             if (oc != ETERNAL)
                 oc += now;
@@ -200,7 +201,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         float q = qua();
         if (q!=q /* fast NaN test */) {
             //HACK for now just assume that only MutableTask supports unbudgeted input
-            memory.budgetDefault((MutableTask)this);
+            nar.budgetDefault((MutableTask)this);
         }
 
 
@@ -208,7 +209,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         //finally, assign a unique stamp if none specified (input)
         if (evidence == null) {
 
-            setEvidence(memory.clock.newStampSerial());
+            setEvidence(nar.clock.newStampSerial());
 
             //this actually means it arrived from unknown origin.
             //we'll clarify what null evidence means later.
@@ -232,18 +233,16 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             }
         }
 
-        onInput(memory);
-
-        return this;
+        return nar.concept(term(), true);
     }
 
 
-    /** if validated and entered into the system. can be overridden in subclasses to handle this event
-     *  isnt called for Command tasks currently; they will be executed right away anyway
-     * */
-    protected void onInput(@NotNull Memory m) {
-
-    }
+//    /** if validated and entered into the system. can be overridden in subclasses to handle this event
+//     *  isnt called for Command tasks currently; they will be executed right away anyway
+//     * */
+//    protected void onInput(@NotNull Memory m) {
+//
+//    }
 
 
 

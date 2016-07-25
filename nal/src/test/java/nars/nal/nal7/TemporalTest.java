@@ -84,6 +84,10 @@ public class TemporalTest {
 
     }
 
+    @Test public void testHasTemporal() {
+        assertTrue( $("(?x &&+1 y)").hasTemporal() );
+    }
+
     @Test public void testParseOperationInFunctionalForm2() {
         assertEquals("(do(that) &&+0 ((a)&&(b)))", n.term("(do(that) &&+0 ((a)&&(b)))").toString());
 

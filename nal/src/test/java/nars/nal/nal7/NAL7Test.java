@@ -10,7 +10,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.$.$;
 import static nars.nal.Tense.ETERNAL;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 1/9/16.
@@ -103,6 +105,8 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(z ==>-5 x)", 1.00f, 0.45f);
 
     }
+
+
 
     @Test
     public void testSum() {

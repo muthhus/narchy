@@ -222,11 +222,11 @@ public class BooleanConcept extends CompoundConcept {
 
         @Nullable @Override
         protected Task update(long now) {
-
-
             MutableTask result = model.update(nar, now, BooleanConcept.this, beliefOrGoal, params.terms());
-
-            return result != null ? result.present(now).normalize(nar) : null;
+            if (result!=null) {
+                result.present(now).normalize(nar);
+            }
+            return result;
         }
 
 //        @Override

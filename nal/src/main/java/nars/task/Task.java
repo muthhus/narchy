@@ -555,7 +555,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      *  null if not normalizable
      */
     @NotNull
-    Task normalize(@NotNull Memory memory) throws InvalidTaskException;
+    Concept normalize(@NotNull NAR memory) throws InvalidTaskException;
 
 
 //    default void ensureValidParentTaskRef() {
@@ -687,7 +687,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
         int base = LongString.maxBase();
         for (int i = 0; i < len; i++) {
-            
+
             if (ev[i] == Long.MAX_VALUE && i == len-1) {
                 //trailing cyclic value
                 buffer.append('C');

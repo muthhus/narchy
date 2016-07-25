@@ -9,6 +9,7 @@ import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.var.Variable;
 import nars.util.graph.TermLinkGraph;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
@@ -173,12 +174,14 @@ public class LinkageTest extends AbstractNALTest {
                 }
 
                 Term w = entry.get().term();
-                Concept Wc = nar.concept(w);
-                if(Wc != null) {
-                    for (BLink<Term> entry2 : Wc.termlinks()) {
-                        if(entry2.get().term().equals(p2Term)) {
-                            passed = true;
-                            break;
+                if (!(w instanceof Variable)) {
+                    Concept Wc = nar.concept(w);
+                    if (Wc != null) {
+                        for (BLink<Term> entry2 : Wc.termlinks()) {
+                            if (entry2.get().term().equals(p2Term)) {
+                                passed = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -216,21 +219,24 @@ public class LinkageTest extends AbstractNALTest {
                     passed = true;
                     break;
                 }
-                Concept Wc = tester.nar.concept(et1);
-                if(Wc != null) {
-                    for (BLink<Term> entry2 : Wc.termlinks()) {
-                        Term et2 = entry2.get().term();
-                        if(et2.toString().equals(premise2)) {
-                            passed = true;
-                            break;
-                        }
-                        Concept Wc2 = tester.nar.concept(et2);
-                        if(Wc2 != null) {
-                            for (BLink<Term> entry3 : Wc2.termlinks()) {
-                                Term et3 = entry3.get().term();
-                                if(et3.toString().equals(premise2)) {
-                                    passed = true;
-                                    break;
+
+                if (!(et1 instanceof Variable)) {
+                    Concept Wc = tester.nar.concept(et1);
+                    if (Wc != null) {
+                        for (BLink<Term> entry2 : Wc.termlinks()) {
+                            Term et2 = entry2.get().term();
+                            if (et2.toString().equals(premise2)) {
+                                passed = true;
+                                break;
+                            }
+                            Concept Wc2 = tester.nar.concept(et2);
+                            if (Wc2 != null) {
+                                for (BLink<Term> entry3 : Wc2.termlinks()) {
+                                    Term et3 = entry3.get().term();
+                                    if (et3.toString().equals(premise2)) {
+                                        passed = true;
+                                        break;
+                                    }
                                 }
                             }
                         }

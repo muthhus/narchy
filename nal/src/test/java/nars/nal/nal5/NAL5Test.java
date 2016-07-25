@@ -22,7 +22,7 @@ public class NAL5Test extends AbstractNALTest {
         return AbstractNALTest.nars(5, true, true);
     }
 
-    final int cycles = 70;
+    final int cycles = 170;
 
     @Test public void revision(){
         test()
