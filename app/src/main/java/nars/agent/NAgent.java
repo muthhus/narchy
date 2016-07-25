@@ -545,7 +545,7 @@ public class NAgent implements Agent {
             throw new RuntimeException();
 
         if (t.occurrence()!=ETERNAL) {
-            Task cloned = nar.inputTask(new GeneratedTask(t.term(), t.punc(), t.truth()).time(nar.time(), nar.time())
+            nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(nar.time(), nar.time())
                     .budget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
         } else {
             //just reactivate the existing eternal

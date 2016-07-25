@@ -147,9 +147,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
         this.runWorker =
-                //ForkJoinPool.commonPool();
-                new ForkJoinPool(concurrency,
-                        defaultForkJoinWorkerThreadFactory, null, false);
+                ForkJoinPool.commonPool();
+                /*new ForkJoinPool(concurrency,
+                        defaultForkJoinWorkerThreadFactory, null, false);*/
         this.taskWorker =
                 new ForkJoinPool(concurrency,
                         defaultForkJoinWorkerThreadFactory, null, false);
@@ -158,27 +158,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         index.loadBuiltins();
 
 
-        //    private void addTransform(Class c, ImmediateTermTransform i) {
-        //        transforms.put((Atomic) index.the($.operator(c.getSimpleName())).term(), i);
-        //    }
-
 
     }
-
-//    private void process(Object o) {
-//        Object x = o;
-//        if (x instanceof Task) {
-//            Task t = (Task) x;
-//            if (!t.isDeleted()) {
-//                input(t);
-//            } else {
-//                logger.info("deleted input: {}", t);
-//            }
-//        } else if (x instanceof Runnable) {
-//            ((Runnable) x).run();
-//        } else
-//            logger.error("unsupported {}", o);
-//    }
 
     @Deprecated
     public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
@@ -239,7 +220,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * inputs a task, only if the parsed text is valid; returns null if invalid
      */
-    @NotNull
+    @Deprecated @NotNull
     public Task inputTask(@NotNull String taskText) {
         Task task = task(taskText);
         if (task == null)
@@ -249,7 +230,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable
     public Task inputTask(@NotNull Task t) {
-        input(t);
+        inputLater(t);
         return t;
     }
 
@@ -489,7 +470,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 .budget(pri, dur)
                 .time(time(), occurrenceTime);
 
-        input(t);
+        inputLater(t);
 
         return t;
     }
@@ -510,7 +491,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         MutableTask t = new MutableTask(term, questionOrQuest, null);
         t.time(time(), when);
 
-        input(t);
+        inputLater(t);
 
         return t;
 
@@ -543,15 +524,64 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * return true if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    public final void input(@NotNull Task t) {
+    protected final Concept input(@NotNull Task input, float conceptActivation, float linkActivation) {
 
-        process(t.normalize(this)); //accept into input buffer for eventual processing
+        if (input.isDeleted()) {
+            throw new InvalidTaskException(input, "Deleted");
+        }
+
+        input = input.normalize(this); //accept into input buffer for eventual processing
+
+        Concept c = concept(input, true);
+        if (c == null) {
+            logger.warn("inconceivable task: {}", input);
+            input.delete();
+            return null;
+        }
+
+        float cost = input.pri(); //the priority demanded by this task
+
+        emotion.busy(cost);
+
+
+        if (c.policy() == null) {
+            c.policy(index.conceptBuilder().initialized());
+        }
+
+
+        Task inputted = c.process(input, this);
+
+        if (inputted != null && !inputted.isDeleted()) {
+
+            if (clock instanceof FrameClock) {
+                //HACK for unique serial number w/ frameclock
+                ((FrameClock) clock).ensureStampSerialGreater(inputted.evidence());
+            }
+
+            //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
+            if (inputted.pri() > Param.BUDGET_EPSILON) {
+                //propagate budget
+                MutableFloat overflow = new MutableFloat();
+                activate(c, inputted, conceptActivation, linkActivation, overflow);
+                emotion.stress(overflow);
+            }
+
+            inputted.onConcept(c, 0);
+
+            eventTaskProcess.emit(inputted); //signal any additional processes
+
+        } else {
+            emotion.frustration(cost);
+        }
+
+        return c;
+
 
     }
 
     @Override
     public final void accept(@NotNull Task task) {
-        input(task);
+        inputLater(task);
     }
 
 
@@ -568,8 +598,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //        TaskQueue tq = new TaskQueue(t);
 //        input((Input) tq);
 //        return tq;
+        float conceptActivation = this.conceptActivation.floatValue();
         for (Task x : t)
-            input(x);
+            input(x, conceptActivation, 1f);
     }
 
 
@@ -900,12 +931,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable
     public Task ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Predicate<Task> eachAnswer) {
-        return inputTask(new MutableTask(term, punc, null) {
+        @NotNull MutableTask t;
+        inputLater(t = new MutableTask(term, punc, null) {
             @Override
             public boolean onAnswered(Task answer) {
                 return eachAnswer.test(answer);
             }
         }.occurr(occ));
+        return t;
     }
 
 //    /**
@@ -1152,17 +1185,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * processes the input before the next frame has run
      */
-
-
     public final void inputLater(@NotNull Task... t) {
-
-        for (Task x : t)
-            taskWorker.execute(()->input(x));
-
+        taskWorker.execute(()->input(t));
     }
 
     public final void inputLater(@NotNull Collection<Task> tt) {
-
 
         int s = tt.size();
         if (s == 0)
@@ -1307,80 +1334,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public final void activate(@NotNull Task t) {
         activate(t, 1f);
-    }
-
-
-    /**
-     * process a Task through its Concept
-     */
-    @Nullable
-    protected final Concept process(@NotNull Task input, float activation) {
-
-        if (input.isDeleted()) {
-            throw new RuntimeException(input + " deleted");
-        }
-
-        Concept c = concept(input, true);
-        if (c == null) {
-            logger.warn("inconceivable task: {}", input);
-            input.delete("Inconceivable");
-            return null;
-        }
-
-        float cost = input.pri(); //the priority demanded by this task
-
-        emotion.busy(cost);
-
-
-        if (c.policy() == null) {
-            c.policy(index.conceptBuilder().initialized());
-        }
-
-
-        Task inputted = c.process(input, this);
-
-        if (inputted != null && !inputted.isDeleted()) {
-
-            if (clock instanceof FrameClock) {
-                //HACK for unique serial number w/ frameclock
-                ((FrameClock) clock).ensureStampSerialGreater(inputted.evidence());
-            }
-
-            //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
-            if (inputted.pri() > Param.BUDGET_EPSILON) {
-                //propagate budget
-                MutableFloat overflow = new MutableFloat();
-                activate(c, inputted, activation, 1f, overflow);
-                emotion.stress(overflow);
-            }
-
-            inputted.onConcept(c, 0);
-
-            eventTaskProcess.emit(inputted); //signal any additional processes
-
-        } else {
-            emotion.frustration(cost);
-        }
-
-        return c;
-    }
-
-    @Nullable
-    protected final Concept process(@NotNull Task input) {
-        return process(input, conceptActivation.floatValue());
-    }
-
-    /**
-     * accepts null-terminated array
-     */
-    protected final void process(@NotNull Task... input) {
-        float activation = conceptActivation.floatValue();
-        for (Task t : input) {
-            if (t == null) //for null-terminated arrays
-                break;
-            if (!t.isDeleted())
-                process(t, activation);
-        }
     }
 
     public final Predicate<@NotNull Task> taskPast = (Task t) -> {
