@@ -1,12 +1,11 @@
 package nars;
 
 
+
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
-import com.lmax.disruptor.*;
-import com.lmax.disruptor.dsl.BasicExecutor;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
+
+
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -45,10 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -97,6 +93,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             "eventSpeak"
     );
 
+
+
+
     /**
      * The id/name of the reasoner
      * TODO
@@ -109,18 +108,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final AtomicBoolean running = new AtomicBoolean();
 
 
-    final Disruptor<Object[]> async =
-            new Disruptor<Object[]>(
-                    () -> new Object[2], 2048,
-                    //new BasicExecutor(Executors.defaultThreadFactory()),
-                    Executors.newCachedThreadPool(),
-                    //ForkJoinPool.commonPool(),
-                    ProducerType.MULTI,
-                    new LiteTimeoutBlockingWaitStrategy(100, TimeUnit.MILLISECONDS)
-                    //new BlockingWaitStrategy()
-                    //new YieldingWaitStrategy()
-                    //Executors.newCachedThreadPool()
-            );
+    final Executor runWorker;
+    final Executor taskWorker;
 
     private NARLoop loop;
 
@@ -128,7 +117,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
-        this(clock, index, rng, self, 1);
+        this(clock, index, rng, self, 4);
     }
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, int concurrency) {
@@ -158,28 +147,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             }
         });
 
-        Supplier<WorkHandler<Object[]>> newRunner = () -> {
-            return ((Object[] tt) -> {
-                Object x = tt[0];
-                if (x instanceof Task) {
-                    Task t = (Task) x;
-                    if (!t.isDeleted()) {
-                        input(t);
-                    } else {
-                        logger.info("deleted input: {}", t);
-                    }
-                } else if (x instanceof Runnable) {
-                    ((Runnable) x).run();
-                } else
-                    logger.error("unsupported {}", tt[0]);
-            });
-        };
 
-        WorkHandler[] workers = new WorkHandler[concurrency];
-        for (int i = 0; i < concurrency; i++)
-            workers[i] = newRunner.get();
 
-        async.handleEventsWithWorkerPool(workers);
+        this.runWorker = ForkJoinPool.commonPool();
+        this.taskWorker = Executors.newWorkStealingPool(concurrency);
+
+
+
+
+
+
 
         //asyncBarrier = async.getRingBuffer().newBarrier();
 
@@ -190,9 +167,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //        transforms.put((Atomic) index.the($.operator(c.getSimpleName())).term(), i);
         //    }
 
-        async.start();
 
     }
+
+//    private void process(Object o) {
+//        Object x = o;
+//        if (x instanceof Task) {
+//            Task t = (Task) x;
+//            if (!t.isDeleted()) {
+//                input(t);
+//            } else {
+//                logger.info("deleted input: {}", t);
+//            }
+//        } else if (x instanceof Runnable) {
+//            ((Runnable) x).run();
+//        } else
+//            logger.error("unsupported {}", o);
+//    }
 
     @Deprecated
     public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
@@ -244,7 +235,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public synchronized void reset() {
 
-        async.shutdown();
 
         super.reset();
 
@@ -674,46 +664,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         Clock clock = this.clock;
 
-        long size = async.getBufferSize();
-        RingBuffer<Object[]> ring = async.getRingBuffer();
+
 
         for (; frames > 0; frames--) {
 
-
-//            final long[] last = new long[1];
-//            inputTaskAsync.publishEvent((t, seq)->{
-//                System.out.println("frame end: " + t + " " + seq);
-//                last[0] = seq;
-//            });
-
-
-
-
-            //long used = size - ring.remainingCapacity();
-            long cap;
-            while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
-                long now = async.getCursor();
-                //logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
-                //Util.pause(1);
-                Thread.yield();
-            }
 
             clock.tick();
             emotion.frame();
 
             frameStart.emit(this);
-
-
-
-
-//                    asyncBarrier.waitFor(now );
-//                }
-//
-//                //}
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-
 
         }
     }
@@ -863,10 +822,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * after the end of the current frame before the next frame.
      */
     public final void runLater(@NotNull Runnable t) {
-        //synchronized (async) {
-
-        async.publishEvent((Object[] x, long seq, Runnable b) -> x[0] = b, t);
-        //}
+        runWorker.execute(t);
     }
 
     public final void runLater(@NotNull Consumer<NAR> t) {
@@ -1194,15 +1150,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * processes the input before the next frame has run
      */
 
-    public static final com.lmax.disruptor.EventTranslatorOneArg<Object[], Task> TASK_EVENT_TRANSLATOR_ONE_ARG = (Object[] f, long s, Task x) -> {
-        f[0] = x;
-    };
 
     public final void inputLater(@NotNull Task... t) {
-        //synchronized (async) {
 
-        async.publishEvents(TASK_EVENT_TRANSLATOR_ONE_ARG, t);
-        //}
+        for (Task x : t)
+            taskWorker.execute(()->input(x));
+
     }
 
     public final void inputLater(@NotNull Collection<Task> tt) {
