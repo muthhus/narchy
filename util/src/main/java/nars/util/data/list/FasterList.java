@@ -1,5 +1,6 @@
 package nars.util.data.list;
 
+import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.gs.collections.impl.list.mutable.FastList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -221,5 +222,15 @@ public class FasterList<X> extends FastList<X> {
         if (x!=null)
             return add(x);
         return false;
+    }
+
+    public int forEachIntSpatial(int offset, IntObjectPredicate each) {
+        int n = offset;
+        for (Object j : items) {
+            if (j == null)
+                break; //end of list
+            each.accept(n++, j);
+        }
+        return size();
     }
 }

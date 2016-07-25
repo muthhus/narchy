@@ -92,15 +92,15 @@ abstract public class DiscreteDynamics<X> extends Dynamics<X> {
     }
 
 
-    private int nextID;
+    private int nextBodyID;
 
     protected final void updateObjects() {
-        nextID = 0;
+        nextBodyID = 0;
         collidable.clear(); //populate in 'saveKinematicState'
         forEachIntSpatial((i, s) -> {
 
-            if (s.active((short) nextID, this)) {
-                nextID++;
+            if (s.active((short)i, this)) {
+                nextBodyID++;
                 reactivate(s);
                 return false; //dont remove
             } else {
@@ -109,7 +109,6 @@ abstract public class DiscreteDynamics<X> extends Dynamics<X> {
             }
 
         });
-
     }
 
     //hold sthe current list of active bodies
@@ -120,9 +119,9 @@ abstract public class DiscreteDynamics<X> extends Dynamics<X> {
 
         OArrayList<Collidable<X>> o = this.collidable;
         int s = o.size();
-        Collidable[] cc = o.array;
+
         for (int i = 0; i < s; i++) {
-            each.value(i, cc[i]);
+            each.value(i, o.get(i));
             //if (!each.(i, o.get(i)))
               //  break;
         }

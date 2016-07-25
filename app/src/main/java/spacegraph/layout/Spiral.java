@@ -12,7 +12,7 @@ public class Spiral<O> implements SpaceTransform<O> {
 
 
     @Override
-    public void update(SpaceGraph<O> g, SpaceInput<O, ?> src, float dt) {
+    public void update(SpaceGraph<O> g, AbstractSpace<O, ?> src, float dt) {
         this.order = 0;
         src.forEach(this::update);
     }

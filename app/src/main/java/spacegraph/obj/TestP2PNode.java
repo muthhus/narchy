@@ -1,15 +1,11 @@
 package spacegraph.obj;
 
-import com.jogamp.nativewindow.WindowClosingProtocol;
-import spacegraph.ListInput;
+import spacegraph.ListSpace;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
-import spacegraph.Spatial;
 import spacegraph.layout.Flatten;
-import spacegraph.math.v3;
-import spacegraph.phys.constraint.HingeConstraint;
+import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.Point2PointConstraint;
-import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.shape.BoxShape;
 
 import static spacegraph.math.v3.v;
@@ -36,16 +32,19 @@ public class TestP2PNode extends RectWidget {
         }
 
         @Override
-        public void updateStart(SpaceGraph s) {
-            super.updateStart(s);
+        public void update(Dynamics world) {
+            super.update(world);
+            if (body == null) {
 
-            float w = ((BoxShape)body.shape()).x();
-            s.dyn.addConstraint(new Point2PointConstraint(
-                body, a.body, v(+w/2,0,0), v(-a.radius/2f,0,0)
-            ), true);
-            s.dyn.addConstraint(new Point2PointConstraint(
-                body, b.body, v(-w/2,0,0), v(+a.radius/2f,0,0)
-            ), true);
+                float w = ((BoxShape) body.shape()).x();
+                world.addConstraint(new Point2PointConstraint(
+                        body, a.body, v(+w / 2, 0, 0), v(-a.radius / 2f, 0, 0)
+                ), true);
+                world.addConstraint(new Point2PointConstraint(
+                        body, b.body, v(-w / 2, 0, 0), v(+a.radius / 2f, 0, 0)
+                ), true);
+            }
+
 
 //            float w = ((BoxShape)body.shape()).x();
 //            v3 axis = v(0, 0, 1);
@@ -68,8 +67,8 @@ public class TestP2PNode extends RectWidget {
 
         TestP2PLink ab = new TestP2PLink(a, b);
 
-        s.addAll(a, b, ab);
-        s.add(new ListInput().with(new Flatten())); //HACK TODO make a Transform-only space input
+        s.add(a, b, ab);
+        s.add(new ListSpace().with(new Flatten())); //HACK TODO make a Transform-only space input
 
         s.show(1000, 800)
                 .setWindowDestroyNotifyAction(()->System.exit(1));

@@ -1,5 +1,6 @@
 package spacegraph;
 
+import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 
 import java.util.Collections;
@@ -12,7 +13,7 @@ import java.util.function.Consumer;
  * @param X input "key" object type
  * @param Y visualized "value" spatial type
  */
-abstract public class SpaceInput<X, Y extends Spatial<X>> implements Iterable<Y> {
+abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable<Y> {
 
     final AtomicBoolean busy = new AtomicBoolean(true);
     protected SpaceGraph<X> space;
@@ -21,7 +22,7 @@ abstract public class SpaceInput<X, Y extends Spatial<X>> implements Iterable<Y>
 
     final List<SpaceTransform> transforms = $.newArrayList();
 
-    public SpaceInput with(SpaceTransform<X>... t) {
+    public AbstractSpace with(SpaceTransform<X>... t) {
         Collections.addAll(this.transforms, t);
         return this;
     }
@@ -54,7 +55,7 @@ abstract public class SpaceInput<X, Y extends Spatial<X>> implements Iterable<Y>
     /**
      * for thread-safe usage
      */
-    public void updateIfNotBusy(Consumer<SpaceInput<X,Y>> proc) {
+    public void updateIfNotBusy(Consumer<AbstractSpace<X,Y>> proc) {
         if (!isBusy()) {
             synchronized (busy) {
                 float last = this.now;
@@ -84,5 +85,7 @@ abstract public class SpaceInput<X, Y extends Spatial<X>> implements Iterable<Y>
 
     /** get the i'th object in the display list; the order is allowed to change each frame but not in-between updates */
     public abstract Y get(int i);
+
+    abstract public int forEachIntSpatial(int offset, IntObjectPredicate<Spatial<X>> each);
 
 }

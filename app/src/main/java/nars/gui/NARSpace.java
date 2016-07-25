@@ -10,9 +10,9 @@ import nars.util.data.list.FasterList;
 import nars.util.event.On;
 import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
-import spacegraph.ListInput;
+import spacegraph.ListSpace;
 import spacegraph.SpaceGraph;
-import spacegraph.SpaceInput;
+import spacegraph.AbstractSpace;
 import spacegraph.Spatial;
 import spacegraph.layout.FastOrganicLayout;
 import spacegraph.layout.Flatten;
@@ -27,7 +27,7 @@ import static spacegraph.math.v3.v;
 /**
  * thread-safe visualization of capacity-bound NAR data buffers
  */
-public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y> {
+public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     private final TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect;
     private On on;
@@ -144,13 +144,13 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListInput<X, Y> {
     }
 
 
-    protected void update(SpaceInput _notused) {
+    protected void update(AbstractSpace _notused) {
 
         List<Y> prev = active;
 
         prev.forEach((y) -> y.preactivate(false));
 
-        List<Y> next = new FasterList<>(capacity);
+        FasterList<Y> next = new FasterList<>(capacity);
 
         //gather the items, preactivating them
         collect.accept(nar, space, next);

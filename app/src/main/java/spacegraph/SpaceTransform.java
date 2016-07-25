@@ -5,6 +5,6 @@ package spacegraph;
  */
 public interface SpaceTransform<X> {
 
-    void update(SpaceGraph<X> g, SpaceInput<X,?> src, float dt);
+    void update(SpaceGraph<X> g, AbstractSpace<X,?> src, float dt);
 
 }

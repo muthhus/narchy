@@ -33,6 +33,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public boolean motionLock;
 
     public float radius = 0;
+    private List<Collidable<X>> bodySingleList = Collections.emptyList();
 
 
     public SimpleSpatial(X x) {
@@ -227,9 +228,12 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     @Override
     public void update(Dynamics world) {
-        Dynamic b = body = newBody(newShape(), collidable());
-        b.setUserPointer(this);
-        b.setRenderer(this);
+        if (body == null) {
+            Dynamic b = body = newBody(newShape(), collidable());
+            b.setUserPointer(this);
+            b.setRenderer(this);
+            bodySingleList = Collections.singletonList(body);
+        }
     }
 
     protected void updateStart(SpaceGraph<X> s) {
@@ -245,7 +249,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     @Override
     public List<Collidable<X>> bodies() {
-        return Collections.singletonList(body);
+        return bodySingleList;
     }
 
     @Override

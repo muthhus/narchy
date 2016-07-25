@@ -10,12 +10,9 @@ import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v3;
-import spacegraph.phys.Collidable;
-import spacegraph.phys.util.OArrayList;
 import spacegraph.render.JoglPhysics;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -26,9 +23,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     final List<Facial> facials = new FasterList<>(1);
 
-    final List<SpaceInput<X,?>> inputs = new FasterList<>(1);
-
-    final OArrayList<Spatial<X>> active = new OArrayList<>(512);
+    final List<AbstractSpace<X,?>> inputs = new FasterList<>(1);
 
     final Cache<X, Spatial> atoms;
 
@@ -53,18 +48,17 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    public SpaceGraph(SpaceInput<X, ?>... cc) {
+    public SpaceGraph(AbstractSpace<X, ?>... cc) {
         this();
 
-        for (SpaceInput c : cc)
+        for (AbstractSpace c : cc)
             add(c);
     }
 
     public SpaceGraph(Spatial<X>... cc) {
         this();
 
-        for (Spatial s : cc)
-            add(s);
+        add(cc);
     }
 
 
@@ -89,12 +83,12 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             c.start(this);
     }
 
-    public void add(SpaceInput<X,?> c) {
+    public void add(AbstractSpace<X,?> c) {
         if (inputs.add(c))
             c.start(this);
     }
 
-    public void remove(SpaceInput<X,?> c) {
+    public void remove(AbstractSpace<X,?> c) {
         if (inputs.remove(c)) {
             c.stop();
         }
@@ -166,14 +160,18 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
     @Override final public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each) {
-        active.forEachWithIndex(each);
+        int n = 0;
+        for (int i = 0, inputsSize = inputs.size(); i < inputsSize; i++) {
+            AbstractSpace s = inputs.get(i);
+            n += s.forEachIntSpatial(n, each);
+        }
     }
 
 
 
     public void display(GLAutoDrawable drawable) {
 
-        List<SpaceInput<X,?>> ss = this.inputs;
+        List<AbstractSpace<X,?>> ss = this.inputs;
 
         ss.forEach( this::update );
 
@@ -181,7 +179,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
         //ss.forEach(this::print);
 
-        ss.forEach( SpaceInput::ready );
+        ss.forEach( AbstractSpace::ready );
 
         renderHUD();
     }
@@ -198,11 +196,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    public void add(Spatial s) {
-        active.add(s);
-    }
-
-    public final synchronized void update(SpaceInput s) {
+    public final synchronized void update(AbstractSpace s) {
 
         float dt = s.setBusy();
 
@@ -210,7 +204,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     }
 
-    void print(SpaceInput s) {
+    void print(AbstractSpace s) {
         System.out.println();
         //+ active.size() + " active, "
         System.out.println(s + ": "   + this.atoms.estimatedSize() + " cached; "+ "\t" + dyn.summary());
@@ -221,8 +215,9 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         System.out.println();
     }
 
-    public void addAll(Spatial<X>... s) {
-        for (Spatial t : s)
-            add(t);
+    public ListSpace<X,?> add(Spatial<X>... s) {
+        ListSpace<X, ?> l = new ListSpace(s);
+        add(l);
+        return l;
     }
 }

@@ -214,7 +214,7 @@ public class FastOrganicLayout<X> implements SpaceTransform<X> {
     }
 
     @Override
-    public void update(SpaceGraph<X> g, SpaceInput<X,?> src, float dt) {
+    public void update(SpaceGraph<X> g, AbstractSpace<X,?> src, float dt) {
 
         int n = src.size();
 

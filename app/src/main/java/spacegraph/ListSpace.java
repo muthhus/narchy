@@ -1,9 +1,11 @@
 package spacegraph;
 
 import com.google.common.collect.Lists;
+import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.util.data.list.FasterList;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -12,15 +14,20 @@ import java.util.function.Function;
 /**
  * Created by me on 6/26/16.
  */
-public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
+public class ListSpace<X,Y extends Spatial<X>> extends AbstractSpace<X,Y> {
 
-    protected List<Y> active = new FasterList<>(0);
+    protected FasterList<Y> active = new FasterList<>(0);
 
-    public ListInput() {
+    public ListSpace() {
         super();
     }
 
-    public ListInput(Function<X,Y> materialize, X... xx) {
+    public ListSpace(Y... xx) {
+        this();
+        Collections.addAll(active, xx);
+    }
+
+    public ListSpace(Function<X,Y> materialize, X... xx) {
         this();
         set(materialize, xx);
     }
@@ -62,6 +69,11 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
     @Override
     public final Y get(int i) {
         return active.get(i);
+    }
+
+    @Override
+    public int forEachIntSpatial(int offset, IntObjectPredicate<Spatial<X>> each) {
+        return active.forEachIntSpatial(offset ,each);
     }
 
     @Override

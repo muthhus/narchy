@@ -2,7 +2,6 @@ package spacegraph.layout;
 
 import spacegraph.*;
 import spacegraph.math.Quat4f;
-import spacegraph.math.v3;
 
 import java.util.function.Consumer;
 
@@ -19,7 +18,7 @@ public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
     }
 
     @Override
-    public void update(SpaceGraph<O> g, SpaceInput<O, ?> src, float dt) {
+    public void update(SpaceGraph<O> g, AbstractSpace<O, ?> src, float dt) {
         src.forEach(this);
     }
 
