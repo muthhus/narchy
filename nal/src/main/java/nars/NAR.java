@@ -6,7 +6,6 @@ import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 
 
-import jdk.nashorn.internal.objects.Global;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -25,7 +24,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Operator;
-import nars.term.var.Variable;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
@@ -533,15 +531,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             throw new InvalidTaskException(input, "Deleted");
         }
 
-        Concept c;
-
+        Concept c = null;
+        //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {
             c = input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
             logger.error("{} invalid: {}", input, e);
             e.printStackTrace();
-            if (Param.DEBUG)
-                throw e;
+            throw e;
         }
 
         //input.onInput(c);
@@ -1053,7 +1050,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return concept(t, createIfMissing);
     }
 
-    public @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) throws TermIndex.InvalidConceptTermException {
+    public @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) throws TermIndex.InvalidConceptException {
         return index.concept(t, createIfMissing);
     }
 

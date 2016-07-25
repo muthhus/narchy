@@ -876,7 +876,7 @@ public class TermTest {
         try {
             Term recv = o.get();
             assertTrue(recv.toString() + " was not null", false);
-        } catch (InvalidTerm e) {
+        } catch (InvalidTermException e) {
             //correct if happens here
         } catch (Narsese.NarseseException e) {
             //correct if happens here

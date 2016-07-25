@@ -20,10 +20,12 @@
  */
 package nars.task;
 
+import alice.tuprolog.InvalidTermException;
 import nars.*;
 import nars.NAR.InvalidTaskException;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.index.TermIndex;
 import nars.nal.Stamp;
 import nars.nal.Tense;
 import nars.term.Compound;
@@ -38,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static nars.index.TermIndex.*;
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.projection;
@@ -555,7 +558,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      *  null if not normalizable
      */
     @NotNull
-    Concept normalize(@NotNull NAR memory) throws InvalidTaskException;
+    Concept normalize(@NotNull NAR memory) throws InvalidTaskException, InvalidConceptException;
 
 
 //    default void ensureValidParentTaskRef() {

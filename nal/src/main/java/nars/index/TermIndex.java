@@ -401,8 +401,8 @@ public interface TermIndex {
     }
 
 
-    @Nullable
-    default Term transform(@Nullable Compound src, @NotNull CompoundTransform t) {
+    @NotNull
+    default Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
         return src == null || !t.testSuperTerm(src) ? src : _transform(src, t);
     }
 
@@ -462,13 +462,11 @@ public interface TermIndex {
             Term y = x;
 
             if (trans.test(x)) {
-                y = termOrNull(trans.apply(src, x));
+                y = trans.apply(src, x).term();
             } else if (x instanceof Compound) {
                 y = transform((Compound) x, trans); //recurse
             }
 
-            if (y == null)
-                return null;
 
             if (x != y) { //must be refernce equality test for some variable normalization cases
                 modifications++;
@@ -509,7 +507,7 @@ public interface TermIndex {
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
     @Nullable
-    default Concept concept(@NotNull Termed term, boolean createIfMissing) throws InvalidConceptTermException {
+    default Concept concept(@NotNull Termed term, boolean createIfMissing) throws InvalidConceptException {
 
 
         term = $.unneg(term); //unwrap negation
@@ -517,7 +515,7 @@ public interface TermIndex {
         if (term instanceof Atomic) {
 
             if (term instanceof Variable)
-                throw new InvalidConceptTermException(term, VARIABLES_ARE_NOT_CONCEPTUALIZABLE);
+                throw new InvalidConceptException(term, VARIABLES_ARE_NOT_CONCEPTUALIZABLE);
 
         } else {
 
@@ -526,11 +524,11 @@ public interface TermIndex {
             Termed prenormalized = term;
 
             if ((term = normalize(term, createIfMissing)) == null)
-                throw new InvalidConceptTermException(prenormalized, "Failed normalization");
+                throw new InvalidConceptException(prenormalized, "Failed normalization");
 
             Term aterm = atemporalize((Compound) term);
             if (!(aterm instanceof Compound))
-                throw new InvalidConceptTermException(term, "Failed atemporalization");
+                throw new InvalidConceptException(term, "Failed atemporalization");
 
             //optimization: atemporalization was unnecessary, normalization may have already provided the concept
             if ((aterm == term) && (term instanceof Concept)) {
@@ -539,7 +537,7 @@ public interface TermIndex {
 
             //term = unneg(aterm); //it can happen that atemporalization will result in a negation that was not unwrapped to begin with?
             if (term.op() == NEG)
-                throw new InvalidConceptTermException(term, "Negation re-appeared");
+                throw new InvalidConceptException(term, "Negation re-appeared");
 
             term = aterm;
         }
@@ -548,7 +546,7 @@ public interface TermIndex {
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {
             if (createIfMissing) {
-                throw new InvalidConceptTermException(term, "Failed to build concept");
+                throw new InvalidConceptException(term, "Failed to build concept");
             }
             return null;
         }
@@ -601,12 +599,12 @@ public interface TermIndex {
     }
 
 
-    final class InvalidConceptTermException extends RuntimeException {
+    final class InvalidConceptException extends RuntimeException {
 
-        public final Termed term;
-        private final String reason;
+        @NotNull public final Termed term;
+        @NotNull public final String reason;
 
-        public InvalidConceptTermException(Termed term, String reason) {
+        public InvalidConceptException(@NotNull Termed term, @NotNull String reason) {
             this.term = term;
             this.reason = reason;
         }
@@ -629,7 +627,7 @@ public interface TermIndex {
         return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
     }
 
-    @Nullable
+    @NotNull
     default Term atemporalize(@NotNull Compound c) {
         if (!possiblyTemporal(c))
             return c;
@@ -640,7 +638,7 @@ public interface TermIndex {
     final class CompoundAtemporalizer implements CompoundTransform<Compound, Term> {
 
         private final TermIndex index;
-        @Nullable
+        @NotNull
         private final Term result;
 
         public CompoundAtemporalizer(@NotNull TermIndex index, @NotNull Compound c) {
@@ -648,16 +646,13 @@ public interface TermIndex {
             this.result = _atemporalize(c);
         }
 
-        @Nullable
+        @NotNull
         Term _atemporalize(@NotNull Compound c) {
             TermIndex i = index;
 
             Term x;
             if (c.op().temporal && c.dt() != DTERNAL) {
                 Term xx = i.builder().build(c.op(), DTERNAL, c.subterms().terms());
-                if (xx == null)
-                    return null;
-
                 x = i.the(xx).term();
             } else {
                 x = c;

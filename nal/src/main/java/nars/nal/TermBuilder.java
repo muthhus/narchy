@@ -9,7 +9,7 @@ import nars.nal.meta.match.Ellipsislike;
 import nars.nal.op.TermTransform;
 import nars.op.data.differ;
 import nars.term.Compound;
-import nars.term.InvalidTerm;
+import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
@@ -34,36 +34,37 @@ import static nars.term.compound.Statement.subj;
 public abstract class TermBuilder {
 
 
-    /** implicit truth subterms */
+    /** truth singularity subterms */
     private static final Atom False = $.the("ø");
     private static final Atom True = $.the("¿");
     private static final Term[] TrueArray = new Term[] { True };
 
-    @Nullable
-    public final Term build(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTerm {
+    @NotNull
+    public final Term build(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
 
         /* special handling */
         switch (op) {
             case NEG:
                 if (u.length != 1)
                     throw new RuntimeException("invalid negation subterms: " + Arrays.toString(u));
+
                 return negation(u[0]);
 
 
             case INSTANCE:
-                if (u.length != 2 || dt != DTERNAL) throw new InvalidTerm(INSTANCE);
+                if (u.length != 2 || dt != DTERNAL) throw new InvalidTermException(INSTANCE, dt, u, "needs 2 arg");
                 return inst(u[0], u[1]);
             case PROPERTY:
-                if (u.length != 2 || dt != DTERNAL) throw new InvalidTerm(PROPERTY);
+                if (u.length != 2 || dt != DTERNAL) throw new InvalidTermException(PROPERTY, dt, u, "needs 2 arg");
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
-                if (u.length != 2 || dt != DTERNAL) throw new InvalidTerm(INSTANCE_PROPERTY);
+                if (u.length != 2 || dt != DTERNAL) throw new InvalidTermException(INSTANCE_PROPERTY, dt, u, "needs 2 arg");
                 return instprop(u[0], u[1]);
 
 
             case DISJ:
                 if (dt!=DTERNAL)
-                    throw new InvalidTerm(op,dt,u);
+                    throw new InvalidTermException(op,dt,u, "Disjunction must be DTERNAL");
                 return disjunction(u);
             case CONJ:
                 return junction(op, dt, filterTrueFalseImplicits(op, u));
@@ -76,7 +77,7 @@ public abstract class TermBuilder {
                     //TODO use result of hasImdex in image construction to avoid repeat iteration to find it
                     return image(op, u);
                 } else if ((dt < 0) || (dt > u.length)) {
-                    throw new InvalidTerm(op,u);
+                    throw new InvalidTermException(op,dt,u,"Invalid Image");
                 }
                 break;
 
@@ -94,7 +95,7 @@ public abstract class TermBuilder {
             case EQUI:
             case IMPL:
                 if (u.length != 2) {//throw new RuntimeException("invalid statement: args=" + Arrays.toString(u));
-                    throw new InvalidTerm(op, dt, u);
+                    throw new InvalidTermException(op, dt, u, "Statement without exactly 2 arguments");
                 }
                 return statement(op, dt, u[0], u[1]);
 
@@ -164,7 +165,7 @@ public abstract class TermBuilder {
     public abstract Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms);
 
 
-    @Nullable
+    @NotNull
     public Term build(@NotNull Op op, @NotNull Term... tt) {
         return build(op, DTERNAL, tt);
     }
@@ -208,12 +209,11 @@ public abstract class TermBuilder {
         return finish(op, DTERNAL, args);
     }
 
-    @Nullable
+    @NotNull
     public final Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
         for (Term x : args) {
             if ((x == True) || (x == False)) {
-                return null;
-                //throw new RuntimeException(op + " term with imdex in subterms: " + args);
+                throw new RuntimeException(op + " term with imdex in subterms: " + args);
             }
         }
         return finish(op, dt, TermContainer.the(op, args));
@@ -501,10 +501,9 @@ public abstract class TermBuilder {
     }
 
 
-    @Nullable
+    @NotNull
     public Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
         while (true) {
-
 
             //special statement filters
             switch (op) {
@@ -517,8 +516,10 @@ public abstract class TermBuilder {
 
 
                 case EQUI:
-                    if (!validEquivalenceTerm(subject) || !validEquivalenceTerm(predicate))
-                        return null;
+                    if (!validEquivalenceTerm(subject))
+                        throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Invalid equivalence subject");
+                    if (!validEquivalenceTerm(predicate))
+                        throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Invalid equivalence predicate");
                     break;
 
                 case IMPL:
@@ -529,15 +530,14 @@ public abstract class TermBuilder {
                     if (subject == True) {
                         return predicate;
                     } else if (subject == False) {
-                        //probably should return null
-                        return null;
-                        //return negation(predicate);
+                        throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
+                        //return negation(predicate); /??
                     }
 
                     if (predicate.op() == IMPL) {
                         Term oldCondition = subj(predicate);
                         if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
-                            return null;
+                            throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication circularity");
                         else
                             return impl2Conj(dt, subject, predicate, oldCondition);
                     }
@@ -556,10 +556,10 @@ public abstract class TermBuilder {
                             if (!common.isEmpty()) {
                                 Term newSubject = build(csub, TermContainer.except(subjs, common));
                                 if (newSubject == null)
-                                    return null;
+                                    throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Failed flattening implication conjunction subject");
                                 Term newPredicate = build(cpred, TermContainer.except(preds, common));
                                 if (newPredicate == null)
-                                    return null;
+                                    throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Failed flattening implication conjunction predicate");
 
                                 subject = newSubject;
                                 predicate = newPredicate;
@@ -576,7 +576,7 @@ public abstract class TermBuilder {
             switch (validity) {
 
                 case -1:
-                    return null;
+                    throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Statement invalid (TODO be more specific)");
 
                 case 0:
                     return True;
@@ -601,7 +601,7 @@ public abstract class TermBuilder {
         return differ.difference(this, setType, A, B);
     }
 
-    @Nullable
+    @NotNull
     public Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
         Term s = junction(CONJ, t, subject, oldCondition);
         return s != null ? build(IMPL, s, pred(predicate)) : null;

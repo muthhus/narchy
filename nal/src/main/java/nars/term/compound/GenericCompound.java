@@ -5,7 +5,7 @@ import nars.Op;
 import nars.Param;
 import nars.nal.Tense;
 import nars.term.Compound;
-import nars.term.InvalidTerm;
+import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
@@ -53,7 +53,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         if (Param.DEBUG && dt != DTERNAL) {
             if (!((op.isImage() && ((dt >= 0) || (dt < subterms.size()))) ||
                     (Op.isTemporal(op, dt, subterms.size()))))
-                throw new InvalidTerm(op, dt, subterms.terms());
+                throw new InvalidTermException(op, dt, subterms.terms());
         }
 
         this.subterms = subterms;
