@@ -25,6 +25,7 @@ import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;
@@ -398,14 +399,8 @@ public class PremiseEval extends FindSubst {
 
     public long[] evidenceDouble() {
         if (evidenceDouble == null) {
-            long[] pte = task.evidence();
-
-            Task b = belief;
-            evidenceDouble =
-                    b != null ?
-                            Stamp.zip(pte, b.evidence()) : //double
-                            pte //single
-            ;
+            evidenceDouble = Stamp.zip(task.evidence(), belief.evidence());
+            //System.out.println(Arrays.toString(task.evidence()) + " " + Arrays.toString(belief.evidence()) + " -> " + Arrays.toString(evidenceDouble));
         }
 
         return evidenceDouble;

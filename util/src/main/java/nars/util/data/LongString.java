@@ -25,15 +25,19 @@ public class LongString {
     /** URIchars must be at least base length */
     public static String toString(long aNumber, int base) {
         StringBuilder result = new StringBuilder();
+
         if (aNumber < 0) {
             result.append('-');
             aNumber = -aNumber;
         }
+
         int r = (int) (aNumber % base);
+
         if (aNumber - r == 0)
             result.append(URIchars[r]);
         else
             result.append(LongString.toString((aNumber - r) / base, base) + URIchars[r]);
+
         return result.toString();
     }
 

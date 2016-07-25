@@ -85,13 +85,13 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 //        );
 //    }
 
-    /** copy/clone constructor */
-    public AbstractTask(@NotNull Task task) {
-        this(task, task.punc(), task.truth(),
-                task.pri(), task.dur(), task.qua());
-        setEvidence(task.evidence());
-        setOccurrence(task.occurrence());
-    }
+//    /** copy/clone constructor */
+//    public AbstractTask(@NotNull Task task) {
+//        this(task, task.punc(), task.truth(),
+//                task.pri(), task.dur(), task.qua());
+//        setEvidence(task.evidence());
+//        setOccurrence(task.occurrence());
+//    }
 
     void setTime(long creation, long occurrence) {
         this.creation = creation;
@@ -339,6 +339,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     /** the evidence should be sorted and de-duplicaed prior to calling this */
     @NotNull protected Task setEvidence(@Nullable long... evidentialSet) {
+
         if (this.evidence !=evidentialSet) {
             this.evidence = evidentialSet;
             invalidate();

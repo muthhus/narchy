@@ -47,6 +47,8 @@ public class FrameClock implements Clock {
 
     /** used to ensure that the next system stamp serial is beyond the range of any input */
     protected final void ensureStampSerialGreater(long s) {
+        if (s == Long.MAX_VALUE) //ignore cyclic indicator
+            return;
         long nextStamp = this.nextStamp.longValue();
         if (nextStamp < s)
             this.nextStamp.set(s+1);

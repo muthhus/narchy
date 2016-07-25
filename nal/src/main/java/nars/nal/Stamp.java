@@ -56,6 +56,8 @@ public interface Stamp {
     static long[] zip(@NotNull long[] a, @NotNull long[] b, float aToB, int maxLen, boolean newToOld) {
 
         int aLen = a.length, bLen = b.length;
+        if (isCyclic(a)) aLen--; //cyclic flag is not propagated
+        if (isCyclic(b)) bLen--; //cyclic flag is not propagated
         int baseLength = Math.min(aLen + bLen, maxLen);
 
         //how many items to exclude from each due to weighting
@@ -147,6 +149,8 @@ public interface Stamp {
 
     @NotNull
     static long[] _toSetArray(int outputLen, @NotNull long[] sorted) {
+
+        //Arrays.sort(sorted, 0, isCyclic(sorted) ? sorted.length-1 : sorted.length);
         Arrays.sort(sorted);
 
         //2. count unique elements
@@ -204,10 +208,14 @@ public interface Stamp {
         /** TODO there may be additional ways to exit early from this loop */
 
         for (long x : a) {
+            if (x == Long.MAX_VALUE)
+                continue; //ignore the cyclic flag
             for (long y : b) {
+                if (x == Long.MAX_VALUE)
+                    continue; //ignore the cyclic flag
                 if (x == y) {
                     return true; //commonality detected
-                } else if (y > x) {
+                } else if (y > x)  {
                     //any values after y in b will not be equal to x
                     break;
                 }
@@ -290,22 +298,22 @@ public interface Stamp {
         return (e[e.length-1] == Long.MAX_VALUE);
     }
 
-    static long[] cyclic(long[] e) {
-        int l = e.length;
-        if (isCyclic(e))
-            return e;
+    static long[] cyclic(long[] x) {
+        int l = x.length;
+        if (isCyclic(x))
+            return x;
 
-        long[] x;
+        long[] y;
         if (l == Param.STAMP_CAPACITY) {
-            x = new long[l];
+            y = new long[l];
             //shift left by one to leave the last entry free
-            System.arraycopy(e, 1, x, 0, l-1);
+            System.arraycopy(x, 1, y, 0, l-1);
         } else {
-            x = new long[l+1];
-            System.arraycopy(e, 0, x, 0, l);
+            y = new long[l+1];
+            System.arraycopy(x, 0, y, 0, l);
         }
 
-        x[x.length-1] = Long.MAX_VALUE;
-        return x;
+        y[y.length-1] = Long.MAX_VALUE;
+        return y;
     }
 }

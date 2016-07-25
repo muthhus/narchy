@@ -687,11 +687,16 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
         int base = LongString.maxBase();
         for (int i = 0; i < len; i++) {
-
-            buffer.append(
-                //Long.toString(ev[i], 36)
-                LongString.toString(ev[i], base)
-            );
+            
+            if (ev[i] == Long.MAX_VALUE && i == len-1) {
+                //trailing cyclic value
+                buffer.append('C');
+            } else {
+                buffer.append(
+                        //Long.toString(ev[i], 36)
+                        LongString.toString(ev[i], base)
+                );
+            }
             if (i < (len - 1)) {
                 buffer.append(Symbols.STAMP_SEPARATOR);
             }
