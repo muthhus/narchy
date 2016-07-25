@@ -80,7 +80,7 @@ public class RevisionTest {
 
         b.input(beliefOrGoal, 0.0f, 0.9f).run(1);
 
-        b.run(delay1);
+        b.run(1 + delay1);
 
         //b.print(beliefOrGoal);
 

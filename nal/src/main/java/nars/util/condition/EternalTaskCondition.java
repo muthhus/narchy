@@ -71,7 +71,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     final static int maxSimilars = 2;
 
-    protected final TreeMap<Float, Task> similar = new TreeMap();
+    @NotNull protected final TreeMap<Float, Task> similar = new TreeMap();
 
 //    @Override
 //    public final Truth getTruth() {
@@ -299,48 +299,50 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     public void recordSimilar(@NotNull Task task) {
         final TreeMap<Float, Task> similar = this.similar;
+        synchronized (similar) {
 
-        //TODO add the levenshtein distance of other task components
-        float worstDiff = similar != null && similar.size() >= maxSimilars ? similar.lastKey() : Float.POSITIVE_INFINITY;
+            //TODO add the levenshtein distance of other task components
+            float worstDiff = similar != null && similar.size() >= maxSimilars ? similar.lastKey() : Float.POSITIVE_INFINITY;
 
-        float difference = 0;
-        Compound tterm = task.term();
-        difference +=
-                tterm.equals(term) ? 0 : (term.volume());
-        if (difference >= worstDiff)
-            return;
+            float difference = 0;
+            Compound tterm = task.term();
+            difference +=
+                    tterm.equals(term) ? 0 : (term.volume());
+            if (difference >= worstDiff)
+                return;
 
-        float f = task.freq();
-        float freqDiff = Math.min(
-                Math.abs(f - freqMin),
-                Math.abs(f - freqMax));
-        difference += 2 * freqDiff;
-        if (difference >= worstDiff)
-            return;
+            float f = task.freq();
+            float freqDiff = Math.min(
+                    Math.abs(f - freqMin),
+                    Math.abs(f - freqMax));
+            difference += 2 * freqDiff;
+            if (difference >= worstDiff)
+                return;
 
-        float c = task.conf();
-        float confDiff = Math.min(
-                Math.abs(c - confMin),
-                Math.abs(c - confMax));
-        difference += 1 * confDiff;
-        if (difference >= worstDiff)
-            return;
+            float c = task.conf();
+            float confDiff = Math.min(
+                    Math.abs(c - confMin),
+                    Math.abs(c - confMax));
+            difference += 1 * confDiff;
+            if (difference >= worstDiff)
+                return;
 
-        float termDifference =
-                termDistance(tterm, term, worstDiff);
-        difference += 3 * termDifference;
+            float termDifference =
+                    termDistance(tterm, term, worstDiff);
+            difference += 3 * termDifference;
 
-        if (difference >= worstDiff)
-            return;
-
-
-        //TODO more efficient way than this
-
-        this.similar.put(difference, task);
+            if (difference >= worstDiff)
+                return;
 
 
-        if (similar.size() > maxSimilars) {
-            similar.remove(similar.lastEntry().getKey());
+            //TODO more efficient way than this
+
+            this.similar.put(difference, task);
+
+
+            if (similar.size() > maxSimilars) {
+                similar.remove(similar.lastEntry().getKey());
+            }
         }
     }
 
@@ -434,12 +436,14 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
             logger.error(msg);
 
-            if (similar != null && !similar.isEmpty()) {
-                similar.values().forEach(s -> {
-                    String pattern = "SIM\n{}";
-                    logger.info(pattern, s.proof());
-                    //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
-                });
+            synchronized (similar) {
+                if (!similar.isEmpty()) {
+                    similar.values().forEach(s -> {
+                        String pattern = "SIM\n{}";
+                        logger.info(pattern, s.proof());
+                        //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
+                    });
+                }
             }
         }
 

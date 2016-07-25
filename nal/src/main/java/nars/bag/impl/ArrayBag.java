@@ -634,7 +634,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @NotNull
     @Override
     public String toString() {
-        return super.toString() + '{' + items.getClass().getSimpleName() + '}';
+        synchronized(map) {
+            return super.toString() + '{' + items.getClass().getSimpleName() + '}';
+        }
     }
 
 

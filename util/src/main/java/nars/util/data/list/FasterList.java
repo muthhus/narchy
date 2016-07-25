@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Less-safe faster FastList with direct array access
@@ -216,6 +217,10 @@ public class FasterList<X> extends FastList<X> {
             return r;
         }
         return null;
+    }
+
+    public final boolean addIfNotNull(@Nullable Supplier<X> x) {
+        return addIfNotNull(x.get());
     }
 
     public final boolean addIfNotNull(@Nullable X x) {

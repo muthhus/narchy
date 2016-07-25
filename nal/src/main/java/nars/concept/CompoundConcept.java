@@ -533,7 +533,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
           otherwise false */
         synchronized (tasks) {
 
-            //checkConsistency(); //TEMPORARY =-=============
+            checkConsistency(); //TEMPORARY =-=============
 
             Task existing = tasks.putIfAbsent(input, input);
             if (existing != null) {
@@ -573,12 +573,18 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
             if (output == null) {
                 //which was added above
                 displaced.add(input);
+            } else {
+                if (input == output)
+                    displaced.remove(input); //incase it or an equivalent was added to the displacement list
+                else {
+                    throw new RuntimeException(input + " task was transformed " + output);
+                }
             }
 
             removeAndDelete(displaced);
 
 
-            //checkConsistency(); //TEMPORARY =-=============
+            checkConsistency(); //TEMPORARY =-=============
 
         }
 
@@ -590,13 +596,16 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, 
         synchronized (tasks) {
             int mapSize = tasks.size();
             int tableSize = beliefs().size() + goals().size() + questions().size() + quests().size();
-            if (mapSize != tableSize) {
-                List<Task> mapTasks = new ArrayList(tasks.keySet());
+
+            int THRESHOLD = 50; //to catch when the table explodes and not just an off-by-one inconsistency that will correct itself in the next cycle
+            if (Math.abs(mapSize - tableSize) > THRESHOLD) {
+                //List<Task> mapTasks = new ArrayList(tasks.keySet());
+                Set<Task> mapTasks = tasks.keySet();
                 ArrayList<Task> tableTasks = Lists.newArrayList(
                         Iterables.concat(beliefs(), goals(), questions(), quests())
                 );
-                Collections.sort(mapTasks);
-                Collections.sort(tableTasks);
+                //Collections.sort(mapTasks);
+                //Collections.sort(tableTasks);
 
                 System.err.println(mapSize + " vs " + tableSize + "\t\t" + mapTasks.size() + " vs " + tableTasks.size());
                 System.err.println(Joiner.on('\n').join(mapTasks));

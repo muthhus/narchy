@@ -98,43 +98,45 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         if (ss == 0)
             return this;
 
+        synchronized(map) {
 
-        final int begin, end;
-        if (ss <= n) {
-            //special case: give everything
-            begin = 0;
-            end = ss;
-            n = ss;
-        } else {
-            //shift upward by the radius to be fair about what is being sampled. to start from the sample index is biased against lower ranked items because they will be selected in increasing values
-            int b = sampleIndex();
-            if (b + n > ss) {
-                b = ss - n;
+            final int begin, end;
+            if (ss <= n) {
+                //special case: give everything
+                begin = 0;
+                end = ss;
+                n = ss;
+            } else {
+                //shift upward by the radius to be fair about what is being sampled. to start from the sample index is biased against lower ranked items because they will be selected in increasing values
+                int b = sampleIndex();
+                if (b + n > ss) {
+                    b = ss - n;
+                }
+                begin = b;
+                end = begin + n;
             }
-            begin = b;
-            end = begin + n;
+
+            BLink<V>[] l = items.array();
+
+            for (int i = begin; i < end; i++) {
+                //scan the designated subarray
+                if (trySample(target, l[i]))
+                    n--;
+            }
+
+            for (int i = begin - 1; n > 0 && i >= 0; i--) {
+                //scan upwards for any remaining
+                if (trySample(target, l[i]))
+                    n--;
+            }
+
+            for (int i = end + 1; n > 0 && i < ss; i++) {
+                //scan downwards for any remaining
+                if (trySample(target, l[i]))
+                    n--;
+            }
+
         }
-
-        BLink<V>[] l = items.array();
-
-        for (int i = begin; i < end; i++) {
-            //scan the designated subarray
-            if (trySample(target, l[i]))
-                n--;
-        }
-
-        for (int i = begin - 1; n > 0 && i >= 0; i--) {
-            //scan upwards for any remaining
-            if (trySample(target, l[i]))
-                n--;
-        }
-
-        for (int i = end + 1; n > 0 && i < ss; i++) {
-            //scan downwards for any remaining
-            if (trySample(target, l[i]))
-                n--;
-        }
-
 
         return this;
         //System.out.println("(of " + ss + ") select " + n + ": " + begin + ".." + end + " = " + target);

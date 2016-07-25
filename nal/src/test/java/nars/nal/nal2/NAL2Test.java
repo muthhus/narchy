@@ -16,7 +16,7 @@ public class NAL2Test extends AbstractNALTest {
 
     public NAL2Test(Supplier<NAR> b) { super(b); }
 
-    static final int cycles = 100;
+    static final int cycles = 150;
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {

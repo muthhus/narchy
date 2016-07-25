@@ -109,7 +109,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final AtomicBoolean running = new AtomicBoolean();
 
 
-    final Executor runWorker;
+    final ForkJoinPool runWorker;
     final ForkJoinPool taskWorker;
 
     private NARLoop loop;
@@ -118,7 +118,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
-        this(clock, index, rng, self, 4);
+        this(clock, index, rng, self, 2);
     }
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, int concurrency) {
@@ -150,7 +150,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
 
-        this.runWorker = ForkJoinPool.commonPool();
+        this.runWorker =
+                //ForkJoinPool.commonPool();
+                new ForkJoinPool(concurrency,
+                        defaultForkJoinWorkerThreadFactory, null, false);
         this.taskWorker =
                 new ForkJoinPool(concurrency,
                         defaultForkJoinWorkerThreadFactory, null, false);
@@ -665,10 +668,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         for (; frames > 0; frames--) {
 
 
+            while (!taskWorker.awaitQuiescence(2, TimeUnit.SECONDS)) {
+                logger.warn("taskWorker lag: {}  ", taskWorker );
+            }
+            while (!runWorker.awaitQuiescence(2, TimeUnit.SECONDS)) {
+                logger.warn("runWorker lag: {}  ", runWorker );
+            }
+
             clock.tick();
             emotion.frame();
 
             frameStart.emit(this);
+
 
         }
     }
