@@ -148,34 +148,40 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         float r, g, b;
         float hp = 0.5f + 0.5f * pri;
         //float qh = 0.5f + 0.5f * qua;
+        float a;
         if (task) {
             Task x = (Task) l.get();
-            if (x.isBeliefOrGoal()) {
-                float e = x.expectation();
-                if (e >= 0.5f) {
-                    //positive in green
-                    g = 0.5f + 0.5f * e;
-                    r = 0;
-                } else {
-                    //negative in red
-                    r = 0.5f + 0.5f * (1f-e);
-                    g = 0;
-                }
-                b = 0.5f * dur;
-
+            if (x == null) {
+                r = g = b = 0;
             } else {
-                //blue for questions and quests
-                b = 0.5f + hp * qua;
-                r = 0.2f;
-                g = 0.2f;
+                if (x.isBeliefOrGoal()) {
+                    float e = x.expectation();
+                    if (e >= 0.5f) {
+                        //positive in green
+                        g = 0.5f + 0.5f * e;
+                        r = 0;
+                    } else {
+                        //negative in red
+                        r = 0.5f + 0.5f * (1f - e);
+                        g = 0;
+                    }
+                    b = 0.5f * dur;
+
+                } else {
+                    //blue for questions and quests
+                    b = 0.5f + hp * qua;
+                    r = 0.2f;
+                    g = 0.2f;
+                }
             }
         } else {
             //gray for termlinks
             r = g = b = hp;
         }
 
-        //int maxEdges = edges.length;
-        float a = 0.25f + 0.5f * pri;// / (maxEdges*0.5f /* est. avg 0.5 per link */);
+        a = 0.25f + 0.25f * pri;
+
+
 
         int n;
         ee[n = (numEdges++)].set(target, width,
