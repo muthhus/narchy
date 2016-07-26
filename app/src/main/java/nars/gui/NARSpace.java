@@ -1,6 +1,7 @@
 package nars.gui;
 
 import com.jogamp.newt.opengl.GLWindow;
+import nars.$;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
@@ -8,6 +9,7 @@ import nars.nar.Default;
 import nars.term.Term;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
+import nars.util.experiment.DeductiveChainTest;
 import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
 import spacegraph.ListSpace;
@@ -36,17 +38,19 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 4, 2, 2);
+        Default n = new Default(512, 8, 4, 2);
         //n.conceptActivation.setValue(0.5f);
         //n.nal(4);
 
 
         new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
+        new DeductiveChainTest(n, 10, 9999991, (x,y) -> $.p($.the(x),$.the(y)));
+
         //new ArithmeticInduction(n);
 
         newConceptWindow(n, 256, 32);
 
-        n.loop(10f);
+        n.loop(100f);
 
     }
 

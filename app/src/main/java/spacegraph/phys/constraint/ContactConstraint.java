@@ -106,7 +106,7 @@ public class ContactConstraint {
 				body1.getInvInertiaDiagLocal(new v3()), body1.getInvMass(),
 				body2.getInvInertiaDiagLocal(new v3()), body2.getInvMass());
 
-		float jacDiagAB = jac.getDiagonal();
+        float jacDiagAB = jac.Adiag;
 		float jacDiagABInv = 1f / jacDiagAB;
 
 		v3 tmp1 = body1.getAngularVelocity(new v3());

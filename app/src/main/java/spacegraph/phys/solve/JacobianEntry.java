@@ -157,8 +157,6 @@ public class JacobianEntry {
 		assert (Adiag > 0f);
 	}
 
-	public float getDiagonal() { return Adiag; }
-
 	/**
 	 * For two constraints on the same rigidbody (for example vehicle friction).
 	 */

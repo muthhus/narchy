@@ -861,7 +861,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements MouseListener,
                     pickConstraint = p2p;
 
                     // very weak constraint for picking
-                    p2p.setting.tau = 0.1f;
+                    p2p.tau = 0.1f;
                 } else {
                     if (directDrag == null) {
                         directDrag = body;

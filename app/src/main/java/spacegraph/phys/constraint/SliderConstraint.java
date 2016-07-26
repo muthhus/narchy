@@ -505,7 +505,7 @@ public class SliderConstraint extends TypedConstraint {
 					rbA.getInvMass(),
 					rbB.getInvInertiaDiagLocal(tmp2),
 					rbB.getInvMass());
-			jacLinDiagABInv[i] = 1f / jacLin[i].getDiagonal();
+            jacLinDiagABInv[i] = 1f / jacLin[i].Adiag;
 			VectorUtil.setCoord(depth, i, delta.dot(normalWorld));
 		}
 		testLinLimits();

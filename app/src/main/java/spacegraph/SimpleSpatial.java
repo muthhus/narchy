@@ -33,7 +33,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public boolean motionLock;
 
     public float radius = 0;
-    private List<Collidable<X>> bodySingleList = Collections.emptyList();
+    private List<Collidable<X>> bodies = Collections.emptyList();
 
 
     public SimpleSpatial(X x) {
@@ -59,6 +59,11 @@ public class SimpleSpatial<X> extends Spatial<X> {
                 Util.lerp(z, center.z, rate)
         );
     }
+
+    public final void move(v3 p) {
+        move(p.x, p.y, p.z);
+    }
+
     public void move(float x, float y, float z) {
         if (motionLock)
             return;
@@ -100,9 +105,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public void update(SpaceGraph<X> s) {
         super.update(s);
         if (body == null) {
-            updateStart(s);
-        } else {
-            updateContinue();
+            enter(s);
         }
     }
 
@@ -219,24 +222,33 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public float y() {  return center.y;        }
     public float z() {  return center.z;        }
 
-    protected void updateContinue() {
-        //if (body.broadphase()==null)
-        //throw new NullPointerException();
-        //reactivate();
-
-    }
+//    protected void updateContinue() {
+//        //if (body.broadphase()==null)
+//        //reactivate();
+//
+//    }
 
     @Override
-    public void update(Dynamics world) {
+    public final void update(Dynamics world) {
         if (body == null) {
-            Dynamic b = body = newBody(newShape(), collidable());
-            b.setUserPointer(this);
-            b.setRenderer(this);
-            bodySingleList = Collections.singletonList(body);
+            this.bodies = enter(world);
+        } else {
+            next(world);
         }
     }
 
-    protected void updateStart(SpaceGraph<X> s) {
+    protected void next(Dynamics world) {
+
+    }
+
+    protected List<Collidable<X>> enter(Dynamics world) {
+        Dynamic b = body = newBody(newShape(), collidable());
+        b.setUserPointer(this);
+        b.setRenderer(this);
+        return Collections.singletonList(body);
+    }
+
+    protected void enter(SpaceGraph<X> s) {
 
     }
 
@@ -249,7 +261,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     @Override
     public List<Collidable<X>> bodies() {
-        return bodySingleList;
+        return bodies;
     }
 
     @Override

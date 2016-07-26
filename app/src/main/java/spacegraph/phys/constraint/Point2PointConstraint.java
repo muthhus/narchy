@@ -30,6 +30,8 @@ import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.solve.JacobianEntry;
 
+import static spacegraph.math.v3.v;
+
 /**
  * Point to point constraint between two rigid bodies each with a pivot point that
  * descibes the "ballsocket" location in local space.
@@ -43,7 +45,13 @@ public class Point2PointConstraint extends TypedConstraint {
 	private final v3 pivotInA = new v3();
 	private final v3 pivotInB = new v3();
 
-	public ConstraintSetting setting = new ConstraintSetting();
+	/** strength */
+	public float tau = 0.3f;
+
+	public float damping = 1f;
+	public float impulseClamp;
+
+
 
 	public Point2PointConstraint() {
 		super(TypedConstraintType.POINT2POINT_CONSTRAINT_TYPE);
@@ -61,6 +69,7 @@ public class Point2PointConstraint extends TypedConstraint {
 		this.pivotInB.set(pivotInA);
 		rbA.getCenterOfMassTransform(new Transform()).transform(this.pivotInB);
 	}
+
 
 	@Override
 	public void buildJacobian() {
@@ -106,6 +115,8 @@ public class Point2PointConstraint extends TypedConstraint {
 		}
 	}
 
+
+
 	@Override
 	public void solveConstraint(float timeStep) {
 		v3 tmp = new v3();
@@ -121,29 +132,33 @@ public class Point2PointConstraint extends TypedConstraint {
 		v3 pivotBInW = new v3(pivotInB);
 		centerOfMassB.transform(pivotBInW);
 
+
+
 		v3 normal = new v3();
 		normal.set(0f, 0f, 0f);
 
 		//btVector3 angvelA = m_rbA.getCenterOfMassTransform().getBasis().transpose() * m_rbA.getAngularVelocity();
 		//btVector3 angvelB = m_rbB.getCenterOfMassTransform().getBasis().transpose() * m_rbB.getAngularVelocity();
 
+		v3 rel_pos1 = new v3();
+		rel_pos1.sub(pivotAInW, centerOfMassA);
+		v3 rel_pos2 = new v3();
+		rel_pos2.sub(pivotBInW, centerOfMassB);
+
+
+		v3 vel1 = rbA.getVelocityInLocalPoint(rel_pos1, new v3());
+		v3 vel2 = rbB.getVelocityInLocalPoint(rel_pos2, new v3());
+		v3 vel = new v3();
+		vel.sub(vel1, vel2);
+
+		float rel_vel;
+		rel_vel = normal.dot(vel);
+
+
 		for (int i = 0; i < 3; i++) {
 			VectorUtil.setCoord(normal, i, 1f);
-			float jacDiagABInv = 1f / jac[i].getDiagonal();
+			float jacDiagABInv = 1f / jac[i].Adiag;
 
-			v3 rel_pos1 = new v3();
-			rel_pos1.sub(pivotAInW, rbA.getCenterOfMassPosition(tmpVec));
-			v3 rel_pos2 = new v3();
-			rel_pos2.sub(pivotBInW, rbB.getCenterOfMassPosition(tmpVec));
-			// this jacobian entry could be re-used for all iterations
-
-			v3 vel1 = rbA.getVelocityInLocalPoint(rel_pos1, new v3());
-			v3 vel2 = rbB.getVelocityInLocalPoint(rel_pos2, new v3());
-			v3 vel = new v3();
-			vel.sub(vel1, vel2);
-
-			float rel_vel;
-			rel_vel = normal.dot(vel);
 
 			/*
 			//velocity error (first order error)
@@ -155,9 +170,9 @@ public class Point2PointConstraint extends TypedConstraint {
 			tmp.sub(pivotAInW, pivotBInW);
 			float depth = -tmp.dot(normal); //this is the error projected on the normal
 
-			float impulse = depth * setting.tau / timeStep * jacDiagABInv - setting.damping * rel_vel * jacDiagABInv;
+			float impulse = depth * tau / timeStep * jacDiagABInv - damping * rel_vel * jacDiagABInv;
 
-			float impulseClamp = setting.impulseClamp;
+			float impulseClamp = this.impulseClamp;
 			if (impulseClamp > 0f) {
 				if (impulse < -impulseClamp) {
 					impulse = -impulseClamp;
@@ -170,10 +185,10 @@ public class Point2PointConstraint extends TypedConstraint {
 			appliedImpulse += impulse;
 			v3 impulse_vector = new v3();
 			impulse_vector.scale(impulse, normal);
-			tmp.sub(pivotAInW, rbA.getCenterOfMassPosition(tmpVec));
+			tmp.sub(pivotAInW, centerOfMassA);
 			rbA.impulse(impulse_vector, tmp);
 			tmp.negate(impulse_vector);
-			tmp2.sub(pivotBInW, rbB.getCenterOfMassPosition(tmpVec));
+			tmp2.sub(pivotBInW, centerOfMassB);
 			rbB.impulse(tmp, tmp2);
 
 			VectorUtil.setCoord(normal, i, 0f);
@@ -203,12 +218,5 @@ public class Point2PointConstraint extends TypedConstraint {
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	public static class ConstraintSetting {
-		/** strength */
-		public float tau = 0.3f;
 
-		public float damping = 1f;
-		public float impulseClamp;
-	}
-	
 }

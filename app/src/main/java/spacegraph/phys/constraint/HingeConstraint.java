@@ -388,7 +388,7 @@ public class HingeConstraint extends TypedConstraint {
 
 			for (int i = 0; i < 3; i++) {
 				v3 normal = jac[i].linearJointAxis;
-				float jacDiagABInv = 1f / jac[i].getDiagonal();
+                float jacDiagABInv = 1f / jac[i].Adiag;
 
 				float rel_vel;
 				rel_vel = normal.dot(vel);

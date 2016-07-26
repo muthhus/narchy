@@ -31,6 +31,8 @@
 
 package spacegraph.math;
 
+import java.util.Random;
+
 /**
  * A 3-element vector that is represented by single-precision floating point 
  * x,y,z coordinates.  If this value represents a normal, then it should
@@ -214,6 +216,24 @@ public class v3 extends Tuple3f implements java.io.Serializable {
       if( vDot < -1.0) vDot = -1.0;
       if( vDot >  1.0) vDot =  1.0;
       return((float) (Math.acos( vDot )));
-   } 
+   }
 
+    public static float dist(v3 a, v3 b) {
+        v3 x = new v3(a);
+        x.sub(b);
+        return x.length();
+    }
+
+    public void normalize(float thenScale) {
+        normalize();
+        scale(thenScale);
+    }
+
+    public boolean isZero(float epsilon) {
+        return epsilonEquals(v(), epsilon);
+    }
+
+    public void randomize(Random r, float scale) {
+        set(r.nextFloat() * scale, r.nextFloat() * scale, r.nextFloat() * scale);
+    }
 }

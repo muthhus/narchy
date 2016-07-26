@@ -49,7 +49,7 @@ public abstract class TypedConstraint {
 	private int userConstraintType = -1;
 	private int userConstraintId = -1;
 
-	protected final TypedConstraintType constraintType;
+	public final TypedConstraintType type;
 	
 	protected final Dynamic rbA;
 	protected final Dynamic rbB;
@@ -64,7 +64,7 @@ public abstract class TypedConstraint {
 	}
 	
 	public TypedConstraint(TypedConstraintType type, Dynamic rbA, Dynamic rbB) {
-		this.constraintType = type;
+		this.type = type;
 		this.rbA = rbA;
 		this.rbB = rbB;
 		getFixed().setMassProps(0f, new v3(0f, 0f, 0f));
@@ -106,12 +106,8 @@ public abstract class TypedConstraint {
 		return appliedImpulse;
 	}
 
-	public TypedConstraintType getConstraintType() {
-		return constraintType;
-	}
 
-
-        // added to Java port for the Generic6DofSpringConstraint
+	// added to Java port for the Generic6DofSpringConstraint
         // use same name as latest version of Bullet, for consistency, 
         // even though the name doesn't properly reflect function here
         public void getInfo2(ContactSolverInfo infoGlobal) {

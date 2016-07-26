@@ -395,7 +395,7 @@ public class Generic6DofConstraint extends TypedConstraint {
 		for (i = 0; i < 3; i++) {
 			if (linearLimits.needApplyForces(i))
                         {
-				jacDiagABInv = 1f / jacLinear[i].getDiagonal();
+							jacDiagABInv = 1f / jacLinear[i].Adiag;
 
 				if (useLinearReferenceFrameA) {
 					calculatedTransformA.basis.getColumn(i, linear_axis);
@@ -421,7 +421,7 @@ public class Generic6DofConstraint extends TypedConstraint {
 				// get axis
 				getAxis(i, angular_axis);
 
-				angularJacDiagABInv = 1f / jacAng[i].getDiagonal();
+				angularJacDiagABInv = 1f / jacAng[i].Adiag;
 
 				angularLimits[i].solveAngularLimits(
                                         this.timeStep,
