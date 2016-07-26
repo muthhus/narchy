@@ -223,8 +223,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         try {
             r = m.index.resolve(cp, m);
         } catch (InvalidTermException e) {
-            logger.warn("{}", e.toString());
-            //e.printStackTrace();
+            logger.warn("{}\n\tderiving rule {}", e.toString(), rule.source);
             return;
         }
 
@@ -248,6 +247,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         }
 
     }
+
 
     final void derive(@NotNull PremiseEval m, @NotNull Compound raw, @Nullable Truth truth, boolean single) {
 
@@ -278,9 +278,15 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             long[] occReturn = new long[]{ETERNAL};
             float[] confScale = new float[]{1f};
 
-            Term temporalized = this.temporalizer.compute(content.term(),
+            Term temporalized;
+            try {
+                temporalized = this.temporalizer.compute(content.term(),
                     m, this, occReturn, confScale
-            );
+                );
+            } catch (InvalidTermException e) {
+                logger.warn("{}\n\ttemporalizing from {}\n\tderiving rule {}", e.toString(), content.term(), rule.source);
+                return;
+            }
 
             if (Param.DEBUG && occReturn[0] == DTERNAL) {
                 //temporalizer.compute(content.term(), m, this, occReturn, confScale);

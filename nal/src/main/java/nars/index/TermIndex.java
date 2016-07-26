@@ -520,22 +520,22 @@ public interface TermIndex {
 
             Termed prenormalized = term;
 
-            if ((term = normalize(term, createIfMissing)) == null)
-                throw new InvalidConceptException(prenormalized, "Failed normalization");
+            if (!((term = normalize(term, createIfMissing)) instanceof Compound))
+                throw new InvalidConceptException(prenormalized, "Failed normalization, becoming: " + term);
 
             Term aterm = atemporalize((Compound) term);
             if (!(aterm instanceof Compound))
-                throw new InvalidConceptException(term, "Failed atemporalization");
+                throw new InvalidConceptException(term, "Failed atemporalization, becoming: " + aterm);
 
             //optimization: atemporalization was unnecessary, normalization may have already provided the concept
             if ((aterm == term) && (term instanceof Concept)) {
                 return (Concept) term;
             }
 
-            if (term.op() == NEG)
-                throw new InvalidConceptException(term, "Negation re-appeared");
+            //if (aterm.op() == NEG)
+                //throw new InvalidConceptException(term, "Negation re-appeared");
+            term = $.unneg(aterm);
 
-            term = unneg(aterm);
         }
 
 

@@ -324,14 +324,14 @@ public class Tetris extends TetrisState implements Environment {
 
                 if (nar instanceof Default) {
 
-                    new BeliefTableChart(nar, charted).show(600, 900);
+                    //new BeliefTableChart(nar, charted).show(600, 900);
 
-                    BagChart.show((Default) nar, 128);
+                    //BagChart.show((Default) nar, 128);
 
                     //STMView.show(stm, 800, 600);
 
 
-                    NARSpace.newConceptWindow((Default) nar, 64, 16);
+                    NARSpace.newConceptWindow((Default) nar, 256, 8);
                 }
 
 

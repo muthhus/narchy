@@ -1329,7 +1329,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * (a normal duplicate task going through process() will not have this behavior.)
      */
     public final void activate(@NotNull Task t, float scale) {
-        activate(t.concept(this), t, inputActivation.floatValue() * scale, scale, null);
+        @Nullable Concept concept = t.concept(this);
+        if (concept == null)
+            throw new NullPointerException();
+        activate(concept, t, inputActivation.floatValue() * scale, scale, null);
     }
 
     public final void activate(@NotNull Task t) {

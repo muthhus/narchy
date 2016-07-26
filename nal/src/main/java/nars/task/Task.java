@@ -302,7 +302,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    @NotNull
 //    @Override default Task get() { return this ;}
 
-    @NotNull
+    @Nullable
     default Concept concept(@NotNull NAR n) {
         return n.concept(term());
     }

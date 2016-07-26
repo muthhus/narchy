@@ -112,9 +112,9 @@ public abstract class TermBuilder {
     private static Term[] filterTrueFalseImplicits(@NotNull Op o, @NotNull Term[] u) {
         int imdices = 0;
         for (Term x : u) {
-            if (x == True) {
+            if (x.equals(True)) {
                 imdices++;
-            } else if (x == False)  {
+            } else if (x.equals(False))  {
                 if (o != DISJ) {
                     //false subterm in conjunction makes the entire condition false
                     //this will eventually reduce diectly to false in this method's only callee HACK
@@ -214,12 +214,16 @@ public abstract class TermBuilder {
     @NotNull
     public final Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
         for (Term x : args) {
-            if ((x == True) || (x == False)) {
+            if (isTrueOrFalse(x)) {
                 if (!Param.ALLOW_SINGULARITY_LEAK)
                     throw new InvalidTermException(op, dt, args, "singularity leak");
             }
         }
         return finish(op, dt, TermContainer.the(op, args));
+    }
+
+    private boolean isTrueOrFalse(Term x) {
+        return (x.equals(True)) || (x.equals(False));
     }
 
 
@@ -244,7 +248,7 @@ public abstract class TermBuilder {
         if (Param.DEBUG ) {
             //check for any imdex terms that may have not been removed
             for (Term x : args.terms()) {
-                if ((x == True) || (x == False)) {
+                if (isTrueOrFalse(x)) {
                     //return null;
                     throw new RuntimeException(op + " term with imdex in subterms: " + args);
                 }
@@ -298,11 +302,12 @@ public abstract class TermBuilder {
             return t;
 
         } else {
-            if ((t instanceof Compound) || (t.op() == VAR_PATTERN))
+            if ((t instanceof Compound) || (t.op() == VAR_PATTERN)) {
                 return finish(NEG, t);
-
-
-            throw new InvalidTermException(NEG, new Term[] { t }, "Non-compound negation content");
+            } else {
+                return False;
+                //throw new InvalidTermException(NEG, new Term[] { t }, "Non-compound negation content");
+            }
         }
     }
 
@@ -396,6 +401,8 @@ public abstract class TermBuilder {
     @NotNull
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
+        if (u.length == 0)
+            return True;
 
         assert(dt ==0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
@@ -405,6 +412,10 @@ public abstract class TermBuilder {
 
         //boolean negate = false;
         int n = s.size();
+        if (n == 0) {
+            //wtf
+            return True;
+        }
         if (n == 1) {
             return s.iterator().next();
         } else if (n == negations) {
@@ -454,6 +465,8 @@ public abstract class TermBuilder {
 //        } else {
         if (dt == 0) {
             s = junctionGroupNonDTSubterms(s, 0);
+            if (s.size() == 0)
+                return True; //wtf
         }
         return finish(op, dt, TermSet.the(s));
         //}
@@ -537,9 +550,9 @@ public abstract class TermBuilder {
                     }
 
 
-                    if (subject == True) {
+                    if (subject.equals(True)) {
                         return predicate;
-                    } else if (subject == False) {
+                    } else if (subject.equals(False)) {
                         return False;
                         //throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
                         //return negation(predicate); /??
@@ -549,8 +562,10 @@ public abstract class TermBuilder {
                         Term oldCondition = subj(predicate);
                         if (!Param.ALLOW_RECURSIVE_IMPLICATIONS && (oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
                             throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication circularity");
-                        else
-                            return impl2Conj(dt, subject, predicate, oldCondition);
+                        else {
+                            if ((dt == 0) || (dt == DTERNAL))
+                                return impl2Conj(dt, subject, predicate, oldCondition);
+                        }
                     }
 
 
