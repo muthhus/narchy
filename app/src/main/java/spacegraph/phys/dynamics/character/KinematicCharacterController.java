@@ -385,8 +385,8 @@ public class KinematicCharacterController extends ActionInterface {
 			//return array[index];
 			BroadphasePair collisionPair = ghostObject.getOverlappingPairCache().getOverlappingPairArray().get(i);
                         //XXX: added no contact response
-                        if (!((Collidable)collisionPair.pProxy0.clientObject).hasContactResponse()
-                                 || !((Collidable)collisionPair.pProxy1.clientObject).hasContactResponse())
+                        if (!((Collidable)collisionPair.pProxy0.data).hasContactResponse()
+                                 || !((Collidable)collisionPair.pProxy1.data).hasContactResponse())
                                  continue;
 			if (collisionPair.algorithm != null) {
 				collisionPair.algorithm.getAllContactManifolds(manifoldArray);

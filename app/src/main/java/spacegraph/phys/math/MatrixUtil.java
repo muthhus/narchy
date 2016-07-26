@@ -341,8 +341,8 @@ public class MatrixUtil {
 			for (int i=0; i<3; i++) {
 				rot.getRow(i, row);
 
-				mrp = VectorUtil.getCoord(row, p);
-				mrq = VectorUtil.getCoord(row, q);
+				mrp = VectorUtil.coord(row, p);
+				mrq = VectorUtil.coord(row, q);
 				VectorUtil.setCoord(row, p, cos * mrp - sin * mrq);
 				VectorUtil.setCoord(row, q, cos * mrq + sin * mrp);
 				rot.setRow(i, row);

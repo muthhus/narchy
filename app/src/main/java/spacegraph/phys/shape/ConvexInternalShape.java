@@ -66,7 +66,7 @@ public abstract class ConvexInternalShape extends ConvexShape {
 			
 			trans.transform(tmp2);
 
-			VectorUtil.setCoord(maxAabb, i, VectorUtil.getCoord(tmp2, i) + margin);
+			VectorUtil.setCoord(maxAabb, i, VectorUtil.coord(tmp2, i) + margin);
 
 			VectorUtil.setCoord(vec, i, -1f);
 
@@ -74,7 +74,7 @@ public abstract class ConvexInternalShape extends ConvexShape {
 			localGetSupportingVertex(tmp1, tmp2);
 			trans.transform(tmp2);
 
-			VectorUtil.setCoord(minAabb, i, VectorUtil.getCoord(tmp2, i) - margin);
+			VectorUtil.setCoord(minAabb, i, VectorUtil.coord(tmp2, i) - margin);
 		}
 	}
 

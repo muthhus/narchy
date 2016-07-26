@@ -85,7 +85,7 @@ public class AabbUtil2 {
 			for (int j = 0; j < 2; j++) {
 				for (int i = 0; i != 3; ++i) {
 					if ((sourceOutcode & bit) != 0) {
-						float lambda = (-VectorUtil.getCoord(source, i) - VectorUtil.getCoord(aabbHalfExtent, i) * normSign) / VectorUtil.getCoord(r, i);
+						float lambda = (-VectorUtil.coord(source, i) - VectorUtil.coord(aabbHalfExtent, i) * normSign) / VectorUtil.coord(r, i);
 						if (lambda_enter <= lambda) {
 							lambda_enter = lambda;
 							hitNormal.set(0f, 0f, 0f);
@@ -93,7 +93,7 @@ public class AabbUtil2 {
 						}
 					}
 					else if ((targetOutcode & bit) != 0) {
-						float lambda = (-VectorUtil.getCoord(source, i) - VectorUtil.getCoord(aabbHalfExtent, i) * normSign) / VectorUtil.getCoord(r, i);
+						float lambda = (-VectorUtil.coord(source, i) - VectorUtil.coord(aabbHalfExtent, i) * normSign) / VectorUtil.coord(r, i);
 						//btSetMin(lambda_exit, lambda);
 						lambda_exit = Math.min(lambda_exit, lambda);
 					}

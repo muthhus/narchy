@@ -24,6 +24,7 @@
 package spacegraph.phys.collision.broad;
 
 import spacegraph.math.v3;
+import spacegraph.phys.Collidable;
 
 /**
  *
@@ -35,7 +36,7 @@ class SimpleBroadphasing extends Broadphasing {
 	protected final v3 max = new v3();
 	
 
-	public SimpleBroadphasing(v3 minpt, v3 maxpt, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Object multiSapProxy) {
+	public SimpleBroadphasing(v3 minpt, v3 maxpt, BroadphaseNativeType shapeType, Collidable userPtr, short collisionFilterGroup, short collisionFilterMask, Object multiSapProxy) {
 		super(userPtr, collisionFilterGroup, collisionFilterMask, multiSapProxy);
 		this.min.set(minpt);
 		this.max.set(maxpt);

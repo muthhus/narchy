@@ -24,6 +24,11 @@
 package spacegraph.phys.collision.broad;
 
 import spacegraph.math.v3;
+import spacegraph.phys.Collidable;
+import spacegraph.phys.util.OArrayList;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * BroadphaseInterface for AABB overlapping object pairs.
@@ -32,14 +37,14 @@ import spacegraph.math.v3;
  */
 public abstract class Broadphase {
 
-	public abstract Broadphasing createProxy(v3 aabbMin, v3 aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Intersecter intersecter, Object multiSapProxy);
+	public abstract Broadphasing createProxy(v3 aabbMin, v3 aabbMax, BroadphaseNativeType shapeType, Collidable userPtr, short collisionFilterGroup, short collisionFilterMask, Intersecter intersecter, Object multiSapProxy);
 
 	public abstract void destroyProxy(Broadphasing proxy, Intersecter intersecter);
 
 	public abstract void setAabb(Broadphasing proxy, v3 aabbMin, v3 aabbMax, Intersecter intersecter);
 
 	///calculateOverlappingPairs is optional: incremental algorithms (sweep and prune) might do it during the set aabb
-	public abstract void calculateOverlappingPairs(Intersecter intersecter);
+	public abstract void update(Intersecter intersecter);
 
 	public abstract OverlappingPairCache getOverlappingPairCache();
 	
@@ -48,5 +53,8 @@ public abstract class Broadphase {
 	public abstract void getBroadphaseAabb(v3 aabbMin, v3 aabbMax);
 
 	public abstract void printStats();
-	
+
+	public <X> void forEach(int maxClusterSize, OArrayList<Collidable<X>> all, Consumer<List<Collidable<X>>> each) {
+		throw new UnsupportedOperationException();
+	}
 }

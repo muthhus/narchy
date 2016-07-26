@@ -28,6 +28,7 @@ package spacegraph.phys.collision.broad;
 
 import spacegraph.math.v3;
 import spacegraph.phys.BulletStats;
+import spacegraph.phys.Collidable;
 import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.util.OArrayList;
@@ -113,7 +114,7 @@ public abstract class AxisSweep3Internal extends Broadphase {
 
 		// make boundary sentinels
 
-		pHandles[0].clientObject = null;
+		pHandles[0].data = null;
 
 		for (int axis = 0; axis < 3; axis++) {
 			pHandles[0].setMinEdges(axis, 0);
@@ -365,7 +366,7 @@ public abstract class AxisSweep3Internal extends Broadphase {
 	}
 
 	@Override
-    public void calculateOverlappingPairs(Intersecter intersecter) {
+    public void update(Intersecter intersecter) {
 		if (pairCache.hasDeferredRemoval()) {
 			OArrayList<BroadphasePair> overlappingPairArray = pairCache.getOverlappingPairArray();
 
@@ -432,7 +433,7 @@ public abstract class AxisSweep3Internal extends Broadphase {
 		}
 	}
 	
-	public int addHandle(v3 aabbMin, v3 aabbMax, Object pOwner, short collisionFilterGroup, short collisionFilterMask, Intersecter intersecter, Object multiSapProxy) {
+	public int addHandle(v3 aabbMin, v3 aabbMax, Collidable pOwner, short collisionFilterGroup, short collisionFilterMask, Intersecter intersecter, Object multiSapProxy) {
 		// quantize the bounds
 		int[] min = new int[3], max = new int[3];
 		quantize(min, aabbMin, 0);
@@ -445,7 +446,7 @@ public abstract class AxisSweep3Internal extends Broadphase {
 
 		pHandle.uid = handle;
 		//pHandle->m_pOverlaps = 0;
-		pHandle.clientObject = pOwner;
+		pHandle.data = pOwner;
 		pHandle.collisionFilterGroup = collisionFilterGroup;
 		pHandle.collisionFilterMask = collisionFilterMask;
 		pHandle.multiSapParentProxy = multiSapProxy;
@@ -571,7 +572,7 @@ public abstract class AxisSweep3Internal extends Broadphase {
 	//}
 	
 	@Override
-    public Broadphasing createProxy(v3 aabbMin, v3 aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Intersecter intersecter, Object multiSapProxy) {
+    public Broadphasing createProxy(v3 aabbMin, v3 aabbMax, BroadphaseNativeType shapeType, Collidable userPtr, short collisionFilterGroup, short collisionFilterMask, Intersecter intersecter, Object multiSapProxy) {
 		int handleId = addHandle(aabbMin, aabbMax, userPtr, collisionFilterGroup, collisionFilterMask, intersecter, multiSapProxy);
 
 		Handle handle = getHandle(handleId);

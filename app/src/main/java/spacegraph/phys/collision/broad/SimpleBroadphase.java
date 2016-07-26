@@ -25,6 +25,7 @@ package spacegraph.phys.collision.broad;
 
 import org.jetbrains.annotations.NotNull;
 import spacegraph.math.v3;
+import spacegraph.phys.Collidable;
 import spacegraph.phys.util.OArrayList;
 
 /**
@@ -62,7 +63,7 @@ public class SimpleBroadphase extends Broadphase {
     }
 
     @Override
-    public Broadphasing createProxy(v3 aabbMin, v3 aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Intersecter intersecter, Object multiSapProxy) {
+    public Broadphasing createProxy(v3 aabbMin, v3 aabbMax, BroadphaseNativeType shapeType, Collidable userPtr, short collisionFilterGroup, short collisionFilterMask, Intersecter intersecter, Object multiSapProxy) {
         assert (aabbMin.x <= aabbMax.x && aabbMin.y <= aabbMax.y && aabbMin.z <= aabbMax.z);
 
         SimpleBroadphasing proxy = new SimpleBroadphasing(aabbMin, aabbMax, shapeType, userPtr, collisionFilterGroup, collisionFilterMask, multiSapProxy);
@@ -127,7 +128,7 @@ public class SimpleBroadphase extends Broadphase {
     }
 
     @Override
-    public void calculateOverlappingPairs(Intersecter intersecter) {
+    public void update(Intersecter intersecter) {
         for (int i = 0; i < handles.size(); i++) {
             //return array[index];
             SimpleBroadphasing proxy0 = handles.get(i);

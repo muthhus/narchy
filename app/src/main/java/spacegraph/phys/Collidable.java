@@ -316,7 +316,7 @@ public class Collidable<X> {
 		this.ccdMotionThreshold = ccdMotionThreshold;
 	}
 
-	public X getUserPointer() {
+	public X data() {
 		return userObjectPointer;
 	}
 

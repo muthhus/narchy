@@ -46,14 +46,12 @@ import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.collision.DefaultCollisionConfiguration;
 import spacegraph.phys.collision.DefaultIntersecter;
 import spacegraph.phys.collision.broad.Broadphase;
+import spacegraph.phys.collision.broad.DbvtBroadphase;
 import spacegraph.phys.collision.broad.Intersecter;
-import spacegraph.phys.collision.broad.SimpleBroadphase;
 import spacegraph.phys.constraint.Point2PointConstraint;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.*;
 import spacegraph.phys.shape.CollisionShape;
-import spacegraph.phys.solve.Constrainer;
-import spacegraph.phys.solve.SequentialImpulseConstrainer;
 import spacegraph.phys.util.AnimFloat;
 import spacegraph.phys.util.AnimFloatAngle;
 import spacegraph.phys.util.AnimVector3f;
@@ -146,12 +144,12 @@ abstract public class JoglPhysics<X> extends JoglSpace implements MouseListener,
         //btPoint3 worldAabbMin(-10000,-10000,-10000);
         //btPoint3 worldAabbMax(10000,10000,10000);
         //btBroadphaseInterface* overlappingPairCache = new btAxisSweep3 (worldAabbMin, worldAabbMax);
-        Broadphase overlappingPairCache = new SimpleBroadphase();
 
+        Broadphase broadphase =
+                //new SimpleBroadphase();
+                new DbvtBroadphase();
 
-        Constrainer constrainer = new SequentialImpulseConstrainer();
-
-        dyn = new DiscreteDynamics<X>(dispatcher, overlappingPairCache, constrainer, collision_config) {
+        dyn = new Dynamics<X>(dispatcher, broadphase) {
 
             @Override
             public void forEachIntSpatial(IntObjectPredicate<Spatial<X>> each) {
@@ -813,7 +811,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements MouseListener,
         }
 
         if (directDrag != null) {
-            Object u = directDrag.getUserPointer();
+            Object u = directDrag.data();
 
             //System.out.println("UNDRAG: " + directDrag);
 
@@ -861,7 +859,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements MouseListener,
                     pickConstraint = p2p;
 
                     // very weak constraint for picking
-                    p2p.tau = 0.1f;
+                    p2p.tau = 0.02f;
                 } else {
                     if (directDrag == null) {
                         directDrag = body;
@@ -898,7 +896,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements MouseListener,
             );*/
 
             if (cray.collidable != null) {
-                Object t = cray.collidable.getUserPointer();
+                Object t = cray.collidable.data();
                 if (t instanceof Spatial) {
                     Spatial a = ((Spatial) t);
                     if (a.onTouch(cray.collidable, cray, buttons)) {
@@ -926,7 +924,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements MouseListener,
             if (directDrag != null) {
                 //directly move the 'static' object
 
-                Object u = directDrag.getUserPointer();
+                Object u = directDrag.data();
 
                 //System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
 

@@ -39,7 +39,7 @@ public class Broadphasing {
 
 	// Usually the client CollisionObject or Rigidbody class
 	@Nullable
-	public Object clientObject;
+	public Collidable data;
 	
 	// TODO: mask
 	public short collisionFilterGroup;
@@ -54,15 +54,19 @@ public class Broadphasing {
 
 	}
 	
-	public Broadphasing(@NotNull Object userPtr, short collisionFilterGroup, short collisionFilterMask) {
+	public Broadphasing(@NotNull Collidable userPtr, short collisionFilterGroup, short collisionFilterMask) {
 		this(userPtr, collisionFilterGroup, collisionFilterMask, null);
 	}
 	
-	public Broadphasing(Object userPtr, short collisionFilterGroup, short collisionFilterMask, Object multiSapParentProxy) {
-		this.clientObject = userPtr;
+	public Broadphasing(Collidable userPtr, short collisionFilterGroup, short collisionFilterMask, Object multiSapParentProxy) {
+		this.data = userPtr;
 		this.collisionFilterGroup = collisionFilterGroup;
 		this.collisionFilterMask = collisionFilterMask;
 		this.multiSapParentProxy = multiSapParentProxy;
 	}
 
+	@Override
+	public final int hashCode() {
+		return uid;
+	}
 }

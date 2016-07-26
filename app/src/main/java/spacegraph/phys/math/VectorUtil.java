@@ -81,7 +81,7 @@ public class VectorUtil {
 		return maxAxis4(tmp);
 	}
 	
-	public static float getCoord(v3 vec, int num) {
+	public static float coord(v3 vec, int num) {
 		switch (num) {
 			case 0: return vec.x;
 			case 1: return vec.y;

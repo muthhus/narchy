@@ -183,7 +183,7 @@ public class Generic6DofConstraint extends TypedConstraint {
             linearLimits.currentLinearDiff.set(calculatedLinearDiff);
             for(int i = 0; i < 3; i++)
             {
-                linearLimits.testLimitValue(i, VectorUtil.getCoord(calculatedLinearDiff, i) );
+                linearLimits.testLimitValue(i, VectorUtil.coord(calculatedLinearDiff, i) );
             }
         }
 
@@ -303,7 +303,7 @@ public class Generic6DofConstraint extends TypedConstraint {
 	 * Generic6DofConstraint.buildJacobian must be called previously.
 	 */
 	public boolean testAngularLimitMotor(int axis_index) {
-		float angle = VectorUtil.getCoord(calculatedAxisAngleDiff, axis_index);
+		float angle = VectorUtil.coord(calculatedAxisAngleDiff, axis_index);
 
 		// test limits
 		angularLimits[axis_index].testLimitValue(angle);
@@ -316,7 +316,7 @@ public class Generic6DofConstraint extends TypedConstraint {
 	 * Generic6DofConstraint.buildJacobian must be called previously.
 	 */
 	public boolean testLinearLimitMotor(int axis_index) {
-		float diff = VectorUtil.getCoord(calculatedLinearDiff, axis_index);
+		float diff = VectorUtil.coord(calculatedLinearDiff, axis_index);
 
 		// test limits
 		linearLimits.testLimitValue(axis_index, diff); 
@@ -451,7 +451,7 @@ public class Generic6DofConstraint extends TypedConstraint {
 	 * Generic6DofConstraint.buildJacobian must be called previously.
 	 */
 	public float getAngle(int axis_index) {
-		return VectorUtil.getCoord(calculatedAxisAngleDiff, axis_index);
+		return VectorUtil.coord(calculatedAxisAngleDiff, axis_index);
 	}
 
 	/**

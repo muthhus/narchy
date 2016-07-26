@@ -106,10 +106,23 @@ public class SimpleSpatial<X> extends Spatial<X> {
         super.update(s);
         if (body == null) {
             enter(s);
+        } else {
+            body.activate();
         }
+
     }
 
+    public void moveDelta(v3 v, float speed) {
+        moveDelta(v.x, v.y, v.z, speed);
+    }
 
+    public void moveDelta(float dx, float dy, float dz, float speed) {
+        move(
+                x() + dx,
+                y() + dy,
+                z() + dz,
+                speed);
+    }
     public void moveDelta(float dx, float dy, float dz) {
         move(
                 x() + dx,

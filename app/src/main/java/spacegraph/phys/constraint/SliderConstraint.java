@@ -552,7 +552,7 @@ public class SliderConstraint extends TypedConstraint {
 			v3 normal = jacLin[i].linearJointAxis;
 			float rel_vel = normal.dot(vel);
 			// calculate positional error
-			float depth = VectorUtil.getCoord(this.depth, i);
+			float depth = VectorUtil.coord(this.depth, i);
 			// get parameters
 			float softness = (i != 0)? softnessOrthoLin : (solveLinLim? softnessLimLin : softnessDirLin);
 			float restitution = (i != 0)? restitutionOrthoLin : (solveLinLim? restitutionLimLin : restitutionDirLin);

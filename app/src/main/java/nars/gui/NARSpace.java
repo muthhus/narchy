@@ -38,7 +38,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 8, 4, 2);
+        Default n = new Default(512, 1, 2, 2);
         //n.conceptActivation.setValue(0.5f);
         //n.nal(4);
 
@@ -48,9 +48,11 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 256, 32);
+        newConceptWindow(n, 256, 4);
 
-        n.loop(100f);
+        n.run(100); //headstart
+
+        //n.loop(1f);
 
     }
 
@@ -96,9 +98,9 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                     }, maxNodes);
 
                 }, maxNodes).with(
-                        new Flatten(),
+                        //new Flatten()
                         //new Spiral()
-                        new FastOrganicLayout()
+                        //new FastOrganicLayout()
                 )
         ).show(1300, 900);
     }

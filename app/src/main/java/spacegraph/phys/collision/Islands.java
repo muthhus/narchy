@@ -33,7 +33,6 @@ import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.util.OArrayList;
 
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * SimulationIslandManager creates and handles simulation islands, using {@link UnionFind}.
@@ -57,10 +56,10 @@ public class Islands {
 			//return array[index];
 			BroadphasePair collisionPair = pairPtr.get(i);
 
-			Collidable colObj0 = (Collidable) collisionPair.pProxy0.clientObject;
+			Collidable colObj0 = (Collidable) collisionPair.pProxy0.data;
 			if (colObj0 == null)
 				continue;
-			Collidable colObj1 = (Collidable) collisionPair.pProxy1.clientObject;
+			Collidable colObj1 = (Collidable) collisionPair.pProxy1.data;
 			if (colObj1 == null)
 				continue;
 
@@ -311,8 +310,9 @@ public class Islands {
 
 				}
 
+
 				if (!islandSleeping) {
-					callback.processIsland(islandBodies, islandBodies.size(), islandmanifold, startManifold_idx, numIslandManifolds, islandId);
+					callback.processIsland(islandBodies, islandmanifold, startManifold_idx, numIslandManifolds, islandId);
 					//printf("Island callback of size:%d bodies, %d manifolds\n",islandBodies.size(),numIslandManifolds);
 				}
 
@@ -322,6 +322,8 @@ public class Islands {
 
 				islandBodies.clear();
 			}
+
+
 			//#endif //SPLIT_ISLANDS
 		}
 		finally {
@@ -332,7 +334,7 @@ public class Islands {
 	////////////////////////////////////////////////////////////////////////////
 	
 	public static abstract class IslandCallback {
-		public abstract void processIsland(OArrayList<Collidable> bodies, int numBodies, OArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId);
+		public abstract void processIsland(OArrayList<Collidable> bodies, OArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId);
 	}
 	
 	private static final Comparator<PersistentManifold> persistentManifoldComparator = (lhs, rhs) -> getIslandId(lhs) < getIslandId(rhs)? -1 : +1;

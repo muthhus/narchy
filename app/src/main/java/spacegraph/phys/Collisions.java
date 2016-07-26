@@ -25,13 +25,10 @@ package spacegraph.phys;
 
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.gs.collections.api.block.procedure.primitive.IntObjectProcedure;
-import nars.$;
-import nars.util.data.list.FasterList;
 import spacegraph.Spatial;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
-import spacegraph.phys.collision.CollisionConfiguration;
 import spacegraph.phys.collision.broad.*;
 import spacegraph.phys.collision.narrow.*;
 import spacegraph.phys.math.AabbUtil2;
@@ -40,8 +37,6 @@ import spacegraph.phys.math.TransformUtil;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.*;
 import spacegraph.phys.util.OArrayList;
-
-import java.util.function.Predicate;
 
 import static spacegraph.math.v3.v;
 
@@ -62,14 +57,14 @@ public abstract class Collisions<X> {
 	public final Intersecter intersecter;
 	protected final DispatcherInfo dispatchInfo = new DispatcherInfo();
 	//protected btStackAlloc*	m_stackAlloc;
-	protected Broadphase broadphasePairCache;
+	protected final Broadphase broadphase;
 
 	/**
 	 * This constructor doesn't own the dispatcher and paircache/broadphase.
 	 */
-	public Collisions(Intersecter intersecter, Broadphase broadphasePairCache) {
+	public Collisions(Intersecter intersecter, Broadphase broadphase) {
 		this.intersecter = intersecter;
-		this.broadphasePairCache = broadphasePairCache;
+		this.broadphase = broadphase;
 	}
 	
 //	public void destroy() {
@@ -111,7 +106,7 @@ public abstract class Collisions<X> {
 			CollisionShape shape = c.shape();
 			shape.getAabb(c.getWorldTransform(new Transform()), minAabb, maxAabb);
 
-			c.broadphase(broadphasePairCache.createProxy(
+			c.broadphase(broadphase.createProxy(
 					minAabb,
 					maxAabb,
 					shape.getShapeType(),
@@ -125,7 +120,7 @@ public abstract class Collisions<X> {
 
 
 
-	public void performDiscreteCollisionDetection() {
+	public void solveCollisions() {
 		BulletStats.pushProfile("performDiscreteCollisionDetection");
 		try {
 			//DispatcherInfo dispatchInfo = getDispatchInfo();
@@ -134,7 +129,7 @@ public abstract class Collisions<X> {
 
 			BulletStats.pushProfile("calculateOverlappingPairs");
 			try {
-				broadphasePairCache.calculateOverlappingPairs(intersecter);
+				broadphase.update(intersecter);
 			}
 			finally {
 				BulletStats.popProfile();
@@ -144,7 +139,7 @@ public abstract class Collisions<X> {
             BulletStats.pushProfile("dispatchAllCollisionPairs");
             try {
                 if (intersecter != null) {
-                    intersecter.dispatchAllCollisionPairs(broadphasePairCache.getOverlappingPairCache(), dispatchInfo, this.intersecter);
+                    intersecter.dispatchAllCollisionPairs(broadphase.getOverlappingPairCache(), dispatchInfo, this.intersecter);
                 }
             }
             finally {
@@ -177,24 +172,18 @@ public abstract class Collisions<X> {
             //
             // only clear the cached algorithms
             //
-			broadphasePairCache.getOverlappingPairCache().cleanProxyFromPairs(bp, intersecter);
-			broadphasePairCache.destroyProxy(bp, intersecter);
+			broadphase.getOverlappingPairCache().cleanProxyFromPairs(bp, intersecter);
+			broadphase.destroyProxy(bp, intersecter);
             collidable.broadphase(null);
         } else {
         	System.err.println(collidable + " missing broadphase");
 		}
 	}
 
-	public void setBroadphase(Broadphase pairCache) {
-		broadphasePairCache = pairCache;
-	}
-	
-	public Broadphase getBroadphase() {
-		return broadphasePairCache;
-	}
+
 	
 	public OverlappingPairCache getPairCache() {
-		return broadphasePairCache.getOverlappingPairCache();
+		return broadphase.getOverlappingPairCache();
 	}
 
 	public DispatcherInfo getDispatchInfo() {
@@ -221,7 +210,7 @@ public abstract class Collisions<X> {
 		minAabb.sub(contactThreshold);
 		maxAabb.add(contactThreshold);
 
-		Broadphase bp = broadphasePairCache;
+		Broadphase bp = broadphase;
 
 		// moving objects should be moderately sized, probably something wrong if not
 		tmp.sub(maxAabb, minAabb); // TODO: optimize

@@ -194,11 +194,11 @@ public class CapsuleShape extends ConvexInternalShape {
 	
 	public float getRadius() {
 		int radiusAxis = (upAxis + 2) % 3;
-		return VectorUtil.getCoord(implicitShapeDimensions, radiusAxis);
+		return VectorUtil.coord(implicitShapeDimensions, radiusAxis);
 	}
 
 	public float getHalfHeight() {
-		return VectorUtil.getCoord(implicitShapeDimensions, upAxis);
+		return VectorUtil.coord(implicitShapeDimensions, upAxis);
 	}
 
 }

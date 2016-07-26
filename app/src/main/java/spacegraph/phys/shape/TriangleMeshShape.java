@@ -85,10 +85,10 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 			vec.set(0f, 0f, 0f);
 			VectorUtil.setCoord(vec, i, 1f);
 			v3 tmp = localGetSupportingVertex(vec, new v3());
-			VectorUtil.setCoord(localAabbMax, i, VectorUtil.getCoord(tmp, i) + collisionMargin);
+			VectorUtil.setCoord(localAabbMax, i, VectorUtil.coord(tmp, i) + collisionMargin);
 			VectorUtil.setCoord(vec, i, -1f);
 			localGetSupportingVertex(vec, tmp);
-			VectorUtil.setCoord(localAabbMin, i, VectorUtil.getCoord(tmp, i) - collisionMargin);
+			VectorUtil.setCoord(localAabbMin, i, VectorUtil.coord(tmp, i) - collisionMargin);
 		}
 	}
 

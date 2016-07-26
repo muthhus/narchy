@@ -178,11 +178,11 @@ public class CompoundShape extends CollisionShape {
 			children.get(j).childShape.getAabb(children.get(j).transform, tmpLocalAabbMin, tmpLocalAabbMax);
 			
 			for (int i = 0; i < 3; i++) {
-				if (VectorUtil.getCoord(localAabbMin, i) > VectorUtil.getCoord(tmpLocalAabbMin, i)) {
-					VectorUtil.setCoord(localAabbMin, i, VectorUtil.getCoord(tmpLocalAabbMin, i));
+				if (VectorUtil.coord(localAabbMin, i) > VectorUtil.coord(tmpLocalAabbMin, i)) {
+					VectorUtil.setCoord(localAabbMin, i, VectorUtil.coord(tmpLocalAabbMin, i));
 				}
-				if (VectorUtil.getCoord(localAabbMax, i) < VectorUtil.getCoord(tmpLocalAabbMax, i)) {
-					VectorUtil.setCoord(localAabbMax, i, VectorUtil.getCoord(tmpLocalAabbMax, i));
+				if (VectorUtil.coord(localAabbMax, i) < VectorUtil.coord(tmpLocalAabbMax, i)) {
+					VectorUtil.setCoord(localAabbMax, i, VectorUtil.coord(tmpLocalAabbMax, i));
 				}
 			}
 		}

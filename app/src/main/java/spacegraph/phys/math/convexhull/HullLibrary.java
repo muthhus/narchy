@@ -654,11 +654,11 @@ public class HullLibrary {
             vtx_idx +=/*stride*/ 1;
 
             for (int j=0; j<3; j++) {
-                if (VectorUtil.getCoord(p, j) < bmin[j]) {
-                    bmin[j] = VectorUtil.getCoord(p, j);
+                if (VectorUtil.coord(p, j) < bmin[j]) {
+                    bmin[j] = VectorUtil.coord(p, j);
                 }
-                if (VectorUtil.getCoord(p, j) > bmax[j]) {
-                    bmax[j] = VectorUtil.getCoord(p, j);
+                if (VectorUtil.coord(p, j) > bmax[j]) {
+                    bmax[j] = VectorUtil.coord(p, j);
                 }
             }
         }
@@ -797,11 +797,11 @@ public class HullLibrary {
 			//return array[index];
 			v3 p = vertices.get(i);
             for (int j = 0; j < 3; j++) {
-                if (VectorUtil.getCoord(p, j) < bmin[j]) {
-                    bmin[j] = VectorUtil.getCoord(p, j);
+                if (VectorUtil.coord(p, j) < bmin[j]) {
+                    bmin[j] = VectorUtil.coord(p, j);
                 }
-                if (VectorUtil.getCoord(p, j) > bmax[j]) {
-                    bmax[j] = VectorUtil.getCoord(p, j);
+                if (VectorUtil.coord(p, j) > bmax[j]) {
+                    bmax[j] = VectorUtil.coord(p, j);
                 }
             }
         }

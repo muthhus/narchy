@@ -193,14 +193,14 @@ public class v3 extends Tuple3f implements java.io.Serializable {
     /**
      * Normalizes this vector in place.
      */
-    public final void normalize()
+    public final float normalize()
     {
 
-        float norm = (float)
-                (1.0 / Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
-        set(this.x * norm,
-            this.y *  norm,
-            this.z * norm);
+        float norm = (float)Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        set(this.x / norm,
+            this.y / norm,
+            this.z / norm);
+        return norm;
     }
 
 

@@ -55,7 +55,7 @@ public class GhostObject extends Collidable {
 	 * This method is mainly for expert/internal use only.
 	 */
 	public void addOverlappingObjectInternal(Broadphasing otherProxy, Broadphasing thisProxy) {
-		Collidable otherObject = (Collidable)otherProxy.clientObject;
+		Collidable otherObject = (Collidable)otherProxy.data;
 		assert(otherObject != null);
 
 		// if this linearSearch becomes too slow (too many overlapping objects) we should add a more appropriate data structure
@@ -70,7 +70,7 @@ public class GhostObject extends Collidable {
 	 * This method is mainly for expert/internal use only.
 	 */
 	public void removeOverlappingObjectInternal(Broadphasing otherProxy, Intersecter intersecter, Broadphasing thisProxy) {
-		Collidable otherObject = (Collidable) otherProxy.clientObject;
+		Collidable otherObject = (Collidable) otherProxy.data;
 		assert(otherObject != null);
 
 		OArrayList<Collidable> o = this.overlappingObjects;

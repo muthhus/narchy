@@ -25,6 +25,8 @@
 
 package spacegraph.phys.collision.broad;
 
+import spacegraph.phys.Collidable;
+
 /**
  *
  * @author jezek2
@@ -36,7 +38,7 @@ public class DbvtProxy extends Broadphasing {
 	public final DbvtProxy[] links = new DbvtProxy[2];
 	public int stage;
 
-	public DbvtProxy(Object userPtr, short collisionFilterGroup, short collisionFilterMask) {
+	public DbvtProxy(Collidable userPtr, short collisionFilterGroup, short collisionFilterMask) {
 		super(userPtr, collisionFilterGroup, collisionFilterMask);
 	}
 

@@ -61,21 +61,21 @@ public class ConeShape extends ConvexInternalShape {
 	private v3 coneLocalSupport(v3 v, v3 out) {
 		float halfHeight = height * 0.5f;
 
-		if (VectorUtil.getCoord(v, coneIndices[1]) > v.length() * sinAngle) {
+		if (VectorUtil.coord(v, coneIndices[1]) > v.length() * sinAngle) {
 			VectorUtil.setCoord(out, coneIndices[0], 0f);
 			VectorUtil.setCoord(out, coneIndices[1], halfHeight);
 			VectorUtil.setCoord(out, coneIndices[2], 0f);
 			return out;
 		}
 		else {
-			float v0 = VectorUtil.getCoord(v, coneIndices[0]);
-			float v2 = VectorUtil.getCoord(v, coneIndices[2]);
+			float v0 = VectorUtil.coord(v, coneIndices[0]);
+			float v2 = VectorUtil.coord(v, coneIndices[2]);
 			float s = (float) Math.sqrt(v0 * v0 + v2 * v2);
 			if (s > BulletGlobals.FLT_EPSILON) {
 				float d = radius / s;
-				VectorUtil.setCoord(out, coneIndices[0], VectorUtil.getCoord(v, coneIndices[0]) * d);
+				VectorUtil.setCoord(out, coneIndices[0], VectorUtil.coord(v, coneIndices[0]) * d);
 				VectorUtil.setCoord(out, coneIndices[1], -halfHeight);
-				VectorUtil.setCoord(out, coneIndices[2], VectorUtil.getCoord(v, coneIndices[2]) * d);
+				VectorUtil.setCoord(out, coneIndices[2], VectorUtil.coord(v, coneIndices[2]) * d);
 				return out;
 			} else {
 				VectorUtil.setCoord(out, coneIndices[0], 0f);

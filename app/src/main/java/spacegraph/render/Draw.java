@@ -30,7 +30,6 @@ import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.util.ImmModeSink;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
-import spacegraph.Spatial;
 import spacegraph.math.AxisAngle4f;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Matrix4f;
@@ -253,7 +252,7 @@ public enum Draw {
                     int upAxis = cylinder.getUpAxis();
 
                     float radius = cylinder.getRadius();
-                    float halfHeight = VectorUtil.getCoord(cylinder.getHalfExtentsWithMargin(new v3()), upAxis);
+                    float halfHeight = VectorUtil.coord(cylinder.getHalfExtentsWithMargin(new v3()), upAxis);
 
                     glsrt.drawCylinder(gl, radius, halfHeight, upAxis);
 

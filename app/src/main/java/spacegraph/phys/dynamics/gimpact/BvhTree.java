@@ -100,7 +100,7 @@ class BvhTree {
 		}
 		means.scale(1f / (float) numIndices);
 
-		splitValue = VectorUtil.getCoord(means, splitAxis);
+		splitValue = VectorUtil.coord(means, splitAxis);
 
 		// sort leafNodes so all values larger then splitValue comes first, and smaller values start from 'splitIndex'.
 		for (int i = startIndex; i < endIndex; i++) {
@@ -109,7 +109,7 @@ class BvhTree {
 			center.add(tmp1, tmp2);
 			center.scale(0.5f);
 
-			if (VectorUtil.getCoord(center, splitAxis) > splitValue) {
+			if (VectorUtil.coord(center, splitAxis) > splitValue) {
 				// swap
 				primitive_boxes.swap(i, splitIndex);
 				//swapLeafNodes(i,splitIndex);

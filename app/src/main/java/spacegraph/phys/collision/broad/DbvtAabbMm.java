@@ -30,6 +30,8 @@ import spacegraph.phys.math.MatrixUtil;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 
+import static spacegraph.phys.math.VectorUtil.coord;
+
 /**
  *
  * @author jezek2
@@ -63,28 +65,28 @@ public class DbvtAabbMm {
 		p2.mx.set(tmp);
 	}
 
-	public v3 Center(v3 out) {
+	public v3 center(v3 out) {
 		out.add(mi, mx);
 		out.scale(0.5f);
 		return out;
 	}
 	
-	public v3 Lengths(v3 out) {
+	public v3 lengths(v3 out) {
 		out.sub(mx, mi);
 		return out;
 	}
 	
-	public v3 Extents(v3 out) {
+	public v3 extents(v3 out) {
 		out.sub(mx, mi);
 		out.scale(0.5f);
 		return out;
 	}
 	
-	public v3 Mins() {
+	public v3 mins() {
 		return mi;
 	}
 
-	public v3 Maxs() {
+	public v3 maxs() {
 		return mx;
 	}
 	
@@ -95,7 +97,7 @@ public class DbvtAabbMm {
 		return box;
 	}
 
-	public static DbvtAabbMm FromCR(v3 c, float r, DbvtAabbMm out) {
+	public static DbvtAabbMm fromCR(v3 c, float r, DbvtAabbMm out) {
 		v3 tmp = new v3();
 		tmp.set(r, r, r);
 		return FromCE(c, tmp, out);
@@ -205,7 +207,7 @@ public class DbvtAabbMm {
 		return p.dot(v);
 	}
 	 
-	public static boolean Intersect(DbvtAabbMm a, DbvtAabbMm b) {
+	public static boolean intersect(DbvtAabbMm a, DbvtAabbMm b) {
 		return ((a.mi.x <= b.mx.x) &&
 		        (a.mx.x >= b.mi.x) &&
 		        (a.mi.y <= b.mx.y) &&
@@ -214,15 +216,15 @@ public class DbvtAabbMm {
 		        (a.mx.z >= b.mi.z));
 	}
 
-	public static boolean Intersect(DbvtAabbMm a, DbvtAabbMm b, Transform xform) {
+	public static boolean intersect(DbvtAabbMm a, DbvtAabbMm b, Transform xform) {
 		v3 d0 = new v3();
 		v3 d1 = new v3();
 		v3 tmp = new v3();
 
 		// JAVA NOTE: check
-		b.Center(d0);
+		b.center(d0);
 		xform.transform(d0);
-		d0.sub(a.Center(tmp));
+		d0.sub(a.center(tmp));
 
 		MatrixUtil.transposeTransform(d1, d0, xform.basis);
 
@@ -231,15 +233,15 @@ public class DbvtAabbMm {
 		s1[0] = xform.dot(d0);
 		s1[1] = s1[0];
 
-		a.AddSpan(d0, s0, 0, s0, 1);
-		b.AddSpan(d1, s1, 0, s1, 1);
+		a.addSpan(d0, s0, 0, s0, 1);
+		b.addSpan(d1, s1, 0, s1, 1);
 		if (s0[0] > (s1[1])) {
 			return false;
 		}
         return s0[1] >= (s1[0]);
     }
 
-	public static boolean Intersect(DbvtAabbMm a, v3 b) {
+	public static boolean intersect(DbvtAabbMm a, v3 b) {
 		return ((b.x >= a.mi.x) &&
 		        (b.y >= a.mi.y) &&
 		        (b.z >= a.mi.z) &&
@@ -248,7 +250,7 @@ public class DbvtAabbMm {
 		        (b.z <= a.mx.z));
 	}
 
-	public static boolean Intersect(DbvtAabbMm a, v3 org, v3 invdir, int[] signs) {
+	public static boolean intersect(DbvtAabbMm a, v3 org, v3 invdir, int[] signs) {
 		v3[] bounds = new v3[]{a.mi, a.mx};
 		float txmin = (bounds[signs[0]].x - org.x) * invdir.x;
 		float txmax = (bounds[1 - signs[0]].x - org.x) * invdir.x;
@@ -289,20 +291,20 @@ public class DbvtAabbMm {
 		return Math.abs(d.x) + Math.abs(d.y) + Math.abs(d.z);
 	}
 
-	public static void Merge(DbvtAabbMm a, DbvtAabbMm b, DbvtAabbMm r) {
+	public static void merge(DbvtAabbMm a, DbvtAabbMm b, DbvtAabbMm r) {
 		for (int i=0; i<3; i++) {
-			if (VectorUtil.getCoord(a.mi, i) < VectorUtil.getCoord(b.mi, i)) {
-				VectorUtil.setCoord(r.mi, i, VectorUtil.getCoord(a.mi, i));
+			if (coord(a.mi, i) < coord(b.mi, i)) {
+				VectorUtil.setCoord(r.mi, i, coord(a.mi, i));
 			}
 			else {
-				VectorUtil.setCoord(r.mi, i, VectorUtil.getCoord(b.mi, i));
+				VectorUtil.setCoord(r.mi, i, coord(b.mi, i));
 			}
 			
-			if (VectorUtil.getCoord(a.mx, i) > VectorUtil.getCoord(b.mx, i)) {
-				VectorUtil.setCoord(r.mx, i, VectorUtil.getCoord(a.mx, i));
+			if (coord(a.mx, i) > coord(b.mx, i)) {
+				VectorUtil.setCoord(r.mx, i, coord(a.mx, i));
 			}
 			else {
-				VectorUtil.setCoord(r.mx, i, VectorUtil.getCoord(b.mx, i));
+				VectorUtil.setCoord(r.mx, i, coord(b.mx, i));
 			}
 		}
 	}
@@ -316,15 +318,20 @@ public class DbvtAabbMm {
 		        (a.mx.z != b.mx.z));
 	}
 	
-	private void AddSpan(v3 d, float[] smi, int smi_idx, float[] smx, int smx_idx) {
+	private void addSpan(v3 d, float[] smi, int smi_idx, float[] smx, int smx_idx) {
+		v3 mx = this.mx;
+		v3 mi = this.mi;
 		for (int i=0; i<3; i++) {
-			if (VectorUtil.getCoord(d, i) < 0) {
-				smi[smi_idx] += VectorUtil.getCoord(mx, i) * VectorUtil.getCoord(d, i);
-				smx[smx_idx] += VectorUtil.getCoord(mi, i) * VectorUtil.getCoord(d, i);
+			float cx = coord(mx, i);
+			float cd = coord(d, i);
+			float ci = coord(mi, i);
+			if (cd < 0) {
+				smi[smi_idx] += cx * cd;
+				smx[smx_idx] += ci * cd;
 			}
 			else {
-				smi[smi_idx] += VectorUtil.getCoord(mi, i) * VectorUtil.getCoord(d, i);
-				smx[smx_idx] += VectorUtil.getCoord(mx, i) * VectorUtil.getCoord(d, i);
+				smi[smi_idx] += ci * cd;
+				smx[smx_idx] += cx * cd;
 			}
 		}
 	}

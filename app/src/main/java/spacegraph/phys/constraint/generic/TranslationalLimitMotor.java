@@ -98,7 +98,7 @@ public class TranslationalLimitMotor {
 	 * - limitIndex: first 3 are linear, next 3 are angular
 	 */
 	public boolean isLimited(int limitIndex) {
-		return (VectorUtil.getCoord(upperLimit, limitIndex) >= VectorUtil.getCoord(lowerLimit, limitIndex));
+		return (VectorUtil.coord(upperLimit, limitIndex) >= VectorUtil.coord(lowerLimit, limitIndex));
 	}
 
 	/**
@@ -111,8 +111,8 @@ public class TranslationalLimitMotor {
 
         public int testLimitValue(int limitIndex, float test_value)
         {
-            float loLimit = VectorUtil.getCoord(lowerLimit, limitIndex);
-            float hiLimit = VectorUtil.getCoord(upperLimit, limitIndex);
+            float loLimit = VectorUtil.coord(lowerLimit, limitIndex);
+            float hiLimit = VectorUtil.coord(upperLimit, limitIndex);
             if(loLimit > hiLimit)
             {
                 currentLimit[limitIndex] = 0;//Free from violation
@@ -162,14 +162,14 @@ public class TranslationalLimitMotor {
 		float rel_vel = axis_normal_on_a.dot(vel);
 
 		// apply displacement correction
-                float target_velocity   = VectorUtil.getCoord(this.targetVelocity, limit_index);
-                float maxMotorForce     = VectorUtil.getCoord(this.maxMotorForce, limit_index);
+                float target_velocity   = VectorUtil.coord(this.targetVelocity, limit_index);
+                float maxMotorForce     = VectorUtil.coord(this.maxMotorForce, limit_index);
 
-                float limErr = VectorUtil.getCoord(currentLimitError, limit_index);
+                float limErr = VectorUtil.coord(currentLimitError, limit_index);
                 if (currentLimit[limit_index] != 0)
                 {
                     target_velocity = restitution * limErr / (timeStep);
-                    maxMotorForce = VectorUtil.getCoord(maxLimitForce, limit_index);
+                    maxMotorForce = VectorUtil.coord(maxLimitForce, limit_index);
                 }
 		maxMotorForce *= timeStep;
 
@@ -201,10 +201,10 @@ public class TranslationalLimitMotor {
 		float hi = 1e30f;
 
                 
-		float oldNormalImpulse = VectorUtil.getCoord(accumulatedImpulse, limit_index);
+		float oldNormalImpulse = VectorUtil.coord(accumulatedImpulse, limit_index);
 		float sum = oldNormalImpulse + normalImpulse;
 		VectorUtil.setCoord(accumulatedImpulse, limit_index, sum > hi ? 0f : sum < lo ? 0f : sum);
-		normalImpulse = VectorUtil.getCoord(accumulatedImpulse, limit_index) - oldNormalImpulse;
+		normalImpulse = VectorUtil.coord(accumulatedImpulse, limit_index) - oldNormalImpulse;
 
 		v3 impulse_vector = new v3();
 		impulse_vector.scale(normalImpulse, axis_normal_on_a);

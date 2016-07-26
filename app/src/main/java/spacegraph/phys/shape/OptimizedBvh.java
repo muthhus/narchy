@@ -633,7 +633,7 @@ public class OptimizedBvh implements Serializable {
 		}
 		means.scale(1f / (float) numIndices);
 
-		splitValue = VectorUtil.getCoord(means, splitAxis);
+		splitValue = VectorUtil.coord(means, splitAxis);
 
 		//sort leafNodes so all values larger then splitValue comes first, and smaller values start from 'splitIndex'.
 		for (i = startIndex; i < endIndex; i++) {
@@ -641,7 +641,7 @@ public class OptimizedBvh implements Serializable {
 			center.add(getAabbMax(i), getAabbMin(i));
 			center.scale(0.5f);
 
-			if (VectorUtil.getCoord(center, splitAxis) > splitValue) {
+			if (VectorUtil.coord(center, splitAxis) > splitValue) {
 				// swap
 				swapLeafNodes(i, splitIndex);
 				splitIndex++;

@@ -43,7 +43,7 @@ public class DefaultIntersecter extends Intersecter {
 	private final OArrayList<PersistentManifold> manifoldsPtr = new OArrayList<>();
 	//private final boolean useIslands = true;
 	private boolean staticWarningReported;
-	private ManifoldResult defaultManifoldResult;
+	//private ManifoldResult defaultManifoldResult;
 	private NearCallback nearCallback;
 	//private PoolAllocator*	m_collisionAlgorithmPoolAllocator;
 	//private PoolAllocator*	m_persistentManifoldPoolAllocator;

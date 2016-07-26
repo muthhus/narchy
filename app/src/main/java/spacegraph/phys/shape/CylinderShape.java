@@ -71,22 +71,22 @@ public class CylinderShape extends BoxShape {
 		//mapping depends on how cylinder local orientation is
 		// extents of the cylinder is: X,Y is for radius, and Z for height
 
-		float radius = VectorUtil.getCoord(halfExtents, XX);
-		float halfHeight = VectorUtil.getCoord(halfExtents, cylinderUpAxis);
+		float radius = VectorUtil.coord(halfExtents, XX);
+		float halfHeight = VectorUtil.coord(halfExtents, cylinderUpAxis);
 
 		float d;
 
-		float s = (float) Math.sqrt(VectorUtil.getCoord(v, XX) * VectorUtil.getCoord(v, XX) + VectorUtil.getCoord(v, ZZ) * VectorUtil.getCoord(v, ZZ));
+		float s = (float) Math.sqrt(VectorUtil.coord(v, XX) * VectorUtil.coord(v, XX) + VectorUtil.coord(v, ZZ) * VectorUtil.coord(v, ZZ));
 		if (s != 0f) {
 			d = radius / s;
-			VectorUtil.setCoord(out, XX, VectorUtil.getCoord(v, XX) * d);
-			VectorUtil.setCoord(out, YY, VectorUtil.getCoord(v, YY) < 0f ? -halfHeight : halfHeight);
-			VectorUtil.setCoord(out, ZZ, VectorUtil.getCoord(v, ZZ) * d);
+			VectorUtil.setCoord(out, XX, VectorUtil.coord(v, XX) * d);
+			VectorUtil.setCoord(out, YY, VectorUtil.coord(v, YY) < 0f ? -halfHeight : halfHeight);
+			VectorUtil.setCoord(out, ZZ, VectorUtil.coord(v, ZZ) * d);
 			return out;
 		}
 		else {
 			VectorUtil.setCoord(out, XX, radius);
-			VectorUtil.setCoord(out, YY, VectorUtil.getCoord(v, YY) < 0f ? -halfHeight : halfHeight);
+			VectorUtil.setCoord(out, YY, VectorUtil.coord(v, YY) < 0f ? -halfHeight : halfHeight);
 			VectorUtil.setCoord(out, ZZ, 0f);
 			return out;
 		}
