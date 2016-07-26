@@ -232,10 +232,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     public static class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstraint<X> {
 
-        public static final int clusters = 5;
+        public static final int clusters = 7;
 
-        float repelSpeed = 1f;
-        float attractSpeed = 10f;
+        float repelSpeed = 3f;
+        float attractSpeed = 3f;
 
         private float minRepelDist = 0f;
         private float maxRepelDist = 350f;
@@ -320,7 +320,9 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             len -= (xp.radius + yp.radius);
 
             if (len > idealDist) {
-                float dd = 1 + (len - idealDist);
+                //float dd = (len - idealDist);
+                float dd = 0; //no attenuation over distance
+
                 delta.scale((-(speed*speed) / (1f+dd)) / 2f);
 
                 ((Dynamic) x).impulse(delta);

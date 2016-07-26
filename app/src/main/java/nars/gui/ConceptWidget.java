@@ -1,6 +1,7 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import javafx.scene.paint.Color;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
@@ -12,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
-import spacegraph.Spatial;
 import spacegraph.render.Draw;
 
 import java.util.function.Predicate;
@@ -31,6 +31,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
     @NotNull
     public final EDraw[] edges;
     @Deprecated public transient int numEdges;
+
 
 
     public ConceptWidget(Term x, int edges, NAR nar) {
@@ -59,14 +60,6 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         renderLabel(gl, 0.0005f);
     }
 
-    protected void colorshape(GL2 gl) {
-        float p = pri/2f;
-        gl.glColor4f(p,
-                //pri * Math.min(1f),
-                p, //1f / (1f + (v.lag / (activationPeriods * dt)))),
-                p,
-                1f);
-    }
 
     @Override
     public void update(SpaceGraph<Term> s) {
@@ -78,10 +71,12 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         float p = pri;// = 1; //pri = key.priIfFiniteElseZero();
 
-        float nodeScale = 1f + p * 3f;//1f + 2f * p;
+        float nodeScale = 0.5f + (p*p) * 5f;//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
-        scale(nodeScale, nodeScale, nodeScale / 4f);
+        scale(nodeScale, nodeScale, nodeScale / 6f);
 
+
+        colorShape( (tt.op().ordinal()/16f), 0.75f, 0.75f  , 0.25f + 0.5f * p);
 
         Concept cc = nar.concept(tt);
         if (cc == null) {
@@ -113,6 +108,14 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
     }
 
+    private void colorShape(float h, float s, float b, float a) {
+        //TODO use a LUT matrix instaed of this shitty Color function
+        Color c = Color.hsb(360*h, s, b);
+        shapeR = (float)c.getRed();
+        shapeG = (float)c.getGreen();
+        shapeB = (float)c.getBlue();
+        shapeA = a;
+    }
 
 
     boolean addLink(SpaceGraph space, BLink<? extends Termed> ll) {
@@ -172,7 +175,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         }
 
         //int maxEdges = edges.length;
-        float a = 0.5f;// / (maxEdges*0.5f /* est. avg 0.5 per link */);
+        float a = 0.25f + 0.5f * pri;// / (maxEdges*0.5f /* est. avg 0.5 per link */);
 
         int n;
         ee[n = (numEdges++)].set(target, width,

@@ -35,9 +35,16 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public float radius = 0;
     private List<Collidable<X>> bodies = Collections.emptyList();
 
+    protected float shapeA;
+    protected float shapeR;
+    protected float shapeG;
+    protected float shapeB;
 
     public SimpleSpatial(X x) {
         super(x);
+
+        shapeA = 0.9f;
+        shapeR = shapeG = shapeB = 0.5f; //gray
 
         this.label = key!=null ? key.toString() : super.toString();
         center = motion.t;
@@ -218,9 +225,19 @@ public class SimpleSpatial<X> extends Spatial<X> {
     }
 
     protected void renderShape(GL2 gl, Dynamic body) {
-        //colorshape(gl);
+        colorshape(gl);
         Draw.draw(gl, body.shape());
     }
+
+    protected void colorshape(GL2 gl) {
+
+        gl.glColor4f(
+                shapeR,
+                shapeG,
+                shapeB,
+                shapeA);
+    }
+
 
 //    @Override
 //    public void start(short order) {

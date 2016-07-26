@@ -12,12 +12,10 @@ import nars.util.event.On;
 import nars.util.experiment.DeductiveChainTest;
 import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
+import spacegraph.AbstractSpace;
 import spacegraph.ListSpace;
 import spacegraph.SpaceGraph;
-import spacegraph.AbstractSpace;
 import spacegraph.Spatial;
-import spacegraph.layout.FastOrganicLayout;
-import spacegraph.layout.Flatten;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.shape.CollisionShape;
 
@@ -38,21 +36,21 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 1, 2, 2);
-        //n.conceptActivation.setValue(0.5f);
+        Default n = new Default(1024, 4, 2, 2);
+        n.inputActivation.setValue(0.5f);
         //n.nal(4);
 
 
         new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
-        new DeductiveChainTest(n, 10, 9999991, (x,y) -> $.p($.the(x),$.the(y)));
+        new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 256, 4);
+        newConceptWindow(n, 512, 8);
 
-        n.run(100); //headstart
+        //n.run(20); //headstart
 
-        //n.loop(1f);
+        n.loop(15f);
 
     }
 
@@ -61,9 +59,12 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         return new SpaceGraph<Term>(
                 new NARSpace<Term, Spatial<Term>>(n, (nar, space, target) -> {
                     Bag<Concept> x = ((Default) nar).core.concepts;
+
+                    //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
+
                     x.topWhile(b -> {
 
-                        final float initDistanceEpsilon = 5f;
+                        final float initDistanceEpsilon = 10f;
                         final float initImpulseEpsilon = 25f;
 
                         ConceptWidget w = space.update(b.get().term(),
@@ -71,6 +72,11 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                                     @Override
                                     public Dynamic newBody(CollisionShape shape, boolean collidesWithOthersLikeThis) {
                                         Dynamic x = super.newBody(shape, collidesWithOthersLikeThis);
+
+                                        //place in a random direction
+                                        x.transform().set(SpaceGraph.r(initDistanceEpsilon),
+                                                SpaceGraph.r(initDistanceEpsilon),
+                                                SpaceGraph.r(initDistanceEpsilon));
 
                                         //impulse in a random direction
                                         x.impulse(v(SpaceGraph.r(initImpulseEpsilon),
@@ -82,13 +88,6 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                                 });
 
                         w.pri = b.priIfFiniteElseZero();
-
-
-
-                        //place in a random direction
-                        w.move(SpaceGraph.r(initDistanceEpsilon),
-                                SpaceGraph.r(initDistanceEpsilon),
-                                SpaceGraph.r(initDistanceEpsilon));
 
 
                         target.add(w);
