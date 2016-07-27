@@ -7,7 +7,6 @@ import nars.Param;
 import nars.index.TermIndex;
 import nars.nal.meta.match.Ellipsislike;
 import nars.nal.op.TermTransform;
-import nars.op.data.differ;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
@@ -24,7 +23,6 @@ import java.util.*;
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
-import static nars.term.Terms.empty;
 import static nars.term.compound.Statement.pred;
 import static nars.term.compound.Statement.subj;
 
@@ -38,6 +36,47 @@ public abstract class TermBuilder {
     public static final Atom False = $.the("ø");
     private static final Atom True = $.the("¿");
     private static final Term[] TrueArray = new Term[] { True };
+
+    public static Term empty(@NotNull Op op) {
+        switch (op) {
+
+            case PROD:
+                return Terms.ZeroProduct;
+            default:
+                return False;
+        }
+    }
+
+    @NotNull
+    public Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
+
+        //quick test: intersect the mask: if nothing in common, then it's entirely the first term
+        if ((a.structure() & b.structure()) == 0) {
+            return a;
+        }
+
+        Term[] aa = a.terms();
+
+        List<Term> terms = $.newArrayList(aa.length);
+
+        int retained = 0, size = a.size();
+        for (int i = 0; i < size; i++) {
+            Term x = a.term(i);
+            if (!b.containsTerm(x)) {
+                terms.add(x);
+                retained++;
+            }
+        }
+
+        if (retained == size) { //same as 'a'
+            return a;
+        } else if (retained == 0) {
+            return False; //empty set
+        } else {
+            return build(o, terms.toArray(new Term[retained]));
+        }
+
+    }
 
     @NotNull
     public final Term build(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
@@ -190,11 +229,9 @@ public abstract class TermBuilder {
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if ((et0.op() == set && et1.op() == set))
-                    return differ.difference(this, set, (Compound) et0, (Compound) et1);
+                    return difference(set, (Compound) et0, (Compound) et1);
                 else
-                    return et0.equals(et1) ?
-                            empty(set) :
-                            finish(op, t);
+                    return et0.equals(et1) ? False : finish(op, t);
             default:
                 throw new InvalidTermException(op, t, "diff requires 2 terms");
         }
@@ -626,10 +663,10 @@ public abstract class TermBuilder {
     protected abstract boolean transformImmediates();
 
 
-    @Nullable
-    public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
-        return differ.difference(this, setType, A, B);
-    }
+//    @Nullable
+//    public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
+//        return difference(setType, A, B);
+//    }
 
     @NotNull
     public Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
@@ -645,7 +682,7 @@ public abstract class TermBuilder {
                 SETe);
     }
 
-    @Nullable
+    @NotNull
     public Term newIntersectEXT(@NotNull Term[] t) {
         return newIntersection(t,
                 SECTe,
@@ -653,7 +690,7 @@ public abstract class TermBuilder {
                 SETi);
     }
 
-    @Nullable
+    @NotNull
     public Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
         switch (t.length) {
 
@@ -672,9 +709,9 @@ public abstract class TermBuilder {
             default:
                 //HACK use more efficient way
                 Term a = newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
-                if (a == null) return null;
+
                 Term b = newIntersection(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection);
-                if (b == null) return null;
+
                 return newIntersection2(a, b,
                         intersection, setUnion, setIntersection
                 );
@@ -682,7 +719,7 @@ public abstract class TermBuilder {
 
     }
 
-    @Nullable
+    @NotNull
     @Deprecated
     public Term newIntersection2(@NotNull Term term1, @NotNull Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
 
@@ -735,14 +772,12 @@ public abstract class TermBuilder {
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s.isEmpty() ? emptySet(o) : (Compound) finish(o, TermContainer.the(o, s));
+        return s.isEmpty() ? empty(o) : (Compound) finish(o, TermContainer.the(o, s));
     }
 
-    public static Term emptySet(Op o) {
-        return True; //use the True for empty set
-    }
 
-    @Nullable
+
+    @NotNull
     public Compound union(@NotNull Op o, @NotNull Compound term1, @NotNull Compound term2) {
         TermContainer u = TermContainer.union(term1, term2);
         if (u == term1)

@@ -18,6 +18,7 @@ import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.index.TermIndex;
 import nars.nal.Tense;
+import nars.nal.TermBuilder;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.nal.rule.PremiseRule;
@@ -27,7 +28,6 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Operator;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
@@ -536,7 +536,7 @@ public class Narsese extends BaseParser<Object> {
 
     Rule EmptyCompound(char c, @NotNull Op op) {
         return sequence(
-            s(), c, push(Terms.empty(op))
+            s(), c, push(TermBuilder.empty(op))
         );
     }
 

@@ -12,6 +12,7 @@ import org.junit.Test;
 import static nars.$.*;
 import static nars.Op.CONJ;
 import static nars.io.NarseseTest.assertInvalid;
+import static nars.nal.TermBuilder.False;
 import static nars.term.TermTest.*;
 import static org.junit.Assert.*;
 
@@ -55,7 +56,10 @@ public class TermReductionsTest {
         //UNION if (term1.op(Op.SET_INT) && term2.op(Op.SET_INT)) {
         assertEquals("{P,Q,R,S}", secte(sete(p, q), sete(r, s)).toString());
         assertEquals("{P,Q,R,S}", $("(&,{P,Q},{R,S})").toString());
-        assertEquals(null /* emptyset */, secte(seti(p, q), seti(r, s)));
+    }
+    @Test
+    public void testIntersectExtReduction5() {
+        assertEquals(False /* emptyset */, secte(seti(p, q), seti(r, s)));
 
     }
 
@@ -197,13 +201,13 @@ public class TermReductionsTest {
     @Test
     public void testDiffIntEqual() {
 
-        assertEquals(null, diffi(p, p));
+        assertEquals(False, diffi(p, p));
     }
 
     @Test
     public void testDiffExtEqual() {
 
-        assertEquals(null, diffe(p, p));
+        assertEquals(False, diffe(p, p));
     }
 
     @Test
@@ -215,7 +219,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
                 new Term[]{r, s},
-                differ.difference(Op.SETe, sete(r, p, q, s), sete(p, q)).terms()
+                ((Compound)differ.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).terms()
         );
     }
 
@@ -227,7 +231,7 @@ public class TermReductionsTest {
 //        );
         //check consistency with differenceSorted
         assertEquals(
-                null,
+                False,
                 differ.difference(Op.SETe, sete(p, q), sete(p, q))
         );
     }
@@ -477,15 +481,19 @@ public class TermReductionsTest {
 
         assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a1)) && (a1))"));
         assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a1)) &&+0 (a1))"));
-        assertValidTerm($("((--,(a1)) &&+1 (a1))"));
+        assertValid($("((--,(a1)) &&+1 (a1))"));
 
         assertInvalid("((--,(a1)) || (a1))");
-
-
-        //invalid because of ordinary common subterm:
-        assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a1)) ==> (a1))"));
         assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a1)) <-> (a1))"));
+    }
 
+    @Test
+    public void testCoNegatedImplication() {
+
+        assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a)) ==> (a))"));
+        assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a)) ==>+0 (a))"));
+        assertValid($("((--,(a)) ==>+1 (a))"));
+        
     }
 
 
@@ -523,7 +531,7 @@ public class TermReductionsTest {
     @Test
     public void testSingularStatementsInDisjunction2() {
         assertEquals($("x:y"), $("(&&,(||,(a<->a),c:d,e:f),x:y)")); //double fall-thru
-        assertEquals(TermBuilder.False, $("(&&,(--,(||,(a<->a),c:d,e:f)),x:y)")); //double fall-thru
+        assertEquals(False, $("(&&,(--,(||,(a<->a),c:d,e:f)),x:y)")); //double fall-thru
 
 //        assertEquals($("(||,c:d,e:f)"), $("(||,(a<=>a),c:d,e:f)"));
 //        assertEquals($("(||,c:d,e:f)"), $("(||,(a-->a),c:d,e:f)"));

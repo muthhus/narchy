@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.TermBuilder.False;
 
 /**
  * Static utility class for static methods related to Terms
@@ -481,16 +482,6 @@ public class Terms   {
         int len = Math.max(a.length(), b.length());
         if (len == 0) return 0f;
         return Texts.levenshteinDistance(a, b) / ((float)len);
-    }
-
-    public static Term empty(@NotNull Op op) {
-        switch (op) {
-
-            case PROD:
-                return ZeroProduct;
-            default:
-                return null;
-        }
     }
 
 

@@ -307,12 +307,6 @@ public class TermTest {
         }
 
 
-        Term s = inh(subj, pred);
-        assertEquals(null, s);
-
-
-        Term i = inh(subj, pred);
-        assertEquals(null, i);
 
 
 //        try {
@@ -660,7 +654,7 @@ public class TermTest {
 
     }
 
-    public static void assertValidTerm(Term o) {
+    public static void assertValid(Term o) {
         assertNotNull(o);
     }
 
@@ -672,7 +666,7 @@ public class TermTest {
             Terminal t = new Terminal(8);
             t.believe(x);
 
-            assertTrue(false);
+            assertTrue(x + " should not have been allowed as a task content", false);
 
 
         } catch (Exception e) {
