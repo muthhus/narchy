@@ -94,8 +94,7 @@ public enum PremiseBuilder {
 
     private static boolean budget(RawBudget pBudget, BLink<Task>taskLink, BLink<Term> termLink, float minDur) {
         TaskBudgeting.premise(pBudget, taskLink, termLink);
-        //return pBudget.dur() >= minDur;
-        return true;
+        return pBudget.dur() >= minDur;
     }
 
     /**

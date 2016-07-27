@@ -8,10 +8,7 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.nal.rule.PremiseRule;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
-import nars.term.Terms;
+import nars.term.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +28,7 @@ public interface TimeFunctions {
      * @param confScale
      * @return
      */
-    @Nullable Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale);
+    @NotNull Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, @NotNull float[] confScale);
 
 
     static long earlyOrLate(long t, long b, boolean early) {
@@ -79,7 +76,7 @@ public interface TimeFunctions {
         return dtDiff(derived, p, occReturn, -2);
     };
 
-    @Nullable
+    @NotNull
     static Compound dtDiff(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
 
         Compound taskTerm = (Compound) $.pos(p.taskTerm);
@@ -159,9 +156,8 @@ public interface TimeFunctions {
 //        return derived;
 //    };
 
-    @Nullable
+    @NotNull
     static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
-        Premise prem = p.premise;
 
         int eventDelta = DTERNAL;
 
@@ -208,12 +204,11 @@ public interface TimeFunctions {
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
-    @Nullable TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, true);
-    @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, false);
+    @NotNull TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, true);
+    @NotNull TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, false);
 
-    @Nullable
+    @NotNull
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
-        Premise prem = p.premise;
 
         Task premBelief = p.belief;
 
@@ -229,7 +224,9 @@ public interface TimeFunctions {
 
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
             //no temporal basis that can apply. only derive an eternal result if there is no actual temporal relation in the decomposition
-            return dtDecomposed == DTERNAL ? derived : null;
+            if (dtDecomposed == DTERNAL) return derived;
+            else
+                return noTemporalBasis(derived);
         } else {
 
             long occ;
@@ -267,8 +264,7 @@ public interface TimeFunctions {
                 }
 
                 if (shift == ETERNAL) {
-                    //there is no basis for relating other occurrence to derived
-                    return null;
+                    return noTemporalBasis(derived);
                 }
 
 
@@ -287,8 +283,7 @@ public interface TimeFunctions {
                 }
 
                 if (shift == ETERNAL) {
-                    //there is no basis for relating other occurrence to derived
-                    return null;
+                    return noTemporalBasis(derived);
                 }
 
 
@@ -305,6 +300,11 @@ public interface TimeFunctions {
 
         }
 
+    }
+
+    static Compound noTemporalBasis(@NotNull Compound derived) {
+        throw new InvalidTermException(derived.op(), derived.dt(), derived.terms(),
+                "no basis for relating other occurrence to derived");
     }
 
 
@@ -509,7 +509,7 @@ public interface TimeFunctions {
     /**
      * combine any existant DT's in the premise (assumes both task and belief are present)
      */
-    @Nullable TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
+    @NotNull TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
 
         Task task = p.task;
         int taskDT = ((Compound)$.pos(p.taskTerm)).dt();
@@ -568,7 +568,7 @@ public interface TimeFunctions {
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
      * apply temporal characteristics to a newly derived term according to the premise's
      */
-    @Nullable TimeFunctions Auto = (derived, p, d, occReturn, confScale) -> {
+    @NotNull TimeFunctions Auto = (derived, p, d, occReturn, confScale) -> {
 
 
         @NotNull PremiseRule rule = d.rule;

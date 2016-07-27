@@ -79,7 +79,7 @@ public class Pacman extends cpcman implements Environment {
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 
-		Param.CONCURRENCY_DEFAULT = 2;
+		//Param.CONCURRENCY_DEFAULT = 2;
 
 		//Multi nar = new Multi(4,512,
 		Default nar = new Default(1024,
@@ -102,8 +102,8 @@ public class Pacman extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(64);
-		nar.confMin.setValue(0.04f);
+		nar.cyclesPerFrame.set(32);
+		nar.confMin.setValue(0.02f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -125,8 +125,6 @@ public class Pacman extends cpcman implements Environment {
 //			}
 //			return false;
 //		});
-
-
 
 		//Global.DEBUG = true;
 

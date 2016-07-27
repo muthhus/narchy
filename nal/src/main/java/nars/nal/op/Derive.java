@@ -293,15 +293,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 throw new RuntimeException("temporalization resulted in suspicious occurrence time");
             }
 
-            if (temporalized == null) {
-                /*throw new RuntimeException("temporal leak:\n" + premise +
-                        "\n\trule: " + rule.source +
-                        "\n\ttask: " + premise.task() +
-                        "\n\tbelief: " + premise.belief + "\t" + premise.beliefTerm() +
-                        "\n\tderived: " + content);*/
-
-                return; //aborted by temporalization
-            }
+            content = temporalized;
 
             //apply the confidence scale
             if (truth != null) {
@@ -318,10 +310,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 }
             }
 
-            //NOTE: if temporalized, the content term will be the unique Term (NOT Termed)
-            //else it will stay as the Concept itself (Termed<> already stored before)
-            if (temporalized.hasTemporal())
-                content = temporalized;
 
             occ = occReturn[0];
         } else {

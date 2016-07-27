@@ -610,11 +610,11 @@ public abstract class TermBuilder {
                     }
 
 
-                    //filter (factor out) any common subterms iff equal 'dt'
+                    //filter (factor out) any common subterms iff DTERNAL
                     if ((subject.op() == CONJ) && (predicate.op() == CONJ)) {
                         Compound csub = (Compound) subject;
                         Compound cpred = (Compound) predicate;
-                        if (csub.dt() == cpred.dt()) {
+                        if (dt == DTERNAL) {
 
                             TermContainer subjs = csub.subterms();
                             TermContainer preds = cpred.subterms();

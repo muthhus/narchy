@@ -28,8 +28,17 @@ public class TaskBudgeting {
 
     /** combines the tasklinks and termlink budgets to arrive at a Premise budget, used in budgeting its derivations */
     public static void premise(@NotNull Budget p, @NotNull BLink<Task> taskLink, @NotNull BLink<Term> termLink) {
-        p.budget(taskLink);
-        BudgetMerge.plusBlend.apply(p, termLink, 1f);
+        try {
+            if (taskLink.isDeleted())
+                return;
+            p.budget(taskLink);
+            if (termLink.isDeleted())
+                return;
+            BudgetMerge.plusBlend.apply(p, termLink, 1f);
+        } catch (Budget.InvalidPriorityException e) {
+            //HACK - this isnt a full solution, but it should work temporarily
+            return;
+        }
     }
 
     public static @Nullable Budget derivation(float qual, @NotNull Termed derived, @NotNull PremiseEval p, float minDur) {

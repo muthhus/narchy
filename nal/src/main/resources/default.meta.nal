@@ -48,8 +48,8 @@
     (P ==> S), (S ==> P), task("?") |- (P ==> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
-    ( (--,%S) ==> P),   P, time(dtTask) |- ( (--,%P) ==> S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
-    ( (--,%S) ==> P),   S, time(dtTask) |- ( (--,%P) ==> S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  P, no_common_subterm(S,P), time(dtTask) |- ( (--,%P) ==> S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  S, no_common_subterm(S,P), time(dtTask) |- ( (--,%P) ==> S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
 
 
 
