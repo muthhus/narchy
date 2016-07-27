@@ -1,7 +1,10 @@
 package nars.op.mental;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Op;
+import nars.Symbols;
 import nars.budget.Budget;
 import nars.nal.Premise;
 import nars.task.MutableTask;

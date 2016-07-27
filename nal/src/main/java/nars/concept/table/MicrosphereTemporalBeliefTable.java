@@ -1,6 +1,5 @@
 package nars.concept.table;
 
-import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.NAR;
 import nars.Param;
 import nars.nal.Stamp;
@@ -9,15 +8,11 @@ import nars.task.Revision;
 import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
-import nars.truth.Truthed;
-import nars.util.Util;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.nal.Tense.ETERNAL;

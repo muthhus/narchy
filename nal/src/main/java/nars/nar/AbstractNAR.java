@@ -2,7 +2,6 @@ package nars.nar;
 
 import nars.NAR;
 import nars.Param;
-import nars.budget.policy.ConceptPolicy;
 import nars.index.TermIndex;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;

@@ -2,8 +2,8 @@ package nars.nal.derive;
 
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
-import nars.nal.Premise;
 import nars.nal.Deriver;
+import nars.nal.Premise;
 import nars.nal.Underiver;
 import nars.task.Task;
 import nars.term.Term;

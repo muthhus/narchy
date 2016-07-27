@@ -10,7 +10,6 @@ import nars.op.data.union;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * static-level instant term transform operations

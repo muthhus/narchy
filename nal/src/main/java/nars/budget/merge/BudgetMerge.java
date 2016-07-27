@@ -9,9 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiFunction;
 
 import static nars.Param.BUDGET_EPSILON;
-import static nars.budget.merge.BudgetMerge.PriMerge.AND;
-import static nars.budget.merge.BudgetMerge.PriMerge.AVERAGE;
-import static nars.budget.merge.BudgetMerge.PriMerge.PLUS;
+import static nars.budget.merge.BudgetMerge.PriMerge.*;
 import static nars.nal.UtilityFunctions.or;
 
 /**

@@ -1,12 +1,9 @@
 package nars.bag.impl;
 
-import nars.NAR;
 import nars.Param;
 import nars.bag.Bag;
 import nars.budget.forget.BudgetForget;
 import nars.link.BLink;
-import nars.nar.util.DefaultCore;
-import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 
 /**

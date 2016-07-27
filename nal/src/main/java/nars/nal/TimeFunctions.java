@@ -10,7 +10,6 @@ import nars.nal.rule.PremiseRule;
 import nars.task.Task;
 import nars.term.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.*;
 

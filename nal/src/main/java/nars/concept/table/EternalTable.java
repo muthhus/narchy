@@ -7,7 +7,6 @@ import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;

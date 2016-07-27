@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.lang.StrictMath.abs;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;

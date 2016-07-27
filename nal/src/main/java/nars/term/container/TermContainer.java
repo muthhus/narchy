@@ -8,7 +8,6 @@ import com.gs.collections.impl.factory.Sets;
 import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import nars.$;
 import nars.Op;
-import nars.nal.TermBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;

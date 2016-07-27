@@ -18,8 +18,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.UtilityFunctions.aveAri;
-
 /**
  * Created by me on 5/23/16.
  */

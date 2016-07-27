@@ -49,47 +49,6 @@ public interface Statement {
 //        return subject.op() == Op.NEG && ((Compound) subject).term(0).equals(predicate);
 //    }
 
-    /** @return
-     *       -1 invalid for statement
-     *       0 equivalent
-     *      +1 valid for statement
-     *
-     */
-    static int validStatement(Op o, @NotNull Term subject, @NotNull Term predicate) throws InvalidTermException {
-
-
-        Compound sc = subject instanceof Compound ? (Compound)subject : null;
-        Compound pc = predicate instanceof Compound ? (Compound)predicate : null;
-
-        if (sc!=null && pc!=null) {
-            if (Terms.equalsAnonymous(sc, pc))
-                return 0;
-        } else {
-            if (subject.equals(predicate))
-                return 0;
-        }
-
-        //TODO its possible to disqualify invalid statement if there is no structural overlap here
-
-        if (!Param.ALLOW_RECURSIVE_STATEMENTS && sc!=null && sc.containsTerm(predicate)) { //non-recursive
-            throw new InvalidTermException(o, new Term[] { subject, predicate }, "subject contains predicate");
-        }
-
-        if (pc!=null) {
-            if (!Param.ALLOW_RECURSIVE_STATEMENTS && pc.containsTerm(subject)) //non-recursive
-                throw new InvalidTermException(o, new Term[] { subject, predicate }, "predicate contains subject");
-
-            if (sc!=null && subject.op().statement && predicate.op().statement) {
-                if ( (sc.term(0).equals(pc.term(1))) ||
-                     (sc.term(1).equals(pc.term(0))) )
-                    throw new InvalidTermException(o, new Term[] { subject, predicate }, "inner subject cross-linked with predicate");
-
-                return +1;
-            }
-        }
-
-        return +1;
-    }
 
 
 

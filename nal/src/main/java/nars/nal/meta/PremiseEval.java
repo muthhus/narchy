@@ -25,7 +25,6 @@ import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;

@@ -5,7 +5,6 @@ import nars.nal.op.BinaryTermOperator;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class intersect extends BinaryTermOperator {
 

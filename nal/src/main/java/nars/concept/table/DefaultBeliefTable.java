@@ -3,7 +3,6 @@ package nars.concept.table;
 import com.google.common.collect.Iterators;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.task.EternalizedTask;
 import nars.task.Task;
 import nars.truth.Truth;

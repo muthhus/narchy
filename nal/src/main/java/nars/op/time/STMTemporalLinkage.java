@@ -1,21 +1,16 @@
 package nars.op.time;
 
-import com.gs.collections.api.tuple.Twin;
-import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
-import nars.Symbols;
 import nars.concept.Concept;
 import nars.task.Task;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
-import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Short-term Memory Belief Event Induction.

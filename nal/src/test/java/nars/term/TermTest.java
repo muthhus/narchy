@@ -486,17 +486,6 @@ public class TermTest {
 
     }
 
-    @Test
-    public void validStatement() {
-        Compound t = $("<({tom},{vienna}) --> livingIn>");
-        assertEquals(+1, Statement.validStatement(INH, t.term(0), t.term(1)));
-
-    }
-
-//    @Test public void invalidStatement() {
-//        NarseseTest.assertParseException("<b-->(&,a,b)>","<(&,a,b)-->b>");
-//        assertNotNull($("<c-->(&,a,b)>"));
-//    }
 
     @Test
     public void statementHash() {

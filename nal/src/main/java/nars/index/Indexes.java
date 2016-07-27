@@ -4,7 +4,6 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.nar.util.DefaultConceptBuilder;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.Random;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;

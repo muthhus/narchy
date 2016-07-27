@@ -6,7 +6,6 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.net.SyslogAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
-import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;

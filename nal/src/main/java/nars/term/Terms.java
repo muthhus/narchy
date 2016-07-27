@@ -23,7 +23,6 @@ import java.util.function.Predicate;
 
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.TermBuilder.False;
 
 /**
  * Static utility class for static methods related to Terms

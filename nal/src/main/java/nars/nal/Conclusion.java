@@ -2,9 +2,7 @@ package nars.nal;
 
 import nars.$;
 import nars.task.Task;
-import nars.term.subst.choice.Termutator;
 
-import java.util.List;
 import java.util.Set;
 
 /**

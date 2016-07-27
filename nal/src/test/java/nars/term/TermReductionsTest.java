@@ -467,11 +467,11 @@ public class TermReductionsTest {
         assertEquals("(x&&y)",
                 $("(&&,x,y,a:b,(--,a:b))").toString());
 
-        assertEquals("x",
-                $("(||,x,a:b,(--,a:b))").toString());
+        assertEquals(TermBuilder.True,
+                $("(||,x,a:b,(--,a:b))"));
 
-        assertEquals("(x||y)",
-                $("(||,x,y,a:b,(--,a:b))").toString());
+        assertEquals(TermBuilder.True,
+                $("(||,x,y,a:b,(--,a:b))"));
     }
 
     @Test
@@ -484,8 +484,13 @@ public class TermReductionsTest {
         assertValid($("((--,(a1)) &&+1 (a1))"));
 
         assertInvalid("((--,(a1)) || (a1))");
-        assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a1)) <-> (a1))"));
     }
+    @Test
+    public void testFilterCoNegatedStatements() {
+        assertEquals(TermBuilder.False, $("((--,(a1)) <-> (a1))"));
+        assertEquals(TermBuilder.False, $("((--,(a1)) --> (a1))"));
+    }
+
 
     @Test
     public void testCoNegatedImplication() {
@@ -571,5 +576,19 @@ public class TermReductionsTest {
 
     @Test public void testConjunctiveCoNegationAcrossImpl() {
         //((--,(&&,(--,(pad_top)),(pad_bottom),(pad_top))) ==>+133 (--,(pad_bottom)))! :4355: %.73;.24%
+
+        /*
+        (
+            (&&,(--,(23)),(--,(31)),(23),(31))
+                <=>
+            (&&,(--,(23)),(--,(31)),(23),(31),((--,(31)) &&+98 (23)))) (class nars.term.compound.GenericCompound): Failed atemporalization, becoming: ¿".
+        ((&&,(--,(2,3)),(--,(3,1)),(2,3),(3,1))<=>(&&,(--,(2,3)),(--,(3,1)),(2,3),(3,1),((--,(3,1)) &&+98 (2,3)))) (class nars.term.compound.GenericCompound): Failed atemporalization, becoming: ¿".
+        ((&&,(--,(0,2)),(--,(2,0)),((((--,(0,2)) &&+428 (--,(2,0))) ==>+1005 (--,(2,0))) &&+0 ((--,(2,0)) <=>-1005 ((--,(0,2)) &&+428 (--,(2,0))))))<=>(&&,(--,(0,2)),((--,(0,2)) &&-395 (--,(2,0))),((((--,(0,2)) &&+428 (--,(2,0))) ==>+1005 (--,(2,0))) &&+0 ((--,(2,0)) <=>-1005 ((--,(0,2)) &&+428 (--,(2,0))))))) (class nars.term.compound.GenericCompound): Failed atemporalization, becoming: ¿".
+        temporal conjunction requires exactly 2 arguments {&&, dt=-125, args=[(1,4), ((&&,(--,(1,4)),(--,(2,4)),(2,4)) ==>+125 (--,(1,4))), ((&&,(--,(1,4)),(--,(2,4)),(1,4),(2,4)) ==>+125 (--,(1,4)))]}
+            temporalizing from (&&,(1,4),((&&,(--,(1,4)),(--,(2,4)),(2,4)) ==>+125 (--,(1,4))),((&&,(--,(1,4)),(--,(2,4)),(1,4),(2,4)) ==>+125 (--,(1,4))))
+            deriving rule <(P ==> M), (S ==> M), neq(S,P), time(dtBminT) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)>".
+        */
+
+
     }
 }

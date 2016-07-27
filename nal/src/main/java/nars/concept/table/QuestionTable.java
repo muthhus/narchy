@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 /** task table used for storing Questions and Quests.
  *  simpler than Belief/Goal tables
