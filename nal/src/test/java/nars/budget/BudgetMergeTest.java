@@ -67,16 +67,16 @@ public class BudgetMergeTest {
     public void testAvg() {
         BudgetMerge m = BudgetMerge.avgBlend;
 
-        testMerge(m, z(), a, 1f, 1, 0.7f, 0.3f);  //adding to zero equals the incoming
-        testMerge(m, z(), a, 0.5f, 0.5f, 0.7f, 0.3f); //scale of half should affect priority only
-        testMerge(m, a, z(), 1f, a.pri(), a.dur(), a.qua());  //merging with zero should hae no effect
+        testMerge(m, z(), a, 1f, 0.5f, 0.7f, 0.3f);  //adding to zero equals the incoming
+        testMerge(m, z(), a, 0.5f, 0.25f, 0.7f, 0.3f); //scale of half should affect priority only
+        testMerge(m, a, z(), 1f, a.pri()/2f, a.dur(), a.qua());  //merging with zero should hae no effect
 
         testMerge(m, b, b, 0, b.pri(), b.dur(), b.qua()); //scale of zero should have no effect
 
-        testMerge(m, b, c, 1, 0.41f, 0.33f, 0.16f); //test correct affect of components; values closer to b since it is dominant
-        testMerge(m, b, c, 0.5f, 0.425f, 0.36f, 0.18f); //lesser affect (dur and qua closer to original values)
+        testMerge(m, b, c, 1, 0.375f, 0.33f, 0.16f); //test correct affect of components; values closer to b since it is dominant
+        testMerge(m, b, c, 0.5f, 0.4375f, 0.33f, 0.16f); //lesser affect (dur and qua closer to original values)
 
-        testMerge(m, a, c, 1f, 0.80f, 0.56f, 0.247f); //priority decrease
+        testMerge(m, a, c, 1f, 0.625f, 0.56f, 0.247f); //priority decrease
 
     }
 

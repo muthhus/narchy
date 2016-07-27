@@ -238,7 +238,7 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
     B, (A ==> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
-        B, ((--,%A) ==> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+        B, ((--,%A) ==> C), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
     B, (C ==> A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Desire:Deduction)
         B, (C ==> (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Belief:Abduction, Desire:Deduction)
     B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)

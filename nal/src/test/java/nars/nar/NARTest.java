@@ -113,7 +113,7 @@ public class NARTest {
     }
 
 
-    @Ignore public void testQueryAnswered(int cyclesBeforeQuestion, int cyclesAfterQuestion) throws Narsese.NarseseException {
+    public void testQueryAnswered(int cyclesBeforeQuestion, int cyclesAfterQuestion) throws Narsese.NarseseException {
 
         AtomicBoolean b = new AtomicBoolean(false);
 

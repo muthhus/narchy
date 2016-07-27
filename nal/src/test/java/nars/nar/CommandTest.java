@@ -14,9 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 
-/**
- * Created by me on 8/19/15.
- */
+
 public class CommandTest {
 
     @Test
