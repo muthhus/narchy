@@ -2,6 +2,7 @@ package nars.nal.multistep;
 
 import nars.NAR;
 import nars.nal.AbstractNALTest;
+import nars.nar.Default;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,15 +12,15 @@ import java.util.function.Supplier;
 
 /** see Natural_Language_Processing2.md */
 @RunWith(Parameterized.class)
-public class PatrickNLP extends AbstractNALTest {
+public class PatrickTests extends AbstractNALTest {
 
-    public PatrickNLP(Supplier<NAR> b) {
+    public PatrickTests(Supplier<NAR> b) {
         super(b);
     }
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(6, true);
+        return AbstractNALTest.nars(8, true);
     }
 
 
@@ -48,9 +49,9 @@ public class PatrickNLP extends AbstractNALTest {
 
             //should WORK with either of these two questions:
             //.askAt(1250,"REPRESENT:((eats,cat),?what)")
-            .askAt(1250,"REPRESENT:((cat,eats),(?x, ?y))")
+            .askAt(2250,"REPRESENT:((cat,eats),(?x, ?y))")
 
-            .mustBelieve(1500, "REPRESENT:((cat,eats),(ANIMAL,EATING))", 1f, 0.73f);
+            .mustBelieve(2500, "REPRESENT:((cat,eats),(ANIMAL,EATING))", 1f, 0.73f);
 
     }
 
@@ -87,5 +88,39 @@ public class PatrickNLP extends AbstractNALTest {
 //
 //    }
 
+
+    @Test public void testToothbrush() {
+        /*
+        <(*,toothbrush,plastic) --> made_of>.
+        <(&/,<(*,$1,plastic) --> made_of>,<({SELF},$1) --> op_lighter>) =/> <$1 --> [heated]>>.
+        <<$1 --> [heated]> =/> <$1 --> [melted]>>.
+        <<$1 --> [melted]> <|> <$1 --> [pliable]>>.
+        <(&/,<$1 --> [pliable]>,<({SELF},$1) --> op_reshape>) =/> <$1 --> [hardened]>>.
+        <<$1 --> [hardened]> =|> <$1 --> [unscrewing]>>.
+        <toothbrush --> object>.
+        (&&,<#1 --> object>,<#1 --> [unscrewing]>)!
+
+            >> lighter({SELF},$1) instead of <({SELF},$1) --> op_lighter>
+
+        */
+
+
+        TestNAR tt = test();
+
+        tt.input("made_of:(toothbrush,plastic).",
+                "( ( made_of:($1, plastic) &&+10 lighter({SELF}, $1) ) ==>+10 <$1 --> [heated]>).",
+                "(<$1 --> [heated]> ==>+10 <$1 --> [melted]>).",
+                "(<$1 --> [melted]> <=>+0 <$1 --> [pliable]>).",
+                "(( <$1 --> [pliable]> &&+0 reshape({SELF},$1)) ==>+10 <$1 --> [hardened]>).",
+                "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrewing]>).",
+                "<toothbrush --> object>.",
+                "(&&,<#1 --> object>,<#1 --> [unscrewing]>)! :|:"
+                );
+
+        tt.mustOutput(0, 2500, "lighter({SELF}, toothbrush)", '!', 1f, 1f,
+                0.3f, 1f, //at least 30% confidence
+                /*@*/ -30L);  //is this correct time? might be off by +/-10 , will check
+
+    }
 
 }

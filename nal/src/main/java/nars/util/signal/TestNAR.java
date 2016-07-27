@@ -126,7 +126,7 @@ public class TestNAR  {
 //    }
 
     @NotNull
-    public TestNAR input(@NotNull String s) {
+    public TestNAR input(@NotNull String... s) {
         finished = false;
         nar.input(s);
         return this;

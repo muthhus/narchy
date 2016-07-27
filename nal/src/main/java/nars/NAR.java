@@ -576,7 +576,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             emotion.stress(overflow);
 
-            inputted.onConcept(c);
+            if (input == inputted)
+                input.onConcept(c);
 
             eventTaskProcess.emit(inputted); //signal any additional processes
 

@@ -72,6 +72,8 @@ public class RevisionTask extends AnswerTask  {
         //TODO reimplement again
 
         float resultPri = pri();
+
+
         Task parentNewBelief = getParentTask();
         if (parentNewBelief==null) {
             unlink();
