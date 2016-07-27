@@ -31,6 +31,7 @@ import nars.budget.UnitBudget;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
+import nars.gui.TimeSpace;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -103,7 +104,7 @@ public class Pacman extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(64);
+		nar.cyclesPerFrame.set(16);
 		nar.confMin.setValue(0.02f);
 
 
@@ -210,11 +211,13 @@ public class Pacman extends cpcman implements Environment {
 
 				if (nar instanceof Default) {
 
-					new BeliefTableChart(nar, charted).show(700, 900);
+//					new BeliefTableChart(nar, charted).show(700, 900);
 //
 					//BagChart.show((Default) nar, 256);
 //
 //					STMView.show(stm, 500, 500);
+
+					TimeSpace.newTimeWindow((Default)nar, 128);
 
 
 				}

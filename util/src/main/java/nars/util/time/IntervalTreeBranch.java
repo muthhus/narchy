@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class IntervalTreeBranch<K extends Comparable<? super K>, V> implements
@@ -166,6 +167,24 @@ public class IntervalTreeBranch<K extends Comparable<? super K>, V> implements
             right.getContain(range, accumulator);
         }
     }
+    @Override
+    public void forEachContainedBy(Between<K> range, BiConsumer<Between<K>,V> accumulator) {
+        if (left != null && left.overlaps(range)) {
+            left.forEachContainedBy(range, accumulator);
+        }
+        if (right != null && right.overlaps(range)) {
+            right.forEachContainedBy(range, accumulator);
+        }
+    }
+    @Override
+    public void searchContainedBy(Between<K> range, Collection<V> accumulator) {
+        if (left != null && left.overlaps(range)) {
+            left.searchContainedBy(range, accumulator);
+        }
+        if (right != null && right.overlaps(range)) {
+            right.searchContainedBy(range, accumulator);
+        }
+    }
 
     @Override
     public int size() {
@@ -235,15 +254,7 @@ public class IntervalTreeBranch<K extends Comparable<? super K>, V> implements
         return interval.contains(key);
     }
 
-    @Override
-    public void searchContainedBy(Between<K> range, Collection<V> accumulator) {
-        if (left != null && left.overlaps(range)) {
-            left.searchContainedBy(range, accumulator);
-        }
-        if (right != null && right.overlaps(range)) {
-            right.searchContainedBy(range, accumulator);
-        }
-    }
+
 
     @Override
     public final Between<K> getRange() {

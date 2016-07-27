@@ -46,12 +46,12 @@ public class TestP2PNode extends RectWidget {
 
         @Override
         protected void next(Dynamics world) {
-            v3 c = new v3(a.center);
-            c.add(b.center);
+            v3 c = new v3(a.transform());
+            c.add(b.transform());
             c.scale(0.5f);
             move(c);
 
-            float dist = v3.dist(a.center, b.center);
+            float dist = v3.dist(a.transform(), b.transform());
             scale(dist, 1, 1);
 
             a.body.activate();

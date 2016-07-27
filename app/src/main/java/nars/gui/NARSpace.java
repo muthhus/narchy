@@ -6,12 +6,14 @@ import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.op.ArithmeticInduction;
 import nars.term.Term;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
 import nars.util.experiment.DeductiveChainTest;
 import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.AbstractSpace;
 import spacegraph.ListSpace;
 import spacegraph.SpaceGraph;
@@ -45,9 +47,9 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
         new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
-        //new ArithmeticInduction(n);
+        new ArithmeticInduction(n);
 
-        newConceptWindow(n, 512, 4);
+        newConceptWindow(n, 512, 8);
 
         //n.run(20); //headstart
 
@@ -55,54 +57,61 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     }
 
-    public static GLWindow newConceptWindow(Default n, int maxNodes, int maxEdges) {
+    public static GLWindow newConceptWindow(Default nn, int maxNodes, int maxEdges) {
 
-        return new SpaceGraph<Term>(
-                new NARSpace<Term, Spatial<Term>>(n, (nar, space, target) -> {
-                    Bag<Concept> x = ((Default) nar).core.concepts;
+        NARSpace<Term, Spatial<Term>> n = new NARSpace<>(nn, (nar, space, target) -> {
+            Bag<Concept> x = ((Default) nar).core.concepts;
 
-                    //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
+            //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
 
-                    x.topWhile(b -> {
+            x.topWhile(b -> {
 
-                        final float initDistanceEpsilon = 10f;
-                        final float initImpulseEpsilon = 25f;
+                final float initDistanceEpsilon = 10f;
+                final float initImpulseEpsilon = 25f;
 
-                        ConceptWidget w = space.update(b.get().term(),
-                                t -> new ConceptWidget(t, maxEdges, nar) {
-                                    @Override
-                                    public Dynamic newBody(CollisionShape shape, boolean collidesWithOthersLikeThis) {
-                                        Dynamic x = super.newBody(shape, collidesWithOthersLikeThis);
+                ConceptWidget w = space.update(b.get().term(),
+                        t -> new ConceptWidget(t, maxEdges, nar) {
+                            @Override
+                            public Dynamic newBody(boolean collidesWithOthersLikeThis) {
+                                Dynamic x = super.newBody(collidesWithOthersLikeThis);
 
-                                        //place in a random direction
-                                        x.transform().set(SpaceGraph.r(initDistanceEpsilon),
-                                                SpaceGraph.r(initDistanceEpsilon),
-                                                SpaceGraph.r(initDistanceEpsilon));
+                                //place in a random direction
+                                x.transform().set(SpaceGraph.r(initDistanceEpsilon),
+                                        SpaceGraph.r(initDistanceEpsilon),
+                                        SpaceGraph.r(initDistanceEpsilon));
 
-                                        //impulse in a random direction
-                                        x.impulse(v(SpaceGraph.r(initImpulseEpsilon),
-                                                SpaceGraph.r(initImpulseEpsilon),
-                                                SpaceGraph.r(initImpulseEpsilon)));
+                                //impulse in a random direction
+                                x.impulse(v(SpaceGraph.r(initImpulseEpsilon),
+                                        SpaceGraph.r(initImpulseEpsilon),
+                                        SpaceGraph.r(initImpulseEpsilon)));
 
-                                        return x;
-                                    }
-                                });
+                                return x;
+                            }
+                        });
 
-                        w.pri = b.priIfFiniteElseZero();
+                w.pri = b.priIfFiniteElseZero();
 
 
-                        target.add(w);
+                target.add(w);
 
-                        return true;
+                return true;
 
-                    }, maxNodes);
+            }, maxNodes);
 
-                }, maxNodes).with(
+        }, maxNodes);
+
+
+        SpaceGraph s = new SpaceGraph<Term>(
+                n.with(
                         //new Flatten()
                         //new Spiral()
                         //new FastOrganicLayout()
                 )
-        ).show(1300, 900);
+        );
+
+        s.dyn.addBroadConstraint(new SpaceGraph.ForceDirected());
+
+        return s.show(1300, 900);
     }
 
 
@@ -116,13 +125,13 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
     //private final ConceptFilter eachConcept = new ConceptFilter();
 
 
-    public NARSpace(TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect, int capacity) {
+    public NARSpace(@Nullable TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect, int capacity) {
         super();
         this.capacity = capacity;
-        this.collect = collect;
+        this.collect = collect == null ? (TriConsumer<NAR, SpaceGraph<X>, List<Y>>) this : collect;
     }
 
-    public NARSpace(NAR nar, TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect, int capacity) {
+    public NARSpace(NAR nar, @Nullable TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect, int capacity) {
         this(collect, capacity);
         start(nar);
     }

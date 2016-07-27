@@ -108,14 +108,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
     }
 
-    private void colorShape(float h, float s, float b, float a) {
-        //TODO use a LUT matrix instaed of this shitty Color function
-        Color c = Color.hsb(360*h, s, b);
-        shapeR = (float)c.getRed();
-        shapeG = (float)c.getGreen();
-        shapeB = (float)c.getBlue();
-        shapeA = a;
-    }
+
 
 
     boolean addLink(SpaceGraph space, BLink<? extends Termed> ll) {

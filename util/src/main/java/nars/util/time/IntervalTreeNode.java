@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public interface IntervalTreeNode<K extends Comparable<? super K>,V> {
@@ -42,6 +43,8 @@ public interface IntervalTreeNode<K extends Comparable<? super K>,V> {
 	 * Returns a collection of values that wholly contain the range specified.
 	 */
 	void getContain(Between<K> range, Collection<V> accumulator);
+	void forEachContainedBy(Between<K> range, BiConsumer<Between<K>,V> accumulator);
+
 	/**
 	 * Returns a collection of values that are wholly contained by the range specified.
 	 */

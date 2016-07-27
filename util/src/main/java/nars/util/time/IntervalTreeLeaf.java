@@ -6,12 +6,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 class IntervalTreeLeaf<K extends Comparable<? super K>,V> implements IntervalTreeNode<K, V>, Entry<Between<K>, V> {
 	
 	private final Between<K> key;
-	private V value;
+	private final V value;
 	
 	IntervalTreeLeaf(@NotNull K min, @NotNull K max, V value) {
 		this(new Between<>(min, max),value);
@@ -101,10 +102,7 @@ class IntervalTreeLeaf<K extends Comparable<? super K>,V> implements IntervalTre
 	@Nullable
 	@Override
 	public V getContain(@NotNull Between<K> range) {
-		if (range.contains(key)) {
-			return getValue();
-		}
-		return null;
+		return range.contains(key) ? getValue() : null;
 	}
 
 
@@ -159,7 +157,8 @@ class IntervalTreeLeaf<K extends Comparable<? super K>,V> implements IntervalTre
 
 	@Override
 	public V setValue(V value) {
-		return this.value = value;
+		throw new UnsupportedOperationException();
+		//return this.value = value;
 	}
 
 	@Override
@@ -168,12 +167,12 @@ class IntervalTreeLeaf<K extends Comparable<? super K>,V> implements IntervalTre
 	}
 
 	@Override
-	public void keySet(@NotNull Set<Between<K>> accumulator) {
+	public final void keySet(@NotNull Set<Between<K>> accumulator) {
 		accumulator.add(key);
 	}
 
 	@Override
-	public boolean containedBy(@NotNull Between<K> interval) {
+	public final boolean containedBy(@NotNull Between<K> interval) {
 		return interval.contains(key);
 	}
 
@@ -182,6 +181,12 @@ class IntervalTreeLeaf<K extends Comparable<? super K>,V> implements IntervalTre
 		if(containedBy(range)){
 			accumulator.add(getValue());
 		}
+	}
+
+	@Override
+	public void forEachContainedBy(Between<K> range, BiConsumer<Between<K>,V> accumulator) {
+		if (containedBy(range))
+			accumulator.accept(key, getValue());
 	}
 
 	@Override

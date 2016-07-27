@@ -41,7 +41,8 @@ import java.util.Comparator;
  */
 public class Islands {
 
-	public final UnionFind find = new UnionFind();
+	//public final UnionFind find = new UnionFind();
+	public final UnionFind2 find = new UnionFind2();
 
 	private final OArrayList<PersistentManifold> islandmanifold = new OArrayList<>();
 	private final OArrayList<Collidable> islandBodies = new OArrayList<>();
@@ -125,8 +126,8 @@ public class Islands {
 
 			// update the sleeping state for bodies, if all are sleeping
 			for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
-                int islandId = find.get(startIslandIndex).id;
-                for (endIslandIndex = startIslandIndex + 1; (endIslandIndex < numElem) && (find.get(endIslandIndex).id == islandId); endIslandIndex++) {
+                int islandId = find.get(startIslandIndex)[0];
+                for (endIslandIndex = startIslandIndex + 1; (endIslandIndex < numElem) && (find.get(endIslandIndex)[0] == islandId); endIslandIndex++) {
 				}
 
 				//int numSleeping = 0;
@@ -135,7 +136,7 @@ public class Islands {
 
 				int idx;
 				for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                    int i = find.get(idx).sz;
+                    int i = find.get(idx)[1];
 
 					//return array[index];
 					Collidable colObj0 = collidables.get(i);
@@ -158,7 +159,7 @@ public class Islands {
 				if (allSleeping) {
 					//int idx;
 					for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                        int i = find.get(idx).sz;
+                        int i = find.get(idx)[1];
 						//return array[index];
 						Collidable colObj0 = collidables.get(i);
 						if ((colObj0.getIslandTag() != islandId) && (colObj0.getIslandTag() != -1)) {
@@ -176,7 +177,7 @@ public class Islands {
 
 					//int idx;
 					for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                        int i = find.get(idx).sz;
+                        int i = find.get(idx)[1];
 
 						//return array[index];
 						Collidable colObj0 = collidables.get(i);
@@ -273,11 +274,11 @@ public class Islands {
 
 			// traverse the simulation islands, and call the solver, unless all objects are sleeping/deactivated
 			for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
-                int islandId = find.get(startIslandIndex).id;
+                int islandId = find.get(startIslandIndex)[0];
 				boolean islandSleeping = false;
 
-				for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((find.get(endIslandIndex).id == islandId)); endIslandIndex++) {
-					int i = find.get(endIslandIndex).sz;
+				for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((find.get(endIslandIndex)[0] == islandId)); endIslandIndex++) {
+					int i = find.get(endIslandIndex)[1];
 					//return array[index];
 					Collidable colObj0 = collidables.get(i);
 					islandBodies.add(colObj0);

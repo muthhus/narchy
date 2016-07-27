@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  */
 abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable<Y> {
 
-    final AtomicBoolean busy = new AtomicBoolean(true);
+    //final AtomicBoolean busy = new AtomicBoolean(true);
     protected SpaceGraph<X> space;
     private long now;
     private float dt;
@@ -35,18 +35,6 @@ abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable
         this.space = null;
     }
 
-    public void ready() {
-        busy.set(false);
-    }
-
-    public final float setBusy() {
-        busy.set(true);
-        return dt;
-    }
-
-    public boolean isBusy() {
-        return busy.get();
-    }
 
     public float dt() {
         return dt;
@@ -56,13 +44,9 @@ abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable
      * for thread-safe usage
      */
     public void updateIfNotBusy(Consumer<AbstractSpace<X,Y>> proc) {
-        if (!isBusy()) {
-            synchronized (busy) {
-                float last = this.now;
-                this.dt = (this.now = now()) - last;
-                proc.accept(this);
-            }
-        }
+        float last = this.now;
+        this.dt = (this.now = now()) - last;
+        proc.accept(this);
     }
 
     abstract public long now();

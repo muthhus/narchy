@@ -1,6 +1,7 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
+import javafx.scene.paint.Color;
 import nars.$;
 import nars.util.Util;
 import spacegraph.math.Quat4f;
@@ -22,12 +23,11 @@ import java.util.List;
 public class SimpleSpatial<X> extends Spatial<X> {
 
 
-    /** cached center reference */
-    public transient final v3 center; //references a field in MotionState's transform
 
     /** physics motion state */
     public final Motion motion = new Motion();
     private final String label;
+    private final CollisionShape shape;
 
     /** prevents physics movement */
     public boolean motionLock;
@@ -45,9 +45,10 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
         shapeA = 0.9f;
         shapeR = shapeG = shapeB = 0.5f; //gray
+        this.shape = newShape();
 
         this.label = key!=null ? key.toString() : super.toString();
-        center = motion.t;
+
     }
 
     public Dynamic body;
@@ -59,7 +60,13 @@ public class SimpleSpatial<X> extends Spatial<X> {
         return b == null ? motion.t : b.transform();
     }
 
+    public void moveX(float x, float rate) {
+        v3 center = transform();
+        move(Util.lerp(x, center.x, rate), center.y, center.z);
+    }
+
     public void move(float x, float y, float z, float rate) {
+        v3 center = transform();
         move(
                 Util.lerp(x, center.x, rate),
                 Util.lerp(y, center.y, rate),
@@ -90,6 +97,15 @@ public class SimpleSpatial<X> extends Spatial<X> {
         target.setAngle(nx,ny,nz,angle);
 
         rotate(target, speed, tmp);
+    }
+
+    public void colorShape(float h, float s, float b, float a) {
+        //TODO use a LUT matrix instaed of this shitty Color function
+        Color c = Color.hsb(360*h, s, b);
+        shapeR = (float)c.getRed();
+        shapeG = (float)c.getGreen();
+        shapeB = (float)c.getBlue();
+        shapeA = a;
     }
 
     public void rotate(Quat4f target, float speed, Quat4f tmp) {
@@ -139,12 +155,8 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     public void scale(float sx, float sy, float sz) {
 
-        if (body!=null) {
-            ((BoxShape) this.body.shape()).size(sx, sy, sz);
-            this.radius = Math.max(sx, Math.max(sy, sz));
-        } else {
-            this.radius = 0;
-        }
+        ((BoxShape)shape).size(sx, sy, sz);
+        this.radius = Math.max(sx, Math.max(sy, sz));
 
     }
 
@@ -153,7 +165,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
         return new BoxShape(v3.v(1, 1, 1));
     }
 
-    public Dynamic newBody(CollisionShape shape, boolean collidesWithOthersLikeThis) {
+    public Dynamic newBody(boolean collidesWithOthersLikeThis) {
         Dynamic b;
         b = Dynamics.newBody(
                 1f, //mass
@@ -248,9 +260,9 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public void motionLock(boolean b) {
         motionLock = b;
     }
-    public float x() {  return center.x;        }
-    public float y() {  return center.y;        }
-    public float z() {  return center.z;        }
+    public float x() {  return transform().x;        }
+    public float y() {  return transform().y;        }
+    public float z() {  return transform().z;        }
 
 //    protected void updateContinue() {
 //        //if (body.broadphase()==null)
@@ -272,7 +284,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
     }
 
     protected List<Collidable<X>> enter(Dynamics world) {
-        Dynamic b = body = newBody(newShape(), collidable());
+        Dynamic b = body = newBody(collidable());
         b.setUserPointer(this);
         b.setRenderer(this);
         return Collections.singletonList(body);

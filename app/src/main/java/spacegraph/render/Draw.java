@@ -495,9 +495,9 @@ public enum Draw {
     public static void renderLineEdge(GL2 gl, SimpleSpatial src, EDraw e, float width) {
         gl.glLineWidth(width);
         gl.glBegin(GL.GL_LINES);
-        v3 s = src.center;
+        v3 s = src.transform();
         gl.glVertex3f(s.x, s.y, s.z);
-        v3 t = e.target.center;
+        v3 t = e.target.transform();
         gl.glVertex3f(t.x, t.y, t.z);
         gl.glEnd();
     }

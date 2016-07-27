@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 public class IntervalTree<K extends Comparable<? super K>, V> {
 	
@@ -50,13 +51,23 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 		}
 		return c;
 	}
-	
+	@NotNull
+	public void forEachContainedBy(Between<K> range, BiConsumer<Between<K>,V> each){
+		if(root != null){
+			root.forEachContainedBy(range, each);
+		}
+	}
+
 	/**
 	 * Returns a collection of values that wholly contain the range specified.
 	 */
 	@NotNull
 	public List<V> searchContaining(@NotNull K low, @NotNull K high){
 		return searchContaining(new Between<>(low, high));
+	}
+
+	public void forEachContainedBy(@NotNull K low, @NotNull K high, BiConsumer<Between<K>,V> each){
+		forEachContainedBy(new Between<>(low, high), each);
 	}
 	
 	/**
@@ -163,14 +174,14 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 		}
 	}
 
-	@NotNull
-	public Set<Between<K>> keySetSorted() {
+
+	@NotNull public SortedSet<Between<K>> keySetSorted() {
 		if(root != null){
-			Set<Between<K>> s = new TreeSet();
+			TreeSet<Between<K>> s = new TreeSet();
 			root.keySet(s);
 			return s;
 		} else {
-			return Collections.emptySet();
+			return Collections.emptySortedSet();
 		}
 	}
 

@@ -22,7 +22,6 @@ import static spacegraph.math.v3.v;
 public class RectWidget<X> extends SimpleSpatial<X> {
 
     public final Surface surface;
-    private final BoxShape shape;
     final float zOffset = 0.05f; //relative to scale
 
     //private float padding;
@@ -38,7 +37,7 @@ public class RectWidget<X> extends SimpleSpatial<X> {
         this.surface = s;
 
         final float thick = 0.2f;
-        this.shape = new BoxShape(w, h, thick * (Math.min(w,h)));
+        scale(w, h, thick * (Math.min(w,h)));
 
         s.setParent(null);
     }
@@ -73,10 +72,7 @@ public class RectWidget<X> extends SimpleSpatial<X> {
         return false;
     }
 
-    @Override
-    protected CollisionShape newShape() {
-        return shape;
-    }
+
 
 
 

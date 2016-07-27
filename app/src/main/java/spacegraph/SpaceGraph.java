@@ -52,7 +52,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                 .weakValues()
                 .build();
 
-        dyn.addBroadConstraint(new ForceDirected());
     }
 
 
@@ -177,19 +176,14 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
 
-    public void display(GLAutoDrawable drawable) {
+    public synchronized final void display(GLAutoDrawable drawable) {
 
-        List<AbstractSpace<X,?>> ss = this.inputs;
-
-        ss.forEach( this::update );
+        this.inputs.forEach( this::update );
 
         super.display(drawable);
 
-        //ss.forEach(this::print);
-
-        ss.forEach( AbstractSpace::ready );
-
         renderHUD();
+
     }
 
 
@@ -206,7 +200,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     public final synchronized void update(AbstractSpace s) {
 
-        float dt = s.setBusy();
+        //float dt = s.setBusy();
 
         s.update(this);
 
@@ -232,10 +226,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     public static class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstraint<X> {
 
-        public static final int clusters = 7;
+        public static final int clusters = 1;
 
-        float repelSpeed = 3f;
-        float attractSpeed = 5f;
+        public float repelSpeed = 3f;
+        public float attractSpeed = 5f;
 
         private float minRepelDist = 0f;
         private float maxRepelDist = 350f;
@@ -312,7 +306,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             SimpleSpatial yp = ((SimpleSpatial) y.data());
 
             v3 delta = v();
-            delta.sub(xp.center, yp.center);
+            delta.sub(xp.transform(), yp.transform());
 
 
             float len = delta.normalize();
@@ -340,7 +334,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             SimpleSpatial yp = ((SimpleSpatial) y.data());
 
             v3 delta = v();
-            delta.sub(xp.center, yp.center);
+            delta.sub(xp.transform(), yp.transform());
 
             float len = delta.normalize();
             len -= ( xp.radius + yp.radius );

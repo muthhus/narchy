@@ -333,7 +333,7 @@ public class Tetris extends TetrisState implements Environment {
                     //STMView.show(stm, 800, 600);
 
 
-                    NARSpace.newConceptWindow((Default) nar, 32, 8);
+                    NARSpace.newConceptWindow((Default) nar, 128, 8);
                 }
 
 
