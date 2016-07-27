@@ -149,7 +149,8 @@ public class ArithmeticInduction implements Consumer<Task> {
                         Term c;
                         if ((c = nar.index.transform(b.term(), pp, fp))!=null) {
 
-                                input( task(b, c) );
+                            @Nullable Task task = task(b, c);
+                            input(task);
 
                         }
                     });

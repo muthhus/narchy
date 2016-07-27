@@ -235,7 +235,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         public static final int clusters = 7;
 
         float repelSpeed = 3f;
-        float attractSpeed = 3f;
+        float attractSpeed = 5f;
 
         private float minRepelDist = 0f;
         private float maxRepelDist = 350f;
@@ -283,7 +283,9 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
                         if ((B !=null) && (B !=A) && (B.body!=null)) {
 
-                            attract(c, B.body, attractSpeed * e.width, attractDist);
+                            float ew = e.width;
+                            float attractStrength = ew * ew;
+                            attract(c, B.body, attractSpeed * attractStrength, attractDist);
                         }
                     }
                 }

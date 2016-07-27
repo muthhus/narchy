@@ -1,10 +1,12 @@
 package nars.io;
 
 import nars.*;
+import nars.nal.TermBuilder;
 import nars.nar.Terminal;
 import nars.op.out.echo;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
@@ -16,6 +18,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static nars.nal.TermBuilder.False;
 import static org.junit.Assert.*;
 
 
@@ -170,7 +173,7 @@ public class NarseseTest {
 
     @Test
     public void testFailureOfMultipleDistinctInfixOperators() {
-        assertParseException("(a * b & c)");
+        assertInvalid("(a * b & c)");
     }
 
     @Test
@@ -576,15 +579,22 @@ public class NarseseTest {
     }
 
     @Test public void testEmptySets() {
-        assertParseException("{}", "[]");
+        assertInvalid("{}", "[]");
     }
 
-    public static void assertParseException(@NotNull String... inputs) {
+    public static void assertInvalid(@NotNull String... inputs) {
         for (String s : inputs ) {
             try {
                 Term e = term(s);
-                assertTrue(s + " should not be parseable but got: " + e, false); //must throw exception
+                //if (!TermBuilder.isTrueOrFalse(False))
+                if (TermBuilder.isFalse(False)) {
+                    assertTrue(true);
+                } else {
+                    assertTrue(s + " should not be parseable but got: " + e, false); //must throw exception
+                }
             } catch (Narsese.NarseseException e) {
+                assertTrue(true);
+            } catch (InvalidTermException f) {
                 assertTrue(true);
             }
         }

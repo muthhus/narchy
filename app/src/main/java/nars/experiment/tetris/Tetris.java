@@ -50,9 +50,9 @@ import static nars.experiment.pong.Pong.numericSensor;
 
 public class Tetris extends TetrisState implements Environment {
 
-    public static final int runCycles = 12000;
-    public static final int cyclesPerFrame = 32;
-    static int frameDelay = 100;
+    public static final int runCycles = 10000;
+    public static final int cyclesPerFrame = 64;
+    static int frameDelay = 50;
 
     private final TetrisVisualizer vis;
     private double currentScore;
@@ -286,15 +286,15 @@ public class Tetris extends TetrisState implements Environment {
         MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
-        new ArithmeticInduction(nar);
+        //new ArithmeticInduction(nar);
 
 
 
         Tetris t = new Tetris(6, 10, 5) {
             @Override
             protected int nextBlock() {
-                return super.nextBlock(); //all blocks
-                //return 1; //square blocks
+                //return super.nextBlock(); //all blocks
+                return 1; //square blocks
                 //return 0; //long blocks
             }
         };
@@ -326,14 +326,14 @@ public class Tetris extends TetrisState implements Environment {
 
                 if (nar instanceof Default) {
 
-                    //new BeliefTableChart(nar, charted).show(600, 900);
+                    new BeliefTableChart(nar, charted).show(600, 900);
 
                     //BagChart.show((Default) nar, 128);
 
                     //STMView.show(stm, 800, 600);
 
 
-                    NARSpace.newConceptWindow((Default) nar, 64, 8);
+                    NARSpace.newConceptWindow((Default) nar, 32, 8);
                 }
 
 

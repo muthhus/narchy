@@ -403,7 +403,7 @@ public class TemporalTest {
     }
 
     @Test public void testInvalidConjunction() {
-        NarseseTest.assertParseException( "( &&-59 ,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
+        NarseseTest.assertInvalid( "( &&-59 ,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
 
         Compound x = $("(&&,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
         Assert.assertNotNull(x);

@@ -146,9 +146,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
         this.runWorker =
-                ForkJoinPool.commonPool();
-                /*new ForkJoinPool(concurrency,
-                        defaultForkJoinWorkerThreadFactory, null, false);*/
+                //ForkJoinPool.commonPool(); //<- uses the common pool's concurrency which may not be the supplied 'concurrency' value
+                new ForkJoinPool(concurrency,
+                        defaultForkJoinWorkerThreadFactory, null, false);
 
         this.taskWorker =
                 new ForkJoinPool(concurrency,
@@ -538,7 +538,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             c = input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
             logger.warn("invalid input: {}", e.toString());
-            e.printStackTrace();
+            //e.printStackTrace();
             //throw e;
             return null;
         }
@@ -876,26 +876,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         eventError.emit(ex);
     }
 
-    /**
-     * queues a task to (hopefully) be executed at an unknown time in the future,
-     * in its own thread in a thread pool
-     */
-    @Nullable
-    public Future runAsync(@NotNull Runnable t) {
-        runLater(t);
-        return null;
-
-//        logger.trace("runAsyncs run {}", t);
-//
-//        try {
-//            return asyncs.submit(t);
-//        } catch (RejectedExecutionException e) {
-//            logger.error("runAsync error {} in {}", t, e);
-//            return null;
-//        }
-    }
-
-//    @Nullable
+    //    @Nullable
 //    public Future runAsync(@NotNull Runnable t, int maxRunsPerFrame) {
 //        final Semaphore s = new Semaphore(0);
 //        onFrame(nn -> {

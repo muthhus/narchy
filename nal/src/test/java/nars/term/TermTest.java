@@ -873,7 +873,7 @@ public class TermTest {
     }
 
 
-    public static void assertInvalidTerm(@NotNull Supplier<Term> o) {
+    public static void assertInvalid(@NotNull Supplier<Term> o) {
         try {
             Term recv = o.get();
             assertTrue(recv.toString() + " was not null", false);

@@ -1,13 +1,13 @@
 package nars.op;
 
 import nars.$;
-import nars.NAR;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class sys extends TermFunction {
 //                    final long pidCopy = pid =
 //                            p.hashCode(); //HACK temporary
 //                            //p.getPid();
-                    nar.runAsync(()-> {
+                    @NotNull Runnable t = ()-> {
                         try {
 
                             Scanner s = new Scanner(p.getInputStream());
@@ -50,7 +50,17 @@ public class sys extends TermFunction {
                         } catch (Exception e) {
                             error(cmd, e);
                         }
-                    });
+                    };
+                    nar.runLater(t);
+
+//        logger.trace("runAsyncs run {}", t);
+//
+//        try {
+//            return asyncs.submit(t);
+//        } catch (RejectedExecutionException e) {
+//            logger.error("runAsync error {} in {}", t, e);
+//            return null;
+//        }
                 } catch (IOException e) {
                     error(cmd, e);
                 }

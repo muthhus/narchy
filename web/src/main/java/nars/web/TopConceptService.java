@@ -6,6 +6,7 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.util.data.MutableInteger;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,10 +57,20 @@ abstract public class TopConceptService<O> extends SynchWebsocketService {
 
                     lPrev = l;
 
-                    nar.runAsync(() -> {
+                    @NotNull Runnable t = () -> {
                         send(l.toArray(new Object[l.size()]));
                         ready.set(true);
-                    });
+                    };
+                    nar.runLater(t);
+
+//        logger.trace("runAsyncs run {}", t);
+//
+//        try {
+//            return asyncs.submit(t);
+//        } catch (RejectedExecutionException e) {
+//            logger.error("runAsync error {} in {}", t, e);
+//            return null;
+//        }
                 }
             });
         }

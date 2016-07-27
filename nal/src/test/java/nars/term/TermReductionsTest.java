@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
+import nars.nal.TermBuilder;
 import nars.op.data.differ;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +11,7 @@ import org.junit.Test;
 
 import static nars.$.*;
 import static nars.Op.CONJ;
-import static nars.io.NarseseTest.assertParseException;
+import static nars.io.NarseseTest.assertInvalid;
 import static nars.term.TermTest.*;
 import static org.junit.Assert.*;
 
@@ -88,7 +89,7 @@ public class TermReductionsTest {
 
     @Test
     public void testIntersectIntReductionToZero() {
-        assertParseException("(|,{P,Q},{R,S})");
+        assertInvalid("(|,{P,Q},{R,S})");
     }
 
     @Test
@@ -102,24 +103,24 @@ public class TermReductionsTest {
     public void testInvalidEquivalences() {
         assertEquals("(P<=>Q)", equi(p, q).toString());
 
-        assertNull(equi(impl(p, q), r));
-        assertNull(equi(equi(p, q), r));
-        assertParseException("<<a <=> b> <=> c>");
+        TermTest.assertInvalid(()->equi(impl(p, q), r));
+        TermTest.assertInvalid(()->equi(equi(p, q), r));
+        assertInvalid("<<a <=> b> <=> c>");
     }
 
     @Test
     public void testReducedAndInvalidImplications1() {
-        assertParseException("<<P<=>Q> ==> R>");
+        assertInvalid("<<P<=>Q> ==> R>");
     }
 
     @Test
     public void testReducedAndInvalidImplications5() {
-        assertParseException("<<P==>Q> ==> R>");
+        assertInvalid("<<P==>Q> ==> R>");
     }
 
     @Test
     public void testReducedAndInvalidImplications6() {
-        assertParseException("<R ==> <P<=>Q>>");
+        assertInvalid("<R ==> <P<=>Q>>");
     }
 
     @Test
@@ -129,12 +130,12 @@ public class TermReductionsTest {
 
     @Test
     public void testReducedAndInvalidImplications3() {
-        assertParseException("<R==><P==>R>>");
+        assertInvalid("<R==><P==>R>>");
     }
 
     @Test
     public void testReducedAndInvalidImplications4() {
-        assertEquals("(R==>P)", $("<R==><R==>P>>").toString());
+        assertEquals("(R==>P)", $("(R==>(R==>P))").toString());
     }
 
 //    @Test public void testReducedAndInvalidImplicationsTemporal() {
@@ -428,10 +429,10 @@ public class TermReductionsTest {
                 $("((&&, a, b, c) ==> (&&, a, d))").toString());
         assertEquals("(d==>(b&&c))",
                 $("((&&, a, d) ==> (&&, a, b, c))").toString());
-        assertParseException("((&&, a, b, c) ==> (&&, a, b))");
-        assertParseException("((&&, a, b) ==> (&&, a, b, c))");
-        assertParseException("((&&, a, b, c) ==> a)");
-        assertParseException("(a ==> (&&, a, b, c))");
+        assertInvalid("((&&, a, b, c) ==> (&&, a, b))");
+        assertInvalid("((&&, a, b) ==> (&&, a, b, c))");
+        assertInvalid("((&&, a, b, c) ==> a)");
+        assertInvalid("(a ==> (&&, a, b, c))");
     }
 
     @Test
@@ -478,7 +479,7 @@ public class TermReductionsTest {
         assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a1)) &&+0 (a1))"));
         assertValidTerm($("((--,(a1)) &&+1 (a1))"));
 
-        assertInvalidTerm(() -> $("((--,(a1)) || (a1))"));
+        assertInvalid("((--,(a1)) || (a1))");
 
 
         //invalid because of ordinary common subterm:
@@ -510,16 +511,19 @@ public class TermReductionsTest {
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<=>a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a-->a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a==>a),c:d,e:f)"));
-        assertInvalidTerm(() -> $("(&&,(--,(a==>a)),c:d,e:f)")); //INVALID
+        assertInvalid("(&&,(--,(a==>a)),c:d,e:f)"); //INVALID
 
     }
 
     @Test
     public void testSingularStatementsInDisjunction() {
 
-        assertInvalidTerm(() -> $("(||,(a<->a),c:d,e:f)")); //null, singular true
-
-        assertEquals($("x:y"), $("(&&,(--,(||,(a<->a),c:d,e:f)),x:y)")); //double fall-thru
+        assertInvalid("(||,(a<->a),c:d,e:f)"); //null, singular true
+    }
+    @Test
+    public void testSingularStatementsInDisjunction2() {
+        assertEquals($("x:y"), $("(&&,(||,(a<->a),c:d,e:f),x:y)")); //double fall-thru
+        assertEquals(TermBuilder.False, $("(&&,(--,(||,(a<->a),c:d,e:f)),x:y)")); //double fall-thru
 
 //        assertEquals($("(||,c:d,e:f)"), $("(||,(a<=>a),c:d,e:f)"));
 //        assertEquals($("(||,c:d,e:f)"), $("(||,(a-->a),c:d,e:f)"));
@@ -537,11 +541,11 @@ public class TermReductionsTest {
     }
     @Test
     public void testCoNegatedIntersectionAndDiffs() {
-        assertInvalidTerm(()->$("(|,(x),(--,(x))"));
-        assertInvalidTerm(()->$("(&,(x),(--,(x))"));
-        assertInvalidTerm(()->$("(-,(x),(--,(x))"));
-        assertInvalidTerm(()->$("(~,(x),(--,(x))"));
-        assertInvalidTerm(()->$("(-,(x),(x))"));
+        assertInvalid("(|,(x),(--,(x))");
+        assertInvalid("(&,(x),(--,(x))");
+        assertInvalid("(-,(x),(--,(x))");
+        assertInvalid("(~,(x),(--,(x))");
+        assertInvalid("(-,(x),(x))");
     }
 
     @Test public void testGroupNonDTemporalParallelComponents() {

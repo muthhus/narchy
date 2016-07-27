@@ -105,7 +105,7 @@
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
-      <version>1.4.14</version>
+      <version>1.4.15</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -191,12 +191,12 @@
       <dependency>
         <groupId>org.cache2k</groupId>
         <artifactId>cache2k-api</artifactId>
-        <version>0.26-BETA</version>
+        <version>0.27-BETA</version>
       </dependency>
       <dependency>
         <groupId>org.cache2k</groupId>
         <artifactId>cache2k-core</artifactId>
-        <version>0.26-BETA</version>
+        <version>0.27-BETA</version>
       </dependency>
 
 

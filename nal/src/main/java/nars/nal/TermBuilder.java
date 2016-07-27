@@ -67,7 +67,7 @@ public abstract class TermBuilder {
                     throw new InvalidTermException(op,dt,u, "Disjunction must be DTERNAL");
                 return disjunction(u);
             case CONJ:
-                return junction(op, dt, filterTrueFalseImplicits(op, u));
+                return conj(dt, u);
 
             case IMGi:
             case IMGe:
@@ -109,11 +109,11 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    private static Term[] filterTrueFalseImplicits(@NotNull Op o, @NotNull Term[] u) {
-        int imdices = 0;
+    private static Term[] conjTrueFalseFilter(@NotNull Term[] u) {
+        int trues = 0; //# of True subterms that can be eliminated
         for (Term x : u) {
             if (x.equals(True)) {
-                imdices++;
+                trues++;
             } else if (x.equals(False))  {
 
                 //false subterm in conjunction makes the entire condition false
@@ -123,18 +123,18 @@ public abstract class TermBuilder {
             }
         }
 
-        if (imdices == 0)
+        if (trues == 0)
             return u;
 
         int ul = u.length;
-        if (ul == imdices)
+        if (ul == trues)
             return TrueArray; //reduces to an Imdex itself
 
-        Term[] y = new Term[ul - imdices];
+        Term[] y = new Term[ul - trues];
         int j = 0;
         for (int i = 0; j < y.length; i++) {
             Term uu = u[i];
-            if ((!uu.equals(True)) && (!uu.equals(False)))
+            if (!uu.equals(True)) // && (!uu.equals(False)))
                 y[j++] = uu;
         }
         if (j!=y.length)
@@ -174,7 +174,7 @@ public abstract class TermBuilder {
     }
 
 
-    @Nullable
+    @NotNull
     public Term newDiff(@NotNull Op op, @NotNull Term[] t) {
 
         //corresponding set type for reduction:
@@ -196,7 +196,7 @@ public abstract class TermBuilder {
                             empty(set) :
                             finish(op, t);
             default:
-                return null;
+                throw new InvalidTermException(op, t, "diff requires 2 terms");
         }
     }
 
@@ -217,8 +217,14 @@ public abstract class TermBuilder {
         return finish(op, dt, TermContainer.the(op, args));
     }
 
-    private boolean isTrueOrFalse(Term x) {
-        return (x.equals(True)) || (x.equals(False));
+    public static boolean isTrueOrFalse(Term x) {
+        return isTrue(x) || isFalse(x);
+    }
+    public static boolean isTrue(Term x) {
+        return x.equals(True);
+    }
+    public static boolean isFalse(Term x) {
+        return x.equals(False);
     }
 
 
@@ -285,15 +291,15 @@ public abstract class TermBuilder {
 
         //HACK testing for equality like this is not a complete solution. for that we need a new special term type
 
-        if (t.equals(True)) return False;
-        else if (t.equals(False)) return True;
+        if (isTrue(t)) return False;
+        if (isFalse(t)) return True;
 
         if (t.op() == NEG) {
             // (--,(--,P)) = P
             t = ((TermContainer) t).term(0);
 
-            if (t.equals(True)) return False;
-            else if (t.equals(False)) return True;
+            if (isTrue(t)) return False;
+            if (isFalse(t)) return True;
 
             return t;
 
@@ -331,7 +337,9 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public Term junction(@NotNull Op op, int dt, final @NotNull Term... u) {
+    public Term conj(int dt, final @NotNull Term... uu) {
+
+        Term[] u = conjTrueFalseFilter(uu);
 
         int ul = u.length;
         if (ul == 0)
@@ -341,7 +349,7 @@ public abstract class TermBuilder {
             Term only = u[0];
             //preserve unitary ellipsis for patterns etc
             return (only instanceof Ellipsislike) ?
-                    finish(op, dt, only) :
+                    finish(CONJ, dt, only) :
                     only;
 
         }
@@ -360,11 +368,11 @@ public abstract class TermBuilder {
         }
 
         if (dt == DTERNAL) {
-            return junctionFlat(op, DTERNAL, u);
+            return junctionFlat(CONJ, DTERNAL, u);
         } else {
 
             if (dt == 0) {
-                Compound x = (Compound) junctionFlat(op, 0, u);
+                Compound x = (Compound) junctionFlat(CONJ, 0, u);
                 if (x.size() == 0)
                     return True;
 
@@ -379,10 +387,10 @@ public abstract class TermBuilder {
                     //if (Global.DEBUG)
                     //throw new InvalidTerm(op, DTERNAL, t, u);
                     //else
-                    throw new InvalidTermException(op, dt, u, "temporal conjunction requires exactly 2 arguments");
+                    throw new InvalidTermException(CONJ, dt, u, "temporal conjunction requires exactly 2 arguments");
                 } else {
 
-                    return finish(op,
+                    return finish(CONJ,
                             (u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
                             u);
                 }
@@ -538,12 +546,12 @@ public abstract class TermBuilder {
                     break;
 
                 case IMPL:
-                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
+                    /*if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
                         if (subject.isAny(TermIndex.InvalidEquivalenceTerm))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
                         if (predicate.isAny(TermIndex.InvalidEquivalenceTerm))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
-                    }
+                    }*/
 
 
                     if (subject.equals(True)) {
@@ -625,7 +633,7 @@ public abstract class TermBuilder {
 
     @NotNull
     public Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
-        Term s = junction(CONJ, t, subject, oldCondition);
+        Term s = conj(t, subject, oldCondition);
         return s != null ? build(IMPL, s, pred(predicate)) : null;
     }
 
@@ -759,7 +767,7 @@ public abstract class TermBuilder {
     }
 
     public final Term disjunction(Term[] u) {
-        return negation(build(CONJ, DTERNAL, negation(u)));
+        return negation(conj(DTERNAL, negation(u)));
     }
 
 }
