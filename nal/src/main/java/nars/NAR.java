@@ -149,6 +149,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 ForkJoinPool.commonPool();
                 /*new ForkJoinPool(concurrency,
                         defaultForkJoinWorkerThreadFactory, null, false);*/
+
         this.taskWorker =
                 new ForkJoinPool(concurrency,
                         defaultForkJoinWorkerThreadFactory, null, false);
@@ -537,7 +538,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             c = input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
             logger.warn("invalid input: {}", e.toString());
-            //e.printStackTrace();
+            e.printStackTrace();
             //throw e;
             return null;
         }

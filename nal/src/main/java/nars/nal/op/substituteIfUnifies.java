@@ -8,6 +8,8 @@ import nars.term.subst.OneMatchFindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.nal.TermBuilder.False;
+
 /**
  * substituteIfUnifies(term, variableType, varFrom, varTo)
  * TODO is this better named "substituteAll"
@@ -57,7 +59,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         boolean hasAnyOp = term.hasAny(op);
 
         if (!hasAnyOp && mustSubstitute()) {
-            return term; //FAILED?
+            return False; //FAILED?
         }
 
         //boolean equals = Term.equalAtemporally(x, y);
@@ -68,7 +70,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             m.clear();
             return (newTerm!=null) ? newTerm : term;
         } else {
-            return term; //FAILED?
+            return equals ? term : False;
         }
     }
 

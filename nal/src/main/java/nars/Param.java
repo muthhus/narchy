@@ -72,7 +72,7 @@ public abstract class Param extends Container implements Level {
      */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON * 2f;
 
-    public static final int CONCURRENCY_DEFAULT = 1;
+    public static int CONCURRENCY_DEFAULT = 1;
 
 
 
@@ -160,7 +160,7 @@ public abstract class Param extends Container implements Level {
 
 
 
-    public static final boolean ALLOW_RECURSIVE_IMPLICATIONS = true;
+    public static final boolean ALLOW_RECURSIVE_IMPLICATIONS = false;
     public static final boolean ALLOW_RECURSIVE_STATEMENTS = true;
     public static final boolean ALLOW_SINGULARITY_LEAK = true;
 

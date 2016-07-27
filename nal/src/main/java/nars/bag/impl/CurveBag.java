@@ -57,30 +57,33 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     @NotNull
     @Override
     public Bag<V> commit(@Nullable Consumer<BLink> each) {
-        super.commit(each);
-        sampler.commit(this);
+        synchronized (map) {
+            super.commit(each);
+            sampler.commit(this);
+        }
         return this;
     }
 
     public @Nullable BLink<V> peekNext(boolean remove) {
 
-        while (!isEmpty()) {
+        synchronized (map) {
+            while (!isEmpty()) {
 
-            int index = sampleIndex();
+                int index = sampleIndex();
 
-            BLink<V> i = remove ?
-                    removeItem(index) : get(index);
+                BLink<V> i = remove ?
+                        removeItem(index) : get(index);
 
-            if (!i.isDeleted()) {
-                return i;
+                if (!i.isDeleted()) {
+                    return i;
+                }
+
+                //ignore this Deleted item now that it's removed from the bag
+                //if it wasnt already removed above
+                if (!remove)
+                    remove(i.get());
+
             }
-
-            //ignore this Deleted item now that it's removed from the bag
-            //if it wasnt already removed above
-            if (!remove)
-                remove(i.get());
-
-
         }
         return null; // empty bag
     }
@@ -94,11 +97,11 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     @Override
     public CurveBag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
 
-        int ss = size();
-        if (ss == 0)
-            return this;
-
         synchronized(map) {
+
+            int ss = size();
+            if (ss == 0)
+                return this;
 
             final int begin, end;
             if (ss <= n) {

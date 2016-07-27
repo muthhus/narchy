@@ -79,6 +79,8 @@ public class Pacman extends cpcman implements Environment {
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 
+		Param.CONCURRENCY_DEFAULT = 2;
+
 		//Multi nar = new Multi(4,512,
 		Default nar = new Default(1024,
 				4, 3, 2, rng,
@@ -211,7 +213,7 @@ public class Pacman extends cpcman implements Environment {
 
 					new BeliefTableChart(nar, charted).show(700, 900);
 //
-					BagChart.show((Default) nar, 256);
+					//BagChart.show((Default) nar, 256);
 //
 //					STMView.show(stm, 500, 500);
 

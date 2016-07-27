@@ -35,7 +35,7 @@ public abstract class TermBuilder {
 
 
     /** truth singularity subterms */
-    private static final Atom False = $.the("ø");
+    public static final Atom False = $.the("ø");
     private static final Atom True = $.the("¿");
     private static final Term[] TrueArray = new Term[] { True };
 
@@ -115,13 +115,11 @@ public abstract class TermBuilder {
             if (x.equals(True)) {
                 imdices++;
             } else if (x.equals(False))  {
-                if (o != DISJ) {
-                    //false subterm in conjunction makes the entire condition false
-                    //this will eventually reduce diectly to false in this method's only callee HACK
-                    return new Term[] { False };
-                } else { //DISJ
-                    imdices++; //false subterm in disjunction (or) has no effect
-                }
+
+                //false subterm in conjunction makes the entire condition false
+                //this will eventually reduce diectly to false in this method's only callee HACK
+                return new Term[] { False };
+
             }
         }
 
@@ -133,11 +131,14 @@ public abstract class TermBuilder {
             return TrueArray; //reduces to an Imdex itself
 
         Term[] y = new Term[ul - imdices];
-        for (int i = 0, j = 0; i < ul; i++) {
+        int j = 0;
+        for (int i = 0; j < y.length; i++) {
             Term uu = u[i];
-            if ((uu!=True) && (uu!=False))
+            if ((!uu.equals(True)) && (!uu.equals(False)))
                 y[j++] = uu;
         }
+        if (j!=y.length)
+            throw new NullPointerException();
 
         return y;
     }
@@ -213,12 +214,6 @@ public abstract class TermBuilder {
 
     @NotNull
     public final Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
-        for (Term x : args) {
-            if (isTrueOrFalse(x)) {
-                if (!Param.ALLOW_SINGULARITY_LEAK)
-                    throw new InvalidTermException(op, dt, args, "singularity leak");
-            }
-        }
         return finish(op, dt, TermContainer.the(op, args));
     }
 
@@ -245,15 +240,16 @@ public abstract class TermBuilder {
             }
         }
 
-        if (Param.DEBUG ) {
+        //if (Param.DEBUG ) {
             //check for any imdex terms that may have not been removed
             for (Term x : args.terms()) {
                 if (isTrueOrFalse(x)) {
                     //return null;
-                    throw new RuntimeException(op + " term with imdex in subterms: " + args);
+                   // throw new RuntimeException(op + " term with imdex in subterms: " + args);
+                    return False;
                 }
             }
-        }
+        //}
 
         return newCompound(op, dt, args);
     }

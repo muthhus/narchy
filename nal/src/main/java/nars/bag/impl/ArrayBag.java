@@ -346,7 +346,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @NotNull
     @Override
     @Deprecated
-    public Bag<V> commit() {
+    public final Bag<V> commit() {
         return commit(null);
     }
 

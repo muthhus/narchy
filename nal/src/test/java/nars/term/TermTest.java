@@ -499,10 +499,10 @@ public class TermTest {
 
     }
 
-    @Test public void invalidStatement() {
-        NarseseTest.assertParseException("<b-->(&,a,b)>","<(&,a,b)-->b>");
-        assertNotNull($("<c-->(&,a,b)>"));
-    }
+//    @Test public void invalidStatement() {
+//        NarseseTest.assertParseException("<b-->(&,a,b)>","<(&,a,b)-->b>");
+//        assertNotNull($("<c-->(&,a,b)>"));
+//    }
 
     @Test
     public void statementHash() {

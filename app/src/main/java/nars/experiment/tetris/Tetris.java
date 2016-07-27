@@ -34,6 +34,7 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -50,7 +51,8 @@ import static nars.experiment.pong.Pong.numericSensor;
 public class Tetris extends TetrisState implements Environment {
 
     public static final int runCycles = 12000;
-    public static final int cyclesPerFrame = 64;
+    public static final int cyclesPerFrame = 32;
+    static int frameDelay = 100;
 
     private final TetrisVisualizer vis;
     private double currentScore;
@@ -284,7 +286,7 @@ public class Tetris extends TetrisState implements Environment {
         MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
-        //new ArithmeticInduction(nar);
+        new ArithmeticInduction(nar);
 
 
 
@@ -331,7 +333,7 @@ public class Tetris extends TetrisState implements Environment {
                     //STMView.show(stm, 800, 600);
 
 
-                    NARSpace.newConceptWindow((Default) nar, 512, 4);
+                    NARSpace.newConceptWindow((Default) nar, 64, 8);
                 }
 
 
@@ -341,7 +343,8 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, runCycles, 100);
+
+        t.run(n, runCycles, frameDelay);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

@@ -583,7 +583,7 @@ public class NarseseTest {
         for (String s : inputs ) {
             try {
                 Term e = term(s);
-                assertTrue(s + " should not be parseable", false); //must throw exception
+                assertTrue(s + " should not be parseable but got: " + e, false); //must throw exception
             } catch (Narsese.NarseseException e) {
                 assertTrue(true);
             }

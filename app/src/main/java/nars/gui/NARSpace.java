@@ -16,6 +16,7 @@ import spacegraph.AbstractSpace;
 import spacegraph.ListSpace;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
+import spacegraph.layout.Flatten;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.shape.CollisionShape;
 
@@ -46,11 +47,11 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 512, 8);
+        newConceptWindow(n, 512, 4);
 
         //n.run(20); //headstart
 
-        n.loop(15f);
+        n.loop(25f);
 
     }
 
