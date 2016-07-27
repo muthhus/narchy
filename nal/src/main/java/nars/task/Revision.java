@@ -266,7 +266,7 @@ public class Revision {
     }
 
     private static Compound failStrongest(Compound a, Compound b, float aProp) {
-        logger.warn("interpolation failure: {} and {}", a, b);
+        //logger.warn("interpolation failure: {} and {}", a, b);
         return strongest(a, b, aProp);
     }
 

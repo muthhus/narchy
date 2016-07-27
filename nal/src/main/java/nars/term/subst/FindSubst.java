@@ -195,37 +195,35 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
      */
     public final boolean match(@NotNull Term x, @NotNull Term y) {
 
-        /*if (x.equals(y)) {
+        if (x.equals(y)) {
             return true;
-        } else*/ {
+        } else {
 
             final Op xOp = x.op();
 
             switch (xOp) {
-                case VAR_DEP:
                 case VAR_INDEP:
+                case VAR_DEP:
                 case VAR_QUERY:
                 case VAR_PATTERN:
                     //Var
-                    if (xOp == y.op())
+                    if (xOp == y.op()) {
                         return putCommon(x, y);
-                    else if (matching(xOp))
+                    } else if (matching(xOp))
                         return matchVarX(x, y);
                     else
-                        break;
+                        break; //continue y variable condition below
                 case OPER:
                 case ATOM:
                     //Atomic
-                    return x.equals(y);
+                    return false;
                 default:
                     //Compound
-                    if ((y instanceof Compound) && (xOp == y.op())) {
-                        if (x.equals(y))
-                            return true;
-                        return ((Compound) x).match((Compound) y, this);
+                    if (y instanceof Compound) {
+                        return (xOp == y.op()) &&
+                                ((Compound) x).match((Compound) y, this);
                     }
-                    else
-                        break;
+                    break;
             }
 
             return (matching(y.op())) && matchVarY(x, y);

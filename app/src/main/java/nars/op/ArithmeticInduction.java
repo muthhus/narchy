@@ -96,7 +96,7 @@ public class ArithmeticInduction implements Consumer<Task> {
         } else {
             if ( (b.op() == CONJ) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
 
-                compress(b, (features, pattern) -> {
+                compress(b, true, (features, pattern) -> {
 
                     input(
                         task(b, $.conj(features, pattern))
@@ -140,7 +140,7 @@ public class ArithmeticInduction implements Consumer<Task> {
                 //TODO see if duplicates exist and can be merged into one substitution
 
                 conjs.forEach((pp,vv) -> {
-                    compress(vv, (features, pattern) -> {
+                    compress(vv, !b.op().statement, (features, pattern) -> {
 
                         @Nullable Term fp = $.conj(features, pattern);
                         if (fp == null)
@@ -181,7 +181,7 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
 
-    protected void compress(Termed<Compound> b, BiConsumer<List<Term>,Term> each) {
+    protected void compress(Termed<Compound> b, boolean varDep, BiConsumer<List<Term>,Term> each) {
         Compound<?> bt = b.term();
         TermContainer<?> subs = bt.subterms();
         int negs = subs.count(x -> x.op() == Op.NEG);
@@ -212,7 +212,10 @@ public class ArithmeticInduction implements Consumer<Task> {
             return true;
         };
 
-        Compound<?> first = (Compound)subs.term(0);
+        Term first = subs.term(0);
+        if (!(first instanceof Compound))
+            return;
+
         //first.pathsTo(ArithmeticTest::intOrNullTerm, collect);
         first.pathsTo(x -> x, collect);
 
@@ -262,8 +265,8 @@ public class ArithmeticInduction implements Consumer<Task> {
                 final int[] var = {0};
 
                 List<Term> features = $.newArrayList();
-                final Compound[] pattern = {first};
-                final Term[] vv = { var(0) };
+                final Compound[] pattern = {(Compound)first};
+                final Term[] vv = { var(0, varDep) };
 
                 numbers.forEach((ppp, nnnt) -> {
 
@@ -283,7 +286,7 @@ public class ArithmeticInduction implements Consumer<Task> {
                                 pattern[0] = (Compound) $.terms.transform(pattern[0], ppp, vv[0]);
 
                                 //increment variable
-                                vv[0] = var(++var[0]);
+                                vv[0] = var(++var[0], varDep);
                             }
                         }
                     }
@@ -302,8 +305,8 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     }
 
-    protected final GenericVariable var(int i) {
-        return new GenericVariable(Op.VAR_DEP, Integer.toString(i));
+    protected final GenericVariable var(int i, boolean varDep) {
+        return new GenericVariable(varDep ? Op.VAR_DEP : Op.VAR_INDEP, Integer.toString(i));
     }
 
     private List<Term> features(IntArrayList numbers, Term relatingVar) {
@@ -342,6 +345,8 @@ public class ArithmeticInduction implements Consumer<Task> {
         if ((c = Task.normalizeTaskTerm(c, b.punc(), nar, true))==null) {
             return null;
         }
+        if (b.isDeleted())
+            return null;
         return new GeneratedTask(
                 c,
                 b.punc(), b.truth())

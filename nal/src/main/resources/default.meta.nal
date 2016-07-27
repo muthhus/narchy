@@ -190,20 +190,21 @@
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
 
-    (S ==> P), (P ==> S), neq(S,P), time(dtCombine) |- (S <=> P), (Belief:Intersection, Derive:AllowBackward)
+    (S ==> P), (P ==> S), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P), neq(S,P), time(dtCombine) |- (S <=> P), (Belief:Intersection, Derive:AllowBackward)
 
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), neq(S,P), time(dtTminB) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+    (P ==> M), (S ==> M), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P), neq(S,P), time(dtTminB) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
-    (M ==> P), (M ==> S), neq(S,P), time(dtTminB) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+    (M ==> P), (M ==> S), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P), neq(S,P), time(dtTminB) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+
+    (M <=> P), (S <=> M), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P), neq(S,P), time(dtCombine) |- (S <=> P), (Belief:Resemblance, Derive:AllowBackward)
 
     (M ==> P), (S <=> M), neq(S,P), time(dtTminB) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
 
     (P ==> M), (S <=> M), neq(S,P), time(dtTminB) |- (P ==> S), (Belief:Analogy, Derive:AllowBackward)
 
-    (M <=> P), (S <=> M), neq(S,P), time(dtCombine) |- (S <=> P), (Belief:Resemblance, Derive:AllowBackward)
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again

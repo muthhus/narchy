@@ -628,7 +628,7 @@ public abstract class TermBuilder {
                     return True;
             }
 
-            if (subject.equals(negation(predicate)))
+            if (Param.ALLOW_RECURSIVE_STATEMENTS && subject.equals(negation(predicate))) //but not THAT recursive
                 return False;
 
             //TODO its possible to disqualify invalid statement if there is no structural overlap here
