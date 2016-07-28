@@ -41,14 +41,22 @@ import static nars.nal.Tense.DTERNAL;
 /** arithmetic rule mining & variable introduction */
 public class ArithmeticInduction implements Consumer<Task> {
     private final NAR nar;
+    private final Consumer<Collection<Task>> target;
     boolean deleteOriginalTaskIfInducted = true;
 
     public static Logger logger = LoggerFactory.getLogger(ArithmeticInduction.class);
-    private boolean trace = true;
+    private boolean trace = false;
 
     public ArithmeticInduction(NAR nar) {
-        this.nar = nar;
+        this(nar, (t) -> {
+            nar.inputLater(t);
+        });
         nar.onTask(this);
+    }
+
+    public ArithmeticInduction(NAR nar, Consumer<Collection<Task>> target) {
+        this.nar = nar;
+        this.target = target;
     }
 
     @Nullable
@@ -146,7 +154,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
             //attempt to replace all subterms of an embedded conjunction subterm
             Compound<?> tn = in.term();
-            if (o != CONJ && tn.subterms().hasAny(CONJ)) {
+            if ((o != CONJ && o!=EQUI) && tn.subterms().hasAny(CONJ)) {
 
 
                 //attempt to transform inner conjunctions
@@ -185,19 +193,14 @@ public class ArithmeticInduction implements Consumer<Task> {
             if (trace) {
                 logger.info("{}\n\t{}", in, Joiner.on("\n\t").join(generated));
             }
-            nar.inputLater(generated);
             if (deleteOriginalTaskIfInducted)
                 in.delete();
+            target.accept(generated);
         }
 
     }
 
 
-
-    static Task print(Task t) {
-        System.out.println(t);
-        return t;
-    }
 
 
     protected void compress(Termed<Compound> b, Consumer<Term> each) {

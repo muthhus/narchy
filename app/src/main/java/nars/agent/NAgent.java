@@ -13,6 +13,7 @@ import nars.learn.Agent;
 import nars.nar.Default;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -28,8 +29,7 @@ import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
+import java.util.*;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -365,8 +365,12 @@ public class NAgent implements Agent {
                 new SensorConcept(inputConceptName(i), nar, () -> {
                     return input[i];
                 }, sensorTruth) {
+                    @Override
+                    protected void input(Task t) {
+                        pendingInputTasks.add(t);
+                    }
 
-//                    @Override
+                    //                    @Override
 //                    public float pri() {
 //                        //input priority modulated by concept priority
 //                        float min = 0.5f;
@@ -561,6 +565,8 @@ public class NAgent implements Agent {
         return nar.activate(c, UnitBudget.One, nar.inputActivation.floatValue() * reinforcementAttention, reinforcementAttention, null);
     }
 
+    final Set<Task> pendingInputTasks = new HashSet();
+
     public void observe(float[] nextObservation) {
 
         System.arraycopy(nextObservation, 0, input, 0, nextObservation.length);
@@ -569,11 +575,19 @@ public class NAgent implements Agent {
 
             nar.clock.tick(ticksBeforeObserve - 1);
 
+            nar.inputLater(perceive(pendingInputTasks));
+            pendingInputTasks.clear();
+
             //if (!nar.running.get())
             nar.run(framesBeforeDecision);
 
         }
 
+    }
+
+    /** can override to pre-process inputs before input to NAR */
+    protected Collection<Task> perceive(Set<Task> inputs) {
+        return inputs;
     }
 
     public void learn(float[] input, int action, float reward) {
@@ -718,19 +732,25 @@ public class NAgent implements Agent {
     private final int decideMotivation() {
 
         float[] motivation = this.motivation;
+        long now = nar.time();
 
         for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
-            motivation[i] = motivation(actions.get(i));
+            MotorConcept aa = actions.get(i);
+            int dt = ticksBeforeObserve + ticksBeforeDecide;
+            motivation[i] =
+                    //motivation(aa, nar.time());
+                    motivation(aa, now) + motivation(aa, now + dt)/2f;
         }
 
         return deciding.decide(motivation.clone(), lastAction, nar.random);
     }
 
     /** maps a concept's belief/goal state to a number */
-    protected float motivation(MotorConcept m) {
-        return m.goals().
-                expectation(nar.time());
-                //motivation(nar.time());
+    protected float motivation(MotorConcept m, long when) {
+        return
+                m.goals().expectation(when);
+                //max(0,m.goals().motivation(when));
+
 
         //                    //(d > 0.5 && d > b ? d - b : 0);
 //                    //(d > 0.5 ? d : 0) / (d+b);

@@ -78,7 +78,7 @@ public enum PremiseBuilder {
 
             if (budget(pBudget, taskLink, termLink, minDur)) {
 
-                Premise p = newPremise(nar, now, task, termLink, pBudget);
+                Premise p = newPremise(nar, now, task, term, pBudget);
 
                 Conclusion c = matcher.run(p, new Conclusion());
 
@@ -110,11 +110,10 @@ public enum PremiseBuilder {
      patham9 especially try to understand the "temporal temporal" case
      patham9 its using the result of higher confidence
      */
-    static @NotNull Premise newPremise(@NotNull NAR nar, long now, @NotNull Task task, @NotNull BLink<Term> termLink, Budget b) {
+    static @NotNull Premise newPremise(@NotNull NAR nar, long now, @NotNull Task task, @NotNull Term termLinkTerm, Budget b) {
 
 
         Task belief = null;
-        Term termLinkTerm = termLink.get();
 
         if (termLinkTerm instanceof Compound) { //atomic concepts will have no beliefs to match
 

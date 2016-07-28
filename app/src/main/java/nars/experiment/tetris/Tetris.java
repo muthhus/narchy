@@ -36,24 +36,23 @@ import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static nars.experiment.pong.Pong.numericSensor;
 
 
 public class Tetris extends TetrisState implements Environment {
 
-    public static final int runCycles = 1000;
-    public static final int cyclesPerFrame = 64;
-    static int frameDelay = 50;
+    public static final int runCycles = 10000;
+    public static final int cyclesPerFrame = 16;
+    static int frameDelay = 10;
 
     private final TetrisVisualizer vis;
     private double currentScore;
@@ -236,21 +235,21 @@ public class Tetris extends TetrisState implements Environment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 4 * 30000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 1 * 10000000, false)
 
                 ,new FrameClock());
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.07f);
+        nar.inputActivation.setValue(0.07f);
+        nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.75f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -284,18 +283,18 @@ public class Tetris extends TetrisState implements Environment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 512, '.', 2);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 512, '!', 2);
 
         new ArithmeticInduction(nar);
 
 
 
-        Tetris t = new Tetris(6, 10, 5) {
+        Tetris t = new Tetris(8, 14, 5) {
             @Override
             protected int nextBlock() {
-                //return super.nextBlock(); //all blocks
-                return 1; //square blocks
+                return super.nextBlock(); //all blocks
+                //return 1; //square blocks
                 //return 0; //long blocks
             }
         };
@@ -327,17 +326,22 @@ public class Tetris extends TetrisState implements Environment {
 
                 if (nar instanceof Default) {
 
-                    //new BeliefTableChart(nar, charted).show(600, 900);
+                    new BeliefTableChart(nar, charted).show(600, 900);
 
-                    //BagChart.show((Default) nar, 128);
+                    BagChart.show((Default) nar, 128);
 
-                    STMView.show(stm, 800, 600);
+                    //STMView.show(stm, 800, 600);
 
 
-                    NARSpace.newConceptWindow((Default) nar, 128, 8);
+                    //NARSpace.newConceptWindow((Default) nar, 128, 8);
                 }
 
 
+            }
+
+            @Override
+            protected Collection<Task> perceive(Set<Task> inputs) {
+                return super.perceive(inputs);
             }
         };
 

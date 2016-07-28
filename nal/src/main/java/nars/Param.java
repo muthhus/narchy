@@ -107,7 +107,7 @@ public abstract class Param extends Container implements Level {
     /**
      * if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression
      */
-    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = true;
+    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = false;
 
     /**
      * relates time and evidence (confidence); how past and future beliefs decay in rank

@@ -122,7 +122,9 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            commit(f);
+            Task t = this.next = newInputTask(f, now);
+            input(t);
+
             this.lastInput = now;
             this.prevF = f;
 
@@ -131,6 +133,10 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
 
         //this.prevValue = next;
+    }
+
+    public void input(Task t) {
+        nar.inputLater(t);
     }
 
     @Nullable
@@ -144,22 +150,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         return this;
     }
 
-    protected final void commit(float v) {
-//        float f, c;
-//        if (v < 0.5f) {
-//            f = 0f;
-//            c = (0.5f - v)*(2f * confFactor);
-//        } else {
-//            f = 1f;
-//            c = (v - 0.5f)*(2f * confFactor);
-//        }
 
-        long now = nar.time();
-
-        @Nullable Task t = this.next = newInputTask(v, now);
-        if (t!=null)
-            nar.inputLater(t);
-    }
 
 
 

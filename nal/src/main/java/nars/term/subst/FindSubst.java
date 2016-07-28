@@ -28,6 +28,8 @@ import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+import static nars.Op.OBJECT;
+
 
 /* recurses a pair of compound term tree's subterms
 across a hierarchy of sequential and permutative fanouts
@@ -204,7 +206,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
             switch (xOp) {
                 case OBJECT:
-                    if (!y.op().var)
+                    if (y.op()==OBJECT)
                         return ((Termject)x).match(y, this);
                     break; //continue to end
                 case VAR_INDEP:

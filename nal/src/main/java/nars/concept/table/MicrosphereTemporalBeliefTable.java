@@ -211,8 +211,11 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         for (int i = 0; i < n; i++) {
 
             Task ii = get(i);
+            @Nullable long[] iiev = ii.evidence();
             if (excluding != null &&
-                    ((ii == excluding) || (!Param.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE && Stamp.overlapping(excludingEvidence, ii.evidence()))))
+                    ((ii == excluding) || (!Param.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE &&
+                            (Stamp.isCyclic(iiev) || Stamp.overlapping(excludingEvidence, iiev))
+                    )))
                 continue;
 
             //consider ii for being the weakest ranked task to remove

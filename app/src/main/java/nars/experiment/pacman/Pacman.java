@@ -99,8 +99,8 @@ public class Pacman extends cpcman implements Environment {
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.6f);
-		nar.goalConfidence(0.6f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.85f);
+		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
@@ -132,7 +132,7 @@ public class Pacman extends cpcman implements Environment {
 		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		MySTMClustered stm = new MySTMClustered(nar, 96, '.', 2);
+		MySTMClustered stm = new MySTMClustered(nar, 96, '.', 3);
 		MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 2);
 
 		new ArithmeticInduction(nar);

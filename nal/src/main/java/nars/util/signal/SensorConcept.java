@@ -47,12 +47,20 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.sensor = new Sensor(n, this, this, truth);
+        this.sensor = new Sensor(n, this, this, truth) {
+            @Override
+            public void input(Task t) {
+                SensorConcept.this.input(t);
+            }
+        };
 
         this.input = input;
 
     }
 
+    protected void input(Task t) {
+        nar.inputLater(t);
+    }
 
 
     /** originating from this sensor, or a future prediction */

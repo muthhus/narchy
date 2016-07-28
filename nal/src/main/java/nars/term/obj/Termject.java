@@ -87,12 +87,12 @@ public interface Termject<X> extends Atomic {
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
-            return (obj instanceof Termject) && val().equals(((PrimTermject)obj).val());
+            return (obj instanceof Termject) && val.equals(((Termject)obj).val());
         }
 
         @Override
         public int hashCode() {
-            return val().hashCode();
+            return val.hashCode();
         }
 
 
@@ -180,6 +180,11 @@ public interface Termject<X> extends Atomic {
         }
 
         @Override
+        public int varQuery() {
+            return 1; //pretend to be a query variable to allow unification
+        }
+
+        @Override
         public int compareVal(Range<Integer> v) {
             int l = val().lowerEndpoint();
             int vl = v.lowerEndpoint();
@@ -213,6 +218,27 @@ public interface Termject<X> extends Atomic {
 
         @Override
         public boolean match(Term y, FindSubst f) {
+            if (y instanceof IntTerm) {
+                int yi = ((IntTerm)y).val;
+                if (val.contains(yi)) {
+                    //return f.matchVarX(this, y);
+                    return true;
+                }
+            } else if (y instanceof IntInterval) {
+                Range<Integer> yr = ((IntInterval) y).val;
+                //if (val.isConnected(yr)) {
+//                    Range<Integer> combinedRange = val.span(yr);
+//                    IntInterval combined;
+//                    if (!combinedRange.equals(val)) {
+//                        combined = new IntInterval(combinedRange);
+//                    } else {
+//                        combined = this;
+//                    }
+//                    return f.putBidi(this, y, combined);
+                    return (val.encloses(yr) || yr.encloses(val));
+                //}
+
+            }
             return false;
         }
 
