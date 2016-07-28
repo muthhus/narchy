@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.gs.collections.api.block.procedure.primitive.FloatProcedure;
-import com.gs.collections.api.map.primitive.IntBooleanMap;
 import com.gs.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import com.jogamp.newt.event.*;
@@ -31,6 +30,8 @@ import spacegraph.render.JoglPhysics;
 import java.util.List;
 import java.util.function.Function;
 
+import static com.jogamp.opengl.math.FloatUtil.sin;
+import static java.lang.Math.cos;
 import static spacegraph.math.v3.v;
 
 /**
@@ -145,6 +146,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     public void init(GL2 gl) {
         super.init(gl);
 
+        addMouseListener(new FPSLook(this));
         addMouseListener(new OrbMouse(this));
         addKeyListener(new KeyXYZ(this));
 
@@ -467,12 +469,11 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         }
 
         void moveX(float speed) {
-            v3 x = v(-1,0,0); //space.camForward();
+            v3 x = v(space.camFwd);
             //System.out.println("x " + x);
-            //x.cross(x, space.camUp);
-            //x.normalize();
-            x.scale(speed);
-            //space.camPos.add(x);
+            x.cross(x, space.camUp);
+            x.normalize();
+            x.scale(-speed);
             space.camPos.add(x);
         }
         void moveY(float speed) {
@@ -480,14 +481,12 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             y.normalize();
             y.scale(speed);
             //System.out.println("y " + y);
-            //space.camPos.add(y);
             space.camPos.add(y);
         }
         void moveZ(float speed) {
             v3 z = v(space.camFwd);
             //System.out.println("z " + z);
             z.scale(speed);
-            //space.camPos.add(z);
             space.camPos.add(z);
         }
 
@@ -510,6 +509,60 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 //            super(g);
 //        }
 //    }
+
+    public static class FPSLook extends SpaceMouse {
+
+        boolean dragging = false;
+        private int prevX, prevY;
+        float h = (float)Math.PI; //angle
+        float v = 0; //angle
+
+        public FPSLook(JoglPhysics g) {
+            super(g);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            dragging = false;
+        }
+
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            short[] bd = e.getButtonsDown();
+            if (bd.length > 0 && bd[0] == 3 /* RIGHT */) {
+                if (!dragging) {
+                    prevX = e.getX();
+                    prevY = e.getY();
+                    dragging = true;
+                }
+
+                int x = e.getX();
+                int y = e.getY();
+
+                int dx = x - prevX;
+                int dy = y - prevY;
+
+                float angleSpeed = 0.001f;
+                h += -dx * angleSpeed;
+                v += -dy * angleSpeed;
+
+                v3 direction = v(
+                        (float)(cos(this.v) * sin(h)),
+                        (float)sin(this.v),
+                        (float)(cos(this.v) * cos(h))
+                );
+
+                System.out.println("set direction: " + direction);
+
+                space.camFwd.set(direction);
+
+                prevX = x;
+                prevY = y;
+            }
+        }
+
+    }
 
     public static class OrbMouse extends SpaceMouse {
 
