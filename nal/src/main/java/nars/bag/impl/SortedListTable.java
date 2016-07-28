@@ -80,7 +80,8 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
     @Override
     @NotNull public V weakest() {
-        return key(bottom());
+        @Nullable L w = bottom();
+        return w == null ? null : key(w);
     }
 
     @Nullable

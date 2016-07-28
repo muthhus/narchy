@@ -14,10 +14,7 @@ import nars.util.experiment.DeductiveChainTest;
 import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.AbstractSpace;
-import spacegraph.ListSpace;
-import spacegraph.SpaceGraph;
-import spacegraph.Spatial;
+import spacegraph.*;
 import spacegraph.layout.Flatten;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.shape.CollisionShape;
@@ -103,6 +100,16 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         SpaceGraph s = new SpaceGraph<Term>(
                 n.with(
+                        new SpaceTransform<Term>() {
+                            @Override
+                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
+                                float cDepth = -9f;
+                                src.forEach(s -> {
+                                    ((SimpleSpatial)s).moveZ(
+                                            s.key.volume() * cDepth, 0.05f );
+                                });
+                            }
+                        }
                         //new Flatten()
                         //new Spiral()
                         //new FastOrganicLayout()

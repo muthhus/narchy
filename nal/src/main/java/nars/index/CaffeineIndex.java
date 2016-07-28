@@ -63,9 +63,9 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                 return 0;
             }
 
-            Concept c = (Concept)v;
-            if (c.active())
-                return 0; //disallow removal of active concepts
+//            Concept c = (Concept)v;
+//            if (c.active())
+//                return 0; //disallow removal of active concepts
         }
 
 
@@ -92,7 +92,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
         long maxSubtermWeight = maxWeight * 1 / 4; //estimate considering re-use of subterms in compounds
 
-        Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
+        Caffeine<Termed, Termed> builder = prepare(Caffeine.newBuilder(), soft);
 
         builder
                .weigher(complexityAndConfidenceWeigher)
@@ -103,7 +103,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         compounds = builder.build();
 
 
-        Caffeine<Object, Object> buildera = prepare(Caffeine.newBuilder(), false);
+        Caffeine<Termed, Termed> buildera = prepare(Caffeine.newBuilder(), false);
         buildera
                 .removalListener(this);
         atomics = buildera.build();
@@ -244,7 +244,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public @NotNull String summary() {
-        return size() + " concepts / " + subtermsCount() + " subterms";
+        return atomics.estimatedSize() + " atoms " + compounds.estimatedSize() + " compounds / " + subtermsCount() + " subterms";
     }
 
     @Override

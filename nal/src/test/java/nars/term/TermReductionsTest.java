@@ -467,10 +467,10 @@ public class TermReductionsTest {
         assertEquals("(x&&y)",
                 $("(&&,x,y,a:b,(--,a:b))").toString());
 
-        assertEquals(TermBuilder.True,
+        assertEquals(TermBuilder.False,
                 $("(||,x,a:b,(--,a:b))"));
 
-        assertEquals(TermBuilder.True,
+        assertEquals(TermBuilder.False,
                 $("(||,x,y,a:b,(--,a:b))"));
     }
 

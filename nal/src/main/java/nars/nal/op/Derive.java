@@ -122,9 +122,9 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         @NotNull Term cp = this.conclusionPattern;
 
 
-        if (!(negBelief ^ negTask) && (negTask && cp.equals(rule.getTask())) || (negBelief && cp.equals(rule.getBelief()))) {
-            return cp; //double negative of the conclusion term which is present in both negated task and belief
-        }
+//        if (!(negBelief ^ negTask) && (negTask && cp.equals(rule.getTask())) || (negBelief && cp.equals(rule.getBelief()))) {
+//            return cp; //double negative of the conclusion term which is present in both negated task and belief
+//        }
         if (cp.op().atomic) {
             return null;
         }
@@ -266,21 +266,23 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             return; //INSUFFICIENT BUDGET
 
         NAR nar = m.nar;
-        Termed<Compound> content = Task.normalizeTaskTerm(raw, m.punct.get(), nar, true);
+        Compound content = Task.normalizeTaskTerm(raw, m.punct.get(), nar, true);
         if (content == null)
             return; //INVALID TERM FOR TASK
 
         long occ;
         Premise premise = m.premise;
 
-        if ((nar.nal() >= 7) && (m.temporal)) {
+        if (m.temporal) {
+            if (nar.nal() < 7)
+                throw new RuntimeException("invalid NAL level");
 
             long[] occReturn = new long[]{ETERNAL};
             float[] confScale = new float[]{1f};
 
-            Term temporalized;
+            Compound temporalized;
             try {
-                temporalized = this.temporalizer.compute(content.term(),
+                temporalized = this.temporalizer.compute(content,
                     m, this, occReturn, confScale
                 );
             } catch (InvalidTermException e) {
@@ -313,6 +315,18 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
             occ = occReturn[0];
         } else {
+            //the derived compound has a dt but the premise was entirely atemporal;
+            // this (probably!) indicates a temporal placeholder in the rules that needs to be set to DTERNAL
+            Op o = content.op();
+            if (content.dt()==0 && !o.isImage()) {
+                Term ete = m.index.builder().build(o, DTERNAL, content.terms());
+                if (!(ete instanceof Compound)) {
+                    //throw new InvalidTermException(o, content.dt(), content.terms(), "untemporalization failed");
+                    return;
+                }
+                content = (Compound) ete;
+            }
+
             occ = ETERNAL;
         }
 

@@ -383,7 +383,7 @@ public abstract class TermBuilder {
 
         int ul = u.length;
         if (ul == 0)
-            return True;
+            return False;
 
         if (ul == 1) {
             Term only = u[0];
@@ -410,7 +410,7 @@ public abstract class TermBuilder {
                 if (((dt == DTERNAL) || (dt == 0)) &&
                         (((a.op() == NEG) && ($.unneg(a).equals(b))) ||
                                 ((b.op() == NEG) && ($.unneg(b).equals(a))))) {
-                    return True;
+                    return False;
                 }
 
                 return finish(CONJ,
@@ -431,7 +431,7 @@ public abstract class TermBuilder {
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
         if (u.length == 0)
-            return True;
+            return False;
 
         assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
@@ -443,13 +443,13 @@ public abstract class TermBuilder {
         int n = s.size();
         switch (n) {
             case 0:
-                return True;
+                return False;
             case 1:
                 return s.iterator().next();
             default:
                 s = junctionGroupNonDTSubterms(s, 0);
-                if (s.size() == 0)
-                    return True; //wtf
+                if (s.isEmpty())
+                    return False; //wtf
                 return finish(op, dt, TermSet.the(s));
         }
 

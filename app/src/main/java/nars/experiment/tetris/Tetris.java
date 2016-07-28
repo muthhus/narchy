@@ -235,21 +235,21 @@ public class Tetris extends TetrisState implements Environment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 30000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 2 * 30000000, false)
 
                 ,new FrameClock());
-        nar.inputActivation.setValue(0.01f);
-        nar.derivedActivation.setValue(0.25f);
+        nar.inputActivation.setValue(0.1f);
+        nar.derivedActivation.setValue(0.15f);
 
 
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.75f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.beliefConfidence(0.85f);
+        nar.goalConfidence(0.85f); //must be slightly higher than epsilon's eternal otherwise it overrides
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -286,7 +286,7 @@ public class Tetris extends TetrisState implements Environment {
         MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
-        //new ArithmeticInduction(nar);
+        new ArithmeticInduction(nar);
 
 
 
@@ -326,11 +326,11 @@ public class Tetris extends TetrisState implements Environment {
 
                 if (nar instanceof Default) {
 
-                    new BeliefTableChart(nar, charted).show(600, 900);
+                    //new BeliefTableChart(nar, charted).show(600, 900);
 
                     //BagChart.show((Default) nar, 128);
 
-                    //STMView.show(stm, 800, 600);
+                    STMView.show(stm, 800, 600);
 
 
                     NARSpace.newConceptWindow((Default) nar, 128, 8);

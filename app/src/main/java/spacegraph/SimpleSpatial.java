@@ -64,6 +64,11 @@ public class SimpleSpatial<X> extends Spatial<X> {
         v3 center = transform();
         move(Util.lerp(x, center.x, rate), center.y, center.z);
     }
+    //TODO moveY
+    public void moveZ(float z, float rate) {
+        v3 center = transform();
+        move(center.x, center.y, Util.lerp(z, center.z, rate));
+    }
 
     public void move(float x, float y, float z, float rate) {
         v3 center = transform();
@@ -310,5 +315,6 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public List<TypedConstraint> constraints() {
         return constraints;
     }
+
 
 }

@@ -74,8 +74,8 @@ public class Pong extends Player implements Environment {
                 //new Indexes.SoftTermIndex(128 * 1024, rng)
                 //new Indexes.DefaultTermIndex(128 *1024, rng)
                 , new FrameClock());
-        nar.beliefConfidence(0.6f);
-        nar.goalConfidence(0.2f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;

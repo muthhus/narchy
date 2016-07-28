@@ -62,7 +62,7 @@ public class Pacman extends cpcman implements Environment {
 
 	final int visionRadius;
 	final int itemTypes = 3;
-	final static int runCycles = 500;
+	final static int runCycles = 15500;
 
 	boolean trace = true;
 
@@ -81,12 +81,12 @@ public class Pacman extends cpcman implements Environment {
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 
-		//Param.CONCURRENCY_DEFAULT = 2;
+		Param.CONCURRENCY_DEFAULT = 2;
 
 		//Multi nar = new Multi(4,512,
 		Default nar = new Default(1024,
 				4, 3, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng), 20000000, false)
+				new CaffeineIndex(new DefaultConceptBuilder(rng), 100000000, false)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
@@ -98,13 +98,13 @@ public class Pacman extends cpcman implements Environment {
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.9f);
-		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.6f);
+		nar.goalConfidence(0.6f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(16);
+		nar.cyclesPerFrame.set(64);
 		nar.confMin.setValue(0.02f);
 
 
@@ -157,8 +157,8 @@ public class Pacman extends cpcman implements Environment {
 				charted.add(sad);
 				charted.add(happy);
 
-				charted.add(nar.activate($.$("[pill]"), UnitBudget.Zero));
-				charted.add(nar.activate($.$("[ghost]"), UnitBudget.Zero));
+//				charted.add(nar.activate($.$("[pill]"), UnitBudget.Zero));
+//				charted.add(nar.activate($.$("[ghost]"), UnitBudget.Zero));
 
 				Iterables.addAll(charted, cheats);
 
@@ -211,13 +211,13 @@ public class Pacman extends cpcman implements Environment {
 
 				if (nar instanceof Default) {
 
-//					new BeliefTableChart(nar, charted).show(700, 900);
+					new BeliefTableChart(nar, charted).show(700, 900);
 //
-					//BagChart.show((Default) nar, 256);
+//					BagChart.show((Default) nar, 512);
 //
 //					STMView.show(stm, 500, 500);
 
-					TimeSpace.newTimeWindow((Default)nar, 128);
+					//TimeSpace.newTimeWindow((Default)nar, 128);
 
 
 				}

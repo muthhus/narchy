@@ -48,7 +48,7 @@ public abstract class Param extends Container implements Level {
     /**
      * maximum changes logged in deriver's stack
      */
-    public final static int UnificationStackMax = 72;
+    public final static int UnificationStackMax = 96;
     /**
      * max # of chained termutes which can be active
      */
