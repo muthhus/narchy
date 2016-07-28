@@ -1,9 +1,16 @@
 package nars.op;
 
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.nar.Default;
+import nars.task.MutableTask;
+import nars.task.Task;
+import nars.term.Compound;
+import nars.term.Termed;
+import nars.term.obj.Termject;
 import nars.util.signal.TestNAR;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -12,6 +19,21 @@ import static org.junit.Assert.*;
  * Created by me on 7/20/16.
  */
 public class ArithmeticInductionTest {
+
+    @Test public void testNew() {
+        //"((x,`3`) &&+0 (y,`2`)). 4-3 %1.0;.36%" //<- should not produce anything
+
+        TestNAR test = test();
+        Compound b = (Compound) $.conj(
+                $.p(new Termject.IntTerm(3), $.the("x")),
+                0,
+                $.p(new Termject.IntTerm(2), $.the(/*"x"*/  "y" ))
+        );
+        b = $.impl(b, $.the("z")); //this puts the above term inside somethign else, which changes the matching behavior that will be applied
+
+        Task t = new MutableTask(b, '.', 1f, test.nar);
+        test.inputAt(1, t).mustBelieve(cycles, "xvxcvc:a.",1,0.9f).test();
+    }
 
     @Test
     public void test0() {

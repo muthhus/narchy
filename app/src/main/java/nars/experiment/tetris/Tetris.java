@@ -236,21 +236,21 @@ public class Tetris extends TetrisState implements Environment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 2 * 30000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 4 * 30000000, false)
 
                 ,new FrameClock());
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.15f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.07f);
 
 
-        nar.beliefConfidence(0.85f);
-        nar.goalConfidence(0.85f); //must be slightly higher than epsilon's eternal otherwise it overrides
-        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -284,8 +284,8 @@ public class Tetris extends TetrisState implements Environment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         new ArithmeticInduction(nar);
 

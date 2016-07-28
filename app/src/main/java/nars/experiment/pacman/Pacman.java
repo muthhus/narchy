@@ -41,6 +41,7 @@ import nars.op.time.MySTMClustered;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.util.Texts;
 import nars.util.Util;
@@ -341,9 +342,9 @@ public class Pacman extends cpcman implements Environment {
 				else /*if (dy < 0)*/ dirY = $.the("d"); //down
 				Term squareTerm = $.p(
 						//$.p(dirX, $.the(Math.abs(dx))),
-						$.p($.the(Math.abs(dx)), dirX),
+						$.p(new Termject.IntTerm(Math.abs(dx)), dirX),
 						//$.p(dirY, $.the(Math.abs(dy)))
-						$.p($.the(Math.abs(dy)), dirY)
+						$.p(new Termject.IntTerm(Math.abs(dy)), dirY)
 				);
 				//System.out.println(dx + " " + dy + " " + squareTerm);
 

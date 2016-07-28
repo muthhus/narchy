@@ -6,6 +6,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.gs.collections.api.list.primitive.ByteList;
+import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import infinispan.com.google.common.collect.Ranges;
 import nars.$;
@@ -17,6 +18,7 @@ import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.obj.Termject;
@@ -42,7 +44,7 @@ public class ArithmeticInduction implements Consumer<Task> {
     boolean deleteOriginalTaskIfInducted = true;
 
     public static Logger logger = LoggerFactory.getLogger(ArithmeticInduction.class);
-    private boolean trace = false;
+    private boolean trace = true;
 
     public ArithmeticInduction(NAR nar) {
         this.nar = nar;
@@ -128,7 +130,7 @@ public class ArithmeticInduction implements Consumer<Task> {
             Op o = in.op();
 
             //attempt to compress all subterms to a single rule
-            if (((o == EQUI || o == IMPL || o == CONJ) && ((bdt == DTERNAL) || (bdt == 0)))
+            if ((/*(o == EQUI || o == IMPL || */(o == CONJ) && ((bdt == DTERNAL) || (bdt == 0)))
                     ||
                     (o.isSet())
                     ||
@@ -144,17 +146,16 @@ public class ArithmeticInduction implements Consumer<Task> {
 
             //attempt to replace all subterms of an embedded conjunction subterm
             Compound<?> tn = in.term();
-            if (tn.subterms().hasAny(CONJ)) {
+            if (o != CONJ && tn.subterms().hasAny(CONJ)) {
 
-                if (o == EQUI) //HACK avoid EQUIVALENCE for now
-                    return;
 
                 //attempt to transform inner conjunctions
                 Map<ByteList, Compound> inners = $.newHashMap();
 
                 //Map<Compound, List<ByteList>> revs = $.newHashMap(); //reverse mapping to detect duplicates
 
-                tn.pathsTo(x -> x.op()==CONJ ? x : null, (p, v) -> {
+                tn.pathsTo(x -> x.op()==CONJ &&
+                        ((((Compound)x).dt() == 0) || ((Compound)x).dt() == DTERNAL)  ? x : null, (p, v) -> {
                     if (!p.isEmpty())
                         inners.put(p.toImmutable(), (Compound)v);
                     return true;
@@ -212,6 +213,9 @@ public class ArithmeticInduction implements Consumer<Task> {
         }
 
         if (!subs.equivalentStructures())
+            return;
+
+        if (!equalNonIntegerAtoms(subs))
             return;
 
         if (negate) {
@@ -289,6 +293,37 @@ public class ArithmeticInduction implements Consumer<Task> {
         });
 
 
+    }
+
+    static boolean compareNonInteger(Term x, Term y) {
+        boolean xint = (x instanceof Termject.IntTerm || x instanceof IntInterval);
+        if (xint) {
+            return (y instanceof Termject.IntTerm || y instanceof IntInterval);
+        } else if (x instanceof Compound) {
+            return x.op() == y.op() && x.size() == y.size() && ((Compound)x).dt() == ((Compound)y).dt();
+        } else {
+            return x.equals(y);
+        }
+    }
+
+    final static Function<Term,Term> xx = x -> x;
+
+    private boolean equalNonIntegerAtoms(TermContainer<?> subs) {
+        Term first = subs.term(0);
+        int ss = subs.size();
+        return first.pathsTo(xx, (ByteList p, Term x)-> {
+            for (int i = 1; i < ss; i++){
+                Term y = subs.term(i);
+                if (!p.isEmpty()) {
+                    if (!compareNonInteger(x, ((Compound)y).subterm(p)))
+                        return false;
+                }/* else {
+                    if (!compareNonInteger(x, y))
+                        return false;
+                }*/
+            }
+            return true;
+        });
     }
 
     static boolean matchable(List<Term> x) {

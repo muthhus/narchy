@@ -89,8 +89,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         synchronized(map) {
             if (!removeDeletedAtBottom()) {
                 @NotNull V w = weakest();
-                if (w!=null)
-                    remove(w).delete(reason);
+                if (w!=null) {
+                    BLink<V> ww = remove(w);
+                    if (ww!=null)
+                        ww.delete(reason);
+                }
             }
         }
     }
