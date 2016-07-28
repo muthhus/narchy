@@ -63,7 +63,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
             int min = termlinksCapacityMin.intValue();
             int max = termlinksCapacityMax.intValue();
 
-            int v = Math.max(1, c.complexity());
+            int v = c.complexity();
             float complexityFactor = 1f - 1f / (1 + v); //smaller concepts get more termlinks
 
             int l = Math.round(Util.lerp(min, max, complexityFactor));

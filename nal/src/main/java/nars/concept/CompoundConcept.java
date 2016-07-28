@@ -31,7 +31,7 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 
-public class CompoundConcept<T extends Compound> implements AbstractConcept<T>, Termlike {
+public class CompoundConcept<T extends Compound> implements AbstractConcept, Termlike {
 
     @NotNull
     private final Bag<Task> taskLinks;

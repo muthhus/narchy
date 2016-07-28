@@ -322,6 +322,10 @@ public enum Op {
         return hasAny(structure, o.bit);
     }
 
+    public final boolean isIntersect() {
+        return this == Op.SECTe || this == Op.SECTi;
+    }
+
 
     /** top-level Op categories */
     public enum OpType {

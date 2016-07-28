@@ -48,8 +48,8 @@
     (P ==> S), (S ==> P), task("?") |- (P ==> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
-    ( (--,%S) ==> P),  P, no_common_subterm(S,P), time(dtTask) |- ( (--,%P) ==> S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
-    ( (--,%S) ==> P),  S, no_common_subterm(S,P), time(dtTask) |- ( (--,%P) ==> S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  P, no_common_subterm(S,P), time(dtTask) |- ( (--,%P) ==>+0 S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  S, no_common_subterm(S,P), time(dtTask) |- ( (--,%P) ==>+0 S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
 
 
 
@@ -191,7 +191,7 @@
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
 
-    (S ==> P), (P ==> S), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P), neq(S,P), time(dtCombine) |- (S <=> P), (Belief:Intersection, Derive:AllowBackward)
+    (S ==> P), (P ==> S), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P), neq(S,P), time(dtCombine) |- (S <=>+0 P), (Belief:Intersection, Derive:AllowBackward)
 
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
@@ -328,7 +328,7 @@
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
-    ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==> C), (Belief:Induction)
+    ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==>+0 C), (Belief:Induction)
 
     ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion) |- ((&&,B,A..+) ==>+0 C), (Belief:Deduction)
     ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB) |- ((&&,M,A..+) ==>+0 C), (Belief:Abduction)
@@ -408,10 +408,10 @@
 
 //precondition combiner inference rule (variable_unification6):
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction)
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,B..+) ==> (&&,A..+)), (Belief:Induction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), time(dtCombine) |- ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,A..+) ==>+0 (&&,B..+)), (Belief:Induction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,B..+) ==>+0 (&&,A..+)), (Belief:Induction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), time(dtCombine) |- ((&&,A..+) ==>+0 (&&,B..+)), (Belief:Abduction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), time(dtCombine) |- ((&&,B..+) ==>+0 (&&,A..+)), (Belief:Abduction)
 
 
 //second level variable introduction

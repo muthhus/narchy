@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 
-public class AtomConcept extends AtomicStringConstant implements AbstractConcept<Atomic>  {
+public class AtomConcept extends AtomicStringConstant implements AbstractConcept {
 
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
@@ -37,9 +37,6 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
     }
-
-
-
 
     @NotNull
     @Override

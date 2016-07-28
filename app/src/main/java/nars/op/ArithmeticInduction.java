@@ -1,34 +1,35 @@
 package nars.op;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeSet;
+import com.google.common.collect.TreeRangeSet;
 import com.gs.collections.api.list.primitive.ByteList;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+import infinispan.com.google.common.collect.Ranges;
 import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.task.GeneratedTask;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atomic;
-import nars.term.atom.Operator;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.obj.Termject;
-import nars.term.var.GenericVariable;
-import nars.util.Texts;
+import nars.term.obj.Termject.IntInterval;
 import nars.util.data.list.FasterList;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.Op.CONJ;
 import static nars.Op.EQUI;
@@ -39,8 +40,9 @@ import static nars.nal.Tense.DTERNAL;
 public class ArithmeticInduction implements Consumer<Task> {
     private final NAR nar;
     boolean deleteOriginalTaskIfInducted = true;
-    private int count = 0;
 
+    public static Logger logger = LoggerFactory.getLogger(ArithmeticInduction.class);
+    private boolean trace = false;
 
     public ArithmeticInduction(NAR nar) {
         this.nar = nar;
@@ -48,33 +50,52 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
     @Nullable
-    public static IntArrayList intsOrNull(List<Term> term) {
+    public static IntArrayList ints(List<Term> term) {
         IntArrayList l = new IntArrayList(term.size());
         for (Term x : term) {
             Integer i = intOrNull(x);
-            if (i == null)
-                return null;
-            l.add(i);
+            if (i != null)
+                l.add(i);
         }
         return l;
     }
 
-    @Nullable
-    public static Term intOrNullTerm(Term term) {
-        if (term instanceof Termject.IntTerm) {
-            return term;
+    public static <X> Set<X> pluck(List<Term> term, Function<Term,X> p) {
+        Set<X> s = new HashSet();
+        for (Term x : term) {
+            X y = p.apply(x);
+            if (y!=null)
+                s.add(y);
         }
-//        if (term instanceof Atomic) {
-//            int i = Texts.i(term.toString(), Integer.MIN_VALUE);
-//            if (i == Integer.MIN_VALUE)
-//                return null;
-//            return term;
-//        }
-        return null;
+        return s;
+    }
+    public static RangeSet<Integer> ranges(List<Term> term) {
+        TreeRangeSet<Integer> r = TreeRangeSet.create();
+        for (Term x : term) {
+            if (x instanceof IntInterval)
+                r.add(((IntInterval)x).val());
+            else if (x instanceof Termject.IntTerm)
+                r.add(Range.singleton(((Termject.IntTerm)x).val()).canonical(DiscreteDomain.integers()));
+        }
+        return r;
     }
 
+//    @Nullable
+//    public static Term intOrNullTerm(Term term) {
+//        if (term instanceof Termject.IntTerm) {
+//            return term;
+//        }
+////        if (term instanceof Atomic) {
+////            int i = Texts.i(term.toString(), Integer.MIN_VALUE);
+////            if (i == Integer.MIN_VALUE)
+////                return null;
+////            return term;
+////        }
+//        return null;
+//    }
+
     @Nullable
-    @Deprecated public static Integer intOrNull(Term term) {
+    public static Integer intOrNull(Term term) {
         if (term instanceof Termject.IntTerm) {
             return ((Termject.IntTerm)term).val();
         }
@@ -95,96 +116,82 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
     @Override
-    public void accept(Task b) {
+    public void accept(Task in) {
 
-        int countStart = count;
+        Set<Task> generated = new HashSet();
 
-        if (!b.isBeliefOrGoal()) {
+        if (!in.isBeliefOrGoal()) {
 
         } else {
-            if ( (b.op() == CONJ) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
 
-                compress(b, true, (pattern) -> {
+            int bdt = in.dt();
+            Op o = in.op();
 
-                    input(
-                        task(b, pattern)
-                    );
-                        /*n.inputLater(
-                                (new MutableTask(
-                                    $.sim(
-                                    //$.equi(
-                                        b.term(), $.conj(f, b.dt(), pattern)
-                                    ),
-                                '.', 1f, n).log(getClass().getSimpleName()))
-                        );*/
+            //attempt to compress all subterms to a single rule
+            if (((o == EQUI || o == IMPL || o == CONJ) && ((bdt == DTERNAL) || (bdt == 0)))
+                    ||
+                    (o.isSet())
+                    ||
+                    (o.isIntersect())) {
 
+                compress(in, (pattern) -> {
+
+                    task(in, pattern, generated);
 
                 });
             }
-//            else if ( ((b.op() == IMPL) /*|| (b.op() == EQUI)*/) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
-//                compress(b, (features, pattern) -> {
-//
-//                    //after variable introduction, such implication is self-referential and probably this conjunction captures the semantics:
-//                    input(
-//                        task(b, $.conj(features, pattern))
-//                    );
-//
-//                });
-//            }
 
-            if (b.op()!=CONJ && b.term().hasAny(CONJ)) {
 
-                if (b.op() == EQUI) //HACK avoid EQUIVALENCE for now
+            //attempt to replace all subterms of an embedded conjunction subterm
+            Compound<?> tn = in.term();
+            if (tn.subterms().hasAny(CONJ)) {
+
+                if (o == EQUI) //HACK avoid EQUIVALENCE for now
                     return;
 
                 //attempt to transform inner conjunctions
-                Map<ByteList, Compound> conjs = $.newHashMap();
+                Map<ByteList, Compound> inners = $.newHashMap();
 
                 //Map<Compound, List<ByteList>> revs = $.newHashMap(); //reverse mapping to detect duplicates
 
-                b.term().pathsTo(x -> x.op()==CONJ ? x : null, (p,v) -> {
+                tn.pathsTo(x -> x.op()==CONJ ? x : null, (p, v) -> {
                     if (!p.isEmpty())
-                        conjs.put(p.toImmutable(), (Compound)v);
+                        inners.put(p.toImmutable(), (Compound)v);
                     return true;
                 });
 
                 //TODO see if duplicates exist and can be merged into one substitution
 
-                conjs.forEach((pp,vv) -> {
-                    compress(vv, !b.op().statement, (fp) -> {
-
-
-                        if (fp == null)
-                            return;
+                inners.forEach((pp,vv) -> {
+                    compress(vv, (fp) -> {
 
                         Term c;
-                        if ((c = nar.index.transform(b.term(), pp, fp))!=null) {
-
-                            @Nullable Task task = task(b, c);
-                            input(task);
-
+                        try {
+                            if ((c = nar.index.transform(tn, pp, fp)) != null) {
+                                task(in, c, generated);
+                            }
+                        } catch (InvalidTermException e) {
+                            logger.warn("{}",e);
                         }
+
                     });
                 });
 
             }
         }
 
-        int countEnd = count;
-        if (countEnd > countStart) {
+        if (!generated.isEmpty()) {
+            if (trace) {
+                logger.info("{}\n\t{}", in, Joiner.on("\n\t").join(generated));
+            }
+            nar.inputLater(generated);
             if (deleteOriginalTaskIfInducted)
-                b.delete();
+                in.delete();
         }
+
     }
 
-    final void input(@Nullable Task task) {
-        if (task!=null) {
-            count++;
-            nar.inputLater(
-                /*print*/(task)
-            );
-        }
-    }
+
 
     static Task print(Task t) {
         System.out.println(t);
@@ -192,7 +199,7 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
 
-    protected void compress(Termed<Compound> b, boolean varDep, Consumer<Term> each) {
+    protected void compress(Termed<Compound> b, Consumer<Term> each) {
         Compound<?> bt = b.term();
         TermContainer<?> subs = bt.subterms();
         int negs = subs.count(x -> x.op() == Op.NEG);
@@ -212,12 +219,12 @@ public class ArithmeticInduction implements Consumer<Task> {
         }
 
         //paths * extracted sequence of numbers at given path for each subterm
-        Map<ByteList,List<Term>> numbers = new HashMap();
+        Map<ByteList,List<Term>> data = new HashMap();
 
         //first subterm: infer location of all inductables
-        BiPredicate<ByteList, @Nullable Term> collect = (p, t) -> {
+        BiPredicate<ByteList, Term> collect = (p, t) -> {
             if (!p.isEmpty() && t!=null) {
-                List<Term> c = numbers.computeIfAbsent(p.toImmutable(), (pp) -> $.newArrayList(1));
+                List<Term> c = data.computeIfAbsent(p.toImmutable(), (pp) -> $.newArrayList(1));
                 c.add(t);
             }
             return true;
@@ -230,8 +237,8 @@ public class ArithmeticInduction implements Consumer<Task> {
         //first.pathsTo(ArithmeticTest::intOrNullTerm, collect);
         first.pathsTo(x -> x, collect);
 
-        //no actual integer numbers found
-        if (!numbers.values().stream().anyMatch(x -> intOrNull(x.get(0))!=null))
+        //prefilter: no actual integer numbers found
+        if (!data.values().stream().anyMatch(x -> matchable(x)))
             return;
 
         //analyze remaining subterms
@@ -241,30 +248,9 @@ public class ArithmeticInduction implements Consumer<Task> {
             subs.term(i).pathsTo(
                     (e) -> e, //(e instanceof Atom && intOrNull(e)==null) ? e : null,
                     collect);
-                    /*(p, x) -> {
-
-                        if (!p.isEmpty()) { //ignore the root superterm
-
-                            //if this is is a potential variable path, add the subterm's value at it to the list of values
-                            List<Term> v = numbers.get(p);
-                            if (v != null) {
-                                v.add(x);
-                            } else {
-                                //else every atomic value must be consistently equal throughout
-                                if (x instanceof Atomic && !first.subterm(p).equals(x))
-                                    return false;
-                            }
-                        }
-
-                        return true;
-
-
-                    }*/;
-
-
         }
 
-        numbers.forEach((pp, nn) -> {
+        data.forEach((pp, nn) -> {
 
             //all subterms must contribute a value for this path
             if (nn.size()!=subCount)
@@ -273,42 +259,30 @@ public class ArithmeticInduction implements Consumer<Task> {
             //for each path where the other numerics are uniformly equal (only one unique value)
             if (new HashSet(nn).size()==1) {
 
-                final int[] var = {0};
 
                 //List<Term> features = $.newArrayList();
-                final Compound[] pattern = {(Compound)first};
-                //@Deprecated final Term[] vv = { var(0, varDep) };
+                final Compound pattern = (Compound) first;
 
-                numbers.forEach((ppp, nnnt) -> {
+                data.forEach((ppp, nnnt) -> {
 
                     if (!pp.equals(ppp)) {
 
-                        IntArrayList nnn = intsOrNull(nnnt);
-                        if (nnn!=null) {
+                        List<Term> fff = features(nnnt);
 
+                        for (Term ff : fff) {
 
-                            //System.out.println(b + " " + pp + " " + nn + " : " + "\t" + numbers + " " + pattern);
-
-                            List<Term> fff = features(nnn);
-                            if (!fff.isEmpty()) {
-                                for (Term ff : fff) {
-
-                                    //introduce variable
-                                    Compound r = (Compound) $.negIf(
-                                                    (Compound) $.terms.transform(pattern[0], ppp, ff),
-                                                    negate
-                                                 );
-                                    each.accept(r);
-
-                                }
-
-                                //increment variable
-                                //vv[0] = var(++var[0], varDep);
+                            //introduce variable
+                            @Nullable Term y = nar.index.transform(pattern, ppp, ff);
+                            if (y instanceof Compound) {
+                                each.accept($.negIf(
+                                        (Compound) y,
+                                        negate
+                                ));
                             }
+
                         }
                     }
                 });
-
 
             }
 
@@ -317,13 +291,48 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     }
 
+    static boolean matchable(List<Term> x) {
+        int intTerms = 0, intPreds = 0;
+        int xSize = x.size();
+        for (int i = 0; i < xSize; i++) {
+            Term t = x.get(i);
+            if (t instanceof Termject.IntTerm)
+                intTerms++;
+            else if (t instanceof Termject.IntPred)
+                intPreds++;
+        }
+        return (intTerms + intPreds == xSize); //all either intTerm or intPred
+    }
+
     //protected final GenericVariable var(int i, boolean varDep) {
         //return new GenericVariable(varDep ? Op.VAR_DEP : Op.VAR_INDEP, Integer.toString(i));
     //}
 
-    private List<Term> features(IntArrayList numbers) {
+    private List<Term> features(List<Term> nnnt) {
         FasterList<Term> ll = $.newArrayList(0);
-        ll.addIfNotNull(iRange(numbers));
+
+        RangeSet<Integer> intIntervals = ranges(nnnt);
+
+        if (!intIntervals.isEmpty()) {
+            Range<Integer> rNew = intIntervals.span();
+            if (rNew.upperEndpoint() - rNew.lowerEndpoint() > 1) {
+
+                boolean connected = true;
+                Range q = null;
+                for (Range r : intIntervals.asRanges()) {
+
+                    if (q != null && !q.isConnected(r)) {
+                        connected = false;
+                        break;
+                    }
+                    q = r;
+                }
+                if (connected) {
+                    //merge their spans
+                    ll.add(new IntInterval(rNew));
+                }
+            }
+        }
 
         //...
 
@@ -331,36 +340,16 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
 
-    final static Operator intRange = $.oper("intRange");
-
-    public Term iRange(IntArrayList l) {
-
-        int min = l.min();
-        int max = l.max();
-
-        if (l.size() == 1) {
-            throw new RuntimeException("invalid sample count");
-        }
-
-        if (min == max) {
-            //return $.p($.the("intEqual"), relatingVariable, $.the(min));
-            return null; //no new information needs to be provided
-        }
-
-        //return $.$("l1Dist(" + $.varDep(1) + ", " + (Math.abs(x - y)) + ")");
-
-        //return $.exec(intRange, relatingVariable, $.p($.the(min), $.the(max-min)));
-        return new Termject.IntPred.IntInterval(min, max);
-    }
 
 
-    @Nullable Task task(Task b, Term c) {
+
+    @Nullable Task task(Task b, Term c, Collection<Task> target) {
         if ((c = Task.normalizeTaskTerm(c, b.punc(), nar, true))==null) {
             return null;
         }
         if (b.isDeleted())
             return null;
-        return new GeneratedTask(
+        Task g = new GeneratedTask(
                 c,
                 b.punc(), b.truth())
                 .time(nar.time(), b.occurrence())
@@ -368,5 +357,8 @@ public class ArithmeticInduction implements Consumer<Task> {
                 .evidence(b.evidence())
                 .log(getClass().getSimpleName())
                 ;
+        if (g!=null)
+            target.add(g);
+        return g;
     }
 }

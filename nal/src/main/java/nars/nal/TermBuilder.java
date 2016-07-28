@@ -533,9 +533,11 @@ public abstract class TermBuilder {
             } else {
                 if (x instanceof Compound) {
                     //cancel co-negations TODO optimize this?
-                    Term negX = $.neg(x);
-                    if (s.remove(negX)) {
-                        continue;
+                    if (!s.isEmpty()) {
+                        Term negX = $.neg(x);
+                        if (s.remove(negX)) {
+                            continue;
+                        }
                     }
                 }
                 s.add(x);

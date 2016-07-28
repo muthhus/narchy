@@ -344,9 +344,11 @@ public class NAgent implements Agent {
     private static float varPct(NAR nar) {
         if (nar instanceof Default) {
             DoubleSummaryStatistics is = new DoubleSummaryStatistics();
-            ((Default)nar).core.concepts.forEach(c -> {
-                Term tt = c.get().term();
-                is.accept(((float)tt.vars())/tt.volume());
+            ((Default)nar).core.concepts.forEach(x -> {
+                Term tt = x.get().term();
+                float v = tt.volume();
+                int c = tt.complexity();
+                is.accept((v - c)/ v);
             });
             return (float) is.getAverage();
         }

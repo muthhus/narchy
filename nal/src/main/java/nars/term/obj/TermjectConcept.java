@@ -21,6 +21,11 @@ public class TermjectConcept<X> extends AtomConcept implements Termject<X> {
     }
 
     @Override
+    public int complexity() {
+        return term().complexity();
+    }
+
+    @Override
     public @NotNull Term term() {
         return termject;
     }
@@ -28,6 +33,11 @@ public class TermjectConcept<X> extends AtomConcept implements Termject<X> {
     @Override
     public X val() {
         return termject.val();
+    }
+
+    @Override
+    public int compareVal(X v) {
+        return termject.compareVal(v);
     }
 
     @Override
