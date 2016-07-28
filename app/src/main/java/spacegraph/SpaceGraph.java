@@ -3,8 +3,11 @@ package spacegraph;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
-import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.newt.event.MouseListener;
+import com.gs.collections.api.block.procedure.primitive.FloatProcedure;
+import com.gs.collections.api.map.primitive.IntBooleanMap;
+import com.gs.collections.impl.map.mutable.primitive.IntBooleanHashMap;
+import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import com.jogamp.newt.event.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.$;
@@ -142,7 +145,9 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     public void init(GL2 gl) {
         super.init(gl);
 
-        addMouseListener(new OrbMouseControl(this));
+        addMouseListener(new OrbMouse(this));
+        addKeyListener(new KeyXYZ(this));
+
 
         for (Facial f : preAdd) {
             _add(f);
@@ -371,21 +376,157 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     }
 
-    public static class OrbMouseControl implements MouseListener {
+    public abstract static class SpaceMouse extends MouseAdapter {
+
+        public final JoglPhysics space;
+        public SpaceMouse(JoglPhysics g) {
+            this.space = g;
+        }
+    }
+    public abstract static class SpaceKeys extends KeyAdapter implements FrameListener {
+
+        public final JoglPhysics space;
+
+        //TODO merge these into one Map
+        final IntBooleanHashMap keyState = new IntBooleanHashMap();
+        final IntObjectHashMap<FloatProcedure> keyPressed = new IntObjectHashMap();
+        final IntObjectHashMap<FloatProcedure> keyReleased = new IntObjectHashMap();
+
+        public SpaceKeys(JoglPhysics g) {
+            this.space = g;
+
+
+            g.addFrameListener(this);
+        }
+
+        @Override
+        public void onFrame(JoglPhysics j) {
+            float dt = j.getLastFrameTime();
+            keyState.forEachKeyValue((k,s)->{
+                FloatProcedure f = (s) ? keyPressed.get(k) : keyReleased.get(k);
+                if (f!=null) {
+                    f.value(dt);
+                }
+            });
+        }
+
+        protected void watch(int keyCode, FloatProcedure ifPressed, FloatProcedure ifReleased) {
+            keyState.put(keyCode, false); //initialized
+            if (ifPressed!=null)
+                keyPressed.put(keyCode, ifPressed);
+            if (ifReleased!=null)
+                keyReleased.put(keyCode, ifReleased);
+        }
+
+        //TODO unwatch
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            setKey((int) e.getKeyCode(), false);
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            setKey((int) e.getKeyCode(), true);
+        }
+
+        protected void setKey(int c, boolean state) {
+            if (keyState.containsKey(c)) {
+                keyState.put(c, state);
+            }
+        }
+    }
+
+    /** simple XYZ control using keys (ex: numeric keypad) */
+    public static class KeyXYZ extends SpaceKeys {
+
+        public KeyXYZ(JoglPhysics g) {
+            super(g);
+
+
+            float speed = 0.25f;
+            watch(KeyEvent.VK_NUMPAD4, (dt)-> {
+                moveX(speed);
+            }, null);
+            watch(KeyEvent.VK_NUMPAD6, (dt)-> {
+                moveX(-speed);
+            }, null);
+            watch(KeyEvent.VK_NUMPAD8, (dt)-> {
+                moveY(speed);
+            }, null);
+            watch(KeyEvent.VK_NUMPAD2, (dt)-> {
+                moveY(-speed);
+            }, null);
+            watch(KeyEvent.VK_NUMPAD5, (dt)-> {
+                moveZ(speed);
+            }, null);
+            watch(KeyEvent.VK_NUMPAD0, (dt)-> {
+                moveZ(-speed);
+            }, null);
+
+        }
+
+        void moveX(float speed) {
+            v3 x = v(-1,0,0); //space.camForward();
+            //System.out.println("x " + x);
+            //x.cross(x, space.camUp);
+            //x.normalize();
+            x.scale(speed);
+            //space.camPos.add(x);
+            space.camPos.add(x);
+        }
+        void moveY(float speed) {
+            v3 y = v(space.camUp);
+            y.normalize();
+            y.scale(speed);
+            //System.out.println("y " + y);
+            //space.camPos.add(y);
+            space.camPos.add(y);
+        }
+        void moveZ(float speed) {
+            v3 z = v(space.camFwd);
+            //System.out.println("z " + z);
+            z.scale(speed);
+            //space.camPos.add(z);
+            space.camPos.add(z);
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            super.keyPressed(e);
+        }
+
+    }
+
+//    public static class PickDragMouse extends SpaceMouse {
+//
+//        public PickDragMouse(JoglPhysics g) {
+//            super(g);
+//        }
+//    }
+//    public static class PickZoom extends SpaceMouse {
+//
+//        public PickZoom(JoglPhysics g) {
+//            super(g);
+//        }
+//    }
+
+    public static class OrbMouse extends SpaceMouse {
 
         final ClosestRay rayCallback = new ClosestRay(((short)(1 << 7)));
-        private final JoglPhysics space;
         // constraint for mouse picking
-        protected TypedConstraint pickConstraint = null;
-        protected Dynamic directDrag;
         private int mouseDragPrevX, mouseDragPrevY;
-        public Dynamic pickedBody = null; // for deactivation state
         private int mouseDragDX, mouseDragDY;
         final v3 gOldPickingPos = v();
         float gOldPickingDist = 0.f;
 
-        public OrbMouseControl(JoglPhysics g) {
-            this.space = g;
+        protected TypedConstraint pickConstraint = null;
+        protected Dynamic directDrag;
+        public Dynamic pickedBody = null; // for deactivation state
+
+
+        public OrbMouse(JoglPhysics g) {
+            super(g);
         }
 
         @Override
@@ -393,7 +534,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             //System.out.println("wheel=" + Arrays.toString(e.getRotation()));
             float y = e.getRotation()[1];
             if (y!=0) {
-                space.setCameraDistance( space.cameraDistance.floatValue() + 0.1f * y );
+                //space.setCameraDistance( space.cameraDistance.floatValue() + 0.1f * y );
             }
         }
 
@@ -410,7 +551,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
                         v3 objTarget = co.getWorldOrigin();
-                        space.camPosTarget.set(objTarget);
+                        //space.camPosTarget.set(objTarget);
 
                         space.setCameraDistance(
                                 co.shape().getBoundingRadius() * 1.25f + space.nearPlane * 1.25f
@@ -667,15 +808,15 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                                     //                        nextAzi = fmodf(nextAzi, btScalar(360.f));
                                     //                        nextEle += dy * btScalar(0.2);
                                     //                        nextEle = fmodf(nextEle, btScalar(180.f));
-                                    space.azi.setValue(space.azi.floatValue() + mouseDragDX * 0.2f );
+                                    //space.azi.setValue(space.azi.floatValue() + mouseDragDX * 0.2f );
                                     //nextAzi = fmodf(nextAzi, btScalar(360.f));
-                                    space.ele.setValue(space.ele.floatValue() + mouseDragDY * (0.2f));
+                                    //space.ele.setValue(space.ele.floatValue() + mouseDragDY * (0.2f));
                                     //nextEle = fmodf(nextEle, btScalar(180.f));
                                     return true;
                                 case 2:
                                     //middle mouse drag = zoom
 
-                                    space.setCameraDistance( space.cameraDistance.floatValue() - mouseDragDY * 0.5f );
+                                    //space.setCameraDistance( space.cameraDistance.floatValue() - mouseDragDY * 0.5f );
                                     return true;
                             }
                         }

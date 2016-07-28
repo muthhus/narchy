@@ -26,30 +26,25 @@ package spacegraph.render;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
-import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.newt.event.MouseListener;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
+import nars.$;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.Color3f;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 import spacegraph.phys.*;
-import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.collision.DefaultCollisionConfiguration;
 import spacegraph.phys.collision.DefaultIntersecter;
 import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.phys.collision.broad.DbvtBroadphase;
 import spacegraph.phys.collision.broad.Intersecter;
-import spacegraph.phys.constraint.Point2PointConstraint;
-import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.*;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.AnimFloat;
@@ -57,6 +52,7 @@ import spacegraph.phys.util.AnimFloatAngle;
 import spacegraph.phys.util.AnimVector3f;
 import spacegraph.phys.util.Motion;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -71,7 +67,20 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
 
     private boolean simulating = true;
+    private float lastFrameTime;
 
+    public interface FrameListener {
+        public void onFrame(JoglPhysics j);
+    }
+
+    final List<FrameListener> frameListeners = $.newArrayList();
+
+    public void addFrameListener(FrameListener f) {
+        frameListeners.add(f);
+    }
+    public void removeFrameListener(FrameListener f) {
+        frameListeners.remove(f);
+    }
 
     /**
      * activate/deactivate the simulation; by default it is enabled
@@ -97,12 +106,11 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
 
     public final v3 camPos = new v3();
-    public final v3 camPosTarget;
-    protected final v3 camDir = new v3();
-    protected final v3 camUp;
-    public final MutableFloat cameraDistance;
-    public final MutableFloat ele;
-    public final MutableFloat azi;
+    public final v3 camFwd;
+    public final v3 camUp;
+//    public final MutableFloat cameraDistance;
+//    public final MutableFloat ele;
+//    public final MutableFloat azi;
     float top;
     float bottom;
     public float nearPlane;
@@ -116,10 +124,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     int zNear = 1;
     int zFar = 500;
 
-
-
-
-    protected int forwardAxis = 2;
 
     protected int screenWidth = 0;
     protected int screenHeight = 0;
@@ -162,11 +166,12 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         };
 
-        cameraDistance = new AnimFloat(55f, dyn, 4f);
-        azi = new AnimFloatAngle(-180, dyn, 30f);
-        ele = new AnimFloatAngle(20, dyn, 30f);
+//        cameraDistance = new AnimFloat(55f, dyn, 4f);
+//        azi = new AnimFloatAngle(-180, dyn, 30f);
+//        ele = new AnimFloatAngle(20, dyn, 30f);
 
-        camPosTarget = new AnimVector3f(0,0,0,dyn, 10f);
+        camPos.set(0, 0, 5);
+        camFwd = new v3(0, 0, -1); //new AnimVector3f(0,0,1,dyn, 10f);
         camUp = new v3(0, 1, 0); //new AnimVector3f(0f, 1f, 0f, dyn, 1f);
 
         dyn.setGravity(v(0, 0, 0));
@@ -287,23 +292,29 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         gl.glEnable(GL2.GL_DEPTH_TEST);
 
+        long dt = clock.getTimeThenReset();
+
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
             dyn.stepSimulation(
-                    Math.max(clock.getTimeThenReset(), 1000000f / 60f) / 1000000.f
+                    Math.max(dt, 1000000f / 60f) / 1000000.f
                     //clock.getTimeThenReset()
             );
         }
 
         updateCamera();
 
-
         forEachSpatial(x -> render(x));
+
+        lastFrameTime = dt/1000f;
+        frameListeners.forEach(f-> f.onFrame(this));
+
     }
 
-
-
-
+    /** in seconds */
+    public float getLastFrameTime() {
+        return lastFrameTime;
+    }
 
     //
     // KeyListener
@@ -325,13 +336,13 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     public void setCameraDistance(float dist) {
         final float minCameraDistance = nearPlane;
-        cameraDistance.setValue(Math.max(minCameraDistance, dist));
+        //cameraDistance.setValue(Math.max(minCameraDistance, dist));
     }
 
-    final Matrix3f tmpMat1 = new Matrix3f(); //stack.matrices.get();
-    final Matrix3f tmpMat2 = new Matrix3f(); //stack.matrices.get();
-    final Quat4f roll = new Quat4f(); //stack.quats.get();
-    final Quat4f rot = new Quat4f(); //stack.quats.get();
+//    final Matrix3f tmpMat1 = new Matrix3f(); //stack.matrices.get();
+//    final Matrix3f tmpMat2 = new Matrix3f(); //stack.matrices.get();
+//    final Quat4f roll = new Quat4f(); //stack.quats.get();
+//    final Quat4f rot = new Quat4f(); //stack.quats.get();
 
     public synchronized void updateCamera() {
 //        stack.vectors.push();
@@ -340,42 +351,49 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         gl.glMatrixMode(gl.GL_PROJECTION);
         gl.glLoadIdentity();
-        float rele = ele.floatValue() * 0.01745329251994329547f; // rads per deg
-        float razi = azi.floatValue() * 0.01745329251994329547f; // rads per deg
 
-        QuaternionUtil.setRotation(rot, camUp, razi);
+//        System.out.println(camPos + " " + camUp + " " + camPosTarget);
+//        float rele = ele.floatValue() * 0.01745329251994329547f; // rads per deg
+//        float razi = azi.floatValue() * 0.01745329251994329547f; // rads per deg
 
-        v3 eyePos = v();
-        VectorUtil.setCoord(eyePos, forwardAxis, -cameraDistance.floatValue());
-
-        v3 forward = v(eyePos.x, eyePos.y, eyePos.z);
-        if (forward.lengthSquared() < ExtraGlobals.FLT_EPSILON) {
-            forward.set(1f, 0f, 0f);
-        }
-
-        v3 camRight = v();
-        camRight.cross(camUp, forward);
-        camRight.normalize();
-        QuaternionUtil.setRotation(roll, camRight, -rele);
-
-
-        tmpMat1.set(rot);
-        tmpMat2.set(roll);
-        tmpMat1.mul(tmpMat2);
-        tmpMat1.transform(eyePos);
-
-        camPos.set(eyePos);
+//        QuaternionUtil.setRotation(rot, camUp, razi);
+//        v3 eyePos = v();
+//        VectorUtil.setCoord(eyePos, forwardAxis, -cameraDistance.floatValue());
+//
+//        v3 forward = v(eyePos.x, eyePos.y, eyePos.z);
+//        if (forward.lengthSquared() < ExtraGlobals.FLT_EPSILON) {
+//            forward.set(1f, 0f, 0f);
+//        }
+//
+//        v3 camRight = v();
+//        camRight.cross(camUp, forward);
+//        camRight.normalize();
+//        QuaternionUtil.setRotation(roll, camRight, -rele);
+//
+//
+//        tmpMat1.set(rot);
+//        tmpMat2.set(roll);
+//        tmpMat1.mul(tmpMat2);
+//        tmpMat1.transform(eyePos);
+//
+//        camPos.set(eyePos);
 
         //gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
         //glu.gluPerspective(45, (float) screenWidth / screenHeight, 4, 2000);
         perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight, zNear, zFar);
 
 
-        camDir.sub(camPosTarget, camPos);
-        camDir.normalize();
+//        final v3 camDir = new v3();
+//        camDir.sub(camPosTarget, camPos);
+//        camDir.normalize();
 
-        glu.gluLookAt(camPos.x, camPos.y, camPos.z,
-                camPosTarget.x, camPosTarget.y, camPosTarget.z,
+        //System.out.println(camPos + " -> " + camFwd + " x " + camUp);
+
+//        glu.gluLookAt(camPos.x, camPos.y, camPos.z,
+//                camPosTarget.x, camPosTarget.y, camPosTarget.z,
+//                camUp.x, camUp.y, camUp.z);
+        glu.gluLookAt(camPos.x-camFwd.x, camPos.y-camFwd.y, camPos.z - camFwd.z,
+                camPos.x, camPos.y, camPos.z,
                 camUp.x, camUp.y, camUp.z);
 
 
@@ -529,6 +547,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        }
 
         //LWJGL.postRedisplay();
+
     }
 
     public int getDebug() {
@@ -617,8 +636,8 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
 
         v3 rayFrom = v(camPos);
-        v3 rayForward = v();
-        rayForward.sub(camPosTarget, camPos);
+        v3 rayForward = v(camFwd);
+//        rayForward.sub(camPosTarget, camPos);
         rayForward.normalize();
         rayForward.scale(farPlane);
 
@@ -813,25 +832,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        }
 //    }
 
-    public Dynamics<X> getDyn() {
-        return dyn;
-    }
 
-    public void setCamUp(v3 camUp) {
-        this.camUp.set(camUp);
-    }
-
-    public void setCameraForwardAxis(int axis) {
-        forwardAxis = axis;
-    }
-
-    public v3 getCamPos() {
-        return camPos;
-    }
-
-    public v3 getCamPosTarget() {
-        return camPosTarget;
-    }
 
 
     public void drawString(CharSequence s, int x, int y, Color3f color) {
