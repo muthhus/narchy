@@ -527,7 +527,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable protected final Concept input(@NotNull Task input) {
 
         if (input.isDeleted()) {
-            throw new InvalidTaskException(input, "Deleted");
+            //throw new InvalidTaskException(input, "Deleted");
+            logger.warn("{} deleted", input);
         }
 
         Concept c = null;

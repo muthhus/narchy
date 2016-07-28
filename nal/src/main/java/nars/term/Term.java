@@ -360,7 +360,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             return this.toString().compareTo((/*(Atomic)*/y).toString());
         }
 
-        throw new RuntimeException("ordering ethisception: " + this + ", " + y);
+        throw new RuntimeException("ordering exception: " + this + ", " + y);
     }
 }
 

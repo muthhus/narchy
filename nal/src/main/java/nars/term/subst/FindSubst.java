@@ -8,6 +8,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
+import nars.term.obj.Termject;
 import nars.term.subst.choice.CommutivePermutations;
 import nars.term.subst.choice.Termunator;
 import nars.term.subst.choice.Termutator;
@@ -202,6 +203,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
             final Op xOp = x.op();
 
             switch (xOp) {
+                case OBJECT:
+                    if (!y.op().var)
+                        return ((Termject)x).match(y, this);
+                    break; //continue to end
                 case VAR_INDEP:
                 case VAR_DEP:
                 case VAR_QUERY:
@@ -212,18 +217,18 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                     } else if (matching(xOp))
                         return matchVarX(x, y);
                     else
-                        break; //continue y variable condition below
+                        break; //continue to end
                 case OPER:
                 case ATOM:
                     //Atomic
-                    return false;
+                    break; //continue to end
                 default:
                     //Compound
                     if (y instanceof Compound) {
                         return (xOp == y.op()) &&
                                 ((Compound) x).match((Compound) y, this);
                     }
-                    break;
+                    break; //continue to end
             }
 
             return (matching(y.op())) && matchVarY(x, y);
@@ -276,7 +281,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     /**
      * x's and y's ops already determined inequal
      */
-    private final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
+    public final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
         Term x2 = term(x);
         return (x2 != null) ?
                 match(x2, y) :
@@ -287,7 +292,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     /**
      * x's and y's ops already determined inequal
      */
-    private final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
+    public final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
 
         Term y2 = yx.get(y);
         return (y2 != null) ?
@@ -511,9 +516,13 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     private boolean putCommon(@NotNull Term /* var */ x, @NotNull Term y) {
         Variable commonVar = CommonVariable.make((Variable) x, (Variable) y);
+        return putBidi(x, y, commonVar);
+    }
+
+    public boolean putBidi(@NotNull Term x, @NotNull Term y, Term common) {
         int s = now();
-        if (putXY(x, commonVar)) {
-            if (putYX(y, commonVar)) {
+        if (putXY(x, common)) {
+            if (putYX(y, common)) {
                 return true;
             } else {
                 //restore changed values if putYX fails but putXY succeeded

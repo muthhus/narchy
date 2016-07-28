@@ -85,6 +85,9 @@ public enum Op {
     //-------------
     //NONE('\u2205', Op.ANY, null),
 
+    /** Termject */
+    OBJECT("`", Op.ANY, OpType.Other),
+
     VAR_PATTERN(Symbols.VAR_PATTERN, Op.ANY, OpType.Variable),
 
 

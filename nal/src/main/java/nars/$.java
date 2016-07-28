@@ -169,13 +169,13 @@ public enum $ {
         return (Compound) compound(IMPL, dt, a, b);
     }
 
-    @Nullable
+    @NotNull
     public static Term neg(@NotNull Term x) {
         return terms.negation(x);
     }
 
-    @Nullable public static Term negIf(@NotNull Term x, boolean negate) {
-        if (negate) return neg(x);
+    @Nullable public static Compound negIf(@NotNull Compound x, boolean negate) {
+        if (negate) return (Compound) neg(x);
         return x;
     }
 

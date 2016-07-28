@@ -15,6 +15,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.term.obj.Termject;
+import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +36,13 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> {
                 Map map = new HashMap();
-                return new AtomConcept(a, termbag(map), taskbag(map));
+                switch (a.op()) {
+                    case OBJECT:
+                        return new TermjectConcept<>((Termject)a, termbag(map), taskbag(map));
+                    default:
+                        return new AtomConcept(a, termbag(map), taskbag(map));
+                }
+
             };
 
     private final ConceptPolicy init, awake, sleep;
@@ -53,6 +61,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
         @NotNull Bag<Task> taskbag = taskbag(map);
 
         switch (t.op()) {
+
             case INH:
                 if (Op.isOperation(t))
                     return new OperationConcept(t, termbag, taskbag);

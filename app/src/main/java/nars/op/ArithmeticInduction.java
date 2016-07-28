@@ -15,6 +15,7 @@ import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.obj.Termject;
 import nars.term.var.GenericVariable;
 import nars.util.Texts;
 import nars.util.data.list.FasterList;
@@ -30,6 +31,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import static nars.Op.CONJ;
+import static nars.Op.EQUI;
 import static nars.Op.IMPL;
 import static nars.nal.Tense.DTERNAL;
 
@@ -59,24 +61,30 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     @Nullable
     public static Term intOrNullTerm(Term term) {
-        if (term instanceof Atomic) {
-            int i = Texts.i(term.toString(), Integer.MIN_VALUE);
-            if (i == Integer.MIN_VALUE)
-                return null;
+        if (term instanceof Termject.IntTerm) {
             return term;
         }
+//        if (term instanceof Atomic) {
+//            int i = Texts.i(term.toString(), Integer.MIN_VALUE);
+//            if (i == Integer.MIN_VALUE)
+//                return null;
+//            return term;
+//        }
         return null;
     }
 
     @Nullable
     @Deprecated public static Integer intOrNull(Term term) {
-        if (term instanceof Atomic) {
-
-            int i = Texts.i(term.toString(), Integer.MIN_VALUE);
-            if (i == Integer.MIN_VALUE)
-                return null;
-            return i;
+        if (term instanceof Termject.IntTerm) {
+            return ((Termject.IntTerm)term).val();
         }
+//        if (term instanceof Atomic) {
+//
+//            int i = Texts.i(term.toString(), Integer.MIN_VALUE);
+//            if (i == Integer.MIN_VALUE)
+//                return null;
+//            return i;
+//        }
 //        if (term instanceof Compound && term.op() == Op.SETe) {
 //            Compound c = ((Compound)term);
 //            if (c.size() == 1) {
@@ -96,10 +104,10 @@ public class ArithmeticInduction implements Consumer<Task> {
         } else {
             if ( (b.op() == CONJ) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
 
-                compress(b, true, (features, pattern) -> {
+                compress(b, true, (pattern) -> {
 
                     input(
-                        task(b, $.conj(features, pattern))
+                        task(b, pattern)
                     );
                         /*n.inputLater(
                                 (new MutableTask(
@@ -126,6 +134,9 @@ public class ArithmeticInduction implements Consumer<Task> {
 
             if (b.op()!=CONJ && b.term().hasAny(CONJ)) {
 
+                if (b.op() == EQUI) //HACK avoid EQUIVALENCE for now
+                    return;
+
                 //attempt to transform inner conjunctions
                 Map<ByteList, Compound> conjs = $.newHashMap();
 
@@ -140,9 +151,9 @@ public class ArithmeticInduction implements Consumer<Task> {
                 //TODO see if duplicates exist and can be merged into one substitution
 
                 conjs.forEach((pp,vv) -> {
-                    compress(vv, !b.op().statement, (features, pattern) -> {
+                    compress(vv, !b.op().statement, (fp) -> {
 
-                        @Nullable Term fp = $.conj(features, pattern);
+
                         if (fp == null)
                             return;
 
@@ -181,7 +192,7 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
 
-    protected void compress(Termed<Compound> b, boolean varDep, BiConsumer<List<Term>,Term> each) {
+    protected void compress(Termed<Compound> b, boolean varDep, Consumer<Term> each) {
         Compound<?> bt = b.term();
         TermContainer<?> subs = bt.subterms();
         int negs = subs.count(x -> x.op() == Op.NEG);
@@ -264,9 +275,9 @@ public class ArithmeticInduction implements Consumer<Task> {
 
                 final int[] var = {0};
 
-                List<Term> features = $.newArrayList();
+                //List<Term> features = $.newArrayList();
                 final Compound[] pattern = {(Compound)first};
-                final Term[] vv = { var(0, varDep) };
+                //@Deprecated final Term[] vv = { var(0, varDep) };
 
                 numbers.forEach((ppp, nnnt) -> {
 
@@ -278,25 +289,26 @@ public class ArithmeticInduction implements Consumer<Task> {
 
                             //System.out.println(b + " " + pp + " " + nn + " : " + "\t" + numbers + " " + pattern);
 
-                            List<Term> ff = features(nnn, vv[0]);
-                            if (!ff.isEmpty()) {
-                                features.addAll(ff);
+                            List<Term> fff = features(nnn);
+                            if (!fff.isEmpty()) {
+                                for (Term ff : fff) {
 
-                                //introduce variable
-                                pattern[0] = (Compound) $.terms.transform(pattern[0], ppp, vv[0]);
+                                    //introduce variable
+                                    Compound r = (Compound) $.negIf(
+                                                    (Compound) $.terms.transform(pattern[0], ppp, ff),
+                                                    negate
+                                                 );
+                                    each.accept(r);
+
+                                }
 
                                 //increment variable
-                                vv[0] = var(++var[0], varDep);
+                                //vv[0] = var(++var[0], varDep);
                             }
                         }
                     }
                 });
 
-                if (!features.isEmpty()) {
-                    @Nullable Term p = $.negIf(pattern[0], negate);
-                    if (p!=null)
-                        each.accept(features, p);
-                }
 
             }
 
@@ -305,13 +317,13 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     }
 
-    protected final GenericVariable var(int i, boolean varDep) {
-        return new GenericVariable(varDep ? Op.VAR_DEP : Op.VAR_INDEP, Integer.toString(i));
-    }
+    //protected final GenericVariable var(int i, boolean varDep) {
+        //return new GenericVariable(varDep ? Op.VAR_DEP : Op.VAR_INDEP, Integer.toString(i));
+    //}
 
-    private List<Term> features(IntArrayList numbers, Term relatingVar) {
+    private List<Term> features(IntArrayList numbers) {
         FasterList<Term> ll = $.newArrayList(0);
-        ll.addIfNotNull(iRange(numbers, relatingVar));
+        ll.addIfNotNull(iRange(numbers));
 
         //...
 
@@ -321,7 +333,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     final static Operator intRange = $.oper("intRange");
 
-    public Term iRange(IntArrayList l, Term relatingVariable) {
+    public Term iRange(IntArrayList l) {
 
         int min = l.min();
         int max = l.max();
@@ -337,7 +349,8 @@ public class ArithmeticInduction implements Consumer<Task> {
 
         //return $.$("l1Dist(" + $.varDep(1) + ", " + (Math.abs(x - y)) + ")");
 
-        return $.exec(intRange, relatingVariable, $.p($.the(min), $.the(max-min)));
+        //return $.exec(intRange, relatingVariable, $.p($.the(min), $.the(max-min)));
+        return new Termject.IntPred.IntInterval(min, max);
     }
 
 

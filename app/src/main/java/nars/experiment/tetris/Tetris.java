@@ -38,6 +38,7 @@ import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Termed;
+import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 
@@ -50,7 +51,7 @@ import static nars.experiment.pong.Pong.numericSensor;
 
 public class Tetris extends TetrisState implements Environment {
 
-    public static final int runCycles = 10000;
+    public static final int runCycles = 100;
     public static final int cyclesPerFrame = 64;
     static int frameDelay = 50;
 
@@ -131,7 +132,7 @@ public class Tetris extends TetrisState implements Environment {
                 int y = y(i);
 
                 //Compound squareTerm = $.inh($.p($.the(x), $.the(y)), $.the("t"));
-                Compound squareTerm = $.p($.the(x), $.the(y));
+                Compound squareTerm = $.p(new Termject.IntTerm(x), new Termject.IntTerm(y));
                 return squareTerm;
 
 //                int dx = (visionRadius  ) - ax;
