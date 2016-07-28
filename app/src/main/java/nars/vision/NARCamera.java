@@ -14,6 +14,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.term.obj.Termject;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.signal.MotorConcept;
@@ -441,7 +442,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 //					$.seti($.the(c1), $.the(c2), $.the(area)) :
 //					$.seti($.the(c1), $.the(c2) );
         Term d = level > 0 ?
-                $.secte($.the(c1), $.the(c2), $.the(area)) :
+                $.secte($.the(c1), $.the(c2), new Termject.IntTerm(area)) :
                 $.secte($.the(c1), $.the(c2));
 
         //Term dir = $.p(d,$.the(area));

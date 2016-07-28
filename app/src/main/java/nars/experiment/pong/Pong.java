@@ -15,10 +15,12 @@ import nars.concept.Concept;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
+import nars.gui.NARSpace;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.time.FrameClock;
@@ -41,14 +43,16 @@ import java.util.List;
 public class Pong extends Player implements Environment {
 
     static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
+    public static final int runCycles = 256;
+    public static final int cycleDelay = 20;
     static boolean loadKnowledgeFromFile = false;
 
     int actions = 3;
 
     boolean trace = true;
 
-    final int width = 7;
-    final int height = 7;
+    final int width = 16;
+    final int height = 16;
     final int pixels = width * height;
     final int scaleX = (int) (24f * 20 / width);
     final int scaleY = (int) (24f * 16 / width);
@@ -67,22 +71,23 @@ public class Pong extends Player implements Environment {
         //Multi nar = new Multi(2,
         Default nar = new Default(
                 1024, 3, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 300000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 50000000, false)
                 //new Cache2kIndex(250000, rng)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)
                 //new Indexes.SoftTermIndex(128 * 1024, rng)
                 //new Indexes.DefaultTermIndex(128 *1024, rng)
                 , new FrameClock());
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.6f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(32);
         nar.inputActivation.setValue(0.1f);
-        nar.confMin.setValue(0.05f);
+        nar.derivedActivation.setValue(0.1f);
+        nar.confMin.setValue(0.03f);
 
 
         List<SensorConcept> cheats = new ArrayList();
@@ -96,6 +101,9 @@ public class Pong extends Player implements Environment {
                 if (nar instanceof Default) {
                     BagChart.show((Default) nar, 256);
                     beliefChart(this, cheats);
+
+                    //NARSpace.newConceptWindow((Default) nar, 64, 6);
+
                 }
             }
 
@@ -121,8 +129,9 @@ public class Pong extends Player implements Environment {
 
         //new Abbreviation2(nar, "_");
         {
-            new MySTMClustered(nar, 256, '.', 3);
+            new MySTMClustered(nar, 256, '.', 5);
             new MySTMClustered(nar, 256, '!', 3);
+            //new ArithmeticInduction(nar);
         }
 
 
@@ -133,7 +142,7 @@ public class Pong extends Player implements Environment {
 
         //nar.logSummaryGT(System.out, 0.25f);
 
-        e.run(a, 256 * 16);
+        e.run(a, runCycles, cycleDelay);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
@@ -402,7 +411,7 @@ public class Pong extends Player implements Environment {
         Compound q = (Compound) NARCamera.quadp(0, x, y, width, height);
         //Compound n = $.inh(q, $.the("w"));
 
-        System.out.println(" (" + x + "," + y + ") " + q);
+        //System.out.println(" (" + x + "," + y + ") " + q);
         return q;
 
 

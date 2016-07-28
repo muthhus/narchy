@@ -485,17 +485,21 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
     public void addConstraint(TypedConstraint constraint, boolean disableCollisionsBetweenLinkedBodies) {
-        constraints.add(constraint);
-        if (disableCollisionsBetweenLinkedBodies) {
-            constraint.getRigidBodyA().addConstraintRef(constraint);
-            constraint.getRigidBodyB().addConstraintRef(constraint);
+        synchronized (constraints) {
+            constraints.add(constraint);
+            if (disableCollisionsBetweenLinkedBodies) {
+                constraint.getRigidBodyA().addConstraintRef(constraint);
+                constraint.getRigidBodyB().addConstraintRef(constraint);
+            }
         }
     }
 
     public void removeConstraint(TypedConstraint constraint) {
-        constraints.remove(constraint);
-        constraint.getRigidBodyA().removeConstraintRef(constraint);
-        constraint.getRigidBodyB().removeConstraintRef(constraint);
+        synchronized (constraints) {
+            constraints.remove(constraint);
+            constraint.getRigidBodyA().removeConstraintRef(constraint);
+            constraint.getRigidBodyB().removeConstraintRef(constraint);
+        }
     }
 
 
