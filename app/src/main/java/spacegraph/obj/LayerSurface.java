@@ -3,7 +3,7 @@ package spacegraph.obj;
 import spacegraph.Surface;
 
 /**
- * Created by me on 7/20/16.
+ * TODO
  */
 public class LayerSurface extends LayoutSurface {
 

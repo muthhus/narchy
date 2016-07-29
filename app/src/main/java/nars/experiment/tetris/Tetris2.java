@@ -26,13 +26,14 @@ import java.util.*;
 import static nars.$.t;
 import static nars.experiment.pong.Pong.numericSensor;
 import static nars.experiment.tetris.TetrisState.*;
+import static spacegraph.obj.ControlSurface.newControlWindow;
 
 /**
  * Created by me on 7/28/16.
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int runCycles = 128;
+    public static final int runCycles = 512;
     public static final int cyclesPerFrame = 128;
     static int frameDelay = 10;
 
@@ -228,7 +229,10 @@ public class Tetris2 extends NAREnvironment {
                 charted.add(happy);
                 new BeliefTableChart(nar, charted).show(600, 200);
 
+
                 BagChart.show((Default) nar, 512);
+
+                newControlWindow(this);
 
                 //STMView.show(stm, 800, 600);
 

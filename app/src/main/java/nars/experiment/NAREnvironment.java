@@ -31,6 +31,7 @@ import static nars.util.Texts.n4;
  */
 abstract public class NAREnvironment {
 
+
     public final SensorConcept happy;
     private final float reinforcementAttention;
     public NAR nar;
@@ -38,7 +39,10 @@ abstract public class NAREnvironment {
     public final FuzzyConceptSet reward;
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<MotorConcept> actions = $.newArrayList();
+
     public float alpha, gamma, epsilon;
+    @Deprecated public static final float gammaEpsilonFactor = 0.66f;
+
     private float rewardValue;
     private final FasterList<MutableTask> predictors = $.newArrayList();
     private boolean trace = true;
@@ -119,14 +123,14 @@ abstract public class NAREnvironment {
 //                             + "," +
 //                     n4( happy.beliefs().truth(now).motivation() )
 //                 + "] "
-                "rwrd=" + n4(rewardValue) + "\t" +
-                 "hapy=" + n4(emotion.happy()) + " "
+                  "rwrd=" + n4(rewardValue) + "\t" +
+                  "hapy=" + n4(emotion.happy()) + " "
                 + "busy=" + n4(emotion.busy.getSum()) + " "
                 + "lern=" + n4(emotion.learning()) + " "
                 + "strs=" + n4(emotion.stress.getSum()) + " "
                 + "alrt=" + n4(emotion.alert.getSum()) + " "
                 + " var=" + n4( varPct(nar) ) + " "
-                + "\t" + nar.index.summary()
+                   + "\t" + nar.index.summary()
 
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());
@@ -201,7 +205,7 @@ abstract public class NAREnvironment {
                     nar.inputLater(new MutableTask(c, '!',
                             nar.random.nextFloat()
                             //Math.random() > 0.5f ? 1f : 0f
-                            , gamma/2f).
+                            , gamma * gammaEpsilonFactor).
                             present(now).log("Curiosity"));
                 }
                 boost(c);
