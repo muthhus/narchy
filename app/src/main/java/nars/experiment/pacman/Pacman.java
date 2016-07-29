@@ -62,7 +62,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 	final int visionRadius;
 	final int itemTypes = 3;
 	final static int runCycles = 15500;
-	final static int runDelay = 50 /* ms */;
+	final static int runDelay = 500 /* ms */;
 
 	boolean trace = true;
 

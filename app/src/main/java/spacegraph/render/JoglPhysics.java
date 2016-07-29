@@ -32,23 +32,22 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
 import nars.$;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
 import spacegraph.math.Color3f;
-import spacegraph.math.Matrix3f;
-import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
-import spacegraph.phys.*;
+import spacegraph.phys.Collidable;
+import spacegraph.phys.Dynamic;
+import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.DefaultCollisionConfiguration;
 import spacegraph.phys.collision.DefaultIntersecter;
 import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.phys.collision.broad.DbvtBroadphase;
 import spacegraph.phys.collision.broad.Intersecter;
-import spacegraph.phys.math.*;
+import spacegraph.phys.math.Clock;
+import spacegraph.phys.math.DebugDrawModes;
+import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.CollisionShape;
-import spacegraph.phys.util.AnimFloat;
-import spacegraph.phys.util.AnimFloatAngle;
 import spacegraph.phys.util.AnimVector3f;
 import spacegraph.phys.util.Motion;
 
@@ -66,8 +65,23 @@ import static spacegraph.math.v3.v;
 abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListener, KeyListener {
 
 
+    private final float cameraSpeed = 5f;
+    private final float cameraRotateSpeed = 5f;
     private boolean simulating = true;
     private float lastFrameTime;
+
+
+    public void camera(v3 target, float distance) {
+        v3 fwd = v();
+
+        fwd.sub(target, camPos);
+        fwd.normalize();
+        camFwd.set(fwd);
+
+        fwd.scale(distance);
+        camPos.sub(target, fwd);
+
+    }
 
     public interface FrameListener {
         public void onFrame(JoglPhysics j);
@@ -105,7 +119,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     protected int debug = 0;
 
 
-    public final v3 camPos = new v3();
+    public final v3 camPos;
     public final v3 camFwd;
     public final v3 camUp;
 //    public final MutableFloat cameraDistance;
@@ -170,9 +184,9 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        azi = new AnimFloatAngle(-180, dyn, 30f);
 //        ele = new AnimFloatAngle(20, dyn, 30f);
 
-        camPos.set(0, 0, 5);
-        camFwd = new v3(0, 0, -1); //new AnimVector3f(0,0,1,dyn, 10f);
-        camUp = new v3(0, 1, 0); //new AnimVector3f(0f, 1f, 0f, dyn, 1f);
+        camPos = new AnimVector3f(0, 0, 5, dyn, cameraSpeed);
+        camFwd = new AnimVector3f(0, 0, -1, dyn, cameraRotateSpeed); //new AnimVector3f(0,0,1,dyn, 10f);
+        camUp = new AnimVector3f(0, 1, 0, dyn, cameraRotateSpeed); //new AnimVector3f(0f, 1f, 0f, dyn, 1f);
 
         dyn.setGravity(v(0, 0, 0));
 
@@ -334,10 +348,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     //
     //
 
-    public void setCameraDistance(float dist) {
-        final float minCameraDistance = nearPlane;
-        //cameraDistance.setValue(Math.max(minCameraDistance, dist));
-    }
 
 //    final Matrix3f tmpMat1 = new Matrix3f(); //stack.matrices.get();
 //    final Matrix3f tmpMat2 = new Matrix3f(); //stack.matrices.get();

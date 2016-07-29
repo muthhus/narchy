@@ -9,6 +9,7 @@ import spacegraph.math.Vector2f;
 import spacegraph.render.Draw;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static spacegraph.obj.GridSurface.VERTICAL;
 
 /**
  * Created by me on 6/26/16.
@@ -43,11 +44,13 @@ public class SliderSurface extends Surface {
         SpaceGraph<?> s = new SpaceGraph();
         s.add( new RectWidget(
                 new GridSurface(
-                    new GridSurface(GridSurface.HORIZONTAL,
-                        new XYSlider(), new XYSlider()
+                    new GridSurface(
+                        new XYSlider(), new XYSlider(), new XYSlider()
                     ),
-                    new GridSurface(GridSurface.VERTICAL,
-                        new SliderSurface(0.75f, 0, 1), new SliderSurface(0.25f, 0, 1), new SliderSurface(0.5f, 0, 1)
+                    new GridSurface(VERTICAL,
+                        new SliderSurface(0.75f, 0, 1),
+                        new SliderSurface(0.25f, 0, 1),
+                        new SliderSurface(0.5f, 0, 1)
                     )
                 ), 8f /* width */, 6 /* height */
         ) );

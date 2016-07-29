@@ -12,6 +12,7 @@ import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.Spatial;
+import spacegraph.math.v3;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -224,6 +225,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public GL2 gl() {
         return gl;
     }
+
 
 
 

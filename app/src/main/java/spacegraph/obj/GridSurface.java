@@ -16,14 +16,14 @@ public class GridSurface extends LayoutSurface {
 
     public static final float HORIZONTAL = 0f;
     public static final float VERTICAL = Float.POSITIVE_INFINITY;
-    public static final float GRID_SQUARE = 0.25f;
+    public static final float SQUARE = 0.5f;
 
     public GridSurface(Surface... children) {
-        this(0f, children);
+        this(SQUARE, children);
     }
 
     public GridSurface(List<? extends Surface> children) {
-        this(children, 0f);
+        this(children, SQUARE);
     }
 
     public GridSurface(float aspect, Surface... children) {
@@ -47,7 +47,10 @@ public class GridSurface extends LayoutSurface {
         if (n == 0)
             return;
 
+
         float a = aspect.floatValue();
+        if (n < 3)
+            a = 0; //use linear layout for small n
 
         float margin = 0.05f;
 
@@ -57,25 +60,58 @@ public class GridSurface extends LayoutSurface {
             layoutLinear(0f, 1f/n, margin);
         } else {
             //HACK: pretends a = 0.5f;
-            int x = (int)Math.ceil(Math.sqrt(n));
-            int y = n / x;
-            layoutGrid(x, y);
+            int x = (int)Math.max(1, Math.ceil(Math.sqrt(n)));
+            int y = (int)Math.max(1, Math.ceil((float)n / x));
+            layoutGrid(x, y, margin);
         }
     }
 
-    private void layoutGrid(int x, int y) {
-        throw new UnsupportedOperationException();
+    private void layoutGrid(int nx, int ny, float margin) {
+        int i = 0;
+        float content = 1f - margin;
+
+        float px, py = margin/2f;
+        float dx = 1f/nx;
+        float dxc = dx * content;
+        float dy = 1f/ny;
+        float dyc = dy * content;
+        int n = children.size();
+        System.out.println(nx + " " + ny + " x " + dx + " " + dy);
+
+        for (int y = 0; y < ny; y++) {
+
+            px = margin/2f;
+
+            for (int x = 0; x < nx; x++) {
+                System.out.println("\t" + px + " " + py);
+
+                Surface c = children.get(i);
+
+                c.translateLocal.set(px, py, 0);
+                c.scaleLocal.set(dxc, dyc);
+                px += dx;
+
+                i++;
+                if (i >= n) break;
+            }
+
+            if (i >= n) break;
+            py += dy;
+
+        }
     }
 
     protected void layoutLinear(float dx, float dy, float margin) {
         float content = 1f - margin;
         float x = margin/2f;
         float y = margin/2f;
+        float dxc = dx != 0 ? dx * content : content;
+        float dyc = dy != 0 ? dy * content : content;
         int n = children.size();
         for (int i = 0; i < n; i++) {
             Surface c = children.get(i);
             c.translateLocal.set(x, y, 0);
-            c.scaleLocal.set(dx!=0 ? dx * content : content, dy!=0 ? dy * content : content);
+            c.scaleLocal.set(dxc, dyc);
             x += dx;
             y += dy;
         }

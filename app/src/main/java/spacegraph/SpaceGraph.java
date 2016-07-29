@@ -446,7 +446,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             super(g);
 
 
-            float speed = 0.25f;
+            float speed = 4f;
             watch(KeyEvent.VK_NUMPAD4, (dt)-> {
                 moveX(speed);
             }, null);
@@ -553,7 +553,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                         (float)(cos(this.v) * cos(h))
                 );
 
-                System.out.println("set direction: " + direction);
+                //System.out.println("set direction: " + direction);
 
                 space.camFwd.set(direction);
 
@@ -604,12 +604,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
                         v3 objTarget = co.getWorldOrigin();
-                        //space.camPosTarget.set(objTarget);
 
-                        space.setCameraDistance(
-                                co.shape().getBoundingRadius() * 1.25f + space.nearPlane * 1.25f
-                        );
-
+                        space.camera(objTarget, co.shape().getBoundingRadius() * 1.25f + space.nearPlane * 1.25f);
 
                     }
                 }

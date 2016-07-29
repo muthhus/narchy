@@ -8,55 +8,51 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.*;
-
-import static org.reflections.ReflectionUtils.withParametersAssignableTo;
-import static org.reflections.ReflectionUtils.withTypeAssignableTo;
 
 /**
  * Generic widget control panel for arbitrary POJOs
  */
 public class ControlSurface extends GridSurface {
 
+    private static final int DEFAULT_DEPTH = 2;
     /** the object being controlled */
     public Object o;
     private Map fields;
     private Map methods;
-    final Set<Object> built = new HashSet();
+    final IdentityHashMap built;
 
     public static void newControlWindow(Object o) {
         SpaceGraph<?> s = new SpaceGraph();
         s.add( new RectWidget(
-                new ControlSurface(o), 8f /* width */, 16f /* height */
+                new ControlSurface(o), 16f /* width */, 16f /* height */
         ) );
 
         //s.add(new Facial(new ConsoleSurface(new ConsoleSurface.DummyTerminal(80, 25))).scale(500f, 400f));
         s.add(new Facial(new CrosshairSurface(s)));
-        s.show(800, 800);
+        s.show(1200, 800);
     }
 
     public ControlSurface(Object o) {
-        this("", o);
+        this(o.toString(), o, DEFAULT_DEPTH,  null);
     }
 
-    public ControlSurface(String label, Object o) {
-        super(VERTICAL);
+    public ControlSurface(Object label, Object o, int maxDepth, IdentityHashMap built) {
+        super(0.5f);
 
-        reset(label, o);
+        this.built = built == null ?  new IdentityHashMap() : built;
+        reset(label, o, maxDepth);
     }
 
-    private synchronized void reset(String label, Object o) {
+
+    private synchronized void reset(Object label, Object o, int maxDepth) {
         this.o = o;
 
         built.clear();
-        setChildren(build(label, o));
+        setChildren(build(label, o, maxDepth, built));
     }
 
-    private synchronized Surface build(Object K, Object V) {
-        if (!built.add(V))
-            return null;
-
+    private synchronized List<Surface> build(Object K, Object V, int remainingDepth, IdentityHashMap built) {
 
 
         FasterList<Surface> w = $.newArrayList();
@@ -70,18 +66,38 @@ public class ControlSurface extends GridSurface {
         w.add(vc);
 
 
-        fields = OgnlRuntime.getFields(o.getClass());
+        Class<?> aClass = o.getClass();
+        fields = OgnlRuntime.getFields(aClass);
         fields.forEach((k,v) -> {
-            w.addIfNotNull(build(k,v));
+            w.addIfNotNull(field(remainingDepth-1, k, v, built));
         });
-        methods = OgnlRuntime.getMethods(o.getClass(), false);
 
+        methods = OgnlRuntime.getMethods(aClass, false);
         methods.forEach((k, v) -> {
-            w.addIfNotNull(build(k, v));
+            w.addIfNotNull(method(remainingDepth-1, k, v, built));
         });
 
-        GridSurface g = new GridSurface(w, Math.random() < 0.5 ? VERTICAL : HORIZONTAL);
-        return g;
+        return w;
+    }
+
+    private Surface field(int remainingDepth, Object k, Object v, IdentityHashMap built) {
+        if (alreadyAdded(remainingDepth, v, built)) return null;
+        return new ControlSurface(k, v, remainingDepth, built);
+    }
+
+
+    private Surface method(int remainingDepth, Object k, Object v, IdentityHashMap built) {
+        if (alreadyAdded(remainingDepth, v, built)) return null;
+        return new ControlSurface(k, v, remainingDepth, built);
+    }
+
+
+    private boolean alreadyAdded(int remainingDepth, Object v, IdentityHashMap built) {
+        if (remainingDepth <= 0)
+            return true;
+        if (built.putIfAbsent(v,v)!=null)
+            return true;
+        return false;
     }
 
 }

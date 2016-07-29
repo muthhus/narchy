@@ -230,7 +230,7 @@ public class Tetris2 extends NAREnvironment {
                 new BeliefTableChart(nar, charted).show(600, 200);
 
 
-                BagChart.show((Default) nar, 512);
+                //BagChart.show((Default) nar, 512);
 
                 newControlWindow(this);
 
