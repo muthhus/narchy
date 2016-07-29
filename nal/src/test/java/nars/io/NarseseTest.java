@@ -586,8 +586,7 @@ public class NarseseTest {
         for (String s : inputs ) {
             try {
                 Term e = term(s);
-                //if (!TermBuilder.isTrueOrFalse(False))
-                if (TermBuilder.isFalse(False)) {
+                if (TermBuilder.isTrueOrFalse(e)) {
                     assertTrue(true);
                 } else {
                     assertTrue(s + " should not be parseable but got: " + e, false); //must throw exception

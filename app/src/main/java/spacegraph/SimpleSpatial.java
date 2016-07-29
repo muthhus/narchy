@@ -1,7 +1,6 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
-import javafx.scene.paint.Color;
 import nars.$;
 import nars.util.Util;
 import spacegraph.math.Quat4f;
@@ -35,16 +34,12 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public float radius = 0;
     private List<Collidable<X>> bodies = Collections.emptyList();
 
-    protected float shapeA;
-    protected float shapeR;
-    protected float shapeG;
-    protected float shapeB;
+    protected float[] shapeColor;
 
     public SimpleSpatial(X x) {
         super(x);
 
-        shapeA = 0.9f;
-        shapeR = shapeG = shapeB = 0.5f; //gray
+        shapeColor = new float[] { 0.5f, 0.5f, 0.5f, 0.9f };
         this.shape = newShape();
 
         this.label = key!=null ? key.toString() : super.toString();
@@ -104,14 +99,6 @@ public class SimpleSpatial<X> extends Spatial<X> {
         rotate(target, speed, tmp);
     }
 
-    public void colorShape(float h, float s, float b, float a) {
-        //TODO use a LUT matrix instaed of this shitty Color function
-        Color c = Color.hsb(360*h, s, b);
-        shapeR = (float)c.getRed();
-        shapeG = (float)c.getGreen();
-        shapeB = (float)c.getBlue();
-        shapeA = a;
-    }
 
     public void rotate(Quat4f target, float speed, Quat4f tmp) {
         if (motionLock)
@@ -247,12 +234,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
     }
 
     protected void colorshape(GL2 gl) {
-
-        gl.glColor4f(
-                shapeR,
-                shapeG,
-                shapeB,
-                shapeA);
+        gl.glColor4fv(shapeColor, 0);
     }
 
 

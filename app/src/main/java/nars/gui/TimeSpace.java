@@ -15,6 +15,7 @@ import spacegraph.*;
 import spacegraph.layout.Flatten;
 import spacegraph.obj.RectWidget;
 import spacegraph.obj.XYSlider;
+import spacegraph.render.Draw;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -86,7 +87,7 @@ public class TimeSpace extends NARSpace implements TriConsumer<NAR, SpaceGraph, 
             };
 
             Value vv = (Value) o;
-            s.colorShape(vv.id.hashCode()/1000f, 0.5f, 0.5f, 0.8f);
+            //Draw.hsb(vv.id.hashCode()/1000f, 0.5f, 0.5f, 0.8f, shapeColor);
             return s;
 
         } else if (o instanceof Value) {
@@ -99,7 +100,7 @@ public class TimeSpace extends NARSpace implements TriConsumer<NAR, SpaceGraph, 
 
             };
             Value vv = (Value) o;
-            s.colorShape(vv.id.hashCode()/1000f, 0.5f, 0.5f, 0.8f);
+            //s.colorShape(vv.id.hashCode()/1000f, 0.5f, 0.5f, 0.8f);
             return s;
         }
         return null;

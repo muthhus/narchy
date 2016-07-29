@@ -2,23 +2,22 @@ package spacegraph.obj;
 
 import nars.$;
 import nars.util.data.list.FasterList;
-import ognl.OgnlException;
-import ognl.OgnlRuntime;
 import org.infinispan.cdi.common.util.Reflections;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
  * Generic widget control panel for arbitrary POJOs
  */
-public class ControlSurface extends GridSurface {
+public class ControlSurface extends PanelSurface {
 
-    private static final int DEFAULT_DEPTH = 3;
+    private static final int DEFAULT_DEPTH = 2;
     /** the object being controlled */
     public Object o;
 
@@ -41,31 +40,22 @@ public class ControlSurface extends GridSurface {
     }
 
     public ControlSurface(Object label, Object o, int maxDepth, IdentityHashMap built) {
-        super(HORIZONTAL);
+        super(label.toString(), new GridSurface());
 
         this.built = built == null ?  new IdentityHashMap() : built;
-        reset(label, o, maxDepth);
-    }
 
-
-    private synchronized void reset(Object label, Object o, int maxDepth) {
         this.o = o;
 
-        built.clear();
-        built.put(o, o);
+        this.built.put(o, o);
 
-        FasterList<Surface> subs = $.newArrayList();
-        children(o, maxDepth, built, subs);
 
-        Surface content = build(label, o, maxDepth);
-        if (subs.isEmpty()) {
-            setChildren(content);
-        } else {
-            setChildren(content, new GridSurface(subs));
-        }
+
+        bottom().setChildren(build(label, o, maxDepth, this.built));
     }
 
-    protected Surface build(Object k, Object v, int remainingDepth) {
+
+
+    protected Surface build(Object k, Object v, int remainingDepth, IdentityHashMap built) {
 
 
 //        ConsoleSurface vc = new ConsoleSurface(24, 4);
@@ -76,11 +66,17 @@ public class ControlSurface extends GridSurface {
 //        }
         if (v instanceof Surface) {
             return ((Surface) v);
-        } //else if (v instanceof String) {
+        } else if (v.getClass().isPrimitive()) {
             return new LabelSurface(k.toString());
-         /*else {
-            return new ControlSurface(k, v, remainingDepth, built);
-        }*/
+        } else {
+            if (v == o) {
+                return new GridSurface(children(o, remainingDepth, built));
+            } else if (remainingDepth > 1) {
+                return new ControlSurface(k, v, remainingDepth, built);
+            } else {
+                return new LabelSurface(k.toString());
+            }
+        }
 
 
 
@@ -90,10 +86,7 @@ public class ControlSurface extends GridSurface {
 
     }
 
-    private void children(Object V, int remainingDepth, IdentityHashMap built, FasterList<Surface> w) {
-
-
-
+    private FasterList<Surface> children(Object V, int remainingDepth, IdentityHashMap built) {
 
 
         Class<?> aClass = o.getClass();
@@ -112,41 +105,58 @@ public class ControlSurface extends GridSurface {
 //            w.addIfNotNull(field(remainingDepth-1, k, v, built));
 //        });
 
+        FasterList<Surface> w = $.newArrayList();
+
         Set<Field> fields = Reflections.getAllDeclaredFields(aClass);
         for (Field f : fields) {
-            try {
-                w.addIfNotNull(field(remainingDepth-1, f, f.get(o), built));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+
+            if (f.getDeclaringClass()!=Object.class) {
+                if (Modifier.isPublic(f.getModifiers())) {
+                    try {
+                        w.addIfNotNull(field(remainingDepth - 1, f, f.get(V), built));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
+        try {
+            Set<Method> methods = Reflections.getAllDeclaredMethods(aClass);
+            methods.forEach((m) -> {
+                if (m.getDeclaringClass() != Object.class) {
+                    if (Modifier.isPublic(m.getModifiers())) {
+                        w.addIfNotNull(method(remainingDepth - 1, m.getName(), m, built));
+                    }
+                }
+            });
+        } catch (NoClassDefFoundError e) {
 
-        Map methods = OgnlRuntime.getMethods(aClass, false);
-        methods.forEach((k, v) -> {
-            w.addIfNotNull(method(remainingDepth-1, k, v, built));
-        });
+        }
 
+        return w;
 
     }
 
     private Surface field(int remainingDepth, Object k, Object v, IdentityHashMap built) {
+        if (v == null)
+            return new LabelSurface("null");
         if (alreadyAdded(remainingDepth, v, built)) return null;
-        return build(k, v, remainingDepth);
+        return build(k, v, remainingDepth, built);
     }
 
 
     private Surface method(int remainingDepth, Object k, Object v, IdentityHashMap built) {
         if (alreadyAdded(remainingDepth, v, built)) return null;
-        return build(k, v, remainingDepth);
+        return build(k, v, remainingDepth, built);
     }
 
 
     private synchronized boolean alreadyAdded(int remainingDepth, Object v, IdentityHashMap built) {
         if (remainingDepth <= 0)
             return true;
-        if (built.putIfAbsent(v,v)!=null)
+        if (v == null)
             return true;
-        return false;
+        return built.putIfAbsent(v, v) != null;
     }
 
 }

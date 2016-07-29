@@ -76,7 +76,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         scale(nodeScale, nodeScale, nodeScale / 6f);
 
 
-        colorShape( (tt.op().ordinal()/16f), 0.75f, 0.75f  , 0.25f + 0.5f * p);
+        Draw.hsb( (tt.op().ordinal()/16f), 0.75f, 0.75f  , 0.25f + 0.5f * p, shapeColor);
 
         Concept cc = nar.concept(tt);
         if (cc == null) {

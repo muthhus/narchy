@@ -64,7 +64,7 @@ public interface Termject<X> extends Atomic {
     }
 
     /** when called, equality to this term has already been tested */
-    abstract boolean match(Term y, FindSubst f);
+    boolean match(Term y, FindSubst f);
 
     abstract class PrimTermject<X> implements Termject<X> {
 
@@ -98,7 +98,7 @@ public interface Termject<X> extends Atomic {
 
     }
 
-    public static class IntTerm extends PrimTermject<Integer> {
+    class IntTerm extends PrimTermject<Integer> {
 
         public IntTerm(Integer val) {
             super(val);
@@ -163,7 +163,7 @@ public interface Termject<X> extends Atomic {
 
     }
 
-    public static class IntInterval extends PrimTermject<Range<Integer>> {
+    class IntInterval extends PrimTermject<Range<Integer>> {
 
 
         public IntInterval(int a, int b) {
@@ -261,7 +261,7 @@ public interface Termject<X> extends Atomic {
 
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         NAR n = new Default();
         n.log();
 

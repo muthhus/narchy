@@ -42,11 +42,17 @@ public class TetrisVisualizer extends Surface {
 	}
 
 	public TetrisVisualizer(TetrisState t, int blockSize) {
+		this(t, blockSize, true);
+	}
+	public TetrisVisualizer(TetrisState t, int blockSize, boolean newWindow) {
 		super();
 
-		SpaceGraph s = new SpaceGraph();
-		s.show(t.getWidth() * blockSize, t.getHeight() * blockSize);
-		s.add(new Facial(this).maximize());
+
+		if (newWindow) {
+			SpaceGraph s = new SpaceGraph();
+			s.show(t.getWidth() * blockSize, t.getHeight() * blockSize);
+			s.add(new Facial(this).maximize());
+		}
 
 		tetris = t;
 		this.blockSize = blockSize;

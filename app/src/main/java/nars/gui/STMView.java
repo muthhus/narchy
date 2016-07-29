@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.layout.treechart.ItemVis;
 import spacegraph.obj.ConsoleSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.LayerSurface;

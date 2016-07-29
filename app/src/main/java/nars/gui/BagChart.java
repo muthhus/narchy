@@ -11,8 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
-import spacegraph.layout.treechart.ItemVis;
-import spacegraph.layout.treechart.TreemapChart;
+import spacegraph.layout.TreeChart;
 import spacegraph.obj.CrosshairSurface;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,7 +20,7 @@ import java.util.function.BiConsumer;
 /**
  * Created by me on 6/29/16.
  */
-public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BLink<X>, ItemVis<BLink<X>>> {
+public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink<X>, TreeChart.ItemVis<BLink<X>>> {
 
 
     protected long now;
@@ -43,6 +42,18 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
     }
 
     public static void show(Default d, int count) {
+        BagChart<Concept> tc = newBagChart(d, count);
+        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
+
+
+        s.show(1400, 800);
+
+
+        s.add(new Facial(tc).maximize());
+        s.add(new Facial(new CrosshairSurface(s)));
+    }
+
+    public static BagChart<Concept> newBagChart(final Default d, final int count) {
         BagChart<Concept> tc = new BagChart<Concept>(d.core.concepts, count) {
             @Override
             public void accept(BLink<Concept> x, ItemVis<BLink<Concept>> y) {
@@ -67,22 +78,16 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
 
             }
         };
-        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
-
 
         d.onFrame(xx -> {
 
             //if (s.window.isVisible()) {
-                tc.now = xx.time();
-                tc.update();
+            tc.now = xx.time();
+            tc.update();
             //}
         });
 
-        s.show(1400, 800);
-
-
-        s.add(new Facial(tc).maximize());
-        s.add(new Facial(new CrosshairSurface(s)));
+        return tc;
     }
 
     public void update() {

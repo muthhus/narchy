@@ -28,6 +28,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.util.ImmModeSink;
+import javafx.scene.paint.Color;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.math.AxisAngle4f;
@@ -500,6 +501,15 @@ public enum Draw {
         v3 t = e.target.transform();
         gl.glVertex3f(t.x, t.y, t.z);
         gl.glEnd();
+    }
+
+    public static void hsb(float h, float s, float b, float a, float[] target) {
+        //TODO use a LUT matrix instaed of this shitty Color function
+        Color c = Color.hsb(360*h, s, b);
+        target[0] = (float)c.getRed();
+        target[1] = (float)c.getGreen();
+        target[2] = (float)c.getBlue();
+        target[3] = a;
     }
 
     ////////////////////////////////////////////////////////////////////////////

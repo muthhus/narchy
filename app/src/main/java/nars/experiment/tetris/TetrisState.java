@@ -44,7 +44,7 @@ public class TetrisState {
     public int currentX;/* where the falling block is currently*/
 
     public int currentY;
-    public int score;/* what is the current_score*/
+    public float score;/* what is the current_score*/
 
     public boolean is_game_over;/*have we reached the end state yet*/
 
@@ -378,12 +378,12 @@ public class TetrisState {
         if (onSomething) {
             running = false;
             writeCurrentBlock(worldState, -1);
-            checkIfRowAndScore();
         } else {
             //fall
             if (time % timePerFall == 0)
                 currentY += 1;
         }
+
     }
 
     public void spawn_block() {
@@ -395,7 +395,7 @@ public class TetrisState {
         currentX = (width / 2) - 2;
         currentY = -4;
         
-        score += getWidth() / 2;
+        //score += getWidth() / 2;
 
 //Colliding checks both bounds and piece/piece collisions.  We really only want the piece to be falling
 //If the filled parts of the 5x5 piece are out of bounds.. IE... we want to stop falling when its all on the screen
@@ -417,6 +417,8 @@ public class TetrisState {
 
     void checkIfRowAndScore() {
         int numRowsCleared = 0;
+        int rowsFilled = 0;
+
 
         //Start at the bottom, work way up
         for (int y = height - 1; y >= 0; --y) {
@@ -424,14 +426,23 @@ public class TetrisState {
                 removeRow(y);
                 numRowsCleared += 1;
                 y += 1;
+            } else {
+                if (!isRowClear(y))
+                    rowsFilled++;
             }
         }
-        
-        //1 line == 1
-        //2 lines == 2
-        //3 lines == 4
-        //4 lines == 8
-        score += Math.pow(2.0d, numRowsCleared-1)*10;
+
+        score = 0;
+
+        if (numRowsCleared > 0) {
+            //1 line == 1
+            //2 lines == 2
+            //3 lines == 4
+            //4 lines == 8
+            score += Math.pow(2.0d, numRowsCleared - 1) * 1;
+        }
+        score -= (((float)rowsFilled) / height) * 0.5f; //penalty for height
+
     }
 
     /**
@@ -444,6 +455,15 @@ public class TetrisState {
         for (int x = 0; x < width; ++x) {
             int linearIndex = i(x, y);
             if (worldState[linearIndex] == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    boolean isRowClear(int y) {
+        for (int x = 0; x < width; ++x) {
+            int linearIndex = i(x, y);
+            if (worldState[linearIndex] != 0) {
                 return false;
             }
         }
@@ -501,9 +521,6 @@ public class TetrisState {
         return t;
     }
 
-    public double get_score() {
-        return (score + getWidth() * numEmptyRows());
-    }
 
     public int getWidth() {
         return width;

@@ -43,7 +43,7 @@ abstract public class NAREnvironment {
     public float alpha, gamma, epsilon;
     @Deprecated public static final float gammaEpsilonFactor = 0.66f;
 
-    private float rewardValue;
+    public float rewardValue;
     private final FasterList<MutableTask> predictors = $.newArrayList();
     private boolean trace = true;
 
@@ -75,26 +75,18 @@ abstract public class NAREnvironment {
     /**
      * install motors and sensors in the NAR
      */
-    abstract public void init(NAR n);
+    abstract protected void init(NAR n);
 
-    /**
-     * interpret env state into sensor states
-     */
-    public void perceive() {
-        /* by default nothing should need done */
-    }
 
     /**
      * interpret motor states into env actions
      */
-    abstract public float act();
+    protected abstract float act();
 
     public void next() {
 
         for (int i = 0; i < ticksBeforeObserve; i++)
             nar.clock.tick();
-
-        perceive();
 
         reinforce();
 
@@ -189,7 +181,7 @@ abstract public class NAREnvironment {
         }
     }
 
-    public void reinforce() {
+    protected void reinforce() {
         long now = nar.time();
 
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
@@ -220,7 +212,8 @@ abstract public class NAREnvironment {
 
     }
 
-    public @Nullable Concept boost(Concept c) {
+    @Nullable
+    protected Concept boost(Concept c) {
 
         return nar.activate(c, UnitBudget.One, nar.inputActivation.floatValue() * reinforcementAttention, reinforcementAttention, null);
     }

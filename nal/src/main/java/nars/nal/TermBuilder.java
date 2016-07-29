@@ -561,19 +561,21 @@ public abstract class TermBuilder {
 
 
                 case EQUI:
-                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS && !validEquivalenceTerm(subject))
+                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS ) {
+                        if (!validEquivalenceTerm(subject))
                         throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence subject");
-                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS && !validEquivalenceTerm(predicate))
-                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
+                        if (!validEquivalenceTerm(predicate))
+                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
+                    }
                     break;
 
                 case IMPL:
-                    /*if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
-                        if (subject.isAny(TermIndex.InvalidEquivalenceTerm))
+                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
+                        if (subject.isAny(TermIndex.InvalidImplicationPredicate))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
-                        if (predicate.isAny(TermIndex.InvalidEquivalenceTerm))
+                        if (predicate.isAny(TermIndex.InvalidImplicationPredicate))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
-                    }*/
+                    }
 
 
                     if (subject.equals(True)) {

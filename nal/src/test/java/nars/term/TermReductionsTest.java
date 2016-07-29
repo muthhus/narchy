@@ -574,6 +574,11 @@ public class TermReductionsTest {
 
     }
 
+    @Test public void testReducibleImpl() {
+        assertInvalid("((--,(x)) ==>+0 ((--,(y)) &&+0 (--,(x))))");
+        assertInvalid("((--,(x)) ==> ((--,(y)) && (--,(x))))");
+    }
+    
     @Test public void testConjunctiveCoNegationAcrossImpl() {
         //((--,(&&,(--,(pad_top)),(pad_bottom),(pad_top))) ==>+133 (--,(pad_bottom)))! :4355: %.73;.24%
 

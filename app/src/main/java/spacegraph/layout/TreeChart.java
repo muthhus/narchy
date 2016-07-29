@@ -1,5 +1,7 @@
-package spacegraph.layout.treechart;
+package spacegraph.layout;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.Lists;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
@@ -7,6 +9,7 @@ import nars.util.data.list.FasterList;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.render.Draw;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -15,12 +18,12 @@ import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static spacegraph.layout.treechart.TreemapChart.WeightedString.w;
+import static spacegraph.layout.TreeChart.WeightedString.w;
 
 /**
  * @author Tadas Subonis <tadas.subonis@gmail.com>
  */
-public class TreemapChart<X> extends Surface {
+public class TreeChart<X> extends Surface {
 
 
 	protected int limit = -1;
@@ -28,7 +31,7 @@ public class TreemapChart<X> extends Surface {
 	public static void main(String[] args) {
 		SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
 		s.show(800, 800);
-		TreemapChart<WeightedString> tc = new TreemapChart<>(500, 400,
+		TreeChart<WeightedString> tc = new TreeChart<>(500, 400,
 				(w, v) -> {
 					v.update(w.weight);
 				},
@@ -56,17 +59,15 @@ public class TreemapChart<X> extends Surface {
 	private double top;
 	private LayoutOrient layoutOrient = LayoutOrient.HORIZONTAL;
 	private Collection<ItemVis<X>> children;
+	final Cache<X,ItemVis<X>> cache;// = new WeakHashMap();
 
-	public TreemapChart() {
-		this(0,0);
+	public TreeChart() {
+		this(0,0, null);
 	}
 
 
-	public TreemapChart(double width, double height ) {
-		update(width, height, Collections.emptyList(), null );
-	}
-
-	public TreemapChart(double width, double height, BiConsumer<X,ItemVis<X>> apply, X... i ) {
+	public TreeChart(double width, double height, BiConsumer<X,ItemVis<X>> apply, X... i ) {
+		cache = Caffeine.newBuilder().maximumSize(1024).build();
 		update(width, height, Lists.newArrayList(i), apply );
 	}
 
@@ -85,7 +86,6 @@ public class TreemapChart<X> extends Surface {
 		update(width, height, 0, children, update, i -> new ItemVis<>(i, i.toString()));
 	}
 
-	final WeakHashMap<X,ItemVis<X>> cache = new WeakHashMap();
 
 	public void update(double width, double height, int estimatedSize, Iterable<X> nextChildren, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> itemBuilder) {
 		this.width = width;
@@ -102,7 +102,7 @@ public class TreemapChart<X> extends Surface {
 				break;
 			if (item==null)
 				continue;
-			ItemVis<X> e = cache.computeIfAbsent(item, itemBuilder);
+			ItemVis<X> e = cache.get(item, itemBuilder);
 			if (e!=null) {
 				update.accept(item, e);
 				newChildren.add(e);
@@ -302,4 +302,108 @@ public class TreemapChart<X> extends Surface {
 //	public DoubleProperty getHeight() {
 //		return height;
 //	}
+
+	/**
+     * @author Tadas Subonis <tadas.subonis@gmail.com>
+     */
+    public static final class ItemVis<X> {
+
+        public final String label;
+        public final X item;
+        public double left;
+        public double top;
+        public double width;
+        public double height;
+        public double area;
+        private float r;
+        private float g;
+        private float b;
+
+        public ItemVis(X item, String label) {
+            this.item = item;
+            this.label = label;
+        }
+
+        public void update(float weight) {
+            this.area = weight;
+            this.r = -1;
+        }
+
+    //    public void update(X item, String label, float weight) {
+    //        this.item = item;
+    //        this.label = label;
+    //        this.area= weight;
+    //        this.r = -1; //auto
+    //    }
+
+        public void update(float weight, float r, float g, float b) {
+            this.area= weight;
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
+
+        @Override
+        public String toString() {
+            return "TreemapDtoElement{" +
+                    "label='" + label + '\'' +
+                    ", area=" + area +
+                    ", top=" + top +
+                    ", left=" + left +
+                    '}';
+        }
+
+        void setArea(double area) {
+            this.area = area;
+        }
+
+    //    boolean isContainer() {
+    //        return item.isContainer();
+    //    }
+
+        @Override
+        public boolean equals(Object o) {
+            return this == o;
+
+            //if (o == null || getClass() != o.getClass()) return false;
+
+    //        ItemVis that = (ItemVis) o;
+    //
+    //        if (item != null ? !item.equals(that.item) : that.item != null) return false;
+    //        return !(label != null ? !label.equals(that.label) : that.label != null);
+
+        }
+
+        @Override
+        public int hashCode() {
+            throw new UnsupportedOperationException();
+    //        int result = label != null ? label.hashCode() : 0;
+    //        result = 31 * result + (item != null ? item.hashCode() : 0);
+    //        return result;
+        }
+
+        public void paint(GL2 gl, double percent) {
+            float i = 0.25f + 0.75f * (float)percent;
+
+            if (r < 0) {
+                r = i;
+                g = 0.1f;
+                b = 0.1f;
+            }
+
+            gl.glColor3f(r, g, b);
+
+            Draw.rect(gl,
+                (float)left, (float)top,
+                (float)width, (float)height
+            );
+
+            gl.glColor3f(1,1,1);
+            float labelSize = (float) (height / 4f * Math.min(0.005f,percent));
+            Draw.renderLabel(gl,
+                    labelSize, labelSize, //label size
+                    label, (float)(left+width/2f), (float)(top+height/2f), 0.5f);
+
+        }
+    }
 }

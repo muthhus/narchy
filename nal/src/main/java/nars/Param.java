@@ -159,7 +159,7 @@ public abstract class Param extends Container implements Level {
 
 
     public static final boolean ALLOW_RECURSIVE_IMPLICATIONS = false;
-    public static final boolean ALLOW_RECURSIVE_STATEMENTS = true;
+    public static final boolean ALLOW_RECURSIVE_STATEMENTS = false;
 
 
     ///** extra debugging checks */

@@ -3,11 +3,11 @@ package nars.experiment.tetris;
 import nars.$;
 import nars.NAR;
 import nars.Param;
+import nars.concept.Concept;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
-import nars.gui.NARSpace;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -20,6 +20,9 @@ import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import spacegraph.Surface;
+import spacegraph.obj.GridSurface;
+import spacegraph.obj.Plot2D;
 import spacegraph.obj.XYSlider;
 
 import java.util.*;
@@ -28,29 +31,35 @@ import static nars.$.t;
 import static nars.experiment.pong.Pong.numericSensor;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
+import static spacegraph.obj.GridSurface.VERTICAL;
 
 /**
  * Created by me on 7/28/16.
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int runCycles = 512;
+    public static final int runCycles = 2512;
     public static final int cyclesPerFrame = 128;
-    static int frameDelay = 10;
+    static int frameDelay = 5;
+
+    static boolean easy = false;
+
 
     private final TetrisState state;
-    private final TetrisVisualizer vis;
-    private double currentScore;
 
-    private double previousScore;
+    public class View {
+        public BagChart<Concept> conceptChart;
+        public TetrisVisualizer vis;
+        public Surface plot1;
+    }
 
+    final View view = new View();
 
-    @Deprecated public XYSlider aSlider = new XYSlider();
 
     private MotorConcept motorRotate;
-    private MotorConcept motorDown;
+    //private MotorConcept motorDown;
     private MotorConcept motorLeftRight;
-    private boolean rotate;
+    private final boolean rotate = !easy;
 
     /**
      * @param width
@@ -62,23 +71,25 @@ public class Tetris2 extends NAREnvironment {
         state = new TetrisState(width, height, timePerFall) {
             @Override
             protected int nextBlock() {
-                //return super.nextBlock(); //all blocks
 
-                //EASY MODE
-                rotate = false;
-                return 1; //square blocks
 
-                //return 0; //long blocks
+                if (easy) {
+                    //EASY MODE
+                    return 1; //square blocks
+                    //return 0; //long blocks
+                } else {
+                    return super.nextBlock(); //all blocks
+                }
             }
         };
-        vis = new TetrisVisualizer(state, 64);
+        view.vis = new TetrisVisualizer(state, 64, false);
 
         //restart();
     }
 
 
     @Override
-    public void init(NAR nar) {
+    protected void init(NAR nar) {
 
         state.seen = new float[state.width * state.height];
         for (int x = 0; x < state.width; x++) {
@@ -108,7 +119,6 @@ public class Tetris2 extends NAREnvironment {
 
         //decide simultaneous motor actions: 0 or more
         long now = nar.time();
-        previousScore = currentScore;
 
 
         float rotateMotivation = (motorRotate!=null && motorRotate.hasGoals()) ? motorRotate.goals().expectation(now) : 0.5f;
@@ -141,24 +151,22 @@ public class Tetris2 extends NAREnvironment {
             state.spawn_block();
         }
 
+        state.checkIfRowAndScore();
+
         state.toVector(false, state.seen);
 
 
-        if (!state.gameOver()) {
-            currentScore = state.get_score();
-        } else {
-            //System.out.println("restart");
+        if (state.gameOver()) {
             reset();
         }
 
-        return (float) (currentScore - previousScore);
+        return state.score;
     }
 
     public void reset() {
         state.reset();
         state.spawn_block();
         state.running = true;
-        currentScore = previousScore = state.get_score();
     }
 
 
@@ -217,13 +225,14 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
         MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
 
         new ArithmeticInduction(nar);
 
 
-        Tetris2 t = new Tetris2(nar, 6, 12, 2) {
+        Tetris2 t = new Tetris2(nar, 6, 12, 5) {
+
             @Override
             public void init(NAR nar) {
                 super.init(nar);
@@ -233,9 +242,31 @@ public class Tetris2 extends NAREnvironment {
                 new BeliefTableChart(nar, charted).show(600, 200);
 
 
-                //BagChart.show((Default) nar, 512);
 
-                newControlWindow(this);
+                view.conceptChart = BagChart.newBagChart((Default) nar, 512);
+
+                int plotHistory = 256;
+                Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
+                plot.add("Rwrd", ()->rewardValue);
+
+                Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
+                plot2.add("Busy", ()->nar.emotion.busy.getSum());
+                plot2.add("Frst", ()->nar.emotion.frustration.getSum());
+
+                Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
+                plot3.add("Hapy", ()->nar.emotion.happy.getSum());
+
+                view.plot1 = new GridSurface(VERTICAL, plot, plot2, plot3);
+
+                nar.onFrame(f -> {
+                    plot.update();
+                    plot2.update();
+                    plot3.update();
+                });
+
+                newControlWindow(view);
+
+
 
                 //STMView.show(stm, 800, 600);
 

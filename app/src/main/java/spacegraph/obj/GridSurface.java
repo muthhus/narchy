@@ -49,7 +49,7 @@ public class GridSurface extends LayoutSurface {
 
 
         float a = aspect.floatValue();
-        if (n < 3)
+        if ((n < 3) && !((a==0) || (a == Float.POSITIVE_INFINITY)))
             a = 0; //use linear layout for small n
 
         float margin = 0.05f;
