@@ -1,11 +1,11 @@
 package nars.experiment.tetris;
 
-import com.google.common.collect.Iterables;
 import nars.$;
 import nars.NAR;
-import nars.agent.NAgent;
+import nars.Param;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.gui.NARSpace;
 import nars.index.CaffeineIndex;
@@ -13,7 +13,6 @@ import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.obj.Termject;
@@ -33,9 +32,9 @@ import static nars.experiment.tetris.TetrisState.*;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int runCycles = 10000;
+    public static final int runCycles = 128;
     public static final int cyclesPerFrame = 128;
-    static int frameDelay = 100;
+    static int frameDelay = 10;
 
     private final TetrisState state;
     private final TetrisVisualizer vis;
@@ -47,6 +46,7 @@ public class Tetris2 extends NAREnvironment {
     private MotorConcept motorRotate;
     private MotorConcept motorDown;
     private MotorConcept motorLeftRight;
+    private boolean rotate;
 
     /**
      * @param width
@@ -59,7 +59,11 @@ public class Tetris2 extends NAREnvironment {
             @Override
             protected int nextBlock() {
                 //return super.nextBlock(); //all blocks
+
+                //EASY MODE
+                rotate = false;
                 return 1; //square blocks
+
                 //return 0; //long blocks
             }
         };
@@ -86,21 +90,28 @@ public class Tetris2 extends NAREnvironment {
         }
 
 
-        motors.add(motorRotate = new MotorConcept("(rotate)", nar));
-        motors.add(motorDown = new MotorConcept("(down)", nar));
-        motors.add(motorLeftRight = new MotorConcept("(leftright)", nar));
+        if (rotate) {
+            actions.add(motorRotate = new MotorConcept("(rotate)", nar));
+        }
+        //actions.add(motorDown = new MotorConcept("(down)", nar));
+        actions.add(motorLeftRight = new MotorConcept("(leftright)", nar));
 
+        reset();
     }
 
     @Override
     public float act() {
+
         //decide simultaneous motor actions: 0 or more
         long now = nar.time();
-        float rotateMotivation = motorRotate.hasGoals() ? motorRotate.goals().expectation(now) : 0.5f;
-        float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
+        previousScore = currentScore;
+
+
+        float rotateMotivation = (motorRotate!=null && motorRotate.hasGoals()) ? motorRotate.goals().expectation(now) : 0.5f;
+        //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
         float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().expectation(now) : 0.5f;
 
-        float actionMargin = 0.2f;
+        float actionMargin = 0.25f;
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
 
@@ -109,9 +120,9 @@ public class Tetris2 extends NAREnvironment {
         } else if (rotateMotivation < actionThresholdLow) {
             state.take_action(CCW);
         }
-        if (downMotivation > actionThresholdHigh) {
-            state.take_action(FALL);
-        }
+//        if (downMotivation > actionThresholdHigh) {
+//            state.take_action(FALL);
+//        }
 
         if (leftRightMotivation > actionThresholdHigh) {
             state.take_action(RIGHT);
@@ -130,45 +141,45 @@ public class Tetris2 extends NAREnvironment {
 
 
         if (!state.gameOver()) {
-            previousScore = currentScore;
             currentScore = state.get_score();
-            return (float) (currentScore - previousScore);
         } else {
             //System.out.println("restart");
-            state.reset();
-            state.spawn_block();
-            state.running = true;
-            previousScore = 0;
-            currentScore = -50;
-            return 0;
+            reset();
         }
+
+        return (float) (currentScore - previousScore);
     }
 
-
-
+    public void reset() {
+        state.reset();
+        state.spawn_block();
+        state.running = true;
+        currentScore = previousScore = state.get_score();
+    }
 
 
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
+        Param.CONCURRENCY_DEFAULT = 2;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 1 * 10000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng),5 * 10000000, false)
 
                 , new FrameClock());
-        nar.inputActivation.setValue(0.07f);
+        nar.inputActivation.setValue(0.08f);
         nar.derivedActivation.setValue(0.05f);
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.65f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -202,13 +213,30 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 512, '.', 2);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 512, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
 
         new ArithmeticInduction(nar);
 
 
-        Tetris2 t = new Tetris2(nar, 6, 12, 2);
+        Tetris2 t = new Tetris2(nar, 6, 12, 2) {
+            @Override
+            public void init(NAR nar) {
+                super.init(nar);
+
+                List<Termed> charted = new ArrayList(actions);
+                charted.add(happy);
+                new BeliefTableChart(nar, charted).show(600, 200);
+
+                BagChart.show((Default) nar, 512);
+
+                //STMView.show(stm, 800, 600);
+
+
+                //NARSpace.newConceptWindow((Default) nar, 128, 8);
+            }
+        };
+
 
 //        Iterable<Termed> cheats = Iterables.concat(
 //                numericSensor(() -> t.currentX, nar, 0.3f,
@@ -261,6 +289,7 @@ public class Tetris2 extends NAREnvironment {
 
 
         t.run(runCycles, frameDelay);
+
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

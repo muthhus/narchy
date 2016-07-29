@@ -8,8 +8,12 @@ import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
+import nars.term.Term;
+import nars.util.Texts;
 import nars.util.Util;
-import nars.util.math.PolarRangeNormalizedFloat;
+import nars.util.data.list.FasterList;
+import nars.util.math.RangeNormalizedFloat;
+import nars.util.signal.Emotion;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -18,34 +22,39 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static nars.agent.NAgent.varPct;
 import static nars.nal.Tense.ETERNAL;
+import static nars.util.Texts.n4;
 
 /**
  * explicit management of sensor concepts and motor functions
  */
 abstract public class NAREnvironment {
 
-    private final SensorConcept happy;
+    public final SensorConcept happy;
     private final float reinforcementAttention;
     public NAR nar;
 
     public final FuzzyConceptSet reward;
     public final List<SensorConcept> sensors = $.newArrayList();
-    public final List<MotorConcept> motors = $.newArrayList();
+    public final List<MotorConcept> actions = $.newArrayList();
     public float alpha, gamma, epsilon;
     private float rewardValue;
+    private final FasterList<MutableTask> predictors = $.newArrayList();
+    private boolean trace = true;
 
+    int ticksBeforeObserve = 1, ticksBeforeDecide = 1;
 
     public NAREnvironment(NAR nar) {
         this.nar = nar;
         alpha = this.nar.confidenceDefault(Symbols.BELIEF);
         gamma = this.nar.confidenceDefault(Symbols.GOAL);
-        epsilon = 0.05f;
+        epsilon = 0.1f;
         this.reinforcementAttention = gamma;
 
-        reward =  new FuzzyConceptSet(
-                new PolarRangeNormalizedFloat(()->rewardValue),
-                //new RangeNormalizedFloat(input),
+        reward = new FuzzyConceptSet(
+                //new PolarRangeNormalizedFloat(()->rewardValue),
+                new RangeNormalizedFloat(() -> rewardValue),
                 nar,
                 //"(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.02f);
                 //"(" + nar.self + " --> [sad])", "(" + nar.self + " --> [happy])").resolution(0.05f);
@@ -59,32 +68,114 @@ abstract public class NAREnvironment {
 
     }
 
-    /** install motors and sensors in the NAR */
+    /**
+     * install motors and sensors in the NAR
+     */
     abstract public void init(NAR n);
 
-    /** interpret env state into sensor states */
+    /**
+     * interpret env state into sensor states
+     */
     public void perceive() {
         /* by default nothing should need done */
     }
 
-    /** interpret motor states into env actions */
+    /**
+     * interpret motor states into env actions
+     */
     abstract public float act();
 
     public void next() {
+
+        for (int i = 0; i < ticksBeforeObserve; i++)
+            nar.clock.tick();
 
         perceive();
 
         reinforce();
 
+        for (int i = 0; i < ticksBeforeDecide - 1; i++)
+            nar.clock.tick();
+
         nar.next();
 
         rewardValue = act();
+
+        if (trace)
+            System.out.println(summary());
+
+    }
+
+    public String summary() {
+
+        @NotNull Emotion emotion = nar.emotion;
+
+        //long now = nar.time();
+
+
+        return
+//                 + "rwrd=[" +
+//                     n4( sad.beliefs().truth(now).motivation() )
+//                             + "," +
+//                     n4( happy.beliefs().truth(now).motivation() )
+//                 + "] "
+                "rwrd=" + n4(rewardValue) + "\t" +
+                 "hapy=" + n4(emotion.happy()) + " "
+                + "busy=" + n4(emotion.busy.getSum()) + " "
+                + "lern=" + n4(emotion.learning()) + " "
+                + "strs=" + n4(emotion.stress.getSum()) + " "
+                + "alrt=" + n4(emotion.alert.getSum()) + " "
+                + " var=" + n4( varPct(nar) ) + " "
+                + "\t" + nar.index.summary()
+
+//                + "," + dRewardPos.belief(nar.time()) +
+//                "," + dRewardNeg.belief(nar.time());
+                ;
+
+    }
+
+
+    protected void mission() {
+        int dt = ticksBeforeObserve + ticksBeforeDecide;
+
+
+        @NotNull Term what = $.$("?w"); //#w
+
+        predictors.add(
+                //what imples reward R
+                (MutableTask) nar.ask($.impl(what, happy.term()), '?', ETERNAL)
+        );
+
+        //what co-occurs with reward R
+        predictors.add(
+                (MutableTask) nar.ask($.conj(what, dt, happy.term()), '?', ETERNAL)
+        );
+        predictors.add(
+                (MutableTask) nar.ask($.conj(what, dt, happy.term()), '?', nar.time())
+        );
+
+
+        for (Concept x : actions) {
+
+            //quest for each action
+            predictors.add((MutableTask) nar.ask(x, '@', ETERNAL));
+            predictors.add((MutableTask) nar.ask(x, '@', nar.time()));
+
+            //does action A imply reward R?
+            predictors.add(
+                    (MutableTask) nar.ask($.conj(x.term(), dt, happy.term()), '?', ETERNAL)
+            );
+
+
+        }
 
     }
 
     public void run(int cycles, int frameDelayMS) {
 
         init(nar);
+
+        mission();
 
         for (int t = 0; t < cycles; t++) {
             next();
@@ -105,22 +196,22 @@ abstract public class NAREnvironment {
             //boost(sad);
 
 
-            for (MotorConcept c : motors) {
+            for (MotorConcept c : actions) {
                 if (Math.random() < epsilon) {
                     nar.inputLater(new MutableTask(c, '!',
-                            Math.random() > 0.5f ? 1f : 0f,
-                            nar).present(now).log("Curiosity"));
+                            nar.random.nextFloat()
+                            //Math.random() > 0.5f ? 1f : 0f
+                            , gamma/2f).
+                            present(now).log("Curiosity"));
                 }
                 boost(c);
             }
 
-//            for (MutableTask x : predictors)
-//                boost(x);
+            for (MutableTask x : predictors)
+                boost(x);
 
-            //nar.goal(RewardAttentionPerFrame.pri(), sad, now+1, 0f, gamma);
-            //nar.goal(RewardAttentionPerFrame.pri(), happy, now+1, 1f, gamma);
+
         }
-
 
 
     }
@@ -131,13 +222,12 @@ abstract public class NAREnvironment {
     }
 
 
-
     private void boost(@NotNull MutableTask t) {
         BudgetMerge.max.apply(t.budget(), UnitBudget.One, reinforcementAttention);
         if (t.isDeleted())
             throw new RuntimeException();
 
-        if (t.occurrence()!=ETERNAL) {
+        if (t.occurrence() != ETERNAL) {
             nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(nar.time(), nar.time())
                     .budget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
         } else {

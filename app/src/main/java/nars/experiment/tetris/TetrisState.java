@@ -431,7 +431,7 @@ public class TetrisState {
         //2 lines == 2
         //3 lines == 4
         //4 lines == 8
-        score += Math.pow(2.0d, numRowsCleared-1);
+        score += Math.pow(2.0d, numRowsCleared-1)*10;
     }
 
     /**

@@ -324,7 +324,7 @@ public class NAgent implements Agent {
 
     }
 
-    private static float varPct(NAR nar) {
+    public static float varPct(NAR nar) {
         if (nar instanceof Default) {
             DoubleSummaryStatistics is = new DoubleSummaryStatistics();
             ((Default)nar).core.concepts.forEach(x -> {
