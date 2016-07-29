@@ -446,7 +446,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             super(g);
 
 
-            float speed = 4f;
+            float speed = 2f;
             watch(KeyEvent.VK_NUMPAD4, (dt)-> {
                 moveX(speed);
             }, null);
@@ -763,8 +763,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                     Spatial a = ((Spatial) t);
                     if (a.onTouch(cray.collidable, cray, buttons)) {
                         //absorbed
-                        mouseDragDX = mouseDragDY = 0;
-                        mouseDragPrevX = mouseDragPrevY = -1; //cancel any drag being enabled
+                        clearDrag();
                         return true;
                     }
                 }
@@ -884,10 +883,15 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         public void mouseEntered(MouseEvent e) {
         }
 
-        public void mouseExited(MouseEvent e) {
+//        public void mouseExited(MouseEvent e) {
+//            clearDrag();
+//        }
+
+        public void clearDrag() {
             mouseDragDX = mouseDragDY = 0; //clear drag
             mouseDragPrevX = mouseDragPrevY = -1;
         }
+
 
         public void mousePressed(MouseEvent e) {
             mouseDragDX = mouseDragDY = 0;
@@ -906,7 +910,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
             pickConstrain(e.getButton(), 0, e.getX(), e.getY());
 
-            mouseDragPrevX = mouseDragPrevY = -1; //HACK todo do this on a per-button basis
+            clearDrag();
         }
 
         //

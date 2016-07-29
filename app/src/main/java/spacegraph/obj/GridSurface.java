@@ -76,14 +76,14 @@ public class GridSurface extends LayoutSurface {
         float dy = 1f/ny;
         float dyc = dy * content;
         int n = children.size();
-        System.out.println(nx + " " + ny + " x " + dx + " " + dy);
+        //System.out.println(nx + " " + ny + " x " + dx + " " + dy);
 
         for (int y = 0; y < ny; y++) {
 
             px = margin/2f;
 
             for (int x = 0; x < nx; x++) {
-                System.out.println("\t" + px + " " + py);
+                //System.out.println("\t" + px + " " + py);
 
                 Surface c = children.get(i);
 

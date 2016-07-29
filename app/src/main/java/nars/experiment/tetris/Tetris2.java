@@ -20,6 +20,7 @@ import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import spacegraph.obj.XYSlider;
 
 import java.util.*;
 
@@ -43,6 +44,8 @@ public class Tetris2 extends NAREnvironment {
 
     private double previousScore;
 
+
+    @Deprecated public XYSlider aSlider = new XYSlider();
 
     private MotorConcept motorRotate;
     private MotorConcept motorDown;

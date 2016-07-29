@@ -2,12 +2,15 @@ package spacegraph.obj;
 
 import nars.$;
 import nars.util.data.list.FasterList;
+import ognl.OgnlException;
 import ognl.OgnlRuntime;
+import org.infinispan.cdi.common.util.Reflections;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -15,11 +18,11 @@ import java.util.*;
  */
 public class ControlSurface extends GridSurface {
 
-    private static final int DEFAULT_DEPTH = 2;
+    private static final int DEFAULT_DEPTH = 3;
     /** the object being controlled */
     public Object o;
-    private Map fields;
-    private Map methods;
+
+
     final IdentityHashMap built;
 
     public static void newControlWindow(Object o) {
@@ -38,7 +41,7 @@ public class ControlSurface extends GridSurface {
     }
 
     public ControlSurface(Object label, Object o, int maxDepth, IdentityHashMap built) {
-        super(0.5f);
+        super(HORIZONTAL);
 
         this.built = built == null ?  new IdentityHashMap() : built;
         reset(label, o, maxDepth);
@@ -49,50 +52,96 @@ public class ControlSurface extends GridSurface {
         this.o = o;
 
         built.clear();
-        setChildren(build(label, o, maxDepth, built));
+        built.put(o, o);
+
+        FasterList<Surface> subs = $.newArrayList();
+        children(o, maxDepth, built, subs);
+
+        Surface content = build(label, o, maxDepth);
+        if (subs.isEmpty()) {
+            setChildren(content);
+        } else {
+            setChildren(content, new GridSurface(subs));
+        }
     }
 
-    private synchronized List<Surface> build(Object K, Object V, int remainingDepth, IdentityHashMap built) {
+    protected Surface build(Object k, Object v, int remainingDepth) {
 
 
-        FasterList<Surface> w = $.newArrayList();
+//        ConsoleSurface vc = new ConsoleSurface(24, 4);
+//        try {
+//            vc.term.putLine(k + "\n  " + v);
+//        } catch (IOException e) {
+//
+//        }
+        if (v instanceof Surface) {
+            return ((Surface) v);
+        } //else if (v instanceof String) {
+            return new LabelSurface(k.toString());
+         /*else {
+            return new ControlSurface(k, v, remainingDepth, built);
+        }*/
 
-        ConsoleSurface vc = new ConsoleSurface(24, 4);
-        try {
-            vc.term.putLine(K + " = " + V);
-        } catch (IOException e) {
 
-        }
-        w.add(vc);
+
+        //return new GridSurface(
+                //vc.term.putLine(k + "\n  " + v);
+                //vc );
+
+    }
+
+    private void children(Object V, int remainingDepth, IdentityHashMap built, FasterList<Surface> w) {
+
+
+
 
 
         Class<?> aClass = o.getClass();
-        fields = OgnlRuntime.getFields(aClass);
-        fields.forEach((k,v) -> {
-            w.addIfNotNull(field(remainingDepth-1, k, v, built));
-        });
+//        Map fields = OgnlRuntime.getFields(aClass);
+//        try {
+//
+//            Iterator z = OgnlRuntime.getElementsAccessor(aClass).getElements(o).asIterator();
+//            while (z.hasNext()) {
+//                System.out.println(z.next());
+//            }
+//
+//        } catch (OgnlException e) {
+//            e.printStackTrace();
+//        }
+//        fields.forEach((k,v) -> {
+//            w.addIfNotNull(field(remainingDepth-1, k, v, built));
+//        });
 
-        methods = OgnlRuntime.getMethods(aClass, false);
+        Set<Field> fields = Reflections.getAllDeclaredFields(aClass);
+        for (Field f : fields) {
+            try {
+                w.addIfNotNull(field(remainingDepth-1, f, f.get(o), built));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Map methods = OgnlRuntime.getMethods(aClass, false);
         methods.forEach((k, v) -> {
             w.addIfNotNull(method(remainingDepth-1, k, v, built));
         });
 
-        return w;
+
     }
 
     private Surface field(int remainingDepth, Object k, Object v, IdentityHashMap built) {
         if (alreadyAdded(remainingDepth, v, built)) return null;
-        return new ControlSurface(k, v, remainingDepth, built);
+        return build(k, v, remainingDepth);
     }
 
 
     private Surface method(int remainingDepth, Object k, Object v, IdentityHashMap built) {
         if (alreadyAdded(remainingDepth, v, built)) return null;
-        return new ControlSurface(k, v, remainingDepth, built);
+        return build(k, v, remainingDepth);
     }
 
 
-    private boolean alreadyAdded(int remainingDepth, Object v, IdentityHashMap built) {
+    private synchronized boolean alreadyAdded(int remainingDepth, Object v, IdentityHashMap built) {
         if (remainingDepth <= 0)
             return true;
         if (built.putIfAbsent(v,v)!=null)

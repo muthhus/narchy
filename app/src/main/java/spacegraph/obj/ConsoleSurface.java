@@ -51,8 +51,9 @@ public class ConsoleSurface extends Surface {
      */
     final VirtualTerminal term;
 
-    final static int font = GLUT.STROKE_MONO_ROMAN;
-    private final float fontWidth;
+    public final static int font = GLUT.STROKE_MONO_ROMAN;
+    public final static float fontWidth = glut.glutStrokeWidthf(font, 'X');
+
     final float fontUnscale;
     private final float fontHeight;
 
@@ -78,7 +79,6 @@ public class ConsoleSurface extends Surface {
 
     public ConsoleSurface(VirtualTerminal term) {
         this.term = term;
-        fontWidth = glut.glutStrokeWidthf(font, 'X');
         fontHeight = fontWidth * 1.25f; //glut.glutStrokeLengthf(font, "X");
 
         fontUnscale = 1 / fontHeight;
