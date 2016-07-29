@@ -24,12 +24,10 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
 import nars.agent.NAgent;
-import nars.experiment.Environment;
+import nars.experiment.DiscreteEnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
-import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.gui.NARSpace;
-import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -48,17 +46,16 @@ import java.util.*;
 import static nars.experiment.pong.Pong.numericSensor;
 
 
-public class Tetris extends TetrisState implements Environment {
+public class Tetris extends TetrisState implements DiscreteEnvironment {
 
     public static final int runCycles = 10000;
-    public static final int cyclesPerFrame = 16;
-    static int frameDelay = 10;
+    public static final int cyclesPerFrame = 128;
+    static int frameDelay = 100;
 
     private final TetrisVisualizer vis;
     private double currentScore;
 
     private double previousScore;
-    public float[] seenState;
     private final static boolean NO_BACKWARDS_ROTATION = true;
 
     /**
@@ -82,12 +79,12 @@ public class Tetris extends TetrisState implements Environment {
     @Override
     public float pre(int t, float[] ins) {
 
-        if (this.seenState == null)
-            this.seenState = new float[ins.length];
+        if (this.seen == null)
+            this.seen = new float[ins.length];
 
         //post process to monochrome bitmap
         for (int i = 0; i < ins.length; i++) {
-            float v = seenState[i];
+            float v = seen[i];
             if (v <= 0) v = 0;
             if (v > 0) v = 1;
             ins[i] = v;
@@ -199,7 +196,7 @@ public class Tetris extends TetrisState implements Environment {
             spawn_block();
         }
 
-        toVector(false, seenState);
+        toVector(false, seen);
         //vis.repaint();
 
 
@@ -290,11 +287,11 @@ public class Tetris extends TetrisState implements Environment {
 
 
 
-        Tetris t = new Tetris(8, 14, 5) {
+        Tetris t = new Tetris(6, 12, 2) {
             @Override
             protected int nextBlock() {
-                return super.nextBlock(); //all blocks
-                //return 1; //square blocks
+                //return super.nextBlock(); //all blocks
+                return 1; //square blocks
                 //return 0; //long blocks
             }
         };
@@ -328,12 +325,12 @@ public class Tetris extends TetrisState implements Environment {
 
                     new BeliefTableChart(nar, charted).show(600, 900);
 
-                    BagChart.show((Default) nar, 128);
+                    //BagChart.show((Default) nar, 128);
 
                     //STMView.show(stm, 800, 600);
 
 
-                    //NARSpace.newConceptWindow((Default) nar, 128, 8);
+                    NARSpace.newConceptWindow((Default) nar, 128, 8);
                 }
 
 

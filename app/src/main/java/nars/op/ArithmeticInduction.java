@@ -180,7 +180,7 @@ public class ArithmeticInduction implements Consumer<Task> {
                                 task(in, c, generated);
                             }
                         } catch (InvalidTermException e) {
-                            logger.warn("{}",e);
+                            logger.warn("{}",e.toString());
                         }
 
                     });

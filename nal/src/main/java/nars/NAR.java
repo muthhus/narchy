@@ -954,8 +954,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //LongPredicate timeCondition = t -> t == time;
 
         List<Task> x = $.newArrayList(tt.length);
-        for (String s : tt)
+        for (String s : tt) {
             x.addAll(tasks(s));
+        }
+
+        //set the appropriate creation and occurrence times
+        for (Task y : x) {
+            MutableTask my = (MutableTask) y;
+            my.setCreationTime(time);
+            if (my.occurrence()!=ETERNAL)
+                my.occurr(time);
+        }
 
         inputAt(time, x);
         return this;

@@ -6,10 +6,8 @@ import nars.util.Util;
 
 import java.util.Arrays;
 
-/**
- * Created by me on 5/5/16.
- */
-public interface Environment {
+
+public interface DiscreteEnvironment {
 
     Twin<Integer> start();
 

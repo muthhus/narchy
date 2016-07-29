@@ -244,23 +244,6 @@ public class NAgent implements Agent {
             } else {
                 return null;
             }
-//            if (b!=null && f!=null) {
-//                if (b.equals(f)) {
-//                    f = null; //no change from current belief state
-//                }
-//                else {
-//                    //reduce feedback by similarity to existing belief state
-//                    float freqDiff = Math.abs(b.freq() - d.freq());
-//                    float confDiff = Math.abs(b.conf() - d.conf());
-//                    //HACK an approximation:
-//                    float c = f.conf() * or( (1-freqDiff), (1-confDiff) );
-//                    if (c < Global.TRUTH_EPSILON)
-//                        return null; //change infinitisemal
-//                    else
-//                        return $.t(f.freq(), c);
-//                }
-//            }
-
             return f;
         };
     }
@@ -383,20 +366,6 @@ public class NAgent implements Agent {
     }
 
     protected void init() {
-
-        //updateMotors();
-
-        seekReward();
-
-        //nar.input("(--,(r))! %0.00;1.00%");
-        actions.forEach(m -> init(m));
-
-
-    }
-
-    private void seekReward() {
-
-
         //nar.believe("((A:#x && I:#y) ==>+0 (R)).");
 
         //TODO specify goal via a method in the sensor/digitizers
@@ -485,17 +454,7 @@ public class NAgent implements Agent {
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //avoid decrease
     }
 
-    private void init(MotorConcept m) {
 
-//        nar.goal(m, Tense.Eternal, 1f, epsilon);
-
-
-        //nar.ask($.$("(?x &&+0 " + m + ")"), '@');
-        //nar.goal(m, Tense.Present, 1f, epsilon);
-        //nar.goal(m, Tense.Present, 0f, epsilon);
-
-
-    }
 
     @Override
     public int act(float rewardValue, @Nullable float[] nextObservation) {
@@ -507,8 +466,10 @@ public class NAgent implements Agent {
         if (nextObservation!=null)
             observe(nextObservation);
 
-        decide(this.lastAction);
         reinforce();
+
+        decide(this.lastAction);
+
 
 
 //        for (Concept a : actions) {
@@ -660,10 +621,10 @@ public class NAgent implements Agent {
             float onness
                     //= 1f;
                     = Math.min(
-                            (2f * nar.confMin.floatValue()) + ((DecidingSoftmax)deciding).decisiveness(),
-                            gamma);
+                            (
+                            2f * nar.confMin.floatValue()) + ((DecidingSoftmax)deciding).decisiveness(),
+                            1f) * gamma;
 
-                    //decisiveness(this.nextAction);
 
             if (lastAction != -1) {
                 MotorConcept lastActionMotor = actions.get(lastAction);
@@ -671,10 +632,12 @@ public class NAgent implements Agent {
                 //nar.goal(goalPriority, lastActionMotor, now-1, preOff, conf); //downward step function top
 
                 float offness = onness;
-                float offFreq = 0.5f; //0 .. 0.5f
+                float offFreq =
+                        0.5f;
+                        //0.5f; //0 .. 0.5f
 
                 //float offness = 1f;
-                nar.goal(goalPriority, lastActionMotor, now-1,
+                nar.goal(goalPriority, lastActionMotor, now,
                         offFreq, max(Param.TRUTH_EPSILON, offness)); //downward step function bottom
             }
 
@@ -738,8 +701,8 @@ public class NAgent implements Agent {
             MotorConcept aa = actions.get(i);
             int dt = ticksBeforeObserve + ticksBeforeDecide;
             motivation[i] =
-                    //motivation(aa, nar.time());
                     motivation(aa, now) + motivation(aa, now + dt)/2f;
+                    //motivation(aa, nar.time());
         }
 
         return deciding.decide(motivation.clone(), lastAction, nar.random);

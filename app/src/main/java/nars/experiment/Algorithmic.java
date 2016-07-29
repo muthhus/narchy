@@ -17,7 +17,7 @@ import static nars.experiment.pong.Pong.beliefChart;
  * http://arxiv.org/pdf/1511.07275v2.pdf
  * https://github.com/openai/gym/blob/master/gym/envs/algorithmic/algorithmic_env.py
  */
-abstract public class Algorithmic implements Environment {
+abstract public class Algorithmic implements DiscreteEnvironment {
 
      final int ins, outs;
     final int radix, last;

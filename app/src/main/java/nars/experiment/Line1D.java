@@ -17,7 +17,7 @@ import static java.lang.System.out;
 /**
  * Created by me on 5/4/16.
  */
-public class Line1D implements Environment {
+public class Line1D implements DiscreteEnvironment {
 
 
     private final IntToFloatFunction targetFunc;

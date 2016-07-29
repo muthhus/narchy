@@ -223,7 +223,8 @@ public interface TimeFunctions {
 
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
             //no temporal basis that can apply. only derive an eternal result if there is no actual temporal relation in the decomposition
-            if (dtDecomposed == DTERNAL) return derived;
+            if (dtDecomposed == DTERNAL)
+                return derived;
             else
                 return noTemporalBasis(derived);
         } else {

@@ -12,15 +12,13 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
-import nars.experiment.Environment;
+import nars.experiment.DiscreteEnvironment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
-import nars.gui.NARSpace;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.time.FrameClock;
@@ -40,7 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Pong extends Player implements Environment {
+public class Pong extends Player implements DiscreteEnvironment {
 
     static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
     public static final int runCycles = 256;

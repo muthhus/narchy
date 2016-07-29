@@ -16,7 +16,7 @@ import static java.lang.System.out;
 /**
  * Created by me on 5/4/16.
  */
-public class Thermostat implements Environment {
+public class Thermostat implements DiscreteEnvironment {
 
 
     public float targetPeriod = 30;

@@ -19,20 +19,19 @@ limitations under the License.
 package nars.experiment.tetris.visualizer;
 
 import com.jogamp.opengl.GL2;
-import nars.experiment.tetris.Tetris;
+import nars.experiment.tetris.TetrisState;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class TetrisVisualizer extends Surface {
 
 	private final int blockSize;
 	private final int lastUpdateTimeStep = -1;
 	JCheckBox printGridCheckBox;
-	public final Tetris tetris;
+	public final TetrisState tetris;
 	private final TetrisBlocksComponent blocks;
 
 	public boolean printGrid() {
@@ -42,7 +41,7 @@ public class TetrisVisualizer extends Surface {
 		return false;
 	}
 
-	public TetrisVisualizer(Tetris t, int blockSize) {
+	public TetrisVisualizer(TetrisState t, int blockSize) {
 		super();
 
 		SpaceGraph s = new SpaceGraph();
@@ -79,7 +78,7 @@ public class TetrisVisualizer extends Surface {
 	 public void paint(GL2 g) {
 	 //g.setPaintMode();
 	 if (blocks!=null && tetris!=null)
-		 blocks.render(g, 1, tetris.seenState);
+		 blocks.render(g, 1, tetris.seen);
 	 //g.setColor(Color.BLUE);
 	 //g.setXORMode(Color.GREEN);
 	 //g.drawString("Score: " + Texts.n4(tetris.reward()), 0, 400);

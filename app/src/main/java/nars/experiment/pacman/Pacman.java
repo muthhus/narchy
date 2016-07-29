@@ -27,11 +27,9 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.agent.NAgent;
-import nars.budget.UnitBudget;
-import nars.experiment.Environment;
-import nars.gui.BagChart;
+import nars.experiment.DiscreteEnvironment;
 import nars.gui.BeliefTableChart;
-import nars.gui.TimeSpace;
+import nars.gui.NARSpace;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -59,11 +57,12 @@ import static nars.experiment.pong.Pong.numericSensor;
 /**
  * the java application class of pacman 
  */
-public class Pacman extends cpcman implements Environment {
+public class Pacman extends cpcman implements DiscreteEnvironment {
 
 	final int visionRadius;
 	final int itemTypes = 3;
 	final static int runCycles = 15500;
+	final static int runDelay = 50 /* ms */;
 
 	boolean trace = true;
 
@@ -219,6 +218,7 @@ public class Pacman extends cpcman implements Environment {
 //					STMView.show(stm, 500, 500);
 
 					//TimeSpace.newTimeWindow((Default)nar, 128);
+					NARSpace.newConceptWindow((Default) nar, 128, 6);
 
 
 				}
@@ -254,7 +254,8 @@ public class Pacman extends cpcman implements Environment {
 				//new DPG(),
 				//new HaiQAgent(),
 				n,
-				runCycles);
+				runCycles,
+				runDelay);
 
 
 

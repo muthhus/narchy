@@ -50,8 +50,9 @@ public class TetrisState {
 
     public int width;/*how wide our board is*/
     public int height;/*how tall our board is*/
-    
-    
+
+
+    public float[] seen;
 
     public float[] worldState;/*what the world looks like without the current block*/
 
@@ -184,8 +185,8 @@ public class TetrisState {
                 break;
             case NONE:
                 break;
-            default:
-                throw new RuntimeException("unknown action");
+            //default:
+                //throw new RuntimeException("unknown action");
         }
         //Check if the resulting position is legal. If so, accept it.
         //Otherwise, don't change anything

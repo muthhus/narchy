@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * Created by me on 7/5/16.
  */
-public class CameraTrack implements Environment {
+public class CameraTrack implements DiscreteEnvironment {
 
 
     private final JPanel scene;
@@ -302,7 +302,7 @@ public class CameraTrack implements Environment {
 //        NAR.printTasks(nar,false);
 //        //nar.loop(50f);
 
-        new Environment() {
+        new DiscreteEnvironment() {
 
             @Override
             public Twin<Integer> start() {
