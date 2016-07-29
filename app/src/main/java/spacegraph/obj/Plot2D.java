@@ -1,20 +1,14 @@
 package spacegraph.obj;
 
-import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import com.gs.collections.api.block.procedure.primitive.FloatProcedure;
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import com.jogamp.opengl.GL2;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import nars.$;
 import nars.util.data.list.FasterList;
-import org.apache.commons.math3.util.FastMath;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
 public class Plot2D extends Surface {
@@ -48,7 +42,7 @@ public class Plot2D extends Surface {
 
             this.name = name;
             this.color = new float[4];
-            Draw.hsb((name.hashCode()%10000) / 10000f * 360.0f, 0.7f, 0.7f, 0.9f, color);
+            Draw.hsb((name.hashCode()%500) / 500f * 360.0f, 0.7f, 0.7f, 0.9f, color);
 
             this.capacity = capacity;
 
@@ -215,38 +209,40 @@ public class Plot2D extends Surface {
     };
 
     public static final PlotVis Line = (List<Series> series, GL2 gl, float minValue, float maxValue) -> {
-        if (gl == null)
-            return;
+
+        float labelDZ = 0.1f;
+        float rangeFontScale = 0.0005f;
+        float seriesFontScale = 0.001f;
+
+        //background
+        gl.glColor4f(0,0,0,0.75f);
+        Draw.rect(gl, 0, 0, 1, 1);
 
         if (minValue != maxValue) {
 
             //float m = 0; //margin
 
-            float w = 1.0f;
+            float W = 1.0f;
             float H = 1.0f;
 
-            //g.setGlobalBlendMode(BlendMode.DIFFERENCE);
-            gl.glColor3f(0.5f,0.5f,0.5f); //gray
+            gl.glColor4f(0.5f,0.5f,0.5f, 0.75f); //gray
+
             //g.fillText(String.valueOf(maxValue), 0, m + g.getFont().getSize());
-            Draw.line(gl, 0, 0, w, 0);
-            Draw.line(gl, 0, H, w, H);
+            Draw.text(gl, rangeFontScale, rangeFontScale, String.valueOf(minValue), 0, 0, labelDZ);
 
-            ///gl.fillText(String.valueOf(minValue), 0, H - m - 2);
-            //gl.setGlobalBlendMode(BlendMode.SRC_OVER /* default */);
+            Draw.line(gl, 0, 0, W, 0);
+            Draw.line(gl, 0, H, W, H);
 
-            FloatToFloatFunction ypos = (v) -> {
-                float py = (v - minValue) / (maxValue - minValue);
-                if (py < 0) py = 0;
-                else if (py > 1.0) py = 1.0f;
-                return (py);
-            };
+            Draw.text(gl, rangeFontScale, rangeFontScale, String.valueOf(maxValue), 0, H, labelDZ);
 
-            series.forEach(s -> {
 
-                //float mid = ypos.valueOf(0.5f * (s.minValue + s.maxValue));
+            for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
+                Series s = series.get(si);
 
-                gl.glColor3fv(s.color, 0);
-                //gl.fillText(s.name, m, mid);
+                float mid = ypos(minValue ,maxValue, (s.minValue + s.maxValue)/2f);
+
+                gl.glColor4fv(s.color, 0);
+                Draw.text(gl, seriesFontScale, seriesFontScale, s.name, 0, mid, labelDZ);
 
                 gl.glLineWidth(2);
 
@@ -257,24 +253,31 @@ public class Plot2D extends Surface {
 
                 int histSize = ss;
 
-                float dx = (w / histSize);
+                float dx = (W / histSize);
 
                 float x = 0;
                 float py = 0;
-                for (int i = 0; i < ss; i++) { //TODO why does the array change
-                    //System.out.println(x + " " + y);
-                    //gl.lineTo(x, ypos.valueOf(ssh[i]));
+                for (int i = 0; i < ss; i++) {
 
-                    float ny = ypos.valueOf(ssh[i]);
+                    float ny = ypos(minValue, maxValue, ssh[i]);
+
+
                     if (i > 0)
-                        Draw.line(gl, x-dx, py, x, ny);
+                        Draw.line(gl, x - dx, py, x, ny);
 
                     x += dx;
                     py = ny;
                 }
-            });
+            }
         }
     };
+
+    private static float ypos(float minValue, float maxValue, float v) {
+        float ny = (v - minValue) / (maxValue - minValue);
+        if (ny < 0) ny = 0;
+        else if (ny > 1.0) ny = 1.0f;
+        return ny;
+    }
 
 
     public void update() {

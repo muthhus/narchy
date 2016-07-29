@@ -21,7 +21,7 @@ public class LabelSurface extends Surface {
     public void paint(GL2 gl) {
         float dz = 0.1f;
         gl.glColor4f(1f,1f,1f,1f); //TODO color params
-        Draw.renderLabel(gl, fontScale, fontScale, value(), scaleLocal.x/2f, scaleLocal.y/2f, dz);
+        Draw.text(gl, fontScale, fontScale, value(), scaleLocal.x/2f, scaleLocal.y/2f, dz);
     }
 
     public void set(String newValue) {

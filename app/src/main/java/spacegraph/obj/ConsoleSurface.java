@@ -49,7 +49,7 @@ public class ConsoleSurface extends Surface {
     /**
      * http://www.java-tips.org/other-api-tips-100035/112-jogl/1689-outline-fonts-nehe-tutorial-jogl-port.html
      */
-    final VirtualTerminal term;
+    public final VirtualTerminal term;
 
     public final static int font = GLUT.STROKE_MONO_ROMAN;
     public final static float fontWidth = glut.glutStrokeWidthf(font, 'X');

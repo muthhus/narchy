@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,12 +15,13 @@ public class Arkanoid extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1L;
 
 	/* CONSTANTS */
+	int score;
 
 	public static final int SCREEN_WIDTH = 800;
 	public static final int SCREEN_HEIGHT = 600;
 
-	public static final double BALL_RADIUS = 10.0;
-	public static final double BALL_VELOCITY = 0.7;
+	public static final double BALL_RADIUS = 20.0;
+	public static final double BALL_VELOCITY = 1.5;
 
 	public static final double PADDLE_WIDTH = 120.0;
 	public static final double PADDLE_HEIGHT = 20.0;
@@ -33,25 +33,20 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public static final int COUNT_BLOCKS_X = 11;
 	public static final int COUNT_BLOCKS_Y = 4;
 
-	public static final int PLAYER_LIVES = 5;
-
-	public static final double FT_SLICE = 1.0;
 	public static final double FT_STEP = 1.0;
 
-	private static final String FONT = "Monospace";
 
 	/* GAME VARIABLES */
 
-	private boolean tryAgain;
+
 	private boolean running;
 
-	private final Paddle paddle = new Paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50);
+	public final Paddle paddle = new Paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50);
 	private final Ball ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 	private final List<Brick> bricks = new ArrayList<Arkanoid.Brick>();
-	private final ScoreBoard scoreboard = new ScoreBoard();
 
-	private double lastFt;
-	private double currentSlice;
+	//private double lastFt;
+	//private double currentSlice;
 
 	abstract class GameObject {
 		abstract double left();
@@ -91,75 +86,20 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	}
 
-	class ScoreBoard {
 
-		int score;
-		int lives = PLAYER_LIVES;
-		boolean win;
-		boolean gameOver;
-		String text = "";
 
-		Font font;
-
-		ScoreBoard() {
-			font = new Font(FONT, Font.PLAIN, 12);
-			text = "Welcome to Arkanoid Java version";
+	void increaseScore() {
+		score++;
+		if (score == (COUNT_BLOCKS_X * COUNT_BLOCKS_Y)) {
+			win();
 		}
+	}
 
-		void increaseScore() {
-			score++;
-			if (score == (COUNT_BLOCKS_X * COUNT_BLOCKS_Y)) {
-				win = true;
-				text = "You have won! \nYour score was: " + score
-						+ "\n\nPress Enter to restart";
-			} else {
-				updateScoreboard();
-			}
-		}
-
-		void die() {
-			lives--;
-			if (lives == 0) {
-				gameOver = true;
-				text = "You have lost! \nYour score was: " + score
-						+ "\n\nPress Enter to restart";
-			} else {
-				updateScoreboard();
-			}
-		}
-
-		void updateScoreboard() {
-			text = "Score: " + score + "  Lives: " + lives;
-		}
-
-		void draw(Graphics g) {
-			if (win || gameOver) {
-				font = font.deriveFont(50f);
-				FontMetrics fontMetrics = g.getFontMetrics(font);
-				g.setColor(Color.WHITE);
-				g.setFont(font);
-				int titleHeight = fontMetrics.getHeight();
-				int lineNumber = 1;
-				for (String line : text.split("\n")) {
-					int titleLen = fontMetrics.stringWidth(line);
-					g.drawString(line, (SCREEN_WIDTH / 2) - (titleLen / 2),
-							(SCREEN_HEIGHT / 4) + (titleHeight * lineNumber));
-					lineNumber++;
-
-				}
-			} else {
-				font = font.deriveFont(34f);
-				FontMetrics fontMetrics = g.getFontMetrics(font);
-				g.setColor(Color.WHITE);
-				g.setFont(font);
-				int titleLen = fontMetrics.stringWidth(text);
-				int titleHeight = fontMetrics.getHeight();
-				g.drawString(text, (SCREEN_WIDTH / 2) - (titleLen / 2),
-						titleHeight + 5);
-
-			}
-		}
-
+	protected void win() {
+		reset();
+	}
+	protected void die() {
+		reset();
 	}
 
 	class Paddle extends Rectangle {
@@ -171,6 +111,10 @@ public class Arkanoid extends JFrame implements KeyListener {
 			this.y = y;
 			this.sizeX = PADDLE_WIDTH;
 			this.sizeY = PADDLE_HEIGHT;
+		}
+
+		public void move(float dx) {
+			x += dx;
 		}
 
 		void update() {
@@ -198,7 +142,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 
 		void draw(Graphics g) {
-			g.setColor(Color.RED);
+			g.setColor(Color.WHITE);
 			g.fillRect((int) (left()), (int) (top()), (int) sizeX, (int) sizeY);
 		}
 
@@ -216,7 +160,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 
 		void draw(Graphics g) {
-			g.setColor(Color.YELLOW);
+			g.setColor(Color.WHITE);
 			g.fillRect((int) left(), (int) top(), (int) sizeX, (int) sizeY);
 		}
 	}
@@ -234,12 +178,12 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 
 		void draw(Graphics g) {
-			g.setColor(Color.RED);
+			g.setColor(Color.WHITE);
 			g.fillOval((int) left(), (int) top(), (int) radius * 2,
 					(int) radius * 2);
 		}
 
-		void update(ScoreBoard scoreBoard, Paddle paddle) {
+		void update(Paddle paddle) {
 			x += velocityX * FT_STEP;
 			y += velocityY * FT_STEP;
 
@@ -253,7 +197,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 				velocityY = -BALL_VELOCITY;
 				x = paddle.x;
 				y = paddle.y - 50;
-				scoreBoard.die();
+				die();
 			}
 
 		}
@@ -295,13 +239,13 @@ public class Arkanoid extends JFrame implements KeyListener {
 			mBall.velocityX = BALL_VELOCITY;
 	}
 
-	void testCollision(Brick mBrick, Ball mBall, ScoreBoard scoreboard) {
+	void testCollision(Brick mBrick, Ball mBall) {
 		if (!isIntersecting(mBrick, mBall))
 			return;
 
 		mBrick.destroyed = true;
 
-		scoreboard.increaseScore();
+		increaseScore();
 
 		double overlapLeft = mBall.right() - mBrick.left();
 		double overlapRight = mBrick.right() - mBall.left();
@@ -342,63 +286,34 @@ public class Arkanoid extends JFrame implements KeyListener {
 		this.setVisible(true);
 		this.addKeyListener(this);
 		this.setLocationRelativeTo(null);
+		setIgnoreRepaint(true);
 
-		this.createBufferStrategy(2);
+		//this.createBufferStrategy(2);
 
+
+		reset();
+
+	}
+
+	public void reset() {
 		initializeBricks(bricks);
+		score = 0;
+		ball.x = SCREEN_WIDTH / 2;
+		ball.y = SCREEN_HEIGHT / 2;
+		paddle.x = SCREEN_WIDTH / 2;
 
 	}
 
 	void run() {
 
-		BufferStrategy bf = this.getBufferStrategy();
-		Graphics g = bf.getDrawGraphics();
-		g.setColor(Color.black);
-		g.fillRect(0, 0, getWidth(), getHeight());
 
 		running = true;
 
+		reset();
+
 		while (running) {
 
-			long time1 = System.currentTimeMillis();
-
-			if (!scoreboard.gameOver && !scoreboard.win) {
-				tryAgain = false;
-				update();
-				drawScene(ball, bricks, scoreboard);
-
-				// to simulate low FPS
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-
-			} else {
-				if (tryAgain) {
-					tryAgain = false;
-					initializeBricks(bricks);
-					scoreboard.lives = PLAYER_LIVES;
-					scoreboard.score = 0;
-					scoreboard.win = false;
-					scoreboard.gameOver = false;
-					scoreboard.updateScoreboard();
-					ball.x = SCREEN_WIDTH / 2;
-					ball.y = SCREEN_HEIGHT / 2;
-					paddle.x = SCREEN_WIDTH / 2;
-				}
-			}
-
-			long time2 = System.currentTimeMillis();
-			double elapsedTime = time2 - time1;
-
-			lastFt = elapsedTime;
-
-			double seconds = elapsedTime / 1000.0;
-			if (seconds > 0.0) {
-				double fps = 1.0 / seconds;
-				this.setTitle("FPS: " + fps);
-			}
+			next();
 
 		}
 
@@ -406,36 +321,42 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	}
 
-	private void update() {
+	public float next() {
 
-		currentSlice += lastFt;
+		//currentSlice += lastFt;
 
-		for (; currentSlice >= FT_SLICE; currentSlice -= FT_SLICE) {
+		//for (; currentSlice >= FT_SLICE; currentSlice -= FT_SLICE) {
 
-			ball.update(scoreboard, paddle);
-			paddle.update();
-			testCollision(paddle, ball);
+		ball.update(paddle);
+		paddle.update();
+		testCollision(paddle, ball);
 
-			Iterator<Brick> it = bricks.iterator();
-			while (it.hasNext()) {
-				Brick brick = it.next();
-				testCollision(brick, ball, scoreboard);
-				if (brick.destroyed) {
-					it.remove();
-				}
-			}
+		Iterator<Brick> it = bricks.iterator();
+		while (it.hasNext()) {
+            Brick brick = it.next();
+            testCollision(brick, ball);
+            if (brick.destroyed) {
+                it.remove();
+            }
+        }
 
-		}
+		//}
+
+
+		SwingUtilities.invokeLater(this::repaint);
+
+        return score;
 	}
 
-	private void drawScene(Ball ball, List<Brick> bricks, ScoreBoard scoreboard) {
+
+	@Override
+	public void paint(Graphics g) {
 		// Code for the drawing goes here.
-		BufferStrategy bf = this.getBufferStrategy();
-		Graphics g = null;
+		//BufferStrategy bf = this.getBufferStrategy();
 
 		try {
 
-			g = bf.getDrawGraphics();
+
 
 			g.setColor(Color.black);
 			g.fillRect(0, 0, getWidth(), getHeight());
@@ -445,15 +366,13 @@ public class Arkanoid extends JFrame implements KeyListener {
 			for (Brick brick : bricks) {
 				brick.draw(g);
 			}
-			scoreboard.draw(g);
 
 		} finally {
 			g.dispose();
 		}
 
-		bf.show();
 
-		Toolkit.getDefaultToolkit().sync();
+		//Toolkit.getDefaultToolkit().sync();
 
 	}
 
@@ -462,9 +381,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 		if (event.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			running = false;
 		}
-		if (event.getKeyCode() == KeyEvent.VK_ENTER) {
-			tryAgain = true;
-		}
+
 		switch (event.getKeyCode()) {
 		case KeyEvent.VK_LEFT:
 			paddle.moveLeft();

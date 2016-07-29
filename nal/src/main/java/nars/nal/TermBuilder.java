@@ -635,15 +635,15 @@ public abstract class TermBuilder {
             if (Param.ALLOW_RECURSIVE_STATEMENTS && subject.equals(negation(predicate))) //but not THAT recursive
                 return False;
 
-            //TODO its possible to disqualify invalid statement if there is no structural overlap here
-
-            if (!Param.ALLOW_RECURSIVE_STATEMENTS && sc != null && sc.containsTerm(predicate)) { //non-recursive
-                throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject contains predicate");
+            //TODO its possible to disqualify invalid statement if there is no structural overlap here??
+//
+            if (!Param.ALLOW_RECURSIVE_STATEMENTS && sc != null && sc.op() == CONJ && sc.containsTerm(predicate)) { //non-recursive
+                throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
             }
 
             if (pc != null) {
-                if (!Param.ALLOW_RECURSIVE_STATEMENTS && pc.containsTerm(subject)) //non-recursive
-                    throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate contains subject");
+                if (!Param.ALLOW_RECURSIVE_STATEMENTS && pc.op()==CONJ && pc.containsTerm(subject)) //non-recursive
+                    throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
 
                 if (sc != null && subject.op().statement && predicate.op().statement) {
                     if ((sc.term(0).equals(pc.term(1))) ||

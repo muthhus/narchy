@@ -2,16 +2,21 @@ package nars.term.subst;
 
 import nars.Memory;
 import nars.Op;
+import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Map;
 
 /** not thread safe, use 1 per thread (do not interrupt matchAll) */
 public class UnifySubst extends FindSubst  {
+
+    static final Logger logger = LoggerFactory.getLogger(UnifySubst.class);
 
     @NotNull
     public final Memory memory;
@@ -53,7 +58,19 @@ public class UnifySubst extends FindSubst  {
 
         //TODO combine these two blocks to use the same sub-method
 
-        Term aa = resolve(a, xy);
+        Term aa;
+        try {
+            aa = resolve(a, xy);
+
+            target.add(aa);
+            //if (accept(a, aa))
+            matches++;
+
+        }
+        catch (InvalidTermException e) {
+            logger.warn("{}",e.toString());
+        }
+
 //        if ((aa == null) ||
 //        //Op aaop = aa.op();
 //        //only set the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
@@ -68,10 +85,6 @@ public class UnifySubst extends FindSubst  {
 //        if (bbop == Op.VAR_QUERY && (bbop == Op.VAR_INDEP || bbop == Op.VAR_DEP))
 //            return false;
 
-
-        target.add(aa);
-        //if (accept(a, aa))
-        matches++;
 
         return matches < maxMatches; //determines how many
     }

@@ -430,7 +430,7 @@ public enum Draw {
     /** thickness of font to avoid z-fighting */
     final static float zStep = 0.05f;
 
-    static public void renderLabel(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
+    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
         gl.glPushMatrix();
         gl.glNormal3f(0, 0, 1f);
         gl.glTranslatef(dx, dy, dz + zStep);

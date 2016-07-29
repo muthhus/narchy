@@ -113,7 +113,7 @@ public class BeliefTableChart extends JoglSpace2D {
         float cp = nar.conceptPriority(cc);
         gl.glColor4f(0.5f,0.5f,0.5f, 0.2f + 0.25f * cp);
         float size = (cp > 0 ? (0.003f + 0.0015f * cp) : 0.0015f) * H; //if not active then show in small, otherwise if active show larger and grow in proportion to the activity
-        Draw.renderLabel(gl, size, size, tt.toString(), W/2f, H/2f, 0);
+        Draw.text(gl, size, size, tt.toString(), W/2f, H/2f, 0);
 
         TruthWave beliefs = this.beliefs.get(n);
         if (!beliefs.isEmpty()) {

@@ -225,7 +225,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     protected void renderLabel(GL2 gl, float scale) {
         final float charAspect = 1.5f;
-        Draw.renderLabel(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
+        Draw.text(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
     }
 
     protected void renderShape(GL2 gl, Dynamic body) {

@@ -14,7 +14,6 @@ import spacegraph.render.Draw;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -400,7 +399,7 @@ public class TreeChart<X> extends Surface {
 
             gl.glColor3f(1,1,1);
             float labelSize = (float) (height / 4f * Math.min(0.005f,percent));
-            Draw.renderLabel(gl,
+            Draw.text(gl,
                     labelSize, labelSize, //label size
                     label, (float)(left+width/2f), (float)(top+height/2f), 0.5f);
 

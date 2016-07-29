@@ -335,9 +335,9 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         //s.add(new Facial(new CrosshairSurface(s)));
     }
 
-    private static class CameraViewer extends Surface {
+    public static class CameraViewer extends Surface {
         private final SwingCamera camera;
-        float tw = 300f;
+        float tw = 1f;
 
         public CameraViewer(SwingCamera camera) {
             this.camera = camera;
@@ -348,29 +348,27 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
             //gl.glScalef(0.25f,0.25f,0.25f);
             //draw(gl, this.camera.out);
-            draw(gl,this.camera.in);
-            drawLegend(gl);
+            draw(gl,this.camera.out);
+            //drawLegend(gl);
 
         }
-
-        public void drawLegend(GL2 gl) {
-
-            gl.glPushMatrix();
-
-            gl.glTranslatef(tw*1.1f, 0, 0);
-            gl.glScalef(0.5f,0.5f,0.5f);
-
-            gl.glColor3f(0.5f,0.5f,0.5f);
-            int hh = camera.inHeight();
-            int ww = camera.inWidth();
-            Draw.strokeRect(gl,0,0, ww, hh);
-
-            if (camera.out!=null)
-                Draw.strokeRect(gl,camera.input.x,camera.input.y, camera.input.width, camera.input.height);
-
-            gl.glPopMatrix();
-
-        }
+//
+//        public void drawLegend(GL2 gl) {
+//
+//            gl.glPushMatrix();
+//
+//
+//            gl.glColor3f(0.5f,0.5f,0.5f);
+//            int hh = camera.inHeight();
+//            int ww = camera.inWidth();
+//            Draw.strokeRect(gl,0,0, 1, hh);
+//
+//            if (camera.out!=null)
+//                Draw.strokeRect(gl,camera.input.x,camera.input.y, camera.input.width, camera.input.height);
+//
+//            gl.glPopMatrix();
+//
+//        }
 
         private void draw(GL2 gl, BufferedImage b) {
             if (b == null)

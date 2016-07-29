@@ -21,10 +21,12 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import spacegraph.Surface;
+import spacegraph.obj.ConsoleSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.Plot2D;
 import spacegraph.obj.XYSlider;
 
+import java.io.IOException;
 import java.util.*;
 
 import static nars.$.t;
@@ -38,11 +40,11 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int runCycles = 2512;
-    public static final int cyclesPerFrame = 128;
-    static int frameDelay = 5;
+    public static final int runCycles = 12512;
+    public static final int cyclesPerFrame = 64;
+    static int frameDelay = 10;
 
-    static boolean easy = false;
+    static boolean easy = true;
 
 
     private final TetrisState state;
@@ -51,6 +53,7 @@ public class Tetris2 extends NAREnvironment {
         public BagChart<Concept> conceptChart;
         public TetrisVisualizer vis;
         public Surface plot1;
+        public ConsoleSurface term = new ConsoleSurface(40,8);
     }
 
     final View view = new View();
@@ -262,6 +265,10 @@ public class Tetris2 extends NAREnvironment {
                     plot.update();
                     plot2.update();
                     plot3.update();
+                    try {
+                        view.term.term.putLinePre(summary());
+                    } catch (IOException e) {
+                    }
                 });
 
                 newControlWindow(view);
