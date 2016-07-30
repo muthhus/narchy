@@ -3,9 +3,8 @@ package nars.util.signal.markov;
 import com.google.common.collect.Iterables;
 import nars.util.io.Twokenize;
 
-import java.io.*;
-import java.net.http.HttpRequest;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;

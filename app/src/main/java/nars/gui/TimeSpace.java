@@ -11,18 +11,16 @@ import nars.util.experiment.DeductiveMeshTest;
 import nars.util.time.Between;
 import nars.util.time.IntervalTree;
 import org.infinispan.util.function.TriConsumer;
-import spacegraph.*;
+import spacegraph.SimpleSpatial;
+import spacegraph.SpaceGraph;
+import spacegraph.Spatial;
 import spacegraph.layout.Flatten;
 import spacegraph.obj.RectWidget;
 import spacegraph.obj.XYSlider;
-import spacegraph.render.Draw;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static nars.util.Util.hashCombine;
-import static spacegraph.math.v3.v;
 
 
 public class TimeSpace extends NARSpace implements TriConsumer<NAR, SpaceGraph, List<Spatial>>, Function<Object,Spatial> {

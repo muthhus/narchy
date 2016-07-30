@@ -4,7 +4,6 @@ import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.math.Transform;
-import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.solve.JacobianEntry;
 
 import static spacegraph.math.v3.v;

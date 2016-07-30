@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +23,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public static final double BALL_VELOCITY = 1.5;
 
 	public static final double PADDLE_WIDTH = 120.0;
-	public static final double PADDLE_HEIGHT = 20.0;
+	public static final double PADDLE_HEIGHT = 40.0;
 	public static final double PADDLE_VELOCITY = 0.6;
 
 	public static final double BLOCK_WIDTH = 60.0;
@@ -33,7 +32,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public static final int COUNT_BLOCKS_X = 11;
 	public static final int COUNT_BLOCKS_Y = 4;
 
-	public static final double FT_STEP = 1.0;
+	public static final double FT_STEP = 2.0;
 
 
 	/* GAME VARIABLES */
@@ -115,6 +114,8 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 		public void move(float dx) {
 			x += dx;
+			x = Math.max(x, sizeX);
+			x = Math.min(x, SCREEN_WIDTH - sizeX);
 		}
 
 		void update() {
@@ -304,22 +305,22 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	}
 
-	void run() {
-
-
-		running = true;
-
-		reset();
-
-		while (running) {
-
-			next();
-
-		}
-
-		this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-
-	}
+//	void run() {
+//
+//
+//		running = true;
+//
+//		reset();
+//
+//		while (running) {
+//
+//			next();
+//
+//		}
+//
+//		this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+//
+//	}
 
 	public float next() {
 
@@ -411,8 +412,5 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	}
 
-	public static void main(String[] args) {
-		new Arkanoid().run();
-	}
 
 }

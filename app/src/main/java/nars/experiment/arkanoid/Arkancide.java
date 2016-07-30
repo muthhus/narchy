@@ -13,6 +13,7 @@ import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
+import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
@@ -22,6 +23,7 @@ import spacegraph.Surface;
 import spacegraph.obj.ControlSurface;
 import spacegraph.obj.MatrixView;
 
+import java.util.List;
 import java.util.Random;
 
 import static nars.$.t;
@@ -36,17 +38,20 @@ public class Arkancide extends NAREnvironment {
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 32;
-    final int visH = 32;
+    final int visW = 12;
+    final int visH = 24;
     final SensorConcept[][] ss;
 
-    float noiseLevel = 0.05f;
+    private int visionSyncPeriod = 10;
+    float noiseLevel = 0.0f;
 
-    float speed = 20f;
+    float paddleSpeed = 40f;
     private long now;
+    private float prevScore;
 
     public class View {
         public Surface camView;
+        public List attention = $.newArrayList();
     }
     private final View view;
 
@@ -69,18 +74,28 @@ public class Arkancide extends NAREnvironment {
 
             SensorConcept s = ss[x][y];
             float b = s.hasBeliefs() ? s.beliefs().expectation(now) : 0;
-            float d = s.hasGoals() ? s.goals().expectation(now) : 0;
+            Truth dt = s.hasGoals() ? s.goals().truth(now) : null;
             float dr, dg;
-            if (d > 0.5f) {
-                dr = 0; dg = d-0.5f * 2f;
+            if (dt == null) {
+                dr = dg = 0;
             } else {
-                dg = 0; dr = (1f-d)-0.5f * 2f;
+                float f = dt.freq();
+                float c = dt.conf();
+                if (f > 0.5f) {
+                    dr = 0;
+                    dg = (f - 0.5f) * 2f * c;
+                } else {
+                    dg = 0;
+                    dr = (0.5f - f) * 2f * c;
+                }
             }
 
             float p = nar.conceptPriority(s);
-            g.glColor4f(dr, dg, b, 0.8f + 0.2f * p);
+            g.glColor4f(dr, dg, b, 0.5f + 0.5f * p);
 
         });
+        view.attention.add(nar.inputActivation);
+        view.attention.add(nar.derivedActivation);
 
         ControlSurface.newControlWindow(view);
 
@@ -99,6 +114,7 @@ public class Arkancide extends NAREnvironment {
                         () -> noise(decodeRed(cam.out.getRGB(xx, yy))) ,// > 0.5f ? 1 : 0,
                         (v) -> t(v, alpha)
                 ));
+                sss.timing(0,visionSyncPeriod);
                 ss[x][y] = sss;
             }
         }
@@ -118,28 +134,30 @@ public class Arkancide extends NAREnvironment {
     protected float act() {
         now = nar.time();
         cam.update();
-        noid.paddle.move((motorLeftRight.goals().expectation(nar.time()) - 0.5f) * speed);
-        return noid.next();
+        noid.paddle.move((motorLeftRight.goals().expectation(nar.time()) - 0.5f) * paddleSpeed);
+        float nextScore = noid.next();
+        float reward = nextScore - prevScore;
+        this.prevScore = nextScore;
+        return reward;
     }
 
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Param.CONCURRENCY_DEFAULT = 2;
+        Param.CONCURRENCY_DEFAULT = 1;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 5 * 10000000, false)
-
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 3 * 10000000, false)
                 , new FrameClock());
-        nar.inputActivation.setValue(0.03f);
+        nar.inputActivation.setValue(0.2f);
         nar.derivedActivation.setValue(0.05f);
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.65f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.8f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
@@ -177,8 +195,8 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 32, '.', 4);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 4);
 
         new ArithmeticInduction(nar);
 

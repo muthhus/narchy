@@ -19,11 +19,9 @@ package nars.term;
 import nars.*;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
-import nars.io.NarseseTest;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
-import nars.term.compound.Statement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -36,9 +34,7 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.$.inh;
-import static nars.Op.IMGe;
-import static nars.Op.IMGi;
-import static nars.Op.INH;
+import static nars.Op.*;
 import static org.junit.Assert.*;
 
 /**

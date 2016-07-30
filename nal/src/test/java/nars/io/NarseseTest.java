@@ -18,7 +18,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static nars.nal.TermBuilder.False;
 import static org.junit.Assert.*;
 
 

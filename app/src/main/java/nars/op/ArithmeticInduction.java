@@ -6,9 +6,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.gs.collections.api.list.primitive.ByteList;
-import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
-import infinispan.com.google.common.collect.Ranges;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -18,7 +16,6 @@ import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.obj.Termject;
@@ -35,7 +32,6 @@ import java.util.function.Function;
 
 import static nars.Op.CONJ;
 import static nars.Op.EQUI;
-import static nars.Op.IMPL;
 import static nars.nal.Tense.DTERNAL;
 
 /** arithmetic rule mining & variable introduction */

@@ -9,8 +9,8 @@ import nars.concept.table.BeliefTable;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
-import spacegraph.render.JoglSpace2D;
 import spacegraph.render.Draw;
+import spacegraph.render.JoglSpace2D;
 
 import java.util.Collections;
 import java.util.List;

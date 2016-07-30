@@ -33,9 +33,7 @@ import spacegraph.phys.util.OArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static spacegraph.math.v3.v;
 import static spacegraph.phys.collision.broad.Dbvt.*;
-import static spacegraph.phys.collision.broad.Dbvt.DOUBLE_STACKSIZE;
 
 /**
  *Dynamic AABB Tree

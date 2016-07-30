@@ -573,6 +573,7 @@ public class Narsese extends BaseParser<Object> {
     public Rule CycleDelta() {
         return
                 firstOf(
+                    seq("+-", push(Tense.XTERNAL)),
                     seq('+',oneOrMore(digit()),
                         push(Integer.parseInt(matchOrDefault(invalidCycleDeltaString)))
                     ),

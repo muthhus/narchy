@@ -1,7 +1,7 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
-import spacegraph.math.*;
+import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;

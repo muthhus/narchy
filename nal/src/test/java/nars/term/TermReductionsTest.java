@@ -13,7 +13,8 @@ import static nars.$.*;
 import static nars.Op.CONJ;
 import static nars.io.NarseseTest.assertInvalid;
 import static nars.nal.TermBuilder.False;
-import static nars.term.TermTest.*;
+import static nars.term.TermTest.assertValid;
+import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static org.junit.Assert.*;
 
 /**

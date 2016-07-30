@@ -3,7 +3,6 @@ package spacegraph.obj;
 import com.jogamp.opengl.GL2;
 import nars.util.Util;
 import spacegraph.SimpleSpatial;
-import spacegraph.Spatial;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
 import spacegraph.math.v3;
@@ -12,7 +11,6 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.BoxShape;
-import spacegraph.phys.shape.CollisionShape;
 
 import static spacegraph.math.v3.v;
 

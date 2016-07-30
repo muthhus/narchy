@@ -2,7 +2,6 @@ package nars.nal.multistep;
 
 import nars.NAR;
 import nars.nal.AbstractNALTest;
-import nars.nar.Default;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;

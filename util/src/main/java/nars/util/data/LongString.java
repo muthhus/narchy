@@ -1,7 +1,5 @@
 package nars.util.data;
 
-import java.math.BigInteger;
-
 /**
  * Created by me on 7/10/16.
  */

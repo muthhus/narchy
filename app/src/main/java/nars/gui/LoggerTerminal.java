@@ -1,14 +1,11 @@
 package nars.gui;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import nars.util.DefaultConsoleAppender;
-import nars.util.event.Topic;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.function.Function;
 
 
 public class LoggerTerminal extends DefaultVirtualTerminal {

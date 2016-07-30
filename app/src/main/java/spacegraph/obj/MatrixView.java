@@ -1,7 +1,6 @@
 package spacegraph.obj;
 
 import com.jogamp.opengl.GL2;
-import nars.experiment.arkanoid.Arkancide;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 

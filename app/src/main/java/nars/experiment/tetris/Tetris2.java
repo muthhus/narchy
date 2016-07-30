@@ -24,13 +24,13 @@ import spacegraph.Surface;
 import spacegraph.obj.ConsoleSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.Plot2D;
-import spacegraph.obj.XYSlider;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static nars.$.t;
-import static nars.experiment.pong.Pong.numericSensor;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.VERTICAL;

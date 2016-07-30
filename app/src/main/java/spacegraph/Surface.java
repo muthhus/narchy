@@ -20,7 +20,7 @@ public class Surface {
     public Vector2f scaleLocal;
 
     public Surface parent;
-    public List<? extends Surface> children;
+    public List<Surface> children;
 
     public Surface() {
         translateLocal = new v3();
@@ -39,7 +39,7 @@ public class Surface {
         setChildren(Lists.newArrayList(s));
     }
 
-    public void setChildren(List<? extends Surface> children) {
+    public void setChildren(List<Surface> children) {
         if (!Objects.equals(this.children, children)) {
             this.children = children;
             layout();

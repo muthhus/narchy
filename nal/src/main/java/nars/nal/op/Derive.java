@@ -30,6 +30,7 @@ import static nars.Op.ATOM;
 import static nars.Op.NEG;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
+import static nars.nal.Tense.XTERNAL;
 
 /**
  * Handles matched derivation results
@@ -318,7 +319,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             //the derived compound has a dt but the premise was entirely atemporal;
             // this (probably!) indicates a temporal placeholder in the rules that needs to be set to DTERNAL
             Op o = content.op();
-            if (content.dt()==0 && !o.isImage()) {
+            if (content.dt()==XTERNAL /*&& !o.isImage()*/) {
                 Term ete = m.index.builder().build(o, DTERNAL, content.terms());
                 if (!(ete instanceof Compound)) {
                     //throw new InvalidTermException(o, content.dt(), content.terms(), "untemporalization failed");

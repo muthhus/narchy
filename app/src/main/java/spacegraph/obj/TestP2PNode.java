@@ -6,16 +6,11 @@ import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.DistanceConstraint;
-import spacegraph.phys.constraint.Point2PointConstraint;
 import spacegraph.phys.shape.BoxShape;
-import spacegraph.phys.shape.CollisionShape;
 
 import java.util.List;
-
-import static spacegraph.math.v3.v;
 
 /**
  * Created by me on 7/23/16.

@@ -1,6 +1,5 @@
 package spacegraph.render;
 
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
@@ -11,14 +10,11 @@ import nars.util.Util;
 import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.Spatial;
-import spacegraph.math.v3;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Set;
-import java.util.function.Consumer;
 
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {

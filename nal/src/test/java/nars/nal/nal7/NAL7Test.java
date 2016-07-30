@@ -10,9 +10,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-import static nars.$.$;
 import static nars.nal.Tense.ETERNAL;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 1/9/16.

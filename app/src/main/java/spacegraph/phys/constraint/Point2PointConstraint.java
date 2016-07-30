@@ -30,8 +30,6 @@ import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.solve.JacobianEntry;
 
-import static spacegraph.math.v3.v;
-
 /**
  * Point to point constraint between two rigid bodies each with a pivot point that
  * descibes the "ballsocket" location in local space.

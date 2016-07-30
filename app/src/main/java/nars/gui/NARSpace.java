@@ -15,9 +15,7 @@ import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
-import spacegraph.layout.Flatten;
 import spacegraph.phys.Dynamic;
-import spacegraph.phys.shape.CollisionShape;
 
 import java.util.List;
 

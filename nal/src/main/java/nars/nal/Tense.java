@@ -27,6 +27,8 @@ public enum Tense  {
     /** integer version of long ETERNAL */
     public static final int DTERNAL = Integer.MIN_VALUE;
 
+    /** a dt placeholder value for preventing premature flattening during derivation term construction */
+    public static final int XTERNAL = Integer.MAX_VALUE;
 
     /**
      * flag for an unknown time, or as-yet-un-perceived time,
@@ -34,6 +36,7 @@ public enum Tense  {
      * if eventually perceived or derived
      */
     @Deprecated public static final long TIMELESS = Long.MIN_VALUE + 1;
+
 
 
     public final String symbol;

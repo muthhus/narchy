@@ -2,7 +2,10 @@ package spacegraph.layout;
 
 import nars.gui.ConceptWidget;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import spacegraph.*;
+import spacegraph.AbstractSpace;
+import spacegraph.EDraw;
+import spacegraph.SpaceGraph;
+import spacegraph.SpaceTransform;
 
 import java.awt.*;
 

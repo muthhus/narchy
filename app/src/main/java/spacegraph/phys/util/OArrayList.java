@@ -24,7 +24,6 @@
 package spacegraph.phys.util;
 
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
-import spacegraph.Spatial;
 
 import java.io.Externalizable;
 import java.io.IOException;

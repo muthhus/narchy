@@ -7,13 +7,9 @@ import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.term.obj.Termject;
 import nars.util.signal.TestNAR;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by me on 7/20/16.

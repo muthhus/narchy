@@ -5,7 +5,6 @@ import nars.util.signal.markov.MarkovTrack;
 
 import javax.sound.midi.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class TrackTest {

@@ -5,7 +5,6 @@ import nars.util.signal.Autoencoder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;
-import java.util.function.IntFunction;
 
 /**
  * Created by me on 5/22/16.

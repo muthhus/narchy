@@ -7,18 +7,11 @@ import com.google.common.collect.Range;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.nal.Tense;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.term.Termlike;
-import nars.term.Terms;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Predicate;
 
 public interface Termject<X> extends Atomic {
 

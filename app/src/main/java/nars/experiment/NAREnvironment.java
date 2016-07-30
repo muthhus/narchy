@@ -9,7 +9,6 @@ import nars.concept.Concept;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Term;
-import nars.util.Texts;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.RangeNormalizedFloat;

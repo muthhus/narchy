@@ -1,7 +1,9 @@
 package spacegraph.obj;
 
 import nars.$;
+import nars.util.Texts;
 import nars.util.data.list.FasterList;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.infinispan.cdi.common.util.Reflections;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
@@ -10,7 +12,8 @@ import spacegraph.Surface;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 /**
  * Generic widget control panel for arbitrary POJOs
@@ -66,6 +69,10 @@ public class ControlSurface extends PanelSurface {
 //        }
         if (v instanceof Surface) {
             return ((Surface) v);
+        } else if (v instanceof MutableFloat) {
+            return build(k, (MutableFloat)v);
+        } else if (v instanceof Iterable) {
+            return build((Iterable)v, remainingDepth, built);
         } else if (v.getClass().isPrimitive()) {
             return new LabelSurface(k.toString());
         } else {
@@ -73,10 +80,11 @@ public class ControlSurface extends PanelSurface {
                 return new GridSurface(children(o, remainingDepth, built));
             } else if (remainingDepth > 1) {
                 return new ControlSurface(k, v, remainingDepth, built);
-            } else {
-                return new LabelSurface(k.toString());
             }
         }
+
+        //else..
+        return new LabelSurface(k + ":" + v);
 
 
 
@@ -84,6 +92,35 @@ public class ControlSurface extends PanelSurface {
                 //vc.term.putLine(k + "\n  " + v);
                 //vc );
 
+    }
+
+    private Surface build(Object k, MutableFloat f) {
+//
+//        if (k instanceof Field) {
+//            System.out.println(k);
+//        }
+
+        //
+        // return new SliderSurface(0.5f, 0, 1);
+
+        return new LabelSurface(k + " " + Texts.n4(f.floatValue()));
+//        int ki = 0;
+//        for (Object x : c) {
+//            g.children.add(build(ki, x, remainingDepth, built));
+//            ki++;
+//        }
+//        return g;
+    }
+
+    private Surface build(Iterable c, int remainingDepth, IdentityHashMap built) {
+        GridSurface g = new GridSurface();
+        int ki = 0;
+        for (Object x : c) {
+            g.children.add(build(ki, x, remainingDepth, built));
+            ki++;
+        }
+        g.layout();
+        return g;
     }
 
     private FasterList<Surface> children(Object V, int remainingDepth, IdentityHashMap built) {

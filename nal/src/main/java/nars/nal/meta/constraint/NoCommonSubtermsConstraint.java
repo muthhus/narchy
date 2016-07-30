@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 
-import static nars.term.container.TermContainer.commonSubterms;
-import static nars.term.container.TermContainer.commonSubtermsRecurse;
 import static nars.term.container.TermContainer.subtermOfTheOther;
 
 /** variables excluded */

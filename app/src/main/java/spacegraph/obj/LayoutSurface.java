@@ -15,7 +15,7 @@ abstract public class LayoutSurface extends Surface {
         this(Lists.newArrayList(children));
     }
 
-    public LayoutSurface(List<? extends Surface> children) {
+    public LayoutSurface(List<Surface> children) {
         setChildren(children);
     }
 

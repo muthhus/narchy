@@ -1,7 +1,6 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
-import javafx.scene.paint.Color;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
