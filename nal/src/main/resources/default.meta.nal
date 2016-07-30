@@ -44,12 +44,12 @@
 //If S can stand for P, P can to a certain low degree also represent the class S
 //If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
 
-    (P --> S), (S --> P), task("?") |- (P --> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
-    (P ==> S), (S ==> P), task("?") |- (P ==> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
+    (P --> S), (S --> P),                  task("?") |- (P --> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
+    (P ==> S), (S ==> P), time(dtCombine), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
-    ( (--,%S) ==> P),  P, no_common_subterm(S,P), time(dtTask) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
-    ( (--,%S) ==> P),  S, no_common_subterm(S,P), time(dtTask) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  P, no_common_subterm(S,P), notEquivalence(P), time(dtTask) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  S, no_common_subterm(S,P), notEquivalence(S), time(dtTask) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
 
 
 
@@ -315,7 +315,7 @@
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact) |- substituteIfUnifiesIndep(((&&,A..+) ==> B),X,Y), (Belief:Deduction)
+    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact) |- substituteIfUnifiesIndep(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
 
 //conditional abduction
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction)
@@ -358,11 +358,11 @@
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==>+- B), (Belief:Induction)
+    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notEquivalence(A), notEquivalence(B) |- (A ==>+- B), (Belief:Induction)
 
     A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
 
-    A, B, task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
+    A, B, task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notEquivalence(A), notEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
 
     A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
 

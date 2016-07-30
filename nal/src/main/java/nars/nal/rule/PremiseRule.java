@@ -633,12 +633,16 @@ public class PremiseRule extends GenericCompound {
                     break;
 
                 case "notConjunction":
-                    constraints.put(arg1, new NotOpConstraint(Op.CONJ));
+                    //constraints.put(arg1, new NotOpConstraint(Op.CONJ));
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.CONJ.bit);
+                    break;
+
+                case "notEquivalence":
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.EQUI.bit);
                     break;
 
                 case "notImplicationOrEquivalence":
-                    int b = Op.ImplicationOrEquivalenceBits;
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, b);
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.ImplicationOrEquivalenceBits);
                     break;
                 
                 case "notImplicationEquivalenceOrConjunction":

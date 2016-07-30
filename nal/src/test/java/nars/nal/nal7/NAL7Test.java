@@ -18,7 +18,7 @@ import static nars.nal.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 200;
+    final int cycles = 500;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -253,12 +253,13 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void inference_on_tense_3() {
         TestNAR tester = test();
-        //tester.log();
-        tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))", 1.0f, 0.9f);
-        tester.input("<(John,key) --> hold>. :|:");
 
         tester.mustBelieve(cycles, "<(John,room) --> enter>",
                 1.00f, 0.81f, 3);
+
+        tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))", 1.0f, 0.9f);
+        tester.input("<(John,key) --> hold>. :|:");
+
 
     }
 
