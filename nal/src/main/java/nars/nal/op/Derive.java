@@ -52,8 +52,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      */
     @NotNull
     public final Term conclusionPattern;
-    @Nullable
-    public final Term conclusionPatternNP, conclusionPatternPN, conclusionPatternNN;
 
 
     /**
@@ -84,32 +82,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         this.conclusionPattern = term;
 
-//        //to be safe, exclude any rules which have an immediate transform (in the form of an operator) in the conclusion,
-//        //because negating its parameters may have unpredictable effects depending on the operation
-//        if (conclusionPattern.hasAny(Op.OPER)) {
-//            this.conclusionPatternNP = this.conclusionPatternPN = this.conclusionPatternNN = null;
-//        } else {
-
-            if (rule.taskPunc != '?') {
-                this.conclusionPatternNP = negateConclusion(true, false);
-            } else {
-                //if the task is a question or quest, it is meaningless to handle that inverted term
-                this.conclusionPatternNP = null;
-            }
-
-            if ((belief == null || belief.single()) && (goal == null || goal.single())) {
-                //there will be no belief to negate, so these patterns
-                //should never be attempted.
-                //however this conditoin will be tested during derivation,
-                // in case EITHER the belief OR the goal are single
-                this.conclusionPatternPN = this.conclusionPatternNN = null;
-            } else {
-                this.conclusionPatternPN = negateConclusion(false, true);
-                this.conclusionPatternNN = negateConclusion(true, true);
-            }
-
-        //}
-
 
         //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
         this.temporalizer = temporalizer;
@@ -118,44 +90,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     }
 
-    private Term negateConclusion(boolean negTask, boolean negBelief) {
-
-        @NotNull Term cp = this.conclusionPattern;
-
-
-//        if (!(negBelief ^ negTask) && (negTask && cp.equals(rule.getTask())) || (negBelief && cp.equals(rule.getBelief()))) {
-//            return cp; //double negative of the conclusion term which is present in both negated task and belief
-//        }
-        if (cp.op().atomic) {
-            return null;
-        }
-
-
-        if (cp.vars() > 0) //exclude vars for now, but this may be allowed if unification on the variable-containing superterm matches the task/belief pattern being negated, etc.
-            return null;
-
-        if (negTask) {
-            Map<Term, Term> cc = new HashMap();
-            Term taskPattern = this.rule.getTask();
-            cc.put(taskPattern, $.neg(taskPattern));
-            Term ccp = $.terms.remap(cp, cc);
-            if (ccp.equals(cp)) {
-                return null; //unaffects the conclusion, so the negation can't be captured by a negated subterm
-            }
-            cp = ccp;
-        }
-        if (negBelief) {
-            Map<Term, Term> cc = new HashMap();
-            @NotNull Term beliefPattern = this.rule.getBelief();
-            cc.put(beliefPattern, $.neg(beliefPattern));
-            Term ccp = $.terms.remap(cp, cc);
-            if (ccp.equals(cp)) {
-                return null; //unaffects the conclusion, so the negation can't be captured by a negated subterm
-            }
-            cp = ccp;
-        }
-        return cp;
-    }
 
 
     @NotNull
@@ -195,29 +129,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         beliefTruth = ((f == null) || single) ? null : m.beliefTruth;
 
         Term cp = this.conclusionPattern;
-
-
-        boolean tn = taskTruth != null && taskTruth.isNegative();
-        boolean bn = beliefTruth != null && beliefTruth.isNegative();
-        if (!bn && !tn) {
-            //continue below
-        } else if (bn && tn) {
-            if (conclusionPatternNN != null) {
-                cp = conclusionPatternNN;
-                taskTruth = taskTruth.negated();
-                beliefTruth = beliefTruth.negated();
-            }
-        } else if (bn) {
-            if (conclusionPatternPN != null) {
-                cp = conclusionPatternPN;
-                beliefTruth = beliefTruth.negated();
-            }
-        } else if (tn) {
-            if (conclusionPatternNP != null) {
-                cp = conclusionPatternNP;
-                taskTruth = taskTruth.negated();
-            }
-        }
 
 
         Term r;
@@ -298,6 +209,11 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
             content = temporalized;
 
+            if (content.dt() == XTERNAL) {
+                //throw new InvalidTermException(content.op(), content.dt(), content.terms(), "XTERNAL leak");
+                return;
+            }
+
             //apply the confidence scale
             if (truth != null) {
                 float projection;
@@ -312,6 +228,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                     //return;
                 }
             }
+
 
 
             occ = occReturn[0];
@@ -330,6 +247,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
             occ = ETERNAL;
         }
+
 
 
         m.conclusion.derive.add( //TODO we should not need to normalize the task, so process directly is preferred

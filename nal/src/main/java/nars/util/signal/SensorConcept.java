@@ -20,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 import static nars.nal.Tense.ETERNAL;
 
 
@@ -65,12 +63,18 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
 
     /** originating from this sensor, or a future prediction */
     @Override
-    public boolean validBelief(@NotNull Task belief, @NotNull NAR nar) {
-        //return futureDerivationsOnly(belief, nar);
-        return true;
+    public boolean validBelief(@NotNull Task t, @NotNull NAR nar) {
+        return onlyDerivationsIfFuture(t, nar);
+        //return true;
+    }
+    @Override
+    public boolean validGoal(@NotNull Task t, @NotNull NAR nar) {
+        return onlyDerivationsIfFuture(t, nar);
+        //return true;
     }
 
-    public static boolean futureDerivationsOnly(@NotNull Task belief, @NotNull NAR nar) {
+
+    public static boolean onlyDerivationsIfFuture(@NotNull Task belief, @NotNull NAR nar) {
         if (!(belief instanceof DerivedTask))
             return true;
 
@@ -78,15 +82,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
         return (bocc!=ETERNAL && bocc > nar.time());
     }
 
-    @Override
-    public boolean validGoal(@NotNull Task belief, @NotNull NAR nar) {
-        return true;
-    }
 
-    @Override
-    public @NotNull Task filterGoals(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
-        return t;
-    }
 
     @Override
     final protected void beliefCapacity(ConceptPolicy p) {

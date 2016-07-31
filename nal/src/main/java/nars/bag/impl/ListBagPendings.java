@@ -56,11 +56,10 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
         if (p != null) {
             clear();
             for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
-                RawBLink<X> w = p.getAndNullify(i);
-                if (w == null) continue;
+                RawBLink<X> w = p.getAndSet(i, NULL_LINK);
 
                 float wp = w.pri();
-                if (wp == wp) { //not deleted
+                if (wp == wp && wp > 0) { //not deleted
                     target.commitPending(w.x, wp, w.dur(), w.qua());
                 }
             }
@@ -88,16 +87,18 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
     }
 
     private void combine(@NotNull CircularArrayList<RawBLink<X>> p) {
-        //HACK remove nulls before sort
-        for (int i = 0; i < pending.size(); ) {
-            if (pending.get(i) == null) {
-                pending.remove(i);
-            } else {
-                i++;
-            }
-        }
+//        //HACK remove nulls before sort
+//        for (int i = 0; i < pending.size(); ) {
+//            if (pending.get(i) == null) {
+//                pending.remove(i);
+//            } else {
+//                i++;
+//            }
+//        }
         Collections.sort(p, this);
     }
+
+    final static RawBLink NULL_LINK = new RawBLink(false, -1, 0, 0);
 
     @Override
     public float mass(ArrayBag<X> bag) {
@@ -115,7 +116,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
                 if (pp > 0) {
                     sum += pp * w.dur();
                 } else {
-                    p.set(i, null);
+                    p.set(i, NULL_LINK);
                 }
             }
         }

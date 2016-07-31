@@ -33,7 +33,7 @@ public class TaskBudgeting {
             if (termLink.isDeleted())
                 return;
             BudgetMerge.plusBlend.apply(p, termLink, 1f);
-        } catch (Budget.InvalidPriorityException e) {
+        } catch (Budget.BudgetException e) {
             //HACK - this isnt a full solution, but it should work temporarily
             return;
         }

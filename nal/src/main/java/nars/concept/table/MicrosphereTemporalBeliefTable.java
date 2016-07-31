@@ -1,5 +1,6 @@
 package nars.concept.table;
 
+import com.gs.collections.api.block.predicate.Predicate;
 import nars.NAR;
 import nars.Param;
 import nars.nal.Stamp;
@@ -446,7 +447,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-//    public final boolean removeIf(@NotNull Predicate<? super Task> o) {
+    //    public final boolean removeIf(@NotNull Predicate<? super Task> o) {
 //
 //        IntArrayList toRemove = new IntArrayList();
 //        for (int i = 0, thisSize = this.size(); i < thisSize; i++) {

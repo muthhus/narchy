@@ -143,7 +143,7 @@ public class TruthWave {
 
 
     @FunctionalInterface public interface TruthWaveVisitor {
-        void onTruth(float f, float c, float occ, float qua);
+        void onTruth(float f, float c, @Deprecated float occ /* should be double here */, float qua);
     }
 
     public final void forEach(@NotNull TruthWaveVisitor v) {

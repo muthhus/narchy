@@ -23,7 +23,7 @@ public class GridSurface extends LayoutSurface {
     }
 
     public GridSurface(List<Surface> children) {
-        this(children, SQUARE);
+        this(SQUARE, children);
     }
 
     public GridSurface(float aspect, Surface... children) {
@@ -32,7 +32,7 @@ public class GridSurface extends LayoutSurface {
         setChildren(children);
     }
 
-    public GridSurface(List<Surface> children, float aspect) {
+    public GridSurface(float aspect, List<Surface> children) {
         super();
         this.aspect.setValue(aspect);
         setChildren(children);

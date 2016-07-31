@@ -110,11 +110,11 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
         //return buf[wrapIndex(head + i)];
     }
 
-    public final E getAndNullify(int i) {
+    public final E getAndSet(int i, E newValue) {
         int ii = (head + i) % n;
         E[] a = this.array;
         E e = a[ii];
-        a[ii] = null;
+        a[ii] = newValue;
         return e;
     }
 

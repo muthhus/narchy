@@ -453,6 +453,7 @@ public class NAL5Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
                 .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL);
     }
+
     @Test public void testNegNegImplicationConc() {
         test()
                 .log()
@@ -464,15 +465,5 @@ public class NAL5Test extends AbstractNALTest {
     }
 
 
-    @Test public void testNegatedImplicationTerm5() {
-        test()
-                .log()
-                .input("(x). %0.0;0.90%")
-                .input("((--,(x)) ==> (--,(y))).")
-                .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
-                .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL)
-        ;
-    }
-    //NO	((<(--,p1) ==> p2>, p2), (<(--,p2) ==> p1>, (<Contraposition --> Truth>, <AllowBackward --> Derive>)))
 
 }

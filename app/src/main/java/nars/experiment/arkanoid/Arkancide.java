@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.experiment.NAREnvironment;
+import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -21,39 +22,43 @@ import nars.util.signal.SensorConcept;
 import nars.vision.SwingCamera;
 import spacegraph.Surface;
 import spacegraph.obj.ControlSurface;
+import spacegraph.obj.GridSurface;
 import spacegraph.obj.MatrixView;
 
 import java.util.List;
 import java.util.Random;
 
+import static java.util.stream.Collectors.toList;
 import static nars.$.t;
 import static nars.vision.PixelCamera.decodeRed;
+import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 32;
+    private static final int cyclesPerFrame = 64;
     final Arkanoid noid;
     private final SwingCamera cam;
 
 
+
     private MotorConcept motorLeftRight;
 
-    final int visW = 12;
-    final int visH = 24;
+    final int visW = 20;
+    final int visH = 14;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 10;
-    float noiseLevel = 0.0f;
+    private int visionSyncPeriod = 32;
+    float noiseLevel = 0;
 
     float paddleSpeed = 40f;
     private long now;
     private float prevScore;
 
     public class View {
-        public Surface camView;
+        //public Surface camView;
         public List attention = $.newArrayList();
     }
-    private final View view;
+    private final View view = new View();
 
     public Arkancide(NAR nar) {
         super(nar);
@@ -64,8 +69,29 @@ public class Arkancide extends NAREnvironment {
         cam = new SwingCamera(noid, visW, visH);
         cam.update();
 
-        view = new View();
-        view.camView = new MatrixView(visW, visH, (x, y, g) -> {
+
+
+    }
+
+    @Override
+    protected void init(NAR n) {
+        for (int x = 0; x < visW; x++) {
+            int xx = x;
+            for (int y = 0; y < visH; y++) {
+                Compound squareTerm = $.p(new Termject.IntTerm(x), new Termject.IntTerm(y));
+                int yy = y;
+                SensorConcept sss;
+                sensors.add(sss = new SensorConcept(squareTerm, nar,
+                        () -> noise(decodeRed(cam.out.getRGB(xx, yy))) ,// > 0.5f ? 1 : 0,
+                        (v) -> t(v, alpha)
+                ));
+                sss.timing(0,visionSyncPeriod);
+                ss[x][y] = sss;
+            }
+        }
+
+
+        MatrixView camView = new MatrixView(visW, visH, (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
 //            float r = decodeRed(rgb);
 //            if (r > 0)
@@ -94,32 +120,33 @@ public class Arkancide extends NAREnvironment {
             g.glColor4f(dr, dg, b, 0.5f + 0.5f * p);
 
         });
-        view.attention.add(nar.inputActivation);
-        view.attention.add(nar.derivedActivation);
 
-        ControlSurface.newControlWindow(view);
-
-
-    }
-
-    @Override
-    protected void init(NAR n) {
-        for (int x = 0; x < visW; x++) {
-            int xx = x;
-            for (int y = 0; y < visH; y++) {
-                Compound squareTerm = $.p(new Termject.IntTerm(x), new Termject.IntTerm(y));
-                int yy = y;
-                SensorConcept sss;
-                sensors.add(sss = new SensorConcept(squareTerm, nar,
-                        () -> noise(decodeRed(cam.out.getRGB(xx, yy))) ,// > 0.5f ? 1 : 0,
-                        (v) -> t(v, alpha)
-                ));
-                sss.timing(0,visionSyncPeriod);
-                ss[x][y] = sss;
-            }
-        }
 
         actions.add(motorLeftRight = new MotorConcept("(leftright)", nar));
+
+        //view.attention.add(nar.inputActivation);
+        //view.attention.add(nar.derivedActivation);
+
+        long[] btRange = new long[2];
+        nar.onFrame(nn -> {
+            long window = 1500;
+            long now = nn.time();
+            btRange[0] = now - window;
+            btRange[1] = now + window;
+        });
+        List<Surface> actionTables = actions.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
+        actionTables.add(new BeliefTableChart(nar,happy, btRange));
+
+        //sample sensors
+        for (int i = 0; i < 4; i++) {
+            actionTables.add(new BeliefTableChart(nar, ss[1+i][1+i], btRange));
+        }
+
+
+        ControlSurface.newControlWindow(
+                new GridSurface(VERTICAL, actionTables),
+                camView
+        );
 
     }
 
@@ -150,18 +177,18 @@ public class Arkancide extends NAREnvironment {
                 4, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 3 * 10000000, false)
                 , new FrameClock());
-        nar.inputActivation.setValue(0.2f);
+        nar.inputActivation.setValue(0.05f);
         nar.derivedActivation.setValue(0.05f);
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.65f);
+        nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.06f);
+        nar.confMin.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -195,8 +222,8 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 32, '.', 4);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 4);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
         new ArithmeticInduction(nar);
 
@@ -204,7 +231,11 @@ public class Arkancide extends NAREnvironment {
 
         Arkancide t = new Arkancide(nar);
 
-        t.run(5000, 1);
+        t.run(35000, 0);
+
+        //nar.index.print(System.out);
+        NAR.printTasks(nar, true);
+        NAR.printTasks(nar, false);
     }
 
 

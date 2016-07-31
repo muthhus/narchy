@@ -7,6 +7,7 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.atom.Atomic;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
@@ -60,17 +61,32 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
                 float p = x.pri();
                 float ph = 0.25f + 0.75f * p;
 
+                float r, g, b;
 
                 Concept c = x.get();
-                float r, g, b;
-                if (c instanceof Atomic) {
+                if (c!=null) if (c instanceof Atomic) {
                     r = g = b = ph * 0.5f;
                 } else {
-                    float belief = c.hasBeliefs() ? c.beliefs().truth(now).conf() : 0f;
-                    float goal = c.hasGoals() ? c.goals().truth(now).conf() : 0f;
+                    float belief = 0;
+                    if (c.hasBeliefs()) {
+                        @Nullable Truth bt = c.beliefs().truth(now);
+                        if (bt!=null)
+                            belief = bt.conf();
+                    }
+
+                    float goal = 0;
+                    if (c.hasGoals()) {
+                        @Nullable Truth gt = c.goals().truth(now);
+                        if (gt!=null)
+                            goal = gt.conf();
+                    }
+
                     r = 0;
                     g = belief;
                     b = goal;
+                }
+                else {
+                    r = g = b = 0;
                 }
 
                 y.update(p, r, g, b);

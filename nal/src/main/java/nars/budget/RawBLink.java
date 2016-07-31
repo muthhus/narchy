@@ -12,8 +12,6 @@ public class RawBLink<X> extends RawBudget {
 
     public RawBLink(@NotNull X x, float p, float d, float q) {
         super(p, d, q);
-        if (x == null)
-            throw new NullPointerException();
         this.x = x;
     }
 

@@ -67,7 +67,7 @@ public class BeliefLab {
             }
         });
 
-        new BeliefTableChart(nar, c).show(400, 100);
+//        new BeliefTableChart(nar, c).show(400, 100);
 
 
 

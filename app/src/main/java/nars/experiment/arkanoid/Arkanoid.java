@@ -11,28 +11,28 @@ import java.util.List;
 /** https://gist.github.com/Miretz/f10b18df01f9f9ebfad5 */
 public class Arkanoid extends JFrame implements KeyListener {
 
-	private static final long serialVersionUID = 1L;
-
-	/* CONSTANTS */
 	int score;
 
-	public static final int SCREEN_WIDTH = 800;
-	public static final int SCREEN_HEIGHT = 600;
+	public static final int SCREEN_WIDTH = 420;
+	public static final int SCREEN_HEIGHT = 250;
 
-	public static final double BALL_RADIUS = 20.0;
+	public static final int BLOCK_LEFT_MARGIN = 10;
+	public static final int BLOCK_TOP_MARGIN = 15;
+
+	public static final double BALL_RADIUS = 10.0;
 	public static final double BALL_VELOCITY = 1.5;
 
-	public static final double PADDLE_WIDTH = 120.0;
-	public static final double PADDLE_HEIGHT = 40.0;
+	public static final double PADDLE_WIDTH = 60.0;
+	public static final double PADDLE_HEIGHT = 20.0;
 	public static final double PADDLE_VELOCITY = 0.6;
 
-	public static final double BLOCK_WIDTH = 60.0;
-	public static final double BLOCK_HEIGHT = 20.0;
+	public static final double BLOCK_WIDTH = 40.0;
+	public static final double BLOCK_HEIGHT = 15.0;
 
-	public static final int COUNT_BLOCKS_X = 11;
-	public static final int COUNT_BLOCKS_Y = 4;
+	public static final int COUNT_BLOCKS_X = 8;
+	public static final int COUNT_BLOCKS_Y = 2;
 
-	public static final double FT_STEP = 2.0;
+	public static final double FT_STEP = 1.0;
 
 
 	/* GAME VARIABLES */
@@ -40,7 +40,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	private boolean running;
 
-	public final Paddle paddle = new Paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50);
+	public final Paddle paddle = new Paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - PADDLE_HEIGHT);
 	private final Ball ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 	private final List<Brick> bricks = new ArrayList<Arkanoid.Brick>();
 
@@ -268,12 +268,14 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	void initializeBricks(List<Brick> bricks) {
 		// deallocate old bricks
-		bricks.clear();
+		synchronized(bricks) {
+			bricks.clear();
 
-		for (int iX = 0; iX < COUNT_BLOCKS_X; ++iX) {
-			for (int iY = 0; iY < COUNT_BLOCKS_Y; ++iY) {
-				bricks.add(new Brick((iX + 1) * (BLOCK_WIDTH + 3) + 22,
-						(iY + 2) * (BLOCK_HEIGHT + 3) + 20));
+			for (int iX = 0; iX < COUNT_BLOCKS_X; ++iX) {
+				for (int iY = 0; iY < COUNT_BLOCKS_Y; ++iY) {
+					bricks.add(new Brick((iX + 1) * (BLOCK_WIDTH + 3) + BLOCK_LEFT_MARGIN,
+							(iY + 2) * (BLOCK_HEIGHT + 3) + BLOCK_TOP_MARGIN));
+				}
 			}
 		}
 	}
@@ -332,14 +334,16 @@ public class Arkanoid extends JFrame implements KeyListener {
 		paddle.update();
 		testCollision(paddle, ball);
 
-		Iterator<Brick> it = bricks.iterator();
-		while (it.hasNext()) {
-            Brick brick = it.next();
-            testCollision(brick, ball);
-            if (brick.destroyed) {
-                it.remove();
-            }
-        }
+		synchronized (bricks) {
+			Iterator<Brick> it = bricks.iterator();
+			while (it.hasNext()) {
+				Brick brick = it.next();
+				testCollision(brick, ball);
+				if (brick.destroyed) {
+					it.remove();
+				}
+			}
+		}
 
 		//}
 

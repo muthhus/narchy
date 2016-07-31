@@ -27,11 +27,13 @@ public class ControlSurface extends PanelSurface {
 
     final IdentityHashMap built;
 
-    public static void newControlWindow(Object o) {
+    public static void newControlWindow(Object... oo) {
         SpaceGraph<?> s = new SpaceGraph();
-        s.add( new RectWidget(
-                new ControlSurface(o), 16f /* width */, 16f /* height */
-        ) );
+        for (Object o : oo) {
+            s.add(new RectWidget(
+                    new ControlSurface(o), 4f /* width */, 4f /* height */
+            ));
+        }
 
         //s.add(new Facial(new ConsoleSurface(new ConsoleSurface.DummyTerminal(80, 25))).scale(500f, 400f));
         s.add(new Facial(new CrosshairSurface(s)));

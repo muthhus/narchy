@@ -62,7 +62,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 	final int visionRadius;
 	final int itemTypes = 3;
 	final static int runCycles = 15500;
-	final static int runDelay = 500 /* ms */;
+	final static int runDelay = 20 /* ms */;
 
 	boolean trace = true;
 
@@ -211,7 +211,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 
 				if (nar instanceof Default) {
 
-					new BeliefTableChart(nar, charted).show(700, 900);
+					//new BeliefTableChart(nar, charted).show(700, 900);
 //
 //					BagChart.show((Default) nar, 512);
 //

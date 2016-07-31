@@ -171,6 +171,7 @@ abstract public class NAREnvironment {
         init(nar);
 
         mission();
+        nar.next(); //step one for any mission() results to process first
 
         for (int t = 0; t < cycles; t++) {
             next();

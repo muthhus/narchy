@@ -20,7 +20,7 @@ public interface TemporalBeliefTable extends TaskTable {
 
     Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, @NotNull NAR nar);
 
-    boolean removeIf(@NotNull Predicate<? super Task> o);
+    boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> displ);
 
     long minTime();
     long maxTime();

@@ -175,18 +175,18 @@
 //                (A ==> C)
 //If after S M happens, and after M P happens, so P happens after S
 
-    (M ==> P), (S ==> M), neq(S,P), time(dtUnionReverse) |- (S ==>+- P), (Belief:Deduction, Derive:AllowBackward)
+    (M ==> P), (S ==> M), no_common_subterm(S,P), neq(S,P), time(dtUnionReverse) |- (S ==>+- P), (Belief:Deduction, Derive:AllowBackward)
 
 //"Please note that the temporal order in the conclusion of a weak rule is
 //not necessarily the same as the order in the premises, given the hypothetical
 //nature of such a rule."
 //the +- in ==>+- is a placeholder that will be calculated, including DTERNAL, depending on the premise
 
-    (P ==> M), (S ==> M), neq(S,P), time(dtBminT) |- (S ==>+- P), (Belief:Induction, Derive:AllowBackward)
+    (P ==> M), (S ==> M), no_common_subterm(S,P), neq(S,P), time(dtBminT) |- (S ==>+- P), (Belief:Induction, Derive:AllowBackward)
 
-    (M ==> P), (M ==> S), neq(S,P), time(dtTminB) |- (S ==>+- P), (Belief:Abduction, Derive:AllowBackward)
+    (M ==> P), (M ==> S), no_common_subterm(S,P), neq(S,P), time(dtTminB) |- (S ==>+- P), (Belief:Abduction, Derive:AllowBackward)
 
-    (P ==> M), (M ==> S), neq(S,P), time(dtUnion) |- (S ==>+- P), (Belief:Exemplification, Derive:AllowBackward)
+    (P ==> M), (M ==> S), no_common_subterm(S,P), neq(S,P), time(dtUnion) |- (S ==>+- P), (Belief:Exemplification, Derive:AllowBackward)
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
@@ -202,9 +202,9 @@
 
     (M <=> P), (S <=> M), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P), neq(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance, Derive:AllowBackward)
 
-    (M ==> P), (S <=> M), neq(S,P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy, Derive:AllowBackward)
+    (M ==> P), (S <=> M), neq(S,P), no_common_subterm(S,P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy, Derive:AllowBackward)
 
-    (P ==> M), (S <=> M), neq(S,P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy, Derive:AllowBackward)
+    (P ==> M), (S <=> M), neq(S,P), no_common_subterm(S,P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy, Derive:AllowBackward)
 
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
@@ -328,10 +328,10 @@
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
-    ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
+    ((&&,A..+) ==> C), M, time(dtTask), no_common_subterm(C,M), notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion) |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
-    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB) |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
+    ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion), no_common_subterm(C,M), notImplicationOrEquivalence(M)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
+    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), no_common_subterm(C,M), notImplicationOrEquivalence(M)  |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
     ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT) |- (B ==>+- M), (Belief:Induction)
 
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
@@ -358,11 +358,11 @@
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notEquivalence(A), notEquivalence(B) |- (A ==>+- B), (Belief:Induction)
+    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==>+- B), (Belief:Induction)
 
     A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
 
-    A, B, task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notEquivalence(A), notEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
+    A, B, task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
 
     A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
 
@@ -489,13 +489,13 @@
 ////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
 //Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate
 
-    (B --> (/,M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Desire:Identity)
+    (B --> (/, M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Desire:Identity)
 
     ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
 
     (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Desire:Identity)
 
-    ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
+    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
 
 //Recursion Force - TODO use varargs
 

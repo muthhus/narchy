@@ -12,6 +12,7 @@ import nars.term.*;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.nal.Tense.*;
+import static nars.term.Terms.compoundOrNull;
 
 /**
  * Strategies for solving temporal components of a derivation
@@ -303,8 +304,9 @@ public interface TimeFunctions {
     }
 
     static Compound noTemporalBasis(@NotNull Compound derived) {
-        throw new InvalidTermException(derived.op(), derived.dt(), derived.terms(),
-                "no basis for relating other occurrence to derived");
+//        throw new InvalidTermException(derived.op(), derived.dt(), derived.terms(),
+//                "no basis for relating other occurrence to derived");
+        return derived;
     }
 
 
@@ -858,8 +860,8 @@ public interface TimeFunctions {
             occReturn[0] += dt/2;
             dt = DTERNAL;
         }
-        if (derived.dt()!=dt)
-            return (Compound) p.index.builder().build(derived.op(), dt, derived.subterms().terms());
-        return derived;
+        return derived.dt() != dt ?
+                compoundOrNull(p.index.builder().build(derived.op(), dt, derived.subterms().terms())) :
+                derived;
     }
 }

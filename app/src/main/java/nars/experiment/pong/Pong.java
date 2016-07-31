@@ -294,7 +294,7 @@ public class Pong extends Player implements DiscreteEnvironment {
         List<Concept> charted = new ArrayList(a.actions);
         Iterables.addAll(charted, a.rewardConcepts);
         charted.addAll(additional);
-        new BeliefTableChart(a.nar, charted).timeRadius(400).show(400, 600);
+        //new BeliefTableChart(a.nar, charted).timeRadius(400).show(400, 600);
     }
 
     @Override

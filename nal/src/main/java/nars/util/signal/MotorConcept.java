@@ -88,10 +88,10 @@ public class MotorConcept extends WiredConcept  {
         return true;
     }
 
-    @Override
-    public @NotNull Task filterGoals(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
-        return t;
-    }
+//    @Override
+//    public @NotNull Task filterGoals(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
+//        return t;
+//    }
 
     /**
      * called each frame with the current motivation measurement (0 <= m <= 1).

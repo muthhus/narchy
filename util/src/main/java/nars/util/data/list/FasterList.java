@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
@@ -123,6 +124,29 @@ public class FasterList<X> extends FastList<X> {
         X[] a = this.items;
         for (int i = 0; i < s; ) {
             if (filter.test(a[i])) {
+                s--;
+                System.arraycopy(a, i+1, a, i, s - i);
+                Arrays.fill(a, s, ps,null);
+            } else {
+                i++;
+            }
+        }
+        if (ps!=s) {
+            this.size = s;
+            return true;
+        }
+
+        return false;
+    }
+
+    public final boolean removeIf(Predicate<? super X> filter, List<X> displaced) {
+        int s = size();
+        int ps = s;
+        X[] a = this.items;
+        for (int i = 0; i < s; ) {
+            X ai = a[i];
+            if (filter.test(ai)) {
+                displaced.add(ai);
                 s--;
                 System.arraycopy(a, i+1, a, i, s - i);
                 Arrays.fill(a, s, ps,null);

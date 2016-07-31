@@ -52,7 +52,7 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
             //try to remove at least one past belief which did not originate from this sensor
             //this should clear space for future predictions
             TemporalBeliefTable tb = ((DefaultBeliefTable) table).temporal;
-            tb.removeIf(x -> !valid.test(x, nar));
+            tb.removeIf(x -> !valid.test(x, nar), displaced);
         }
 
         if (!valid.test(t, nar)) {
@@ -60,7 +60,7 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
             //TODO delete its non-input parent tasks?
             onConflict(t);
 
-            TaskTable.removeTask(t, "Ignored Speculation", displaced);
+            //TaskTable.removeTask(t, "Ignored Speculation", displaced); //will be displaced normally by returning null
             return null;
         }
 

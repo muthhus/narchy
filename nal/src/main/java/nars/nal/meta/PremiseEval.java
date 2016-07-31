@@ -204,17 +204,19 @@ public class PremiseEval extends FindSubst {
      */
     public final Conclusion run(@NotNull Premise p, @NotNull Conclusion c) {
 
-        Task task;
-        this.task = task = p.task();
-
-        this.punct.set(this.taskPunct = task.punc());
 
         this.premise = p;
 
+        Task task;
+        this.task = task = p.task();
+        Compound tt = task.term();
+        Term taskTerm = this.taskTerm = tt;
+
         Task belief;
         this.belief = belief = p.belief();
+        Term beliefTerm = this.beliefTerm = p.beliefTerm().term();
 
-        Compound tt = task.term();
+        this.punct.set(this.taskPunct = task.punc());
 
         this.taskTruth = task.truth();
         this.beliefTruth = belief != null ? belief.truth() : null;
@@ -236,10 +238,9 @@ public class PremiseEval extends FindSubst {
 //            this.beliefInverted = false;
 //        }
 
-        Term beliefTerm = this.beliefTerm = p.beliefTerm().term();
-        Term taskTerm = this.taskTerm = tt;
+        //this.cyclic = task.cyclic();
+        this.cyclic = task.cyclic() || (belief!=null ? belief.cyclic() : false);
 
-        this.cyclic = task.cyclic();
         this.overlap = belief != null && Stamp.overlapping(task, belief);
 
         this.termSub0Struct = taskTerm.structure();

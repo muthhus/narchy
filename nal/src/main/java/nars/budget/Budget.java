@@ -97,8 +97,8 @@ public interface Budget extends Budgeted {
     }
 
 
-    final static class InvalidPriorityException extends RuntimeException {
-        public InvalidPriorityException() {
+    final static class BudgetException extends RuntimeException {
+        public BudgetException() {
             super();
         }
 
@@ -116,7 +116,7 @@ public interface Budget extends Budgeted {
      */
     default void setPriority(float p) {
         if (p!=p /* fast NaN test */)
-            throw new InvalidPriorityException();
+            throw new BudgetException();
 
         _setPriority(Util.clamp(p));
     }

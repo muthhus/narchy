@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static java.util.stream.Collectors.toList;
 import static nars.$.t;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
@@ -54,6 +55,7 @@ public class Tetris2 extends NAREnvironment {
         public TetrisVisualizer vis;
         public Surface plot1;
         public ConsoleSurface term = new ConsoleSurface(40,8);
+
     }
 
     final View view = new View();
@@ -242,11 +244,16 @@ public class Tetris2 extends NAREnvironment {
 
                 List<Termed> charted = new ArrayList(actions);
                 charted.add(happy);
-                new BeliefTableChart(nar, charted).show(600, 200);
+
+                newControlWindow(
+                        new GridSurface(VERTICAL,
+                                charted.stream().map(c -> new BeliefTableChart(nar, c)).collect(toList())
+                        )
+                );
 
 
 
-                view.conceptChart = BagChart.newBagChart((Default) nar, 512);
+                //view.conceptChart = BagChart.newBagChart((Default) nar, 512);
 
                 int plotHistory = 256;
                 Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);

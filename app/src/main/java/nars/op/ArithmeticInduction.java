@@ -275,13 +275,18 @@ public class ArithmeticInduction implements Consumer<Task> {
                         for (Term ff : fff) {
 
                             //introduce variable
-                            @Nullable Term y = nar.index.transform(pattern, ppp, ff);
-                            if (y instanceof Compound) {
-                                each.accept($.negIf(
-                                        (Compound) y,
-                                        negate
-                                ));
+                            try {
+                                @Nullable Term y = nar.index.transform(pattern, ppp, ff);
+                                if (y instanceof Compound) {
+                                    each.accept($.negIf(
+                                            (Compound) y,
+                                            negate
+                                    ));
+                                }
+                            } catch (InvalidTermException e) {
+                                logger.error("{}",e.toString());
                             }
+
 
                         }
                     }

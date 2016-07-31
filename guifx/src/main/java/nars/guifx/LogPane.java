@@ -204,7 +204,7 @@ public class LogPane extends BorderPane  {
                     new TaskLabel(p.task(),nar)
             );
 
-            if (p.belief()!=null)
+            if (p.belief!=null)
                 getChildren().add(
                         new TaskLabel( p.belief(),nar )
                 );

@@ -267,11 +267,11 @@ public class NAL7Test extends AbstractNALTest {
     public void inference_on_tense_4() {
         TestNAR tester = test();
         //tester.log();
+        tester.mustBelieve(cycles, "<(John,key) --> hold>",
+                1.00f, 0.45f, -3);
         tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))");
         tester.input("<(John,room) --> enter>. :|:");
 
-        tester.mustBelieve(cycles, "<(John,key) --> hold>",
-                1.00f, 0.45f, -3);
     }
 
     @Test
