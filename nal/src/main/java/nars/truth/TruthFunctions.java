@@ -385,16 +385,27 @@ public final class TruthFunctions extends UtilityFunctions {
     /* ----- double argument functions, called in CompositionalRules ----- */
     /**
      * {<M --> S>, <M <-> P>} |- <M --> (S|P)>
-     * @param v1 Truth value of the first premise
-     * @param v2 Truth value of the second premise
+     * @param a Truth value of the first premise
+     * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth union(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
-        float c = and(v1.conf(), v2.conf());
+    public static Truth union(@NotNull Truth a, @NotNull Truth b, float minConf) {
+
+        float f1 = a.freq();
+        float f2 = b.freq();
+        float c1 = a.conf();
+        float c2 = b.conf();
+
+        //   or(and(f 1 , c 1 ), and(f 2 , c 2 ))
+        // + and(not(f 1 ), c 1 , not(f 2 ), c 2 )
+        float cA = or(and(f1, c1), and(f2, c2));
+        float cB = and( (1 - f1), c1, (1 - f2), c2);
+        float c = Math.max(cA, cB);
+
         return (c < minConf) ?
                 null :
-                t(or(v1.freq(), v2.freq()), c);
+                t(or(a.freq(), b.freq()), c);
 
     }
 
@@ -517,8 +528,19 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @Nullable
     public static Truth difference(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float c = and(a.conf(), b.conf());
-        return (c < minConf) ? null : t(and(a.freq(), (1 - b.freq())), c);
+        float f1 = a.freq();
+        float f2 = b.freq();
+
+        float c1 = a.conf();
+        float c2 = b.conf();
+
+        //      or(and(not(f 1 ), c 1 ), and(f 2 , c 2 ))
+        //    + and(f 1 , c 1 , not(f 2 ), c 2 )
+        float cA =  or(and( 1- f1, c1 ), and( f2 , c2 ));
+        float cB =  and( f1 , c1, (1-f2), c2 );
+        float c = Math.max(cA, cB);
+
+        return (c < minConf) ? null : t(and(f1, (1 - f2)), c);
 
     }
 
