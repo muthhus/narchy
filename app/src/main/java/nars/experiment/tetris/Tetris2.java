@@ -41,9 +41,12 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int runFrames = 12512;
+    static {
+        Param.DEBUG = false;
+    }
+    public static final int runFrames = 12800;
     public static final int cyclesPerFrame = 256;
-    public static final int tetris_width = 6;
+    public static final int tetris_width = 8;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 1;
     static int frameDelay = 30;
@@ -76,6 +79,7 @@ public class Tetris2 extends NAREnvironment {
      */
     public Tetris2(NAR nar, int width, int height, int timePerFall) {
         super(nar);
+
         state = new TetrisState(width, height, timePerFall) {
             @Override
             protected int nextBlock() {
@@ -233,7 +237,7 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
 
         new ArithmeticInduction(nar);

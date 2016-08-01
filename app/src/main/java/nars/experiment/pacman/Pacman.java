@@ -28,7 +28,6 @@ import nars.NAR;
 import nars.Param;
 import nars.agent.NAgent;
 import nars.experiment.DiscreteEnvironment;
-import nars.gui.BeliefTableChart;
 import nars.gui.NARSpace;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
@@ -59,15 +58,16 @@ import static nars.experiment.pong.Pong.numericSensor;
  */
 public class Pacman extends cpcman implements DiscreteEnvironment {
 
+	public static final int cyclesPerFrame = 32;
 	final int visionRadius;
 	final int itemTypes = 3;
 	final static int runCycles = 15500;
-	final static int runDelay = 20 /* ms */;
+	final static int runDelay = 0 /* ms */;
 
 	boolean trace = true;
 
 	final int inputs;
-	private final int pacmanCyclesPerFrame = 8;
+	private final int pacmanCyclesPerFrame = 4;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
 	public float scoretoReward = 0.1f;
 
@@ -104,7 +104,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(64);
+		nar.cyclesPerFrame.set(cyclesPerFrame);
 		nar.confMin.setValue(0.02f);
 
 
@@ -131,7 +131,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		MySTMClustered stm = new MySTMClustered(nar, 96, '.', 3);
+		MySTMClustered stm = new MySTMClustered(nar, 96, '.', 4);
 		MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 2);
 
 		new ArithmeticInduction(nar);

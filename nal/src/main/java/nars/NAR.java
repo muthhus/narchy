@@ -536,7 +536,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         try {
             c = input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
-            logger.warn("invalid input: {}", e.toString());
+            if (Param.DEBUG)
+                logger.warn("invalid input: {}", e.toString());
             //e.printStackTrace();
             //throw e;
             return null;

@@ -654,11 +654,11 @@ public interface TermIndex {
             if (o.temporal && dt != DTERNAL) {
                 @NotNull TermContainer csubs = c.subterms();
                 int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
-                if (o == CONJ && dt != 0 /*&& csubs.hasAny(CONJ.bit)*/) {
-                    edt = XTERNAL;
-                } else {
+                //if (o == CONJ && dt != 0 && csubs.hasAny(CONJ.bit)) {
+                    //edt = XTERNAL;
+                //} else {
                     edt = DTERNAL;
-                }
+                //}
                 Term xx = i.builder().build(o, edt, csubs.terms());
                 //x = i.the(xx).term();
                 x = xx;

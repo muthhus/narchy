@@ -48,8 +48,8 @@
     (P ==> S), (S ==> P), time(dtCombine), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
-    ( (--,%S) ==> P),  P, no_common_subterm(S,P), notEquivalence(P), time(dtTask) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
-    ( (--,%S) ==> P),  S, no_common_subterm(S,P), notEquivalence(S), time(dtTask) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  P, no_common_subterm(S,P), notEquivalence(P), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  S, no_common_subterm(S,P), notEquivalence(S), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
 
 
 
@@ -327,7 +327,7 @@
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
-    ((&&,A..+) ==> C), M, time(dtTask), no_common_subterm(C,M), notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
+    //((&&,A..+) ==> C), M, time(dtTask), no_common_subterm(C,M), notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
     ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion), no_common_subterm(C,M), notImplicationOrEquivalence(M)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
     ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), no_common_subterm(C,M), notImplicationOrEquivalence(M)  |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
@@ -362,7 +362,8 @@
 
     A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
 
-    A, B, task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
+    A, B, task(positive), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
+        A, B, task(negative), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- (--,%A)), (Belief:Abduction)
 
     A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
         A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)

@@ -195,10 +195,7 @@ public interface TimeFunctions {
      * copiesthe 'dt' and the occurence of the task term directly
      */
     TimeFunctions dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, true);
-    TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
-        Premise prem = p.premise;
-        return dtExact(derived, occReturn, p, false);
-    };
+    TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, false);
 
 
     /**
@@ -498,14 +495,14 @@ public interface TimeFunctions {
         return derived;
     }
 
-    static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull PremiseEval p, int eventDelta, @NotNull long[] occReturn) {
+    @NotNull static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull PremiseEval p, int eventDelta, @NotNull long[] occReturn) {
+        int dt;
         if (eventDelta == DTERNAL)
-            return derived; //no change
+            dt = DTERNAL;
+        else
+            dt = eventDelta * polarity;
 
-        if (!Param.DEBUG && !derived.op().temporal)
-            return derived; //disregard dt if not in debug mode
-
-        return dt(derived, eventDelta * polarity, p, occReturn);
+        return dt(derived, dt, p, occReturn);
     }
 
     /**
@@ -854,14 +851,19 @@ public interface TimeFunctions {
 
     };
 
-    static Compound dt(@NotNull Compound derived, int dt, @NotNull PremiseEval p, long[] occReturn) {
+    @NotNull static Compound dt(@NotNull Compound derived, int dt, @NotNull PremiseEval p, long[] occReturn) {
         if (!derived.op().temporal && dt!=DTERNAL && dt!=0 && occReturn[0]!=ETERNAL) {
             //something got reduced to a non-temporal, so shift it to the midpoint of what the actual term would have been:
             occReturn[0] += dt/2;
             dt = DTERNAL;
         }
-        return derived.dt() != dt ?
-                compoundOrNull(p.index.builder().build(derived.op(), dt, derived.subterms().terms())) :
-                derived;
+        if (derived.dt() != dt) {
+            @NotNull Term n = p.index.builder().build(derived.op(), dt, derived.subterms().terms());
+            if (!(n instanceof Compound))
+                throw new InvalidTermException(derived.op(), dt, derived.subterms().terms(), "Untemporalizable to new DT");
+            return (Compound) n;
+        } else {
+            return derived;
+        }
     }
 }

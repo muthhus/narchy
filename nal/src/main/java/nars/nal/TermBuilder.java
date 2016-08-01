@@ -561,9 +561,9 @@ public abstract class TermBuilder {
 
 
                 case EQUI:
-                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS ) {
+                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
                         if (!validEquivalenceTerm(subject))
-                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence subject");
+                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence subject");
                         if (!validEquivalenceTerm(predicate))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
                     }
@@ -622,31 +622,33 @@ public abstract class TermBuilder {
             }
 
 
-            Term sRoot = subject instanceof Compound ? $.unneg(subject).term() : subject;
-            Term pRoot = predicate instanceof Compound ? $.unneg(predicate).term() : predicate;
+            //compare unneg'd if it's not temporal or eternal/parallel
+            boolean preventInverse = !op.temporal || (dt == DTERNAL || dt == 0);
+            Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject).term() : subject;
+            Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate).term() : predicate;
             if (Terms.equalsAnonymous(sRoot, pRoot))
                 return subject.op() == predicate.op() ? True : False; //True if same, False if negated
 
 
             //TODO its possible to disqualify invalid statement if there is no structural overlap here??
 //
-            if (sRoot.op() == CONJ && sRoot.containsTerm(pRoot)) { //non-recursive
+            if (sRoot.op() == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
                 //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
                 return True;
             }
 
 
-                if (pRoot.op()==CONJ && pRoot.containsTerm(sRoot)) {
-                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
-                    return True;
-                }
+            if (pRoot.op() == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
+                //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
+                return True;
+            }
 
-                if (sRoot.op().statement && pRoot.op().statement) {
-                    if ((((Compound)sRoot).term(0).equals(((Compound)pRoot).term(1))) ||
-                            (((Compound)sRoot).term(1).equals(((Compound)pRoot).term(0))))
-                        throw new InvalidTermException(op, new Term[]{subject, predicate}, "inner subject cross-linked with predicate");
+            if (sRoot.op().statement && pRoot.op().statement) {
+                if ((((Compound) sRoot).term(0).equals(((Compound) pRoot).term(1))) ||
+                        (((Compound) sRoot).term(1).equals(((Compound) pRoot).term(0))))
+                    throw new InvalidTermException(op, new Term[]{subject, predicate}, "inner subject cross-linked with predicate");
 
-                }
+            }
 
 
             if (op.commutative && (dt != DTERNAL && dt != 0) && subject.compareTo(predicate) > 0) //equivalence

@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.Op;
+import nars.Param;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -28,6 +29,13 @@ public final class InvalidTermException extends RuntimeException {
         this.dt = dt;
         this.args = args;
         this.reason = reason;
+    }
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        if (!Param.DEBUG)
+            return this; //omit stacktrace if not in debug mode for efficiency
+        return super.fillInStackTrace();
     }
 
     @NotNull

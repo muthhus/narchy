@@ -246,7 +246,7 @@ public enum Op {
             if (t >= 0) w.append('+');
             String ts;
             if (t == Tense.XTERNAL)
-                ts = "?";
+                ts = "-";
             else
                 ts = Integer.toString(t);
             w.append(ts).append(' ');

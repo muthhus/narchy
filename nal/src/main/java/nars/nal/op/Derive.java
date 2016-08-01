@@ -117,7 +117,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         try {
             r = m.index.resolve(cp, m);
         } catch (InvalidTermException e) {
-            logger.warn("{}\n\tderiving rule {}", e.toString(), rule.source);
+            if (Param.DEBUG)
+                logger.warn("{}\n\tderiving rule {}", e.toString(), rule.source);
             return;
         }
 
@@ -170,7 +171,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                     m, this, occReturn, confScale
                 );
             } catch (InvalidTermException e) {
-                logger.warn("{}\n\ttemporalizing from {}\n\tderiving rule {}", e.toString(), content.term(), rule.source);
+                if (Param.DEBUG)
+                    logger.warn("{}\n\ttemporalizing from {}\n\tderiving rule {}", e.toString(), content.term(), rule.source);
                 return;
             }
 
@@ -181,9 +183,9 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
             content = temporalized;
 
-            if (content.dt() == XTERNAL) {
-                //throw new InvalidTermException(content.op(), content.dt(), content.terms(), "XTERNAL leak");
-                return;
+            if (content.dt() == XTERNAL || content.dt()==-XTERNAL) {
+                throw new InvalidTermException(content.op(), content.dt(), content.terms(), "XTERNAL leak");
+                //return;
             }
 
             //apply the confidence scale
