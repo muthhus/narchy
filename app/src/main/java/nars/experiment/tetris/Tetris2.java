@@ -45,11 +45,11 @@ public class Tetris2 extends NAREnvironment {
         Param.DEBUG = false;
         Param.CONCURRENCY_DEFAULT = 3;
     }
-    public static final int runFrames = 100;
+    public static final int runFrames = 10000;
     public static final int cyclesPerFrame = 512;
     public static final int tetris_width = 8;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 1;
+    public static final int TIME_PER_FALL = 2;
     static int frameDelay = 0;
 
     static boolean easy = true;

@@ -529,9 +529,8 @@ public interface TermIndex {
             if (!(aterm instanceof Compound))
                 throw new InvalidConceptException(term, "Failed atemporalization, becoming: " + aterm);
 
-            //optimization: atemporalization was unnecessary, normalization may have already provided the concept
-            if ((aterm == term) && (term instanceof Concept)) {
-                return (Concept) term;
+            if (aterm instanceof Concept) {
+                return (Concept) aterm;
             }
 
             //if (aterm.op() == NEG)
@@ -652,8 +651,7 @@ public interface TermIndex {
             int dt = c.dt();
             if (dt!=DTERNAL) {
                 Op o = c.op();
-                if (o.temporal && dt != DTERNAL) {
-                    @NotNull TermContainer csubs = c.subterms();
+                if (o.temporal) {
                     //int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
                     //if (o == CONJ && dt != 0 && csubs.hasAny(CONJ.bit)) {
                     //edt = XTERNAL;
@@ -662,15 +660,20 @@ public interface TermIndex {
                     //}
                     //Term xx = i.builder().build(o, edt, csubs.terms());
 
-                    Term xx = new GenericCompound(o, DTERNAL, csubs);
+                    Term xx = new GenericCompound(o, DTERNAL, c.subterms());
+
+//                    Termed exxist = i.get(xx, false); //early exit: atemporalized to a concept already, so return
+//                    if (exxist!=null)
+//                        return exxist.term();
 
                     //x = i.the(xx).term();
                     x = xx;
                 }
             }
 
-            if (x instanceof Compound)
+            if (x instanceof Compound) {
                 return i.transform((Compound) x, this);
+            }
             else
                 return x;
         }

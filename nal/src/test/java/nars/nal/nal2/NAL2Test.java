@@ -152,6 +152,7 @@ public class NAL2Test extends AbstractNALTest {
     public void setDefinition()  {
         TestNAR tester = test();
 
+        tester.log();
         tester.believe("<{Tweety} --> {Birdie}>");//Tweety is Birdie.");
         tester.mustBelieve(cycles,"<{Tweety} <-> {Birdie}>",1.0f,0.9f);//Birdie is similar to Tweety.");
 

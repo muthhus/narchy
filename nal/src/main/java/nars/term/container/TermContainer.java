@@ -553,6 +553,10 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
 //        if ((diff = Integer.compare(v, b.structure())) != 0)
 //            return diff;
 
+//        int h = a.hashCode();
+//        if ((diff = Integer.compare(h, b.hashCode())) != 0)
+//            return diff;
+
         int s = a.size();
         if ((diff = Integer.compare(s, b.size())) != 0)
             return diff;

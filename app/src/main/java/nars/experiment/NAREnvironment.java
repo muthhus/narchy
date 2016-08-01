@@ -52,6 +52,12 @@ abstract public class NAREnvironment {
         this.nar = nar;
         alpha = this.nar.confidenceDefault(Symbols.BELIEF);
         gamma = this.nar.confidenceDefault(Symbols.GOAL);
+
+        float rewardGamma =
+                1.0f
+                //gamma
+        ;
+
         epsilon = 0.1f;
         this.reinforcementAttention = gamma;
 
@@ -67,7 +73,7 @@ abstract public class NAREnvironment {
         ).resolution(0.02f);
 
         this.happy = reward.iterator().next(); //the only one HACK
-        happy.desire($.t(1f, gamma));
+        happy.desire($.t(1f, rewardGamma));
 
     }
 
