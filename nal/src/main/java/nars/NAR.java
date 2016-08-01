@@ -1191,7 +1191,21 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * processes the input before the next frame has run
      */
     public final void inputLater(@NotNull Task... t) {
-        taskWorker.execute(()->input(t));
+        //taskWorker.execute(()->input(t));
+        taskWorker.execute(new InputTasks(t));
+    }
+
+    private final class InputTasks implements Runnable {
+        public final Task[] t;
+
+        private InputTasks(Task[] t) {
+            this.t = t;
+        }
+
+        @Override
+        public void run() {
+            input(t);
+        }
     }
 
     public final void inputLater(@NotNull Collection<Task> tt) {

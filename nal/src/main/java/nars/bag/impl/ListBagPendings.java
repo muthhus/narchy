@@ -31,16 +31,17 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
 
     @Override
     public void add(@NotNull X x, float p, float d, float q) {
+        synchronized (this) { //HACK
+            CircularArrayList<RawBLink<X>> pend = this.pending;
+            if (pend == null) {
+                //pending = Global.newArrayList(capacity);
+                this.pending = pend = new CircularArrayList<>(capacity);
+            } else if (pend.size() == capacity) {
+                pend.removeFirst();
+            }
 
-        CircularArrayList<RawBLink<X>> pend = this.pending;
-        if (pend == null) {
-            //pending = Global.newArrayList(capacity);
-            this.pending = pend = new CircularArrayList<>(capacity);
-        } else if (pend.size() == capacity) {
-            pend.removeFirst();
+            pend.add(new RawBLink<>(x, p, d, q));
         }
-
-        pend.add(new RawBLink<>(x, p, d, q));
 
     }
 

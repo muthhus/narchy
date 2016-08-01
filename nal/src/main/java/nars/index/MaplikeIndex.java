@@ -134,29 +134,34 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
     public @NotNull TermContainer internSubs(@NotNull TermContainer s) {
         int ss = s.size();
-        Term[] bb = new Term[ss];
-        boolean changed = false, temporal = false;
+        Term[] bb = s.terms().clone();
+        boolean changed = false;//, temporal = false;
         for (int i = 0; i < ss; i++) {
-            Term a = s.term(i);
+            Term a = bb[i];
 
             Term b;
             if (a instanceof Compound) {
                 if (a.hasTemporal()) {
-                    temporal = true;//dont store subterm arrays containing temporal compounds
+                    //temporal = true;//dont store subterm arrays containing temporal compounds
+                    b = a;
+                } else {
+                    @Nullable Termed b0 = theCompound((Compound) a, false);
+                    if (b0 == null)
+                        b = a;
+                    else
+                        b = b0.term(); //use the term key not the concept if exists; avoid GC hairballs
                 }
-                b = termOrNull(theCompound((Compound) a, true));
-                if (b == null)
-                    return null;
             } else {
                 b = theAtom((Atomic) a, true).term();
             }
             if (a != b) {
                 changed = true;
+            } else {
+                bb[i] = b;
             }
-            bb[i] = b;
         }
 
-        if (changed && !temporal) {
+        if (changed) {
             s = TermVector.the(bb);
         }
         return s;

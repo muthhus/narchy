@@ -648,22 +648,25 @@ public interface TermIndex {
         Term _atemporalize(@NotNull Compound c) {
             TermIndex i = index;
 
-            Term x;
-            Op o = c.op();
+            Term x = c;
             int dt = c.dt();
-            if (o.temporal && dt != DTERNAL) {
-                @NotNull TermContainer csubs = c.subterms();
-                int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
-                //if (o == CONJ && dt != 0 && csubs.hasAny(CONJ.bit)) {
+            if (dt!=DTERNAL) {
+                Op o = c.op();
+                if (o.temporal && dt != DTERNAL) {
+                    @NotNull TermContainer csubs = c.subterms();
+                    //int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
+                    //if (o == CONJ && dt != 0 && csubs.hasAny(CONJ.bit)) {
                     //edt = XTERNAL;
-                //} else {
-                    edt = DTERNAL;
-                //}
-                Term xx = i.builder().build(o, edt, csubs.terms());
-                //x = i.the(xx).term();
-                x = xx;
-            } else {
-                x = c;
+                    //} else {
+                    //edt = DTERNAL;
+                    //}
+                    //Term xx = i.builder().build(o, edt, csubs.terms());
+
+                    Term xx = new GenericCompound(o, DTERNAL, csubs);
+
+                    //x = i.the(xx).term();
+                    x = xx;
+                }
             }
 
             if (x instanceof Compound)

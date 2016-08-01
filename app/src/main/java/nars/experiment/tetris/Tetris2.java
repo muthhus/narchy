@@ -43,13 +43,14 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = false;
+        Param.CONCURRENCY_DEFAULT = 3;
     }
-    public static final int runFrames = 12800;
-    public static final int cyclesPerFrame = 256;
+    public static final int runFrames = 100;
+    public static final int cyclesPerFrame = 512;
     public static final int tetris_width = 8;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 1;
-    static int frameDelay = 30;
+    static int frameDelay = 0;
 
     static boolean easy = true;
 
@@ -189,7 +190,7 @@ public class Tetris2 extends NAREnvironment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng),5 * 10000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 , new FrameClock());
         nar.inputActivation.setValue(0.08f);
@@ -252,11 +253,11 @@ public class Tetris2 extends NAREnvironment {
                 List<Termed> charted = new ArrayList(actions);
                 charted.add(happy);
 
-                newControlWindow(
-                        new GridSurface(VERTICAL,
-                                charted.stream().map(c -> new BeliefTableChart(nar, c)).collect(toList())
-                        )
-                );
+//                newControlWindow(
+//                        new GridSurface(VERTICAL,
+//                                charted.stream().map(c -> new BeliefTableChart(nar, c)).collect(toList())
+//                        )
+//                );
 
 
 

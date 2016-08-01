@@ -237,10 +237,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
             Task revised;
             if (!(input instanceof AnswerTask)) {
                 revised = tryRevision(input, nar);
-                if (revised != null) {
 
-                    if (Param.DEBUG) {
-
+                if (Param.DEBUG) {
+                    if (revised != null) {
                         if (revised.isDeleted())
                             throw new RuntimeException("revised task is deleted");
                         if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {

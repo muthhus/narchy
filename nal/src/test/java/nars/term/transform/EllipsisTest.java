@@ -29,6 +29,7 @@ import java.util.Random;
 import java.util.Set;
 
 import static nars.$.$;
+import static nars.Op.DISJ;
 import static nars.Op.VAR_DEP;
 import static nars.Op.VAR_PATTERN;
 import static nars.nal.meta.match.Ellipsis.firstEllipsis;
@@ -492,6 +493,7 @@ public class EllipsisTest {
 
         for (Op o : Op.values()) {
             if (o.minSize <= 1) continue;
+            if (o == DISJ) continue;
 
             if (o.isStatement()) continue;
 
