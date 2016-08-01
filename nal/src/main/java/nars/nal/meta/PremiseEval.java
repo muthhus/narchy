@@ -1,5 +1,6 @@
 package nars.nal.meta;
 
+import com.gs.collections.api.tuple.primitive.ObjectCharPair;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -46,9 +47,21 @@ public class PremiseEval extends FindSubst {
      */
     public transient Premise premise;
 
+    public static class TruthPuncEvidence {
+        public final Truth truth;
+        public final char punc;
+        public final long[] evidence;
+
+        public TruthPuncEvidence(Truth truth, char punc, long[] evidence) {
+            this.truth = truth;
+            this.punc = punc;
+            this.evidence = evidence;
+        }
+
+    }
 
     @NotNull
-    public final Versioned<Character> punct;
+    public final Versioned<TruthPuncEvidence> punct;
 
 
     /**
@@ -111,7 +124,7 @@ public class PremiseEval extends FindSubst {
         this.deriver = deriver;
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);
-        punct = new Versioned(versioning);
+        this.punct = new Versioned(versioning);
 
         put(new substitute(this));
 
@@ -216,9 +229,9 @@ public class PremiseEval extends FindSubst {
         this.belief = belief = p.belief();
         Term beliefTerm = this.beliefTerm = p.beliefTerm().term();
 
-        this.punct.set(this.taskPunct = task.punc());
 
         this.taskTruth = task.truth();
+        this.taskPunct = task.punc();
         this.beliefTruth = belief != null ? belief.truth() : null;
         this.termutesMax = matchesMax(task.summary());
 

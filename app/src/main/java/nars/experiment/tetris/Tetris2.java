@@ -42,8 +42,11 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Tetris2 extends NAREnvironment {
 
     public static final int runCycles = 12512;
-    public static final int cyclesPerFrame = 64;
-    static int frameDelay = 10;
+    public static final int cyclesPerFrame = 128;
+    public static final int tetris_width = 8;
+    public static final int tetris_height = 12;
+    public static final int TIME_PER_FALL = 3;
+    static int frameDelay = 50;
 
     static boolean easy = true;
 
@@ -130,7 +133,7 @@ public class Tetris2 extends NAREnvironment {
         //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
         float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().expectation(now) : 0.5f;
 
-        float actionMargin = 0.25f;
+        float actionMargin = 0.35f;
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
 
@@ -236,7 +239,7 @@ public class Tetris2 extends NAREnvironment {
         new ArithmeticInduction(nar);
 
 
-        Tetris2 t = new Tetris2(nar, 6, 12, 5) {
+        Tetris2 t = new Tetris2(nar, tetris_width, tetris_height, TIME_PER_FALL) {
 
             @Override
             public void init(NAR nar) {

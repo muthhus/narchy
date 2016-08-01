@@ -272,7 +272,7 @@ public final class TruthFunctions extends UtilityFunctions {
         float c1 = a.conf();
         float c2 = b.conf();
         float c = and(c1, c2, f2);
-        return desire(minConf, a.freq(), f2, c1, c2, c);
+        return desire(minConf, a.freq(), f2, c);
     }
 
     /**
@@ -288,12 +288,12 @@ public final class TruthFunctions extends UtilityFunctions {
         float c1 = a.conf();
         float c2 = b.conf();
         float c = and(c1, c2, f2, w2c(1.0f));
-        return desire(minConf, f1, f2, c1, c2, c);
+        return desire(minConf, f1, f2, c);
     }
 
     public
     @Nullable
-    static Truth desire(float minConf, float f1, float f2, float c1, float c2, float c) {
+    static Truth desire(float minConf, float f1, float f2, float c) {
         if (c < minConf)
             return null;
         else {
@@ -304,9 +304,9 @@ public final class TruthFunctions extends UtilityFunctions {
         }
     }
 
-    static float avgPolar(float x, float y) {
+    /*static float avgPolar(float x, float y) {
         return bf((fb(x) + fb(y)) / 2f);
-    }
+    }*/
 
 //    static float andPolar(float x, float y) {
 //        x = fb(x);
@@ -397,21 +397,21 @@ public final class TruthFunctions extends UtilityFunctions {
         float c1 = a.conf();
         float c2 = b.conf();
 
-        //   or(and(f 1 , c 1 ), and(f 2 , c 2 ))
-        // + and(not(f 1 ), c 1 , not(f 2 ), c 2 )
-        float cA = or(and(f1, c1), and(f2, c2));
-        float cB = and( (1 - f1), c1, (1 - f2), c2);
-        float c = Math.max(cA, cB);
+//        //   or(and(f 1 , c 1 ), and(f 2 , c 2 ))
+//        // + and(not(f 1 ), c 1 , not(f 2 ), c 2 )
+//        //float cA = or(and(f1, c1), and(f2, c2));
+//        float cA = and(and(f1, c1), and(f2, c2));
+//        float cB = and( (1 - f1), c1, (1 - f2), c2);
+//        float c = Math.max(cA, cB);
+//        float c = confComposition(f1, f2, c1, c2);
+        //float c = or(and(f1, c1), and(f2, c2)) + and(1 - f1, 1 - f2, c1, c2);
+        float c = and(c1, c2);
+
 
         return (c < minConf) ?
                 null :
-                t(or(a.freq(), b.freq()), c);
+                t(or(f1, f2), c);
 
-    }
-
-    @Nullable
-    public static Truth intersection(@Nullable Truth v1, @NotNull Truth v2, float minConf) {
-        return intersection(v1, v2, false, minConf);
     }
 
     /**
@@ -421,31 +421,33 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth intersection(@Nullable Truth v1, @NotNull Truth v2, boolean invert1, float minConf) {
+    public static Truth intersection(@Nullable Truth v1, @NotNull Truth v2, float minConf) {
         if (v1 == null) return null;
 
         float c1 = v1.conf();
         float c2 = v2.conf();
-        float f1 = invert1 ? v1.freqNegated() : v1.freq();
+        float f1 = v1.freq();
         float f2 = v2.freq();
 
         //F = and( f1 , f2 )
         //C = or( and( not( f1 ), c1 ), and( not( f2 ), c2 ) ) +
         //    and( f1 , c1 , f2 , c2 )
-        float cA = or( and( 1-f1, c1), and(1-f2, c2 ));
-        float cB = and(f1, f2, c1, c2);
-        float c = Math.max(cA, cB);
-        if (c < minConf)
-            return null;
+        //float cA = or( and( 1-f1, c1), and(1-f2, c2 ));
+        //float c = confComposition(f1, c1, f2, c2);
+        //float c = or(and(1 - f1, c1), and(1 - f2, c2)) + and(f1, f2, c1, c2);
+        float c = and(c1, c2);
 
-        return t(and(f1, f2), c);
+        return (c < minConf) ?
+                null :
+                t(and(f1, f2), c);
     }
 
-    private static float freqInterp(float f1, float f2, float c1, float c2) {
-        float w1 = c2w(c1);
-        float w2 = c2w(c2);
-        return lerp(f2, f1, w1/(w1+w2));
-    }
+
+//    private static float freqInterp(float f1, float f2, float c1, float c2) {
+//        float w1 = c2w(c1);
+//        float w2 = c2w(c2);
+//        return lerp(f2, f1, w1/(w1+w2));
+//    }
 
     /**
      * {(||, A, B), (--, B)} |- A
@@ -528,19 +530,22 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @Nullable
     public static Truth difference(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float f1 = a.freq();
-        float f2 = b.freq();
+        return intersection(a, b.negated(), minConf);
 
-        float c1 = a.conf();
-        float c2 = b.conf();
-
-        //      or(and(not(f 1 ), c 1 ), and(f 2 , c 2 ))
-        //    + and(f 1 , c 1 , not(f 2 ), c 2 )
-        float cA =  or(and( 1- f1, c1 ), and( f2 , c2 ));
-        float cB =  and( f1 , c1, (1-f2), c2 );
-        float c = Math.max(cA, cB);
-
-        return (c < minConf) ? null : t(and(f1, (1 - f2)), c);
+//        float f1 = a.freq();
+//        float f2 = b.freq();
+//
+//        float c1 = a.conf();
+//        float c2 = b.conf();
+//
+//        //      or(and(not(f 1 ), c 1 ), and(f 2 , c 2 ))
+//        //    + and(f 1 , c 1 , not(f 2 ), c 2 )
+//        ///float cA =  or(and( 1 - f1, c1 ), and( f2 , c2 ));
+//        float cA =  and(and( 1 - f1, c1 ), and( f2 , c2 ));
+//        float cB =  and( f1 , c1, (1-f2), c2 );
+//        float c = Math.max(cA, cB);
+//
+//        return (c < minConf) ? null : t(and(f1, (1 - f2)), c);
 
     }
 

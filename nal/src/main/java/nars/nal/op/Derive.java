@@ -23,9 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
 import static nars.nal.Tense.DTERNAL;
@@ -66,14 +63,15 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
-                  @Nullable TruthOperator belief, @Nullable TruthOperator goal, boolean eternalize, @NotNull TimeFunctions temporalizer) {
+                  @Nullable TruthOperator belief, @Nullable TruthOperator goal, @Deprecated boolean eternalize, @NotNull TimeFunctions temporalizer) {
         super("Derive(" +
                 Joiner.on(',').join(
                         term,
-                        "temporal" + Integer.toHexString(temporalizer.hashCode()), //HACK todo until names are given to unique classes
-                        belief != null ? belief : "_",
-                        goal != null ? goal : "_",
-                        eternalize ? "Et" : "_") +
+                        "temporal" + Integer.toHexString(temporalizer.hashCode()) //HACK todo until names are given to unique classes
+                        //belief != null ? belief : "_",
+                        //goal != null ? goal : "_",
+                        //eternalize ? "Et" : "_") +
+                        )+
                 ')');
         this.rule = rule;
 
@@ -109,24 +107,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     public final void accept(@NotNull PremiseEval m) {
 
 
-        char c = m.punct.get();
+        PremiseEval.TruthPuncEvidence ct = m.punct.get();
 
-        TruthOperator f;
-        if (c == Symbols.BELIEF)
-            f = belief;
-        else if (c == Symbols.GOAL)
-            f = goal;
-        else
-            f = null;
-
-        Truth taskTruth, beliefTruth;
-
-        //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
-        taskTruth = (f == null) ? null : m.taskTruth;
-
-        //truth function is single premise so set belief truth to be null to prevent any negations below:
-        boolean single = f == null || f.single();
-        beliefTruth = ((f == null) || single) ? null : m.beliefTruth;
 
         Term cp = this.conclusionPattern;
 
@@ -144,25 +126,15 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
         if (r instanceof Compound) { //includes null test
-
-            Truth t = (f == null) ?
-                    null :
-                    f.apply(
-                            taskTruth,
-                            beliefTruth,
-                            m.nar,
-                            m.confMin
-                    );
-
-            if (f == null || t != null)
-                derive(m, (Compound) r, t, single);
+            derive(m, (Compound) r, ct);
         }
 
     }
 
 
-    final void derive(@NotNull PremiseEval m, @NotNull Compound raw, @Nullable Truth truth, boolean single) {
+    final void derive(@NotNull PremiseEval m, @NotNull Compound raw, @NotNull PremiseEval.TruthPuncEvidence ct) {
 
+        Truth truth = ct.truth;
         if (raw.op() == NEG) {
             //negations cant term concepts or tasks, so we unwrap and invert the truth (fi
             Term raw2 = raw.term(0);
@@ -178,7 +150,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             return; //INSUFFICIENT BUDGET
 
         NAR nar = m.nar;
-        Compound content = Task.normalizeTaskTerm(raw, m.punct.get(), nar, true);
+        Compound content = Task.normalizeTaskTerm(raw, ct.punc, nar, true);
         if (content == null)
             return; //INVALID TERM FOR TASK
 
@@ -250,8 +222,10 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
 
+
+
         m.conclusion.derive.add( //TODO we should not need to normalize the task, so process directly is preferred
-                derive(content, truth, budget, nar.time(), occ, m, this, single)
+                derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence)
         );
 
 
@@ -261,14 +235,14 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      * part 2
      */
     @NotNull
-    public final Task derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d, boolean single) {
+    public final Task derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, Truth truth, char punc, long[] evidence) {
 
 
-        return newDerivedTask(c, p.punct.get(), truth, p, single)
+        return newDerivedTask(c, truth, punc, evidence, p)
                 .time(now, occ)
                 .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
-                .log(Param.DEBUG ? d.rule : null);
+                .log(Param.DEBUG ? rule : null);
 
 
         //ETERNALIZE: (CURRENTLY DISABLED)
@@ -296,8 +270,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
 
-    public @NotNull DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, @Nullable Truth truth, PremiseEval p, boolean single) {
-        return new DerivedTask.DefaultDerivedTask(c, punct, truth, p, p.evidence(single));
+    public @NotNull DerivedTask newDerivedTask(@NotNull Termed<Compound> c, Truth truth, char punc, long[] evidence, PremiseEval p) {
+        return new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p);
     }
 
 

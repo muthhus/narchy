@@ -38,7 +38,7 @@ public class NAL3Test extends AbstractNALTest {
     @Test
     public void compound_composition_two_premises2()  {
         TestNAR tester = test();
-        tester.believe("<sport --> competition>",0.9f,0.9f); //.en("Sport is a type of competition.");
+        tester.believe("<sport --> competition>", 0.9f, 0.9f); //.en("Sport is a type of competition.");
         tester.believe("<chess --> competition>", 0.8f, 0.9f); //.en("Chess is a type of competition.");
         tester.mustBelieve(cycles, "<(|,chess,sport) --> competition>", 0.72f ,0.81f); //.en("If something is either chess or sport, then it is a competition.");
         tester.mustBelieve(cycles, "<(&,chess,sport) --> competition>", 0.98f, 0.81f); //.en("If something is both chess and sport, then it is a competition.");
@@ -80,9 +80,16 @@ public class NAL3Test extends AbstractNALTest {
         tester.believe("<planetX --> {Mars,Pluto,Venus}>",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> {Pluto,Saturn}>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
         tester.mustBelieve(cycles, "<planetX --> {Mars,Pluto,Saturn,Venus}>", 0.91f, 0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
-
-
     }
+    @Test
+    public void set_operationsSetExt_unionNeg()  {
+        TestNAR tester = test();
+        tester.believe("<planetX --> {Earth}>",0.1f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
+        tester.believe("<planetX --> {Mars}>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
+        tester.mustBelieve(cycles, "<planetX --> {Earth,Mars}>", 0.19f, 0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
+    }
+
+
     @Test
     public void set_operationsSetInt_union_2_3_4()  {
         TestNAR tester = test();

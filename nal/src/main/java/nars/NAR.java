@@ -470,7 +470,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 .budget(pri, dur)
                 .time(time(), occurrenceTime);
 
-        inputLater(t);
+        input(t);
 
         return t;
     }

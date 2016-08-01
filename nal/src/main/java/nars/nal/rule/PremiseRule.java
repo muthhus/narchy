@@ -386,8 +386,8 @@ public class PremiseRule extends GenericCompound {
                 /*anticipate,*/
                 eternalize, temporalizer);
 
-        String beliefLabel = belief != null ? "belief" : "_";
-        String desireLabel = desire != null ? "desire" : "_";
+        String beliefLabel = belief != null ? belief.toString() : "_";
+        String desireLabel = desire != null ? desire.toString() : "_";
 
         String sn = "Truth(";
         String i =

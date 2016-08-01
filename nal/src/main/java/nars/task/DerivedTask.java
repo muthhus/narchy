@@ -69,7 +69,7 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
-        public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise, long[] evidence) {
+        public DefaultDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull PremiseEval premise) {
             super(tc, punct, truth, premise, evidence);
         }
 

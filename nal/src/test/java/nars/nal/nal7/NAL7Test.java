@@ -244,10 +244,10 @@ public class NAL7Test extends AbstractNALTest {
     public void inference_on_tense_reverse_novar() {
         TestNAR tester = test();
 
+        tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.45f, -7);
         tester.input("(((John, key) --> hold) ==>+7 ((John, room) --> enter)).");
         tester.input("<(John, room) --> enter>. :|:");
 
-        tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.45f, -7);
     }
 
     @Test
@@ -283,7 +283,18 @@ public class NAL7Test extends AbstractNALTest {
             .mustBelieve(cycles, "( enter:(John, room) ==>-4 open:(John, door) )",
                     1.00f, 0.45f, 0);
     }
-
+    @Test
+    public void induction_on_events_0_neg() {
+        test()
+                //.log()
+                .input("(--,open:(John,door)). :|:")
+                .inputAt(4, "enter:(John,room). :|:")
+                .mustBelieve(cycles, "( (--,open:(John, door)) ==>+4 enter:(John, room) )",
+                        1.00f, 0.45f, 0)
+                .mustBelieve(cycles, "( (--,open:(John, door)) &&+4 enter:(John, room) )",
+                        1.00f, 0.81f, 0)
+        ;
+    }
 
     @Test
     public void induction_on_events2() {

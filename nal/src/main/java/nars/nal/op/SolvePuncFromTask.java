@@ -15,6 +15,6 @@ public final class SolvePuncFromTask extends Solve {
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseEval m) {
-        return measure(m, m.punct.get());
+        return measure(m, m.taskPunct);
     }
 }

@@ -180,7 +180,6 @@
 //"Please note that the temporal order in the conclusion of a weak rule is
 //not necessarily the same as the order in the premises, given the hypothetical
 //nature of such a rule."
-//the +- in ==>+- is a placeholder that will be calculated, including DTERNAL, depending on the premise
 
     (P ==> M), (S ==> M), no_common_subterm(S,P), neq(S,P), time(dtBminT) |- (S ==>+- P), (Belief:Induction, Derive:AllowBackward)
 
@@ -240,14 +239,14 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
     B, (A ==> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
-        B, ((--,%A) ==> C), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+        B, ((--,%A) ==> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:DeductionN, Desire:InductionN, Event:Anticipate)
     B, (C ==> A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Desire:Deduction)
-        B, (C ==> (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Belief:Abduction, Desire:Deduction)
+        B, (C ==> (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:AbductionN, Desire:DeductionN)
     B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)
-        //B, ((--,%A) <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Belief:Analogy, Desire:Strong)
+        B, ((--,%A) <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:AnalogyN, Desire:StrongN)
 
     B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Desire:Strong)
-        B, (C && (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Desire:Strong)
+        B, (C && (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Desire:StrongN)
 
 //    M, (M ==> P), shift_occurrence_forward(unused,"==>") |- P, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
 //    B, (A ==> C), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"==>") |- C, (Truth:Deduction, Order:ForAllSame)
@@ -358,13 +357,15 @@
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==>+- B), (Belief:Induction)
+    A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==>+- B), (Belief:Induction)
+        A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
 
     A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
 
     A, B, task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
 
-    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
+    A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
+        A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
 
     //A, B,   time(dtBefore), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B &&+- A), (Desire:Intersection)
 

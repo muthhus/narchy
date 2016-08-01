@@ -1,9 +1,11 @@
 package nars.nal.op;
 
+import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.Op;
 import nars.Symbols;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
+import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +61,42 @@ abstract public class Solve extends AtomicBoolCondition {
                 throw new Op.InvalidPunctuationException(punct);
         }
 
-        m.punct.set(punct);
+        TruthOperator f;
+        if (punct == Symbols.BELIEF)
+            f = belief;
+        else if (punct == Symbols.GOAL)
+            f = desire;
+        else
+            f = null;
+
+
+
+        boolean single =  f == null || f.single();
+
+        Truth t;
+        if (f == null) {
+            t = null;
+        } else {
+            Truth taskTruth, beliefTruth;
+
+            //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
+            taskTruth = m.taskTruth;
+
+            //truth function is single premise so set belief truth to be null to prevent any negations below:
+
+            beliefTruth = (single) ? null : m.beliefTruth;
+
+            t = f.apply(
+                    taskTruth,
+                    beliefTruth,
+                    m.nar,
+                    m.confMin
+            );
+            if (t == null)
+                return false;
+        }
+
+        m.punct.set(new PremiseEval.TruthPuncEvidence(t, punct, m.evidence(single)));
         return true;
     }
 
