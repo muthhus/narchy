@@ -50,8 +50,8 @@ public class AnswerTask extends MutableTask {
         float acw = a.confWeight();
         float aMix = acw / (acw + b.confWeight());
         budget(a, b, aMix);
-        if (isDeleted())
-            throw new RuntimeException("budget mix resulted in deletion");
+        //if (isDeleted())
+            //throw new RuntimeException("budget mix resulted in deletion");
         return this;
     }
 

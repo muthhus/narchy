@@ -81,7 +81,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 
-		Param.CONCURRENCY_DEFAULT = 2;
+		//Param.CONCURRENCY_DEFAULT = 2;
 
 		//Multi nar = new Multi(4,512,
 		Default nar = new Default(1024,
@@ -218,7 +218,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 //					STMView.show(stm, 500, 500);
 
 					//TimeSpace.newTimeWindow((Default)nar, 128);
-					NARSpace.newConceptWindow((Default) nar, 128, 6);
+					//NARSpace.newConceptWindow((Default) nar, 128, 6);
 
 
 				}

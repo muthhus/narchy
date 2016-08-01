@@ -196,13 +196,15 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 } else {
                     projection = 1f;
                 }
-                truth = truth.confMultViaWeightMaxEternal(confScale[0] * projection);
-                if (truth == null) {
-                    throw new RuntimeException("temporal leak: " + premise);
-                    //return;
+                float cf = confScale[0];
+                if ((cf!=1 || projection!=1)) {
+                    truth = truth.confMultViaWeightMaxEternal(cf * projection);
+                    if (truth == null) {
+                        throw new RuntimeException("temporal leak: " + premise);
+                        //return;
+                    }
                 }
             }
-
 
 
             occ = occReturn[0];

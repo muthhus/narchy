@@ -301,9 +301,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         } else {
             if (isFull()) {
 
-                synchronized (pending) {
                     pending.add(key, bp * scale, b.qua(), b.dur());
-                }
 
             } else {
                 putNewAndDeleteDisplaced(key, newLink(key, bp * scale, b.qua(), b.dur()));
@@ -348,9 +346,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Nullable
     protected BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {
-        synchronized(map) {
-            return put(i, newBudget);
-        }
+
+        return put(i, newBudget);
+
     }
 
 

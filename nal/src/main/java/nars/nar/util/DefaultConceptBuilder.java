@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 
+import static nars.nal.Tense.DTERNAL;
+
 /**
  * Created by me on 2/24/16.
  */
@@ -56,6 +58,10 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     @Nullable
     final Concept newConcept(@NotNull Compound t){
 
+        if (t.op().temporal && t.dt()!=DTERNAL)
+            throw new RuntimeException("temporality in concept term: " + t);
+
+
         Map map = new HashMap();
         @NotNull Bag<Term> termbag = termbag(map);
         @NotNull Bag<Task> taskbag = taskbag(map);
@@ -68,13 +74,11 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                 break;
 
             case NEG:
-                throw new RuntimeException("building a negated concept should not be attempted");
-                //return t; //return new NegationConcept(t, termbag, taskbag);
+                throw new RuntimeException("negation terms must not be conceptualized");
 
         }
 
-        Concept c = new CompoundConcept(t, termbag, taskbag);
-        return c;
+        return new CompoundConcept<>(t, termbag, taskbag);
     }
 
 

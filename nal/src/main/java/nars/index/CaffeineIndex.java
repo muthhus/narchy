@@ -11,6 +11,7 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.util.signal.WiredConcept;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.function.BiConsumer;
@@ -90,7 +91,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, long maxWeight, boolean soft) {
         super(conceptBuilder);
 
-        long maxSubtermWeight = maxWeight * 1 / 4; //estimate considering re-use of subterms in compounds
+        long maxSubtermWeight = maxWeight * 2; //estimate considering re-use of subterms in compounds
 
         Caffeine<Termed, Termed> builder = prepare(Caffeine.newBuilder(), soft);
 
@@ -212,13 +213,12 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
 
-
     @NotNull
     @Override
     protected TermContainer put(@NotNull TermContainer s) {
-        subs.put(s, s);
-        return s;
-        //return subs.get(s, (ss) -> s); //HACK
+        return subs.get(s, ss -> ss);
+        //subs.put(s, s);
+        //return s;
     }
 
 

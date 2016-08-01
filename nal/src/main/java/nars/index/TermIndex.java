@@ -529,9 +529,8 @@ public interface TermIndex {
             if (!(aterm instanceof Compound))
                 throw new InvalidConceptException(term, "Failed atemporalization, becoming: " + aterm);
 
-            //optimization: atemporalization was unnecessary, normalization may have already provided the concept
-            if ((aterm == term) && (term instanceof Concept)) {
-                return (Concept) term;
+            if (aterm instanceof Concept) {
+                return (Concept) aterm;
             }
 
             //if (aterm.op() == NEG)
@@ -648,26 +647,35 @@ public interface TermIndex {
         Term _atemporalize(@NotNull Compound c) {
             TermIndex i = index;
 
-            Term x;
-            Op o = c.op();
+            Term x = c;
             int dt = c.dt();
-            if (o.temporal && dt != DTERNAL) {
-                @NotNull TermContainer csubs = c.subterms();
-                int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
-                //if (o == CONJ && dt != 0 && csubs.hasAny(CONJ.bit)) {
+            if (dt!=DTERNAL) {
+                Op o = c.op();
+                if (o.temporal) {
+                    //int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
+                    //if (o == CONJ && dt != 0 && csubs.hasAny(CONJ.bit)) {
                     //edt = XTERNAL;
-                //} else {
-                    edt = DTERNAL;
-                //}
-                Term xx = i.builder().build(o, edt, csubs.terms());
-                //x = i.the(xx).term();
-                x = xx;
-            } else {
-                x = c;
+                    //} else {
+                    //edt = DTERNAL;
+                    //}
+                    //Term xx = i.builder().build(o, edt, csubs.terms());
+
+                    GenericCompound xx = new GenericCompound(o, DTERNAL, c.subterms());
+                    if (c.isNormalized())
+                        xx.setNormalized();
+
+//                    Termed exxist = i.get(xx, true); //early exit: atemporalized to a concept already, so return
+//                    if (exxist!=null)
+//                        return exxist.term();
+
+                    //x = i.the(xx).term();
+                    x = xx;
+                }
             }
 
-            if (x instanceof Compound)
+            if (x instanceof Compound) {
                 return i.transform((Compound) x, this);
+            }
             else
                 return x;
         }

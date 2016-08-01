@@ -28,12 +28,12 @@ public class BudgetMergeTest {
         testMerge(m, b, b, 0, b.pri(), b.dur(), b.qua()); //scale of zero should have no effect
 
         testMerge(m, b, c, 1, (c.pri() + b.pri()), 0.33f, 0.16f); //test correct affect of components
-        testMerge(m, b, c, 0.5f, (c.pri()/2f + b.pri()), 0.36f, 0.18f); //lesser affect (dur and qua closer to original values)
+        testMerge(m, b, c, 0.5f, (c.pri()/2f + b.pri()), 0.33f, 0.16f); //lesser affect (dur and qua closer to original values)
 
         testMerge(m, a, c, 1f, 1, 0.56f, 0.24f, //priority saturation behavior
                 0.25f); //with overflow
 
-        testMerge(m, a, c, 0.5f, 1, 0.62f, 0.277f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
+        testMerge(m, a, c, 0.5f, 1, 0.57f, 0.24f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
                 0f);  //no overflow
 
         testMerge(m, a, a, 1f, a.pri(), a.dur(), a.qua()); //no change since saturated with the same incoming values
@@ -51,12 +51,12 @@ public class BudgetMergeTest {
         testMerge(m, b, b, 0, b.pri(), b.dur(), b.qua()); //scale of zero should have no effect
 
         testMerge(m, b, c, 1, (c.pri() + b.pri()), 0.33f, 0.16f); //test correct affect of components
-        testMerge(m, b, c, 0.5f, (c.pri()/2f + b.pri()), 0.36f, 0.18f); //lesser affect (dur and qua closer to original values)
+        testMerge(m, b, c, 0.5f, (c.pri()/2f + b.pri()), 0.33f, 0.16f); //lesser affect (dur and qua closer to original values)
 
         testMerge(m, a, c, 1f, 1, 0.57f, 0.25f, //priority saturation behavior
             0.25f); //with overflow
 
-        testMerge(m, a, c, 0.5f, 1, 0.62f, 0.277f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
+        testMerge(m, a, c, 0.5f, 1, 0.57f, 0.24f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
             0f);  //no overflow
 
         testMerge(m, a, a, 1f, a.pri(), a.dur(), a.qua()); //no change since saturated with the same incoming values
