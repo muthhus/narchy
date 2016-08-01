@@ -475,26 +475,26 @@ public class IO {
             }
         }
 
-        static void inheritAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
-            Term a = Statement.subj(c);
-            Term b = Statement.pred(c);
-
-            p.append(Symbols.COMPOUND_TERM_OPENER);
-            b.append(p);
-            p.append(Symbols.INHERIT_SEPARATOR);
-            a.append(p);
-            p.append(Symbols.COMPOUND_TERM_CLOSER);
-        }
-        static void similarAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
-            Term a = Statement.subj(c);
-            Term b = Statement.pred(c);
-
-            p.append(Symbols.COMPOUND_TERM_OPENER);
-            a.append(p);
-            p.append(Symbols.SIMILAR_SEPARATOR);
-            b.append(p);
-            p.append(Symbols.COMPOUND_TERM_CLOSER);
-        }
+//        static void inheritAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
+//            Term a = Statement.subj(c);
+//            Term b = Statement.pred(c);
+//
+//            p.append(Symbols.COMPOUND_TERM_OPENER);
+//            b.append(p);
+//            p.append(Symbols.INHERIT_SEPARATOR);
+//            a.append(p);
+//            p.append(Symbols.COMPOUND_TERM_CLOSER);
+//        }
+//        static void similarAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
+//            Term a = Statement.subj(c);
+//            Term b = Statement.pred(c);
+//
+//            p.append(Symbols.COMPOUND_TERM_OPENER);
+//            a.append(p);
+//            p.append(Symbols.SIMILAR_SEPARATOR);
+//            b.append(p);
+//            p.append(Symbols.COMPOUND_TERM_CLOSER);
+//        }
 
         static void statementAppend(@NotNull Compound c, @NotNull Appendable p, @NotNull Op op) throws IOException {
             Term a = Statement.subj(c);

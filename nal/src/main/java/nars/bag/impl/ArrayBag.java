@@ -72,7 +72,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     public boolean setCapacity(int newCapacity) {
         if (super.setCapacity(newCapacity)) {
-            pending.capacity(newCapacity);
+            synchronized (pending) {
+                pending.capacity(newCapacity);
+            }
             return true;
         }
         return false;
@@ -299,7 +301,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         } else {
             if (isFull()) {
 
-                pending.add(key, bp * scale, b.qua(), b.dur());
+                synchronized (pending) {
+                    pending.add(key, bp * scale, b.qua(), b.dur());
+                }
 
             } else {
                 putNewAndDeleteDisplaced(key, newLink(key, bp * scale, b.qua(), b.dur()));
@@ -649,8 +653,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     public void clear() {
-        synchronized (map) {
+        synchronized (pending) {
             pending.clear();
+        }
+        synchronized (map) {
             super.clear();
         }
     }
@@ -673,16 +679,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      */
     @NotNull
     public float[] preCommit() {
+        float mass = 0, pendingMass = 0;
         BLink<V>[] l = items.array();
         int s = size();
-        float mass = 0, pendingMass = 0;
         for (int i = s - 1; i >= 0; i--) {
             BLink<V> b = l[i];
             float d = b.dur(); //HACK ignores any pending durDelta change
             mass += d * b.priIfFiniteElseZero();
             pendingMass += d * b.priDelta();
         }
-        pendingMass += pending.mass(this);
+        synchronized (pending) {
+            pendingMass += pending.mass(this);
+        }
         return new float[]{mass, pendingMass};
     }
 

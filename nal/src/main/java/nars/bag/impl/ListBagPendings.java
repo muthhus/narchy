@@ -31,6 +31,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
 
     @Override
     public void add(@NotNull X x, float p, float d, float q) {
+
         CircularArrayList<RawBLink<X>> pend = this.pending;
         if (pend == null) {
             //pending = Global.newArrayList(capacity);
@@ -40,6 +41,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
         }
 
         pend.add(new RawBLink<>(x, p, d, q));
+
     }
 
     @Override
@@ -51,19 +53,23 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
     }
 
     @Override
-    public void apply(@NotNull ArrayBag<X> target) {
-        CircularArrayList<RawBLink<X>> p = this.pending;
-        if (p != null) {
-            clear();
-            for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
-                RawBLink<X> w = p.getAndSet(i, NULL_LINK);
+    public void apply(@NotNull ArrayBag<X> bag) {
 
-                float wp = w.pri();
-                if (wp == wp && wp > 0) { //not deleted
-                    target.commitPending(w.x, wp, w.dur(), w.qua());
+
+
+            CircularArrayList<RawBLink<X>> p = this.pending;
+            if (p != null) {
+                clear();
+                for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
+                    RawBLink<X> w = p.getAndSet(i, null);
+                    if (w!=null) {
+                        float wp = w.pri();
+                        if (wp == wp) { //not deleted
+                            bag.commitPending(w.x, wp, w.dur(), w.qua());
+                        }
+                    }
                 }
             }
-        }
     }
 
     @Override
@@ -86,19 +92,6 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
         return cmp;
     }
 
-    private void combine(@NotNull CircularArrayList<RawBLink<X>> p) {
-//        //HACK remove nulls before sort
-//        for (int i = 0; i < pending.size(); ) {
-//            if (pending.get(i) == null) {
-//                pending.remove(i);
-//            } else {
-//                i++;
-//            }
-//        }
-        Collections.sort(p, this);
-    }
-
-    final static RawBLink NULL_LINK = new RawBLink(false, -1, 0, 0);
 
     @Override
     public float mass(ArrayBag<X> bag) {
@@ -106,24 +99,25 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
         if (p == null)
             return 0;
 
-        combine(p);
 
-        float sum = 0;
-        for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
-            RawBLink<X> w = p.get(i);
-            //if (w!=null) {
+            Collections.sort(p, this);
+
+            float sum = 0;
+            for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
+                RawBLink<X> w = p.get(i);
+                //if (w!=null) {
                 float pp = w.priIfFiniteElseZero();
                 if (pp > 0) {
                     sum += pp * w.dur();
                 } else {
-                    p.set(i, NULL_LINK);
+                    p.set(i, null);
                 }
-            //}
-        }
-        if (sum < Param.BUDGET_EPSILON) {
-            clear();
-        }
-        return sum;
+                //}
+            }
+            if (sum < Param.BUDGET_EPSILON) {
+                clear();
+            }
+            return sum;
     }
 
     @Override

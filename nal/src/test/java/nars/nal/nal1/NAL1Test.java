@@ -139,7 +139,7 @@ public class NAL1Test extends AbstractNALTest {
     public void exemplification() throws Narsese.NarseseException {
 
         test()
-            //.debug()
+            .log()
             .believe("<robin --> bird>")
             .believe("<bird --> animal>")
             .mustOutput(withinCycles, "<animal --> robin>. %1.00;0.4475%");

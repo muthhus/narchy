@@ -447,7 +447,7 @@ public abstract class TermBuilder {
             case 1:
                 return s.iterator().next();
             default:
-                s = junctionGroupNonDTSubterms(s, 0);
+                s = junctionGroupNonDTSubterms(s, dt);
                 if (s.isEmpty())
                     return False; //wtf
                 return finish(op, dt, TermSet.the(s));
@@ -621,37 +621,33 @@ public abstract class TermBuilder {
 
             }
 
-            Compound sc = subject instanceof Compound ? (Compound) subject : null;
-            Compound pc = predicate instanceof Compound ? (Compound) predicate : null;
 
-            if (sc != null && pc != null) {
-                if (Terms.equalsAnonymous(sc, pc))
-                    return True;
-            } else {
-                if (subject.equals(predicate))
-                    return True;
-            }
+            Term sRoot = subject instanceof Compound ? $.unneg(subject).term() : subject;
+            Term pRoot = predicate instanceof Compound ? $.unneg(predicate).term() : predicate;
+            if (Terms.equalsAnonymous(sRoot, pRoot))
+                return subject.op() == predicate.op() ? True : False; //True if same, False if negated
 
-            if (Param.ALLOW_RECURSIVE_STATEMENTS && subject.equals(negation(predicate))) //but not THAT recursive
-                return False;
 
             //TODO its possible to disqualify invalid statement if there is no structural overlap here??
 //
-            if (!Param.ALLOW_RECURSIVE_STATEMENTS && sc != null && sc.op() == CONJ && sc.containsTerm(predicate)) { //non-recursive
-                throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
+            if (sRoot.op() == CONJ && sRoot.containsTerm(pRoot)) { //non-recursive
+                //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
+                return True;
             }
 
-            if (pc != null) {
-                if (!Param.ALLOW_RECURSIVE_STATEMENTS && pc.op()==CONJ && pc.containsTerm(subject)) //non-recursive
-                    throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
 
-                if (sc != null && subject.op().statement && predicate.op().statement) {
-                    if ((sc.term(0).equals(pc.term(1))) ||
-                            (sc.term(1).equals(pc.term(0))))
+                if (pRoot.op()==CONJ && pRoot.containsTerm(sRoot)) {
+                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
+                    return True;
+                }
+
+                if (sRoot.op().statement && pRoot.op().statement) {
+                    if ((((Compound)sRoot).term(0).equals(((Compound)pRoot).term(1))) ||
+                            (((Compound)sRoot).term(1).equals(((Compound)pRoot).term(0))))
                         throw new InvalidTermException(op, new Term[]{subject, predicate}, "inner subject cross-linked with predicate");
 
                 }
-            }
+
 
             if (op.commutative && (dt != DTERNAL && dt != 0) && subject.compareTo(predicate) > 0) //equivalence
                 dt = -dt;

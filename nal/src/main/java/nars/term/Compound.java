@@ -48,6 +48,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.XTERNAL;
 
 /**
  * a compound term
@@ -591,7 +592,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default boolean hasTemporal() {
-        return (dt() != DTERNAL && isAny(Op.TemporalBits)) || or(Term::hasTemporal);
+        int dt = dt();
+        return ((dt != DTERNAL) && (dt!=XTERNAL) && isAny(Op.TemporalBits)) || or(Term::hasTemporal);
     }
 
     //    public int countOccurrences(final Term t) {

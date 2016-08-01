@@ -244,7 +244,12 @@ public enum Op {
 
         if (hasTime) {
             if (t >= 0) w.append('+');
-            w.append(Integer.toString(t)).append(' ');
+            String ts;
+            if (t == Tense.XTERNAL)
+                ts = "?";
+            else
+                ts = Integer.toString(t);
+            w.append(ts).append(' ');
         }
     }
 

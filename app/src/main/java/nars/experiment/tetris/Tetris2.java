@@ -41,12 +41,12 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int runCycles = 12512;
-    public static final int cyclesPerFrame = 128;
-    public static final int tetris_width = 8;
+    public static final int runFrames = 12512;
+    public static final int cyclesPerFrame = 256;
+    public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 3;
-    static int frameDelay = 50;
+    public static final int TIME_PER_FALL = 1;
+    static int frameDelay = 30;
 
     static boolean easy = true;
 
@@ -343,7 +343,7 @@ public class Tetris2 extends NAREnvironment {
         //addCamera(t, nar, 8, 8);
 
 
-        t.run(runCycles, frameDelay);
+        t.run(runFrames, frameDelay);
 
 
         nar.index.print(System.out);

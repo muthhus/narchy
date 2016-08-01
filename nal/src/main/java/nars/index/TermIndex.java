@@ -3,6 +3,7 @@ package nars.index;
 import com.gs.collections.api.list.primitive.ByteList;
 import nars.$;
 import nars.Narsese;
+import nars.Op;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.nal.TermBuilder;
@@ -35,6 +36,7 @@ import java.util.function.Consumer;
 import static nars.$.unneg;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.XTERNAL;
 import static nars.term.Termed.termOrNull;
 
 /**
@@ -647,9 +649,19 @@ public interface TermIndex {
             TermIndex i = index;
 
             Term x;
-            if (c.op().temporal && c.dt() != DTERNAL) {
-                Term xx = i.builder().build(c.op(), DTERNAL, c.subterms().terms());
-                x = i.the(xx).term();
+            Op o = c.op();
+            int dt = c.dt();
+            if (o.temporal && dt != DTERNAL) {
+                @NotNull TermContainer csubs = c.subterms();
+                int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
+                if (o == CONJ && dt != 0 /*&& csubs.hasAny(CONJ.bit)*/) {
+                    edt = XTERNAL;
+                } else {
+                    edt = DTERNAL;
+                }
+                Term xx = i.builder().build(o, edt, csubs.terms());
+                //x = i.the(xx).term();
+                x = xx;
             } else {
                 x = c;
             }

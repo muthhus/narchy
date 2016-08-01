@@ -35,7 +35,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 64;
+    private static final int cyclesPerFrame = 128;
     final Arkanoid noid;
     private final SwingCamera cam;
 
