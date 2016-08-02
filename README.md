@@ -59,19 +59,20 @@ time intervals.  A concept's beliefs and goals co-locate all temporal and non-te
 its form into separate eternal and temporal belief tables which can not compete with each other
 yet support each other when evaluating truth value.
 
-This replaces the separate Parallel and Sequential term operator variations of Conjunctions,
- Equivalences, and Implications with 3 unified continuous-time Conjunction, Implication and 
- Equivalence which share all derivation rules with their eternal-time root types.  This reduces
- the number of derivation rules necessary and smooths some discontinuities and edge cases
- that multiple temporal and non-temporal operator types necessitated.
+NARchy removes the separate Parallel and Sequential term operator variations of Conjunctions,
+ Equivalences, and Implications by using unified continuous-time Conjunction, Implication and 
+ Equivalence operators, sharing all derivation rules with their eternal-time root types.  
+ This reduces the number of derivation rules necessary and smooths some discontinuities and 
+ edge cases that multiple temporal and non-temporal operator types necessitated.
  
 In order to fully utilize this added temporal expressiveness, temporal belief tables were
 redesigned to support evaluation of concept truth value at any point in time using a 
 generalized microsphere interpolation "revection" algorithm which combines revision (interpolation) and
-projection (extrapolation).
+projection (extrapolation).  Temporal revision can be thought of as lossy compression, in that
+tasks (as data points in truth-time space) can be merged to empty room for incoming data. 
 
 In keeping with a design preference for unity and spectral continuity, negations are also handled
- differently by eliminating all Negation concepts.  Instead, a concept stores
+ differently through the elimination of all Negation concepts.  Instead, a concept stores
  its complete frequency spectrum within itself and Negation is handled automaticaly and
  transparently during derivation and user-input/output.  Subterms may be negated, and this
  results in unique compounds, but the top-level term of a task is always stored un-negated.
@@ -81,6 +82,29 @@ In keeping with a design preference for unity and spectral continuity, negations
  supports smooth and balanced revection across the 0.5 "maybe" midpoint of the frequency range,
  in both temporal and eternal modes.
  
+ Disjunctions are only virtual operators as perceivable by input and displayed on output. They 
+ are converted immediately to negated conjunction of negations via DeMorgan's laws.  By preferring 
+ the conjunction representation,
+ temoral information can not be lost through conversion to or from the non-temporal Disjunction type.
+ 
+ The default bag type is a Buffered Auto-Forgetting CurveBag which accumulate updates between 
+ "commits" in which the changes are later applied.  Buffering supports rapid high-frequency 
+ inter-concept activation without needing continuous bag data structure maintenance.  Auto-forgetting
+ removes the need for arbitrary forgetting rates, instead replacing with a continuous forgetting
+ applied in a balanced proportion to the bag activation pressure relative to the existing
+ bag's mass.  Bags also share key maps where possible (between all tasks in a concept, and
+ between both termlink and tasklink bags in a concept), reducing memory usage.
+ 
+ A central, concurrent concept index (cache) provides access to all inactive concepts.  The capacity
+ of the index can be adjusted in various ways including maximum size, maximum "weight", and weak/soft
+ references.  This cache can also serve as an asynchronous reader and writer to longer-term caches 
+ which persist on disk or in a database.
+ 
+ A compact byte-level codec for terms and tasks allows all concept data to be serialized to
+ disk, off-heap memory, or network streams.  It is optionally compressed with Snappy compression
+ algorithm which offers a tradeoff of speed and size savings.
+ 
+   
  _Many other changes remain to be documented._
  
 
