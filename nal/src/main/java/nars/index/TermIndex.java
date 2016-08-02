@@ -19,6 +19,7 @@ import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
@@ -620,74 +621,127 @@ public interface TermIndex {
         }
     }
 
-    static boolean possiblyTemporal(Termlike x) {
-        return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
+
+    default Term atemporalize(@NotNull Term c) {
+        if (c instanceof Compound)
+            return atemporalize((Compound)c);
+        return c;
     }
 
-    @NotNull
-    default Term atemporalize(@NotNull Compound c) {
-        if (!possiblyTemporal(c))
-            return c;
-        return new CompoundAtemporalizer(this, c).result;
-    }
+    default Compound atemporalize(@NotNull Compound c) {
 
 
-    final class CompoundAtemporalizer implements CompoundTransform<Compound, Term> {
-
-        private final TermIndex index;
-        @NotNull
-        private final Term result;
-
-        public CompoundAtemporalizer(@NotNull TermIndex index, @NotNull Compound c) {
-            this.index = index;
-            this.result = apply(null, c);
-        }
-
-
-        @Override
-        public boolean test(Term subterm) {
-            return possiblyTemporal(subterm);
-        }
-
-        @Override
-        public @Nullable Term apply(Compound parent, @NotNull Term subterm) {
-
-            Compound c = (Compound)subterm;
-            TermIndex i = index;
-
-            Term x = c;
-            int dt = c.dt();
-            if (dt!=DTERNAL) {
-                Op o = c.op();
-                if (o.temporal) {
-                    //int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
-                    //if (o == CONJ && dt != 0 && csubs.hasAny(CONJ.bit)) {
-                    //edt = XTERNAL;
-                    //} else {
-                    //edt = DTERNAL;
-                    //}
-                    //Term xx = i.builder().build(o, edt, csubs.terms());
-
-                    GenericCompound xx = new GenericCompound(o, DTERNAL, c.subterms());
-                    if (c.isNormalized())
-                        xx.setNormalized();
-
-                    Termed exxist = i.get(xx, false); //early exit: atemporalized to a concept already, so return
-                    if (exxist!=null)
-                        return exxist.term();
-
-                    //x = i.the(xx).term();
-                    x = xx;
-                }
+        TermContainer psubs = c.subterms();
+        TermContainer newSubs;
+        if (psubs.hasAny(Op.TemporalBits)) {
+            boolean subsChanged = false;
+            int cs = c.size();
+            Term[] ss = new Term[cs];
+            for (int i = 0; i < cs; i++) {
+                Term m = psubs.term(i);
+                Term n = atemporalize(m);
+                if (m != n)
+                    subsChanged = true;
+                ss[i] = n;
             }
-
-            //if (x instanceof Compound) {
-                return i.transform((Compound) x, this);
-            //}
-            //else
-                //return x;
-
-
+            newSubs = subsChanged ? TermVector.the(ss) : null;
+        } else {
+            newSubs = null;
         }
+
+
+        int pdt = c.dt();
+        Op o = c.op();
+        boolean dtChanged = (pdt != DTERNAL && o.temporal);
+
+        if (newSubs!=null || dtChanged) {
+
+            GenericCompound xx = new GenericCompound(o,
+                    dtChanged ? DTERNAL : pdt,
+                    newSubs!=null ? newSubs : psubs);
+
+            if (c.isNormalized())
+                xx.setNormalized();
+
+            //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
+            //if (exxist!=null)
+                //return exxist.term();
+
+            //x = i.the(xx).term();
+            return xx;
+        }
+
+        return c;
     }
+
+//    static boolean possiblyTemporal(Termlike x) {
+//        return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
+//    }
+//
+//    @NotNull
+//    default Term atemporalize2(@NotNull Compound c) {
+//        if (!possiblyTemporal(c))
+//            return c;
+//        return new CompoundAtemporalizer(this, c).result;
+//    }
+//
+//
+//    final class CompoundAtemporalizer implements CompoundTransform<Compound, Term> {
+//
+//        private final TermIndex index;
+//        @NotNull
+//        private final Term result;
+//
+//        public CompoundAtemporalizer(@NotNull TermIndex index, @NotNull Compound c) {
+//            this.index = index;
+//            this.result = apply(null, c);
+//        }
+//
+//
+//        @Override
+//        public boolean test(Term subterm) {
+//            return possiblyTemporal(subterm);
+//        }
+//
+//        @Override
+//        public @Nullable Term apply(Compound parent, @NotNull Term subterm) {
+//
+//            Compound c = (Compound)subterm;
+//            TermIndex i = index;
+//
+//            Term x = c;
+//            int dt = c.dt();
+//            if (dt!=DTERNAL) {
+//                Op o = c.op();
+//                if (o.temporal) {
+//                    //int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
+//                    //if (o == CONJ && dt != 0 && csubs.hasAny(CONJ.bit)) {
+//                    //edt = XTERNAL;
+//                    //} else {
+//                    //edt = DTERNAL;
+//                    //}
+//                    //Term xx = i.builder().build(o, edt, csubs.terms());
+//
+//                    GenericCompound xx = new GenericCompound(o, DTERNAL, c.subterms());
+//                    if (c.isNormalized())
+//                        xx.setNormalized();
+//
+//                    Termed exxist = i.get(xx, false); //early exit: atemporalized to a concept already, so return
+//                    if (exxist!=null)
+//                        return exxist.term();
+//
+//                    //x = i.the(xx).term();
+//                    x = xx;
+//                }
+//            }
+//
+//            //if (x instanceof Compound) {
+//                return i.transform((Compound) x, this);
+//            //}
+//            //else
+//                //return x;
+//
+//
+//        }
+//    }
 }
