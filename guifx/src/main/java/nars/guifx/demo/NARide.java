@@ -42,7 +42,7 @@ import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;
 import nars.util.FX;
 import nars.util.Util;
-import spacegraph.video.WebcamFX;
+import spacegraph.video.WebcamSurface;
 import org.jewelsea.willow.browser.WebBrowser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,7 +197,7 @@ public class NARide extends StackPane {
         ni.addTool("Fractal Workspace", () -> new NARspace(nar));
 
 
-        ni.addTool("Webcam", WebcamFX::new);
+        ni.addTool("Webcam", WebcamSurface::new);
 
 
         //ni.addTool("Terminal (bash)", LocalTerminal::new);
