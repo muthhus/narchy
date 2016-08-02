@@ -147,7 +147,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     }
 
     @NotNull
-    static boolean subtermOfTheOther(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, @NotNull HashSet<Term> scratch) {
+    static boolean subtermOfTheOther(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -156,7 +156,9 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
         if (commonStructure == 0)
             return false;
 
-        return (a.containsTermRecursively(b) || b.containsTermRecursively(a));
+        //return (a.containsTermRecursively(b) || b.containsTermRecursively(a));
+        return ((!excludeVariables || !a.op().var) && a.containsTerm(b)) ||
+               ((!excludeVariables || !b.op().var) && b.containsTerm(a));
     }
 
     @NotNull

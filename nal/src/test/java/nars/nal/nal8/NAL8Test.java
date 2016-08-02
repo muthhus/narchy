@@ -441,36 +441,35 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test
     public void condition_belief_deduction_2()  {
-        int time = 124;
 
         test()
             //.log()
             .input(              "on:({t002},{t003}). :|:")
             .inputAt(10,         "(on:({t002},#1) &&+0 at:(SELF,#1)).")
-            .mustBelieve(time,   "at:(SELF,{t003})", 1.0f, 0.43f, 0)
-            .mustNotOutput(time, "at:(SELF,{t003})", '.', 0, 1f, 0, 1f, ETERNAL);
+            .mustBelieve(cycles,   "at:(SELF,{t003})", 1.0f, 0.43f, 0)
+            .mustNotOutput(cycles, "at:(SELF,{t003})", '.', 0, 1f, 0, 1f, ETERNAL);
 
     }
+
     @Test
     public void condition_belief_deduction_2_easier()  {
-        int time = 124;
 
         test()
                 //.log()
                 .input(              "on:(t002,t003). :|:")
                 .inputAt(10,         "(on:(t002,#1) &&+0 at:(SELF,#1)).")
-                .mustBelieve(time,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
-                .mustNotOutput(time, "at:(SELF,t003)", '.', 0, 1f, 0, 1f, ETERNAL);
+                .mustBelieve(cycles,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
+                .mustNotOutput(cycles, "at:(SELF,t003)", '.', 0, 1f, 0, 1f, ETERNAL);
     }
     @Test
     public void condition_belief_deduction_2_eternal()  {
-        int time = 124;
+
 
         test()
                 //.log()
                 .input(              "on:(t002,t003). :|:")
                 .inputAt(10,         "(on:(t002,#1) && at:(SELF,#1)).") //<-- ETERNAL
-                .mustBelieve(time,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
+                .mustBelieve(cycles*4,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
                 ;
     }
 

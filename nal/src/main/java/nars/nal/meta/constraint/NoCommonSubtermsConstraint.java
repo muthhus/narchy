@@ -39,7 +39,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
             Compound C = (Compound) y;
 
             return bCompound ?
-                    subtermOfTheOther((Compound)B, C, true, scratch.get())
+                    subtermOfTheOther((Compound)B, C, true)
                     //commonSubtermsRecurse((Compound) B, C, true, scratch.get())
                     //commonSubterms((Compound) B, C, true, scratch.get())
                     :
