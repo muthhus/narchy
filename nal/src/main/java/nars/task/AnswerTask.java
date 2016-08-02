@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.budget.merge.BudgetMerge;
+import nars.concept.Concept;
 import nars.nal.Stamp;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -26,6 +27,11 @@ public class AnswerTask extends MutableTask {
         evidence( Stamp.zip(bBelief.evidence(), bBelief.evidence(), aMix) );
 
         time(creationTime, occTime);
+    }
+
+    /** rather than store weakrefs to these tasks, just use normal refs but be sure to nullify them before returning from onConcept */
+    public void unlink() {
+        this.aBelief = this.bBelief = null;
     }
 
     @Override
@@ -66,6 +72,9 @@ public class AnswerTask extends MutableTask {
         return this;
     }
 
-
-
+    @Override
+    public boolean onConcept(@NotNull Concept c) {
+        unlink();
+        return true;
+    }
 }

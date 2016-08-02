@@ -138,7 +138,7 @@ public abstract class AbstractCore {
         private final short termlinks;
 
         public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks) {
-            super($.newHashSet(16));
+            super($.newHashSet(8 * tasklinks * termlinks));
             this.concept = c;
             this.nar = nar;
             this.tasklinks = tasklinks;
@@ -163,6 +163,8 @@ public abstract class AbstractCore {
                     termlinks
             );
 
+            nar.input(derive);
+
         }
 
         /**
@@ -171,17 +173,13 @@ public abstract class AbstractCore {
          */
         public final int firePremiseSquared(@NotNull Concept c, int tasklinks, int termlinks) {
 
-
-            //Set<Task> cccc = $.newHashSet(16);
-
-
             int count = 0;
-            FasterList<BLink<Term>> termsBuffer = $.newArrayList();;
+            FasterList<BLink<Term>> termsBuffer = $.newArrayList(termlinks);;
             c.termlinks().sample(termlinks, termsBuffer::addIfNotNull);
             if (!termsBuffer.isEmpty()) {
 
 
-                FasterList<BLink<Task>> tasksBuffer = $.newArrayList();;
+                FasterList<BLink<Task>> tasksBuffer = $.newArrayList(tasklinks);
                 c.tasklinks().sample(tasklinks, tasksBuffer::addIfNotNull);
 
                 if (!tasksBuffer.isEmpty()) {
@@ -206,7 +204,6 @@ public abstract class AbstractCore {
                 termsBuffer.clear();
             }
 
-            nar.input(derive);
 
             return count;
         }

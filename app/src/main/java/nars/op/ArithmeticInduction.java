@@ -36,6 +36,9 @@ import static nars.nal.Tense.DTERNAL;
 
 /** arithmetic rule mining & variable introduction */
 public class ArithmeticInduction implements Consumer<Task> {
+
+    final static String tag = ArithmeticInduction.class.getSimpleName();
+
     private final NAR nar;
     private final Consumer<Collection<Task>> target;
     boolean deleteOriginalTaskIfInducted = true;
@@ -388,13 +391,14 @@ public class ArithmeticInduction implements Consumer<Task> {
         }
         if (b.isDeleted())
             return null;
+
         Task g = new GeneratedTask(
                 c,
                 b.punc(), b.truth())
                 .time(nar.time(), b.occurrence())
                 .budget(b)
                 .evidence(b.evidence())
-                .log(getClass().getSimpleName())
+                .log(tag)
                 ;
         if (g!=null)
             target.add(g);

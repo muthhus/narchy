@@ -59,15 +59,11 @@ public class RevisionTask extends AnswerTask  {
         return false;
     }
 
-    /** rather than store weakrefs to these tasks, just use normal refs but be sure to nullify them before returning from onConcept */
-    private void unlink() {
-        this.aBelief = this.bBelief = null;
-    }
+
 
 
     /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
     @Override public boolean onConcept(@NotNull Concept c) {
-        super.onConcept(c);
 
         //TODO reimplement again
 
@@ -120,8 +116,7 @@ public class RevisionTask extends AnswerTask  {
 ////            weaken(parentOldBelief);
 ////            //oldBelief.onRevision(this);
 
-        unlink();
-        return true;
+        return super.onConcept(c);
     }
 
 //    private void weaken(Task parent) {

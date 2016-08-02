@@ -351,17 +351,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         float r = 1f - (existing / (existing + pending));
 
-        if (r >= Param.BUDGET_EPSILON * size()) {
-            return forget.set(r);
+        if (r >= Param.BUDGET_EPSILON * size()/2f) {
+            return new Forget(r);
         } else {
             return null;
         }
     }
 
     private static final class Forget implements Consumer<BLink> {
-        public float r;
+        public final float r;
 
         static final float maxEffectiveDurability = 1f;
+
+        public Forget(float r) {
+            this.r = r;
+        }
 
         @Override
         public void accept(BLink bLink) {
@@ -369,14 +373,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             bLink.priMult(1f - (r * (1f - eDur)));
         }
 
-        public Consumer<BLink> set(float r) {
-            this.r = r;
-            return this;
-        }
+//        public Consumer<BLink> set(float r) {
+//            this.r = r;
+//            return this;
+//        }
 
     }
 
-    private Forget forget = new Forget();
 
     /**
      * applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted
