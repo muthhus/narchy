@@ -1,4 +1,4 @@
-package nars.video;
+package spacegraph.video;
 
 import nars.util.signal.OneDHaar;
 import org.apache.commons.math3.util.FastMath;

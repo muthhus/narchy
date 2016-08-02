@@ -18,6 +18,8 @@ import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -30,6 +32,8 @@ import static nars.util.Texts.n4;
  */
 abstract public class NAREnvironment {
 
+
+    static final Logger logger = LoggerFactory.getLogger(NAREnvironment.class);
 
     public final SensorConcept happy;
     private final float reinforcementAttention;
@@ -47,6 +51,7 @@ abstract public class NAREnvironment {
     private boolean trace = true;
 
     int ticksBeforeObserve = 1, ticksBeforeDecide = 1;
+    protected long now;
 
     public NAREnvironment(NAR nar) {
         this.nar = nar;
@@ -99,6 +104,9 @@ abstract public class NAREnvironment {
             nar.clock.tick();
 
         nar.next();
+
+
+        now = nar.time();
 
         rewardValue = act();
 
@@ -235,7 +243,11 @@ abstract public class NAREnvironment {
                     .budget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
         } else {
             //just reactivate the existing eternal
-            nar.activate(t);
+            try {
+                nar.activate(t);
+            } catch (Exception e) {
+                logger.warn("{}", e.toString());
+            }
         }
 
     }

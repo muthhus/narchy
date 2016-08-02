@@ -42,7 +42,7 @@ import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;
 import nars.util.FX;
 import nars.util.Util;
-import nars.video.WebcamFX;
+import spacegraph.video.WebcamFX;
 import org.jewelsea.willow.browser.WebBrowser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

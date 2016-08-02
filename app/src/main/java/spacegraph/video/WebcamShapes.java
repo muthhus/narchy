@@ -1,4 +1,4 @@
-package nars.video;
+package spacegraph.video;
 
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.feature.detect.edge.CannyEdge;

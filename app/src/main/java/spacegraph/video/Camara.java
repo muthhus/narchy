@@ -1,4 +1,4 @@
-package nars.video;
+package spacegraph.video;
 
 import com.github.sarxos.webcam.Webcam;
 import javafx.application.Application;

@@ -279,11 +279,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         if (existing != null) {
             putExists(b, scale, existing, overflow);
         } else {
-            if (minPriIfFull() > p) {
-                putFail(key);
-                pending += p; //include failed input in pending
-            } else {
-                putNewAndDeleteDisplaced(key, newLink(key, p, b.qua(), b.dur()));
+            synchronized (map) {
+
+                if (minPriIfFull() > p) {
+                    putFail(key);
+                    pending += p; //include failed input in pending
+                } else {
+                    putNewAndDeleteDisplaced(key, newLink(key, p, b.qua(), b.dur()));
+                }
             }
         }
 

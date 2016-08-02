@@ -142,15 +142,19 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         });
 
 
+        if (concurrency == -1) {
+            this.runWorker = this.taskWorker = ForkJoinPool.commonPool();
+        } else {
 
-        this.runWorker =
-                //ForkJoinPool.commonPool(); //<- uses the common pool's concurrency which may not be the supplied 'concurrency' value
-                new ForkJoinPool(concurrency,
-                        defaultForkJoinWorkerThreadFactory, null, false);
+            this.runWorker =
+                    //ForkJoinPool.commonPool(); //<- uses the common pool's concurrency which may not be the supplied 'concurrency' value
+                    new ForkJoinPool(concurrency,
+                            defaultForkJoinWorkerThreadFactory, null, false);
 
-        this.taskWorker =
-                new ForkJoinPool(concurrency,
-                        defaultForkJoinWorkerThreadFactory, null, false);
+            this.taskWorker =
+                    new ForkJoinPool(concurrency,
+                            defaultForkJoinWorkerThreadFactory, null, false);
+        }
 
 
         index.loadBuiltins();
@@ -1346,7 +1350,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final void activate(@NotNull Task t, float scale) {
         @Nullable Concept concept = t.concept(this);
         if (concept == null)
-            throw new NullPointerException();
+            throw new RuntimeException("task did not resolve to a concept: " + t);
         activate(concept, t, inputActivation.floatValue() * scale, scale, null);
     }
 

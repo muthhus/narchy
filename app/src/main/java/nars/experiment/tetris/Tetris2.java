@@ -7,23 +7,26 @@ import nars.concept.Concept;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
-import nars.gui.BeliefTableChart;
-import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
+import nars.predict.LSTMPredictor;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
+import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.math.FloatSupplier;
+import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import spacegraph.Surface;
 import spacegraph.obj.ConsoleSurface;
 import spacegraph.obj.GridSurface;
+import spacegraph.obj.MatrixView;
 import spacegraph.obj.Plot2D;
 
 import java.io.IOException;
@@ -31,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static java.util.stream.Collectors.toList;
 import static nars.$.t;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
@@ -44,26 +46,30 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = false;
-        Param.CONCURRENCY_DEFAULT = 2;
+        Param.CONCURRENCY_DEFAULT = 3;
     }
+
     public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 1024;
+    public static final int cyclesPerFrame = 64;
     public static final int tetris_width = 8;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 2;
+    public static final int TIME_PER_FALL = 3;
     static int frameDelay = 0;
 
-    static boolean easy = true;
+    static boolean easy = false;
 
 
     private final TetrisState state;
+    private int visionSyncPeriod = 16;
 
     public class View {
         public BagChart<Concept> conceptChart;
         public TetrisVisualizer vis;
         public Surface plot1;
-        public ConsoleSurface term = new ConsoleSurface(40,8);
+        public ConsoleSurface term = new ConsoleSurface(40, 8);
 
+        public MatrixView camView;
+        public Plot2D lstm;
     }
 
     final View view = new View();
@@ -106,15 +112,16 @@ public class Tetris2 extends NAREnvironment {
     protected void init(NAR nar) {
 
         state.seen = new float[state.width * state.height];
-        for (int x = 0; x < state.width; x++) {
-            int xx = x;
-            for (int y = 0; y < state.height; y++) {
+        for (int y = 0; y < state.height; y++) {
+            int yy = y;
+            for (int x = 0; x < state.width; x++) {
+                int xx = x;
                 Compound squareTerm = $.p(new Termject.IntTerm(x), new Termject.IntTerm(y));
-                int yy = y;
                 sensors.add(new SensorConcept(squareTerm, nar,
                         () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
                         (v) -> t(v, alpha)
-                ));
+                ).timing(0, visionSyncPeriod));
+
             }
         }
 
@@ -131,11 +138,8 @@ public class Tetris2 extends NAREnvironment {
     @Override
     public float act() {
 
-        //decide simultaneous motor actions: 0 or more
-        long now = nar.time();
 
-
-        float rotateMotivation = (motorRotate!=null && motorRotate.hasGoals()) ? motorRotate.goals().expectation(now) : 0.5f;
+        float rotateMotivation = (motorRotate != null && motorRotate.hasGoals()) ? motorRotate.goals().expectation(now) : 0.5f;
         //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
         float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().expectation(now) : 0.5f;
 
@@ -190,21 +194,21 @@ public class Tetris2 extends NAREnvironment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 5 * 10000000, false)
 
                 , new FrameClock());
         nar.inputActivation.setValue(0.05f);
         nar.derivedActivation.setValue(0.04f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.75f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
+        nar.beliefConfidence(0.95f);
+        nar.goalConfidence(0.8f);
+        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.04f);
+        nar.confMin.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -260,44 +264,100 @@ public class Tetris2 extends NAREnvironment {
 //                );
 
 
-
                 //BagChart.show((Default) nar, 1024);
                 //STMView.show(stm, 800, 600);
 
                 int plotHistory = 256;
                 Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
-                plot.add("Rwrd", ()->rewardValue);
+                plot.add("Rwrd", () -> rewardValue);
 
                 Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
-                plot2.add("Busy", ()->nar.emotion.busy.getSum());
-                plot2.add("Lern", ()->nar.emotion.learning());
+                plot2.add("Busy", () -> nar.emotion.busy.getSum());
+                plot2.add("Lern", () -> nar.emotion.learning());
                 //plot2.add("Strs", ()->nar.emotion.stress.getSum());
 
                 Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
-                plot3.add("Hapy", ()->nar.emotion.happy.getSum());
+                plot3.add("Hapy", () -> nar.emotion.happy.getSum());
 
 //                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
 //                plot4.add("Errr", ()->nar.emotion.errr.getSum());
 
 
-
                 view.plot1 = new GridSurface(VERTICAL, plot, plot2, plot3);
+
+
+
+                {
+                    List<FloatSupplier> li = new ArrayList();
+                    for (int i = 0; i < sensors.size(); i++) {
+                        li.add(sensors.get(i).getInput());
+                    }
+
+                    List<FloatSupplier> lo = new ArrayList();
+                    RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> rewardValue);
+                    lo.add(normReward);
+//
+//
+                    LSTMPredictor lp = new LSTMPredictor(li, lo, 1);
+//
+
+                    double[] lpp = new double[2];
+                    nar.onFrame(nn -> {
+                        double[] p = lp.next();
+                        System.arraycopy(p, 0, lpp, 0, p.length);
+                        //System.out.println("LSTM: " + Texts.n4(p) + " , " + normReward.asFloat());
+                    });
+
+                    view.lstm = new Plot2D(plotHistory, Plot2D.Line)
+                            .add("Reward (actual)", () -> normReward.asFloat())
+                            .add("Predicted", () -> lpp[0]);
+
+
+                }
 
                 nar.onFrame(f -> {
                     plot.update();
                     plot2.update();
                     plot3.update();
+                    view.lstm.update();
                     try {
                         view.term.term.putLinePre(summary());
                     } catch (IOException e) {
                     }
                 });
 
+
+                view.camView = new MatrixView(tetris_width, tetris_height, (x, y, g) -> {
+//            int rgb = cam.out.getRGB(x,y);
+//            float r = decodeRed(rgb);
+//            if (r > 0)
+//                System.out.println(x + " "+ y + " " + r);
+//            g.glColor3f(r,0,0);
+
+                    SensorConcept s = sensors.get(y * tetris_width + x);
+                    float b = s.hasBeliefs() ? s.beliefs().expectation(now) : 0;
+                    Truth dt = s.hasGoals() ? s.goals().truth(now) : null;
+                    float dr, dg;
+                    if (dt == null) {
+                        dr = dg = 0;
+                    } else {
+                        float f = dt.freq();
+                        float c = dt.conf();
+                        if (f > 0.5f) {
+                            dr = 0;
+                            dg = (f - 0.5f) * 2f * c;
+                        } else {
+                            dg = 0;
+                            dr = (0.5f - f) * 2f * c;
+                        }
+                    }
+
+                    float p = nar.conceptPriority(s);
+                    g.glColor4f(dr, dg, b, 0.5f + 0.5f * p);
+
+                });
+
                 newControlWindow(view);
-
-
-
-
 
 
                 //NARSpace.newConceptWindow((Default) nar, 128, 8);

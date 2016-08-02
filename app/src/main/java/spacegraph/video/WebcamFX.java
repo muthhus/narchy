@@ -1,4 +1,4 @@
-package nars.video;
+package spacegraph.video;
 
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import com.github.sarxos.webcam.Webcam;
@@ -13,17 +13,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import nars.data.Range;
-import nars.guifx.NARfx;
-import nars.guifx.util.POJOPane;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.Surface;
 
 import java.awt.image.BufferedImage;
 
 import static javafx.application.Platform.runLater;
 
-
+//TODO convert to SpaceGraph Surface
 public class WebcamFX extends StackPane implements Runnable {
 
     //private SourceDataLine mLine;
@@ -76,8 +75,8 @@ public class WebcamFX extends StackPane implements Runnable {
         try {
             final int audioFPS = 10;
             WaveCapture au = new WaveCapture(new AudioSource(0, audioFPS), audioFPS);
-            VBox mp = au.newMonitorPane();
-            mp.setAlignment(Pos.BOTTOM_RIGHT);
+            Surface mp = au.newMonitorPane();
+            //mp.setAlignment(Pos.BOTTOM_RIGHT);
 
             //widthProperty().multiply(0.5);
             //mp.setFillWidth(true);
@@ -87,7 +86,7 @@ public class WebcamFX extends StackPane implements Runnable {
 
             //mp.maxWidth(Double.MAX_VALUE);
             //mp.maxHeight(Double.MAX_VALUE);
-            getChildren().add(mp);
+            //getChildren().add(mp);
         } catch (Exception e) {
             logger.error("{}", e);
             getChildren().add(new Label(e.toString()));
@@ -98,20 +97,20 @@ public class WebcamFX extends StackPane implements Runnable {
         //ImagePanel gui = new ImagePanel();
         //gui.setPreferredSize(webcam.getViewSize());
 
-        BorderPane control = new POJOPane(this);
-        //control.setStyle("-fx-background-color: gray");
-        control.setStyle("-fx-text-fill: gray");
-        //control.setBlendMode(BlendMode.EXCLUSION);
-        control.setOpacity(0.92);
-
-        VBox wcon = new VBox(control);
-        wcon.prefWidth(150);
-        wcon.maxWidth(150);
-        wcon.setFillWidth(false);
-        wcon.setAlignment(Pos.CENTER_LEFT);
-        //wcon.(150);
-
-        getChildren().add(wcon);
+//        BorderPane control = new POJOPane(this);
+//        //control.setStyle("-fx-background-color: gray");
+//        control.setStyle("-fx-text-fill: gray");
+//        //control.setBlendMode(BlendMode.EXCLUSION);
+//        control.setOpacity(0.92);
+//
+//        VBox wcon = new VBox(control);
+//        wcon.prefWidth(150);
+//        wcon.maxWidth(150);
+//        wcon.setFillWidth(false);
+//        wcon.setAlignment(Pos.CENTER_LEFT);
+//        //wcon.(150);
+//
+//        getChildren().add(wcon);
 
         try {
 
@@ -125,21 +124,21 @@ public class WebcamFX extends StackPane implements Runnable {
 
     public static void main(String[] args) {
 
-        NARfx.run((a, b) -> {
-
-
-            Pane bv = new WebcamFX();
-
-
-            b.setWidth(1000);
-            b.setHeight(1000);
-            b.setScene(new Scene(bv));
-
-            b.show();
-
-            //b.sizeToScene();
-
-        });
+//        NARfx.run((a, b) -> {
+//
+//
+//            Pane bv = new WebcamFX();
+//
+//
+//            b.setWidth(1000);
+//            b.setHeight(1000);
+//            b.setScene(new Scene(bv));
+//
+//            b.show();
+//
+//            //b.sizeToScene();
+//
+//        });
 
 
     }

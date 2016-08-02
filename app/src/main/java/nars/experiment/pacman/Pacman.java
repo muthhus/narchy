@@ -28,8 +28,6 @@ import nars.NAR;
 import nars.Param;
 import nars.agent.NAgent;
 import nars.experiment.DiscreteEnvironment;
-import nars.gui.BagChart;
-import nars.gui.NARSpace;
 import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
@@ -37,6 +35,7 @@ import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
+import nars.predict.LSTMPredictor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -45,6 +44,8 @@ import nars.time.FrameClock;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.math.FloatSupplier;
+import nars.util.math.RangeNormalizedFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,8 +102,8 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.85f);
-		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.95f);
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
@@ -188,27 +189,27 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 //								"unmotivationed", "motivated", nar, ()->(float)nar.emotion.motivation.getSum(), 0.5f).resolution(0.1f));
 
 //				{
-//					List<FloatSupplier> li = new ArrayList();
-//					for (int i = 0; i < this.inputs.size(); i++) {
-//						li.add( this.inputs.get(i).getInput() );
+					List<FloatSupplier> li = new ArrayList();
+					for (int i = 0; i < this.inputs.size(); i++) {
+						li.add( this.inputs.get(i).getInput() );
+					}
+//					for (int i = 0; i < cheats.size(); i++) {
+//						FloatSupplier ci = cheats.get(i).getInput();
+//						//li.add( new DelayedFloat(ci, 2) );
+//						//li.add( new DelayedFloat(new RangeNormalizedFloat(()->reward), 1) );
+//						li.add( ci );
 //					}
-////					for (int i = 0; i < cheats.size(); i++) {
-////						FloatSupplier ci = cheats.get(i).getInput();
-////						//li.add( new DelayedFloat(ci, 2) );
-////						//li.add( new DelayedFloat(new RangeNormalizedFloat(()->reward), 1) );
-////						li.add( ci );
-////					}
-//					List<FloatSupplier> lo = new ArrayList();
-//					RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> reward);
-//					lo.add(normReward);
+					List<FloatSupplier> lo = new ArrayList();
+					RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> reward);
+					lo.add(normReward);
 //
 //
-//					LSTMPredictor lp = new LSTMPredictor(li, lo);
+					LSTMPredictor lp = new LSTMPredictor(li, lo, 1);
 //
-//					nar.onFrame(nn->{
-//						double[] p = lp.next();
-//						System.out.println(Texts.n4(p) + " , " + normReward.asFloat() );
-//					});
+					nar.onFrame(nn->{
+						double[] p = lp.next();
+						System.out.println(Texts.n4(p) + " , " + normReward.asFloat() );
+					});
 //				}
 
 

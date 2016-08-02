@@ -75,7 +75,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         return list.isEmpty();
     }
 
-    @Deprecated public final void remove(@NotNull Task belief, List<Task> displ) {
+    @Deprecated
+    public final void remove(@NotNull Task belief, List<Task> displ) {
         //this list removal is slow; indexed or iterator is better
         if (list.remove(belief)) {
             TaskTable.removeTask(belief, null, displ);
@@ -148,12 +149,12 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             nar.activate(a, qBudget);
 
 
-
             //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly
             //BudgetFunctions.transferPri(q.budget(), a.budget(), (1f - q.qua()) * aConf);
 
         } else {
             //the qustion requested for it to be deleted
+            return;
         }
 
 //        //generate a projected answer
@@ -182,16 +183,15 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         synchronized (list) {
             questioned = insert(question, displ);
-            if (questioned != null) {
-                //inserted
-                if (!answers.isEmpty()) {
-                    Task a = answers.top(questioned.occurrence());
-                    if (a != null && !a.isDeleted()) {
-                        answer(questioned, a, n);
-                    }
-                }
+        }
+        //inserted if questioned!=null
+        if (questioned != null && !answers.isEmpty()) {
+            Task a = answers.top(questioned.occurrence());
+            if (a != null && !a.isDeleted()) {
+                answer(questioned, a, n);
             }
         }
+
 
         return questioned;
     }
@@ -208,31 +208,31 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         float tp = t.pri();
 
 
-            if (siz == capacity()) {
+        if (siz == capacity()) {
 
 
-                Collections.sort(list, this);
+            Collections.sort(list, this);
 
-                if (last().qua() > tp) {
-                    t.delete("Insufficient Priority");
-                    return null;
-                } else {
-                    // FIFO, remove oldest question (last)
-                    float removedPri = remove(siz - 1, "Table Pop", displaced);
-                    if (removedPri == removedPri) //not deleted
-                        t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
-                }
+            if (last().qua() > tp) {
+                t.delete("Insufficient Priority");
+                return null;
+            } else {
+                // FIFO, remove oldest question (last)
+                float removedPri = remove(siz - 1, "Table Pop", displaced);
+                if (removedPri == removedPri) //not deleted
+                    t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
             }
+        }
 
-            //insert in sorted order by qua
-            List<Task> list = this.list;
+        //insert in sorted order by qua
+        List<Task> list = this.list;
 
-            int i = 0;
-            for (; i < siz - 1; i++) {
-                if (list.get(i).qua() < tp)
-                    break;
-            }
-            list.add(i, t);
+        int i = 0;
+        for (; i < siz - 1; i++) {
+            if (list.get(i).qua() < tp)
+                break;
+        }
+        list.add(i, t);
 
         return t;
     }

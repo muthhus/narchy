@@ -17,16 +17,10 @@ public class DelayedFloat implements FloatSupplier {
         Arrays.fill(data, input.asFloat()); //fill with initial value, HACK
     }
 
-    protected boolean autoshift() {
-        return true;
-    }
 
     @Override
     public float asFloat() {
         float v = data[data.length-1];
-        if (autoshift()) {
-            next();
-        }
         return v;
     }
 

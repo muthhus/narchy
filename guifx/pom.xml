@@ -117,12 +117,6 @@
             <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.boofcv</groupId>
-            <artifactId>WebcamCapture</artifactId>
-            <version>0.24.1</version>
-            <scope>compile</scope>
-        </dependency>
         <!--<dependency>-->
             <!--<groupId>org.jfxtras</groupId>-->
             <!--<artifactId>jfxtras-test-support</artifactId>-->

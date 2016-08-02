@@ -392,9 +392,13 @@ public interface TermIndex {
             r = t.term();
         }
 
-        Compound s = (Compound) termOrNull(get(r, insert));
+        if (insert) {
+            Compound s = (Compound) termOrNull(get(r, true));
+            return s == null ? r : s; //if a concept does not exist and was not created, return the key
+        } else {
+            return r;
+        }
 
-        return s == null ? r : s; //if a concept does not exist and was not created, return the key
     }
 
 
@@ -523,7 +527,7 @@ public interface TermIndex {
 
             Termed prenormalized = term;
 
-            if (!((term = normalize(term, createIfMissing)) instanceof Compound))
+            if (!((term = normalize(term, false)) instanceof Compound))
                 throw new InvalidConceptException(prenormalized, "Failed normalization, becoming: " + term);
 
             Term aterm = atemporalize((Compound) term);

@@ -1,4 +1,4 @@
-package nars.video;
+package spacegraph.video;
 
 /**
  * Source of a digitized 1D wave signal

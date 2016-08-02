@@ -1,20 +1,26 @@
-package nars.video;
+package spacegraph.video;
 
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
+import com.jogamp.opengl.GL2;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
-import nars.guifx.NARfx;
-import nars.guifx.chart.Plot2D;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
 import nars.util.signal.OneDHaar;
+import spacegraph.SpaceGraph;
+import spacegraph.Surface;
+import spacegraph.obj.GridSurface;
+import spacegraph.obj.Plot2D;
+import spacegraph.obj.RectWidget;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import static spacegraph.obj.GridSurface.VERTICAL;
 
 /**
  * Created by me on 10/28/15.
@@ -54,53 +60,52 @@ public class WaveCapture implements Runnable {
         start(0);
     }
 
-    public VBox newMonitorPane() {
 
+    public Surface newMonitorPane() {
 
-        Plot2D audioPlot = new Plot2D(Plot2D.Line, bufferSamples, 450, 60);
+        Plot2D audioPlot = new Plot2D(bufferSamples, Plot2D.Line);//, bufferSamples, 450, 60);
         audioPlot.add(rawWave);
-        Plot2D audioPlot2 = new Plot2D(Plot2D.Line, bufferSamples, 450, 60);
+        Plot2D audioPlot2 = new Plot2D(bufferSamples, Plot2D.Line);
         audioPlot2.add(wavelet1d);
 
 
-        Consumer<WaveCapture> u = (a) -> {
-            audioPlot.update();
-            audioPlot2.update();
-        };
 
-        VBox v = new VBox(
+
+        GridSurface v = new GridSurface(VERTICAL,
                 audioPlot,
-                audioPlot2);
-
-        v.maxWidth(Double.MAX_VALUE);
-        v.maxHeight(Double.MAX_VALUE);
-
-        //noinspection OverlyComplexAnonymousInnerClass
-        ChangeListener onParentChange = new ChangeListener() {
-
-            public On observe;
-
+                audioPlot2) {
             @Override
-            public void changed(ObservableValue observableValue, Object o, Object t1) {
-
-                if (t1 == null) {
-                    if (observe != null) {
-                        //System.out.println("stopping view");
-                        this.observe.off();
-                        this.observe = null;
-                    }
-                } else {
-                    if (observe == null) {
-                        //System.out.println("starting view");
-                        observe = nextReady.on(u);
-                    }
-                }
+            protected void paint(GL2 gl) {
+                audioPlot.update();
+                audioPlot2.update();
+                super.paint(gl);
             }
         };
-        //runLater(() -> {
-        onParentChange.changed(null, null, null);
-        v.sceneProperty().addListener(onParentChange);
-        //});
+
+//
+//        //noinspection OverlyComplexAnonymousInnerClass
+//        ChangeListener onParentChange = new ChangeListener() {
+//
+//            public On observe;
+//
+//            @Override
+//            public void changed(ObservableValue observableValue, Object o, Object t1) {
+//
+//                if (t1 == null) {
+//                    if (observe != null) {
+//                        //System.out.println("stopping view");
+//                        this.observe.off();
+//                        this.observe = null;
+//                    }
+//                } else {
+//                    if (observe == null) {
+//                        //System.out.println("starting view");
+//                        observe = nextReady.on(u);
+//                    }
+//                }
+//            }
+//        };
+
         return v;
     }
 
@@ -119,13 +124,19 @@ public class WaveCapture implements Runnable {
 
             @Override
             public void update() {
-                history.clear();
+                clear();
 
                 float[] samples = WaveCapture.this.samples;
                 if (samples == null) return;
                 //samples[0] = null;
 
-                history.addAll(samples);
+                addAll(samples);
+
+                //minValue = -0.5f;
+                //maxValue = 0.5f;
+
+                autorange();
+
 //                final FloatArrayList history = this.history;
 //
 //                for (int i = 0; i < nSamplesRead; i++) {
@@ -135,8 +146,6 @@ public class WaveCapture implements Runnable {
 //                while (history.size() > maxHistory)
 //                    history.removeAtIndex(0);
 
-                minValue = -1.0f; //Short.MIN_VALUE;
-                maxValue = 1.0f;  //Short.MAX_VALUE;
 //                                        minValue = Float.POSITIVE_INFINITY;
 //                                        maxValue = Float.NEGATIVE_INFINITY;
 //
@@ -158,7 +167,7 @@ public class WaveCapture implements Runnable {
                 if (ss == null) return;
                 //samples[0] = null;
 
-                FloatArrayList history = this.history;
+                FloatArrayList history = this;
 
                 //                        for (short s : ss) {
                 //                            history.add((float)s);
@@ -249,14 +258,15 @@ public class WaveCapture implements Runnable {
 
     public static void main(String[] args) {
         WaveCapture au = new WaveCapture(
-                new AudioSource(0, 30),
+                new AudioSource(0, 20),
                 //new SineSource(128),
-                30);
+                20);
 
-        NARfx.run((a, b) -> {
-            b.setScene(new Scene(au.newMonitorPane(), 500, 400));
-            b.show();
-        });
+        new SpaceGraph(new RectWidget(au.newMonitorPane(), 16,8)).show(1200,1200);
+
+//            b.setScene(new Scene(au.newMonitorPane(), 500, 400));
+//            b.show();
+//        });
     }
 
 }

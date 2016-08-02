@@ -1,4 +1,4 @@
-package nars.video;
+package spacegraph.video;
 
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;

@@ -1,4 +1,4 @@
-package nars.video;
+package spacegraph.video;
 
 import nars.util.signal.OneDHaar;
 
@@ -111,11 +111,11 @@ public class AudioSource implements WaveSource {
         int start = Math.max(0, nSamplesRead - bufferSamples);
         int end = nSamplesRead;
         int j = 0;
-        float fmax = Short.MAX_VALUE;
         for (int i = start; i < end; i++)
-            buffer[j++] = samples[i] / fmax;
+            buffer[j++] = samples[i] / shortRange;
 
         return nSamplesRead;
     }
 
+    static final float shortRange = (((long)Short.MAX_VALUE)-((long)Short.MIN_VALUE))/2f;
 }
