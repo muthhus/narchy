@@ -49,6 +49,43 @@ current cycle.
 
 ----
 
+How NARchy Reasons Differently From OpenNARS
+-------------------------------------------
+
+The most significant difference is NARchy's completely redesigned Temporal Logic (NAL7) system
+which uses numeric time differences embedded within temporal compounds.  These allow for 
+arbitrary resolution in measuring and interpolating time as opposed to arbitrarily discretized
+time intervals.  A concept's beliefs and goals co-locate all temporal and non-temporal varieties of 
+its form into separate eternal and temporal belief tables which can not compete with each other
+yet support each other when evaluating truth value.
+
+This replaces the separate Parallel and Sequential term operator variations of Conjunctions,
+ Equivalences, and Implications with 3 unified continuous-time Conjunction, Implication and 
+ Equivalence which share all derivation rules with their eternal-time root types.  This reduces
+ the number of derivation rules necessary and smooths some discontinuities and edge cases
+ that multiple temporal and non-temporal operator types necessitated.
+ 
+In order to fully utilize this added temporal expressiveness, temporal belief tables were
+redesigned to support evaluation of concept truth value at any point in time using a 
+generalized microsphere interpolation "revection" algorithm which combines revision (interpolation) and
+projection (extrapolation).
+
+In keeping with a design preference for unity and spectral continuity, negations are also handled
+ differently by eliminating all Negation concepts.  Instead, a concept stores
+ its complete frequency spectrum within itself and Negation is handled automaticaly and
+ transparently during derivation and user-input/output.  Subterms may be negated, and this
+ results in unique compounds, but the top-level term of a task is always stored un-negated.
+ This ultimately can result in less concepts (since a negation of a concept doesn't exist separately)
+ and eliminates the possibility of a concept contradicting the beliefs of its negation which
+ otheriwse would be stored in separate belief tables.  It also
+ supports smooth and balanced revection across the 0.5 "maybe" midpoint of the frequency range,
+ in both temporal and eternal modes.
+ 
+ _Many other changes remain to be documented._
+ 
+
+----
+
  * A comprehensive description of NARS [Rigid Flexibility: The Logic of Intelligence](http://www.springer.com/west/home/computer/artificial?SGWID=4-147-22-173659733-0) and [Non-Axiomatic Logic: A Model of Intelligent Reasoning](http://www.worldscientific.com/worldscibooks/10.1142/8665).
  * Papers discussing aspects of the system: [available here](http://www.cis.temple.edu/~pwang/papers.html)
  * Introduction: [The Logic of Intelligence](http://www.cis.temple.edu/~pwang/Publication/logic_intelligence.pdf)
