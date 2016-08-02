@@ -144,9 +144,9 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
                 if (a.hasTemporal()) {
                     temporal = true;//dont store subterm arrays containing temporal compounds
                 }
-                b = termOrNull(theCompound((Compound) a, true));
-                if (b == null)
-                    return null;
+                b = termOrNull(theCompound((Compound) a, true)).term();
+                /*if (b == null)
+                    return null;*/
             } else {
                 b = theAtom((Atomic) a, true).term();
             }

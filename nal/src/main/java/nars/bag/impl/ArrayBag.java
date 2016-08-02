@@ -72,9 +72,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     public boolean setCapacity(int newCapacity) {
         if (super.setCapacity(newCapacity)) {
-            synchronized (pending) {
-                pending.capacity(newCapacity);
-            }
+            pending.capacity(newCapacity);
             return true;
         }
         return false;
@@ -651,9 +649,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     public void clear() {
-        synchronized (pending) {
-            pending.clear();
-        }
+
+        pending.clear();
+
         synchronized (map) {
             super.clear();
         }
@@ -686,9 +684,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             mass += d * b.priIfFiniteElseZero();
             pendingMass += d * b.priDelta();
         }
-        synchronized (pending) {
-            pendingMass += pending.mass(this);
-        }
+
+        pendingMass += pending.mass(this);
+
         return new float[]{mass, pendingMass};
     }
 

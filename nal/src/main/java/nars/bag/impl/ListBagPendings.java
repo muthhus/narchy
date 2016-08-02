@@ -54,15 +54,14 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
 
     @Override
     public void apply(@NotNull ArrayBag<X> bag) {
+        CircularArrayList<RawBLink<X>> p = this.pending;
+        if (p != null) {
+            synchronized(bag) {
 
-
-
-            CircularArrayList<RawBLink<X>> p = this.pending;
-            if (p != null) {
                 clear();
                 for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
                     RawBLink<X> w = p.getAndSet(i, null);
-                    if (w!=null) {
+                    if (w != null) {
                         float wp = w.pri();
                         if (wp == wp) { //not deleted
                             bag.commitPending(w.x, wp, w.dur(), w.qua());
@@ -70,6 +69,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
                     }
                 }
             }
+        }
     }
 
     @Override
@@ -100,12 +100,13 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
             return 0;
 
 
+        float sum = 0;
+        synchronized (bag) {
             Collections.sort(p, this);
 
-            float sum = 0;
             for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
                 RawBLink<X> w = p.get(i);
-                if (w!=null) {
+                if (w != null) {
                     float pp = w.priIfFiniteElseZero();
                     if (pp > 0) {
                         sum += pp * w.dur();
@@ -117,7 +118,8 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
             if (sum < Param.BUDGET_EPSILON) {
                 clear();
             }
-            return sum;
+        }
+        return sum;
     }
 
     @Override

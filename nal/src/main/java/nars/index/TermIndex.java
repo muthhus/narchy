@@ -640,11 +640,19 @@ public interface TermIndex {
 
         public CompoundAtemporalizer(@NotNull TermIndex index, @NotNull Compound c) {
             this.index = index;
-            this.result = _atemporalize(c);
+            this.result = apply(null, c);
         }
 
-        @NotNull
-        Term _atemporalize(@NotNull Compound c) {
+
+        @Override
+        public boolean test(Term subterm) {
+            return possiblyTemporal(subterm);
+        }
+
+        @Override
+        public @Nullable Term apply(Compound parent, @NotNull Term subterm) {
+
+            Compound c = (Compound)subterm;
             TermIndex i = index;
 
             Term x = c;
@@ -664,33 +672,22 @@ public interface TermIndex {
                     if (c.isNormalized())
                         xx.setNormalized();
 
-//                    Termed exxist = i.get(xx, true); //early exit: atemporalized to a concept already, so return
-//                    if (exxist!=null)
-//                        return exxist.term();
+                    Termed exxist = i.get(xx, false); //early exit: atemporalized to a concept already, so return
+                    if (exxist!=null)
+                        return exxist.term();
 
                     //x = i.the(xx).term();
                     x = xx;
                 }
             }
 
-            if (x instanceof Compound) {
+            //if (x instanceof Compound) {
                 return i.transform((Compound) x, this);
-            }
-            else
-                return x;
-        }
+            //}
+            //else
+                //return x;
 
-        @Override
-        public boolean test(Term term) {
-            return possiblyTemporal(term);
-        }
 
-        @Override
-        public @Nullable Term apply(Compound parent, @NotNull Term subterm) {
-            if (subterm instanceof Compound)
-                return _atemporalize((Compound) subterm);
-            else
-                return subterm;
         }
     }
 }
