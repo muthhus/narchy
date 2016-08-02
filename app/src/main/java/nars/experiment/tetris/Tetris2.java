@@ -8,6 +8,7 @@ import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
+import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -43,10 +44,10 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = false;
-        Param.CONCURRENCY_DEFAULT = 3;
+        Param.CONCURRENCY_DEFAULT = 2;
     }
     public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 512;
+    public static final int cyclesPerFrame = 1024;
     public static final int tetris_width = 8;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 2;
@@ -192,18 +193,18 @@ public class Tetris2 extends NAREnvironment {
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 , new FrameClock());
-        nar.inputActivation.setValue(0.08f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.1f);
+        nar.derivedActivation.setValue(0.1f);
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.65f);
+        nar.goalConfidence(0.75f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -260,7 +261,8 @@ public class Tetris2 extends NAREnvironment {
 
 
 
-                //view.conceptChart = BagChart.newBagChart((Default) nar, 512);
+                //BagChart.show((Default) nar, 1024);
+                //STMView.show(stm, 800, 600);
 
                 int plotHistory = 256;
                 Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
@@ -268,18 +270,18 @@ public class Tetris2 extends NAREnvironment {
 
                 Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
                 plot2.add("Busy", ()->nar.emotion.busy.getSum());
-                plot2.add("Frst", ()->nar.emotion.learning());
+                plot2.add("Lern", ()->nar.emotion.learning());
                 //plot2.add("Strs", ()->nar.emotion.stress.getSum());
 
                 Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
                 plot3.add("Hapy", ()->nar.emotion.happy.getSum());
 
-                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
-                plot4.add("Errr", ()->nar.emotion.errr.getSum());
+//                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
+//                plot4.add("Errr", ()->nar.emotion.errr.getSum());
 
 
 
-                view.plot1 = new GridSurface(VERTICAL, plot, plot2, plot3, plot4);
+                view.plot1 = new GridSurface(VERTICAL, plot, plot2, plot3);
 
                 nar.onFrame(f -> {
                     plot.update();
@@ -295,7 +297,7 @@ public class Tetris2 extends NAREnvironment {
 
 
 
-                //STMView.show(stm, 800, 600);
+
 
 
                 //NARSpace.newConceptWindow((Default) nar, 128, 8);

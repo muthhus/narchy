@@ -8,6 +8,7 @@ import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.data.Range;
 import nars.link.BLink;
+import nars.nal.Conclusion;
 import nars.nal.Deriver;
 import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
@@ -18,10 +19,12 @@ import nars.util.data.list.FasterList;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * The original deterministic memory cycle implementation that is currently used as a standard
@@ -66,16 +69,20 @@ public abstract class AbstractCore {
             ()->new PremiseEval(new XorShift128PlusRandom((int)Thread.currentThread().getId()), Deriver.getDefaultDeriver())
     );
 
-    /**
-     * temporary re-usable array for batch firing
-     */
-    transient private final FasterList<Concept> qoncepts = $.newArrayList();
-
-    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
+//
+//    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
 
     private final boolean queueConcept(BLink<Concept> b) {
-        return qoncepts.addIfNotNull(b.get());
+        @Nullable Concept c = b.get();
+        if (c!=null) {
+            nar.runLater(new FireConcept(c, nar,
+                (short)tasklinksFiredPerFiredConcept.intValue(),
+                (short)termlinksFiredPerFiredConcept.intValue())
+            );
+            return true;
+        }
+        return false;
     }
 
     protected AbstractCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {
@@ -106,24 +113,12 @@ public abstract class AbstractCore {
         int cycles = nar.cyclesPerFrame.intValue();
 
         int cpf = conceptsFiredPerCycle.intValue();
-        float dCycle = 1f / cycles;
 
         for (int cycleNum = 0; cycleNum < cycles; cycleNum++) {
-            float subCycle = dCycle * cycleNum;
 
             concepts.commit();
 
             concepts.sample(cpf, this::queueConcept);
-            qoncepts.forEach((Concept c) -> nar.runLater(()->fireConcept(c)));
-            //qoncepts.forEach(this::fireConcept);
-            qoncepts.clear();
-
-//            if (!pending.isEmpty()) {
-//                //Util.time(logger, "processing " + pending.size() + " derivations", () -> {
-//                    //this.nar.input(pending);
-//                    nar.inputDrain(pending);
-//                //});
-//            }
 
         }
 
@@ -134,64 +129,89 @@ public abstract class AbstractCore {
         concepts.clear();
     }
 
-    protected final boolean fireConcept(@NotNull Concept concept) {
-        //Concept concept = conceptLink.get();
+    /** shared combined conclusion */
+    public static class FireConcept extends Conclusion implements Runnable, Supplier<Conclusion> {
 
-        concept.tasklinks().commit();
-        concept.termlinks().commit();
+        private final Concept concept;
+        private final NAR nar;
+        private final short tasklinks;
+        private final short termlinks;
 
-        return firePremiseSquared(
-                concept,
-                tasklinksFiredPerFiredConcept.intValue(),
-                termlinksFiredPerFiredConcept.intValue()
-        ) > 0;
-    }
-
-    /**
-     * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
-     * (recycles buffers, non-thread safe, one thread use this at a time)
-     */
-    public final int firePremiseSquared(@NotNull Concept c, int tasklinks, int termlinks) {
-
-
-        Set<Task> cccc = $.newHashSet(16);
-
-
-        int count = 0;
-        FasterList<BLink<Term>> termsBuffer = $.newArrayList();;
-        c.termlinks().sample(termlinks, termsBuffer::addIfNotNull);
-        if (!termsBuffer.isEmpty()) {
-
-
-            FasterList<BLink<Task>> tasksBuffer = $.newArrayList();;
-            c.tasklinks().sample(tasklinks, tasksBuffer::addIfNotNull);
-
-            if (!tasksBuffer.isEmpty()) {
-
-                PremiseEval mm = matcher.get();
-                mm.init(nar);
-
-                for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
-                    count += PremiseBuilder.run(
-                            nar,
-                            termsBuffer,
-                            tasksBuffer.get(i),
-                            mm,
-                            (premise,conclusion)->{
-                                cccc.addAll(conclusion.derive);
-                            });
-
-                }
-
-                tasksBuffer.clear();
-            }
-
-            termsBuffer.clear();
+        public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks) {
+            super($.newHashSet(16));
+            this.concept = c;
+            this.nar = nar;
+            this.tasklinks = tasklinks;
+            this.termlinks = termlinks;
         }
 
-        nar.inputLater(cccc);
+        @Override
+        public final Conclusion get() {
+            return this;
+        }
 
-        return count;
+        @Override
+        public void run() {
+            //Concept concept = conceptLink.get();
+
+            concept.tasklinks().commit();
+            concept.termlinks().commit();
+
+            firePremiseSquared(
+                    concept,
+                    tasklinks,
+                    termlinks
+            );
+
+        }
+
+        /**
+         * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
+         * (recycles buffers, non-thread safe, one thread use this at a time)
+         */
+        public final int firePremiseSquared(@NotNull Concept c, int tasklinks, int termlinks) {
+
+
+            //Set<Task> cccc = $.newHashSet(16);
+
+
+            int count = 0;
+            FasterList<BLink<Term>> termsBuffer = $.newArrayList();;
+            c.termlinks().sample(termlinks, termsBuffer::addIfNotNull);
+            if (!termsBuffer.isEmpty()) {
+
+
+                FasterList<BLink<Task>> tasksBuffer = $.newArrayList();;
+                c.tasklinks().sample(tasklinks, tasksBuffer::addIfNotNull);
+
+                if (!tasksBuffer.isEmpty()) {
+
+                    PremiseEval mm = matcher.get();
+                    mm.init(nar);
+
+                    for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
+                        count += PremiseBuilder.run(
+                                nar,
+                                termsBuffer,
+                                tasksBuffer.get(i),
+                                mm,
+                                this
+                                );
+
+                    }
+
+                    tasksBuffer.clear();
+                }
+
+                termsBuffer.clear();
+            }
+
+            nar.input(derive);
+
+            return count;
+        }
+
+
     }
 
 

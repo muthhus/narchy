@@ -58,7 +58,6 @@ abstract public class DefaultBLink<X> extends BLink<X> {
         if (p==p) {
             //not already deleted
             PRI = (Float.NaN);
-            changed = true;
             return true;
         }
         return false;

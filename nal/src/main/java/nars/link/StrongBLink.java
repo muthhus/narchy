@@ -18,8 +18,7 @@ public class StrongBLink<X> extends DefaultBLink<X> {
 
     @Override
     public boolean delete() {
-        if (!Param.DEBUG)
-            id = null;
+        id = null;
         return super.delete();
     }
 

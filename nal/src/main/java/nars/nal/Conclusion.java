@@ -3,6 +3,7 @@ package nars.nal;
 import nars.$;
 import nars.task.Task;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -32,7 +33,11 @@ import java.util.Set;
  */
 public class Conclusion {
 
-    public final Set<Task> derive = $.newHashSet(0);
+    public Conclusion(Collection<Task> target) {
+        this.derive = target;
+    }
+
+    public final Collection<Task> derive;
 
 //    /** the termutators which can be evaluated to generate all possible permutations. */
 //    public List<Termutator> termutators = null;

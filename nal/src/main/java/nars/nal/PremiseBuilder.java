@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 import static nars.nal.Tense.ETERNAL;
 
@@ -48,7 +49,7 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static int run(@NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, BiConsumer<Premise, Conclusion> each) {
+    public static int run(@NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, Supplier<Conclusion> conclusions) {
 
         int count = 0;
         long now = nar.time();
@@ -80,9 +81,7 @@ public enum PremiseBuilder {
 
                 Premise p = newPremise(nar, now, task, term, pBudget);
 
-                Conclusion c = matcher.run(p, new Conclusion());
-
-                each.accept(p, c);
+                matcher.run(p, conclusions.get());
 
                 count++;
 

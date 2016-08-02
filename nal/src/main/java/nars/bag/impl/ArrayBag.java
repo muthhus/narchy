@@ -31,6 +31,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /** pending mass since last commit */
     float pending = 0;
 
+    /** mass as calculated in previous commit */
+    private float mass = 0;
+
     public ArrayBag(int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
         super(BLink[]::new,
 
@@ -96,6 +99,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      */
     static final boolean cmpGT(@NotNull BLink o1, @NotNull BLink o2) {
         return (priIfFiniteElseNeg1(o1) < priIfFiniteElseNeg1(o2));
+    }
+    /**
+     * true iff o1 > o2
+     */
+    static final boolean cmpGT(float o1PriElseNeg1, @NotNull BLink o2) {
+        return (o1PriElseNeg1 < priIfFiniteElseNeg1(o2));
     }
 
     /**
@@ -264,7 +273,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
         float p = bp * scale;
-        pending += p; //TODO more accurate calculation of incoming budget with respect to merge function, existing budget, etc
 
         BLink<V> existing = get(key);
         if (existing != null) {
@@ -272,10 +280,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         } else {
             if (minPriIfFull() > p) {
                 putFail(key);
-                return;
+            } else {
+                putNewAndDeleteDisplaced(key, newLink(key, p, b.qua(), b.dur()));
             }
-
-            putNewAndDeleteDisplaced(key, newLink(key, p, b.qua(), b.dur()));
         }
     }
 
@@ -290,9 +297,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             throw new RuntimeException("budget self merge");
         }
 
+        float pBefore = existing.priIfFiniteElseZero() * existing.dur();
         float o = mergeFunction.merge(existing, b, scale);
         if (overflow != null)
             overflow.add(o);
+
+        this.pending += existing.priIfFiniteElseZero() * existing.dur() - pBefore;
 
     }
 
@@ -324,45 +334,49 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @NotNull
     @Override
-    public final Bag<V> commit() {
+    public final synchronized Bag<V> commit() {
 
-        synchronized (map) {
-            if (!isEmpty()) {
-                commit(autoforget());
-            }
+        if (!isEmpty()) {
+            commit(autoforget());
         }
+
         return this;
     }
 
     private @Nullable Consumer<BLink> autoforget() {
-        float mass = 0;
-        BLink<V>[] l = items.array();
-        int s = size();
-        for (int i = s - 1; i >= 0; i--) {
-            BLink<V> b = l[i];
-            float d = b.dur(); //HACK ignores any pending durDelta change
-            mass += d * b.priIfFiniteElseZero();
-            //pendingMass += d * b.priDelta();
-        }
 
-        float pendingMass = this.pending;
-        this.pending = 0; //reset pending
+        float existing = this.mass;
+        float pending = this.pending;
+        this.pending = 0; //reset pending accumulator
 
-        float r = 1f - (mass / (mass + pendingMass));
+        float r = 1f - (existing / (existing + pending));
 
-
-        @Nullable Consumer<BLink> u;
-        if (r >= Param.BUDGET_EPSILON) {
-            u = (bLink) -> {
-                final float maxEffectiveDurability = 1f;
-                float eDur = bLink.dur() * maxEffectiveDurability;
-                bLink.priMult(1f - (r * (1f - eDur)));
-            };
+        if (r >= Param.BUDGET_EPSILON * size()) {
+            return forget.set(r);
         } else {
-            u = null;
+            return null;
         }
-        return u;
     }
+
+    private static final class Forget implements Consumer<BLink> {
+        public float r;
+
+        static final float maxEffectiveDurability = 1f;
+
+        @Override
+        public void accept(BLink bLink) {
+            float eDur = bLink.dur() * maxEffectiveDurability;
+            bLink.priMult(1f - (r * (1f - eDur)));
+        }
+
+        public Consumer<BLink> set(float r) {
+            this.r = r;
+            return this;
+        }
+
+    }
+
+    private Forget forget = new Forget();
 
     /**
      * applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted
@@ -393,8 +407,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /** wraps the putNew call with a suffix that destroys the link at the end */
     private final void putNewAndDeleteDisplaced(@NotNull V key, @Nullable BLink<V> value) {
         BLink<V> displaced = putNew(key, value);
-        if (displaced!=null)
+
+        float dp = value.pri() * value.dur();
+
+        if (displaced!=null) {
+            dp -= displaced.priIfFiniteElseZero() * displaced.dur();
             displaced.delete();
+        }
+
+        this.pending += dp;
     }
 
     protected void putFail(V key) {
@@ -417,6 +438,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         BLink<V>[] l = items.array();
         int t = s - 1;
+        float weightedMass = 0;
         @NotNull BLink<V> beneath = l[t]; //compares with self below to avoid a null check in subsequent iterations
         for (int i = t; i >= 0; i--) {
             BLink<V> b = l[i];
@@ -426,13 +448,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
             b.commit();
 
+            float o1PriElseNeg1 = priIfFiniteElseNeg1(b);
+            if (o1PriElseNeg1 > 0) {
+                weightedMass += o1PriElseNeg1 * b.dur();
+            }
 
-            if (lowestUnsorted == -1 && cmpGT(b, beneath)) {
+            if (lowestUnsorted == -1 && cmpGT(o1PriElseNeg1, beneath)) {
                 lowestUnsorted = i + 1;
             }
 
             beneath = b;
         }
+
+        this.mass = weightedMass;
+
         return lowestUnsorted;
     }
 

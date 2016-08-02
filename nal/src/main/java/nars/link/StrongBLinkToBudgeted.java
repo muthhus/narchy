@@ -14,9 +14,11 @@ public final class StrongBLinkToBudgeted<B extends Budgeted> extends StrongBLink
         super(id, p, d, q);
     }
 
+
+
     @Override
     public void commit() {
-        @NotNull B x = get();
+        B x = get();
         if (x != null) {
             if (x.isDeleted())
                 delete();

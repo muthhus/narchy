@@ -30,6 +30,7 @@ import nars.agent.NAgent;
 import nars.experiment.DiscreteEnvironment;
 import nars.gui.BagChart;
 import nars.gui.NARSpace;
+import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -215,9 +216,9 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 
 					//new BeliefTableChart(nar, charted).show(700, 900);
 //
-					BagChart.show((Default) nar, 512);
+//					BagChart.show((Default) nar, 1024);
 //
-//					STMView.show(stm, 500, 500);
+					STMView.show(stm, 500, 500);
 
 					//TimeSpace.newTimeWindow((Default)nar, 128);
 					//NARSpace.newConceptWindow((Default) nar, 128, 6);
