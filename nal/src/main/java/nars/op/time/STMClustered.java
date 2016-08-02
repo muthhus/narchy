@@ -2,8 +2,7 @@ package nars.op.time;
 
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
-import nars.bag.impl.AutoBag;
-import nars.bag.impl.MapBagPendings;
+
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.learn.gng.NeuralGasNet;
@@ -35,7 +34,6 @@ public class STMClustered extends STM {
 
     final short clusters;
 
-    final AutoBag bagForget = new AutoBag();
 
     @NotNull
     public final ArrayBag<Task> input;
@@ -298,11 +296,6 @@ public class STMClustered extends STM {
         this.punc = punc;
         this.input = new ArrayBag<>(1, BudgetMerge.avgBlend, new HashMap<>(capacity.intValue())) {
 
-            @NotNull
-            @Override
-            protected BagPendings<Task> newPendings() {
-                return new MapBagPendings<>(mergeFunction);
-            }
 
             @NotNull
             @Override
@@ -369,7 +362,7 @@ public class STMClustered extends STM {
         now = t;
 
 
-        bagForget.commit(input);
+        input.commit();
 
         ready.set(true);
 

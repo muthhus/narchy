@@ -3,7 +3,6 @@ package nars.nar.util;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.bag.impl.MapBagPendings;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.link.BLink;
@@ -64,12 +63,6 @@ public class DefaultCore extends AbstractCore {
             super(capacity, sampler, BudgetMerge.plusBlend);
             this.nar = nar;
             setCapacity(capacity);
-        }
-
-        @NotNull
-        @Override
-        protected BagPendings<Concept> newPendings() {
-            return new MapBagPendings<>(mergeFunction);
         }
 
         @Override

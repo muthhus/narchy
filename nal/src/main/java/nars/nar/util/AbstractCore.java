@@ -4,7 +4,6 @@ import nars.$;
 import nars.Memory;
 import nars.NAR;
 import nars.bag.Bag;
-import nars.bag.impl.AutoBag;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.data.Range;
@@ -39,11 +38,6 @@ public abstract class AbstractCore {
 
 
 
-    public final @NotNull AutoBag<Task> tasklinkUpdate;
-
-    public final @NotNull AutoBag<Term> termlinkUpdate;
-
-
     //public final MutableFloat activationFactor = new MutableFloat(1.0f);
 
 //        final Function<Task, Task> derivationPostProcess = d -> {
@@ -67,9 +61,6 @@ public abstract class AbstractCore {
     @Range(min = 0, max = 16, unit = "TermLink")
     public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
-
-
-    @NotNull private final AutoBag<Concept> conceptUpdate;
 
     private static final ThreadLocal<@NotNull PremiseEval> matcher = ThreadLocal.withInitial(
             ()->new PremiseEval(new XorShift128PlusRandom((int)Thread.currentThread().getId()), Deriver.getDefaultDeriver())
@@ -102,11 +93,7 @@ public abstract class AbstractCore {
         this.conceptsFiredPerCycle = new MutableInteger(1);
 
         this.concepts = newConceptBag();
-        this.conceptUpdate = new AutoBag<>();
 
-
-        this.termlinkUpdate = new AutoBag();
-        this.tasklinkUpdate = new AutoBag();
 
     }
 
@@ -114,10 +101,6 @@ public abstract class AbstractCore {
     protected abstract Bag<Concept> newConceptBag();
 
     public void frame(@NotNull NAR nar) {
-
-        tasklinkUpdate.update(nar);
-        termlinkUpdate.update(nar);
-        conceptUpdate.update(nar);
 
 
         int cycles = nar.cyclesPerFrame.intValue();
@@ -128,11 +111,7 @@ public abstract class AbstractCore {
         for (int cycleNum = 0; cycleNum < cycles; cycleNum++) {
             float subCycle = dCycle * cycleNum;
 
-            termlinkUpdate.cycle(subCycle);
-            tasklinkUpdate.cycle(subCycle);
-            conceptUpdate.cycle(subCycle);
-
-            conceptUpdate.commit(concepts);
+            concepts.commit();
 
             concepts.sample(cpf, this::queueConcept);
             qoncepts.forEach((Concept c) -> nar.runLater(()->fireConcept(c)));
@@ -158,8 +137,8 @@ public abstract class AbstractCore {
     protected final boolean fireConcept(@NotNull Concept concept) {
         //Concept concept = conceptLink.get();
 
-        tasklinkUpdate.commit(concept.tasklinks());
-        termlinkUpdate.commit(concept.termlinks());
+        concept.tasklinks().commit();
+        concept.termlinks().commit();
 
         return firePremiseSquared(
                 concept,

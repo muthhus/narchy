@@ -2,7 +2,6 @@ package nars.inter.gnutella.thread;
 
 import com.google.common.io.ByteStreams;
 import nars.bag.impl.ArrayBag;
-import nars.bag.impl.AutoBag;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
@@ -133,7 +132,6 @@ public class ServerThread extends PeerThread {
 
     }
 
-    final AutoBag a = new AutoBag();
 
     protected synchronized void send() {
 
@@ -145,7 +143,7 @@ public class ServerThread extends PeerThread {
 
                 synchronized (outgoing) {
                     if (!outgoing.isEmpty()) {
-                        a.commit(outgoing);
+                        outgoing.commit();
 
                         top = outgoing.removeItem(0).get();
                     }

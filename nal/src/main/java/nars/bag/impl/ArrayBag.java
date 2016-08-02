@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.RawBudget;
@@ -27,27 +28,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public final BudgetMerge mergeFunction;
 
 
-    abstract public static class BagPendings<V> {
-        abstract public void capacity(int c);
-
-        abstract public void add(V v, float p, float d, float q);
-
-        abstract public int size();
-
-        abstract public void apply(ArrayBag<V> target);
-
-        abstract public float mass(ArrayBag<V> bag);
-
-        abstract public void clear();
-
-        public boolean isEmpty() {
-            return size()==0;
-        }
-    }
-
-
-    @NotNull
-    final BagPendings<V> pending;
+    /** pending mass since last commit */
+    float pending = 0;
 
     public ArrayBag(int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
         super(BLink[]::new,
@@ -60,23 +42,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         );
 
         this.mergeFunction = mergeFunction;
-        this.pending = newPendings();
 
         setCapacity(cap);
     }
 
-    @NotNull
-    protected BagPendings<V> newPendings() {
-        return new ListBagPendings(mergeFunction);
-    }
 
-    public boolean setCapacity(int newCapacity) {
-        if (super.setCapacity(newCapacity)) {
-            pending.capacity(newCapacity);
-            return true;
-        }
-        return false;
-    }
+
 
 
     @Override
@@ -288,22 +259,23 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         float bp = b.pri();
         if (bp!=bp) { //deleted
             //throw new RuntimeException();
+            putFail(key);
             return;
         }
 
+        float p = bp * scale;
+        pending += p; //TODO more accurate calculation of incoming budget with respect to merge function, existing budget, etc
 
         BLink<V> existing = get(key);
-
         if (existing != null) {
             putExists(b, scale, existing, overflow);
         } else {
-            if (isFull()) {
-
-                    pending.add(key, bp * scale, b.qua(), b.dur());
-
-            } else {
-                putNewAndDeleteDisplaced(key, newLink(key, bp * scale, b.qua(), b.dur()));
+            if (minPriIfFull() > p) {
+                putFail(key);
+                return;
             }
+
+            putNewAndDeleteDisplaced(key, newLink(key, p, b.qua(), b.dur()));
         }
     }
 
@@ -352,9 +324,44 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @NotNull
     @Override
-    @Deprecated
     public final Bag<V> commit() {
-        return commit(null);
+
+        synchronized (map) {
+            if (!isEmpty()) {
+                commit(autoforget());
+            }
+        }
+        return this;
+    }
+
+    private @Nullable Consumer<BLink> autoforget() {
+        float mass = 0;
+        BLink<V>[] l = items.array();
+        int s = size();
+        for (int i = s - 1; i >= 0; i--) {
+            BLink<V> b = l[i];
+            float d = b.dur(); //HACK ignores any pending durDelta change
+            mass += d * b.priIfFiniteElseZero();
+            //pendingMass += d * b.priDelta();
+        }
+
+        float pendingMass = this.pending;
+        this.pending = 0; //reset pending
+
+        float r = 1f - (mass / (mass + pendingMass));
+
+
+        @Nullable Consumer<BLink> u;
+        if (r >= Param.BUDGET_EPSILON) {
+            u = (bLink) -> {
+                final float maxEffectiveDurability = 1f;
+                float eDur = bLink.dur() * maxEffectiveDurability;
+                bLink.priMult(1f - (r * (1f - eDur)));
+            };
+        } else {
+            u = null;
+        }
+        return u;
     }
 
     /**
@@ -363,6 +370,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @NotNull
     @Override
     public Bag<V> commit(@Nullable Consumer<BLink> each) {
+
         synchronized (map) {
             int s = size();
             if (s > 0) {
@@ -377,44 +385,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             }
         }
 
-        synchronized (map) {
-            BagPendings<V> p = this.pending;
-            if (p != null) {
-                this.bottomPri = minPriIfFull();
-                p.apply(this);
-            }
-        }
 
         return this;
     }
 
-    transient private float bottomPri;
-
-    public final void commitPending(@NotNull V key, float p, float d, float q) {
-        //final BiConsumer<V,RawBudget> eachPending = (key, inc) -> {
-        //            if (key == null)
-//                continue; //link was destroyed before it could be processed
-
-            /*BLink<V> existing = get(key);
-            if (existing != null) {
-                //SHOULD NOT BE IN THE MAP ALREADY
-                mergeFunction.merge(existing, inc, 1f);
-            }
-            else {*/
-
-        float v = bottomPri;
-        if (v <= p) {
-            putNewAndDeleteDisplaced(key, newLink(key, p, d, q));
-            bottomPri = minPriIfFull();
-        } else {
-            putFail(key);
-        }
-                /*else {
-                    insufficient, try again next commit
-                }*/
-        //}
-
-    }
 
     /** wraps the putNew call with a suffix that destroys the link at the end */
     private final void putNewAndDeleteDisplaced(@NotNull V key, @Nullable BLink<V> value) {
@@ -649,9 +623,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     public void clear() {
-
-        pending.clear();
-
         synchronized (map) {
             super.clear();
         }
@@ -668,26 +639,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public float priMin() {
         BLink<V> x = items.last();
         return x!=null ? x.pri() : 0f;
-    }
-
-    /**
-     * returns mass (index 0) pending mass (index 1)
-     */
-    @NotNull
-    public float[] preCommit() {
-        float mass = 0, pendingMass = 0;
-        BLink<V>[] l = items.array();
-        int s = size();
-        for (int i = s - 1; i >= 0; i--) {
-            BLink<V> b = l[i];
-            float d = b.dur(); //HACK ignores any pending durDelta change
-            mass += d * b.priIfFiniteElseZero();
-            pendingMass += d * b.priDelta();
-        }
-
-        pendingMass += pending.mass(this);
-
-        return new float[]{mass, pendingMass};
     }
 
 

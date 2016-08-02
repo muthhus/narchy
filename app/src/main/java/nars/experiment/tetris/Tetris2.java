@@ -269,7 +269,7 @@ public class Tetris2 extends NAREnvironment {
                 Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
                 plot2.add("Busy", ()->nar.emotion.busy.getSum());
                 plot2.add("Frst", ()->nar.emotion.learning());
-                plot2.add("Strs", ()->nar.emotion.stress.getSum());
+                //plot2.add("Strs", ()->nar.emotion.stress.getSum());
 
                 Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
                 plot3.add("Hapy", ()->nar.emotion.happy.getSum());
