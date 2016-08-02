@@ -10,8 +10,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 import static nars.$.$;
 
 
@@ -107,6 +105,7 @@ public class MotorConcept extends WiredConcept  {
         return motor;
     }
 
+    @Override
     protected final boolean runLater(@NotNull Task t, @NotNull NAR nar) {
         //return hasGoals();
         return true;

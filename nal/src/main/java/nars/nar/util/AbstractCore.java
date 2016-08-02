@@ -20,10 +20,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -173,9 +170,9 @@ public abstract class AbstractCore {
          */
         public final int firePremiseSquared(@NotNull Concept c, int tasklinks, int termlinks) {
 
-            int count = 0;
-            FasterList<BLink<Term>> termsBuffer = $.newArrayList(termlinks);;
+            FasterList<BLink<Term>> termsBuffer = $.newArrayList(termlinks);
             c.termlinks().sample(termlinks, termsBuffer::addIfNotNull);
+            int count = 0;
             if (!termsBuffer.isEmpty()) {
 
 

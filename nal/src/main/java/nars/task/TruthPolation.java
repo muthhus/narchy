@@ -49,7 +49,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     @Nullable
     public Truth truth(long when, @Nullable Truthed topEternal, Task... tasks) {
-        return truth(when, new FasterList<Task>((Task[])tasks), topEternal);
+        return truth(when, new FasterList<>((Task[]) tasks), topEternal);
     }
 
     @Nullable

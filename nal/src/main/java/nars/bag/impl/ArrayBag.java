@@ -28,10 +28,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public final BudgetMerge mergeFunction;
 
 
-    /** pending mass since last commit */
+    /**
+     * pending mass since last commit
+     */
     float pending = 0;
 
-    /** mass as calculated in previous commit */
+    /**
+     * mass as calculated in previous commit
+     */
     private float mass = 0;
 
     public ArrayBag(int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
@@ -50,9 +54,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-
-
-
     @Override
     public final boolean isEmpty() {
         return size() == 0;
@@ -60,12 +61,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     protected final void removeWeakest(Object reason) {
-        synchronized(map) {
+        synchronized (map) {
             if (!removeDeletedAtBottom()) {
                 @NotNull V w = weakest();
-                if (w!=null) {
+                if (w != null) {
                     BLink<V> ww = remove(w);
-                    if (ww!=null)
+                    if (ww != null)
                         ww.delete(reason);
                 }
             }
@@ -75,11 +76,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Nullable
     @Override
     public BLink<V> remove(@NotNull V x) {
-        synchronized(map) {
+        synchronized (map) {
             return super.remove(x);
         }
     }
-
 
 
     @Override
@@ -100,6 +100,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     static final boolean cmpGT(@NotNull BLink o1, @NotNull BLink o2) {
         return (priIfFiniteElseNeg1(o1) < priIfFiniteElseNeg1(o2));
     }
+
     /**
      * true iff o1 > o2
      */
@@ -266,7 +267,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public final void put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
         float bp = b.pri();
-        if (bp!=bp) { //deleted
+        if (bp != bp) { //deleted
             //throw new RuntimeException();
             putFail(key);
             return;
@@ -285,6 +286,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 putNewAndDeleteDisplaced(key, newLink(key, p, b.qua(), b.dur()));
             }
         }
+
+
     }
 
 
@@ -341,6 +344,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             commit(autoforget());
         }
 
+
         return this;
     }
 
@@ -352,7 +356,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         float r = 1f - (existing / (existing + pending));
 
-        if (r >= Param.BUDGET_EPSILON ) {
+        if (r >= Param.BUDGET_EPSILON) {
             return new Forget(r);
         } else {
             return null;
@@ -390,6 +394,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public Bag<V> commit(@Nullable Consumer<BLink> each) {
 
         synchronized (map) {
+
+
             int s = size();
             if (s > 0) {
                 int lowestUnsorted = updateExisting(each, s);
@@ -401,20 +407,23 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 removeDeletedAtBottom();
             }
+
+
         }
 
 
         return this;
     }
 
-
-    /** wraps the putNew call with a suffix that destroys the link at the end */
+    /**
+     * wraps the putNew call with a suffix that destroys the link at the end
+     */
     private final void putNewAndDeleteDisplaced(@NotNull V key, @Nullable BLink<V> value) {
         BLink<V> displaced = putNew(key, value);
 
         float dp = value.pri() * value.dur();
 
-        if (displaced!=null) {
+        if (displaced != null) {
             dp -= displaced.priIfFiniteElseZero() * displaced.dur();
             displaced.delete();
         }
@@ -498,9 +507,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         if (toRemoveFromMap > 0) {
 //            int sizeBefore = map.size();
-                if (map.values().removeIf(BLink::isDeleted)) {
-                    return true;
-                }
+            if (map.values().removeIf(BLink::isDeleted)) {
+                return true;
+            }
 
 
             //EXTRA checks but which dont apply if dealing with weak links becaues they can get removed in the middle of checking them (heisenbug):
@@ -648,7 +657,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @NotNull
     @Override
     public String toString() {
-        synchronized(map) {
+        synchronized (map) {
             return super.toString() + '{' + items.getClass().getSimpleName() + '}';
         }
     }
@@ -665,13 +674,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public float priMax() {
         BLink<V> x = items.first();
-        return x!=null ? x.pri() : 0f;
+        return x != null ? x.pri() : 0f;
     }
 
     @Override
     public float priMin() {
         BLink<V> x = items.last();
-        return x!=null ? x.pri() : 0f;
+        return x != null ? x.pri() : 0f;
     }
 
 

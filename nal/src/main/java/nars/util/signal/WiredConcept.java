@@ -5,7 +5,6 @@ import nars.budget.policy.ConceptPolicy;
 import nars.concept.CompoundConcept;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
-import nars.concept.table.TaskTable;
 import nars.concept.table.TemporalBeliefTable;
 import nars.task.Task;
 import nars.term.Compound;

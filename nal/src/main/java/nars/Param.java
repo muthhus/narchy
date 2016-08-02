@@ -96,7 +96,7 @@ public abstract class Param extends Container implements Level {
      */
     public static float matchTermutationsMax = 6;
     public static int QUERY_ANSWERS_PER_MATCH = 1;
-    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
+    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 
 
     /**
@@ -107,7 +107,7 @@ public abstract class Param extends Container implements Level {
     /**
      * if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression
      */
-    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = false;
+    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE;
 
     /**
      * relates time and evidence (confidence); how past and future beliefs decay in rank

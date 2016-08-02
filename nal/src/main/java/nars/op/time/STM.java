@@ -14,7 +14,7 @@ public abstract class STM implements Consumer<Task> {
     public final @NotNull NAR nar;
 
     public final MutableInteger capacity;
-    protected boolean allowNonInput = false;
+    protected boolean allowNonInput;
 
     public STM(@NotNull NAR nar, MutableInteger capacity) {
         this.nar = nar;

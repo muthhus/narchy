@@ -1,10 +1,8 @@
 package nars.nal;
 
-import nars.$;
 import nars.task.Task;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * Effectively a 'compiled Premise evaluation' which contains certain invariant characteristics

@@ -11,7 +11,6 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.util.signal.WiredConcept;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.function.BiConsumer;

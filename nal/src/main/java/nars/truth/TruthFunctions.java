@@ -29,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 
 import static java.lang.StrictMath.abs;
 import static nars.$.t;
-import static nars.util.Util.lerp;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules
@@ -602,7 +601,7 @@ public final class TruthFunctions extends UtilityFunctions {
             return 1f;
         } else {
             float denom = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
-            return denom == 0 ? 1f : (abs(sourceTime - targetTime)) / (float) denom;
+            return denom == 0 ? 1f : (abs(sourceTime - targetTime)) / denom;
         }
     }
 

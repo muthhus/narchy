@@ -158,7 +158,7 @@ public class STMClustered extends STM {
             AtomicInteger subterms = new AtomicInteger();
             AtomicInteger currentVolume = new AtomicInteger();
             return tasks.values().stream().map(TLink::get).
-                    filter(x -> x!=null ? true : false).
+                    filter(x -> x != null).
                     collect(Collectors.groupingBy(x -> {
 
                         int v = x.volume();
@@ -254,13 +254,15 @@ public class STMClustered extends STM {
 
         @Override
         public int compareTo(TLink o) {
-            if (id == o.id)
+            @Nullable Task id = this.id;
+            @Nullable Task oid = o.id;
+            if (id == oid)
                 return 0;
             if (id == null)
                 return 1;
-            if (o.id == null)
+            if (oid == null)
                 return -1;
-            return id.compareTo(o.id);
+            return id.compareTo(oid);
         }
     }
 

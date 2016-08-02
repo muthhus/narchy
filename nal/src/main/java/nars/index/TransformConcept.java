@@ -36,7 +36,7 @@ public final class TransformConcept extends AtomConcept implements TermTransform
 
     @NotNull
     @Override
-    public Term function(Compound args) {
+    public final Term function(@NotNull Compound args) {
 //            if (args.varPattern() > 0) {
 //                //return the operation which would have been constructed for the pattern
 //                return index.b(Op.INH, args, this);

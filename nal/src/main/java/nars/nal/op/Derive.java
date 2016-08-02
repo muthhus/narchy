@@ -51,14 +51,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     public final Term conclusionPattern;
 
 
-    /**
-     * whether this a single or double premise derivation; necessary in case premise
-     * does have a belief but it was not involved in determining Truth
-     */
-    @Nullable
-    private final TruthOperator belief;
-    @Nullable
-    private final TruthOperator goal;
+
     //private final ImmutableSet<Term> uniquePatternVar;
 
 
@@ -75,8 +68,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 ')');
         this.rule = rule;
 
-        this.belief = belief;
-        this.goal = goal;
+//        this.belief = belief;
+//        this.goal = goal;
 
         this.conclusionPattern = term;
 

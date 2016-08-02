@@ -106,7 +106,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     /**
      * returns false if the question should be removed after retuning
      */
-    private void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar) {
+    private static void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar) {
 //        if (Stamp.overlapping(q.evidence(), a.evidence()))
 //            return;
 
@@ -134,10 +134,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             q.budget().quaMult(factor);
         }
 
-        if (!q.onAnswered(a)) {
-            //the qustion requested for it to be deleted
-            return;
-        } else {
+        if (q.onAnswered(a)) {
 
             //if there is a reduction in variables, link the (distinct) concepts
             if (a.term().vars() < q.term().vars()) {
@@ -155,6 +152,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly
             //BudgetFunctions.transferPri(q.budget(), a.budget(), (1f - q.qua()) * aConf);
 
+        } else {
+            //the qustion requested for it to be deleted
         }
 
 //        //generate a projected answer

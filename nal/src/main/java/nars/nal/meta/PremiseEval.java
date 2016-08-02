@@ -1,6 +1,5 @@
 package nars.nal.meta;
 
-import com.gs.collections.api.tuple.primitive.ObjectCharPair;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -142,7 +141,7 @@ public class PremiseEval extends FindSubst {
         putXY(t, t);
     }
 
-    public int matchesMax(float p) {
+    public static int matchesMax(float p) {
         final float min = Param.matchTermutationsMin, max = Param.matchTermutationsMax;
         return (int) Math.ceil(p * (max - min) + min);
     }
@@ -252,7 +251,7 @@ public class PremiseEval extends FindSubst {
 //        }
 
         //this.cyclic = task.cyclic();
-        this.cyclic = task.cyclic() || (belief!=null ? belief.cyclic() : false);
+        this.cyclic = task.cyclic() || (belief != null && belief.cyclic());
 
         this.overlap = belief != null && Stamp.overlapping(task, belief);
 

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 
 /**
@@ -143,6 +144,10 @@ public abstract class CollectorMap<K, V> {
 
     @Nullable public final V get(@NotNull Object key) {
         return map.get(key);
+    }
+
+    public final V compute(@NotNull K key, BiFunction<? super K, ? super V, ? extends V> c) {
+        return map.compute(key,c);
     }
 
     public boolean containsKey(@NotNull K name) {

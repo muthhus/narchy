@@ -249,14 +249,14 @@ public interface Concept extends Termed {
             final float learningRate = (bp * q) / bag.capacity();
             //System.out.println(this + " activating " + x);
             bag.forEach(tl -> {
-                boolean active = tl == existing;
-//                if (active && init)
+                //                if (active && init)
 //                    return; //dont modify the newly inserted link
 
                 float p = tl.pri();
                 if (p!=p) //the link is currently deleted
                     return;
 
+                boolean active = tl == existing;
                 float dp = (active ? learningRate : -learningRate);
                 tl.priAdd(dp);
                 //System.out.println(tl.toString2());

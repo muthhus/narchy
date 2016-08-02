@@ -58,9 +58,8 @@ public class UnifySubst extends FindSubst  {
 
         //TODO combine these two blocks to use the same sub-method
 
-        Term aa;
         try {
-            aa = resolve(a, xy);
+            Term aa = resolve(a, xy);
 
             target.add(aa);
             //if (accept(a, aa))

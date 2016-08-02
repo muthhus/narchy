@@ -41,7 +41,7 @@ abstract public class events extends AtomicBoolCondition {
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
             @Nullable Task b = m.belief;
-            return b == null ? false : beliefBeforeOrDuringTask(b, m.task);
+            return b != null && beliefBeforeOrDuringTask(b, m.task);
         }
 
     };

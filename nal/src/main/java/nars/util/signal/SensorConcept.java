@@ -36,7 +36,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
     /** implicit motivation task */
-    private Task desire = null;
+    private Task desire;
 
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
         this($.$(term), n, input, truth);

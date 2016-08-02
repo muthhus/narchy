@@ -73,15 +73,7 @@ abstract public class DerivedTask extends MutableTask {
             super(tc, punct, truth, premise, evidence);
         }
 
-        @Override
-        public boolean onConcept(@NotNull Concept c) {
-            if (super.onConcept(c)) {
-                return true;
-            }
-            return false;
-        }
-
-//        void feedback(float score) {
+        //        void feedback(float score) {
 ////            ConceptProcess p = this.premise.get();
 ////            if (p != null) {
 ////                BLink<? extends Term> termlink = p.termLink;

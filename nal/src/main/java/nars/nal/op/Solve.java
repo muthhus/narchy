@@ -1,6 +1,5 @@
 package nars.nal.op;
 
-import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.Op;
 import nars.Symbols;
 import nars.nal.meta.AtomicBoolCondition;

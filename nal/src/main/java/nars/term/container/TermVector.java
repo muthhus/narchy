@@ -93,9 +93,11 @@ public class TermVector implements TermContainer<Term> {
 
          final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
 
-        final int vD = meta[0];  this.varDeps = (byte)vD;   int varTot = vD;
-        final int vI = meta[1];  this.varIndeps = (byte)vI;     varTot+=vI;
-        final int vQ = meta[2];  this.varQuerys = (byte)vQ;     varTot+=vQ;
+        final int vD = meta[0];  this.varDeps = (byte)vD;
+        final int vI = meta[1];  this.varIndeps = (byte)vI;
+        final int vQ = meta[2];  this.varQuerys = (byte)vQ;
+
+        int varTot = vD + vI + vQ ;
         this.vars = (byte)(varTot);
 
         final int vol = meta[4] + 1;

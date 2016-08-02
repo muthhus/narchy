@@ -252,7 +252,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
      * (can be overridden in subclasses) the extent to which it is truth
      * that the 2 given terms are equal.  in other words, a distance metric
      */
-    public float equals(@NotNull Term a, Term b) {
+    public static float equals(@NotNull Term a, Term b) {
         //default: Term equality
         return a.equals(b) ? 1.0f : 0.0f;
     }

@@ -2,7 +2,6 @@ package nars.nal;
 
 import nars.$;
 import nars.Op;
-import nars.Param;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
@@ -12,7 +11,6 @@ import nars.term.*;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.nal.Tense.*;
-import static nars.term.Terms.compoundOrNull;
 
 /**
  * Strategies for solving temporal components of a derivation

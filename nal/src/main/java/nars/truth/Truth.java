@@ -67,6 +67,7 @@ public interface Truth extends Truthed {
      *
      * @return The expectation value
      */
+    @Override
     default float expectation() {
         return TruthFunctions.expectation(freq(), conf());
     }

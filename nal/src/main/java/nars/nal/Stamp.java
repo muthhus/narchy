@@ -305,7 +305,7 @@ public interface Stamp {
 
         long[] y;
         if (l == Param.STAMP_CAPACITY) {
-            y = new long[l];
+            y = new long[Param.STAMP_CAPACITY];
             //shift left by one to leave the last entry free
             System.arraycopy(x, 1, y, 0, l-1);
         } else {
