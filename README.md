@@ -69,9 +69,14 @@ In order to fully utilize this added temporal expressiveness, temporal belief ta
 redesigned to support evaluation of concept truth value at any point in time using a 
 generalized microsphere interpolation "revection" algorithm which combines revision (interpolation) and
 projection (extrapolation).  Temporal revision can be thought of as lossy compression, in that
-tasks (as data points in truth-time space) can be merged to empty room for incoming data. 
+tasks (as data points in truth-time space) can be merged to empty room for incoming data.  The
+ 1D "microsphere interpolation" algorithm was chosen and adapted with support for
+  varying "illumination" intensity (set to truth confidence values).  The top eternal
+  belief/goal, if exists, is applied as the "background" light source in which
+  temporal beliefs shine their frequency "color" to the evaluated time point.
 
-In keeping with a design preference for unity and spectral continuity, negations are also handled
+In keeping with a design preference for unity and balanced spectral continuity, negations are 
+ also handled
  differently through the elimination of all Negation concepts.  Instead, a concept stores
  its complete frequency spectrum within itself and Negation is handled automaticaly and
  transparently during derivation and user-input/output.  Subterms may be negated, and this
@@ -85,7 +90,7 @@ In keeping with a design preference for unity and spectral continuity, negations
  Disjunctions are only virtual operators as perceivable by input and displayed on output. They 
  are converted immediately to negated conjunction of negations via DeMorgan's laws.  By preferring 
  the conjunction representation,
- temoral information can not be lost through conversion to or from the non-temporal Disjunction type.
+ temporal information can not be lost through conversion to or from the non-temporal Disjunction type.
  
  The default bag type is a Buffered Auto-Forgetting CurveBag which accumulate updates between 
  "commits" in which the changes are later applied.  Buffering supports rapid high-frequency 
@@ -98,12 +103,39 @@ In keeping with a design preference for unity and spectral continuity, negations
  A central, concurrent concept index (cache) provides access to all inactive concepts.  The capacity
  of the index can be adjusted in various ways including maximum size, maximum "weight", and weak/soft
  references.  This cache can also serve as an asynchronous reader and writer to longer-term caches 
- which persist on disk or in a database.
+ which persist on disk or in a database.  The concurrent abilities of this index support
+ arbitrarily parallelized reasoner operations along with concurrent concept data structures.
+  While not yet entirely synchronization-free, this becomes less important as the number
+   of concepts generally exceeds greatly the number of threads.
  
  A compact byte-level codec for terms and tasks allows all concept data to be serialized to
  disk, off-heap memory, or network streams.  It is optionally compressed with Snappy compression
  algorithm which offers a tradeoff of speed and size savings.
  
+ An adaptive concept "policy" system manages the allowed capacity of the different concept
+ data structures according to activity, term complexity, confidence levels, or other heuristics.  
+ This can be used, for example, to allow atomic concepts to support more termlinks than compounds, 
+ or to allow more beliefs for a concept which has higher confidence values.  It also allows for
+ shrinking capacities when a concept is deactivated, acting as another form of lossy
+ concept compression which removes less essential components.
+ 
+ A sensor/motor "NAgent" API for wrapping a NAR reasoner and attaching various sensor and
+ motor concepts with specific behavior and abilities for transducing input to beliefs
+ and effecting actions from goals.  This can be used to easily interface a NAR as a 
+ reinforcement-learning agent with a specific environment or interface.   It also has support for
+ Reward sensor concept which can be desired and focused as the object of procedural questions
+ and future predictions with respect to the sensor and motor concepts of its context.
+   
+ The InterNARS is a multi-agent p2p mesh network protocol allowing individual NAR peers to communicate
+  asynchronously and remotely through messages containing serialized tasks.  In the InterNARS, 
+  peers learn to intelligently route their own and others' communications according to the
+  budget and/or truth heuristics inherent in the reasoning itself.  Another peer's beliefs can 
+  be corroborated, doubted, augmented, summarized, misrepresented, or ignored.  Their questions
+  can be answered, reiterated, or answered with more questions.  Goals can be obeyed, reinforced,
+  or disobeyed.  The semantics of the various NAL operator and task punctuations covers the abiltiies
+  of classical multi-agent communication protocols like FIPA and ACL, but perhaps in a more
+  natural way, and with the added expressiveness of shades of NAL truth and budget. 
+   
    
  _Many other changes remain to be documented._
  
