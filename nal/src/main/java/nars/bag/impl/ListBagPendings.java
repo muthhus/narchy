@@ -18,6 +18,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
     private final BudgetMerge merge;
     //public List<RawBLink<X>> pending = null;
     @Nullable CircularArrayList<RawBLink<X>> pending;
+    final Object lock = new Object();
     private int capacity;
 
     public ListBagPendings(BudgetMerge m) {
@@ -32,32 +33,35 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
     @Override
     public void add(@NotNull X x, float p, float d, float q) {
 
-        CircularArrayList<RawBLink<X>> pend = this.pending;
-        if (pend == null) {
-            //pending = Global.newArrayList(capacity);
-            this.pending = pend = new CircularArrayList<>(capacity);
-        } else if (pend.size() == capacity) {
-            pend.removeFirst();
-        }
+        synchronized (lock) { //HACK
+            CircularArrayList<RawBLink<X>> pend = this.pending;
+            if (pend == null) {
+                //pending = Global.newArrayList(capacity);
+                this.pending = pend = new CircularArrayList<>(capacity);
+            } else if (pend.size() == capacity) {
+                pend.removeFirst();
+            }
 
-        pend.add(new RawBLink<>(x, p, d, q));
+            pend.add(new RawBLink<>(x, p, d, q));
+        }
 
     }
 
     @Override
     public int size() {
-        CircularArrayList<RawBLink<X>> p = this.pending;
-        if (p == null)
-            return 0;
-        return p.size();
+        synchronized (lock) { //HACK
+            CircularArrayList<RawBLink<X>> p = this.pending;
+            if (p == null)
+                return 0;
+            return p.size();
+        }
     }
 
     @Override
     public void apply(@NotNull ArrayBag<X> bag) {
-        CircularArrayList<RawBLink<X>> p = this.pending;
-        if (p != null) {
-            synchronized(bag) {
-
+        synchronized (lock) { //HACK
+            CircularArrayList<RawBLink<X>> p = this.pending;
+            if (p != null) {
                 clear();
                 for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
                     RawBLink<X> w = p.getAndSet(i, null);
@@ -95,13 +99,26 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
 
     @Override
     public float mass(ArrayBag<X> bag) {
-        CircularArrayList<RawBLink<X>> p = this.pending;
-        if (p == null)
-            return 0;
+
+        synchronized (lock) { //HACK
+            CircularArrayList<RawBLink<X>> p = this.pending;
+            if (p == null)
+                return 0;
 
 
-        float sum = 0;
-        synchronized (bag) {
+            float sum = 0;
+
+            //HACK remove null entries
+            for (int i = 0, pendingSize = p.size(); i < pendingSize; ) {
+                RawBLink<X> w = p.get(i);
+                if (w == null) {
+                    p.remove(i);
+                    pendingSize--;
+                } else {
+                    i++;
+                }
+            }
+
             Collections.sort(p, this);
 
             for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
@@ -118,8 +135,8 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
             if (sum < Param.BUDGET_EPSILON) {
                 clear();
             }
+            return sum;
         }
-        return sum;
     }
 
     @Override

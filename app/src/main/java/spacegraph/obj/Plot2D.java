@@ -42,7 +42,7 @@ public class Plot2D extends Surface {
 
             this.name = name;
             this.color = new float[4];
-            Draw.hsb((name.hashCode()%500) / 500f * 360.0f, 0.7f, 0.7f, 0.9f, color);
+            Draw.hsb((name.hashCode()%500) / 500f * 360.0f, 0.7f, 0.7f, 1f, color);
 
             this.capacity = capacity;
 
@@ -236,15 +236,16 @@ public class Plot2D extends Surface {
             Draw.text(gl, rangeFontScale, rangeFontScale, String.valueOf(maxValue), 0, H, labelDZ);
 
 
+
             for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
+
                 Series s = series.get(si);
 
                 float mid = ypos(minValue ,maxValue, (s.minValue + s.maxValue)/2f);
 
-                gl.glColor4fv(s.color, 0);
-                Draw.text(gl, seriesFontScale, seriesFontScale, s.name, 0, mid, labelDZ);
 
-                gl.glLineWidth(2);
+
+
 
                 FloatArrayList sh = s;
                 int ss = sh.size();
@@ -256,7 +257,12 @@ public class Plot2D extends Surface {
                 float dx = (W / histSize);
 
                 float x = 0;
+
                 float py = 0;
+
+                gl.glLineWidth(2);
+                gl.glColor4fv(s.color, 0);
+
                 for (int i = 0; i < ss; i++) {
 
                     float ny = ypos(minValue, maxValue, ssh[i]);
@@ -268,6 +274,9 @@ public class Plot2D extends Surface {
                     x += dx;
                     py = ny;
                 }
+
+                Draw.text(gl, seriesFontScale, seriesFontScale, s.name, 0, mid, labelDZ, s.color);
+
             }
         }
     };

@@ -536,6 +536,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         try {
             c = input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
+            emotion.errr();
             if (Param.DEBUG)
                 logger.warn("invalid input: {}", e.toString());
             //e.printStackTrace();
@@ -1191,7 +1192,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * processes the input before the next frame has run
      */
     public final void inputLater(@NotNull Task... t) {
-        //taskWorker.execute(()->input(t));
+        if (t.length == 0)
+            throw new RuntimeException("empty task array");
         taskWorker.execute(new InputTasks(t));
     }
 
@@ -1209,15 +1211,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     public final void inputLater(@NotNull Collection<Task> tt) {
-
         int s = tt.size();
-        if (s == 0)
-            return;
-
-        Task[] a = new Task[s];
-        tt.toArray(a);
-
-        inputLater(a);
+        if (s > 0)
+            inputLater(tt.toArray(new Task[s]));
     }
 
 

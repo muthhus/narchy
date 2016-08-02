@@ -431,14 +431,19 @@ public enum Draw {
     final static float zStep = 0.05f;
 
     static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
+        text(gl, scaleX, scaleY, label, dx, dy, dz, null);
+    }
+    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz, float[] color) {
         gl.glPushMatrix();
-        gl.glNormal3f(0, 0, 1f);
+        //gl.glNormal3f(0, 0, 1f);
         gl.glTranslatef(dx, dy, dz + zStep);
 
         float fontThick = 1f;
         gl.glLineWidth(fontThick);
 
 
+        if (color!=null)
+            gl.glColor3fv(color, 0);
 
         //float r = v.radius;
         renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, label,
