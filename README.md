@@ -87,6 +87,14 @@ In keeping with a design preference for unity and balanced spectral continuity, 
  supports smooth and balanced revection across the 0.5 "maybe" midpoint of the frequency range,
  in both temporal and eternal modes.
  
+ NARchy's deriver follows a continued evolution from its beginnings in the OpenNARS 1.6..1.7 versions
+ which featured the Termutator to manage the traversal of the space of possible permutations
+ while obeying AIKR principles according to operating parameter limits.  It has some 
+ additional features including inline 
+ term rewrite functions (ex: set operations and 2nd-layer subtitutions) and integration of
+  the temporal functions necessary to appropriately "temporalize" derivations according
+  to the timing of premise components.
+ 
  Disjunctions are only virtual operators as perceivable by input and displayed on output. They 
  are converted immediately to negated conjunction of negations via DeMorgan's laws.  By preferring 
  the conjunction representation,
@@ -120,8 +128,8 @@ In keeping with a design preference for unity and balanced spectral continuity, 
  concept compression which removes less essential components.
  
  A sensor/motor "NAgent" API for wrapping a NAR reasoner and attaching various sensor and
- motor concepts with specific behavior and abilities for transducing input to beliefs
- and effecting actions from goals.  This can be used to easily interface a NAR as a 
+ motor concepts with specific abilities for transducing input to beliefs
+ and effecting behaviors from goals.  This can be used to easily interface a NAR as a 
  reinforcement-learning agent with a specific environment or interface.   It also has support for
  Reward sensor concept which can be desired and focused as the object of procedural questions
  and future predictions with respect to the sensor and motor concepts of its context.
@@ -132,9 +140,10 @@ In keeping with a design preference for unity and balanced spectral continuity, 
   budget and/or truth heuristics inherent in the reasoning itself.  Another peer's beliefs can 
   be corroborated, doubted, augmented, summarized, misrepresented, or ignored.  Their questions
   can be answered, reiterated, or answered with more questions.  Goals can be obeyed, reinforced,
-  or disobeyed.  The semantics of the various NAL operator and task punctuations covers the abiltiies
-  of classical multi-agent communication protocols like FIPA and ACL, but perhaps in a more
-  natural way, and with the added expressiveness of shades of NAL truth and budget. 
+  or disobeyed.  The semantics of the various NAL operator and task punctuations covers the range
+  of "performatives" offered by
+  classical multi-agent communication protocols like FIPA and ACL, but perhaps in a more
+  natural way, and enhanced with the added expressiveness of shades of NAL truth and budget. 
    
    
  _Many other changes remain to be documented._
