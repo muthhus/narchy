@@ -193,8 +193,8 @@ public class Tetris2 extends NAREnvironment {
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 , new FrameClock());
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.1f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.04f);
 
 
         nar.beliefConfidence(0.9f);

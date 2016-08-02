@@ -280,6 +280,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         } else {
             if (minPriIfFull() > p) {
                 putFail(key);
+                pending += p; //include failed input in pending
             } else {
                 putNewAndDeleteDisplaced(key, newLink(key, p, b.qua(), b.dur()));
             }
@@ -351,7 +352,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         float r = 1f - (existing / (existing + pending));
 
-        if (r >= Param.BUDGET_EPSILON * size()/2f) {
+        if (r >= Param.BUDGET_EPSILON ) {
             return new Forget(r);
         } else {
             return null;
