@@ -10,7 +10,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
  - By default, NARS makes *no assumptions* about the meaning or truth value of input beliefs and goals.
  - How to choose proper inputs and interpret possible outputs for each application is an *open problem* to be solved by its users. :warning: 
 
-```task ::= [budget] [term] [punct] [tense] [truth]```
+```task ::= [budget] <term> <punct> [occurrence] [truth]```
 
 **Punctuation**
  - "."  Belief to be remembered, representing a specified amount of factual evidence with which to revise existing knowledge and derive novel conclusions. 
@@ -20,33 +20,33 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
 **Term**
 ```
-               <term> ::= <atom>                             // an atomic constant term; Unicode string in an arbitrary alphabet
+               <term> ::= 
+                        | <atom>                             // an atomic constant term; Unicode string in an arbitrary alphabet
                         | <variable>                         // an atomic variable term
                         | <compound>                         // a term with internal structure
                         
                         | `<object>`                         // object value or expression (TODO)
                         | `<integer>`                        // integer value (TODO)
                         
-        <statement> ::= "("<term> <relation> <term>")"         // two terms related to each other
-                                                                         
-           <relation> ::= "-->"                              // inheritance
-                        | ":"                                // reverse-inheritance (shorthand)
+           <compound> ::=                       
+                        | "("<term> "-->" <term>")"          // inheritance
+                        | <term> ":" <term>                  // reverse-inheritance (shorthand)
                         
-                        | "<->"                              // similarity
+                        | "("<term> "<->" <term>")"          // similarity
 
-                        | "==>"                              // implication
-                        | "==>"<dt>                          // implication sequence
+                        | "("<term> "==>" <term>")"          // implication
+                        | "("<term> "==>"<dt> <term>")"      // implication sequence
                         
-                        | "<=>"                              // equivalence
-                        | "<=>"<dt>                          // equivalence sequence
+                        | "("<term> "<=>" <term>")"          // equivalence
+                        | "("<term> "<=>"<dt> <term>")"      // equivalence sequence
                         
-                        | "&&"<dt>                           // conjunction sequence (size=2 only)
+                        | "("<term> "&&"<dt> <term>")"       // conjunction sequence (size=2 only)
 
-                        | "-{-"                              // instance, expanded on input to: {x} --> y
-                        | "-]-"                              // property, expanded on input to: x --> [y]
-                        | "{-]"                              // instance-property, expanded on input to: {x} --> [y]
-                        
-      <compound-term> ::= "{" <term> {","<term>} "}"         // extensional set
+                        | "("<term> "-{-" <term>")"          // instance, expanded on input to: {x} --> y
+                        | "("<term> "-]-" <term>")"          // property, expanded on input to: x --> [y]
+                        | "("<term> "{-]" <term>")"          // instance-property, expanded on input to: {x} --> [y]
+                                                                                                 
+                        | "{" <term> {","<term>} "}"         // extensional set
                         | "[" <term> {","<term>} "]"         // intensional set
                         | "(" <term> {","<term>} ")"         // product (ie. vector or list)
                         
@@ -65,10 +65,9 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         
                         | "(||," <term> {","<term>} ")"      // disjunction (internally converted to negated conjunction of negations), also: (x || y)                                   
                         
-          <operation> ::= <term>"("<term> {","<term>} ")"      // an operation to be executed (C-function syntax); op(x,y) internally is: ((x,y)-->^op)
+                        | <term>"("<term> {","<term>} ")"    // an operation to be executed (function syntax); op(x,y) internally is: ((x,y)-->^op)
 
                  <dt> ::= [+|-]<integer>[""|"frames"|"min"|"hr"|"day"...] //delta-time amount (frames if no unit specified)
-
 ```
 
 **Truth** = (frequency, confidence)
