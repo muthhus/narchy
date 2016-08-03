@@ -7,8 +7,8 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 # Usage
 
 **Tasks** can arrive at any time.  There are no restrictions on their content as far as they can be expressed in __Narsese__ (the I/O language of NARS).
- * By default, NARS makes *no assumptions* about the meaning or truth value of input beliefs and goals.
- * :warning: How to choose proper inputs and interpret possible outputs for each application is an *open problem* to be solved by its users.
+ - By default, NARS makes *no assumptions* about the meaning or truth value of input beliefs and goals.
+ - How to choose proper inputs and interpret possible outputs for each application is an *open problem* to be solved by its users. :warning: 
 
 ```task ::= [budget] [term] [punct] [tense] [truth]```
 
@@ -85,22 +85,22 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
  - %A pattern variable
               
 **Truth** = (frequency, confidence)
- * Frequency [0..1.0]
- * Confidence (0..1.0]*
-   * an input confidence=1.0 triggers a locked axiomatic belief state that disables additional beliefs in its table. otherwise conf=1.0 is not allowed  
+ - Frequency [0..1.0]
+ - Confidence (0..1.0]*
+   - an input confidence=1.0 triggers a locked axiomatic belief state that disables additional beliefs in its table. otherwise conf=1.0 is not allowed  
 
 **Budget** = (priority, durability, quality)
- * Priority [0..1.0]
- * Durability [0..1.0]
- * Quality [0..1.0]
+ - Priority [0..1.0]
+ - Durability [0..1.0]
+ - Quality [0..1.0]
 
 **Concept** = identified by non-variable, non-negated term
- * TermLinks (bag)
- * TaskLinks (bag)
- * Metadata table
- * Capacity Policy
- * Compound Concepts also include:
-   * Belief, Goal, Question, and Quest Task Tables
+ - TermLinks (bag)
+ - TaskLinks (bag)
+ - Metadata table
+ - Capacity Policy
+ - Compound Concepts also include:
+   - Belief, Goal, Question, and Quest Task Tables
 
 
 
@@ -246,39 +246,39 @@ In keeping with a design preference for unity and balanced spectral continuity, 
  
 ----
 
- * A comprehensive description of NARS [Rigid Flexibility: The Logic of Intelligence](http://www.springer.com/west/home/computer/artificial?SGWID=4-147-22-173659733-0) and [Non-Axiomatic Logic: A Model of Intelligent Reasoning](http://www.worldscientific.com/worldscibooks/10.1142/8665).
- * Papers discussing aspects of the system: [available here](http://www.cis.temple.edu/~pwang/papers.html)
- * Introduction: [The Logic of Intelligence](http://www.cis.temple.edu/~pwang/Publication/logic_intelligence.pdf)
- * High-level engineering plan: [From NARS to a Thinking Machine](http://www.cis.temple.edu/~pwang/Publication/roadmap.pdf)
- * Core Logic: [From Inheritance Relation to Non-Axiomatic Logic](http://www.cis.temple.edu/~pwang/Publication/inheritance_nal.pdf)
- * Semantics: [Experience-Grounded Semantics: A theory for intelligent systems](http://www.cis.temple.edu/~pwang/Publication/semantics.pdf)
- * Memory & Control: [Computation and Intelligence in Problem Solving](http://www.cis.temple.edu/~pwang/Writing/computation.pdf)
- * NAL Spec (2010) https://github.com/opennars/opennars2/blob/2.0.0_postdev1/docs/NAL-Specification.pdf
+ - A comprehensive description of NARS [Rigid Flexibility: The Logic of Intelligence](http://www.springer.com/west/home/computer/artificial?SGWID=4-147-22-173659733-0) and [Non-Axiomatic Logic: A Model of Intelligent Reasoning](http://www.worldscientific.com/worldscibooks/10.1142/8665).
+ - Papers discussing aspects of the system: [available here](http://www.cis.temple.edu/~pwang/papers.html)
+ - Introduction: [The Logic of Intelligence](http://www.cis.temple.edu/~pwang/Publication/logic_intelligence.pdf)
+ - High-level engineering plan: [From NARS to a Thinking Machine](http://www.cis.temple.edu/~pwang/Publication/roadmap.pdf)
+ - Core Logic: [From Inheritance Relation to Non-Axiomatic Logic](http://www.cis.temple.edu/~pwang/Publication/inheritance_nal.pdf)
+ - Semantics: [Experience-Grounded Semantics: A theory for intelligent systems](http://www.cis.temple.edu/~pwang/Publication/semantics.pdf)
+ - Memory & Control: [Computation and Intelligence in Problem Solving](http://www.cis.temple.edu/~pwang/Writing/computation.pdf)
+ - NAL Spec (2010) https://github.com/opennars/opennars2/blob/2.0.0_postdev1/docs/NAL-Specification.pdf
 
 [![](https://images.microbadger.com/badges/image/automenta/narchy.svg)](http://microbadger.com/images/automenta/narchy "image badge from microbadger.com")
 
 Contents
 --------
- * **nal** - Logic Reasoner
- * **guifx** - JavaFX GUI
- * **app** - Application-level and supporting tools
- * **web** - Web server and client
- * **lab** - Experiments & demos
- * **util** - Non-NARS specific supporting utilities
- * **logic** - Non-NARS specific supporting logic
- * **perf** - JMH benchmarks
+ - **nal** - Logic Reasoner
+ - **guifx** - JavaFX GUI
+ - **app** - Application-level and supporting tools
+ - **web** - Web server and client
+ - **lab** - Experiments & demos
+ - **util** - Non-NARS specific supporting utilities
+ - **logic** - Non-NARS specific supporting logic
+ - **perf** - JMH benchmarks
 
 Requirements
 ------------
- * Java 9 (OpenJDK or Oracle JDK)
- * Maven
+ - Java 9 (OpenJDK or Oracle JDK)
+ - Maven
 
 References
 ----------
 
- * Offficial OpenNARS Github http://github.com/opennars
- * OpenNARS v2 aka Narjure (Clojure) http://github.com/opennars/opennars2
- * OpenNARS v1 (Java) http://github.com/opennars/opennars 
- * An (outdated) HTML user manual http://www.cis.temple.edu/~pwang/Implementation/NARS/NARS-GUI-Guide.html
- * Old project home page https://code.google.com/p/open-nars/
- * Discussion Group https://groups.google.com/forum/?fromgroups#!forum/open-nars
+ - Offficial OpenNARS Github http://github.com/opennars
+ - OpenNARS v2 aka Narjure (Clojure) http://github.com/opennars/opennars2
+ - OpenNARS v1 (Java) http://github.com/opennars/opennars 
+ - An (outdated) HTML user manual http://www.cis.temple.edu/~pwang/Implementation/NARS/NARS-GUI-Guide.html
+ - Old project home page https://code.google.com/p/open-nars/
+ - Discussion Group https://groups.google.com/forum/?fromgroups#!forum/open-nars
