@@ -19,9 +19,8 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
  - "@"  Quest about goal state, find the best matching procedural answers.
 
 **Term**
-
 ```
-               <term> ::= <word>                             // an atomic constant term; Unicode string in an arbitrary alphabet
+               <term> ::= <atom>                             // an atomic constant term; Unicode string in an arbitrary alphabet
                         | <variable>                         // an atomic variable term
                         | <compound>                         // a term with internal structure
                         
@@ -36,11 +35,13 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | "<->"                              // similarity
 
                         | "==>"                              // implication
-                        | "==>"<dt>                          // implication across time
+                        | "==>"<dt>                          // implication sequence
                         
                         | "<=>"                              // equivalence
-                        | "<=>"<dt>                          // equivalence across time
+                        | "<=>"<dt>                          // equivalence sequence
                         
+                        | "&&"<dt>                           // conjunction sequence (size=2 only)
+
                         | "-{-"                              // instance, expanded on input to: {x} --> y
                         | "-]-"                              // property, expanded on input to: x --> [y]
                         | "{-]"                              // instance-property, expanded on input to: {x} --> [y]
@@ -52,57 +53,57 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | "(/," <term> {","<term>} ")"       // extensional image
                         | "(\," <term> {","<term>} ")"       // intensional image
                         
-                        | "(&," <term> {","<term>} ")"       // extensional intersection
-                        | "(|," <term> {","<term>} ")"       // intensional intersection
-                        | "(-," <term> "," <term> ")"        // extensional difference
-                        | "(~," <term> "," <term> ")"        // intensional difference
+                        | "(&," <term> {","<term>} ")"       // extensional intersection, also: (x & y)
+                        | "(|," <term> {","<term>} ")"       // intensional intersection, also: (x | y)
+                        | "(-," <term> "," <term> ")"        // extensional difference, also: (x - y)
+                        | "(~," <term> "," <term> ")"        // intensional difference, also: (x ~ y)
                         
                         | "(--," <term> ")"                  // negation
                         
-                        | "(&&," <term> {","<term>} ")"      // conjunction                       
-                        | "(&|," <term> {","<term>} ")"      // conjunction shorthand for dt=0 (TODO)
-                        | "(" <term> " &&"<dt> " "<term> ")" // conjunction across time (size=2)
+                        | "(&&," <term> {","<term>} ")"      // conjunction eternal, also: (x && y)   
+                        | "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0)
                         
-                        | "(||," <term> {","<term>} ")"      // disjunction (internally converted to negated conjunction of negations)
-
-                        //Infix variations are supported for certain size=2 compounds:
-                        //    (x & y), (x | y), (x - y), (x ~ y), (x || y), (x && y)             
+                        | "(||," <term> {","<term>} ")"      // disjunction (internally converted to negated conjunction of negations), also: (x || y)                                   
                         
-          <operation> ::= <term>"("<term> {","<term>} ")"      // an operation to be executed (C-function syntax)
-                //op(x,y)  internally is: ((x,y)-->^op)
+          <operation> ::= <term>"("<term> {","<term>} ")"      // an operation to be executed (C-function syntax); op(x,y) internally is: ((x,y)-->^op)
 
-              <truth> ::= "%"<frequency>[";"<confidence>]"%" // two numbers in [0,1]x(0,1)
-             <budget> ::= "$"<priority>[";"<durability>]"$"  // two numbers in [0,1]x(0,1)
-                 <dt> ::= [+|-]<integer>[""|"min"|"hr"|"day"...] //delta-time amount
+                 <dt> ::= [+|-]<integer>[""|"frames"|"min"|"hr"|"day"...] //delta-time amount (frames if no unit specified)
 
 ```
 
-**Variables**
+**Truth** = (frequency, confidence)
+```
+<truth> ::= "%"<frequency>[";"<confidence>]"%" // two numbers in [0,1]x(0,1)
+```
+ - Frequency [0..1.0]
+ - Confidence (0..1.0]*
+    - an input confidence=1.0 triggers a locked axiomatic belief state that disables additional beliefs in its table. otherwise conf=1.0 is not allowed  
 
+
+**Budget** = (priority, durability, quality)
+```
+<budget> ::= "$"<priority>[";"<durability>[";"<quality>]]"$"  // three numbers in [0,1]x(0,1)
+```
+ - Priority [0..1.0] - determines applied attention relative to other items
+ - Durability [0..1.0] - determines forget rate relative to other items
+ - Quality [0..1.0] - indicates a level of accumulated utility
+ 
+**Variables**
  - $X independent variable
  - \#Y dependent variable
  - ?Z query variable
  - %A pattern variable
-              
-**Truth** = (frequency, confidence)
- - Frequency [0..1.0]
- - Confidence (0..1.0]*
-   - an input confidence=1.0 triggers a locked axiomatic belief state that disables additional beliefs in its table. otherwise conf=1.0 is not allowed  
 
-**Budget** = (priority, durability, quality)
- - Priority [0..1.0]
- - Durability [0..1.0]
- - Quality [0..1.0]
 
 **Concept** = identified by non-variable, non-negated term
  - TermLinks (bag)
  - TaskLinks (bag)
  - Metadata table
  - Capacity Policy
- - Compound Concepts also include:
-   - Belief, Goal, Question, and Quest Task Tables
-
-
+ - Compound Concepts also include..
+    - Belief, Goal, Question, and Quest Task Tables
+    - TermLink templates
+    
 
 # Reasoning
 ![Inference](https://raw.githubusercontent.com/automenta/narchy/skynet2/doc/derivation_pipeline.png)
