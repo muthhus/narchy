@@ -105,7 +105,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
 
 # Reasoning
-![Inference](https://raw.githubusercontent.com/automenta/narchy/skynet1/doc/derivation_pipeline.png)
+![Inference](https://raw.githubusercontent.com/automenta/narchy/skynet2/doc/derivation_pipeline.png)
 
 As a reasoning system, the [architecture of NARS](http://www.cis.temple.edu/~pwang/Implementation/NARS/architecture.pdf) consists of a **memory**, an **inference engine**, and a **control system**.
 
