@@ -41,6 +41,10 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | "("<term> "<=>"<dt> <term>")"      // equivalence sequence
                         
                         | "("<term> "&&"<dt> <term>")"       // conjunction sequence (size=2 only)
+                        | "(&&," <term> {","<term>} ")"      // conjunction eternal, also: (x && y)   
+                        | "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0)
+                        
+                        | "(||," <term> {","<term>} ")"      // disjunction (internally converted to negated conjunction of negations), also: (x || y)                                   
 
                         | "("<term> "-{-" <term>")"          // instance, expanded on input to: {x} --> y
                         | "("<term> "-]-" <term>")"          // property, expanded on input to: x --> [y]
@@ -59,12 +63,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | "(~," <term> "," <term> ")"        // intensional difference, also: (x ~ y)
                         
                         | "(--," <term> ")"                  // negation
-                        
-                        | "(&&," <term> {","<term>} ")"      // conjunction eternal, also: (x && y)   
-                        | "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0)
-                        
-                        | "(||," <term> {","<term>} ")"      // disjunction (internally converted to negated conjunction of negations), also: (x || y)                                   
-                        
+                                                
                         | <term>"("<term> {","<term>} ")"    // an operation to be executed (function syntax); op(x,y) internally is: ((x,y)-->^op)
 
                  <dt> ::= [+|-]<integer>[""|"frames"|"min"|"hr"|"day"...] //delta-time amount (frames if no unit specified)
