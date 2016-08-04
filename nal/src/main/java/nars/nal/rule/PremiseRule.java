@@ -759,6 +759,9 @@ public class PremiseRule extends GenericCompound {
                         case "dtUnionReverse":
                             timeFunction = TimeFunctions.dtUnionReverse;
                             break;
+                        case "occMerge":
+                            timeFunction = TimeFunctions.occMerge;
+                            break;
 
                         default:
                             throw new RuntimeException("invalid events parameters");

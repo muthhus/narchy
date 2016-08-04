@@ -24,7 +24,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     abstract public NAR nar();
 
     @Override
-    public void capacity(int eternals, int temporals, List<Task> displ) {
+    public void capacity(int eternals, int temporals, List<Task> displ, long now) {
         //ignored
     }
 

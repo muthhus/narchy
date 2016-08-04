@@ -14,7 +14,6 @@ import nars.nal.op.TermTransform;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
@@ -37,7 +36,6 @@ import java.util.function.Consumer;
 import static nars.$.unneg;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.XTERNAL;
 import static nars.term.Termed.termOrNull;
 
 /**
@@ -574,31 +572,24 @@ public interface TermIndex {
         throw new UnsupportedOperationException();
     }
 
-    default void policy(@NotNull Concept c, ConceptPolicy p) {
+    default void policy(@NotNull Concept c, ConceptPolicy p, long now) {
 
-        synchronized (c) {
-            if (c.policy() != p) {
-                c.policy(p);
+        if (c.policy() != p) {
+            synchronized (c) {
+
+                c.policy(p, now);
 
                 c.tasklinks().commit();
                 c.termlinks().commit();
+
+                set(c); //update in the cache (weight, etc.)
+
             }
-            set(c); //update in the cache (weight, etc.)
         }
 
     }
 
-    default void activate(@NotNull Concept c, @NotNull ConceptPolicy warm) {
 
-        if (c.policy() == warm)
-            return;
-        c.policy(warm);
-        set(c); //update in the cache (weight, etc.)
-
-        //clean out any deleted links since having been deactivated
-        c.tasklinks().commit();
-        c.termlinks().commit();
-    }
 
 
     final class InvalidConceptException extends RuntimeException {

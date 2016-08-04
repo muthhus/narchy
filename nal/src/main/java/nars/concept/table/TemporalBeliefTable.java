@@ -22,13 +22,11 @@ public interface TemporalBeliefTable extends TaskTable {
 
     boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> displ);
 
-    long minTime();
-    long maxTime();
 
-//    void minTime(long minT);
-//    void maxTime(long maxT);
 
-    void capacity(int c, List<Task> displaced);
+    void capacity(int c, long now, List<Task> displaced);
 
     boolean isFull();
+
+    void range(long[] t);
 }

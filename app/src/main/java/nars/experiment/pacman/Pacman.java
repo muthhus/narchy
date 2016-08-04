@@ -70,7 +70,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 	boolean trace = true;
 
 	final int inputs;
-	private final int pacmanCyclesPerFrame = 4;
+	private final int pacmanCyclesPerFrame = 8;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
 	public float scoretoReward = 0.1f;
 
@@ -88,7 +88,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 
 		//Multi nar = new Multi(4,512,
 		Default nar = new Default(1024,
-				4, 3, 2, rng,
+				16, 2, 2, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng), 100000000, false)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))

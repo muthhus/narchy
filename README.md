@@ -4,7 +4,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
 **NARchy** derives from [OpenNARS](https://github.com/opennars/opennars2), the open-source version of [NARS](https://sites.google.com/site/narswang/home), a general-purpose AI system, designed in the framework of a reasoning system.
 
-# Usage
+## Usage
 
 **Tasks** can arrive at any time.  There are no restrictions on their content as far as they can be expressed in __Narsese__ (the I/O language of NARS).
  - By default, NARS makes *no assumptions* about the meaning or truth value of input beliefs and goals.
@@ -66,7 +66,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                                                 
                         | <term>"("<term> {","<term>} ")"    // an operation to be executed (function syntax); op(x,y) internally is: ((x,y)-->^op)
 
-                 <dt> ::= [+|-]<integer>[""|"frames"|"min"|"hr"|"day"...] //delta-time amount (frames if no unit specified)
+                 <dt> ::= [+|-]<number>[""|"frames"|"min"|"hr"|"day"...] //delta-time amount (frames if no unit specified); positive = future, negative = past, +0 = simultaneous
 ```
 
 **Truth** = (frequency, confidence)
@@ -103,7 +103,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
     - TermLink templates
     
 
-# Reasoning
+## Reasoning
 ![Inference](https://raw.githubusercontent.com/automenta/narchy/skynet2/doc/derivation_pipeline.png)
 
 As a reasoning system, the [architecture of NARS](http://www.cis.temple.edu/~pwang/Implementation/NARS/architecture.pdf) consists of a **memory**, an **inference engine**, and a **control system**.
@@ -133,9 +133,7 @@ At step 5, the priority values of all the involved items
 are adjusted, according to the immediate feedback of the
 current cycle.
 
-----
-
-# What's New
+## What's New
 
 ### Continuous-Time NAL7
 The most significant difference is NARchy's completely redesigned Temporal Logic (NAL7) system
@@ -177,7 +175,7 @@ In keeping with a design preference for unity and balanced spectral continuity, 
 ### Enhanced Deriver
  NARchy's deriver follows a continued evolution from its beginnings in the OpenNARS 1.6..1.7 versions
  which featured the Termutator to manage the traversal of the space of possible permutations
- while obeying AIKR principles according to operating parameter limits.  It has some 
+ while obeying AIKR principles according to limit parameters.  It has some 
  additional features including inline 
  term rewrite functions (ex: set operations and 2nd-layer subtitutions) and integration of
   the temporal functions necessary to appropriately "temporalize" derivations according
@@ -243,7 +241,27 @@ In keeping with a design preference for unity and balanced spectral continuity, 
    
  _Many other changes remain to be documented._
  
-----
+
+## Contents
+
+ - **nal** - Logic Reasoner
+ - **guifx** - JavaFX GUI
+ - **app** - Application-level and supporting tools
+ - **web** - Web server and client
+ - **lab** - Experiments & demos
+ - **util** - Non-NARS specific supporting utilities
+ - **logic** - Non-NARS specific supporting logic
+ - **perf** - JMH benchmarks
+
+## Requirements
+ - Java 9 (OpenJDK or Oracle JDK)
+ - Maven
+
+## References
+
+ - Offficial OpenNARS Github http://github.com/opennars
+ - OpenNARS v2 aka Narjure (Clojure) http://github.com/opennars/opennars2
+ - OpenNARS v1 (Java) http://github.com/opennars/opennars 
 
  - A comprehensive description of NARS [Rigid Flexibility: The Logic of Intelligence](http://www.springer.com/west/home/computer/artificial?SGWID=4-147-22-173659733-0) and [Non-Axiomatic Logic: A Model of Intelligent Reasoning](http://www.worldscientific.com/worldscibooks/10.1142/8665).
  - Papers discussing aspects of the system: [available here](http://www.cis.temple.edu/~pwang/papers.html)
@@ -254,30 +272,8 @@ In keeping with a design preference for unity and balanced spectral continuity, 
  - Memory & Control: [Computation and Intelligence in Problem Solving](http://www.cis.temple.edu/~pwang/Writing/computation.pdf)
  - NAL Spec (2010) https://github.com/opennars/opennars2/blob/2.0.0_postdev1/docs/NAL-Specification.pdf
 
-[![](https://images.microbadger.com/badges/image/automenta/narchy.svg)](http://microbadger.com/images/automenta/narchy "image badge from microbadger.com")
-
-Contents
---------
- - **nal** - Logic Reasoner
- - **guifx** - JavaFX GUI
- - **app** - Application-level and supporting tools
- - **web** - Web server and client
- - **lab** - Experiments & demos
- - **util** - Non-NARS specific supporting utilities
- - **logic** - Non-NARS specific supporting logic
- - **perf** - JMH benchmarks
-
-Requirements
-------------
- - Java 9 (OpenJDK or Oracle JDK)
- - Maven
-
-References
-----------
-
- - Offficial OpenNARS Github http://github.com/opennars
- - OpenNARS v2 aka Narjure (Clojure) http://github.com/opennars/opennars2
- - OpenNARS v1 (Java) http://github.com/opennars/opennars 
  - An (outdated) HTML user manual http://www.cis.temple.edu/~pwang/Implementation/NARS/NARS-GUI-Guide.html
  - Old project home page https://code.google.com/p/open-nars/
  - Discussion Group https://groups.google.com/forum/?fromgroups#!forum/open-nars
+
+[![](https://images.microbadger.com/badges/image/automenta/narchy.svg)](http://microbadger.com/images/automenta/narchy "image badge from microbadger.com")

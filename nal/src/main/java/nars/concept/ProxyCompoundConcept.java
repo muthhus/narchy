@@ -188,8 +188,8 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public void policy(@NotNull ConceptPolicy c) {
-        target.policy(c);
+    public void policy(@NotNull ConceptPolicy c, long now) {
+        target.policy(c, now);
     }
 
 

@@ -50,7 +50,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
         return policy;
     }
     @Override
-    public void policy(@Nullable ConceptPolicy p) {
+    public void policy(@Nullable ConceptPolicy p, long now) {
         this.policy = p;
         if (p!=null) {
             linkCapacity(p);

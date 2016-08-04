@@ -313,10 +313,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    @NotNull
-    protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b) {
-        return newLink(i, b, 1f);
-    }
+//    @NotNull
+//    protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b) {
+//        return newLink(i, b, 1f);
+//    }
 
     @NotNull
     protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b, float scale) {
@@ -377,8 +377,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         @Override
         public void accept(BLink bLink) {
-            float eDur = bLink.dur() * maxEffectiveDurability;
-            bLink.priMult(1f - (r * (1f - eDur)));
+            float p = bLink.pri();
+            if (p == p) {
+                bLink.setPriority(p * (1f - (r * (1f - bLink.dur() * maxEffectiveDurability))));
+            }
         }
 
 //        public Consumer<BLink> set(float r) {

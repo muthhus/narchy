@@ -43,7 +43,7 @@ public class TemporalTest {
     }
 
     @Test public void testCoNegatedSubtermConcept() {
-        assertEquals("((x)&&(--,(x)))", n.activate(
+        assertEquals("((--,(x))&&(x))", n.activate(
                 n.term("((x) &&+10 (--,(x)))"), UnitBudget.One).toString());
     }
 
@@ -184,7 +184,7 @@ public class TemporalTest {
 
         a.beliefs().print();
 
-        assertEquals(6, a.beliefs().size());
+        assertEquals(7, a.beliefs().size());
     }
 
     @Nullable
@@ -378,6 +378,7 @@ public class TemporalTest {
 
     @Test public void testNonCommutivityImplConcept() {
         NAR n = new Default();
+
         n.input("(x ==>+5 y).");
         n.input("(y ==>-5 x).");
         n.next();
@@ -387,7 +388,7 @@ public class TemporalTest {
         n.forEachActiveConcept(d::add);
 
         //2 unique impl concepts created
-        assertEquals("[(x==>y), (y==>x), x, y]", d.toString());
+        assertEquals("[(x<=>y), (x==>y), (y==>x), x, y]", d.toString());
     }
 
     @Test public void testCommutivity() {

@@ -177,8 +177,9 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
         }
 
-        Termed<Compound> ntt = Task.normalizeTaskTerm(t, punc, nar);
-        setTerm(ntt);
+        Compound ntt = Task.normalizeTaskTerm(t, punc, nar);
+        if (ntt!=t)
+            setTerm(ntt);
 
         // if a task has an unperceived creationTime,
         // set it to the memory's current time here,
@@ -226,14 +227,14 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (log!=null && log().get(0).equals(Narsese.NARSESE_TASK_TAG)) {
             long exOcc = occurrence();
             if (exOcc != ETERNAL) {
-                int termDur = term.term().dt();
+                int termDur = ntt.dt();
                 if (termDur != DTERNAL && termDur < 0) {
                     setOccurrence(exOcc - termDur);
                 }
             }
         }
 
-        return nar.concept(term(), true);
+        return nar.concept(ntt, true);
     }
 
 

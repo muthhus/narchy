@@ -119,8 +119,8 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                 new CurveBag.NormalizedSampler(
                         //new CurveBag.DirectSampler(
                         //CurveBag.linearBagCurve,
-                        CurveBag.power2BagCurve,
-                        //CurveBag.power4BagCurve,
+                        //CurveBag.power2BagCurve,
+                        CurveBag.power4BagCurve,
                         //CurveBag.power6BagCurve,
                         rng);
 

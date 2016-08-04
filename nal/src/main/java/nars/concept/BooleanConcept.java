@@ -242,5 +242,10 @@ public class BooleanConcept extends CompoundConcept {
         public float confMax(float minFreq, float maxFreq) {
             return current!=null ? current.conf() : 0;
         }
+
+        @Override
+        public void range(long[] t) {
+
+        }
     }
 }

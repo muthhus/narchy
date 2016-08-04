@@ -1,10 +1,8 @@
 package nars.concept.table;
 
-import com.gs.collections.api.block.predicate.Predicate;
 import nars.NAR;
 import nars.Param;
 import nars.nal.Stamp;
-import nars.nal.Tense;
 import nars.task.Revision;
 import nars.task.Task;
 import nars.task.TruthPolation;
@@ -16,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
-import static nars.nal.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.and;
 import static nars.truth.TruthFunctions.projection;
 
@@ -30,21 +27,18 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         return new TruthPolation(MAX_TRUTHPOLATION_SIZE);
     });
 
-
-    private long min = Tense.ETERNAL, max = Tense.ETERNAL;
-    private long lastUpdate = Tense.TIMELESS;
     private int capacity;
 
     public MicrosphereTemporalBeliefTable(int initialCapacity) {
         super();
-        capacity(initialCapacity, null);
+        this.capacity = initialCapacity;
     }
 
 
-    public void capacity(int newCapacity, List<Task> displaced) {
+    public void capacity(int newCapacity, long now, List<Task> displaced) {
         this.capacity = newCapacity;
         while (this.size() > newCapacity) {
-            removeWeakest(displaced);
+            removeWeakest(displaced, now);
         }
 
     }
@@ -54,9 +48,9 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         return capacity;
     }
 
-    public static float rank(@NotNull Task t, long when, long now, float ageFactor) {
+    public static float rank(@NotNull Task t, long when, long now) {
         //return rankTemporalByConfidenceAndOriginality(t, when, now, ageFactor, -1);
-        return rankTemporalByConfidence(t, when, now, ageFactor, -1);
+        return rankTemporalByConfidence(t, when, now, -1);
     }
 
     @Override
@@ -67,7 +61,6 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         if (cap == 0)
             return null;
 
-        this.lastUpdate = nar.time();
 
 
         //the result of compression is processed separately
@@ -110,27 +103,16 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 //        this.max = maxT;
 //    }
 
-    @Override
-    public long minTime() {
-        ageFactor();
-        return min;
-    }
 
     @Override
-    public long maxTime() {
-        ageFactor();
-        return max;
-    }
-
-    @Override
-    public boolean add(Task t) {
-        if (super.add(t)) {
-            long o = t.occurrence();
-            if ((o < min) || (o > max))
-                invalidateRange();
-            return true;
+    public final void range(long[] t) {
+        for (Task x : this.items) {
+            if (x !=null) {
+                long o = x.occurrence();
+                if (o < t[0]) t[0] = o;
+                if (o > t[1]) t[1] = o;
+            }
         }
-        return false;
     }
 
 
@@ -138,8 +120,6 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     public boolean remove(Object object) {
         return super.remove(object);
     }
-
-
 
     private final void remove(@NotNull Task removed, List<Task> displ) {
         int i = indexOf(removed);
@@ -152,12 +132,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         }
     }
 
-    private void invalidRangeIfLimit(@NotNull Task removed) {
-        long occ = removed.occurrence();
-        if ((occ == min) || (occ == max)) {
-            invalidateRange();
-        }
-    }
+
 
 
 //    @Override
@@ -174,53 +149,45 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         @Nullable Task t = this.remove(index);
         if (t!=null) {
             displ.add(t);
-            invalidRangeIfLimit(t);
         }
         return t;
     }
 
-    private final void invalidateRange() {
-        min = max = ETERNAL;
-    }
-
     @Nullable
-    public Task weakest() {
-        if (lastUpdate == Tense.TIMELESS)
-            throw new RuntimeException("unable to measure weakest without knowing current time");
-        return weakest(lastUpdate, null, Float.POSITIVE_INFINITY);
+    public Task weakest(long now) {
+        return weakest(now, null, Float.POSITIVE_INFINITY);
     }
 
 
-    protected final void removeWeakest(List<Task> displ) {
+    protected final void removeWeakest(List<Task> displ, long now) {
 
         int sizeBefore = size();
-        compress(displ);
+        compress(displ, now);
         if (size() < sizeBefore)
             return; //compression successful
 
-        remove(weakest(), displ);
+        remove(weakest(now), displ);
     }
 
     @Nullable
-    public Task weakest(long now, @Nullable Task excluding, float minRank) {
+    public Task weakest(long now, @Nullable Task toMergeWith, float minRank) {
         Task weakest = null;
         float weakestRank = minRank;
         int n = size();
 
-        float ageFactor = ageFactor();
-        long[] excludingEvidence = excluding != null ? excluding.evidence() : null;
+        long[] mergeEvidence = toMergeWith != null ? toMergeWith.evidence() : null;
         for (int i = 0; i < n; i++) {
 
             Task ii = get(i);
             @Nullable long[] iiev = ii.evidence();
-            if (excluding != null &&
-                    ((ii == excluding) || (!Param.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE &&
-                            (Stamp.isCyclic(iiev) || Stamp.overlapping(excludingEvidence, iiev))
+            if (toMergeWith != null &&
+                    ((!Param.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE &&
+                            (Stamp.isCyclic(iiev) || Stamp.overlapping(mergeEvidence, iiev))
                     )))
                 continue;
 
             //consider ii for being the weakest ranked task to remove
-            float r = rank(ii, now, now, ageFactor);
+            float r = rank(ii, now, now);
             if (r < weakestRank) {
                 weakestRank = r;
                 weakest = ii;
@@ -232,39 +199,11 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    public float ageFactor() {
 
-        if (min == ETERNAL) {
-            //invalidated, recalc:
-            long tmin = Long.MAX_VALUE, tmax = Long.MIN_VALUE;
-
-            //TODO synchronized(..
-
-            int s = size();
-            for (int i = 0; i < s; i++) {
-                long o = get(i).occurrence();
-                if (o < tmin) tmin = o;
-                if (o > tmax) tmax = o;
-            }
-
-            this.min = tmin;
-            this.max = tmax;
-        }
-
-        //return 1f;
-        long range = max - min;
-        /* history factor:
-           higher means it is easier to hold beliefs further away from current time at the expense of accuracy
-           lower means more accuracy at the expense of shorter memory span
-     */
-        float historyFactor = Param.TEMPORAL_DURATION;
-        return (range == 0) ? 1 :
-                ((1f) / (range * historyFactor));
-    }
 
     @Nullable
-    protected Task compress(List<Task> displ) {
-        return compress(null, lastUpdate, null, displ);
+    protected Task compress(List<Task> displ, long now) {
+        return compress(null, now, null, displ);
     }
 
     /**
@@ -278,31 +217,26 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         }
 
 
-        float inputRank = input != null ? rank(input, now, now, ageFactor()) : Float.POSITIVE_INFINITY;
+        float inputRank = input != null ? rank(input, now, now) : Float.POSITIVE_INFINITY;
 
         Task a = weakest(now, null, inputRank);
         if (a == null)
             return null;
 
+        remove(a, displ);
+
         Task b = weakest(now, a, Float.POSITIVE_INFINITY);
-        if (a == b)
-            throw new RuntimeException();
 
-        Task merged;
         if (b != null) {
-            merged = merge(a, b, now, eternal);
 
-            remove(b, displ);
             //TaskTable.removeTask(b, "Revection Revision", displ);
+            remove(b, displ);
+
+            return merge(a, b, now, eternal);
         } else {
-            merged = null;
+            return input;
         }
 
-        remove(a, displ);
-        //TaskTable.removeTask(a, (b == null) ? "Revection Forget" : "Revection Revision", displ);
-
-
-        return merged != null ? merged : input;
     }
 
     /**
@@ -341,12 +275,12 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
                 //Math.min(aProj, bProj);
                 and(aProj, bProj);
 
-        float relMin = projection(minTime(), mid, now);
-        float relMax = projection(maxTime(), mid, now);
-        float relevance = Math.max(relMin, relMax );
+//        float relMin = projection(minTime(), mid, now);
+//        float relMax = projection(maxTime(), mid, now);
+//        float relevance = Math.max(relMin, relMax );
 
 
-        float confScale = Param.REVECTION_CONFIDENCE_FACTOR * diffuseCost * relevance * (1f - overlap);
+        float confScale = Param.REVECTION_CONFIDENCE_FACTOR * diffuseCost * (1f - overlap);
 
         if (confScale < Param.BUDGET_EPSILON) //TODO use NAR.confMin which will be higher than this
             return null;
@@ -362,16 +296,6 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    public long range() {
-        return maxTime()-minTime();
-    }
-
-    /** normalize relative to the min/max span of this table */
-    public float tnorm(long absolute) {
-        double range = range();
-        if (range == 0) return 0;
-        return (float)((absolute - min) / range);
-    }
 
     @Nullable
     @Override
@@ -386,15 +310,13 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
         Task best = null;
 
-        float ageFactor = ageFactor();
-
         float bestRank = -1;
 
         for (int i = 0; i < ls; i++) {
             Task x = get(i);
             if (x == null) continue;
 
-            float r = rank(x, when, now, ageFactor);
+            float r = rank(x, when, now);
 
             if (against != null && Stamp.overlapping(x.evidence(), against.evidence())) {
                 r *= Param.PREMISE_MATCH_OVERLAP_MULTIPLIER;

@@ -278,7 +278,6 @@ public class CurveBagTest  {
     }
 
     @Test public void testFlatBagRemainsRandomInNormalizedSampler() {
-        Random rng = new XorShift128PlusRandom(1);
         int n = 8;
 
         float level = 0.04f;

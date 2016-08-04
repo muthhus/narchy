@@ -44,7 +44,7 @@ abstract public class NAREnvironment {
     public final List<MotorConcept> actions = $.newArrayList();
 
     public float alpha, gamma, epsilon;
-    @Deprecated public static final float gammaEpsilonFactor = 0.66f;
+    @Deprecated public static final float gammaEpsilonFactor = 0.25f;
 
     public float rewardValue;
     private final FasterList<MutableTask> predictors = $.newArrayList();

@@ -556,7 +556,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         float cost = input.pri() * conceptActivation; //the concept priority demanded by this task
 
         if (c.policy() == null) {
-            c.policy(index.conceptBuilder().init());
+            c.policy(index.conceptBuilder().init(), time());
         }
 
 

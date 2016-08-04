@@ -8,6 +8,7 @@ import nars.nal.op.Derive;
 import nars.nal.rule.PremiseRule;
 import nars.task.Task;
 import nars.term.*;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.nal.Tense.*;
@@ -17,6 +18,8 @@ import static nars.nal.Tense.*;
  */
 @FunctionalInterface
 public interface TimeFunctions {
+
+
 
     /**
      * @param derived   raw resulting untemporalized derived term that may or may not need temporalized and/or occurrence shifted as part of a derived task
@@ -548,6 +551,23 @@ public interface TimeFunctions {
         occReturn[0] = p.occurrenceTarget(earliestOccurrence); //(t, b) -> t >= b ? t : b); //latest occurring one
 
         return deriveDT(derived, 1, p, eventDelta, occReturn);
+    };
+
+    TimeFunctions occMerge= (derived, p, d, occReturn, confScale) -> {
+        long taskOcc = p.task.occurrence();
+        long beliefOcc = p.belief.occurrence();
+        if (taskOcc == ETERNAL) {
+            occReturn[0] = beliefOcc;
+        } else if (beliefOcc == ETERNAL) {
+            occReturn[0] = taskOcc;
+        } else {
+            //merge in proportion to their conf
+            float tConf = p.task.conf();
+            float bConf = p.belief.conf();
+            double newOcc = Util.lerp(taskOcc, beliefOcc, tConf / (bConf + tConf));
+            occReturn[0] = (long)newOcc;
+        }
+        return derived;
     };
 
 //    Temporalize AutoSimple = (derived, p, d, occReturn) -> {

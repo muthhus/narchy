@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
@@ -15,6 +16,7 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.link.TermLinkBuilder;
+import nars.nal.Tense;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.task.Task;
 import nars.term.Compound;
@@ -29,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+
+import static nars.nal.Tense.ETERNAL;
 
 
 public class CompoundConcept<T extends Compound> implements AbstractConcept, Termlike {
@@ -56,9 +60,12 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     @Nullable
     private BeliefTable goals;
 
-    private float satisfaction = 0;
-    private @NotNull Map meta;
+    private @Nullable Map meta;
+
     private transient ConceptPolicy policy;
+
+    private transient float satisfaction = 0;
+    //private transient long min = Tense.ETERNAL, max = Tense.ETERNAL;
 
 
     final HashMap<Task, Task> tasks = new HashMap<>();
@@ -321,13 +328,13 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     @Override
-    public final void policy(@Nullable ConceptPolicy p) {
+    public final void policy(@Nullable ConceptPolicy p, long now) {
         ConceptPolicy current = this.policy;
         if (current!=p) {
             if ((this.policy = p) != null) {
                 linkCapacity(p);
                 //synchronized (tasks) {
-                beliefCapacity(p);
+                beliefCapacity(p, now);
                 questionCapacity(p);
                 //}
             }
@@ -364,7 +371,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     }
 
-    protected void beliefCapacity(@NotNull ConceptPolicy p) {
+    protected void beliefCapacity(@NotNull ConceptPolicy p, long now) {
 
         int be = p.beliefCap(this, true, true);
         int bt = p.beliefCap(this, true, false);
@@ -372,14 +379,14 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         int ge = p.beliefCap(this, false, true);
         int gt = p.beliefCap(this, false, false);
 
-        beliefCapacity(be, bt, ge, gt);
+        beliefCapacity(be, bt, ge, gt, now);
     }
 
-    protected final void beliefCapacity(int be, int bt, int ge, int gt) {
+    protected final void beliefCapacity(int be, int bt, int ge, int gt, long now) {
         List<Task> displ = $.newArrayList(0);
 
-        beliefs().capacity(be, bt, displ);
-        goals().capacity(ge, gt, displ);
+        beliefs().capacity(be, bt, displ, now);
+        goals().capacity(ge, gt, displ, now);
 
         removeAndDelete(displ);
     }
@@ -613,6 +620,45 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
             }
         }
     }
+
+//    public long minTime() {
+//        ageFactor();
+//        return min;
+//    }
+//
+//    public long maxTime() {
+//        ageFactor();
+//        return max;
+//    }
+//
+//    public float ageFactor() {
+//
+//        if (min == ETERNAL) {
+//            //invalidated, recalc:
+//            long t[] = new long[] { Long.MAX_VALUE, Long.MIN_VALUE };
+//
+//            beliefs.range(t);
+//            goals.range(t);
+//
+//            if (t[0] == Long.MAX_VALUE) {
+//                min = max= 0;
+//            } else {
+//                min = t[0];
+//                max = t[1];
+//            }
+//
+//        }
+//
+//        //return 1f;
+//        long range = max - min;
+//        /* history factor:
+//           higher means it is easier to hold beliefs further away from current time at the expense of accuracy
+//           lower means more accuracy at the expense of shorter memory span
+//     */
+//        float historyFactor = Param.TEMPORAL_DURATION;
+//        return (range == 0) ? 1 :
+//                ((1f) / (range * historyFactor));
+//    }
 
     @Override
     public final boolean equals(Object obj) {

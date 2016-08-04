@@ -62,9 +62,12 @@ public interface Termject<X> extends Atomic {
     abstract class PrimTermject<X> implements Termject<X> {
 
         final X val;
+        private final int _hash;
 
         public PrimTermject(X val) {
+
             this.val = val;
+            this._hash = val.hashCode();
         }
 
         @Override
@@ -84,8 +87,9 @@ public interface Termject<X> extends Atomic {
         }
 
         @Override
-        public int hashCode() {
-            return val.hashCode();
+        public final int hashCode() {
+            //return val.hashCode();
+            return _hash;
         }
 
 

@@ -521,10 +521,12 @@ public enum Util {
      * linear interpolate between target & current, factor is between 0 and 1.0
      */
     public static float lerp(float target, float current, float factor) {
-        return target * factor + current * (1.0f - factor);
+        //return target * factor + current * (1.0f - factor);
+        return Math.fma(target, factor, current * (1.0f - factor));
     }
     public static double lerp(double target, double current, double factor) {
-        return target * factor + current * (1.0f - factor);
+        //return target * factor + current * (1.0f - factor);
+        return Math.fma(target, factor, current * (1.0f - factor));
     }
     /**
      * maximum, simpler and faster than Math.max without its additional tests

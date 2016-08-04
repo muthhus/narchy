@@ -40,7 +40,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void capacity(int eternals, int temporals, List<Task> displ) {
+        public void capacity(int eternals, int temporals, List<Task> displ, long now) {
 
         }
 
@@ -87,10 +87,15 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
+        @Override
+        public void range(long[] t) {
+
+        }
+
 
     };
 
-    void capacity(int eternals, int temporals, List<Task> displ);
+    void capacity(int eternals, int temporals, List<Task> displ, long now);
 
 
 //    /**
@@ -149,18 +154,17 @@ public interface BeliefTable extends TaskTable {
 //        return a.conf() > b.conf() ? a : b;
 //    }
 
-    static float rankTemporalByConfidenceAndOriginality(@NotNull Task t, long when, long now, float ageFactor, float bestSoFar) {
-        return rankTemporalByConfidence(t, when, now, ageFactor, bestSoFar) * t.originality();
+    static float rankTemporalByConfidenceAndOriginality(@NotNull Task t, long when, long now, float bestSoFar) {
+        return rankTemporalByConfidence(t, when, now, bestSoFar) * t.originality();
     }
 
     /**
      *
      * @param t
      * @param when target time that is being evaluated (may be 'now' or some other time projected to)
-     * @param ageFactor effectively a ratio for trading off confidence against time
      * @return
      */
-    static float rankTemporalByConfidence(@NotNull Task t, long when, long now, float ageFactor, float bestSoFar) {
+    static float rankTemporalByConfidence(@NotNull Task t, long when, long now, float bestSoFar) {
         float c = t.truth().conf();
         //float c = t.confWeight(); //<- doesnt seem to work, produces values too high
 
@@ -169,7 +173,7 @@ public interface BeliefTable extends TaskTable {
         else {
             long dt = Math.abs(t.occurrence() - now) + Math.abs(when - now);
 
-            float relevance = relevance(dt, ageFactor);
+            float relevance = relevance(dt, 1f);
             relevance = relevance * relevance; //pow2 sharpening curve, defining a temporal focus shape that is stronger closer to now
 
             float rank = c * relevance;
@@ -404,6 +408,9 @@ public interface BeliefTable extends TaskTable {
         Truth t = truth(when);
         return t != null ? t.freq() : 0.5f;
     }
+
+    /** 2-element array containing running min/max range accumulator */
+    void range(long[] t);
 
 
     //void remove(Task belief, @NotNull NAR nar);

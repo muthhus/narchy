@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.experiment.NAREnvironment;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -35,7 +36,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 128;
+    private static final int cyclesPerFrame = 64;
     final Arkanoid noid;
     private final SwingCamera cam;
 
@@ -43,15 +44,14 @@ public class Arkancide extends NAREnvironment {
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 20;
-    final int visH = 14;
+    final int visW = 24;
+    final int visH = 18;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 32;
+    private int visionSyncPeriod = 16;
     float noiseLevel = 0;
 
     float paddleSpeed = 40f;
-    private long now;
     private float prevScore;
 
     public class View {
@@ -144,7 +144,8 @@ public class Arkancide extends NAREnvironment {
 
 
         ControlSurface.newControlWindow(
-                new GridSurface(VERTICAL, actionTables),
+                //new GridSurface(VERTICAL, actionTables),
+                //BagChart.newBagChart((Default)nar, 1024),
                 camView
         );
 
@@ -159,9 +160,9 @@ public class Arkancide extends NAREnvironment {
 
     @Override
     protected float act() {
-        now = nar.time();
+        long now = nar.time();
         cam.update();
-        noid.paddle.move((motorLeftRight.goals().expectation(nar.time()) - 0.5f) * paddleSpeed);
+        noid.paddle.move((motorLeftRight.goals().expectation(now) - 0.5f) * paddleSpeed);
         float nextScore = noid.next();
         float reward = nextScore - prevScore;
         this.prevScore = nextScore;
@@ -174,21 +175,21 @@ public class Arkancide extends NAREnvironment {
         Param.CONCURRENCY_DEFAULT = 1;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 3 * 10000000, false)
+                8, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 9 * 10000000, false)
                 , new FrameClock());
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.005f);
+        nar.derivedActivation.setValue(0.004f);
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.6f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)

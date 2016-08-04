@@ -385,7 +385,7 @@ public interface Concept extends Termed {
 
     @Nullable ConceptPolicy policy();
 
-    void policy(@Nullable ConceptPolicy c);
+    void policy(@Nullable ConceptPolicy c, long now);
 
     default boolean active() {
         return policy()!=null;

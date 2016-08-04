@@ -74,7 +74,8 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
         float newPri = Float.NaN;
         switch (priMerge) {
             case PLUS:
-                newPri = targetPri + srcPri * srcScale;
+                //newPri = targetPri + srcPri * srcScale;
+                newPri = Math.fma(srcPri, srcScale, targetPri);
                 break;
             case AND:
                 newPri = Util.lerp(targetPri * srcPri, targetPri, srcScale);
