@@ -11,6 +11,7 @@ import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.ArithmeticInduction;
+import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.predict.LSTMPredictor;
 import nars.term.Compound;
@@ -47,7 +48,7 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = false;
-        Param.CONCURRENCY_DEFAULT = 3;
+        Param.CONCURRENCY_DEFAULT = 2;
     }
 
     public static final int runFrames = 1000;
@@ -243,10 +244,12 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
         MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
 
         new ArithmeticInduction(nar);
+        new VariableCompressor(nar);
+
 
 
         Tetris2 t = new Tetris2(nar, tetris_width, tetris_height, TIME_PER_FALL) {

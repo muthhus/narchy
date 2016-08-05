@@ -11,6 +11,7 @@ import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.ArithmeticInduction;
+import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.obj.Termject;
@@ -202,7 +203,7 @@ public class Arkancide extends NAREnvironment {
         nar.derivedActivation.setValue(0.1f);
 
 
-        nar.beliefConfidence(0.7f);
+        nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
@@ -243,10 +244,11 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 4);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 2);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         new ArithmeticInduction(nar);
+        new VariableCompressor(nar);
 
 
 

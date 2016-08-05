@@ -577,7 +577,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             //propagate budget
             MutableFloat overflow = new MutableFloat();
-            activate(c, inputted, conceptActivation, linkActivation, overflow);
+            try {
+                activate(c, inputted, conceptActivation, linkActivation, overflow);
+            } catch (TermIndex.InvalidConceptException e) {
+                emotion.errr();
+
+                if (Param.DEBUG)
+                    logger.warn("invalid input: {}", e.toString());
+
+                inputted.delete();
+            }
+
             emotion.busy(cost);
             emotion.stress(overflow);
 

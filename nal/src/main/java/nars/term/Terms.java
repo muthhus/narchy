@@ -554,6 +554,11 @@ public class Terms   {
             return null;
     }
 
+    @Nullable
+    public static Compound compoundOrNull(@Nullable Termed t) {
+        return compoundOrNull(t.term());
+    }
+
     /** detects a negated conjunction of negated subterms:
      *  (--, (&&, --A, --B, .., --Z) ) */
     public static boolean isDisjunction(Compound c) {

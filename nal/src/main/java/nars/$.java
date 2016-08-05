@@ -22,6 +22,7 @@ import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.obj.Termject;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.term.var.VarPattern;
@@ -205,7 +206,11 @@ public enum $ {
     }
 
     @NotNull
-    public static Compound/*<Atom>*/ p(@NotNull String... t) {
+    public static Compound p(@NotNull String... t) {
+        return $.p((Term[]) $.the(t));
+    }
+    @NotNull
+    public static Compound p(@NotNull int... t) {
         return $.p((Term[]) $.the(t));
     }
 
@@ -801,6 +806,16 @@ public enum $ {
     @NotNull
     public static Atom the(byte c) {
         return the(new byte[] { c });
+    }
+
+    @NotNull
+    public static Term[] the(int... i) {
+        int l = i.length;
+        Term[] x = new Term[l];
+        for (int j = 0; j < l; j++) {
+            x[j] = new Termject.IntTerm(i[j]);
+        }
+        return x;
     }
 
     @Nullable

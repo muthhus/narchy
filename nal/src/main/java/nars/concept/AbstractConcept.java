@@ -2,9 +2,12 @@ package nars.concept;
 
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
+import nars.Op;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.task.Task;
+import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -50,7 +53,7 @@ public interface AbstractConcept extends Concept {
         /* activate concept */
         Concept targetConcept;
 
-        if (target instanceof Variable) {
+        if (!linkable(target)) {
             targetConcept = null;
         } else {
             targetConcept = nar.activate(target, b,
@@ -76,6 +79,18 @@ public interface AbstractConcept extends Concept {
         return targetConcept;
     }
 
+    static boolean linkable(Termed target) {
+        Term x = target.term();
+        if (x instanceof Variable) {
+            return false;
+        } else if (x instanceof Compound) {
+            if (x.op() == Op.NEG) {
+                if (((Compound) x).term(0) instanceof Variable)
+                    return false;
+            }
+        }
+        return true;
+    }
 
 
     //    @Override @NotNull

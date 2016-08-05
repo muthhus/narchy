@@ -1,6 +1,7 @@
 package nars.index;
 
 import com.gs.collections.api.list.primitive.ByteList;
+import com.gs.collections.impl.factory.Maps;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
@@ -37,6 +38,7 @@ import static nars.$.unneg;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.term.Termed.termOrNull;
+import static nars.term.Terms.compoundOrNull;
 
 /**
  *
@@ -171,7 +173,7 @@ public interface TermIndex {
         }
 
         //no variables that could be substituted, so return this constant
-        if (src.vars() + src.varPattern() == 0)
+        if (f instanceof PremiseEval && src.vars() + src.varPattern() == 0) //shortcut for premise evaluation matching
             return src;
 
         int len = src.size();
@@ -383,15 +385,17 @@ public interface TermIndex {
                 return null;
             }*/
 
+            if (!(t2 instanceof Compound))
+                return null;
 
             ((GenericCompound) t2).setNormalized();
             r = (Compound) t2;
 
         } else {
-            r = t.term();
+            r = compoundOrNull(t);
         }
 
-        if (insert) {
+        if (r!=null && insert) {
             Compound s = (Compound) termOrNull(get(r, true));
             return s == null ? r : s; //if a concept does not exist and was not created, return the key
         } else {
@@ -527,11 +531,11 @@ public interface TermIndex {
             Termed prenormalized = term;
 
             if (!((term = normalize(term, false)) instanceof Compound))
-                throw new InvalidConceptException(prenormalized, "Failed normalization, becoming: " + term);
+                throw new InvalidConceptException(prenormalized, "Failed normalization");
 
             Term aterm = atemporalize((Compound) term);
             if (!(aterm instanceof Compound))
-                throw new InvalidConceptException(term, "Failed atemporalization, becoming: " + aterm);
+                throw new InvalidConceptException(term, "Failed atemporalization");
 
             if (aterm instanceof Concept) {
                 return (Concept) aterm;
@@ -567,6 +571,10 @@ public interface TermIndex {
     @Nullable
     default Term remap(@NotNull Term src, Map<Term, Term> m) {
         return termOrNull(resolve(src, new MapSubst(m)));
+    }
+    @Nullable
+    default Term remap(@NotNull Term src, Term from, Term to) {
+        return remap(src, Maps.mutable.of(from, to));
     }
 
     default void remove(Termed entry) {

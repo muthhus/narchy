@@ -344,7 +344,7 @@ public abstract class TermBuilder {
             return t;
 
         } else {
-            if ((t instanceof Compound) || (t.op() == VAR_PATTERN)) {
+            if ((t instanceof Compound) || (t.op().var)) {
                 return finish(NEG, t);
             } else {
                 return False;

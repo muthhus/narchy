@@ -47,9 +47,7 @@ public class ArithmeticInduction implements Consumer<Task> {
     private boolean trace = false;
 
     public ArithmeticInduction(NAR nar) {
-        this(nar, (t) -> {
-            nar.inputLater(t);
-        });
+        this(nar, nar::inputLater);
         nar.onTask(this);
     }
 
@@ -78,6 +76,7 @@ public class ArithmeticInduction implements Consumer<Task> {
         }
         return s;
     }
+
     public static RangeSet<Integer> ranges(List<Term> term) {
         TreeRangeSet<Integer> r = TreeRangeSet.create();
         for (Term x : term) {

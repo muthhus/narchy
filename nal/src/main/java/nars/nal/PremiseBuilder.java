@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+import static nars.concept.AbstractConcept.linkable;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -114,7 +115,7 @@ public enum PremiseBuilder {
 
         Task belief = null;
 
-        if (termLinkTerm instanceof Compound) { //atomic concepts will have no beliefs to match
+        if (linkable(termLinkTerm)) { //atomic concepts will have no beliefs to match
 
             Concept beliefConcept = nar.concept(termLinkTerm);
             if (beliefConcept != null) {

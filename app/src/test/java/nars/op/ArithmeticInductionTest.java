@@ -7,13 +7,12 @@ import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.obj.Termject;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 
-/**
- * Created by me on 7/20/16.
- */
+
 public class ArithmeticInductionTest {
 
     @Test public void testNew() {
@@ -44,7 +43,7 @@ public class ArithmeticInductionTest {
     @Test
     public void test2() {
         //should find only one pattern
-        test("((x,1) && (x,2))", "((x,$1)&&(intRange,$1,1,1))");
+        test("((x,1) && (x,2))", "((x,$1)&&(intRange,$1,1,1))", true);
     }
     @Test
     public void test3() {
@@ -84,5 +83,17 @@ public class ArithmeticInductionTest {
         t.believe(input).test();
 
     }
-
+//    void test(Compound input, Compound expected, boolean log) {
+//
+//        TestNAR t = test()
+//                .mustOutput()
+//                .mustBelieve(cycles, expected, 1f, 0.9f);
+//
+//        if (log)
+//            t.log();
+//
+//        t.nar.believe(input);
+//        t.test();
+//
+//    }
 }
