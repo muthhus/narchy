@@ -20,6 +20,7 @@ import static nars.nal.Tense.ETERNAL;
 public class BeliefTableChart extends Surface {
 
     public static final float baseTaskSize = 0.05f;
+    public static final float CROSSHAIR_THICK = 3;
     final Termed term;
     final TruthWave beliefs;
     final TruthWave beliefProj;
@@ -42,7 +43,7 @@ public class BeliefTableChart extends Surface {
      * draw additional projection wave to show truthpolation values for a set of evenly spaced points on the visible range
      */
     private boolean drawProjections = false;
-    private boolean showEternal = false;
+    @Deprecated private boolean showEternal = false;
 
     long[] range;
 
@@ -177,6 +178,10 @@ public class BeliefTableChart extends Surface {
         gl.glColor3f(0,0,0); //background
         Draw.rect(gl, 0,0, 1, 1);
 
+        gl.glLineWidth(1f);
+        gl.glColor3f(0.5f,0.5f,0.5f); //border
+        Draw.rectStroke(gl, 0,0, 1, 1);
+
         Concept cc = nar.concept(term);
         if (cc != null) {
             draw(term, cc, gl, minT, maxT);
@@ -216,28 +221,27 @@ public class BeliefTableChart extends Surface {
     };
 
 
-    public void drawCrossHair(GL2 gl, float gew, float geh, Truth truth, double theta) {
-        float w = 3;
-        gl.glLineWidth(w);
+    public void drawCrossHair(GL2 gl, float x, float gew, Truth truth, double theta) {
+        gl.glLineWidth(CROSSHAIR_THICK);
 
         float conf = truth.conf();
 
 
-        float bcx = eternalX(gew, 0, w, conf);
-        float bcy = yPos(truth.freq(), geh, w);
+        float bcy = yPos(truth.freq(), 1);
 
         //ge.strokeLine(bcx, border, bcx, geh - border);
         //ge.strokeLine(border, bcy, gew - border, bcy);
-        double r = gew * (0.15 + (0.2 * conf));
+        double r = gew * (0.5f + 0.5f * conf);
+
 
         double dx0 = Math.cos(theta) * r;
         double dy0 = Math.sin(theta) * r;
-        Draw.line(gl, dx0 + bcx, dy0 + bcy, -dx0 + bcx, -dy0 + bcy);
+        Draw.line(gl, dx0 + x, dy0 + bcy, -dx0 + x, -dy0 + bcy);
 
         double hpi = PI / 2.0;
         double dx1 = Math.cos(theta + hpi) * r;
         double dy1 = Math.sin(theta + hpi) * r;
-        Draw.line(gl, dx1 + bcx, dy1 + bcy, -dx1 + bcx, -dy1 + bcy);
+        Draw.line(gl, dx1 + x, dy1 + bcy, -dx1 + x, -dy1 + bcy);
     }
 
 
@@ -251,13 +255,16 @@ public class BeliefTableChart extends Surface {
         if (c == null)
             return;
 
+        float nowX = xTime(minT, maxT, now);
+
         //Present axis line
         if ((now <= maxT) && (now >= minT)) {
-            float nowLineWidth = 0.005f;
-            float nx = xTime(minT, maxT, now);
 
             gl.glColor4f(1f, 1f, 1f, 0.5f);
-            Draw.rect(gl, nx - nowLineWidth / 2f, 0, nowLineWidth, 1);
+            Draw.line(gl, nowX, 0, nowX, 1);
+
+            //float nowLineWidth = 0.005f;
+            //Draw.rect(gl, nowX - nowLineWidth / 2f, 0, nowLineWidth, 1);
         }
 
         /** drawn "pixel" dimensions*/
@@ -276,9 +283,9 @@ public class BeliefTableChart extends Surface {
         }
 
         Truth bc = wave.current;
-        if (bc != null && showEternal) {
+        if (bc != null) {
             float theta;
-            float dTheta = bc.motivation() * angleSpeed;
+            float dTheta = (bc.expectation()-0.5f) * angleSpeed;
             if (beliefOrGoal) {
                 this.beliefTheta += dTheta;
                 theta = beliefTheta;
@@ -288,7 +295,8 @@ public class BeliefTableChart extends Surface {
                 theta = goalTheta;
                 gl.glColor4f(0f, 1f, 0, 0.2f + 0.8f * bc.conf());
             }
-            drawCrossHair(gl, 1, 1, bc, theta);
+            float chSize = 0.1f;
+            drawCrossHair(gl, nowX, chSize, bc, theta);
         }
 
     }
@@ -312,13 +320,13 @@ public class BeliefTableChart extends Surface {
             }
 
             if(eh==eh) {
-                r.renderTask(gl, qua, conf, pw, ph, x, yPos(freq, eh, ph));
+                r.renderTask(gl, qua, conf, pw, ph, x, yPos(freq, eh));
             }
         });
     }
 
-    private static float yPos(float f, float eh,  /* margin */ float dh /* drawn object height, padding */) {
-        return (eh - dh) * (f);
+    private static float yPos(float f, float eh /* drawn object height, padding */) {
+        return (eh) * (f);
     }
 
     private static float eternalX(float width, float b, float w, float cc) {

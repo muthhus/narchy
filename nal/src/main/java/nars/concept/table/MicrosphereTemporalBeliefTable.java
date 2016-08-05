@@ -180,16 +180,15 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         for (int i = 0; i < n; i++) {
 
             Task ii = get(i);
-            @Nullable long[] iiev = ii.evidence();
             if (toMergeWith != null &&
                     ((!Param.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE &&
-                            (/*Stamp.isCyclic(iiev) || */Stamp.overlapping(mergeEvidence, iiev))
+                            (/*Stamp.isCyclic(iiev) || */Stamp.overlapping(mergeEvidence, ii.evidence()))
                     )))
                 continue;
 
             //consider ii for being the weakest ranked task to remove
-            float r = rank(ii, now, now) *
-                    (toMergeWith!=null ? (1f / (1f + Math.abs(ii.freq()-toMergeWith.freq()))) : 1f); //prefer close freq match
+            float r = rank(ii, now, now);
+                    //(toMergeWith!=null ? (1f / (1f + Math.abs(ii.freq()-toMergeWith.freq()))) : 1f); //prefer close freq match
             if (r < weakestRank) {
                 weakestRank = r;
                 weakest = ii;

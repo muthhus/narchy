@@ -62,7 +62,7 @@ public class CrosshairSurface extends Surface implements MouseListener {
         gl.glColor4f(r, g, b, 0.6f);
 
         gl.glLineWidth(4f);
-        Draw.strokeRect(gl, smx-cw/2f, smy-ch/2f, cw, ch);
+        Draw.rectStroke(gl, smx-cw/2f, smy-ch/2f, cw, ch);
 
         float hl = 1.25f; //cross hair length
         Draw.line(gl, smx, smy-ch*hl, smx, smy+ch*hl);

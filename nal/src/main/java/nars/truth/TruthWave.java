@@ -51,6 +51,7 @@ public class TruthWave {
     public void set(@NotNull BeliefTable b, long now) {
         int s = b.size();
         if (s == 0) {
+            this.current = null;
             clear();
             return;
         }

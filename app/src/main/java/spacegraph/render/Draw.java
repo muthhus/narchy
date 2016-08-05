@@ -400,7 +400,7 @@ public enum Draw {
         gl.glEnd();
     }
 
-    public static void strokeRect(GL2 gl, float x1, float y1, float w, float h) {
+    public static void rectStroke(GL2 gl, float x1, float y1, float w, float h) {
         line(gl, x1, y1, x1 + w, y1);
         line(gl, x1, y1, x1, y1 + h);
         line(gl, x1, y1 + h, x1 + w, y1 + h);

@@ -202,9 +202,9 @@ public class Arkancide extends NAREnvironment {
         nar.derivedActivation.setValue(0.1f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
+        nar.beliefConfidence(0.7f);
+        nar.goalConfidence(0.7f);
+        nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;

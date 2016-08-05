@@ -405,7 +405,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
             //border
             gl.glColor4f(1f, 1f, 1f, 1f);
-            Draw.strokeRect(gl, 0, 0, tw + dw, th + dh);
+            Draw.rectStroke(gl, 0, 0, tw + dw, th + dh);
         }
 
 

@@ -23,7 +23,7 @@ public class MotorConcept extends WiredConcept  {
     final int decisionDT = 0;
 
     /** relative temporal delta time for feedback occurrence */
-    final int feedbackDT = 0;
+    final int feedbackDT = 1;
 
 
 

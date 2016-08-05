@@ -43,7 +43,7 @@ public abstract class Param extends Container implements Level {
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public static final MutableInteger compoundVolumeMax = new MutableInteger(128);
+    public static final MutableInteger compoundVolumeMax = new MutableInteger(96);
 
     /**
      * maximum changes logged in deriver's stack
@@ -98,7 +98,7 @@ public abstract class Param extends Container implements Level {
     /**
      * upper limit for # of termutations derived, determined by premise's priority
      */
-    public static float matchTermutationsMax = 6;
+    public static float matchTermutationsMax = 3;
     public static int QUERY_ANSWERS_PER_MATCH = 1;
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 
@@ -111,20 +111,20 @@ public abstract class Param extends Container implements Level {
     /**
      * if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression
      */
-    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE;
+    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = true;
 
-    /**
-     * relates time and evidence (confidence); how past and future beliefs decay in rank
-     * across time; width of the temporal focus relative to the min/max occurrence times
-     * of tasks contained in the belief table
-     */
-    public static final float TEMPORAL_DURATION = 0.9f;
+//    /**
+//     * relates time and evidence (confidence); how past and future beliefs decay in rank
+//     * across time; width of the temporal focus relative to the min/max occurrence times
+//     * of tasks contained in the belief table
+//     */
+//    public static final float TEMPORAL_DURATION = 0.9f;
 
     /**
      * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
      * see: the microsphere interpolation paper for analysis on this parameter
      */
-    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1f;
+    public static float TEMPORAL_MICROSPHERE_EXPONENT = 2f;
 
 
 
