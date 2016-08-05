@@ -98,7 +98,8 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     }
 
 
-    private final BudgetMerge mergeDefault = BudgetMerge.plusBlend;
+    /** use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process */
+    private final BudgetMerge mergeDefault = BudgetMerge.avgBlend;
 
 
 

@@ -571,7 +571,7 @@ public abstract class TermBuilder {
 
                 case IMPL:
                     if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
-                        if (subject.isAny(TermIndex.InvalidImplicationPredicate))
+                        if (subject.isAny(TermIndex.InvalidImplicationSubject))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
                         if (predicate.isAny(TermIndex.InvalidImplicationPredicate))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");

@@ -21,6 +21,9 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import nars.vision.SwingCamera;
+import org.jetbrains.annotations.Nullable;
+import spacegraph.Facial;
+import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.ControlSurface;
 import spacegraph.obj.GridSurface;
@@ -31,12 +34,14 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.t;
+import static nars.gui.NARSpace.newConceptWindow;
 import static nars.vision.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
     private static final int cyclesPerFrame = 64;
+    public static final int runFrames = 100000;
     final Arkanoid noid;
     private final SwingCamera cam;
 
@@ -44,14 +49,14 @@ public class Arkancide extends NAREnvironment {
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 24;
-    final int visH = 18;
+    final int visW = 32;
+    final int visH = 24;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 16;
+    private int visionSyncPeriod = 32;
     float noiseLevel = 0;
 
-    float paddleSpeed = 40f;
+    float paddleSpeed = 50f;
     private float prevScore;
 
     public class View {
@@ -122,26 +127,23 @@ public class Arkancide extends NAREnvironment {
         });
 
 
-        actions.add(motorLeftRight = new MotorConcept("(leftright)", nar));
+        actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b,d)->{
+
+            noid.paddle.move((motorLeftRight.goals().expectation(now) - 0.5f) * paddleSpeed);
+            return d;
+            //return $.t((float)(noid.paddle.x / noid.SCREEN_WIDTH), 0.9f);
+
+            //@Nullable Truth tNow = motorLeftRight.goals().truth(now);
+            //if (tNow!=null)
+                //noid.paddle.set(tNow.freq());
+
+            //return $.t(noid.paddle.moveTo(d.freq(), paddleSpeed), 0.9f);
+        }));
 
         //view.attention.add(nar.inputActivation);
         //view.attention.add(nar.derivedActivation);
 
-        long[] btRange = new long[2];
-        nar.onFrame(nn -> {
-            long window = 1500;
-            long now = nn.time();
-            btRange[0] = now - window;
-            btRange[1] = now + window;
-        });
-        List<Surface> actionTables = actions.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
-        actionTables.add(new BeliefTableChart(nar,happy, btRange));
-
-        //sample sensors
-        for (int i = 0; i < 4; i++) {
-            actionTables.add(new BeliefTableChart(nar, ss[1+i][1+i], btRange));
-        }
-
+        newBeliefChart(this, 500);
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
@@ -149,6 +151,24 @@ public class Arkancide extends NAREnvironment {
                 camView
         );
 
+        //newConceptWindow((Default) n, 64, 4);
+
+    }
+
+    public static void newBeliefChart(NAREnvironment narenv, long window) {
+        NAR nar = narenv.nar;
+        long[] btRange = new long[2];
+        nar.onFrame(nn -> {
+            long now = nn.time();
+            btRange[0] = now - window;
+            btRange[1] = now + window;
+        });
+        List<Surface> actionTables = narenv.actions.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
+        actionTables.add(new BeliefTableChart(nar, narenv.happy, btRange));
+
+
+
+        new SpaceGraph().add(new Facial(new GridSurface(VERTICAL, actionTables)).maximize()).show(800,600);
     }
 
     private float noise(float v) {
@@ -160,9 +180,9 @@ public class Arkancide extends NAREnvironment {
 
     @Override
     protected float act() {
-        long now = nar.time();
         cam.update();
-        noid.paddle.move((motorLeftRight.goals().expectation(now) - 0.5f) * paddleSpeed);
+
+
         float nextScore = noid.next();
         float reward = nextScore - prevScore;
         this.prevScore = nextScore;
@@ -172,24 +192,24 @@ public class Arkancide extends NAREnvironment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Param.CONCURRENCY_DEFAULT = 1;
+        Param.CONCURRENCY_DEFAULT = 2;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                8, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 9 * 10000000, false)
+                4, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
                 , new FrameClock());
-        nar.inputActivation.setValue(0.005f);
-        nar.derivedActivation.setValue(0.004f);
+        nar.inputActivation.setValue(0.1f);
+        nar.derivedActivation.setValue(0.1f);
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.9f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.4f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.1f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -223,8 +243,8 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 4);
 
         new ArithmeticInduction(nar);
 
@@ -232,7 +252,7 @@ public class Arkancide extends NAREnvironment {
 
         Arkancide t = new Arkancide(nar);
 
-        t.run(35000, 0);
+        t.run(runFrames, 0);
 
         //nar.index.print(System.out);
         NAR.printTasks(nar, true);

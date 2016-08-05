@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Random;
 
 import static nars.$.t;
+import static nars.experiment.arkanoid.Arkancide.newBeliefChart;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.VERTICAL;
@@ -49,7 +50,7 @@ public class Tetris2 extends NAREnvironment {
         Param.CONCURRENCY_DEFAULT = 2;
     }
 
-    public static final int runFrames = 10000;
+    public static final int runFrames = 1000;
     public static final int cyclesPerFrame = 64;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -60,16 +61,16 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private int visionSyncPeriod = 16;
+    private int visionSyncPeriod = 32;
 
     public class View {
-        public BagChart<Concept> conceptChart;
+
         public TetrisVisualizer vis;
         public Surface plot1;
         public ConsoleSurface term = new ConsoleSurface(40, 8);
 
         public MatrixView camView;
-        public Plot2D lstm;
+        //public Plot2D lstm;
     }
 
     final View view = new View();
@@ -208,7 +209,7 @@ public class Tetris2 extends NAREnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.12f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -287,39 +288,39 @@ public class Tetris2 extends NAREnvironment {
 
 
 
-                {
-                    List<FloatSupplier> li = new ArrayList();
-                    for (int i = 0; i < sensors.size(); i++) {
-                        li.add(sensors.get(i).getInput());
-                    }
-
-                    List<FloatSupplier> lo = new ArrayList();
-                    RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> rewardValue);
-                    lo.add(normReward);
+//                {
+//                    List<FloatSupplier> li = new ArrayList();
+//                    for (int i = 0; i < sensors.size(); i++) {
+//                        li.add(sensors.get(i).getInput());
+//                    }
+//
+//                    List<FloatSupplier> lo = new ArrayList();
+//                    RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> rewardValue);
+//                    lo.add(normReward);
+////
+////
+//                    LSTMPredictor lp = new LSTMPredictor(li, lo, 1);
+////
+//
+//                    double[] lpp = new double[2];
+//                    nar.onFrame(nn -> {
+//                        double[] p = lp.next();
+//                        System.arraycopy(p, 0, lpp, 0, p.length);
+//                        //System.out.println("LSTM: " + Texts.n4(p) + " , " + normReward.asFloat());
+//                    });
+//
+//                    view.lstm = new Plot2D(plotHistory, Plot2D.Line)
+//                            .add("Reward (actual)", () -> normReward.asFloat())
+//                            .add("Predicted", () -> lpp[0]);
 //
 //
-                    LSTMPredictor lp = new LSTMPredictor(li, lo, 1);
-//
-
-                    double[] lpp = new double[2];
-                    nar.onFrame(nn -> {
-                        double[] p = lp.next();
-                        System.arraycopy(p, 0, lpp, 0, p.length);
-                        //System.out.println("LSTM: " + Texts.n4(p) + " , " + normReward.asFloat());
-                    });
-
-                    view.lstm = new Plot2D(plotHistory, Plot2D.Line)
-                            .add("Reward (actual)", () -> normReward.asFloat())
-                            .add("Predicted", () -> lpp[0]);
-
-
-                }
+//                }
 
                 nar.onFrame(f -> {
                     plot.update();
                     plot2.update();
                     plot3.update();
-                    view.lstm.update();
+                    //view.lstm.update();
                     try {
                         view.term.term.putLinePre(summary());
                     } catch (IOException e) {
@@ -359,6 +360,7 @@ public class Tetris2 extends NAREnvironment {
 
                 newControlWindow(view);
 
+                newBeliefChart(this, 1500);
 
                 //NARSpace.newConceptWindow((Default) nar, 128, 8);
             }

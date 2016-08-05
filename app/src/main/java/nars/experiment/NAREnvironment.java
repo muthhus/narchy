@@ -8,6 +8,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
+import nars.task.Task;
 import nars.term.Term;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
@@ -44,7 +45,7 @@ abstract public class NAREnvironment {
     public final List<MotorConcept> actions = $.newArrayList();
 
     public float alpha, gamma, epsilon;
-    @Deprecated public static final float gammaEpsilonFactor = 0.25f;
+    @Deprecated public static final float gammaEpsilonFactor = 0.35f;
 
     public float rewardValue;
     private final FasterList<MutableTask> predictors = $.newArrayList();
@@ -63,7 +64,7 @@ abstract public class NAREnvironment {
                 //gamma
         ;
 
-        epsilon = 0.1f;
+        epsilon = 0.05f;
         this.reinforcementAttention = gamma;
 
         reward = new FuzzyConceptSet(
@@ -208,10 +209,22 @@ abstract public class NAREnvironment {
 
             for (MotorConcept c : actions) {
                 if (Math.random() < epsilon) {
-                    nar.inputLater(new MutableTask(c, '!',
-                            nar.random.nextFloat()
+                    nar.inputLater(new GeneratedTask(c, '!',
+                            $.t(nar.random.nextFloat()
                             //Math.random() > 0.5f ? 1f : 0f
-                            , gamma * gammaEpsilonFactor).
+                            , gamma * gammaEpsilonFactor)) {
+                        @Override
+                        public boolean onConcept(@NotNull Concept c) {
+                            if (super.onConcept(c)) {
+                                //self-destruct later
+                                nar.runLater(()->{
+                                    delete();
+                                });
+                                return true;
+                            }
+                            return false;
+                        }
+                    }.
                             present(now).log("Curiosity"));
                 }
                 boost(c);

@@ -8,6 +8,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Symbols;
 import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
@@ -543,14 +544,18 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
             Task existing = tasks.putIfAbsent(input, input);
             if (existing != null) {
+                boolean budgetChange = false;
                 if (existing != input) {
-                    DuplicateMerge.merge(existing.budget(), input, 1f);
+                    if (!existing.equalsBudget(input)) {
+                        DuplicateMerge.merge(existing.budget(), input, 1f);
+                        budgetChange = true;
+                    }
                     input.delete(DUPLICATE_BELIEF_GOAL);
                 }
 
                 //checkConsistency(); //TEMPORARY =-=============
 
-                return null;
+                return budgetChange ? existing : null; //return existing if budget changed to reactivate links
             }
 
 

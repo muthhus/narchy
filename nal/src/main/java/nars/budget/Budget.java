@@ -97,6 +97,7 @@ public interface Budget extends Budgeted {
     }
 
 
+
     final static class BudgetException extends RuntimeException {
         public BudgetException() {
             super();
@@ -181,12 +182,6 @@ public interface Budget extends Budgeted {
     }
 
     public abstract void _setQuality(float q);
-
-    default boolean equalsByPrecision(@NotNull Budget t, float epsilon) {
-        return Util.equals(pri(), t.pri(), epsilon) &&
-                Util.equals(dur(), t.dur(), epsilon) &&
-                Util.equals(qua(), t.qua(), epsilon);
-    }
 
     /**
      * Increase priority value by a percentage of the remaining range.

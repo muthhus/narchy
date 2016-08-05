@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
+import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.UtilityFunctions.and;
 import static nars.truth.TruthFunctions.projection;
 
@@ -49,8 +50,8 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
     public static float rank(@NotNull Task t, long when, long now) {
-        //return rankTemporalByConfidenceAndOriginality(t, when, now, ageFactor, -1);
-        return rankTemporalByConfidence(t, when, now, -1);
+        return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
+        //return rankTemporalByConfidence(t, when, now, -1);
     }
 
     @Override
@@ -182,12 +183,13 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             @Nullable long[] iiev = ii.evidence();
             if (toMergeWith != null &&
                     ((!Param.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE &&
-                            (Stamp.isCyclic(iiev) || Stamp.overlapping(mergeEvidence, iiev))
+                            (/*Stamp.isCyclic(iiev) || */Stamp.overlapping(mergeEvidence, iiev))
                     )))
                 continue;
 
             //consider ii for being the weakest ranked task to remove
-            float r = rank(ii, now, now);
+            float r = rank(ii, now, now) *
+                    (toMergeWith!=null ? (1f / (1f + Math.abs(ii.freq()-toMergeWith.freq()))) : 1f); //prefer close freq match
             if (r < weakestRank) {
                 weakestRank = r;
                 weakest = ii;

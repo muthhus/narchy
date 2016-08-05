@@ -93,12 +93,13 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
 
-    public void add(Facial c) {
+    public SpaceGraph add(Facial c) {
         if (window == null) {
             preAdd.add(c);
         } else {
             _add(c);
         }
+        return this;
     }
 
     void _add(Facial c) {

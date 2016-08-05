@@ -174,7 +174,6 @@ public interface BeliefTable extends TaskTable {
             long dt = Math.abs(t.occurrence() - now) + Math.abs(when - now);
 
             float relevance = relevance(dt, 1f);
-            relevance = relevance * relevance; //pow2 sharpening curve, defining a temporal focus shape that is stronger closer to now
 
             float rank = c * relevance;
             //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);

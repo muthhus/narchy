@@ -177,7 +177,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 //{ return a.term().toString().compareTo(b.term().toString()); }
                 //sort by confidence (descending)
         {
-            return Float.compare(b.conf(), a.conf());
+            int i = Float.compare(b.conf(), a.conf());
+            if (i == 0 && a!=b) {
+                return b.compareTo(a); //equal conf but different task
+            }
+            return i;
         }
         );
         n.forEachActiveConcept(c -> {
@@ -565,31 +569,22 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //decides if TaskProcess was successful in somehow affecting its concept's state
         if (inputted != null && !inputted.isDeleted()) {
 
-            if (clock instanceof FrameClock) {
+            if ((input == inputted) && (clock instanceof FrameClock)) {
                 //HACK for unique serial number w/ frameclock
                 ((FrameClock) clock).ensureStampSerialGreater(inputted.evidence());
             }
 
 
-
             //propagate budget
             MutableFloat overflow = new MutableFloat();
-            {
-                activate(c, inputted, conceptActivation, linkActivation, overflow);
-                emotion.busy(cost);
-            }
-
+            activate(c, inputted, conceptActivation, linkActivation, overflow);
+            emotion.busy(cost);
             emotion.stress(overflow);
 
-            //try {
-                if (input == inputted)
-                    input.onConcept(c);
-//            } catch (Budget.BudgetException e) {
-//                //TODO this shouldn't be allowed
-//                logger.error("{}", e.toString());
-//            }
-
-            eventTaskProcess.emit(inputted); //signal any additional processes
+            if (input == inputted) {
+                input.onConcept(c);
+                eventTaskProcess.emit(inputted); //signal any additional processes
+            }
 
         } else {
             emotion.frustration(cost);

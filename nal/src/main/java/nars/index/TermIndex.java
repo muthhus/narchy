@@ -92,6 +92,7 @@ public interface TermIndex {
     /**
      * equivalences and intervals (not implications, they are allowed
      */
+    int InvalidImplicationSubject = or(EQUI, IMPL);
     int InvalidImplicationPredicate = or(EQUI);
 
 

@@ -1,6 +1,8 @@
 package nars.budget;
 
 import nars.Memory;
+import nars.Param;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.budget.Budget.aveGeo;
@@ -74,6 +76,16 @@ public interface Budgeted  {
 
     float dur();
 
+
+    default boolean equalsBudget(@NotNull Budgeted t, float epsilon) {
+        return Util.equals(pri(), t.pri(), epsilon) &&
+                Util.equals(dur(), t.dur(), epsilon) &&
+                Util.equals(qua(), t.qua(), epsilon);
+    }
+
+    default boolean equalsBudget(Budgeted b) {
+        return equalsBudget(b, Param.BUDGET_EPSILON);
+    }
 
 
 }

@@ -19,7 +19,7 @@ import static nars.nal.Tense.ETERNAL;
 
 public class BeliefTableChart extends Surface {
 
-    public static final float baseTaskSize = 0.1f;
+    public static final float baseTaskSize = 0.05f;
     final Termed term;
     final TruthWave beliefs;
     final TruthWave beliefProj;
@@ -124,9 +124,9 @@ public class BeliefTableChart extends Surface {
     protected void paint(GL2 gl) {
 
 
-        if (!redraw.compareAndSet(true, false)) {
+        /*if (!redraw.compareAndSet(true, false)) {
             return;
-        }
+        }*/
 
         //swapBuffers();
 
@@ -298,8 +298,8 @@ public class BeliefTableChart extends Surface {
 
             boolean eternal = (o != o);
             float eh, x;
-            float pw = baseTaskSize + gew / (1f / conf) / 4f;//10 + 10 * conf;
-            float ph = baseTaskSize + geh / (1f / conf) / 4f;//10 + 10 * conf;
+            float pw = baseTaskSize;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
+            float ph = baseTaskSize;// + geh / (1f / conf) / 4f;//10 + 10 * conf;
 
             if (showEternal && eternal) {
                 eh = geh;

@@ -58,7 +58,7 @@ public class CurveBagTest  {
 
         assertEquals(0, c.priMin(), 0.001f);
 
-        assertTrue(UnitBudget.Zero.equalsByPrecision( c.get("x"), 0.01f) );
+        assertTrue(UnitBudget.Zero.equalsBudget( c.get("x"), 0.01f) );
 
     }
 
@@ -72,7 +72,7 @@ public class CurveBagTest  {
 
 
         BLink<String> agx = a.get("x");
-        assertTrue(new UnitBudget(0.2f, 0.5f, 0.5f).equalsByPrecision(
+        assertTrue(new UnitBudget(0.2f, 0.5f, 0.5f).equalsBudget(
                 agx, 0.01f));
 
     }

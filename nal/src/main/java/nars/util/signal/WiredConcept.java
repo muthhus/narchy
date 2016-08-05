@@ -34,8 +34,8 @@ import java.util.function.BiPredicate;
 public abstract class WiredConcept extends CompoundConcept<Compound> implements Runnable {
 
     protected final NAR nar;
-    int beliefCapacity = 16;
-    int goalCapacity = 16;
+    int beliefCapacity = 24;
+    int goalCapacity = 24;
 
     @NotNull final private AtomicBoolean pendingRun = new AtomicBoolean(false);
 
@@ -45,7 +45,7 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
         this.nar = n;
     }
 
-    @Nullable protected Task process(@NotNull Task t, @NotNull BeliefTable table, @NotNull BiPredicate<Task,NAR> valid, @NotNull NAR nar, @NotNull List<Task> displaced) {
+    @Nullable protected Task filter(@NotNull Task t, @NotNull BeliefTable table, @NotNull BiPredicate<Task,NAR> valid, @NotNull NAR nar, @NotNull List<Task> displaced) {
 
         if (!table.isEmpty() /*&& ((DefaultBeliefTable)beliefs()).temporal.isFull()*/) {
             //try to remove at least one past belief which did not originate from this sensor
@@ -80,13 +80,13 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
 
     /** NOTE: if validBelief always returns true, then this can be bypassed by overriding with blank method */
     public @Nullable Task filterBeliefs(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
-        t = process(t, beliefs(), this::validBelief, nar, displaced);
+        t = filter(t, beliefs(), this::validBelief, nar, displaced);
         return t;
     }
 
     /** NOTE: if validGoal always returns true, then this can be bypassed by overriding with blank method */
     public @Nullable Task filterGoals(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
-        t = process(t, goals(), this::validGoal, nar, displaced);
+        t = filter(t, goals(), this::validGoal, nar, displaced);
         return t;
     }
 

@@ -3,12 +3,15 @@ package nars.util.signal;
 import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
+import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 import static nars.$.$;
 
@@ -26,6 +29,10 @@ public class MotorConcept extends WiredConcept  {
 
     private final float feedbackPriority;
     private final float feedbackDurability;
+
+    private Task lastFeedback = null;
+
+    float feedbackResolution = 0.05f;
 
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept
@@ -72,6 +79,9 @@ public class MotorConcept extends WiredConcept  {
         this.feedbackDurability = n.durabilityDefault(Symbols.GOAL /* though these will be used for beliefs */);
         this.motor = motor;
 
+        nar.onFrame(nn->{
+            run();
+        });
     }
 
     @Override
@@ -108,7 +118,7 @@ public class MotorConcept extends WiredConcept  {
     @Override
     protected final boolean runLater(@NotNull Task t, @NotNull NAR nar) {
         //return hasGoals();
-        return true;
+        return false; //will run automatically each frame, as set in constructor
     }
 
 
@@ -122,19 +132,27 @@ public class MotorConcept extends WiredConcept  {
 
 
     @Override
-    protected final void update() {
+    protected synchronized final void update() {
+
+        if (!hasGoals())
+            return;
 
         long now = nar.time();
         @Nullable Truth d = this.desire(now+ decisionDT);
         @Nullable Truth b = this.belief(now+ decisionDT);
 
         Truth feedback = motor.motor(b, d);
-        if (feedback!=null)
-            nar.inputLater(feedback(feedback, now));
+        if (feedback!=null) {
+            Task next = feedback(feedback, now);
+            if (lastFeedback==null || !lastFeedback.equalsTruth(next, feedbackResolution)) { //if feedback is different from last
+                lastFeedback = next;
+                nar.input(next);
+            }
+        }
     }
 
     protected final Task feedback(Truth t, long when) {
-        return new MutableTask(this, Symbols.BELIEF, t)
+        return new GeneratedTask(this, Symbols.BELIEF, t)
                 .time(when, when+ feedbackDT)
                 .budget(feedbackPriority, feedbackDurability)
                 .log("Motor Feedback");

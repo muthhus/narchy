@@ -20,7 +20,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public static final int BLOCK_TOP_MARGIN = 15;
 
 	public static final double BALL_RADIUS = 10.0;
-	public static final double BALL_VELOCITY = 1.5;
+	public static final double BALL_VELOCITY = 2;
 
 	public static final double PADDLE_WIDTH = 60.0;
 	public static final double PADDLE_HEIGHT = 20.0;
@@ -147,6 +147,26 @@ public class Arkanoid extends JFrame implements KeyListener {
 			g.fillRect((int) (left()), (int) (top()), (int) sizeX, (int) sizeY);
 		}
 
+		public void set(float freq) {
+			x = freq * SCREEN_WIDTH;
+		}
+
+		public float moveTo(float target, float paddleSpeed) {
+			target *= SCREEN_WIDTH;
+
+			if (Math.abs(target-x) <= paddleSpeed) {
+				x = target;
+			} else if (target < x) {
+				x -= paddleSpeed;
+			} else {
+				x += paddleSpeed;
+			}
+
+			x = Math.min(x, SCREEN_WIDTH);
+			x = Math.max(x, 0);
+
+			return (float)(x/SCREEN_WIDTH);
+		}
 	}
 
 	class Brick extends Rectangle {
