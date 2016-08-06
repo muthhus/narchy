@@ -41,7 +41,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     private final NAR nar;
     private final Consumer<Collection<Task>> target;
-    boolean deleteOriginalTaskIfInducted = true;
+    boolean deleteOriginalTaskIfInducted = false;
 
     public static Logger logger = LoggerFactory.getLogger(ArithmeticInduction.class);
     private boolean trace = false;

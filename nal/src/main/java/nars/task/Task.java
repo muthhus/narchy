@@ -144,7 +144,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @Nullable
-    private static Compound test(@NotNull Term t, String reason, boolean safe) {
+    private static Compound test(@Nullable Term t, String reason, boolean safe) {
         if (safe)
             return null;
         else

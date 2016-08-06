@@ -39,14 +39,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     private float mass = 0;
 
     public ArrayBag(int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
-        super(BLink[]::new,
-
-                //new ConcurrentHashMapUnsafe<V, BLink<V>>(),
-                //new LinkedHashMap<>(cap),
-                map
-                //Global.newHashMap(cap),
-
-        );
+        super(BLink[]::new, map);
 
         this.mergeFunction = mergeFunction;
 
@@ -130,29 +123,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-    //    @Override public V put(V k, Budget b) {
-//        //TODO use Map.compute.., etc
-//
-//        BagBudget<V> v = getBudget(k);
-//
-//        if (v!=null) {
-//            v.set(b);
-//            return k;
-//        } else {
-//            index.put(k, b);
-//            return null;
-//        }
-//    }
-
-    //    protected CurveMap newIndex() {
-//        return new CurveMap(
-//                //new HashMap(capacity)
-//                Global.newHashMap(capacity()),
-//                //new UnifiedMap(capacity)
-//                //new CuckooMap(capacity)
-//                items
-//        );
-//    }
 
     @Override
     public @Nullable BLink<V> sample() {
@@ -164,97 +134,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public Bag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
         throw new RuntimeException("unimpl");
     }
-
-//    @NotNull
-//    @Override
-//    public Bag<V> filter(@NotNull Predicate<BLink> forEachIfFalseThenRemove) {
-//
-//        int n = items.size();
-//        BLink<V>[] l = items.array();
-//        if (n > 0) {
-//            for (int i = 0; i < n; i++) {
-//                BLink<V> h = l[i];
-//                if (!forEachIfFalseThenRemove.test(h)) {
-//                    removeKeyForValue(h); //only remove key, we remove the item here
-//                    h.delete();
-//                    items.remove(i--);
-//                    n--;
-//                }
-//            }
-//        }
-//        return this;
-//    }
-
-    //    public void validate() {
-//        int in = ArrayTable.this.size();
-//        int is = items.size();
-//        if (Math.abs(is - in) > 0) {
-////                System.err.println("INDEX");
-////                for (Object o : index.values()) {
-////                    System.err.println(o);
-////                }
-////                System.err.println("ITEMS:");
-////                for (Object o : items) {
-////                    System.err.println(o);
-////                }
-//
-//            Set<V> difference = Sets.symmetricDifference(
-//                    new HashSet(((CollectorMap<V, L>) ArrayTable.this).values()),
-//                    new HashSet(items)
-//            );
-//
-//            System.err.println("DIFFERENCE");
-//            for (Object o : difference) {
-//                System.err.println("  " + o);
-//            }
-//
-//            throw new RuntimeException("curvebag fault: " + in + " index, " + is + " items");
-//        }
-//
-////            //test for a discrepency of +1/-1 difference between name and items
-////            if ((is - in > 2) || (is - in < -2)) {
-////                System.err.println(this.getClass() + " inconsistent index: items=" + is + " names=" + in);
-////                /*System.out.println(nameTable);
-////                System.out.println(items);
-////                if (is > in) {
-////                    List<E> e = new ArrayList(items);
-////                    for (E f : nameTable.values())
-////                        e.remove(f);
-////                    System.out.println("difference: " + e);
-////                }*/
-////                throw new RuntimeException(this.getClass() + " inconsistent index: items=" + is + " names=" + in);
-////            }
-//    }
-
-    //    /**
-//     * Get an Item by key
-//     *
-//     * @param key The key of the Item
-//     * @return The Item with the given key
-//     */
-//    @Override
-//    public V get(K key) {
-//        //TODO combine into one Map operation
-//        V v = index.get(key);
-//        if (v!=null && v.getBudget().isDeleted()) {
-//            index.remove(key);
-//            return null;
-//        }
-//        return v;
-//    }
-
-
-//    /**
-//     * Choose an Item according to priority distribution and take it out of the
-//     * Bag
-//     *
-//     * @return The selected Item, or null if this bag is empty
-//     */
-//    @Nullable
-//    @Override
-//    public BLink<V> pop() {
-//        throw new UnsupportedOperationException();
-//    }
 
 
     /**
@@ -318,10 +197,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //        return newLink(i, b, 1f);
 //    }
 
-    @NotNull
-    protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b, float scale) {
-        return newLink(i, scale * b.pri(), b.dur(), b.qua());
-    }
+//    @NotNull
+//    protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b, float scale) {
+//        return newLink(i, scale * b.pri(), b.dur(), b.qua());
+//    }
 
     @NotNull
     protected BLink<V> newLink(@NotNull V i, float p, float d, float q) {
@@ -359,11 +238,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         float r = 1f - (existing / (existing + pending));
 
-        if (r >= Param.BUDGET_EPSILON) {
-            return new Forget(r);
-        } else {
-            return null;
-        }
+        return r >= Param.BUDGET_EPSILON ? new Forget(r) : null;
     }
 
     private static final class Forget implements Consumer<BLink> {

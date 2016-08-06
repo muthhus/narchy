@@ -244,7 +244,7 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
 
         new ArithmeticInduction(nar);

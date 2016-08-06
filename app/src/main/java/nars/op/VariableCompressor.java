@@ -22,10 +22,11 @@ public class VariableCompressor implements Consumer<Task> {
 
     final int introductionThreshold =
             //3; //the cost of introducing a variable
-            7;
+            5;
 
     final int minCompressedComplexity = 3;
     private final NAR nar;
+    private boolean deleteOriginal = false;
 
     public VariableCompressor(NAR n) {
         this.nar = n;
@@ -74,7 +75,10 @@ public class VariableCompressor implements Consumer<Task> {
     }
 
     private void compress(Task task, Term max) {
-        Term var = $.varDep("c");
+        Term var =
+                //$.varDep("c");
+                $.varIndep("c");
+
         Compound<?> oldContent = task.term();
         Term newContent = $.terms.remap(oldContent, max, var);
         if (newContent != null) {
@@ -95,7 +99,8 @@ public class VariableCompressor implements Consumer<Task> {
                         @NotNull MutableTask tt = new GeneratedTask(newContent, task.punc(), task.truth()).evidence(task.evidence())
                                 .budget(task.budget());
 
-                        task.delete();
+                        if (deleteOriginal)
+                            task.delete();
 
                         nar.inputLater(tt.log(tag));
                     }

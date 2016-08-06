@@ -564,7 +564,20 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
 
-        Task inputted = c.process(input, this);
+        Task inputted;
+        try {
+            inputted = c.process(input, this);
+        } catch (Exception e) {
+            emotion.errr();
+
+            if (Param.DEBUG)
+                logger.warn("process error: {}", e.toString());
+
+            input.delete();
+
+            return null;
+        }
+
 
         //decides if TaskProcess was successful in somehow affecting its concept's state
         if (inputted != null && !inputted.isDeleted()) {
@@ -583,7 +596,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 emotion.errr();
 
                 if (Param.DEBUG)
-                    logger.warn("invalid input: {}", e.toString());
+                    logger.warn("activation error: {}", e.toString());
 
                 inputted.delete();
             }
