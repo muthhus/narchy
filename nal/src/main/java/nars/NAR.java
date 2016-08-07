@@ -525,6 +525,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         });
     }
 
+    protected Task preprocess(Task input) {
+        return input;
+    }
+
     /**
      * exposes the memory to an input, derived, or immediate task.
      * the memory then delegates it to its controller
@@ -542,7 +546,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         Concept c = null;
         //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {
-            c = input.normalize(this); //accept into input buffer for eventual processing
+            c = preprocess(input).normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
             emotion.errr();
             if (Param.DEBUG)
@@ -1365,10 +1369,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * but it will be reinforced via peer tasklinks activation.
      * (a normal duplicate task going through process() will not have this behavior.)
      */
-    public final void activate(@NotNull Task t, float scale) {
+    public final void activate(@NotNull Task t, float scale) /* throws InvalidConceptException.. */{
         @Nullable Concept concept = t.concept(this);
         if (concept == null)
-            throw new RuntimeException("task did not resolve to a concept: " + t);
+            throw new TermIndex.InvalidConceptException(t.term(), "task did not resolve to a concept");
+
         activate(concept, t, inputActivation.floatValue() * scale, scale, null);
     }
 

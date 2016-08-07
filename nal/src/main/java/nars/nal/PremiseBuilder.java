@@ -10,6 +10,7 @@ import nars.budget.policy.TaskBudgeting;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
+import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.task.AnswerTask;
@@ -21,6 +22,8 @@ import nars.term.Terms;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -45,6 +48,8 @@ import static nars.nal.Tense.ETERNAL;
  */
 public enum PremiseBuilder {
     ;
+
+    private static final Logger logger = LoggerFactory.getLogger(PremiseBuilder.class);
 
     /**
      * Main Entry point: begin matching the task half of a premise
@@ -127,9 +132,14 @@ public enum PremiseBuilder {
 
                     Task solution = table.match(task, now);
                     if (solution!=null) {
-                        Task answered = answer(nar, task, solution, beliefConcept);
-                        if (task.isQuestion())
-                            belief = answered;
+                        try {
+                            Task answered = answer(nar, task, solution, beliefConcept);
+                            if (task.isQuestion())
+                                belief = answered;
+                        } catch (TermIndex.InvalidConceptException e) {
+                            logger.warn("{}", e.getMessage());
+                        }
+
                     }
 
 

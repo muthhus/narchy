@@ -14,6 +14,7 @@ import nars.op.ArithmeticInduction;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.predict.LSTMPredictor;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.obj.Termject;
@@ -31,9 +32,7 @@ import spacegraph.obj.MatrixView;
 import spacegraph.obj.Plot2D;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static nars.$.t;
 import static nars.experiment.arkanoid.Arkancide.newBeliefChart;
@@ -198,19 +197,41 @@ public class Tetris2 extends NAREnvironment {
                 16, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
-                , new FrameClock());
+                , new FrameClock()) {
+
+            VariableCompressor c = new VariableCompressor(this);
+            ArithmeticInduction i = new ArithmeticInduction(this);
+
+            @Override
+            protected Task preprocess(Task input) {
+                input = c.tryCompress(input);
+                Set<Task> inputs = i.compress(input);
+                if (inputs.isEmpty()) {
+                    return input;
+                } else {
+                    Iterator<Task> ii = inputs.iterator();
+                    input = ii.next(); //directly input the first, queue any others
+                    while (ii.hasNext()) {
+                        inputLater(ii.next());
+                    }
+                    return input;
+                }
+            }
+
+        };
+
         nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.04f);
+        nar.derivedActivation.setValue(0.05f);
 
 
         nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.8f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.12f);
+        nar.confMin.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -247,8 +268,8 @@ public class Tetris2 extends NAREnvironment {
         MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
 
-        new ArithmeticInduction(nar);
-        new VariableCompressor(nar);
+        //new ArithmeticInduction(nar);
+        //new VariableCompressor(nar);
 
 
 

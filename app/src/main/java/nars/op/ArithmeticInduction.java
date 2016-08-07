@@ -48,7 +48,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     public ArithmeticInduction(NAR nar) {
         this(nar, nar::inputLater);
-        nar.onTask(this);
+        //nar.onTask(this);
     }
 
     public ArithmeticInduction(NAR nar, Consumer<Collection<Task>> target) {
@@ -126,6 +126,11 @@ public class ArithmeticInduction implements Consumer<Task> {
     @Override
     public void accept(Task in) {
 
+        compress(in);
+
+    }
+
+    public Set<Task> compress(Task in) {
         Set<Task> generated = new HashSet();
 
         if (!in.isBeliefOrGoal()) {
@@ -193,12 +198,10 @@ public class ArithmeticInduction implements Consumer<Task> {
             }
             if (deleteOriginalTaskIfInducted)
                 in.delete();
-            target.accept(generated);
+
         }
-
+        return generated;
     }
-
-
 
 
     protected void compress(Termed<Compound> b, Consumer<Term> each) {
