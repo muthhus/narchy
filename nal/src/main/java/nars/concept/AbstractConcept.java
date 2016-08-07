@@ -10,7 +10,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,35 +45,42 @@ public interface AbstractConcept extends Concept {
     /** returns the outgoing component only */
     @Nullable
     static Concept linkSub(@NotNull Concept source, @NotNull Termed target,
-                           @NotNull Budgeted b, float subScale, boolean alsoReverse,
-                           @Nullable MutableFloat conceptOverflow,
-                           @Nullable MutableFloat termlinkOverflow, @NotNull NAR nar) {
+                        float subScale,
+                        @Nullable NAR.Activation activation, NAR nar) {
 
         /* activate concept */
         Concept targetConcept;
 
-        if (!linkable(target)) {
+        @NotNull Term tt = target.term();
+
+        if (!linkable(tt)) {
             targetConcept = null;
         } else {
-            targetConcept = nar.activate(target, b,
-                    subScale,
-                    conceptOverflow);
-            if (targetConcept == null)
-                throw new RuntimeException("termlink to null concept: " + target);
+            targetConcept = nar.concept(tt, true);
+            if (targetConcept!=null)
+                activation.concepts.addToValue(targetConcept, subScale);
+//            targetConcept = nar.activate(target,
+//                    activation);
+            //if (targetConcept == null)
+                //throw new RuntimeException("termlink to null concept: " + target);
         }
 
-        if (target == source)
+        if (tt == source)
             throw new RuntimeException("termlink self-loop");
 
 
-        /* insert termlink target to source */
+//        /* insert termlink target to source */
+        boolean alsoReverse = true;
         if (targetConcept!=null && alsoReverse) {
-            subScale /= 2; //divide among both directions
-            targetConcept.termlinks().put(source.term(), b, subScale, termlinkOverflow);
+            //subScale /= 2; //divide among both directions
+
+            targetConcept.termlinks().put(source.term(), activation.in, subScale, activation.overflow);
         }
 
         /* insert termlink source to target */
-        source.termlinks().put(target.term(), b, subScale, termlinkOverflow);
+        source.termlinks().put(tt, activation.in, subScale, activation.overflow);
+
+
 
         return targetConcept;
     }

@@ -36,7 +36,6 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -169,32 +168,33 @@ public interface Concept extends Termed {
      *
      * @return whether the link successfully was completed
      */
-    default boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+    default boolean link(float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
 
+        Budgeted b = activation.in;
         if (b instanceof Task) {
             linkTask((Task)b, scale);
         }
 
-        linkAny(b, scale, minScale, nar, conceptOverflow);
+        linkAny(b, scale, minScale, nar, activation);
 
         return true;
     }
 
-    void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow);
+    void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation);
 
 
     void linkTask(@NotNull Task t, float scale);
 
 
 
-    default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+    default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, NAR.Activation activation) {
         float p = b.priIfFiniteElseNeg1();
         if (p < 0)
             return false;
 
-        return link(b, initialScale,
+        return link(initialScale,
                 nar.taskLinkThreshold.floatValue() / p, //minScale
-                nar, conceptOverflow);
+                nar, activation);
     }
 
     /**
@@ -210,9 +210,11 @@ public interface Concept extends Termed {
 
         float halfScale = scale / 2f;
 
-        link(otherTask, halfScale, nar, null);
+        NAR.Activation a = new NAR.Activation(thisTask, 1f);
+        link(otherTask, halfScale, nar, a);
+        a.run(nar);
 
-        other.link(thisTask, halfScale, nar, null);
+        //other.link(thisTask, halfScale, nar, null);
 
     }
 

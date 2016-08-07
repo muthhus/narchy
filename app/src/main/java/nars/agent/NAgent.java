@@ -515,7 +515,7 @@ public class NAgent implements Agent {
                     .budget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
         } else {
             //just reactivate the existing eternal
-            nar.activate(t);
+            //nar.activate(t);
         }
 
     }
@@ -523,7 +523,8 @@ public class NAgent implements Agent {
 
     public @Nullable Concept boost(Concept c) {
 
-        return nar.activate(c, UnitBudget.One, nar.inputActivation.floatValue() * reinforcementAttention, reinforcementAttention, null);
+        return c;
+        //return nar.activate(c, null);
     }
 
     final Set<Task> pendingInputTasks = new HashSet();

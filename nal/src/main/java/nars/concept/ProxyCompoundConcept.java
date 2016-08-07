@@ -12,7 +12,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.proxy.ProxyCompound;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -178,13 +177,13 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-        return target.link(b, scale, minScale, nar, conceptOverflow);
+    public boolean link(float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+        return target.link(scale, minScale, nar, activation);
     }
 
     @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-        target.linkAny(b, scale, minScale, nar, conceptOverflow);
+    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+        target.linkAny(b, scale, minScale, nar, activation);
     }
 
     @Override

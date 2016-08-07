@@ -67,7 +67,7 @@ public enum NARideRealtimeDefault {
                 Anticipate.class,
                 Inperience.class
         );
-        nar.with(new Abbreviation(nar, "is"));
+        //nar.with(new Abbreviation(nar, "is"));
         return nar;
     }
 }

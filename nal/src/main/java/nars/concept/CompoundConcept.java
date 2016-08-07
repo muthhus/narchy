@@ -5,10 +5,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Symbols;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
@@ -17,7 +15,6 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.link.TermLinkBuilder;
-import nars.nal.Tense;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.task.Task;
 import nars.term.Compound;
@@ -25,15 +22,12 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.container.TermSet;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
-
-import static nars.nal.Tense.ETERNAL;
 
 
 public class CompoundConcept<T extends Compound> implements AbstractConcept, Termlike {
@@ -426,8 +420,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-        linkSubs(b, scale, minScale, nar, conceptOverflow);
+    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable NAR.Activation conceptOverflow) {
+        linkSubs(scale, minScale, conceptOverflow, nar);
         //linkPeers(b, scale, nar, false);
     }
 
@@ -435,10 +429,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     /**
      * link to subterms, hierarchical downward
      */
-    public void linkSubs(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+    public void linkSubs(float scale, float minScale, @Nullable NAR.Activation conceptOverflow, NAR nar) {
 
 
-        linkDistribute(b, scale, minScale, nar, templates, conceptOverflow);
+        linkDistribute(scale, minScale, templates, conceptOverflow, nar);
 
 
 //            /*if (subScale >= minScale)*/
@@ -491,7 +485,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
 
-    final void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull TermSet templates, MutableFloat subConceptOverflow) {
+    final void linkDistribute(float scale, float minScale, @NotNull TermSet templates, NAR.Activation activation, NAR nar) {
 
         int n = templates.size();
         float tStrength = 1f / n;
@@ -503,11 +497,11 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
             //Link the peer termlink bidirectionally
             if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
-                Concept target = AbstractConcept.linkSub(this, tt, b, subScale, true, subConceptOverflow, null, nar);
+                Concept target = AbstractConcept.linkSub(this, tt, subScale, activation, nar);
 
-                if (target != null && b instanceof Task) {
+                if (target != null && activation.in instanceof Task) {
                     //insert 2nd-order tasklink
-                    target.linkTask((Task) b, subScale);
+                    target.linkTask((Task) activation.in, subScale);
                 }
             }
         }

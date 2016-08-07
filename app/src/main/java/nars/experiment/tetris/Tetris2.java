@@ -45,7 +45,7 @@ public class Tetris2 extends NAREnvironment {
     }
 
     public static final int runFrames = 1000;
-    public static final int cyclesPerFrame = 64;
+    public static final int cyclesPerFrame = 96;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 3;
@@ -261,8 +261,6 @@ public class Tetris2 extends NAREnvironment {
             public void init(NAR nar) {
                 super.init(nar);
 
-                List<Termed> charted = new ArrayList(actions);
-                charted.add(happy);
 
 //                newControlWindow(
 //                        new GridSurface(VERTICAL,

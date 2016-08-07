@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
+import nars.task.Task;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
@@ -42,8 +43,9 @@ public class BeliefTableChart extends Surface {
     /**
      * draw additional projection wave to show truthpolation values for a set of evenly spaced points on the visible range
      */
-    private boolean drawProjections = false;
-    @Deprecated private boolean showEternal = false;
+    private boolean showProjections = false;
+    private boolean showTaskLinks = true;
+    @Deprecated private boolean showEternal = true;
 
     long[] range;
 
@@ -113,6 +115,25 @@ public class BeliefTableChart extends Surface {
             renderTable(cc, minT, maxT, now, gl, goals, false);
         }
 
+        if (showTaskLinks) {
+            gl.glLineWidth(1f);
+            float nowX = xTime(minT, maxT, now);
+            cc.tasklinks().forEach(tl -> {
+                if (tl!=null) {
+                    Task x = tl.get();
+                    if ((x != null) && (x.isBeliefOrGoal())) {
+                        long o = x.occurrence();
+                        float tlx = o == ETERNAL ? nowX : xTime(minT, maxT, o);
+                        float tly = x.freq();
+                        float ii = 0.3f + 0.7f * x.conf();
+                        gl.glColor4f(ii / 2f, 0, ii, 0.25f + tl.pri() * 0.75f);
+                        float w = 0.05f;
+                        float h = 0.05f;
+                        Draw.rectStroke(gl, tlx - w / 2, tly - h / 2, w, h);
+                    }
+                }
+            });
+        }
 
         //gl.glLineWidth(1f);
         //gl.glColor4f(1f, 1f, 1f, 0.3f);
@@ -201,7 +222,7 @@ public class BeliefTableChart extends Surface {
 
     //horizontal block
     final static TaskRenderer beliefRenderer = (ge, q, c, w, h, x, y) -> {
-        ge.glColor4f(0.1f + 0.9f * c, 0.1f, 0.1f, 0.5f + 0.25f * q);
+        ge.glColor4f(0.3f + 0.7f * c, 0.1f, 0.1f, 0.5f + 0.25f * q);
         Draw.rect(ge, x - w / 2, y - h / 4, w, h / 2, dz);
     };
     final static TaskRenderer beliefProjRenderer = (ge, q, c, w, h, x, y) -> {
@@ -211,7 +232,7 @@ public class BeliefTableChart extends Surface {
     };
     //vertical block
     final static TaskRenderer goalRenderer = (ge, q, c, w, h, x, y) -> {
-        ge.glColor4f(0.1f, 0.1f + 0.9f * c, 0.1f, 0.5f + 0.25f * q);
+        ge.glColor4f(0.1f, 0.3f + 0.7f * c, 0.1f, 0.5f + 0.25f * q);
         Draw.rect(ge, x - w / 4, y - h / 2, w / 2, h, dz);
     };
     final static TaskRenderer goalProjRenderer = (ge, q, c, w, h, x, y) -> {
@@ -227,7 +248,7 @@ public class BeliefTableChart extends Surface {
         float conf = truth.conf();
 
 
-        float bcy = yPos(truth.freq(), 1);
+        float bcy = truth.freq();
 
         //ge.strokeLine(bcx, border, bcx, geh - border);
         //ge.strokeLine(border, bcy, gew - border, bcy);
@@ -269,17 +290,17 @@ public class BeliefTableChart extends Surface {
 
         /** drawn "pixel" dimensions*/
 
-        renderWave(minT, maxT, gl, 1, 1, 1, wave, beliefOrGoal ? beliefRenderer : goalRenderer);
+        renderWave(nowX, minT, maxT, gl, wave, beliefOrGoal ? beliefRenderer : goalRenderer);
 
         //draw projections
-        if (drawProjections && minT != maxT) {
+        if (showProjections && minT != maxT) {
 
             BeliefTable table = beliefOrGoal ? c.beliefs() : c.goals();
 
             int projections = 8;
             TruthWave pwave = beliefProj;
             pwave.setProjected(table, minT, maxT, projections);
-            renderWave(minT, maxT, gl, 1, 1, 1, pwave, beliefOrGoal ? beliefProjRenderer : goalProjRenderer);
+            renderWave(nowX, minT, maxT, gl, pwave, beliefOrGoal ? beliefProjRenderer : goalProjRenderer);
         }
 
         Truth bc = wave.current;
@@ -301,37 +322,35 @@ public class BeliefTableChart extends Surface {
 
     }
 
-    private void renderWave(long minT, long maxT, GL2 gl, float gew, float geh, float teh, TruthWave wave, TaskRenderer r) {
+    private void renderWave(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, TaskRenderer r) {
         wave.forEach((freq, conf, o, qua) -> {
 
             boolean eternal = (o != o);
-            float eh, x;
+            float x;
             float pw = baseTaskSize;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
             float ph = baseTaskSize;// + geh / (1f / conf) / 4f;//10 + 10 * conf;
 
             if (showEternal && eternal) {
-                eh = geh;
-                x = eternalX(gew, 0, pw, conf);
+                x = nowX;
             } else if ((o >= minT) && (o <= maxT)) {
-                eh = teh;
                 x = xTime(minT, maxT, o);
             } else {
-                x = eh = Float.NaN; //dont draw
+                x = Float.NaN; //dont draw
             }
 
-            if(eh==eh) {
-                r.renderTask(gl, qua, conf, pw, ph, x, yPos(freq, eh));
+            if(x==x) {
+                r.renderTask(gl, qua, conf, pw, ph, x, freq);
             }
         });
     }
 
-    private static float yPos(float f, float eh /* drawn object height, padding */) {
-        return (eh) * (f);
-    }
+//    private static float yPos(float f, float eh /* drawn object height, padding */) {
+//        return (eh) * (f);
+//    }
 
-    private static float eternalX(float width, float b, float w, float cc) {
+    /*private static float eternalX(float width, float b, float w, float cc) {
         return b + (width - b - w) * cc;
-    }
+    }*/
 
     public BeliefTableChart time(BiFunction<Long, long[], long[]> rangeControl) {
         this.rangeControl = rangeControl;

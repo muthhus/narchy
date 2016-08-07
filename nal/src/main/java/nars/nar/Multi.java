@@ -247,32 +247,32 @@ public class Multi extends AbstractNAR {
     }
 
 
-    @Nullable
-    @Override
-    public final Concept activate(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow) {
-        Concept c = concept(termed, true);
-        if (c != null) {
-//            {
-//                int cc = 0;
-//                int as = active.size();
-//                for (WorkerCore w : cores) {
-//                    cc += w.concepts.size();
-//                }
-//                if (Math.abs(cc - as) > 1) {
-//                    System.err.println("active size fault: " + cc + " " + as);
-//                }
+//    @Nullable
+//    @Override
+//    public final Concept activate(@NotNull Termed termed, @Nullable Activation conceptOverflow) {
+//        Concept c = concept(termed, true);
+//        if (c != null) {
+////            {
+////                int cc = 0;
+////                int as = active.size();
+////                for (WorkerCore w : cores) {
+////                    cc += w.concepts.size();
+////                }
+////                if (Math.abs(cc - as) > 1) {
+////                    System.err.println("active size fault: " + cc + " " + as);
+////                }
+////            }
+//
+//            DefaultCore w;
+//            if ((w = active.get(c)) == null) {
+//                w = assign(c);
 //            }
-
-            DefaultCore w;
-            if ((w = active.get(c)) == null) {
-                w = assign(c);
-            }
-            w.conceptualize(c, b, conceptActivation, linkActivation, conceptOverflow);
-
-
-        }
-        return c;
-    }
+//            w.conceptualize(c, b, conceptActivation, linkActivation, conceptOverflow);
+//
+//
+//        }
+//        return c;
+//    }
 
     @NotNull
     public Multi.@NotNull WorkerCore assign(Concept c) {

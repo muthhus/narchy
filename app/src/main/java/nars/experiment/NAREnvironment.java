@@ -8,7 +8,6 @@ import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Term;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
@@ -16,7 +15,6 @@ import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
-import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +39,7 @@ abstract public class NAREnvironment {
 
     public final SensorConcept happy;
     private final float reinforcementAttention;
-    private final SensorConcept joy;
+    public final SensorConcept joy;
     public NAR nar;
 
     public final List<SensorConcept> sensors = $.newArrayList();
@@ -182,10 +180,10 @@ abstract public class NAREnvironment {
             predictors.add(
                 (MutableTask) nar.ask($.conj(x.term(), dt, happy.term()), '?', ETERNAL)
             );
-            //does not action A co-occur with reward R?
-            predictors.add(
-                (MutableTask) nar.ask($.conj($.neg(x.term()), dt, happy.term()), '?', ETERNAL)
-            );
+//            //does not action A co-occur with reward R?
+//            predictors.add(
+//                (MutableTask) nar.ask($.conj($.neg(x.term()), dt, happy.term()), '?', ETERNAL)
+//            );
 
 
         }
@@ -253,7 +251,8 @@ abstract public class NAREnvironment {
     @Nullable
     protected Concept boost(Concept c) {
 
-        return nar.activate(c, UnitBudget.One, nar.inputActivation.floatValue() * reinforcementAttention, reinforcementAttention, null);
+        return c;
+        //return nar.activate(c, null);
     }
 
 
@@ -267,11 +266,11 @@ abstract public class NAREnvironment {
                     .budget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
         } else {
             //just reactivate the existing eternal
-            try {
-                nar.activate(t);
-            } catch (Exception e) {
-                logger.warn("{}", e.toString());
-            }
+            //try {
+                //nar.activate(t);
+            //} catch (Exception e) {
+              //  logger.warn("{}", e.toString());
+            //}
         }
 
     }

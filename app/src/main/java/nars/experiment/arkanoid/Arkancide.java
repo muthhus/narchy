@@ -167,6 +167,7 @@ public class Arkancide extends NAREnvironment {
         });
         List<Surface> actionTables = narenv.actions.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
         actionTables.add(new BeliefTableChart(nar, narenv.happy, btRange));
+        actionTables.add(new BeliefTableChart(nar, narenv.joy, btRange));
 
 
 

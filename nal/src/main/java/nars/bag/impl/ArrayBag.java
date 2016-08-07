@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
@@ -135,6 +136,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         throw new RuntimeException("unimpl");
     }
 
+
+    @Override
+    public void put(ObjectFloatHashMap<? extends V> values, Budgeted in/*, MutableFloat overflow*/) {
+
+        synchronized(map) {
+            values.forEachKeyValue((k, v) -> {
+                put(k, in, v, null);
+            });
+        }
+    }
 
     /**
      * Insert an item into the itemTable

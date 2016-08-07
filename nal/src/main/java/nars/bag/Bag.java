@@ -1,5 +1,6 @@
 package nars.bag;
 
+import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.link.BLink;
@@ -474,6 +475,11 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
 
         @Override
+        public void put(ObjectFloatHashMap values, Budgeted in) {
+
+        }
+
+        @Override
         public int size() {
             return 0;
         }
@@ -548,4 +554,5 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     };
 
 
+    void put(ObjectFloatHashMap<? extends V> values, Budgeted in);
 }

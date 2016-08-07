@@ -3,6 +3,7 @@ package nars;
 
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
+import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -10,10 +11,12 @@ import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
 import nars.index.TermIndex;
+import nars.link.BLink;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
+import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -568,6 +571,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
 
+        if (clock instanceof FrameClock) {
+            //HACK for unique serial number w/ frameclock
+            ((FrameClock) clock).ensureStampSerialGreater(input.evidence());
+        }
+
         Task inputted;
         try {
             inputted = c.process(input, this);
@@ -586,16 +594,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //decides if TaskProcess was successful in somehow affecting its concept's state
         if (inputted != null && !inputted.isDeleted()) {
 
-            if ((input == inputted) && (clock instanceof FrameClock)) {
-                //HACK for unique serial number w/ frameclock
-                ((FrameClock) clock).ensureStampSerialGreater(inputted.evidence());
-            }
 
 
             //propagate budget
-            MutableFloat overflow = new MutableFloat();
             try {
-                activate(c, inputted, conceptActivation, linkActivation, overflow);
+                Activation activation = new Activation(inputted, conceptActivation);
+                ((Default)this).core.concepts.put(c, inputted, conceptActivation, null /*activation.overflow <- mixes concept and link activation? */);
+                c.link(linkActivation, Param.BUDGET_EPSILON, this, activation);
+                activation.run(this);
+
+                emotion.busy(cost);
+                emotion.stress(activation.overflow);
             } catch (TermIndex.InvalidConceptException e) {
                 emotion.errr();
 
@@ -605,13 +614,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 inputted.delete();
             }
 
-            emotion.busy(cost);
-            emotion.stress(overflow);
 
             if (input == inputted) {
                 input.onConcept(c);
-                eventTaskProcess.emit(inputted); //signal any additional processes
             }
+
+            eventTaskProcess.emit(inputted); //signal any additional processes
 
         } else {
             emotion.frustration(cost);
@@ -1100,24 +1108,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    /**
-     * activate the concept and other features (termlinks, etc)
-     *
-     * @param link whether to activate termlinks recursively
-     */
-    @Nullable
-    public abstract Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
-
-    /* zero avoids direct recursive linking, it should go through the target concept though and happen through there */
-    @Nullable
-    final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float activation, @Nullable MutableFloat overflow) {
-        return activate(termed, b, activation, 0f, overflow);
-    }
-
-    @Nullable
-    final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b) {
-        return activate(termed, b, 1f, null);
-    }
+//    /**
+//     * activate the concept and other features (termlinks, etc)
+//     *
+//     * @param link whether to activate termlinks recursively
+//     */
+//    @Nullable
+//    public abstract Concept activate(@NotNull Termed<?> termed, @Nullable Activation activation);
+//
+//    @Nullable
+//    final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b) {
+//        return activate(termed, new Activation(b, 1f));
+//    }
 
     @NotNull
     public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
@@ -1364,22 +1366,46 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    /**
-     * activates a concept via a task. the task may already be present in the system,
-     * but it will be reinforced via peer tasklinks activation.
-     * (a normal duplicate task going through process() will not have this behavior.)
-     */
-    public final void activate(@NotNull Task t, float scale) /* throws InvalidConceptException.. */{
-        @Nullable Concept concept = t.concept(this);
-        if (concept == null)
-            throw new TermIndex.InvalidConceptException(t.term(), "task did not resolve to a concept");
+//    /**
+//     * activates a concept via a task. the task may already be present in the system,
+//     * but it will be reinforced via peer tasklinks activation.
+//     * (a normal duplicate task going through process() will not have this behavior.)
+//     */
+//    public final Activation activate(@NotNull Task t, float scale) /* throws InvalidConceptException.. */{
+//        @Nullable Concept concept = concept(t, true);
+//        if (concept == null)
+//            throw new TermIndex.InvalidConceptException(t.term(), "task did not resolve to a concept");
+//
+//
+//        Activation aa = new Activation(t, scale);
+//        aa.run(this);
+//        return aa;
+//    }
 
-        activate(concept, t, inputActivation.floatValue() * scale, scale, null);
+
+    public static class Activation {
+        public final MutableFloat overflow = new MutableFloat(0);
+        public final Budgeted in;
+        public final float scale;
+
+        //final ObjectFloatHashMap<BLink<Task>> tasks = new ObjectFloatHashMap<>();
+        //public final ObjectFloatHashMap<BLink<Term>> termlinks = new ObjectFloatHashMap<>();
+        public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
+
+        public Activation(Budgeted in, float scale) {
+            this.in = in;
+            this.scale = scale;
+        }
+
+        public void run(NAR nar) {
+            if (!concepts.isEmpty())
+                ((Default)nar).core.concepts.put(concepts, in);
+        }
     }
 
-    public final void activate(@NotNull Task t) {
-        activate(t, 1f);
-    }
+//    public final void activate(@NotNull Task t) {
+//        activate(t, 1f);
+//    }
 
     public final Predicate<@NotNull Task> taskPast = (Task t) -> {
         long o = t.occurrence();

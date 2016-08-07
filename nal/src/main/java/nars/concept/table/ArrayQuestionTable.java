@@ -112,7 +112,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 //            return;
 
 
-        float qBudget = q.pri();
+        //float qBudget = q.pri();
 
         boolean aEtern = a.isEternal();
         boolean qEtern = q.isEternal();
@@ -146,7 +146,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
                     qc.crossLink(q, a, aConf, nar);
                 }
             }
-            nar.activate(a, qBudget);
+            //nar.activate(a, qBudget);
 
 
             //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly

@@ -38,139 +38,139 @@ public class TermLinkTest {
 
     }
 
-    abstract static class Hebbian<V extends Term, E extends Compound> {
-
-        private final NAR nar;
-        private final int size;
-
-        public Hebbian(NAR n, int size, float initialActivationPerEdge) {
-            this.nar = n;
-            this.size = size;
-            for (int x = 0; x < size; x++) {
-                for (int y = 0; y < size; y++) {
-                    if ((x!=y) && (x < y))
-                        n.believe(initialActivationPerEdge, edge(x, y), Tense.Eternal, 1f, 0.9f);
-                }
-            }
-        }
-
-        abstract protected V vertex(int x);
-        abstract protected E edge(V x, V y);
-
-        public float pri(int x) {
-            return pri(vertex(x));
-        }
-
-        float pri(Term x) {
-            return nar.conceptPriority(x);
-        }
-
-        public float pri(int x, int y) {
-            BLink<Term> tl = concept(x).termlinks().get(vertex(y));
-            if (tl == null)
-                return 0f;
-            return tl.pri();
-        }
-
-        public void activate(int x, float a) {
-
-            //Concept c = concept(x);
-            Concept c = nar.activate(vertex(x), b(a, 0.5f, 0.5f),
-                    /* concept factor */ 1f,  /* link factor */ 1f, null);
-
-            //((CompoundConcept)c).linkPeers(b(a, 0.5f, 0.5f), 1f, nar, true);
-        }
-
-        public @Nullable Concept concept(int x) {
-            return concept(vertex(x));
-        }
-
-        public void activate(int x, int y, float a) {
-            //nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f));
-            //Concept c = nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f), 1f, 1f, null);
-            Budget b = b(a, 0.5f, 0.5f);
-            Concept c = nar.activate(vertex(x), b, a, 0f, null);
-            Concept.linkPeer(c.termlinks(), vertex(y), b, a);
-
-        }
-
-
-
-        final public Termed edge(int x, int y) {
-            return edge(vertex(x), vertex(y));
-        }
-
-        public Stream<Term> vertices() {
-            return IntStream.range(0, size).mapToObj(i -> vertex(i));
-        }
-
-        public void commit() {
-            vertices().forEach(v -> {
-                @NotNull Bag<Term> tl = concept(v).termlinks();
-                tl.commit();
-                System.out.println("commit: " + v + " " + tl);
-            });
-        }
-
-        public @Nullable Concept concept(Term v) {
-            return nar.concept(v);
-        }
-
-        public void print() {
-            commit();
-
-            System.out.println("Vertex: " + Joiner.on(" ").join(
-                vertices().map(v -> v.toString() + '=' + pri(v)).collect(toList())
-            ));
-            System.out.println("Edges:");
-            for (int y = 0; y < size; y++) {
-                for (int x = 0; x < size; x++) {
-                    System.out.print(priChar(pri(x, y)));
-                    System.out.print(' ');
-                }
-                System.out.println();
-            }
-        }
-
-        static char priChar(float pri) {
-            int i = (int) Math.floor(pri * 9.5f);
-            return (char)(i + '0');
-        }
-
-    }
-
-    @Test public void testTermLinkHebbianLearning() {
-        Default n = new Default();
-        n.log();
-        Hebbian h = new Hebbian<Compound,Compound>(n, 4, 0.5f) {
-
-            @Override
-            public Compound vertex(int x) {
-                return $.p(the(x));
-            }
-
-            @Override
-            protected Compound edge(Compound x, Compound y) {
-                return $.sim(x, y);
-            }
-
-
-        };
-        n.next(); //build network
-        n.core.concepts.print();
-
-//        //activate neurons 1 and 3
-//        h.activate(1, 1f);
-//        h.activate(3, 1f);
-        h.activate(1, 3, 1f);
-        h.activate(1, 2, 1f);
-
-        n.run(10);
-
-        h.print();
-
-    }
-
+//    abstract static class Hebbian<V extends Term, E extends Compound> {
+//
+//        private final NAR nar;
+//        private final int size;
+//
+//        public Hebbian(NAR n, int size, float initialActivationPerEdge) {
+//            this.nar = n;
+//            this.size = size;
+//            for (int x = 0; x < size; x++) {
+//                for (int y = 0; y < size; y++) {
+//                    if ((x!=y) && (x < y))
+//                        n.believe(initialActivationPerEdge, edge(x, y), Tense.Eternal, 1f, 0.9f);
+//                }
+//            }
+//        }
+//
+//        abstract protected V vertex(int x);
+//        abstract protected E edge(V x, V y);
+//
+//        public float pri(int x) {
+//            return pri(vertex(x));
+//        }
+//
+//        float pri(Term x) {
+//            return nar.conceptPriority(x);
+//        }
+//
+//        public float pri(int x, int y) {
+//            BLink<Term> tl = concept(x).termlinks().get(vertex(y));
+//            if (tl == null)
+//                return 0f;
+//            return tl.pri();
+//        }
+//
+//        public void activate(int x) {
+//
+//            //Concept c = concept(x);
+//            Concept c = nar.activate(vertex(x),
+//                    /* concept factor */   /* link factor */  null);
+//
+//            //((CompoundConcept)c).linkPeers(b(a, 0.5f, 0.5f), 1f, nar, true);
+//        }
+//
+//        public @Nullable Concept concept(int x) {
+//            return concept(vertex(x));
+//        }
+//
+//        public void activate(int x, int y, float a) {
+//            //nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f));
+//            //Concept c = nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f), 1f, 1f, null);
+//            Budget b = b(a, 0.5f, 0.5f);
+//            Concept c = nar.activate(vertex(x), null);
+//            Concept.linkPeer(c.termlinks(), vertex(y), b, a);
+//
+//        }
+//
+//
+//
+//        final public Termed edge(int x, int y) {
+//            return edge(vertex(x), vertex(y));
+//        }
+//
+//        public Stream<Term> vertices() {
+//            return IntStream.range(0, size).mapToObj(i -> vertex(i));
+//        }
+//
+//        public void commit() {
+//            vertices().forEach(v -> {
+//                @NotNull Bag<Term> tl = concept(v).termlinks();
+//                tl.commit();
+//                System.out.println("commit: " + v + " " + tl);
+//            });
+//        }
+//
+//        public @Nullable Concept concept(Term v) {
+//            return nar.concept(v);
+//        }
+//
+//        public void print() {
+//            commit();
+//
+//            System.out.println("Vertex: " + Joiner.on(" ").join(
+//                vertices().map(v -> v.toString() + '=' + pri(v)).collect(toList())
+//            ));
+//            System.out.println("Edges:");
+//            for (int y = 0; y < size; y++) {
+//                for (int x = 0; x < size; x++) {
+//                    System.out.print(priChar(pri(x, y)));
+//                    System.out.print(' ');
+//                }
+//                System.out.println();
+//            }
+//        }
+//
+//        static char priChar(float pri) {
+//            int i = (int) Math.floor(pri * 9.5f);
+//            return (char)(i + '0');
+//        }
+//
+//    }
+//
+//    @Test public void testTermLinkHebbianLearning() {
+//        Default n = new Default();
+//        n.log();
+//        Hebbian h = new Hebbian<Compound,Compound>(n, 4, 0.5f) {
+//
+//            @Override
+//            public Compound vertex(int x) {
+//                return $.p(the(x));
+//            }
+//
+//            @Override
+//            protected Compound edge(Compound x, Compound y) {
+//                return $.sim(x, y);
+//            }
+//
+//
+//        };
+//        n.next(); //build network
+//        n.core.concepts.print();
+//
+////        //activate neurons 1 and 3
+////        h.activate(1, 1f);
+////        h.activate(3, 1f);
+//        h.activate(1, 3, 1f);
+//        h.activate(1, 2, 1f);
+//
+//        n.run(10);
+//
+//        h.print();
+//
+//    }
+//
 
 //
 //    @Test public void testTermLinkActivationOnConceptualization() {

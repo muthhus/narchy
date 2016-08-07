@@ -206,7 +206,7 @@ public class TermIndexTest {
 
         Term at = $("a");
         TermVector a = TermVector.the(at, $("b"), $("cd"));
-        TermContainer b = ((Compound)n.activate(p(a), UnitBudget.Zero).term()).subterms();
+        TermContainer b = ((Compound)n.concept(p(a), true).term()).subterms();
         assertEquals(a, b);
 
         //i.print(System.out);

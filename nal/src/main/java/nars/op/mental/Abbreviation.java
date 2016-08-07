@@ -113,37 +113,37 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
      */
     @Override
     public void accept(@NotNull Task task) {
-
-        //is it complex and also important? then give it a name:
-        if (canAbbreviate(task)) {
-            if (nar.random.nextFloat() <= abbreviationProbability.floatValue()) {
-
-                Concept abbreviated = task.concept(nar);
-                if (abbreviated != null && abbreviated.get(Abbreviation.class) == null) {
-
-                    Term id = newSerialTerm();
-
-                    abbreviate(abbreviated, id);
-                }
-            }
-        }
+//
+//        //is it complex and also important? then give it a name:
+//        if (canAbbreviate(task)) {
+//            if (nar.random.nextFloat() <= abbreviationProbability.floatValue()) {
+//
+//                Concept abbreviated = task.concept(nar);
+//                if (abbreviated != null && abbreviated.get(Abbreviation.class) == null) {
+//
+//                    Term id = newSerialTerm();
+//
+//                    abbreviate(abbreviated, id);
+//                }
+//            }
+//        }
     }
 
     protected  void abbreviate(@NotNull Concept abbreviated, @NotNull Term alias) {
-        Concept abbreviation = nar.activate(newAbbreviation(abbreviated, alias), NewAbbreviationBudget);
-        if (abbreviation != null) {
-
-            abbreviation.put(Abbreviation.class, abbreviation); //abbreviated by itself
-            abbreviated.put(Abbreviation.class, alias); //abbreviated by the serial
-
-            logger.info("Abbreviation {}", abbreviation);
-
-            nar.input(
-                    new MutableTask(abbreviation, Symbols.BELIEF,
-                            $.t(1, abbreviationConfidence.floatValue()))
-            );
-
-        }
+//        Concept abbreviation = nar.activate(newAbbreviation(abbreviated, alias), NewAbbreviationBudget);
+//        if (abbreviation != null) {
+//
+//            abbreviation.put(Abbreviation.class, abbreviation); //abbreviated by itself
+//            abbreviated.put(Abbreviation.class, alias); //abbreviated by the serial
+//
+//            logger.info("Abbreviation {}", abbreviation);
+//
+//            nar.input(
+//                    new MutableTask(abbreviation, Symbols.BELIEF,
+//                            $.t(1, abbreviationConfidence.floatValue()))
+//            );
+//
+//        }
     }
 
 

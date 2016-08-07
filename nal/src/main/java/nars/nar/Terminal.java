@@ -37,10 +37,10 @@ public class Terminal extends AbstractNAR {
     }
 
 
-    @Override
-    public Concept activate(@NotNull Termed termed, @NotNull Budgeted activation, float conceptActivation, float linkActivation, MutableFloat overflow) {
-        return concept(termed, true); //ignore activation
-    }
+//    @Override
+//    public Concept activate(@NotNull Termed termed, Activation overflow) {
+//        return concept(termed, true); //ignore activation
+//    }
 
     @Override
     public void clear() {

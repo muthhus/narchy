@@ -210,14 +210,14 @@ public abstract class AbstractCore {
 
 
 
-    public void conceptualize(@NotNull Concept c, @NotNull Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
+    public void conceptualize(@NotNull Concept c, @NotNull Budgeted b, float conceptActivation, float linkActivation, NAR.Activation activation) {
 
-        concepts.put(c, b, conceptActivation, conceptOverflow);
+        concepts.put(c, b, conceptActivation, activation.overflow);
         //if (b.isDeleted())
             //return;
             //throw new RuntimeException("Concept rejected: " + b);
         if (linkActivation > 0)
-            c.link(b, linkActivation, nar, conceptOverflow);
+            c.link(b, linkActivation, nar, activation);
     }
 
 
