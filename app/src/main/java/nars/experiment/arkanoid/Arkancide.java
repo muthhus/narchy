@@ -13,6 +13,7 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.ArithmeticInduction;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
@@ -198,7 +199,14 @@ public class Arkancide extends NAREnvironment {
         Default nar = new Default(1024,
                 4, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
-                , new FrameClock());
+                , new FrameClock()) {
+
+            VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
+            @Override protected Task preprocess(Task input) {
+                return p.pre(input);
+            }
+
+        };
         nar.inputActivation.setValue(0.1f);
         nar.derivedActivation.setValue(0.1f);
 

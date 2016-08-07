@@ -13,6 +13,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static nars.Op.CONJ;
@@ -48,7 +50,7 @@ public class VariableCompressor implements Consumer<Task> {
 
     public Task compress(Task task) {
         Compound<?> contnt = task.term();
-        if (contnt.op() == CONJ) {
+        //if (contnt.op() == CONJ) {
 
             HashBag<Term> contents = new HashBag();
             contnt.recurseTerms((subterm) -> {
@@ -80,7 +82,8 @@ public class VariableCompressor implements Consumer<Task> {
                     return compress(task, max[0]);
 
             }
-        }
+        //}
+
         return null;
     }
 
@@ -136,5 +139,33 @@ public class VariableCompressor implements Consumer<Task> {
         if (c1!=null)
             return c1;
         return input;
+    }
+
+    public static class Precompressor {
+        private final NAR nar;
+        VariableCompressor c;
+        ArithmeticInduction i;
+
+        public Precompressor(NAR nar) {
+            this.nar = nar;
+            this.c = new VariableCompressor(nar);
+            this.i = new ArithmeticInduction(nar);
+        }
+
+        public Task pre(Task input) {
+            input = c.tryCompress(input);
+            Set<Task> inputs = i.compress(input);
+            if (inputs.isEmpty()) {
+                return input;
+            } else {
+                Iterator<Task> ii = inputs.iterator();
+                input = ii.next(); //directly input the first, queue any others
+                while (ii.hasNext()) {
+                    nar.inputLater(ii.next());
+                }
+                return input;
+            }
+        }
+
     }
 }

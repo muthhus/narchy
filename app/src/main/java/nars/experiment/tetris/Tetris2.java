@@ -3,17 +3,13 @@ package nars.experiment.tetris;
 import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.concept.Concept;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
-import nars.gui.BagChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.ArithmeticInduction;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
-import nars.predict.LSTMPredictor;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -21,8 +17,6 @@ import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.math.FloatSupplier;
-import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import spacegraph.Surface;
@@ -199,23 +193,11 @@ public class Tetris2 extends NAREnvironment {
 
                 , new FrameClock()) {
 
-            VariableCompressor c = new VariableCompressor(this);
-            ArithmeticInduction i = new ArithmeticInduction(this);
+            VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
 
             @Override
             protected Task preprocess(Task input) {
-                input = c.tryCompress(input);
-                Set<Task> inputs = i.compress(input);
-                if (inputs.isEmpty()) {
-                    return input;
-                } else {
-                    Iterator<Task> ii = inputs.iterator();
-                    input = ii.next(); //directly input the first, queue any others
-                    while (ii.hasNext()) {
-                        inputLater(ii.next());
-                    }
-                    return input;
-                }
+                return p.pre(input);
             }
 
         };
@@ -450,7 +432,7 @@ public class Tetris2 extends NAREnvironment {
         //nar.forEachActiveConcept(System.out::println);
     }
 
-//    static void addCamera(Tetris t, NAR n, int w, int h) {
+    //    static void addCamera(Tetris t, NAR n, int w, int h) {
 //        //n.framesBeforeDecision = GAME_DIVISOR;
 //        SwingCamera s = new SwingCamera(t.vis);
 //

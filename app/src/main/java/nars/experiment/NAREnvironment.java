@@ -178,9 +178,13 @@ abstract public class NAREnvironment {
             predictors.add((MutableTask) nar.ask(x, '@', ETERNAL));
             predictors.add((MutableTask) nar.ask(x, '@', nar.time()));
 
-            //does action A imply reward R?
+            //does action A co-occur with reward R?
             predictors.add(
-                    (MutableTask) nar.ask($.conj(x.term(), dt, happy.term()), '?', ETERNAL)
+                (MutableTask) nar.ask($.conj(x.term(), dt, happy.term()), '?', ETERNAL)
+            );
+            //does not action A co-occur with reward R?
+            predictors.add(
+                (MutableTask) nar.ask($.conj($.neg(x.term()), dt, happy.term()), '?', ETERNAL)
             );
 
 
