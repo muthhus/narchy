@@ -12,6 +12,8 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
+import nars.util.math.FirstOrderDifferenceFloat;
+import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
 import nars.util.signal.FuzzyConceptSet;
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static nars.$.t;
 import static nars.agent.NAgent.varPct;
 import static nars.nal.Tense.ETERNAL;
 import static nars.util.Texts.n4;
@@ -38,9 +41,9 @@ abstract public class NAREnvironment {
 
     public final SensorConcept happy;
     private final float reinforcementAttention;
+    private final SensorConcept joy;
     public NAR nar;
 
-    public final FuzzyConceptSet reward;
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<MotorConcept> actions = $.newArrayList();
 
@@ -67,19 +70,23 @@ abstract public class NAREnvironment {
         epsilon = 0.05f;
         this.reinforcementAttention = gamma;
 
-        reward = new FuzzyConceptSet(
-                //new PolarRangeNormalizedFloat(()->rewardValue),
-                new RangeNormalizedFloat(() -> rewardValue),
-                nar,
-                //"(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.02f);
-                //"(" + nar.self + " --> [sad])", "(" + nar.self + " --> [happy])").resolution(0.05f);
-                //nar.self + "(sad)", nar.self + "(happy)"
-                //nar.self + "(happy)"
-                "(happy)"
-        ).resolution(0.02f);
+        float rewardConf = alpha;
 
-        this.happy = reward.iterator().next(); //the only one HACK
+        happy = new SensorConcept("(happy)", nar,
+                new RangeNormalizedFloat(() -> rewardValue),
+                (x) -> t(x, rewardConf)
+        );
         happy.desire($.t(1f, rewardGamma));
+
+
+        joy = new SensorConcept("(joy)", nar,
+                new PolarRangeNormalizedFloat(
+                    new FirstOrderDifferenceFloat(
+                        ()->nar.time(), () -> rewardValue
+                    )
+                ),
+                (x) -> t(x, rewardConf)
+        );
 
     }
 

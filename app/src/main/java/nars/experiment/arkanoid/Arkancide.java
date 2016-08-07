@@ -247,8 +247,8 @@ public class Arkancide extends NAREnvironment {
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 2);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
-        new ArithmeticInduction(nar);
-        new VariableCompressor(nar);
+        //new ArithmeticInduction(nar);
+        //new VariableCompressor(nar);
 
 
 
