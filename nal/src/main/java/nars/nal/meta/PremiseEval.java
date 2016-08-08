@@ -20,6 +20,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.subst.FindSubst;
 import nars.term.subst.OneMatchFindSubst;
+import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +46,27 @@ public class PremiseEval extends FindSubst {
      * the current premise being evaluated in this context TODO make private again
      */
     public transient Premise premise;
+    private float truthResolution;
+
+    public boolean setPunct(Truth t, char p, long[] evidence) {
+        @Nullable Truth tt = dither(t);
+        if (tt != null) {
+            this.punct.set(new PremiseEval.TruthPuncEvidence(tt, p, evidence));
+            return true;
+        }
+        return false;
+    }
+
+    @Nullable public Truth dither(@Nullable Truth t) {
+        if (t == null)
+            return null;
+        float res = this.truthResolution;
+        if (res == Param.TRUTH_EPSILON) {
+            return t; //unchanged by
+        } else {
+            return DefaultTruth.ditherOrNull(t, res);
+        }
+    }
 
     public static class TruthPuncEvidence {
         public final Truth truth;
@@ -209,6 +231,7 @@ public class PremiseEval extends FindSubst {
     public void init(@NotNull NAR nar) {
         this.nar = nar;
         this.confMin = nar.confMin.floatValue();
+        this.truthResolution = nar.truthResolution.floatValue();
     }
 
     /**

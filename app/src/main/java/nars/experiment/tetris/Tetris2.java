@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Param;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
-import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -13,7 +12,6 @@ import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -40,13 +38,15 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
+    public static final int TIME_DILATION = 4; //resolution in between frames for interpolation space
+
     static {
         Param.DEBUG = true;
         Param.CONCURRENCY_DEFAULT = 2;
     }
 
     public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 32;
+    public static final int cyclesPerFrame = 16;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 2;
@@ -56,7 +56,7 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private int visionSyncPeriod = 16;
+    private int visionSyncPeriod = 64 * TIME_DILATION;
 
     public class View {
 
@@ -188,9 +188,9 @@ public class Tetris2 extends NAREnvironment {
         Random rng = new XorShift128PlusRandom(1);
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(1024,
-                16, 3, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 8 * 1000000, false)
+        Default nar = new Default(2048,
+                32, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 5 * 1000000, false)
 
                 , new FrameClock()) {
 
@@ -203,18 +203,19 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.1f);
+        nar.inputActivation.setValue(0.25f);
+        nar.derivedActivation.setValue(0.25f);
 
 
-        nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.3f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.04f);
+        nar.confMin.setValue(0.02f);
+        nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -271,7 +272,7 @@ public class Tetris2 extends NAREnvironment {
 
 
                 //BagChart.show((Default) nar, 1024);
-                STMView.show(stm, 800, 600);
+                //STMView.show(stm, 800, 600);
 
                 int plotHistory = 256;
                 Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
@@ -279,7 +280,7 @@ public class Tetris2 extends NAREnvironment {
 
                 Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
                 plot2.add("Busy", () -> nar.emotion.busy.getSum());
-                plot2.add("Lern", () -> nar.emotion.learning());
+                plot2.add("Lern", () -> nar.emotion.busy.getSum() - nar.emotion.frustration.getSum());
                 //plot2.add("Strs", ()->nar.emotion.stress.getSum());
 
                 Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
@@ -365,7 +366,7 @@ public class Tetris2 extends NAREnvironment {
 
                 newControlWindow(view);
 
-                newBeliefChart(this, 1500);
+                newBeliefChart(this, 11500);
 
                 //NARSpace.newConceptWindow((Default) nar, 128, 8);
             }
@@ -422,7 +423,7 @@ public class Tetris2 extends NAREnvironment {
         //addCamera(t, nar, 8, 8);
 
 
-        t.run(runFrames, frameDelay).join();
+        t.run(runFrames, frameDelay, TIME_DILATION).join();
         //nar.stop();
 
         //nar.index.print(System.out);

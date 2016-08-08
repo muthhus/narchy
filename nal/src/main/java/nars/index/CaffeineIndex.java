@@ -13,6 +13,9 @@ import nars.util.signal.WiredConcept;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -44,7 +47,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                     return 0; //disallow removal of active concepts
             }
 
-            int w = v.complexity() * 100;
+            int w = v.complexity() * 10;
 
             return (int)w;
         //}
@@ -94,10 +97,17 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
         Caffeine<Termed, Termed> builder = prepare(Caffeine.newBuilder(), soft);
 
+        final ExecutorService executor =
+                ForkJoinPool.commonPool();
+                //Executors.newCachedThreadPool();
+                //Executors.newSingleThreadExecutor();
+
         builder
                .weigher(complexityAndConfidenceWeigher)
                .maximumWeight(maxWeight)
                .removalListener(this)
+               .executor(executor)
+
                //.recordStats()
         ;
         compounds = builder.build();
@@ -105,7 +115,8 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
         Caffeine<Termed, Termed> buildera = prepare(Caffeine.newBuilder(), false);
         buildera
-                .removalListener(this);
+                .removalListener(this)
+                .executor(executor);
         atomics = buildera.build();
 
 
@@ -115,6 +126,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                 //.weakValues() //.softValues()
                 .weigher(complexityWeigher)
                 .maximumWeight(maxSubtermWeight)
+                .executor(executor)
                 .build();
 
 //        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), soft);

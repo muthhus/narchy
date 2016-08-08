@@ -43,7 +43,7 @@ public abstract class Param extends Container implements Level {
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public static final MutableInteger compoundVolumeMax = new MutableInteger(96);
+    public static final MutableInteger compoundVolumeMax = new MutableInteger(72);
 
     /**
      * maximum changes logged in deriver's stack
@@ -206,6 +206,10 @@ public abstract class Param extends Container implements Level {
     @NotNull
     @Range(min = 0, max = 1f)
     public final MutableFloat confMin = new MutableFloat(TRUTH_EPSILON);
+
+    @NotNull
+    @Range(min = 0, max = 1f)
+    public final MutableFloat truthResolution = new MutableFloat(TRUTH_EPSILON);
 
 
     /**

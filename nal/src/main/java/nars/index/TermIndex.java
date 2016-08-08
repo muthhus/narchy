@@ -583,7 +583,8 @@ public interface TermIndex {
 
     default void policy(@NotNull Concept c, ConceptPolicy p, long now) {
 
-        if (c.policy() != p) {
+        @Nullable ConceptPolicy prev = c.policy();
+        if (prev != p) {
             synchronized (c) {
 
                 c.policy(p, now);

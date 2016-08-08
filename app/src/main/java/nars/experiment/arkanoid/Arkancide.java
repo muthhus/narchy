@@ -5,12 +5,10 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.experiment.NAREnvironment;
-import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.ArithmeticInduction;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.task.Task;
@@ -23,7 +21,6 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import nars.vision.SwingCamera;
-import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -36,7 +33,6 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.t;
-import static nars.gui.NARSpace.newConceptWindow;
 import static nars.vision.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
@@ -263,7 +259,7 @@ public class Arkancide extends NAREnvironment {
 
         Arkancide t = new Arkancide(nar);
 
-        t.run(runFrames, 100).join();
+        t.run(runFrames, 0, 1).join();
 
         //nar.index.print(System.out);
         NAR.printTasks(nar, true);

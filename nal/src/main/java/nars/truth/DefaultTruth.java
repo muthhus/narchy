@@ -12,6 +12,8 @@ import static nars.util.Util.clampround;
 public class DefaultTruth implements Truth  {
 
     public final float freq, conf;
+
+
     //public final int hash;
 
     @Override
@@ -112,11 +114,18 @@ public class DefaultTruth implements Truth  {
         return new DefaultTruth(1.0f - freq, conf);
     }
 
-    protected boolean equalsFrequency(@NotNull Truth t) {
-        return (Util.equals(freq, t.freq(), Param.TRUTH_EPSILON));
+//    protected boolean equalsFrequency(@NotNull Truth t) {
+//        return (Util.equals(freq, t.freq(), Param.TRUTH_EPSILON));
+//    }
+//
+//    private static final int hashDiscreteness = (int)(1.0f / Param.TRUTH_EPSILON);
+
+    public static Truth ditherOrNull(Truth t, float res) {
+        float c = clampround(t.conf(), res);
+        if (c == 0) return null;
+        return new DefaultTruth(clampround(t.freq(), res), c, res);
     }
 
-    private static final int hashDiscreteness = (int)(1.0f / Param.TRUTH_EPSILON);
 
     /*    public float getEpsilon() {
         return DEFAULT_TRUTH_EPSILON;

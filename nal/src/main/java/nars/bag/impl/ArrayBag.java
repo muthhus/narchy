@@ -140,11 +140,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
 
     @Override
-    public void put(ObjectFloatHashMap<? extends V> values, Budgeted in,/*, MutableFloat overflow*/float scale) {
+    public void put(ObjectFloatHashMap<? extends V> values, Budgeted in,/*, MutableFloat overflow*/float scale, MutableFloat overflow) {
 
         //synchronized(map) {
             values.forEachKeyValue((k, v) -> {
-                put(k, in, v*scale, null);
+                put(k, in, v*scale, overflow);
             });
         //}
     }

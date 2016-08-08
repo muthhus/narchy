@@ -46,14 +46,12 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -590,7 +588,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         Concept c = null;
         //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {
-            c = preprocess(input).normalize(this); //accept into input buffer for eventual processing
+            input = preprocess(input);
+            c = input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
             emotion.errr();
             if (Param.DEBUG)
@@ -1427,17 +1426,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     public static class Activation {
-        public final MutableFloat overflow = new MutableFloat(0);
         public final Budgeted in;
 
         //final ObjectFloatHashMap<BLink<Task>> tasks = new ObjectFloatHashMap<>();
         //public final ObjectFloatHashMap<BLink<Term>> termlinks = new ObjectFloatHashMap<>();
         public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
+        public final MutableFloat overflow = new MutableFloat(0);
 
         public Activation(Budgeted in) {
             this.in = in;
         }
-
 
         public void run(NAR nar) {
             run(nar, 1f);
@@ -1447,9 +1445,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             if (!concepts.isEmpty()) {
                 float total = (float) concepts.sum();
                 ((Default) nar).core.concepts.put(concepts, in,
-                        activation / total //normalize to 1.0 total
-                        //activation
-                );
+                        activation / total, //normalize to 1.0 total
+                        overflow);
             }
         }
     }

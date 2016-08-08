@@ -95,8 +95,7 @@ abstract public class Solve extends AtomicBoolCondition {
                 return false;
         }
 
-        m.punct.set(new PremiseEval.TruthPuncEvidence(t, punct, m.evidence(single)));
-        return true;
+        return m.setPunct(t, punct, m.evidence(single));
     }
 
 

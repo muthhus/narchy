@@ -190,7 +190,14 @@ abstract public class NAREnvironment {
 
     }
 
-    public @NotNull NARLoop run(int cycles, int frameDelayMS) {
+    public NARLoop run(int cycles, int frameDelayMS) {
+        return run(cycles, frameDelayMS, 1);
+    }
+
+    public NARLoop run(final int cycles, int frameDelayMS, final int timeDilation) {
+
+        ticksBeforeDecide = timeDilation;
+        ticksBeforeObserve = timeDilation;
 
         init(nar);
 
@@ -202,11 +209,11 @@ abstract public class NAREnvironment {
             public void frame(@NotNull NAR nar) {
                 super.frame(nar);
                 next();
-                if (nar.time() >= cycles)
+                if (nar.time() >= cycles*timeDilation)
                     stop();
             }
         };
-   
+
 
         return l;
 

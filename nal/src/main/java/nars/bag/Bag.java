@@ -475,7 +475,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
 
         @Override
-        public void put(ObjectFloatHashMap values, Budgeted in, float scale) {
+        public void put(ObjectFloatHashMap values, Budgeted in, float scale, MutableFloat overflow) {
 
         }
 
@@ -554,5 +554,5 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     };
 
 
-    void put(ObjectFloatHashMap<? extends V> values, Budgeted in, float scale);
+    void put(ObjectFloatHashMap<? extends V> values, Budgeted in, float scale, MutableFloat overflow);
 }
