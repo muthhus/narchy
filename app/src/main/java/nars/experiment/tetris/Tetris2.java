@@ -38,25 +38,25 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int TIME_DILATION = 4; //resolution in between frames for interpolation space
+    public static final int TIME_DILATION = 1; //resolution in between frames for interpolation space
 
     static {
         Param.DEBUG = true;
-        Param.CONCURRENCY_DEFAULT = 2;
+        Param.CONCURRENCY_DEFAULT = 4;
     }
 
-    public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 32;
+    public static final int runFrames = 1000;
+    public static final int cyclesPerFrame = 16;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 2;
+    public static final int TIME_PER_FALL = 3;
     static int frameDelay = 0;
 
     static boolean easy = true;
 
 
     private final TetrisState state;
-    private int visionSyncPeriod = 16 * TIME_DILATION;
+    private int visionSyncPeriod = 8 * TIME_DILATION;
 
     public class View {
 
@@ -203,18 +203,18 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.25f);
-        nar.derivedActivation.setValue(0.25f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.7f);
+        nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.1f);
+        nar.confMin.setValue(0.05f);
         nar.truthResolution.setValue(0.05f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {

@@ -65,7 +65,7 @@ abstract public class NAREnvironment {
                 //gamma
         ;
 
-        epsilon = 0.05f;
+        epsilon = 0.07f;
         this.reinforcementAttention = gamma;
 
         float rewardConf = alpha;
@@ -197,7 +197,7 @@ abstract public class NAREnvironment {
     public NARLoop run(final int cycles, int frameDelayMS, final int timeDilation) {
 
         ticksBeforeDecide = timeDilation;
-        ticksBeforeObserve = timeDilation;
+        ticksBeforeObserve = 0;
 
         init(nar);
 

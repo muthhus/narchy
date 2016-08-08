@@ -197,7 +197,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return ((TaskEvent te) -> {
             Task[] tt = te.tasks;
             te.tasks = null;
-            input(tt);
+            try {
+                input(tt);
+            } catch (Exception e) {
+                logger.error("{}",e);
+            }
         });
     };
 

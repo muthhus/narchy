@@ -96,7 +96,13 @@ public class VariableCompressor implements Consumer<Task> {
         Term newContent = $.terms.remap(oldContent, max, var);
         if (newContent != null) {
 
-            newContent = $.conj(newContent, $.sim(var, max));
+            newContent = $.conj(newContent,
+
+                    //task.dt() == 0 ? 0 : DTERNAL, //allow +0 to merge with the other part
+                    DTERNAL,
+
+                    $.sim(var, max)
+            );
             //newContent = $.impl($.sim(var, max), newContent);
 
                 newContent = Task.normalizeTaskTerm(newContent, task.punc(), nar, true);

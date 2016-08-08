@@ -123,6 +123,7 @@ public class DefaultTruth implements Truth  {
     public static Truth ditherOrNull(Truth t, float res) {
         float c = clampround(t.conf(), res);
         if (c == 0) return null;
+        c = Math.min(c,1f-res); //dont allow to exceed 1.0-res
         return new DefaultTruth(clampround(t.freq(), res), c, res);
     }
 
