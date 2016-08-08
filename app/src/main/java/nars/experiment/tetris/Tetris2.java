@@ -42,10 +42,10 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = true;
-        Param.CONCURRENCY_DEFAULT = 3;
+        Param.CONCURRENCY_DEFAULT = 4;
     }
 
-    public static final int runFrames = 100;
+    public static final int runFrames = 10000;
     public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -189,7 +189,7 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                64, 3, 2, rng,
+                32, 3, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 , new FrameClock()) {
@@ -203,14 +203,14 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.25f);
+        nar.derivedActivation.setValue(0.15f);
 
 
         nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.3f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);

@@ -171,15 +171,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         if (existing != null) {
             putExists(b, scale, existing, overflow);
         } else {
-            synchronized (map) {
+            //synchronized (map) {
 
-                if (minPriIfFull() > p) {
+                if (minPriIfFull > p) {
                     putFail(key);
                     pending += p; //include failed input in pending
                 } else {
                     putNewAndDeleteDisplaced(key, newLink(key, p, b.qua(), b.dur()));
                 }
-            }
+            //}
         }
 
 
@@ -230,6 +230,17 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
+    @Nullable
+    @Override
+    protected BLink<V> addItem(BLink<V> x) {
+        BLink<V> y = super.addItem(x);
+        if (y!=x) {
+            int s = size();
+            if (s == capacity())
+                updateRange(s);
+        }
+        return y;
+    }
 
     @NotNull
     @Override
@@ -267,8 +278,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         public void accept(BLink bLink) {
             float p = bLink.pri();
             if (p == p) {
-                //float d = bLink.dur();
-                float d = or(bLink.dur(), bLink.qua());
+                float d = bLink.dur();
+                //float d = or(bLink.dur(), bLink.qua());
+                //float d = Math.max(bLink.dur(), bLink.qua());
                 bLink.setPriority(p * (1f - (r * (1f - d * maxEffectiveDurability))));
             }
         }
@@ -330,10 +342,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    private final float minPriIfFull() {
-        int s = size();
-        return (s == capacity()) ? priMin() : -1f;
-    }
+    /** if not full, this value must be set to -1 */
+    float minPriIfFull = -1;
+
+//    private final float minPriIfFull() {
+//        BLink<V>[] ii = items.last();
+//        BLink<V> b = ii[ii.length - 1];
+//        if (b!=null) {
+//            return b.priIfFiniteElseNeg1();
+//        }
+//        return -1f;
+//
+//        //int s = size();
+//        //return (s == capacity()) ? itempriMin() : -1f;
+//    }
 
     /**
      * returns the index of the lowest unsorted item
@@ -399,6 +421,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             i--;
         }
 
+        updateRange(i);
+
 
         if (toRemoveFromMap > 0) {
 //            int sizeBefore = map.size();
@@ -414,7 +438,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //            if (currentSize!=items.size())
 //                throw new RuntimeException("bag fault");
         }
+
+
         return removed > 0;
+    }
+
+    private void updateRange(int size) {
+        minPriIfFull = (size == capacity()) ? items.last().pri() : -1f;
     }
 
 

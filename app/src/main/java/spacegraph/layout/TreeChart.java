@@ -6,12 +6,12 @@ import com.google.common.collect.Lists;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
 import nars.util.data.list.FasterList;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.BiConsumer;
@@ -92,7 +92,7 @@ public class TreeChart<X> extends Surface {
 		left = 0.0;
 		top = 0.0;
 
-		ArrayDeque<ItemVis<X>> newChildren = new ArrayDeque<>(estimatedSize);
+		CircularFifoQueue<ItemVis<X>> newChildren = new CircularFifoQueue<>(1+estimatedSize);
 
 		int i = limit < 0 ? Integer.MAX_VALUE : limit;
 
@@ -114,16 +114,16 @@ public class TreeChart<X> extends Surface {
 			heightLeft = this.height;
 			widthLeft = this.width;
 
-			squarify(newChildren, new ArrayDeque<>(), minimumSide());
+			squarify(newChildren, new CircularFifoQueue<>(), minimumSide());
 		}
 		this.children = newChildren;
 
 	}
 
 
-	private void squarify(ArrayDeque<ItemVis<X>> children, Collection<ItemVis> row, double w) {
-		ArrayDeque<ItemVis<X>> remainPoped = new ArrayDeque<>(children);
-		ItemVis c = remainPoped.pop();
+	private void squarify(CircularFifoQueue<ItemVis<X>> children, Collection<ItemVis> row, double w) {
+		CircularFifoQueue<ItemVis<X>> remainPoped = new CircularFifoQueue<>(children);
+		ItemVis c = remainPoped.poll();//.pop();
 
 		FasterList<ItemVis> concatRow = concat(row, c);
 

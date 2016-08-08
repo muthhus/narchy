@@ -34,6 +34,16 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+      <version>4.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.lmax</groupId>
+      <artifactId>disruptor</artifactId>
+      <version>3.3.5</version>
+    </dependency>
+    <dependency>
       <!-- https://vimeo.com/12165742 -->
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>

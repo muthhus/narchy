@@ -160,9 +160,11 @@ public interface TimeFunctions {
     @NotNull
     static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
 
-        int eventDelta = DTERNAL;
+        int eventDelta;
 
-        if (!p.belief.isEternal() && !p.task.isEternal()) {
+        long beliefO = p.belief.occurrence();
+        long taskO = p.task.occurrence();
+        if (beliefO!=ETERNAL && taskO!=ETERNAL) {
             long earliest = p.occurrenceTarget(earliestOccurrence);
 
             //TODO check valid int/long conversion
@@ -171,11 +173,20 @@ public interface TimeFunctions {
 
 
             occReturn[0] = earliest;
+        } else if (beliefO!=ETERNAL) {
+            occReturn[0] = beliefO;
+            eventDelta = DTERNAL;
+        } else if (taskO!=ETERNAL) {
+            occReturn[0] = taskO;
+            eventDelta = DTERNAL;
+        } else {
+            eventDelta = DTERNAL;
         }
 
 
+
         //HACK to handle commutive switching so that the dt is relative to the effective subject
-        if (derived.op().commutative) {
+        if (eventDelta!=0 && eventDelta!=DTERNAL && derived.op().commutative) {
 
             Term bt = p.beliefTerm;
             Term d0 = derived.term(0);

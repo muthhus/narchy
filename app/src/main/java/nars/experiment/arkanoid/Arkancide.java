@@ -195,11 +195,11 @@ public class Arkancide extends NAREnvironment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Param.CONCURRENCY_DEFAULT = 2;
+        Param.CONCURRENCY_DEFAULT = 3;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 5 * 10000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 10 * 10000000, false)
                 , new FrameClock()) {
 
             VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
@@ -208,18 +208,18 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.1f);
         nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.9f);
+        nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -253,8 +253,8 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 5);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 5);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);

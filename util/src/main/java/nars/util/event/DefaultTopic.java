@@ -1,5 +1,6 @@
 package nars.util.event;
 
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
@@ -60,6 +61,23 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
                     break; //null terminator hit
             }
         }
+    }
+
+    @Override
+    public void emitAsync(V inputted, ExecutorService e) {
+        Consumer[] vv = getCachedNullTerminatedArray();
+        if (vv != null) {
+            for (int i = 0; ; ) {
+                Consumer c = vv[i++];
+                if (c != null) {
+                    e.submit(()-> {
+                        c.accept(inputted);
+                    });
+                } else
+                    break; //null terminator hit
+            }
+        }
+
     }
 
     @Override

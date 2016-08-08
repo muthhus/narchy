@@ -17,6 +17,8 @@ import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.stream.Stream;
 
@@ -25,11 +27,13 @@ import java.util.stream.Stream;
  */
 public class MySTMClustered extends STMClustered {
 
+	private static final Logger logger= LoggerFactory.getLogger(MySTMClustered.class);
+
 	public final Topic<Task> generate = new DefaultTopic<>();
 
 	private final int maxGroupSize;
 
-	float timeCoherenceThresh = 0.5f; //for sequence pairs phase
+	float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
 	float freqCoherenceThresh = 0.9f;
 	float confCoherenceThresh = 0.5f;
 
@@ -57,13 +61,17 @@ public class MySTMClustered extends STMClustered {
 		//LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
 
 
-		//clusters where all terms occurr simultaneously at precisely the same time
-		//cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
-		cluster(maxGroupSize);
+		try {
+			//clusters where all terms occurr simultaneously at precisely the same time
+			//cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
+			cluster(maxGroupSize);
 
-		//clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
-		if (maxGroupSize!=2)
-			cluster(2);
+			//clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
+			if (maxGroupSize != 2)
+				cluster(2);
+		} catch (Exception e) {
+			logger.warn("{}", e);
+		}
 	}
 
 	private void cluster(int maxGroupSize) {
@@ -74,12 +82,14 @@ public class MySTMClustered extends STMClustered {
 				if (n.size() < 2)
 					return false;
 
+				//TODO wrap all the coherence tests in one function call which the node can handle in a synchronized way because the results could change in between each of the sub-tests:
+
 				double[] tc = n.coherence(0);
 				if (tc==null)
 					return false;
 
 
-				if (tc[1] >= timeCoherenceThresh) {
+				if (maxGroupSize== 2 || tc[1] >= timeCoherenceThresh) {
 					double[] fc = n.coherence(1);
 					if (fc[1] >= freqCoherenceThresh) {
 						double[] cc = n.coherence(2);

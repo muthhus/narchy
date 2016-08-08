@@ -145,8 +145,8 @@ public interface BeliefTable extends TaskTable {
 //    }
 
     /** returns a value <= 1.0 */
-    static float relevance(long delta /* positive only */, float ageFactor /* <1, divides usually */) {
-        return 1f / (1f + delta*ageFactor);
+    static float temporalIrrelevance(long delta /* positive only */, float duration /* <1, divides usually */) {
+        return (1f + (float)Math.log(1+delta/duration));
     }
 
 //    @NotNull
@@ -173,9 +173,7 @@ public interface BeliefTable extends TaskTable {
         else {
             long dt = Math.abs(t.occurrence() - now) + Math.abs(when - now);
 
-            float relevance = relevance(dt, 1f);
-
-            float rank = c * relevance;
+            float rank = c / temporalIrrelevance(dt, 1f);
             //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);
             return rank;
         }

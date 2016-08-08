@@ -160,7 +160,7 @@ public abstract class AbstractCore {
                     termlinks
             );
 
-            nar.input(derive);
+            nar.inputLater(derive);
 
         }
 

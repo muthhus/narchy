@@ -4,6 +4,9 @@ package nars;
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import com.lmax.disruptor.*;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -41,12 +44,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
@@ -105,7 +110,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     final ForkJoinPool runWorker;
-    final ForkJoinPool taskWorker;
+    //final ForkJoinPool taskWorker;
+
+    static class TaskEvent {
+        public Task[] tasks;
+    }
+
+    final Disruptor<TaskEvent> async =
+            new Disruptor<TaskEvent>(
+                    () -> new TaskEvent(), 1024,
+                    //new BasicExecutor(Executors.defaultThreadFactory()),
+                    Executors.newCachedThreadPool(),
+                    //ForkJoinPool.commonPool(),
+                    ProducerType.MULTI,
+                    new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
+                    //Executors.newCachedThreadPool()
+            );
+    //private final SequenceBarrier asyncBarrier;
 
     private NARLoop loop;
 
@@ -144,26 +165,46 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         });
 
 
-        if (concurrency == -1) {
-            this.runWorker = this.taskWorker = ForkJoinPool.commonPool();
-        } else {
-
-            this.runWorker =
-                    //ForkJoinPool.commonPool(); //<- uses the common pool's concurrency which may not be the supplied 'concurrency' value
-                    new ForkJoinPool(concurrency,
-                            defaultForkJoinWorkerThreadFactory, null, false);
-
-            this.taskWorker =
-                    new ForkJoinPool(concurrency,
-                            defaultForkJoinWorkerThreadFactory, null, false);
-        }
-
-
         index.loadBuiltins();
+
+
+        this.runWorker = ForkJoinPool.commonPool();
+        if (concurrency == -1) {
+            concurrency = 1;
+        } //else {
+
+//            this.runWorker =
+                    //ForkJoinPool.commonPool(); //<- uses the common pool's concurrency which may not be the supplied 'concurrency' value
+//                    new ForkJoinPool(concurrency,
+//                            defaultForkJoinWorkerThreadFactory, null, false);
+
+//            this.taskWorker =
+//                    new ForkJoinPool(concurrency,
+//                            defaultForkJoinWorkerThreadFactory, null, false);
+        //}
+
+
+        WorkHandler[] workers = new WorkHandler[concurrency];
+        for (int i = 0; i < concurrency; i++)
+            workers[i] = newRunner.get();
+
+        async.handleEventsWithWorkerPool(workers);
+        async.start();
+
+
 
 
 
     }
+
+
+    Supplier<WorkHandler<TaskEvent>> newRunner = () -> {
+        return ((TaskEvent te) -> {
+            Task[] tt = te.tasks;
+            te.tasks = null;
+            input(tt);
+        });
+    };
 
     @Deprecated
     public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
@@ -219,6 +260,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public synchronized void reset() {
 
+        async.shutdown();
 
         super.reset();
 
@@ -597,28 +639,31 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             try {
                 Activation activation = new Activation(inputted);
 
-                c.link(conceptActivation /* linkActivation */, Param.BUDGET_EPSILON, this, activation);
+                c.link( 1 /* linkActivation */, Param.BUDGET_EPSILON, this, activation);
 
-                activation.run(this, 1f /*conceptActivation*/);
+                activation.run(this, conceptActivation);
 
                 emotion.busy(cost);
                 emotion.stress(activation.overflow);
-            } catch (TermIndex.InvalidConceptException e) {
+            } catch (Exception e) {
                 emotion.errr();
 
                 if (Param.DEBUG)
                     logger.warn("activation error: {}", e.toString());
 
                 inputted.delete();
+                return c;
             }
 
 
             if (input != inputted) {
-                input.onConcept(c);
+                //input.onConcept(c);
+                input.delete();
             }
             inputted.onConcept(c);
 
             eventTaskProcess.emit(inputted); //signal any additional processes
+            //eventTaskProcess.emitAsync(inputted, concurrency, runWorker);
 
         } else {
             emotion.frustration(cost);
@@ -738,10 +783,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         Clock clock = this.clock;
 
-
-
         for (; frames > 0; frames--) {
-
 
             awaitQuiescence();
 
@@ -749,7 +791,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             emotion.frame();
 
             frameStart.emit(this);
-
 
         }
     }
@@ -760,11 +801,24 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 logger.warn("runWorker lag: {}", runWorker);
             }
         }
-        if (!taskWorker.isQuiescent()) {
-            while (!taskWorker.awaitQuiescence(500, TimeUnit.MILLISECONDS)) {
-                logger.warn("taskWorker lag: {}", taskWorker);
-            }
+
+
+        //long used = size - ring.remainingCapacity();
+        long cap;
+        RingBuffer<TaskEvent> ring = async.getRingBuffer();
+        while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
+        //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
+            long now = async.getCursor();
+            //logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
+            //Util.pause(1);
+            Thread.yield();
         }
+//        taskWorker.getRingBuffer().
+//        if (!taskWorker.isQuiescent()) {
+//            while (!taskWorker.awaitQuiescence(500, TimeUnit.MILLISECONDS)) {
+//                logger.warn("taskWorker lag: {}", taskWorker);
+//            }
+//        }
     }
 
 
@@ -1234,7 +1288,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final void inputLater(@NotNull Task... t) {
         if (t.length == 0)
             throw new RuntimeException("empty task array");
-        taskWorker.execute(new InputTasks(t));
+        //taskWorker.execute(new InputTasks(t));
+        async.publishEvent((TaskEvent x, long seq, Task[] b) -> x.tasks = b, t);
+
     }
 
     private final class InputTasks implements Runnable {

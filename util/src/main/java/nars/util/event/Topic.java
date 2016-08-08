@@ -4,6 +4,8 @@ package nars.util.event;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -90,6 +92,8 @@ public interface Topic<V> {
     int size();
 
     boolean isEmpty();
+
+    void emitAsync(V inputted, ExecutorService e);
 
 //    String name();
 

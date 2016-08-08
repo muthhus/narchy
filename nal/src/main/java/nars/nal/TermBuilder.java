@@ -586,6 +586,7 @@ public abstract class TermBuilder {
                         //return negation(predicate); /??
                     }
 
+                    // (C ==> (A ==> B))   <<==>>  ((&&,A,C) ==> B)
                     if (predicate.op() == IMPL) {
                         Term oldCondition = subj(predicate);
                         if (!Param.ALLOW_RECURSIVE_IMPLICATIONS && (oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
@@ -597,11 +598,11 @@ public abstract class TermBuilder {
                     }
 
 
-                    //filter (factor out) any common subterms iff DTERNAL
+                    //filter (factor out) any common subterms iff commutive
                     if ((subject.op() == CONJ) && (predicate.op() == CONJ)) {
                         Compound csub = (Compound) subject;
                         Compound cpred = (Compound) predicate;
-                        if (dt == DTERNAL) {
+                        if ((dt == DTERNAL || dt == 0)) {
 
                             TermContainer subjs = csub.subterms();
                             TermContainer preds = cpred.subterms();
