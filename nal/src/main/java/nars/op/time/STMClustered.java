@@ -27,9 +27,10 @@ import java.util.stream.StreamSupport;
 
 public class STMClustered extends STM {
 
-    static final int DIMENSIONS = 2;
+    static final int DIMENSIONS = 3;
     final int TIME = 0;
     final int FREQ = 1;
+    final int CONF = 1; //group by confidence to preserve the maximum collective confidence of any group
 
 
     final short clusters;
@@ -46,7 +47,6 @@ public class STMClustered extends STM {
 
     public final char punc;
 
-    //final float timeResolution = 0.5f;
 
 
     private static final int compactPeriod = 8;
@@ -62,6 +62,7 @@ public class STMClustered extends STM {
             super(id, dimensions);
             randomizeUniform(0, now-1, now+1);
             randomizeUniform(1, 0f, 1f);
+            randomizeUniform(2, 0f, 1f);
             filter();
         }
 
@@ -282,12 +283,11 @@ public class STMClustered extends STM {
         double[] c = new double[DIMENSIONS];
         c[0] = t.occurrence(); //time
         c[1] = t.freq(); //0..+1
+        c[2] = t.conf(); //0..+1
         return c;
     }
 
     final Deque<TasksNode> removed = new ArrayDeque<>();
-
-
 
     public STMClustered(@NotNull NAR nar, @NotNull MutableInteger capacity, char punc, int expectedTasksPerNode) {
         super(nar, capacity);

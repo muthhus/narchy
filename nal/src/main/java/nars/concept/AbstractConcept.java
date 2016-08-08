@@ -72,7 +72,7 @@ public interface AbstractConcept extends Concept {
 //        /* insert termlink target to source */
         boolean alsoReverse = true;
         if (targetConcept!=null && alsoReverse) {
-            //subScale /= 2; //divide among both directions
+            subScale /= 2; //divide among both directions
 
             targetConcept.termlinks().put(source.term(), activation.in, subScale, activation.overflow);
         }

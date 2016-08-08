@@ -27,16 +27,17 @@ public class MySTMClustered extends STMClustered {
 
 	public final Topic<Task> generate = new DefaultTopic<>();
 
-	private final int maxConjunctionSize;
+	private final int maxGroupSize;
 
 	float timeCoherenceThresh = 0.5f; //for sequence pairs phase
 	float freqCoherenceThresh = 0.9f;
+	float confCoherenceThresh = 0.5f;
 
 	float confMin;
 
-	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxConjunctionSize) {
-        super(nar, new MutableInteger(size), punc, maxConjunctionSize);
-		this.maxConjunctionSize = maxConjunctionSize;
+	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize) {
+        super(nar, new MutableInteger(size), punc, maxGroupSize);
+		this.maxGroupSize = maxGroupSize;
 
 		//this.logger = LoggerFactory.getLogger(toString());
 
@@ -55,20 +56,17 @@ public class MySTMClustered extends STMClustered {
 
 		//LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
 
-		int maxConjunctionSize = this.maxConjunctionSize;
-		float timeCoherenceThresh = this.timeCoherenceThresh;
-		float freqCoherenceThresh = this.freqCoherenceThresh;
 
 		//clusters where all terms occurr simultaneously at precisely the same time
 		//cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
+		cluster(maxGroupSize);
 
-		//clusters where dt is allowed, but these must be of length 2
-		cluster(2, timeCoherenceThresh, freqCoherenceThresh);
-
-
+		//clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
+		if (maxGroupSize!=2)
+			cluster(2);
 	}
 
-	private void cluster(int maxConjunctionSize, float timeCoherenceThresh, float freqCoherenceThresh) {
+	private void cluster(int maxGroupSize) {
 		net.nodeStream()
 			//.parallel()
 				//.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
@@ -84,6 +82,10 @@ public class MySTMClustered extends STMClustered {
 				if (tc[1] >= timeCoherenceThresh) {
 					double[] fc = n.coherence(1);
 					if (fc[1] >= freqCoherenceThresh) {
+						double[] cc = n.coherence(2);
+						if (cc[1] >= confCoherenceThresh) {
+							return true;
+						}
 						return true;
 					}
 				}
@@ -103,7 +105,7 @@ public class MySTMClustered extends STMClustered {
 				}
 
 				float finalFreq = freq;
-				node.termSet(maxConjunctionSize,  Param.compoundVolumeMax.intValue()-1).forEach(tt -> {
+				node.termSet(maxGroupSize,  Param.compoundVolumeMax.intValue()-1).forEach(tt -> {
 
 					Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
@@ -115,7 +117,7 @@ public class MySTMClustered extends STMClustered {
 
 					long[] evidence = Stamp.zip(Stream.of(uu), uu.length, Param.STAMP_CAPACITY);
 
-					@Nullable Term conj = conj(negated, uu);
+					@Nullable Term conj = group(negated, uu);
 
 					if (!(conj instanceof Compound))
 						return;
@@ -153,7 +155,7 @@ public class MySTMClustered extends STMClustered {
 		});
 	}
 
-	private Term conj(boolean negated, Task[] uu) {
+	private Term group(boolean negated, Task[] uu) {
 
 		if (uu.length == 2) {
 			//find the dt and construct a sequence
@@ -164,6 +166,7 @@ public class MySTMClustered extends STMClustered {
 				early = uu[1]; late = uu[0];
 			}
 			int dt = (int)(late.occurrence() - early.occurrence());
+
 
 			return $.conj(
 					$.negIf(early.term(), negated),
@@ -179,6 +182,7 @@ public class MySTMClustered extends STMClustered {
 
 			//just assume they occurr simultaneously
 			return $.parallel(s);
+			//return $.secte(s);
 		}
 	}
 }

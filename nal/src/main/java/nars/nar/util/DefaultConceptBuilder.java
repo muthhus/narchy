@@ -99,7 +99,10 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
 
     /** use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process */
-    private final BudgetMerge mergeDefault = BudgetMerge.avgBlend;
+    private final BudgetMerge mergeDefault = BudgetMerge
+            //.avgBlend;
+            .plusBlend;
+
 
 
 
@@ -120,8 +123,8 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                 new CurveBag.NormalizedSampler(
                         //new CurveBag.DirectSampler(
                         //CurveBag.linearBagCurve,
-                        //CurveBag.power2BagCurve,
-                        CurveBag.power4BagCurve,
+                        CurveBag.power2BagCurve,
+                        //CurveBag.power4BagCurve,
                         //CurveBag.power6BagCurve,
                         rng);
 

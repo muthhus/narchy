@@ -64,7 +64,7 @@ public abstract class Param extends Container implements Level {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.0001f;
+    public static final float BUDGET_EPSILON = 0.00001f;
     /**
      * minimum durability and quality necessary for a derivation to form
      */

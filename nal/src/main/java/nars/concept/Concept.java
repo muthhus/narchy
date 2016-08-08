@@ -206,7 +206,7 @@ public interface Concept extends Termed {
      */
     default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
 
-        Concept other = nar.concept(otherTask);
+        Concept other = otherTask.concept(nar);
         if (other == null || other.equals(this))
             return; //null or same concept
 

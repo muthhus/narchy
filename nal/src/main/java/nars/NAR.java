@@ -542,7 +542,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         if (input.isDeleted()) {
             //throw new InvalidTaskException(input, "Deleted");
-            logger.warn("{} deleted", input);
+            logger.warn("input deleted: {}", input);
+            return null;
         }
 
         Concept c = null;
@@ -592,15 +593,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //decides if TaskProcess was successful in somehow affecting its concept's state
         if (inputted != null && !inputted.isDeleted()) {
 
-
-
             //propagate budget
             try {
                 Activation activation = new Activation(inputted);
-                //((Default)this).core.concepts.put(c, inputted, conceptActivation, null /*activation.overflow <- mixes concept and link activation? */);
-                c.link(1f, Param.BUDGET_EPSILON, this, activation);
 
-                activation.run(this, conceptActivation);
+                c.link(conceptActivation /* linkActivation */, Param.BUDGET_EPSILON, this, activation);
+
+                activation.run(this, 1f /*conceptActivation*/);
 
                 emotion.busy(cost);
                 emotion.stress(activation.overflow);
@@ -614,15 +613,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             }
 
 
-            if (input == inputted) {
+            if (input != inputted) {
                 input.onConcept(c);
             }
+            inputted.onConcept(c);
 
             eventTaskProcess.emit(inputted); //signal any additional processes
 
         } else {
             emotion.frustration(cost);
         }
+
 
         return c;
     }
@@ -669,6 +670,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * Exits an iteration loop if running
      */
     public void stop() {
+
+        awaitQuiescence();
+
         if (!running.compareAndSet(true, false)) {
             throw new RuntimeException("wasnt running");
         }
@@ -739,12 +743,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         for (; frames > 0; frames--) {
 
 
-            while (!taskWorker.awaitQuiescence(2, TimeUnit.SECONDS)) {
-                logger.warn("taskWorker lag: {}  ", taskWorker );
-            }
-            while (!runWorker.awaitQuiescence(2, TimeUnit.SECONDS)) {
-                logger.warn("runWorker lag: {}  ", runWorker );
-            }
+            awaitQuiescence();
 
             clock.tick();
             emotion.frame();
@@ -754,6 +753,20 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         }
     }
+
+    private void awaitQuiescence() {
+        if (!runWorker.isQuiescent()) {
+            while (!runWorker.awaitQuiescence(500, TimeUnit.MILLISECONDS)) {
+                logger.warn("runWorker lag: {}", runWorker);
+            }
+        }
+        if (!taskWorker.isQuiescent()) {
+            while (!taskWorker.awaitQuiescence(500, TimeUnit.MILLISECONDS)) {
+                logger.warn("taskWorker lag: {}", taskWorker);
+            }
+        }
+    }
+
 
 //    private void runAsyncFrameTasks() {
 //        try {
@@ -1400,8 +1413,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
         public void run(NAR nar, float activation) {
-            if (!concepts.isEmpty())
-                ((Default)nar).core.concepts.put(concepts, in, activation);
+            if (!concepts.isEmpty()) {
+                float total = (float)concepts.sum();
+                ((Default) nar).core.concepts.put(concepts, in,
+                        activation/total //normalize to 1.0 total
+                        //activation
+                );
+            }
         }
     }
 

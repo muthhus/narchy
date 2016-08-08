@@ -39,8 +39,8 @@ public class STMView  {
             if (state.range.length == 0)
                 return;
 
-            if (state.range.length!=2)
-                throw new UnsupportedOperationException("only dim=2 supported currently");
+            //if (state.range.length!=2)
+                //throw new UnsupportedOperationException("only dim=2 supported currently");
 
             float s = 1f;
             float w = 0.02f;
@@ -63,6 +63,7 @@ public class STMView  {
 
                 float x = (float) c[0];
                 float y = (float) c[1];
+                //TODO HACK dimension c > 1 ignored
 
                 gl.glColor4f(p, 0.5f, 0, 0.75f);
 

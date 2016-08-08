@@ -219,7 +219,7 @@ public class Arkancide extends NAREnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.1f);
+        nar.confMin.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -253,8 +253,8 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 2);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 5);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 5);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);

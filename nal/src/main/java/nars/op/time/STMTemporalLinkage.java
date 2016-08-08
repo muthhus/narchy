@@ -47,6 +47,8 @@ public final class STMTemporalLinkage extends STM {
 
         /** current task's... */
         Concept concept = t.concept(nar);
+        if (concept == null)
+            throw new RuntimeException("null concept for " + t);
 
 
         int stmSize = capacity.intValue();

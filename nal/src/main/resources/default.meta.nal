@@ -48,8 +48,8 @@
     (P ==> S), (S ==> P), time(dtCombine), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
-    ( (--,%S) ==> P),  P, no_common_subterm(S,P), notEquivalence(P), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
-    ( (--,%S) ==> P),  S, no_common_subterm(S,P), notEquivalence(S), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  P, neq(S,P), no_common_subterm(S,P), notEquivalence(P), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+    ( (--,%S) ==> P),  S, neq(S,P), neq((--,%S),P), no_common_subterm(S,P), notEquivalence(S), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
 
 
 
@@ -99,6 +99,12 @@
     (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P), time(occMerge) |- (M --> (P & S)), (Belief:Intersection, Derive:NoSwap)
     (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P), time(occMerge) |- (M --> (P | S)), (Belief:Union, Derive:NoSwap)
     (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P), time(occMerge) |- (M --> (P - S)), (Belief:Difference, Derive:NoSwap)
+
+//raw product composition
+//    (A..+), (B..+), time(occMerge) |- ((A..+) | (B..+)), (Belief:Intersection, Derive:NoSwap)
+//    (A..+), (B..+), time(occMerge) |- ((A..+) & (B..+)), (Belief:Union, Derive:NoSwap)
+//    (A..+), (B..+), time(occMerge) |- ((A..+) ~ (B..+)), (Belief:Difference, Derive:NoSwap)
+//raw product decomposition ?
 
 //// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
 //if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
@@ -285,7 +291,7 @@
         //(&&,(--,%X),A..+), X, time(taskConjDecomposable) |- (--,%X), (Belief:StructuralDeduction)
      (&&,X,A..+), X, time(taskConjDecomposable) |- (&&,A..+), (Belief:StructuralDeduction)
         //(&&,(--,%X),A..+), X, time(taskConjDecomposable) |- (&&,A..+), (Belief:StructuralDeduction)
-     (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     (&&,X,A..+), B, time(taskConjDecomposable) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
         //TODO as above
 
     //decompose (only) the leading event in a conjunction goal
@@ -360,14 +366,14 @@
     A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==>+- B), (Belief:Induction)
         A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
 
-    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
+    A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
+        A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) <=>+- B), (Belief:Comparison)
 
     A, B, task(positive), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
         A, B, task(negative), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- (--,%A)), (Belief:Abduction)
 
-    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
-        //A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
-        //A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
+    A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
+        A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
 
     //A, B,   time(dtBefore), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B &&+- A), (Desire:Intersection)
 

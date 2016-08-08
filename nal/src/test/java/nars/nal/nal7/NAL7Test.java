@@ -2,6 +2,7 @@ package nars.nal.nal7;
 
 import nars.NAR;
 import nars.nal.AbstractNALTest;
+import nars.nar.Default;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -18,7 +19,7 @@ import static nars.nal.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 500;
+    final int cycles = 700;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -336,8 +337,8 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events3_simple_reversed() {
         //TESTS COMMUTIVITY
 
-        test()
-            //.log()
+        TestNAR t = test()
+                .log()
                 .inputAt(0, "<room --> enter>. :|:")
                 .inputAt(4, "<door --> open>. :|:")
                 .mustBelieve(cycles, "(open:door <=>-4 enter:room)",
@@ -668,18 +669,18 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles,"(x)",1f,0.81f,0)
                 .mustBelieve(cycles,"(y)",1f,0.81f,0);
     }
-    @Test public void testWTFDontDecomposeConjunction0() {
-        test()
-                .input("((x)&&(y)). :|:")
-                .mustNotOutput(cycles,"(x)",'.',0,ETERNAL)
-                .mustNotOutput(cycles,"(y)",'.',0,ETERNAL);
-    }
-    @Test public void testWTFDontDecomposeConjunction1() {
-        test()
-                .input("((x) &&+0 (y)).")
-                .mustNotOutput(cycles,"(x)",'.',0,ETERNAL)
-                .mustNotOutput(cycles,"(y)",'.',0,ETERNAL);
-    }
+//    @Test public void testWTFDontDecomposeConjunction0() {
+//        test()
+//                .input("((x)&&(y)). :|:")
+//                .mustNotOutput(cycles,"(x)",'.',0,ETERNAL)
+//                .mustNotOutput(cycles,"(y)",'.',0,ETERNAL);
+//    }
+//    @Test public void testWTFDontDecomposeConjunction1() {
+//        test()
+//                .input("((x) &&+0 (y)).")
+//                .mustNotOutput(cycles,"(x)",'.',0,ETERNAL)
+//                .mustNotOutput(cycles,"(y)",'.',0,ETERNAL);
+//    }
 
     @Test public void testWTFDontDecomposeConjunction() {
         //$.07;.23;.24$ ((I-->happy) &&+0 (I-->neutral)). 3-2 %.06;.81%

@@ -32,6 +32,7 @@ import java.util.function.Function;
 
 import static nars.Op.CONJ;
 import static nars.Op.EQUI;
+import static nars.Op.IMPL;
 import static nars.nal.Tense.DTERNAL;
 
 /** arithmetic rule mining & variable introduction */
@@ -142,10 +143,10 @@ public class ArithmeticInduction implements Consumer<Task> {
 
             //attempt to compress all subterms to a single rule
             if ((/*(o == EQUI || o == IMPL || */(o == CONJ) && ((bdt == DTERNAL) || (bdt == 0)))
-                    ||
+                    /*||
                     (o.isSet())
                     ||
-                    (o.isIntersect())) {
+                    (o.isIntersect())*/) {
 
                 compress(in, (pattern) -> {
 
@@ -157,7 +158,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
             //attempt to replace all subterms of an embedded conjunction subterm
             Compound<?> tn = in.term();
-            if ((o != CONJ && o!=EQUI) && tn.subterms().hasAny(CONJ)) {
+            if ((o != CONJ && o!=EQUI && o!=IMPL) && tn.subterms().hasAny(CONJ)) {
 
 
                 //attempt to transform inner conjunctions

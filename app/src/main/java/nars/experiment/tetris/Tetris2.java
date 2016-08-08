@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Param;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -40,22 +41,22 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Tetris2 extends NAREnvironment {
 
     static {
-        Param.DEBUG = false;
-        Param.CONCURRENCY_DEFAULT = 2;
+        Param.DEBUG = true;
+        Param.CONCURRENCY_DEFAULT = 3;
     }
 
-    public static final int runFrames = 1000;
-    public static final int cyclesPerFrame = 96;
+    public static final int runFrames = 100;
+    public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 3;
+    public static final int TIME_PER_FALL = 2;
     static int frameDelay = 0;
 
     static boolean easy = true;
 
 
     private final TetrisState state;
-    private int visionSyncPeriod = 32;
+    private int visionSyncPeriod = 16;
 
     public class View {
 
@@ -188,7 +189,7 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                16, 2, 2, rng,
+                64, 3, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 , new FrameClock()) {
@@ -202,7 +203,7 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.1f);
         nar.derivedActivation.setValue(0.05f);
 
 
@@ -213,7 +214,7 @@ public class Tetris2 extends NAREnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.03f);
+        nar.confMin.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -247,8 +248,8 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
@@ -270,7 +271,7 @@ public class Tetris2 extends NAREnvironment {
 
 
                 //BagChart.show((Default) nar, 1024);
-                //STMView.show(stm, 800, 600);
+                STMView.show(stm, 800, 600);
 
                 int plotHistory = 256;
                 Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
@@ -422,9 +423,9 @@ public class Tetris2 extends NAREnvironment {
 
 
         t.run(runFrames, frameDelay);
+        //nar.stop();
 
-
-        nar.index.print(System.out);
+        //nar.index.print(System.out);
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
         //nar.forEachActiveConcept(System.out::println);
