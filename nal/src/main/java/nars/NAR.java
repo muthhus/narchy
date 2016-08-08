@@ -32,7 +32,6 @@ import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
-import net.openhft.affinity.AffinityLock;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
 import org.iq80.snappy.SnappyFramedInputStream;
@@ -731,28 +730,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return run(1);
     }
 
-    /**
-     * pins thread to a CPU core to improve performance while
-     * running some frames.
-     * <p>
-     * there is some overhead in acquiring the lock so it
-     * will not make sense to use this method unless
-     * the expected runtime for the given # of frames
-     * is sufficiently high (ie. dont use this in a loop;
-     * instead put the loop inside an AffinityLock)
-     */
-    @NotNull
-    public NAR runBatch(int frames) {
-
-        AffinityLock al = AffinityLock.acquireLock();
-        try {
-            run(frames);
-        } finally {
-            al.release();
-        }
-
-        return this;
-    }
 
     /**
      * Runs multiple frames, unless already running (then it return -1).
@@ -937,6 +914,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @NotNull
     public NARLoop loop(float initialFPS) {
+        if (initialFPS == 0)
+            return loop((int)0);
         float millisecPerFrame = 1000.0f / initialFPS;
         return loop((int) millisecPerFrame);
     }

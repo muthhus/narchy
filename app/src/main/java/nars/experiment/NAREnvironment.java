@@ -2,15 +2,14 @@ package nars.experiment;
 
 import nars.$;
 import nars.NAR;
+import nars.NARLoop;
 import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
-import nars.nar.Default;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Term;
-import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.PolarRangeNormalizedFloat;
@@ -100,7 +99,7 @@ abstract public class NAREnvironment {
      */
     protected abstract float act();
 
-    public void next() {
+    public synchronized void next() {
 
         for (int i = 0; i < ticksBeforeObserve; i++)
             nar.clock.tick();
@@ -191,19 +190,34 @@ abstract public class NAREnvironment {
 
     }
 
-    public void run(int cycles, int frameDelayMS) {
+    public @NotNull NARLoop run(int cycles, int frameDelayMS) {
 
         init(nar);
 
         mission();
-        nar.next(); //step one for any mission() results to process first
 
-        for (int t = 0; t < cycles; t++) {
-            next();
+        NARLoop l = new NARLoop(nar, frameDelayMS) {
 
-            if (frameDelayMS > 0)
-                Util.pause(frameDelayMS);
-        }
+            @Override
+            public void frame(@NotNull NAR nar) {
+                super.frame(nar);
+                next();
+                if (nar.time() >= cycles)
+                    stop();
+            }
+        };
+   
+
+        return l;
+
+//        nar.next(); //step one for any mission() results to process first
+//
+//        for (int t = 0; t < cycles; t++) {
+//            next();
+//
+//            if (frameDelayMS > 0)
+//                Util.pause(frameDelayMS);
+//        }
     }
 
     protected void reinforce() {

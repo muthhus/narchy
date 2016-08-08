@@ -113,7 +113,7 @@ public class TermIOTest {
     }
 
     @Test public void testTaskSerialization2() {
-        assertEqualSerialize(nar.inputTask("$0.3;0.2;0.1$ <a-->(b==>c)>! %1.0;0.8%"));
+        assertEqualSerialize(nar.inputTask("$0.3;0.2;0.1$ (a-->(b==>c))! %1.0;0.8%"));
     }
 
     @Test public void testNARTaskDump() throws Exception {

@@ -22,7 +22,7 @@ public class DefaultCore extends AbstractCore {
 
 
     public DefaultCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {
-        super(nar, matcher);
+        super(nar);
     }
 
 

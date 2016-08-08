@@ -587,14 +587,16 @@ public interface TermIndex {
             synchronized (c) {
 
                 c.policy(p, now);
+            }
 
                 c.tasklinks().commit();
                 c.termlinks().commit();
 
                 set(c); //update in the cache (weight, etc.)
 
-            }
+
         }
+
 
     }
 

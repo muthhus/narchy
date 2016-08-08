@@ -199,7 +199,7 @@ public class Arkancide extends NAREnvironment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 32, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 10 * 10000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 7 * 1000000, false)
                 , new FrameClock()) {
 
             VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
@@ -263,7 +263,7 @@ public class Arkancide extends NAREnvironment {
 
         Arkancide t = new Arkancide(nar);
 
-        t.run(runFrames, 0);
+        t.run(runFrames, 100).join();
 
         //nar.index.print(System.out);
         NAR.printTasks(nar, true);

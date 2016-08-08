@@ -69,7 +69,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         }
 
 
-        float w = v.complexity() * (1f - maxConfidence((CompoundConcept)v)) * 100;
+        float w = v.complexity() * (1f - maxConfidence((CompoundConcept)v)) * 10;
 
         return (int)w;
         //}

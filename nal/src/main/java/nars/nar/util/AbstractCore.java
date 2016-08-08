@@ -82,7 +82,7 @@ public abstract class AbstractCore {
         return false;
     }
 
-    protected AbstractCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {
+    protected AbstractCore(@NotNull NAR nar) {
 
         this.nar = nar;
 
@@ -135,7 +135,7 @@ public abstract class AbstractCore {
         private final short termlinks;
 
         public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks) {
-            super($.newHashSet(8 * tasklinks * termlinks));
+            super($.newHashSet(4 * tasklinks * termlinks));
             this.concept = c;
             this.nar = nar;
             this.tasklinks = tasklinks;

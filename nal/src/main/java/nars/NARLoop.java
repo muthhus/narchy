@@ -1,7 +1,8 @@
 package nars;
 
 import nars.util.Util;
-import net.openhft.affinity.AffinityLock;
+import org.apache.commons.lang3.mutable.MutableFloat;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -26,15 +27,19 @@ public class NARLoop implements Runnable {
      * sleep mode delay time
      */
     static final long sleepTimeMS = 250;
-    private final boolean cpuCoreReserve;
 
 
-    public volatile int cyclesPerFrame = 1;
     volatile int periodMS = 1000;
     private volatile boolean stopping,  stopped;
     //private boolean running;
 
-    //TODO make this into a SimpleIntegerProperty also
+
+    final int windowLength = 16;
+    public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
+
+
+    /** average desired cpu percentage */
+    public final MutableFloat priority = new MutableFloat(1f);
 
 
     @NotNull
@@ -53,21 +58,27 @@ public class NARLoop implements Runnable {
 //    }
 //
 
-    public NARLoop(@NotNull NAR n, int initialPeriod) {
-        this(n, initialPeriod, false);
+    public NARLoop(@NotNull NAR n) {
+        this(n, 0);
+    }
+
+    public synchronized void join() {
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      *
      * @param n
      * @param initialPeriod
-     * @param reserveCPUCore whether to acquire a thread affinity lock on a CPU core, which will improve performance if a dedicated core can be assigned
      */
-    public NARLoop(@NotNull NAR n, int initialPeriod, boolean reserveCPUCore) {
+    public NARLoop(@NotNull NAR n, int initialPeriod) {
 
 
         nar = n;
-        cpuCoreReserve = reserveCPUCore;
 
         n.the("loop", this);
 
@@ -114,34 +125,39 @@ public class NARLoop implements Runnable {
         return true;
     }
 
-    public void stop() throws InterruptedException  {
+    public void stop() /*throws InterruptedException */ {
         logger.info("stopping {}", this);
 
-        synchronized (thread) {
-            if (stopping || stopped)
-                throw new RuntimeException("already waiting for stop");
+        stopping = true;
 
-            stopping = true;
-            thread.join();
-        }
+//        synchronized (thread) {
+//            if (stopping || stopped)
+//                throw new RuntimeException("already waiting for stop");
+//
+//            try {
+//                thread.join();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
 
     /** dont call this directly */
-    @Override public final void run() {
+    @Override public final synchronized void run() {
 
-        AffinityLock al;
-        if (cpuCoreReserve) {
-            al = AffinityLock.acquireLock();
-            if (al.isAllocated() && al.isBound()) {
-                logger.info(thread + " running exclusively on CPU " +  al.cpuId());
-            }
-        }
-        else {
-            al = null;
-        }
+//        AffinityLock al;
+//        if (cpuCoreReserve) {
+//            al = AffinityLock.acquireLock();
+//            if (al.isAllocated() && al.isBound()) {
+//                logger.info(thread + " running exclusively on CPU " +  al.cpuId());
+//            }
+//        }
+//        else {
+//            al = null;
+//        }
 
-        try {
+        /* try */{
             NAR nar = this.nar;
 
             if (periodMS != -1)
@@ -150,26 +166,24 @@ public class NARLoop implements Runnable {
             prevTime = System.currentTimeMillis();
 
             do {
-                try {
-                    while (!stopping)
+                while (!stopping) {
+                    try {
                         frame(nar);
-                } catch (Throwable e) {
-                    nar.eventError.emit(e);
-                    if (Param.DEBUG) {
-                        try {
+                    } catch (Throwable e) {
+                        logger.error("{}",e);
+                        /*nar.eventError.emit(e);
+                        if (Param.DEBUG) {
                             stop();
-                        } catch (InterruptedException e1) {
-                            e1.printStackTrace();
-                        }
-                        break;
+                            break;
+                        }*/
                     }
                 }
             } while (!stopping);
 
-        } finally {
+        } /*finally {
             if (al!=null)
                 al.release();
-        }
+        }*/
 
         logger.info("stopped");
         stopped = true;
@@ -178,7 +192,7 @@ public class NARLoop implements Runnable {
 
     long prevTime;
 
-    public final void frame(@NotNull NAR nar) {
+    public void frame(@NotNull NAR nar) {
         int periodMS = this.periodMS;
 
         if (periodMS < 0) {
@@ -188,10 +202,16 @@ public class NARLoop implements Runnable {
 
             //if (!nar.running.get()) {
 
-                nar.run(cyclesPerFrame);
+            nar.next();
 
                 //this.prevTime = Util.pauseLockUntil(prevTime + periodMS);
-                this.prevTime = Util.pauseWaitUntil(prevTime + periodMS);
+            long prevPrevTime = this.prevTime;
+
+            //if we have a set period time, delay as appropriate otherwise continue immediately with the next cycle
+
+            this.prevTime = periodMS <= 0 ? System.currentTimeMillis() : Util.pauseWaitUntil(prevPrevTime + periodMS);
+
+            frameTime.addValue(prevTime - prevPrevTime);
 
                 //throttle(periodMS, System.currentTimeMillis() - lastTime);
 
