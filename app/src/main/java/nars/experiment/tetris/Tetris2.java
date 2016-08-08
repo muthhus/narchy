@@ -46,7 +46,7 @@ public class Tetris2 extends NAREnvironment {
     }
 
     public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 16;
+    public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 2;
@@ -56,7 +56,7 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private int visionSyncPeriod = 64 * TIME_DILATION;
+    private int visionSyncPeriod = 16 * TIME_DILATION;
 
     public class View {
 
@@ -214,8 +214,8 @@ public class Tetris2 extends NAREnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
-        nar.truthResolution.setValue(0.02f);
+        nar.confMin.setValue(0.1f);
+        nar.truthResolution.setValue(0.05f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)

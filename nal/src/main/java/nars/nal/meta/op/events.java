@@ -47,28 +47,28 @@ abstract public class events extends AtomicBoolCondition {
     };
 
 
-    public static final BoolCondition taskConjDecomposable = new AtomicBoolCondition() {
-        @Override
-        public @NotNull String toString() {
-            return "taskConjDecomposable";
-        }
-
-        @Override
-        public boolean booleanValueOf(PremiseEval p) {
-            Task t = p.task;
-
-            // rejects any task term with dt==DTERNAL and if task and belief are both eternal */
-            /*if (t.dt()!=DTERNAL) {
-                if (!t.isEternal())
-                    return true;
-                Task b = p.belief;
-                return (b!=null && !p.belief.isEternal());
-            } else {
-                return true; //dternal
-            }*/
-            return true;
-        }
-    };
+//    public static final BoolCondition taskConjDecomposable = new AtomicBoolCondition() {
+//        @Override
+//        public @NotNull String toString() {
+//            return "taskConjDecomposable";
+//        }
+//
+//        @Override
+//        public boolean booleanValueOf(PremiseEval p) {
+//            Task t = p.task;
+//
+//            // rejects any task term with dt==DTERNAL and if task and belief are both eternal */
+//            /*if (t.dt()!=DTERNAL) {
+//                if (!t.isEternal())
+//                    return true;
+//                Task b = p.belief;
+//                return (b!=null && !p.belief.isEternal());
+//            } else {
+//                return true; //dternal
+//            }*/
+//            return true;
+//        }
+//    };
 
     public static boolean beliefBeforeOrDuringTask(@NotNull Task a, @Nullable Task b) {
 

@@ -1,6 +1,7 @@
 package nars.util.signal;
 
 import nars.NAR;
+import nars.Param;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.CompoundConcept;
 import nars.concept.table.BeliefTable;
@@ -34,8 +35,8 @@ import java.util.function.BiPredicate;
 public abstract class WiredConcept extends CompoundConcept<Compound> implements Runnable {
 
     protected final NAR nar;
-    int beliefCapacity = 24;
-    int goalCapacity = 24;
+    int beliefCapacity = Param.DEFAULT_WIRED_CONCEPT_BELIEFS;
+    int goalCapacity = Param.DEFAULT_WIRED_CONCEPT_GOALS;
 
     @NotNull final private AtomicBoolean pendingRun = new AtomicBoolean(false);
 

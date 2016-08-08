@@ -1267,18 +1267,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     }
 
-    private final class InputTasks implements Runnable {
-        public final Task[] t;
-
-        private InputTasks(Task[] t) {
-            this.t = t;
-        }
-
-        @Override
-        public void run() {
-            input(t);
-        }
-    }
+//    private final class InputTasks implements Runnable {
+//        public final Task[] t;
+//
+//        private InputTasks(Task[] t) {
+//            this.t = t;
+//        }
+//
+//        @Override
+//        public void run() {
+//            input(t);
+//        }
+//    }
 
     public final void inputLater(@NotNull Collection<Task> tt) {
         int s = tt.size();

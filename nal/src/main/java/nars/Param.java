@@ -70,6 +70,8 @@ public abstract class Param extends Container implements Level {
      */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON * 2f;
 
+    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 12;
+    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 12;
     /**
      * specify level of concurrency (# of threads per each pool)
      * or -1 to use the common pool

@@ -693,7 +693,7 @@ public class PremiseRule extends GenericCompound {
                             break;
 
                         case "taskConjDecomposable":
-                            pres.add(events.taskConjDecomposable);
+                            //pres.add(events.taskConjDecomposable);
                             timeFunction = TimeFunctions.decomposeTask;
                             break;
 

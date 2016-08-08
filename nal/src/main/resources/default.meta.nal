@@ -289,10 +289,10 @@
      //decompose any event in a conjunction belief
      (&&,X,A..+), X, time(taskConjDecomposable) |- X, (Belief:StructuralDeduction)
         //(&&,(--,%X),A..+), X, time(taskConjDecomposable) |- (--,%X), (Belief:StructuralDeduction)
-     (&&,X,A..+), X, time(taskConjDecomposable) |- (&&,A..+), (Belief:StructuralDeduction)
+     (&&,X,A..+), B, time(taskConjDecomposable) |- substituteIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
         //(&&,(--,%X),A..+), X, time(taskConjDecomposable) |- (&&,A..+), (Belief:StructuralDeduction)
-     (&&,X,A..+), B, time(taskConjDecomposable) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
-        //TODO as above
+     //(&&,X,A..+), B, time(taskConjDecomposable) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
+
 
     //decompose (only) the leading event in a conjunction goal
     (&&,X,A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- X, (Desire:StructuralStrong)

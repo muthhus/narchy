@@ -300,22 +300,22 @@ public class NAL8Test extends AbstractNALTest {
 //    public void detaching_condition_2present()  {
 //        detachingCondition(true);
 //    }
-    @Test
-    public void detaching_condition_2eternal()  {
-        detachingCondition(false);
-    }
-
-    public void detachingCondition(boolean presentOrEternal) {
-        String suffix = "(open({t001}) ==>+5 [opened]:{t001})";
-        test()
-                //.log()
-            .input("at:(SELF,{t001}). :|: ")
-            .inputAt(10, "(at:(SELF,{t001}) &&+5 " + suffix + "). " + (presentOrEternal ? ":|:" : "")) //the occurrence time of this event is ignored; what matter is the task
-            .mustBelieve(cycles, suffix, 1.0f, 0.81f, 5)
-            .mustNotOutput(cycles,suffix,'.',ETERNAL)
-            .mustNotOutput(cycles,suffix,'.',0)
-        ;
-    }
+//    @Test
+//    public void detaching_condition_2eternal()  {
+//        detachingCondition(false);
+//    }
+//
+//    public void detachingCondition(boolean presentOrEternal) {
+//        String suffix = "(open({t001}) ==>+5 [opened]:{t001})";
+//        test()
+//                //.log()
+//            .input("at:(SELF,{t001}). :|: ")
+//            .inputAt(10, "(at:(SELF,{t001}) &&+5 " + suffix + "). " + (presentOrEternal ? ":|:" : "")) //the occurrence time of this event is ignored; what matter is the task
+//            .mustBelieve(cycles, suffix, 1.0f, 0.81f, 5)
+//            .mustNotOutput(cycles,suffix,'.',ETERNAL)
+//            .mustNotOutput(cycles,suffix,'.',0)
+//        ;
+//    }
 
 
     @Test
