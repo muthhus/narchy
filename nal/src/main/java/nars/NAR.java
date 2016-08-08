@@ -106,24 +106,25 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * Flag for running continuously
      */
-    public final AtomicBoolean running = new AtomicBoolean();
+    public volatile boolean running = false;
 
 
     final ForkJoinPool runWorker;
     //final ForkJoinPool taskWorker;
 
-    static class TaskEvent {
+    static final class TaskEvent {
         public Task[] tasks;
     }
 
     final Disruptor<TaskEvent> async =
             new Disruptor<TaskEvent>(
-                    () -> new TaskEvent(), 1024,
+                    () -> new TaskEvent(), 8192,
                     //new BasicExecutor(Executors.defaultThreadFactory()),
                     Executors.newCachedThreadPool(),
                     //ForkJoinPool.commonPool(),
                     ProducerType.MULTI,
-                    new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
+                    //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
+                    new LiteBlockingWaitStrategy()
                     //Executors.newCachedThreadPool()
             );
     //private final SequenceBarrier asyncBarrier;
@@ -174,7 +175,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         } //else {
 
 //            this.runWorker =
-                    //ForkJoinPool.commonPool(); //<- uses the common pool's concurrency which may not be the supplied 'concurrency' value
+        //ForkJoinPool.commonPool(); //<- uses the common pool's concurrency which may not be the supplied 'concurrency' value
 //                    new ForkJoinPool(concurrency,
 //                            defaultForkJoinWorkerThreadFactory, null, false);
 
@@ -190,9 +191,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         async.handleEventsWithWorkerPool(workers);
         async.start();
-
-
-
 
 
     }
@@ -221,7 +219,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 //sort by confidence (descending)
         {
             int i = Float.compare(b.conf(), a.conf());
-            if (i == 0 && a!=b) {
+            if (i == 0 && a != b) {
                 return b.compareTo(a); //equal conf but different task
             }
             return i;
@@ -270,7 +268,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * inputs a task, only if the parsed text is valid; returns null if invalid
      */
-    @Deprecated @NotNull
+    @Deprecated
+    @NotNull
     public Task inputTask(@NotNull String taskText) {
         Task task = task(taskText);
         if (task == null)
@@ -580,7 +579,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * return true if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    @Nullable protected final Concept input(@NotNull Task input) {
+    @Nullable
+    protected final Concept input(@NotNull Task input) {
 
         if (input.isDeleted()) {
             //throw new InvalidTaskException(input, "Deleted");
@@ -639,7 +639,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             try {
                 Activation activation = new Activation(inputted);
 
-                c.link( 1 /* linkActivation */, Param.BUDGET_EPSILON, this, activation);
+                c.link(1 /* linkActivation */, Param.BUDGET_EPSILON, this, activation);
 
                 activation.run(this, conceptActivation);
 
@@ -718,7 +718,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         awaitQuiescence();
 
-        if (!running.compareAndSet(true, false)) {
+        if (!running) {
             throw new RuntimeException("wasnt running");
         }
     }
@@ -760,24 +760,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * @return total time in seconds elapsed in realtime
      */
     @NotNull
-    public final NAR run(int frames) {
+    public final synchronized NAR run(int frames) {
 
-        AtomicBoolean r;
-        synchronized (r = this.running) {
+        //AtomicBoolean r = this.running;
+        //synchronized (r = this.running) {
 
-            if (!r.compareAndSet(false, true))
-                throw new RunStateException(true);
-
-            next(frames);
-
-            if (!r.compareAndSet(true, false))
-                throw new RunStateException(false);
-        }
-
-        return this;
-    }
-
-    private final void next(int frames) {
+        this.running = true;
 
         Topic<NAR> frameStart = eventFrameStart;
 
@@ -785,15 +773,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         for (; frames > 0; frames--) {
 
-            awaitQuiescence();
-
             clock.tick();
             emotion.frame();
 
             frameStart.emit(this);
 
+            awaitQuiescence();
+
         }
+
+        this.running = false;
+        //if (!r.compareAndSet(true, false))
+        //throw new RunStateException(false);
+        //}
+
+        return this;
     }
+
 
     private void awaitQuiescence() {
         if (!runWorker.isQuiescent()) {
@@ -807,11 +803,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         long cap;
         RingBuffer<TaskEvent> ring = async.getRingBuffer();
         while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
-        //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
+            //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
             long now = async.getCursor();
             //logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
             //Util.pause(1);
-            Thread.yield();
+            //Thread.yield();
         }
 //        taskWorker.getRingBuffer().
 //        if (!taskWorker.isQuiescent()) {
@@ -1069,7 +1065,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         for (Task y : x) {
             MutableTask my = (MutableTask) y;
             my.setCreationTime(time);
-            if (my.occurrence()!=ETERNAL)
+            if (my.occurrence() != ETERNAL)
                 my.occurr(time);
         }
 
@@ -1470,9 +1466,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         public void run(NAR nar, float activation) {
             if (!concepts.isEmpty()) {
-                float total = (float)concepts.sum();
+                float total = (float) concepts.sum();
                 ((Default) nar).core.concepts.put(concepts, in,
-                        activation/total //normalize to 1.0 total
+                        activation / total //normalize to 1.0 total
                         //activation
                 );
             }

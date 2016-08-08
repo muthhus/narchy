@@ -42,7 +42,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 127;
+    private static final int cyclesPerFrame = 16;
     public static final int runFrames = 100000;
     final Arkanoid noid;
     private final SwingCamera cam;
@@ -55,7 +55,7 @@ public class Arkancide extends NAREnvironment {
     final int visH = 24;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 16;
+    private int visionSyncPeriod = 32;
     float noiseLevel = 0;
 
     float paddleSpeed = 70f;
@@ -198,7 +198,7 @@ public class Arkancide extends NAREnvironment {
         Param.CONCURRENCY_DEFAULT = 3;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                4, 2, 2, rng,
+                32, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 10 * 10000000, false)
                 , new FrameClock()) {
 
@@ -209,7 +209,7 @@ public class Arkancide extends NAREnvironment {
 
         };
         nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.1f);
 
 
         nar.beliefConfidence(0.95f);

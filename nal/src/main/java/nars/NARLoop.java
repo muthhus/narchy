@@ -186,7 +186,7 @@ public class NARLoop implements Runnable {
             Util.pause(sleepTimeMS);
         } else {
 
-            if (!nar.running.get()) {
+            //if (!nar.running.get()) {
 
                 nar.run(cyclesPerFrame);
 
@@ -196,10 +196,10 @@ public class NARLoop implements Runnable {
                 //throttle(periodMS, System.currentTimeMillis() - lastTime);
 
 
-            } else {
-                //logger.warn("nar began running before this frame attempted to start");
-                Thread.yield();
-            }
+//            } else {
+//                //logger.warn("nar began running before this frame attempted to start");
+//                Thread.yield();
+//            }
 
         }
 

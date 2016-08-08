@@ -67,12 +67,12 @@ public class LoopPane extends FlowPane {
         stepButton.setOnAction(e -> {
 
             NAR n = loop.nar;
-            if (!n.running.get()) {
-                n.next();
-                say("stepped to time " + n.time());
-            } else {
-                say("already running");
-            }
+//            if (!n.running.get()) {
+//                n.next();
+//                say("stepped to time " + n.time());
+//            } else {
+//                say("already running");
+//            }
         });
 
 
