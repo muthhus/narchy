@@ -42,7 +42,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 64;
+    private static final int cyclesPerFrame = 127;
     public static final int runFrames = 100000;
     final Arkanoid noid;
     private final SwingCamera cam;
@@ -55,10 +55,10 @@ public class Arkancide extends NAREnvironment {
     final int visH = 24;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 32;
+    private int visionSyncPeriod = 16;
     float noiseLevel = 0;
 
-    float paddleSpeed = 50f;
+    float paddleSpeed = 70f;
     private float prevScore;
 
     public class View {
@@ -149,7 +149,7 @@ public class Arkancide extends NAREnvironment {
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
-                //BagChart.newBagChart((Default)nar, 1024),
+                //BagChart.newBagChart((Default)nar, 512),
                 camView
         );
 
@@ -199,7 +199,7 @@ public class Arkancide extends NAREnvironment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 5 * 10000000, false)
                 , new FrameClock()) {
 
             VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
@@ -208,12 +208,12 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.1f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.7f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;

@@ -168,14 +168,16 @@ public interface Concept extends Termed {
      *
      * @return whether the link successfully was completed
      */
-    default boolean link(float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+    default boolean link(float linkScale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
 
         Budgeted b = activation.in;
         if (b instanceof Task) {
-            linkTask((Task)b, scale);
+            linkTask((Task)b, linkScale);
         }
 
-        linkAny(b, scale, minScale, nar, activation);
+        activation.concepts.addToValue(this, linkScale);
+
+        linkAny(b, linkScale, minScale, nar, activation);
 
         return true;
     }
@@ -210,11 +212,12 @@ public interface Concept extends Termed {
 
         float halfScale = scale / 2f;
 
-        NAR.Activation a = new NAR.Activation(thisTask, 1f);
-        link(otherTask, halfScale, nar, a);
-        a.run(nar);
+        NAR.Activation a = new NAR.Activation(thisTask);
 
-        //other.link(thisTask, halfScale, nar, null);
+        link(otherTask, halfScale, nar, a);
+        other.link(thisTask, halfScale, nar, a);
+
+        a.run(nar);
 
     }
 

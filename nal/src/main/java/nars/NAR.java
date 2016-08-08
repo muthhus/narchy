@@ -11,7 +11,6 @@ import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
 import nars.index.TermIndex;
-import nars.link.BLink;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
@@ -562,7 +561,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //input.onInput(c);
 
         float conceptActivation = input.isInput() ? this.inputActivation.floatValue() : this.derivedActivation.floatValue();
-        float linkActivation = 1f;
 
         float cost = input.pri() * conceptActivation; //the concept priority demanded by this task
 
@@ -598,10 +596,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             //propagate budget
             try {
-                Activation activation = new Activation(inputted, conceptActivation);
-                ((Default)this).core.concepts.put(c, inputted, conceptActivation, null /*activation.overflow <- mixes concept and link activation? */);
-                c.link(linkActivation, Param.BUDGET_EPSILON, this, activation);
-                activation.run(this);
+                Activation activation = new Activation(inputted);
+                //((Default)this).core.concepts.put(c, inputted, conceptActivation, null /*activation.overflow <- mixes concept and link activation? */);
+                c.link(1f, Param.BUDGET_EPSILON, this, activation);
+
+                activation.run(this, conceptActivation);
 
                 emotion.busy(cost);
                 emotion.stress(activation.overflow);
@@ -1386,20 +1385,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public static class Activation {
         public final MutableFloat overflow = new MutableFloat(0);
         public final Budgeted in;
-        public final float scale;
 
         //final ObjectFloatHashMap<BLink<Task>> tasks = new ObjectFloatHashMap<>();
         //public final ObjectFloatHashMap<BLink<Term>> termlinks = new ObjectFloatHashMap<>();
         public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
 
-        public Activation(Budgeted in, float scale) {
+        public Activation(Budgeted in) {
             this.in = in;
-            this.scale = scale;
         }
 
+
         public void run(NAR nar) {
+            run(nar, 1f);
+        }
+
+        public void run(NAR nar, float activation) {
             if (!concepts.isEmpty())
-                ((Default)nar).core.concepts.put(concepts, in);
+                ((Default)nar).core.concepts.put(concepts, in, activation);
         }
     }
 

@@ -6,6 +6,7 @@ import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
+import nars.nar.Default;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Term;
@@ -251,6 +252,7 @@ abstract public class NAREnvironment {
     @Nullable
     protected Concept boost(Concept c) {
 
+        //((Default)nar).core.concepts.put(c, UnitBudget.One);
         return c;
         //return nar.activate(c, null);
     }
