@@ -1,7 +1,9 @@
 package nars.experiment.tetris;
 
+import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
+import nars.NARLoop;
 import nars.Param;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
@@ -16,6 +18,7 @@ import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import spacegraph.Surface;
@@ -50,13 +53,13 @@ public class Tetris2 extends NAREnvironment {
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 3;
-    static int frameDelay = 0;
+    static int frameDelay;
 
     static boolean easy = true;
 
 
     private final TetrisState state;
-    private int visionSyncPeriod = 8 * TIME_DILATION;
+    private final int visionSyncPeriod = 8 * TIME_DILATION;
 
     public class View {
 
@@ -366,7 +369,7 @@ public class Tetris2 extends NAREnvironment {
 
                 newControlWindow(view);
 
-                newBeliefChart(this, 11500);
+                newBeliefChart(this, 1500);
 
                 //NARSpace.newConceptWindow((Default) nar, 128, 8);
             }
@@ -423,7 +426,9 @@ public class Tetris2 extends NAREnvironment {
         //addCamera(t, nar, 8, 8);
 
 
-        t.run(runFrames, frameDelay, TIME_DILATION).join();
+        NARLoop loop = t.run(runFrames, frameDelay, TIME_DILATION);
+        NARController ctl = NARController.newDefault(nar, loop);
+        loop.join();
         //nar.stop();
 
         //nar.index.print(System.out);
@@ -431,6 +436,78 @@ public class Tetris2 extends NAREnvironment {
         NAR.printTasks(nar, false);
         //nar.forEachActiveConcept(System.out::println);
     }
+
+    static class NARController extends NAREnvironment {
+
+        private final NARLoop loop;
+        private final NAR nar, worker;
+
+        public static NARController newDefault(NAR worker, NARLoop loop) {
+            NAR ctl = new Default(256, 8, 2, 2);
+            ctl.confMin.setValue(0.1f);
+            ctl.truthResolution.setValue(0.1f);
+            return new NARController(ctl, worker, loop);
+        }
+
+        public NARController(NAR ctl, NAR worker, NARLoop loop) {
+
+            super(ctl);
+
+            this.nar = ctl;
+            this.worker = worker;
+            this.loop = loop;
+
+            happiness = new RangeNormalizedFloat(()->(float)worker.emotion.happy.getSum());
+
+            nar.log();
+            worker.onFrame(nn->next());
+
+            init(nar);
+            mission();
+        }
+
+
+        @Override
+        protected void init(NAR n) {
+
+            SensorConcept happy = new SensorConcept("(happy)", n,
+                    happiness,
+                    (v) -> $.t(v, 0.9f)
+            );
+            sensors.addAll(Lists.newArrayList(
+                happy,
+                new SensorConcept("(busy)", n,
+                    new RangeNormalizedFloat( ()->(float)worker.emotion.busy.getSum() ),
+                    (v)->$.t(v,0.9f)
+                ),
+                new SensorConcept("(learn)", n,
+                    new RangeNormalizedFloat( ()-> worker.emotion.learning()),
+                    (v)->$.t(v,0.9f)
+                )
+            ));
+
+            final int BASE_PERIOD_MS = 1000;
+
+            actions.addAll(Lists.newArrayList(
+                //cpu throttle
+                new MotorConcept("(cpu)", nar, (b,d)->{
+                    int newPeriod = Math.round( ((1f - (d.expectation())) * BASE_PERIOD_MS/2f) );
+                    loop.setPeriodMS(newPeriod);
+                    System.err.println("  loop period ms: " + newPeriod);
+                    return d;
+                })
+            ));
+        }
+
+        final RangeNormalizedFloat happiness;
+
+        @Override
+        protected float act() {
+            //float avgFramePeriodMS = (float) loop.frameTime.getMean();
+            return happiness.asFloat();
+        }
+    }
+
 
     //    static void addCamera(Tetris t, NAR n, int w, int h) {
 //        //n.framesBeforeDecision = GAME_DIVISOR;

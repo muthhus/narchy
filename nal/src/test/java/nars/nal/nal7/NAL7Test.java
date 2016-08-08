@@ -183,7 +183,7 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void intervalPreserve_and_shift_occurence() {
-        int time = cycles * 2;
+        int time = cycles * 4;
         test()
             //.log()
             //.input("X:x.") //shouldnt be necessary

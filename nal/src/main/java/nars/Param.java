@@ -147,7 +147,7 @@ public abstract class Param extends Container implements Level {
      *  a value less than 1.0 allows subsequent revections to decay faster, preventing
      *  a compounding / "snowballing" of mergings into a highly confident rolling average task.
      */
-    public static final float REVECTION_CONFIDENCE_FACTOR = 1f; //0.95f;
+    public static final float REVECTION_CONFIDENCE_FACTOR = 0.9f; //1f; //0.95f;
 
 
     private Truth defaultGoalTruth, defaultJudgmentTruth;

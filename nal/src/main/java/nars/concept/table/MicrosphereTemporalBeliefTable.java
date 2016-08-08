@@ -286,9 +286,11 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         if (confScale < Param.BUDGET_EPSILON) //TODO use NAR.confMin which will be higher than this
             return null;
 
+        confScale = Math.min(1f, confScale);
+
         Truth truth = truth(mid, now, eternal);
         if (truth!=null)
-            truth = truth.confMultViaWeight(confScale);
+            truth = truth.confMult(confScale);
 
         if (truth != null)
             return Revision.merge(a, b, mid, now, truth);
