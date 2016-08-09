@@ -383,7 +383,7 @@ public enum $ {
         return compound(CONJ, a);
     }
     @Nullable
-    public static Term conj(Collection<Term> collection, Term... append) {
+    public static Term conj(@NotNull Collection<Term> collection, @NotNull Term... append) {
         if (append.length == 0)
             throw new RuntimeException("unnecessary append");
         int cs = collection.size();
@@ -406,7 +406,7 @@ public enum $ {
     }
 
     @Nullable
-    public static Term disj(Term... a) {
+    public static Term disj(@NotNull Term... a) {
         return terms.disjunction(a);
     }
 
@@ -809,7 +809,7 @@ public enum $ {
     }
 
     @NotNull
-    public static Term[] the(int... i) {
+    public static Term[] the(@NotNull int... i) {
         int l = i.length;
         Term[] x = new Term[l];
         for (int j = 0; j < l; j++) {

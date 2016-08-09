@@ -1,13 +1,11 @@
 package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -31,6 +29,7 @@ abstract public class events extends AtomicBoolCondition {
     };
 
     /** true if belief is before or during task */
+    @Nullable
     public static final events before = new events() {
 
         @Override

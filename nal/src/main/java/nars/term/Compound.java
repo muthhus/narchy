@@ -48,7 +48,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.XTERNAL;
 
 /**
  * a compound term
@@ -232,7 +231,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return true;
     }
 
-    default ByteList structureKey(ByteArrayList appendTo) {
+    @NotNull
+    default ByteList structureKey(@NotNull ByteArrayList appendTo) {
         appendTo.add((byte) op().ordinal());
         appendTo.add((byte) size());
         forEach(x -> {

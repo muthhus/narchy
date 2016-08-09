@@ -394,7 +394,7 @@ public class IO {
             appendCloser(p);
 
         }
-        static void compoundAppend(String o, @NotNull TermContainer c, Function<Term, Term> filter, @NotNull Appendable p) throws IOException {
+        static void compoundAppend(String o, @NotNull TermContainer c, @NotNull Function<Term, Term> filter, @NotNull Appendable p) throws IOException {
 
             p.append(COMPOUND_TERM_OPENER);
 
@@ -422,7 +422,7 @@ public class IO {
             }
         }
 
-        static void appendArgs(@NotNull TermContainer c, Function<Term, Term> filter, @NotNull Appendable p) throws IOException {
+        static void appendArgs(@NotNull TermContainer c, @NotNull Function<Term, Term> filter, @NotNull Appendable p) throws IOException {
             int nterms = c.size();
 
             boolean bb = nterms > 1;

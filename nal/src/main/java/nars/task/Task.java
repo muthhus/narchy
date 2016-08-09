@@ -517,7 +517,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-    Object log(int index);
+    @Nullable Object log(int index);
 
     /** append a log entry; returns this task */
     @NotNull

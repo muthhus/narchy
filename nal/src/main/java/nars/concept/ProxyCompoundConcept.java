@@ -118,6 +118,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
         return (target.quests());
     }
 
+    @Nullable
     @Override
     public Task process(@NotNull Task task, @NotNull NAR nar) {
         return target.process(task, nar);
@@ -177,7 +178,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public boolean link(float linkScale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+    public boolean link(float linkScale, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
         return target.link(linkScale, minScale, nar, activation);
     }
 

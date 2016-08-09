@@ -57,6 +57,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     private @Nullable Map meta;
 
+    @Nullable
     private transient ConceptPolicy policy;
 
     private transient float satisfaction = 0;
@@ -231,7 +232,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     public
     @Nullable
-    Task processQuest(@NotNull Task task, @NotNull NAR nar, List<Task> displaced) {
+    Task processQuest(@NotNull Task task, @NotNull NAR nar, @NotNull List<Task> displaced) {
         return processQuestion(task, nar, displaced);
     }
 
@@ -250,6 +251,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * To accept a new judgment as belief, and check for revisions and solutions
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
+    @Nullable
     public Task processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
         return processBeliefOrGoal(belief, nar, beliefsOrNew(), questions(), displaced);
     }
@@ -259,6 +261,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * decide whether to actively pursue it
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
+    @Nullable
     public Task processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
         return processBeliefOrGoal(goal, nar, goalsOrNew(), quests(), displaced);
     }
@@ -401,7 +404,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * @param displaced
      * @return the relevant task
      */
-    public Task processQuestion(@NotNull Task q, @NotNull NAR nar, List<Task> displaced) {
+    @Nullable
+    public Task processQuestion(@NotNull Task q, @NotNull NAR nar, @NotNull List<Task> displaced) {
 
         final QuestionTable questionTable;
         final BeliefTable answerTable;
@@ -429,7 +433,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     /**
      * link to subterms, hierarchical downward
      */
-    public void linkSubs(float scale, float minScale, @Nullable NAR.Activation conceptOverflow, NAR nar) {
+    public void linkSubs(float scale, float minScale, @Nullable NAR.Activation conceptOverflow, @NotNull NAR nar) {
 
 
         linkDistribute(scale, minScale, templates, conceptOverflow, nar);
@@ -485,7 +489,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
 
-    final void linkDistribute(float scale, float minScale, @NotNull TermSet templates, NAR.Activation activation, NAR nar) {
+    final void linkDistribute(float scale, float minScale, @NotNull TermSet templates, @NotNull NAR.Activation activation, @NotNull NAR nar) {
 
         int n = templates.size();
         float tStrength = 1f / n;

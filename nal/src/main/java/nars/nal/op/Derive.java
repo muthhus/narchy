@@ -1,7 +1,9 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
 import nars.budget.Budget;
 import nars.nal.Premise;
 import nars.nal.TimeFunctions;
@@ -25,9 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
-import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
-import static nars.nal.Tense.XTERNAL;
+import static nars.nal.Tense.*;
 
 /**
  * Handles matched derivation results
@@ -103,11 +103,9 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         PremiseEval.TruthPuncEvidence ct = m.punct.get();
 
 
-        Term cp = this.conclusionPattern;
-
-
         Term r;
         try {
+            Term cp = this.conclusionPattern;
             r = m.index.resolve(cp, m);
         } catch (InvalidTermException e) {
             if (Param.DEBUG)
@@ -184,11 +182,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             //apply the confidence scale
             if (truth != null) {
                 float projection;
-                if (Param.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent()) {
-                    projection = TruthFunctions.projection(m.task.occurrence(), m.belief.occurrence(), nar.time());
-                } else {
-                    projection = 1f;
-                }
+                projection = Param.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent() ? TruthFunctions.projection(m.task.occurrence(), m.belief.occurrence(), nar.time()) : 1f;
                 float cf = confScale[0];
                 if ((cf!=1 || projection!=1)) {
                     truth = truth.confMultViaWeightMaxEternal(cf * projection);
@@ -267,7 +261,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
 
-    public @NotNull DerivedTask newDerivedTask(@NotNull Termed<Compound> c, Truth truth, char punc, long[] evidence, PremiseEval p) {
+    public @NotNull DerivedTask newDerivedTask(@NotNull Termed<Compound> c, Truth truth, char punc, long[] evidence, @NotNull PremiseEval p) {
         return new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p);
     }
 

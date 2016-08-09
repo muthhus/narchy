@@ -29,9 +29,7 @@ import java.util.Random;
 import java.util.Set;
 
 import static nars.$.$;
-import static nars.Op.DISJ;
-import static nars.Op.VAR_DEP;
-import static nars.Op.VAR_PATTERN;
+import static nars.Op.*;
 import static nars.nal.meta.match.Ellipsis.firstEllipsis;
 import static org.junit.Assert.*;
 

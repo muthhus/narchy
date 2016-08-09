@@ -79,7 +79,7 @@ public interface Concept extends Termed {
 
     @NotNull QuestionTable questions();
 
-    @NotNull QuestionTable quests();
+    @Nullable QuestionTable quests();
 
     @Nullable
     default Truth belief(long when, long now) {
@@ -156,7 +156,7 @@ public interface Concept extends Termed {
      * @param displaced collects tasks which have been displaced by the potential insertion of this task
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    Task process(@NotNull Task task, @NotNull NAR nar);
+    @Nullable Task process(@NotNull Task task, @NotNull NAR nar);
 
 
     /**
@@ -168,7 +168,7 @@ public interface Concept extends Termed {
      *
      * @return whether the link successfully was completed
      */
-    default boolean link(float linkScale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+    default boolean link(float linkScale, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
 
         Budgeted b = activation.in;
         if (b instanceof Task) {
@@ -189,7 +189,7 @@ public interface Concept extends Termed {
 
 
 
-    default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, NAR.Activation activation) {
+    default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
         float p = b.priIfFiniteElseNeg1();
         if (p < 0)
             return false;
@@ -436,8 +436,8 @@ public interface Concept extends Termed {
 //        Bag<Task> taskbag();
 //        Bag<Term> termbag(Map<Term, Term> map);
 
-        ConceptPolicy init();
-        ConceptPolicy awake();
-        ConceptPolicy sleep();
+        @NotNull ConceptPolicy init();
+        @NotNull ConceptPolicy awake();
+        @NotNull ConceptPolicy sleep();
     }
 }

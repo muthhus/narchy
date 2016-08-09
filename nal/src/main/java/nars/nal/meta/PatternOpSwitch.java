@@ -16,7 +16,7 @@ public final class PatternOpSwitch extends Atom /* TODO represent as some Generi
 
 
     public PatternOpSwitch(int subterm, @NotNull Map<PatternOp, ProcTerm> cases) {
-        super("\"" + cases.toString() + "\"");
+        super('"' + cases.toString() + '"');
 
         this.subterm = subterm;
 

@@ -146,7 +146,7 @@ public abstract class CollectorMap<K, V> {
         return map.get(key);
     }
 
-    public final V compute(@NotNull K key, BiFunction<? super K, ? super V, ? extends V> c) {
+    public final V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> c) {
         return map.compute(key,c);
     }
 

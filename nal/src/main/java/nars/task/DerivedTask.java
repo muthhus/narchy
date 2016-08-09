@@ -1,7 +1,6 @@
 package nars.task;
 
 import nars.Param;
-import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
@@ -14,11 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 abstract public class DerivedTask extends MutableTask {
 
+    @Nullable
     public transient Premise premise;
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, PremiseEval p, long[] evidence) {
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval p, long[] evidence) {
         super(tc, punct, truth);
 
         evidence(evidence);

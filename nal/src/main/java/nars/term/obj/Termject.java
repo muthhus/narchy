@@ -61,20 +61,23 @@ public interface Termject<X> extends Atomic {
 
     abstract class PrimTermject<X> implements Termject<X> {
 
+        @NotNull
         final X val;
         private final int _hash;
 
-        public PrimTermject(X val) {
+        public PrimTermject(@NotNull X val) {
 
             this.val = val;
             this._hash = val.hashCode();
         }
 
+        @NotNull
         @Override
         public X val() {
             return val;
         }
 
+        @NotNull
         @Override
         public String toString() {
             return '`' + val.toString() + '`'; //TODO escape any '`' which appear in the string
@@ -97,7 +100,7 @@ public interface Termject<X> extends Atomic {
 
     class IntTerm extends PrimTermject<Integer> {
 
-        public IntTerm(Integer val) {
+        public IntTerm(@NotNull Integer val) {
             super(val);
         }
 
@@ -107,6 +110,7 @@ public interface Termject<X> extends Atomic {
             return Integer.compare(val(), v);
         }
 
+        @NotNull
         @Override
         public Class type() {
             return Integer.class;
@@ -167,7 +171,7 @@ public interface Termject<X> extends Atomic {
             this(Range.closed(a,b).canonical( DiscreteDomain.integers() ));
         }
 
-        public IntInterval(Range<Integer> span) {
+        public IntInterval(@NotNull Range<Integer> span) {
             super(span.canonical( DiscreteDomain.integers() ));
         }
 
@@ -182,7 +186,7 @@ public interface Termject<X> extends Atomic {
         }
 
         @Override
-        public int compareVal(Range<Integer> v) {
+        public int compareVal(@NotNull Range<Integer> v) {
             int l = val().lowerEndpoint();
             int vl = v.lowerEndpoint();
             int lc = Integer.compare(l, vl);
@@ -194,11 +198,13 @@ public interface Termject<X> extends Atomic {
             return lc;
         }
 
+        @NotNull
         @Override
         public Class<? super Range<Integer>> type() {
             return Range.class;
         }
 
+        @NotNull
         @Override
         public String toString() {
             Range<Integer> r = val();
@@ -210,7 +216,7 @@ public interface Termject<X> extends Atomic {
             if (r.lowerBoundType()== BoundType.OPEN) {
                 l++;
             }
-            return "`" + l + "<=?<=" + u + "`";
+            return "`" + l + "<=?<=" + u + '`';
         }
 
         @Override

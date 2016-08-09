@@ -89,7 +89,7 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public final void capacity(int eternals, int temporals, List<Task> displ, long now) {
+    public final void capacity(int eternals, int temporals, @NotNull List<Task> displ, long now) {
         eternal.capacity(eternals, displ);
         synchronized (temporal) {
             temporal.capacity(temporals, now, displ);
@@ -156,7 +156,8 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
 
-    @Override public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, @NotNull NAR nar) {
+    @Nullable
+    @Override public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, @NotNull NAR nar) {
 
 
         //Filter duplicates; return null if duplicate
@@ -181,7 +182,7 @@ public class DefaultBeliefTable implements BeliefTable {
         return result;
     }
 
-    private void eternalizeForgottenTemporals(List<Task> displaced, @NotNull NAR nar, float factor) {
+    private void eternalizeForgottenTemporals(@NotNull List<Task> displaced, @NotNull NAR nar, float factor) {
         float confMin = nar.confMin.floatValue();
 
         @NotNull EternalTable eternal = this.eternal;

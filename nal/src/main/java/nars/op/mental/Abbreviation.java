@@ -2,10 +2,8 @@ package nars.op.mental;
 
 import nars.$;
 import nars.NAR;
-import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;

@@ -3,7 +3,6 @@ package nars.concept;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.Op;
-import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.task.Task;
 import nars.term.Compound;
@@ -45,8 +44,8 @@ public interface AbstractConcept extends Concept {
     /** returns the outgoing component only */
     @Nullable
     static Concept linkSub(@NotNull Concept source, @NotNull Termed target,
-                        float subScale,
-                        @Nullable NAR.Activation activation, NAR nar) {
+                           float subScale,
+                           @Nullable NAR.Activation activation, @NotNull NAR nar) {
 
         /* activate concept */
         Concept targetConcept;
@@ -85,7 +84,7 @@ public interface AbstractConcept extends Concept {
         return targetConcept;
     }
 
-    static boolean linkable(Termed target) {
+    static boolean linkable(@NotNull Termed target) {
         Term x = target.term();
         if (x instanceof Variable) {
             return false;

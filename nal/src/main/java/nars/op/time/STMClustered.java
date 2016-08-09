@@ -2,7 +2,6 @@ package nars.op.time;
 
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
-
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.learn.gng.NeuralGasNet;
@@ -89,7 +88,7 @@ public class STMClustered extends STM {
         @NotNull
         @Override
         public String toString() {
-            return super.toString() + ":" + tasks;
+            return super.toString() + ':' + tasks;
         }
 
         public void transfer(@NotNull TLink x) {
@@ -103,7 +102,7 @@ public class STMClustered extends STM {
             insert(x);
         }
 
-        protected boolean remove(TLink x) {
+        protected boolean remove(@NotNull TLink x) {
             x.node = null;
             if (tasks.remove(x)!=null) {
                 return true;
@@ -187,7 +186,7 @@ public class STMClustered extends STM {
 
 
 
-        protected void remove(Task[] uu) {
+        protected void remove(@NotNull Task[] uu) {
             for (Task x : uu) {
                 input.remove(x);
                 tasks.remove(x);
@@ -206,19 +205,20 @@ public class STMClustered extends STM {
         public final double[] coord;
 
         /** current centroid */
-        TasksNode node;
+        @Nullable TasksNode node;
 
         public TLink(@NotNull Task t, float p, float d, float q) {
             super(t, p, d, q);
             this.coord = getCoord(t);
         }
 
+
         @NotNull
         @Override
         public String toString() {
             return id + "<<" +
                     Arrays.toString(coord) +
-                    "|" + node.id +
+                    '|' + node.id +
                     ">>";
         }
 

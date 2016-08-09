@@ -1,26 +1,7 @@
 package nars.concept;
 
-import com.google.common.base.Joiner;
-import nars.$;
-import nars.NAR;
-import nars.bag.Bag;
-import nars.budget.Budget;
-import nars.link.BLink;
-import nars.nal.Tense;
 import nars.nar.Default;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
-
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
-import static nars.$.b;
-import static nars.$.the;
 
 
 public class TermLinkTest {

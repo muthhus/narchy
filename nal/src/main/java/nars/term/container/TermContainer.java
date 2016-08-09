@@ -457,7 +457,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
         return true;
     }
 
-    default int count(Predicate<Term> match) {
+    default int count(@NotNull Predicate<Term> match) {
         int s = size();
         int count = 0;
         for (int i = 0; i < s; i++) {
@@ -470,7 +470,8 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     }
 
     /** note: if the function returns null, null will not be added to the result set */
-    default Set<Term> unique(Function<Term,Term> each) {
+    @NotNull
+    default Set<Term> unique(@NotNull Function<Term,Term> each) {
         Set<Term> r = new HashSet(size());
         int s = size();
         for (int i = 0; i < s; i++) {

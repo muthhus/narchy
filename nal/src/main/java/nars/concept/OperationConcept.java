@@ -47,11 +47,13 @@ public class OperationConcept extends CompoundConcept<Compound> implements Consu
         return ((Compound)term().term(0)).subterms();
     }
 
+    @Nullable
     @Override
     public Task processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
         return executeLater(super.processGoal(goal, nar, displaced), nar);
     }
 
+    @Nullable
     @Override
     public Task processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
         return executeLater(super.processBelief(belief, nar, displaced), nar);

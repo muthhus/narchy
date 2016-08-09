@@ -319,7 +319,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return structureKey(new ByteArrayList(volume()*2 /* estimate */));
     }
 
-    default ByteList structureKey(ByteArrayList appendTo) {
+    default ByteList structureKey(@NotNull ByteArrayList appendTo) {
         appendTo.add((byte)op().ordinal());
         return appendTo;
     }

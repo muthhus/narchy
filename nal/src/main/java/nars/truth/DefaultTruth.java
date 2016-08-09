@@ -2,7 +2,6 @@ package nars.truth;
 
 import nars.Memory;
 import nars.Param;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -120,7 +119,7 @@ public class DefaultTruth implements Truth  {
 //
 //    private static final int hashDiscreteness = (int)(1.0f / Param.TRUTH_EPSILON);
 
-    public static Truth ditherOrNull(Truth t, float res) {
+    public static Truth ditherOrNull(@NotNull Truth t, float res) {
         float c = clampround(t.conf(), res);
         if (c == 0) return null;
         c = Math.min(c,1f-res); //dont allow to exceed 1.0-res

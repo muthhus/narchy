@@ -34,6 +34,7 @@ import java.util.function.BiPredicate;
  * */
 public abstract class WiredConcept extends CompoundConcept<Compound> implements Runnable {
 
+    @NotNull
     protected final NAR nar;
     int beliefCapacity = Param.DEFAULT_WIRED_CONCEPT_BELIEFS;
     int goalCapacity = Param.DEFAULT_WIRED_CONCEPT_GOALS;
@@ -68,25 +69,25 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
     }
 
     @Override
-    @Nullable public Task processBelief(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
+    @Nullable public Task processBelief(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
         t = filterBeliefs(t, nar, displaced);
         return (t != null) ? executeLater(super.processBelief(t, nar, displaced), nar) : null;
     }
 
     @Override
-    @Nullable public Task processGoal(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
+    @Nullable public Task processGoal(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
         t = filterGoals(t, nar, displaced);
         return (t != null) ? executeLater(super.processGoal(t, nar, displaced), nar) : null;
     }
 
     /** NOTE: if validBelief always returns true, then this can be bypassed by overriding with blank method */
-    public @Nullable Task filterBeliefs(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
+    public @Nullable Task filterBeliefs(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
         t = filter(t, beliefs(), this::validBelief, nar, displaced);
         return t;
     }
 
     /** NOTE: if validGoal always returns true, then this can be bypassed by overriding with blank method */
-    public @Nullable Task filterGoals(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
+    public @Nullable Task filterGoals(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
         t = filter(t, goals(), this::validGoal, nar, displaced);
         return t;
     }

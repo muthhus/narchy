@@ -45,6 +45,7 @@ public class PremiseEval extends FindSubst {
     /**
      * the current premise being evaluated in this context TODO make private again
      */
+    @Nullable
     public transient Premise premise;
     private float truthResolution;
 
@@ -61,11 +62,7 @@ public class PremiseEval extends FindSubst {
         if (t == null)
             return null;
         float res = this.truthResolution;
-        if (res == Param.TRUTH_EPSILON) {
-            return t; //unchanged by
-        } else {
-            return DefaultTruth.ditherOrNull(t, res);
-        }
+        return res == Param.TRUTH_EPSILON ? t : DefaultTruth.ditherOrNull(t, res);
     }
 
     public static class TruthPuncEvidence {
@@ -125,8 +122,10 @@ public class PremiseEval extends FindSubst {
      * whether the premise involves temporality that must be calculated upon derivation
      */
     public boolean temporal;
+    @Nullable
     private long[] evidenceDouble, evidenceSingle;
 
+    @Nullable
     public Conclusion conclusion;
     private boolean cyclic;
 
@@ -237,6 +236,7 @@ public class PremiseEval extends FindSubst {
     /**
      * execute the next premise, be sure to call init() before a batch of run()'s
      */
+    @NotNull
     public final Conclusion run(@NotNull Premise p, @NotNull Conclusion c) {
 
 
@@ -416,15 +416,13 @@ public class PremiseEval extends FindSubst {
     }
 
 
+    @Nullable
     public long[] evidence(boolean single) {
 
-        if (single) {
-            return evidenceSingle();
-        } else {
-            return evidenceDouble();
-        }
+        return single ? evidenceSingle() : evidenceDouble();
     }
 
+    @Nullable
     public long[] evidenceSingle() {
         if (evidenceSingle == null) {
             evidenceSingle = Stamp.cyclic(task.evidence());
@@ -432,6 +430,7 @@ public class PremiseEval extends FindSubst {
         return evidenceSingle;
     }
 
+    @Nullable
     public long[] evidenceDouble() {
         if (evidenceDouble == null) {
             evidenceDouble = Stamp.zip(task.evidence(), belief.evidence());

@@ -1,14 +1,12 @@
 package nars.nar;
 
 import nars.NAR;
-import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.index.Indexes;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.random.XORShiftRandom;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

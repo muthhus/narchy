@@ -76,7 +76,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     }
 
     @Deprecated
-    public final void remove(@NotNull Task belief, List<Task> displ) {
+    public final void remove(@NotNull Task belief, @NotNull List<Task> displ) {
         //this list removal is slow; indexed or iterator is better
         if (list.remove(belief)) {
             TaskTable.removeTask(belief, null, displ);
@@ -176,6 +176,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
     }
 
+    @Nullable
     @Override
     public final Task add(@NotNull Task question, @NotNull BeliefTable answers, List<Task> displ, @NotNull NAR n) {
 
@@ -237,7 +238,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         return t;
     }
 
-    private float remove(int n, Object reason, List<Task> displaced) {
+    private float remove(int n, Object reason, @NotNull List<Task> displaced) {
 
         Task removed = list.remove(n);
         if (Param.DEBUG)

@@ -18,7 +18,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
 
     private int capacity = -1;
 
-    public ArrayListTable(Map<V, L> map) {
+    public ArrayListTable(@NotNull Map<V, L> map) {
         super(map);
     }
 

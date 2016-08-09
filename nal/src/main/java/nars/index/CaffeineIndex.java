@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -171,6 +170,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         return cacheFor(tx).getIfPresent(tx);
     }
 
+    @NotNull
     private final Cache<Termed,Termed> cacheFor(Term x) {
         return x instanceof Compound ? compounds : atomics;
     }

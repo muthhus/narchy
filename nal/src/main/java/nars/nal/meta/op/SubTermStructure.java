@@ -24,7 +24,7 @@ public final class SubTermStructure extends AtomicBoolCondition {
 
 
         this.bits = filter(matchingType, bits);
-        id = "SubTermStruct" + subterm + ":" +
+        id = "SubTermStruct" + subterm + ':' +
                 Integer.toString(bits, 16);
     }
 

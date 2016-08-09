@@ -17,6 +17,7 @@ import nars.truth.Truth;
 import nars.util.data.Sensor;
 import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
         this.input = input;
 
         final float gain = 1.0f;
-        final float base = n.confMin.floatValue();
+        final float base = 0f;
         this.sensor.pri(()->Math.max(1f, base + gain * n.conceptPriority(term)));
     }
 
@@ -132,7 +133,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
         return this;
     }
 
-    public Task desire(Truth t) {
+    public Task desire(@Nullable Truth t) {
         if (this.desire==null || !this.desire.truth().equals(t)) {
             if (this.desire != null) {
                 this.desire.delete();

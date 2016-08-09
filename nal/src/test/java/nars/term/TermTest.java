@@ -17,7 +17,6 @@
 package nars.term;
 
 import nars.*;
-import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;

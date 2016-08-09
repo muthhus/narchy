@@ -10,7 +10,7 @@ public abstract class TermTransformOperator extends AtomicStringConstant impleme
 
 
     public TermTransformOperator(String name) {
-        super("^" + name);
+        super('^' + name);
     }
 
     @NotNull

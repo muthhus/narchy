@@ -12,6 +12,7 @@ import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -28,10 +29,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
     public EternalTable(int initialCapacity) {
         super(Task[]::new);
-        capacity(initialCapacity, null);
+        capacity(initialCapacity, Collections.emptyList());
     }
 
-    public void capacity(int c, List<Task> displ) {
+    public void capacity(int c, @NotNull List<Task> displ) {
         if (this.capacity != c) {
 
             this.capacity = c;
@@ -176,7 +177,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
              .log("Insertion Revision");
     }
 
-    public final Task put(final Task t) {
+    public final Task put(@NotNull final Task t) {
         Task displaced = null;
 
         if (size() == capacity()) {
@@ -215,7 +216,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 //        TaskTable.removeTask(belief, null, displ);
 //    }
 
-    public Task add(@NotNull Task input, List<Task> displaced, @NotNull NAR nar) {
+    @Nullable
+    public Task add(@NotNull Task input, @NotNull List<Task> displaced, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {
@@ -286,7 +288,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
      * try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      * returns true if it was inserted, false if not
      */
-    private boolean insert(@NotNull Task incoming, List<Task> displ) {
+    private boolean insert(@NotNull Task incoming, @NotNull List<Task> displ) {
 
         Task displaced = put(incoming);
 
@@ -301,7 +303,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         return inserted;
     }
 
-    private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, List<Task> displ) {
+    private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, @NotNull List<Task> displ) {
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
         Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden", displ);
@@ -333,7 +335,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
     /**
      * TODO abstract into removeIf(Predicate<> p) ...
      */
-    public void removeDeleted(List<Task> displ) {
+    public void removeDeleted(@NotNull List<Task> displ) {
 
         synchronized (builder) {
             int s = size();

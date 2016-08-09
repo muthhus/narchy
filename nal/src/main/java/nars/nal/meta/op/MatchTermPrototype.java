@@ -112,7 +112,7 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
             matchFactor = derive.size();
 
             this.id = $.the("MatchTerm(" + pid +
-                    ((om!=null) ? ",  " + om  : "") + ")");
+                    ((om!=null) ? ",  " + om  : "") + ')');
 
 
             this.eachMatch = om;

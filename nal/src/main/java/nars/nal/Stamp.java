@@ -294,11 +294,11 @@ public interface Stamp {
 
 
     /** cyclic tasks are indicated with a final value of Long.MAX_VALUE */
-    static boolean isCyclic(long[] e) {
+    static boolean isCyclic(@NotNull long[] e) {
         return (e[e.length-1] == Long.MAX_VALUE);
     }
 
-    static long[] cyclic(long[] x) {
+    static long[] cyclic(@NotNull long[] x) {
         int l = x.length;
         if (isCyclic(x))
             return x;
@@ -307,7 +307,7 @@ public interface Stamp {
         if (l == Param.STAMP_CAPACITY) {
             y = new long[Param.STAMP_CAPACITY];
             //shift left by one to leave the last entry free
-            System.arraycopy(x, 1, y, 0, l-1);
+            System.arraycopy(x, 1, y, 0, Param.STAMP_CAPACITY -1);
         } else {
             y = new long[l+1];
             System.arraycopy(x, 0, y, 0, l);

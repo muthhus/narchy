@@ -165,7 +165,8 @@ public class MySTMClustered extends STMClustered {
 		});
 	}
 
-	private Term group(boolean negated, Task[] uu) {
+	@Nullable
+	private Term group(boolean negated, @NotNull Task[] uu) {
 
 		if (uu.length == 2) {
 			//find the dt and construct a sequence

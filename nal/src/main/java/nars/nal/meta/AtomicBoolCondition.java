@@ -29,7 +29,7 @@ public abstract class AtomicBoolCondition extends AtomicString implements BoolCo
     }
 
     @Override
-    public boolean equals(Object u) {
+    public boolean equals(@NotNull Object u) {
         return toString().equals(u.toString());
     }
 

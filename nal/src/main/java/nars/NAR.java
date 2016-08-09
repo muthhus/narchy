@@ -4,7 +4,9 @@ package nars;
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
-import com.lmax.disruptor.*;
+import com.lmax.disruptor.LiteBlockingWaitStrategy;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.WorkHandler;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import nars.Narsese.NarseseException;
@@ -110,6 +112,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     //final ForkJoinPool taskWorker;
 
     static final class TaskEvent {
+        @Nullable
         public Task[] tasks;
     }
 
@@ -193,7 +196,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    Supplier<WorkHandler<TaskEvent>> newRunner = () -> {
+    @NotNull Supplier<WorkHandler<TaskEvent>> newRunner = () -> {
         return ((TaskEvent te) -> {
             Task[] tt = te.tasks;
             te.tasks = null;
@@ -213,7 +216,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @Deprecated
-    public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals, Consumer<Task> e) {
+    public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals, @NotNull Consumer<Task> e) {
         TreeSet<Task> bt = new TreeSet<>((a, b) ->
                 //sort by name
                 //{ return a.term().toString().compareTo(b.term().toString()); }
@@ -1058,7 +1061,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    public void inputAt(long time, Collection<Task> x) {
+    public void inputAt(long time, @NotNull Collection<Task> x) {
         long now = time();
         if (time < now) {
             //past
@@ -1444,11 +1447,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             this.in = in;
         }
 
-        public void run(NAR nar) {
+        public void run(@NotNull NAR nar) {
             run(nar, 1f);
         }
 
-        public void run(NAR nar, float activation) {
+        public void run(@NotNull NAR nar, float activation) {
             if (!concepts.isEmpty()) {
                 float total = (float) concepts.sum();
                 ((Default) nar).core.concepts.put(concepts, in,

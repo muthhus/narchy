@@ -1,7 +1,6 @@
 package nars.term;
 
 import nars.NAR;
-import nars.budget.UnitBudget;
 import nars.concept.AtomConcept;
 import nars.index.Indexes;
 import nars.index.MaplikeIndex;

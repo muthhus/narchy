@@ -11,7 +11,6 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicStringConstant;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +21,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
 
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
+    @Nullable
     private ConceptPolicy policy;
 
     @NotNull
@@ -104,6 +104,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
     }
 
 
+    @NotNull
     @Override
     public Task process(@NotNull Task task, @NotNull NAR nar) {
         throw new UnsupportedOperationException();

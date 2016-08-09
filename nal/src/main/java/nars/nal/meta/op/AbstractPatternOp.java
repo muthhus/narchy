@@ -20,13 +20,13 @@ abstract public class AbstractPatternOp extends AtomicBoolCondition {
     public AbstractPatternOp(int subterm, @NotNull Op op) {
         this.subterm = subterm;
         this.op = op.ordinal();
-        id = getClass().getSimpleName() + "(" + Integer.toString(subterm) + "&\"" + op + "\")";
+        id = getClass().getSimpleName() + '(' + Integer.toString(subterm) + "&\"" + op + "\")";
     }
 
     public AbstractPatternOp(int subterm, int bits) {
         this.subterm = subterm;
         this.op = bits;
-        id = getClass().getSimpleName() + "(" + Integer.toString(subterm) + "&" + bits + ")";
+        id = getClass().getSimpleName() + '(' + Integer.toString(subterm) + '&' + bits + ')';
     }
 
     @NotNull

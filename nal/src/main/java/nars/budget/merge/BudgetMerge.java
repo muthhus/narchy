@@ -30,7 +30,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 
     @Nullable
     @Override
-    default Budget apply(Budget existing, Budget incoming) {
+    default Budget apply(@NotNull Budget existing, @NotNull Budget incoming) {
         return apply(existing, incoming, 1f);
     }
 
@@ -48,7 +48,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 
     /** srcScale only affects the amount of priority adjusted; for the other components, the 'score'
      * calculations are used to interpolate */
-    static float blend(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, PriMerge priMerge) {
+    static float blend(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, @NotNull PriMerge priMerge) {
 
         float srcPri = src.priIfFiniteElseZero();
         float srcScore =

@@ -1,6 +1,5 @@
 package nars.truth;
 
-import nars.task.Task;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -74,7 +73,7 @@ public interface Truthed  {
         return 1f - freq();
     }
 
-    default boolean equalsTruth(Truthed x, float resolution) {
+    default boolean equalsTruth(@NotNull Truthed x, float resolution) {
         return Util.equals(freq(), x.freq(), resolution) && Util.equals(conf(), x.conf(), resolution);
     }
 

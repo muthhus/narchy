@@ -185,7 +185,7 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    public final MutableTask evidence(Task evidenceToCopy) {
+    public final MutableTask evidence(@NotNull Task evidenceToCopy) {
         return evidence(evidenceToCopy.evidence());
     }
 }

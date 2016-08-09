@@ -157,33 +157,28 @@ public class NARLoop implements Runnable {
 //            al = null;
 //        }
 
-        /* try */{
-            NAR nar = this.nar;
+        /* try */
+        NAR nar = this.nar;
 
-            if (periodMS != -1)
-                logger.info("started, period={}", periodMS);
+        if (periodMS != -1)
+            logger.info("started, period={}", periodMS);
 
-            prevTime = System.currentTimeMillis();
+        prevTime = System.currentTimeMillis();
 
-            do {
-                while (!stopping) {
-                    try {
-                        frame(nar);
-                    } catch (Throwable e) {
-                        logger.error("{}",e);
-                        /*nar.eventError.emit(e);
-                        if (Param.DEBUG) {
-                            stop();
-                            break;
-                        }*/
-                    }
+        do {
+            while (!stopping) {
+                try {
+                    frame(nar);
+                } catch (Throwable e) {
+                    logger.error("{}",e);
+                    /*nar.eventError.emit(e);
+                    if (Param.DEBUG) {
+                        stop();
+                        break;
+                    }*/
                 }
-            } while (!stopping);
-
-        } /*finally {
-            if (al!=null)
-                al.release();
-        }*/
+            }
+        } while (!stopping);
 
         logger.info("stopped");
         stopped = true;

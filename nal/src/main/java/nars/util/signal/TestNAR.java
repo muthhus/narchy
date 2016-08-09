@@ -168,6 +168,7 @@ public class TestNAR  {
     }
 
     /** fails if anything non-input is processed */
+    @NotNull
     public TestNAR mustNotOutput() {
         exitOnAllSuccess = false;
         requireConditions = false; //this is the condition

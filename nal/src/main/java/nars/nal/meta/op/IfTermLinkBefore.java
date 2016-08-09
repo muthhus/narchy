@@ -60,11 +60,7 @@ public class IfTermLinkBefore extends events {
         } else {
 
             final int targetMatch;  //must match term
-            if (ttdt < 0) { //time reversed
-                targetMatch = 1;
-            } else /*if (ttdt > 0) */ { //time forward
-                targetMatch = 0;
-            }
+            targetMatch = ttdt < 0 ? 1 : 0;
             return tt.term(targetMatch).equals(m.beliefTerm);
         }
     }

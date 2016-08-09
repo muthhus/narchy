@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Op;
 import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
-import nars.budget.UnitBudget;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.io.NarseseTest;

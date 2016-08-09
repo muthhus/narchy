@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class TermjectConcept<X> extends AtomConcept implements Termject<X> {
 
+    @NotNull
     private final Termject<X> termject;
 
     public TermjectConcept(@NotNull Termject<X> t, Bag<Term> termLinks, Bag<Task> taskLinks) {

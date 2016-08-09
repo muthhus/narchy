@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static nars.concept.AbstractConcept.linkable;
@@ -55,7 +54,7 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static int run(@NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, Supplier<Conclusion> conclusions) {
+    public static int run(@NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, @NotNull Supplier<Conclusion> conclusions) {
 
         int count = 0;
         long now = nar.time();
@@ -97,7 +96,7 @@ public enum PremiseBuilder {
         return count;
     }
 
-    private static boolean budget(RawBudget pBudget, BLink<Task>taskLink, BLink<Term> termLink, float minDur) {
+    private static boolean budget(@NotNull RawBudget pBudget, @NotNull BLink<Task>taskLink, @NotNull BLink<Term> termLink, float minDur) {
         TaskBudgeting.premise(pBudget, taskLink, termLink);
         return pBudget.dur() >= minDur;
     }
@@ -156,6 +155,7 @@ public enum PremiseBuilder {
         return p;
     }
 
+    @NotNull
     private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {
 
         long taskOcc = taskLink.occurrence();

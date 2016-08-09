@@ -20,11 +20,11 @@ public final class InvalidTermException extends RuntimeException {
 
 
 
-    public InvalidTermException(Op op, Term[] args, String reason) {
+    public InvalidTermException(@NotNull Op op, @NotNull Term[] args, @NotNull String reason) {
         this(op, DTERNAL, args, reason);
     }
 
-    public InvalidTermException(Op op, int dt, Term[] args, String reason) {
+    public InvalidTermException(@NotNull Op op, int dt, @NotNull Term[] args, @NotNull String reason) {
         this.op = op;
         this.dt = dt;
         this.args = args;

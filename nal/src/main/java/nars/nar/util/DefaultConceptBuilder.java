@@ -47,6 +47,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
             };
 
+    @NotNull
     private final ConceptPolicy init, awake, sleep;
 
 
@@ -175,15 +176,18 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     }
 
+    @NotNull
     @Override
     public ConceptPolicy init() {
         return init;
     }
+    @NotNull
     @Override
     public ConceptPolicy awake() {
         return awake;
     }
 
+    @NotNull
     @Override
     public ConceptPolicy sleep() {
         return sleep;

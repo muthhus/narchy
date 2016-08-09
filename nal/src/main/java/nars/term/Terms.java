@@ -561,7 +561,7 @@ public class Terms   {
 
     /** detects a negated conjunction of negated subterms:
      *  (--, (&&, --A, --B, .., --Z) ) */
-    public static boolean isDisjunction(Compound c) {
+    public static boolean isDisjunction(@NotNull Compound c) {
         if (c.dt() == DTERNAL && c.op() == NEG && c.isTerm(0, CONJ)) {
             return allNegated(((Compound)c.term(0)).subterms());
         }
@@ -569,7 +569,7 @@ public class Terms   {
     }
 
 
-    public static boolean allNegated(TermContainer<?> subterms) {
+    public static boolean allNegated(@NotNull TermContainer<?> subterms) {
         return subterms.and((Term t)-> t.op() == NEG);
     }
 

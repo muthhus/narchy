@@ -382,12 +382,8 @@ abstract public class PatternCompound extends GenericCompound {
                     return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
                 case 1:
                     Term theFreeX = xFree.iterator().next();
-                    if (yFree.size() == 1) {
-                        return subst.putXY(theFreeX, yFree.iterator().next());
-                    } else {
-                        return subst.addTermutator(
-                                new Choose1(ellipsis, theFreeX, yFree));
-                    }
+                    return yFree.size() == 1 ? subst.putXY(theFreeX, yFree.iterator().next()) : subst.addTermutator(
+                            new Choose1(ellipsis, theFreeX, yFree));
                 case 2:
                     return subst.addTermutator(
                             new Choose2(subst, ellipsis, xFree, yFree));

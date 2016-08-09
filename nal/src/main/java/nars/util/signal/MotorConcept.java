@@ -4,14 +4,11 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
 import nars.task.GeneratedTask;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
 
 import static nars.$.$;
 
@@ -30,7 +27,7 @@ public class MotorConcept extends WiredConcept  {
     private final float feedbackPriority;
     private final float feedbackDurability;
 
-    private Task lastFeedback = null;
+    private Task lastFeedback;
 
     float feedbackResolution = 0.05f;
 
@@ -54,7 +51,7 @@ public class MotorConcept extends WiredConcept  {
         MotorFunction Direct = (believed, desired) -> desired;
 
         /** absorbs all desire and doesnt affect belief */
-        MotorFunction Null = (believed, desired) -> null;
+        @Nullable MotorFunction Null = (believed, desired) -> null;
     }
 
 
@@ -132,7 +129,7 @@ public class MotorConcept extends WiredConcept  {
 
 
     @Override
-    protected synchronized final void update() {
+    protected final void update() {
 
         if (!hasGoals())
             return;

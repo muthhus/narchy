@@ -32,6 +32,7 @@ public class TermVector implements TermContainer<Term> {
      * list of (direct) term
      * TODO make not public
      */
+    @NotNull
     public final Term[] term;
 
 
@@ -73,7 +74,7 @@ public class TermVector implements TermContainer<Term> {
 
 
      @SafeVarargs
-     public TermVector(Term... terms) {
+     public TermVector(@NotNull Term... terms) {
         this.term = terms;
 
          if (terms.length > Param.MAX_SUBTERMS)

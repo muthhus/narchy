@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  */
 public interface TaskTable extends Iterable<Task> {
 
-    @Deprecated static void removeTask(@NotNull Task t, @Nullable String reason, List<Task> displ) {
+    @Deprecated static void removeTask(@NotNull Task t, @Nullable String reason, @NotNull List<Task> displ) {
         t.log(reason);
         displ.add(t);
     }

@@ -38,6 +38,7 @@ public abstract class TermBuilder {
     public static final Atom False = $.the("Ø");
     private static final Term[] TrueArray = new Term[]{True};
 
+    @NotNull
     public static Term empty(@NotNull Op op) {
         switch (op) {
 
@@ -150,6 +151,7 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
+    @NotNull
     private static Term[] conjTrueFalseFilter(@NotNull Term[] u) {
         int trues = 0; //# of True subterms that can be eliminated
         for (Term x : u) {
@@ -224,10 +226,7 @@ public abstract class TermBuilder {
         switch (t.length) {
             case 1:
                 Term t0 = t[0];
-                if (t0 instanceof Ellipsislike)
-                    return finish(op, t0);
-                else
-                    return t0;
+                return t0 instanceof Ellipsislike ? finish(op, t0) : t0;
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if ((et0.op() == set && et1.op() == set))
@@ -255,15 +254,15 @@ public abstract class TermBuilder {
         return finish(op, dt, TermContainer.the(op, args));
     }
 
-    public static boolean isTrueOrFalse(Term x) {
+    public static boolean isTrueOrFalse(@NotNull Term x) {
         return isTrue(x) || isFalse(x);
     }
 
-    public static boolean isTrue(Term x) {
+    public static boolean isTrue(@NotNull Term x) {
         return x.equals(True);
     }
 
-    public static boolean isFalse(Term x) {
+    public static boolean isFalse(@NotNull Term x) {
         return x.equals(False);
     }
 
@@ -344,12 +343,7 @@ public abstract class TermBuilder {
             return t;
 
         } else {
-            if ((t instanceof Compound) || (t.op().var)) {
-                return finish(NEG, t);
-            } else {
-                return False;
-                //throw new InvalidTermException(NEG, new Term[] { t }, "Non-compound negation content");
-            }
+            return (t instanceof Compound) || (t.op().var) ? finish(NEG, t) : False;
         }
     }
 
@@ -494,7 +488,8 @@ public abstract class TermBuilder {
      * flattening and intermpolation is prevented from destroying temporal
      * measurements.
      */
-    protected TreeSet<Term> junctionGroupNonDTSubterms(TreeSet<Term> s, int innerDT) {
+    @NotNull
+    protected TreeSet<Term> junctionGroupNonDTSubterms(@NotNull TreeSet<Term> s, int innerDT) {
         TreeSet<Term> outer = new TreeSet();
         Iterator<Term> ss = s.iterator();
         while (ss.hasNext()) {
@@ -698,12 +693,7 @@ public abstract class TermBuilder {
             case 1:
 
                 Term single = t[0];
-                if (single instanceof Ellipsislike) {
-                    //allow
-                    return finish(intersection, single);
-                } else {
-                    return single;
-                }
+                return single instanceof Ellipsislike ? finish(intersection, single) : single;
 
             case 2:
                 return newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
@@ -794,13 +784,10 @@ public abstract class TermBuilder {
 
     @NotNull
     public final Term build(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
-        if (csrc.subterms().equals(newSubs))
-            return csrc;
-        else
-            return build(csrc.op(), csrc.dt(), newSubs.terms());
+        return csrc.subterms().equals(newSubs) ? csrc : build(csrc.op(), csrc.dt(), newSubs.terms());
     }
 
-    public final Term disjunction(Term[] u) {
+    public final Term disjunction(@NotNull Term[] u) {
         return negation(conj(DTERNAL, negation(u)));
     }
 

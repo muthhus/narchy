@@ -44,7 +44,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
         return nearness[index] /= s;
     }
 
-    public FuzzyConceptSet(MutableFloat input, @NotNull NAR nar, @NotNull String... states) {
+    public FuzzyConceptSet(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull String... states) {
         this(input::floatValue, nar, states);
     }
 

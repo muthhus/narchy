@@ -76,14 +76,13 @@ abstract public class Solve extends AtomicBoolCondition {
         if (f == null) {
             t = null;
         } else {
-            Truth taskTruth, beliefTruth;
 
             //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
-            taskTruth = m.taskTruth;
+            Truth taskTruth = m.taskTruth;
 
             //truth function is single premise so set belief truth to be null to prevent any negations below:
 
-            beliefTruth = (single) ? null : m.beliefTruth;
+            Truth beliefTruth = (single) ? null : m.beliefTruth;
 
             t = f.apply(
                     taskTruth,

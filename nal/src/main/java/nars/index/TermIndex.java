@@ -418,12 +418,12 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term transform(@NotNull Compound src, ByteList path, Term replacement) {
+    default Term transform(@NotNull Compound src, @NotNull ByteList path, Term replacement) {
         return transform(src, path, 0, replacement);
     }
 
     @Nullable
-    default Term transform(@NotNull Term src, ByteList path, int depth, Term replacement) {
+    default Term transform(@NotNull Term src, @NotNull ByteList path, int depth, Term replacement) {
         int ps = path.size();
         if (ps == depth)
             return replacement;
@@ -629,12 +629,14 @@ public interface TermIndex {
     }
 
 
+    @Nullable
     default Term atemporalize(@NotNull Term c) {
         if (c instanceof Compound)
             return atemporalize((Compound)c);
         return c;
     }
 
+    @Nullable
     default Compound atemporalize(@NotNull Compound c) {
 
 

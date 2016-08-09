@@ -287,7 +287,7 @@ public class Revision {
      * known to be equal.
      */
     public static boolean isRevisible(@NotNull Task newBelief, @NotNull Task oldBelief) {
-        Term t = newBelief.term();
+        //Term t = newBelief.term();
         return
                 newBelief != oldBelief &&
 
@@ -321,11 +321,7 @@ public class Revision {
         }
 
         Term r = $.compound(a.op(), dt, aterm.terms());
-        if (!(r instanceof Compound)) {
-            return strongest(aterm, bterm, aProp);
-        } else {
-            return (Compound) r;
-        }
+        return !(r instanceof Compound) ? strongest(aterm, bterm, aProp) : (Compound) r;
     }
 }
 

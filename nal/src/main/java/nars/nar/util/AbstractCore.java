@@ -4,7 +4,6 @@ import nars.$;
 import nars.Memory;
 import nars.NAR;
 import nars.bag.Bag;
-import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.data.Range;
 import nars.link.BLink;
@@ -17,7 +16,6 @@ import nars.term.Term;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
 import nars.util.data.random.XorShift128PlusRandom;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +68,7 @@ public abstract class AbstractCore {
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
 
-    private final boolean queueConcept(BLink<Concept> b) {
+    private final boolean queueConcept(@NotNull BLink<Concept> b) {
         @Nullable Concept c = b.get();
         if (c!=null) {
             nar.runLater(new FireConcept(c, nar,
@@ -142,6 +140,7 @@ public abstract class AbstractCore {
             this.termlinks = termlinks;
         }
 
+        @NotNull
         @Override
         public final Conclusion get() {
             return this;

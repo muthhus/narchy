@@ -85,7 +85,7 @@ public class PostCondition implements Serializable, Level //since there can be m
      * @throws RuntimeException
      */
     @NotNull public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term pattern,
-                                     @NotNull Term... modifiers) throws RuntimeException {
+                                     @NotNull Term... modifiers) throws RuntimeException, UnsupportedOperationException {
 
 
         Term beliefTruth = null, goalTruth = null;

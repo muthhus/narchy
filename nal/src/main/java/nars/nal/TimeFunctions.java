@@ -312,6 +312,7 @@ public interface TimeFunctions {
 
     }
 
+    @NotNull
     static Compound noTemporalBasis(@NotNull Compound derived) {
 //        throw new InvalidTermException(derived.op(), derived.dt(), derived.terms(),
 //                "no basis for relating other occurrence to derived");
@@ -509,10 +510,7 @@ public interface TimeFunctions {
 
     @NotNull static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull PremiseEval p, int eventDelta, @NotNull long[] occReturn) {
         int dt;
-        if (eventDelta == DTERNAL)
-            dt = DTERNAL;
-        else
-            dt = eventDelta * polarity;
+        dt = eventDelta == DTERNAL ? DTERNAL : eventDelta * polarity;
 
         return dt(derived, dt, p, occReturn);
     }

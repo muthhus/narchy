@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.UtilityFunctions.and;
 import static nars.truth.TruthFunctions.projection;
@@ -36,7 +35,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    public void capacity(int newCapacity, long now, List<Task> displaced) {
+    public void capacity(int newCapacity, long now, @NotNull List<Task> displaced) {
         this.capacity = newCapacity;
         while (this.size() > newCapacity) {
             removeWeakest(displaced, now);
@@ -54,8 +53,9 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         //return rankTemporalByConfidence(t, when, now, -1);
     }
 
+    @Nullable
     @Override
-    public Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, EternalTable eternal, @NotNull List<Task> displ, @NotNull NAR nar) {
 
 
         int cap = capacity();
@@ -122,7 +122,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         return super.remove(object);
     }
 
-    private final void remove(@NotNull Task removed, List<Task> displ) {
+    private final void remove(@NotNull Task removed, @NotNull List<Task> displ) {
         int i = indexOf(removed);
         if (i == -1)
             return;
@@ -146,7 +146,8 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 //    }
 
 
-    private final Task remove(int index, List<Task> displ) {
+    @Nullable
+    private final Task remove(int index, @NotNull List<Task> displ) {
         @Nullable Task t = this.remove(index);
         if (t!=null) {
             displ.add(t);
@@ -160,7 +161,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    protected final void removeWeakest(List<Task> displ, long now) {
+    protected final void removeWeakest(@NotNull List<Task> displ, long now) {
 
         int sizeBefore = size();
         compress(displ, now);
@@ -203,14 +204,15 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
 
     @Nullable
-    protected Task compress(List<Task> displ, long now) {
+    protected Task compress(@NotNull List<Task> displ, long now) {
         return compress(null, now, null, displ);
     }
 
     /**
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
-    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, List<Task> displ) {
+    @Nullable
+    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull List<Task> displ) {
 
         int cap = capacity();
         if (size() < cap || removeAlreadyDeleted(displ) < cap) {

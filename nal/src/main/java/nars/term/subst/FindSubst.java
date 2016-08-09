@@ -521,7 +521,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return putBidi(x, y, commonVar);
     }
 
-    public boolean putBidi(@NotNull Term x, @NotNull Term y, Term common) {
+    public boolean putBidi(@NotNull Term x, @NotNull Term y, @NotNull Term common) {
         int s = now();
         if (putXY(x, common)) {
             if (putYX(y, common)) {

@@ -19,8 +19,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static nars.nal.UtilityFunctions.or;
-
 
 /**
  * A bag implemented as a combination of a Map and a SortedArrayList
@@ -140,7 +138,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
 
     @Override
-    public void put(ObjectFloatHashMap<? extends V> values, Budgeted in,/*, MutableFloat overflow*/float scale, MutableFloat overflow) {
+    public void put(@NotNull ObjectFloatHashMap<? extends V> values, @NotNull Budgeted in,/*, MutableFloat overflow*/float scale, MutableFloat overflow) {
 
         //synchronized(map) {
             values.forEachKeyValue((k, v) -> {
@@ -275,7 +273,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
         @Override
-        public void accept(BLink bLink) {
+        public void accept(@NotNull BLink bLink) {
             float p = bLink.pri();
             if (p == p) {
                 float d = bLink.dur();

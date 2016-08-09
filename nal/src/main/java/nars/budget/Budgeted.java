@@ -83,7 +83,7 @@ public interface Budgeted  {
                 Util.equals(qua(), t.qua(), epsilon);
     }
 
-    default boolean equalsBudget(Budgeted b) {
+    default boolean equalsBudget(@NotNull Budgeted b) {
         return equalsBudget(b, Param.BUDGET_EPSILON);
     }
 
