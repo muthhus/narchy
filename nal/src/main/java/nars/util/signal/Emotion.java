@@ -29,6 +29,8 @@ public final class Emotion implements Serializable {
     @NotNull
     public final FloatGuage happy;
 
+
+
     @NotNull
     public final FloatGuage motivation;
 
@@ -51,7 +53,9 @@ public final class Emotion implements Serializable {
         logger = LoggerFactory.getLogger(Emotion.class);
 
         this.busy = new FloatGuage("busy");
+
         this.happy = new FloatGuage("happy");
+
         this.stress = new FloatGuage("stress");
         this.frustration = new FloatGuage("frustration");
         this.alert = new FloatGuage("alert");

@@ -42,17 +42,18 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Tetris2 extends NAREnvironment {
 
     public static final int TIME_DILATION = 1; //resolution in between frames for interpolation space
+    public static final int DEFAULT_INDEX_WEIGHT = 5 * 1000000;
 
     static {
         Param.DEBUG = true;
-        Param.CONCURRENCY_DEFAULT = 4;
+        Param.CONCURRENCY_DEFAULT = 2;
     }
 
     public static final int runFrames = 1000;
     public static final int cyclesPerFrame = 16;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 3;
+    public static final int TIME_PER_FALL = 2;
     static int frameDelay;
 
     static boolean easy = true;
@@ -193,7 +194,7 @@ public class Tetris2 extends NAREnvironment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
                 32, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 5 * 1000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false)
 
                 , new FrameClock()) {
 
@@ -288,6 +289,7 @@ public class Tetris2 extends NAREnvironment {
 
                 Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
                 plot3.add("Hapy", () -> nar.emotion.happy.getSum());
+                plot3.add("Motv", () -> nar.emotion.motivation.getSum());
 
 //                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
 //                plot4.add("Errr", ()->nar.emotion.errr.getSum());
@@ -427,13 +429,16 @@ public class Tetris2 extends NAREnvironment {
 
 
         NARLoop loop = t.run(runFrames, frameDelay, TIME_DILATION);
-        NARController ctl = NARController.newDefault(nar, loop);
+        NARController meta = NARController.newDefault(nar, loop);
         loop.join();
         //nar.stop();
 
         //nar.index.print(System.out);
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
+
+        NAR.printTasks(meta.nar, true);
+        NAR.printTasks(meta.nar, false);
         //nar.forEachActiveConcept(System.out::println);
     }
 
@@ -443,11 +448,28 @@ public class Tetris2 extends NAREnvironment {
         private final NAR nar, worker;
 
         public static NARController newDefault(NAR worker, NARLoop loop) {
-            NAR ctl = new Default(256, 8, 2, 2);
-            ctl.confMin.setValue(0.1f);
-            ctl.truthResolution.setValue(0.1f);
+            Default ctl = new Default(512, 8, 2, 2);
+            ctl.cyclesPerFrame.setValue(16);
+            ctl.inputActivation.setValue(0.5f);
+            ctl.derivedActivation.setValue(0.1f);
+            //ctl.confMin.setValue(0.01f);
+            //ctl.truthResolution.setValue(0.01f);
+            ctl.beliefConfidence(0.25f);
+            ctl.goalConfidence(0.25f);
             return new NARController(ctl, worker, loop);
         }
+
+        @Override
+        protected float act() {
+            //float avgFramePeriodMS = (float) loop.frameTime.getMean();
+
+            float mUsage = memory();
+            float targetMemUsage = 0.75f;
+
+            return motivation.asFloat() +  //boost for happiness
+                    (mUsage < targetMemUsage ? 1f : (1f/(1f + mUsage - targetMemUsage))); //maintain % memory utilization TODO cache 'memory()' result
+        }
+
 
         public NARController(NAR ctl, NAR worker, NARLoop loop) {
 
@@ -457,9 +479,9 @@ public class Tetris2 extends NAREnvironment {
             this.worker = worker;
             this.loop = loop;
 
-            happiness = new RangeNormalizedFloat(()->(float)worker.emotion.happy.getSum());
+            motivation = new RangeNormalizedFloat(()->(float)worker.emotion.motivation.getSum());
 
-            nar.log();
+            //nar.log();
             worker.onFrame(nn->next());
 
             init(nar);
@@ -467,45 +489,72 @@ public class Tetris2 extends NAREnvironment {
         }
 
 
+
         @Override
         protected void init(NAR n) {
 
-            SensorConcept happy = new SensorConcept("(happy)", n,
-                    happiness,
-                    (v) -> $.t(v, 0.9f)
-            );
             sensors.addAll(Lists.newArrayList(
-                happy,
+                new SensorConcept("(happy)", n,
+                        motivation,
+                        (v1) -> $.t(v1, 0.9f)
+                ),
                 new SensorConcept("(busy)", n,
                     new RangeNormalizedFloat( ()->(float)worker.emotion.busy.getSum() ),
                     (v)->$.t(v,0.9f)
                 ),
                 new SensorConcept("(learn)", n,
-                    new RangeNormalizedFloat( ()-> worker.emotion.learning()),
+                    /* new RangeNormalizedFloat(  */ ()-> worker.emotion.learning(),
+                    (v)->$.t(v,0.9f)
+                ),
+                new SensorConcept("(memory)", n,
+                    () -> memory(),
                     (v)->$.t(v,0.9f)
                 )
             ));
 
-            final int BASE_PERIOD_MS = 1000;
+            final int BASE_PERIOD_MS = 100;
 
             actions.addAll(Lists.newArrayList(
                 //cpu throttle
                 new MotorConcept("(cpu)", nar, (b,d)->{
-                    int newPeriod = Math.round( ((1f - (d.expectation())) * BASE_PERIOD_MS/2f) );
+                    int newPeriod = Math.round( ((1f - (d.expectation())) * BASE_PERIOD_MS) );
                     loop.setPeriodMS(newPeriod);
-                    System.err.println("  loop period ms: " + newPeriod);
+                    //System.err.println("  loop period ms: " + newPeriod);
+                    return d;
+                }),
+
+                //memory throttle
+                new MotorConcept("(memoryWeight)", nar, (b,d)->{
+                    ((CaffeineIndex)worker.index).compounds.policy().eviction().ifPresent(e->{
+                        e.setMaximum((long)(DEFAULT_INDEX_WEIGHT * (1f + d.expectation()-0.5f)));//50%..150% sweep
+                    });
+                    //System.err.println("  loop period ms: " + newPeriod);
+                    return d;
+                }),
+
+                new MotorConcept("(confMin)", nar, (b,d)->{
+                    worker.confMin.setValue(d.expectation());
+                    //System.err.println("  loop period ms: " + newPeriod);
                     return d;
                 })
+
             ));
         }
 
-        final RangeNormalizedFloat happiness;
-
-        @Override
-        protected float act() {
-            //float avgFramePeriodMS = (float) loop.frameTime.getMean();
-            return happiness.asFloat();
+        public final float memory() {
+            Runtime runtime = Runtime.getRuntime();
+            long total = runtime.totalMemory(); // current heap allocated to the VM process
+            long free = runtime.freeMemory(); // out of the current heap, how much is free
+            long max = runtime.maxMemory(); // Max heap VM can use e.g. Xmx setting
+            long usedMemory = total - free; // how much of the current heap the VM is using
+            long availableMemory = max - usedMemory; // available memory i.e. Maximum heap size minus the current amount used
+            float ratio = 1f - ((float)availableMemory) / max;
+            //logger.warn("max={}k, used={}k {}%, free={}k", max/1024, total/1024, Texts.n2(100f * ratio), free/1024);
+            return ratio;
         }
+
+        final RangeNormalizedFloat motivation;
+
     }
 
 
