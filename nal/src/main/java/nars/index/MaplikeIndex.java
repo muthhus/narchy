@@ -83,6 +83,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
             //if (yy == null)
                 //return null;
 
+
             if (canBuildConcept(x)) {
                 boolean xnormalized = x.isNormalized();
 
@@ -90,7 +91,8 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
                 TermContainer ys = theSubterms(xs);
                 Term yy;
                 if (xs != ys) {
-                    yy = buildCompound(x.op(), x.op().temporal ? DTERNAL : x.dt(), ys);
+                    //x should have already been atemporalized by this point, so any 'dt' will be from Images
+                    yy = new GenericCompound(x.op(), x.dt(), ys);
                     if (xnormalized)
                         ((GenericCompound) yy).setNormalized();
 
@@ -145,7 +147,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     }
 
 
-    @Override public @Nullable TermContainer theSubterms(@NotNull TermContainer s) {
+    @Override public final @Nullable TermContainer theSubterms(@NotNull TermContainer s) {
 
         //early existence test:
         TermContainer existing = getSubterms(s);
@@ -164,7 +166,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
             Term b;
             if (a instanceof Compound) {
 
-                if (a.hasTemporal()) {
+                if (!canBuildConcept(a) || a.hasTemporal()) {
                     //temporal = true;//dont store subterm arrays containing temporal compounds
                     b = a;
                 } else {

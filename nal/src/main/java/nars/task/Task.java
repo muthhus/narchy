@@ -114,7 +114,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         if (!(t instanceof Compound))
             return test(t, "Task Term is null or not a Compound", safe);
 
-        t = memory.index.normalize(t, false);
+        t = memory.index.normalize(t, !safe);
 
         if (!(t instanceof Compound))
             return test(t, "Task Term Does Not Normalize to Compound", safe);

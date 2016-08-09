@@ -54,7 +54,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
         if (a.op() == b.op()) {
             if (a.structure() == b.structure() && a.volume() == b.volume()) {
-                return b.equals($.terms.atemporalize((Compound) a));
+                return b.equals(Terms.atemporalize((Compound) a));
             }
         }
         return false;

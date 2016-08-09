@@ -574,4 +574,58 @@ public class Terms   {
     }
 
 
+//    @Nullable
+//    public static Term atemporalize(@NotNull Term c) {
+//        if (c instanceof Compound)
+//            return atemporalize((Compound)c);
+//        return c;
+//    }
+
+    @Nullable
+    public static Compound atemporalize(@NotNull Compound c) {
+
+
+        TermContainer psubs = c.subterms();
+        TermContainer newSubs;
+        if (psubs.hasAny(Op.TemporalBits)) {
+            boolean subsChanged = false;
+            int cs = c.size();
+            Term[] ss = new Term[cs];
+            for (int i = 0; i < cs; i++) {
+
+                Term m = psubs.term(i);
+                if (m != (ss[i] = m instanceof Compound ? atemporalize((Compound)m) : m))
+                    subsChanged = true;
+
+            }
+            newSubs = subsChanged ? /*theSubterms(*/TermVector.the(ss)/*)*/ : null;
+        } else {
+            newSubs = null;
+        }
+
+
+        int pdt = c.dt();
+        Op o = c.op();
+        boolean dtChanged = (pdt != DTERNAL && o.temporal);
+
+        if (newSubs!=null || dtChanged) {
+
+            GenericCompound xx = new GenericCompound(o,
+                    dtChanged ? DTERNAL : pdt,
+                    newSubs!=null ? newSubs : psubs);
+
+            if (c.isNormalized())
+                xx.setNormalized();
+
+            //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
+            //if (exxist!=null)
+                //return exxist.term();
+
+
+            //x = i.the(xx).term();
+            return xx;
+        }
+
+        return c;
+    }
 }

@@ -4,7 +4,6 @@ import com.gs.collections.api.list.primitive.ByteList;
 import com.gs.collections.impl.factory.Maps;
 import nars.$;
 import nars.Narsese;
-import nars.Op;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.nal.TermBuilder;
@@ -12,15 +11,11 @@ import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.op.TermTransform;
-import nars.term.Compound;
-import nars.term.InvalidTermException;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
@@ -540,7 +535,7 @@ public interface TermIndex {
             if (!((term = normalize(term, false)) instanceof Compound))
                 throw new InvalidConceptException(prenormalized, "Failed normalization");
 
-            Term aterm = atemporalize((Compound) term);
+            Term aterm = Terms.atemporalize((Compound) term);
             if (!(aterm instanceof Compound))
                 throw new InvalidConceptException(term, "Failed atemporalization");
 
@@ -638,61 +633,7 @@ public interface TermIndex {
     }
 
 
-    @Nullable
-    default Term atemporalize(@NotNull Term c) {
-        if (c instanceof Compound)
-            return atemporalize((Compound)c);
-        return c;
-    }
-
-    @Nullable
-    default Compound atemporalize(@NotNull Compound c) {
-
-
-        TermContainer psubs = c.subterms();
-        TermContainer newSubs;
-        if (psubs.hasAny(Op.TemporalBits)) {
-            boolean subsChanged = false;
-            int cs = c.size();
-            Term[] ss = new Term[cs];
-            for (int i = 0; i < cs; i++) {
-                Term m = psubs.term(i);
-                Term n = atemporalize(m);
-                if (m != n)
-                    subsChanged = true;
-                ss[i] = n;
-            }
-            newSubs = subsChanged ? TermVector.the(ss) : null;
-        } else {
-            newSubs = null;
-        }
-
-
-        int pdt = c.dt();
-        Op o = c.op();
-        boolean dtChanged = (pdt != DTERNAL && o.temporal);
-
-        if (newSubs!=null || dtChanged) {
-
-            GenericCompound xx = new GenericCompound(o,
-                    dtChanged ? DTERNAL : pdt,
-                    newSubs!=null ? newSubs : psubs);
-
-            if (c.isNormalized())
-                xx.setNormalized();
-
-            //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
-            //if (exxist!=null)
-                //return exxist.term();
-
-            //x = i.the(xx).term();
-            return xx;
-        }
-
-        return c;
-    }
-
-//    static boolean possiblyTemporal(Termlike x) {
+    //    static boolean possiblyTemporal(Termlike x) {
 //        return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
 //    }
 //

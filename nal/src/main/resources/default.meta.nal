@@ -287,19 +287,22 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //decompose any event in a conjunction belief
-     (&&,X,A..+), X, time(taskConjDecomposable) |- X, (Belief:StructuralDeduction)
-        //(&&,(--,%X),A..+), X, time(taskConjDecomposable) |- (--,%X), (Belief:StructuralDeduction)
-     (&&,X,A..+), B, time(taskConjDecomposable) |- substituteIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
-        //(&&,(--,%X),A..+), X, time(taskConjDecomposable) |- (&&,A..+), (Belief:StructuralDeduction)
-     //(&&,X,A..+), B, time(taskConjDecomposable) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     (&&,X,A..+), X, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
+        //(&&,(--,%X),A..+), X, time(decomposeTask) |- (--,%X), (Belief:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTask), task(".") |- (&&,A..+), (Belief:StructuralDeduction)
+
+     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy)
+        //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
+     //(&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
 
 
     //decompose (only) the leading event in a conjunction goal
     (&&,X,A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- X, (Desire:StructuralStrong)
         //(&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- (--,%X), (Desire:StructuralStrong)
     (&&,X,A), X, time(decomposeTaskIfBeliefBefore), task("!") |- A, (Desire:StructuralStrong)
+
         //(&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- A, (Desire:StructuralStrong)
-    (&&,X,A), B, time(decomposeTask), task("!")            |- substituteOnlyIfUnifiesDep(A,X,B), (Desire:Deduction)
+    (&&,X,A..+), B, time(decomposeTask), task("!") |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Desire:Strong)
         //TODO as above
 
 
