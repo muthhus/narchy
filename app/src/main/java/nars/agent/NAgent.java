@@ -365,7 +365,7 @@ public class NAgent implements Agent {
 //                        float min = 0.5f;
 //                        return sensorPriority * (min /* min */ + (1f-min) * nar.conceptPriority(this));
 //                    }
-                }.resolution(0.01f).timing(-1, -1).pri(sensorPriority)
+                }.resolution(0.01f).timing(-1, -1)//.pri(sensorPriority)
         );
 
 

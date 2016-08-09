@@ -637,24 +637,27 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //decides if TaskProcess was successful in somehow affecting its concept's state
         if (inputted != null && !inputted.isDeleted()) {
 
-            //propagate budget
-            try {
-                Activation activation = new Activation(inputted);
+            float p = inputted.pri();
+            if (p > 0) {
+                //propagate budget
+                try {
+                    Activation activation = new Activation(inputted);
 
-                c.link(1 /* linkActivation */, Param.BUDGET_EPSILON, this, activation);
+                    c.link(1 /* linkActivation */, Param.BUDGET_EPSILON, this, activation);
 
-                activation.run(this, conceptActivation);
+                    activation.run(this, conceptActivation);
 
-                emotion.busy(cost);
-                emotion.stress(activation.overflow);
-            } catch (Exception e) {
-                emotion.errr();
+                    emotion.busy(cost);
+                    emotion.stress(activation.overflow);
+                } catch (Exception e) {
+                    emotion.errr();
 
-                if (Param.DEBUG)
-                    logger.warn("activation error: {}", e.toString());
+                    if (Param.DEBUG)
+                        logger.warn("activation error: {}", e.toString());
 
-                inputted.delete();
-                return c;
+                    inputted.delete();
+                    return c;
+                }
             }
 
 

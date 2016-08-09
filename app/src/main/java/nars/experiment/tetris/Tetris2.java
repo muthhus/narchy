@@ -48,21 +48,22 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = true;
-        Param.CONCURRENCY_DEFAULT = 3;
+        Param.CONCURRENCY_DEFAULT = 4;
     }
 
     public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 16;
+    public static final int cyclesPerFrame = 8;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 2;
+    public static final int TIME_PER_FALL = 4;
+    static boolean easy = false;
+
     static int frameDelay;
 
-    static boolean easy = true;
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 8 * TIME_DILATION;
+    private final int visionSyncPeriod = 16 * TIME_DILATION;
 
     public class View {
 
@@ -209,19 +210,19 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.25f);
+        nar.derivedActivation.setValue(0.25f);
 
 
-        nar.beliefConfidence(0.7f);
+        nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
-        nar.truthResolution.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
+        nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)

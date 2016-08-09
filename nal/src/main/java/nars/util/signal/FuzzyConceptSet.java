@@ -117,6 +117,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
         }
         return this;
     }
+
     @NotNull
     public FuzzyConceptSet resolution(float r) {
         for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {

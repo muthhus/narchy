@@ -12,6 +12,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.Util;
+import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +37,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     @NotNull
     public final NAR nar;
-    public float pri;
+    public FloatSupplier pri;
     private final float dur;
 
     private float prevF = Float.NaN;
@@ -66,7 +67,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         this.value = value;
         this.truthFloatFunction = truthFloatFunction;
 
-        this.pri = pri;
+        pri(pri);
         this.dur = dur;
         this.lastInput = n.time() - 1;
 
@@ -80,8 +81,13 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     }
 
     @NotNull
-    public Sensor pri(float p) {
+    public Sensor pri(FloatSupplier p) {
         this.pri = p;
+        return this;
+    }
+    @NotNull
+    public Sensor pri(float p) {
+        pri(()->p);
         return this;
     }
 
@@ -167,16 +173,16 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         if (t!=null) {
             return new MutableTask(term(), punc, t)
                     .time(now, now + dt())
-                    .budget(pri(v, now, prevF, lastInput), dur)
+                    .budget(pri.asFloat() /*(v, now, prevF, lastInput)*/, dur)
                     .log(this);
         } else {
             return null;
         }
     }
 
-    public float pri(float v, long now, float prevV, long lastV) {
-        return pri;
-    }
+//    public float pri(float v, long now, float prevV, long lastV) {
+//        return pri;
+//    }
 
     @NotNull
     public Termed<Compound> term() {

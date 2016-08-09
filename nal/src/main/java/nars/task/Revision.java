@@ -88,10 +88,20 @@ public class Revision {
                 return null;
             }
 
-            return new RevisionTask(c.getTwo(),
+            RevisionTask t = new RevisionTask(c.getTwo(),
                     a, b, now, when, aMix,
                     newTruth.withConf(newConf)
-                    ).budget(a, b, aMix).log("Revection Merge");
+            );
+
+            t.budget(a, b, aMix);
+
+            if (Param.REVECTION_PRIORITY_ZERO)
+                t.setPriority(0);
+
+
+            t.log("Revection Merge");
+            return t;
+
 
         } else {
             //just project 'b' to 'a' time
@@ -229,11 +239,9 @@ public class Revision {
                 accumulatedDifference.add(Math.abs(adt - bdt) * depth);
             } else if (bdt != DTERNAL) {
                 newDT = bdt;
-            }
-            else if (adt != DTERNAL) {
+            } else if (adt != DTERNAL) {
                 newDT = adt;
-            }
-            else {
+            } else {
                 throw new RuntimeException();
             }
         } else {
@@ -261,7 +269,7 @@ public class Revision {
         return failStrongest(a, b, aProp);
 
         //if (a.op().temporal) //when would it not be temporal? this happens though
-            //d = d.dt(newDT);
+        //d = d.dt(newDT);
         //return d;
     }
 
@@ -281,15 +289,17 @@ public class Revision {
     public static boolean isRevisible(@NotNull Task newBelief, @NotNull Task oldBelief) {
         Term t = newBelief.term();
         return
-            newBelief!=oldBelief &&
+                newBelief != oldBelief &&
 
-            //!(t.op().isConjunctive() && t.hasVarDep()) &&  // t.hasVarDep());
+                        //!(t.op().isConjunctive() && t.hasVarDep()) &&  // t.hasVarDep());
 
-            //!newBelief.equals(oldBelief) &&  //if it overlaps it will be equal, so just do overlap test
-            !Stamp.overlapping(newBelief, oldBelief);
+                        //!newBelief.equals(oldBelief) &&  //if it overlaps it will be equal, so just do overlap test
+                        !Stamp.overlapping(newBelief, oldBelief);
     }
 
-    /** assumes the compounds are the same except for possible numeric metadata differences */
+    /**
+     * assumes the compounds are the same except for possible numeric metadata differences
+     */
     public static @NotNull Compound intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
         @NotNull Compound aterm = a.term();
         if (a.equals(b))
@@ -305,7 +315,7 @@ public class Revision {
         int at = aterm.dt();
         if (at != DTERNAL) {
             int bt = bterm.dt();
-            if (bt!= DTERNAL) {
+            if (bt != DTERNAL) {
                 dt = Math.round(Util.lerp(at, bt, aProp));
             }
         }

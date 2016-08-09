@@ -150,6 +150,10 @@ public abstract class Param extends Container implements Level {
     public static final float REVECTION_CONFIDENCE_FACTOR = 0.9f; //1f; //0.95f;
 
 
+    /** if false, then revection will be budgeted with parent's budget mix, otherwise it will have dur/qua mixed but priority set to zero to not trigger linking */
+    public static boolean REVECTION_PRIORITY_ZERO = true;
+
+
     private Truth defaultGoalTruth, defaultJudgmentTruth;
 
     public final MutableInteger cyclesPerFrame = new MutableInteger(1);

@@ -54,6 +54,9 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
 
         this.input = input;
 
+        final float gain = 1.0f;
+        final float base = n.confMin.floatValue();
+        this.sensor.pri(()->Math.max(1f, base + gain * n.conceptPriority(term)));
     }
 
     protected void input(Task t) {
@@ -69,8 +72,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
     }
     @Override
     public boolean validGoal(@NotNull Task t, @NotNull NAR nar) {
-        return onlyDerivationsIfFuture(t, nar);
-        //return true;
+        //return onlyDerivationsIfFuture(t, nar);
+        return true;
     }
 
 

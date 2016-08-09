@@ -53,7 +53,7 @@ public class Arkancide extends NAREnvironment {
     final int visH = 24;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 32;
+    private int visionSyncPeriod = 256;
     float noiseLevel = 0;
 
     float paddleSpeed = 70f;
@@ -121,7 +121,8 @@ public class Arkancide extends NAREnvironment {
                 }
             }
 
-            float p = nar.conceptPriority(s);
+            float maxConceptPriority = ((Default)nar).core.concepts.priMax(); //TODO cache this
+            float p = nar.conceptPriority(s) / maxConceptPriority;
             g.glColor4f(dr, dg, b, 0.5f + 0.5f * p);
 
         });
@@ -193,10 +194,10 @@ public class Arkancide extends NAREnvironment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Param.CONCURRENCY_DEFAULT = 3;
+        Param.CONCURRENCY_DEFAULT = 4;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                16, 2, 2, rng,
+                16, 3, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 7 * 1000000, false)
                 , new FrameClock()) {
 
@@ -210,8 +211,8 @@ public class Arkancide extends NAREnvironment {
         nar.derivedActivation.setValue(0.1f);
 
 
-        nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
@@ -251,8 +252,8 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
@@ -264,8 +265,8 @@ public class Arkancide extends NAREnvironment {
 
         NARLoop loop = t.run(runFrames, 0,1);
 
-        Tetris2.NARController meta = new Tetris2.NARController(nar, loop, t);
-        newBeliefChart(meta, 500);
+        //Tetris2.NARController meta = new Tetris2.NARController(nar, loop, t);
+        //newBeliefChart(meta, 500);
 
         loop.join();
         //t.run(runFrames, 0, 1).join();

@@ -258,14 +258,14 @@ public class CameraTrack implements DiscreteEnvironment {
         }*/
     }
 
-    public void addSensor(NAR nar, Map<Term, SensorConcept> sensors, Compound t, Term componentTerm, FloatSupplier component) {
-        Compound tr = $.instprop(t.term(), componentTerm);
-        sensors.put(tr, new SensorConcept( tr, nar,
-                component,
-                f -> {
-                    return $.t(f, 0.75f);
-                }).resolution(0.1f).pri(0.1f));
-    }
+//    public void addSensor(NAR nar, Map<Term, SensorConcept> sensors, Compound t, Term componentTerm, FloatSupplier component) {
+//        Compound tr = $.instprop(t.term(), componentTerm);
+//        sensors.put(tr, new SensorConcept( tr, nar,
+//                component,
+//                f -> {
+//                    return $.t(f, 0.75f);
+//                }).resolution(0.1f));//.pri(0.1f));
+//    }
 
     @Override
     public Twin<Integer> start() {
