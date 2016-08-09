@@ -40,6 +40,7 @@ abstract public class NAREnvironment {
     public final SensorConcept happy;
     private final float reinforcementAttention;
     public final SensorConcept joy;
+    public final RangeNormalizedFloat rewardNormalized;
     public NAR nar;
 
     public final List<SensorConcept> sensors = $.newArrayList();
@@ -70,8 +71,10 @@ abstract public class NAREnvironment {
 
         float rewardConf = alpha;
 
+        rewardNormalized = new RangeNormalizedFloat(() -> rewardValue);
+
         happy = new SensorConcept("(happy)", nar,
-                new RangeNormalizedFloat(() -> rewardValue),
+                rewardNormalized,
                 (x) -> t(x, rewardConf)
         );
         happy.desire($.t(1f, rewardGamma));

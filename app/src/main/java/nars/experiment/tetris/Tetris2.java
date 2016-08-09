@@ -8,6 +8,7 @@ import nars.Param;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.index.CaffeineIndex;
+import nars.index.Indexes;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.VariableCompressor;
@@ -17,6 +18,7 @@ import nars.term.Compound;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.truth.Truth;
+import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
@@ -46,10 +48,10 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = true;
-        Param.CONCURRENCY_DEFAULT = 2;
+        Param.CONCURRENCY_DEFAULT = 3;
     }
 
-    public static final int runFrames = 1000;
+    public static final int runFrames = 10000;
     public static final int cyclesPerFrame = 16;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -429,8 +431,14 @@ public class Tetris2 extends NAREnvironment {
 
 
         NARLoop loop = t.run(runFrames, frameDelay, TIME_DILATION);
-        NARController meta = NARController.newDefault(nar, loop);
+
+        NARController meta = NARController.newDefault(nar, loop, t);
+        newBeliefChart(meta, 500);
+
         loop.join();
+
+
+
         //nar.stop();
 
         //nar.index.print(System.out);
@@ -445,18 +453,16 @@ public class Tetris2 extends NAREnvironment {
     static class NARController extends NAREnvironment {
 
         private final NARLoop loop;
-        private final NAR nar, worker;
+        private final NAR worker;
 
-        public static NARController newDefault(NAR worker, NARLoop loop) {
-            Default ctl = new Default(512, 8, 2, 2);
-            ctl.cyclesPerFrame.setValue(16);
-            ctl.inputActivation.setValue(0.5f);
-            ctl.derivedActivation.setValue(0.1f);
-            //ctl.confMin.setValue(0.01f);
-            //ctl.truthResolution.setValue(0.01f);
-            ctl.beliefConfidence(0.25f);
-            ctl.goalConfidence(0.25f);
-            return new NARController(ctl, worker, loop);
+        public static NARController newDefault(NAR worker, NARLoop loop, NAREnvironment env) {
+
+            return new NARController(worker, loop) {
+                @Override
+                protected float act() {
+                    return super.act() + env.rewardNormalized.asFloat();
+                }
+            };
         }
 
         @Override
@@ -471,11 +477,25 @@ public class Tetris2 extends NAREnvironment {
         }
 
 
-        public NARController(NAR ctl, NAR worker, NARLoop loop) {
+        public NARController( NAR worker, NARLoop loop) {
 
-            super(ctl);
+            super( new Default(384, 4, 2, 2, new XORShiftRandom(2),
+                    new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)),5*100000),
+                    //new CaffeineIndex(new DefaultConceptBuilder(random)),
+                    new FrameClock()) {
+                       @Override
+                       protected void initHigherNAL() {
+                           super.initHigherNAL();
+                           cyclesPerFrame.setValue(16);
+                           inputActivation.setValue(0.25f);
+                           derivedActivation.setValue(0.25f);
+                           //ctl.confMin.setValue(0.01f);
+                           //ctl.truthResolution.setValue(0.01f);
+                           beliefConfidence(0.9f);
+                           goalConfidence(0.4f);
+                       }
+                   });
 
-            this.nar = ctl;
             this.worker = worker;
             this.loop = loop;
 
@@ -493,26 +513,29 @@ public class Tetris2 extends NAREnvironment {
         @Override
         protected void init(NAR n) {
 
+            float sensorResolution = 0.05f;
+
             sensors.addAll(Lists.newArrayList(
                 new SensorConcept("(happy)", n,
-                        motivation,
-                        (v1) -> $.t(v1, 0.9f)
-                ),
+                    motivation,
+                    (v1) -> $.t(v1, 0.9f)
+                ).resolution(sensorResolution),
                 new SensorConcept("(busy)", n,
                     new RangeNormalizedFloat( ()->(float)worker.emotion.busy.getSum() ),
                     (v)->$.t(v,0.9f)
-                ),
+                ).resolution(sensorResolution),
                 new SensorConcept("(learn)", n,
                     /* new RangeNormalizedFloat(  */ ()-> worker.emotion.learning(),
                     (v)->$.t(v,0.9f)
-                ),
+                ).resolution(sensorResolution),
                 new SensorConcept("(memory)", n,
                     () -> memory(),
                     (v)->$.t(v,0.9f)
-                )
+                ).resolution(sensorResolution)
             ));
 
             final int BASE_PERIOD_MS = 100;
+            final int MAX_CONCEPTS_FIRE_PER_CYCLE = 64;
 
             actions.addAll(Lists.newArrayList(
                 //cpu throttle
@@ -526,15 +549,32 @@ public class Tetris2 extends NAREnvironment {
                 //memory throttle
                 new MotorConcept("(memoryWeight)", nar, (b,d)->{
                     ((CaffeineIndex)worker.index).compounds.policy().eviction().ifPresent(e->{
-                        e.setMaximum((long)(DEFAULT_INDEX_WEIGHT * (1f + d.expectation()-0.5f)));//50%..150% sweep
+                        float sweep = 0.1f; //% sweep , 0<sweep
+                        e.setMaximum((long)(DEFAULT_INDEX_WEIGHT * (1f + sweep * 2f * (d.expectation()-0.5f))));
                     });
                     //System.err.println("  loop period ms: " + newPeriod);
                     return d;
                 }),
 
                 new MotorConcept("(confMin)", nar, (b,d)->{
-                    worker.confMin.setValue(d.expectation());
-                    //System.err.println("  loop period ms: " + newPeriod);
+                    float MAX_CONFMIN = 0.1f;
+                    float newConfMin = Math.max(Param.TRUTH_EPSILON, MAX_CONFMIN * d.expectation());
+                    worker.confMin.setValue(newConfMin);
+                    return d;
+                }),
+
+                new MotorConcept("(inputActivation)", nar, (b,d)->{
+                    worker.inputActivation.setValue(d.expectation());
+                    return d;
+                }),
+
+                new MotorConcept("(derivedActivation)", nar, (b,d)->{
+                    worker.derivedActivation.setValue(d.expectation());
+                    return d;
+                }),
+
+                new MotorConcept("(conceptsPerFrame)", nar, (b,d)->{
+                    ((Default)worker).core.conceptsFiredPerCycle.setValue((int)(d.expectation() * MAX_CONCEPTS_FIRE_PER_CYCLE));
                     return d;
                 })
 

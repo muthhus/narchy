@@ -538,18 +538,15 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
             Task existing = tasks.putIfAbsent(input, input);
             if (existing != null) {
-                boolean budgetChange = false;
+                ///boolean budgetChange = false;
                 if (existing != input) {
-                    if (!existing.equalsBudget(input)) {
-                        DuplicateMerge.merge(existing.budget(), input, 1f);
-                        budgetChange = true;
-                    }
+                    DuplicateMerge.merge(existing.budget(), input, 1f);
                     input.delete(DUPLICATE_BELIEF_GOAL);
                 }
 
                 //checkConsistency(); //TEMPORARY =-=============
-
-                return budgetChange ? existing : null; //return existing if budget changed to reactivate links
+                return null;
+                //return budgetChange ? existing : null; //return existing if budget changed to reactivate links
             }
 
 
