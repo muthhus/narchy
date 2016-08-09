@@ -3,8 +3,10 @@ package nars.experiment.arkanoid;
 
 import nars.$;
 import nars.NAR;
+import nars.NARLoop;
 import nars.Param;
 import nars.experiment.NAREnvironment;
+import nars.experiment.tetris.Tetris2;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -194,7 +196,7 @@ public class Arkancide extends NAREnvironment {
         Param.CONCURRENCY_DEFAULT = 3;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                32, 2, 2, rng,
+                16, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 7 * 1000000, false)
                 , new FrameClock()) {
 
@@ -215,7 +217,7 @@ public class Arkancide extends NAREnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -259,7 +261,14 @@ public class Arkancide extends NAREnvironment {
 
         Arkancide t = new Arkancide(nar);
 
-        t.run(runFrames, 0, 1).join();
+
+        NARLoop loop = t.run(runFrames, 0,1);
+
+        Tetris2.NARController meta = new Tetris2.NARController(nar, loop, t);
+        newBeliefChart(meta, 500);
+
+        loop.join();
+        //t.run(runFrames, 0, 1).join();
 
         //nar.index.print(System.out);
         NAR.printTasks(nar, true);

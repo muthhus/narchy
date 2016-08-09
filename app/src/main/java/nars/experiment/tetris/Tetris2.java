@@ -1,6 +1,7 @@
 package nars.experiment.tetris;
 
 import com.google.common.collect.Lists;
+import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
@@ -449,7 +450,7 @@ public class Tetris2 extends NAREnvironment {
         //nar.forEachActiveConcept(System.out::println);
     }
 
-    static class NARController extends NAREnvironment {
+    public static class NARController extends NAREnvironment {
 
         private final NARLoop loop;
         private final NAR worker;
@@ -511,36 +512,41 @@ public class Tetris2 extends NAREnvironment {
 
             float sensorResolution = 0.05f;
 
+            float sensorConf = alpha;
+
+            FloatToObjectFunction<Truth> truther = (v) -> $.t(v, sensorConf);
+
             sensors.addAll(Lists.newArrayList(
-                    new SensorConcept("(happy)", n,
+                    new SensorConcept("(motive)", n,
                             motivation,
-                            (v1) -> $.t(v1, 0.9f)
+                            truther
                     ).resolution(sensorResolution),
                     new SensorConcept("(busy)", n,
                             new RangeNormalizedFloat(() -> (float) worker.emotion.busy.getSum()),
-                            (v) -> $.t(v, 0.9f)
+                            truther
                     ).resolution(sensorResolution),
                     new SensorConcept("(learn)", n,
                     /* new RangeNormalizedFloat(  */ () -> worker.emotion.learning(),
-                            (v) -> $.t(v, 0.9f)
+                            truther
                     ).resolution(sensorResolution),
                     new SensorConcept("(memory)", n,
                             () -> memory(),
-                            (v) -> $.t(v, 0.9f)
+                            truther
                     ).resolution(sensorResolution)
             ));
 
-            final int BASE_PERIOD_MS = 100;
-            final int MAX_CONCEPTS_FIRE_PER_CYCLE = 64;
+            //final int BASE_PERIOD_MS = 100;
+            final int MAX_CONCEPTS_FIRE_PER_CYCLE = 32;
+            final int MAX_LINKS_PER_CONCEPT = 24;
 
             actions.addAll(Lists.newArrayList(
                     //cpu throttle
-                    new MotorConcept("(cpu)", nar, (b, d) -> {
+                    /*new MotorConcept("(cpu)", nar, (b, d) -> {
                         int newPeriod = Math.round(((1f - (d.expectation())) * BASE_PERIOD_MS));
                         loop.setPeriodMS(newPeriod);
                         //System.err.println("  loop period ms: " + newPeriod);
                         return d;
-                    }),
+                    }),*/
 
                     //memory throttle
                     new MotorConcept("(memoryWeight)", nar, (b, d) -> {
@@ -574,6 +580,15 @@ public class Tetris2 extends NAREnvironment {
                         return d;
                     }),
 
+                    new MotorConcept("(linksPerConcept)", nar, (b, d) -> {
+                        float l = d.expectation() * MAX_LINKS_PER_CONCEPT;
+                        l = Math.max(l, 1f);
+                        int vv = (int) Math.floor((float)Math.sqrt(l));
+
+                        ((Default) worker).core.tasklinksFiredPerFiredConcept.setValue(vv);
+                        ((Default) worker).core.termlinksFiredPerFiredConcept.setValue((int)Math.ceil(l / vv));
+                        return d;
+                    }),
 
                     new MotorConcept("(envCuriosity)", nar, (b, d) -> {
                         float exp = d.expectation();
