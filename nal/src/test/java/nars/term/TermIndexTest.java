@@ -249,9 +249,9 @@ public class TermIndexTest {
         i.print(System.out);
 
         //assertEquals(20 + 2, i.atoms.size());
-        assertEquals(sui, i.get(sui));
-        assertEquals(su, i.get(su));
-        assertNotEquals(sui, i.get(su));
+        assertEquals(sui, i.concept(sui, false));
+        assertEquals(su, i.concept(su, false));
+        assertNotEquals(sui, i.concept(su, false));
 
     }
 }

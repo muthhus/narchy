@@ -63,8 +63,8 @@ public interface TermIndex {
         return get(t, false);
     }
 
-    @Nullable
-    Termed get(@NotNull Termed key, boolean createIfMissing);
+    //use concept(key, craeteIfMissing) instead
+    @Nullable Termed get(@NotNull Termed key, boolean createIfMissing);
 
 
     /**
@@ -396,7 +396,7 @@ public interface TermIndex {
         }
 
         if (r!=null && insert) {
-            Compound s = (Compound) termOrNull(get(r, true));
+            Compound s = (Compound) termOrNull(get(r, false));
             return s == null ? r : s; //if a concept does not exist and was not created, return the key
         } else {
             return r;
@@ -541,9 +541,11 @@ public interface TermIndex {
                 return (Concept) aterm;
             }
 
+            term = $.unneg(aterm);
+//            term = aterm;
+
             //if (aterm.op() == NEG)
                 //throw new InvalidConceptException(term, "Negation re-appeared");
-            term = $.unneg(aterm);
 
         }
 

@@ -119,7 +119,7 @@ public enum PremiseBuilder {
 
         Task belief = null;
 
-        if (linkable(termLinkTerm)) { //atomic concepts will have no beliefs to match
+        if (termLinkTerm instanceof Compound && linkable(termLinkTerm)) { //atomic concepts will have no beliefs to match
 
             Concept beliefConcept = nar.concept(termLinkTerm);
             if (beliefConcept != null) {
@@ -155,7 +155,8 @@ public enum PremiseBuilder {
         return p;
     }
 
-    @NotNull
+
+    @Nullable
     private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {
 
         long taskOcc = taskLink.occurrence();

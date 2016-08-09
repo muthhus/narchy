@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import static nars.concept.table.BeliefTable.rankEternalByConfAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 
+
 /**
  * Created by me on 5/7/16.
  */

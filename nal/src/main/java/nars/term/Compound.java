@@ -592,8 +592,11 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default boolean hasTemporal() {
-        int dt = dt();
-        return ((dt != DTERNAL) /*&& (dt!=XTERNAL)*/ && isAny(Op.TemporalBits)) || or(Term::hasTemporal);
+        if (hasAny(Op.TemporalBits)) {
+            int dt = dt();
+            return ((dt != DTERNAL) /*&& (dt!=XTERNAL)*/ && isAny(Op.TemporalBits)) || or(Term::hasTemporal);
+        }
+        return false;
     }
 
     //    public int countOccurrences(final Term t) {

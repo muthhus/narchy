@@ -71,7 +71,7 @@ public class Narsese extends BaseParser<Object> {
         return parsers.get();
     }
 
-    @Nullable
+    @NotNull
     public static Task makeTask(@NotNull Memory memory, @Nullable float[] b, Termed content, char p, @Nullable Truth t, @NotNull Tense tense) {
 
 //        if (p == null)
@@ -86,7 +86,7 @@ public class Narsese extends BaseParser<Object> {
 //
 
         if (!(content instanceof Compound)) {
-            return null;
+            throw new RuntimeException("Task content is not compound");
         }
 
         if (t == null) {
@@ -1135,7 +1135,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * parse one task
      */
-    @Nullable
+    @NotNull
     public Task task(@NotNull String input, @NotNull Memory memory) throws NarseseException {
         ParsingResult r;
         try {
@@ -1159,7 +1159,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * returns null if the Task is invalid (ex: invalid term)
      */
-    @Nullable
+    @NotNull
     public static Task decodeTask(@NotNull Memory m, @NotNull Object[] x) throws NarseseException  {
         if (x.length == 1 && x[0] instanceof Task) {
             return (Task) x[0];
@@ -1167,7 +1167,7 @@ public class Narsese extends BaseParser<Object> {
         Term contentRaw = (Term) x[1];
         if (contentRaw == null)
             throw new NarseseException("Invalid task term");
-        Termed content = m.index.normalize(contentRaw, true);
+        Termed content = m.index.normalize(contentRaw, false);
         if (content == null)
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
 

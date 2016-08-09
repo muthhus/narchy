@@ -28,7 +28,6 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 public class LinkageTest extends AbstractNALTest {
 
-    public static final int TERM_LINK_BAG_SIZE = 8;
 
     public LinkageTest(Supplier<NAR> b) { super(b); }
 
@@ -118,7 +117,9 @@ public class LinkageTest extends AbstractNALTest {
         //List<String> fails = new ArrayList();
 
 
-        boolean passed = linksIndirectly(nar, premise2, nar.concept(premise1));
+        @Nullable Concept premise1Concept = nar.concept(premise1);
+        assertNotNull(premise1Concept);
+        boolean passed = linksIndirectly(nar, premise2, premise1Concept);
 
         boolean passed2 = linksIndirectly(nar, premise1, nar.concept(premise2));
 

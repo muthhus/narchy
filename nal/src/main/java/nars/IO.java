@@ -244,12 +244,19 @@ public class IO {
         try {
             ByteArrayOutputStream bs = new ByteArrayOutputStream();
             IO.writeTask(new DataOutputStream(bs), t);
-            byte[] tb = bs.toByteArray();
-            return tb;
+            return bs.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+    }
+    public static byte[] asBytes(@NotNull Term t) {
+        try {
+            ByteArrayOutputStream bs = new ByteArrayOutputStream();
+            IO.writeTerm(new DataOutputStream(bs), t);
+            return bs.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
@@ -261,6 +268,14 @@ public class IO {
         }
     }
 
+    public static Term termFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
+        try {
+            return IO.readTerm(new DataInputStream(new ByteArrayInputStream(b)), index);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     /** serialization and deserialization of terms, tasks, etc. */
     public static class DefaultCodec extends FSTConfiguration {

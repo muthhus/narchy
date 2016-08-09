@@ -10,13 +10,16 @@ import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 import static nars.Op.*;
+import static nars.nal.Tense.DTERNAL;
 import static nars.term.Termed.termOrNull;
+import static nars.term.Terms.compoundOrNull;
 
 /**
  * Index which is supported by Map/Cache-like operations
@@ -24,6 +27,7 @@ import static nars.term.Termed.termOrNull;
 public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
 
+    public static final int invalidConceptBitVector = Op.NEG.bit | Op.VariableBits;
     protected final Concept.ConceptBuilder conceptBuilder;
 
     public MaplikeIndex(Concept.ConceptBuilder conceptBuilder) {
@@ -38,8 +42,9 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
     @Nullable
     protected Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
+
         return createIfMissing ?
-                getNewCompound(x) :
+                getConceptCompound(x) :
                 get(x);
     }
 
@@ -60,7 +65,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
      */
     @NotNull
     protected Termed getNewAtom(@NotNull Atomic x) {
-        Termed y = get(x);
+        Termed y = get(x, false);
         if (y == null) {
             set(y = buildConcept(x));
         }
@@ -71,25 +76,44 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
      * default lowest common denominator impl, subclasses may reimpl for more efficiency
      */
     @Nullable
-    protected Termed getNewCompound(@NotNull Compound x) {
-        Termed y = get(x);
+    protected Termed getConceptCompound(@NotNull Compound x) {
+        Termed y = get(x, false);
         if (y == null) {
-            y = buildCompound(x.op(), x.dt(), x.subterms()    /* TODO make this sometimes false */);
-            if (y == null)
-                return null;
+            //Term yy = x;//buildCompound(x.op(), x.dt(), x.subterms()    /* TODO make this sometimes false */);
+            //if (yy == null)
+                //return null;
+            boolean xnormalized = x.isNormalized();
 
-            if (x.isNormalized())
-                ((GenericCompound) y).setNormalized();
+            @NotNull TermContainer xs = x.subterms();
+            TermContainer ys = internSubs(xs);
+            Term yy;
+            if (xs!=ys) {
+                yy = buildCompound(x.op(), x.op().temporal ? DTERNAL : x.dt(), ys);
+                if (xnormalized)
+                    ((GenericCompound)yy).setNormalized();
+            } else {
+                yy = x;
+            }
 
-            if (canBuildConcept(y)) {
-                set(y = buildConcept(y));
+            if (xnormalized && canBuildConcept(yy)) {
+                set(y = buildConcept(yy));
+            } else {
+                y = yy;
             }
         }
         return y;
     }
 
-    static protected boolean canBuildConcept(@Nullable Termed y) {
-        return y != null && y.op() != Op.NEG && !y.term().hasTemporal();
+    static protected boolean canBuildConcept(@NotNull Term y) {
+        if (y instanceof Compound) {
+            if (y.op() == NEG)
+                //throw new InvalidConceptException(y, "should have been un-neg");
+                return false;
+            return true; //return !y.isAny(invalidConceptBitVector) && !y.hasTemporal();
+        } else {
+            return !(y instanceof Variable);
+        }
+
     }
 
 
@@ -135,18 +159,21 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     public @NotNull TermContainer internSubs(@NotNull TermContainer s) {
         int ss = s.size();
         Term[] bb = new Term[ss];
-        boolean changed = false, temporal = false;
+        boolean changed = false;//, temporal = false;
         for (int i = 0; i < ss; i++) {
             Term a = s.term(i);
 
             Term b;
             if (a instanceof Compound) {
+
                 if (a.hasTemporal()) {
-                    temporal = true;//dont store subterm arrays containing temporal compounds
+                    //temporal = true;//dont store subterm arrays containing temporal compounds
+                    b = a;
+                } else {
+                    /*if (b != a && a.isNormalized())
+                        ((GenericCompound) b).setNormalized();*/
+                    b = theCompound((Compound) a, true).term();
                 }
-                b = termOrNull(theCompound((Compound) a, true)).term();
-                /*if (b == null)
-                    return null;*/
             } else {
                 b = theAtom((Atomic) a, true).term();
             }
@@ -156,10 +183,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
             bb[i] = b;
         }
 
-        if (changed && !temporal) {
-            s = TermVector.the(bb);
-        }
-        return s;
+        return changed ? TermVector.the(bb) : s;
     }
 
     /**
@@ -192,7 +216,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         @Nullable TermContainer s = theSubterms(subs);
         if (s == null)
             return null;
-        if ((subs.size() == 2) && op == INH && (subs.term(1).op() == OPER) && subs.term(0).op() == PROD)
+        if (op == INH && (subs.term(1).op() == OPER) && subs.term(0).op() == PROD)
             return termOrNull(build(INH, dt, s.terms())); //HACK send through the full build process in case it is an immediate transform
         else
             return finish(op, dt, s);

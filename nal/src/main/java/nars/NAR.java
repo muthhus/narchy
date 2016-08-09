@@ -275,15 +275,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Deprecated
     @NotNull
     public Task inputTask(@NotNull String taskText) {
-        Task task = task(taskText);
-        if (task == null)
-            throw new NarseseException("No task parsed: " + taskText);
-        return inputTask(task);
+        return inputTask(Narsese.the().task(taskText, this));
     }
 
     @Nullable
     public Task inputTask(@NotNull Task t) {
-        inputLater(t);
+        input(t);
         return t;
     }
 
@@ -643,7 +640,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             float p = inputted.pri();
             if (p > 0) {
                 //propagate budget
-                try {
+                //try {
                     Activation activation = new Activation(inputted);
 
                     c.link(1 /* linkActivation */, Param.BUDGET_EPSILON, this, activation);
@@ -652,15 +649,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
                     emotion.busy(cost);
                     emotion.stress(activation.overflow);
-                } catch (Exception e) {
-                    emotion.errr();
-
-                    if (Param.DEBUG)
-                        logger.warn("activation error: {}", e.toString());
-
-                    inputted.delete();
-                    return c;
-                }
+//                } catch (Exception e) {
+//                    emotion.errr();
+//
+//                    if (Param.DEBUG)
+//                        logger.warn("activation error: {}", e.toString());
+//
+//                    inputted.delete();
+//                    return c;
+//                }
             }
 
 
@@ -1116,29 +1113,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable
     public final Concept concept(@NotNull Termed tt, boolean createIfMissing) {
-
-//
-////        //optimization: assume a concept instance is the concept of this NAR
-//        //dangerous for CompoundConcept's because it my be a stale concept instance, so always do a lookup
-//        //in fact this is how stale instances can be detected
-        Term t = tt.term();
-//        if (tt instanceof Concept) {
-//            if (t instanceof Compound) {
-//                //assert(t !=tt);
-//                if (t!=tt) {
-//                    Concept next = concept(t, createIfMissing);
-//                    //if (next!=tt)
-//                    //logger.info("warning: callee has a stale concept instance: " + tt + " vs. active " + next);
-//                    return next;
-//                }
-//            }
-////
-////            //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
-////            return (Concept) tt;
-//        }
-
-
-        return concept(t, createIfMissing);
+        return concept(tt.term(), createIfMissing);
     }
 
     public @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) throws TermIndex.InvalidConceptException {
@@ -1453,13 +1428,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         public void run(@NotNull NAR nar, float activation) {
             if (!concepts.isEmpty()) {
-                float total = (float) concepts.sum();
-                ((Default) nar).core.concepts.put(concepts, in,
-                        activation / total, //normalize to 1.0 total
-                        overflow);
+                //float total = (float) concepts.sum();
+                nar.activate(concepts, in, activation, overflow);
             }
         }
     }
+
+    abstract protected void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow);
+
 
 //    public final void activate(@NotNull Task t) {
 //        activate(t, 1f);

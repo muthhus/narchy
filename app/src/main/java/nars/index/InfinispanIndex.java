@@ -91,7 +91,7 @@ public class InfinispanIndex extends MaplikeIndex {
     }
 
     @Override
-    protected Termed getNewCompound(@NotNull Compound x) {
+    protected Termed getConceptCompound(@NotNull Compound x) {
 
         if (!canBuildConcept(x)) {
             return buildCompound(x);

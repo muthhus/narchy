@@ -56,8 +56,7 @@ abstract public class PatternCompound extends GenericCompound {
             super(seed, subterms);
 
             this.ellipsis = ellipsis;
-            if (ellipsis == null)
-                throw new RuntimeException("no ellipsis");
+
 
 
         }
@@ -170,7 +169,7 @@ abstract public class PatternCompound extends GenericCompound {
      */
     abstract public static class PatternCompoundWithEllipsisLinearDT extends PatternCompoundWithEllipsisLinear {
 
-        public PatternCompoundWithEllipsisLinearDT(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        public PatternCompoundWithEllipsisLinearDT(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
         }
 
@@ -218,7 +217,7 @@ abstract public class PatternCompound extends GenericCompound {
         @NotNull
         private final EllipsisTransform ellipsisTransform;
 
-        public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @Nullable EllipsisTransform ellipsis, @NotNull TermContainer subterms) {
+        public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @NotNull EllipsisTransform ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
             this.ellipsisTransform = ellipsis;
         }

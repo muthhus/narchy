@@ -354,7 +354,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         return punc;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public final long[] evidence() {
         return this.evidence;

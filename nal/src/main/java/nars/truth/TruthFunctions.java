@@ -27,7 +27,7 @@ import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static java.lang.StrictMath.abs;
+import static java.lang.Math.abs;
 import static nars.$.t;
 
 /**
@@ -346,14 +346,14 @@ public final class TruthFunctions extends UtilityFunctions {
 //
 //        return bf(p);
 //    }
-    /** bipolarize a frequency value to -1..+1 */
-    public static float fb(float f) {
-        return (f - 0.5f) * 2f;
-    }
-    /** unipolarize a frequency value to 0..+1 */
-    public static float bf(float f) {
-        return (f/2f)+0.5f;
-    }
+//    /** bipolarize a frequency value to -1..+1 */
+//    public static float fb(float f) {
+//        return (f - 0.5f) * 2f;
+//    }
+//    /** unipolarize a frequency value to 0..+1 */
+//    public static float bf(float f) {
+//        return (f/2f)+0.5f;
+//    }
 
 
 
@@ -493,16 +493,16 @@ public final class TruthFunctions extends UtilityFunctions {
 //            return null;
     }
 
-    /**
-     * {(--, (&&, A, (--, B))), (--, B)} |- (--, A)
-     * @param a Truth value of the first premise
-     * @param b Truth value of the second premise
-     * @return Truth value of the conclusion
-     */
-    @Nullable
-    public static Truth reduceConjunctionNeg(@NotNull Truth a, @NotNull Truth b,float minConf) {
-        return reduceConjunction(a, negation(b, minConf), minConf);
-    }
+//    /**
+//     * {(--, (&&, A, (--, B))), (--, B)} |- (--, A)
+//     * @param a Truth value of the first premise
+//     * @param b Truth value of the second premise
+//     * @return Truth value of the conclusion
+//     */
+//    @Nullable
+//    public static Truth reduceConjunctionNeg(@NotNull Truth a, @NotNull Truth b,float minConf) {
+//        return reduceConjunction(a, negation(b, minConf), minConf);
+//    }
 
     /**
      * {(&&, <#x() ==> M>, <#x() ==> P>), S ==> M} |- <S ==> P>

@@ -508,14 +508,65 @@ public enum Draw {
         gl.glEnd();
     }
 
-    public static void hsb(float h, float s, float b, float a, float[] target) {
-        //TODO use a LUT matrix instaed of this shitty Color function
-        Color c = Color.hsb(360*h, s, b);
-        target[0] = (float)c.getRed();
-        target[1] = (float)c.getGreen();
-        target[2] = (float)c.getBlue();
+
+    public static void hsb(float hue, float saturation, float brightness, float a, float[] target) {
+        float r = 0, g = 0, b = 0;
+        if (saturation == 0) {
+            r = g = b = (int) (brightness * 255.0f + 0.5f);
+        } else {
+            float h = (hue - (float)Math.floor(hue)) * 6.0f;
+            float f = h - (float)Math.floor(h);
+            float p = brightness * (1.0f - saturation);
+            float q = brightness * (1.0f - saturation * f);
+            float t = brightness * (1.0f - (saturation * (1.0f - f)));
+            switch ((int) h) {
+                case 0:
+                    r =(brightness );
+                    g =(t );
+                    b =(p );
+                    break;
+                case 1:
+                    r =(q );
+                    g =(brightness );
+                    b =(p );
+                    break;
+                case 2:
+                    r =(p );
+                    g =(brightness );
+                    b =(t );
+                    break;
+                case 3:
+                    r =(p );
+                    g =(q );
+                    b =(brightness );
+                    break;
+                case 4:
+                    r =(t );
+                    g =(p );
+                    b =(brightness );
+                    break;
+                case 5:
+                    r =(brightness );
+                    g =(p );
+                    b =(q );
+                    break;
+            }
+        }
+        target[0] = r;
+        target[1] = g;
+        target[2] = b;
         target[3] = a;
     }
+
+//
+//    public static void hsb(float h, float s, float b, float a, float[] target) {
+//        //TODO use a LUT matrix instaed of this shitty Color function
+//        Color c = Color.hsb(360*h, s, b);
+//        target[0] = (float)c.getRed();
+//        target[1] = (float)c.getGreen();
+//        target[2] = (float)c.getBlue();
+//        target[3] = a;
+//    }
 
     ////////////////////////////////////////////////////////////////////////////
 

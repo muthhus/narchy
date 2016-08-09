@@ -30,13 +30,32 @@ public class TermIOTest {
     final NAR nar = new Terminal();
 
     void assertEqualSerialize(@NotNull Object orig) {
-        final IO.DefaultCodec codec = new IO.DefaultCodec(nar.index);
+        //final IO.DefaultCodec codec = new IO.DefaultCodec(nar.index);
 
-        byte barray[] = codec.asByteArray(orig);
+
+        byte barray[];
+        if (orig instanceof Task) {
+            Task torig = (Task) orig;
+            if (torig.isDeleted())
+                throw new RuntimeException("task is deleted already");
+            barray = IO.asBytes(torig);
+        }
+        else if (orig instanceof Term)
+            barray = IO.asBytes((Term)orig);
+        else
+            throw new RuntimeException("");
+
         out.println(orig + "\n\tserialized: " + barray.length + " bytes " + Arrays.toString(barray));
 
 
-        Object copy = codec.asObject(barray);
+        Object copy;
+        if (orig instanceof Task)
+            copy = IO.taskFromBytes(barray, nar.index);
+        else if (orig instanceof Term)
+            copy = IO.termFromBytes(barray, nar.index);
+        else
+            throw new RuntimeException("");
+
         //if (copy instanceof Task) {
             //((MutableTask)copy).invalidate();
             //((Task)copy).normalize(nar);
@@ -71,7 +90,7 @@ public class TermIOTest {
     }
     @Test
     public void testTermSerialization2() {
-        assertTermEqualSerialize("<a-->(b==>c)>");
+        assertTermEqualSerialize("<a-->(be)>");
     }
     @Test
     public void testTermSerialization3() {
@@ -113,7 +132,7 @@ public class TermIOTest {
     }
 
     @Test public void testTaskSerialization2() {
-        assertEqualSerialize(nar.inputTask("$0.3;0.2;0.1$ (a-->(b==>c))! %1.0;0.8%"));
+        assertEqualSerialize(nar.inputTask("$0.3;0.2;0.1$ (a-->(bd))! %1.0;0.8%"));
     }
 
     @Test public void testNARTaskDump() throws Exception {

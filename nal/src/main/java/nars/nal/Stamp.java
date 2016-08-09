@@ -256,7 +256,7 @@ public interface Stamp {
      * this can always be calculated deterministically from the evidentialBAse
      * since it is the deduplicated and sorted form of it.
      */
-    @Nullable
+    @NotNull
     long[] evidence();
 
     //Stamp setEvidence(long... evidentialSet);
