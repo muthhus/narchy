@@ -13,6 +13,7 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.op.TermTransform;
 import nars.term.Compound;
+import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
@@ -365,7 +366,7 @@ public interface TermIndex {
     }
 
 
-    @Nullable
+    @NotNull
     default Compound normalize(@NotNull Termed<Compound> t, boolean insert) {
         Compound r;
         if (!t.isNormalized()) {
@@ -385,17 +386,20 @@ public interface TermIndex {
                 return null;
             }*/
 
-            if (!(t2 instanceof Compound))
-                return null;
+            if (!(t2 instanceof Compound)) {
+                throw new InvalidTermException(ct.op(), ct.dt(), ct.terms(), "could not normalize");
+            }
 
             ((GenericCompound) t2).setNormalized();
             r = (Compound) t2;
 
         } else {
             r = compoundOrNull(t);
+            if (r == null)
+                throw new InvalidTermException(t.op(), DTERNAL, new Term[]{}, "could not normalize");
         }
 
-        if (r!=null && insert) {
+        if (insert) {
             Compound s = (Compound) termOrNull(get(r, false));
             return s == null ? r : s; //if a concept does not exist and was not created, return the key
         } else {
@@ -521,8 +525,11 @@ public interface TermIndex {
 
         if (term instanceof Atomic) {
 
-            if (term instanceof Variable)
-                throw new InvalidConceptException(term, VARIABLES_ARE_NOT_CONCEPTUALIZABLE);
+            if (term instanceof Variable) {
+                //if (createIfMissing)
+                    throw new InvalidConceptException(term, VARIABLES_ARE_NOT_CONCEPTUALIZABLE);
+                //return null;
+            }
 
         } else {
 
@@ -541,7 +548,7 @@ public interface TermIndex {
                 return (Concept) aterm;
             }
 
-            term = $.unneg(aterm);
+            term = unneg(aterm);
 //            term = aterm;
 
             //if (aterm.op() == NEG)

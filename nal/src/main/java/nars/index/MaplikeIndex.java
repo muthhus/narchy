@@ -82,24 +82,36 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
             //Term yy = x;//buildCompound(x.op(), x.dt(), x.subterms()    /* TODO make this sometimes false */);
             //if (yy == null)
                 //return null;
-            boolean xnormalized = x.isNormalized();
 
-            @NotNull TermContainer xs = x.subterms();
-            TermContainer ys = internSubs(xs);
-            Term yy;
-            if (xs!=ys) {
-                yy = buildCompound(x.op(), x.op().temporal ? DTERNAL : x.dt(), ys);
-                if (xnormalized)
-                    ((GenericCompound)yy).setNormalized();
-            } else {
-                yy = x;
-            }
+            if (canBuildConcept(x)) {
+                boolean xnormalized = x.isNormalized();
 
-            if (xnormalized && canBuildConcept(yy)) {
+                TermContainer xs = x.subterms();
+                TermContainer ys = theSubterms(xs);
+                Term yy;
+                if (xs != ys) {
+                    yy = buildCompound(x.op(), x.op().temporal ? DTERNAL : x.dt(), ys);
+                    if (xnormalized)
+                        ((GenericCompound) yy).setNormalized();
+
+                    //                if (xnormalized && !yy.isNormalized()) {
+                    //                    yy = normalize(yy, false);
+                    //                }
+                } else {
+                    yy = x;
+                }
+
                 set(y = buildConcept(yy));
             } else {
-                y = yy;
+                y = x;
             }
+
+//            if (/*xnormalized && */canBuildConcept(yy)) {
+//
+//            } else {
+//                //set(x, y = yy);
+//
+//            }
         }
         return y;
     }
@@ -107,7 +119,6 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     static protected boolean canBuildConcept(@NotNull Term y) {
         if (y instanceof Compound) {
             if (y.op() == NEG)
-                //throw new InvalidConceptException(y, "should have been un-neg");
                 return false;
             return true; //return !y.isAny(invalidConceptBitVector) && !y.hasTemporal();
         } else {
@@ -136,27 +147,14 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
     @Override public @Nullable TermContainer theSubterms(@NotNull TermContainer s) {
 
-        TermContainer r = s;
-
         //early existence test:
         TermContainer existing = getSubterms(s);
-        if (existing != null)
-            return existing;
 
-        s = internSubs(s);
+        return existing != null ? existing : internSubs(s);
 
-        if (r == s) {
-            return s;
-        } else {
-            TermContainer existing2 = put(s);
-            if (existing2 != null)
-                s = existing2;
-
-            return s;
-        }
     }
 
-    public @NotNull TermContainer internSubs(@NotNull TermContainer s) {
+    private final @NotNull TermContainer internSubs(@NotNull TermContainer s) {
         int ss = s.size();
         Term[] bb = new Term[ss];
         boolean changed = false;//, temporal = false;
@@ -183,11 +181,12 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
             bb[i] = b;
         }
 
-        return changed ? TermVector.the(bb) : s;
+        return put(changed ? TermVector.the(bb) : s);
     }
 
     /**
-     * subterms put
+     * subterms put;
+     * returns the interned subterm
      */
     abstract protected TermContainer put(TermContainer s);
 

@@ -58,7 +58,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         this.subterms = subterms;
 
-        this.normalized = (subterms.vars == 0) && (subterms.varPatterns == 0) /* not included in the count */;
+        this.normalized = !subterms.hasAny(Op.VariableBits) && (subterms.varPatterns == 0); /* not included in the count */;
         this.op = op;
 
         this.dt = dt;

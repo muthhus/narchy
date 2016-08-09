@@ -1,5 +1,6 @@
 package nars.link;
 
+import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
@@ -51,6 +52,9 @@ public enum TermLinkBuilder {
             }
 
         } else {
+
+            if (t instanceof Compound)
+                t = $.terms.normalize(t,false);
 
             if (target.add(t)) { //do not descend on repeats
 

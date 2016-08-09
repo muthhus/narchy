@@ -493,11 +493,15 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         int n = templates.size();
         float tStrength = 1f / n;
+        float subScale = scale * tStrength;
 
         Term[] t = templates.terms();
         for (int i = 0; i < n; i++) {
             Termed tt = t[i];
-            float subScale = scale * tStrength;
+
+            if (!tt.isNormalized()) {
+                continue;
+            }
 
             //Link the peer termlink bidirectionally
             if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time

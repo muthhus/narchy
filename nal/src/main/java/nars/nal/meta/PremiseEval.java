@@ -1,9 +1,6 @@
 package nars.nal.meta;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.index.TermIndex;
@@ -50,12 +47,15 @@ public class PremiseEval extends FindSubst {
     private float truthResolution;
 
     public boolean setPunct(Truth t, char p, long[] evidence) {
-        @Nullable Truth tt = dither(t);
-        if (tt != null) {
-            this.punct.set(new PremiseEval.TruthPuncEvidence(tt, p, evidence));
-            return true;
+
+        if (t!=null) {
+            t = dither(t);
+            if (t == null)
+                throw new RuntimeException("confMin should be greater than or equal to truthResolution");
         }
-        return false;
+
+        this.punct.set(new PremiseEval.TruthPuncEvidence(t, p, evidence));
+        return true;
     }
 
     @Nullable public Truth dither(@Nullable Truth t) {
@@ -229,8 +229,8 @@ public class PremiseEval extends FindSubst {
 
     public void init(@NotNull NAR nar) {
         this.nar = nar;
-        this.confMin = nar.confMin.floatValue();
         this.truthResolution = nar.truthResolution.floatValue();
+        this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
     }
 
     /**
