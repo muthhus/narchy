@@ -8,7 +8,6 @@ import nars.Param;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.index.CaffeineIndex;
-import nars.index.Indexes;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.VariableCompressor;
@@ -432,7 +431,7 @@ public class Tetris2 extends NAREnvironment {
 
         NARLoop loop = t.run(runFrames, frameDelay, TIME_DILATION);
 
-        NARController meta = NARController.newDefault(nar, loop, t);
+        NARController meta = new NARController(nar, loop, t);
         newBeliefChart(meta, 500);
 
         loop.join();
@@ -454,16 +453,8 @@ public class Tetris2 extends NAREnvironment {
 
         private final NARLoop loop;
         private final NAR worker;
+        private final NAREnvironment env;
 
-        public static NARController newDefault(NAR worker, NARLoop loop, NAREnvironment env) {
-
-            return new NARController(worker, loop) {
-                @Override
-                protected float act() {
-                    return super.act() + env.rewardNormalized.asFloat();
-                }
-            };
-        }
 
         @Override
         protected float act() {
@@ -472,12 +463,16 @@ public class Tetris2 extends NAREnvironment {
             float mUsage = memory();
             float targetMemUsage = 0.75f;
 
-            return motivation.asFloat() +  //boost for happiness
+
+
+            return
+                    env.rewardNormalized.asFloat() +
+                    motivation.asFloat() +  //boost for happiness
                     (mUsage < targetMemUsage ? 1f : (1f/(1f + mUsage - targetMemUsage))); //maintain % memory utilization TODO cache 'memory()' result
         }
 
 
-        public NARController( NAR worker, NARLoop loop) {
+        public NARController( NAR worker, NARLoop loop, NAREnvironment env) {
 
             super( new Default(384, 4, 2, 2, new XORShiftRandom(2),
                     new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)),5*100000),
@@ -498,6 +493,7 @@ public class Tetris2 extends NAREnvironment {
 
             this.worker = worker;
             this.loop = loop;
+            this.env = env;
 
             motivation = new RangeNormalizedFloat(()->(float)worker.emotion.motivation.getSum());
 
@@ -516,68 +512,75 @@ public class Tetris2 extends NAREnvironment {
             float sensorResolution = 0.05f;
 
             sensors.addAll(Lists.newArrayList(
-                new SensorConcept("(happy)", n,
-                    motivation,
-                    (v1) -> $.t(v1, 0.9f)
-                ).resolution(sensorResolution),
-                new SensorConcept("(busy)", n,
-                    new RangeNormalizedFloat( ()->(float)worker.emotion.busy.getSum() ),
-                    (v)->$.t(v,0.9f)
-                ).resolution(sensorResolution),
-                new SensorConcept("(learn)", n,
-                    /* new RangeNormalizedFloat(  */ ()-> worker.emotion.learning(),
-                    (v)->$.t(v,0.9f)
-                ).resolution(sensorResolution),
-                new SensorConcept("(memory)", n,
-                    () -> memory(),
-                    (v)->$.t(v,0.9f)
-                ).resolution(sensorResolution)
+                    new SensorConcept("(happy)", n,
+                            motivation,
+                            (v1) -> $.t(v1, 0.9f)
+                    ).resolution(sensorResolution),
+                    new SensorConcept("(busy)", n,
+                            new RangeNormalizedFloat(() -> (float) worker.emotion.busy.getSum()),
+                            (v) -> $.t(v, 0.9f)
+                    ).resolution(sensorResolution),
+                    new SensorConcept("(learn)", n,
+                    /* new RangeNormalizedFloat(  */ () -> worker.emotion.learning(),
+                            (v) -> $.t(v, 0.9f)
+                    ).resolution(sensorResolution),
+                    new SensorConcept("(memory)", n,
+                            () -> memory(),
+                            (v) -> $.t(v, 0.9f)
+                    ).resolution(sensorResolution)
             ));
 
             final int BASE_PERIOD_MS = 100;
             final int MAX_CONCEPTS_FIRE_PER_CYCLE = 64;
 
             actions.addAll(Lists.newArrayList(
-                //cpu throttle
-                new MotorConcept("(cpu)", nar, (b,d)->{
-                    int newPeriod = Math.round( ((1f - (d.expectation())) * BASE_PERIOD_MS) );
-                    loop.setPeriodMS(newPeriod);
-                    //System.err.println("  loop period ms: " + newPeriod);
-                    return d;
-                }),
+                    //cpu throttle
+                    new MotorConcept("(cpu)", nar, (b, d) -> {
+                        int newPeriod = Math.round(((1f - (d.expectation())) * BASE_PERIOD_MS));
+                        loop.setPeriodMS(newPeriod);
+                        //System.err.println("  loop period ms: " + newPeriod);
+                        return d;
+                    }),
 
-                //memory throttle
-                new MotorConcept("(memoryWeight)", nar, (b,d)->{
-                    ((CaffeineIndex)worker.index).compounds.policy().eviction().ifPresent(e->{
-                        float sweep = 0.1f; //% sweep , 0<sweep
-                        e.setMaximum((long)(DEFAULT_INDEX_WEIGHT * (1f + sweep * 2f * (d.expectation()-0.5f))));
-                    });
-                    //System.err.println("  loop period ms: " + newPeriod);
-                    return d;
-                }),
+                    //memory throttle
+                    new MotorConcept("(memoryWeight)", nar, (b, d) -> {
+                        ((CaffeineIndex) worker.index).compounds.policy().eviction().ifPresent(e -> {
+                            float sweep = 0.1f; //% sweep , 0<sweep
+                            e.setMaximum((long) (DEFAULT_INDEX_WEIGHT * (1f + sweep * 2f * (d.expectation() - 0.5f))));
+                        });
+                        //System.err.println("  loop period ms: " + newPeriod);
+                        return d;
+                    }),
 
-                new MotorConcept("(confMin)", nar, (b,d)->{
-                    float MAX_CONFMIN = 0.1f;
-                    float newConfMin = Math.max(Param.TRUTH_EPSILON, MAX_CONFMIN * d.expectation());
-                    worker.confMin.setValue(newConfMin);
-                    return d;
-                }),
+                    new MotorConcept("(confMin)", nar, (b, d) -> {
+                        float MAX_CONFMIN = 0.1f;
+                        float newConfMin = Math.max(Param.TRUTH_EPSILON, MAX_CONFMIN * d.expectation());
+                        worker.confMin.setValue(newConfMin);
+                        return d;
+                    }),
 
-                new MotorConcept("(inputActivation)", nar, (b,d)->{
-                    worker.inputActivation.setValue(d.expectation());
-                    return d;
-                }),
+                    new MotorConcept("(inputActivation)", nar, (b, d) -> {
+                        worker.inputActivation.setValue(d.expectation());
+                        return d;
+                    }),
 
-                new MotorConcept("(derivedActivation)", nar, (b,d)->{
-                    worker.derivedActivation.setValue(d.expectation());
-                    return d;
-                }),
+                    new MotorConcept("(derivedActivation)", nar, (b, d) -> {
+                        worker.derivedActivation.setValue(d.expectation());
+                        return d;
+                    }),
 
-                new MotorConcept("(conceptsPerFrame)", nar, (b,d)->{
-                    ((Default)worker).core.conceptsFiredPerCycle.setValue((int)(d.expectation() * MAX_CONCEPTS_FIRE_PER_CYCLE));
-                    return d;
-                })
+                    new MotorConcept("(conceptsPerFrame)", nar, (b, d) -> {
+                        ((Default) worker).core.conceptsFiredPerCycle.setValue((int) (d.expectation() * MAX_CONCEPTS_FIRE_PER_CYCLE));
+                        return d;
+                    }),
 
+
+                    new MotorConcept("(envCuriosity)", nar, (b, d) -> {
+                        float exp = d.expectation();
+                        env.epsilon = exp;
+                        env.gammaEpsilonFactor = exp*exp;
+                        return d;
+                    })
             ));
         }
 
