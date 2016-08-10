@@ -168,14 +168,17 @@ public interface Concept extends Termed {
      *
      * @return whether the link successfully was completed
      */
-    default boolean link(float linkScale, Concept src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    default boolean link(float scale, Concept src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+
+        if (scale < minScale)
+            return false;
 
         Budgeted b = activation.in;
         if (b instanceof Task) {
-            linkTask((Task)b, linkScale);
+            linkTask((Task)b, scale);
         }
 
-        linkAny(b, src, linkScale, minScale, nar, activation);
+        linkAny(b, src, scale, minScale, nar, activation);
 
         return true;
     }

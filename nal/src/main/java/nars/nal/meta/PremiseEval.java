@@ -103,7 +103,7 @@ public class PremiseEval extends FindSubst {
     public float confMin = Param.TRUTH_EPSILON;
     public int termSub0op, termSub1op;
     public int termSub0Struct, termSub1Struct;
-    //@Deprecated public boolean cyclic; //TODO if this is necessary, encode this in the stamp as a -1 element prefix which will indicate that it inherited evidence directly from a parent in a single-premise derivation
+
     public boolean overlap;
 
     @Nullable

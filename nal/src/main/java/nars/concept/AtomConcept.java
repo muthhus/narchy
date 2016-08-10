@@ -2,8 +2,11 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
@@ -110,13 +113,29 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
         throw new UnsupportedOperationException();
     }
 
-//    @Override
-//    public final boolean contains(Task t) {
-//        return false;
-//    }
-
     @Override
-    public void linkAny(@NotNull Budgeted b, Concept src, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
-        //nothing
+    public void linkTask(@NotNull Task t, float scale) {
+
+        tasklinks().put(t, t, scale, null);
+
+        @NotNull Bag<Term> tl = termlinks();
+
+        int s = tl.size();
+        //experimental: activate links with the incoming budget
+        float subScale = scale / s;
+
+        if (subScale >= Param.BUDGET_EPSILON) {
+            //if (subScale >= minScale) {
+            Budget in = t.budget();
+            final BudgetMerge merge = BudgetMerge.plusBlend;
+            tl.forEach(x -> merge.apply(x, in, subScale));
+            //}
+            //TODO adjust the bag's pending mass with a Bag multi-item method that does this precisely and efficiently
+        }
+    }
+
+    /** does nothing, should never get called */
+    @Override @Deprecated public void linkAny(@NotNull Budgeted b, Concept src, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+
     }
 }

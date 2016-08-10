@@ -197,7 +197,7 @@ public class Arkancide extends NAREnvironment {
         Param.CONCURRENCY_DEFAULT = 2;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                16, 3, 3, rng,
+                16, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 7 * 1000000, false)
                 , new FrameClock()) {
 
@@ -207,18 +207,18 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.01f);
-        nar.derivedActivation.setValue(0.01f);
+        nar.inputActivation.setValue(0.25f);
+        nar.derivedActivation.setValue(0.25f);
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.goalConfidence(0.85f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.03f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)

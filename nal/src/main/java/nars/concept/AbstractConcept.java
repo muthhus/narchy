@@ -60,7 +60,8 @@ public interface AbstractConcept extends Concept {
                 throw new NullPointerException(target + " did not resolve to a concept");
             //if (targetConcept!=null)
 
-            activation.concepts.addToValue(targetConcept, subScale);
+
+            activation.activate(targetConcept, subScale);
 //            targetConcept = nar.activate(target,
 //                    activation);
             //if (targetConcept == null)

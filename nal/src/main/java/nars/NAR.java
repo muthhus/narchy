@@ -611,7 +611,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         float conceptActivation = input.isInput() ? this.inputActivation.floatValue() : this.derivedActivation.floatValue();
 
-        float cost = input.pri() * conceptActivation; //the concept priority demanded by this task
 
         if (c.policy() == null) {
             c.policy(index.conceptBuilder().init(), time());
@@ -637,6 +636,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             return null;
         }
 
+        float cost = input.pri() * conceptActivation; //the concept priority demanded by this task
 
         //decides if TaskProcess was successful in somehow affecting its concept's state
         if (inputted != null && !inputted.isDeleted()) {
@@ -647,9 +647,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 //try {
                     Activation activation = new Activation(inputted);
 
-                    c.link(1 /* linkActivation */, c,  /* HACK: 'self' */ Param.BUDGET_EPSILON, this, activation);
+                    c.link(conceptActivation /* linkActivation */, c,  /* HACK: 'self' */ Param.BUDGET_EPSILON, this, activation);
 
-                    activation.run(this, conceptActivation);
+                    activation.run(this, 1f); //values will already be scaled
 
                     emotion.busy(cost);
                     emotion.stress(activation.overflow);
@@ -1434,10 +1434,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         public void run(@NotNull NAR nar, float activation) {
             if (!concepts.isEmpty()) {
-                //float total = (float) concepts.sum();
-                nar.activate(concepts, in, activation, overflow);
+                float total = (float) concepts.sum();
+                nar.activate(concepts, in, activation/total, overflow);
             }
         }
+
+        public void activate(Concept targetConcept, float scale) {
+            concepts.addToValue(targetConcept, scale);
+        }
+
     }
 
     abstract protected void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow);

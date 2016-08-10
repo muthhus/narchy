@@ -499,7 +499,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
             //link the src to this
             AbstractConcept.linkSub(this, src, scale, activation, nar);
         } else {
-            activation.concepts.addToValue(this, scale); //activate self
+            activation.activate(this, scale); //activate self
         }
 
         //then link this to templates
@@ -508,7 +508,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
             Termed tt = t[i];
 
             if (!tt.isNormalized()) {
-                continue;
+                continue; //HACK
             }
 
             //Link the peer termlink bidirectionally
