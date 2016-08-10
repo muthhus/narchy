@@ -34,8 +34,9 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 8, 4, 2);
-        n.inputActivation.setValue(0.1f);
+        Default n = new Default(1024, 32, 4, 2);
+        n.inputActivation.setValue(0.005f);
+        n.derivedActivation.setValue(0.005f);
         //n.nal(4);
 
 
@@ -44,7 +45,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         new ArithmeticInduction(n);
 
-        newConceptWindow(n, 512, 16);
+        newConceptWindow(n, 128, 12);
 
         //n.run(20); //headstart
 

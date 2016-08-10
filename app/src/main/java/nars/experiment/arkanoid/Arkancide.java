@@ -49,8 +49,8 @@ public class Arkancide extends NAREnvironment {
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 32;
-    final int visH = 24;
+    final int visW = 24;
+    final int visH = 16;
     final SensorConcept[][] ss;
 
     private int visionSyncPeriod = 256;
@@ -194,7 +194,7 @@ public class Arkancide extends NAREnvironment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Param.CONCURRENCY_DEFAULT = 4;
+        Param.CONCURRENCY_DEFAULT = 2;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 16, 3, 3, rng,
@@ -207,8 +207,8 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.1f);
+        nar.inputActivation.setValue(0.01f);
+        nar.derivedActivation.setValue(0.01f);
 
 
         nar.beliefConfidence(0.9f);
