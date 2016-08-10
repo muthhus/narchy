@@ -31,7 +31,7 @@ public class VariableCompressor implements Consumer<Task> {
 
     final int minCompressedComplexity = 3;
     private final NAR nar;
-    private boolean deleteOriginal = false;
+
 
     public VariableCompressor(NAR n) {
         this.nar = n;
@@ -99,14 +99,14 @@ public class VariableCompressor implements Consumer<Task> {
             newContent = $.conj(newContent,
 
                     //task.dt() == 0 ? 0 : DTERNAL, //allow +0 to merge with the other part
-                    DTERNAL,
+                    //DTERNAL,
 
                     $.sim(var, max)
             );
             //newContent = $.impl($.sim(var, max), newContent);
 
-                newContent = Task.normalizeTaskTerm(newContent, task.punc(), nar, true);
-                if (newContent!=null) {
+                //newContent = Task.normalizeTaskTerm(newContent, task.punc(), nar, true);
+                //if (newContent!=null) {
 
 //                    float ratio = ((float) newContent.complexity()) / oldContent.complexity();
 //                    System.out.println(oldContent + "\n\t" + newContent + ": " + ratio + " compression ratio");
@@ -115,25 +115,16 @@ public class VariableCompressor implements Consumer<Task> {
 
                     if (!task.isDeleted()) {
 
-                        RawBudget b;
-                        try {
-                             b = new RawBudget(task.budget(), 1f);
-                        } catch (Budget.BudgetException e) {
-                            return null; //HACK
-                        }
-
                         Task tt = new GeneratedTask(newContent, task.punc(), task.truth())
-                                .time(nar.time(), task.occurrence())
+                                .time(task.creation(), task.occurrence())
                                 .evidence(task.evidence())
-                                .budget(b)
+                                .budget(task.budget())
                                 .log(tag);
 
-                        if (deleteOriginal)
-                            task.delete();
-
-                        return tt;
+                        if (!tt.isDeleted()) //applying task's budget may have deleted it by here
+                            return tt;
                     }
-                }
+                //}
 
         }
 

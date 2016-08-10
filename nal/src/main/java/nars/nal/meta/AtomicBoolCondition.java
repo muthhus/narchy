@@ -28,10 +28,6 @@ public abstract class AtomicBoolCondition extends AtomicString implements BoolCo
         return Op.ATOM;
     }
 
-    @Override
-    public boolean equals(@NotNull Object u) {
-        return toString().equals(u.toString());
-    }
 
     /** just attempts to evaluate the condition, causing any desired side effects as a result */
     @Override public final void accept(@NotNull PremiseEval m) {

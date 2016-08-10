@@ -89,23 +89,32 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public final boolean equals(@Nullable Object that) {
 
-        if (this == that)
-            return true;
 
 
         Compound cthat;
         if (that instanceof Compound) {
+
+            if (this == that)
+                return true;
+
             cthat = (Compound)that;
+
         } else if (that instanceof Termed) {
             Term tthat = ((Termed) that).term();
             if (tthat instanceof Compound) {
+
+                if (this == tthat)
+                    return true;
+
                 cthat = (Compound) tthat;
+
             } else {
                 return false;
             }
         } else {
             return false;
         }
+
 
         if (hash != that.hashCode())
             return false;

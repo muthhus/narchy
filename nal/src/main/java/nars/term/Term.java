@@ -346,11 +346,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             Compound cthis = (Compound)this;
             Compound cy = (Compound)y;
 
-            int diff3 = Integer.compare(cthis.dt(), cy.dt());
+            int diff3 = TermContainer.compare(cthis.subterms(),cy.subterms());
             if (diff3 != 0)
                 return diff3;
 
-            return TermContainer.compare(cthis.subterms(),cy.subterms());
+            return Integer.compare(cthis.dt(), cy.dt());
 
         } else if (this instanceof AbstractVariable) {
             //hashcode serves as the ordering too

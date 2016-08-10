@@ -196,16 +196,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    @NotNull Supplier<WorkHandler<TaskEvent>> newRunner = () -> {
-        return ((TaskEvent te) -> {
-            Task[] tt = te.tasks;
-            te.tasks = null;
-            try {
-                input(tt);
-            } catch (Exception e) {
-                logger.error("{}",e);
-            }
-        });
+    final @NotNull Supplier<WorkHandler<TaskEvent>> newRunner = () -> {
+        return (new TaskEventWorkHandler());
     };
 
     @Deprecated
@@ -1449,4 +1441,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         long o = t.occurrence();
         return o != Tense.ETERNAL && o > time();
     };
+
+    private final class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
+        @Override
+        public void onEvent(TaskEvent te) throws Exception {
+            Task[] tt = te.tasks;
+            te.tasks = null;
+            try {
+                NAR.this.input(tt);
+            } catch (Exception e) {
+                logger.error("{}", e);
+            }
+        }
+    }
 }
