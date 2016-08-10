@@ -106,18 +106,18 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         try {
             Term cp = this.conclusionPattern;
             r = m.index.resolve(cp, m);
-        } catch (InvalidTermException e) {
-            if (Param.DEBUG)
-                logger.warn("{}\n\tderiving rule {}", e.toString(), rule.source);
-            return;
-        }
-
         /*if (r == Imdex)
             System.err.println(r + " " + this.rule.source);*/ //<- finds rules which may help to add a neq(x,y) constraint
 
 
-        if (r instanceof Compound) { //includes null test
-            derive(m, (Compound) r, ct);
+            if (r instanceof Compound) { //includes null test
+                derive(m, (Compound) r, ct);
+            }
+
+        } catch (Exception e) {
+            if (Param.DEBUG_DERIVER)
+                logger.warn("{}\n\tderiving concluson {}", e.toString(), rule.source);
+            return;
         }
 
     }
@@ -142,15 +142,10 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         NAR nar = m.nar;
 
-        try {
-            if (!Task.taskContentPreTest(content, ct.punc, nar, !Param.DEBUG))
-                return; //INVALID TERM FOR TASK
-        } catch (Exception e) {
-            if (Param.DEBUG) {
-                logger.error("{}", e.toString());
-            }
-            return;
-        }
+
+        if (!Task.taskContentPreTest(content, ct.punc, nar, !Param.DEBUG))
+            return; //INVALID TERM FOR TASK
+
 
         long occ;
         Premise premise = m.premise;

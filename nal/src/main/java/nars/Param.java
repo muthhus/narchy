@@ -152,6 +152,7 @@ public abstract class Param extends Container implements Level {
 
     /** if false, then revection will be budgeted with parent's budget mix, otherwise it will have dur/qua mixed but priority set to zero to not trigger linking */
     public static boolean REVECTION_PRIORITY_ZERO = true;
+    public static boolean DEBUG_DERIVER = false;
 
 
     private Truth defaultGoalTruth, defaultJudgmentTruth;
