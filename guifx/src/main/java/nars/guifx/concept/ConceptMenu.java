@@ -35,7 +35,7 @@ public class ConceptMenu extends FlowPane {
             }
         });
 
-        Button activateButton = new NARActionButton(nar, "+", (n) -> n.activate(t, null));
+        //Button activateButton = new NARActionButton(nar, "+", (n) -> n.activate(t, null));
         Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> n.input(new MutableTask(t, '!', 1f, nar).present(nar).log("GUI Goal")));
         Button noGoalButton = new NARActionButton(nar, "-!", (n) -> n.input(new MutableTask(t, '!', 0f, nar).present(nar).log("GUI Goal")));
         Button trueButton = new NARActionButton(nar, "T", (n) -> n.input(new MutableTask(t, '.', 1f, nar).present(nar).log("GUI True")));
@@ -67,7 +67,7 @@ public class ConceptMenu extends FlowPane {
 
         })));
 
-        getChildren().addAll(button, activateButton, trueButton, falseButton, yesGoalButton, noGoalButton, isTrueButton, shouldIButton);
+        getChildren().addAll(button/*, activateButton*/, trueButton, falseButton, yesGoalButton, noGoalButton, isTrueButton, shouldIButton);
 
     }
 

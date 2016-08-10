@@ -197,7 +197,7 @@ public class NARide extends StackPane {
         ni.addTool("Fractal Workspace", () -> new NARspace(nar));
 
 
-        ni.addTool("Webcam", WebcamSurface::new);
+        //ni.addTool("Webcam", WebcamSurface::new);
 
 
         //ni.addTool("Terminal (bash)", LocalTerminal::new);
@@ -610,11 +610,7 @@ public class NARide extends StackPane {
         NARLoop tmp = nar.loop();
         new Thread(() -> NARide.show(tmp, x -> {
             if (!start)
-                try {
-                    tmp.stop();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                tmp.stop();
         })).start();
     }
 

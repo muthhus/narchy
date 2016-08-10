@@ -147,11 +147,13 @@ public abstract class Param extends Container implements Level {
      *  a value less than 1.0 allows subsequent revections to decay faster, preventing
      *  a compounding / "snowballing" of mergings into a highly confident rolling average task.
      */
-    public static final float REVECTION_CONFIDENCE_FACTOR = 0.9f; //1f; //0.95f;
+    public static final float REVECTION_CONFIDENCE_FACTOR = 1f; //1f; //0.95f;
 
 
     /** if false, then revection will be budgeted with parent's budget mix, otherwise it will have dur/qua mixed but priority set to zero to not trigger linking */
     public static boolean REVECTION_PRIORITY_ZERO = true;
+
+    /** additional output for when deriver fails before deriving something */
     public static boolean DEBUG_DERIVER = false;
 
 

@@ -102,7 +102,9 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
             times[i][0] = -when + t.occurrence() + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
             freq[i] = t.freq();
-            conf[i] = t.confWeight();
+            conf[i] =
+                    t.conf();
+                    //t.confWeight();
 
             //TODO dt
         }
@@ -121,7 +123,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
                 maxDarkFraction, darkThresold,
                 n);
 
-        return $.t(v[0], w2c(v[1]));
+        return $.t(v[0], /*w2c*/(v[1]));
     }
 
 
