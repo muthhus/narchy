@@ -48,11 +48,11 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = false;
-        Param.CONCURRENCY_DEFAULT = 4;
+        Param.CONCURRENCY_DEFAULT = 3;
     }
 
     public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 8;
+    public static final int cyclesPerFrame = 16;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 4;
@@ -146,7 +146,7 @@ public class Tetris2 extends NAREnvironment {
         //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
         float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().expectation(now) : 0.5f;
 
-        float actionMargin = 0.35f;
+        float actionMargin = 0.3f;
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
 
@@ -210,8 +210,8 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.25f);
-        nar.derivedActivation.setValue(0.25f);
+        nar.inputActivation.setValue(0.1f);
+        nar.derivedActivation.setValue(0.1f);
 
 
         nar.beliefConfidence(0.95f);
@@ -221,8 +221,8 @@ public class Tetris2 extends NAREnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
-        nar.truthResolution.setValue(0.02f);
+        nar.confMin.setValue(0.04f);
+        nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -500,10 +500,15 @@ public class Tetris2 extends NAREnvironment {
             motivation = new RangeNormalizedFloat(()->(float)worker.emotion.motivation.getSum());
 
             //nar.log();
-            worker.onFrame(nn->next());
+            worker.onFrame(nn -> next());
 
             init(nar);
             mission();
+        }
+
+        @Override public void next() {
+            super.next();
+            nar.next();
         }
 
 

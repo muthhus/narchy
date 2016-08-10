@@ -119,9 +119,10 @@ public enum PremiseBuilder {
 
         Task belief = null;
 
-        if (termLinkTerm instanceof Compound && linkable(termLinkTerm)) { //atomic concepts will have no beliefs to match
+        Term termLinkTermConceptTerm = $.unneg(termLinkTerm).term();
+        if (termLinkTerm instanceof Compound && linkable(termLinkTermConceptTerm)) { //atomic concepts will have no beliefs to match
 
-            Concept beliefConcept = nar.concept(termLinkTerm);
+            Concept beliefConcept = nar.concept(termLinkTermConceptTerm);
             if (beliefConcept != null) {
 
                 if ( task.isQuestOrQuestion()) {

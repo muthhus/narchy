@@ -113,7 +113,7 @@ abstract public class NAREnvironment {
         for (int i = 0; i < ticksBeforeDecide - 1; i++)
             nar.clock.tick();
 
-        nar.next();
+        //nar.next();
 
 
         now = nar.time();

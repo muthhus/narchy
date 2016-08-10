@@ -5,8 +5,10 @@ import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import com.lmax.disruptor.LiteBlockingWaitStrategy;
+import com.lmax.disruptor.LiteTimeoutBlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.WorkHandler;
+import com.lmax.disruptor.dsl.BasicExecutor;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import nars.Narsese.NarseseException;
@@ -45,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
@@ -116,17 +119,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         public Task[] tasks;
     }
 
-    final Disruptor<TaskEvent> async =
-            new Disruptor<TaskEvent>(
-                    () -> new TaskEvent(), 8192,
-                    //new BasicExecutor(Executors.defaultThreadFactory()),
-                    Executors.newCachedThreadPool(),
-                    //ForkJoinPool.commonPool(),
-                    ProducerType.MULTI,
-                    //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
-                    new LiteBlockingWaitStrategy()
-                    //Executors.newCachedThreadPool()
-            );
+    final Disruptor<TaskEvent> async;
     //private final SequenceBarrier asyncBarrier;
 
     private NARLoop loop;
@@ -169,10 +162,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         index.loadBuiltins();
 
 
+
         this.runWorker = ForkJoinPool.commonPool();
-        if (concurrency == -1) {
-            concurrency = 1;
-        } //else {
+        //this.runWorker = concurrency == -1 ? ForkJoinPool.commonPool() : (ForkJoinPool)Executors.newWorkStealingPool(concurrency);
+        Executor taskWorker = //concurrency == -1 ? (ForkJoinPool) Executors.newWorkStealingPool(1) : (ForkJoinPool) Executors.newWorkStealingPool(concurrency);
+                new BasicExecutor(Executors.defaultThreadFactory());
+
+//        if (concurrency == -1) {
+//            concurrency = 1;
+//        } //else {
 
 //            this.runWorker =
         //ForkJoinPool.commonPool(); //<- uses the common pool's concurrency which may not be the supplied 'concurrency' value
@@ -185,9 +183,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //}
 
 
+        if (concurrency == -1) concurrency = 1;
+
         WorkHandler[] workers = new WorkHandler[concurrency];
         for (int i = 0; i < concurrency; i++)
             workers[i] = newRunner.get();
+
+        async = new Disruptor<TaskEvent>(
+                () -> new TaskEvent(), 4096,
+                taskWorker,
+                //new BasicExecutor(Executors.defaultThreadFactory()),
+                //ForkJoinPool.commonPool(),
+                ProducerType.MULTI,
+                //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
+                new LiteBlockingWaitStrategy()
+                //Executors.newCachedThreadPool()
+        );
+
 
         async.handleEventsWithWorkerPool(workers);
         async.start();
@@ -786,7 +798,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 //        taskWorker.getRingBuffer().
 //        if (!taskWorker.isQuiescent()) {
-//            while (!taskWorker.awaitQuiescence(500, TimeUnit.MILLISECONDS)) {
+//            while (!taskWorker.awaitQuiescence(500, TimdeUnit.MILLISECONDS)) {
 //                logger.warn("taskWorker lag: {}", taskWorker);
 //            }
 //        }

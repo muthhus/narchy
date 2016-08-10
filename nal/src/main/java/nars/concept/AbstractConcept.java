@@ -1,6 +1,7 @@
 package nars.concept;
 
 import javassist.scopedpool.SoftValueHashMap;
+import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.budget.policy.ConceptPolicy;
@@ -50,24 +51,25 @@ public interface AbstractConcept extends Concept {
         /* activate concept */
         Concept targetConcept;
 
-        @NotNull Term tt = target.term();
 
-        if (!linkable(tt)) {
+        if (!linkable(target)) {
             targetConcept = null;
         } else {
             targetConcept = nar.concept(target, true);
             if (targetConcept == null)
-                throw new NullPointerException(tt + " did not resolve to a concept");
+                throw new NullPointerException(target + " did not resolve to a concept");
             //if (targetConcept!=null)
-                activation.concepts.addToValue(targetConcept, subScale);
+
+            activation.concepts.addToValue(targetConcept, subScale);
 //            targetConcept = nar.activate(target,
 //                    activation);
             //if (targetConcept == null)
                 //throw new RuntimeException("termlink to null concept: " + target);
         }
 
-        if (tt == source)
-            throw new RuntimeException("termlink self-loop");
+        Term ttt = target.term();
+//        if (tt.equals( source.term() ))
+//            throw new RuntimeException("termlink self-loop");
 
 
 //        /* insert termlink target to source */
@@ -79,7 +81,7 @@ public interface AbstractConcept extends Concept {
         }
 
         /* insert termlink source to target */
-        source.termlinks().put(tt, activation.in, subScale, activation.overflow);
+        source.termlinks().put(ttt, activation.in, subScale, activation.overflow);
 
 
 
@@ -87,10 +89,13 @@ public interface AbstractConcept extends Concept {
     }
 
     static boolean linkable(@NotNull Termed target) {
-        Term x = target.term();
-        if (x instanceof Variable) {
+//        return !(target instanceof Variable);
+        if (target instanceof Variable) {
             return false;
-        } else if (x instanceof Compound) {
+        }
+        Term x = target.term();
+        if (x instanceof Compound) {
+
             if (x.op() == Op.NEG) {
                 if (((Compound) x).term(0) instanceof Variable)
                     return false;
