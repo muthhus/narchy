@@ -179,7 +179,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
         Task.taskContentPreTest(t, punc, nar, false);
 
-        Compound ntt = nar.index.normalize(t,false);
+        Compound ntt = nar.index.normalize(t,true);
         if (ntt == null)
             throw new NAR.InvalidTaskException(t, "Failed normalization");
 

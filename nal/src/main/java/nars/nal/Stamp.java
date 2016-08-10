@@ -300,6 +300,7 @@ public interface Stamp {
 
     static long[] cyclic(@NotNull long[] x) {
         int l = x.length;
+
         if (isCyclic(x))
             return x;
 

@@ -155,15 +155,9 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             float[] confScale = new float[]{1f};
 
             Compound temporalized;
-            try {
-                temporalized = this.temporalizer.compute(content,
-                        m, this, occReturn, confScale
-                );
-            } catch (InvalidTermException e) {
-                if (Param.DEBUG)
-                    logger.warn("{}\n\ttemporalizing from {}\n\tderiving rule {}", e.toString(), content.term(), rule.source);
-                return;
-            }
+            temporalized = this.temporalizer.compute(content,
+                    m, this, occReturn, confScale
+            );
 
             if (Param.DEBUG && occReturn[0] == DTERNAL) {
                 //temporalizer.compute(content.term(), m, this, occReturn, confScale);

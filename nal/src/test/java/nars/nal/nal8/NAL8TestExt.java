@@ -3,6 +3,7 @@ package nars.nal.nal8;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.util.signal.TestNAR;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -14,6 +15,7 @@ import static nars.nal.Tense.ETERNAL;
 /**
  * Additional experimental tests,
  */
+@Ignore
 @RunWith(Parameterized.class)
 public class NAL8TestExt extends AbstractNALTest {
 

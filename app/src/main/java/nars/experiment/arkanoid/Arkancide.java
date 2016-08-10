@@ -207,8 +207,8 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.25f);
-        nar.derivedActivation.setValue(0.25f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
         nar.beliefConfidence(0.9f);

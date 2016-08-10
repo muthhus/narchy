@@ -91,6 +91,11 @@ public class TemporalStabilityTests {
         char d = (char) ('a' + (j+1)); //next
         return "(" + c + "==>" + d + ")";
     };
+    static final IntToObjectFunction<String> linkedTempConj = (j) -> {
+        char c = (char) ('a' + j);
+        char d = (char) ('a' + (j+1)); //next
+        return "(" + c + " &&+5" + ")";
+    };
 
     @Test public void testTemporalStabilityInh3() {
         new T1(inheritencer, 1, 2, 5).test(300, new Default(1024, 8, 4, 3));
@@ -114,6 +119,9 @@ public class TemporalStabilityTests {
     }
     @Test public void testTemporalStabilityLinkedImpl() {
         new T1(linkedimpl, 1, 2, 5).test(400, new Default(1024, 12, 4, 3));
+    }
+    @Test public void testTemporalStabilityLinkedTemporalConj() {
+        new T1(linkedTempConj, 1, 2, 5).test(400, new Default(1024, 12, 4, 3));
     }
     @Test public void testTemporalStabilityLinkedImplExt() {
         new T1(linkedimpl, 1, 2, 5).test(400, new Default(1024, 12, 4, 3));

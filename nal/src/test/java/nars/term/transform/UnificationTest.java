@@ -171,8 +171,8 @@ public class UnificationTest {
                 true
         );
         test(Op.VAR_QUERY,
-                "<(?1,?1,$1) --> wu>",
-                "<(lol,lol2,$1) --> wu>",
+                "<(?1,?1,#1) --> wu>",
+                "<(lol,lol2,#1) --> wu>",
                 false
         );
     }

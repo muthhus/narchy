@@ -236,9 +236,9 @@ public interface TimeFunctions {
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
             //no temporal basis that can apply. only derive an eternal result if there is no actual temporal relation in the decomposition
             //else
-            //return noTemporalBasis(derived);
+            return noTemporalBasis(derived);
 
-            return derived; //no shift necessary
+            //return derived; //no shift necessary
         } else {
 
             long occ;
@@ -249,7 +249,7 @@ public interface TimeFunctions {
                 occ = occDecomposed != ETERNAL ? occDecomposed : occOther;
             } else if (occOther != ETERNAL) {
 
-                long shift = ETERNAL;
+                long shift = 0;
 
                 Term d0 = p.resolveNormalized(decomposedTerm.term(0));
                 boolean derivedIsDecomposedZero = Terms.equalOrNegationOf(d0, derived);
@@ -314,9 +314,9 @@ public interface TimeFunctions {
 
     @NotNull
     static Compound noTemporalBasis(@NotNull Compound derived) {
-//        throw new InvalidTermException(derived.op(), derived.dt(), derived.terms(),
-//                "no basis for relating other occurrence to derived");
-        return derived;
+        throw new InvalidTermException(derived.op(), derived.dt(), derived.terms(),
+                "no basis for relating other occurrence to derived");
+        //return derived;
     }
 
 
