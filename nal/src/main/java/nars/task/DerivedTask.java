@@ -1,6 +1,9 @@
 package nars.task;
 
+import nars.NAR;
 import nars.Param;
+import nars.concept.Concept;
+import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
@@ -13,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 
 abstract public class DerivedTask extends MutableTask {
 
+    public transient Concept concept;
+
     @Nullable
     public transient Premise premise;
 
@@ -21,10 +26,18 @@ abstract public class DerivedTask extends MutableTask {
     public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval p, long[] evidence) {
         super(tc, punct, truth);
 
+
         evidence(evidence);
+
+        this.concept = super.normalize(p.nar);
 
         if (Param.DEBUG)
             this.premise = p.premise;
+    }
+
+    @Override
+    public @NotNull Concept normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptException, NAR.InvalidTaskException {
+        return concept;
     }
 
     @Override
@@ -67,6 +80,20 @@ abstract public class DerivedTask extends MutableTask {
         }
     }
 
+
+    @Override
+    public boolean onConcept(@NotNull Concept c) {
+        this.concept = null;
+        return true;
+    }
+
+    @Override
+    public boolean delete() {
+        this.premise = null;
+        this.concept = null;
+        return super.delete();
+    }
+
     public static class DefaultDerivedTask extends DerivedTask {
 
         public DefaultDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull PremiseEval premise) {
@@ -87,11 +114,6 @@ abstract public class DerivedTask extends MutableTask {
 ////            }
 //        }
 
-        @Override
-        public boolean delete() {
-            this.premise = null;
-            return super.delete();
-        }
     }
 
 //    public static class CompetingDerivedTask extends DerivedTask {

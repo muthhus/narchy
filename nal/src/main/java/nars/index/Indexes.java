@@ -57,16 +57,16 @@ public enum Indexes {
             }
         }
 
-    public static class SoftTermIndex extends MapIndex {
-
-            public SoftTermIndex(int capacity, @NotNull Random random) {
-                super(
-                        new DefaultConceptBuilder(random),
-                        new SoftValueHashMap(capacity),
-                        new WeakHashMap(capacity)
-                        //new WeakHashMap<>(capacity)
-                );
-
-            }
-        }
+//    private static class SoftTermIndex extends MapIndex {
+//
+//            public SoftTermIndex(int capacity, @NotNull Random random) {
+//                super(
+//                        new DefaultConceptBuilder(random),
+//                        new SoftValueHashMap(capacity),
+//                        new WeakHashMap(capacity)
+//                        //new WeakHashMap<>(capacity)
+//                );
+//
+//            }
+//        }
 }

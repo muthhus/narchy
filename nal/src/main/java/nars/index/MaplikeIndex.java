@@ -17,9 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
-import static nars.nal.Tense.DTERNAL;
 import static nars.term.Termed.termOrNull;
-import static nars.term.Terms.compoundOrNull;
 
 /**
  * Index which is supported by Map/Cache-like operations
@@ -27,8 +25,8 @@ import static nars.term.Terms.compoundOrNull;
 public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
 
-    public static final int invalidConceptBitVector = Op.NEG.bit | Op.VariableBits;
-    protected final Concept.ConceptBuilder conceptBuilder;
+
+    private final Concept.ConceptBuilder conceptBuilder;
 
     public MaplikeIndex(Concept.ConceptBuilder conceptBuilder) {
         this.conceptBuilder = conceptBuilder;
@@ -40,8 +38,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         return new GenericCompound(op, dt, subterms);
     }
 
-    @Nullable
-    protected Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
+    @Nullable Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
 
         return createIfMissing ?
                 getConceptCompound(x) :
@@ -54,7 +51,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     }
 
     @Nullable
-    protected Termed theAtom(@NotNull Atomic x, boolean createIfMissing) {
+    private Termed theAtom(@NotNull Atomic x, boolean createIfMissing) {
         return createIfMissing ?
                 getNewAtom(x) :
                 get(x);
@@ -156,7 +153,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
     }
 
-    private final @NotNull TermContainer internSubs(@NotNull TermContainer s) {
+    private @NotNull TermContainer internSubs(@NotNull TermContainer s) {
         int ss = s.size();
         Term[] bb = new Term[ss];
         boolean changed = false;//, temporal = false;

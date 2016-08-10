@@ -136,7 +136,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
     @NotNull @Override
-    public final Concept normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptException, NAR.InvalidTaskException  {
+    public Concept normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptException, NAR.InvalidTaskException  {
 
         if (isDeleted())
             throw new NAR.InvalidTaskException(this, "Deleted");
@@ -177,7 +177,12 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
         }
 
-        Compound ntt = Task.normalizeTaskTerm(t, punc, nar);
+        Task.taskContentPreTest(t, punc, nar, false);
+
+        Compound ntt = nar.index.normalize(t,false);
+        if (ntt == null)
+            throw new NAR.InvalidTaskException(t, "Failed normalization");
+
         if (ntt!=t)
             setTerm(ntt);
 
@@ -223,7 +228,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         }
 
 
-        //shift the occurrence time if input and dt < 0 and non-eternal
+        //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
         if (log!=null && log().get(0).equals(Narsese.NARSESE_TASK_TAG)) {
             long exOcc = occurrence();
             if (exOcc != ETERNAL) {

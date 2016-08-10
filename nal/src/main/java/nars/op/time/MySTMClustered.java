@@ -139,7 +139,7 @@ public class MySTMClustered extends STMClustered {
 
 					long t = Math.round(nc[0]);
 
-					if ((conj = Task.normalizeTaskTerm(conj, punc, nar, true))!=null) {
+
 
 						Task m = new GeneratedTask(conj, punc,
 								new DefaultTruth(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
@@ -156,7 +156,7 @@ public class MySTMClustered extends STMClustered {
 						nar.inputLater(m);
 
 						node.remove(uu);
-					}
+					
 
 
 			});

@@ -42,15 +42,15 @@ public class PatternIndex extends RawTermIndex {
     }
 
     @NotNull
-    public PatternCompound make(@NotNull Compound seed) {
+    private PatternCompound make(@NotNull Compound seed) {
 
         TermContainer v = theSubterms(seed.subterms());
-        TermContainer vv = v; //TermVector.the(v);
+        //TermContainer vv = v; //TermVector.the(v);
 
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
-                makeEllipsis(seed, vv, e) :
-                new PatternCompound.PatternCompoundSimple(seed, vv);
+                makeEllipsis(seed, v, e) :
+                new PatternCompound.PatternCompoundSimple(seed, v);
     }
 
     @NotNull

@@ -389,9 +389,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
 
     @Nullable Task task(Task b, Term c, Collection<Task> target) {
-        if ((c = Task.normalizeTaskTerm(c, b.punc(), nar, true))==null) {
-            return null;
-        }
+
         if (b.isDeleted())
             return null;
 

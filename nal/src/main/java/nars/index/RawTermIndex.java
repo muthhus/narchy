@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class RawTermIndex extends MapIndex implements Serializable {
 
-    public RawTermIndex(Concept.ConceptBuilder conceptBuilder, int capacity) {
+    RawTermIndex(Concept.ConceptBuilder conceptBuilder, int capacity) {
         super(conceptBuilder,
                 new ConcurrentHashMap<>(capacity),
                 new ConcurrentHashMap<>(capacity)

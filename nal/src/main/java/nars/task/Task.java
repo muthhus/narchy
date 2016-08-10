@@ -101,23 +101,21 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //        return s;
 //    }
 
-    @NotNull static Compound normalizeTaskTerm(@NotNull Term t, char punc, @NotNull Memory memory) {
-        return normalizeTaskTerm(t, punc, memory, false);
-    }
+
 
     /** performs some (but not exhaustive) tests on a term to determine some cases where it is invalid as a sentence content
      * returns the compound valid for a Task if so,
      * otherwise returns null
      * */
-    @Nullable static Compound normalizeTaskTerm(@NotNull Term t, char punc, @NotNull Memory memory, boolean safe) {
+    @Nullable static boolean taskContentPreTest(@NotNull Term t, char punc, @NotNull Memory memory, boolean safe) {
 
         if (!(t instanceof Compound))
             return test(t, "Task Term is null or not a Compound", safe);
 
-        t = memory.index.normalize(t, !safe);
+        //t = memory.index.normalize(t, !safe);
 
-        if (!(t instanceof Compound))
-            return test(t, "Task Term Does Not Normalize to Compound", safe);
+        //if (!(t instanceof Compound))
+            //return test(t, "Task Term Does Not Normalize to Compound", safe);
 
         Compound ct = (Compound)t;
 
@@ -140,13 +138,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         if (!t.levelValid( memory.nal() ) )
             return test(t, "Term exceeds maximum NAL level", safe);
 
-        return ct;
+        return true;
     }
 
     @Nullable
-    private static Compound test(@Nullable Term t, String reason, boolean safe) {
+    private static boolean test(@Nullable Term t, String reason, boolean safe) {
         if (safe)
-            return null;
+            return false;
         else
             throw new InvalidTaskException(t, reason);
     }

@@ -55,7 +55,7 @@ public interface AbstractConcept extends Concept {
         if (!linkable(tt)) {
             targetConcept = null;
         } else {
-            targetConcept = nar.concept(tt, true);
+            targetConcept = nar.concept(target, true);
             if (targetConcept == null)
                 throw new NullPointerException(tt + " did not resolve to a concept");
             //if (targetConcept!=null)

@@ -35,38 +35,38 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     }
 
     @Override
-    public L get(int i) {
+    public final L get(int i) {
         return items.array()[i];
     }
 
     @Override
-    public int size() {
+    public final int size() {
         return items.size();
     }
 
     @Override
-    protected boolean listRemove(L removed) {
+    protected final boolean listRemove(L removed) {
         return items.remove(removed, this);
     }
 
     @Override
-    protected void listAdd(L i) {
+    protected final void listAdd(L i) {
         items.add(i, this);
     }
 
     @Override
-    protected void listClear() {
+    protected final void listClear() {
         items.clear();
     }
 
 
     @Override @Nullable
-    public L top() {
+    public final L top() {
         return (size()==0) ? null : get(0);
     }
 
     @Override @Nullable
-    public L bottom() {
+    public final L bottom() {
         int s = size();
         return s == 0 ? null : get(s - 1);
     }
@@ -89,8 +89,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     protected L addItem(L i) {
         int cap = capacity();
         if (cap < 1) {
-            //bounce
-            return i;
+            return i; //bounce
         }
 
         int size = size();

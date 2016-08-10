@@ -30,16 +30,19 @@ public class VariableCompressor implements Consumer<Task> {
             5;
 
     final int minCompressedComplexity = 3;
+    final static int VOLUME_SAFETY_THRESH = 6;
     private final NAR nar;
 
 
     public VariableCompressor(NAR n) {
         this.nar = n;
         //n.onTask(this);
+
     }
 
     @Override
     public void accept(Task task) {
+
 
         Task result = compress(task);
         if (result!=null) {
@@ -50,6 +53,11 @@ public class VariableCompressor implements Consumer<Task> {
 
     public Task compress(Task task) {
         Compound<?> contnt = task.term();
+
+        int n = nar.compoundVolumeMax.intValue();
+        if (contnt.volume() + VOLUME_SAFETY_THRESH >= n)
+            return null;
+
         //if (contnt.op() == CONJ) {
 
             HashBag<Term> contents = new HashBag();

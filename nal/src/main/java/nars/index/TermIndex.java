@@ -412,7 +412,39 @@ public interface TermIndex {
 
     @NotNull
     default Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
-        return src == null || !t.testSuperTerm(src) ? src : _transform(src, t);
+        if (src == null || !t.testSuperTerm(src))
+            return src;
+
+        int n = src.size();
+
+        int modifications = 0;
+
+        Term[] target = new Term[n];
+
+        for (int i = 0; i < n; i++) {
+            Term x = src.term(i);
+
+            Term y = x;
+
+            if (t.test(x)) {
+                y = t.apply(src, x).term();
+            } else if (x instanceof Compound) {
+                y = transform((Compound) x, t); //recurse
+            }
+
+
+            if (x != y) { //must be refernce equality test for some variable normalization cases
+                modifications++;
+                x = y;
+            }
+
+            target[i] = x;
+        }
+
+        return modifications > 0 ?
+                builder().build(src.op(), src.dt(), target) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
+                src;
+
     }
 
 
@@ -450,44 +482,6 @@ public interface TermIndex {
         }
 
         return builder().build(csrc.op(), csrc.dt(), target);
-    }
-
-    /**
-     * returns how many subterms were modified, or -1 if failure (ex: results in invalid term)
-     */
-    @Nullable
-    default Term _transform(@NotNull Compound src, @NotNull CompoundTransform trans) {
-
-
-        int n = src.size();
-
-        int modifications = 0;
-
-        Term[] target = new Term[n];
-
-        for (int i = 0; i < n; i++) {
-            Term x = src.term(i);
-
-            Term y = x;
-
-            if (trans.test(x)) {
-                y = trans.apply(src, x).term();
-            } else if (x instanceof Compound) {
-                y = transform((Compound) x, trans); //recurse
-            }
-
-
-            if (x != y) { //must be refernce equality test for some variable normalization cases
-                modifications++;
-                x = y;
-            }
-
-            target[i] = x;
-        }
-
-        return modifications > 0 ?
-                builder().build(src.op(), src.dt(), target) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
-                src;
     }
 
 

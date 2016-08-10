@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.budget.Budget;
+import nars.index.TermIndex;
 import nars.nal.Premise;
 import nars.nal.TimeFunctions;
 import nars.nal.meta.PremiseEval;
@@ -51,7 +52,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     public final Term conclusionPattern;
 
 
-
     //private final ImmutableSet<Term> uniquePatternVar;
 
 
@@ -64,7 +64,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                         //belief != null ? belief : "_",
                         //goal != null ? goal : "_",
                         //eternalize ? "Et" : "_") +
-                        )+
+                ) +
                 ')');
         this.rule = rule;
 
@@ -80,7 +80,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         this.eternalize = eternalize;
 
     }
-
 
 
     @NotNull
@@ -124,27 +123,34 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
 
-    final void derive(@NotNull PremiseEval m, @NotNull Compound raw, @NotNull PremiseEval.TruthPuncEvidence ct) {
+    final void derive(@NotNull PremiseEval m, @NotNull Compound content, @NotNull PremiseEval.TruthPuncEvidence ct) {
 
         Truth truth = ct.truth;
-        if (raw.op() == NEG) {
+        if (content.op() == NEG) {
             //negations cant term concepts or tasks, so we unwrap and invert the truth (fi
-            Term raw2 = raw.term(0);
+            Term raw2 = content.term(0);
             if (!(raw2 instanceof Compound))
                 return; //unwrapped to a variable (negations of atomics are not allowed)
-            raw = (Compound) raw2;
+            content = (Compound) raw2;
             if (truth != null)
                 truth = truth.negated();
         }
 
-        Budget budget = m.budget(truth, raw);
+        Budget budget = m.budget(truth, content);
         if (budget == null)
             return; //INSUFFICIENT BUDGET
 
         NAR nar = m.nar;
-        Compound content = Task.normalizeTaskTerm(raw, ct.punc, nar, true);
-        if (content == null)
-            return; //INVALID TERM FOR TASK
+
+        try {
+            if (!Task.taskContentPreTest(content, ct.punc, nar, !Param.DEBUG))
+                return; //INVALID TERM FOR TASK
+        } catch (Exception e) {
+            if (Param.DEBUG) {
+                logger.error("{}", e.toString());
+            }
+            return;
+        }
 
         long occ;
         Premise premise = m.premise;
@@ -159,7 +165,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             Compound temporalized;
             try {
                 temporalized = this.temporalizer.compute(content,
-                    m, this, occReturn, confScale
+                        m, this, occReturn, confScale
                 );
             } catch (InvalidTermException e) {
                 if (Param.DEBUG)
@@ -174,7 +180,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
             content = temporalized;
 
-            if (content.dt() == XTERNAL || content.dt()==-XTERNAL) {
+            if (content.dt() == XTERNAL || content.dt() == -XTERNAL) {
                 throw new InvalidTermException(content.op(), content.dt(), content.terms(), "XTERNAL leak");
                 //return;
             }
@@ -184,7 +190,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 float projection;
                 projection = Param.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent() ? TruthFunctions.projection(m.task.occurrence(), m.belief.occurrence(), nar.time()) : 1f;
                 float cf = confScale[0];
-                if ((cf!=1 || projection!=1)) {
+                if ((cf != 1 || projection != 1)) {
                     truth = truth.confMultViaWeightMaxEternal(cf * projection);
                     if (truth == null) {
                         throw new RuntimeException("temporal leak: " + premise);
@@ -199,7 +205,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             //the derived compound has a dt but the premise was entirely atemporal;
             // this (probably!) indicates a temporal placeholder in the rules that needs to be set to DTERNAL
             Op o = content.op();
-            if (content.dt()==XTERNAL /*&& !o.isImage()*/) {
+            if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
                 Term ete = m.index.builder().build(o, DTERNAL, content.terms());
                 if (!(ete instanceof Compound)) {
                     //throw new InvalidTermException(o, content.dt(), content.terms(), "untemporalization failed");
@@ -212,28 +218,40 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         }
 
 
-
-
-
-        m.conclusion.derive.add( //TODO we should not need to normalize the task, so process directly is preferred
-                derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence)
-        );
-
+        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
+        if (d!=null)
+            m.conclusion.derive.add(d);
 
     }
 
     /**
      * part 2
      */
-    @NotNull
-    public final Task derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, Truth truth, char punc, long[] evidence) {
+    @Nullable
+    public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, Truth truth, char punc, long[] evidence) {
 
 
-        return newDerivedTask(c, truth, punc, evidence, p)
-                .time(now, occ)
-                .budget(budget) // copied in, not shared
-                //.anticipate(derivedTemporal && d.anticipate)
-                .log(Param.DEBUG ? rule : null);
+        try {
+            DerivedTask dt = newDerivedTask(c, truth, punc, evidence, p);
+            if (dt.concept == null) { //no concept target for this
+                if (Param.DEBUG)
+                    throw new TermIndex.InvalidConceptException(c, "Derive");
+                else
+                    return null;
+            }
+
+            dt.time(now, occ)
+                    .budget(budget) // copied in, not shared
+                    //.anticipate(derivedTemporal && d.anticipate)
+                    .log(Param.DEBUG ? rule : null);
+
+            return dt;
+        } catch (Exception e) {
+            if (Param.DEBUG) {
+                logger.error("{}", e.toString());
+            }
+            return null;
+        }
 
 
         //ETERNALIZE: (CURRENTLY DISABLED)

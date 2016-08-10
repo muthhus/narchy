@@ -1105,6 +1105,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable
     public final Concept concept(@NotNull Termed tt, boolean createIfMissing) {
+        if (tt instanceof Concept)
+            return ((Concept)tt);
         return concept(tt.term(), createIfMissing);
     }
 

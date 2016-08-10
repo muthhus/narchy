@@ -1216,11 +1216,12 @@ public class PremiseRule extends GenericCompound {
                 Variable r = ((Ellipsis) v).clone(varPattern(actualSerial + idOffset), this);
                 offset = 0; //return to zero
                 return r;
-            } else if (v instanceof GenericVariable) {
+            } /*else if (v instanceof GenericVariable) {
                 return ((GenericVariable) v).normalize(actualSerial); //HACK
             } else {
                 return v(v.op(), actualSerial);
-            }
+            }*/
+            return super.newVariable(v, actualSerial);
         }
 
         @Override

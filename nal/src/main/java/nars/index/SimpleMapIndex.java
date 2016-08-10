@@ -11,9 +11,9 @@ import java.util.function.Consumer;
 /** implements AbstractMapIndex with one ordinary map implementation. does not cache subterm vectors */
 abstract public class SimpleMapIndex extends MaplikeIndex {
 
-    protected final Map<Termed,Termed> concepts;
+    final Map<Termed,Termed> concepts;
 
-    public SimpleMapIndex(Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds) {
+    SimpleMapIndex(Concept.ConceptBuilder conceptBuilder, Map<Termed, Termed> compounds) {
         super(conceptBuilder);
         this.concepts = compounds;
     }

@@ -97,7 +97,7 @@ public abstract class CollectorMap<K, V> {
     public V remove(@NotNull K x) {
 
         synchronized(map) {
-            V e = removeKey(x);
+            V e = map.remove(x);
             if (e != null) {
                 V removed = removeItem(e);
                 //            if (removed == null) {
@@ -106,7 +106,6 @@ public abstract class CollectorMap<K, V> {
                 //                //return null;
                 //            }
                 if (removed != e) {
-                    removeItem(e);
                     throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
                 }
                 return removed;
@@ -117,9 +116,6 @@ public abstract class CollectorMap<K, V> {
     }
 
 
-    protected final @Nullable V removeKey(@NotNull K key) {
-        return map.remove(key);
-    }
 
 //    /** does a more exhaustive removal in case the BLink no longer has the key (ex: weakref) */
 //    protected final void removeKey(BLink<V> item) {
@@ -130,7 +126,7 @@ public abstract class CollectorMap<K, V> {
 
     protected final @Nullable V removeKeyForValue(@NotNull V value) {
         @Nullable K key = key(value);
-        return key == null ? null : removeKey(key);
+        return key == null ? null : map.remove(key);
     }
 
 

@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -26,41 +25,30 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
 //    @NotNull
 //    public final Cache<Termed, Termed> atomics;
-    public final Map<Termed,Termed> atomics;
+    private final Map<Termed,Termed> atomics;
 
     @NotNull
     public final Cache<Termed, Termed> compounds;
 
     @NotNull
-    public final Cache<TermContainer, TermContainer> subs;
+    private final Cache<TermContainer, TermContainer> subs;
 
 
     private static final Weigher<Termlike, Termlike> complexityAndConfidenceWeigher = (k, v) -> {
 
-
-//        if (v instanceof Atomic) {
-//            return 0; //dont allow removal of atomic
-//        } else {
-        if (v instanceof Concept) {
-
-            if (v instanceof WiredConcept) {
-                //special implementation, dont allow removal
-                return 0;
-            }
-
-//            Concept c = (Concept)v;
-//            if (c.active())
-//                return 0; //disallow removal of active concepts
-        }
-
-
-        float w = 1 + v.complexity() * 10f;
+        float scale;
         if (v instanceof CompoundConcept) {
-             w /= (1f + maxConfidence((CompoundConcept)v)); //discount factor for belief/goal confidence
+            if (v instanceof WiredConcept) {
+                return 0; //special concept implementation: dont allow removal
+            }
+            scale = 1f/ (1f + maxConfidence((CompoundConcept)v)); //discount factor for belief/goal confidence
+        } else {
+            scale = 1f;
         }
+        float w = 1 + v.complexity() * 10f;
 
-        return (int)w;
-        //}
+
+        return (int)(w * scale);
     };
 
     private static float maxConfidence(@NotNull CompoundConcept v) {

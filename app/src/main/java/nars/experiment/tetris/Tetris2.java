@@ -47,8 +47,8 @@ public class Tetris2 extends NAREnvironment {
     public static final int DEFAULT_INDEX_WEIGHT = 5 * 1000000;
 
     static {
-        Param.DEBUG = true;
-        Param.CONCURRENCY_DEFAULT = 2;
+        Param.DEBUG = false;
+        Param.CONCURRENCY_DEFAULT = 4;
     }
 
     public static final int runFrames = 10000;

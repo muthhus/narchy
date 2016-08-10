@@ -130,16 +130,20 @@ public class Default extends AbstractNAR {
         core.concepts.clear();
     }
 
-    /** faster access from active concept bag than the index
-     * TODO faster access by providing a Concept instance, instead of its key.
-     * this indicates the term is already known to be a key and does not need
-     * atemporalized etc
-     * */
-    @Nullable @Override public final Concept concept(@NotNull Term t, boolean createIfMissing) {
-        @Nullable BLink<Concept> activeLink = core.concepts.get(t);
-        if (activeLink!=null) {
-            return activeLink.get();
-        }
-        return super.concept(t, createIfMissing);
-    }
+
+
+//    /** possibly faster access from active concept bag than the index
+//     * TODO faster access by providing a Concept instance, instead of its key.
+//     * this indicates the term is already known to be a key and does not need
+//     * atemporalized etc
+//     * */
+//    @Nullable @Override public final Concept concept(@NotNull Term t, boolean createIfMissing) {
+//        @Nullable BLink<Concept> activeLink = core.concepts.get(t);
+//        if (activeLink!=null) {
+//            return activeLink.get();
+//        }
+//        return super.concept(t, createIfMissing);
+//    }
+
+
 }

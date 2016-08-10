@@ -88,8 +88,8 @@ public class VariableNormalization extends VariableTransform implements Function
         @NotNull @Override
         public Termed apply(Compound containing, @NotNull Variable current) {
 
-            if (current instanceof Ellipsis)
-                throw new RuntimeException("not allowed");
+            //if (current instanceof Ellipsis)
+               //throw new RuntimeException("not allowed");
                 //return null;
 
             return $.v(current.op(), 1);
@@ -115,16 +115,15 @@ public class VariableNormalization extends VariableTransform implements Function
 
     @NotNull
     protected Variable newVariable(@NotNull Variable v, int serial) {
+        Variable u;
         if (v instanceof GenericVariable) {
-            return ((GenericVariable) v).normalize(serial); //HACK
+            u = ((GenericVariable) v).normalize(serial); //HACK
         } else {
-            @NotNull AbstractVariable vn = $.v(v.op(), serial);
-            /*if (v instanceof Ellipsis) {
-                return ((Ellipsis) v).clone(vn, this);
-            } else {*/
-                return vn; //N/A
-            //}
+            u = $.v(v.op(), serial);
+            u = u.equals(v) ? v : u; //attempt to use the original if they are equal, this can help prevent unnecessary transforms etc
         }
+
+        return u ;
 
     }
 

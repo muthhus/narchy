@@ -73,7 +73,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
 
     @Nullable
     @Override
-    protected L removeItem(@NotNull L removed) {
+    protected final L removeItem(@NotNull L removed) {
         return listRemove(removed) ? removed : null;
     }
 
