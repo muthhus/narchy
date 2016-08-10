@@ -688,11 +688,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         for (int i = 0; i < len; i++) {
 
             if (ev[i] == Long.MAX_VALUE && i == len-1) {
-                //trailing cyclic value
-                buffer.append('C');
+                buffer.append(';'); //trailing cyclic value
             } else {
                 buffer.append(
-                        //Long.toString(ev[i], 36)
                         LongString.toString(ev[i], base)
                 );
             }

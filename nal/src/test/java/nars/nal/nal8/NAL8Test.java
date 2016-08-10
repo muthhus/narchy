@@ -673,7 +673,7 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testGoalConjunctionDecomposeSuffix() {
         test()
-                //.log()
+                .log()
                 .goal("((x) &&+3 (y))", Tense.Eternal, 1f, 0.9f)
                 .inputAt(4, "(x). :|:")
                 .mustDesire(cycles, "(y)", 1f, 0.81f, (4+3))

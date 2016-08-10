@@ -173,15 +173,15 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
      */
     public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
 
-        match(x, y);
+        if (match(x, y)) {
 
-        if (finish) {
-            if (!termutes.isEmpty())
-                termunator.run(this, null, -1);
-            else
-                onMatch();
+            if (finish) {
+                if (!termutes.isEmpty())
+                    termunator.run(this, null, -1);
+                else
+                    onMatch();
+            }
         }
-
     }
 
 

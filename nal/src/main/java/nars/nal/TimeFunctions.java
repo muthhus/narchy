@@ -213,8 +213,10 @@ public interface TimeFunctions {
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
-    @NotNull TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, true);
-    @NotNull TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, false);
+    @NotNull TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) ->
+            decompose(derived, p, occReturn, true);
+    @NotNull TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) ->
+            decompose(derived, p, occReturn, false);
 
     @NotNull
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
@@ -241,14 +243,13 @@ public interface TimeFunctions {
 
             long occ;
 
-            long shift = ETERNAL;
 
             if (decomposedTerm.size() != 2) {
                 //probably a (&&+0, ...)
-                shift = 0;
                 occ = occDecomposed != ETERNAL ? occDecomposed : occOther;
             } else if (occOther != ETERNAL) {
 
+                long shift = ETERNAL;
 
                 Term d0 = p.resolveNormalized(decomposedTerm.term(0));
                 boolean derivedIsDecomposedZero = Terms.equalOrNegationOf(d0, derived);
@@ -256,22 +257,26 @@ public interface TimeFunctions {
                 if (Terms.equalOrNegationOf(otherTerm, decomposedTerm)) {
                     //beginning, assume its relative to the occurrenc
                     shift = derivedIsDecomposedZero ? 0 : dtDecomposed;
+
                 } else {
                     Term d1 = p.resolveNormalized(decomposedTerm.term(1));
 
                     if (derivedIsDecomposedZero && Terms.equalOrNegationOf(d1, otherTerm)) {
                         shift = -dtDecomposed; //shift negative
+
                     } else {
                         boolean derivedIsDecomposedOne = Terms.equalOrNegationOf(d1, derived);
 
                         if (derivedIsDecomposedOne && Terms.equalOrNegationOf(d0, otherTerm)) {
                             shift = dtDecomposed; //shift positive
+
                         } else if (derivedIsDecomposedZero || derivedIsDecomposedOne) {
                             shift = 0; //shift zero
                         }
                     }
 
                 }
+                occOther += shift;
 
                 if (shift == ETERNAL) {
                     return noTemporalBasis(derived);
@@ -282,6 +287,7 @@ public interface TimeFunctions {
 
             } else {//if (occ == ETERNAL && occDecomposed != ETERNAL) {
 
+                long shift = 0;
 
                 Term d0 = p.resolve(decomposedTerm.term(0));
                 Term d1 = p.resolve(decomposedTerm.term(1));
@@ -289,21 +295,15 @@ public interface TimeFunctions {
                 if (Terms.equalOrNegationOf(d0, derived)) {
                     shift = 0; //beginning
                 } else if (Terms.equalOrNegationOf(d1, derived)) {
-                    shift = dtDecomposed; //offset
+                    shift = dtDecomposed; //
                 }
 
-                if (shift == ETERNAL) {
-                    return noTemporalBasis(derived);
-                }
-
-
-                occ = occDecomposed;
+                occ = occDecomposed + shift;
             }
 
 
             if (occ != ETERNAL) {
-                if (shift != DTERNAL)
-                    occ += shift;
+
                 occReturn[0] = occ;
             }
             return derived;
@@ -607,9 +607,20 @@ public interface TimeFunctions {
         Task belief = p.belief;
 
         long occ = p.occurrenceTarget((t, b) -> {
-            if ((belief!=null) && (!belief.isEternal()))
-                return b;
-            return t;
+            if (t!=ETERNAL && b!= ETERNAL) {
+
+                //randomize choice by confidence
+                float tc = task.conf() + belief.conf();
+
+                if ( p.random.nextFloat() * tc < task.conf() ) {
+                    return t;
+                } else {
+                    return b;
+                }
+
+            } else {
+                return b!=ETERNAL ? b : t;
+            }
         }); //reset
 
         Compound tt = (Compound) $.pos(p.taskTerm);

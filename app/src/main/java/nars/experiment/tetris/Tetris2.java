@@ -50,14 +50,14 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = false;
-        Param.CONCURRENCY_DEFAULT = 3;
+        Param.CONCURRENCY_DEFAULT = 2;
     }
 
     public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 16;
-    public static final int tetris_width = 6;
+    public static final int cyclesPerFrame = 4;
+    public static final int tetris_width = 8;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 4;
+    public static final int TIME_PER_FALL = 3;
     static boolean easy = true;
 
     static int frameDelay;
@@ -65,7 +65,7 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 16 * TIME_DILATION;
+    private final int visionSyncPeriod = 0; //16 * TIME_DILATION;
 
     public class View {
 
@@ -185,6 +185,13 @@ public class Tetris2 extends NAREnvironment {
 
     private void inputSpan(int start, int end, int axis, int sign, boolean horizontal) {
 
+        Truth t = $.t(sign>0 ? 1f : 0f,
+            //(float)Math.pow(alpha, end-start)
+            alpha
+        );
+        if (t == null)
+            return; //too low confidence
+
         Term range = new Termject.IntInterval(start, end);
         Term fixed = new Termject.IntTerm(axis);
 
@@ -192,8 +199,8 @@ public class Tetris2 extends NAREnvironment {
         nar.believe(
                 horizontal ? $.p(range, fixed) : $.p(fixed, range),
                 Tense.Present,
-                sign>0 ? 1f : 0f,
-                alpha/4f );
+                t.freq(), t.conf() //HACK this parameters sux
+        );
     }
 
     @Override

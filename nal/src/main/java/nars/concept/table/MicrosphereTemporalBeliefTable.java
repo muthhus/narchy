@@ -7,6 +7,7 @@ import nars.task.Revision;
 import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -247,9 +248,10 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
      */
     @Nullable
     private Task merge(@NotNull Task a, @NotNull Task b, long now, @Nullable EternalTable eternal) {
-        double ac = a.confWeight();
-        double bc = b.confWeight();
-        long mid = (long) ((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
+        double ac = a.conf();
+        double bc = b.conf();
+        long mid = (long)Math.round(Util.lerp((double)a.occurrence(), (double)b.occurrence(), ac/(ac+bc)));
+        //long mid = (long)Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
         //TODO weight the contributed overlap amount by the relative confidence provided by each task

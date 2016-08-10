@@ -92,18 +92,18 @@
 //// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P), time(occMerge) |- ((S | P) --> M), (Belief:Intersection, Derive:NoSwap)
-    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P), time(occMerge) |- ((S & P) --> M), (Belief:Union, Derive:NoSwap)
-    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P), time(occMerge) |- ((P ~ S) --> M), (Belief:Difference, Derive:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection, Derive:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S & P) --> M), (Belief:Union, Derive:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((P ~ S) --> M), (Belief:Difference, Derive:NoSwap)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P), time(occMerge) |- (M --> (P & S)), (Belief:Intersection, Derive:NoSwap)
-    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P), time(occMerge) |- (M --> (P | S)), (Belief:Union, Derive:NoSwap)
-    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P), time(occMerge) |- (M --> (P - S)), (Belief:Difference, Derive:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P & S)), (Belief:Intersection, Derive:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P | S)), (Belief:Union, Derive:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P - S)), (Belief:Difference, Derive:NoSwap)
 
 //raw product composition
-//    (A..+), (B..+), time(occMerge) |- ((A..+) | (B..+)), (Belief:Intersection, Derive:NoSwap)
-//    (A..+), (B..+), time(occMerge) |- ((A..+) & (B..+)), (Belief:Union, Derive:NoSwap)
-//    (A..+), (B..+), time(occMerge) |- ((A..+) ~ (B..+)), (Belief:Difference, Derive:NoSwap)
+//    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection, Derive:NoSwap)
+//    (A..+), (B..+) |- ((A..+) & (B..+)), (Belief:Union, Derive:NoSwap)
+//    (A..+), (B..+) |- ((A..+) ~ (B..+)), (Belief:Difference, Derive:NoSwap)
 //raw product decomposition ?
 
 //// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
@@ -294,9 +294,8 @@
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (--,%X), (Belief:StructuralDeduction)
      (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Desire:StructuralStrong)
 
-     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy)
+     (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
 
-     (&&,X,A..+), B, time(decomposeTaskIfBeliefBefore), task("!") |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Desire:Strong)
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
      //(&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)

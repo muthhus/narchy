@@ -83,13 +83,16 @@ abstract public class DerivedTask extends MutableTask {
 
     @Override
     public boolean onConcept(@NotNull Concept c) {
-        this.concept = null;
+        if (!Param.DEBUG)
+            this.concept = null;
         return true;
     }
 
     @Override
     public boolean delete() {
-        this.premise = null;
+        if (!Param.DEBUG) {
+            this.premise = null;
+        }
         this.concept = null;
         return super.delete();
     }

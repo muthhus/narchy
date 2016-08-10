@@ -112,6 +112,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     final ForkJoinPool runWorker;
+
     //final ForkJoinPool taskWorker;
 
     static final class TaskEvent {
@@ -160,7 +161,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
         index.loadBuiltins();
-
 
 
         this.runWorker = ForkJoinPool.commonPool();
@@ -645,14 +645,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             if (p > 0) {
                 //propagate budget
                 //try {
-                    Activation activation = new Activation(inputted);
+                Activation activation = new Activation(inputted);
 
-                    c.link(conceptActivation /* linkActivation */, c,  /* HACK: 'self' */ Param.BUDGET_EPSILON, this, activation);
+                c.link(conceptActivation /* linkActivation */, c,  /* HACK: 'self' */ Param.BUDGET_EPSILON, this, activation);
 
-                    activation.run(this, 1f); //values will already be scaled
+                activation.run(this, 1f); //values will already be scaled
 
-                    emotion.busy(cost);
-                    emotion.stress(activation.overflow);
+                emotion.busy(cost);
+                emotion.stress(activation.overflow);
 //                } catch (Exception e) {
 //                    emotion.errr();
 //
@@ -925,7 +925,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public NARLoop loop(float initialFPS) {
         if (initialFPS == 0)
-            return loop((int)0);
+            return loop((int) 0);
         float millisecPerFrame = 1000.0f / initialFPS;
         return loop((int) millisecPerFrame);
     }
@@ -1072,12 +1072,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             input(x);
         } else {
             //future
+
             onFrame(m -> {
                 //if (timeCondition.test(m.time())) {
                 if (m.time() == time) {
                     m.input(x);
+                    //this.off.off();
                 }
             });
+
         }
     }
 
@@ -1118,7 +1121,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable
     public final Concept concept(@NotNull Termed tt, boolean createIfMissing) {
         if (tt instanceof Concept)
-            return ((Concept)tt);
+            return ((Concept) tt);
         return concept(tt.term(), createIfMissing);
     }
 
@@ -1435,7 +1438,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         public void run(@NotNull NAR nar, float activation) {
             if (!concepts.isEmpty()) {
                 float total = (float) concepts.sum();
-                nar.activate(concepts, in, activation/total, overflow);
+                nar.activate(concepts, in, activation / total, overflow);
             }
         }
 

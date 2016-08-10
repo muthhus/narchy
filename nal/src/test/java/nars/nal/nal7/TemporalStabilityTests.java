@@ -3,6 +3,7 @@ package nars.nal.nal7;
 import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
 import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
 import nars.NAR;
+import nars.Param;
 import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -13,20 +14,29 @@ import org.junit.Test;
  */
 public class TemporalStabilityTests {
 
+    static {
+        Param.DEBUG = true;
+    }
+
     static class T1 extends TemporalStabilityTest {
 
         @NotNull
         private final IntHashSet whens;
         private final IntToObjectFunction<String> eventer;
+        private final int minT, maxT;
+        final int tolerance = 2;
 
         public T1(IntToObjectFunction<String> eventer, int... whens) {
             this.whens = new IntHashSet(whens);
+            minT = this.whens.min();
+            maxT = this.whens.max();
             this.eventer = eventer;
         }
 
         @Override
         public boolean validOccurrence(long o) {
-            return whens.contains((int)o);
+            //return whens.contains((int)o);
+            return (o >= minT-tolerance) && (o <= maxT+tolerance);
         }
 
         @Override
@@ -100,13 +110,29 @@ public class TemporalStabilityTests {
     }
 
     @Test public void testTemporalStabilityLinkedInh() {
-        new T1(linkedinh, 1, 2, 5).test(400, new Default(1024, 8, 4, 3));
+        new T1(linkedinh, 1, 2, 5).test(400, new Default(1024, 8, 4, 3) );
     }
     @Test public void testTemporalStabilityLinkedImpl() {
         new T1(linkedimpl, 1, 2, 5).test(400, new Default(1024, 12, 4, 3));
     }
     @Test public void testTemporalStabilityLinkedImplExt() {
-        new T1(linkedimpl, 1, 2, 5, 10).test(400, new Default(1024, 12, 4, 3));
+        new T1(linkedimpl, 1, 2, 5).test(400, new Default(1024, 12, 4, 3));
+    }
+    @Test public void testTemporalStabilityLinkedImplExt2() {
+        @NotNull NAR n = new Default(1024, 32, 4, 3);
+        int time = 400;
+        T1 a = new T1(linkedimpl, 1, 2, 5, 10);
+        T1 b = new T1(linkedinh, 1, 2, 5, 10);
+
+        a.test(-1, n);
+        b.test(-1, n);
+
+        n.run(time);
+
+        a.evaluate(n);
+        b.evaluate(n);
+
     }
 
 }
+
