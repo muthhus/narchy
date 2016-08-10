@@ -35,6 +35,9 @@ public class TetrisState {
 
     float fallingBLockColor = 1f;
 
+    int width, height;
+    public float[] seen;
+
     private final Random randomGenerator = new Random();
     
     public boolean running = true;
@@ -48,11 +51,6 @@ public class TetrisState {
 
     public boolean is_game_over;/*have we reached the end state yet*/
 
-    public int width;/*how wide our board is*/
-    public int height;/*how tall our board is*/
-
-
-    public float[] seen;
 
     public float[] worldState;/*what the world looks like without the current block*/
 

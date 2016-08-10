@@ -220,12 +220,11 @@ public class MatchTaskBelief extends AtomicBoolCondition {
             return false;
         }
 
-        //defer any single-term matches to the end because they have the most generality:
         if (belief.size() == 0) {
-            return true;
+            return false;
         }
         if (task.size() == 0) {
-            return false;
+            return true;
         }
         
         //prefer non-ellipsis matches first

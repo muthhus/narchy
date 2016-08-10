@@ -258,8 +258,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         TermContainer ysubs = y.subterms();
         if (xs == ysubs.size()) {
 
-            if (vars() + y.vars() == 0)
-                return false; //no variables that could produce any matches
 
             @NotNull Op op = op();
             if (!op.isImage() || (dt() == y.dt())) {

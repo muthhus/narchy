@@ -118,7 +118,9 @@ public final class TruthFunctions extends UtilityFunctions {
     @Nullable
     public static Truth deductionB(@NotNull Truth a, float bF, float bC, float minConf) {
         float f = and(a.freq(), bF);
+
         float c = and(f, a.conf(), bC);
+
         return c >= minConf ? t(f, c) : null;
     }
 

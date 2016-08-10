@@ -54,7 +54,7 @@ public enum TermLinkBuilder {
         } else {
 
             if (t instanceof Compound)
-                t = $.terms.normalize(t,false);
+                t = $.terms.normalize($.unneg(t),false);
 
             if (target.add(t)) { //do not descend on repeats
 

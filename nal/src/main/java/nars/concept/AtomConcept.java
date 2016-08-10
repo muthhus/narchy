@@ -118,20 +118,20 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
 
         tasklinks().put(t, t, scale, null);
 
-        @NotNull Bag<Term> tl = termlinks();
-
-        int s = tl.size();
         //experimental: activate links with the incoming budget
-        float subScale = scale / s;
-
-        if (subScale >= Param.BUDGET_EPSILON) {
-            //if (subScale >= minScale) {
-            Budget in = t.budget();
-            final BudgetMerge merge = BudgetMerge.plusBlend;
-            tl.forEach(x -> merge.apply(x, in, subScale));
-            //}
-            //TODO adjust the bag's pending mass with a Bag multi-item method that does this precisely and efficiently
-        }
+//        @NotNull Bag<Term> tl = termlinks();
+//
+//        int s = tl.size();
+//        float subScale = scale / s;
+//
+//        if (subScale >= Param.BUDGET_EPSILON) {
+//            //if (subScale >= minScale) {
+//            Budget in = t.budget();
+//            final BudgetMerge merge = BudgetMerge.plusBlend;
+//            tl.forEach(x -> merge.apply(x, in, subScale));
+//            //}
+//            //TODO adjust the bag's pending mass with a Bag multi-item method that does this precisely and efficiently
+//        }
     }
 
     /** does nothing, should never get called */

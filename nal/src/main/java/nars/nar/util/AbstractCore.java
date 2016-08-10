@@ -18,6 +18,8 @@ import nars.util.data.list.FasterList;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
@@ -33,6 +35,7 @@ public abstract class AbstractCore {
     public final @NotNull MutableInteger conceptsFiredPerCycle;
 
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
 
 
@@ -150,16 +153,22 @@ public abstract class AbstractCore {
         public void run() {
             //Concept concept = conceptLink.get();
 
-            concept.tasklinks().commit();
-            concept.termlinks().commit();
+            try {
 
-            firePremiseSquared(
-                    concept,
-                    tasklinks,
-                    termlinks
-            );
+                concept.tasklinks().commit();
+                concept.termlinks().commit();
 
-            nar.inputLater(derive);
+                firePremiseSquared(
+                        concept,
+                        tasklinks,
+                        termlinks
+                );
+
+                nar.inputLater(derive);
+            } catch (Exception e) {
+                logger.error("{}", e);
+            }
+
 
         }
 

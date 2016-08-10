@@ -9,12 +9,14 @@ import nars.Param;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.index.CaffeineIndex;
+import nars.nal.Tense;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -110,11 +112,95 @@ public class Tetris2 extends NAREnvironment {
         //restart();
     }
 
+    //TODO
+    public static class NARCam {
+        public int width;/*how wide our board is*/
+        public int height;/*how tall our board is*/
+
+
+
+    }
+
+    /** RLE/scanline input method: groups similar pixels (monochrome) into a runline using a integer range */
+    protected void input() {
+
+        float thresh = 0.5f;
+
+        inputAxis(thresh, true);
+        inputAxis(thresh, false);
+    }
+
+    private void inputAxis(float thresh, boolean horizontal) {
+        int hh = horizontal ? state.height : state.width;
+        for (int y = 0; y < hh; ) {
+
+            int start = 0, end = 0;
+            int sign = 0;
+
+            int ww = horizontal ? state.width : state.height;
+            for (int x = 0; x < ww; ) {
+
+                int i;
+                if (horizontal)
+                    i = y * ww + x;
+                else
+                    i = x * hh + y;
+
+                float s = state.seen[i];
+
+                if (x == 0) {
+                    //beginning of span
+                    sign = (int) Math.signum(s);
+                } else {
+
+                    if (sign > 0) {
+                        if (s < (thresh)) {
+                            //switch
+                            sign = -1;
+                        } else {
+                            end = x;  //continue span
+                        }
+                    }
+                    if (sign < 0) {
+                        if (s > (1f - thresh)) {
+                            sign = +1;
+                        } else {
+                            end = x; //continue span
+                        }
+                    }
+                }
+
+                //if it switched or reach the end of the line
+                if (end!=x || (x >= ww-1)) {
+                    //end of span
+                    inputSpan(start, end, y, sign, horizontal);
+                }
+
+                x++;
+            }
+
+            y++;
+        }
+    }
+
+    private void inputSpan(int start, int end, int axis, int sign, boolean horizontal) {
+
+        Term range = new Termject.IntInterval(start, end);
+        Term fixed = new Termject.IntTerm(axis);
+
+        //TODO collect evidence stamp
+        nar.believe(
+                horizontal ? $.p(range, fixed) : $.p(fixed, range),
+                Tense.Present,
+                sign>0 ? 1f : 0f,
+                alpha/4f );
+    }
 
     @Override
     protected void init(NAR nar) {
 
         state.seen = new float[state.width * state.height];
+
         for (int y = 0; y < state.height; y++) {
             int yy = y;
             for (int x = 0; x < state.width; x++) {
@@ -122,7 +208,11 @@ public class Tetris2 extends NAREnvironment {
                 Compound squareTerm = $.p(new Termject.IntTerm(x), new Termject.IntTerm(y));
                 sensors.add(new SensorConcept(squareTerm, nar,
                         () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
-                        (v) -> t(v, alpha)
+
+                        //null //disable input
+
+                        (v) -> $.t(v,alpha)
+
                 ).timing(0, visionSyncPeriod));
 
             }
@@ -146,7 +236,7 @@ public class Tetris2 extends NAREnvironment {
         //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
         float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().expectation(now) : 0.5f;
 
-        float actionMargin = 0.35f;
+        float actionMargin = 0.25f;
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
 
@@ -181,6 +271,8 @@ public class Tetris2 extends NAREnvironment {
             reset();
         }
 
+        input();
+
         return state.score;
     }
 
@@ -210,19 +302,19 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.4f);
-        nar.derivedActivation.setValue(0.4f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.7f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
+        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.75f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.04f);
-        nar.truthResolution.setValue(0.04f);
+        nar.confMin.setValue(0.02f);
+        nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -256,7 +348,7 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 2);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new ArithmeticInduction(nar);
@@ -374,7 +466,7 @@ public class Tetris2 extends NAREnvironment {
 
                 newControlWindow(view);
 
-                newBeliefChart(this, 1500);
+                newBeliefChart(this, 200);
 
                 //NARSpace.newConceptWindow((Default) nar, 128, 8);
             }

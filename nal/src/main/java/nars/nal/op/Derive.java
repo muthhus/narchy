@@ -106,9 +106,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         try {
             Term cp = this.conclusionPattern;
             r = m.index.resolve(cp, m);
-        /*if (r == Imdex)
-            System.err.println(r + " " + this.rule.source);*/ //<- finds rules which may help to add a neq(x,y) constraint
-
 
             if (r instanceof Compound) { //includes null test
                 derive(m, (Compound) r, ct);

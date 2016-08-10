@@ -65,7 +65,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         this.nar = n;
         this.term = t.term();
         this.value = value;
-        this.truthFloatFunction = truthFloatFunction;
+        this.truthFloatFunction = truthFloatFunction == null ? (v)->null : truthFloatFunction;
 
         pri(pri);
         this.dur = dur;
@@ -128,17 +128,16 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            Task t = this.next = newInputTask(f, now);
-            input(t);
-
-            this.lastInput = now;
-            this.prevF = f;
-
+            Task t = newInputTask(f, now);
+            if (t!=null) {
+                this.next = t;
+                input(t);
+                this.lastInput = now;
+                this.prevF = f;
+            }
 
         }
 
-
-        //this.prevValue = next;
     }
 
     public void input(Task t) {
@@ -167,7 +166,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 //        return v;
 //    }
 
-    @NotNull
+    @Nullable
     protected Task newInputTask(float v, long now) {
         Truth t = truthFloatFunction.valueOf(v);
         return t != null ? new MutableTask(term(), punc, t)
