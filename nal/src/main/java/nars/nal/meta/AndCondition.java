@@ -39,8 +39,9 @@ public final class AndCondition extends GenericCompound<Term> implements BoolCon
     @Override
     public final boolean booleanValueOf(PremiseEval m) {
         for (BoolCondition x : termCache) {
-            if (!x.booleanValueOf(m))
+            if (!x.booleanValueOf(m)) {
                 return false;
+            }
         }
         return true;
     }

@@ -168,34 +168,37 @@ public interface Concept extends Termed {
      *
      * @return whether the link successfully was completed
      */
-    default boolean link(float linkScale, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    default boolean link(float linkScale, Concept src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
 
         Budgeted b = activation.in;
         if (b instanceof Task) {
             linkTask((Task)b, linkScale);
         }
 
-        activation.concepts.addToValue(this, linkScale);
-
-        linkAny(b, linkScale, minScale, nar, activation);
+        linkAny(b, src, linkScale, minScale, nar, activation);
 
         return true;
     }
 
-    void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation);
+    void linkAny(@NotNull Budgeted b, Concept other, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation);
 
 
     void linkTask(@NotNull Task t, float scale);
 
 
 
-    default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    default boolean link(@NotNull Budgeted b, Concept source, float initialScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
         float p = b.priIfFiniteElseNeg1();
-        if (p < 0)
+        if (p <= 0)
             return false;
 
-        return link(initialScale,
-                nar.taskLinkThreshold.floatValue() / p, //minScale
+        float minScale = nar.taskLinkThreshold.floatValue() / p;
+
+        if (p <= minScale)
+            return false;
+
+        return link(initialScale, source,
+                minScale, //minScale
                 nar, activation);
     }
 
@@ -214,8 +217,8 @@ public interface Concept extends Termed {
 
         NAR.Activation a = new NAR.Activation(thisTask);
 
-        link(otherTask, halfScale, nar, a);
-        other.link(thisTask, halfScale, nar, a);
+        this.link(otherTask, other, halfScale, nar, a);
+        other.link(thisTask, this, halfScale, nar, a);
 
         a.run(nar);
 

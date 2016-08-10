@@ -178,13 +178,13 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public boolean link(float linkScale, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
-        return target.link(linkScale, minScale, nar, activation);
+    public boolean link(float linkScale, Concept source, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+        return target.link(linkScale, source, minScale, nar, activation);
     }
 
     @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
-        target.linkAny(b, scale, minScale, nar, activation);
+    public void linkAny(@NotNull Budgeted b, Concept source, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+        target.linkAny(b, source, scale, minScale, nar, activation);
     }
 
     @Override

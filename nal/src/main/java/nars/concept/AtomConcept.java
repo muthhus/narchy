@@ -116,7 +116,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
 //    }
 
     @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+    public void linkAny(@NotNull Budgeted b, Concept src, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
         //nothing
     }
 }

@@ -424,8 +424,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable NAR.Activation conceptOverflow) {
-        linkSubs(scale, minScale, conceptOverflow, nar);
+    public void linkAny(@NotNull Budgeted b, Concept src, float scale, float minScale, @NotNull NAR nar, @Nullable NAR.Activation conceptOverflow) {
+        linkSubs(scale, src, minScale, conceptOverflow, nar);
         //linkPeers(b, scale, nar, false);
     }
 
@@ -433,10 +433,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     /**
      * link to subterms, hierarchical downward
      */
-    public void linkSubs(float scale, float minScale, @Nullable NAR.Activation conceptOverflow, @NotNull NAR nar) {
+    public void linkSubs(float scale, Concept src, float minScale, @Nullable NAR.Activation conceptOverflow, @NotNull NAR nar) {
 
 
-        linkDistribute(scale, minScale, templates, conceptOverflow, nar);
+        linkDistribute(scale, src,  minScale, templates, conceptOverflow, nar);
 
 
 //            /*if (subScale >= minScale)*/
@@ -489,12 +489,20 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
 
-    final void linkDistribute(float scale, float minScale, @NotNull TermSet templates, @NotNull NAR.Activation activation, @NotNull NAR nar) {
+    final void linkDistribute(float scale, Concept src, float minScale, @NotNull TermSet templates, @NotNull NAR.Activation activation, @NotNull NAR nar) {
 
         int n = templates.size();
         float tStrength = 1f / n;
         float subScale = scale * tStrength;
 
+        if (src!=this) {
+            //link the src to this
+            AbstractConcept.linkSub(this, src, scale, activation, nar);
+        } else {
+            activation.concepts.addToValue(this, scale); //activate self
+        }
+
+        //then link this to templates
         Term[] t = templates.terms();
         for (int i = 0; i < n; i++) {
             Termed tt = t[i];
@@ -508,7 +516,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
                 Concept target = AbstractConcept.linkSub(this, tt, subScale, activation, nar);
 
                 if (target != null && activation.in instanceof Task) {
-                    //insert 2nd-order tasklink
+                    //insert recursive tasklink
                     target.linkTask((Task) activation.in, subScale);
                 }
             }

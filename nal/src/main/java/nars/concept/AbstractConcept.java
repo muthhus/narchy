@@ -42,7 +42,7 @@ public interface AbstractConcept extends Concept {
 
     //public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
 
-    /** returns the outgoing component only */
+    /** crosslinks termlinks */
     @Nullable
     static Concept linkSub(@NotNull Concept source, @NotNull Termed target,
                            float subScale,

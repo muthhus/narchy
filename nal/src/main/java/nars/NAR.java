@@ -647,7 +647,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 //try {
                     Activation activation = new Activation(inputted);
 
-                    c.link(1 /* linkActivation */, Param.BUDGET_EPSILON, this, activation);
+                    c.link(1 /* linkActivation */, c,  /* HACK: 'self' */ Param.BUDGET_EPSILON, this, activation);
 
                     activation.run(this, conceptActivation);
 
