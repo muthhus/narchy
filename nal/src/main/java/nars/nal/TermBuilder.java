@@ -381,10 +381,11 @@ public abstract class TermBuilder {
 
         if (ul == 1) {
             Term only = u[0];
-            //preserve unitary ellipsis for patterns etc
-            return (only instanceof Ellipsislike) ?
-                    finish(CONJ, dt, only) :
-                    only;
+
+            if (only instanceof Ellipsislike) {
+                //preserve unitary ellipsis for patterns etc
+                return finish(CONJ, dt, only);
+            } else return only;
 
         }
 

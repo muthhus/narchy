@@ -1,7 +1,6 @@
 package nars.concept;
 
 import javassist.scopedpool.SoftValueHashMap;
-import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.budget.policy.ConceptPolicy;

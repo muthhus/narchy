@@ -1,6 +1,9 @@
 package nars.nal.meta;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.index.TermIndex;
@@ -50,17 +53,14 @@ public class PremiseEval extends FindSubst {
 
         if (t!=null) {
             t = dither(t);
-            if (t == null)
-                throw new RuntimeException("confMin should be greater than or equal to truthResolution");
+            assert(t!=null); //confMin should be greater than or equal to truthResolution
         }
 
         this.punct.set(new PremiseEval.TruthPuncEvidence(t, p, evidence));
         return true;
     }
 
-    @Nullable public Truth dither(@Nullable Truth t) {
-        if (t == null)
-            return null;
+    @Nullable public Truth dither(@NotNull Truth t) {
         float res = this.truthResolution;
         return res == Param.TRUTH_EPSILON ? t : DefaultTruth.ditherOrNull(t, res);
     }
@@ -212,19 +212,6 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    @NotNull
-    @Override
-    public String toString() {
-        return "RuleMatch:{" +
-                "premise:" + premise +
-                ", subst:" + super.toString() +
-                (forEachMatch != null ? (", derived:" + forEachMatch) : "") +
-                //(!secondary.isEmpty() ? (", secondary:" + secondary) : "")+
-                //(occurrenceShift.get()!=null ? (", occShift:" + occurrenceShift) : "")+
-                //(branchPower.get()!=null ? (", derived:" + branchPower) : "")+
-                '}';
-
-    }
 
 
     public void init(@NotNull NAR nar) {

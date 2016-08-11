@@ -15,7 +15,6 @@ import nars.term.subst.FindSubst;
 import nars.term.subst.choice.Choose1;
 import nars.term.subst.choice.Choose2;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 

@@ -249,26 +249,31 @@ public interface TimeFunctions {
                 occ = occDecomposed != ETERNAL ? occDecomposed : occOther;
             } else if (occOther != ETERNAL) {
 
-                long shift = 0;
+                long shift = ETERNAL;
 
                 Term d0 = p.resolveNormalized(decomposedTerm.term(0));
                 boolean derivedIsDecomposedZero = Terms.equalOrNegationOf(d0, derived);
 
+                int edtDecomposed = dtDecomposed != DTERNAL ? dtDecomposed : 0; //effective dt decomposed
+
                 if (Terms.equalOrNegationOf(otherTerm, decomposedTerm)) {
                     //beginning, assume its relative to the occurrenc
-                    shift = derivedIsDecomposedZero ? 0 : dtDecomposed;
+
+                    shift = derivedIsDecomposedZero ?
+                                0 :
+                            edtDecomposed;
 
                 } else {
                     Term d1 = p.resolveNormalized(decomposedTerm.term(1));
 
                     if (derivedIsDecomposedZero && Terms.equalOrNegationOf(d1, otherTerm)) {
-                        shift = -dtDecomposed; //shift negative
+                        shift = -edtDecomposed; //shift negative
 
                     } else {
                         boolean derivedIsDecomposedOne = Terms.equalOrNegationOf(d1, derived);
 
                         if (derivedIsDecomposedOne && Terms.equalOrNegationOf(d0, otherTerm)) {
-                            shift = dtDecomposed; //shift positive
+                            shift = edtDecomposed; //shift positive
 
                         } else if (derivedIsDecomposedZero || derivedIsDecomposedOne) {
                             shift = 0; //shift zero
@@ -276,18 +281,16 @@ public interface TimeFunctions {
                     }
 
                 }
-                occOther += shift;
 
                 if (shift == ETERNAL) {
                     return noTemporalBasis(derived);
                 }
 
-
-                occ = occOther;
+                occ = occOther + shift;
 
             } else {//if (occ == ETERNAL && occDecomposed != ETERNAL) {
 
-                long shift = 0;
+                long shift = ETERNAL;
 
                 Term d0 = p.resolve(decomposedTerm.term(0));
                 Term d1 = p.resolve(decomposedTerm.term(1));
@@ -296,6 +299,10 @@ public interface TimeFunctions {
                     shift = 0; //beginning
                 } else if (Terms.equalOrNegationOf(d1, derived)) {
                     shift = dtDecomposed; //
+                }
+
+                if (shift == ETERNAL) {
+                    return noTemporalBasis(derived);
                 }
 
                 occ = occDecomposed + shift;

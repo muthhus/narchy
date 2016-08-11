@@ -294,8 +294,8 @@
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (--,%X), (Belief:StructuralDeduction)
      (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Desire:StructuralStrong)
 
-     (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
-
+     (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     (&&,X,A), B, time(decomposeTask) |- substituteIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Desire:Strong)
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
      //(&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)

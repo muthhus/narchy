@@ -80,7 +80,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException {
         //super(n.task(sentenceTerm + punc).normalize(n.memory));
-        try {
+
             nar = n;
 
             if (freqMax < freqMin) throw new RuntimeException("freqMax < freqMin");
@@ -105,10 +105,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
 
             //this.duration = n.memory.duration();
-        } catch (Throwable t) {
-            logger.error("TaskCondition: {}", t);
-            throw new RuntimeException(t);
-        }
+
     }
 
     @NotNull

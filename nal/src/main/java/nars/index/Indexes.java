@@ -1,6 +1,5 @@
 package nars.index;
 
-import javassist.scopedpool.SoftValueHashMap;
 import nars.nar.util.DefaultConceptBuilder;
 import org.jetbrains.annotations.NotNull;
 

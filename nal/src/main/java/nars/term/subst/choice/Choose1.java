@@ -41,13 +41,14 @@ public class Choose1 extends Termutator {
         if (ysize < 2) {
             throw new RuntimeException(yFree + " offers no choice");
         }
+        yy = yFree.toArray(new Term[ysize]);
+        this.yFree = yFree;
+
 
         this.xEllipsis = xEllipsis;
         this.x = x;
 
-        this.yFree = yFree;
 
-        yy = yFree.toArray(new Term[ysize]);
     }
 
     @Override

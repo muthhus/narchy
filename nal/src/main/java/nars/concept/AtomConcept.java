@@ -2,11 +2,8 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Op;
-import nars.Param;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;

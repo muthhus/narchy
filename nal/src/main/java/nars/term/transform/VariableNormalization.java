@@ -1,10 +1,8 @@
 package nars.term.transform;
 
 import nars.$;
-import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.Termed;
-import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
 import nars.util.data.map.UnifriedMap;

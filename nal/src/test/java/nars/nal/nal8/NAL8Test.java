@@ -6,6 +6,7 @@ import nars.nal.AbstractNALTest;
 import nars.nal.Tense;
 import nars.term.Term;
 import nars.util.signal.TestNAR;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -461,15 +462,17 @@ public class NAL8Test extends AbstractNALTest {
                 .mustBelieve(cycles,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
                 .mustNotOutput(cycles, "at:(SELF,t003)", '.', 0, 1f, 0, 1f, ETERNAL);
     }
+    @Ignore
     @Test
-    public void condition_belief_deduction_2_eternal()  {
+    public void condition_belief_deduction_2_dternal()  {
 
 
         test()
                 //.log()
                 .input(              "on:(t002,t003). :|:")
-                .inputAt(10,         "(on:(t002,#1) && at:(SELF,#1)).") //<-- ETERNAL
+                .inputAt(10,         "(on:(t002,#1) && at:(SELF,#1)).") //<-- DTERNAL
                 .mustBelieve(cycles*4,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
+                //TODO mustNotBelieve? ^ the DTERNAL conjunctoin maybe should not be decomposed
                 ;
     }
 

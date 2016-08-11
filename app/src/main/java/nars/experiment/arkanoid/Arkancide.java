@@ -207,18 +207,18 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.5f);
+        nar.derivedActivation.setValue(0.5f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.85f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.03f);
+        nar.confMin.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)

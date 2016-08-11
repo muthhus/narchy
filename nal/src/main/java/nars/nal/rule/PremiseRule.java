@@ -32,7 +32,6 @@ import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.AbstractVariable;
-import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
 import nars.truth.func.BeliefFunction;
 import nars.truth.func.DesireFunction;
