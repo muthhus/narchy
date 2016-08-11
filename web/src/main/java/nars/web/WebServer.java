@@ -151,11 +151,7 @@ public class WebServer /*extends PathHandler*/ {
         synchronized (server) {
             server.stop();
 
-            try {
-                loop.stop();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            loop.stop();
         }
     }
 
