@@ -143,7 +143,7 @@ public class MotorConcept extends WiredConcept  {
             Task next = feedback(feedback, now);
             if (lastFeedback==null || !lastFeedback.equalsTruth(next, feedbackResolution)) { //if feedback is different from last
                 lastFeedback = next;
-                nar.input(next);
+                nar.inputLater(next);
             }
         }
     }

@@ -782,8 +782,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private void awaitQuiescence() {
         if (!runWorker.isQuiescent()) {
-            while (!runWorker.awaitQuiescence(25, TimeUnit.MILLISECONDS)) {
-                logger.warn("runWorker lag: {}", runWorker);
+            while (!runWorker.awaitQuiescence(100, TimeUnit.MILLISECONDS)) {
+                //logger.warn("runWorker lag: {}", runWorker);
                 Thread.yield();
             }
         }
