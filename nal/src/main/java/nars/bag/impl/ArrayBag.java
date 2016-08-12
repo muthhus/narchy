@@ -260,6 +260,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         float r = 1f - (existing / (existing + pending));
 
+
         return r >= Param.BUDGET_EPSILON ? new Forget(r) : null;
     }
 

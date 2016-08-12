@@ -897,15 +897,17 @@ public interface TimeFunctions {
     };
 
     @NotNull static Compound dt(@NotNull Compound derived, int dt, @NotNull PremiseEval p, long[] occReturn) {
-        if (!derived.op().temporal && dt!=DTERNAL && dt!=0 && occReturn[0]!=ETERNAL) {
+        Op o = derived.op();
+        if (!o.temporal && dt!=DTERNAL && dt!=0 && occReturn[0]!=ETERNAL) {
             //something got reduced to a non-temporal, so shift it to the midpoint of what the actual term would have been:
             occReturn[0] += dt/2;
             dt = DTERNAL;
         }
         if (derived.dt() != dt) {
-            @NotNull Term n = p.index.builder().build(derived.op(), dt, derived.subterms().terms());
+            Term[] derivedSubterms = derived.subterms().terms();
+            @NotNull Term n = p.index.builder().build(o, dt, derivedSubterms);
             if (!(n instanceof Compound))
-                throw new InvalidTermException(derived.op(), dt, derived.subterms().terms(), "Untemporalizable to new DT");
+                throw new InvalidTermException(o, dt, derivedSubterms, "Untemporalizable to new DT");
             return (Compound) n;
         } else {
             return derived;

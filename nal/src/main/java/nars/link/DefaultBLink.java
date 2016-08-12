@@ -1,5 +1,7 @@
 package nars.link;
 
+import nars.Param;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
 
@@ -88,8 +90,13 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     
     @Override
     public final void _setPriority(float p) {
-        dPri += p - PRI;
-        changed = true;
+        float delta = p - PRI;
+        if (delta >= Param.BUDGET_EPSILON || delta <= -Param.BUDGET_EPSILON) {
+            dPri += delta;
+            changed = true;
+        } /*else {
+            throw new RuntimeException("insignificant priority change detected");
+        }*/
     }
 
     @Override
@@ -99,8 +106,11 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
     @Override
     public final void _setDurability(float d) {
-        dDur += d - DUR;
-        changed = true;
+        float delta = d - DUR;
+        if (delta >= Param.BUDGET_EPSILON || delta <= -Param.BUDGET_EPSILON) {
+            dDur += delta;
+            changed = true;
+        }
     }
 
     @Override
@@ -110,8 +120,11 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
     @Override
     public final void _setQuality(float q) {
-        dQua += q - QUA;
-        changed = true;
+        float delta = q - QUA;
+        if (delta >= Param.BUDGET_EPSILON || delta <= -Param.BUDGET_EPSILON) {
+            dQua += delta;
+            changed = true;
+        }
     }
 
 
