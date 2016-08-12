@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static nars.nal.UtilityFunctions.w2c;
+import static nars.truth.TruthFunctions.c2w;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
@@ -102,9 +103,9 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
             times[i][0] = -when + t.occurrence() + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
             freq[i] = t.freq();
-            conf[i] =
-                    //t.conf();
-                    t.confWeight();
+
+            float c = Math.min(t.conf(), 1f-Param.TRUTH_EPSILON); //clip maximum confidence
+            conf[i] = c2w(c);
 
             //TODO dt
         }

@@ -1,5 +1,6 @@
 package nars.concept.table;
 
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
@@ -289,11 +290,12 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         confScale = Math.min(1f, confScale);
 
         Truth truth = truth(mid, now, eternal);
-        if (truth!=null)
+        if (truth!=null) {
             truth = truth.confMult(confScale);
 
-        if (truth != null)
-            return Revision.merge(a, b, mid, now, truth, concept);
+            if (truth != null)
+                return Revision.merge(a, b, mid, now, truth, concept);
+        }
 
         return null;
     }
@@ -350,11 +352,17 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             copy = toArray(new Task[s]);
         }
 
+        Truth res;
         if (s == 1)
-            return copy[0].projectTruth(when, now, false);
+            res = copy[0].projectTruth(when, now, false);
         else
-            return truthpolations.get().truth(when, eternal != null ? eternal.strongest() : null, copy);
+            res =  truthpolations.get().truth(when, eternal != null ? eternal.strongest() : null, copy);
 
+        float confLimit = 1f - Param.TRUTH_EPSILON;
+        if (res!=null && res.conf() > confLimit) //clip at max conf
+            res = $.t(res.freq(), confLimit);
+
+        return res;
     }
 
 

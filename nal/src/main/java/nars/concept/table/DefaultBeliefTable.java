@@ -46,8 +46,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         final Truth tt;
 
-            tt = temporal.truth(when, now, eternal);
-
+        tt = temporal.truth(when, now, eternal);
 
         if (tt!=null) {
             return tt;

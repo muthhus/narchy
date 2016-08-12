@@ -150,6 +150,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (punc == 0)
             throw new NAR.InvalidTaskException(this, "Unspecified punctuation");
 
+
         //this conflicts with weakref's
         /*if (!isCommand()) {
             ensureValidParentTaskRef();
@@ -227,6 +228,12 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
         }
 
+
+        float confLimit = 1f - Param.TRUTH_EPSILON;
+        if (!isInput() && conf() > confLimit) {
+            //clip maximum confidence in case a derivation of an axiomatic belief reaches conf=~1.0 also
+            setTruth($.t(freq(), confLimit));
+        }
 
         //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
         if (log!=null && log().get(0).equals(Narsese.NARSESE_TASK_TAG)) {
