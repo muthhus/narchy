@@ -134,7 +134,7 @@ public class TermIndexTest {
         int t0 = i.size();
         int s0 = i.subtermsCount();
 
-        Term a = i.parse(s); //create by parsing
+        Term a = i.the(i.parse(s)).term(); //create by parsing then manually intern it
 
         int t1 = i.size();
         int s1 = i.subtermsCount();
@@ -142,10 +142,9 @@ public class TermIndexTest {
         //some terms and subterms were added
         if (a instanceof Compound) {
             assertTrue(t0 < t1);
-            //assertTrue(s1 + " subterms indexed for " + t0 + " terms", s0 < s1);
         }
 
-        Term a2 = i.parse(s); //create by parsing again
+        Term a2 = i.the(i.parse(s)).term(); //create by parsing again
         testShared(a, a2);
 
         assertEquals(i.size(), t1 /* unchanged */);
@@ -154,7 +153,7 @@ public class TermIndexTest {
         //i.print(System.out); System.out.println();
 
         //create by composition
-        Compound b = i.parse('(' + s + ')');
+        Compound b = (Compound) i.the(i.parse('(' + s + ')')).term();
         testShared(a.term(), b.term(0));
 
         assertEquals(i.size(), t1 + 1 /* one more for the product container */);

@@ -98,7 +98,7 @@ public class DefaultTruth implements Truth  {
 
     @Override
     public final int hashCode() {
-        return Truth.hash(freq, conf, Param.TRUTH_DISCRETION);
+        return Truth.hash(freq, conf, (int)(1f/Param.TRUTH_EPSILON));
         //return hash;
     }
 

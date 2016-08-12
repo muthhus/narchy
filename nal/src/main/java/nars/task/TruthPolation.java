@@ -29,7 +29,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     @NotNull final float[] freq;
     @NotNull final float[] conf;
     @Nullable
-    private static final Truth EterNull = $.t(0.5f, Param.TRUTH_EPSILON);
+    //private static final Truth EterNull = $.t(0.5f, Param.TRUTH_EPSILON);
 
     public TruthPolation(int size) {
         super(1, 2 /* must be 2 for 1D */, null);
@@ -63,7 +63,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         float thresh = Param.TRUTH_EPSILON/2f; //c2w(Global.TRUTH_EPSILON);
 
         return truth(when, tasks,
-                (topEternal == null) ? EterNull : topEternal,
+                (topEternal == null) ? null : topEternal,
                 maxDarkFraction, thresh);
 
     }
@@ -102,7 +102,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             float window = 0.01f;
 
             times[i][0] = -when + t.occurrence() + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
-            freq[i] = t.freq();
+            freq[i] = (t.freq() - 0.5f) * 2f; //convert to -1..+1 range
 
             float c = Math.min(t.conf(), 1f-Param.TRUTH_EPSILON); //clip maximum confidence
             conf[i] = c2w(c);
@@ -125,7 +125,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
                 maxDarkFraction, darkThresold,
                 n);
 
-        return $.t(v[0], w2c(v[1]));
+        return $.t((v[0]/2f+0.5f), w2c(v[1]));
     }
 
 

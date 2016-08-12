@@ -64,14 +64,11 @@ public abstract class Param extends Container implements Level {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.00001f;
-    /**
-     * minimum durability and quality necessary for a derivation to form
-     */
-    public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON * 2f;
+    public static final float BUDGET_EPSILON = 0.00004f;
 
-    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 12;
-    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 12;
+
+    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
+    public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
     /**
      * specify level of concurrency (# of threads per each pool)
      * or -1 to use the common pool
@@ -100,7 +97,7 @@ public abstract class Param extends Container implements Level {
     /**
      * upper limit for # of termutations derived, determined by premise's priority
      */
-    public static float matchTermutationsMax = 3;
+    public static float matchTermutationsMax = 2;
     public static int QUERY_ANSWERS_PER_MATCH = 1;
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 
@@ -109,7 +106,8 @@ public abstract class Param extends Container implements Level {
      * how much to multiply (shrink) the rank of a potential belief match if it overlaps with the task.
      * used to discourage premise's choice of belief tasks which overlap with the task.
      */
-    public static float PREMISE_MATCH_OVERLAP_MULTIPLIER = 1f; //0.1f;
+    //public static float PREMISE_MATCH_OVERLAP_MULTIPLIER = 1f; //0.1f;
+
     /**
      * if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression
      */
@@ -167,8 +165,6 @@ public abstract class Param extends Container implements Level {
      * how precise unit test results must match expected values to pass
      */
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
-    public static final int TRUTH_DISCRETION = (int) (1f / TRUTH_EPSILON);
-
 
 
     public static final boolean ALLOW_RECURSIVE_IMPLICATIONS = false;

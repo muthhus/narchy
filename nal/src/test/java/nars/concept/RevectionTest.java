@@ -3,7 +3,9 @@ package nars.concept;
 import nars.NAR;
 import nars.Param;
 import nars.task.Task;
+import nars.truth.Truth;
 import nars.util.analyze.BeliefAnalysis;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -62,34 +64,37 @@ public class RevectionTest {
 
     @Test
     public void testTemporalProjectionConfidenceAccumulation2_1() {
-        testConfidenceAccumulation(2, 0.1f);
+        testConfidenceAccumulation(2, 1f, 0.1f);
     }
+
     @Test
     public void testTemporalProjectionConfidenceAccumulation2_5() {
-        testConfidenceAccumulation(2, 0.5f);
+        testConfidenceAccumulation(2, 1f, 0.5f);
     }
     @Test
     public void testTemporalProjectionConfidenceAccumulation2_9() {
-        testConfidenceAccumulation(2, 0.9f);
+
+        testConfidenceAccumulation(2, 1f, 0.9f);
+        testConfidenceAccumulation(2, 0f, 0.9f);
     }
 
     @Test
     public void testTemporalProjectionConfidenceAccumulation3_1() {
-        testConfidenceAccumulation(3, 0.1f);
+        testConfidenceAccumulation(3, 1f, 0.1f);
     }
 
     @Test
     public void testTemporalProjectionConfidenceAccumulation3_5() {
-        testConfidenceAccumulation(3, 0.5f);
+        testConfidenceAccumulation(3, 1f, 0.5f);
     }
 
     @Test
     public void testTemporalProjectionConfidenceAccumulation3_9() {
-        testConfidenceAccumulation(3, 0.9f);
+        testConfidenceAccumulation(3, 1f, 0.9f);
     }
 
 
-    public void testConfidenceAccumulation(int repeats, float inConf) {
+    public void testConfidenceAccumulation(int repeats, float freq, float inConf) {
         int maxBeliefs = repeats*4;
         NAR n = newNAR(maxBeliefs);
 
@@ -101,14 +106,16 @@ public class RevectionTest {
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
         for (int i = 0; i < repeats; i++) {
-            b.believe(0.5f, 1.0f, inConf, at);
+            b.believe(0.5f, freq, inConf, at);
         }
 
         b.run(1);
         b.print();
         assertEquals(repeats, b.size());
 
-        assertEquals(outConf, b.beliefs().truth(at).conf(), 0.01f);
+        @Nullable Truth result = b.beliefs().truth(at);
+        assertEquals(freq, result.freq(), Param.TRUTH_EPSILON);
+        assertEquals(outConf, result.conf(), Param.TRUTH_EPSILON);
     }
 
 

@@ -39,7 +39,7 @@ public abstract class AbstractNAR extends NAR {
     public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, index, rng, self);
 
-        durMin.setValue(Param.DERIVATION_DURABILITY_THRESHOLD);
+        durMin.setValue(BUDGET_EPSILON * 2f);
 
         taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
 

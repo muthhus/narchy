@@ -323,9 +323,9 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
             float r = rank(x, when, now);
 
-            if (against != null && Stamp.overlapping(x.evidence(), against.evidence())) {
-                r *= Param.PREMISE_MATCH_OVERLAP_MULTIPLIER;
-            }
+//            if (against != null && Stamp.overlapping(x.evidence(), against.evidence())) {
+//                r *= Param.PREMISE_MATCH_OVERLAP_MULTIPLIER;
+//            }
 
             if (r > bestRank) {
                 best = x;
