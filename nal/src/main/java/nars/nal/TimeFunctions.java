@@ -243,6 +243,7 @@ public interface TimeFunctions {
 
             long occ;
 
+            int edtDecomposed = dtDecomposed != DTERNAL ? dtDecomposed : 0; //effective dt decomposed
 
             if (decomposedTerm.size() != 2) {
                 //probably a (&&+0, ...)
@@ -254,7 +255,6 @@ public interface TimeFunctions {
                 Term d0 = p.resolveNormalized(decomposedTerm.term(0));
                 boolean derivedIsDecomposedZero = Terms.equalOrNegationOf(d0, derived);
 
-                int edtDecomposed = dtDecomposed != DTERNAL ? dtDecomposed : 0; //effective dt decomposed
 
                 if (Terms.equalOrNegationOf(otherTerm, decomposedTerm)) {
                     //beginning, assume its relative to the occurrenc
@@ -298,7 +298,7 @@ public interface TimeFunctions {
                 if (Terms.equalOrNegationOf(d0, derived)) {
                     shift = 0; //beginning
                 } else if (Terms.equalOrNegationOf(d1, derived)) {
-                    shift = dtDecomposed; //
+                    shift = edtDecomposed; //
                 }
 
                 if (shift == ETERNAL) {

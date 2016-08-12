@@ -49,6 +49,7 @@ public class RevisionTask extends AnswerTask  {
 
     @Override
     public void unlink() {
+        super.unlink();
         concept = null;
     }
 

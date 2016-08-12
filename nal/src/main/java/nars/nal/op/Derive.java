@@ -159,8 +159,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                     m, this, occReturn, confScale
             );
 
-            if (Param.DEBUG && occReturn[0] == DTERNAL) {
-                //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
+            if (Param.DEBUG && occReturn[0]!=ETERNAL && Math.abs(occReturn[0] - DTERNAL)<1000) {
+                temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
                 throw new RuntimeException("temporalization resulted in suspicious occurrence time");
             }
 

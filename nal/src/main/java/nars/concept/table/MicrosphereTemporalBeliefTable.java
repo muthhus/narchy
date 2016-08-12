@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.UtilityFunctions.and;
 import static nars.truth.TruthFunctions.projection;
@@ -56,8 +57,8 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
     public static float rank(@NotNull Task t, long when, long now) {
-        return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        //return rankTemporalByConfidence(t, when, now, -1);
+        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
+        return rankTemporalByConfidence(t, when, now, -1);
     }
 
     @Nullable
