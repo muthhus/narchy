@@ -1,5 +1,6 @@
 package nars.util.signal;
 
+import nars.term.Term;
 import nars.util.meter.event.FloatGuage;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -29,10 +30,11 @@ public final class Emotion implements Serializable {
     @NotNull
     public final FloatGuage happy;
 
-
-
+    /** sadness rate */
     @NotNull
-    public final FloatGuage motivation;
+    public final FloatGuage sad;
+
+
 
 
     /** count of errors */
@@ -55,11 +57,12 @@ public final class Emotion implements Serializable {
         this.busy = new FloatGuage("busy");
 
         this.happy = new FloatGuage("happy");
+        this.sad = new FloatGuage("sad");
+
 
         this.stress = new FloatGuage("stress");
         this.frustration = new FloatGuage("frustration");
         this.alert = new FloatGuage("alert");
-        this.motivation = new FloatGuage("motivation");
         this.errr = new FloatGuage("error");
 
     }
@@ -68,11 +71,11 @@ public final class Emotion implements Serializable {
     /** new frame started */
     public void frame() {
         happy.clear();
+        sad.clear();
         busy.clear();
         stress.clear();
         frustration.clear();
         alert.clear();
-        motivation.clear();
         errr.clear();
     }
 
@@ -137,10 +140,18 @@ public final class Emotion implements Serializable {
 
     //TODO use Meter subclass that will accept and transform these float parameters
 
-    @Deprecated public void happy(float delta) {
-        happy.accept( delta );
-        motivation.accept( Math.abs(delta) );
+    @Deprecated public void happy(float delta, Term concept) {
+
+        float factor = 1f / concept.complexity(); //adjust by the complexity of the concept's term
+
+        delta *= factor;
+
+        if (delta > 0)
+            happy.accept( delta );
+        else
+            sad.accept(delta);
     }
+
     @Deprecated public void busy(float pri) {
         busy.accept( pri );
     }
@@ -150,7 +161,9 @@ public final class Emotion implements Serializable {
             stress.accept( v );
     }
     @Deprecated public void frustration(float pri) {
+
         frustration.accept( pri );
+
     }
     @Deprecated public void alert(float percentFocusChange) {
         alert.accept( percentFocusChange );
@@ -158,6 +171,11 @@ public final class Emotion implements Serializable {
 
     public void errr() {
         errr.accept(1);
+    }
+
+    public double happysad() {
+
+        return happy.getSum() + sad.getSum();
     }
 
 

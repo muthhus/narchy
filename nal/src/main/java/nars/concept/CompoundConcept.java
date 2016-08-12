@@ -305,18 +305,20 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     protected final void updateSatisfaction(@NotNull NAR nar) {
-        BeliefTable b = beliefs();
-        BeliefTable g = goals();
+        if (hasGoals()) {
+            BeliefTable b = beliefs();
+            BeliefTable g = goals();
 
-        long now = nar.time();
+            long now = nar.time();
 
-        float nextSatisfaction = b.motivation(now) - g.motivation(now);
+            float nextSatisfaction = b.expectation(now) - g.expectation(now);
 
-        float deltaSatisfaction = nextSatisfaction - satisfaction;
+            float deltaSatisfaction = nextSatisfaction - satisfaction;
 
-        this.satisfaction = nextSatisfaction;
+            this.satisfaction = nextSatisfaction;
 
-        nar.emotion.happy(deltaSatisfaction);
+            nar.emotion.happy(deltaSatisfaction, term);
+        }
     }
 
 

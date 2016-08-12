@@ -587,6 +587,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         if (input.isDeleted()) {
             //throw new InvalidTaskException(input, "Deleted");
+            emotion.errr();
             logger.warn("input deleted: {}", input);
             return null;
         }
@@ -597,7 +598,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             input = preprocess(input);
             c = input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
+            emotion.frustration(input.priIfFiniteElseZero());
             emotion.errr();
+
             if (Param.DEBUG)
                 logger.warn("invalid input: {}", e.toString());
             //e.printStackTrace();
@@ -629,12 +632,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             if (Param.DEBUG)
                 logger.warn("process error: {}", e.toString());
 
+            emotion.frustration(input.priIfFiniteElseZero());
+
             input.delete();
 
             return null;
         }
 
-        float cost = input.pri() * conceptActivation; //the concept priority demanded by this task
 
         //decides if TaskProcess was successful in somehow affecting its concept's state
         if (inputted != null && !inputted.isDeleted()) {
@@ -649,7 +653,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
                 activation.run(this, 1f); //values will already be scaled
 
-                emotion.busy(cost);
+                emotion.busy(p);
                 emotion.stress(activation.overflow);
 //                } catch (Exception e) {
 //                    emotion.errr();
@@ -673,7 +677,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             //eventTaskProcess.emitAsync(inputted, concurrency, runWorker);
 
         } else {
-            emotion.frustration(cost);
+            emotion.frustration(input.priIfFiniteElseZero());
         }
 
 

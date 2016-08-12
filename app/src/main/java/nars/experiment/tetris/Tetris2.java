@@ -50,14 +50,14 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = false;
-        Param.CONCURRENCY_DEFAULT = 2;
+        Param.CONCURRENCY_DEFAULT = 3;
     }
 
     public static final int runFrames = 10000;
     public static final int cyclesPerFrame = 8;
-    public static final int tetris_width = 8;
+    public static final int tetris_width = 4;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 4;
+    public static final int TIME_PER_FALL = 2;
     static boolean easy = true;
 
     static int frameDelay;
@@ -243,7 +243,7 @@ public class Tetris2 extends NAREnvironment {
         //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
         float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().expectation(now) : 0.5f;
 
-        float actionMargin = 0.25f;
+        float actionMargin = 0.3f;
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
 
@@ -295,7 +295,7 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
-                32, 2, 2, rng,
+                16, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false)
 
                 , new FrameClock()) {
@@ -309,19 +309,19 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.03f);
+        nar.derivedActivation.setValue(0.03f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
-        nar.truthResolution.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
+        //nar.truthResolution.setValue(0.01f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -391,7 +391,7 @@ public class Tetris2 extends NAREnvironment {
 
                 Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
                 plot3.add("Hapy", () -> nar.emotion.happy.getSum());
-                plot3.add("Motv", () -> nar.emotion.motivation.getSum());
+                plot3.add("Sad", () -> nar.emotion.sad.getSum());
 
 //                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
 //                plot4.add("Errr", ()->nar.emotion.errr.getSum());
@@ -568,7 +568,7 @@ public class Tetris2 extends NAREnvironment {
 
             return
                     env.rewardNormalized.asFloat() +
-                    motivation.asFloat() +  //boost for happiness
+                    happysad.asFloat() +  //boost for happiness
                     (mUsage < targetMemUsage ? 1f : (1f/(1f + mUsage - targetMemUsage))); //maintain % memory utilization TODO cache 'memory()' result
         }
 
@@ -596,7 +596,7 @@ public class Tetris2 extends NAREnvironment {
             this.loop = loop;
             this.env = env;
 
-            motivation = new RangeNormalizedFloat(()->(float)worker.emotion.motivation.getSum());
+            happysad = new RangeNormalizedFloat(()->(float)worker.emotion.happysad());
 
             //nar.log();
             worker.onFrame(nn -> next());
@@ -623,7 +623,7 @@ public class Tetris2 extends NAREnvironment {
 
             sensors.addAll(Lists.newArrayList(
                     new SensorConcept("(motive)", n,
-                            motivation,
+                            happysad,
                             truther
                     ).resolution(sensorResolution),
                     new SensorConcept("(busy)", n,
@@ -716,7 +716,7 @@ public class Tetris2 extends NAREnvironment {
             return ratio;
         }
 
-        final RangeNormalizedFloat motivation;
+        final RangeNormalizedFloat happysad;
 
     }
 
