@@ -23,7 +23,7 @@ import static nars.truth.TruthFunctions.c2w;
  */
 public final class TruthPolation extends InterpolatingMicrosphere {
 
-    public static final float[] ZERO = { 0 };
+    public static final float[] ZEROTIME = { 0.1f }; //a value in (0..1.0) represents a partial time-step offset so that no time-points being compared will be the same as this (either to the left or right), given that the task times are long int
 
     @NotNull final float[][] times;
     @NotNull final float[] freq;
@@ -58,9 +58,9 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         //float ecap = eternal.capacity();
         //float eternalization = ecap / (ecap + tcap));
 
-        float maxDarkFraction = 1f - Param.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
+        float maxDarkFraction = Param.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
 
-        float thresh = Param.TRUTH_EPSILON/2f; //c2w(Global.TRUTH_EPSILON);
+        float thresh = Param.TRUTH_EPSILON;
 
         return truth(when, tasks,
                 (topEternal == null) ? null : topEternal,
@@ -76,12 +76,20 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         int n = tasks.size();
         assert(n >= 2);
 
-//        float sum = 0;
-//        for (int i = 0; i < n; i++) {
-//            Task t = tasks.get(i);
-//            sum += t.confWeight();
-//            //sum += t.conf();
+//        long minT, maxT;
+//        minT = maxT = tasks.get(0).occurrence();
+//        for (int i = 1; i < n; i++) {
+//            long o = tasks.get(i).occurrence();
+//            if (minT > o) minT = o;
+//            if (maxT < o) maxT = o;
+//
+////            sum += t.confWeight();
+////            //sum += t.conf();
 //        }
+//        //clip the target time point to the range of values, so that the value latches at the last known point
+//        when = Math.min(when, maxT);
+//        when = Math.max(when, minT);
+
 //        System.out.println(tasks + " sum=" + sum);
 
         for (int i = 0; i < n; i++) {
@@ -99,10 +107,10 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             //-when added is shifting relative to the target time, so the queried interpolation time will equal zero below
             //this helps the floating point precision in calculations with numbers close together
 
-            float window = 0.01f;
+            //float window = 0.01f;
 
-            times[i][0] = -when + t.occurrence() + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
-            freq[i] = (t.freq() - 0.5f) * 2f; //convert to -1..+1 range
+            times[i][0] = -when + t.occurrence();// + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
+            freq[i] = t.freq();
 
             float c = Math.min(t.conf(), 1f-Param.TRUTH_EPSILON); //clip maximum confidence
             conf[i] = c2w(c);
@@ -110,22 +118,24 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             //TODO dt
         }
 
-        if (topEternal!=null) {
-            this.setBackground(topEternal.freq(), topEternal.confWeight());
-
-        } else {
-            this.setBackground(Float.NaN, 0);
-        }
+//        if (topEternal!=null) {
+//            this.setBackground(topEternal.freq(), topEternal.confWeight());
+//
+//        } else {
+//            this.setBackground(0.5f, 0);
+//        }
 
         float exp = Param.TEMPORAL_MICROSPHERE_EXPONENT;
         float[] v = this.value(
-                ZERO, times,
+                ZEROTIME,
+                times,
                 freq, conf,
                 exp,
                 maxDarkFraction, darkThresold,
                 n);
-
-        return $.t((v[0]/2f+0.5f), w2c(v[1]));
+        if (v!=null)
+            return $.t(v[0], w2c(v[1]));
+        return null;
     }
 
 

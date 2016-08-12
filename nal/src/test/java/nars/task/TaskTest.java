@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.Param;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
+import nars.nar.Terminal;
 import nars.truth.DefaultTruth;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -39,12 +40,13 @@ public class TaskTest {
      * representation (which is perfect and lossless hash if truth epsilon
      * is sufficiently large) */
     @Test public void testTaskOrderByTruthViaHash() {
+        Terminal n = new Terminal();
         TreeSet<Task> t = new TreeSet<>();
         int count = 0;
         for (float f = 0; f < 1.0f; f += 0.3f)
             for (float c = 0.01f; c < 1.0f; c += 0.3f) {
                 t.add(
-                    $.task("a:b", '.',f, c)
+                    n.inputTask($.task("a:b", '.',f, c))
                 );
                 count++;
             }

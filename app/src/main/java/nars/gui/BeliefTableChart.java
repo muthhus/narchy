@@ -5,17 +5,25 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
+import spacegraph.Facial;
+import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.obj.GridSurface;
 import spacegraph.render.Draw;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 
 import static java.lang.Math.PI;
+import static java.util.stream.Collectors.toList;
 import static nars.nal.Tense.ETERNAL;
+import static spacegraph.obj.GridSurface.VERTICAL;
 
 
 public class BeliefTableChart extends Surface {
@@ -76,6 +84,20 @@ public class BeliefTableChart extends Surface {
 
         redraw.set(true);
 
+    }
+
+    public static void newBeliefChart(NAR nar, Collection<? extends Termed> terms, long window) {
+
+        long[] btRange = new long[2];
+        nar.onFrame(nn -> {
+            long now = nn.time();
+            btRange[0] = now - window;
+            btRange[1] = now + window;
+        });
+        List<Surface> actionTables = terms.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
+
+
+        new SpaceGraph().add(new Facial(new GridSurface(VERTICAL, actionTables)).maximize()).show(800,600);
     }
 
     public void update() {

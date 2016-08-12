@@ -75,12 +75,21 @@ public class RevectionTest {
     public void testTemporalProjectionConfidenceAccumulation2_9() {
 
         testConfidenceAccumulation(2, 1f, 0.9f);
+        testConfidenceAccumulation(2, 0.5f, 0.9f);
         testConfidenceAccumulation(2, 0f, 0.9f);
     }
 
     @Test
-    public void testTemporalProjectionConfidenceAccumulation3_1() {
+    public void testTemporalProjectionConfidenceAccumulation3_1_pos() {
         testConfidenceAccumulation(3, 1f, 0.1f);
+    }
+    @Test
+    public void testTemporalProjectionConfidenceAccumulation3_1_neg() {
+        testConfidenceAccumulation(3, 0f, 0.1f);
+    }
+    @Test
+    public void testTemporalProjectionConfidenceAccumulation3_1_mid() {
+        testConfidenceAccumulation(3, 0.5f, 0.1f);
     }
 
     @Test

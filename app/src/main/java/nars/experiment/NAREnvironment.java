@@ -200,8 +200,8 @@ abstract public class NAREnvironment {
 
     public NARLoop run(final int cycles, int frameDelayMS, final int timeDilation) {
 
-        ticksBeforeDecide = timeDilation;
-        ticksBeforeObserve = 0;
+        ticksBeforeDecide = 0;
+        ticksBeforeObserve = timeDilation;
 
         init(nar);
 

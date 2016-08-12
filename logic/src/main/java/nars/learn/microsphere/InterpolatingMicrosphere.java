@@ -47,9 +47,9 @@ public class InterpolatingMicrosphere {
 //    private float maxDarkFraction;
 //    /** Lowest non-zero illumination. */
 //    private float darkThreshold;
-    /** Background value. */
-    private float background;
-    private float backgroundConfidence;
+//    /** Background value. */
+//    private float background;
+//    private float backgroundConfidence;
 
     /**
      * Create an unitialiazed sphere.
@@ -82,17 +82,17 @@ public class InterpolatingMicrosphere {
 
         this.dimension = dimension;
         this.size = size;
-        this.backgroundConfidence = 1.0f;
+        //this.backgroundConfidence = 1.0f;
         microsphere =  new FasterList(size);
         microsphereData = new FasterList(size);
 
 
     }
 
-    public void setBackground(float background, float confidence) {
-        this.background = background;
-        this.backgroundConfidence = confidence;
-    }
+//    public void setBackground(float background, float confidence) {
+//        this.background = background;
+//        this.backgroundConfidence = confidence;
+//    }
 
     /**
      * Create a sphere from randomly sampled vectors.
@@ -203,7 +203,7 @@ public class InterpolatingMicrosphere {
      * @return the estimated value at the given {@code point}.
      * @throws NotPositiveException if {@code exponent < 0}.
      */
-    @NotNull
+    @Nullable
     public float[]  value(@NotNull float[] targetPoint,
                            float[][] samplePoints,
                            float[] sampleValues,
@@ -340,7 +340,7 @@ public class InterpolatingMicrosphere {
                             float weight,
                             float conf, float darkThreshold) {
 
-        float visibleThreshold = darkThreshold * backgroundConfidence;
+        float visibleThreshold = 0; // darkThreshold * backgroundConfidence;
 
 
         for (int i = 0; i < size; i++) {
@@ -413,7 +413,7 @@ public class InterpolatingMicrosphere {
      * @return the value estimated from the current illumination of the
      * microsphere.
      */
-    @NotNull
+    @Nullable
     private float[] interpolate(float maxDarkFraction) {
 
         int size = this.size;
@@ -431,13 +431,13 @@ public class InterpolatingMicrosphere {
             float ill = fd[0]; /* weighted illumination */
             float conf = fd[2];
 
-            totalWeight += (ill);
 
             //float conf = fd[2];
             if (ill != 0d) {
 
                 value += fd[1]; /* sample */
                 totalConf += (conf);
+                totalWeight += (ill);
 
 
                 //maxConf = Math.max(conf*iV, maxConf);
@@ -455,9 +455,10 @@ public class InterpolatingMicrosphere {
             throw new RuntimeException("no illumination accepted or background value not used or invalid");
         }
 
-        float v = darkFraction <= maxDarkFraction ?
-            value / totalWeight :
-            background;
+        if (totalWeight < maxDarkFraction)
+            return null;
+
+        float v = value / totalWeight;
 
         float c = totalConf;
         //float c = totalConfDen!=0 ? totalConfNum / totalConfDen : this.backgroundConfidence;

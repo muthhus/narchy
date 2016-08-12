@@ -15,6 +15,7 @@ import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -30,6 +31,7 @@ import spacegraph.obj.ControlSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.MatrixView;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -53,7 +55,7 @@ public class Arkancide extends NAREnvironment {
     final int visH = 16;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 256;
+    private int visionSyncPeriod = 8;
     float noiseLevel = 0;
 
     float paddleSpeed = 70f;
@@ -207,11 +209,11 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.5f);
-        nar.derivedActivation.setValue(0.5f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.8f);
+        nar.beliefConfidence(0.25f);
         nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;

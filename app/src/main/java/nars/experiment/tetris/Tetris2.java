@@ -7,8 +7,9 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
 import nars.experiment.NAREnvironment;
+import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
-import nars.gui.BagChart;
+import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nal.Tense;
 import nars.nar.Default;
@@ -26,6 +27,8 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import spacegraph.Facial;
+import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.ConsoleSurface;
 import spacegraph.obj.GridSurface;
@@ -36,7 +39,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static nars.$.t;
-import static nars.experiment.arkanoid.Arkancide.newBeliefChart;
+import static nars.gui.BeliefTableChart.newBeliefChart;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.VERTICAL;
@@ -56,9 +59,9 @@ public class Tetris2 extends NAREnvironment {
 
     public static final int runFrames = 10000;
     public static final int cyclesPerFrame = 8;
-    public static final int tetris_width = 4;
+    public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 2;
+    public static final int TIME_PER_FALL = 4;
     static boolean easy = true;
 
     static int frameDelay;
@@ -66,7 +69,7 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 0; //16 * TIME_DILATION;
+    private final int visionSyncPeriod = 6; //16 * TIME_DILATION;
 
     public class View {
 
@@ -310,18 +313,18 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.03f);
+        nar.derivedActivation.setValue(0.03f);
 
 
-        nar.beliefConfidence(0.8f);
+        nar.beliefConfidence(0.5f);
         nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
         //nar.truthResolution.setValue(0.01f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -378,7 +381,7 @@ public class Tetris2 extends NAREnvironment {
 //                );
 
 
-                BagChart.show((Default) nar, 1024);
+                //BagChart.show((Default) nar, 1024);
 
                 //STMView.show(stm, 800, 600);
 
@@ -451,7 +454,9 @@ public class Tetris2 extends NAREnvironment {
 //            g.glColor3f(r,0,0);
 
                     SensorConcept s = sensors.get(y * tetris_width + x);
-                    float b = s.hasBeliefs() ? s.beliefs().expectation(now) : 0;
+                    float b = s.hasBeliefs() ?
+                            s.beliefs().freq(now) : 0;
+                            //s.beliefs().expectation(now) : 0;
                     Truth dt = s.hasGoals() ? s.goals().truth(now) : null;
                     float dr, dg;
                     if (dt == null) {
@@ -475,7 +480,14 @@ public class Tetris2 extends NAREnvironment {
 
                 newControlWindow(view);
 
-                newBeliefChart(this, 200);
+                BeliefTableChart.newBeliefChart(nar, Lists.newArrayList(
+                        sensors.get(0),
+                        sensors.get(1),
+                        sensors.get(2),
+                        sensors.get(3),
+                        sensors.get(4),
+                        sensors.get(5)
+                ), 200);
 
                 //NARSpace.newConceptWindow((Default) nar, 128, 8);
             }
@@ -535,7 +547,7 @@ public class Tetris2 extends NAREnvironment {
         NARLoop loop = t.run(runFrames, frameDelay, TIME_DILATION);
 
         NARController meta = new NARController(nar, loop, t);
-        newBeliefChart(meta, 500);
+        Arkancide.newBeliefChart(meta, 500);
 
         loop.join();
 
