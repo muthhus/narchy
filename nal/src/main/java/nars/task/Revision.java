@@ -5,6 +5,7 @@ import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.Param;
 import nars.budget.Budget;
+import nars.concept.Concept;
 import nars.nal.Stamp;
 import nars.nal.UtilityFunctions;
 import nars.term.Compound;
@@ -58,7 +59,7 @@ public class Revision {
     }
 
 
-    public static Task merge(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth) {
+    public static Task merge(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, Concept concept) {
 
         if (a.isBeliefOrGoal() && b.isBeliefOrGoal() && Term.equalAtemporally(a.term(), b.term())) {
             float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question
@@ -90,7 +91,8 @@ public class Revision {
 
             RevisionTask t = new RevisionTask(c.getTwo(),
                     a, b, now, when, aMix,
-                    newTruth.withConf(newConf)
+                    newTruth.withConf(newConf),
+                    concept
             );
 
             t.budget(a, b, aMix);

@@ -142,12 +142,12 @@ public interface Concept extends Termed {
 //    }
 
 
-    default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull NAR nar) {
+    default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull Concept concept, @NotNull NAR nar) {
         long now = nar.time();
         Truth truth = ((BeliefTable) tableFor(y.punc())).truth(when, now);
         if (truth == null)
             return null;
-        return Revision.merge(x, y, when, now, truth );
+        return Revision.merge(x, y, when, now, truth, concept);
     }
 
     /**

@@ -8,6 +8,7 @@ import nars.NARLoop;
 import nars.Param;
 import nars.experiment.NAREnvironment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.gui.BagChart;
 import nars.index.CaffeineIndex;
 import nars.nal.Tense;
 import nars.nar.Default;
@@ -309,8 +310,8 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.03f);
-        nar.derivedActivation.setValue(0.03f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
         nar.beliefConfidence(0.8f);
@@ -377,7 +378,8 @@ public class Tetris2 extends NAREnvironment {
 //                );
 
 
-                //BagChart.show((Default) nar, 1024);
+                BagChart.show((Default) nar, 1024);
+
                 //STMView.show(stm, 800, 600);
 
                 int plotHistory = 256;

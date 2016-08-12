@@ -2,6 +2,7 @@ package nars.concept.table;
 
 import nars.NAR;
 import nars.Param;
+import nars.concept.Concept;
 import nars.nal.Stamp;
 import nars.task.Revision;
 import nars.task.Task;
@@ -36,10 +37,14 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    public void capacity(int newCapacity, long now, @NotNull List<Task> displaced) {
+    public void capacity(int newCapacity, long now, @NotNull List<Task> displ) {
         this.capacity = newCapacity;
+
+        removeAlreadyDeleted(displ);
+        //compress(displ, now);
+
         while (this.size() > newCapacity) {
-            removeWeakest(displaced, now);
+            remove(weakest(now), displ);
         }
 
     }
@@ -56,7 +61,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
     @Nullable
     @Override
-    public Task add(@NotNull Task input, EternalTable eternal, @NotNull List<Task> displ, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, EternalTable eternal, @NotNull List<Task> displ, Concept concept, @NotNull NAR nar) {
 
 
         int cap = capacity();
@@ -66,7 +71,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
 
         //the result of compression is processed separately
-        Task next = compress(input, nar.time(), eternal, displ);
+        Task next = compress(input, nar.time(), eternal, displ, concept);
         if (next == null) {
             //not compressible with respect to this input, so reject the input
             return null;
@@ -162,15 +167,6 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    protected final void removeWeakest(@NotNull List<Task> displ, long now) {
-
-        int sizeBefore = size();
-        compress(displ, now);
-        if (size() < sizeBefore)
-            return; //compression successful
-
-        remove(weakest(now), displ);
-    }
 
     @Nullable
     public Task weakest(long now, @Nullable Task toMergeWith, float minRank) {
@@ -206,14 +202,14 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
     @Nullable
     protected Task compress(@NotNull List<Task> displ, long now) {
-        return compress(null, now, null, displ);
+        return compress(null, now, null, displ, null);
     }
 
     /**
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
     @Nullable
-    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull List<Task> displ) {
+    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull List<Task> displ, @Nullable Concept concept) {
 
         int cap = capacity();
         if (size() < cap || removeAlreadyDeleted(displ) < cap) {
@@ -236,7 +232,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             //TaskTable.removeTask(b, "Revection Revision", displ);
             remove(b, displ);
 
-            return merge(a, b, now, eternal);
+            return merge(a, b, now, concept, eternal);
         } else {
             return input;
         }
@@ -247,7 +243,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
      * t is the target time of the new merged task
      */
     @Nullable
-    private Task merge(@NotNull Task a, @NotNull Task b, long now, @Nullable EternalTable eternal) {
+    private Task merge(@NotNull Task a, @NotNull Task b, long now, Concept concept, @Nullable EternalTable eternal) {
         double ac = a.conf();
         double bc = b.conf();
         long mid = (long)Math.round(Util.lerp((double)a.occurrence(), (double)b.occurrence(), ac/(ac+bc)));
@@ -297,7 +293,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             truth = truth.confMult(confScale);
 
         if (truth != null)
-            return Revision.merge(a, b, mid, now, truth);
+            return Revision.merge(a, b, mid, now, truth, concept);
 
         return null;
     }
@@ -344,11 +340,12 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
 
         //make a copy so that truthpolation can freely operate asynchronously
-        int s;
+        int s = size();
+        if (s == 0) return null;
+
         Task[] copy;
         synchronized (this) {
-            s = size();
-            if (s == 0) return null;
+
 
             copy = toArray(new Task[s]);
         }

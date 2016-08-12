@@ -2,6 +2,7 @@ package nars.concept.table;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
+import nars.concept.CompoundConcept;
 import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
 
     @Nullable
     @Override
-    public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
         return input == current ? input : null;
     }
 

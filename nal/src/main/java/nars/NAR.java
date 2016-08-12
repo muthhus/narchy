@@ -782,8 +782,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private void awaitQuiescence() {
         if (!runWorker.isQuiescent()) {
-            while (!runWorker.awaitQuiescence(500, TimeUnit.MILLISECONDS)) {
+            while (!runWorker.awaitQuiescence(25, TimeUnit.MILLISECONDS)) {
                 logger.warn("runWorker lag: {}", runWorker);
+                Thread.yield();
             }
         }
 
@@ -793,10 +794,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         RingBuffer<TaskEvent> ring = async.getRingBuffer();
         while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
             //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
-            long now = async.getCursor();
+
+            //long now = async.getCursor();
             //logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
             //Util.pause(1);
-            //Thread.yield();
+            Thread.yield();
         }
 //        taskWorker.getRingBuffer().
 //        if (!taskWorker.isQuiescent()) {

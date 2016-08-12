@@ -2,6 +2,8 @@ package nars.concept.table;
 
 import nars.NAR;
 import nars.Param;
+import nars.concept.CompoundConcept;
+import nars.concept.Concept;
 import nars.task.AnswerTask;
 import nars.task.Revision;
 import nars.task.RevisionTask;
@@ -103,7 +105,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
     }
 
     @Nullable
-    public /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull NAR nar) {
+    public /*Revision*/Task tryRevision(@NotNull Task newBelief, Concept concept, @NotNull NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -173,7 +175,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
                 newBelief, oldBelief,
                 conclusion,
                 nar.time(),
-                ETERNAL
+                ETERNAL,
+                concept
             ).budget(oldBelief, newBelief)
              .log("Insertion Revision");
     }
@@ -218,7 +221,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 //    }
 
     @Nullable
-    public Task add(@NotNull Task input, @NotNull List<Task> displaced, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {
@@ -239,7 +242,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
             Task revised;
             if (!(input instanceof AnswerTask)) {
-                revised = tryRevision(input, nar);
+                revised = tryRevision(input, concept, nar);
                 if (revised != null) {
 
                     if (Param.DEBUG) {

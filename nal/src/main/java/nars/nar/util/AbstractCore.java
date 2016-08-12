@@ -71,7 +71,7 @@ public abstract class AbstractCore {
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
 
-    private final boolean queueConcept(@NotNull BLink<Concept> b) {
+    private final boolean fire(@NotNull BLink<Concept> b) {
         @Nullable Concept c = b.get();
         if (c!=null) {
             nar.runLater(new FireConcept(c, nar,
@@ -116,7 +116,7 @@ public abstract class AbstractCore {
 
             concepts.commit();
 
-            concepts.sample(cpf, this::queueConcept);
+            concepts.sample(cpf, this::fire);
 
         }
 
@@ -136,7 +136,7 @@ public abstract class AbstractCore {
         private final short termlinks;
 
         public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks) {
-            super($.newHashSet(4 * tasklinks * termlinks));
+            super($.newHashSet(2 * tasklinks * termlinks));
             this.concept = c;
             this.nar = nar;
             this.tasklinks = tasklinks;

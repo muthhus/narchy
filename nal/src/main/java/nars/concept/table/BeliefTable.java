@@ -2,6 +2,7 @@ package nars.concept.table;
 
 import nars.NAR;
 import nars.budget.Budgeted;
+import nars.concept.CompoundConcept;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.Truth;
@@ -59,7 +60,7 @@ public interface BeliefTable extends TaskTable {
 
         @NotNull
         @Override
-        public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, @NotNull NAR nar) {
+        public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
             return input;
         }
 
@@ -187,7 +188,7 @@ public interface BeliefTable extends TaskTable {
 //    }
 
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
-    Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, @NotNull NAR nar);
+    Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar);
 
 
 //    @Nullable

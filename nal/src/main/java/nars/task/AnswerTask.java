@@ -77,4 +77,10 @@ public class AnswerTask extends MutableTask {
         unlink();
         return true;
     }
+
+    @Override
+    public boolean delete() {
+        unlink();
+        return super.delete();
+    }
 }

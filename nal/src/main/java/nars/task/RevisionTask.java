@@ -1,12 +1,15 @@
 package nars.task;
 
+import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
+import nars.index.TermIndex;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The result of belief/goal revision. Also responsible for balancing
@@ -20,21 +23,36 @@ import org.jetbrains.annotations.NotNull;
 public class RevisionTask extends AnswerTask  {
 
 
-    public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long occTime) {
+    private Concept concept;
+
+    public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long occTime, Concept target) {
         super(term, newBelief, oldBelief, conclusion, creationTime, occTime, 0.5f);
+        this.concept = target;
 
     }
 
-    public RevisionTask(@NotNull Compound c, @NotNull Task a, @NotNull Task b, long now, long newOcc, float aMix, Truth newTruth) {
+    public RevisionTask(@NotNull Compound c, @NotNull Task a, @NotNull Task b, long now, long newOcc, float aMix, Truth newTruth, Concept target) {
         super(c, a, b, newTruth, now, newOcc, aMix);
 
         if (!a.isBeliefOrGoal() || !b.isBeliefOrGoal() )
             throw new UnsupportedOperationException("invalid punctuation");
+
+        this.concept = target;
     }
 
+    @Override
+    public @NotNull Concept normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptException, NAR.InvalidTaskException {
+        if (concept==null)
+            return super.normalize(nar); //HACK
+        return concept;
+    }
 
+    @Override
+    public void unlink() {
+        concept = null;
+    }
 
-//    @Override
+    //    @Override
 //    public boolean isDeleted() {
 //        if (super.isDeleted()) {
 //            return true;

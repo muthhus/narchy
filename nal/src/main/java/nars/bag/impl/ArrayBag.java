@@ -194,12 +194,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             throw new RuntimeException("budget self merge");
         }
 
-        float pBefore = existing.priIfFiniteElseZero();
+        float pBefore = existing.priIfFiniteElseZero() * existing.dur();
         float o = mergeFunction.merge(existing, b, scale);
         if (overflow != null)
             overflow.add(o);
 
-        this.pending += existing.priIfFiniteElseZero() - pBefore;
+        this.pending += existing.priIfFiniteElseZero() * existing.dur() - pBefore;
 
     }
 
@@ -326,10 +326,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     private final void putNewAndDeleteDisplaced(@NotNull V key, @Nullable BLink<V> value) {
         BLink<V> displaced = putNew(key, value);
 
-        float dp = value.pri();
+        float dp = value.pri() * value.dur();
 
         if (displaced != null) {
-            dp -= displaced.priIfFiniteElseZero();
+            dp -= displaced.priIfFiniteElseZero() * displaced.dur();
             displaced.delete();
         }
 

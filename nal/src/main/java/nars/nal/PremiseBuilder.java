@@ -165,7 +165,7 @@ public enum PremiseBuilder {
         //project the belief to the question's time
         if (taskOcc != ETERNAL) {
             @Nullable Concept cbel = nar.concept(solution);
-            solution = cbel != null ? cbel.merge(taskLink, solution, taskOcc, nar) : null;
+            solution = cbel != null ? cbel.merge(taskLink, solution, taskOcc, beliefConcept, nar) : null;
         }
 
         if (solution != null) { //may have become null as a result of projection

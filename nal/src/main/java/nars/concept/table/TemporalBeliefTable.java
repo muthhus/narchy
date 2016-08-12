@@ -1,6 +1,7 @@
 package nars.concept.table;
 
 import nars.NAR;
+import nars.concept.Concept;
 import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +19,7 @@ public interface TemporalBeliefTable extends TaskTable {
 
     @Nullable Truth truth(long when, long now, EternalTable eternal);
 
-    Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, @NotNull NAR nar);
+    Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, Concept concept, @NotNull NAR nar);
 
     boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> displ);
 

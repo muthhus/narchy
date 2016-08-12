@@ -10,15 +10,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 
 public enum TermLinkBuilder {
     ;
 
-    @NotNull public static Set<Term> components(@NotNull Compound host) {
+    @NotNull public static TreeSet<Term> components(@NotNull Compound host) {
 
-        Set<Term> components = new HashSet<>(//new LinkedHashSet<>(
-            host.complexity() /* estimate */
+        TreeSet<Term> components = new TreeSet<>(//new LinkedHashSet<>(
+            //host.complexity() /* estimate */
         );
 
         for (int i = 0, ii = host.size(); i < ii; i++) {
@@ -54,7 +55,7 @@ public enum TermLinkBuilder {
         } else {
 
             if (t instanceof Compound)
-                t = $.terms.normalize($.unneg(t),false);
+                t = $.terms.normalize($.unneg(t),true);
 
             if (target.add(t)) { //do not descend on repeats
 

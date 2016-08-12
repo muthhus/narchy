@@ -3,6 +3,7 @@ package nars.concept.table;
 import com.google.common.collect.Iterators;
 import nars.$;
 import nars.NAR;
+import nars.concept.CompoundConcept;
 import nars.task.EternalizedTask;
 import nars.task.Task;
 import nars.truth.Truth;
@@ -157,7 +158,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     @Nullable
-    @Override public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, @NotNull NAR nar) {
+    @Override public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
 
 
         //Filter duplicates; return null if duplicate
@@ -165,14 +166,14 @@ public class DefaultBeliefTable implements BeliefTable {
         Task result;
         if (input.isEternal()) {
 
-            result = eternal.add(input, displaced, nar);
+            result = eternal.add(input, displaced, concept, nar);
 
         } else {
-            synchronized (temporal) {
+            //synchronized (temporal) {
 
-                result = temporal.add(input, eternal, displaced, nar);
+                result = temporal.add(input, eternal, displaced, concept, nar);
 
-            }
+            //}
         }
 
         if (result!=null) {
