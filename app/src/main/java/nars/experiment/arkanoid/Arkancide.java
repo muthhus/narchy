@@ -5,8 +5,8 @@ import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
+import nars.data.AutoClassifier;
 import nars.experiment.NAREnvironment;
-import nars.experiment.tetris.Tetris2;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -15,7 +15,6 @@ import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -31,12 +30,12 @@ import spacegraph.obj.ControlSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.MatrixView;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.t;
+import static nars.experiment.tetris.Tetris2.arrayRenderer;
 import static nars.vision.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
@@ -47,16 +46,18 @@ public class Arkancide extends NAREnvironment {
     public static final int CONCEPTS_FIRE_PER_CYCLE = 32;
     final Arkanoid noid;
     private final SwingCamera cam;
-
+    static {
+        Param.CONCURRENCY_DEFAULT = 1;
+    }
 
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 24;
-    final int visH = 16;
+    final int visW = 64;
+    final int visH = 24;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 32;
+    private int visionSyncPeriod = 7;
     float noiseLevel = 0;
 
     float paddleSpeed = 70f;
@@ -65,6 +66,7 @@ public class Arkancide extends NAREnvironment {
     public class View {
         //public Surface camView;
         public List attention = $.newArrayList();
+        public MatrixView autoenc;
     }
     private final View view = new View();
 
@@ -98,6 +100,11 @@ public class Arkancide extends NAREnvironment {
             }
         }
 
+
+        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
+                visW/2, 16 /* states */,
+                0.05f);
+        view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 
         MatrixView camView = new MatrixView(visW, visH, (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
@@ -147,19 +154,24 @@ public class Arkancide extends NAREnvironment {
         //view.attention.add(nar.inputActivation);
         //view.attention.add(nar.derivedActivation);
 
-        newBeliefChart(this, 500);
+        newBeliefChartWindow(this, 500);
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
                 //BagChart.newBagChart((Default)nar, 512),
-                camView
+                camView, view
         );
 
         //newConceptWindow((Default) n, 64, 4);
 
     }
 
-    public static void newBeliefChart(NAREnvironment narenv, long window) {
+    public static void newBeliefChartWindow(NAREnvironment narenv, long window) {
+        GridSurface chart = newBeliefChart(narenv, window);
+        new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
+    }
+
+    public static GridSurface newBeliefChart(NAREnvironment narenv, long window) {
         NAR nar = narenv.nar;
         long[] btRange = new long[2];
         nar.onFrame(nn -> {
@@ -172,8 +184,7 @@ public class Arkancide extends NAREnvironment {
         actionTables.add(new BeliefTableChart(nar, narenv.joy, btRange));
 
 
-
-        new SpaceGraph().add(new Facial(new GridSurface(VERTICAL, actionTables)).maximize()).show(800,600);
+        return new GridSurface(VERTICAL, actionTables);
     }
 
     private float noise(float v) {
@@ -197,9 +208,8 @@ public class Arkancide extends NAREnvironment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Param.CONCURRENCY_DEFAULT = 2;
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(1024,
+        Default nar = new Default(3072,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 7 * 1000000, false)
                 , new FrameClock()) {
@@ -210,18 +220,19 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.1f);
+        nar.inputActivation.setValue(0.01f);
+        nar.derivedActivation.setValue(0.01f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.6f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.4f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.04f);
+        nar.confMin.setValue(0.02f);
+        nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)

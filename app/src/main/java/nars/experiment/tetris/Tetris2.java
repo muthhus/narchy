@@ -24,6 +24,8 @@ import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.math.FloatSupplier;
+import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -38,6 +40,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static nars.$.t;
+import static nars.experiment.arkanoid.Arkancide.newBeliefChart;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.VERTICAL;
@@ -56,7 +59,7 @@ public class Tetris2 extends NAREnvironment {
     }
 
     public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 8;
+    public static final int cyclesPerFrame = 16;
     public static final int tetris_width = 8;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 3;
@@ -76,6 +79,7 @@ public class Tetris2 extends NAREnvironment {
         public ConsoleSurface term = new ConsoleSurface(40, 8);
 
         public Surface camView;
+        public Surface autoenc;
         //public Plot2D lstm;
     }
 
@@ -404,12 +408,14 @@ public class Tetris2 extends NAREnvironment {
                 super.init(nar);
 
                 AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                        tetris_width, 8,
+                        tetris_width, 12 /* states */,
                         0.05f);
-                int totalSize = tetris_width*tetris_height;
-                AutoClassifier bc = new AutoClassifier($.the("row4"), nar, sensors,
-                        tetris_width*4, 16,
-                        0.1f);
+                view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
+
+//                int totalSize = tetris_width*tetris_height;
+//                AutoClassifier bc = new AutoClassifier($.the("row4"), nar, sensors,
+//                        tetris_width*4, 16,
+//                        0.1f);
 
 //                newControlWindow(
 //                        new GridSurface(VERTICAL,
@@ -422,24 +428,7 @@ public class Tetris2 extends NAREnvironment {
 
                 //STMView.show(stm, 800, 600);
 
-                int plotHistory = 256;
-                Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
-                plot.add("Rwrd", () -> rewardValue);
-
-                Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
-                plot2.add("Busy", () -> nar.emotion.busy.getSum());
-                plot2.add("Lern", () -> nar.emotion.busy.getSum() - nar.emotion.frustration.getSum());
-                //plot2.add("Strs", ()->nar.emotion.stress.getSum());
-
-                Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
-                plot3.add("Hapy", () -> nar.emotion.happy.getSum());
-                plot3.add("Sad", () -> nar.emotion.sad.getSum());
-
-//                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
-//                plot4.add("Errr", ()->nar.emotion.errr.getSum());
-
-
-                view.plot1 = new GridSurface(VERTICAL, plot, plot2, plot3);
+                view.plot1 = newCPanel(nar, 256, () -> rewardValue);
 
 
 
@@ -471,10 +460,8 @@ public class Tetris2 extends NAREnvironment {
 //
 //                }
 
+
                 nar.onFrame(f -> {
-                    plot.update();
-                    plot2.update();
-                    plot3.update();
                     //view.lstm.update();
                     try {
                         view.term.term.putLinePre(summary());
@@ -493,7 +480,7 @@ public class Tetris2 extends NAREnvironment {
 
                 newControlWindow(view);
 
-                Arkancide.newBeliefChart(this, 200);
+                Arkancide.newBeliefChartWindow(this, 200);
 //                BeliefTableChart.newBeliefChart(nar, Lists.newArrayList(
 //                        sensors.get(0),
 //                        sensors.get(1),
@@ -505,6 +492,7 @@ public class Tetris2 extends NAREnvironment {
 
                 //NARSpace.newConceptWindow((Default) nar, 128, 8);
             }
+
 
             public MatrixView.ViewFunc sensorMatrixView(NAR nar, long whenRelative) {
                 return (x, y, g) -> {
@@ -595,7 +583,11 @@ public class Tetris2 extends NAREnvironment {
         NARLoop loop = t.run(runFrames, frameDelay, TIME_DILATION);
 
         NARController meta = new NARController(nar, loop, t);
-        Arkancide.newBeliefChart(meta, 500);
+
+        newControlWindow(Lists.newArrayList(
+                newCPanel(nar, 256, () -> meta.rewardValue),
+                newBeliefChart(meta, 200)
+        ));
 
         loop.join();
 
@@ -615,11 +607,50 @@ public class Tetris2 extends NAREnvironment {
 //        });
     }
 
+    public static MatrixView.ViewFunc arrayRenderer(float[][] ww) {
+        return (x, y, g) -> {
+            float v = ww[x][y];
+            if (v < 0) {
+                v = -v;
+                g.glColor3f(v/2, 0, v);
+            } else {
+                g.glColor3f(v,v/2,0);
+            }
+        };
+    }
+
+    public static GridSurface newCPanel(NAR nar, int plotHistory, FloatSupplier reward) {
+        Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
+        plot.add("Rwrd", reward);
+
+        Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
+        plot2.add("Busy", () -> nar.emotion.busy.getSum());
+        plot2.add("Lern", () -> nar.emotion.busy.getSum() - nar.emotion.frustration.getSum());
+        //plot2.add("Strs", ()->nar.emotion.stress.getSum());
+
+        Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
+        plot3.add("Hapy", () -> nar.emotion.happy.getSum());
+        plot3.add("Sad", () -> nar.emotion.sad.getSum());
+
+//                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
+//                plot4.add("Errr", ()->nar.emotion.errr.getSum());
+
+        nar.onFrame(f -> {
+            plot.update();
+            plot2.update();
+            plot3.update();
+        });
+
+        return new GridSurface(VERTICAL, plot, plot2, plot3);
+    }
+
     public static class NARController extends NAREnvironment {
 
         private final NARLoop loop;
         private final NAR worker;
         private final NAREnvironment env;
+        private final FloatSupplier learn;
+        public float score;
 
 
         @Override
@@ -631,16 +662,18 @@ public class Tetris2 extends NAREnvironment {
 
 
 
-            return
-                    env.rewardNormalized.asFloat() +
-                    happysad.asFloat() +  //boost for happiness
-                    (mUsage < targetMemUsage ? 1f : (1f/(1f + mUsage - targetMemUsage))); //maintain % memory utilization TODO cache 'memory()' result
+            return this.score = (
+                    //env.rewardNormalized.asFloat() +
+                    happysad.asFloat() +  //boost for motivation change
+                    learn.asFloat() +
+                    1 / (1f + Math.abs(targetMemUsage - mUsage) / (targetMemUsage)) //maintain % memory utilization TODO cache 'memory()' result
+            );
         }
 
 
         public NARController( NAR worker, NARLoop loop, NAREnvironment env) {
 
-            super( new Default(384, 4, 2, 2, new XORShiftRandom(2),
+            super( new Default(384, 4, 3, 2, new XORShiftRandom(2),
                     new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)),5*100000),
                     //new CaffeineIndex(new DefaultConceptBuilder(random)),
                     new FrameClock()) {
@@ -652,8 +685,8 @@ public class Tetris2 extends NAREnvironment {
                            derivedActivation.setValue(0.25f);
                            //ctl.confMin.setValue(0.01f);
                            //ctl.truthResolution.setValue(0.01f);
-                           beliefConfidence(0.9f);
-                           goalConfidence(0.4f);
+                           beliefConfidence(0.5f);
+                           goalConfidence(0.5f);
                        }
                    });
 
@@ -662,6 +695,7 @@ public class Tetris2 extends NAREnvironment {
             this.env = env;
 
             happysad = new RangeNormalizedFloat(()->(float)worker.emotion.happysad());
+            learn = ()->(float)worker.emotion.learning();
 
             //nar.log();
             worker.onFrame(nn -> next());
@@ -696,7 +730,7 @@ public class Tetris2 extends NAREnvironment {
                             truther
                     ).resolution(sensorResolution),
                     new SensorConcept("(learn)", n,
-                    /* new RangeNormalizedFloat(  */ () -> worker.emotion.learning(),
+                            learn,
                             truther
                     ).resolution(sensorResolution),
                     new SensorConcept("(memory)", n,
