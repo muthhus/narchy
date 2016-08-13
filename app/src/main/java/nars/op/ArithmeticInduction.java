@@ -143,10 +143,10 @@ public class ArithmeticInduction implements Consumer<Task> {
 
             //attempt to compress all subterms to a single rule
             if ((/*(o == EQUI || o == IMPL || */(o == CONJ) && ((bdt == DTERNAL) || (bdt == 0)))
-                    /*||
+                    ||
                     (o.isSet())
                     ||
-                    (o.isIntersect())*/) {
+                    (o.isIntersect())) {
 
                 compress(in, (pattern) -> {
 
