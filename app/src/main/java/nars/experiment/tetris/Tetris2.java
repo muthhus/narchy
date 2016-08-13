@@ -6,6 +6,7 @@ import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
+import nars.data.AutoClassifier;
 import nars.experiment.NAREnvironment;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
@@ -54,7 +55,7 @@ public class Tetris2 extends NAREnvironment {
         Param.CONCURRENCY_DEFAULT = 1;
     }
 
-    public static final int runFrames = 100000;
+    public static final int runFrames = 100;
     public static final int cyclesPerFrame = 24;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -402,6 +403,7 @@ public class Tetris2 extends NAREnvironment {
             public void init(NAR nar) {
                 super.init(nar);
 
+                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors, tetris_width, 3, 0.05f);
 
 //                newControlWindow(
 //                        new GridSurface(VERTICAL,

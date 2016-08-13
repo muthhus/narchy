@@ -147,7 +147,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
             controller.reinforce();
 
             //float reward = 0.5f * (controller.happy.get() - controller.sad.get());
-            float sadness = 1f - controller.happy.get();
+            float sadness = 1f - controller.happy.asFloat();
             float alpha = 0.8f;
             int mm = 0;
             for (MotorConcept m : controller.actions) {

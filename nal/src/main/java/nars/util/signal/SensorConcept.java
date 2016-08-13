@@ -27,7 +27,7 @@ import static nars.nal.Tense.ETERNAL;
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
+public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier {
 
     @NotNull
     protected final Sensor sensor;
@@ -174,14 +174,14 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
         return this;
     }
 
-    public final float get() {
-        return current;
-    }
-
     @NotNull
     public <S extends SensorConcept> S punc(char c) {
         sensor.punc(c);
         return (S)this;
     }
 
+    @Override
+    public float asFloat() {
+        return current;
+    }
 }
