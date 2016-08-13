@@ -425,12 +425,11 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         return questionTable.add(q, answerTable, displaced, nar);
     }
 
-    @Override
-    public void linkAny(@NotNull Budgeted b, Concept src, float scale, float minScale, @NotNull NAR nar, @Nullable NAR.Activation conceptOverflow) {
-        linkSubs(scale, src, minScale, conceptOverflow, nar);
-        //linkPeers(b, scale, nar, false);
-    }
 
+    @Override
+    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+        linkSubs(scale, activation.src, minScale, activation, nar);
+    }
 
     /**
      * link to subterms, hierarchical downward
@@ -497,7 +496,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         float tStrength = 1f / n;
         float subScale = scale * tStrength;
 
-        if (src!=this) {
+        if (src!=null && src!=this) {
             //link the src to this
             AbstractConcept.linkSub(this, src, scale, activation, nar);
         } else {

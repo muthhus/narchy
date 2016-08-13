@@ -194,6 +194,7 @@ public abstract class AbstractCore {
 
                     for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
                         count += PremiseBuilder.run(
+                                c,
                                 nar,
                                 termsBuffer,
                                 tasksBuffer.get(i),

@@ -82,7 +82,13 @@ public class Surface {
 
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
-    public boolean onKey(Vector2f hitPoint, char charCode) {
+    public boolean onKey(Vector2f hitPoint, char charCode, boolean pressed) {
+        if (children!=null) {
+            for (Surface c : children) {
+                if (c.onKey(hitPoint, charCode, pressed))
+                    return true;
+            }
+        }
         return false;
     }
 

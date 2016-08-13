@@ -412,6 +412,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return goal(term, tense, freq, confidenceDefault(Symbols.GOAL));
     }
 
+
     @Nullable
     public Task believe(float priority, @NotNull Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         return believe(priority, durabilityDefault(BELIEF), term, time(tense), freq, conf);
@@ -647,9 +648,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             if (p > 0) {
                 //propagate budget
                 //try {
-                Activation activation = new Activation(inputted);
+                Activation activation = new Activation(inputted, c);
 
-                c.link(conceptActivation /* linkActivation */, c,  /* HACK: 'self' */ Param.BUDGET_EPSILON, this, activation);
+                c.link(conceptActivation , null/* linkActivation */, Param.BUDGET_EPSILON, this, activation);
 
                 activation.run(this, 1f); //values will already be scaled
 
@@ -782,7 +783,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private void awaitQuiescence() {
         if (!runWorker.isQuiescent()) {
-            while (!runWorker.awaitQuiescence(100, TimeUnit.MILLISECONDS)) {
+            while (!runWorker.awaitQuiescence(QUIESENCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
                 //logger.warn("runWorker lag: {}", runWorker);
                 Thread.yield();
             }
@@ -1426,13 +1427,21 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public static class Activation {
         public final Budgeted in;
 
+        public Concept src;
         //final ObjectFloatHashMap<BLink<Task>> tasks = new ObjectFloatHashMap<>();
         //public final ObjectFloatHashMap<BLink<Term>> termlinks = new ObjectFloatHashMap<>();
         public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
         public final MutableFloat overflow = new MutableFloat(0);
 
-        public Activation(Budgeted in) {
+        public Activation(Termed in, NAR n) {
+            this((Budgeted)in, n.concept(in.term()));
+        }
+
+        public Activation(Budgeted in, Concept src) {
+
             this.in = in;
+            this.src = src;
+
         }
 
         public void run(@NotNull NAR nar) {

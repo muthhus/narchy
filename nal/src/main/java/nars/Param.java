@@ -69,6 +69,12 @@ public abstract class Param extends Container implements Level {
 
     public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
     public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
+
+
+    /** yielding interval for waiting to finish worker threads */
+    public static final int QUIESENCE_TIMEOUT_MS = 50;
+
+
     /**
      * specify level of concurrency (# of threads per each pool)
      * or -1 to use the common pool

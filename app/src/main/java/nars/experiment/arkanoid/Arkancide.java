@@ -44,6 +44,7 @@ public class Arkancide extends NAREnvironment {
 
     private static final int cyclesPerFrame = 16;
     public static final int runFrames = 100000;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 32;
     final Arkanoid noid;
     private final SwingCamera cam;
 
@@ -55,7 +56,7 @@ public class Arkancide extends NAREnvironment {
     final int visH = 16;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 8;
+    private int visionSyncPeriod = 32;
     float noiseLevel = 0;
 
     float paddleSpeed = 70f;
@@ -199,7 +200,7 @@ public class Arkancide extends NAREnvironment {
         Param.CONCURRENCY_DEFAULT = 2;
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                16, 2, 2, rng,
+                CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 7 * 1000000, false)
                 , new FrameClock()) {
 
@@ -209,18 +210,18 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.1f);
+        nar.derivedActivation.setValue(0.1f);
 
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -254,7 +255,7 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 2);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new ArithmeticInduction(nar);
@@ -265,7 +266,7 @@ public class Arkancide extends NAREnvironment {
         Arkancide t = new Arkancide(nar);
 
 
-        NARLoop loop = t.run(runFrames, 0,1);
+        NARLoop loop = t.run(runFrames, 0,0);
 
         //Tetris2.NARController meta = new Tetris2.NARController(nar, loop, t);
         //newBeliefChart(meta, 500);

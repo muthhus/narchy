@@ -168,8 +168,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term> {
         return this;
     }
 
-    @NotNull
-    public SensorConcept pri(float v) {
+
+    @Deprecated @NotNull public SensorConcept pri(float v) {
         sensor.pri(v);
         return this;
     }

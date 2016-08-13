@@ -1,5 +1,6 @@
 package nars.budget.policy;
 
+import nars.Param;
 import nars.concept.AbstractConcept;
 import nars.concept.CompoundConcept;
 import nars.util.Util;
@@ -14,7 +15,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     public final MutableInteger beliefsMaxEte, goalsMaxEte;
     public final MutableInteger questionsMax;
     @NotNull
-    public final MutableInteger termlinksCapacityMax, termlinksCapacityMin, taskLinksCapacity;
+    public final MutableInteger termLinksCapacityMax, termLinksCapacityMin, taskLinksCapacityMax, taskLinksCapacityMin;
     private final MutableInteger beliefsMaxTemp;
     private final MutableInteger goalsMaxTemp;
 
@@ -33,9 +34,10 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         this.goalsMaxEte = goalsMaxEte;
         this.goalsMaxTemp = goalsMaxEte;
         this.questionsMax = questionsMax;
-        this.termlinksCapacityMin = new MutableInteger(Math.max(1,termlinksCapacity.intValue()/2));
-        this.termlinksCapacityMax = termlinksCapacity;
-        this.taskLinksCapacity = taskLinksCapacity;
+        this.termLinksCapacityMin = new MutableInteger(Math.max(1,termlinksCapacity.intValue()/2));
+        this.termLinksCapacityMax = termlinksCapacity;
+        this.taskLinksCapacityMin = new MutableInteger(Math.max(1,taskLinksCapacity.intValue()/2));
+        this.taskLinksCapacityMax = taskLinksCapacity;
     }
 
 
@@ -60,21 +62,26 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     public int linkCap(@NotNull AbstractConcept c, boolean termOrTask) {
         if (termOrTask) {
 
-            int min = termlinksCapacityMin.intValue();
-            int max = termlinksCapacityMax.intValue();
-
-            int v = c.complexity();
-            float complexityFactor = 1f - 1f / (1 + v); //smaller concepts get more termlinks
-
-            int l = Math.round(Util.lerp(min, max, complexityFactor));
-            if (c instanceof CompoundConcept)
-                l = Math.max(l, ((CompoundConcept)c).templates.size()); //at least enough for its templates
-
-            return l;
+            return lerp(c, this.termLinksCapacityMin, this.termLinksCapacityMax);
 
         } else {
-            return taskLinksCapacity.intValue();
+            return lerp(c, this.taskLinksCapacityMin, this.taskLinksCapacityMax);
         }
+    }
+
+    public int lerp(@NotNull AbstractConcept c, MutableInteger _min, MutableInteger _max) {
+        int min = _min.intValue();
+        int max = _max.intValue();
+
+        float v = c.complexity();
+        float complexityFactor = v / (Param.compoundVolumeMax.intValue()/4f); //HEURISTIC
+        complexityFactor = Math.min(complexityFactor, 1f); //clip at +1
+
+        int l = Math.round(Util.lerp(min, max, complexityFactor));
+        if (c instanceof CompoundConcept)
+            l = Math.max(l, 1+((CompoundConcept)c).templates.size()); //at least enough for its templates
+
+        return l;
     }
 
     @Override

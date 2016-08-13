@@ -330,24 +330,14 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         return lastFrameTime;
     }
 
-    //
-    // KeyListener
-    //
+
     public void keyPressed(KeyEvent e) {
     }
 
+    @Override
     public void keyReleased(KeyEvent e) {
-        if (e.isActionKey()) {
-            specialKeyboard(e.getKeyCode());
-        } else {
-            keyboardCallback(e.getKeyChar());
-        }
+
     }
-
-    //
-    //
-    //
-
 
 //    final Matrix3f tmpMat1 = new Matrix3f(); //stack.matrices.get();
 //    final Matrix3f tmpMat2 = new Matrix3f(); //stack.matrices.get();
@@ -435,130 +425,130 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     }
 
 
-    public void keyboardCallback(char key) {
-        lastKey = 0;
-
-        if (key >= 0x31 && key < 0x37) {
-            int child = key - 0x31;
-            // TODO: m_profileIterator->Enter_Child(child);
-        }
-        if (key == 0x30) {
-            // TODO: m_profileIterator->Enter_Parent();
-        }
-
-        switch (key) {
-            case 'h':
-                if ((debug & DebugDrawModes.NO_HELP_TEXT) != 0) {
-                    debug = debug & (~DebugDrawModes.NO_HELP_TEXT);
-                } else {
-                    debug |= DebugDrawModes.NO_HELP_TEXT;
-                }
-                break;
-
-            case 'w':
-                if ((debug & DebugDrawModes.DRAW_WIREFRAME) != 0) {
-                    debug = debug & (~DebugDrawModes.DRAW_WIREFRAME);
-                } else {
-                    debug |= DebugDrawModes.DRAW_WIREFRAME;
-                }
-                break;
-
-            case 'p':
-                if ((debug & DebugDrawModes.PROFILE_TIMINGS) != 0) {
-                    debug = debug & (~DebugDrawModes.PROFILE_TIMINGS);
-                } else {
-                    debug |= DebugDrawModes.PROFILE_TIMINGS;
-                }
-                break;
-
-            case 'm':
-                if ((debug & DebugDrawModes.ENABLE_SAT_COMPARISON) != 0) {
-                    debug = debug & (~DebugDrawModes.ENABLE_SAT_COMPARISON);
-                } else {
-                    debug |= DebugDrawModes.ENABLE_SAT_COMPARISON;
-                }
-                break;
-
-            case 'n':
-                if ((debug & DebugDrawModes.DISABLE_BULLET_LCP) != 0) {
-                    debug = debug & (~DebugDrawModes.DISABLE_BULLET_LCP);
-                } else {
-                    debug |= DebugDrawModes.DISABLE_BULLET_LCP;
-                }
-                break;
-
-            case 't':
-                if ((debug & DebugDrawModes.DRAW_TEXT) != 0) {
-                    debug = debug & (~DebugDrawModes.DRAW_TEXT);
-                } else {
-                    debug |= DebugDrawModes.DRAW_TEXT;
-                }
-                break;
-            case 'y':
-                if ((debug & DebugDrawModes.DRAW_FEATURES_TEXT) != 0) {
-                    debug = debug & (~DebugDrawModes.DRAW_FEATURES_TEXT);
-                } else {
-                    debug |= DebugDrawModes.DRAW_FEATURES_TEXT;
-                }
-                break;
-            case 'a':
-                if ((debug & DebugDrawModes.DRAW_AABB) != 0) {
-                    debug = debug & (~DebugDrawModes.DRAW_AABB);
-                } else {
-                    debug |= DebugDrawModes.DRAW_AABB;
-                }
-                break;
-            case 'c':
-                if ((debug & DebugDrawModes.DRAW_CONTACT_POINTS) != 0) {
-                    debug = debug & (~DebugDrawModes.DRAW_CONTACT_POINTS);
-                } else {
-                    debug |= DebugDrawModes.DRAW_CONTACT_POINTS;
-                }
-                break;
-
-            case 'd':
-                if ((debug & DebugDrawModes.NO_DEACTIVATION) != 0) {
-                    debug = debug & (~DebugDrawModes.NO_DEACTIVATION);
-                } else {
-                    debug |= DebugDrawModes.NO_DEACTIVATION;
-                }
-                if ((debug & DebugDrawModes.NO_DEACTIVATION) != 0) {
-                    ExtraGlobals.gDisableDeactivation = true;
-                } else {
-                    ExtraGlobals.gDisableDeactivation = false;
-                }
-                break;
-
-            case 'o': {
-                stepping = !stepping;
-                break;
-            }
-            case 's':
-                break;
-            //    case ' ' : newRandom(); break;
-
-            case '1': {
-                if ((debug & DebugDrawModes.ENABLE_CCD) != 0) {
-                    debug = debug & (~DebugDrawModes.ENABLE_CCD);
-                } else {
-                    debug |= DebugDrawModes.ENABLE_CCD;
-                }
-                break;
-            }
-
-
-            default:
-                // std::cout << "unused key : " << key << std::endl;
-                break;
-        }
-
-//        if (getDyn() != null && getDyn().debugDrawer != null) {
-//            getDyn().debugDrawer.setDebugMode(debug);
+//    public void keyboardCallback(char key) {
+//        lastKey = 0;
+//
+//        if (key >= 0x31 && key < 0x37) {
+//            int child = key - 0x31;
+//            // TODO: m_profileIterator->Enter_Child(child);
 //        }
-
-        //LWJGL.postRedisplay();
-
-    }
+//        if (key == 0x30) {
+//            // TODO: m_profileIterator->Enter_Parent();
+//        }
+//
+//        switch (key) {
+//            case 'h':
+//                if ((debug & DebugDrawModes.NO_HELP_TEXT) != 0) {
+//                    debug = debug & (~DebugDrawModes.NO_HELP_TEXT);
+//                } else {
+//                    debug |= DebugDrawModes.NO_HELP_TEXT;
+//                }
+//                break;
+//
+//            case 'w':
+//                if ((debug & DebugDrawModes.DRAW_WIREFRAME) != 0) {
+//                    debug = debug & (~DebugDrawModes.DRAW_WIREFRAME);
+//                } else {
+//                    debug |= DebugDrawModes.DRAW_WIREFRAME;
+//                }
+//                break;
+//
+//            case 'p':
+//                if ((debug & DebugDrawModes.PROFILE_TIMINGS) != 0) {
+//                    debug = debug & (~DebugDrawModes.PROFILE_TIMINGS);
+//                } else {
+//                    debug |= DebugDrawModes.PROFILE_TIMINGS;
+//                }
+//                break;
+//
+//            case 'm':
+//                if ((debug & DebugDrawModes.ENABLE_SAT_COMPARISON) != 0) {
+//                    debug = debug & (~DebugDrawModes.ENABLE_SAT_COMPARISON);
+//                } else {
+//                    debug |= DebugDrawModes.ENABLE_SAT_COMPARISON;
+//                }
+//                break;
+//
+//            case 'n':
+//                if ((debug & DebugDrawModes.DISABLE_BULLET_LCP) != 0) {
+//                    debug = debug & (~DebugDrawModes.DISABLE_BULLET_LCP);
+//                } else {
+//                    debug |= DebugDrawModes.DISABLE_BULLET_LCP;
+//                }
+//                break;
+//
+//            case 't':
+//                if ((debug & DebugDrawModes.DRAW_TEXT) != 0) {
+//                    debug = debug & (~DebugDrawModes.DRAW_TEXT);
+//                } else {
+//                    debug |= DebugDrawModes.DRAW_TEXT;
+//                }
+//                break;
+//            case 'y':
+//                if ((debug & DebugDrawModes.DRAW_FEATURES_TEXT) != 0) {
+//                    debug = debug & (~DebugDrawModes.DRAW_FEATURES_TEXT);
+//                } else {
+//                    debug |= DebugDrawModes.DRAW_FEATURES_TEXT;
+//                }
+//                break;
+//            case 'a':
+//                if ((debug & DebugDrawModes.DRAW_AABB) != 0) {
+//                    debug = debug & (~DebugDrawModes.DRAW_AABB);
+//                } else {
+//                    debug |= DebugDrawModes.DRAW_AABB;
+//                }
+//                break;
+//            case 'c':
+//                if ((debug & DebugDrawModes.DRAW_CONTACT_POINTS) != 0) {
+//                    debug = debug & (~DebugDrawModes.DRAW_CONTACT_POINTS);
+//                } else {
+//                    debug |= DebugDrawModes.DRAW_CONTACT_POINTS;
+//                }
+//                break;
+//
+//            case 'd':
+//                if ((debug & DebugDrawModes.NO_DEACTIVATION) != 0) {
+//                    debug = debug & (~DebugDrawModes.NO_DEACTIVATION);
+//                } else {
+//                    debug |= DebugDrawModes.NO_DEACTIVATION;
+//                }
+//                if ((debug & DebugDrawModes.NO_DEACTIVATION) != 0) {
+//                    ExtraGlobals.gDisableDeactivation = true;
+//                } else {
+//                    ExtraGlobals.gDisableDeactivation = false;
+//                }
+//                break;
+//
+//            case 'o': {
+//                stepping = !stepping;
+//                break;
+//            }
+//            case 's':
+//                break;
+//            //    case ' ' : newRandom(); break;
+//
+//            case '1': {
+//                if ((debug & DebugDrawModes.ENABLE_CCD) != 0) {
+//                    debug = debug & (~DebugDrawModes.ENABLE_CCD);
+//                } else {
+//                    debug |= DebugDrawModes.ENABLE_CCD;
+//                }
+//                break;
+//            }
+//
+//
+//            default:
+//                // std::cout << "unused key : " << key << std::endl;
+//                break;
+//        }
+//
+////        if (getDyn() != null && getDyn().debugDrawer != null) {
+////            getDyn().debugDrawer.setDebugMode(debug);
+////        }
+//
+//        //LWJGL.postRedisplay();
+//
+//    }
 
     public int getDebug() {
         return debug;
@@ -571,42 +561,42 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        }
     }
 
-    public void specialKeyboard(int keycode) {
-        switch (keycode) {
-            case KeyEvent.VK_F1: {
-                break;
-            }
-            case KeyEvent.VK_F2: {
-                break;
-            }
-            case KeyEvent.VK_END: {
-//                int numObj = getDyn().getNumCollisionObjects();
-//                if (numObj != 0) {
-//                    CollisionObject<X> obj = getDyn().objects().get(numObj - 1);
+//    public void specialKeyboard(int keycode) {
+//        switch (keycode) {
+//            case KeyEvent.VK_F1: {
+//                break;
+//            }
+//            case KeyEvent.VK_F2: {
+//                break;
+//            }
+//            case KeyEvent.VK_END: {
+////                int numObj = getDyn().getNumCollisionObjects();
+////                if (numObj != 0) {
+////                    CollisionObject<X> obj = getDyn().objects().get(numObj - 1);
+////
+////                    getDyn().removeCollisionObject(obj);
+////                    RigidBody body = RigidBody.upcast(obj);
+////                    if (body != null && body.getMotionState() != null) {
+////                        //delete body->getMotionState();
+////                    }
+////                    //delete obj;
+////                }
+//                break;
+//            }
+//            /*
+//            case KeyEvent.VK_PRIOR:
+//				zoomIn();
+//				break;
+//			case KeyEvent.VK_NEXT:
+//				zoomOut();
+//				break;
+//            */
 //
-//                    getDyn().removeCollisionObject(obj);
-//                    RigidBody body = RigidBody.upcast(obj);
-//                    if (body != null && body.getMotionState() != null) {
-//                        //delete body->getMotionState();
-//                    }
-//                    //delete obj;
-//                }
-                break;
-            }
-            /*
-            case KeyEvent.VK_PRIOR:
-				zoomIn();
-				break;
-			case KeyEvent.VK_NEXT:
-				zoomOut();
-				break;
-            */
-
-            default:
-                // std::cout << "unused (special) key : " << key << std::endl;
-                break;
-        }
-    }
+//            default:
+//                // std::cout << "unused (special) key : " << key << std::endl;
+//                break;
+//        }
+//    }
 
 //    public void shootBox(Vector3f destination) {
 //        if (dyn != null) {

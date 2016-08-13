@@ -168,7 +168,7 @@ public interface Concept extends Termed {
      *
      * @return whether the link successfully was completed
      */
-    default boolean link(float scale, Concept src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    default boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
 
         if (scale < minScale)
             return false;
@@ -178,23 +178,21 @@ public interface Concept extends Termed {
             linkTask((Task)b, scale);
         }
 
-        linkAny(b, src, scale, minScale, nar, activation);
+        linkAny(b, scale, minScale, nar, activation);
 
         return true;
     }
 
-    void linkAny(@NotNull Budgeted b, Concept other, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation);
+    void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation);
 
 
     void linkTask(@NotNull Task t, float scale);
 
 
 
-    default boolean link(@NotNull Budgeted b, Concept source, float initialScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
-        float p = b.priIfFiniteElseNeg1();
-        if (p <= 0)
-            return false;
+    default boolean link(Budgeted source, float initialScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
 
+        float p = activation.in.priIfFiniteElseNeg1();
         float minScale = nar.taskLinkThreshold.floatValue() / p;
 
         if (p <= minScale)
@@ -210,21 +208,26 @@ public interface Concept extends Termed {
      * @param otherTask task with a term equal to another concept's
      * @return number of links created (0, 1, or 2)
      */
-    default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
+    default void crossLink(@NotNull Budgeted thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
 
         Concept other = otherTask.concept(nar);
         if (other == null || other.equals(this))
             return; //null or same concept
 
+        crossLink(thisTask, scale, nar, other, otherTask);
+
+    }
+
+    default void crossLink(Budgeted thisInput, float scale, @NotNull NAR nar, Concept other, Budgeted otherTask) {
         float halfScale = scale / 2f;
 
-        NAR.Activation a = new NAR.Activation(thisTask);
+        NAR.Activation a = new NAR.Activation(thisInput, null);
 
-        this.link(otherTask, other, halfScale, nar, a);
-        other.link(thisTask, this, halfScale, nar, a);
+        this.link(otherTask, halfScale, nar, a);
+
+        other.link(thisInput, halfScale, nar, a);
 
         a.run(nar);
-
     }
 
     /** link to a specific peer */
@@ -372,7 +375,7 @@ public interface Concept extends Termed {
             //out.print("TermLinkTemplates: ");
             //out.println(termlinkTemplates());
 
-            out.println("\n TermLinks:");
+            out.println("\n TermLinks: " + termlinks().size() + "/" + termlinks().capacity());
             termlinks().forEach(b -> {
                 out.print(indent);
                 out.print(b.get() + " " + b.toBudgetString());
@@ -381,7 +384,7 @@ public interface Concept extends Termed {
         }
 
         if (showtasklinks) {
-            out.println("\n TaskLinks:");
+            out.println("\n TaskLinks: " + tasklinks().size() + "/" + tasklinks().capacity());
             tasklinks().forEach(b -> {
                 out.print(indent);
                 out.print(b.get() + " " + b.toBudgetString());

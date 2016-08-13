@@ -20,53 +20,60 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
 **Term**
 ```
-               <term> ::= 
+               <term> ::=
                         | <atom>                             // an atomic constant term; Unicode string in an arbitrary alphabet
                         | <variable>                         // an atomic variable term
                         | <compound>                         // a term with internal structure
-                        
+
                         | `<object>`                         // object value or expression (TODO)
                         | `<integer>`                        // integer value (TODO)
-                        
-           <compound> ::=                       
+
+           <compound> ::=
+                        | "(--," <term> ")"                  // negation
+                        | --<term>                           // negation shorthand, semi-functional TODO
+
                         | "("<term> "-->" <term>")"          // inheritance
                         | <term> ":" <term>                  // reverse-inheritance (shorthand)
-                        
+
                         | "("<term> "<->" <term>")"          // similarity
 
                         | "("<term> "==>" <term>")"          // implication
                         | "("<term> "==>"<dt> <term>")"      // implication sequence
-                        
+
                         | "("<term> "<=>" <term>")"          // equivalence
                         | "("<term> "<=>"<dt> <term>")"      // equivalence sequence
-                        
+
+                        | "(&&," <term> {","<term>} ")"      // conjunction eternal, also: (x && y)
+                        | "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0) TODO
+                        | "(&/," <term> {","<term>} ")"      // conjunction sequence, internally converted to recursive 2-ary sequence conjunctions TODO
                         | "("<term> "&&"<dt> <term>")"       // conjunction sequence (size=2 only)
-                        | "(&&," <term> {","<term>} ")"      // conjunction eternal, also: (x && y)   
-                        | "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0)
-                        
-                        | "(||," <term> {","<term>} ")"      // disjunction (internally converted to negated conjunction of negations), also: (x || y)                                   
+
+                        | "(||," <term> {","<term>} ")"      // disjunction, internally converted to negated conjunction of negations, also: (x || y)
 
                         | "("<term> "-{-" <term>")"          // instance, expanded on input to: {x} --> y
                         | "("<term> "-]-" <term>")"          // property, expanded on input to: x --> [y]
                         | "("<term> "{-]" <term>")"          // instance-property, expanded on input to: {x} --> [y]
-                                                                                                 
+
                         | "{" <term> {","<term>} "}"         // extensional set
                         | "[" <term> {","<term>} "]"         // intensional set
                         | "(" <term> {","<term>} ")"         // product (ie. vector or list)
-                        
+
                         | "(/," <term> {","<term>} ")"       // extensional image
                         | "(\," <term> {","<term>} ")"       // intensional image
-                        
+
                         | "(&," <term> {","<term>} ")"       // extensional intersection, also: (x & y)
                         | "(|," <term> {","<term>} ")"       // intensional intersection, also: (x | y)
                         | "(-," <term> "," <term> ")"        // extensional difference, also: (x - y)
                         | "(~," <term> "," <term> ")"        // intensional difference, also: (x ~ y)
-                        
-                        | "(--," <term> ")"                  // negation
-                                                
+
                         | <term>"("<term> {","<term>} ")"    // an operation to be executed (function syntax); op(x,y) internally is: ((x,y)-->^op)
 
-                 <dt> ::= [+|-]<number>[""|"frames"|"min"|"hr"|"day"...] //delta-time amount (frames if no unit specified); positive = future, negative = past, +0 = simultaneous
+
+                 <dt> ::= [+|-]<number>                      //delta-time amount (frames); positive = future, negative = past, +0 = simultaneous
+                        | [+|-]<number>["min"|"hr"|"day"...] //delta-time amount (other time metrics) TODO
+
+                        <dt> is 32-bit integer
+
 ```
 
 **Truth** = (frequency, confidence)
@@ -75,8 +82,10 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 ```
  - Frequency [0..1.0]
  - Confidence (0..1.0]*
-    - an input confidence=1.0 triggers a locked axiomatic belief state that disables additional beliefs in its table. otherwise conf=1.0 is not allowed  
+    - an input confidence=1.0 triggers a locked axiomatic belief state that disables additional beliefs in its table. otherwise conf=1.0 is not allowed
 
+**Occurrence** - (64 bit integer, can store resolutions up to Nanosecond precision)
+ - specifies a relative (see <dt>) or absolute occurrence time. if unspecified, ETERNAL (TODO)
 
 **Budget** = (priority, durability, quality)
 ```

@@ -40,7 +40,14 @@ public class RectWidget<X> extends SimpleSpatial<X> {
         s.setParent(null);
     }
 
+    @Override
+    public boolean onKey(Collidable body, v3 hitPoint, char charCode, boolean pressed) {
+        if (!super.onKey(body, hitPoint, charCode, pressed)) {
 
+            return surface!=null ? surface.onKey(null, charCode, pressed) : false;
+        }
+        return true;
+    }
 
     @Override
     public boolean onTouch(Collidable body, ClosestRay r, short[] buttons) {

@@ -101,7 +101,7 @@ public abstract class Spatial<X> implements BiConsumer<GL2, Dynamic> {
     }
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
-    public boolean onKey(Collidable body, v3 hitPoint, char charCode) {
+    public boolean onKey(Collidable body, v3 hitPoint, char charCode, boolean pressed) {
         return false;
     }
 

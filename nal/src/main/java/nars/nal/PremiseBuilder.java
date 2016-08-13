@@ -54,7 +54,7 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static int run(@NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, @NotNull Supplier<Conclusion> conclusions) {
+    public static int run(@NotNull Concept c, @NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, @NotNull Supplier<Conclusion> conclusions) {
 
         int count = 0;
         long now = nar.time();
@@ -84,7 +84,7 @@ public enum PremiseBuilder {
 
             if (budget(pBudget, taskLink, termLink, minDur)) {
 
-                Premise p = newPremise(nar, now, task, term, pBudget);
+                Premise p = newPremise(nar, c, now, task, term, pBudget);
 
                 matcher.run(p, conclusions.get());
 
@@ -114,7 +114,7 @@ public enum PremiseBuilder {
      patham9 especially try to understand the "temporal temporal" case
      patham9 its using the result of higher confidence
      */
-    static @NotNull Premise newPremise(@NotNull NAR nar, long now, @NotNull Task task, @NotNull Term termLinkTerm, Budget b) {
+    static @NotNull Premise newPremise(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task, @NotNull Term termLinkTerm, Budget b) {
 
 
         Task belief = null;
@@ -133,7 +133,7 @@ public enum PremiseBuilder {
                     Task solution = table.match(task, now);
                     if (solution!=null) {
                         try {
-                            Task answered = answer(nar, task, solution, beliefConcept);
+                            Task answered = answer(nar, c, task, solution, beliefConcept);
                             if (task.isQuestion())
                                 belief = answered;
                         } catch (TermIndex.InvalidConceptException e) {
@@ -158,14 +158,13 @@ public enum PremiseBuilder {
 
 
     @Nullable
-    private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {
+    private static Task answer(@NotNull NAR nar, @NotNull Concept c, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {
 
         long taskOcc = taskLink.occurrence();
 
         //project the belief to the question's time
         if (taskOcc != ETERNAL) {
-            @Nullable Concept cbel = nar.concept(solution);
-            solution = cbel != null ? cbel.merge(taskLink, solution, taskOcc, beliefConcept, nar) : null;
+            solution = beliefConcept.merge(taskLink, solution, taskOcc, beliefConcept, nar);
         }
 
         if (solution != null) { //may have become null as a result of projection
@@ -177,7 +176,10 @@ public enum PremiseBuilder {
                 matchAnswer(nar, taskLink, solution);
             }
 
+
+
         }
+
         return solution;
     }
 

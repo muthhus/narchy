@@ -129,12 +129,10 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                         //CurveBag.power6BagCurve,
                         rng);
 
-        this.sleep = new DefaultConceptPolicy(10, 8, 2, 16, 8);
+        this.sleep = new DefaultConceptPolicy(7, 8, 2, 24, 16);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy(12, 10, 4, 24, 12);
-
-
+        this.awake = new DefaultConceptPolicy(12, 10, 4, 32, 24);
     }
 
 

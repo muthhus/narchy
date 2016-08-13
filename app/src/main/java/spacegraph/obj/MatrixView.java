@@ -1,6 +1,8 @@
 package spacegraph.obj;
 
 import com.jogamp.opengl.GL2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
@@ -8,6 +10,8 @@ import spacegraph.render.Draw;
  * Created by me on 7/29/16.
  */
 public class MatrixView extends Surface {
+
+    private static final Logger logger = LoggerFactory.getLogger(MatrixView.class);
 
     private final int w;
     private final int h;
@@ -36,10 +40,15 @@ public class MatrixView extends Surface {
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                view.update(x, y, gl);
 
-//                    gl.glColor3f(r, g, bl);
-                Draw.rect(gl, x * dw, 1f - y * dh, dw, dh);
+                try {
+                    view.update(x, y, gl);
+
+                    //                    gl.glColor3f(r, g, bl);
+                    Draw.rect(gl, x * dw, 1f - y * dh, dw, dh);
+                } catch (Exception e) {
+                    logger.error("{}",e);
+                }
 
             }
         }

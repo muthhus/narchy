@@ -7,6 +7,7 @@ import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
+import nars.nar.Default;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Term;
@@ -54,7 +55,7 @@ abstract public class NAREnvironment {
     private final FasterList<MutableTask> predictors = $.newArrayList();
     private boolean trace = true;
 
-    int ticksBeforeObserve = 1, ticksBeforeDecide = 1;
+    int ticksBeforeObserve = 0, ticksBeforeDecide = 0;
     protected long now;
 
     public NAREnvironment(NAR nar) {
@@ -110,7 +111,7 @@ abstract public class NAREnvironment {
 
         reinforce();
 
-        for (int i = 0; i < ticksBeforeDecide - 1; i++)
+        for (int i = 0; i < ticksBeforeDecide; i++)
             nar.clock.tick();
 
         //nar.next();
@@ -195,7 +196,7 @@ abstract public class NAREnvironment {
     }
 
     public NARLoop run(int cycles, int frameDelayMS) {
-        return run(cycles, frameDelayMS, 1);
+        return run(cycles, frameDelayMS, 0);
     }
 
     public NARLoop run(final int cycles, int frameDelayMS, final int timeDilation) {
@@ -213,7 +214,7 @@ abstract public class NAREnvironment {
             public void frame(@NotNull NAR nar) {
                 super.frame(nar);
                 next();
-                if (nar.time() >= cycles*timeDilation)
+                if (nar.time() >= cycles*(1+timeDilation))
                     stop();
             }
         };
@@ -277,8 +278,9 @@ abstract public class NAREnvironment {
     @Nullable
     protected Concept boost(Concept c) {
 
-        //((Default)nar).core.concepts.put(c, UnitBudget.One);
+        ((Default)nar).core.concepts.put(c, UnitBudget.One);
         return c;
+        //return c;
         //return nar.activate(c, null);
     }
 
@@ -288,16 +290,14 @@ abstract public class NAREnvironment {
         if (t.isDeleted())
             throw new RuntimeException();
 
+        float REINFORCEMENT_DURABILITY = 0.9f;
+        long now = nar.time();
         if (t.occurrence() != ETERNAL) {
-            nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(nar.time(), nar.time())
-                    .budget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
+            nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(now, now)
+                    .budget(reinforcementAttention, REINFORCEMENT_DURABILITY, 0.5f).log("Predictor"));
         } else {
-            //just reactivate the existing eternal
-            //try {
-                //nar.activate(t);
-            //} catch (Exception e) {
-              //  logger.warn("{}", e.toString());
-            //}
+            nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(now, ETERNAL)
+                    .budget(reinforcementAttention, REINFORCEMENT_DURABILITY, 0.5f).log("Predictor"));
         }
 
     }

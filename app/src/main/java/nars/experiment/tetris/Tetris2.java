@@ -9,7 +9,6 @@ import nars.Param;
 import nars.experiment.NAREnvironment;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
-import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nal.Tense;
 import nars.nar.Default;
@@ -27,9 +26,8 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
-import spacegraph.Facial;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.math.Vector2f;
 import spacegraph.obj.ConsoleSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.MatrixView;
@@ -39,7 +37,6 @@ import java.io.IOException;
 import java.util.*;
 
 import static nars.$.t;
-import static nars.gui.BeliefTableChart.newBeliefChart;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.VERTICAL;
@@ -49,27 +46,27 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int TIME_DILATION = 1; //resolution in between frames for interpolation space
-    public static final int DEFAULT_INDEX_WEIGHT = 5 * 1000000;
+    public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
+    public static final int DEFAULT_INDEX_WEIGHT = 12 * 1000000;
 
     static {
         Param.DEBUG = false;
-        Param.CONCURRENCY_DEFAULT = 3;
+        Param.CONCURRENCY_DEFAULT = 1;
     }
 
-    public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 8;
+    public static final int runFrames = 100000;
+    public static final int cyclesPerFrame = 24;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 4;
-    static boolean easy = true;
+    public static final int TIME_PER_FALL = 3;
+    static boolean easy = false;
 
     static int frameDelay;
 
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 6; //16 * TIME_DILATION;
+    private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
     public class View {
 
@@ -77,7 +74,7 @@ public class Tetris2 extends NAREnvironment {
         public Surface plot1;
         public ConsoleSurface term = new ConsoleSurface(40, 8);
 
-        public MatrixView camView;
+        public Surface camView;
         //public Plot2D lstm;
     }
 
@@ -111,7 +108,20 @@ public class Tetris2 extends NAREnvironment {
                 }
             }
         };
-        view.vis = new TetrisVisualizer(state, 64, false);
+        view.vis = new TetrisVisualizer(state, 64, false) {
+            @Override
+            public boolean onKey(Vector2f hitPoint, char charCode, boolean pressed) {
+
+                switch (charCode) {
+                    case 'a': nar.goal(motorRotate, Tense.Present, pressed ? 0f: 0.5f, gamma); break;
+                    case 's': nar.goal(motorRotate, Tense.Present, pressed ? 1f: 0.5f, gamma); break;
+                    case 'z': nar.goal(motorLeftRight, Tense.Present, pressed ? 0f: 0.5f, gamma); break;
+                    case 'x': nar.goal(motorLeftRight, Tense.Present, pressed ? 1f: 0.5f, gamma); break;
+                }
+
+                return true;
+            }
+        };
 
         //restart();
     }
@@ -128,10 +138,10 @@ public class Tetris2 extends NAREnvironment {
     /** RLE/scanline input method: groups similar pixels (monochrome) into a runline using a integer range */
     protected void input() {
 
-        float thresh = 0.5f;
-
-        inputAxis(thresh, true);
-        inputAxis(thresh, false);
+//        float thresh = 0.5f;
+//
+//        inputAxis(thresh, true);
+//        inputAxis(thresh, false);
     }
 
     private void inputAxis(float thresh, boolean horizontal) {
@@ -159,7 +169,6 @@ public class Tetris2 extends NAREnvironment {
 
                     if (sign > 0) {
                         if (s < (thresh)) {
-                            //switch
                             sign = -1;
                         } else {
                             end = x;  //continue span
@@ -177,7 +186,11 @@ public class Tetris2 extends NAREnvironment {
                 //if it switched or reach the end of the line
                 if (end!=x || (x >= ww-1)) {
                     //end of span
-                    inputSpan(start, end, y, sign, horizontal);
+                    if (end-start == 1) {
+                        inputBlock(start, start+1, sign, horizontal);
+                    } else {
+                        inputSpan(start, end, y, sign, horizontal);
+                    }
                 }
 
                 x++;
@@ -202,6 +215,22 @@ public class Tetris2 extends NAREnvironment {
         //TODO collect evidence stamp
         nar.believe(
                 horizontal ? $.p(range, fixed) : $.p(fixed, range),
+                Tense.Present,
+                t.freq(), t.conf() //HACK this parameters sux
+        );
+    }
+    private void inputBlock(int x, int y, float v, boolean horizontal) {
+
+        Truth t = $.t(v>0 ? 1f : 0f,
+                //(float)Math.pow(alpha, end-start)
+                alpha
+        );
+        if (t == null)
+            return; //too low confidence
+
+        //TODO collect evidence stamp
+        nar.believe(
+                horizontal ? $.p(x, y) : $.p(y, x),
                 Tense.Present,
                 t.freq(), t.conf() //HACK this parameters sux
         );
@@ -317,15 +346,15 @@ public class Tetris2 extends NAREnvironment {
         nar.derivedActivation.setValue(0.03f);
 
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
-        //nar.truthResolution.setValue(0.01f);
+        nar.confMin.setValue(0.03f);
+        nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -359,7 +388,7 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new ArithmeticInduction(nar);
@@ -446,7 +475,31 @@ public class Tetris2 extends NAREnvironment {
                 });
 
 
-                view.camView = new MatrixView(tetris_width, tetris_height, (x, y, g) -> {
+                int window = 32;
+                view.camView =
+                        new GridSurface(
+                            new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window)),
+                            new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)),
+                            new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window))
+                        );
+
+                newControlWindow(view);
+
+                Arkancide.newBeliefChart(this, 200);
+//                BeliefTableChart.newBeliefChart(nar, Lists.newArrayList(
+//                        sensors.get(0),
+//                        sensors.get(1),
+//                        sensors.get(2),
+//                        sensors.get(3),
+//                        sensors.get(4),
+//                        sensors.get(5)
+//                ), 200);
+
+                //NARSpace.newConceptWindow((Default) nar, 128, 8);
+            }
+
+            public MatrixView.ViewFunc sensorMatrixView(NAR nar, long whenRelative) {
+                return (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
 //            float r = decodeRed(rgb);
 //            if (r > 0)
@@ -455,7 +508,7 @@ public class Tetris2 extends NAREnvironment {
 
                     SensorConcept s = sensors.get(y * tetris_width + x);
                     float b = s.hasBeliefs() ?
-                            s.beliefs().freq(now) : 0;
+                            s.beliefs().freq(now + whenRelative) : 0;
                             //s.beliefs().expectation(now) : 0;
                     Truth dt = s.hasGoals() ? s.goals().truth(now) : null;
                     float dr, dg;
@@ -476,20 +529,7 @@ public class Tetris2 extends NAREnvironment {
                     float p = nar.conceptPriority(s);
                     g.glColor4f(dr, dg, b, 0.5f + 0.5f * p);
 
-                });
-
-                newControlWindow(view);
-
-                BeliefTableChart.newBeliefChart(nar, Lists.newArrayList(
-                        sensors.get(0),
-                        sensors.get(1),
-                        sensors.get(2),
-                        sensors.get(3),
-                        sensors.get(4),
-                        sensors.get(5)
-                ), 200);
-
-                //NARSpace.newConceptWindow((Default) nar, 128, 8);
+                };
             }
         };
 
@@ -559,9 +599,12 @@ public class Tetris2 extends NAREnvironment {
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
 
-        NAR.printTasks(meta.nar, true);
-        NAR.printTasks(meta.nar, false);
-        //nar.forEachActiveConcept(System.out::println);
+        //NAR.printTasks(meta.nar, true);
+        //NAR.printTasks(meta.nar, false);
+//        nar.forEachActiveConcept(c -> {
+//            if (c.volume() < 12)
+//                c.print();
+//        });
     }
 
     public static class NARController extends NAREnvironment {
@@ -671,7 +714,7 @@ public class Tetris2 extends NAREnvironment {
                     new MotorConcept("(memoryWeight)", nar, (b, d) -> {
                         ((CaffeineIndex) worker.index).compounds.policy().eviction().ifPresent(e -> {
                             float sweep = 0.1f; //% sweep , 0<sweep
-                            e.setMaximum((long) (DEFAULT_INDEX_WEIGHT * (1f + sweep * 2f * (d.expectation() - 0.5f))));
+                            e.setMaximum((long) (DEFAULT_INDEX_WEIGHT * (1f + sweep * 2f * (d.freq() - 0.5f))));
                         });
                         //System.err.println("  loop period ms: " + newPeriod);
                         return d;
@@ -679,28 +722,28 @@ public class Tetris2 extends NAREnvironment {
 
                     new MotorConcept("(confMin)", nar, (b, d) -> {
                         float MAX_CONFMIN = 0.1f;
-                        float newConfMin = Math.max(Param.TRUTH_EPSILON, MAX_CONFMIN * d.expectation());
+                        float newConfMin = Math.max(Param.TRUTH_EPSILON, MAX_CONFMIN * d.freq());
                         worker.confMin.setValue(newConfMin);
                         return d;
                     }),
 
                     new MotorConcept("(inputActivation)", nar, (b, d) -> {
-                        worker.inputActivation.setValue(d.expectation());
+                        worker.inputActivation.setValue(d.freq());
                         return d;
                     }),
 
                     new MotorConcept("(derivedActivation)", nar, (b, d) -> {
-                        worker.derivedActivation.setValue(d.expectation());
+                        worker.derivedActivation.setValue(d.freq());
                         return d;
                     }),
 
                     new MotorConcept("(conceptsPerFrame)", nar, (b, d) -> {
-                        ((Default) worker).core.conceptsFiredPerCycle.setValue((int) (d.expectation() * MAX_CONCEPTS_FIRE_PER_CYCLE));
+                        ((Default) worker).core.conceptsFiredPerCycle.setValue((int) (d.freq() * MAX_CONCEPTS_FIRE_PER_CYCLE));
                         return d;
                     }),
 
                     new MotorConcept("(linksPerConcept)", nar, (b, d) -> {
-                        float l = d.expectation() * MAX_LINKS_PER_CONCEPT;
+                        float l = d.freq() * MAX_LINKS_PER_CONCEPT;
                         l = Math.max(l, 1f);
                         int vv = (int) Math.floor((float)Math.sqrt(l));
 
@@ -710,7 +753,7 @@ public class Tetris2 extends NAREnvironment {
                     }),
 
                     new MotorConcept("(envCuriosity)", nar, (b, d) -> {
-                        float exp = d.expectation();
+                        float exp = d.freq();
                         env.epsilon = exp;
                         env.gammaEpsilonFactor = exp*exp;
                         return d;

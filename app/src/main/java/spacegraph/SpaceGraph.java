@@ -6,10 +6,7 @@ import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.gs.collections.api.block.procedure.primitive.FloatProcedure;
 import com.gs.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
-import com.jogamp.newt.event.KeyAdapter;
-import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.newt.event.MouseAdapter;
-import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.newt.event.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.$;
@@ -568,7 +565,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     }
 
-    public static class OrbMouse extends SpaceMouse {
+    public static class OrbMouse extends SpaceMouse implements KeyListener {
 
         final ClosestRay rayCallback = new ClosestRay(((short)(1 << 7)));
         // constraint for mouse picking
@@ -580,15 +577,21 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         protected TypedConstraint pickConstraint = null;
         protected Dynamic directDrag;
         public Dynamic pickedBody = null; // for deactivation state
+        private Spatial pickedSpatial;
+        private Collidable picked;
+        private v3 hitPoint;
 
 
         public OrbMouse(JoglPhysics g) {
+
             super(g);
+            g.addKeyListener(this);
+
         }
 
         @Override
         public void mouseWheelMoved(MouseEvent e) {
-            //System.out.println("wheel=" + Arrays.toString(e.getRotation()));
+            //System.out.println("wheel=" + Arrays.toString(e.getRotati on()));
             float y = e.getRotation()[1];
             if (y!=0) {
                 //space.setCameraDistance( space.cameraDistance.floatValue() + 0.1f * y );
@@ -761,17 +764,24 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                 Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
             );*/
 
-            if (cray.collidable != null) {
-                Object t = cray.collidable.data();
+            picked = cray.collidable;
+            if (picked != null) {
+                Object t = picked.data();
                 if (t instanceof Spatial) {
-                    Spatial a = ((Spatial) t);
-                    if (a.onTouch(cray.collidable, cray, buttons)) {
+                    pickedSpatial = ((Spatial) t);
+                    hitPoint = cray.hitPointWorld;
+                    if (pickedSpatial.onTouch(picked, cray, buttons)) {
                         //absorbed
                         clearDrag();
                         return true;
                     }
+                } else {
+                    pickedSpatial = null;
                 }
+            } else {
+                pickedSpatial = null;
             }
+
             //}
 
             if ((pickConstraint != null) || (directDrag != null)) {
@@ -940,5 +950,18 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             mouseMotionFunc(e.getX(), e.getY(), e.getButtonsDown());
         }
 
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (pickedSpatial !=null) {
+                pickedSpatial.onKey(picked, hitPoint, e.getKeyChar(), true);
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if (pickedSpatial !=null) {
+                pickedSpatial.onKey(picked, hitPoint, e.getKeyChar(), false);
+            }
+        }
     }
 }
