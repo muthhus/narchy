@@ -6,7 +6,7 @@ package com.grapeshot.halfnes;
 
 import com.grapeshot.halfnes.cheats.Patch;
 import com.grapeshot.halfnes.mappers.Mapper;
-import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import java.util.Arrays;
 

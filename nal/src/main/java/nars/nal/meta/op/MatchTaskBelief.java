@@ -3,7 +3,7 @@ package nars.nal.meta.op;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
 import com.google.common.primitives.Ints;
-import com.gs.collections.api.map.ImmutableMap;
+import org.eclipse.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Op;
 import nars.nal.meta.AtomicBoolCondition;
@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static com.gs.collections.impl.factory.Maps.immutable;
+import static org.eclipse.collections.impl.factory.Maps.immutable;
 
 
 @Deprecated

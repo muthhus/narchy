@@ -1,6 +1,6 @@
 package nars.prolog;
 
-import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import nars.Events.OUT;
 import nars.NAR;
 import nars.io.out.TextOutput;

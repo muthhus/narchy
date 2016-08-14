@@ -1,7 +1,7 @@
 package nars;
 
 
-import com.gs.collections.api.tuple.primitive.IntIntPair;
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Term;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static com.gs.collections.impl.tuple.primitive.PrimitiveTuples.pair;
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 import static nars.nal.Tense.DTERNAL;
 
 /**

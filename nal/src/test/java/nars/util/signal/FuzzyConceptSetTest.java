@@ -1,7 +1,7 @@
 package nars.util.signal;
 
 import com.google.common.collect.Iterables;
-import com.gs.collections.api.block.predicate.primitive.FloatPredicate;
+import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import nars.NAR;
 import nars.nar.Default;
 import nars.truth.Truth;

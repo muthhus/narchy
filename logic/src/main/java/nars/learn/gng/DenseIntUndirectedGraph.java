@@ -1,8 +1,8 @@
 package nars.learn.gng;
 
-import com.gs.collections.api.block.predicate.primitive.IntPredicate;
-import com.gs.collections.api.block.procedure.primitive.ShortIntProcedure;
-import com.gs.collections.api.block.procedure.primitive.ShortProcedure;
+import org.eclipse.collections.api.block.predicate.primitive.IntPredicate;
+import org.eclipse.collections.api.block.procedure.primitive.ShortIntProcedure;
+import org.eclipse.collections.api.block.procedure.primitive.ShortProcedure;
 
 import java.util.Arrays;
 

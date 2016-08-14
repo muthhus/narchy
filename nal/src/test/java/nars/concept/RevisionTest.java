@@ -1,6 +1,6 @@
 package nars.concept;
 
-import com.gs.collections.api.tuple.primitive.FloatObjectPair;
+import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
 import nars.$;
 import nars.NAR;
 import nars.Param;

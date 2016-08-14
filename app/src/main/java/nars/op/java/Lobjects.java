@@ -1,7 +1,7 @@
 //package nars.op.java;
 //
-//import com.gs.collections.api.map.MutableMap;
-//import com.gs.collections.impl.map.mutable.UnifiedMap;
+//import org.eclipse.collections.api.map.MutableMap;
+//import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 //import javassist.util.proxy.MethodHandler;
 //import javassist.util.proxy.ProxyFactory;
 //import javassist.util.proxy.ProxyObject;

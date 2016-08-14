@@ -1,6 +1,6 @@
 package nars.nal.meta.op;
 
-import com.gs.collections.api.map.ImmutableMap;
+import org.eclipse.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Op;
 import nars.nal.meta.ProcTerm;

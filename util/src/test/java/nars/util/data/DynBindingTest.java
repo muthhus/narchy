@@ -1,6 +1,6 @@
 package nars.util.data;
 
-import com.gs.collections.api.block.function.primitive.BooleanFunction;
+import org.eclipse.collections.api.block.function.primitive.BooleanFunction;
 import org.apache.commons.math3.primes.Primes;
 import org.junit.Test;
 

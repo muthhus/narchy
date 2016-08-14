@@ -1,7 +1,7 @@
 package nars.experiment.tetris;
 
 import com.google.common.collect.Lists;
-import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;

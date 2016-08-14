@@ -1,6 +1,6 @@
 package mcaixictw;
 
-import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import mcaixictw.worldmodels.WorldModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

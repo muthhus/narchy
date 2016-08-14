@@ -1,7 +1,7 @@
 package com.grapeshot.halfnes.cheats;
 
 import com.grapeshot.halfnes.CPURAM;
-import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import java.util.ArrayList;
 import java.util.List;

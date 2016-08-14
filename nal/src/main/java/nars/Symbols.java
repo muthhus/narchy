@@ -21,9 +21,9 @@
 package nars;
 
 
-import com.gs.collections.api.map.ImmutableMap;
-import com.gs.collections.impl.factory.Maps;
-import com.gs.collections.impl.map.mutable.primitive.CharObjectHashMap;
+import org.eclipse.collections.api.map.ImmutableMap;
+import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.map.mutable.primitive.CharObjectHashMap;
 
 import java.util.HashMap;
 import java.util.Map;

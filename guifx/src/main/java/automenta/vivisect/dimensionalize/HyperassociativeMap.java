@@ -14,7 +14,7 @@
  */
 package automenta.vivisect.dimensionalize;
 
- import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
+ import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
  import nars.util.data.random.XORShiftRandom;
  import org.apache.commons.math3.linear.ArrayRealVector;
 

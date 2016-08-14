@@ -1,7 +1,7 @@
 package nars.task;
 
-import com.gs.collections.api.tuple.primitive.FloatObjectPair;
-import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
+import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.Param;
 import nars.budget.Budget;

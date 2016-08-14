@@ -1,6 +1,6 @@
 package nars.bag;
 
-import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Param;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;

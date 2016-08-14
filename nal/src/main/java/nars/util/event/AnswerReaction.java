@@ -4,7 +4,7 @@
 // */
 //package nars.util.event;
 //
-//import com.gs.collections.api.tuple.Twin;
+//import org.eclipse.collections.api.tuple.Twin;
 //import nars.NAR;
 //import nars.Narsese;
 //import nars.concept.Concept;

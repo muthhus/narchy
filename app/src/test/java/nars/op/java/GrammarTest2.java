@@ -1,6 +1,6 @@
 //package nars.op.java;
 //
-//import com.gs.collections.impl.set.mutable.primitive.CharHashSet;
+//import org.eclipse.collections.impl.set.mutable.primitive.CharHashSet;
 //import nars.Global;
 //import nars.NAR;
 //import nars.concept.Concept;

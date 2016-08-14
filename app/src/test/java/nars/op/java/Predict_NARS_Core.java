@@ -1,6 +1,6 @@
 package nars.op.java;
 
-import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import nars.NAR;
 import nars.Op;
 import nars.Param;

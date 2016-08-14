@@ -1,6 +1,6 @@
 package nars.util.data;
 
-import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Term;

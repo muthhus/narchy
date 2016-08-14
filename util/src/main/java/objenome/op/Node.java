@@ -21,8 +21,8 @@
  */
 package objenome.op;
 
-import com.gs.collections.impl.list.mutable.FastList;
-import com.gs.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import objenome.util.TypeUtil;
 
 import java.util.*;

@@ -1,8 +1,8 @@
 package nars.nal.derive;
 
 import com.google.common.base.Joiner;
-import com.gs.collections.api.block.function.primitive.FloatFunction;
-import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import nars.term.Term;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;

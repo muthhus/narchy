@@ -1,6 +1,6 @@
 package objenome.solution.dependency;
 
-import com.gs.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import objenome.util.FindMethod;
 import objenome.util.InjectionUtils;
 

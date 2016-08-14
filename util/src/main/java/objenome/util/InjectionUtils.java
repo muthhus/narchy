@@ -1,6 +1,6 @@
 package objenome.util;
 
-import com.gs.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

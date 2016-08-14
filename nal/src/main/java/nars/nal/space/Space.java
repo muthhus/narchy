@@ -1,6 +1,6 @@
 //package nars.nal.space;
 //
-//import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
+//import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 //import nars.Op;
 //import nars.term.Compound;
 //import nars.term.Termed;

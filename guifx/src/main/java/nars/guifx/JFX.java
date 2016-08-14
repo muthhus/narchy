@@ -1,6 +1,6 @@
 package nars.guifx;
 
-import com.gs.collections.impl.map.mutable.primitive.FloatObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.FloatObjectHashMap;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.application.Application;

@@ -1,6 +1,6 @@
 package org.zhz.dfargx.automata;
 
-import com.gs.collections.impl.map.mutable.primitive.CharObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.CharObjectHashMap;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,7 +1,7 @@
 package mcaixictw;
 
-import com.gs.collections.api.list.primitive.BooleanList;
-import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+import org.eclipse.collections.api.list.primitive.BooleanList;
+import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 
 import java.util.List;
 

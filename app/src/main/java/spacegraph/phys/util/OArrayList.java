@@ -23,7 +23,7 @@
 
 package spacegraph.phys.util;
 
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 
 import java.io.Externalizable;
 import java.io.IOException;

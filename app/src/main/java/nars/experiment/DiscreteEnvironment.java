@@ -1,6 +1,6 @@
 package nars.experiment;
 
-import com.gs.collections.api.tuple.Twin;
+import org.eclipse.collections.api.tuple.Twin;
 import nars.learn.Agent;
 import nars.util.Util;
 

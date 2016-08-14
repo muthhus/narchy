@@ -1,6 +1,6 @@
 //package nars.op.java;
 //
-//import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
+//import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 //import nars.Global;
 //import nars.NAR;
 //import nars.Narsese;

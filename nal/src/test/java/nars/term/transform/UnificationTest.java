@@ -1,6 +1,6 @@
 package nars.term.transform;
 
-import com.gs.collections.impl.factory.Sets;
+import org.eclipse.collections.impl.factory.Sets;
 import nars.*;
 import nars.concept.Concept;
 import nars.index.PatternIndex;

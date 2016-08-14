@@ -1,7 +1,7 @@
 package nars.bag.impl;
 
-import com.gs.collections.api.block.procedure.primitive.ObjectFloatProcedure;
-import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;

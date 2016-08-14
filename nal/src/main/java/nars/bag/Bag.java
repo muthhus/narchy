@@ -1,6 +1,6 @@
 package nars.bag;
 
-import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.link.BLink;

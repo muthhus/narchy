@@ -1,8 +1,8 @@
 package nars.op.java;
 
 import com.google.common.collect.ImmutableSet;
-import com.gs.collections.api.bimap.MutableBiMap;
-import com.gs.collections.impl.bimap.mutable.HashBiMap;
+import org.eclipse.collections.api.bimap.MutableBiMap;
+import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;

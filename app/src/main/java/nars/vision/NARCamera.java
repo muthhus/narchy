@@ -1,9 +1,9 @@
 package nars.vision;
 
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
-import com.gs.collections.api.block.predicate.primitive.IntIntPredicate;
-import com.gs.collections.impl.factory.Lists;
-import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
+import org.eclipse.collections.api.block.predicate.primitive.IntIntPredicate;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;

@@ -2,7 +2,7 @@ package nars.rover.obj;
 
 import com.artemis.Component;
 import com.artemis.Entity;
-import com.gs.collections.api.block.procedure.primitive.FloatObjectProcedure;
+import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import nars.$;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.gl.JoglDraw;

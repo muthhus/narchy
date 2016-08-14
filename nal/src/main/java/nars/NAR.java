@@ -2,8 +2,8 @@ package nars;
 
 
 import com.google.common.collect.Sets;
-import com.gs.collections.api.tuple.Twin;
-import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.LiteBlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;

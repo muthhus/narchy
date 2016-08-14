@@ -4,7 +4,7 @@ import com.artemis.Aspect;
 import com.artemis.Entity;
 import com.artemis.EntitySystem;
 import com.artemis.utils.Bag;
-import com.gs.collections.api.block.procedure.Procedure;
+import org.eclipse.collections.api.block.procedure.Procedure;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.GL2;
 import nars.rover.Sim;

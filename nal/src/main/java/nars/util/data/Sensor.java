@@ -1,8 +1,8 @@
 package nars.util.data;
 
-import com.gs.collections.api.block.function.primitive.FloatFunction;
-import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
-import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.NAR;
 import nars.Param;
 import nars.task.MutableTask;

@@ -1,7 +1,7 @@
 package nars.guifx.graph2.layout;
 
 import automenta.vivisect.dimensionalize.HyperassociativeMap;
-import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import javafx.beans.property.SimpleDoubleProperty;
 import nars.data.Range;
 import nars.guifx.graph2.TermEdge;

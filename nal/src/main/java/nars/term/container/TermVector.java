@@ -1,7 +1,7 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
 import nars.Param;
 import nars.term.Compound;

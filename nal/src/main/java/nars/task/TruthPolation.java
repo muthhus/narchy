@@ -1,7 +1,7 @@
 package nars.task;
 
 import com.google.common.base.Joiner;
-import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.$;
 import nars.Param;
 import nars.learn.microsphere.InterpolatingMicrosphere;

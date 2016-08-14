@@ -4,7 +4,7 @@
  */
 package com.grapeshot.halfnes.video;
 
-import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
 import java.awt.image.BufferedImage;
 import java.util.Collections;

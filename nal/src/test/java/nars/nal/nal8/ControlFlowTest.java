@@ -1,7 +1,7 @@
 //package nars.nal.nal8;
 //
-//import com.gs.collections.api.tuple.primitive.IntObjectPair;
-//import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
+//import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
+//import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 //import nars.$;
 //import nars.Global;
 //import nars.NAR;

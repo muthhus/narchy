@@ -1,6 +1,6 @@
 package nars.guifx.concept;
 
-import com.gs.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;

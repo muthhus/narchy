@@ -1,6 +1,6 @@
 package nars.rl;
 
-import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import jurls.reinforcementlearning.domains.RLEnvironment;
 import nars.NAR;
 import nars.nal.nal8.OpReaction;

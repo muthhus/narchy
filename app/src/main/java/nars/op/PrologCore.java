@@ -1,8 +1,8 @@
 package nars.op;
 
 import alice.tuprolog.*;
-import com.gs.collections.api.tuple.Pair;
-import com.gs.collections.impl.tuple.Tuples;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
 import nars.Op;

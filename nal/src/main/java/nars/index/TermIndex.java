@@ -1,7 +1,7 @@
 package nars.index;
 
-import com.gs.collections.api.list.primitive.ByteList;
-import com.gs.collections.impl.factory.Maps;
+import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.impl.factory.Maps;
 import nars.$;
 import nars.Narsese;
 import nars.budget.policy.ConceptPolicy;

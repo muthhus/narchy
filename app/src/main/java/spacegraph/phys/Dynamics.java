@@ -23,7 +23,7 @@
 
 package spacegraph.phys;
 
-import com.gs.collections.api.block.procedure.primitive.IntObjectProcedure;
+import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import nars.$;
 import nars.util.data.list.FasterList;
 import spacegraph.Spatial;

@@ -1,7 +1,7 @@
 package nars.op;
 
-import com.gs.collections.api.tuple.primitive.ObjectIntPair;
-import com.gs.collections.impl.bag.mutable.HashBag;
+import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import org.eclipse.collections.impl.bag.mutable.HashBag;
 import nars.$;
 import nars.NAR;
 import nars.budget.Budget;

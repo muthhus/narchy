@@ -1,6 +1,6 @@
 package spacegraph.video;
 
-import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import com.jogamp.opengl.GL2;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;

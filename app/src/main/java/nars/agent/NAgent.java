@@ -1,7 +1,7 @@
 package nars.agent;
 
 import com.google.common.base.Joiner;
-import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
 import nars.Param;

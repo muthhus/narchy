@@ -1,8 +1,8 @@
 //package nars.guifx.demo.graph2;
 //
-//import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
-//import com.gs.collections.api.tuple.Twin;
-//import com.gs.collections.impl.tuple.Tuples;
+//import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
+//import org.eclipse.collections.api.tuple.Twin;
+//import org.eclipse.collections.impl.tuple.Tuples;
 //import nars.$;
 //import nars.NAR;
 //import nars.budget.Budget;

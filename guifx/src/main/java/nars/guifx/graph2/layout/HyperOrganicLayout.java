@@ -11,8 +11,8 @@ package nars.guifx.graph2.layout;
 //import com.mxgraph.view.mxGraph;
 //import com.mxgraph.view.mxGraphView;
 
-import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
-import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;

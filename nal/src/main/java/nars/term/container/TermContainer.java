@@ -1,11 +1,11 @@
 package nars.term.container;
 
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
-import com.gs.collections.api.list.primitive.ByteList;
-import com.gs.collections.api.set.ImmutableSet;
-import com.gs.collections.api.set.MutableSet;
-import com.gs.collections.impl.factory.Sets;
-import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Sets;
+import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;
@@ -21,8 +21,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static com.gs.collections.impl.factory.Sets.immutable;
-import static com.gs.collections.impl.factory.Sets.mutable;
+import static org.eclipse.collections.impl.factory.Sets.immutable;
+import static org.eclipse.collections.impl.factory.Sets.mutable;
 
 
 /**

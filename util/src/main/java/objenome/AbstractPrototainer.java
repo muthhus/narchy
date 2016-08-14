@@ -5,8 +5,8 @@
  */
 package objenome;
 
-import com.gs.collections.impl.map.mutable.UnifiedMap;
-import com.gs.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import objenome.solution.dependency.*;
 import objenome.util.InjectionUtils;
 

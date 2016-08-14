@@ -2,10 +2,10 @@ package spacegraph;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
-import com.gs.collections.api.block.procedure.primitive.FloatProcedure;
-import com.gs.collections.impl.map.mutable.primitive.IntBooleanHashMap;
-import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
+import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import com.jogamp.newt.event.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;

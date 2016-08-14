@@ -1,6 +1,6 @@
 package nars.guifx.graph2.layout;
 
-import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import javafx.beans.property.SimpleDoubleProperty;
 import nars.$;
 import nars.data.Range;

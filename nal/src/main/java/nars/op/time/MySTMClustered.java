@@ -1,6 +1,6 @@
 package nars.op.time;
 
-import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.NAR;
 import nars.Param;

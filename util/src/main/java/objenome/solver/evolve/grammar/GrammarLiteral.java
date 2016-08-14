@@ -21,8 +21,8 @@
  */
 package objenome.solver.evolve.grammar;
 
-import com.gs.collections.api.CharIterable;
-import com.gs.collections.impl.set.mutable.primitive.CharHashSet;
+import org.eclipse.collections.api.CharIterable;
+import org.eclipse.collections.impl.set.mutable.primitive.CharHashSet;
 
 /**
  * Grammar literals are a type of grammar node, that represent the terminals of

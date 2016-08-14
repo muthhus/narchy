@@ -1,9 +1,9 @@
 //package nars.nlp;
 //
-//import com.gs.collections.api.set.primitive.MutableCharSet;
-//import com.gs.collections.api.tuple.primitive.CharFloatPair;
-//import com.gs.collections.impl.map.mutable.primitive.CharFloatHashMap;
-//import com.gs.collections.impl.set.mutable.primitive.CharHashSet;
+//import org.eclipse.collections.api.set.primitive.MutableCharSet;
+//import org.eclipse.collections.api.tuple.primitive.CharFloatPair;
+//import org.eclipse.collections.impl.map.mutable.primitive.CharFloatHashMap;
+//import org.eclipse.collections.impl.set.mutable.primitive.CharHashSet;
 //import nars.Global;
 //import nars.NAR;
 //import nars.Symbols;

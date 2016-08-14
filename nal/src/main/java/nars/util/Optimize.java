@@ -2,8 +2,8 @@ package nars.util;
 
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
-import com.gs.collections.api.block.function.primitive.FloatFunction;
-import com.gs.collections.api.block.procedure.primitive.FloatObjectProcedure;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import ognl.Ognl;
 import ognl.OgnlException;
 import org.apache.commons.math3.optim.InitialGuess;

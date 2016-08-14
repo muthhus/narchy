@@ -1,8 +1,8 @@
 package nars.guifx.util;
 
 import com.google.common.collect.Lists;
-import com.gs.collections.api.tuple.Twin;
-import com.gs.collections.impl.tuple.Tuples;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.tuple.Tuples;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;

@@ -1,6 +1,6 @@
 package nars.agent;
 
-import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;

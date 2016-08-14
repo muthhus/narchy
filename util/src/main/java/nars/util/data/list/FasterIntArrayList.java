@@ -1,6 +1,6 @@
 package nars.util.data.list;
 
-import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
 /**
  * Created by me on 12/3/15.

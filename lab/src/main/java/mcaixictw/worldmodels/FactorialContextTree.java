@@ -1,7 +1,7 @@
 package mcaixictw.worldmodels;
 
 
-import com.gs.collections.api.list.primitive.BooleanList;
+import org.eclipse.collections.api.list.primitive.BooleanList;
 
 import java.util.ArrayList;
 import java.util.List;

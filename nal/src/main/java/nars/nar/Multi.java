@@ -1,7 +1,7 @@
 //package nars.nar;
 //
-//import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
-//import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+//import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+//import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 //import nars.NAR;
 //import nars.Param;
 //import nars.budget.Budgeted;

@@ -1,7 +1,7 @@
 //package nars.nal.meta;
 //
 //import com.google.common.collect.Iterators;
-//import com.gs.collections.impl.map.mutable.UnifiedMap;
+//import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 //import nars.$;
 //import nars.Global;
 //import nars.nal.Deriver;

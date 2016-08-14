@@ -1,6 +1,6 @@
 //package nars.op.java;
 //
-//import com.gs.collections.api.tuple.Twin;
+//import org.eclipse.collections.api.tuple.Twin;
 //import nars.Global;
 //import nars.nar.Default;
 //import nars.task.Task;

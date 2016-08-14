@@ -1,6 +1,6 @@
 package nars.nal.meta;
 
-import com.gs.collections.api.set.MutableSet;
+import org.eclipse.collections.api.set.MutableSet;
 import nars.$;
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;

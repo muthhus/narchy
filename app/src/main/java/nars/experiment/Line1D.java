@@ -1,8 +1,8 @@
 package nars.experiment;
 
-import com.gs.collections.api.block.function.primitive.IntToFloatFunction;
-import com.gs.collections.api.tuple.Twin;
-import com.gs.collections.impl.tuple.Tuples;
+import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.tuple.Tuples;
 import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;

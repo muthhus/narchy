@@ -1,8 +1,8 @@
 package nars.term;
 
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
-import com.gs.collections.api.set.ImmutableSet;
-import com.gs.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import nars.$;
 import nars.Op;
 import nars.term.compound.GenericCompound;

@@ -1,6 +1,6 @@
 package nars.guifx.graph2.scene;
 
-import com.gs.collections.api.tuple.Pair;
+import org.eclipse.collections.api.tuple.Pair;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;

@@ -1,7 +1,7 @@
 package nars.util.signal;
 
-import com.gs.collections.api.block.function.primitive.FloatFunction;
-import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;

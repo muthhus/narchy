@@ -23,7 +23,7 @@
 
 package spacegraph.render;
 
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.opengl.GL2;

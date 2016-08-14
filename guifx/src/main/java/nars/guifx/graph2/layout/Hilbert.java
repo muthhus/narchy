@@ -1,6 +1,6 @@
 package nars.guifx.graph2.layout;
 
-import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
 

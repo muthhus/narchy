@@ -1,7 +1,7 @@
 package nars.nal.nal7;
 
-import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
-import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
+import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import nars.NAR;
 import nars.Param;
 import nars.nar.Default;

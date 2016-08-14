@@ -1,8 +1,8 @@
 package nars.experiment;
 
 import com.google.common.collect.Iterables;
-import com.gs.collections.api.tuple.Twin;
-import com.gs.collections.impl.tuple.Tuples;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
 import nars.Param;

@@ -1,7 +1,7 @@
 package nars.util.graph;
 
-import com.gs.collections.api.tuple.primitive.ObjectIntPair;
-import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
+import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;

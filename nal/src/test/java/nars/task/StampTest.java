@@ -1,6 +1,6 @@
 package nars.task;
 
-import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import nars.nal.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

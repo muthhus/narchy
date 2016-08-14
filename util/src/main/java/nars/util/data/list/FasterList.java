@@ -1,7 +1,7 @@
 package nars.util.data.list;
 
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
-import com.gs.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -62,7 +62,7 @@ public class MapIndex extends SimpleMapIndex {
 
 //package nars.index;
 //
-//import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+//import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 //import nars.concept.Concept;
 //import nars.term.*;
 //import nars.term.container.TermContainer;

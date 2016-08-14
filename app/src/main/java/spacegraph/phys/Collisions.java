@@ -23,8 +23,8 @@
 
 package spacegraph.phys;
 
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
-import com.gs.collections.api.block.procedure.primitive.IntObjectProcedure;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import spacegraph.Spatial;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;

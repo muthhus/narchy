@@ -1,6 +1,6 @@
 //package nars.bag.impl;
 //
-//import com.gs.collections.api.block.procedure.Procedure2;
+//import org.eclipse.collections.api.block.procedure.Procedure2;
 //import nars.Global;
 //import nars.bag.Bag;
 //import nars.bag.BagBudget;

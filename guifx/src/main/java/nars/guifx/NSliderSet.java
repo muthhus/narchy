@@ -1,6 +1,6 @@
 package nars.guifx;
 
-import com.gs.collections.impl.map.mutable.ConcurrentHashMap;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import javafx.scene.layout.FlowPane;
 import nars.guifx.util.NSlider;
 

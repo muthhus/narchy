@@ -1,7 +1,7 @@
 package spacegraph.obj;
 
-import com.gs.collections.api.block.procedure.primitive.FloatProcedure;
-import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.util.data.list.FasterList;

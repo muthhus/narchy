@@ -21,9 +21,9 @@
 package nars.term;
 
 
-import com.gs.collections.api.list.primitive.ByteList;
-import com.gs.collections.impl.factory.primitive.ByteLists;
-import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.impl.factory.primitive.ByteLists;
+import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;

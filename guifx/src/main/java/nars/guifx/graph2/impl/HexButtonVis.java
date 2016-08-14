@@ -1,6 +1,6 @@
 package nars.guifx.graph2.impl;
 
-import com.gs.collections.impl.tuple.Tuples;
+import org.eclipse.collections.impl.tuple.Tuples;
 import javafx.geometry.Bounds;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;

@@ -5,8 +5,8 @@
 package nars.rover.obj;
 
 import com.artemis.Entity;
-import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
-import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
 import nars.budget.UnitBudget;

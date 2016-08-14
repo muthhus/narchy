@@ -1,7 +1,7 @@
 package spacegraph;
 
 import com.google.common.collect.Lists;
-import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.util.data.list.FasterList;
 

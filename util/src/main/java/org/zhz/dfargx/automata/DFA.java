@@ -1,7 +1,7 @@
 package org.zhz.dfargx.automata;
 
-import com.gs.collections.impl.map.mutable.primitive.CharObjectHashMap;
-import com.gs.collections.impl.map.mutable.primitive.IntIntHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.CharObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
 import org.zhz.dfargx.util.CommonSets;
 
 import java.util.*;
