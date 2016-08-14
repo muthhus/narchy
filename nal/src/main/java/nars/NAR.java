@@ -744,14 +744,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             return null;
         }
 
-        Concept c = null;
         //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {
             input = preprocess(input);
-            c = input.normalize(this); //accept into input buffer for eventual processing
+            input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
             emotion.frustration(input.priIfFiniteElseZero());
             emotion.errr();
+
+            input.delete();
 
             if (Param.DEBUG)
                 logger.warn("invalid input: {}", e.toString());
@@ -765,96 +766,94 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         float conceptActivation = input.isInput() ? this.inputActivation.floatValue() : this.derivedActivation.floatValue();
 
 
-        if (c.policy() == null) {
-            policy(c, index.conceptBuilder().init(), time());
-        }
-
 
         if (clock instanceof FrameClock) {
             //HACK for unique serial number w/ frameclock
             ((FrameClock) clock).ensureStampSerialGreater(input.evidence());
         }
 
-        Task inputted;
+
         try {
 
             if (tasks.addIfAbsent(input)) {
 
+                Concept c = input.concept(this);
+                if (c.policy() == null) {
+                    policy(c, index.conceptBuilder().init(), time());
+                }
+
                 List<Task> removed = $.newArrayList();
 
-                inputted = c.process(input, this, removed);
+                Task inputted = c.process(input, this, removed);
 
                 tasks.remove(removed);
 
-                if (inputted!=input) {
-                    tasks.remove(input);
+                if (inputted != input) {
+                    if (inputted!=null)
+                        tasks.replace(input, inputted);
+                    else
+                        tasks.remove(input);
                     input.delete();
                 }
 
-                /*
-                long numTasks = tasks.tasks.estimatedSize();
-                int concepts = index.size();
-                float per = numTasks/concepts;
-                System.out.println("tasks=" + numTasks + ", ~" + per + " per concept");
-                */
 
-            } else {
-                inputted = null;
+
+                if (inputted!=null && !inputted.isDeleted()) {
+
+                    /*
+                    long numTasks = tasks.tasks.estimatedSize();
+                    int concepts = index.size();
+                    float per = numTasks/concepts;
+                    System.out.println("tasks=" + numTasks + ", ~" + per + " per concept");
+                    */
+
+                    float p = inputted.pri();
+                    if (p > 0) {
+                        //propagate budget
+                        //try {
+                        Activation activation = new Activation(inputted, c);
+
+                        c.link(1f, null/* linkActivation */, Param.BUDGET_EPSILON, this, activation);
+
+                        activation.run(this, conceptActivation); //values will already be scaled
+
+                        emotion.busy(p);
+                        emotion.stress(activation.overflow);
+                        //                } catch (Exception e) {
+                        //                    emotion.errr();
+                        //
+                        //                    if (Param.DEBUG)
+                        //                        logger.warn("activation error: {}", e.toString());
+                        //
+                        //                    inputted.delete();
+                        //                    return c;
+                        //                }
+                    }
+
+
+                    inputted.onConcept(c);
+
+                    eventTaskProcess.emit(inputted); //signal any additional processes
+                    //eventTaskProcess.emitAsync(inputted, concurrency, runWorker);
+
+                    return c; //SUCCESSFULLY PROCESSED
+                }
+
             }
-
 
         } catch (Exception e) {
             emotion.errr();
 
             if (Param.DEBUG)
                 logger.warn("process error: {}", e.toString());
-
-            emotion.frustration(input.priIfFiniteElseZero());
-
-            input.delete();
-
-            return null;
         }
 
 
-        //decides if TaskProcess was successful in somehow affecting its concept's state
-        if (inputted != null && !inputted.isDeleted()) {
 
-            float p = inputted.pri();
-            if (p > 0) {
-                //propagate budget
-                //try {
-                Activation activation = new Activation(inputted, c);
+        emotion.frustration(input.priIfFiniteElseZero());
+        input.delete();
 
-                c.link(1f, null/* linkActivation */, Param.BUDGET_EPSILON, this, activation);
-
-                activation.run(this, conceptActivation); //values will already be scaled
-
-                emotion.busy(p);
-                emotion.stress(activation.overflow);
-//                } catch (Exception e) {
-//                    emotion.errr();
-//
-//                    if (Param.DEBUG)
-//                        logger.warn("activation error: {}", e.toString());
-//
-//                    inputted.delete();
-//                    return c;
-//                }
-            }
-
-
-            inputted.onConcept(c);
-
-            eventTaskProcess.emit(inputted); //signal any additional processes
-            //eventTaskProcess.emitAsync(inputted, concurrency, runWorker);
-
-        } else {
-            emotion.frustration(input.priIfFiniteElseZero());
-        }
-
-
-        return c;
+        return null;
     }
 
     @Override

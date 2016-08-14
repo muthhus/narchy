@@ -26,17 +26,19 @@ abstract public class DerivedTask extends MutableTask {
     public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval p, long[] evidence) {
         super(tc, punct, truth);
 
-
         evidence(evidence);
 
-        this.concept = super.normalize(p.nar);
+        this.concept = super.concept(p.nar);
 
         if (Param.DEBUG)
             this.premise = p.premise;
     }
 
+
     @Override
-    public @NotNull Concept normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptException, NAR.InvalidTaskException {
+    public @Nullable Concept concept(@NotNull NAR n) {
+        if (concept == null)
+            return super.concept(n);
         return concept;
     }
 

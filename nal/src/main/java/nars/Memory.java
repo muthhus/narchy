@@ -229,6 +229,12 @@ public class Memory extends Param {
 
 
         }
+
+        public void replace(Task in, Task out) {
+            remove(in);
+            tasks.put(out, out);
+        }
+
     }
 
 

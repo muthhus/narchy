@@ -41,9 +41,9 @@ public class RevisionTask extends AnswerTask  {
     }
 
     @Override
-    public @NotNull Concept normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptException, NAR.InvalidTaskException {
+    public @Nullable Concept concept(@NotNull NAR n) {
         if (concept==null)
-            return super.normalize(nar); //HACK
+            return super.concept(n); //HACK
         return concept;
     }
 

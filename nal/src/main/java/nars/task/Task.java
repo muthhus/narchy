@@ -295,12 +295,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return appendTo(new StringBuilder(), memory, showStamp);
     }
 
-//    @NotNull
-//    @Override default Task get() { return this ;}
 
-    @Nullable
+
+    @NotNull
     default Concept concept(@NotNull NAR n) {
-        return n.concept(term());
+        return n.concept(term(), true);
     }
 
     @NotNull @Override Compound<?> term();
@@ -553,8 +552,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     /** if unnormalized, returns a normalized version of the task,
      *  null if not normalizable
      */
-    @NotNull
-    Concept normalize(@NotNull NAR memory) throws InvalidTaskException, InvalidConceptException;
+    void normalize(@NotNull NAR memory) throws InvalidTaskException, InvalidConceptException;
 
 
 //    default void ensureValidParentTaskRef() {

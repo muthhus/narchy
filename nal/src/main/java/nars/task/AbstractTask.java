@@ -135,8 +135,8 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
 
-    @NotNull @Override
-    public Concept normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptException, NAR.InvalidTaskException  {
+    @Override
+    public void normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptException, NAR.InvalidTaskException  {
 
         if (isDeleted())
             throw new NAR.InvalidTaskException(this, "Deleted");
@@ -246,7 +246,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             }
         }
 
-        return nar.concept(ntt, true);
     }
 
 
