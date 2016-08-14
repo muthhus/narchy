@@ -374,10 +374,10 @@
         A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
 
     A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
-        A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) <=>+- B), (Belief:Comparison)
+        A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) <=>+- B), (Belief:ComparisonN)
 
     A, B, task(positive), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
-        A, B, task(negative), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- (--,%A)), (Belief:Abduction)
+        A, B, task(negative), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
 
     A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
         A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)

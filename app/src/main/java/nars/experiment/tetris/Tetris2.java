@@ -339,7 +339,7 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
-                16, 2, 2, rng,
+                32, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false)
 
                 , new FrameClock()) {
