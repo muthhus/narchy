@@ -75,4 +75,6 @@ public abstract class BLink<X> implements Budget, Link<X> {
         return toString();
     }
 
+    public abstract float priNext();
+    public abstract float durNext();
 }

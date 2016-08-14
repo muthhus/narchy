@@ -29,6 +29,7 @@ import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
 import spacegraph.obj.ConsoleSurface;
@@ -60,9 +61,9 @@ public class Tetris2 extends NAREnvironment {
 
     public static final int runFrames = 10000;
     public static final int cyclesPerFrame = 16;
-    public static final int tetris_width = 8;
+    public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 3;
+    public static final int TIME_PER_FALL = 1;
     static boolean easy = false;
 
     static int frameDelay;
@@ -70,7 +71,7 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
+    private final int visionSyncPeriod = 2; //16 * TIME_DILATION;
 
     public class View {
 
@@ -251,14 +252,19 @@ public class Tetris2 extends NAREnvironment {
             for (int x = 0; x < state.width; x++) {
                 int xx = x;
                 Compound squareTerm = $.p(new Termject.IntTerm(x), new Termject.IntTerm(y));
-                sensors.add(new SensorConcept(squareTerm, nar,
+                @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
                         () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
 
                         //null //disable input
 
-                        (v) -> $.t(v,alpha)
+                        (v) -> $.t(v, alpha )
 
-                ).timing(0, visionSyncPeriod));
+                ).timing(0, visionSyncPeriod);
+
+//                FloatSupplier defaultPri = s.sensor.pri;
+//                s.pri( () -> defaultPri.asFloat() * 0.25f );
+
+                sensors.add(s);
 
             }
         }
@@ -281,7 +287,7 @@ public class Tetris2 extends NAREnvironment {
         //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
         float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().expectation(now) : 0.5f;
 
-        float actionMargin = 0.3f;
+        float actionMargin = 0.25f;
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
 
@@ -408,7 +414,7 @@ public class Tetris2 extends NAREnvironment {
                 super.init(nar);
 
                 AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                        tetris_width, 12 /* states */,
+                        tetris_width, 16 /* states */,
                         0.05f);
                 view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 

@@ -3,6 +3,7 @@ package nars.link;
 import nars.Param;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.util.Util.clamp;
@@ -87,7 +88,17 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     public final float pri() {
         return PRI;
     }
-    
+
+    @Override
+    public float priNext() {
+        return Util.clamp(PRI + dPri);
+    }
+
+    @Override
+    public float durNext() {
+        return Util.clamp(DUR + dDur);
+    }
+
     @Override
     public final void _setPriority(float p) {
         float delta = p - PRI;

@@ -30,7 +30,7 @@ import static nars.nal.Tense.ETERNAL;
 public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier {
 
     @NotNull
-    protected final Sensor sensor;
+    public final Sensor sensor;
     private FloatSupplier input;
     private float current = Float.NaN;
 
@@ -168,6 +168,10 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return this;
     }
 
+    @NotNull public SensorConcept pri(FloatSupplier v) {
+        sensor.pri(v);
+        return this;
+    }
 
     @Deprecated @NotNull public SensorConcept pri(float v) {
         sensor.pri(v);

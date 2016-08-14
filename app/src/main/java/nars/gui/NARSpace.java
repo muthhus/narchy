@@ -35,8 +35,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
     public static void main(String[] args) {
 
         Default n = new Default(1024, 32, 4, 2);
-        n.inputActivation.setValue(0.5f);
-        n.derivedActivation.setValue(0.5f);
+        n.inputActivation.setValue(0.1f);
+        n.derivedActivation.setValue(0.1f);
         //n.nal(4);
 
 

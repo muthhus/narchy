@@ -4,7 +4,6 @@ import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.concept.CompoundConcept;
-import nars.nal.Tense;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -13,14 +12,11 @@ import nars.term.obj.Termject;
 import nars.util.signal.Autoencoder;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Autoencodes a vector of inputs and attempts to classify the current values to
@@ -78,7 +74,7 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
 
             float c = conf * (1f - error);
             if (c > cMin) {
-                input(s, y, c);
+                input(s, state(y), c);
             }
 
             errorSum += error;
@@ -93,10 +89,12 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
 
     }
 
-    protected void input(int stride, int which, float conf) {
+    protected void input(int stride, Term which, float conf) {
 
         GeneratedTask t = new GeneratedTask(
-                $.instprop(stride(stride), state(which)),
+                input(stride, which),
+
+
                 '.', $.t(1f, conf));
         t.time(nar.time(), nar.time()).budget(nar.priorityDefault(Symbols.BELIEF), nar.durabilityDefault(Symbols.BELIEF));
         nar.inputLater( t );
@@ -110,20 +108,23 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
     }
 
     @NotNull
-    private Compound stride(int stride) {
-        return $.p(base, new Termject.IntTerm(stride));
+    private Compound input(int stride, Term state) {
+        return $.p(base, new Termject.IntTerm(stride), state);
+        //return $.image(2, false, base, new Termject.IntTerm(stride), state);
     }
 
     /** input the 'metadata' of the autoencoder that connects the virtual concepts to their semantic inputs */
     protected void meta() {
         int k = 0;
         int n = input.size();
+        final Term unknown = $.varDep(2);
         for (int i = 0; i < strides; i++) {
             List<? extends SensorConcept> l = input.subList(k, Math.min(n, k + stride));
             //TODO re-use the same eternal belief to reactivate itself
-            @Nullable Compound x = $.sim($.sete(
+            Compound x = $.sim($.sete(
                     l.stream().map(CompoundConcept::term).toArray(Term[]::new)),
-                    stride(i)
+                    //input(i, unknown).term(0) //the image internal
+                    input(i, unknown)
             );
             nar.believe(x);
             k+= stride;

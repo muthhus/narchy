@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.DoubleSupplier;
 
+import static nars.budget.merge.BudgetMerge.plusBlend;
 import static nars.budget.merge.BudgetMerge.plusDQDominant;
 import static org.junit.Assert.*;
 
@@ -138,13 +139,16 @@ public class CurveBagTest  {
     }
 
     @Test public void testScalePut() {
-        ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
+        ArrayBag<String> a = new ArrayBag(2, plusBlend, new HashMap<>(2));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
         a.commit();
 
         assertEquals(0.15, a.get("x").pri(), 0.001f);
+    }
+    @Test public void testScalePut2() {
+        ArrayBag<String> a = new ArrayBag(2, plusBlend, new HashMap<>(2));
 
         a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
