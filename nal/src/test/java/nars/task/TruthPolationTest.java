@@ -118,7 +118,7 @@ public class TruthPolationTest {
 
         System.out.println("TRUTHPOLATION");
         for (long d = start; d < end; d++) {
-            Truth a1 = p.truth(d, l, null, Float.NaN, Float.NaN);
+            Truth a1 = p.truth(d, l);
             System.out.println(d + ": " + a1);
         }
     }

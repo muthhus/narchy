@@ -209,16 +209,16 @@ public class InterpolatingMicrosphere {
                            float[] sampleValues,
                            float[] sampleWeights,
                            float exponent,
-                           float maxDarkFraction,
+                           float minWeight,
                            float darkThreshold,
                            int numSamples) {
 
 
-
-        if (maxDarkFraction < 0 ||
-                maxDarkFraction > 1) {
-            throw new OutOfRangeException(maxDarkFraction, 0, 1);
-        }
+//
+//        if (maxDarkFraction < 0 ||
+//                maxDarkFraction > 1) {
+//            throw new OutOfRangeException(maxDarkFraction, 0, 1);
+//        }
         if (darkThreshold < 0) {
             throw new NotPositiveException(darkThreshold);
         }
@@ -235,7 +235,7 @@ public class InterpolatingMicrosphere {
         // microsphere's facets.
         illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, exponent, numSamples, darkThreshold);
 
-        return interpolate(maxDarkFraction);
+        return interpolate(minWeight);
 
     }
 
@@ -414,7 +414,7 @@ public class InterpolatingMicrosphere {
      * microsphere.
      */
     @Nullable
-    private float[] interpolate(float maxDarkFraction) {
+    private float[] interpolate(float minWeight) {
 
         int size = this.size;
 
@@ -448,14 +448,14 @@ public class InterpolatingMicrosphere {
 
         }
 
-        final float darkFraction = darkCount / (float) size;
+        //final float darkFraction = darkCount / (float) size;
 
 
-        if ((size == darkCount && maxDarkFraction >= 1.0f)/* || (mdf < 1.0 && !float.isFinite(background)))*/) {
+        if ((size == darkCount /*&& maxDarkFraction >= 1.0f*/)/* || (mdf < 1.0 && !float.isFinite(background)))*/) {
             throw new RuntimeException("no illumination accepted or background value not used or invalid");
         }
 
-        if (totalWeight < maxDarkFraction)
+        if (totalWeight < minWeight)
             return null;
 
         float v = value / totalWeight;

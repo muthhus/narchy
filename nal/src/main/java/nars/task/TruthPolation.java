@@ -6,12 +6,12 @@ import nars.$;
 import nars.Param;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
-import nars.truth.Truthed;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,37 +43,33 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     }
 
+
+
     @Nullable
-    public Truth truth(long when, Task... tasks) {
-        return truth(when, null, tasks);
+    public Truth truth(long when, Collection<Task> tasks) {
+        return truth(when, tasks.toArray(new Task[tasks.size()]));
     }
 
     @Nullable
-    public Truth truth(long when, @Nullable Truthed topEternal, Task... tasks) {
-        return truth(when, new FasterList<>((Task[]) tasks), topEternal);
-    }
-
-    @Nullable
-    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Truthed topEternal) {
+    public Truth truth(long when, @NotNull Task... tasks) {
         //float ecap = eternal.capacity();
         //float eternalization = ecap / (ecap + tcap));
 
-        float maxDarkFraction = Param.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
+        float minWeight = Param.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
 
         float thresh = Param.TRUTH_EPSILON;
 
         return truth(when, tasks,
-                (topEternal == null) ? null : topEternal,
-                maxDarkFraction, thresh);
+                minWeight, thresh);
 
     }
 
 
     @Nullable
-    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Truthed topEternal, /* background */float maxDarkFraction, float darkThresold) {
-        assert(times.length <= tasks.size());
+    public Truth truth(long when, @NotNull Task[] tasks,  /* background */float minWeight, float darkThresold) {
+        int n = tasks.length;
+        assert(times.length <= n);
 
-        int n = tasks.size();
         assert(n >= 2);
 
 //        long minT, maxT;
@@ -92,12 +88,13 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
 //        System.out.println(tasks + " sum=" + sum);
 
-        for (int i = 0; i < n; i++) {
-            Task t = tasks.get(i);
-            if (t == null) {
-                n--;
-                continue;
-            }
+        int i = 0;
+        for (Task t : tasks) {
+
+//            if (t == null) {
+//                n--;
+//                continue;
+//            }
             //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
 
             //offset the specified occurence time to a small window around the pure occurrence time,
@@ -114,8 +111,9 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
             float c = Math.min(t.conf(), 1f-Param.TRUTH_EPSILON); //clip maximum confidence
             conf[i] = c2w(c);
-
             //TODO dt
+
+            i++;
         }
 
 //        if (topEternal!=null) {
@@ -131,7 +129,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
                 times,
                 freq, conf,
                 exp,
-                maxDarkFraction, darkThresold,
+                minWeight, darkThresold,
                 n);
         if (v!=null)
             return $.t(v[0], w2c(v[1]));

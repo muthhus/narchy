@@ -291,8 +291,8 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(4, "enter:(John,room). :|:")
                 .mustBelieve(cycles, "( (--,open:(John, door)) ==>+4 enter:(John, room) )",
                         1.00f, 0.45f, 0)
-                .mustBelieve(cycles, "( (--,open:(John, door)) &&+4 enter:(John, room) )",
-                        1.00f, 0.81f, 0)
+                .mustBelieve(cycles, "( open:(John, door) &&+4 enter:(John, room) )",
+                        0.00f, 0.81f, 0)
         ;
     }
 

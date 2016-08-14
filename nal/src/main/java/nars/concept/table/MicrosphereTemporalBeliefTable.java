@@ -17,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
-import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.UtilityFunctions.and;
 import static nars.truth.TruthFunctions.projection;
 
@@ -202,10 +201,10 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
 
 
-    @Nullable
-    protected Task compress(@NotNull List<Task> displ, long now) {
-        return compress(null, now, null, displ, null);
-    }
+//    @Nullable
+//    protected Task compress(@NotNull List<Task> displ, long now) {
+//        return compress(null, now, null, displ, null);
+//    }
 
     /**
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
@@ -357,7 +356,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         if (s == 1)
             res = copy[0].projectTruth(when, now, false);
         else
-            res =  truthpolations.get().truth(when, eternal != null ? eternal.strongest() : null, copy);
+            res =  truthpolations.get().truth(when, copy);
 
         float confLimit = 1f - Param.TRUTH_EPSILON;
         if (res!=null && res.conf() > confLimit) //clip at max conf

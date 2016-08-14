@@ -8,7 +8,6 @@ import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.MutableInteger;
-import objenome.Container;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -154,7 +153,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static boolean DEBUG_DERIVER = false;
 
 
-    private Truth defaultGoalTruth, defaultJudgmentTruth;
+    private Truth defaultGoalTruth, defaultBeliefTruth;
 
     public final MutableInteger cyclesPerFrame = new MutableInteger(1);
 
@@ -275,7 +274,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
         switch (punctuation) {
             case BELIEF:
-                return defaultJudgmentTruth.conf();
+                return defaultBeliefTruth.conf();
 
             case GOAL:
                 return defaultGoalTruth.conf();
@@ -408,7 +407,7 @@ public abstract class Param /*extends Container*/ implements Level {
             case GOAL:
                 return defaultGoalTruth;
             case BELIEF:
-                return defaultJudgmentTruth;
+                return defaultBeliefTruth;
 
             case COMMAND:
                 return null;
@@ -515,6 +514,6 @@ public abstract class Param /*extends Container*/ implements Level {
      * sets the default input belief confidence
      */
     public void beliefConfidence(float v) {
-        defaultJudgmentTruth = new DefaultTruth(1.0f, v);
+        defaultBeliefTruth = new DefaultTruth(1.0f, v);
     }
 }
