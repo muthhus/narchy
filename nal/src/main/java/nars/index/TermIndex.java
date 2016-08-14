@@ -1,5 +1,9 @@
 package nars.index;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import nars.NAR;
+import nars.task.Task;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
 import nars.$;
@@ -28,6 +32,7 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static nars.$.unneg;
@@ -77,6 +82,8 @@ public interface TermIndex {
 
     void forEach(Consumer<? super Termed> c);
 
+
+    default public void start(NAR nar) { }
 
     /**
      * # of contained terms
@@ -516,7 +523,7 @@ public interface TermIndex {
 
             if (term instanceof Variable) {
                 //if (createIfMissing)
-                    throw new InvalidConceptException(term, VARIABLES_ARE_NOT_CONCEPTUALIZABLE);
+                throw new InvalidConceptException(term, VARIABLES_ARE_NOT_CONCEPTUALIZABLE);
                 //return null;
             }
 
@@ -541,7 +548,7 @@ public interface TermIndex {
 //            term = aterm;
 
             //if (aterm.op() == NEG)
-                //throw new InvalidConceptException(term, "Negation re-appeared");
+            //throw new InvalidConceptException(term, "Negation re-appeared");
 
         }
 
@@ -570,6 +577,7 @@ public interface TermIndex {
     default Term remap(@NotNull Term src, Map<Term, Term> m) {
         return termOrNull(resolve(src, new MapSubst(m)));
     }
+
     @Nullable
     default Term remap(@NotNull Term src, Term from, Term to) {
         return remap(src, Maps.mutable.of(from, to));
@@ -579,33 +587,14 @@ public interface TermIndex {
         throw new UnsupportedOperationException();
     }
 
-    default void policy(@NotNull Concept c, ConceptPolicy p, long now) {
-
-        @Nullable ConceptPolicy prev = c.policy();
-        if (prev != p) {
-            synchronized (c) {
-
-                c.policy(p, now);
-            }
-
-                c.tasklinks().commit();
-                c.termlinks().commit();
-
-                set(c); //update in the cache (weight, etc.)
-
-
-        }
-
-
-    }
-
-
 
 
     final class InvalidConceptException extends RuntimeException {
 
-        @NotNull public final Termed term;
-        @NotNull public final String reason;
+        @NotNull
+        public final Termed term;
+        @NotNull
+        public final String reason;
 
         public InvalidConceptException(@NotNull Termed term, @NotNull String reason) {
             this.term = term;

@@ -2,6 +2,7 @@ package nars;
 
 
 import com.google.common.collect.Sets;
+import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import com.lmax.disruptor.EventTranslatorOneArg;
@@ -31,7 +32,6 @@ import nars.term.atom.Atom;
 import nars.term.atom.Operator;
 import nars.time.Clock;
 import nars.time.FrameClock;
-import nars.util.Util;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -48,8 +48,6 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -355,9 +353,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //        });
 
 
-        index.loadBuiltins();
 
         (this.exe = exe).start(this);
+
+        index.loadBuiltins();
+        index.start(this);
     }
 
 
@@ -766,7 +766,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
         if (c.policy() == null) {
-            c.policy(index.conceptBuilder().init(), time());
+            policy(c, index.conceptBuilder().init(), time());
         }
 
 
@@ -777,7 +777,32 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         Task inputted;
         try {
-            inputted = c.process(input, this);
+
+            if (tasks.addIfAbsent(input)) {
+
+                List<Task> removed = $.newArrayList();
+
+                inputted = c.process(input, this, removed);
+
+                tasks.remove(removed);
+
+                if (inputted!=input) {
+                    tasks.remove(input);
+                    input.delete();
+                }
+
+                /*
+                long numTasks = tasks.tasks.estimatedSize();
+                int concepts = index.size();
+                float per = numTasks/concepts;
+                System.out.println("tasks=" + numTasks + ", ~" + per + " per concept");
+                */
+
+            } else {
+                inputted = null;
+            }
+
+
         } catch (Exception e) {
             emotion.errr();
 
@@ -819,10 +844,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             }
 
 
-            if (input != inputted) {
-                //input.onConcept(c);
-                input.delete();
-            }
             inputted.onConcept(c);
 
             eventTaskProcess.emit(inputted); //signal any additional processes

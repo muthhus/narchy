@@ -41,7 +41,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void capacity(int eternals, int temporals, List<Task> displ, long now) {
+        public void capacity(int eternals, int temporals, List<Task> removed, long now) {
 
         }
 
@@ -97,7 +97,7 @@ public interface BeliefTable extends TaskTable {
 
     };
 
-    void capacity(int eternals, int temporals, List<Task> displ, long now);
+    void capacity(int eternals, int temporals, List<Task> removed, long now);
 
 
 //    /**

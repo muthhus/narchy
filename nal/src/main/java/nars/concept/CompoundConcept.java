@@ -1,8 +1,5 @@
 package nars.concept;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.Symbols;
@@ -64,7 +61,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     //private transient long min = Tense.ETERNAL, max = Tense.ETERNAL;
 
 
-    final HashMap<Task, Task> tasks = new HashMap<>();
+    //final HashMap<Task, Task> tasks = new HashMap<>();
 
     /**
      * Constructor, called in Memory.getConcept only
@@ -237,9 +234,19 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     @Override
-    public void delete() {
+    public void delete(NAR nar) {
         termlinks().clear();
         tasklinks().clear();
+
+        //remove all tasks from the index:
+
+        List<Task> removed = $.newArrayList();
+        visitTasks((t) -> {
+            removed.add(t);
+        }, true, true, true, true);
+
+        nar.tasks.remove(removed);
+
         beliefs = null;
         goals = null;
         questions = null;
@@ -328,50 +335,21 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     @Override
-    public final void policy(@Nullable ConceptPolicy p, long now) {
+    public final void policy(@Nullable ConceptPolicy p, long now, List<Task> removed) {
         ConceptPolicy current = this.policy;
-        if (current!=p) {
+        if (current != p) {
             if ((this.policy = p) != null) {
                 linkCapacity(p);
                 //synchronized (tasks) {
-                beliefCapacity(p, now);
-                questionCapacity(p);
+                beliefCapacity(p, now, removed);
+                questionCapacity(p, removed);
                 //}
             }
         }
     }
 
 
-    private final void removeAndDelete(@NotNull List<Task> tt) {
-
-        int s = tt.size();
-        if (s == 0)
-            return;
-
-        synchronized (this.tasks) {
-            for (int i = 0; i < s; i++) {
-                Task x = tt.get(i), y;
-                if ((y = this.tasks.remove(x)) == null)
-                    throw new RuntimeException(x + " not in tasks map");
-                y.delete();
-                if (x!=y)
-                    x.delete();
-
-                /*
-                TODO eternalization for non-deleted temporal tasks that reach here:
-
-                float eternalizationFactor = Param.ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR;
-                if (eternalizationFactor > 0f && displaced.size() > 0 && eternal.capacity() > 0) {
-                    eternalizeForgottenTemporals(displaced, nar, eternalizationFactor);
-                }
-                 */
-
-            }
-        }
-
-    }
-
-    protected void beliefCapacity(@NotNull ConceptPolicy p, long now) {
+    protected void beliefCapacity(@NotNull ConceptPolicy p, long now, List<Task> removed) {
 
         int be = p.beliefCap(this, true, true);
         int bt = p.beliefCap(this, true, false);
@@ -379,23 +357,19 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         int ge = p.beliefCap(this, false, true);
         int gt = p.beliefCap(this, false, false);
 
-        beliefCapacity(be, bt, ge, gt, now);
+        beliefCapacity(be, bt, ge, gt, now, removed);
     }
 
-    protected final void beliefCapacity(int be, int bt, int ge, int gt, long now) {
-        List<Task> displ = $.newArrayList(0);
+    protected final void beliefCapacity(int be, int bt, int ge, int gt, long now, List<Task> removed) {
 
-        beliefs().capacity(be, bt, displ, now);
-        goals().capacity(ge, gt, displ, now);
+        beliefs().capacity(be, bt, removed, now);
+        goals().capacity(ge, gt, removed, now);
 
-        removeAndDelete(displ);
     }
 
-    protected void questionCapacity(@NotNull ConceptPolicy p) {
-        List<Task> displ = $.newArrayList(0);
-        questions().capacity((byte) p.questionCap(true), displ);
-        quests().capacity((byte) p.questionCap(false), displ);
-        removeAndDelete(displ);
+    protected void questionCapacity(@NotNull ConceptPolicy p, List<Task> removed) {
+        questions().capacity((byte) p.questionCap(true), removed);
+        quests().capacity((byte) p.questionCap(false), removed);
     }
 
     /**
@@ -437,7 +411,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     public void linkSubs(float scale, Concept src, float minScale, @Nullable NAR.Activation conceptOverflow, @NotNull NAR nar) {
 
 
-        linkDistribute(scale, src,  minScale, templates, conceptOverflow, nar);
+        linkDistribute(scale, src, minScale, templates, conceptOverflow, nar);
 
 
 //            /*if (subScale >= minScale)*/
@@ -496,7 +470,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         float tStrength = 1f / n;
         float subScale = scale * tStrength;
 
-        if (src!=null && src!=this) {
+        if (src != null && src != this) {
             //link the src to this
             AbstractConcept.linkSub(this, src, scale, activation, nar);
         } else {
@@ -540,32 +514,18 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * --a revised/projected task which may or may not remain in the belief table
      */
     @Override
-    public final Task process(@NotNull Task input, @NotNull NAR nar) {
+    public final Task process(@NotNull Task input, @NotNull NAR nar, List<Task> displaced) {
 
-
-        List<Task> displaced = $.newArrayList(1);
 
         Task output;
 
         /* if a duplicate exists, it will merge the incoming task and return true.
           otherwise false */
-        synchronized (tasks) {
+        //synchronized (tasks) {
 
-            //checkConsistency(); //TEMPORARY =-=============
 
-            Task existing = tasks.putIfAbsent(input, input);
-            if (existing != null) {
-                ///boolean budgetChange = false;
-                if (existing != input) {
-                    DuplicateMerge.merge(existing.budget(), input, 1f);
-                    input.delete(DUPLICATE_BELIEF_GOAL);
-                }
 
-                //checkConsistency(); //TEMPORARY =-=============
-                return null;
-                //return budgetChange ? existing : null; //return existing if budget changed to reactivate links
-            }
-
+        synchronized (term) {
 
             switch (input.punc()) {
                 case Symbols.BELIEF:
@@ -599,40 +559,35 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
                     throw new RuntimeException(input + " task was transformed " + output);
                 }
             }
-
-            removeAndDelete(displaced);
-
-            //checkConsistency(); //TEMPORARY =-=============
-
         }
 
 
         return output;
     }
 
-    private void checkConsistency() {
-        synchronized (tasks) {
-            int mapSize = tasks.size();
-            int tableSize = beliefs().size() + goals().size() + questions().size() + quests().size();
-
-            int THRESHOLD = 50; //to catch when the table explodes and not just an off-by-one inconsistency that will correct itself in the next cycle
-            if (Math.abs(mapSize - tableSize) > THRESHOLD) {
-                //List<Task> mapTasks = new ArrayList(tasks.keySet());
-                Set<Task> mapTasks = tasks.keySet();
-                ArrayList<Task> tableTasks = Lists.newArrayList(
-                        Iterables.concat(beliefs(), goals(), questions(), quests())
-                );
-                //Collections.sort(mapTasks);
-                //Collections.sort(tableTasks);
-
-                System.err.println(mapSize + " vs " + tableSize + "\t\t" + mapTasks.size() + " vs " + tableTasks.size());
-                System.err.println(Joiner.on('\n').join(mapTasks));
-                System.err.println("----");
-                System.err.println(Joiner.on('\n').join(tableTasks));
-                System.err.println("----");
-            }
-        }
-    }
+//    private void checkConsistency() {
+//        synchronized (tasks) {
+//            int mapSize = tasks.size();
+//            int tableSize = beliefs().size() + goals().size() + questions().size() + quests().size();
+//
+//            int THRESHOLD = 50; //to catch when the table explodes and not just an off-by-one inconsistency that will correct itself in the next cycle
+//            if (Math.abs(mapSize - tableSize) > THRESHOLD) {
+//                //List<Task> mapTasks = new ArrayList(tasks.keySet());
+//                Set<Task> mapTasks = tasks.keySet();
+//                ArrayList<Task> tableTasks = Lists.newArrayList(
+//                        Iterables.concat(beliefs(), goals(), questions(), quests())
+//                );
+//                //Collections.sort(mapTasks);
+//                //Collections.sort(tableTasks);
+//
+//                System.err.println(mapSize + " vs " + tableSize + "\t\t" + mapTasks.size() + " vs " + tableTasks.size());
+//                System.err.println(Joiner.on('\n').join(mapTasks));
+//                System.err.println("----");
+//                System.err.println(Joiner.on('\n').join(tableTasks));
+//                System.err.println("----");
+//            }
+//        }
+//    }
 
 //    public long minTime() {
 //        ageFactor();

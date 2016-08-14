@@ -131,8 +131,8 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
     }
 
     @Override
-    protected void beliefCapacity(ConceptPolicy p, long now) {
-        beliefCapacity(0, beliefCapacity, 0, goalCapacity, now);
+    protected void beliefCapacity(ConceptPolicy p, long now, List<Task> removed) {
+        beliefCapacity(0, beliefCapacity, 0, goalCapacity, now, removed);
     }
 
     @Override

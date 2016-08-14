@@ -218,7 +218,7 @@ public interface AbstractConcept extends Concept {
 
 
     @Override
-    default void delete() {
+    default void delete(NAR nar) {
         termlinks().clear();
         tasklinks().clear();
     }

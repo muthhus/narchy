@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -77,7 +78,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public void delete() {
+    public void delete(NAR nar) {
         //?
     }
 
@@ -118,10 +119,9 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
         return (target.quests());
     }
 
-    @Nullable
     @Override
-    public Task process(@NotNull Task task, @NotNull NAR nar) {
-        return target.process(task, nar);
+    public Task process(@NotNull Task task, @NotNull NAR nar, List<Task> removed) {
+        return target.process(task, nar, removed);
     }
 
     @NotNull
@@ -188,8 +188,8 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public void policy(@NotNull ConceptPolicy c, long now) {
-        target.policy(c, now);
+    public void policy(@NotNull ConceptPolicy c, long now, List<Task> removed) {
+        target.policy(c, now, removed);
     }
 
 

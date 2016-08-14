@@ -21,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 import static nars.nal.Tense.ETERNAL;
 
 
@@ -89,8 +91,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
 
     @Override
-    final protected void beliefCapacity(ConceptPolicy p, long now) {
-        beliefCapacity(0, beliefCapacity, desire!=null ? 1 : 0, goalCapacity, now);
+    final protected void beliefCapacity(ConceptPolicy p, long now, List<Task> removed) {
+        beliefCapacity(0, beliefCapacity, desire!=null ? 1 : 0, goalCapacity, now, removed);
     }
 
     @Override
@@ -141,7 +143,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
             if (t!=null) {
                 this.desire = new MutableTask(term(), Symbols.GOAL, t).log("Sensor Goal");
-                policy(policy(), nar.time()); //trigger capacity update
+                //policy(policy(), nar.time()); //trigger capacity update
                 sensor.nar.inputLater(this.desire);
             }
         }

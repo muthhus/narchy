@@ -1,8 +1,11 @@
 package nars.index;
 
 import com.github.benmanes.caffeine.cache.*;
+import nars.$;
+import nars.NAR;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -13,6 +16,7 @@ import nars.util.signal.WiredConcept;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +27,8 @@ import java.util.function.Consumer;
 
 
 public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
+
+    private NAR nar;
 
 //    @NotNull
 //    public final Cache<Termed, Termed> atomics;
@@ -248,7 +254,13 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     @Override
     public final void onRemoval(Object key, Object value, @Nonnull RemovalCause cause) {
         if (value instanceof Concept) {
-            ((Concept)value).delete();
+            Concept c = (Concept) value;
+            c.delete(nar);
         }
+    }
+
+    @Override
+    public void start(NAR nar) {
+        this.nar = nar;
     }
 }

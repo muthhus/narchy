@@ -29,7 +29,7 @@ public class DefaultCore extends AbstractCore {
     protected void sleep(@NotNull Concept c) {
         NAR n = this.nar;
 
-        n.index.policy(c, n.index.conceptBuilder().sleep(), n.time());
+        n.policy(c, n.index.conceptBuilder().sleep(), n.time());
 
         n.emotion.alert(1f / concepts.size());
     }
@@ -40,7 +40,7 @@ public class DefaultCore extends AbstractCore {
     protected boolean awake(@NotNull Concept c) {
 
         NAR n = this.nar;
-        n.index.policy(c, n.index.conceptBuilder().awake(), n.time());
+        n.policy(c, n.index.conceptBuilder().awake(), n.time());
 
         return true;
     }

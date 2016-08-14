@@ -25,7 +25,7 @@ public interface TemporalBeliefTable extends TaskTable {
 
 
 
-    void capacity(int c, long now, List<Task> displaced);
+    void capacity(int c, long now, List<Task> removed);
 
     boolean isFull();
 

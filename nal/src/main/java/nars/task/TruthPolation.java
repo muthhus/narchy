@@ -91,10 +91,10 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         int i = 0;
         for (Task t : tasks) {
 
-//            if (t == null) {
-//                n--;
-//                continue;
-//            }
+            if (t == null) {
+                n--;
+                continue;
+            }
             //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
 
             //offset the specified occurence time to a small window around the pure occurrence time,

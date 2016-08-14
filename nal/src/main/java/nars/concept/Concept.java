@@ -42,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -154,9 +155,10 @@ public interface Concept extends Termed {
      * process a task in this concept
      *
      * @param displaced collects tasks which have been displaced by the potential insertion of this task
+     * @param removed
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    @Nullable Task process(@NotNull Task task, @NotNull NAR nar);
+    Task process(@NotNull Task task, @NotNull NAR nar, List<Task> removed);
 
 
     /**
@@ -233,55 +235,55 @@ public interface Concept extends Termed {
         b.run(nar);
     }
 
-    /** link to a specific peer */
-    static <T> void linkPeer(@NotNull Bag<T> bag, @NotNull T x, @NotNull Budget b, float q) {
-        //@NotNull Bag<Termed> bag = termlinks();
-        BLink<? extends T> existing = bag.get(x);
-        if (existing == null)
-            return;
-
-        /*
-        Hebbian Learning:
-            deltaWeight = (input[fromNeuron] -
-                            output[toNeuron] * weight(fromNeuron,toNeuron)
-							* output[toNeuron] * this.learningRate);
-							*
-            deltaWeight = input[toNeuron] * output[toNeuron] * learningRate;
-            deltaWeight = (input - netInput) * output * this.learningRate; // is it right to use netInput here?
-			deltaWeight = input * desiredOutput * this.learningRate;
-         */
-
-
-        boolean init;
-        if (existing == null ) {
-            bag.put(x, b, q, null);
-            init = true;
-        } else {
-            init = false;
-        }
-
-        float bp = b.pri();
-        if (bp == bp /*!NaN */) {
-
-            final float learningRate = (bp * q) / bag.capacity();
-            //System.out.println(this + " activating " + x);
-            bag.forEach(tl -> {
-                //                if (active && init)
-//                    return; //dont modify the newly inserted link
-
-                float p = tl.pri();
-                if (p!=p) //the link is currently deleted
-                    return;
-
-                boolean active = tl == existing;
-                float dp = (active ? learningRate : -learningRate);
-                tl.priAdd(dp);
-                //System.out.println(tl.toString2());
-            });
-
-        }
-
-    }
+//    /** link to a specific peer */
+//    static <T> void linkPeer(@NotNull Bag<T> bag, @NotNull T x, @NotNull Budget b, float q) {
+//        //@NotNull Bag<Termed> bag = termlinks();
+//        BLink<? extends T> existing = bag.get(x);
+//        if (existing == null)
+//            return;
+//
+//        /*
+//        Hebbian Learning:
+//            deltaWeight = (input[fromNeuron] -
+//                            output[toNeuron] * weight(fromNeuron,toNeuron)
+//							* output[toNeuron] * this.learningRate);
+//							*
+//            deltaWeight = input[toNeuron] * output[toNeuron] * learningRate;
+//            deltaWeight = (input - netInput) * output * this.learningRate; // is it right to use netInput here?
+//			deltaWeight = input * desiredOutput * this.learningRate;
+//         */
+//
+//
+//        boolean init;
+//        if (existing == null ) {
+//            bag.put(x, b, q, null);
+//            init = true;
+//        } else {
+//            init = false;
+//        }
+//
+//        float bp = b.pri();
+//        if (bp == bp /*!NaN */) {
+//
+//            final float learningRate = (bp * q) / bag.capacity();
+//            //System.out.println(this + " activating " + x);
+//            bag.forEach(tl -> {
+//                //                if (active && init)
+////                    return; //dont modify the newly inserted link
+//
+//                float p = tl.pri();
+//                if (p!=p) //the link is currently deleted
+//                    return;
+//
+//                boolean active = tl == existing;
+//                float dp = (active ? learningRate : -learningRate);
+//                tl.priAdd(dp);
+//                //System.out.println(tl.toString2());
+//            });
+//
+//        }
+//
+//    }
 
 //    /** link to all existing termlinks, hierarchical and heterarchical */
 //    default void linkPeers(@NotNull Budgeted b, float scale, @NotNull NAR nar, boolean recurse) {
@@ -398,11 +400,11 @@ public interface Concept extends Termed {
         out.println('\n');
     }
 
-    void delete();
+    void delete(NAR nar);
 
     @Nullable ConceptPolicy policy();
 
-    void policy(@Nullable ConceptPolicy c, long now);
+    void policy(@Nullable ConceptPolicy c, long now, List<Task> removed);
 
     default boolean active() {
         return policy()!=null;

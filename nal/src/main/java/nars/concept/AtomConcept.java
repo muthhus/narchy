@@ -14,6 +14,7 @@ import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -50,7 +51,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
         return policy;
     }
     @Override
-    public void policy(@Nullable ConceptPolicy p, long now) {
+    public void policy(@Nullable ConceptPolicy p, long now, List<Task> removed) {
         this.policy = p;
         if (p!=null) {
             linkCapacity(p);
@@ -104,9 +105,8 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
     }
 
 
-    @NotNull
     @Override
-    public Task process(@NotNull Task task, @NotNull NAR nar) {
+    public Task process(@NotNull Task task, @NotNull NAR nar, List<Task> removed) {
         throw new UnsupportedOperationException();
     }
 

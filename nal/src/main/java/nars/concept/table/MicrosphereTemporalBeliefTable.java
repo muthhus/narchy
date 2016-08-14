@@ -38,14 +38,14 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    public void capacity(int newCapacity, long now, @NotNull List<Task> displ) {
+    public void capacity(int newCapacity, long now, @NotNull List<Task> removed) {
         this.capacity = newCapacity;
 
-        removeAlreadyDeleted(displ);
+        removeAlreadyDeleted(removed);
         //compress(displ, now);
 
         while (this.size() > newCapacity) {
-            remove(weakest(now), displ);
+            remove(weakest(now), removed);
         }
 
     }

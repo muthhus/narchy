@@ -53,6 +53,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         this.capacity = newCapacity;
 
+        @NotNull List<Task> list = this.list;
+
         synchronized (list) {
             int s = size();
 

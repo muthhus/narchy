@@ -21,6 +21,10 @@
 package nars;
 
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import nars.budget.policy.ConceptPolicy;
+import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.task.Task;
 import nars.term.atom.Atom;
@@ -29,9 +33,16 @@ import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import nars.util.signal.Emotion;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
+
+import static nars.concept.CompoundConcept.DUPLICATE_BELIEF_GOAL;
+import static nars.concept.CompoundConcept.DuplicateMerge;
 
 
 /**
@@ -66,6 +77,8 @@ public class Memory extends Param {
     /** holds known Term's and Concept's */
     @NotNull public final TermIndex index;
 
+    @NotNull public final TaskIndex tasks;
+
 
     /** maximum NAL level currently supported by this memory, for restricting it to activity below NAL8 */
     int level;
@@ -87,6 +100,8 @@ public class Memory extends Param {
 
         this.index = index;
 
+        this.tasks = new TaskIndex();
+
 
         self = Param.DEFAULT_SELF; //default value
 
@@ -106,6 +121,114 @@ public class Memory extends Param {
      */
     public final void nal(int newLevel) {
         level = newLevel;
+    }
+
+
+    public final void policy(@NotNull Concept c, ConceptPolicy p, long now) {
+
+        @Nullable ConceptPolicy prev = c.policy();
+        if (prev != p) {
+            List<Task> removed = $.newArrayList();
+
+            synchronized (c) {
+
+                c.policy(p, now, removed);
+            }
+
+            tasks.remove(removed);
+
+            c.tasklinks().commit();
+            c.termlinks().commit();
+
+            index.set(c); //update in the cache (weight, etc.)
+
+
+        }
+
+
+    }
+
+
+    public final static class TaskIndex {
+        protected final Cache<Task, Task> tasks = Caffeine.newBuilder().build();
+        private final ConcurrentMap<Task, Task> tasksMap;
+
+
+        public TaskIndex() {
+            this.tasksMap = tasks.asMap();
+        }
+
+
+        public boolean addIfAbsent(Task x) {
+            final boolean[] isNew = {false};
+
+            tasksMap.compute(x, (X,oldValue) -> {
+                    if (oldValue == null) {
+                        isNew[0] = true;
+                        return x;
+                    } else {
+                        if (oldValue!=x) {
+                            DuplicateMerge.merge(oldValue.budget(), x, 1f);
+                        }
+                        return oldValue;
+                    }
+            });
+
+            if (!isNew[0]) {
+                x.delete(DUPLICATE_BELIEF_GOAL);
+                return false;
+            } else {
+                return true;
+            }
+
+//            tasksMap.compute()
+//
+//            Concept c = tasks.get(x, X -> {
+//                Concept cc = X.normalize(nar);
+//                isNew[0] = true;
+//                return cc;
+//            });
+//            if (isNew[0]) {
+//                ifAdded.accept(x, c);
+//            } else {
+//                ifExists.accept()
+//            }
+//            return c;
+        }
+
+
+        public final void remove(@NotNull Task tt) {
+            tasks.invalidate(tt);
+        }
+
+        public final void remove(@NotNull List<Task> tt) {
+
+            int s = tt.size();
+            if (s == 0)
+                return;
+
+            tasks.invalidateAll(tt);
+
+            //synchronized (this.tasks) {
+            for (int i = 0; i < s; i++) {
+                Task x = tt.get(i);
+//                    if ((y = this.tasks.invalidate(x)) == null)
+//                        throw new RuntimeException(x + " not in tasks map");
+                x.delete();
+
+                /*
+                TODO eternalization for non-deleted temporal tasks that reach here:
+
+                float eternalizationFactor = Param.ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR;
+                if (eternalizationFactor > 0f && displaced.size() > 0 && eternal.capacity() > 0) {
+                    eternalizeForgottenTemporals(displaced, nar, eternalizationFactor);
+                }
+                 */
+
+            }
+
+
+        }
     }
 
 

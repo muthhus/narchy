@@ -89,10 +89,10 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public final void capacity(int eternals, int temporals, @NotNull List<Task> displ, long now) {
-        eternal.capacity(eternals, displ);
+    public final void capacity(int eternals, int temporals, @NotNull List<Task> removed, long now) {
+        eternal.capacity(eternals, removed);
         synchronized (temporal) {
-            temporal.capacity(temporals, now, displ);
+            temporal.capacity(temporals, now, removed);
         }
     }
 
