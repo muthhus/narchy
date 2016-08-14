@@ -32,12 +32,9 @@ public abstract class AbstractNAR extends NAR {
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 4;
 
-    public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random random) {
-        this(clock, index, random, Param.DEFAULT_SELF);
-    }
 
-    public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
-        super(clock, index, rng, self);
+    public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
+        super(clock, index, rng, self, exe);
 
         durMin.setValue(BUDGET_EPSILON * 2f);
 

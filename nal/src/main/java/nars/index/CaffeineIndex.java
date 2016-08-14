@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -71,10 +72,10 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         Caffeine<Termed, Termed> builder = prepare(Caffeine.newBuilder(), soft);
 
         final ExecutorService executor =
-                ForkJoinPool.commonPool();
+                //ForkJoinPool.commonPool();
                 //Executors.newFixedThreadPool(2);
                 //Executors.newCachedThreadPool();
-                //Executors.newSingleThreadExecutor();
+                Executors.newSingleThreadExecutor();
 
         builder
                .weigher(complexityAndConfidenceWeigher)

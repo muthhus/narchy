@@ -132,6 +132,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         abstract public void inputLater(Task[] t);
 
+        abstract public void next(NAR nar);
     }
 
     public static class SingleThreadExecutioner extends Executioner {
@@ -146,6 +147,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         @Override
         public void synchronize() {
 
+        }
+
+        @Override
+        public void next(NAR nar) {
+            nar.eventFrameStart.emit(nar);
         }
 
         @Override
@@ -186,6 +192,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
                     new LiteBlockingWaitStrategy()
             );
+        }
+
+        @Override
+        public void next(NAR nar) {
+            nar.eventFrameStart.emitAsync(nar, runWorker);
         }
 
         @Override
@@ -836,7 +847,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         this.running = true;
 
-        Topic<NAR> frameStart = eventFrameStart;
+
 
         Clock clock = this.clock;
 
@@ -845,7 +856,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             clock.tick();
             emotion.frame();
 
-            frameStart.emit(this);
+            exe.next(this);
 
             exe.synchronize();
 

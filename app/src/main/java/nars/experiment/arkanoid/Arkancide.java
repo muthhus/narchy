@@ -36,6 +36,7 @@ import java.util.Random;
 import static java.util.stream.Collectors.toList;
 import static nars.$.t;
 import static nars.experiment.tetris.Tetris2.arrayRenderer;
+import static nars.experiment.tetris.Tetris2.exe;
 import static nars.vision.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
@@ -210,7 +211,7 @@ public class Arkancide extends NAREnvironment {
         Default nar = new Default(3072,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 7 * 1000000, false)
-                , new FrameClock()) {
+                , new FrameClock(), exe) {
 
             VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
             @Override protected Task preprocess(Task input) {

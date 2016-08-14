@@ -2,6 +2,7 @@ package nars.nar;
 
 import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.NAR;
+import nars.Param;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.index.Indexes;
@@ -34,7 +35,7 @@ public class Terminal extends AbstractNAR {
         this(capacity, new XORShiftRandom(1), new FrameClock());
     }
     public Terminal(int capacity, @NotNull Random random, @NotNull Clock c) {
-        super(c, new Indexes.DefaultTermIndex(capacity, random), random);
+        super(c, new Indexes.DefaultTermIndex(capacity, random), random, Param.DEFAULT_SELF, new SingleThreadExecutioner());
     }
 
 

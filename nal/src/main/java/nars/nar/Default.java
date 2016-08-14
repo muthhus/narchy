@@ -47,10 +47,14 @@ public class Default extends AbstractNAR {
 
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex index, @NotNull Clock clock) {
+        this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random, index, clock, new SingleThreadExecutioner());
+    }
+
+    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex index, @NotNull Clock clock, Executioner exe) {
         super(clock,
                 index,
                 random,
-                Param.DEFAULT_SELF);
+                Param.DEFAULT_SELF, exe);
 
 
         core = newCore(

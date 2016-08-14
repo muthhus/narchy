@@ -53,6 +53,7 @@ public class Tetris2 extends NAREnvironment {
 
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
     public static final int DEFAULT_INDEX_WEIGHT = 12 * 1000000;
+    public static final NAR.Executioner exe = new NAR.MultiThreadExecutioner(2,2);
 
     static {
         Param.DEBUG = false;
@@ -341,7 +342,9 @@ public class Tetris2 extends NAREnvironment {
                 32, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false)
 
-                , new FrameClock()) {
+                , new FrameClock(), exe
+
+        ) {
 
             VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
 
