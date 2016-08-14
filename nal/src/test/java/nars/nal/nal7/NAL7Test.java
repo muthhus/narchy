@@ -324,12 +324,13 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void induction_on_events3_simple() {
         TestNAR tester = test();
-        tester.input("<door --> open>. :|:");
-        tester.inputAt(4, "<room --> enter>. :|:");
 
-        tester.mustBelieve(cycles, "(<door --> open> <=>+4 <room --> enter>)",
+        tester.inputAt(1, "<door --> open>. :|:");
+        tester.inputAt(2, "<room --> enter>. :|:");
+
+        tester.mustBelieve(cycles, "(<door --> open> <=>+1 <room --> enter>)",
                 1.00f, 0.45f,
-                0);
+                1);
     }
 
     @Test
@@ -673,12 +674,14 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles,"(x)",1f,0.81f,0)
                 .mustBelieve(cycles,"(y)",1f,0.81f,0);
     }
-//    @Test public void testWTFDontDecomposeConjunction0() {
-//        test()
-//                .input("((x)&&(y)). :|:")
-//                .mustNotOutput(cycles,"(x)",'.',0,ETERNAL)
-//                .mustNotOutput(cycles,"(y)",'.',0,ETERNAL);
-//    }
+    @Test public void testWTFDontDecomposeConjunctionDTERNAL() {
+        test()
+                .input("((x)&&(y)). :|:")
+                .mustBelieve(cycles,"(x)",1f,0.81f,0)
+                .mustBelieve(cycles,"(y)",1f,0.81f,0)
+                .mustNotOutput(cycles,"(x)",'.',ETERNAL)
+                .mustNotOutput(cycles,"(y)",'.',ETERNAL);
+    }
 //    @Test public void testWTFDontDecomposeConjunction1() {
 //        test()
 //                .input("((x) &&+0 (y)).")

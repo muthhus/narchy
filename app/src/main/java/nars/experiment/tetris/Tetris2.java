@@ -359,15 +359,15 @@ public class Tetris2 extends NAREnvironment {
         nar.derivedActivation.setValue(0.03f);
 
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.7f);
+        nar.beliefConfidence(0.85f);
+        nar.goalConfidence(0.75f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.03f);
-        nar.truthResolution.setValue(0.02f);
+        nar.confMin.setValue(0.02f);
+        //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -401,8 +401,8 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 4);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 4);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);

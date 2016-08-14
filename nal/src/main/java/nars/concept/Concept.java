@@ -190,7 +190,7 @@ public interface Concept extends Termed {
 
 
 
-    default boolean link(Budgeted source, float initialScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    default boolean link(float initialScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
 
         float p = activation.in.priIfFiniteElseNeg1();
         float minScale = nar.taskLinkThreshold.floatValue() / p;
@@ -198,7 +198,7 @@ public interface Concept extends Termed {
         if (p <= minScale)
             return false;
 
-        return link(initialScale, source,
+        return link(initialScale, activation.in,
                 minScale, //minScale
                 nar, activation);
     }
@@ -221,13 +221,16 @@ public interface Concept extends Termed {
     default void crossLink(Budgeted thisInput, float scale, @NotNull NAR nar, Concept other, Budgeted otherTask) {
         float halfScale = scale / 2f;
 
-        NAR.Activation a = new NAR.Activation(thisInput, null);
+        NAR.Activation a = new NAR.Activation(otherTask, null);
 
-        this.link(otherTask, halfScale, nar, a);
+        this.link(halfScale, nar, a);
 
-        other.link(thisInput, halfScale, nar, a);
+        NAR.Activation b = new NAR.Activation(thisInput, null);
+
+        other.link(halfScale, nar, b);
 
         a.run(nar);
+        b.run(nar);
     }
 
     /** link to a specific peer */

@@ -107,7 +107,9 @@ public class PatrickTests extends AbstractNALTest {
 
         TestNAR tt = test();
 
-        tt.mustOutput(0, 2500, "lighter({SELF}, toothbrush)", '!', 1f, 1f,
+        //tt.log();
+
+        tt.mustOutput(0, 500, "lighter({SELF}, toothbrush)", '!', 1f, 1f,
                 0.1f, 1f, //at least 30% confidence
                 /*@*/ -30L);  //is this correct time? might be off by +/-10 , will check
 
@@ -118,7 +120,10 @@ public class PatrickTests extends AbstractNALTest {
                 "(( <$1 --> [pliable]> &&+0 reshape({SELF},$1)) ==>+10 <$1 --> [hardened]>).",
                 "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrewing]>).",
                 "<toothbrush --> here>. :|:", //there is a toothbrush here NOW
-                "(&&,<#1 --> here>,<#1 --> [unscrewing]>)!"
+
+                "( <#1 --> here> &&+0 <#1 --> [unscrewing]>)!" //simultaneous
+                    //"( <#1 --> here> && <#1 --> [unscrewing]>)! :|:" //alternate: NOW
+
                 );
 
 

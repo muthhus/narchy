@@ -159,7 +159,7 @@ public class Arkancide extends NAREnvironment {
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
-                BagChart.newBagChart((Default)nar, 1024),
+                //BagChart.newBagChart((Default)nar, 1024),
                 camView, view
         );
 
@@ -221,8 +221,8 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.01f);
-        nar.derivedActivation.setValue(0.01f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
         nar.beliefConfidence(0.8f);
