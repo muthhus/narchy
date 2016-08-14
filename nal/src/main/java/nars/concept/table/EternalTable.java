@@ -19,7 +19,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nars.concept.table.BeliefTable.rankEternalByConfAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 
 
@@ -88,15 +87,20 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 //        }
     }
 
+    protected static float rank(Task w) {
+        //return rankEternalByConfAndOriginality(w);
+        return w.conf();
+    }
+
     public final float minRank() {
         Task w = weakest();
-        return w == null ? 0 : rankEternalByConfAndOriginality(w);
+        return w == null ? 0 : rank(w);
     }
 
     @Override
     public final int compare(@NotNull Task o1, @NotNull Task o2) {
-        float f1 = rankEternalByConfAndOriginality(o2); //reversed
-        float f2 = rankEternalByConfAndOriginality(o1);
+        float f1 = rank(o2); //reversed
+        float f2 = rank(o1);
         if (f1 < f2)
             return -1;
         if (f1 > f2)
@@ -187,8 +191,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         if (size() == capacity()) {
             Task l = weakest();
             if (l!=null) {
-                float lc = rankEternalByConfAndOriginality(l);
-                float tc = rankEternalByConfAndOriginality(t);
+                float lc = rank(l);
+                float tc = rank(t);
                 if (lc <= tc) {
                     displaced = removeWeakest();
                 } else {
@@ -329,7 +333,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
 
     public final float rank(float eConf, int length) {
-        return rankEternalByConfAndOriginality(eConf, length);
+        //return rankEternalByConfAndOriginality(eConf, length);
+        return eConf;
     }
 
     public boolean isFull() {

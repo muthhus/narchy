@@ -653,7 +653,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         public Insertion(Budgeted b, float scale, @Nullable MutableFloat overflow) {
             this.b = b;
             this.scale = scale;
-
             this.overflow = overflow;
         }
 
@@ -671,6 +670,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             } else {
                 BLink d, r;
                 float bp = b.pri() * scale;
+                int activated;
                 if (minPriIfFull > bp) {
                     //insufficient budget
                     pending += bp * b.dur(); //include failed input in pending
@@ -689,6 +689,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                         r = null;
                     }
                 }
+                this.activated = activated;
                 displaced = d;
                 return r;
             }
