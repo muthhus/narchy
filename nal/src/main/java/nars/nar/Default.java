@@ -95,7 +95,7 @@ public class Default extends AbstractNAR {
     }
 
     @Override
-    protected void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
+    protected final void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
         core.concepts.put(concepts, in, activation,overflow);
     }
 

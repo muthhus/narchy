@@ -38,7 +38,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     @NotNull
     public final NAR nar;
     public FloatSupplier pri;
-    private final float dur;
+    public float dur;
 
     private float prevF = Float.NaN;
 

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 12/22/15.
  */
-public class CommutivePermutations extends Termutator {
+public final class CommutivePermutations extends Termutator {
     @NotNull
     private final ShuffledSubterms perm;
     @NotNull

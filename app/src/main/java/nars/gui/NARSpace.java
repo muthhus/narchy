@@ -34,22 +34,22 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 32, 4, 2);
-        n.inputActivation.setValue(0.1f);
-        n.derivedActivation.setValue(0.1f);
+        Default n = new Default(1024, 5, 4, 2);
+        n.inputActivation.setValue(0.5f);
+        n.derivedActivation.setValue(0.5f);
         //n.nal(4);
 
 
-        new DeductiveMeshTest(n, new int[]{7, 7}, 16384);
-        new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
+        new DeductiveMeshTest(n, new int[]{8, 3}, 16384);
+        //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
-        new ArithmeticInduction(n);
+        //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 128, 12);
+        newConceptWindow(n, 256, 32);
 
         //n.run(20); //headstart
 
-        n.loop(25f);
+        n.loop(5f);
 
     }
 

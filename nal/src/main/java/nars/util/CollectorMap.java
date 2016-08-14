@@ -63,34 +63,42 @@ public abstract class CollectorMap<K, V> {
 
         synchronized (map) {
             V removed = map.put(key, value);
-            if (removed != null) {
-
-                if (removed == value) {
-                    //rejected input
-                    return value;
-                } else {
-                    //displaced other
-                    V remd = removeItem(removed);
-                    if (remd == null)
-                        throw new RuntimeException("unable to remove item corresponding to key " + key);
-
-                }
-            }
-
-            V displaced = addItem(value);
-
-            if (displaced != null) { //&& (!key(removed2).equals(key))) {
-                if (removed != null && removed != displaced) {
-                    throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + displaced);
-                }
+            V displaced = mergeList(key, value, removed);
+            if (displaced!=null) {
                 removeKeyForValue(displaced);
-                removed = displaced;
             }
-
-            return removed;
+            return displaced;
         }
 
 
+    }
+
+    /** the key of the displaced item needs to be removed from the table sometime after calling this */
+    public @Nullable V mergeList(@NotNull K key, @NotNull V value, V removed) {
+        if (removed != null) {
+
+            if (removed == value) {
+                //rejected input
+                return value;
+            } else {
+                //displaced other
+                V remd = removeItem(removed);
+                if (remd == null)
+                    throw new RuntimeException("unable to remove item corresponding to key " + key);
+
+            }
+        }
+
+        V displaced = addItem(value);
+
+        if (displaced != null) { //&& (!key(removed2).equals(key))) {
+            if (removed != null && removed != displaced) {
+                throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + displaced);
+            }
+            removed = displaced;
+        }
+
+        return removed;
     }
 
     @Nullable
@@ -126,7 +134,13 @@ public abstract class CollectorMap<K, V> {
 
     protected final @Nullable V removeKeyForValue(@NotNull V value) {
         @Nullable K key = key(value);
-        return key == null ? null : map.remove(key);
+        if (key == null) {
+            return null;
+        } else {
+            synchronized (map) {
+                return map.remove(key);
+            }
+        }
     }
 
 
@@ -142,9 +156,13 @@ public abstract class CollectorMap<K, V> {
         return map.get(key);
     }
 
-    public final V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> c) {
-        return map.compute(key,c);
+    public final V merge(@NotNull K key, V value, @NotNull BiFunction<? super V, ? super V, ? extends V> c) {
+        return map.merge(key, value, c);
     }
+    public final V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> c) {
+        return map.compute(key, c);
+    }
+
 
     public boolean containsKey(@NotNull K name) {
         return map.containsKey(name);

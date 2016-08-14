@@ -7,6 +7,7 @@ import nars.NARLoop;
 import nars.Param;
 import nars.data.AutoClassifier;
 import nars.experiment.NAREnvironment;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -56,7 +57,7 @@ public class Arkancide extends NAREnvironment {
     final int visH = 24;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 16;
+    private int visionSyncPeriod = 8;
     float noiseLevel = 0;
 
     float paddleSpeed = 70f;
@@ -94,6 +95,7 @@ public class Arkancide extends NAREnvironment {
                         () -> noise(decodeRed(cam.out.getRGB(xx, yy))) ,// > 0.5f ? 1 : 0,
                         (v) -> t(v, alpha)
                 ));
+                sss.sensor.dur = 0.1f;
                 sss.timing(0,visionSyncPeriod);
                 ss[x][y] = sss;
             }
@@ -157,7 +159,7 @@ public class Arkancide extends NAREnvironment {
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
-                //BagChart.newBagChart((Default)nar, 512),
+                BagChart.newBagChart((Default)nar, 1024),
                 camView, view
         );
 
@@ -208,9 +210,9 @@ public class Arkancide extends NAREnvironment {
         Random rng = new XorShift128PlusRandom(1);
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(3072,
+        Default nar = new Default(1024,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 7 * 1000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 4 * 1000000, false)
                 , new FrameClock(), exe) {
 
             VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
@@ -223,15 +225,15 @@ public class Arkancide extends NAREnvironment {
         nar.derivedActivation.setValue(0.01f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
-        nar.truthResolution.setValue(0.04f);
+        nar.confMin.setValue(0.02f);
+        //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)

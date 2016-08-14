@@ -34,7 +34,7 @@ abstract public class Versioning extends FasterList<Versioned> {
     public final int newChange(Versioned v) {
         int c = ++now;
         if (!addIfCapacity(v))
-            throw new OutOfMemoryError("Versioned stack fault");
+            throw new RuntimeException("Versioned stack fault");
         return c;
     }
 

@@ -54,7 +54,7 @@ public class Memory extends Param {
 
     public final transient Topic<Memory> eventReset = new DefaultTopic<>();
 
-    public final transient Topic<NAR> eventFrameStart = new DefaultTopic<>();
+    public final transient DefaultTopic<NAR> eventFrameStart = new DefaultTopic<>();
 
     public final transient Topic<Task> eventTaskProcess = new DefaultTopic<>();
 

@@ -306,8 +306,8 @@ public class STMClustered extends STM {
             }
 
             @Override
-            protected BLink<Task> putNew(Task i, BLink<Task> newBudget) {
-                BLink<Task> displaced = super.putNew(i, newBudget);
+            protected BLink<Task> prePutNew(Task k, BLink<Task> v) {
+                BLink<Task> displaced = super.prePutNew(k, v);
                 if (displaced != null)
                     drop((TLink)displaced);
                 return displaced;
@@ -340,7 +340,7 @@ public class STMClustered extends STM {
         super.start();
         nar.onFrame((nn) -> {
             if (ready.compareAndSet(true, false)) {
-                nn.runLater(this::iterate);
+                iterate();
             }
         });
     }

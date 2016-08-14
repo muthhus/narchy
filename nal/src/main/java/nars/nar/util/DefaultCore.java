@@ -6,7 +6,6 @@ import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,17 +70,9 @@ public class DefaultCore extends AbstractCore {
             super.clear();
         }
 
-
-        @Nullable
         @Override
-        protected BLink<Concept> putNew(@NotNull Concept i, @NotNull BLink<Concept> b) {
-            if (!awake(i))
-                return b;
-            BLink<Concept> displaced = super.putNew(i, b);
-            if (displaced!=null) {
-                sleep(displaced.get());
-            }
-            return displaced;
+        protected void putActive(Concept c) {
+            awake(c);
         }
 
         @Override

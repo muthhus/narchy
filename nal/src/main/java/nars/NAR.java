@@ -31,6 +31,7 @@ import nars.term.atom.Atom;
 import nars.term.atom.Operator;
 import nars.time.Clock;
 import nars.time.FrameClock;
+import nars.util.Util;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -46,14 +47,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static nars.Symbols.*;
@@ -112,8 +111,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public volatile boolean running = false;
 
 
-
-
     private NARLoop loop;
 
     private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
@@ -167,8 +164,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public static class MultiThreadExecutioner extends Executioner {
 
-        final ForkJoinPool runWorker;
-        private final int taskThreads;
+        //final ForkJoinPool runWorker;
+        private final int taskThreads, runThreads;
 
 
         static final class TaskEvent {
@@ -176,15 +173,22 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             public Task[] tasks;
         }
 
-        final Disruptor<TaskEvent> async;
-        //private final SequenceBarrier asyncBarrier;
+        final Disruptor<TaskEvent> taskruptor;
+
+        static final class RunEvent {
+            @Nullable
+            public Runnable r;
+        }
+
+        final Disruptor<RunEvent> runruptor;
 
         public MultiThreadExecutioner(int taskThreads, int runThreads) {
 
-            this.runWorker = (ForkJoinPool) Executors.newWorkStealingPool(runThreads);
+            //this.runWorker = (ForkJoinPool) Executors.newWorkStealingPool(runThreads);
             this.taskThreads = taskThreads;
+            this.runThreads = runThreads;
 
-            this.async = new Disruptor<TaskEvent>(
+            this.taskruptor = new Disruptor<TaskEvent>(
                     () -> new TaskEvent(),
                     4096 /* ringbuffer size */,
                     new BasicExecutor(Executors.defaultThreadFactory()),
@@ -192,45 +196,86 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
                     new LiteBlockingWaitStrategy()
             );
+            this.runruptor = new Disruptor<RunEvent>(
+                    () -> new RunEvent(),
+                    4096 /* ringbuffer size */,
+                    new BasicExecutor(Executors.defaultThreadFactory()),
+                    ProducerType.MULTI,
+                    //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
+                    new LiteBlockingWaitStrategy()
+            );
+
         }
 
         @Override
         public void next(NAR nar) {
-            nar.eventFrameStart.emitAsync(nar, runWorker);
+            //nar.eventFrameStart.emitAsync(nar, runWorker);
+
+            Consumer[] vv = nar.eventFrameStart.getCachedNullTerminatedArray();
+            if (vv != null) {
+                for (int i = 0; ; ) {
+                    Consumer c = vv[i++];
+                    if (c != null) {
+                        runLater(() -> {
+                            c.accept(nar);
+                        });
+                    } else
+                        break; //null terminator hit
+                }
+            }
+
         }
 
         @Override
         public void start(NAR nar) {
 
-            WorkHandler[] workers = new WorkHandler[taskThreads];
+            WorkHandler[] taskWorker = new WorkHandler[taskThreads];
             for (int i = 0; i < taskThreads; i++)
-                workers[i] = new TaskEventWorkHandler(nar);
+                taskWorker[i] = new TaskEventWorkHandler(nar);
+            taskruptor.handleEventsWithWorkerPool(taskWorker);
 
-            async.handleEventsWithWorkerPool(workers);
-            async.start();
+            WorkHandler[] runWorker = new WorkHandler[runThreads];
+            for (int i = 0; i < runThreads; i++)
+                runWorker[i] = new RunWorkHandler();
+            runruptor.handleEventsWithWorkerPool(runWorker);
+
+            runruptor.start();
+            taskruptor.start();
         }
 
         public void synchronize() {
             //if (!runWorker.isQuiescent()) {
-                while (!runWorker.awaitQuiescence(QUIESENCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
-                    //logger.warn("runWorker lag: {}", runWorker);
-                    Thread.yield();
-                }
+//                while (!runWorker.awaitQuiescence(QUIESENCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+//                    //logger.warn("runWorker lag: {}", runWorker);
+//                    Thread.yield();
+//                }
             //}
 
+            waitFor(runruptor);
+            waitFor(taskruptor);
+
+
+        }
+
+        public void waitFor(Disruptor d) {
 
             //long used = size - ring.remainingCapacity();
             long cap;
-            RingBuffer<TaskEvent> ring = async.getRingBuffer();
+            RingBuffer<TaskEvent> ring = d.getRingBuffer();
             while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
                 //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
 
                 //long now = async.getCursor();
                 //logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
-                //Util.pause(1);
-                Thread.yield();
-            }
 
+                //Thread.yield();
+                //Util.pause(1);
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+
+                }
+            }
 
         }
 
@@ -239,12 +284,30 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         @Override
         public void inputLater(Task[] t) {
             //taskWorker.execute(new InputTasks(t));
-            async.publishEvent(taskPublisher, t);
+            taskruptor.publishEvent(taskPublisher, t);
         }
+
+        final static EventTranslatorOneArg<RunEvent, Runnable> runPublisher = (RunEvent x, long seq, Runnable b) -> x.r = b;
 
         @Override
         public void runLater(Runnable r) {
-            runWorker.execute(r);
+
+            //runWorker.execute(r);
+            runruptor.publishEvent(runPublisher, r);
+        }
+
+        private final static class RunWorkHandler implements WorkHandler<RunEvent> {
+
+            @Override
+            public void onEvent(RunEvent r) throws Exception {
+                @Nullable Runnable rr = r.r;
+                r.r = null;
+                try {
+                    rr.run();
+                } catch (Exception e) {
+                    logger.error("{}", e);
+                }
+            }
         }
 
         private final static class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
@@ -272,7 +335,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         super(clock, rng, index);
 
 
-
         this.self = self;
 
 
@@ -297,7 +359,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         (this.exe = exe).start(this);
     }
-
 
 
     @Deprecated
@@ -740,9 +801,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 //try {
                 Activation activation = new Activation(inputted, c);
 
-                c.link(conceptActivation , null/* linkActivation */, Param.BUDGET_EPSILON, this, activation);
+                c.link(1f, null/* linkActivation */, Param.BUDGET_EPSILON, this, activation);
 
-                activation.run(this, 1f); //values will already be scaled
+                activation.run(this, conceptActivation); //values will already be scaled
 
                 emotion.busy(p);
                 emotion.stress(activation.overflow);
@@ -848,7 +909,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         this.running = true;
 
 
-
         Clock clock = this.clock;
 
         for (; frames > 0; frames--) {
@@ -869,8 +929,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         return this;
     }
-
-
 
 
 //    private void runAsyncFrameTasks() {
@@ -912,7 +970,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             try {
                 outputEvent(out, previous[0], k, v);
             } catch (IOException e) {
-                logger.error("outputEvent: {}",e.toString());
+                logger.error("outputEvent: {}", e.toString());
             }
             previous[0] = k;
         }, includeKey);
@@ -1027,8 +1085,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //TODO lambda may be optimized slightly
         runLater(() -> t.accept(this));
     }
-
-
 
 
     //    @Nullable
@@ -1492,7 +1548,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         public final MutableFloat overflow = new MutableFloat(0);
 
         public Activation(Termed in, NAR n) {
-            this((Budgeted)in, n.concept(in.term()));
+            this((Budgeted) in, n.concept(in.term()));
         }
 
         public Activation(Budgeted in, Concept src) {
@@ -1508,7 +1564,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         public void run(@NotNull NAR nar, float activation) {
             if (!concepts.isEmpty()) {
-                float total = (float) concepts.sum();
+                float total = 1;
+                    //(float) concepts.sum();
                 nar.activate(concepts, in, activation / total, overflow);
             }
         }
