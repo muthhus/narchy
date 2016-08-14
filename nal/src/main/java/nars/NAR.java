@@ -4,6 +4,7 @@ package nars;
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.LiteBlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.WorkHandler;
@@ -92,9 +93,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     static final Set<String> logEvents = Sets.newHashSet(
             "eventTaskProcess", "eventAnswer",
-            "eventExecute", //"eventRevision", /* eventDerive */ "eventError",
-            "eventSpeak"
+            "eventExecute" //"eventRevision", /* eventDerive */ "eventError",
+            //"eventSpeak"
     );
+
+    private final Executioner exe;
 
 
     /**
@@ -109,17 +112,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public volatile boolean running = false;
 
 
-    final ForkJoinPool runWorker;
 
-    //final ForkJoinPool taskWorker;
-
-    static final class TaskEvent {
-        @Nullable
-        public Task[] tasks;
-    }
-
-    final Disruptor<TaskEvent> async;
-    //private final SequenceBarrier asyncBarrier;
 
     private NARLoop loop;
 
@@ -127,88 +120,174 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
-        this(clock, index, rng, self, CONCURRENCY_DEFAULT);
+        this(clock, index, rng, self, new SingleThreadExecutioner());
     }
 
-    public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, int concurrency) {
+    abstract public static class Executioner {
+        abstract public void start(NAR nar);
+
+        abstract public void synchronize();
+
+        abstract public void runLater(Runnable r);
+
+        abstract public void inputLater(Task[] t);
+
+    }
+
+    public static class SingleThreadExecutioner extends Executioner {
+
+        private NAR nar;
+
+        @Override
+        public void start(NAR nar) {
+            this.nar = nar;
+        }
+
+        @Override
+        public void synchronize() {
+
+        }
+
+        @Override
+        public void runLater(Runnable r) {
+            r.run();
+        }
+
+        @Override
+        public void inputLater(Task[] t) {
+            nar.input(t);
+        }
+    }
+
+    public static class MultiThreadExecutioner extends Executioner {
+
+        final ForkJoinPool runWorker;
+        private final int taskThreads;
+
+
+        static final class TaskEvent {
+            @Nullable
+            public Task[] tasks;
+        }
+
+        final Disruptor<TaskEvent> async;
+        //private final SequenceBarrier asyncBarrier;
+
+        public MultiThreadExecutioner(int taskThreads, int runThreads) {
+
+            this.runWorker = (ForkJoinPool) Executors.newWorkStealingPool(runThreads);
+            this.taskThreads = taskThreads;
+
+            this.async = new Disruptor<TaskEvent>(
+                    () -> new TaskEvent(),
+                    4096 /* ringbuffer size */,
+                    new BasicExecutor(Executors.defaultThreadFactory()),
+                    ProducerType.MULTI,
+                    //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
+                    new LiteBlockingWaitStrategy()
+            );
+        }
+
+        @Override
+        public void start(NAR nar) {
+
+            WorkHandler[] workers = new WorkHandler[taskThreads];
+            for (int i = 0; i < taskThreads; i++)
+                workers[i] = new TaskEventWorkHandler(nar);
+
+            async.handleEventsWithWorkerPool(workers);
+            async.start();
+        }
+
+        public void synchronize() {
+            //if (!runWorker.isQuiescent()) {
+                while (!runWorker.awaitQuiescence(QUIESENCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+                    //logger.warn("runWorker lag: {}", runWorker);
+                    Thread.yield();
+                }
+            //}
+
+
+            //long used = size - ring.remainingCapacity();
+            long cap;
+            RingBuffer<TaskEvent> ring = async.getRingBuffer();
+            while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
+                //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
+
+                //long now = async.getCursor();
+                //logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
+                //Util.pause(1);
+                Thread.yield();
+            }
+
+
+        }
+
+        final static EventTranslatorOneArg<TaskEvent, Task[]> taskPublisher = (TaskEvent x, long seq, Task[] b) -> x.tasks = b;
+
+        @Override
+        public void inputLater(Task[] t) {
+            //taskWorker.execute(new InputTasks(t));
+            async.publishEvent(taskPublisher, t);
+        }
+
+        @Override
+        public void runLater(Runnable r) {
+            runWorker.execute(r);
+        }
+
+        private final static class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
+            private final NAR nar;
+
+            public TaskEventWorkHandler(NAR nar) {
+                this.nar = nar;
+            }
+
+            @Override
+            public void onEvent(TaskEvent te) throws Exception {
+                Task[] tt = te.tasks;
+                te.tasks = null;
+                try {
+                    nar.input(tt);
+                } catch (Exception e) {
+                    logger.error("{}", e);
+                }
+            }
+        }
+
+    }
+
+    public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
         super(clock, rng, index);
 
-        the(NAR.class, this);
+
 
         this.self = self;
 
-        /** register some components in the dependency context, Container (which Memory subclasses from) */
-        the("clock", clock);
 
-
-        eventError.on(e -> {
-            if (e instanceof Throwable) {
-                Throwable ex = (Throwable) e;
-
-                //TODO move this to a specific impl of error reaction:
-                ex.printStackTrace();
-
-                if (Param.DEBUG && Param.EXIT_ON_EXCEPTION) {
-                    //throw the exception to the next lower stack catcher, or cause program exit if none exists
-                    throw new RuntimeException(ex);
-                }
-            } else {
-                logger.error(e.toString());
-            }
-        });
+//        eventError.on(e -> {
+//            if (e instanceof Throwable) {
+//                Throwable ex = (Throwable) e;
+//
+//                //TODO move this to a specific impl of error reaction:
+//                ex.printStackTrace();
+//
+//                if (Param.DEBUG && Param.EXIT_ON_EXCEPTION) {
+//                    //throw the exception to the next lower stack catcher, or cause program exit if none exists
+//                    throw new RuntimeException(ex);
+//                }
+//            } else {
+//                logger.error(e.toString());
+//            }
+//        });
 
 
         index.loadBuiltins();
 
-
-        this.runWorker = ForkJoinPool.commonPool();
-        //this.runWorker = concurrency == -1 ? ForkJoinPool.commonPool() : (ForkJoinPool)Executors.newWorkStealingPool(concurrency);
-        Executor taskWorker = //concurrency == -1 ? (ForkJoinPool) Executors.newWorkStealingPool(1) : (ForkJoinPool) Executors.newWorkStealingPool(concurrency);
-                new BasicExecutor(Executors.defaultThreadFactory());
-
-//        if (concurrency == -1) {
-//            concurrency = 1;
-//        } //else {
-
-//            this.runWorker =
-        //ForkJoinPool.commonPool(); //<- uses the common pool's concurrency which may not be the supplied 'concurrency' value
-//                    new ForkJoinPool(concurrency,
-//                            defaultForkJoinWorkerThreadFactory, null, false);
-
-//            this.taskWorker =
-//                    new ForkJoinPool(concurrency,
-//                            defaultForkJoinWorkerThreadFactory, null, false);
-        //}
-
-
-        if (concurrency == -1) concurrency = 1;
-
-        WorkHandler[] workers = new WorkHandler[concurrency];
-        for (int i = 0; i < concurrency; i++)
-            workers[i] = newRunner.get();
-
-        async = new Disruptor<TaskEvent>(
-                () -> new TaskEvent(), 4096,
-                taskWorker,
-                //new BasicExecutor(Executors.defaultThreadFactory()),
-                //ForkJoinPool.commonPool(),
-                ProducerType.MULTI,
-                //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
-                new LiteBlockingWaitStrategy()
-                //Executors.newCachedThreadPool()
-        );
-
-
-        async.handleEventsWithWorkerPool(workers);
-        async.start();
-
-
+        (this.exe = exe).start(this);
     }
 
 
-    final @NotNull Supplier<WorkHandler<TaskEvent>> newRunner = () -> {
-        return (new TaskEventWorkHandler());
-    };
 
     @Deprecated
     public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
@@ -264,7 +343,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public synchronized void reset() {
 
-        async.shutdown();
+        exe.synchronize();
 
         super.reset();
 
@@ -728,7 +807,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     public void stop() {
 
-        awaitQuiescence();
+        exe.synchronize();
 
         if (!running) {
             throw new RuntimeException("wasnt running");
@@ -768,7 +847,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             frameStart.emit(this);
 
-            awaitQuiescence();
+            exe.synchronize();
 
         }
 
@@ -781,33 +860,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    private void awaitQuiescence() {
-        if (!runWorker.isQuiescent()) {
-            while (!runWorker.awaitQuiescence(QUIESENCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
-                //logger.warn("runWorker lag: {}", runWorker);
-                Thread.yield();
-            }
-        }
-
-
-        //long used = size - ring.remainingCapacity();
-        long cap;
-        RingBuffer<TaskEvent> ring = async.getRingBuffer();
-        while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
-            //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
-
-            //long now = async.getCursor();
-            //logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
-            //Util.pause(1);
-            Thread.yield();
-        }
-//        taskWorker.getRingBuffer().
-//        if (!taskWorker.isQuiescent()) {
-//            while (!taskWorker.awaitQuiescence(500, TimdeUnit.MILLISECONDS)) {
-//                logger.warn("taskWorker lag: {}", taskWorker);
-//            }
-//        }
-    }
 
 
 //    private void runAsyncFrameTasks() {
@@ -849,7 +901,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             try {
                 outputEvent(out, previous[0], k, v);
             } catch (IOException e) {
-                error(e);
+                logger.error("outputEvent: {}",e.toString());
             }
             previous[0] = k;
         }, includeKey);
@@ -957,7 +1009,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * after the end of the current frame before the next frame.
      */
     public final void runLater(@NotNull Runnable t) {
-        runWorker.execute(t);
+        exe.runLater(t);
     }
 
     public final void runLater(@NotNull Consumer<NAR> t) {
@@ -966,12 +1018,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    /**
-     * signals an error through one or more event notification systems
-     */
-    protected void error(@NotNull Throwable ex) {
-        eventError.emit(ex);
-    }
+
 
     //    @Nullable
 //    public Future runAsync(@NotNull Runnable t, int maxRunsPerFrame) {
@@ -1261,8 +1308,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final void inputLater(@NotNull Task... t) {
         if (t.length == 0)
             throw new RuntimeException("empty task array");
-        //taskWorker.execute(new InputTasks(t));
-        async.publishEvent((TaskEvent x, long seq, Task[] b) -> x.tasks = b, t);
+
+        exe.inputLater(t);
 
     }
 
@@ -1477,16 +1524,5 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return o != Tense.ETERNAL && o > time();
     };
 
-    private final class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
-        @Override
-        public void onEvent(TaskEvent te) throws Exception {
-            Task[] tt = te.tasks;
-            te.tasks = null;
-            try {
-                NAR.this.input(tt);
-            } catch (Exception e) {
-                logger.error("{}", e);
-            }
-        }
-    }
+
 }

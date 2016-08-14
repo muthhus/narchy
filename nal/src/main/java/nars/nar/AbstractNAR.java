@@ -71,7 +71,8 @@ public abstract class AbstractNAR extends NAR {
     /** NAL7 plugins */
     public void initNAL7() {
 
-        the(new STMTemporalLinkage(this, 2)); //TEMPORARY
+        new STMTemporalLinkage(this, 2);
+
     }
 
     /* NAL8 plugins */

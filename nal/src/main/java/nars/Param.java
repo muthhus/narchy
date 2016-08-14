@@ -18,7 +18,7 @@ import static nars.Symbols.*;
 /**
  * NAR Parameters which can be changed during runtime.
  */
-public abstract class Param extends Container implements Level {
+public abstract class Param /*extends Container*/ implements Level {
 
 
     //TODO use 'I' for SELf, it is 3 characters shorter
@@ -73,13 +73,6 @@ public abstract class Param extends Container implements Level {
 
     /** yielding interval for waiting to finish worker threads */
     public static final int QUIESENCE_TIMEOUT_MS = 50;
-
-
-    /**
-     * specify level of concurrency (# of threads per each pool)
-     * or -1 to use the common pool
-     */
-    public static int CONCURRENCY_DEFAULT = 1;
 
 
 

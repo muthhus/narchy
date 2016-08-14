@@ -139,7 +139,7 @@ public class Multi extends AbstractNAR {
 
 
         public WorkerCore(int n, @NotNull PremiseEval matcher) {
-            super(Multi.this, matcher);
+            super(Multi.this);
             this.thread = new Thread(this);
             thread.setName(nar.toString() + ".Worker" + n);
             thread.start();

@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public class DefaultCore extends AbstractCore {
 
 
-    public DefaultCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {
+    public DefaultCore(@NotNull NAR nar) {
         super(nar);
     }
 

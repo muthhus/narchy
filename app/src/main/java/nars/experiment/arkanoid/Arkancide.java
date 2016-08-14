@@ -46,18 +46,16 @@ public class Arkancide extends NAREnvironment {
     public static final int CONCEPTS_FIRE_PER_CYCLE = 32;
     final Arkanoid noid;
     private final SwingCamera cam;
-    static {
-        Param.CONCURRENCY_DEFAULT = 1;
-    }
+
 
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 64;
+    final int visW = 32;
     final int visH = 24;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 7;
+    private int visionSyncPeriod = 16;
     float noiseLevel = 0;
 
     float paddleSpeed = 70f;
@@ -102,7 +100,7 @@ public class Arkancide extends NAREnvironment {
 
 
         AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                visW/2, 16 /* states */,
+                8, 16 /* states */,
                 0.05f);
         view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 
@@ -224,15 +222,15 @@ public class Arkancide extends NAREnvironment {
         nar.derivedActivation.setValue(0.01f);
 
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.4f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
-        nar.truthResolution.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
+        nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)

@@ -58,24 +58,6 @@ public class Memory extends Param {
 
     public final transient Topic<Task> eventTaskProcess = new DefaultTopic<>();
 
-    /**
-     * used for reporting or informing outside. consists of additional notes
-     * or data which could annotate a log or summary of system activity
-     */
-    public final transient Topic<Object> eventSpeak = new DefaultTopic<>();
-
-
-
-    //public final transient Topic<Task> eventInput = new DefaultTopic<>();
-    public final transient Topic<Serializable> eventError = new DefaultTopic<>();
-
-
-
-    //public final transient Topic<Twin<Task>> eventAnswer = new DefaultTopic<>();
-
-
-
-
 
     @NotNull public final transient Emotion emotion;
 
@@ -148,7 +130,7 @@ public class Memory extends Param {
 //        event.delete();
 //    }
 
-    @Override
+
     public void reset() {
 
         eventReset.emit(this);

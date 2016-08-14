@@ -13,7 +13,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	int score;
 
-	public static final int SCREEN_WIDTH = 420;
+	public static final int SCREEN_WIDTH = 360;
 	public static final int SCREEN_HEIGHT = 250;
 
 	public static final int BLOCK_LEFT_MARGIN = 10;
@@ -29,8 +29,8 @@ public class Arkanoid extends JFrame implements KeyListener {
 	public static final double BLOCK_WIDTH = 40.0;
 	public static final double BLOCK_HEIGHT = 15.0;
 
-	public static final int COUNT_BLOCKS_X = 8;
-	public static final int COUNT_BLOCKS_Y = 2;
+	public static final int COUNT_BLOCKS_X = 7;
+	public static final int COUNT_BLOCKS_Y = 3;
 
 	public static final double FT_STEP = 1.0;
 

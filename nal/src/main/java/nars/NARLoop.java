@@ -80,7 +80,6 @@ public class NARLoop implements Runnable {
 
         nar = n;
 
-        n.the("loop", this);
 
         setPeriodMS(initialPeriod);
 
@@ -170,7 +169,8 @@ public class NARLoop implements Runnable {
                 try {
                     frame(nar);
                 } catch (Throwable e) {
-                    logger.error("{}",e);
+                    logger.error("{}",e.toString());
+                    e.printStackTrace();
                     /*nar.eventError.emit(e);
                     if (Param.DEBUG) {
                         stop();

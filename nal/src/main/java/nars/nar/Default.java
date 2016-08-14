@@ -29,8 +29,6 @@ public class Default extends AbstractNAR {
 
     public final @NotNull DefaultCore core;
 
-    public final @NotNull PremiseEval matcher;
-
     @Deprecated
     public Default() {
         this(1024, 1, 1, 3);
@@ -54,14 +52,12 @@ public class Default extends AbstractNAR {
                 random,
                 Param.DEFAULT_SELF);
 
-        the("reasoner", matcher = newMatcher());
 
-        the("core", core = newCore(
+        core = newCore(
                 activeConcepts,
                 conceptsFirePerCycle,
-                termLinksPerConcept, taskLinksPerConcept,
-                matcher
-        ));
+                termLinksPerConcept, taskLinksPerConcept
+        );
 
         if (nal() >= 7) {
             initNAL7();
@@ -76,9 +72,9 @@ public class Default extends AbstractNAR {
     }
 
 
-    protected @NotNull DefaultCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, @NotNull PremiseEval matcher) {
+    protected @NotNull DefaultCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
 
-        DefaultCore c = new DefaultCore(this, matcher);
+        DefaultCore c = new DefaultCore(this);
         c.concepts.setCapacity(activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies

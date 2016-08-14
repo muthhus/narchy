@@ -1,5 +1,6 @@
 package spacegraph.video;
 
+import com.google.common.base.Joiner;
 import nars.util.signal.OneDHaar;
 
 import javax.sound.sampled.*;
@@ -19,6 +20,8 @@ public class AudioSource implements WaveSource {
 
     private byte[] audioBytes;
     private short[] samples;
+    private final int bytesPerSample;
+    public float gain = 1f;
 
 
     public AudioSource(int device, float frameRate) {
@@ -31,7 +34,7 @@ public class AudioSource implements WaveSource {
 
         // Get TargetDataLine with that format
         Mixer.Info[] minfoSet = AudioSystem.getMixerInfo();
-        System.out.println(Arrays.toString(minfoSet));
+        System.out.println("Devices:\n\t" + Joiner.on("\n\t").join(minfoSet));
 
         mixer = AudioSystem.getMixer(minfoSet[device]);
         System.out.println(mixer);
@@ -40,6 +43,8 @@ public class AudioSource implements WaveSource {
 
         dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
         System.out.println(dataLineInfo);
+
+        bytesPerSample = 2;
     }
 
 
@@ -48,8 +53,8 @@ public class AudioSource implements WaveSource {
         // Open and start capturing audio
         // It's possible to have more control over the chosen audio device with this line:
         try {
-            line = (TargetDataLine) mixer.getLine(dataLineInfo);
-            //line = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+            //line = (TargetDataLine) mixer.getLine(dataLineInfo);
+            line = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
             line.open(audioFormat);
             line.start();
 
@@ -94,7 +99,7 @@ public class AudioSource implements WaveSource {
         int avail = line.available();
         int nBytesRead = line.read(audioBytes, 0,
                 //bufferSamples*2
-                Math.min(bufferSamples * 2, avail)
+                Math.min(bufferSamples * bytesPerSample, avail)
         );
 
         // Since we specified 16 bits in the AudioFormat,
@@ -112,7 +117,7 @@ public class AudioSource implements WaveSource {
         int end = nSamplesRead;
         int j = 0;
         for (int i = start; i < end; i++)
-            buffer[j++] = samples[i] / shortRange;
+            buffer[j++] = gain * samples[i] / shortRange;
 
         return nSamplesRead;
     }

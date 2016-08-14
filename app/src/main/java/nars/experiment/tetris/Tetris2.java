@@ -56,7 +56,6 @@ public class Tetris2 extends NAREnvironment {
 
     static {
         Param.DEBUG = false;
-        Param.CONCURRENCY_DEFAULT = 2;
     }
 
     public static final int runFrames = 10000;
