@@ -71,11 +71,11 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
         return target.policy();
     }
 
-    @Override
-    public int compareTo(@NotNull Termlike o) {
-        if (equals(o)) return 0;
-        return alias.compareTo(o);
-    }
+//    @Override
+//    public int compareTo(@NotNull Termlike o) {
+//        if (equals(o)) return 0;
+//        return alias.compareTo(o);
+//    }
 
     @Override
     public void delete(NAR nar) {

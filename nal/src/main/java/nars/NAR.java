@@ -53,6 +53,7 @@ import java.util.stream.Stream;
 
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
+import static nars.nal.TermBuilder.FalseProduct;
 import static org.fusesource.jansi.Ansi.ansi;
 
 
@@ -116,8 +117,33 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         this(clock, index, rng, self, new SingleThreadExecutioner());
     }
 
-    public final Term normalize(Compound t) {
-        return normalizations.get(t, u -> $.terms.normalize(u, false) );
+    //long miss= 0, hit  = 0;
+    @Nullable public final Compound normalize(Compound t) {
+//        Compound x = normalizations.get(t);
+//        if (x == null) {
+//            normalizations.put(x = index.normalize(t, true));
+//            //miss++;
+//        }/* else {
+//            hit++;
+//        }*/
+//        System.out.println("size=" + normalizations.validatedSize());
+//        return x;
+
+        //final boolean[] bmiss = {false};
+        Compound v = normalizations.get().computeIfAbsent(t, u -> {
+            //bmiss[0] = true;
+            try {
+                return index.normalize(u);
+            } catch (Exception e) {
+                if (Param.DEBUG)
+                    logger.warn("normalization: {}", e);
+                return FalseProduct; //since computeIfAbsent uses null as a dont-modify signal
+            }
+
+        });
+        //if (bmiss[0]) miss++; else hit++;
+        //System.out.println( Texts.n2(1 - (double)miss/hit) + " hit rate, size=" + normalizations.get().size());
+        return v == FalseProduct ? null : v;
     }
 
     abstract public static class Executioner {
@@ -759,8 +785,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             input.delete();
 
-            if (Param.DEBUG)
-                logger.warn("invalid input: {}", e.toString());
+            //if (Param.DEBUG)
+                logger.warn("input preprocess: {}", e.toString());
             //e.printStackTrace();
             //throw e;
             return null;

@@ -1,5 +1,7 @@
 package nars.nal;
 
+import nars.term.compound.GenericCompound;
+import nars.term.container.TermVector;
 import org.eclipse.collections.api.set.MutableSet;
 import nars.$;
 import nars.Op;
@@ -37,6 +39,8 @@ public abstract class TermBuilder {
     public static final Atom True = $.the("†");
     public static final Atom False = $.the("Ø");
     private static final Term[] TrueArray = new Term[]{True};
+    public static final Compound FalseProduct = new GenericCompound(Op.PROD, TermVector.the(False));
+
 
     @NotNull
     public static Term empty(@NotNull Op op) {

@@ -23,19 +23,26 @@ package nars;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import nars.bag.impl.experimental.ChainBag;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.index.TermIndex;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.Clock;
+import nars.util.data.map.CapacityLinkedHashMap;
+import nars.util.data.random.XORShiftRandom;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import nars.util.signal.Emotion;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 
@@ -73,7 +80,16 @@ public class Memory extends Param {
 
     @NotNull public final TaskIndex tasks;
 
-    public final Cache<Term,Term> normalizations = Caffeine.newBuilder().maximumSize(1024).build();
+    public final ThreadLocal<Map<Compound,Compound>> normalizations =
+            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
+            ThreadLocal.withInitial( () -> new CapacityLinkedHashMap(32*1024) );
+
+    //public final ChainBag<Compound> normalizations =
+            //Caffeine.newBuilder().maximumSize(16*1024).build();
+            //new ChainBag(new XORShiftRandom(1), 32);
+
+
+
 
 
 

@@ -1166,7 +1166,7 @@ public class Narsese extends BaseParser<Object> {
         Term contentRaw = (Term) x[1];
         if (contentRaw == null)
             throw new NarseseException("Invalid task term");
-        Termed content = m.index.normalize(contentRaw, true);
+        Termed content = m.index.normalize(contentRaw);
         if (content == null)
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
 
@@ -1218,7 +1218,7 @@ public class Narsese extends BaseParser<Object> {
         Term y = term(s);
         if (normalize) {
             if (y instanceof Compound) {
-                Termed x = index.normalize(y, true);
+                Termed x = index.normalize(y);
                 if (x == null)
                     throw new NarseseException("Un-normalizable: " + y);
                 return x.term();

@@ -180,10 +180,10 @@ public interface Termject<X> extends Atomic {
             return 0; //it's like a variable
         }
 
-        @Override
-        public int varQuery() {
-            return 1; //pretend to be a query variable to allow unification
-        }
+//        @Override
+//        public int varQuery() {
+//            return 1; //pretend to be a query variable to allow unification
+//        }
 
         @Override
         public int compareVal(@NotNull Range<Integer> v) {

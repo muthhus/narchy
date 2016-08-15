@@ -1,5 +1,6 @@
 package nars.term.subst;
 
+import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.index.TermIndex;
@@ -401,10 +402,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
     @Nullable
-    public final Term resolveNormalized(@NotNull Term t) {
+    public final Term resolveNormalized(@NotNull Term t, NAR nar) {
         //TODO make a half resolve that only does xy?
         t = resolve(t);
-        return (t instanceof Compound) ? this.index.normalize((Compound) t, false).term() : t;
+        return (t instanceof Compound) ? nar.normalize((Compound) t) : t;
     }
 
     @Nullable

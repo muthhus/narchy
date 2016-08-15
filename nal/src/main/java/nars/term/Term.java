@@ -334,7 +334,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     /** GLOBAL TERM COMPARATOR FUNCTION */
     @Override
     default int compareTo(@NotNull Termlike y) {
-        if (this == y || this.equals(y)) return 0;
+        if (this == y /*|| this.equals(y)*/) return 0;
 
         int d = this.op().compareTo(((Term)y).op()); //HACK
         if (d!=0)
@@ -342,14 +342,14 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
         if (this instanceof Compound) {
 
-            Compound cthis = (Compound)this;
+            Compound cx = (Compound)this;
             Compound cy = (Compound)y;
 
-            int diff3 = TermContainer.compare(cthis.subterms(),cy.subterms());
+            int diff3 = TermContainer.compare(cx.subterms(),cy.subterms());
             if (diff3 != 0)
                 return diff3;
 
-            return Integer.compare(cthis.dt(), cy.dt());
+            return Integer.compare(cx.dt(), cy.dt());
 
         } else if (this instanceof AbstractVariable) {
             //hashcode serves as the ordering too

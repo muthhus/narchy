@@ -2,6 +2,7 @@ package nars.util.data;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Simple object pool implemented by a Deque (ex: ArrayDeque)
@@ -14,6 +15,8 @@ public abstract class DequePool<X> implements Pool<X> {
 
     public DequePool(int initialCapacity, int preallocate) {
         data = new ArrayDeque(initialCapacity);
+        //data = new ConcurrentLinkedDeque<>();
+
         setCapacity(initialCapacity);
         //data = new CircularArrayList<>(initialCapacity);
 

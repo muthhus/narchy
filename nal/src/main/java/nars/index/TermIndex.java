@@ -365,7 +365,7 @@ public interface TermIndex {
 
 
     @NotNull
-    default Compound normalize(@NotNull Termed<Compound> t, boolean insert) {
+    default Compound normalize(@NotNull Termed<Compound> t) {
         Compound r;
         if (!t.isNormalized()) {
             Compound ct = (Compound) t;
@@ -401,12 +401,12 @@ public interface TermIndex {
                 );
         }
 
-        if (insert) {
-            Compound s = (Compound) termOrNull(get(r, false));
-            return s == null ? r : s; //if a concept does not exist, do not create one yet and just return the key
-        } else {
+//        if (insert) {
+//            Compound s = (Compound) termOrNull(get(r, false));
+//            return s == null ? r : s; //if a concept does not exist, do not create one yet and just return the key
+//        } else {
             return r;
-        }
+//        }
 
     }
 
@@ -533,7 +533,7 @@ public interface TermIndex {
 
             Termed prenormalized = term;
 
-            if (!((term = normalize(term, false)) instanceof Compound))
+            if (!((term = normalize(term)) instanceof Compound))
                 throw new InvalidConceptException(prenormalized, "Failed normalization");
 
             Term aterm = Terms.atemporalize((Compound) term);

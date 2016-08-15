@@ -27,13 +27,14 @@ public class GenericVariable extends AtomicString implements Variable {
     public int id() {
         throw new UnsupportedOperationException();
     }
-    @Override public boolean equals(Object u) {
+
+    final @Override public boolean equals(Object u) {
         if (this == u) return true;
 
         //prevent comparison with AbstractVariable
         if (u instanceof GenericVariable) {
             GenericVariable tu = (GenericVariable) u;
-            return toString().equals(tu.toString());
+            return str.equals(tu.str);
         }
         return false;
     }
