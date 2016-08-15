@@ -4,7 +4,6 @@ import automenta.vivisect.swing.NWindow;
 import jurls.core.utils.MatrixImage;
 import jurls.reinforcementlearning.domains.RLEnvironment;
 import nars.NAR;
-import nars.task.Task;
 import nars.util.signal.Autoencoder;
 
 

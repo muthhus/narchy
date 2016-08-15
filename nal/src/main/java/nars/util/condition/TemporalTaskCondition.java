@@ -2,7 +2,7 @@ package nars.util.condition;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.task.Task;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 /**

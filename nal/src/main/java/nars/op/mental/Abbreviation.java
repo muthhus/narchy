@@ -2,9 +2,9 @@ package nars.op.mental;
 
 import nars.$;
 import nars.NAR;
+import nars.Task;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import org.apache.commons.lang3.mutable.MutableFloat;

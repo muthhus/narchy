@@ -1,5 +1,6 @@
 package nars.task;
 
+import nars.Task;
 import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;

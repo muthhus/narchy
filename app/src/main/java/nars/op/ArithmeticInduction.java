@@ -5,13 +5,10 @@ import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
+import nars.*;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import nars.$;
-import nars.NAR;
-import nars.Op;
 import nars.task.GeneratedTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
@@ -42,7 +39,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     private final NAR nar;
     private final Consumer<Collection<Task>> target;
-    boolean deleteOriginalTaskIfInducted = false;
+
 
     public static Logger logger = LoggerFactory.getLogger(ArithmeticInduction.class);
     private boolean trace = false;
@@ -197,8 +194,6 @@ public class ArithmeticInduction implements Consumer<Task> {
             if (trace) {
                 logger.info("{}\n\t{}", in, Joiner.on("\n\t").join(generated));
             }
-            if (deleteOriginalTaskIfInducted)
-                in.delete();
 
         }
         return generated;

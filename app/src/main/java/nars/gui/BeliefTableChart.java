@@ -2,10 +2,9 @@ package nars.gui;
 
 import com.jogamp.opengl.GL2;
 import nars.NAR;
+import nars.Task;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
-import nars.task.Task;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;

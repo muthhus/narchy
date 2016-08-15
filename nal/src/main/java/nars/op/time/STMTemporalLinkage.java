@@ -2,8 +2,8 @@ package nars.op.time;
 
 import nars.$;
 import nars.NAR;
+import nars.Task;
 import nars.concept.Concept;
-import nars.task.Task;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;

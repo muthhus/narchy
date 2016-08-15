@@ -1,11 +1,8 @@
 package nars.experiment.tetris;
 
 import com.google.common.collect.Lists;
+import nars.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import nars.$;
-import nars.NAR;
-import nars.NARLoop;
-import nars.Param;
 import nars.data.AutoClassifier;
 import nars.experiment.NAREnvironment;
 import nars.experiment.arkanoid.Arkancide;
@@ -16,7 +13,6 @@ import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.obj.Termject;
@@ -25,7 +21,6 @@ import nars.truth.Truth;
 import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
-import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -52,7 +47,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Tetris2 extends NAREnvironment {
 
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
-    public static final int DEFAULT_INDEX_WEIGHT = 12 * 1000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 4 * 1000000;
     public static final NAR.Executioner exe = new NAR.MultiThreadExecutioner(2,2);
 
     static {
@@ -339,7 +334,7 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
-                32, 2, 2, rng,
+                32, 3, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false)
 
                 , new FrameClock(), exe

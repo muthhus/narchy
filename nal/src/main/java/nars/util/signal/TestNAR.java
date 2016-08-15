@@ -1,10 +1,7 @@
 package nars.util.signal;
 
-import nars.$;
-import nars.NAR;
-import nars.Param;
+import nars.*;
 import nars.nal.Tense;
-import nars.task.Task;
 import nars.task.Tasked;
 import nars.util.analyze.EventCount;
 import nars.util.condition.EternalTaskCondition;

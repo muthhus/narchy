@@ -8,10 +8,10 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import nars.NAR;
+import nars.Task;
 import nars.guifx.nars.TaskButton;
 import nars.guifx.nars.TracePane;
 import nars.guifx.util.NSlider;
-import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 
 /**

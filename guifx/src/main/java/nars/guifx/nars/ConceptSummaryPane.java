@@ -4,11 +4,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import nars.Task;
 import nars.concept.Concept;
 import nars.guifx.JFX;
 import nars.guifx.SummaryIcon;
 import nars.guifx.util.ColorMatrix;
-import nars.task.Task;
 import nars.truth.Truth;
 
 import java.util.concurrent.atomic.AtomicBoolean;

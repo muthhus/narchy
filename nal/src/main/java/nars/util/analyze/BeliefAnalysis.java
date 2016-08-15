@@ -1,11 +1,11 @@
 package nars.util.analyze;
 
 import nars.NAR;
+import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.truth.TruthWave;
 import org.jetbrains.annotations.NotNull;

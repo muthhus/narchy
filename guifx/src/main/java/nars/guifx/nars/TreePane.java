@@ -8,11 +8,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import nars.$;
 import nars.NAR;
+import nars.Task;
 import nars.guifx.AutoLabel;
 import nars.guifx.util.NSlider;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.op.out.echo;
-import nars.task.Task;
 import nars.util.FX;
 import nars.util.event.FrameReaction;
 

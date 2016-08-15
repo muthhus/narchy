@@ -1,5 +1,6 @@
 package nars.task;
 
+import nars.Task;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.nal.Stamp;

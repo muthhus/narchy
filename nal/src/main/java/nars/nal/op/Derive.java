@@ -1,9 +1,7 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
+import nars.*;
 import nars.budget.Budget;
 import nars.index.TermIndex;
 import nars.nal.Premise;
@@ -12,7 +10,6 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;

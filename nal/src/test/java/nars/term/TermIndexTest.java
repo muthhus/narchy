@@ -1,13 +1,13 @@
 package nars.term;
 
 import nars.NAR;
+import nars.Task;
 import nars.concept.AtomConcept;
 import nars.index.Indexes;
 import nars.index.MaplikeIndex;
 import nars.index.TermIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.task.Task;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;

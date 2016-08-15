@@ -1,31 +1,12 @@
-/*
- * Task.java
- *
- * Copyright (C) 2008  Pei Wang
- *
- * This file is part of Open-NARS.
- *
- * Open-NARS is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * Open-NARS is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Open-NARS.  If not, see <http://www.gnu.org/licenses/>.
- */
-package nars.task;
+package nars;
 
-import nars.*;
-import nars.NAR.InvalidTaskException;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.index.TermIndex;
 import nars.nal.Stamp;
 import nars.nal.Tense;
+import nars.task.MutableTask;
+import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -38,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static nars.index.TermIndex.InvalidConceptException;
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
@@ -107,7 +87,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * returns the compound valid for a Task if so,
      * otherwise returns null
      * */
-    @Nullable static boolean taskContentPreTest(@NotNull Term t, char punc, @NotNull Memory memory, boolean safe) {
+    @Nullable
+    static boolean taskContentPreTest(@NotNull Term t, char punc, @NotNull Memory memory, boolean safe) {
 
         if (!(t instanceof Compound))
             return test(t, "Task Term is null or not a Compound", safe);
@@ -142,11 +123,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @Nullable
-    private static boolean test(@Nullable Term t, String reason, boolean safe) {
+    static boolean test(@Nullable Term t, String reason, boolean safe) {
         if (safe)
             return false;
         else
-            throw new InvalidTaskException(t, reason);
+            throw new NAR.InvalidTaskException(t, reason);
     }
 
 //    static boolean hasCoNegatedAtemporalConjunction(Term term) {
@@ -296,6 +277,14 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
+    @Override
+    boolean delete();
+
+    /** you should use this delete, not the other */
+    default void delete(NAR nar) {
+        nar.tasks.remove(this);
+        delete();
+    }
 
     @NotNull
     default Concept concept(@NotNull NAR n) {
@@ -400,7 +389,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @Nullable
     @Deprecated
-    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/ Memory memory, boolean showStamp) {
+    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/Memory memory, boolean showStamp) {
         boolean notCommand = punc()!=Symbols.COMMAND;
         return appendTo(buffer, memory, true, showStamp && notCommand,
                 notCommand, //budget
@@ -552,7 +541,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     /** if unnormalized, returns a normalized version of the task,
      *  null if not normalizable
      */
-    void normalize(@NotNull NAR memory) throws InvalidTaskException, InvalidConceptException;
+    void normalize(@NotNull NAR memory) throws NAR.InvalidTaskException, TermIndex.InvalidConceptException;
 
 
 //    default void ensureValidParentTaskRef() {

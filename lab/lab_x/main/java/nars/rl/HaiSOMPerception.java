@@ -4,7 +4,6 @@ import jurls.reinforcementlearning.domains.RLEnvironment;
 import nars.NAR;
 import nars.nal.nal1.Inheritance;
 import nars.rl.hai.Hsom;
-import nars.task.Task;
 import nars.term.Atom;
 import nars.term.Term;
 

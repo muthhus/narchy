@@ -1,10 +1,7 @@
 package nars.agent;
 
+import nars.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import nars.NAR;
-import nars.Narsese;
-import nars.Param;
-import nars.task.Task;
 import nars.truth.Truth;
 import nars.util.math.FloatSupplier;
 import nars.util.signal.SensorConcept;

@@ -2,8 +2,8 @@ package nars.concept.table;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
+import nars.Task;
 import nars.concept.CompoundConcept;
-import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,9 +58,10 @@ abstract public class DynamicBeliefTable implements BeliefTable {
                     !Arrays.equals(prev.evidence(), next.evidence())
             ))) {
                 this.current = next;
+                @NotNull NAR nar = nar();
                 if (prev!=null)
-                    prev.delete();
-                nar().input(next);
+                    prev.delete(nar);
+                nar.input(next);
             }
             //changed = false;
         }

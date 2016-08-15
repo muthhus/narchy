@@ -1,10 +1,10 @@
 package nars.predict;
 
 import nars.NAR;
+import nars.Task;
 import nars.concept.table.BeliefTable;
 import nars.learn.ql.DQN;
 import nars.nal.Tense;
-import nars.task.Task;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 

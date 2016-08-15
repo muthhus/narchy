@@ -1,8 +1,6 @@
 package nars.nar.util;
 
-import nars.$;
-import nars.Memory;
-import nars.NAR;
+import nars.*;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.data.Range;
@@ -11,7 +9,6 @@ import nars.nal.Conclusion;
 import nars.nal.Deriver;
 import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
-import nars.task.Task;
 import nars.term.Term;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;

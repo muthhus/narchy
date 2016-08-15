@@ -2,10 +2,10 @@ package nars.op.mental;
 
 import nars.$;
 import nars.NAR;
+import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.ProxyCompoundConcept;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

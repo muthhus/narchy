@@ -1,8 +1,8 @@
 package nars.nal;
 
 import nars.Memory;
+import nars.Task;
 import nars.concept.table.BeliefTable;
-import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 

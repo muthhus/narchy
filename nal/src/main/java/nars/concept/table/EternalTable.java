@@ -2,12 +2,12 @@ package nars.concept.table;
 
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.task.AnswerTask;
 import nars.task.Revision;
 import nars.task.RevisionTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.data.sorted.SortedArray;

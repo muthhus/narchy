@@ -1,7 +1,7 @@
 package nars.guifx.nars;
 
 import nars.NAR;
-import nars.task.Task;
+import nars.Task;
 import nars.nal.Stamp;
 
 import java.util.LinkedHashMap;

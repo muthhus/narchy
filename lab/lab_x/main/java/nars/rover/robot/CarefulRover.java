@@ -4,7 +4,6 @@ import nars.Memory;
 import nars.NAR;
 import nars.nal.nal8.operator.NullOperator;
 import nars.rover.obj.VisionRay;
-import nars.task.Task;
 import nars.term.Term;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;

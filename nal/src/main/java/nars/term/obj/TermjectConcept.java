@@ -1,8 +1,8 @@
 package nars.term.obj;
 
+import nars.Task;
 import nars.bag.Bag;
 import nars.concept.AtomConcept;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;

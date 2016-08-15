@@ -14,11 +14,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import nars.NAR;
+import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.impl.CanvasEdgeRenderer;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 

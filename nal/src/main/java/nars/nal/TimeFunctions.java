@@ -2,11 +2,11 @@ package nars.nal;
 
 import nars.$;
 import nars.Op;
+import nars.Task;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.nal.rule.PremiseRule;
-import nars.task.Task;
 import nars.term.*;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;

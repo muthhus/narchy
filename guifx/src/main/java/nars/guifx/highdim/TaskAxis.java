@@ -2,8 +2,8 @@ package nars.guifx.highdim;
 
 import javafx.scene.Group;
 import javafx.scene.control.Label;
+import nars.Task;
 import nars.guifx.graph2.TermNode;
-import nars.task.Task;
 import nars.term.Term;
 import nars.util.Util;
 

@@ -20,10 +20,10 @@
  */
 package nars.nal;
 
+import nars.Task;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import nars.Param;
-import nars.task.Task;
 import nars.truth.TruthFunctions;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;

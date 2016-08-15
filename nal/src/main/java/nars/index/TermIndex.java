@@ -1,14 +1,11 @@
 package nars.index;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import nars.NAR;
-import nars.task.Task;
+import nars.Param;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
 import nars.$;
 import nars.Narsese;
-import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseAware;
@@ -32,7 +29,6 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static nars.$.unneg;
@@ -389,7 +385,9 @@ public interface TermIndex {
             }*/
 
             if (!(t2 instanceof Compound)) {
-                throw new InvalidTermException(ct.op(), ct.dt(), ct.terms(), "could not normalize");
+                throw new InvalidTermException(ct.op(), ct.dt(), ct.terms(),
+                    Param.DEBUG ? "normalized to non-compound: " + t2 : "normalized to non-compound"
+                );
             }
 
             ((GenericCompound) t2).setNormalized();
@@ -398,12 +396,14 @@ public interface TermIndex {
         } else {
             r = compoundOrNull(t);
             if (r == null)
-                throw new InvalidTermException(t.op(), DTERNAL, new Term[]{}, "could not normalize");
+                throw new InvalidTermException(t.op(), DTERNAL, new Term[]{},
+                    Param.DEBUG ? "normalizing non-compound: " + t : "normalizing non-compound"
+                );
         }
 
         if (insert) {
             Compound s = (Compound) termOrNull(get(r, false));
-            return s == null ? r : s; //if a concept does not exist and was not created, return the key
+            return s == null ? r : s; //if a concept does not exist, do not create one yet and just return the key
         } else {
             return r;
         }

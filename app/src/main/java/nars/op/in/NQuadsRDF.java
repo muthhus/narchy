@@ -1,11 +1,8 @@
 package nars.op.in;
 
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
+import nars.*;
 import nars.nal.Tense;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -290,8 +287,8 @@ public abstract class NQuadsRDF {
     }};
 
     public static Task input(@NotNull NAR nar,
-                              @Nullable Atom subject,
-                              @NotNull Atom predicate, @NotNull Term object) {
+                             @Nullable Atom subject,
+                             @NotNull Atom predicate, @NotNull Term object) {
 
         if ((subject == null) || (predicate == null) || (object == null))
             return null;
@@ -319,8 +316,8 @@ public abstract class NQuadsRDF {
          *
          */
     public static Task input0(@NotNull NAR nar,
-                             @Nullable Atom subject,
-                             @NotNull Atom predicate, @NotNull Term object) {
+                              @Nullable Atom subject,
+                              @NotNull Atom predicate, @NotNull Term object) {
 
         //http://www.w3.org/TR/owl-ref/
 

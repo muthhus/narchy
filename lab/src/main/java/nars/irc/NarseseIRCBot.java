@@ -1,10 +1,7 @@
 package nars.irc;
 
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
+import nars.*;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
@@ -16,7 +13,6 @@ import nars.nal.Tense;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;

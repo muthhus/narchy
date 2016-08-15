@@ -1,6 +1,7 @@
 package nars.nar.util;
 
 import nars.Op;
+import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
@@ -10,7 +11,6 @@ import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -35,9 +35,12 @@ import static nars.nal.Tense.DTERNAL;
  */
 public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
+    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
+    private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 16;
+
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> {
-                Map map = new HashMap();
+                Map map = new HashMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
                 switch (a.op()) {
                     case OBJECT:
                         return new TermjectConcept<>((Termject)a, termbag(map), taskbag(map));
@@ -63,7 +66,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
             throw new RuntimeException("temporality in concept term: " + t);
 
 
-        Map map = new HashMap();
+        Map map = new HashMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
         @NotNull Bag<Term> termbag = termbag(map);
         @NotNull Bag<Task> taskbag = taskbag(map);
 

@@ -1,6 +1,7 @@
 package nars.op.time;
 
 import nars.NAR;
+import nars.Task;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
@@ -8,7 +9,6 @@ import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
 import nars.link.StrongBLink;
-import nars.task.Task;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;

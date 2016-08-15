@@ -1,7 +1,7 @@
 package nars.op.time;
 
 import nars.NAR;
-import nars.task.Task;
+import nars.Task;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 

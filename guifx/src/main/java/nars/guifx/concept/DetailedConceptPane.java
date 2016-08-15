@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import nars.NAR;
+import nars.Task;
 import nars.concept.Concept;
 import nars.guifx.NARfx;
 import nars.guifx.chart.Plot2D;
@@ -14,7 +15,6 @@ import nars.guifx.graph2.source.ConceptNeighborhoodSource;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.nars.TaskButton;
 import nars.nar.Default;
-import nars.task.Task;
 import nars.term.Termed;
 import nars.util.FX;
 

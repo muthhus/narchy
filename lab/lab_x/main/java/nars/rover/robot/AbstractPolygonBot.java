@@ -8,7 +8,6 @@ import nars.nal.nal7.Tense;
 import nars.rl.gng.NeuralGasNet;
 import nars.rover.Material;
 import nars.rover.Sim;
-import nars.task.Task;
 import nars.task.TaskSeed;
 import nars.term.Compound;
 import nars.term.Term;

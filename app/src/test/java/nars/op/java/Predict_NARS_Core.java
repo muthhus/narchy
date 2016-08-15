@@ -1,12 +1,9 @@
 package nars.op.java;
 
+import nars.*;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
 import nars.nar.Default;
 import nars.op.in.ChangedTextInput;
-import nars.task.Task;
 import nars.util.time.IntervalTree;
 
 import java.util.List;

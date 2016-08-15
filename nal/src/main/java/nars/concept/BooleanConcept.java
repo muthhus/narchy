@@ -1,14 +1,11 @@
 package nars.concept;
 
+import nars.*;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
-import nars.$;
-import nars.NAR;
-import nars.Param;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DynamicBeliefTable;
 import nars.nal.Stamp;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

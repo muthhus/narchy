@@ -1,11 +1,7 @@
 package nars.util.condition;
 
 
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Symbols;
-import nars.task.Task;
+import nars.*;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;

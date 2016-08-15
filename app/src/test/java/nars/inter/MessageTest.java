@@ -1,9 +1,9 @@
 package nars.inter;
 
 import nars.IO;
+import nars.Task;
 import nars.inter.gnutella.message.QueryMessage;
 import nars.nar.Terminal;
-import nars.task.Task;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -9,7 +9,6 @@ import nars.nal.nal3.SetExt;
 import nars.nal.nal4.Product;
 import nars.nar.experimental.Equalized;
 import nars.narsese.InvalidInputException;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.util.data.random.XORShiftRandom;

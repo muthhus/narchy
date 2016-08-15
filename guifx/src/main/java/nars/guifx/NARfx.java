@@ -1,5 +1,6 @@
 package nars.guifx;
 
+import nars.Task;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -17,7 +18,6 @@ import nars.guifx.concept.DetailedConceptPane;
 import nars.guifx.demo.NARide;
 import nars.guifx.nars.TaskPane;
 import nars.guifx.util.ColorMatrix;
-import nars.task.Task;
 import nars.term.Termed;
 import nars.util.FX;
 import nars.util.Util;

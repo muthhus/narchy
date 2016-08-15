@@ -2,7 +2,7 @@ package nars.nal.nal7;
 
 import nars.$;
 import nars.NAR;
-import nars.task.Task;
+import nars.Task;
 import nars.util.TimeMap;
 import org.jetbrains.annotations.NotNull;
 

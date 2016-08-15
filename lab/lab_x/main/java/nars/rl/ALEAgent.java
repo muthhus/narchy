@@ -12,7 +12,6 @@ import nars.NAR;
 import nars.Video;
 import nars.nar.Default;
 import nars.rl.example.QVis;
-import nars.task.Task;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

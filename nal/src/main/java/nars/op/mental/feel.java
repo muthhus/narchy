@@ -16,12 +16,9 @@
  */
 package nars.op.mental;
 
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
+import nars.*;
 import nars.nal.nal8.AbstractOperator;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

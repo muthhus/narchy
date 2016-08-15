@@ -1,13 +1,9 @@
 package nars.nal.nal8;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Symbols;
+import nars.*;
 import nars.concept.OperationConcept;
 import nars.nal.Tense;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;

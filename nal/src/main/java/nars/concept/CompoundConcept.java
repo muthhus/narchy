@@ -1,8 +1,6 @@
 package nars.concept;
 
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
+import nars.*;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
@@ -13,7 +11,6 @@ import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.link.TermLinkBuilder;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -229,7 +226,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     public
     @Nullable
-    Task processQuest(@NotNull Task task, @NotNull NAR nar, @NotNull List<Task> displaced) {
+    boolean processQuest(@NotNull Task task, @NotNull NAR nar, @NotNull List<Task> displaced) {
         return processQuestion(task, nar, displaced);
     }
 
@@ -258,8 +255,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * To accept a new judgment as belief, and check for revisions and solutions
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    @Nullable
-    public Task processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
+    public boolean processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
         return processBeliefOrGoal(belief, nar, beliefsOrNew(), questions(), displaced);
     }
 
@@ -268,8 +264,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * decide whether to actively pursue it
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    @Nullable
-    public Task processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
+    public boolean processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
         return processBeliefOrGoal(goal, nar, goalsOrNew(), quests(), displaced);
     }
 
@@ -277,7 +272,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      * TODO remove synchronized by lock-free technique
      */
-    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions, List<Task> displaced) {
+    private final boolean processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions, List<Task> displaced) {
 
         //this may be helpful but we need a different way of applying it to keep the two table's ranges consistent
 
@@ -305,9 +300,11 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         //synchronized (target) {
         Task b = target.add(belief, questions, displaced, this, nar);
-        if (b != null)
+        if (b != null) {
             updateSatisfaction(nar);
-        return b;
+            return true;
+        }
+        return false;
         //}
     }
 
@@ -380,8 +377,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * @param displaced
      * @return the relevant task
      */
-    @Nullable
-    public Task processQuestion(@NotNull Task q, @NotNull NAR nar, @NotNull List<Task> displaced) {
+    public boolean processQuestion(@NotNull Task q, @NotNull NAR nar, @NotNull List<Task> displaced) {
 
         final QuestionTable questionTable;
         final BeliefTable answerTable;
@@ -396,7 +392,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         }
 
 
-        return questionTable.add(q, answerTable, displaced, nar);
+        return questionTable.add(q, answerTable, displaced, nar)!=null;
     }
 
 
@@ -498,7 +494,6 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         }
     }
 
-    public static final String DUPLICATE_BELIEF_GOAL = "Duplicate Belief/Goal";
     public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
 
     /**
@@ -514,16 +509,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * --a revised/projected task which may or may not remain in the belief table
      */
     @Override
-    public final Task process(@NotNull Task input, @NotNull NAR nar, List<Task> displaced) {
+    public final boolean process(@NotNull Task input, @NotNull NAR nar, List<Task> displaced) {
 
 
-        Task output;
-
-        /* if a duplicate exists, it will merge the incoming task and return true.
-          otherwise false */
-        //synchronized (tasks) {
-
-
+        boolean output;
 
         synchronized (term) {
 
@@ -549,15 +538,9 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
             }
 
 
-            if (output == null) {
+            if (!output) {
                 //which was added above
                 displaced.add(input);
-            } else {
-                if (input == output)
-                    displaced.remove(input); //incase it or an equivalent was added to the displacement list
-                else {
-                    throw new RuntimeException(input + " task was transformed " + output);
-                }
             }
         }
 

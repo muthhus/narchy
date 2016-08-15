@@ -1,7 +1,7 @@
 package nars.util.graph;
 
+import nars.Task;
 import nars.concept.Concept;
-import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jgrapht.graph.DirectedMultigraph;
 

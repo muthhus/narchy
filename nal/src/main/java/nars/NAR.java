@@ -2,7 +2,6 @@ package nars;
 
 
 import com.google.common.collect.Sets;
-import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import com.lmax.disruptor.EventTranslatorOneArg;
@@ -24,7 +23,6 @@ import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -353,11 +351,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //        });
 
 
-
         (this.exe = exe).start(this);
 
         index.loadBuiltins();
         index.start(this);
+
+        tasks.start(this);
     }
 
 
@@ -761,21 +760,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             return null;
         }
 
-        //input.onInput(c);
-
         float conceptActivation = input.isInput() ? this.inputActivation.floatValue() : this.derivedActivation.floatValue();
 
+        if (tasks.add(input)) {
 
-
-        if (clock instanceof FrameClock) {
-            //HACK for unique serial number w/ frameclock
-            ((FrameClock) clock).ensureStampSerialGreater(input.evidence());
-        }
-
-
-        try {
-
-            if (tasks.addIfAbsent(input)) {
+            try {
 
                 Concept c = input.concept(this);
                 if (c.policy() == null) {
@@ -784,21 +773,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
                 List<Task> removed = $.newArrayList();
 
-                Task inputted = c.process(input, this, removed);
+                boolean entered = c.process(input, this, removed);
 
                 tasks.remove(removed);
 
-                if (inputted != input) {
-                    if (inputted!=null)
-                        tasks.replace(input, inputted);
-                    else
-                        tasks.remove(input);
-                    input.delete();
-                }
+                if (entered) {
 
-
-
-                if (inputted!=null && !inputted.isDeleted()) {
+                    if (clock instanceof FrameClock) {
+                        //HACK for unique serial number w/ frameclock
+                        ((FrameClock) clock).ensureStampSerialGreater(input.evidence());
+                    }
 
                     /*
                     long numTasks = tasks.tasks.estimatedSize();
@@ -807,11 +791,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     System.out.println("tasks=" + numTasks + ", ~" + per + " per concept");
                     */
 
-                    float p = inputted.pri();
+                    float p = input.pri();
                     if (p > 0) {
                         //propagate budget
                         //try {
-                        Activation activation = new Activation(inputted, c);
+                        Activation activation = new Activation(input, c);
 
                         c.link(1f, null/* linkActivation */, Param.BUDGET_EPSILON, this, activation);
 
@@ -831,27 +815,29 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     }
 
 
-                    inputted.onConcept(c);
+                    input.onConcept(c);
 
-                    eventTaskProcess.emit(inputted); //signal any additional processes
+                    eventTaskProcess.emit(input); //signal any additional processes
                     //eventTaskProcess.emitAsync(inputted, concurrency, runWorker);
 
                     return c; //SUCCESSFULLY PROCESSED
                 }
 
+
+            } catch (Exception e) {
+
+                tasks.remove(input);
+
+                emotion.errr();
+
+                if (Param.DEBUG)
+                    logger.warn("process error: {}", e.toString());
             }
-
-        } catch (Exception e) {
-            emotion.errr();
-
-            if (Param.DEBUG)
-                logger.warn("process error: {}", e.toString());
         }
 
 
-
         emotion.frustration(input.priIfFiniteElseZero());
-        input.delete();
+        //input.delete();
 
         return null;
     }
@@ -1585,7 +1571,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         public void run(@NotNull NAR nar, float activation) {
             if (!concepts.isEmpty()) {
                 float total = 1;
-                    //(float) concepts.sum();
+                //(float) concepts.sum();
                 nar.activate(concepts, in, activation / total, overflow);
             }
         }

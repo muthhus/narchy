@@ -1,8 +1,6 @@
 package nars.nal.nal7;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
+import nars.*;
 import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
 import nars.concept.CompoundConcept;
@@ -11,7 +9,6 @@ import nars.io.NarseseTest;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.nar.Terminal;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

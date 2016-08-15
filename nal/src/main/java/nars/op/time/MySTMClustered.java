@@ -1,13 +1,10 @@
 package nars.op.time;
 
+import nars.*;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
-import nars.$;
-import nars.NAR;
-import nars.Param;
 import nars.budget.BudgetFunctions;
 import nars.nal.Stamp;
 import nars.task.GeneratedTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.DefaultTruth;

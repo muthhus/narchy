@@ -1,12 +1,12 @@
 package nars.guifx.demo;
 
 import nars.Param;
+import nars.Task;
 import nars.guifx.highdim.HighDim;
 import nars.guifx.highdim.TaskAxis;
 import nars.guifx.util.Animate;
 import nars.guifx.util.TabX;
 import nars.nar.Default;
-import nars.task.Task;
 
 public class DemoTimeline {
     public static void main(String[] args) {

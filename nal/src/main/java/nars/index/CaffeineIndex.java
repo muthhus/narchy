@@ -1,11 +1,9 @@
 package nars.index;
 
 import com.github.benmanes.caffeine.cache.*;
-import nars.$;
 import nars.NAR;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -16,12 +14,10 @@ import nars.util.signal.WiredConcept;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 

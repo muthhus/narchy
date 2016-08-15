@@ -1,8 +1,8 @@
 package nars.nal.nal6;
 
+import nars.Task;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.task.Task;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

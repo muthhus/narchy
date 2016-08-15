@@ -1,10 +1,10 @@
 package nars.nlp;
 
 import nars.Narsese;
+import nars.Task;
 import nars.index.PatternIndex;
 import nars.nal.Tense;
 import nars.nar.Terminal;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.subst.FindSubst;
 

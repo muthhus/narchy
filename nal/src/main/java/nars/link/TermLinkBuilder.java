@@ -4,6 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +46,7 @@ public enum TermLinkBuilder {
      * determines whether to grow a 1st-level termlink to a subterm
      */
     protected static void components(@NotNull Term t, int level, @NotNull Collection<Term> target) {
-
+        t = $.unneg(t).term();
         if (t instanceof Variable) {
 
             if (t.op()!=Op.VAR_QUERY) {
@@ -54,8 +55,9 @@ public enum TermLinkBuilder {
 
         } else {
 
-            if (t instanceof Compound)
-                t = $.terms.normalize($.unneg(t),true);
+            if (t instanceof Compound) {
+                t = $.terms.normalize(t,true);
+            }
 
             if (target.add(t)) { //do not descend on repeats
 

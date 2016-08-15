@@ -2,7 +2,6 @@ package nars.rl;
 
 import jurls.reinforcementlearning.domains.RLEnvironment;
 import nars.NAR;
-import nars.task.Task;
 import nars.term.Term;
 
 /* dimension reduction / input processing implementations */

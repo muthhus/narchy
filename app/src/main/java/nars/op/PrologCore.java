@@ -1,14 +1,11 @@
 package nars.op;
 
 import alice.tuprolog.*;
+import nars.*;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
-import nars.$;
-import nars.NAR;
-import nars.Op;
 import nars.concept.Concept;
 import nars.data.Range;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;

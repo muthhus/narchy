@@ -1,9 +1,7 @@
 package nars.task;
 
 import com.google.common.collect.Lists;
-import nars.$;
-import nars.NAR;
-import nars.Param;
+import nars.*;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.nar.Terminal;

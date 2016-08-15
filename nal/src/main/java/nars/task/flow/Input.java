@@ -20,7 +20,7 @@
 package nars.task.flow;
 
 import nars.NAR;
-import nars.task.Task;
+import nars.Task;
 import nars.util.data.buffer.Source;
 import nars.util.event.On;
 import org.jetbrains.annotations.NotNull;

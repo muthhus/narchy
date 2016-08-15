@@ -1,8 +1,6 @@
 package nars.nal.nal8.operator;
 
-import nars.$;
-import nars.Narsese;
-import nars.Op;
+import nars.*;
 import nars.budget.Budgeted;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
@@ -11,7 +9,6 @@ import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;

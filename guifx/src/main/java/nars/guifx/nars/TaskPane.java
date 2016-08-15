@@ -6,9 +6,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import nars.NAR;
+import nars.Task;
 import nars.concept.Concept;
 import nars.guifx.NARfx;
-import nars.task.Task;
 
 import static nars.guifx.NARfx.scrolled;
 

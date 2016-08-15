@@ -1,16 +1,13 @@
 package nars.concept;
 
+import nars.*;
 import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
-import nars.$;
-import nars.NAR;
-import nars.Param;
 import nars.bag.Bag;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.task.Revision;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.util.analyze.BeliefAnalysis;
 import org.jetbrains.annotations.NotNull;

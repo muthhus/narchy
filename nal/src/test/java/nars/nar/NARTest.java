@@ -2,7 +2,7 @@ package nars.nar;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.task.Task;
+import nars.Task;
 import org.junit.Ignore;
 import org.junit.Test;
 

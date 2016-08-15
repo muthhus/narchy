@@ -1,11 +1,8 @@
 package nars.nal.nal8;
 
-import nars.$;
-import nars.NAR;
-import nars.Param;
+import nars.*;
 import nars.concept.OperationConcept;
 import nars.nar.Default;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Operator;
 import org.jetbrains.annotations.NotNull;

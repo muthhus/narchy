@@ -2,6 +2,7 @@ package nars.budget.policy;
 
 import nars.$;
 import nars.Memory;
+import nars.Task;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
@@ -11,7 +12,6 @@ import nars.nal.Premise;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
 import nars.nal.meta.PremiseEval;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;

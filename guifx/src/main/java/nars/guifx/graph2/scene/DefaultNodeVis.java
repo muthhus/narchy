@@ -1,5 +1,6 @@
 package nars.guifx.graph2.scene;
 
+import nars.Task;
 import org.eclipse.collections.api.tuple.Pair;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
@@ -21,7 +22,6 @@ import nars.guifx.graph2.NodeVis;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.ColorMatrix;
-import nars.task.Task;
 import nars.term.Termed;
 
 import java.util.concurrent.atomic.AtomicReference;

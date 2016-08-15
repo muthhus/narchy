@@ -6,7 +6,6 @@ import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.task.AbstractTask;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;

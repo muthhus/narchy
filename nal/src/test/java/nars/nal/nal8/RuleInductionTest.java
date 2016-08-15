@@ -3,8 +3,8 @@ package nars.nal.nal8;
 import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.nar.Default;
-import nars.task.Task;
 import nars.util.signal.FuzzyConceptSet;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class RuleInductionTest {
 
         }
 
-        TreeSet<Task> nameSorted = new TreeSet<Task>((x,y)->x.toString().compareTo(y.toString()));
+        TreeSet<Task> nameSorted = new TreeSet<Task>((x, y)->x.toString().compareTo(y.toString()));
 
         NAR.printTasks(d, true, (x) -> {
             if ((x.op().temporal) && (x.volume()<=7) && (x.dt() <= 1)) {

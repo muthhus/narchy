@@ -1,12 +1,8 @@
 package nars.io;
 
-import nars.$;
-import nars.Narsese;
-import nars.Op;
-import nars.Symbols;
+import nars.*;
 import nars.nal.Tense;
 import nars.nar.Terminal;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

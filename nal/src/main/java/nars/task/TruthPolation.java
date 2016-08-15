@@ -1,18 +1,17 @@
 package nars.task;
 
 import com.google.common.base.Joiner;
+import nars.Task;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.$;
 import nars.Param;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
-import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static nars.nal.UtilityFunctions.w2c;

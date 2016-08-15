@@ -24,11 +24,8 @@ package nars.op.mental;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
+import nars.*;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.task.Temporal;
 import nars.term.Compound;
 import nars.truth.DefaultTruth;
@@ -50,7 +47,7 @@ public final class Anticipate {
     /** max differnce in frequency value to be considered a match */
     final static float FREQ_TOLERANCE = 0.25f;
 
-    final Multimap<Compound,Task> anticipations = LinkedHashMultimap.create();
+    final Multimap<Compound, Task> anticipations = LinkedHashMultimap.create();
 
     @NotNull
     private final NAR nar;

@@ -1,9 +1,6 @@
 package nars.nal.meta;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.index.TermIndex;
@@ -14,7 +11,6 @@ import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

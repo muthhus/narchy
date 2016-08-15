@@ -2,10 +2,10 @@ package nars.gui;
 
 import com.jogamp.opengl.GL2;
 import nars.NAR;
+import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;

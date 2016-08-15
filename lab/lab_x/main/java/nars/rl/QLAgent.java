@@ -13,7 +13,6 @@ import nars.nal.nal8.decide.DecideAboveDecisionThreshold;
 import nars.nal.nal8.decide.DecideAllGoals;
 import nars.nal.nal8.decide.Decider;
 import nars.nal.nal8.operator.SynchOperator;
-import nars.task.Task;
 import nars.term.Atom;
 import nars.term.Compound;
 import nars.term.Term;

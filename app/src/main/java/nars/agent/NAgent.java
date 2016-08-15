@@ -1,11 +1,8 @@
 package nars.agent;
 
 import com.google.common.base.Joiner;
+import nars.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
@@ -13,7 +10,6 @@ import nars.learn.Agent;
 import nars.nar.Default;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;

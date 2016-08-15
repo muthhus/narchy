@@ -3,9 +3,9 @@ package nars.guifx.nars;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import nars.Task;
 import nars.guifx.SummaryIcon;
 import nars.guifx.util.ColorArray;
-import nars.task.Task;
 
 /**
  * Created by me on 8/14/15.

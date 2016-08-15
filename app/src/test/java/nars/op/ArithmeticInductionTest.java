@@ -1,13 +1,9 @@
 package nars.op;
 
-import nars.$;
-import nars.NAR;
-import nars.Param;
+import nars.*;
 import nars.nar.Default;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.obj.Termject;
 import nars.util.signal.TestNAR;
 import org.junit.Test;

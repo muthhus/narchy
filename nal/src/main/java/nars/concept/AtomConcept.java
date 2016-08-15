@@ -2,12 +2,12 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Op;
+import nars.Task;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicStringConstant;
@@ -106,7 +106,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
 
 
     @Override
-    public Task process(@NotNull Task task, @NotNull NAR nar, List<Task> removed) {
+    public boolean process(@NotNull Task task, @NotNull NAR nar, List<Task> removed) {
         throw new UnsupportedOperationException();
     }
 

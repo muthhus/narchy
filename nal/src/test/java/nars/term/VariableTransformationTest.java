@@ -1,8 +1,8 @@
 package nars.term;
 
 import nars.NAR;
+import nars.Task;
 import nars.nar.Terminal;
-import nars.task.Task;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

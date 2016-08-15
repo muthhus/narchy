@@ -1,6 +1,6 @@
 package nars.nal;
 
-import nars.task.Task;
+import nars.Task;
 
 import java.util.Collection;
 

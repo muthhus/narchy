@@ -4,9 +4,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import nars.NAR;
+import nars.Task;
 import nars.guifx.AutoLabel;
 import nars.guifx.NARfx;
-import nars.task.Task;
 
 import static javafx.application.Platform.runLater;
 

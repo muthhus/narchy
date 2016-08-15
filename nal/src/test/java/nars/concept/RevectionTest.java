@@ -2,7 +2,7 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Param;
-import nars.task.Task;
+import nars.Task;
 import nars.truth.Truth;
 import nars.util.analyze.BeliefAnalysis;
 import org.jetbrains.annotations.Nullable;

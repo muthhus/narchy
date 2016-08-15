@@ -1,12 +1,12 @@
 package nars.util.data;
 
+import nars.Task;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.NAR;
 import nars.Param;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

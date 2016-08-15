@@ -248,7 +248,10 @@ abstract public class NAREnvironment {
                     nar.inputLater(new GeneratedTask(c, '!',
                             $.t(nar.random.nextFloat()
                             //Math.random() > 0.5f ? 1f : 0f
-                            , gamma * gammaEpsilonFactor)) {
+                            , gamma * gammaEpsilonFactor))
+
+                    //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
+                    /* {
                         @Override
                         public boolean onConcept(@NotNull Concept c) {
                             if (super.onConcept(c)) {
@@ -260,7 +263,7 @@ abstract public class NAREnvironment {
                             }
                             return false;
                         }
-                    }.
+                    }*/.
                             present(now).log("Curiosity"));
                 }
                 boost(c);

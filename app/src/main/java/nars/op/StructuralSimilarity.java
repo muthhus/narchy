@@ -1,10 +1,7 @@
 package nars.op;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
+import nars.*;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 

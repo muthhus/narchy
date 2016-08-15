@@ -1,13 +1,10 @@
 package nars.concept.table;
 
 
-import nars.$;
-import nars.NAR;
-import nars.Param;
+import nars.*;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.task.AnswerTask;
-import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

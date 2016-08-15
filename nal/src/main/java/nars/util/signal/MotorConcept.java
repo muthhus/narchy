@@ -1,10 +1,7 @@
 package nars.util.signal;
 
-import nars.NAR;
-import nars.Narsese;
-import nars.Symbols;
+import nars.*;
 import nars.task.GeneratedTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

@@ -2,12 +2,12 @@ package nars.concept;
 
 import nars.IO;
 import nars.NAR;
+import nars.Task;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -120,7 +120,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public Task process(@NotNull Task task, @NotNull NAR nar, List<Task> removed) {
+    public boolean process(@NotNull Task task, @NotNull NAR nar, List<Task> removed) {
         return target.process(task, nar, removed);
     }
 

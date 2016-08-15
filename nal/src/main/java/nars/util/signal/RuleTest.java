@@ -1,6 +1,6 @@
 package nars.util.signal;
 
-import nars.task.Task;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -50,7 +50,7 @@ public interface RuleTest {
 
 	}
 	static void test(@NotNull TestNAR test, @NotNull Task task, @NotNull Task belief, @NotNull String result,
-					 float minFreq, float maxFreq, float minConf, float maxConf) {
+                     float minFreq, float maxFreq, float minConf, float maxConf) {
 
 		test.nar.input(task);
 		test.nar.input(belief);

@@ -24,7 +24,6 @@ import nars.nal.nal8.operator.ImmediateOperator;
 import nars.nal.rule.PremiseRule;
 import nars.op.out.echo;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

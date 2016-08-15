@@ -2,7 +2,7 @@ package nars.nar.util;
 
 import nars.NAR;
 import nars.Op;
-import nars.task.Task;
+import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.OneMatchFindSubst;

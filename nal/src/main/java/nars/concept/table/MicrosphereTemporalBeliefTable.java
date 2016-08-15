@@ -1,12 +1,9 @@
 package nars.concept.table;
 
-import nars.$;
-import nars.NAR;
-import nars.Param;
+import nars.*;
 import nars.concept.Concept;
 import nars.nal.Stamp;
 import nars.task.Revision;
-import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
 import nars.util.Util;

@@ -1,11 +1,11 @@
 package nars.irc;
 
+import nars.Task;
 import nars.experiment.Talk;
 import nars.index.TermIndex;
 import nars.inter.InterNAR;
 import nars.nal.Tense;
 import nars.nar.Terminal;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.time.RealtimeMSClock;

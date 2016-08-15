@@ -10,7 +10,6 @@ import nars.concept.TaskTable;
 import nars.premise.Premise;
 import nars.premise.PremiseGenerator;
 import nars.task.Sentence;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.transform.TermVisitor;
 

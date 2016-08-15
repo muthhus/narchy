@@ -2,12 +2,12 @@ package nars.op.java;
 
 import nars.$;
 import nars.Param;
+import nars.Task;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.op.in.Twenglish;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

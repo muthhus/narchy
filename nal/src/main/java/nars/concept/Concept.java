@@ -23,16 +23,14 @@ package nars.concept;
 import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.Symbols;
+import nars.Task;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.concept.table.TaskTable;
-import nars.link.BLink;
 import nars.task.Revision;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -158,7 +156,7 @@ public interface Concept extends Termed {
      * @param removed
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    Task process(@NotNull Task task, @NotNull NAR nar, List<Task> removed);
+    boolean process(@NotNull Task task, @NotNull NAR nar, List<Task> removed);
 
 
     /**

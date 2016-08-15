@@ -1,8 +1,8 @@
 package nars.nal.meta.op;
 
+import nars.Task;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
-import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

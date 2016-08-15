@@ -2,10 +2,10 @@ package nars.nar;
 
 import nars.NAR;
 import nars.Symbols;
+import nars.Task;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.nal.nal8.operator.NullOperator;
-import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

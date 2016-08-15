@@ -4,13 +4,12 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import nars.NAR;
+import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
 import nars.budget.merge.BudgetMerge;
 import nars.guifx.InputPane;
 import nars.guifx.concept.BagView;
-import nars.link.BLink;
-import nars.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

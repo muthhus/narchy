@@ -1,6 +1,6 @@
 package nars.task.flow;
 
-import nars.task.Task;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

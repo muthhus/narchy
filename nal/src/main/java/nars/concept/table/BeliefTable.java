@@ -1,10 +1,10 @@
 package nars.concept.table;
 
 import nars.NAR;
+import nars.Task;
 import nars.budget.Budgeted;
 import nars.concept.CompoundConcept;
 import nars.nal.Tense;
-import nars.task.Task;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
@@ -187,7 +187,9 @@ public interface BeliefTable extends TaskTable {
 //                BeliefTable.relevance(b, when, 1);
 //    }
 
-    /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
+    /** attempt to insert a task; returns what was input or null if nothing changed (rejected)
+     *  TODO return boolean, input should not be transformed
+     * */
     Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar);
 
 

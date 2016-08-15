@@ -2,12 +2,12 @@ package nars.util.signal;
 
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.CompoundConcept;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.TemporalBeliefTable;
-import nars.task.Task;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,15 +69,25 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
     }
 
     @Override
-    @Nullable public Task processBelief(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
+    public boolean processBelief(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
         t = filterBeliefs(t, nar, displaced);
-        return (t != null) ? executeLater(super.processBelief(t, nar, displaced), nar) : null;
+        if (t!=null && super.processBelief(t, nar, displaced)){
+            executeLater(t, nar);
+            return true;
+        }
+        return false;
+
     }
 
     @Override
-    @Nullable public Task processGoal(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
+    public boolean processGoal(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
         t = filterGoals(t, nar, displaced);
-        return (t != null) ? executeLater(super.processGoal(t, nar, displaced), nar) : null;
+        if (t!=null && super.processGoal(t, nar, displaced)){
+            executeLater(t, nar);
+            return true;
+        }
+        return false;
+
     }
 
     /** NOTE: if validBelief always returns true, then this can be bypassed by overriding with blank method */

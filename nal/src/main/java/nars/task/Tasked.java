@@ -1,6 +1,7 @@
 package nars.task;
 
 
+import nars.Task;
 import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface

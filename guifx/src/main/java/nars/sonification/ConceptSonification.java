@@ -1,15 +1,12 @@
 package nars.sonification;
 
-import nars.$;
-import nars.Audio;
-import nars.NAR;
+import nars.*;
 import nars.audio.SoundProducer;
 import nars.audio.granular.Granulize;
 import nars.audio.sample.SampleLoader;
 import nars.audio.sample.SonarSample;
 import nars.budget.Budgeted;
 import nars.nar.Default;
-import nars.task.Task;
 import nars.term.Term;
 import nars.util.event.FrameReaction;
 

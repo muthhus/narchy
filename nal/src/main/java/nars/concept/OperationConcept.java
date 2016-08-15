@@ -1,11 +1,8 @@
 package nars.concept;
 
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
+import nars.*;
 import nars.bag.Bag;
 import nars.nal.nal8.Execution;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
@@ -47,16 +44,22 @@ public class OperationConcept extends CompoundConcept<Compound> implements Consu
         return ((Compound)term().term(0)).subterms();
     }
 
-    @Nullable
     @Override
-    public Task processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
-        return executeLater(super.processGoal(goal, nar, displaced), nar);
+    public boolean processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
+        if (super.processGoal(goal, nar, displaced)){
+            executeLater(goal, nar);
+            return true;
+        }
+        return false;
     }
 
-    @Nullable
     @Override
-    public Task processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
-        return executeLater(super.processBelief(belief, nar, displaced), nar);
+    public boolean processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
+        if (super.processBelief(belief, nar, displaced)){
+            executeLater(belief, nar);
+            return true;
+        }
+        return false;
     }
 
     @Nullable

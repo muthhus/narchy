@@ -2,7 +2,7 @@ package nars.op.in;
 
 import com.google.common.io.Files;
 import nars.NAR;
-import nars.task.Task;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

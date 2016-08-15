@@ -1,7 +1,7 @@
 package nars.op.in;
 
 import nars.NAR;
-import nars.task.Task;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;

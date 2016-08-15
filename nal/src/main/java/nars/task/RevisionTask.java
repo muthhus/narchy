@@ -1,10 +1,10 @@
 package nars.task;
 
 import nars.NAR;
+import nars.Task;
 import nars.bag.Bag;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
-import nars.index.TermIndex;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;

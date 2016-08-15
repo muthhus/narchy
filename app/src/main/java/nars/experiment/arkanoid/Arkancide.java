@@ -1,20 +1,15 @@
 package nars.experiment.arkanoid;
 
 
-import nars.$;
-import nars.NAR;
-import nars.NARLoop;
-import nars.Param;
+import nars.*;
 import nars.data.AutoClassifier;
 import nars.experiment.NAREnvironment;
-import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;

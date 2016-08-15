@@ -1,23 +1,17 @@
 package nars.op;
 
-import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import nars.Task;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import nars.$;
 import nars.NAR;
-import nars.budget.Budget;
-import nars.budget.RawBudget;
 import nars.task.GeneratedTask;
-import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static nars.Op.CONJ;
 import static nars.nal.Tense.DTERNAL;
 
 
@@ -106,7 +100,7 @@ public class VariableCompressor implements Consumer<Task> {
 
             newContent = $.conj(newContent,
 
-                    //task.dt() == 0 ? 0 : DTERNAL, //allow +0 to merge with the other part
+                    task.dt() == 0 ? 0 : DTERNAL, //allow +0 to merge with the other part
                     //DTERNAL,
 
                     $.sim(var, max)

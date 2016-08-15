@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Op;
 import nars.nal.nal1.Inheritance;
 import nars.nal.nal2.Instance;
-import nars.task.Task;
 import nars.task.TaskSeed;
 import nars.term.Atom;
 import nars.term.Compound;

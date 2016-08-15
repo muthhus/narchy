@@ -1,16 +1,12 @@
 package nars.util.signal;
 
+import nars.*;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Symbols;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.task.DerivedTask;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -138,7 +134,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     public Task desire(@Nullable Truth t) {
         if (this.desire==null || !this.desire.truth().equals(t)) {
             if (this.desire != null) {
-                this.desire.delete();
+                this.desire.delete(nar);
             }
 
             if (t!=null) {

@@ -1,7 +1,7 @@
 package nars.util;
 
 import nars.NAR;
-import nars.task.Task;
+import nars.Task;
 import nars.util.time.IntervalTree;
 import org.jetbrains.annotations.NotNull;
 

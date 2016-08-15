@@ -4,10 +4,10 @@
  */
 package nars.nal;
 
+import nars.Task;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.task.Task;
 import nars.task.Tasked;
 import nars.term.Term;
 import nars.term.Termed;

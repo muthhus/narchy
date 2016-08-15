@@ -1,9 +1,6 @@
 package nars.nal;
 
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.budget.policy.TaskBudgeting;
@@ -14,7 +11,6 @@ import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.task.AnswerTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
