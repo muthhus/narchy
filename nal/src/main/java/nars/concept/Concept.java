@@ -451,5 +451,7 @@ public interface Concept extends Termed {
         @NotNull ConceptPolicy init();
         @NotNull ConceptPolicy awake();
         @NotNull ConceptPolicy sleep();
+
+        void start(NAR nar);
     }
 }

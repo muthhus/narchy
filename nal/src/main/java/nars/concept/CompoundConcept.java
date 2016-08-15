@@ -67,10 +67,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull T term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks) {
+    public CompoundConcept(@NotNull T term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, NAR nar) {
         this.term = term;
 
-        this.templates = TermSet.the(TermLinkBuilder.components(term));
+        this.templates = TermSet.the(TermLinkBuilder.components(term, nar));
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
@@ -116,14 +116,14 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public CompoundConcept(@NotNull T term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.index.conceptBuilder(), new HashMap());
+        this(term, (DefaultConceptBuilder) n.index.conceptBuilder(), new HashMap(), n);
     }
 
     /**
      * default construction by a NAR on conceptualization
      */
-    CompoundConcept(@NotNull T term, @NotNull DefaultConceptBuilder b, Map bagMap) {
-        this(term, b.termbag(bagMap), b.taskbag(bagMap));
+    CompoundConcept(@NotNull T term, @NotNull DefaultConceptBuilder b, Map bagMap, NAR nar) {
+        this(term, b.termbag(bagMap), b.taskbag(bagMap), nar);
     }
 
 

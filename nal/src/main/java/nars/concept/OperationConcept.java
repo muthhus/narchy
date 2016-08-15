@@ -25,8 +25,8 @@ public class OperationConcept extends CompoundConcept<Compound> implements Consu
     protected volatile boolean pendingRun;
 
 
-    public OperationConcept(@NotNull Compound term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks) {
-        super(term, termLinks, taskLinks);
+    public OperationConcept(@NotNull Compound term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, NAR nar) {
+        super(term, termLinks, taskLinks, nar);
     }
 
     public OperationConcept(@NotNull Compound term, @NotNull NAR n) throws Narsese.NarseseException {

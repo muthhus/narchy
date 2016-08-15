@@ -1,5 +1,6 @@
 package nars.nar.util;
 
+import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
@@ -52,6 +53,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     @NotNull
     private final ConceptPolicy init, awake, sleep;
+    private NAR nar;
 
 
     //private static volatile int serial = 0;
@@ -74,7 +76,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
             case INH:
                 if (Op.isOperation(t))
-                    return new OperationConcept(t, termbag, taskbag);
+                    return new OperationConcept(t, termbag, taskbag, nar);
                 break;
 
             case NEG:
@@ -82,7 +84,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
         }
 
-        return new CompoundConcept<>(t, termbag, taskbag);
+        return new CompoundConcept<>(t, termbag, taskbag, nar);
     }
 
 
@@ -136,6 +138,10 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
         this.init = sleep;
 
         this.awake = new DefaultConceptPolicy(12, 10, 4, 32, 24);
+    }
+
+    public void start(NAR nar) {
+        this.nar = nar;
     }
 
 

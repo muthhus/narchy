@@ -216,12 +216,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         try {
             DerivedTask dt = newDerivedTask(c, truth, punc, evidence, p);
-            if (dt.concept == null) { //no concept target for this
-                if (Param.DEBUG)
-                    throw new TermIndex.InvalidConceptException(c, "Derive");
-                else
-                    return null;
-            }
 
             dt.time(now, occ)
                     .budget(budget) // copied in, not shared

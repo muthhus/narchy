@@ -21,9 +21,12 @@
 package nars;
 
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.index.TermIndex;
+import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.Clock;
 import nars.util.event.DefaultTopic;
@@ -69,6 +72,9 @@ public class Memory extends Param {
     @NotNull public final TermIndex index;
 
     @NotNull public final TaskIndex tasks;
+
+    public final Cache<Term,Term> normalizations = Caffeine.newBuilder().maximumSize(1024).build();
+
 
 
     /** maximum NAL level currently supported by this memory, for restricting it to activity below NAL8 */
@@ -169,7 +175,7 @@ public class Memory extends Param {
         clock.clear();
 
         index.clear();
-
+        tasks.clear();
     }
 
 

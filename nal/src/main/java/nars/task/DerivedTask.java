@@ -16,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 
 abstract public class DerivedTask extends MutableTask {
 
-    public transient Concept concept;
 
     @Nullable
     public transient Premise premise;
@@ -28,19 +27,10 @@ abstract public class DerivedTask extends MutableTask {
 
         evidence(evidence);
 
-        this.concept = super.concept(p.nar);
-
         if (Param.DEBUG)
             this.premise = p.premise;
     }
 
-
-    @Override
-    public @Nullable Concept concept(@NotNull NAR n) {
-        if (concept == null)
-            return super.concept(n);
-        return concept;
-    }
 
     @Override
     public final boolean isInput() {
@@ -83,19 +73,12 @@ abstract public class DerivedTask extends MutableTask {
     }
 
 
-    @Override
-    public boolean onConcept(@NotNull Concept c) {
-        if (!Param.DEBUG)
-            this.concept = null;
-        return true;
-    }
 
     @Override
     public boolean delete() {
         if (!Param.DEBUG) {
             this.premise = null;
         }
-        this.concept = null;
         return super.delete();
     }
 

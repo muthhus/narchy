@@ -1,6 +1,9 @@
 package nars.link;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import nars.$;
+import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
@@ -17,15 +20,17 @@ import java.util.TreeSet;
 public enum TermLinkBuilder {
     ;
 
-    @NotNull public static TreeSet<Term> components(@NotNull Compound host) {
+
+    @NotNull public static TreeSet<Term> components(@NotNull Compound host, NAR nar) {
 
         TreeSet<Term> components = new TreeSet<>(//new LinkedHashSet<>(
             //host.complexity() /* estimate */
         );
 
+
         for (int i = 0, ii = host.size(); i < ii; i++) {
 
-            components(host.term(i), levels(host), components);
+            components(host.term(i), levels(host), components, nar);
 
         }
         return components;
@@ -45,8 +50,10 @@ public enum TermLinkBuilder {
     /**
      * determines whether to grow a 1st-level termlink to a subterm
      */
-    protected static void components(@NotNull Term t, int level, @NotNull Collection<Term> target) {
+    protected static void components(@NotNull Term t, int level, @NotNull Collection<Term> target, NAR nar) {
+
         t = $.unneg(t).term();
+
         if (t instanceof Variable) {
 
             if (t.op()!=Op.VAR_QUERY) {
@@ -56,7 +63,7 @@ public enum TermLinkBuilder {
         } else {
 
             if (t instanceof Compound) {
-                t = $.terms.normalize(t,true);
+                t = nar.normalize((Compound)t);
             }
 
             if (target.add(t)) { //do not descend on repeats
@@ -64,7 +71,7 @@ public enum TermLinkBuilder {
                 if (level > 0 && t instanceof Compound) {
                     Compound cct = (Compound) t;
                     for (int i = 0, ii = cct.size(); i < ii; i++) {
-                        components(cct.term(i), level - 1, target);
+                        components(cct.term(i), level - 1, target, nar);
                     }
                 }
             }

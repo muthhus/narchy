@@ -116,6 +116,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         this(clock, index, rng, self, new SingleThreadExecutioner());
     }
 
+    public final Term normalize(Compound t) {
+        return normalizations.get(t, u -> $.terms.normalize(u, false) );
+    }
+
     abstract public static class Executioner {
         abstract public void start(NAR nar);
 
@@ -352,6 +356,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
         (this.exe = exe).start(this);
+
+        index.conceptBuilder().start(this);
 
         index.loadBuiltins();
         index.start(this);

@@ -1,5 +1,6 @@
 package nars;
 
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,9 @@ public final class TaskIndex {
 
 
     public TaskIndex() {
-        this.tasks = new ConcurrentHashMap(128 * 1024 /* estimate TODO */);
+        this.tasks =
+                //new ConcurrentHashMap(128 * 1024 /* estimate TODO */);
+                new ConcurrentHashMapUnsafe(128 * 1024 /* estimate TODO */);
 
         //Caffeine.newBuilder()
 
@@ -110,6 +113,10 @@ public final class TaskIndex {
 
     public void replace(Task in, Task out) {
         add(out);
+    }
+
+    public void clear() {
+        tasks.clear();
     }
 
 }

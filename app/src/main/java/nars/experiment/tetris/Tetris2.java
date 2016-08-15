@@ -47,7 +47,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Tetris2 extends NAREnvironment {
 
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
-    public static final int DEFAULT_INDEX_WEIGHT = 4 * 1000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 15 * 1000000;
     public static final NAR.Executioner exe = new NAR.MultiThreadExecutioner(2,2);
 
     static {
