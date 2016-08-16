@@ -225,20 +225,20 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 //    }
 
     @Nullable
-    public Task add(@NotNull Task input, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+    public boolean add(@NotNull Task input, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {
             if (input.isInput())
                 throw new RuntimeException("input task rejected (0 capacity): " + input);
-            return null;
+            return false;
         }
 
         synchronized (builder) {
             if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
                 //AXIOMATIC/CONSTANT BELIEF/GOAL
                 addEternalAxiom(input, this, displaced);
-                return input;
+                return true;
             }
 
             removeDeleted(displaced);
@@ -263,7 +263,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
 
             //Finally try inserting this task.  If successful, it will be returned for link activation etc
-            Task result = insert(input, displaced) ? input : null;
+            boolean inserted = insert(input, displaced);
             if (revised != null) {
 
                 //            revised = insert(revised, displaced) ? revised : null;
@@ -286,7 +286,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
                 //                    nar.input(revised);
                 //            });
             }
-            return result;
+            return inserted;
         }
 
     }

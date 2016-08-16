@@ -91,9 +91,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public final void capacity(int eternals, int temporals, @NotNull List<Task> removed, long now) {
         eternal.capacity(eternals, removed);
-        synchronized (temporal) {
-            temporal.capacity(temporals, now, removed);
-        }
+        temporal.capacity(temporals, now, removed);
     }
 
     @Override
@@ -156,27 +154,20 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
 
-    @Nullable
-    @Override public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+    @Override public boolean add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
 
 
         //Filter duplicates; return null if duplicate
         // (no link activation will propagate and TaskProcess event will not be triggered)
-        Task result;
+        boolean result;
         if (input.isEternal()) {
-
             result = eternal.add(input, displaced, concept, nar);
-
         } else {
-            //synchronized (temporal) {
-
-                result = temporal.add(input, eternal, displaced, concept, nar);
-
-            //}
+            result = temporal.add(input, eternal, displaced, concept, nar);
         }
 
-        if (result!=null) {
-            questions.answer(result, nar, displaced);
+        if (result) {
+            questions.answer(input, nar, displaced);
         }
 
         return result;

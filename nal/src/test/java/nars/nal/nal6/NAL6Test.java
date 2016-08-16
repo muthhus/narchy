@@ -180,6 +180,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_elimination5()  {
         TestNAR tester = test();
+        tester.log();
         tester.believe("<{Tweety} --> [withWings]>"); //en("Tweety has wings.");
         tester.believe("<(&&,<$x --> [chirping]>,<$x --> [withWings]>) ==> <$x --> bird>>"); //en("If something can chirp and has wings, then it is a bird.");
         tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.81f); //en("If Tweety can chirp, then it is a bird.");

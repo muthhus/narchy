@@ -109,8 +109,12 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
 
     @NotNull
     private Compound input(int stride, Term state) {
-        return $.p(base, new Termject.IntTerm(stride), state);
+        return $.instprop(stride(stride), state);
         //return $.image(2, false, base, new Termject.IntTerm(stride), state);
+    }
+
+    private Term stride(int stride) {
+        return $.p(base, new Termject.IntTerm(stride));
     }
 
     /** input the 'metadata' of the autoencoder that connects the virtual concepts to their semantic inputs */
@@ -121,10 +125,10 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
         for (int i = 0; i < strides; i++) {
             List<? extends SensorConcept> l = input.subList(k, Math.min(n, k + stride));
             //TODO re-use the same eternal belief to reactivate itself
-            Compound x = $.sim($.sete(
+            Compound x = $.inh($.sete(
                     l.stream().map(CompoundConcept::term).toArray(Term[]::new)),
                     //input(i, unknown).term(0) //the image internal
-                    input(i, unknown)
+                    stride(i)
             );
             nar.believe(x);
             k+= stride;

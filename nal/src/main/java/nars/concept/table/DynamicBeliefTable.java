@@ -29,10 +29,9 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         //ignored
     }
 
-    @Nullable
     @Override
-    public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
-        return input == current ? input : null;
+    public boolean add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+        return input == current ? true : false;
     }
 
     @Nullable

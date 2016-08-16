@@ -6,21 +6,14 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 /** freq < 0.5 */
-public final class TaskNegative extends AtomicBoolCondition {
+public final class TaskNegative extends TaskPositive {
 
     public static final TaskNegative the = new TaskNegative();
 
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseEval m) {
-        Truth t = m.task.truth();
-        return (t!=null && t.freq() < 0.5f);
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return getClass().getSimpleName();
+        return !super.booleanValueOf(m);
     }
 
 

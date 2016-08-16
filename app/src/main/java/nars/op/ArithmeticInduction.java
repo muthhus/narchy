@@ -129,11 +129,13 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
     public Set<Task> compress(Task in) {
-        Set<Task> generated = new HashSet();
 
         if (!in.isBeliefOrGoal()) {
 
+            return Collections.emptySet();
         } else {
+
+            Set<Task> generated = new HashSet();
 
             int bdt = in.dt();
             Op o = in.op();
@@ -188,15 +190,16 @@ public class ArithmeticInduction implements Consumer<Task> {
                 });
 
             }
-        }
 
-        if (!generated.isEmpty()) {
-            if (trace) {
-                logger.info("{}\n\t{}", in, Joiner.on("\n\t").join(generated));
+            if (!generated.isEmpty()) {
+                if (trace) {
+                    logger.info("{}\n\t{}", in, Joiner.on("\n\t").join(generated));
+                }
+
             }
-
+            return generated;
         }
-        return generated;
+
     }
 
 

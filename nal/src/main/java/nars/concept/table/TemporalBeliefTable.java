@@ -19,7 +19,7 @@ public interface TemporalBeliefTable extends TaskTable {
 
     @Nullable Truth truth(long when, long now, EternalTable eternal);
 
-    Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, Concept concept, @NotNull NAR nar);
+    boolean add(@NotNull Task input, EternalTable eternal, List<Task> displ, Concept concept, @NotNull NAR nar);
 
     boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> displ);
 

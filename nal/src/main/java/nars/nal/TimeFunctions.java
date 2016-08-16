@@ -415,6 +415,7 @@ public interface TimeFunctions {
 
         Task t = p.task;
         Task b = p.belief;
+        long tOcc = t.occurrence();
         if (!taskOrBelief && b != null) {
             //if (b.occurrence()!=ETERNAL) {
             int derivedInT = dtTerm.subtermTime(derived);
@@ -427,13 +428,15 @@ public interface TimeFunctions {
                 derivedInT = 0;
             }
 
-            occReturn[0] = t.occurrence() + derivedInT;
+            if (tOcc!=ETERNAL)
+                occReturn[0] = tOcc + derivedInT;
+
 //            } else if (t.occurrence()!=ETERNAL) {
 //                //find the offset of the task term within the belief term, and then add the task term's occurrence
 //                occReturn[0] =
 //            }
         } else {
-            occReturn[0] = t.occurrence(); //the original behavior, but may not be right
+            occReturn[0] = tOcc; //the original behavior, but may not be right
         }
 
 
@@ -541,19 +544,22 @@ public interface TimeFunctions {
             Task belief = p.belief;
 
             if (belief != null && task.isBeliefOrGoal() && belief.isBeliefOrGoal()) {
-//                //blend task and belief's DT's weighted by their relative confidence
-//                float taskConf = task.confWeight();
-//                eventDelta = Math.round(Util.lerp(
-//                        taskDT,
-//                        beliefDT,
-//                        taskConf / (taskConf + belief.confWeight())
-//                ));
+                //blend task and belief's DT's weighted by their relative confidence
+                float taskConf = task.conf();
+                eventDelta = Math.round(Util.lerp(
+                        taskDT,
+                        beliefDT,
+                        taskConf / (taskConf + belief.conf())
+                ));
 //
 //                //reduce confidence by the total change proportion
 //                confScale[0] = eventDelta / (Math.abs(eventDelta-taskDT) + Math.abs(eventDelta-beliefDT)
 
                 //choose dt from task with more confidence
-                eventDelta = task.conf() > belief.conf() ? taskDT : beliefDT;
+                //eventDelta = task.conf() > belief.conf() ? taskDT : beliefDT;
+
+
+
             } else {
                 eventDelta = taskDT;
             }
@@ -614,6 +620,8 @@ public interface TimeFunctions {
         Task belief = p.belief;
 
         long occ = p.occurrenceTarget((t, b) -> {
+
+
             if (t!=ETERNAL && b!= ETERNAL) {
 
                 //randomize choice by confidence

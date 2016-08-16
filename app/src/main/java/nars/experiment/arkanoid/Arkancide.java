@@ -39,7 +39,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Arkancide extends NAREnvironment {
 
     private static final int cyclesPerFrame = 16;
-    public static final int runFrames = 100000;
+    public static final int runFrames = 200;
     public static final int CONCEPTS_FIRE_PER_CYCLE = 32;
     final Arkanoid noid;
     private final SwingCamera cam;
@@ -98,7 +98,7 @@ public class Arkancide extends NAREnvironment {
 
 
         AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                8, 16 /* states */,
+                16, 8 /* states */,
                 0.05f);
         view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 
@@ -205,7 +205,7 @@ public class Arkancide extends NAREnvironment {
         Random rng = new XorShift128PlusRandom(1);
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(1024,
+        Default nar = new Default(2048,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 4 * 1000000, false)
                 , new FrameClock(), exe) {
@@ -216,18 +216,18 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.02f);
-        nar.derivedActivation.setValue(0.02f);
+        nar.inputActivation.setValue(0.1f);
+        nar.derivedActivation.setValue(0.1f);
 
 
         nar.beliefConfidence(0.85f);
-        nar.goalConfidence(0.6f);
+        nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.04f);
+        nar.confMin.setValue(0.02f);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -262,8 +262,8 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 32, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 3);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
@@ -284,6 +284,8 @@ public class Arkancide extends NAREnvironment {
         //nar.index.print(System.out);
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
+
+        nar.printConceptStatistics();
     }
 
 

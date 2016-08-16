@@ -52,7 +52,7 @@ public class Tetris2 extends NAREnvironment {
 
 
 
-    public static final int runFrames = 10000;
+    public static final int runFrames = 1000;
     public static final int cyclesPerFrame = 16;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -396,8 +396,8 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 4);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 4);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
@@ -601,6 +601,7 @@ public class Tetris2 extends NAREnvironment {
         //nar.index.print(System.out);
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
+        nar.printConceptStatistics();
 
         //NAR.printTasks(meta.nar, true);
         //NAR.printTasks(meta.nar, false);

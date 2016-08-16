@@ -62,7 +62,7 @@ public class VariableCompressor implements Consumer<Task> {
 
             HashBag<Term> contents = new HashBag();
             contnt.recurseTerms((subterm) -> {
-                if (subterm.complexity() > 1) //ignore atoms
+                if (subterm.complexity() > 3) //ignore atoms, 1-product of atom, and negated 1-product of atoms, etc.
                     contents.add(subterm);
             });
             //        contents.forEachWithOccurrences((x, o) -> {
@@ -101,17 +101,23 @@ public class VariableCompressor implements Consumer<Task> {
                 //$.varIndep("c");
 
         Compound<?> oldContent = task.term();
-        Term newContent = nar.normalize((Compound) $.terms.remap(oldContent, max, var));
+        Term newContent = $.terms.remap(oldContent, max, var);
         //if (newContent != null) {
 
-            newContent = $.conj(newContent,
-
+            newContent =
+                //$.secte( newContent,
+                    //$.impl(
+                $.conj(
+                    $.sim(var, max),
                     task.dt() == 0 ? 0 : DTERNAL, //allow +0 to merge with the other part
-                    //DTERNAL,
+                        //DTERNAL,
 
-                    $.sim(var, max)
+                    newContent
             );
-            //newContent = $.impl($.sim(var, max), newContent);
+
+        newContent = nar.normalize((Compound)newContent);
+
+                //newContent = $.impl($.sim(var, max), newContent);
 
                 //newContent = Task.normalizeTaskTerm(newContent, task.punc(), nar, true);
                 //if (newContent!=null) {
@@ -121,7 +127,7 @@ public class VariableCompressor implements Consumer<Task> {
 
 
 
-                    if (!task.isDeleted()) {
+                    if (newContent!=null && !task.isDeleted()) {
 
                         Task tt = new GeneratedTask(newContent, task.punc(), task.truth())
                                 .time(task.creation(), task.occurrence())
@@ -140,17 +146,10 @@ public class VariableCompressor implements Consumer<Task> {
     }
 
     public Task tryCompress(Task input) {
-        try {
             Task c1 = compress(input);
             if (c1!=null)
                 return c1;
             return input;
-        } catch (Exception e) {
-            if (Param.DEBUG)
-                logger.error("{}", e);
-            return input;
-        }
-
 
     }
 
@@ -166,18 +165,31 @@ public class VariableCompressor implements Consumer<Task> {
         }
 
         public Task pre(Task input) {
-            input = c.tryCompress(input);
-            Set<Task> inputs = i.compress(input);
-            if (inputs.isEmpty()) {
-                return input;
-            } else {
-                Iterator<Task> ii = inputs.iterator();
-                input = ii.next(); //directly input the first, queue any others
-                while (ii.hasNext()) {
-                    nar.inputLater(ii.next());
+            try {
+                //stage 1
+                input = c.tryCompress(input);
+
+
+                //stage 2
+                Set<Task> inputs = i.compress(input);
+
+                if (!inputs.isEmpty()) {
+                    Iterator<Task> ii = inputs.iterator();
+                    input = ii.next();
+                    while (ii.hasNext()) {
+                        nar.inputLater(ii.next());
+                    }
                 }
+
+                return input;
+
+            } catch (Exception e) {
+                if (Param.DEBUG)
+                    logger.error("{}", e);
                 return input;
             }
+
+
         }
 
     }

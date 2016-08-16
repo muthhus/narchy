@@ -91,6 +91,10 @@
 
 //// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:
+//The duality of extension and intension in NAL corresponds to the
+//  duality of intersection and union in set theory — intensional intersection
+//  corresponds to extensional union, and extensional intersection corresponds
+//  to intensional union.
 
     (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection, Derive:NoSwap)
     (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S & P) --> M), (Belief:Union, Derive:NoSwap)
@@ -252,7 +256,7 @@
         B, ((--,%A) <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:AnalogyN, Desire:StrongN)
 
     B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Desire:Strong)
-        B, (C && (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Desire:StrongN)
+        //B, (C && (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Desire:StrongN)
 
 //    M, (M ==> P), shift_occurrence_forward(unused,"==>") |- P, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
 //    B, (A ==> C), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"==>") |- C, (Truth:Deduction, Order:ForAllSame)
@@ -287,15 +291,15 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //structural decompose any component of a conjunction
-     (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Desire:StructuralStrong)
+     (&&,X,A..+), X, hasNoDepVar(X), time(decomposeTask) |- X, (Belief:StructuralDeduction,Desire:StructuralStrong)
      //(&&,(--,%X),A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeductionN,Desire:StructuralStrongN)
 
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (--,%X), (Belief:StructuralDeduction)
      (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Desire:StructuralStrong)
 
-     (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
-     (&&,X,A), B, time(decomposeTask) |- substituteIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     (&&,X,A), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
      //(&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)

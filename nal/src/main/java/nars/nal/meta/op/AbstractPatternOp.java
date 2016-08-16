@@ -8,67 +8,67 @@ import org.jetbrains.annotations.NotNull;
 /**
  * a condition on the op of a pattern term (task=0, or belief=1)
  */
-abstract public class AbstractPatternOp extends AtomicBoolCondition {
+public enum AbstractPatternOp  {
+    ;
 
-    public final int subterm;
-    public final int op;
-
-    @NotNull
-    private final transient String id;
-
-
-    public AbstractPatternOp(int subterm, @NotNull Op op) {
-        this.subterm = subterm;
-        this.op = op.ordinal();
-        id = getClass().getSimpleName() + '(' + Integer.toString(subterm) + "&\"" + op + "\")";
+    static String name(Class c, int subterm, String param) {
+        return c.getSimpleName() + "(p" + Integer.toString(subterm) + ",\"" + param + "\")";
     }
 
-    public AbstractPatternOp(int subterm, int bits) {
-        this.subterm = subterm;
-        this.op = bits;
-        id = getClass().getSimpleName() + '(' + Integer.toString(subterm) + '&' + bits + ')';
-    }
+    public static class PatternOp extends AtomicBoolCondition {
 
-    @NotNull
-    @Override
-    public String toString() {
-        return id;
-    }
+        public final int subterm;
+        public final int opOrdinal;
 
-    @Override
-    public boolean booleanValueOf(@NotNull PremiseEval ff) {
-        return test(subterm == 0 ? ff.termSub0op : ff.termSub1op);
-    }
-
-    abstract public boolean test(int i);
-
-    public static final class PatternOp extends AbstractPatternOp {
+        @NotNull private final transient String id;
 
         public PatternOp(int subterm, @NotNull Op op) {
-            super(subterm, op);
+
+            this.subterm = subterm;
+            this.opOrdinal = op.ordinal();
+            this.id = name(getClass(), subterm, "\"" + op + "\"");
+
         }
 
-        public PatternOp(int subterm, int structure) {
-            super(subterm, structure);
+        @NotNull
+        @Override
+        public String toString() {
+            return id;
         }
-
 
         @Override
-        public boolean test(int i) {
-            return i == op;
+        public boolean booleanValueOf(@NotNull PremiseEval ff) {
+            return (subterm == 0 ? ff.termSub0op : ff.termSub1op) == opOrdinal;
         }
+
     }
 
-    public static final class PatternOpNot extends AbstractPatternOp {
+    /** tests op membership in a given vector */
+    public static final class PatternOpNot extends AtomicBoolCondition {
+
+        public final int subterm;
+        public final int opBits;
+
+        @NotNull private final transient String id;
+
 
         public PatternOpNot(int subterm, int structure) {
-            super(subterm, structure);
+            this.subterm = subterm;
+            this.opBits = structure;
+            this.id = name(getClass(), subterm, Integer.toString(structure,2));
         }
 
         @Override
-        public boolean test(int i) {
+        public @NotNull String toString() {
+            return id;
+        }
+
+        @Override
+        public boolean booleanValueOf(@NotNull PremiseEval ff) {
             //the bit must not be set in the structure
-            return (i & op) == 0;
+            return (opBits & (subterm == 0 ? ff.termSub0opBit : ff.termSub1opBit)) == 0;
         }
     }
+
+
 }

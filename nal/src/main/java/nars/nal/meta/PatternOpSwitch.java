@@ -20,7 +20,7 @@ public final class PatternOpSwitch extends Atom /* TODO represent as some Generi
 
         this.subterm = subterm;
 
-        cases.forEach((c,p) -> proc[c.op] = p);
+        cases.forEach((c,p) -> proc[c.opOrdinal] = p);
     }
 
     @Override

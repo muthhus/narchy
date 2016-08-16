@@ -58,10 +58,9 @@ public interface BeliefTable extends TaskTable {
 
 
 
-        @NotNull
         @Override
-        public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
-            return input;
+        public boolean add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+            return false;
         }
 
 
@@ -190,7 +189,7 @@ public interface BeliefTable extends TaskTable {
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected)
      *  TODO return boolean, input should not be transformed
      * */
-    Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar);
+    boolean add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar);
 
 
 //    @Nullable

@@ -97,7 +97,14 @@ public class PremiseEval extends FindSubst {
      * cached value
      */
     public float confMin = Param.TRUTH_EPSILON;
+
+    /** op ordinals, 0=task, 1=belief */
     public int termSub0op, termSub1op;
+
+    /** op bits, 0=task, 1=belief */
+    public int termSub0opBit, termSub1opBit;
+
+    /** structs, 0=task, 1=belief */
     public int termSub0Struct, termSub1Struct;
 
     public boolean overlap;
@@ -263,8 +270,10 @@ public class PremiseEval extends FindSubst {
 
         this.termSub0Struct = taskTerm.structure();
         this.termSub0op = taskTerm.op().ordinal();
+        this.termSub0opBit = taskTerm.op().bit;
         this.termSub1Struct = beliefTerm.structure();
         this.termSub1op = beliefTerm.op().ordinal();
+        this.termSub1opBit = beliefTerm.op().bit;
 
         this.temporal = temporal(task, belief);
 

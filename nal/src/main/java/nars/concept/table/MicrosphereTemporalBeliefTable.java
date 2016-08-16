@@ -38,11 +38,14 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     public void capacity(int newCapacity, long now, @NotNull List<Task> removed) {
         this.capacity = newCapacity;
 
-        removeAlreadyDeleted(removed);
-        //compress(displ, now);
-
-        while (this.size() > newCapacity) {
-            remove(weakest(now), removed);
+        synchronized (this) {
+            int s = removeAlreadyDeleted(removed);
+            //compress(displ, now);
+            if (s > newCapacity) {
+                do {
+                    remove(weakest(now), removed);
+                } while (this.size() > newCapacity);
+            }
         }
 
     }
@@ -59,42 +62,41 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
     @Nullable
     @Override
-    public Task add(@NotNull Task input, EternalTable eternal, @NotNull List<Task> displ, Concept concept, @NotNull NAR nar) {
-
+    public final boolean add(@NotNull Task input, EternalTable eternal, @NotNull List<Task> displ, Concept concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0)
-            return null;
-
-
+            return false;
 
         //the result of compression is processed separately
-        Task next = compress(input, nar.time(), eternal, displ, concept);
-        if (next == null) {
-            //not compressible with respect to this input, so reject the input
-            return null;
-        } else if (next != input) {
-            // else: the result of compression has freed a space for the incoming input
-            //nar.runLater(()->{
-            //nar.input
-            nar.inputLater(next);
-            //});
-        } else {
-            //space has been freed for the input, no merging resulted
-
+        Task next;
+        synchronized (this) {
+            next = compress(input, nar.time(), eternal, displ, concept);
         }
 
-        if (!isFull() && add(input)) {
-            return input;
-        } else {
-            //HACK DOES THIS HAPPEN and WHY, IS IT DANGEROUS
-            //if (Global.DEBUG)
-            //throw new RuntimeException(this + " compression failed");
-            return null;
+        if (next!=null && !isFull()) {
+
+            synchronized (this) {
+                add(input);
+            }
+
+            if (next != input)
+                nar.inputLater(next);
+
+            return true;
         }
+
+
+        //not compressible with respect to this input, so reject the input
+        // HACK DOES THIS HAPPEN and WHY, IS IT DANGEROUS
+        //if (Global.DEBUG)
+        //throw new RuntimeException(this + " compression failed");
+        return false;
+
     }
 
-    @Override public final boolean isFull() {
+    @Override
+    public final boolean isFull() {
         return size() == capacity();
     }
 
@@ -112,7 +114,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     @Override
     public final void range(long[] t) {
         for (Task x : this.items) {
-            if (x !=null) {
+            if (x != null) {
                 long o = x.occurrence();
                 if (o < t[0]) t[0] = o;
                 if (o > t[1]) t[1] = o;
@@ -132,12 +134,10 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             return;
 
         Task x = remove(i, displ);
-        if (x!=removed) {
+        if (x != removed) {
             throw new RuntimeException("equal but different instances: " + removed);
         }
     }
-
-
 
 
 //    @Override
@@ -153,7 +153,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     @Nullable
     private final Task remove(int index, @NotNull List<Task> displ) {
         @Nullable Task t = this.remove(index);
-        if (t!=null) {
+        if (t != null) {
             displ.add(t);
         }
         return t;
@@ -163,7 +163,6 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     public Task weakest(long now) {
         return weakest(now, null, Float.POSITIVE_INFINITY);
     }
-
 
 
     @Nullable
@@ -184,7 +183,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
             //consider ii for being the weakest ranked task to remove
             float r = rank(ii, now, now);
-                    //(toMergeWith!=null ? (1f / (1f + Math.abs(ii.freq()-toMergeWith.freq()))) : 1f); //prefer close freq match
+            //(toMergeWith!=null ? (1f / (1f + Math.abs(ii.freq()-toMergeWith.freq()))) : 1f); //prefer close freq match
             if (r < weakestRank) {
                 weakestRank = r;
                 weakest = ii;
@@ -194,8 +193,6 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
         return weakest;
     }
-
-
 
 
 //    @Nullable
@@ -244,7 +241,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     private Task merge(@NotNull Task a, @NotNull Task b, long now, Concept concept, @Nullable EternalTable eternal) {
         double ac = a.conf();
         double bc = b.conf();
-        long mid = (long)Math.round(Util.lerp((double)a.occurrence(), (double)b.occurrence(), ac/(ac+bc)));
+        long mid = (long) Math.round(Util.lerp((double) a.occurrence(), (double) b.occurrence(), ac / (ac + bc)));
         //long mid = (long)Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
@@ -288,7 +285,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
         Truth truth = truth(mid, now, eternal);
 
-        if (truth!=null) {
+        if (truth != null) {
             truth = truth.confMult(confScale);
 
             if (truth != null)
@@ -297,7 +294,6 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
         return null;
     }
-
 
 
     @Nullable
@@ -354,10 +350,10 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         if (s == 1)
             res = copy[0].projectTruth(when, now, false);
         else
-            res =  truthpolations.get().truth(when, copy);
+            res = truthpolations.get().truth(when, copy);
 
         float confLimit = 1f - Param.TRUTH_EPSILON;
-        if (res!=null && res.conf() > confLimit) //clip at max conf
+        if (res != null && res.conf() > confLimit) //clip at max conf
             res = $.t(res.freq(), confLimit);
 
         return res;

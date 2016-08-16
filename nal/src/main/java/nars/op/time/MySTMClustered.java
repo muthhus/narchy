@@ -64,8 +64,9 @@ public class MySTMClustered extends STMClustered {
 			cluster(maxGroupSize);
 
 			//clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
-			if (maxGroupSize != 2)
-				cluster(2);
+			//if (maxGroupSize != 2)
+				//cluster(2);
+
 		} catch (Exception e) {
 			logger.warn("{}", e);
 		}

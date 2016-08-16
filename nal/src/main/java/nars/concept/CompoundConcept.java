@@ -300,8 +300,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 //        }
 
         //synchronized (target) {
-        Task b = target.add(belief, questions, displaced, this, nar);
-        if (b != null) {
+        boolean b = target.add(belief, questions, displaced, this, nar);
+        if (b) {
             updateSatisfaction(nar);
             return true;
         }

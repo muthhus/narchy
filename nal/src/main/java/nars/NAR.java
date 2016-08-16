@@ -2,6 +2,8 @@ package nars;
 
 
 import com.google.common.collect.Sets;
+import nars.nar.Default;
+import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import com.lmax.disruptor.EventTranslatorOneArg;
@@ -46,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -115,6 +118,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         this(clock, index, rng, self, new SingleThreadExecutioner());
+    }
+
+    public void printConceptStatistics() {
+        Frequency complexity = new Frequency();
+        Frequency volume = new Frequency();
+        Frequency rootOp = new Frequency();
+        AtomicInteger i = new AtomicInteger(0);
+        forEachConcept(c -> {
+            i.incrementAndGet();
+            complexity.addValue(c.complexity());
+            volume.addValue(c.volume());
+            rootOp.addValue(c.op());
+        });
+        System.out.println("Total Concepts:\n" + i.get());
+        System.out.println("\nComplexity:\n" + complexity);
+        System.out.println("\nvolume:\n" + volume);
+        System.out.println("\nrootOp:\n" + rootOp);
     }
 
     //long miss= 0, hit  = 0;

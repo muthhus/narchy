@@ -614,6 +614,10 @@ public class PremiseRule extends GenericCompound {
                     notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.SetsBits);
                     break;
 
+                case "hasNoDepVar":
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.VAR_DEP.bit);
+                    break;
+
                 case "setext":
                     //assumes arity=2 but arity=1 support can be written
                     constraints.put(arg1, new OpConstraint(Op.SETe));
@@ -913,13 +917,19 @@ public class PremiseRule extends GenericCompound {
     }
 
     public static void notOp(Term task, Term belief, @NotNull Set<BoolCondition> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
-        constraints.put(t, new NotOpConstraint(structure));
+
+        boolean constrained = false;
         if (t.equals(task)) {
             pres.add(new PatternOpNot(0, structure));
+            constrained = true;
         }
         if (t.equals(belief)) {
             pres.add(new PatternOpNot(1, structure));
+            constrained = true;
         }
+
+        if (!constrained)
+            constraints.put(t, new NotOpConstraint(structure));
     }
 
     public void neq(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term arg1, @NotNull Term arg2) {
