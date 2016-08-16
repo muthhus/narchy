@@ -65,7 +65,8 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public CaffeineIndex(Concept.ConceptBuilder builder, long maxWeight) {
         this(builder, maxWeight, false,
                 //ForkJoinPool.commonPool()
-                Executors.newFixedThreadPool(1)
+                //Executors.newFixedThreadPool(1)
+                Executors.newSingleThreadExecutor()
         );
     }
 

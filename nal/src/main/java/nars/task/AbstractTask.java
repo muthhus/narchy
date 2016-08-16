@@ -10,6 +10,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.Util;
+import nars.util.data.array.LongArrays;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +36,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     private Truth truth;
 
     @Nullable
-    private long[] evidence;
+    private long[] evidence = LongArrays.EMPTY_ARRAY;
 
     private long creation = Tense.TIMELESS;
     private long occurrence = ETERNAL;
@@ -214,7 +215,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
         //finally, assign a unique stamp if none specified (input)
-        if (evidence == null) {
+        if (evidence.length == 0) {
 
             setEvidence(nar.clock.newStampSerial());
 

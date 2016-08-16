@@ -656,7 +656,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     default CharSequence stampAsStringBuilder() {
 
         long[] ev = evidence();
-        int len = ev != null ? ev.length : 0;
+        int len = ev.length;
         int estimatedInitialSize = 8 + (len * 3);
 
         StringBuilder buffer = new StringBuilder(estimatedInitialSize);

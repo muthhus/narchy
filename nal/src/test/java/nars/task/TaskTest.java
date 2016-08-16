@@ -53,17 +53,19 @@ public class TaskTest {
         List<Task> l = Lists.newArrayList(t);
         //l.forEach(System.out::println);
         int last = l.size() - 1;
-        assertTrue(l.get(0).toString().contains("(b-->a). :-: %.90;.91%"));
-        assertTrue(l.get(last).toString().contains("(b-->a). :-: %0.0;.01%"));
 
-        //test monotonically decreasing
+        assertTrue(l.get(0).toString(), l.get(0).toString().contains("(b-->a). :0: %0.0;.01%"));
+        assertTrue(l.get(last).toString(), l.get(last).toString().contains("(b-->a). :0: %.90;.91%"));
+
+        //test monotonically increasing
         Task y = null;
-        for (Task x : l) {
-            if (y!=null) {
-                assertTrue( x.freq() <= y.freq() );
+        for (int i = l.size()-1; i >=0; i--) {
+            Task x = l.get(i);
+            if (y != null) {
+                assertTrue(x.freq() <= y.freq());
                 float c = y.conf();
                 if (x.conf() < 0.90f) //wrap around only time when it will decrease
-                    assertTrue( x.conf() <= c);
+                    assertTrue(x.conf() <= c);
             }
             y = x;
         }

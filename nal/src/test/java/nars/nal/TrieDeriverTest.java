@@ -9,6 +9,7 @@ import nars.nal.meta.BoolCondition;
 import nars.nal.rule.PremiseRule;
 import nars.nar.Default;
 import nars.term.Termed;
+import nars.term.var.Variable;
 import org.apache.commons.math3.stat.Frequency;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -225,6 +226,9 @@ public class TrieDeriverTest {
 
             //test all subterms are in the pattern index too
             t.term().recurseTerms((s, parent)->{
+                if (s instanceof Variable)
+                    return;
+
                 Termed sub = p.concept(s, false);
                 if (sub == null) {
                     System.out.println("subterm " + s + " of " + parent + " not in PatternIndex");

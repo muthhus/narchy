@@ -50,8 +50,9 @@ public interface AbstractConcept extends Concept {
         /* activate concept */
         Concept targetConcept;
 
+        Term targetTerm = target.term();
 
-        if (!linkable(target)) {
+        if (!linkable(targetTerm)) {
             targetConcept = null;
         } else {
             targetConcept = nar.concept(target, true);
@@ -67,7 +68,6 @@ public interface AbstractConcept extends Concept {
                 //throw new RuntimeException("termlink to null concept: " + target);
         }
 
-        Term ttt = target.term();
 //        if (tt.equals( source.term() ))
 //            throw new RuntimeException("termlink self-loop");
 
@@ -81,19 +81,18 @@ public interface AbstractConcept extends Concept {
         }
 
         /* insert termlink source to target */
-        source.termlinks().put(ttt, activation.in, subScale, activation.overflow);
+        source.termlinks().put(targetTerm, activation.in, subScale, activation.overflow);
 
 
 
         return targetConcept;
     }
 
-    static boolean linkable(@NotNull Termed target) {
+    static boolean linkable(@NotNull Term x) {
 //        return !(target instanceof Variable);
-        if (target instanceof Variable) {
+        if (x instanceof Variable) {
             return false;
         }
-        Term x = target.term();
         if (x instanceof Compound) {
 
             if (x.op() == Op.NEG) {

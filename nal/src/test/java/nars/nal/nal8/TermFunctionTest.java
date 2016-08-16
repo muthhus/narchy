@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 public class TermFunctionTest {
 
     @Test
-    public void testImmediateTransform() {
+    public void testImmediateTransformOfInput() { //as opposed to deriver's use of it
         Default d = new Default();
         d.log();
         final boolean[] got = {false};

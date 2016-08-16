@@ -82,7 +82,7 @@ public class BeliefTableTest  {
 
 
     @Test
-    public void testTemporalQueries() {
+    public void testInterpolation() {
 
         Param.DEBUG = true;
 

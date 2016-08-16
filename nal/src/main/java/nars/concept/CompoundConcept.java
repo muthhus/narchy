@@ -481,7 +481,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         //then link this to templates
         Term[] t = templates.terms();
         for (int i = 0; i < n; i++) {
-            Termed tt = t[i];
+            Term tt = t[i];
 
             if (!tt.isNormalized()) {
                 continue; //HACK

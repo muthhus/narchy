@@ -36,7 +36,7 @@ public class NALLevelTest {
             n1.input(productSentence);
             n1.run(5);
             assertTrue(false); //should not reach here
-        } catch (NAR.InvalidTaskException e) {
+        } catch (Exception e) {
             //this is normal
         }
 
