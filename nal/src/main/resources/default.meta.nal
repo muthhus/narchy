@@ -291,15 +291,15 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //structural decompose any component of a conjunction
-     (&&,X,A..+), X, hasNoDepVar(X), time(decomposeTask) |- X, (Belief:StructuralDeduction,Desire:StructuralStrong)
+     (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Desire:StructuralStrong)
      //(&&,(--,%X),A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeductionN,Desire:StructuralStrongN)
 
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (--,%X), (Belief:StructuralDeduction)
      (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Desire:StructuralStrong)
 
-     (&&,X,A), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Desire:Strong)
-     (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     (&&,X,A), B, time(decomposeTask) |- substituteIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
      //(&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
@@ -357,8 +357,8 @@
         (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) ==>+- (--,(S --> $X))), (Belief:AbductionN)
     (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternal) |- ((S --> $X) ==>+- (P --> $X)), (Belief:Induction)
         (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,(S --> $X)) ==>+- (P --> $X)), (Belief:InductionN)
-    (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) <=> (S --> $X)), (Belief:Comparison)
-        (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) <=> (--,(S --> $X))), (Belief:ComparisonN)
+    (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) <=>+- (S --> $X)), (Belief:Comparison)
+        (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) <=>+- (--,(S --> $X))), (Belief:ComparisonN)
     (S --> M), (P --> M), neq(S,P), time(dtAfterOrEternal) |- (&&, (S --> #Y), (P --> #Y)), (Belief:Intersection)
         //^ intersection should be ok for both positive and negative cases
             //(S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternal) |- (&&, (--,(S --> #Y)), (P --> #Y)), (Belief:IntersectionN)
@@ -367,8 +367,8 @@
         (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,($X --> S)) ==>+- ($X --> P)), (Belief:InductionN)
     (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- (($X --> P) ==>+- ($X --> S)), (Belief:Abduction)
         (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- (($X --> P) ==>+- (--,($X --> S))), (Belief:AbductionN)
-    (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternal) |- (($X --> S) <=> ($X --> P)), (Belief:Comparison)
-        (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,($X --> S)) <=> ($X --> P)), (Belief:ComparisonN)
+    (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternal) |- (($X --> S) <=>+- ($X --> P)), (Belief:Comparison)
+        (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,($X --> S)) <=>+- ($X --> P)), (Belief:ComparisonN)
     (M --> S), (M --> P), neq(S,P), time(dtAfterOrEternal) |- (&&, (#Y --> P), (#Y --> S)), (Belief:Intersection)
         //^ intersection should be ok for both positive and negative cases
             //(M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- (&&, (#Y --> P), (--,(#Y --> S))), (Belief:IntersectionN)
