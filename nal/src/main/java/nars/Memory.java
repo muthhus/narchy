@@ -82,7 +82,7 @@ public class Memory extends Param {
 
     public final ThreadLocal<Map<Compound,Compound>> normalizations =
             //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
-            ThreadLocal.withInitial( () -> new CapacityLinkedHashMap(32*1024) );
+            ThreadLocal.withInitial( () -> new CapacityLinkedHashMap(16*1024) );
 
     //public final ChainBag<Compound> normalizations =
             //Caffeine.newBuilder().maximumSize(16*1024).build();

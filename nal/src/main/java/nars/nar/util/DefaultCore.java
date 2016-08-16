@@ -6,6 +6,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.link.BLink;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,7 +60,7 @@ public class DefaultCore extends AbstractCore {
         final NAR nar;
 
         public MonitoredCurveBag(NAR nar, int capacity, @NotNull CurveSampler sampler) {
-            super(capacity, sampler, BudgetMerge.plusBlend);
+            super(capacity, sampler, BudgetMerge.plusBlend, new ConcurrentHashMap<>());
             this.nar = nar;
             setCapacity(capacity);
         }

@@ -29,6 +29,9 @@ public abstract class CollectorMap<K, V> {
         return map.toString();
     }
 
+    /** returns an object that stores the items so that it can be synchronized upon */
+    abstract protected Object _items();
+
     /**
      * implementation for adding the value to another collecton (called internally)
      * returns null if successful, non-null if an item was displaced it will be that item
@@ -61,20 +64,24 @@ public abstract class CollectorMap<K, V> {
     @Nullable
     public V put(@NotNull K key, @NotNull V value) {
 
-        synchronized (map) {
-            V removed = map.put(key, value);
-            V displaced = mergeList(key, value, removed);
-            if (displaced!=null) {
-                removeKeyForValue(displaced);
-            }
-            return displaced;
+
+        V removed = map.put(key, value);
+
+        V displaced;
+        synchronized (_items()) {
+            displaced = mergeList(key, value, removed);
         }
 
+        if (displaced!=null) {
+            removeKeyForValue(displaced);
+        }
+        return displaced;
 
     }
 
     /** the key of the displaced item needs to be removed from the table sometime after calling this */
     public @Nullable V mergeList(@NotNull K key, @NotNull V value, V removed) {
+
         if (removed != null) {
 
             if (removed == value) {
@@ -104,8 +111,9 @@ public abstract class CollectorMap<K, V> {
     @Nullable
     public V remove(@NotNull K x) {
 
-        synchronized(map) {
-            V e = map.remove(x);
+        V e = map.remove(x);
+
+        synchronized (_items()) {
             if (e != null) {
                 V removed = removeItem(e);
                 //            if (removed == null) {
@@ -137,9 +145,7 @@ public abstract class CollectorMap<K, V> {
         if (key == null) {
             return null;
         } else {
-            synchronized (map) {
-                return map.remove(key);
-            }
+            return map.remove(key);
         }
     }
 

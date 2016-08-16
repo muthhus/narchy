@@ -785,7 +785,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             input.delete();
 
-            //if (Param.DEBUG)
+            if (Param.DEBUG)
                 logger.warn("input preprocess: {}", e.toString());
             //e.printStackTrace();
             //throw e;

@@ -19,6 +19,7 @@ import nars.term.atom.Atomic;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static nars.nal.Tense.DTERNAL;
@@ -41,7 +43,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> {
-                Map map = new HashMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
+                Map map = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
                 switch (a.op()) {
                     case OBJECT:
                         return new TermjectConcept<>((Termject)a, termbag(map), taskbag(map));
@@ -50,6 +52,11 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                 }
 
             };
+
+    private static Map newBagMap(int cap) {
+        //return new HashMap(cap);
+        return new ConcurrentHashMap(cap);
+    }
 
     @NotNull
     private final ConceptPolicy init, awake, sleep;
@@ -67,8 +74,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
         if (t.op().temporal && t.dt()!=DTERNAL)
             throw new RuntimeException("temporality in concept term: " + t);
 
-
-        Map map = new HashMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
+        Map map = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
         @NotNull Bag<Term> termbag = termbag(map);
         @NotNull Bag<Task> taskbag = taskbag(map);
 

@@ -40,7 +40,7 @@ public class CurveBagTest  {
         int cap = 1;
 
         testBasicInsertionRemoval(new ArrayBag(cap, plusDQDominant, new HashMap<>(cap)));
-        testBasicInsertionRemoval(new CurveBag(cap, defaultSampler, plusDQDominant));
+        testBasicInsertionRemoval(new CurveBag(cap, defaultSampler, plusDQDominant, new HashMap()));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
@@ -310,7 +310,7 @@ public class CurveBagTest  {
 
     @NotNull
     public CurveBag<String> newNormalizedSamplingBag(int n, BudgetMerge mergeFunction) {
-        return new CurveBag(n, defaultSampler, mergeFunction);
+        return new CurveBag(n, defaultSampler, mergeFunction, new HashMap());
     }
 
 //    /** maybe should be in ArrayBagTest */

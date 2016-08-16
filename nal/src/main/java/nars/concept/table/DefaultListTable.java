@@ -18,6 +18,11 @@ public abstract class DefaultListTable<V,L> extends ArrayListTable<V,L> {
     }
 
     @Override
+    protected final Object _items() {
+        return list;
+    }
+
+    @Override
     protected final boolean listRemove(L removed) {
         return list.remove(removed);
     }

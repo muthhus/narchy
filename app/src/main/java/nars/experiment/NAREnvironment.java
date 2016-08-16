@@ -208,6 +208,8 @@ abstract public class NAREnvironment {
 
         mission();
 
+        System.gc();
+
         NARLoop l = new NARLoop(nar, frameDelayMS) {
 
             @Override

@@ -68,14 +68,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
     }
 
-    @Nullable
-    @Override
-    public BLink<V> remove(@NotNull V x) {
-        synchronized (map) {
-            return super.remove(x);
-        }
-    }
-
 
     @Override
     public final int compare(@Nullable BLink o1, @Nullable BLink o2) {
@@ -125,7 +117,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-
     @Override
     public @Nullable BLink<V> sample() {
         throw new RuntimeException("unimpl");
@@ -149,8 +140,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         };
 
         //synchronized(map) {
-            values.forEachKeyValue(p);
-       // }
+        values.forEachKeyValue(p);
+        //}
     }
 
 //    @Override
@@ -191,12 +182,30 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
         Insertion ii = new Insertion(this, b, scale, overflow);
-        synchronized (map) {
-            compute(key, ii);
-        }
+        //synchronized (map) {
+        BLink<V> r = compute(key, ii);
+        //}
 
         BLink<V> dd = ii.displaced;
-        if (dd!=null) {
+
+        if (ii.activated > 0) {
+
+            dd = putNewAndReturnDisplaced(key, r);
+
+            if (dd == r) {
+                dd.delete();
+                dd = null;
+                r = null;
+                ii.activated = -1;
+            }
+
+            putActive(key);
+
+        } else {
+            dd = ii.displaced;
+        }
+
+        if (dd != null) {
             removeKeyForValue(dd);
             dd.delete();
         }
@@ -205,9 +214,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             putFail(key);
         }
 
-        if (ii.activated > 0) {
-            putActive(key);
-        }
 
     }
 
@@ -249,19 +255,23 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     protected @Nullable BLink<V> prePutNew(@NotNull V k, @NotNull BLink<V> v) {
-        return mergeList(k, v, null);
+        synchronized (items) {
+            return mergeList(k, v, null);
+        }
     }
 
     @Nullable
     @Override
     protected BLink<V> addItem(BLink<V> x) {
-        BLink<V> y = super.addItem(x);
-        if (y!=x) {
-            int s = size();
-            if (s == capacity())
-                updateRange(s);
+        synchronized (items) {
+            BLink<V> y = super.addItem(x);
+            if (y != x) {
+                int s = size();
+                if (s == capacity())
+                    updateRange(s);
+            }
+            return y;
         }
-        return y;
     }
 
     @NotNull
@@ -326,11 +336,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public Bag<V> commit(@Nullable Consumer<BLink> each) {
 
-        synchronized (map) {
 
-
-            int s = size();
-            if (s > 0) {
+        int s = size();
+        if (s > 0) {
+            synchronized (items) {
                 int lowestUnsorted = updateExisting(each, s);
 
                 if (lowestUnsorted != -1) {
@@ -353,7 +362,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      */
     protected final BLink<V> putNewAndReturnDisplaced(@NotNull V key, @Nullable BLink<V> value) {
         BLink<V> displaced = prePutNew(key, value);
-        if (displaced!=value) {
+        if (displaced != value) {
             float dp = value.pri() * value.dur();
 
             if (displaced != null) {
@@ -368,11 +377,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     protected void putFail(V key) {
 
     }
+
     protected void putActive(V key) {
 
     }
 
-    /** if not full, this value must be set to -1 */
+    /**
+     * if not full, this value must be set to -1
+     */
     float minPriIfFull = -1;
 
 //    private final float minPriIfFull() {
@@ -709,6 +721,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 arrayBag.putExists(newLink(key), existing, overflow);
                 return existing;
             } else {
+
                 BLink d, r;
                 float bp = b.pri() * scale;
                 int activated;
@@ -721,17 +734,19 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 } else {
                     //successfully displaced another item
                     BLink nvv = newLink(key);
-                    d = arrayBag.putNewAndReturnDisplaced(key, nvv);
-                    if (d != nvv) {
+
+
+                    //if (d != nvv) {
                         activated = +1;
+                        d = null;
                         r = nvv;
-                    } else {
-                        activated = -1;
-                        r = null;
-                    }
+                    //} else {
+                      //  activated = -1;
+                      //  r = null;
+                    //}
                 }
                 this.activated = activated;
-                displaced = d;
+                this.displaced = d;
                 return r;
             }
         }

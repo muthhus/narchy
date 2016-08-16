@@ -27,6 +27,10 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
         this.items = new SortedArray<>(builder);
     }
 
+    @Override
+    protected final Object _items() {
+        return items;
+    }
 
     @NotNull
     @Override

@@ -217,7 +217,7 @@ public class STMClustered extends STM {
         @Override
         public String toString() {
             return id + "<<" +
-                    Arrays.toString(coord) +
+                    coord!=null ? Arrays.toString(coord) : "0" +
                     '|' + node.id +
                     ">>";
         }
@@ -296,7 +296,7 @@ public class STMClustered extends STM {
         clusters = (short)Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.input = new ArrayBag<>(1, BudgetMerge.avgBlend, new HashMap<>(capacity.intValue())) {
+        this.input = new ArrayBag<>(1, BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity.intValue())) {
 
 
             @NotNull

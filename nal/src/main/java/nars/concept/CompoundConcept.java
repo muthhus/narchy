@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
@@ -116,7 +117,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public CompoundConcept(@NotNull T term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.index.conceptBuilder(), new HashMap(), n);
+        this(term, (DefaultConceptBuilder) n.index.conceptBuilder(), new ConcurrentHashMap(), n);
     }
 
     /**

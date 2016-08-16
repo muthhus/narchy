@@ -7,7 +7,6 @@ import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -33,12 +32,8 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     final CurveSampler sampler;
 
 
-    public CurveBag(@NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction) {
-        this(1, c, mergeFunction);
-    }
-
-    public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction) {
-        this(initialCapacity, c, mergeFunction, new HashMap<>(initialCapacity));
+    public CurveBag(@NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
+        this(1, c, mergeFunction, map);
     }
 
     public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, Map<V, BLink<V>> map) {

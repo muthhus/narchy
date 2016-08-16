@@ -207,7 +207,7 @@ public class Arkancide extends NAREnvironment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 6 * 1000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 4 * 1000000, false)
                 , new FrameClock(), exe) {
 
             VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
