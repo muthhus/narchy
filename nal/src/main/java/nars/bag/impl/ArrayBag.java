@@ -56,14 +56,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     protected final void removeWeakest(Object reason) {
-        synchronized (map) {
-            if (!removeDeletedAtBottom()) {
-                @NotNull V w = weakest();
-                if (w != null) {
-                    BLink<V> ww = remove(w);
-                    if (ww != null)
-                        ww.delete(reason);
-                }
+        if (!removeDeletedAtBottom()) {
+            @NotNull V w = weakest();
+            if (w != null) {
+                BLink<V> ww = remove(w);
+                if (ww != null)
+                    ww.delete(reason);
             }
         }
     }
@@ -255,28 +253,27 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     protected @Nullable BLink<V> prePutNew(@NotNull V k, @NotNull BLink<V> v) {
-        synchronized (items) {
-            return mergeList(k, v, null);
-        }
+        return mergeList(k, v, null);
     }
 
     @Nullable
     @Override
     protected BLink<V> addItem(BLink<V> x) {
+        BLink<V> y;
         synchronized (items) {
-            BLink<V> y = super.addItem(x);
-            if (y != x) {
-                int s = size();
-                if (s == capacity())
-                    updateRange(s);
-            }
-            return y;
+            y = super.addItem(x);
         }
+        if (y != x) {
+            int s = size();
+            if (s == capacity())
+                updateRange(s);
+        }
+        return y;
     }
 
     @NotNull
     @Override
-    public final synchronized Bag<V> commit() {
+    public final Bag<V> commit() {
 
         if (!isEmpty()) {
             commit(autoforget());
@@ -347,9 +344,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, s);
                 } // else: perfectly sorted
 
-                removeDeletedAtBottom();
             }
 
+            removeDeletedAtBottom();
 
         }
 
@@ -442,25 +439,29 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         int i = size() - 1;
         BLink<V> ii;
         SortedArray<BLink<V>> items = this.items;
-        BLink<V>[] l = items.array();
-
         int removed = 0;
         int toRemoveFromMap = 0;
-        while (i > 0 && ((ii = l[i]) == null || (ii.isDeleted()))) {
-            if (ii != null && removeKeyForValue(ii) == null) {
-                //
-                //throw new RuntimeException("Bag fault while trying to remove key by item value");
 
-                //exhaustive removal, since the BLink has lost its key
-                toRemoveFromMap++;
-            } else {
-                removed++;
+        synchronized (items) {
+            BLink<V>[] l = items.array();
+
+
+            while (i > 0 && ((ii = l[i]) == null || (ii.isDeleted()))) {
+                if (ii != null && removeKeyForValue(ii) == null) {
+                    //
+                    //throw new RuntimeException("Bag fault while trying to remove key by item value");
+
+                    //exhaustive removal, since the BLink has lost its key
+                    toRemoveFromMap++;
+                } else {
+                    removed++;
+                }
+
+                //remove by known index rather than have to search for it by key or something
+                //different from removeItem which also removes the key, but we have already done that above
+                items.remove(i);
+                i--;
             }
-
-            //remove by known index rather than have to search for it by key or something
-            //different from removeItem which also removes the key, but we have already done that above
-            items.remove(i);
-            i--;
         }
 
         updateRange(i);
@@ -626,14 +627,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public String toString() {
         synchronized (map) {
             return super.toString() + '{' + items.getClass().getSimpleName() + '}';
-        }
-    }
-
-
-    @Override
-    public void clear() {
-        synchronized (map) {
-            super.clear();
         }
     }
 

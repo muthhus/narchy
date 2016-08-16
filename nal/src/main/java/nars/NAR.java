@@ -135,7 +135,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             try {
                 return index.normalize(u);
             } catch (Exception e) {
-                if (Param.DEBUG)
+                if (Param.DEBUG_EXTRA)
                     logger.warn("normalization: {}", e);
                 return FalseProduct; //since computeIfAbsent uses null as a dont-modify signal
             }
@@ -863,7 +863,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 emotion.errr();
 
                 if (Param.DEBUG)
-                    logger.warn("process error: {}", e.toString());
+                    logger.warn("process error: {}", e);
             }
         }
 

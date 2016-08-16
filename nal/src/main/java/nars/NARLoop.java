@@ -62,7 +62,7 @@ public class NARLoop implements Runnable {
         this(n, 0);
     }
 
-    public synchronized void join() {
+    @Deprecated public synchronized void join() {
         try {
             thread.join();
         } catch (InterruptedException e) {

@@ -28,8 +28,8 @@ public final class TaskIndex {
 
     public TaskIndex() {
         this.tasks =
-                //new ConcurrentHashMap(128 * 1024 /* estimate TODO */);
-                new ConcurrentHashMapUnsafe(128 * 1024 /* estimate TODO */);
+                new ConcurrentHashMap(128 * 1024 /* estimate TODO */);
+                //new ConcurrentHashMapUnsafe(128 * 1024 /* estimate TODO */);
 
         //Caffeine.newBuilder()
 

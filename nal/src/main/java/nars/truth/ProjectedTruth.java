@@ -1,6 +1,8 @@
 package nars.truth;
 
+import nars.Param;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** subclass used as an indicator that it was the result of projection */
 public final class ProjectedTruth extends DefaultTruth {
@@ -16,10 +18,15 @@ public final class ProjectedTruth extends DefaultTruth {
 		this.when = when;
 	}
 
-	@NotNull
+	@Nullable
 	@Override
 	public Truth confMult(float factor) {
-		return factor == 1 ? this : new ProjectedTruth(freq, conf() * factor, when);
+		float newConf = conf() * factor;
+
+		if (newConf < Param.TRUTH_EPSILON)
+			return null;
+
+		return factor == 1 ? this : new ProjectedTruth(freq, newConf, when);
 	}
 
 	// public ProjectedTruth(Truth cloned, long occurrenceTime) {

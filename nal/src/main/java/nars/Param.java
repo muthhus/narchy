@@ -77,11 +77,17 @@ public abstract class Param /*extends Container*/ implements Level {
 
     public static int DEFAULT_NAL_LEVEL = 8;
     public static boolean EXIT_ON_EXCEPTION = true;
+
     /**
      * use this for advanced error checking, at the expense of lower performance.
      * it is enabled for unit tests automatically regardless of the value here.
      */
     public static boolean DEBUG;
+
+
+    /** additional pedantic warnings */
+    public static final boolean DEBUG_EXTRA = false;
+
     //public static final boolean DEBUG_BAG_MASS = false;
     //public static boolean DEBUG_TRACE_EVENTS = false; //shows all emitted events
     //public static boolean DEBUG_DERIVATION_STACKTRACES; //includes stack trace in task's derivation rule string

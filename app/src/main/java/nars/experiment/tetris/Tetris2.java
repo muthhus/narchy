@@ -47,12 +47,10 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Tetris2 extends NAREnvironment {
 
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
-    public static final int DEFAULT_INDEX_WEIGHT = 15 * 1000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 5 * 1000000;
     public static final NAR.Executioner exe = new NAR.MultiThreadExecutioner(2,2);
 
-    static {
-        Param.DEBUG = false;
-    }
+
 
     public static final int runFrames = 10000;
     public static final int cyclesPerFrame = 16;
@@ -331,6 +329,8 @@ public class Tetris2 extends NAREnvironment {
 
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
+
+        Param.DEBUG = true;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,

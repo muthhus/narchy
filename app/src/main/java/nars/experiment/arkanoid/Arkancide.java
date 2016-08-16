@@ -216,18 +216,18 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.02f);
+        nar.derivedActivation.setValue(0.02f);
 
 
-        nar.beliefConfidence(0.8f);
+        nar.beliefConfidence(0.85f);
         nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.04f);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -262,8 +262,8 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 2);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 2);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);

@@ -1,12 +1,16 @@
 package nars.op;
 
+import nars.Param;
 import nars.Task;
+import nars.term.var.Variable;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import nars.$;
 import nars.NAR;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -16,6 +20,8 @@ import static nars.nal.Tense.DTERNAL;
 
 
 public class VariableCompressor implements Consumer<Task> {
+
+    private static final Logger logger = LoggerFactory.getLogger(VariableCompressor.class);
 
     final static String tag = VariableCompressor.class.getSimpleName();
 
@@ -95,8 +101,8 @@ public class VariableCompressor implements Consumer<Task> {
                 //$.varIndep("c");
 
         Compound<?> oldContent = task.term();
-        Term newContent = $.terms.remap(oldContent, max, var);
-        if (newContent != null) {
+        Term newContent = nar.normalize((Compound) $.terms.remap(oldContent, max, var));
+        //if (newContent != null) {
 
             newContent = $.conj(newContent,
 
@@ -128,16 +134,24 @@ public class VariableCompressor implements Consumer<Task> {
                     }
                 //}
 
-        }
+        //}
 
         return null;
     }
 
     public Task tryCompress(Task input) {
-        Task c1 = compress(input);
-        if (c1!=null)
-            return c1;
-        return input;
+        try {
+            Task c1 = compress(input);
+            if (c1!=null)
+                return c1;
+            return input;
+        } catch (Exception e) {
+            if (Param.DEBUG)
+                logger.error("{}", e);
+            return input;
+        }
+
+
     }
 
     public static class Precompressor {

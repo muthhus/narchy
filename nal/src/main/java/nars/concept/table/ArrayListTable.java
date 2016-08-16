@@ -54,8 +54,12 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
 
     @Override
     public void clear() {
-        super.clear();
-        listClear();
+        synchronized (map) {
+            super.clear();
+        }
+        synchronized (_items()) {
+            listClear();
+        }
     }
 
     abstract protected void listClear();

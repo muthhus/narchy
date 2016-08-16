@@ -60,7 +60,7 @@ public class DefaultCore extends AbstractCore {
         final NAR nar;
 
         public MonitoredCurveBag(NAR nar, int capacity, @NotNull CurveSampler sampler) {
-            super(capacity, sampler, BudgetMerge.plusBlend, new ConcurrentHashMap<>());
+            super(capacity, sampler, BudgetMerge.plusBlend, new ConcurrentHashMap<>(capacity));
             this.nar = nar;
             setCapacity(capacity);
         }

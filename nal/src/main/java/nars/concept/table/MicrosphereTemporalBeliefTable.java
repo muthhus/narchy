@@ -287,6 +287,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         confScale = Math.min(1f, confScale);
 
         Truth truth = truth(mid, now, eternal);
+
         if (truth!=null) {
             truth = truth.confMult(confScale);
 

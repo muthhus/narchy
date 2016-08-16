@@ -89,14 +89,20 @@ public abstract class CollectorMap<K, V> {
                 return value;
             } else {
                 //displaced other
-                V remd = removeItem(removed);
+                V remd;
+                synchronized (_items()) {
+                    remd = removeItem(removed);
+                }
                 if (remd == null)
                     throw new RuntimeException("unable to remove item corresponding to key " + key);
 
             }
         }
 
-        V displaced = addItem(value);
+        V displaced;
+        synchronized (_items()) {
+            displaced = addItem(value);
+        }
 
         if (displaced != null) { //&& (!key(removed2).equals(key))) {
             if (removed != null && removed != displaced) {

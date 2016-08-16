@@ -104,7 +104,7 @@ abstract public class NAREnvironment {
      */
     protected abstract float act();
 
-    public synchronized void next() {
+    public void next() {
 
         for (int i = 0; i < ticksBeforeObserve; i++)
             nar.clock.tick();
