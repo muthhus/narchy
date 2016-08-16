@@ -1,20 +1,14 @@
 package nars.link;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.index.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.TreeSet;
 
 
@@ -22,7 +16,7 @@ public enum TermLinkBuilder {
     ;
 
 
-    @NotNull public static TreeSet<Term> components(@NotNull Compound host, NAR nar) {
+    @NotNull public static TreeSet<Term> components(@NotNull Compound host, @NotNull NAR nar) {
 
         TreeSet<Term> components = new TreeSet<>(//new LinkedHashSet<>(
             //host.complexity() /* estimate */
@@ -51,7 +45,7 @@ public enum TermLinkBuilder {
     /**
      * determines whether to grow a 1st-level termlink to a subterm
      */
-    protected static void components(@NotNull Term t, int level, @NotNull Collection<Term> target, NAR nar) {
+    protected static void components(@NotNull Term t, int level, @NotNull Collection<Term> target, @NotNull NAR nar) {
 
         t = $.unneg(t).term();
 

@@ -69,7 +69,7 @@ public class Pong extends Player implements DiscreteEnvironment {
         //Multi nar = new Multi(2,
         Default nar = new Default(
                 1024, 3, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 50000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 5000000)
                 //new Cache2kIndex(250000, rng)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)

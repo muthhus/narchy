@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
@@ -29,6 +29,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
 //    @NotNull
 //    public final Cache<Termed, Termed> atomics;
+    @NotNull
     private final Map<Termed,Termed> atomics;
 
     @NotNull
@@ -62,23 +63,21 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
 
     public CaffeineIndex(Concept.ConceptBuilder builder, long maxWeight) {
-        this(builder, maxWeight, false);
+        this(builder, maxWeight, false,
+                //ForkJoinPool.commonPool()
+                Executors.newFixedThreadPool(1)
+        );
     }
 
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, long maxWeight, boolean soft) {
+    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor executor) {
         super(conceptBuilder);
 
         long maxSubtermWeight = maxWeight * 2; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
         Caffeine<Termed, Termed> builder = prepare(Caffeine.newBuilder(), soft);
 
-        final ExecutorService executor =
-                ForkJoinPool.commonPool();
-                //Executors.newFixedThreadPool(2);
-                //Executors.newCachedThreadPool();
-                //Executors.newSingleThreadExecutor();
 
         builder
                .weigher(complexityAndConfidenceWeigher)
@@ -118,7 +117,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
 
-    private Caffeine prepare(Caffeine<Object, Object> builder, boolean soft) {
+    private static Caffeine prepare(Caffeine<Object, Object> builder, boolean soft) {
 
         //builder = builder.initialCapacity(initialSize);
 

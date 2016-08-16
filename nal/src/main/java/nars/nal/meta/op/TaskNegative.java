@@ -1,8 +1,6 @@
 package nars.nal.meta.op;
 
-import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
-import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 /** freq < 0.5 */

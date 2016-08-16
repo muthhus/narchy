@@ -15,7 +15,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class NARLoop implements Runnable {
 
-    static final Logger logger = getLogger(NARLoop.class);
+    private static final Logger logger = getLogger(NARLoop.class);
 
     @NotNull
     public final NAR nar;
@@ -62,7 +62,7 @@ public class NARLoop implements Runnable {
         this(n, 0);
     }
 
-    @Deprecated public synchronized void join() {
+    @Deprecated public void join() {
         try {
             thread.join();
         } catch (InterruptedException e) {
@@ -109,12 +109,6 @@ public class NARLoop implements Runnable {
         //thread priority control
         if (thread != null) {
             int pri = thread.getPriority();
-            int fullThrottlePri = Thread.MIN_PRIORITY;
-
-            int targetPri = periodMS == 0 ? fullThrottlePri : Thread.NORM_PRIORITY;
-
-            if (targetPri != pri)
-                thread.setPriority(fullThrottlePri);
 
             thread.interrupt();
 
@@ -143,7 +137,7 @@ public class NARLoop implements Runnable {
 
 
     /** dont call this directly */
-    @Override public final synchronized void run() {
+    @Override public final void run() {
 
 //        AffinityLock al;
 //        if (cpuCoreReserve) {

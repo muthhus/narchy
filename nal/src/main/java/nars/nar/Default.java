@@ -1,6 +1,5 @@
 package nars.nar;
 
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.NAR;
 import nars.Param;
 import nars.budget.Budgeted;
@@ -8,13 +7,13 @@ import nars.concept.Concept;
 import nars.index.Indexes;
 import nars.index.TermIndex;
 import nars.link.BLink;
-import nars.nal.meta.PremiseEval;
 import nars.nar.util.DefaultCore;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;

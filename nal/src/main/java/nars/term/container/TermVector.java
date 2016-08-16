@@ -1,7 +1,6 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
 import nars.Param;
 import nars.term.Compound;
@@ -10,6 +9,7 @@ import nars.term.Terms;
 import nars.term.visit.SubtermVisitorX;
 import nars.util.Util;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

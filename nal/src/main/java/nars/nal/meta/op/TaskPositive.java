@@ -1,10 +1,7 @@
 package nars.nal.meta.op;
 
-import nars.$;
-import nars.Op;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
-import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 

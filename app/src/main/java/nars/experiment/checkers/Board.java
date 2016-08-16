@@ -1,4 +1,4 @@
-package nars.checkers;
+package nars.experiment.checkers;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,20 +17,20 @@ public class Board extends JPanel implements MouseListener, PlayerListener
 	private static final int SQUARE_WIDTH = 60;
 	private static final int SQUARE_HEIGHT = 60;
 	private Square source;
-	private Game game;
+	private Checkers game;
 	private final Square[][] squares;
 	private boolean mouseListener;
 	private final Player player1;
 	private final Player player2;
 
 	public Board(Player player1, Player player2, int WIDTH, int HEIGHT) {
-		this(player1, player2, new Game(WIDTH, HEIGHT));
+		this(player1, player2, new Checkers(WIDTH, HEIGHT));
 	}
 	/**
 	 *
 	 *
 	 */
-	public Board(Player player1, Player player2, Game game)
+	public Board(Player player1, Player player2, Checkers game)
 	{
 		int WIDTH = game.WIDTH;
 		int HEIGHT = game.HEIGHT;
@@ -119,7 +119,7 @@ public class Board extends JPanel implements MouseListener, PlayerListener
 	 *
 	 * @param context the board's context
 	 */
-	public void setContext(Game context)
+	public void setContext(Checkers context)
 	{
 		game = context;
 		setPieces();
@@ -129,7 +129,7 @@ public class Board extends JPanel implements MouseListener, PlayerListener
 	 *
 	 * @return the board's context
 	 */
-	public Game getContext()
+	public Checkers getContext()
 	{
 		return game;
 	}

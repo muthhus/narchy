@@ -501,7 +501,7 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public final PremiseRule normalizeRule(@NotNull PatternIndex index) {
-        try {
+        //try {
 
             //HACK
             Compound ss = (Compound) index.transform(this, UppercaseAtomsToPatternVariables);
@@ -518,11 +518,11 @@ public class PremiseRule extends GenericCompound {
 
             return new PremiseRule(premiseComponents);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("normalizeRule untransformed: {} {}", this, e.getCause());
-            return null;
-        }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            logger.error("normalizeRule untransformed: {} {}", this, e.getCause());
+//            throw e;
+//        }
 
 
     }

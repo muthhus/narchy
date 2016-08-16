@@ -1,6 +1,9 @@
 package nars.util.signal;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.nal.Tense;
 import nars.task.Tasked;
 import nars.util.analyze.EventCount;
@@ -54,7 +57,7 @@ public class TestNAR  {
     private Object result;
     private boolean exitOnAllSuccess = true;
 
-    public final List<Task> inputs = new ArrayList();
+    public final List<Task> inputs = $.newArrayList();
     private static final int temporalTolerance = 0;
     protected static final float truthTolerance = Param.TESTS_TRUTH_ERROR_TOLERANCE;
 
@@ -572,7 +575,7 @@ public class TestNAR  {
         for (NARCondition t : disqualifies) {
             if (t.isTrue()) {
 
-                logger.error("mustNot: {}\n{}", t);
+                logger.error("mustNot: {}", t);
                 t.log(logger);
                 ((EternalTaskCondition)t).matched.forEach(shouldntHave -> logger.error("Must not:\n{}", shouldntHave.proof()));
 

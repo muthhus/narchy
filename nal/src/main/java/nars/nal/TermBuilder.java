@@ -1,8 +1,5 @@
 package nars.nal;
 
-import nars.term.compound.GenericCompound;
-import nars.term.container.TermVector;
-import org.eclipse.collections.api.set.MutableSet;
 import nars.$;
 import nars.Op;
 import nars.Param;
@@ -14,8 +11,11 @@ import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
+import nars.term.container.TermVector;
+import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -14,8 +14,6 @@ import com.github.fge.grappa.run.context.MatcherContext;
 import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.TermBuilder;
@@ -33,6 +31,8 @@ import nars.term.var.Variable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Texts;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

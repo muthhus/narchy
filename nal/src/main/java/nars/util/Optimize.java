@@ -2,8 +2,6 @@ package nars.util;
 
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import ognl.Ognl;
 import ognl.OgnlException;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -13,6 +11,8 @@ import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.MultiDirectionalSimplex;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.SimplexOptimizer;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

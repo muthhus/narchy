@@ -1,6 +1,9 @@
 package nars.concept;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Narsese;
+import nars.Task;
 import nars.bag.Bag;
 import nars.nal.nal8.Execution;
 import nars.term.Compound;
@@ -25,7 +28,7 @@ public class OperationConcept extends CompoundConcept<Compound> implements Consu
     protected volatile boolean pendingRun;
 
 
-    public OperationConcept(@NotNull Compound term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, NAR nar) {
+    public OperationConcept(@NotNull Compound term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, @NotNull NAR nar) {
         super(term, termLinks, taskLinks, nar);
     }
 

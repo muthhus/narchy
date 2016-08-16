@@ -11,7 +11,8 @@ import org.jetbrains.annotations.NotNull;
 public enum AbstractPatternOp  {
     ;
 
-    static String name(Class c, int subterm, String param) {
+    @NotNull
+    static String name(@NotNull Class c, int subterm, String param) {
         return c.getSimpleName() + "(p" + Integer.toString(subterm) + ",\"" + param + "\")";
     }
 

@@ -218,7 +218,7 @@ public interface Concept extends Termed {
 
     }
 
-    default void crossLink(Budgeted thisInput, float scale, @NotNull NAR nar, Concept other, Budgeted otherTask) {
+    default void crossLink(Budgeted thisInput, float scale, @NotNull NAR nar, @NotNull Concept other, Budgeted otherTask) {
         float halfScale = scale / 2f;
 
         NAR.Activation a = new NAR.Activation(otherTask, null);
@@ -398,11 +398,11 @@ public interface Concept extends Termed {
         out.println('\n');
     }
 
-    void delete(NAR nar);
+    void delete(@NotNull NAR nar);
 
     @Nullable ConceptPolicy policy();
 
-    void policy(@Nullable ConceptPolicy c, long now, List<Task> removed);
+    void policy(@NotNull ConceptPolicy c, long now, @NotNull List<Task> removed);
 
     default boolean active() {
         return policy()!=null;

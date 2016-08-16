@@ -1,9 +1,9 @@
 package nars.bag.impl;
 
-import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.bag.Bag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

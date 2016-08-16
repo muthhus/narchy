@@ -1,6 +1,9 @@
 package nars.nal.nal8.operator;
 
-import nars.*;
+import nars.$;
+import nars.Narsese;
+import nars.Op;
+import nars.Task;
 import nars.budget.Budgeted;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;

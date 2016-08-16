@@ -69,7 +69,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         }
     }
 
-    public int lerp(@NotNull AbstractConcept c, MutableInteger _min, MutableInteger _max) {
+    public static int lerp(@NotNull AbstractConcept c, @NotNull MutableInteger _min, @NotNull MutableInteger _max) {
         int min = _min.intValue();
         int max = _max.intValue();
 

@@ -1,4 +1,4 @@
-package nars.checkers;
+package nars.experiment.checkers;
 
 import javax.swing.*;
 import java.awt.*;

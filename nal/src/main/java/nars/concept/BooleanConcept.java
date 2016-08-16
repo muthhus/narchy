@@ -1,7 +1,9 @@
 package nars.concept;
 
-import nars.*;
-import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DynamicBeliefTable;
 import nars.nal.Stamp;
@@ -12,6 +14,7 @@ import nars.term.Termed;
 import nars.term.atom.Operator;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,6 +1,5 @@
 package nars.nal.meta;
 
-import org.eclipse.collections.api.set.MutableSet;
 import nars.$;
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
@@ -14,6 +13,7 @@ import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import nars.term.subst.choice.Choose1;
 import nars.term.subst.choice.Choose2;
+import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;

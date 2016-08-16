@@ -3,7 +3,6 @@ package nars.nal.meta.op;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
 import com.google.common.primitives.Ints;
-import org.eclipse.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Op;
 import nars.nal.meta.AtomicBoolCondition;
@@ -18,6 +17,7 @@ import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.FindSubst;
+import org.eclipse.collections.api.map.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -87,7 +87,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 //        }
     }
 
-    protected static float rank(Task w) {
+    protected static float rank(@NotNull Task w) {
         //return rankEternalByConfAndOriginality(w);
         return w.conf();
     }

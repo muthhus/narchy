@@ -1,11 +1,11 @@
 package nars.bag;
 
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.link.BLink;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

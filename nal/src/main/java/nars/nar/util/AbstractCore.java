@@ -1,6 +1,9 @@
 package nars.nar.util;
 
-import nars.*;
+import nars.$;
+import nars.Memory;
+import nars.NAR;
+import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.data.Range;
@@ -127,6 +130,8 @@ public abstract class AbstractCore {
     /** shared combined conclusion */
     public static class FireConcept extends Conclusion implements Runnable, Supplier<Conclusion> {
 
+        private static final Logger logger = LoggerFactory.getLogger(FireConcept.class);
+
         private final Concept concept;
         private final NAR nar;
         private final short tasklinks;
@@ -163,7 +168,7 @@ public abstract class AbstractCore {
 
                 nar.inputLater(derive);
             } catch (Exception e) {
-                logger.error("{}", e);
+                logger.error("run {}", e);
             }
 
 

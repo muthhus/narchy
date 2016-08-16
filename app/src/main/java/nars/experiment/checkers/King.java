@@ -1,4 +1,4 @@
-package nars.checkers;
+package nars.experiment.checkers;
 
 import java.awt.*;
 
@@ -15,7 +15,7 @@ public class King extends Piece
 	 */
 	public static King createLightKing()
 	{
-		return new King(Piece.LIGHT);
+		return new King(LIGHT);
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class King extends Piece
 	 */
 	public static King createDarkKing()
 	{
-		return new King(Piece.DARK);
+		return new King(DARK);
 	}
 
 	/**
@@ -42,9 +42,9 @@ public class King extends Piece
 		super.draw(g);
 
 		if(isLight())
-			g.setColor(Piece.DARK);
+			g.setColor(DARK);
 		else
-			g.setColor(Piece.LIGHT);
+			g.setColor(LIGHT);
 
 		// both arrays must have same size
 		int[] xcoords = {1, 8, 16, 23, 31, 28, 3};

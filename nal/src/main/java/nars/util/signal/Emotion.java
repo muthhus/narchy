@@ -140,7 +140,7 @@ public final class Emotion implements Serializable {
 
     //TODO use Meter subclass that will accept and transform these float parameters
 
-    @Deprecated public void happy(float delta, Term concept) {
+    @Deprecated public void happy(float delta, @NotNull Term concept) {
 
         float factor = 1f / concept.complexity(); //adjust by the complexity of the concept's term
 

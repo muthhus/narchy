@@ -1,10 +1,8 @@
 package nars.task;
 
-import nars.Task;
-import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.Param;
+import nars.Task;
 import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.nal.Stamp;
@@ -17,6 +15,8 @@ import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

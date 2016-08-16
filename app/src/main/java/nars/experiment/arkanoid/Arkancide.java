@@ -38,8 +38,8 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 16;
-    public static final int runFrames = 2000;
+    private static final int cyclesPerFrame = 32;
+    public static final int runFrames = 20000;
     public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
     final Arkanoid noid;
     private final SwingCamera cam;
@@ -207,7 +207,7 @@ public class Arkancide extends NAREnvironment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 4 * 1000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 3 * 1000000, false, exe)
                 , new FrameClock(), exe) {
 
             VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
@@ -216,18 +216,18 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.1f);
+        nar.inputActivation.setValue(0.3f);
+        nar.derivedActivation.setValue(0.3f);
 
 
-        nar.beliefConfidence(0.85f);
-        nar.goalConfidence(0.7f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.08f);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {

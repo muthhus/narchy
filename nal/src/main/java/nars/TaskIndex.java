@@ -1,6 +1,5 @@
 package nars;
 
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 import static nars.concept.CompoundConcept.DuplicateMerge;
-import static nars.truth.TruthFunctions.eternalize;
-import static nars.truth.TruthFunctions.projection;
 
 /**
  * Created by me on 8/14/16.
@@ -22,6 +18,7 @@ public final class TaskIndex {
 
     final static Logger logger = LoggerFactory.getLogger(TaskIndex.class);
 
+    @NotNull
     protected final Map<Task, Task> tasks;
     //private final ConcurrentMap<Task, Task> tasksMap;
 
@@ -44,7 +41,7 @@ public final class TaskIndex {
 //        this.tasksMap = tasks.asMap();
     }
 
-    public void start(NAR nar) {
+    public void start(@NotNull NAR nar) {
         if (Param.DEBUG) {
             int sweepInterval = 32;
             nar.onFrame(nn -> {
@@ -66,7 +63,7 @@ public final class TaskIndex {
     }
 
 
-    public boolean add(Task x) {
+    public boolean add(@NotNull Task x) {
 
 
         Task existing = tasks.putIfAbsent(x,x);
@@ -111,7 +108,7 @@ public final class TaskIndex {
 
     }
 
-    public void replace(Task in, Task out) {
+    public void replace(Task in, @NotNull Task out) {
         add(out);
     }
 

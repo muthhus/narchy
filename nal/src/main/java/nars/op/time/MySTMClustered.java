@@ -1,7 +1,9 @@
 package nars.op.time;
 
-import nars.*;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.nal.Stamp;
 import nars.task.GeneratedTask;
@@ -12,6 +14,7 @@ import nars.truth.TruthFunctions;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -68,7 +71,7 @@ public class MySTMClustered extends STMClustered {
 				//cluster(2);
 
 		} catch (Exception e) {
-			logger.warn("{}", e);
+			logger.warn("iterate {}", e);
 		}
 	}
 

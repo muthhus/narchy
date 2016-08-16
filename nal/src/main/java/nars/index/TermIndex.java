@@ -1,11 +1,9 @@
 package nars.index;
 
-import nars.NAR;
-import nars.Param;
-import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.impl.factory.Maps;
 import nars.$;
+import nars.NAR;
 import nars.Narsese;
+import nars.Param;
 import nars.concept.Concept;
 import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseAware;
@@ -22,6 +20,8 @@ import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
+import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

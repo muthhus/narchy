@@ -21,26 +21,19 @@
 package nars;
 
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import nars.bag.impl.experimental.ChainBag;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.Clock;
 import nars.util.data.map.CapacityLinkedHashMap;
-import nars.util.data.random.XORShiftRandom;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import nars.util.signal.Emotion;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -137,7 +130,7 @@ public class Memory extends Param {
     }
 
 
-    public final void policy(@NotNull Concept c, ConceptPolicy p, long now) {
+    public final void policy(@NotNull Concept c, @NotNull ConceptPolicy p, long now) {
 
         @Nullable ConceptPolicy prev = c.policy();
         if (prev != p) {

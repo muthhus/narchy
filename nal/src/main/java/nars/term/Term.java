@@ -21,9 +21,6 @@
 package nars.term;
 
 
-import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.impl.factory.primitive.ByteLists;
-import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
@@ -33,6 +30,9 @@ import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import nars.util.data.array.IntArrays;
+import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.impl.factory.primitive.ByteLists;
+import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -314,16 +314,18 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return null;
     }
 
+    @NotNull
     default ByteList structureKey() {
         return structureKey(new ByteArrayList(volume()*2 /* estimate */));
     }
 
+    @NotNull
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
         appendTo.add((byte)op().ordinal());
         return appendTo;
     }
 
-    @Nullable default <X> boolean pathsTo(@NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList,X> receiver) {
+    default <X> boolean pathsTo(@NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList,X> receiver) {
         X ss = subterm.apply(this);
         if (ss!=null)
             return receiver.test(ByteLists.immutable.empty(), ss);

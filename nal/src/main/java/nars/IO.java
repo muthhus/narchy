@@ -473,7 +473,7 @@ public class IO {
                 case NEG:
                     //special case disjunction: (--,(&&,.....))
                     if (Terms.isDisjunction(c)) {
-                        compoundAppend(Op.DISJ.toString(), ((Compound)c.term(0)).subterms(), (x) -> $.neg(x), p);
+                        compoundAppend(Op.DISJ.toString(), ((Compound)c.term(0)).subterms(), $::neg, p);
                         return;
                     }
             }

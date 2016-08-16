@@ -19,13 +19,11 @@ import nars.term.atom.Atomic;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,6 +51,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
             };
 
+    @NotNull
     private static Map newBagMap(int cap) {
         //return new HashMap(cap);
         return new ConcurrentHashMap(cap);
@@ -146,6 +145,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
         this.awake = new DefaultConceptPolicy(12, 10, 4, 32, 24);
     }
 
+    @Override
     public void start(NAR nar) {
         this.nar = nar;
     }

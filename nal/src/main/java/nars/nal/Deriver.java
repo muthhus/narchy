@@ -35,6 +35,7 @@ public abstract class Deriver  {
                         try {
                             defaultRules = PremiseRuleSet.resource("default.meta.nal");
                         } catch (Exception e) {
+                            logger.error("rule parse: {}", e);
                             throw new RuntimeException(e);
                         }
                     });

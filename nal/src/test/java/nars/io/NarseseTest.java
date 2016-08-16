@@ -544,37 +544,37 @@ public class NarseseTest {
         assertEquals(1, l.size());
     }
 
-    @Test
-    public void testLineComment() {
-        String a = "<a --> b>.\n//comment1234\n<b-->c>.";
-        List<Task> l = tasks(a);
-        assertEquals(3, l.size());
-        Compound op = l.get(1).term();
-        ensureIsEcho(op);
-        assertEquals("echo(\"comment1234\")", op.toString());
-    }
+//    @Test
+//    public void testLineComment() {
+//        String a = "<a --> b>.\n//comment1234\n<b-->c>.";
+//        List<Task> l = tasks(a);
+//        assertEquals(3, l.size());
+//        Compound op = l.get(1).term();
+//        ensureIsEcho(op);
+//        assertEquals("echo(\"comment1234\")", op.toString());
+//    }
 
-    protected void ensureIsEcho(@NotNull Compound op) {
-        //return Atom.the(Utf8.toUtf8(name));
-
-        //        int olen = name.length();
-//        switch (olen) {
-//            case 0:
-//                throw new RuntimeException("empty atom name: " + name);
+//    protected void ensureIsEcho(@NotNull Compound op) {
+//        //return Atom.the(Utf8.toUtf8(name));
 //
-////            //re-use short term names
-////            case 1:
-////            case 2:
-////                return theCached(name);
+//        //        int olen = name.length();
+////        switch (olen) {
+////            case 0:
+////                throw new RuntimeException("empty atom name: " + name);
+////
+//////            //re-use short term names
+//////            case 1:
+//////            case 2:
+//////                return theCached(name);
+////
+////            default:
+////                if (olen > Short.MAX_VALUE/2)
+////                    throw new RuntimeException("atom name too long");
 //
-//            default:
-//                if (olen > Short.MAX_VALUE/2)
-//                    throw new RuntimeException("atom name too long");
-
-        //  }
-        assertEquals("^" + $.the(echo.class.getSimpleName()),
-                Operator.operator(op).toString());
-    }
+//        //  }
+//        assertEquals("^" + $.the(echo.class.getSimpleName()),
+//                Operator.operator(op).toString());
+//    }
 
     @Test public void testEmptySets() {
         assertInvalid("{}", "[]");

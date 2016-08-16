@@ -94,7 +94,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
 
     @Override
     @NotNull
-    public final @Nullable QuestionTable questions() {
+    public final QuestionTable questions() {
         return QuestionTable.EMPTY;
     }
 

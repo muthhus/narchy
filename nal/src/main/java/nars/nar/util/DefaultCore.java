@@ -72,7 +72,7 @@ public class DefaultCore extends AbstractCore {
         }
 
         @Override
-        protected void putActive(Concept c) {
+        protected void putActive(@NotNull Concept c) {
             awake(c);
         }
 

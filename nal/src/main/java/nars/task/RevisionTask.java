@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public class RevisionTask extends AnswerTask  {
 
 
+    @Nullable
     private Concept concept;
 
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long occTime, Concept target) {

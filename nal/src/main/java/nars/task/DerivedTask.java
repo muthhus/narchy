@@ -1,9 +1,7 @@
 package nars.task;
 
-import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;

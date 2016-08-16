@@ -32,7 +32,6 @@ import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;

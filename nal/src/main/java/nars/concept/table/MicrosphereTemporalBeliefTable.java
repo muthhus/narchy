@@ -1,6 +1,9 @@
 package nars.concept.table;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.concept.Concept;
 import nars.nal.Stamp;
 import nars.task.Revision;

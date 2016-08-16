@@ -1,4 +1,4 @@
-package nars.checkers;
+package nars.experiment.checkers;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * @author Arjen Hoogesteger
  * @version 0.4
  */
-public class Game {
+public class Checkers {
 	private static final char TURN_DARK = 0x000F;
 	private static final char TURN_LIGHT = 0x00F0;
 	public final int HEIGHT;
@@ -19,14 +19,14 @@ public class Game {
 	private char turn = TURN_DARK;	// dark is basically an alias for player 1
 	private int remainingJumpX = -1, remainingJumpY = -1;
 
-	public Game() 	{
+	public Checkers() 	{
 		this(8,8);
 	}
 
-	public Game(int width, int height) 	{
+	public Checkers(int width, int height) 	{
 		WIDTH = width;
 		HEIGHT = height;
-            pieces = (Piece[][]) Array.newInstance(Piece.class, WIDTH, HEIGHT);
+		pieces = (Piece[][]) Array.newInstance(Piece.class, WIDTH, HEIGHT);
             
 		// create initial context
 		for(int i = 0; i < WIDTH; i++)
@@ -392,9 +392,9 @@ public class Game {
 	@Override
 	public boolean equals(Object o)
 	{
-		if(o instanceof Game)
+		if(o instanceof Checkers)
 		{
-			Piece[][] p = ((Game) o).getPieces();
+			Piece[][] p = ((Checkers) o).getPieces();
 
 			for(int i = 0; i < WIDTH; i++)
 			{

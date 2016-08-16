@@ -1,4 +1,4 @@
-package nars.checkers;
+package nars.experiment.checkers;
 
 import java.awt.*;
 
@@ -11,7 +11,7 @@ import java.awt.*;
 public class Piece
 {
 	protected static final Color LIGHT = new Color(251, 249, 246);
-	protected static final Color DARK = Color.BLACK;
+	protected static final Color DARK = new Color(255, 15, 15);
 
 	private final Color color;
 

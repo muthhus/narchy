@@ -5,6 +5,8 @@ import nars.util.data.linkedlist.DDList;
 import nars.util.data.linkedlist.DDNodePool;
 import nars.util.math.Distributor;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Random;
@@ -29,6 +31,7 @@ import java.util.function.Consumer;
 public class ChainBag<V> {
 
 
+    @NotNull
     private final transient Mean mean; //priority mean, continuously calculated
     private Random rng;
 
@@ -36,6 +39,7 @@ public class ChainBag<V> {
 
     private int capacity;
 
+    @Nullable
     transient DD<V> current = null;
 
     //public transient Frequency removal = new Frequency();
@@ -44,17 +48,19 @@ public class ChainBag<V> {
 
     private final transient DDNodePool<V> nodePool;
 
-    DD<V> nextRemoval = null;
+    @Nullable DD<V> nextRemoval = null;
 
 
     /**
      * mapping from key to item
      */
+    @NotNull
     public final Map<V, DD<V>> index;
 
     /**
      * array of lists of items, for items on different level
      */
+    @NotNull
     public final DDList<V> chain;
 
     private static final float PERCENTILE_THRESHOLD_FOR_EMERGENCY_REMOVAL = 0.5f; //slightly below half
@@ -93,6 +99,7 @@ public class ChainBag<V> {
     }
 
 
+    @Nullable
     public V pop() {
         if (size() == 0) return null;
         DD<V> d = next(true);
@@ -106,6 +113,7 @@ public class ChainBag<V> {
         return v;
     }
 
+    @Nullable
     public V peekNext() {
         DD<V> d = next(true);
         if (d != null) return d.item;
@@ -263,6 +271,7 @@ public class ChainBag<V> {
      * @param byPriority - whether to select according to priority, or just the next item in chain order
      * @return
      */
+    @Nullable
     protected DD<V> next(boolean byPriority) {
         int s = size();
         if (s == 0) return null;
@@ -358,7 +367,7 @@ public class ChainBag<V> {
         return perc;
     }
 
-    protected boolean considerRemoving(DD<V> d, double percentileEstimate) {
+    protected boolean considerRemoving(@NotNull DD<V> d, double percentileEstimate) {
         //TODO improve this based on adaptive statistics measurement
         V item = d.item;
         float p = weigh(item);
@@ -396,7 +405,8 @@ public class ChainBag<V> {
         return rng.nextFloat() < weigh(v);
     }
 
-    protected DD<V> after(DD<V> d) {
+    @Nullable
+    protected DD<V> after(@Nullable DD<V> d) {
         DD<V> n = d != null ? d.next : null;
         if ((n == null) || (n.item == null)) {
             synchronized (chain) {
@@ -456,6 +466,7 @@ public class ChainBag<V> {
 //
 //    }
 
+    @Nullable
     public V remove(V key) {
         DD<V> d = index.remove(key);
         if (d != null) {
@@ -482,12 +493,13 @@ public class ChainBag<V> {
     }
 
 
+    @Nullable
     public V get(V key) {
         DD<V> d = index.get(key);
         return (d != null) ? d.item : null;
     }
 
-    public void forEach(Consumer<? super V> value) {
+    public void forEach(@NotNull Consumer<? super V> value) {
         synchronized (chain) {
             chain.forEach(value);
         }

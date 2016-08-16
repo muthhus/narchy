@@ -2,12 +2,10 @@ package nars;
 
 
 import com.google.common.collect.Sets;
-import com.lmax.disruptor.*;
-import nars.nar.Default;
-import org.apache.commons.math3.stat.Frequency;
-import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
-import com.lmax.disruptor.dsl.BasicExecutor;
+import com.lmax.disruptor.EventTranslatorOneArg;
+import com.lmax.disruptor.LiteBlockingWaitStrategy;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.WorkHandler;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import nars.Narsese.NarseseException;
@@ -34,6 +32,9 @@ import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.apache.commons.math3.stat.Frequency;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.fusesource.jansi.Ansi;
 import org.iq80.snappy.SnappyFramedInputStream;
 import org.iq80.snappy.SnappyFramedOutputStream;
@@ -44,8 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -164,16 +164,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return v == FalseProduct ? null : v;
     }
 
-    abstract public static class Executioner {
-        abstract public void start(NAR nar);
+    abstract public static class Executioner implements Executor {
+        abstract public void start(@NotNull NAR nar);
 
         abstract public void synchronize();
 
-        abstract public void runLater(Runnable r);
+        abstract public void inputLater(@NotNull Task[] t);
 
-        abstract public void inputLater(Task[] t);
-
-        abstract public void next(NAR nar);
+        abstract public void next(@NotNull NAR nar);
     }
 
     public static class SingleThreadExecutioner extends Executioner {
@@ -191,12 +189,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
         @Override
-        public void next(NAR nar) {
+        public void next(@NotNull NAR nar) {
             nar.eventFrameStart.emit(nar);
         }
 
         @Override
-        public void runLater(Runnable r) {
+        public void execute(@NotNull Runnable r) {
             r.run();
         }
 
@@ -215,11 +213,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         private final int taskThreads, runThreads;
 
 
+
+
         static final class TaskEvent {
             @Nullable
             public Task[] tasks;
         }
 
+        @NotNull
         final Disruptor<TaskEvent> taskruptor;
 
         static final class RunEvent {
@@ -227,21 +228,20 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             public Runnable r;
         }
 
+        @NotNull
         final Disruptor<RunEvent> runruptor;
 
-        public MultiThreadExecutioner(int taskThreads, int runThreads) {
+        public MultiThreadExecutioner(int taskThreads, int runThreads, Executor exe) {
 
             //this.runWorker = (ForkJoinPool) Executors.newWorkStealingPool(runThreads);
             this.taskThreads = taskThreads;
             this.runThreads = runThreads;
 
 
-
-
             this.taskruptor = new Disruptor<TaskEvent>(
                     () -> new TaskEvent(),
                     TASK_RING_SIZE /* ringbuffer size */,
-                    new BasicExecutor(Executors.defaultThreadFactory()),
+                    exe,
                     ProducerType.MULTI,
                     //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
                     new LiteBlockingWaitStrategy()
@@ -249,7 +249,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             this.runruptor = new Disruptor<RunEvent>(
                     () -> new RunEvent(),
                     RUN_RING_SIZE/* ringbuffer size */,
-                    new BasicExecutor(Executors.defaultThreadFactory()),
+                    exe,
                     ProducerType.MULTI,
                     //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
                     new LiteBlockingWaitStrategy()
@@ -258,7 +258,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
         @Override
-        public void next(NAR nar) {
+        public void next(@NotNull NAR nar) {
             //nar.eventFrameStart.emitAsync(nar, runWorker);
 
             Consumer[] vv = nar.eventFrameStart.getCachedNullTerminatedArray();
@@ -266,7 +266,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 for (int i = 0; ; ) {
                     Consumer c = vv[i++];
                     if (c != null) {
-                        runLater(() -> { //TODO these Runnables can be cached
+                        execute(() -> { //TODO these Runnables can be cached
                             c.accept(nar);
                         });
                     } else
@@ -277,7 +277,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
         @Override
-        public void start(NAR nar) {
+        public void start(@NotNull NAR nar) {
 
             WorkHandler[] taskWorker = new WorkHandler[taskThreads];
             for (int i = 0; i < taskThreads; i++)
@@ -307,7 +307,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         }
 
-        public void waitFor(Disruptor d) {
+        public void waitFor(@NotNull Disruptor d) {
 
             //long used = size - ring.remainingCapacity();
             long cap;
@@ -341,11 +341,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         };
 
         @Override
-        public void runLater(@NotNull Runnable r) {
-
-            //runWorker.execute(r);
+        public void execute(@NotNull Runnable r) {
             runruptor.publishEvent(runPublisher, r);
         }
+
 
         private final static class RunWorkHandler implements WorkHandler<RunEvent> {
 
@@ -362,6 +361,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
         private final static class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
+            @NotNull
             private final NAR nar;
 
             public TaskEventWorkHandler(@NotNull NAR nar) {
@@ -1143,7 +1143,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * after the end of the current frame before the next frame.
      */
     public final void runLater(@NotNull Runnable t) {
-        exe.runLater(t);
+        exe.execute(t);
     }
 
     public final void runLater(@NotNull Consumer<NAR> t) {
@@ -1612,7 +1612,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
         public final MutableFloat overflow = new MutableFloat(0);
 
-        public Activation(Termed in, NAR n) {
+        public Activation(@NotNull Termed in, @NotNull NAR n) {
             this((Budgeted) in, n.concept(in.term()));
         }
 

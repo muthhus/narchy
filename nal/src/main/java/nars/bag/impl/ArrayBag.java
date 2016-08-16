@@ -1,7 +1,5 @@
 package nars.bag.impl;
 
-import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
@@ -12,6 +10,8 @@ import nars.link.StrongBLink;
 import nars.link.StrongBLinkToBudgeted;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -258,7 +258,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Nullable
     @Override
-    protected BLink<V> addItem(BLink<V> x) {
+    protected BLink<V> addItem(@NotNull BLink<V> x) {
         BLink<V> y;
         synchronized (items) {
             y = super.addItem(x);
@@ -357,6 +357,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * wraps the putNew call with a suffix that destroys the link at the end
      */
+    @Nullable
     protected final BLink<V> putNewAndReturnDisplaced(@NotNull V key, @Nullable BLink<V> value) {
         BLink<V> displaced = prePutNew(key, value);
         if (displaced != value) {
@@ -683,6 +684,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     static final class Insertion<V> implements BiFunction<V, BLink<V>, BLink<V>> {
 
         private ArrayBag<V> arrayBag;
+        @Nullable
         private final MutableFloat overflow;
         private final Budgeted b;
 
@@ -693,7 +695,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
          */
         int activated = 0;
 
-        BLink<V> displaced = null;
+        @Nullable BLink<V> displaced = null;
 
         public Insertion(ArrayBag arrayBag, Budgeted b, float scale, @Nullable MutableFloat overflow) {
             this.arrayBag = arrayBag;
@@ -702,12 +704,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             this.overflow = overflow;
         }
 
-        private BLink<V> newLink(V key) {
+        private BLink<V> newLink(@NotNull V key) {
             return arrayBag.newLink(key, b.pri() * scale, b.qua(), b.dur());
         }
 
+        @Nullable
         @Override
-        public BLink<V> apply(V key, BLink<V> existing) {
+        public BLink<V> apply(@NotNull V key, @Nullable BLink<V> existing) {
 
 
             if (existing != null) {

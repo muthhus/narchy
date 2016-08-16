@@ -1,7 +1,5 @@
 package nars.nal.rule;
 
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.IO;
 import nars.Param;
@@ -9,6 +7,8 @@ import nars.index.PatternIndex;
 import nars.nal.Deriver;
 import nars.term.Compound;
 import nars.util.Util;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -120,9 +120,9 @@ public class PremiseRuleSet {
 
         this.patterns = patterns;
 
-        logger.info("indexed " + rules.size() + " total rules, consisting of " + patterns.size() + " unique pattern components terms");
+        logger.info("indexed {} total rules, consisting of {} unique pattern components terms", rules.size(), patterns.size());
         if (errors[0] > 0) {
-            logger.warn("\trule errors: " + errors[0]);
+            logger.warn("\trule errors: {}", errors[0]);
         }
     }
 
@@ -222,8 +222,7 @@ public class PremiseRuleSet {
                 PremiseRule preNorm = new PremiseRule(rawAndSrc.getOne());
                 permute(preNorm, src, index, ur);
             } catch (Exception ex) {
-                logger.error("Invalid TaskRule: {} {}", src, ex.getMessage());
-                throw new RuntimeException(ex);
+                throw new RuntimeException("Invalid TaskRule: " + src, ex);
             }
 
             return ur;

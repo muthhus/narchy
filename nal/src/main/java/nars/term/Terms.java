@@ -1,8 +1,5 @@
 package nars.term;
 
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
-import org.eclipse.collections.api.set.ImmutableSet;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import nars.$;
 import nars.Op;
 import nars.term.compound.GenericCompound;
@@ -11,6 +8,9 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.Texts;
 import nars.util.data.sorted.SortedList;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

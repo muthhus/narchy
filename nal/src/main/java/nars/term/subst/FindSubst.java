@@ -402,7 +402,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
     @Nullable
-    public final Term resolveNormalized(@NotNull Term t, NAR nar) {
+    public final Term resolveNormalized(@NotNull Term t, @NotNull NAR nar) {
         //TODO make a half resolve that only does xy?
         t = resolve(t);
         return (t instanceof Compound) ? nar.normalize((Compound) t) : t;

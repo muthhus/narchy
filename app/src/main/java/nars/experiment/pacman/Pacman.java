@@ -89,7 +89,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 		//Multi nar = new Multi(4,512,
 		Default nar = new Default(1024,
 				16, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng), 100000000, false)
+				new CaffeineIndex(new DefaultConceptBuilder(rng), 10000000)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)

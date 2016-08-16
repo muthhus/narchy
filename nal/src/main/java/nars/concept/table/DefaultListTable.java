@@ -17,6 +17,7 @@ public abstract class DefaultListTable<V,L> extends ArrayListTable<V,L> {
         this.list = new FasterList<>(0);
     }
 
+    @NotNull
     @Override
     protected final Object _items() {
         return list;

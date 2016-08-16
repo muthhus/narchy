@@ -1,6 +1,9 @@
 package nars.concept;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Symbols;
+import nars.Task;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
@@ -19,7 +22,8 @@ import nars.term.container.TermSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -68,7 +72,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull T term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, NAR nar) {
+    public CompoundConcept(@NotNull T term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, @NotNull NAR nar) {
         this.term = term;
 
         this.templates = TermSet.the(TermLinkBuilder.components(term, nar));
@@ -123,7 +127,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     /**
      * default construction by a NAR on conceptualization
      */
-    CompoundConcept(@NotNull T term, @NotNull DefaultConceptBuilder b, Map bagMap, NAR nar) {
+    CompoundConcept(@NotNull T term, @NotNull DefaultConceptBuilder b, Map bagMap, @NotNull NAR nar) {
         this(term, b.termbag(bagMap), b.taskbag(bagMap), nar);
     }
 
@@ -365,7 +369,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     }
 
-    protected void questionCapacity(@NotNull ConceptPolicy p, List<Task> removed) {
+    protected void questionCapacity(@NotNull ConceptPolicy p, @NotNull List<Task> removed) {
         questions().capacity((byte) p.questionCap(true), removed);
         quests().capacity((byte) p.questionCap(false), removed);
     }
@@ -398,7 +402,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
 
     @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
         linkSubs(scale, activation.src, minScale, activation, nar);
     }
 
@@ -461,7 +465,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
 
-    final void linkDistribute(float scale, Concept src, float minScale, @NotNull TermSet templates, @NotNull NAR.Activation activation, @NotNull NAR nar) {
+    final void linkDistribute(float scale, @Nullable Concept src, float minScale, @NotNull TermSet templates, @NotNull NAR.Activation activation, @NotNull NAR nar) {
 
         int n = templates.size();
         float tStrength = 1f / n;
@@ -510,7 +514,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * --a revised/projected task which may or may not remain in the belief table
      */
     @Override
-    public final boolean process(@NotNull Task input, @NotNull NAR nar, List<Task> displaced) {
+    public final boolean process(@NotNull Task input, @NotNull NAR nar, @NotNull List<Task> displaced) {
 
 
         boolean output;

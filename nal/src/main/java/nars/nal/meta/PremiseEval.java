@@ -45,7 +45,7 @@ public class PremiseEval extends FindSubst {
     public transient Premise premise;
     private float truthResolution;
 
-    public boolean setPunct(Truth t, char p, long[] evidence) {
+    public boolean setPunct(@Nullable Truth t, char p, long[] evidence) {
 
         if (t!=null) {
             t = dither(t);

@@ -7,6 +7,7 @@ import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
 import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -84,7 +85,7 @@ public class VariableNormalization extends VariableTransform implements Function
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
         @NotNull @Override
-        public Termed apply(Compound containing, @NotNull Variable current) {
+        public Termed apply(@NotNull Compound containing, @NotNull Variable current) {
 
             //if (current instanceof Ellipsis)
                //throw new RuntimeException("not allowed");
@@ -107,7 +108,7 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     @NotNull @Override
-    public final Termed apply(Compound ct, @NotNull Variable v) {
+    public final Termed apply(@Nullable Compound ct, @NotNull Variable v) {
         return rename.computeIfAbsent(v, this);
     }
 

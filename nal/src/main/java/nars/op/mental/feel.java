@@ -16,7 +16,10 @@
  */
 package nars.op.mental;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Symbols;
+import nars.Task;
 import nars.nal.nal8.AbstractOperator;
 import nars.task.MutableTask;
 import nars.term.Term;

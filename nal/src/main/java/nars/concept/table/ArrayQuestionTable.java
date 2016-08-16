@@ -1,7 +1,10 @@
 package nars.concept.table;
 
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.task.AnswerTask;
@@ -50,9 +53,9 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         this.capacity = newCapacity;
 
-        @NotNull List<Task> list = this.list;
+        @NotNull List<Task> list;
 
-        synchronized (list) {
+        synchronized (list = this.list) {
             int s = size();
 
             int toRemove = s - newCapacity;

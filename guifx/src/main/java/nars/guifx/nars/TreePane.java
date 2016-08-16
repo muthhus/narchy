@@ -27,7 +27,8 @@ import static javafx.application.Platform.runLater;
  */
 public class TreePane extends BorderPane {
 
-    public static final Task root = ImmediateOperator.command(echo.class, $.the(TreePane.class.getSimpleName()));
+    //public static final Task root = ImmediateOperator.command(echo.class, $.the(TreePane.class.getSimpleName()));
+
     private final TaskTreeItem rootNode;
     private final TreeView<Task> tree;
     private final FrameReaction onFrame;
@@ -59,7 +60,7 @@ public class TreePane extends BorderPane {
 
 
 
-        rootNode = new TaskTreeItem(root);
+        rootNode = new TaskTreeItem(null/*root*/);
         tree = new TreeView<>(rootNode);
         tree.setCellFactory(param -> new TaskCell());
 

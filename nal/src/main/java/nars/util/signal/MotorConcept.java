@@ -1,6 +1,9 @@
 package nars.util.signal;
 
-import nars.*;
+import nars.NAR;
+import nars.Narsese;
+import nars.Symbols;
+import nars.Task;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.truth.Truth;

@@ -153,7 +153,7 @@ public abstract class AbstractNAR extends NAR {
             //new Abbreviate(),
             //new Register(),
 
-            new echo(),
+            //new echo(),
 
 
             new doubt(),        // decrease the confidence of a belief

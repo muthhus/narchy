@@ -1,11 +1,8 @@
 package nars.util.data;
 
-import nars.Task;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
-import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -13,6 +10,9 @@ import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +33,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     @NotNull
     private final Term term;
     private final FloatFunction<Term> value;
+    @NotNull
     private final FloatToObjectFunction<Truth> truthFloatFunction;
 
     @NotNull
@@ -61,7 +62,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         this(n, t, value, truthFloatFunction, n.DEFAULT_BELIEF_PRIORITY, n.DEFAULT_BELIEF_DURABILITY);
     }
 
-    public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction, float pri, float dur) {
+    public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri, float dur) {
         this.nar = n;
         this.term = t.term();
         this.value = value;

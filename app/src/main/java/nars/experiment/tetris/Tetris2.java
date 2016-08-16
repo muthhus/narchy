@@ -1,6 +1,7 @@
 package nars.experiment.tetris;
 
 import com.google.common.collect.Lists;
+import com.lmax.disruptor.dsl.BasicExecutor;
 import nars.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.data.AutoClassifier;
@@ -34,6 +35,9 @@ import spacegraph.obj.Plot2D;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static nars.$.t;
 import static nars.experiment.arkanoid.Arkancide.newBeliefChart;
@@ -48,7 +52,13 @@ public class Tetris2 extends NAREnvironment {
 
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
     public static final int DEFAULT_INDEX_WEIGHT = 5 * 1000000;
-    public static final NAR.Executioner exe = new NAR.MultiThreadExecutioner(2,2);
+
+
+    private static final Executor exePool =
+            //Executors.newWorkStealingPool(Runtime.getRuntime().availableProcessors()-1);
+            //Executors.newCachedThreadPool();
+            new BasicExecutor(Executors.defaultThreadFactory());
+    public static final NAR.Executioner exe = new NAR.MultiThreadExecutioner(2,2, exePool);
 
 
 
@@ -335,7 +345,7 @@ public class Tetris2 extends NAREnvironment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
                 32, 3, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
 
                 , new FrameClock(), exe
 
@@ -654,6 +664,7 @@ public class Tetris2 extends NAREnvironment {
         private final NAR worker;
         private final NAREnvironment env;
         private final FloatSupplier learn;
+        private final RangeNormalizedFloat busy;
         public float score;
 
 
@@ -661,16 +672,17 @@ public class Tetris2 extends NAREnvironment {
         protected float act() {
             //float avgFramePeriodMS = (float) loop.frameTime.getMean();
 
-            float mUsage = memory();
-            float targetMemUsage = 0.75f;
-
-
+            //float mUsage = memory();
+            //float targetMemUsage = 0.75f;
 
             return this.score = (
+                    (1f + learn.asFloat()) *       //learn
+//                    (1f + (1f- busy.asFloat())) *  //avoid busywork
+                    (1f + happysad.asFloat())      //boost for motivation change
+
                     //env.rewardNormalized.asFloat() +
-                    happysad.asFloat() +  //boost for motivation change
-                    learn.asFloat() +
-                    1 / (1f + Math.abs(targetMemUsage - mUsage) / (targetMemUsage)) //maintain % memory utilization TODO cache 'memory()' result
+
+//                    1 / (1f + Math.abs(targetMemUsage - mUsage) / (targetMemUsage)) //maintain % memory utilization TODO cache 'memory()' result
             );
         }
 
@@ -678,7 +690,7 @@ public class Tetris2 extends NAREnvironment {
         public NARController( NAR worker, NARLoop loop, NAREnvironment env) {
 
             super( new Default(384, 4, 3, 2, new XORShiftRandom(2),
-                    new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)),5*100000),
+                    new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 5*100000, false, exe),
                     //new CaffeineIndex(new DefaultConceptBuilder(random)),
                     new FrameClock()) {
                        @Override
@@ -698,6 +710,7 @@ public class Tetris2 extends NAREnvironment {
             this.loop = loop;
             this.env = env;
 
+            busy = new RangeNormalizedFloat(()->(float)worker.emotion.busy.getSum());
             happysad = new RangeNormalizedFloat(()->(float)worker.emotion.happysad());
             learn = ()->(float)worker.emotion.learning();
 
@@ -757,14 +770,14 @@ public class Tetris2 extends NAREnvironment {
                     }),*/
 
                     //memory throttle
-                    new MotorConcept("(memoryWeight)", nar, (b, d) -> {
-                        ((CaffeineIndex) worker.index).compounds.policy().eviction().ifPresent(e -> {
-                            float sweep = 0.1f; //% sweep , 0<sweep
-                            e.setMaximum((long) (DEFAULT_INDEX_WEIGHT * (1f + sweep * 2f * (d.freq() - 0.5f))));
-                        });
-                        //System.err.println("  loop period ms: " + newPeriod);
-                        return d;
-                    }),
+//                    new MotorConcept("(memoryWeight)", nar, (b, d) -> {
+//                        ((CaffeineIndex) worker.index).compounds.policy().eviction().ifPresent(e -> {
+//                            float sweep = 0.1f; //% sweep , 0<sweep
+//                            e.setMaximum((long) (DEFAULT_INDEX_WEIGHT * (1f + sweep * 2f * (d.freq() - 0.5f))));
+//                        });
+//                        //System.err.println("  loop period ms: " + newPeriod);
+//                        return d;
+//                    }),
 
                     new MotorConcept("(confMin)", nar, (b, d) -> {
                         float MAX_CONFMIN = 0.1f;

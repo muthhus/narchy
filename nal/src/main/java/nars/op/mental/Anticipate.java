@@ -24,7 +24,10 @@ package nars.op.mental;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Symbols;
+import nars.Task;
 import nars.task.MutableTask;
 import nars.task.Temporal;
 import nars.term.Compound;

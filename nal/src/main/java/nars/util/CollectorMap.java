@@ -80,7 +80,7 @@ public abstract class CollectorMap<K, V> {
     }
 
     /** the key of the displaced item needs to be removed from the table sometime after calling this */
-    public @Nullable V mergeList(@NotNull K key, @NotNull V value, V removed) {
+    public @Nullable V mergeList(@NotNull K key, @NotNull V value, @Nullable V removed) {
 
         if (removed != null) {
 
@@ -119,20 +119,22 @@ public abstract class CollectorMap<K, V> {
 
         V e = map.remove(x);
 
-        synchronized (_items()) {
-            if (e != null) {
-                V removed = removeItem(e);
+        if (e != null) {
+            V removed;
+            synchronized (_items()) {
+                removed = removeItem(e);
                 //            if (removed == null) {
                 //                /*if (Global.DEBUG)
                 //                    throw new RuntimeException(key + " removed from index but not from items list");*/
                 //                //return null;
                 //            }
-                if (removed != e) {
-                    throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
-                }
-                return removed;
             }
+            if (removed != e) {
+                throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
+            }
+            return removed;
         }
+
 
         return null;
     }
@@ -168,7 +170,7 @@ public abstract class CollectorMap<K, V> {
         return map.get(key);
     }
 
-    public final V merge(@NotNull K key, V value, @NotNull BiFunction<? super V, ? super V, ? extends V> c) {
+    public final V merge(@NotNull K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> c) {
         return map.merge(key, value, c);
     }
     public final V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> c) {

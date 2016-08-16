@@ -10,7 +10,6 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termlike;
 import nars.term.proxy.ProxyCompound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -120,7 +119,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public boolean process(@NotNull Task task, @NotNull NAR nar, List<Task> removed) {
+    public boolean process(@NotNull Task task, @NotNull NAR nar, @NotNull List<Task> removed) {
         return target.process(task, nar, removed);
     }
 
@@ -183,12 +182,12 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
+    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
         target.linkAny(b, scale, minScale, nar, activation);
     }
 
     @Override
-    public void policy(@NotNull ConceptPolicy c, long now, List<Task> removed) {
+    public void policy(@NotNull ConceptPolicy c, long now, @NotNull List<Task> removed) {
         target.policy(c, now, removed);
     }
 

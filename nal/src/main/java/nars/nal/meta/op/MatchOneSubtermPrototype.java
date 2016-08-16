@@ -1,11 +1,11 @@
 package nars.nal.meta.op;
 
-import org.eclipse.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Op;
 import nars.nal.meta.ProcTerm;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
+import org.eclipse.collections.api.map.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

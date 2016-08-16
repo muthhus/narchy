@@ -1,12 +1,12 @@
 package nars.task;
 
 import com.google.common.base.Joiner;
-import nars.Task;
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.$;
 import nars.Param;
+import nars.Task;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +45,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
 
     @Nullable
-    public Truth truth(long when, Collection<Task> tasks) {
+    public Truth truth(long when, @NotNull Collection<Task> tasks) {
         return truth(when, tasks.toArray(new Task[tasks.size()]));
     }
 

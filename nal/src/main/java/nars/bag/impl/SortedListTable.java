@@ -21,12 +21,13 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     protected final @NotNull SortedArray<L> items;
 
 
-    public SortedListTable(IntFunction<L[]> builder, Map<V, L> map) {
+    public SortedListTable(IntFunction<L[]> builder, @NotNull Map<V, L> map) {
         super(map);
         //this.items = new SortedList_1x4<>(items, this, searchType, false);
         this.items = new SortedArray<>(builder);
     }
 
+    @NotNull
     @Override
     protected final Object _items() {
         return items;
@@ -79,7 +80,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
     /** gets the key associated with a value */
     @Nullable @Override
-    abstract public V key(L l);
+    abstract public V key(@NotNull L l);
 
 
     @Override
@@ -90,7 +91,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
     @Nullable
     @Override
-    protected L addItem(L i) {
+    protected L addItem(@NotNull L i) {
         int cap = capacity();
         if (cap < 1) {
             return i; //bounce

@@ -1,9 +1,11 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.budget.Budget;
-import nars.index.TermIndex;
 import nars.nal.Premise;
 import nars.nal.TimeFunctions;
 import nars.nal.meta.PremiseEval;
@@ -256,7 +258,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
 
-    public @NotNull DerivedTask newDerivedTask(@NotNull Termed<Compound> c, Truth truth, char punc, long[] evidence, @NotNull PremiseEval p) {
+    public @NotNull
+    static DerivedTask newDerivedTask(@NotNull Termed<Compound> c, Truth truth, char punc, long[] evidence, @NotNull PremiseEval p) {
         return new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p);
     }
 

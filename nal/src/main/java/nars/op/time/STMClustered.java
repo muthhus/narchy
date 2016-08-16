@@ -27,9 +27,9 @@ import java.util.stream.StreamSupport;
 public class STMClustered extends STM {
 
     static final int DIMENSIONS = 3;
-    final int TIME = 0;
-    final int FREQ = 1;
-    final int CONF = 1; //group by confidence to preserve the maximum collective confidence of any group
+    final static int TIME = 0;
+    final static int FREQ = 1;
+    final static int CONF = 2; //group by confidence to preserve the maximum collective confidence of any group
 
 
     final short clusters;
@@ -45,11 +45,6 @@ public class STMClustered extends STM {
 
 
     public final char punc;
-
-
-
-    private static final int compactPeriod = 8;
-    private long lastCompact;
 
     public final class TasksNode extends Node {
 
@@ -217,7 +212,7 @@ public class STMClustered extends STM {
         @Override
         public String toString() {
             return id + "<<" +
-                    coord!=null ? Arrays.toString(coord) : "0" +
+                    (coord!=null ? Arrays.toString(coord) : "0") +
                     '|' + node.id +
                     ">>";
         }
@@ -356,10 +351,8 @@ public class STMClustered extends STM {
         }
 
         long t = nar.time();
-        if (t - lastCompact > compactPeriod) {
-            net.compact();
-            lastCompact = t;
-        }
+
+        net.compact();
 
         now = t;
 

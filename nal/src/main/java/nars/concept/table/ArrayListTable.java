@@ -86,7 +86,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
 
     @Nullable
     @Override
-    protected L addItem(L i) {
+    protected L addItem(@NotNull L i) {
         if (isFull())
             throw new RuntimeException("table full");
 
