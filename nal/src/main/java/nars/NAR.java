@@ -2,14 +2,11 @@ package nars;
 
 
 import com.google.common.collect.Sets;
+import com.lmax.disruptor.*;
 import nars.nar.Default;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
-import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.LiteBlockingWaitStrategy;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.WorkHandler;
 import com.lmax.disruptor.dsl.BasicExecutor;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -48,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -210,6 +208,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public static class MultiThreadExecutioner extends Executioner {
 
+        public static final int RUN_RING_SIZE = 8192;
+        public static final int TASK_RING_SIZE = 16384;
+
         //final ForkJoinPool runWorker;
         private final int taskThreads, runThreads;
 
@@ -234,9 +235,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             this.taskThreads = taskThreads;
             this.runThreads = runThreads;
 
+
+
+
             this.taskruptor = new Disruptor<TaskEvent>(
                     () -> new TaskEvent(),
-                    4096 /* ringbuffer size */,
+                    TASK_RING_SIZE /* ringbuffer size */,
                     new BasicExecutor(Executors.defaultThreadFactory()),
                     ProducerType.MULTI,
                     //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
@@ -244,7 +248,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             );
             this.runruptor = new Disruptor<RunEvent>(
                     () -> new RunEvent(),
-                    4096 /* ringbuffer size */,
+                    RUN_RING_SIZE/* ringbuffer size */,
                     new BasicExecutor(Executors.defaultThreadFactory()),
                     ProducerType.MULTI,
                     //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
@@ -262,7 +266,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 for (int i = 0; ; ) {
                     Consumer c = vv[i++];
                     if (c != null) {
-                        runLater(() -> {
+                        runLater(() -> { //TODO these Runnables can be cached
                             c.accept(nar);
                         });
                     } else
@@ -311,8 +315,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
                 //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
 
-                //long now = async.getCursor();
-                //logger.info(time() + "<-- seq=" + now + " remain=" + cap);// + " last=" + last[0]);
+                //logger.info( "<-- seq=" + ring.getCursor() + " remain=" + cap);// + " last=" + last[0]);
 
                 //Thread.yield();
                 //Util.pause(1);
@@ -328,15 +331,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         final static EventTranslatorOneArg<TaskEvent, Task[]> taskPublisher = (TaskEvent x, long seq, Task[] b) -> x.tasks = b;
 
         @Override
-        public void inputLater(Task[] t) {
+        public void inputLater(@NotNull Task[] t) {
             //taskWorker.execute(new InputTasks(t));
             taskruptor.publishEvent(taskPublisher, t);
         }
 
-        final static EventTranslatorOneArg<RunEvent, Runnable> runPublisher = (RunEvent x, long seq, Runnable b) -> x.r = b;
+        final static EventTranslatorOneArg<RunEvent, Runnable> runPublisher = (RunEvent x, long seq, Runnable b) -> {
+            x.r = b;
+        };
 
         @Override
-        public void runLater(Runnable r) {
+        public void runLater(@NotNull Runnable r) {
 
             //runWorker.execute(r);
             runruptor.publishEvent(runPublisher, r);
@@ -345,8 +350,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         private final static class RunWorkHandler implements WorkHandler<RunEvent> {
 
             @Override
-            public void onEvent(RunEvent r) throws Exception {
-                @Nullable Runnable rr = r.r;
+            public void onEvent(@NotNull RunEvent r) throws Exception {
+                Runnable rr = r.r;
                 r.r = null;
                 try {
                     rr.run();
@@ -359,12 +364,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         private final static class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
             private final NAR nar;
 
-            public TaskEventWorkHandler(NAR nar) {
+            public TaskEventWorkHandler(@NotNull NAR nar) {
                 this.nar = nar;
             }
 
             @Override
-            public void onEvent(TaskEvent te) throws Exception {
+            public void onEvent(@NotNull TaskEvent te) throws Exception {
                 Task[] tt = te.tasks;
                 te.tasks = null;
                 try {
@@ -401,7 +406,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //        });
 
 
-        (this.exe = exe).start(this);
 
         index.conceptBuilder().start(this);
 
@@ -409,6 +413,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         index.start(this);
 
         tasks.start(this);
+
+        (this.exe = exe).start(this);
+
     }
 
 
@@ -971,12 +978,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         for (; frames > 0; frames--) {
 
+            exe.synchronize();
+
             clock.tick();
             emotion.frame();
 
             exe.next(this);
-
-            exe.synchronize();
 
         }
 

@@ -37,7 +37,7 @@ public abstract class STM implements Consumer<Task> {
     abstract public void clear();
 
     static public boolean temporallyInductable(@NotNull Task newEvent, boolean allowNonInput) {
-        return (!newEvent.isDeleted() && (allowNonInput || newEvent.isInput()) && !newEvent.isEternal());
+        return ( (allowNonInput || newEvent.isInput()) && !newEvent.isEternal());
     }
 
 

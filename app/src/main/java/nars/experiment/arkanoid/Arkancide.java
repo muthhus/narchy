@@ -39,8 +39,8 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Arkancide extends NAREnvironment {
 
     private static final int cyclesPerFrame = 16;
-    public static final int runFrames = 200;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 32;
+    public static final int runFrames = 2000;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
     final Arkanoid noid;
     private final SwingCamera cam;
 
@@ -49,10 +49,10 @@ public class Arkancide extends NAREnvironment {
     private MotorConcept motorLeftRight;
 
     final int visW = 32;
-    final int visH = 24;
+    final int visH = 18;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 8;
+    private int visionSyncPeriod = 16;
     float noiseLevel = 0;
 
     float paddleSpeed = 70f;
@@ -227,7 +227,7 @@ public class Arkancide extends NAREnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -262,8 +262,8 @@ public class Arkancide extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 32, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);

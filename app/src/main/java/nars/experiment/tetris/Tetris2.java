@@ -52,7 +52,7 @@ public class Tetris2 extends NAREnvironment {
 
 
 
-    public static final int runFrames = 1000;
+    public static final int runFrames = 10000;
     public static final int cyclesPerFrame = 16;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -64,7 +64,7 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 2; //16 * TIME_DILATION;
+    private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
     public class View {
 
@@ -330,7 +330,7 @@ public class Tetris2 extends NAREnvironment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Param.DEBUG = true;
+        Param.DEBUG = false;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,

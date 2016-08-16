@@ -288,7 +288,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	void initializeBricks(List<Brick> bricks) {
 		// deallocate old bricks
-		synchronized(bricks) {
+		//synchronized(bricks) {
 			bricks.clear();
 
 			for (int iX = 0; iX < COUNT_BLOCKS_X; ++iX) {
@@ -297,7 +297,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 							(iY + 2) * (BLOCK_HEIGHT + 3) + BLOCK_TOP_MARGIN));
 				}
 			}
-		}
+		//}
 	}
 
 	public Arkanoid() {
@@ -354,7 +354,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 		paddle.update();
 		testCollision(paddle, ball);
 
-		synchronized (bricks) {
+		//synchronized (bricks) {
 			Iterator<Brick> it = bricks.iterator();
 			while (it.hasNext()) {
 				Brick brick = it.next();
@@ -363,12 +363,13 @@ public class Arkanoid extends JFrame implements KeyListener {
 					it.remove();
 				}
 			}
-		}
+		//}
 
 		//}
 
 
-		SwingUtilities.invokeLater(this::repaint);
+		//SwingUtilities.invokeLater(this::repaint);
+		repaint();
 
         return score;
 	}
