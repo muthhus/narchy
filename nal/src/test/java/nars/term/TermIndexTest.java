@@ -47,7 +47,10 @@ public class TermIndexTest {
     }
 
     void testIndex(@NotNull TermIndex i) {
-        i.start(new Terminal());
+        Terminal t = new Terminal();
+        i.start(t);
+        i.conceptBuilder().start(t);
+
         testTermSharing(i);
         //testSequenceNotShared(i);
     }
@@ -99,6 +102,7 @@ public class TermIndexTest {
 
     void testTermSharing(@NotNull TermIndex tt) {
 
+        tt.start(new Terminal());
         testShared(tt, "<<x-->w> --> <y-->z>>");
         testShared(tt, "<a --> b>");
         testShared(tt, "(c, d)");
