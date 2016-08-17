@@ -92,7 +92,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     @Override
     public CurveBag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
 
-        synchronized(map) {
+        synchronized(items) {
 
             int ss = size();
             if (ss == 0)

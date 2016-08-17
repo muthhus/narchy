@@ -216,12 +216,12 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.3f);
-        nar.derivedActivation.setValue(0.3f);
+        nar.inputActivation.setValue(0.25f);
+        nar.derivedActivation.setValue(0.25f);
 
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.6f);
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;

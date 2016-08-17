@@ -3,6 +3,8 @@ package nars.experiment.tetris;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.dsl.BasicExecutor;
 import nars.*;
+import nars.nar.Executioner;
+import nars.nar.MultiThreadExecutioner;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.data.AutoClassifier;
 import nars.experiment.NAREnvironment;
@@ -36,7 +38,6 @@ import spacegraph.obj.Plot2D;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static nars.$.t;
@@ -53,12 +54,7 @@ public class Tetris2 extends NAREnvironment {
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
     public static final int DEFAULT_INDEX_WEIGHT = 5 * 1000000;
 
-
-    private static final Executor exePool =
-            //Executors.newWorkStealingPool(Runtime.getRuntime().availableProcessors()-1);
-            //Executors.newCachedThreadPool();
-            new BasicExecutor(Executors.defaultThreadFactory());
-    public static final NAR.Executioner exe = new NAR.MultiThreadExecutioner(2,2, exePool);
+    public static final Executioner exe = new MultiThreadExecutioner(3, 512);
 
 
 

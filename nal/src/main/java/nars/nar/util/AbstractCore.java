@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -71,17 +72,7 @@ public abstract class AbstractCore {
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
 
-    private final boolean fire(@NotNull BLink<Concept> b) {
-        @Nullable Concept c = b.get();
-        if (c!=null) {
-            nar.runLater(new FireConcept(c, nar,
-                (short)tasklinksFiredPerFiredConcept.intValue(),
-                (short)termlinksFiredPerFiredConcept.intValue())
-            );
-            return true;
-        }
-        return false;
-    }
+
 
     protected AbstractCore(@NotNull NAR nar) {
 
@@ -112,12 +103,26 @@ public abstract class AbstractCore {
 
         int cpf = conceptsFiredPerCycle.intValue();
 
+        short  taskLinks = (short)tasklinksFiredPerFiredConcept.intValue();
+        short  termLinks = (short)termlinksFiredPerFiredConcept.intValue();
+
+        List<BLink<Concept>> toFire = $.newArrayList();
         for (int cycleNum = 0; cycleNum < cycles; cycleNum++) {
 
             concepts.commit();
 
-            concepts.sample(cpf, this::fire);
+            //gather the concepts into a list before firing. if firing while sampling, the bag can block itself
+            concepts.sample(cpf, toFire::add);
 
+            for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
+                @Nullable Concept c = toFire.get(i).get();
+                if (c!=null) {
+                    if (!nar.runLaterMaybe(new FireConcept(c, nar, taskLinks, termLinks)))
+                        return;
+                }
+            }
+
+            toFire.clear();
         }
 
     }

@@ -161,7 +161,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
     private Truth defaultGoalTruth, defaultBeliefTruth;
 
-    public final MutableInteger cyclesPerFrame = new MutableInteger(1);
+    @Deprecated public final MutableInteger cyclesPerFrame = new MutableInteger(1); //this is specific to a Core implementation, not the entire NAR
 
 
     public static final float TRUTH_EPSILON = 0.01f;

@@ -10,7 +10,6 @@ import nars.op.data.*;
 import nars.op.math.length;
 import nars.op.mental.doubt;
 import nars.op.mental.schizo;
-import nars.op.out.echo;
 import nars.op.out.say;
 import nars.op.sys.reset;
 import nars.op.time.STMTemporalLinkage;

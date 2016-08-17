@@ -19,6 +19,9 @@ import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
+import nars.nar.Executioner;
+import nars.nar.SingleThreadExecutioner;
+import nars.nar.util.AbstractCore;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -162,224 +165,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //if (bmiss[0]) miss++; else hit++;
         //System.out.println( Texts.n2(1 - (double)miss/hit) + " hit rate, size=" + normalizations.get().size());
         return v == FalseProduct ? null : v;
-    }
-
-    abstract public static class Executioner implements Executor {
-        abstract public void start(@NotNull NAR nar);
-
-        abstract public void synchronize();
-
-        abstract public void inputLater(@NotNull Task[] t);
-
-        abstract public void next(@NotNull NAR nar);
-    }
-
-    public static class SingleThreadExecutioner extends Executioner {
-
-        private NAR nar;
-
-        @Override
-        public void start(NAR nar) {
-            this.nar = nar;
-        }
-
-        @Override
-        public void synchronize() {
-
-        }
-
-        @Override
-        public void next(@NotNull NAR nar) {
-            nar.eventFrameStart.emit(nar);
-        }
-
-        @Override
-        public void execute(@NotNull Runnable r) {
-            r.run();
-        }
-
-        @Override
-        public void inputLater(Task[] t) {
-            nar.input(t);
-        }
-    }
-
-    public static class MultiThreadExecutioner extends Executioner {
-
-        public static final int RUN_RING_SIZE = 8192;
-        public static final int TASK_RING_SIZE = 16384;
-
-        //final ForkJoinPool runWorker;
-        private final int taskThreads, runThreads;
-
-
-
-
-        static final class TaskEvent {
-            @Nullable
-            public Task[] tasks;
-        }
-
-        @NotNull
-        final Disruptor<TaskEvent> taskruptor;
-
-        static final class RunEvent {
-            @Nullable
-            public Runnable r;
-        }
-
-        @NotNull
-        final Disruptor<RunEvent> runruptor;
-
-        public MultiThreadExecutioner(int taskThreads, int runThreads, Executor exe) {
-
-            //this.runWorker = (ForkJoinPool) Executors.newWorkStealingPool(runThreads);
-            this.taskThreads = taskThreads;
-            this.runThreads = runThreads;
-
-
-            this.taskruptor = new Disruptor<TaskEvent>(
-                    () -> new TaskEvent(),
-                    TASK_RING_SIZE /* ringbuffer size */,
-                    exe,
-                    ProducerType.MULTI,
-                    //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
-                    new LiteBlockingWaitStrategy()
-            );
-            this.runruptor = new Disruptor<RunEvent>(
-                    () -> new RunEvent(),
-                    RUN_RING_SIZE/* ringbuffer size */,
-                    exe,
-                    ProducerType.MULTI,
-                    //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
-                    new LiteBlockingWaitStrategy()
-            );
-
-        }
-
-        @Override
-        public void next(@NotNull NAR nar) {
-            //nar.eventFrameStart.emitAsync(nar, runWorker);
-
-            Consumer[] vv = nar.eventFrameStart.getCachedNullTerminatedArray();
-            if (vv != null) {
-                for (int i = 0; ; ) {
-                    Consumer c = vv[i++];
-                    if (c != null) {
-                        execute(() -> { //TODO these Runnables can be cached
-                            c.accept(nar);
-                        });
-                    } else
-                        break; //null terminator hit
-                }
-            }
-
-        }
-
-        @Override
-        public void start(@NotNull NAR nar) {
-
-            WorkHandler[] taskWorker = new WorkHandler[taskThreads];
-            for (int i = 0; i < taskThreads; i++)
-                taskWorker[i] = new TaskEventWorkHandler(nar);
-            taskruptor.handleEventsWithWorkerPool(taskWorker);
-
-            WorkHandler[] runWorker = new WorkHandler[runThreads];
-            for (int i = 0; i < runThreads; i++)
-                runWorker[i] = new RunWorkHandler();
-            runruptor.handleEventsWithWorkerPool(runWorker);
-
-            runruptor.start();
-            taskruptor.start();
-        }
-
-        public void synchronize() {
-            //if (!runWorker.isQuiescent()) {
-//                while (!runWorker.awaitQuiescence(QUIESENCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
-//                    //logger.warn("runWorker lag: {}", runWorker);
-//                    Thread.yield();
-//                }
-            //}
-
-            waitFor(runruptor);
-            waitFor(taskruptor);
-
-
-        }
-
-        public void waitFor(@NotNull Disruptor d) {
-
-            //long used = size - ring.remainingCapacity();
-            long cap;
-            RingBuffer<TaskEvent> ring = d.getRingBuffer();
-            while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
-                //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
-
-                //logger.info( "<-- seq=" + ring.getCursor() + " remain=" + cap);// + " last=" + last[0]);
-
-                //Thread.yield();
-                //Util.pause(1);
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-
-                }
-            }
-
-        }
-
-        final static EventTranslatorOneArg<TaskEvent, Task[]> taskPublisher = (TaskEvent x, long seq, Task[] b) -> x.tasks = b;
-
-        @Override
-        public void inputLater(@NotNull Task[] t) {
-            //taskWorker.execute(new InputTasks(t));
-            taskruptor.publishEvent(taskPublisher, t);
-        }
-
-        final static EventTranslatorOneArg<RunEvent, Runnable> runPublisher = (RunEvent x, long seq, Runnable b) -> {
-            x.r = b;
-        };
-
-        @Override
-        public void execute(@NotNull Runnable r) {
-            runruptor.publishEvent(runPublisher, r);
-        }
-
-
-        private final static class RunWorkHandler implements WorkHandler<RunEvent> {
-
-            @Override
-            public void onEvent(@NotNull RunEvent r) throws Exception {
-                Runnable rr = r.r;
-                r.r = null;
-                try {
-                    rr.run();
-                } catch (Exception e) {
-                    logger.error("{}", e);
-                }
-            }
-        }
-
-        private final static class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
-            @NotNull
-            private final NAR nar;
-
-            public TaskEventWorkHandler(@NotNull NAR nar) {
-                this.nar = nar;
-            }
-
-            @Override
-            public void onEvent(@NotNull TaskEvent te) throws Exception {
-                Task[] tt = te.tasks;
-                te.tasks = null;
-                try {
-                    nar.input(tt);
-                } catch (Exception e) {
-                    logger.error("{}", e);
-                }
-            }
-        }
-
     }
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
@@ -1462,6 +1247,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         int s = tt.size();
         if (s > 0)
             inputLater(tt.toArray(new Task[s]));
+    }
+
+    /** will run this if the executioner is not completely saturated */
+    public boolean runLaterMaybe(Runnable r) {
+        return exe.executeMaybe(r);
     }
 
 
