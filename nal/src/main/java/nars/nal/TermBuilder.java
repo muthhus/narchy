@@ -548,6 +548,8 @@ public abstract class TermBuilder {
 
     @NotNull
     public Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
+
+
         while (true) {
 
             //special statement filters
@@ -652,8 +654,35 @@ public abstract class TermBuilder {
             }
 
 
-            if (op.commutative && (dt != DTERNAL && dt != 0) && subject.compareTo(predicate) > 0) //equivalence
-                dt = -dt;
+            if (op.commutative) {
+
+
+                //normalize co-negation
+                boolean sn = subject.op() == NEG;
+                boolean pn = predicate.op() == NEG;
+                if (sn && pn) {
+                    //unnegate both
+                    subject = $.unneg(subject).term();
+                    predicate = $.unneg(predicate).term();
+                } else if (sn && !pn) {
+                    //swap negation so that subject is un-negated
+                    subject = $.unneg(subject).term();
+                    predicate = $.neg(predicate);
+                }
+
+                boolean reversed = subject.compareTo(predicate) > 0;
+                if (reversed) {
+                    Term x = predicate;
+                    predicate = subject;
+                    subject = x;
+                }
+
+                if (reversed && (dt != DTERNAL && dt != 0) ) {
+                    dt = -dt;
+                }
+
+
+            }
             return finish(op, dt, subject, predicate);
 
         }

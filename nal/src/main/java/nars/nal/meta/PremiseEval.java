@@ -217,7 +217,7 @@ public class PremiseEval extends FindSubst {
             return true;
         } catch (Exception e) {
             if (Param.DEBUG_DERIVER)
-                Derive.logger.warn("{}\n\tderiving {}", e.toString(), ((Derive)forEachMatch).rule.source);
+                Derive.logger.warn("{}\n\tderiving {}", e, ((Derive)forEachMatch).rule.source);
             return false;
         }
     }

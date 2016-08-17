@@ -108,9 +108,18 @@ public class TemporalTest {
 
     }
 
-    @Test public void testCommutiveTemporality() {
+    @Test public void testCommutiveTemporalityConjEquiv() {
+        testParse("((#1-->$2) <=>-20 ({(row,3)}-->$2))", "((#1-->$2) <=>-20 ({(row,3)}-->$2))");
+        testParse("(({(row,3)}-->$2) <=>+20 (#1-->$2))", "((#1-->$2) <=>-20 ({(row,3)}-->$2))");
+
+        testParse("((#1-->$2) &&-20 ({(row,3)}-->$2))", "((#1-->$2) &&-20 ({(row,3)}-->$2))");
+        testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "((#1-->$2) &&-20 ({(row,3)}-->$2))");
+    }
+    @Test public void testCommutiveTemporalityConj2() {
         testParse("(goto(a) &&+5 ((SELF,b)-->at))", "(goto(a) &&+5 ((SELF,b)-->at))");
     }
+
+
     @Test public void testCommutiveTemporality1() {
         testParse("(goto(a) &&-5 ((SELF,b)-->at))", "(goto(a) &&-5 ((SELF,b)-->at))");
         testParse("(goto(a) &&+0 ((SELF,b)-->at))", "(goto(a) &&+0 ((SELF,b)-->at))");
@@ -141,14 +150,14 @@ public class TemporalTest {
     }
 
     void testParse(String s) {
-        testParse(null, s);
+        testParse(s, null);
     }
 
-    void testParse(String tt, String s) {
-        Termed<Term> t = n.term(s);
-        if (tt == null)
-            tt = s;
-        assertEquals(tt, t.toString());
+    void testParse(String input, String expected) {
+        Termed<Term> t = n.term(input);
+        if (expected == null)
+            expected = input;
+        assertEquals(expected, t.toString());
     }
 
     @Test public void testCommutiveTemporalityConcepts() {

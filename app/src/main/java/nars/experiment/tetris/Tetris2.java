@@ -48,18 +48,17 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
-    public static final int DEFAULT_INDEX_WEIGHT = 6 * 1000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 8 * 1000000;
 
-    public static final Executioner exe = new MultiThreadExecutioner(3, 4096);
-
+    public static final Executioner exe = new MultiThreadExecutioner(2, 4096);
 
 
-    public static final int runFrames = 100;
+
+    public static final int runFrames = 50000;
     public static final int cyclesPerFrame = 8;
     public static final int tetris_width = 6;
-    public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 4;
+    public static final int tetris_height = 16;
+    public static final int TIME_PER_FALL = 6;
     static boolean easy = false;
 
     static int frameDelay;
@@ -337,7 +336,7 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1300,
-                64, 2, 2, rng,
+                64, 3, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
 
                 , new FrameClock(), exe
@@ -414,7 +413,7 @@ public class Tetris2 extends NAREnvironment {
                 super.init(nar);
 
                 AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                        tetris_width, 16 /* states */,
+                        tetris_width/2, 8 /* states */,
                         0.05f);
                 view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 

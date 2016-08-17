@@ -97,18 +97,12 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     @Override
     public final void accept(@NotNull PremiseEval m) {
 
+        Term r = m.index.resolve(this.conclusionPattern, m);
 
-        PremiseEval.TruthPuncEvidence ct = m.punct.get();
-
-
-        Term r;
-
-            Term cp = this.conclusionPattern;
-            r = m.index.resolve(cp, m);
-
-            if (r instanceof Compound) { //includes null test
-                derive(m, (Compound) r, ct);
-            }
+        if (r instanceof Compound) { //includes null test
+            PremiseEval.TruthPuncEvidence ct = m.punct.get();
+            derive(m, (Compound) r, ct);
+        }
 
     }
 
@@ -152,7 +146,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                     m, this, occReturn, confScale
             );
 
-            if (Param.DEBUG && occReturn[0]!=ETERNAL && Math.abs(occReturn[0] - DTERNAL)<1000) {
+            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
                 //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
                 throw new RuntimeException("temporalization resulted in suspicious occurrence time");
             }
@@ -198,7 +192,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
         DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
-        if (d!=null)
+        if (d != null)
             m.conclusion.derive.add(d);
 
     }
@@ -252,7 +246,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
 
-    public @NotNull
+    public
+    @NotNull
     static DerivedTask newDerivedTask(@NotNull Termed<Compound> c, Truth truth, char punc, long[] evidence, @NotNull PremiseEval p) {
         return new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p);
     }

@@ -113,6 +113,22 @@ public class TermReductionsTest {
         assertInvalid("<<a <=> b> <=> c>");
     }
 
+
+    @Test
+    public void testSimilarityAndEquivalenceNegatedSubtermsDoubleNeg() {
+        assertEquals($("((P)<->(Q))"), $("((--,(P))<->(--,(Q)))"));
+        assertEquals($("((P)<=>(Q))"), $("((--,(P))<=>(--,(Q)))"));
+
+    }
+    @Test
+    public void testSimilarityAndEquivalenceNegatedSubtermsOpposite() {
+        assertEquals($("((P)<->(--,(Q)))"), $("((P)<->(--,(Q)))"));
+        assertEquals($("((P)<->(--,(Q)))"), $("((--,(P))<->(Q))"));
+
+        assertEquals($("((P)<=>(--,(Q)))"), $("((P)<=>(--,(Q)))"));
+        assertEquals($("((P)<=>(--,(Q)))"), $("((--,(P))<=>(Q))"));
+    }
+
     @Test
     public void testReducedAndInvalidImplications1() {
         assertInvalid("<<P<=>Q> ==> R>");

@@ -100,7 +100,7 @@ public class Arkancide extends NAREnvironment {
 
 
         AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                16, 8 /* states */,
+                4, 8 /* states */,
                 0.05f);
         view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 
