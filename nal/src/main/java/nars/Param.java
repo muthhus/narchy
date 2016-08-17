@@ -128,7 +128,7 @@ public abstract class Param /*extends Container*/ implements Level {
      * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
      * see: the microsphere interpolation paper for analysis on this parameter
      */
-    public static float TEMPORAL_MICROSPHERE_EXPONENT = 2f;
+    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1f;
 
 
 

@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static java.util.stream.StreamSupport.stream;
+import static nars.nal.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.and;
 
 /**
@@ -212,7 +213,7 @@ public interface BeliefTable extends TaskTable {
     default Task top(long when, long now, @Nullable Task against) {
 
         final Task ete = eternalTop();
-        if (when == Tense.ETERNAL) {
+        if (when == ETERNAL) {
             if (ete != null) {
                 return ete;
             } /*else {
@@ -359,7 +360,7 @@ public interface BeliefTable extends TaskTable {
 
 
     @Nullable default Truth truth(long now) {
-        return truth(now, now);
+        return truth(now, ETERNAL);
     }
 
     /** finds the strongest matching belief for the given term (and its possible 'dt' value) and the given occurrence time.

@@ -33,6 +33,7 @@ import static java.util.stream.Collectors.toList;
 import static nars.$.t;
 import static nars.experiment.tetris.Tetris2.arrayRenderer;
 import static nars.experiment.tetris.Tetris2.exe;
+import static nars.nal.UtilityFunctions.or;
 import static nars.vision.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
@@ -40,7 +41,7 @@ public class Arkancide extends NAREnvironment {
 
     private static final int cyclesPerFrame = 16;
     public static final int runFrames = 20000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 64;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
     public static final int INDEX_SIZE = 6 * 1000000;
     final Arkanoid noid;
     private final SwingCamera cam;
@@ -53,10 +54,10 @@ public class Arkancide extends NAREnvironment {
     final int visH = 18;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 16;
+    private int visionSyncPeriod = 24;
     float noiseLevel = 0;
 
-    float paddleSpeed = 70f;
+    float paddleSpeed = 25f;
     private float prevScore;
 
     public class View {
@@ -103,7 +104,7 @@ public class Arkancide extends NAREnvironment {
                 0.05f);
         view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 
-        MatrixView camView = new MatrixView(visW, visH, (x, y, g) -> {
+        MatrixView.ViewFunc camViewView = (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
 //            float r = decodeRed(rgb);
 //            if (r > 0)
@@ -111,14 +112,15 @@ public class Arkancide extends NAREnvironment {
 //            g.glColor3f(r,0,0);
 
             SensorConcept s = ss[x][y];
-            float b = s.hasBeliefs() ? s.beliefs().expectation(now) : 0;
-            Truth dt = s.hasGoals() ? s.goals().truth(now) : null;
+            Truth b =  s.hasBeliefs() ? s.beliefs().truth(now) : null;
+            float bf = b!=null ? b.freq() : 0.5f;
+            Truth d = s.hasGoals() ? s.goals().truth(now) : null;
             float dr, dg;
-            if (dt == null) {
+            if (d == null) {
                 dr = dg = 0;
             } else {
-                float f = dt.freq();
-                float c = dt.conf();
+                float f = d.freq();
+                float c = d.conf();
                 if (f > 0.5f) {
                     dr = 0;
                     dg = (f - 0.5f) * 2f * c;
@@ -130,14 +132,19 @@ public class Arkancide extends NAREnvironment {
 
             float maxConceptPriority = ((Default)nar).core.concepts.priMax(); //TODO cache this
             float p = nar.conceptPriority(s) / maxConceptPriority;
-            g.glColor4f(dr, dg, b, 0.5f + 0.5f * p);
+            g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
-        });
+            return or(b!=null ? b.conf() : 0 , d!=null ? d.conf() : 0);
+
+        };
+
+        MatrixView camView = new MatrixView(visW, visH,
+                camViewView);
 
 
         actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b,d)->{
 
-            noid.paddle.move((motorLeftRight.goals().expectation(now) - 0.5f) * paddleSpeed);
+            noid.paddle.move((motorLeftRight.goals().freq(now) - 0.5f) * paddleSpeed);
             return d;
             //return $.t((float)(noid.paddle.x / noid.SCREEN_WIDTH), 0.9f);
 
@@ -221,7 +228,7 @@ public class Arkancide extends NAREnvironment {
         nar.derivedActivation.setValue(0.25f);
 
 
-        nar.beliefConfidence(0.75f);
+        nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.75f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;

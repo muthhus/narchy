@@ -763,12 +763,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         for (; frames > 0; frames--) {
 
-            exe.synchronize();
 
             clock.tick();
             emotion.frame();
 
             exe.next(this);
+
+            exe.synchronize();
 
         }
 

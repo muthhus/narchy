@@ -77,10 +77,10 @@ public class WaveCapture implements Runnable {
 
         MatrixView freqHistory = new MatrixView(freqSamplesPerFrame, historyFrames, (x, y, g) -> {
             if (history == null)
-                return;
+                return 0;
             float v = history[y * freqSamplesPerFrame + x];
             g.glColor3f(v, v, v);
-
+            return 0f;
         });
 
 

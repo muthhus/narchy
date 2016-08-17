@@ -18,6 +18,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
+import static nars.nal.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.and;
 import static nars.truth.TruthFunctions.projection;
 
@@ -349,21 +350,22 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             copy = toArrayExact(new Task[s]);
         }
 
+        boolean projectionUnnecessary = now == ETERNAL || when == now;
+
         Truth res;
         if (s == 1) {
             Task the = copy[0];
             res = the.truth();
-            if (when == now && the.occurrence() == when) //optimization: if at the current time and when
+            if (projectionUnnecessary && the.occurrence() == when) //optimization: if at the current time and when
                 return res;
 
         } else {
             res = truthpolations.get().truth(when, copy);
         }
 
-        return (res!=null && when!=now) ?
-                Revision.project(res, when, now, Revision.closestTo(copy, now).occurrence(), false) : /* projection adjustment */
-                res/* unprojected */
-                ;
+        return (res==null || projectionUnnecessary) ?
+                res :
+                Revision.project(res, when, now, Revision.closestTo(copy, now).occurrence(), false);
     }
 
 

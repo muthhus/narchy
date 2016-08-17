@@ -18,7 +18,11 @@ public class MatrixView extends Surface {
     private final ViewFunc view;
 
     public interface ViewFunc {
-        void update(int x, int y, GL2 gl);
+        /**
+         * updates the GL state for each visited matrix cell (ex: gl.glColor...)
+         * before a rectangle is drawn at the returned z-offset
+         */
+        float update(int x, int y, GL2 gl);
     }
 
     public MatrixView(int w, int h, ViewFunc view) {
@@ -30,29 +34,29 @@ public class MatrixView extends Surface {
     @Override
     protected void paint(GL2 gl) {
 
+        float h = this.h;
+        float w = this.w;
 
         if ((w == 0) || (h == 0))
             return;
 
-
         float dw = 1f / w;
         float dh = 1f / h;
+
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
 
                 try {
-                    view.update(x, y, gl);
-
-                    //                    gl.glColor3f(r, g, bl);
-                    Draw.rect(gl, x * dw, 1f - y * dh, dw, dh);
+                    float dz = view.update(x, y, gl);
+                    Draw.rect(gl, x * dw, 1f - y * dh, dw, dh, dz);
                 } catch (Exception e) {
                     logger.error("{}",e);
+                    return;
                 }
 
             }
         }
-
 
 //            //border
 //            gl.glColor4f(1f, 1f, 1f, 1f);

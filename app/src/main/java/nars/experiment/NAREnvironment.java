@@ -49,7 +49,7 @@ abstract public class NAREnvironment {
 
     public float alpha, gamma, epsilon;
 
-    @Deprecated public float gammaEpsilonFactor = 0.5f;
+    @Deprecated public float gammaEpsilonFactor = 0.25f;
 
     public float rewardValue;
     private final FasterList<MutableTask> predictors = $.newArrayList();

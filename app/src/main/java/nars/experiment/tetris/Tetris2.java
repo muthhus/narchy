@@ -1,7 +1,6 @@
 package nars.experiment.tetris;
 
 import com.google.common.collect.Lists;
-import com.lmax.disruptor.dsl.BasicExecutor;
 import nars.*;
 import nars.nar.Executioner;
 import nars.nar.MultiThreadExecutioner;
@@ -37,13 +36,12 @@ import spacegraph.obj.Plot2D;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import static nars.$.t;
 import static nars.experiment.arkanoid.Arkancide.newBeliefChart;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
+import static spacegraph.obj.GridSurface.HORIZONTAL;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
 /**
@@ -54,7 +52,7 @@ public class Tetris2 extends NAREnvironment {
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
     public static final int DEFAULT_INDEX_WEIGHT = 8 * 1000000;
 
-    public static final Executioner exe = new MultiThreadExecutioner(2, 4096);
+    public static final Executioner exe = new MultiThreadExecutioner(4, 4096);
 
 
 
@@ -78,7 +76,6 @@ public class Tetris2 extends NAREnvironment {
         public Surface plot1;
         public ConsoleSurface term = new ConsoleSurface(40, 8);
 
-        public Surface camView;
         public Surface autoenc;
         //public Plot2D lstm;
     }
@@ -282,9 +279,11 @@ public class Tetris2 extends NAREnvironment {
     public float act() {
 
 
-        float rotateMotivation = (motorRotate != null && motorRotate.hasGoals()) ? motorRotate.goals().expectation(now) : 0.5f;
+        float rotateMotivation = (motorRotate != null && motorRotate.hasGoals()) ? motorRotate.goals().freq(now) : 0.5f;
         //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
-        float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().expectation(now) : 0.5f;
+        float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().freq(now) : 0.5f;
+
+        System.out.println(leftRightMotivation);
 
         float actionMargin = 0.25f;
         float actionThresholdHigh = 1f - actionMargin;
@@ -356,12 +355,12 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.03f);
-        nar.derivedActivation.setValue(0.03f);
+        nar.inputActivation.setValue(0.1f);
+        nar.derivedActivation.setValue(0.1f);
 
 
-        nar.beliefConfidence(0.85f);
-        nar.goalConfidence(0.75f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
@@ -480,12 +479,15 @@ public class Tetris2 extends NAREnvironment {
 
 
                 int window = 32;
-                view.camView =
-                        new GridSurface(
-                            new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window)),
-                            new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)),
-                            new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window))
-                        );
+                GridSurface camHistory = new GridSurface(HORIZONTAL,
+                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window * 2)),
+                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window)),
+                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)),
+                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window)),
+                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window * 2))
+                );
+
+                newControlWindow(12f,4f, new Object[] { camHistory } );
 
                 newControlWindow(view);
 
@@ -512,10 +514,10 @@ public class Tetris2 extends NAREnvironment {
 //            g.glColor3f(r,0,0);
 
                     SensorConcept s = sensors.get(y * tetris_width + x);
-                    float b = s.hasBeliefs() ?
-                            s.beliefs().freq(now + whenRelative) : 0;
-                            //s.beliefs().expectation(now) : 0;
-                    Truth dt = s.hasGoals() ? s.goals().truth(now) : null;
+
+                    Truth b =  s.hasBeliefs() ? s.beliefs().truth(now + whenRelative) : null;
+                    float bf = b!=null ? b.freq() : 0.5f;
+                    Truth dt = s.hasGoals() ? s.goals().truth(now + whenRelative) : null;
                     float dr, dg;
                     if (dt == null) {
                         dr = dg = 0;
@@ -532,8 +534,9 @@ public class Tetris2 extends NAREnvironment {
                     }
 
                     float p = nar.conceptPriority(s);
-                    g.glColor4f(dr, dg, b, 0.5f + 0.5f * p);
+                    g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
+                    return b.conf();
                 };
             }
         };
@@ -591,12 +594,13 @@ public class Tetris2 extends NAREnvironment {
 
         NARLoop loop = t.run(runFrames, frameDelay, TIME_DILATION);
 
-        NARController meta = new NARController(nar, loop, t);
-
-        newControlWindow(Lists.newArrayList(
-                newCPanel(nar, 256, () -> meta.rewardValue),
-                newBeliefChart(meta, 200)
-        ));
+//        NARController meta = new NARController(nar, loop, t);
+//
+//        newControlWindow(Lists.newArrayList(
+//                newCPanel(nar, 256, () -> meta.rewardValue),
+//                newBeliefChart(meta, 200)
+//
+//        ));
 
         loop.join();
 
@@ -626,6 +630,7 @@ public class Tetris2 extends NAREnvironment {
             } else {
                 g.glColor3f(v,v/2,0);
             }
+            return 0;
         };
     }
 

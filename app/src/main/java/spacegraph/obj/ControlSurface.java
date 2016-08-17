@@ -28,10 +28,14 @@ public class ControlSurface extends PanelSurface {
     final IdentityHashMap built;
 
     public static void newControlWindow(Object... oo) {
+        newControlWindow(4,4,oo);
+    }
+
+    public static void newControlWindow(float w, float h, Object[] oo) {
         SpaceGraph<?> s = new SpaceGraph();
         for (Object o : oo) {
             s.add(new RectWidget(
-                    new ControlSurface(o), 4f /* width */, 4f /* height */
+                    new ControlSurface(o), w /* width */, h /* height */
             ));
         }
 

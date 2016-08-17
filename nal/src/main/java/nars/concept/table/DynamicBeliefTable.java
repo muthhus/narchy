@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import static nars.nal.Tense.ETERNAL;
+
 /**
  * Created by me on 4/4/16.
  */
@@ -78,6 +80,9 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public Truth truth(long when, long now) {
+        if (now == ETERNAL)
+            throw new UnsupportedOperationException("soon");
+
         @Nullable Task x = topTemporal(when, now, null);
         return x != null ? x.projectTruth(when, now, false) : null;
     }
