@@ -33,15 +33,23 @@ import java.util.List;
  * @since 3.6
  */
 public class InterpolatingMicrosphere {
-    /** Microsphere. */
+    /**
+     * Microsphere.
+     */
     @NotNull
     public final List<float[]> microsphere; /* n-element (size) */
-    /** Microsphere data. */
+    /**
+     * Microsphere data.
+     */
     @NotNull
     public final List<float[]> microsphereData; /* 2-element illumination, value pairs */
-    /** Space dimension. */
+    /**
+     * Space dimension.
+     */
     private final int dimension;
-    /** Number of surface elements. */
+    /**
+     * Number of surface elements.
+     */
     private final int size;
 //    /** Maximum fraction of the facets that can be dark. */
 //    private float maxDarkFraction;
@@ -56,19 +64,19 @@ public class InterpolatingMicrosphere {
      * Sub-classes are responsible for calling the {@code add(float[]) add}
      * method in order to initialize all the sphere's facets.
      *
-     * @param dimension Dimension of the data space.
-     * @param size Number of surface elements of the sphere.
+     * @param dimension       Dimension of the data space.
+     * @param size            Number of surface elements of the sphere.
      * @param maxDarkFraction Maximum fraction of the facets that can be dark.
-     * If the fraction of "non-illuminated" facets is larger, no estimation
-     * of the value will be performed, and the {@code background} value will
-     * be returned instead.
-     * @param darkThreshold Value of the illumination below which a facet is
-     * considered dark.
+     *                        If the fraction of "non-illuminated" facets is larger, no estimation
+     *                        of the value will be performed, and the {@code background} value will
+     *                        be returned instead.
+     * @param darkThreshold   Value of the illumination below which a facet is
+     *                        considered dark.
      * @throws NotStrictlyPositiveException if {@code dimension <= 0}
-     * or {@code size <= 0}.
-     * @throws NotPositiveException if {@code darkThreshold < 0}.
-     * @throws OutOfRangeException if {@code maxDarkFraction} does not
-     * belong to the interval {@code [0, 1]}.
+     *                                      or {@code size <= 0}.
+     * @throws NotPositiveException         if {@code darkThreshold < 0}.
+     * @throws OutOfRangeException          if {@code maxDarkFraction} does not
+     *                                      belong to the interval {@code [0, 1]}.
      */
     protected InterpolatingMicrosphere(int dimension,
                                        int size) {
@@ -83,7 +91,7 @@ public class InterpolatingMicrosphere {
         this.dimension = dimension;
         this.size = size;
         //this.backgroundConfidence = 1.0f;
-        microsphere =  new FasterList(size);
+        microsphere = new FasterList(size);
         microsphereData = new FasterList(size);
 
 
@@ -97,24 +105,24 @@ public class InterpolatingMicrosphere {
     /**
      * Create a sphere from randomly sampled vectors.
      *
-     * @param dimension Dimension of the data space.
-     * @param size Number of surface elements of the sphere.
-     * @param rand Unit vector generator for creating the microsphere.
+     * @param dimension       Dimension of the data space.
+     * @param size            Number of surface elements of the sphere.
+     * @param rand            Unit vector generator for creating the microsphere.
      * @param maxDarkFraction Maximum fraction of the facets that can be dark.
-     * If the fraction of "non-illuminated" facets is larger, no estimation
-     * of the value will be performed, and the {@code background} value will
-     * be returned instead.
-     * @param darkThreshold Value of the illumination below which a facet
-     * is considered dark.
-     * @param background Value returned when the {@code maxDarkFraction}
-     * threshold is exceeded.
-     * @throws DimensionMismatchException if the size of the generated
-     * vectors does not match the dimension set in the constructor.
+     *                        If the fraction of "non-illuminated" facets is larger, no estimation
+     *                        of the value will be performed, and the {@code background} value will
+     *                        be returned instead.
+     * @param darkThreshold   Value of the illumination below which a facet
+     *                        is considered dark.
+     * @param background      Value returned when the {@code maxDarkFraction}
+     *                        threshold is exceeded.
+     * @throws DimensionMismatchException   if the size of the generated
+     *                                      vectors does not match the dimension set in the constructor.
      * @throws NotStrictlyPositiveException if {@code dimension <= 0}
-     * or {@code size <= 0}.
-     * @throws NotPositiveException if {@code darkThreshold < 0}.
-     * @throws OutOfRangeException if {@code maxDarkFraction} does not
-     * belong to the interval {@code [0, 1]}.
+     *                                      or {@code size <= 0}.
+     * @throws NotPositiveException         if {@code darkThreshold < 0}.
+     * @throws OutOfRangeException          if {@code maxDarkFraction} does not
+     *                                      belong to the interval {@code [0, 1]}.
      */
     public InterpolatingMicrosphere(int dimension,
                                     int size,
@@ -122,10 +130,10 @@ public class InterpolatingMicrosphere {
         this(dimension, size);
 
         if (dimension == 1) {
-            if ((size!=2) || (rand!=null))
+            if ((size != 2) || (rand != null))
                 throw new RuntimeException("there are only 2 possible unit vectors in 1D");
-            addNormal(new float[] { -1 });
-            addNormal(new float[] { +1 });
+            addNormal(new float[]{-1});
+            addNormal(new float[]{+1});
         } else {
 
             throw new UnsupportedOperationException("TODO support float[] conversion from UnitSphereRandomVectorGenerator.nextVector()");
@@ -194,24 +202,24 @@ public class InterpolatingMicrosphere {
      * (illumination) and the interpolation is performed (integration of
      * the illumination).
      *
-     * @param targetPoint Interpolation point.
+     * @param targetPoint  Interpolation point.
      * @param samplePoints Sampling data points.
      * @param sampleValues Sampling data values at the corresponding
-     * {@code samplePoints}.
-     * @param exponent Exponent used in the power law that computes
-     * the weights (distance dimming factor) of the sample data.
+     *                     {@code samplePoints}.
+     * @param exponent     Exponent used in the power law that computes
+     *                     the weights (distance dimming factor) of the sample data.
      * @return the estimated value at the given {@code point}.
      * @throws NotPositiveException if {@code exponent < 0}.
      */
     @Nullable
-    public float[]  value(@NotNull float[] targetPoint,
-                           float[][] samplePoints,
-                           float[] sampleValues,
-                           float[] sampleWeights,
-                           float exponent,
-                           float minWeight,
-                           float darkThreshold,
-                           int numSamples) {
+    public float[] value(@NotNull float[] targetPoint,
+                         float[][] samplePoints,
+                         float[] sampleValues,
+                         float[] sampleWeights,
+                         float exponent,
+                         float minWeight,
+                         float darkThreshold,
+                         int numSamples) {
 
 
 //
@@ -223,10 +231,8 @@ public class InterpolatingMicrosphere {
             throw new NotPositiveException(darkThreshold);
         }
 
-        assert(exponent >= 0);
-        if (exponent < 0) {
-            throw new NotPositiveException(exponent);
-        }
+        assert (exponent >= 0);
+
 
         clear();
 
@@ -244,14 +250,24 @@ public class InterpolatingMicrosphere {
         float[] result = a.clone();
 
         int l = a.length;
-        for(int i = 0; i < l; ++i) {
+        for (int i = 0; i < l; ++i) {
             result[i] -= b[i];
         }
 
         return result;
     }
 
-    public static float safeNorm(float[] v) {
+    public static float safeNorm(float epsilon, float[] v) {
+        boolean zero = true;
+        for (float x : v) {
+            if (Math.abs(x) > epsilon) {
+                zero = false;
+                break;
+            }
+        }
+        if (zero)
+            return 0;
+
         double rdwarf = 3.834E-20D;
         double rgiant = 1.304E19D;
         double s1 = 0.0D;
@@ -259,17 +275,17 @@ public class InterpolatingMicrosphere {
         double s3 = 0.0D;
         double x1max = 0.0D;
         double x3max = 0.0D;
-        double floatn = (double)v.length;
+        double floatn = (double) v.length;
         double agiant = rgiant / floatn;
 
-        for(int norm = 0; norm < v.length; ++norm) {
+        for (int norm = 0; norm < v.length; ++norm) {
             double xabs = FastMath.abs(v[norm]);
-            if(xabs >= rdwarf && xabs <= agiant) {
+            if (xabs >= rdwarf && xabs <= agiant) {
                 s2 += xabs * xabs;
             } else {
                 double r;
-                if(xabs > rdwarf) {
-                    if(xabs > x1max) {
+                if (xabs > rdwarf) {
+                    if (xabs > x1max) {
                         r = x1max / xabs;
                         s1 = 1.0D + s1 * r * r;
                         x1max = xabs;
@@ -277,11 +293,11 @@ public class InterpolatingMicrosphere {
                         r = xabs / x1max;
                         s1 += r * r;
                     }
-                } else if(xabs > x3max) {
+                } else if (xabs > x3max) {
                     r = x3max / xabs;
                     s3 = 1.0D + s3 * r * r;
                     x3max = xabs;
-                } else if(xabs != 0.0D) {
+                } else if (xabs != 0.0D) {
                     r = xabs / x3max;
                     s3 += r * r;
                 }
@@ -289,11 +305,11 @@ public class InterpolatingMicrosphere {
         }
 
         double var24;
-        if(s1 != 0.0D) {
+        if (s1 != 0.0D) {
             var24 = x1max * Math.sqrt(s1 + s2 / x1max / x1max);
-        } else if(s2 == 0.0D) {
+        } else if (s2 == 0.0D) {
             var24 = x3max * Math.sqrt(s3);
-        } else if(s2 >= x3max) {
+        } else if (s2 >= x3max) {
             var24 = Math.sqrt(s2 * (1.0D + x3max / s2 * x3max * s3));
         } else {
             var24 = Math.sqrt(x3max * (s2 / x3max + x3max * s3));
@@ -303,12 +319,12 @@ public class InterpolatingMicrosphere {
     }
 
     public void illuminate(@NotNull float[] targetPoint, float[][] samplePoints, float[] sampleValues, @Nullable float[] sampleWeights, float exponent, int numSamples, float darkThreshold) {
-        float epsilon = 0.5f;
+        float epsilon = 0.01f;
 
         for (int i = 0; i < numSamples; i++) {
             // Vector between interpolation point and current sample point.
             final float[] diff = ebeSubtract(samplePoints[i], targetPoint);
-            final float diffNorm = Math.max(epsilon, safeNorm(diff));
+            final float diffNorm = safeNorm(epsilon, diff);
 
             /*if (noInterpolationTolerance>0 && Math.abs(diffNorm) < noInterpolationTolerance) {
                 // No need to interpolate, as the interpolation point is
@@ -316,12 +332,12 @@ public class InterpolatingMicrosphere {
                 return new float[] { sampleValues[i], sampleWeights == null ? 1f : sampleWeights[i] };
             } else {*/
 
-                float weight = pow(diffNorm, -exponent);
+            float weight = pow(1f + diffNorm, -exponent);
 
-                illuminate(i, diffNorm > 0 ? diff : null, sampleValues[i],
-                        weight,
-                        sampleWeights == null ? 1f : sampleWeights[i],
-                        darkThreshold);
+            illuminate(i, diffNorm > 0 ? diff : null, sampleValues[i],
+                    weight,
+                    sampleWeights == null ? 1f : sampleWeights[i],
+                    darkThreshold);
             //}
         }
     }
@@ -330,10 +346,9 @@ public class InterpolatingMicrosphere {
      * Illumination.
      *
      * @param sampleDirection Vector whose origin is at the interpolation
-     * point and tail is at the sample location.
-     * @param sampleValue Data value of the sample.
-     * @param weight Weight.
-     *
+     *                        point and tail is at the sample location.
+     * @param sampleValue     Data value of the sample.
+     * @param weight          Weight.
      */
     private void illuminate(int sampleNum, @Nullable float[] sampleDirection,
                             float sampleValue,
@@ -345,11 +360,10 @@ public class InterpolatingMicrosphere {
 
         for (int i = 0; i < size; i++) {
             final float[] n = microsphere.get(i);
-            final float cos = sampleDirection!=null ? cosAngleNormalized(n, sampleDirection) : 1;
+            final float cos = sampleDirection != null ? cosAngleNormalized(n, sampleDirection) : 1f;
 
             if (cos > 0) {
                 final float illumination = cos * weight;
-
 
 
                 if (illumination > visibleThreshold) {
@@ -357,9 +371,9 @@ public class InterpolatingMicrosphere {
 //                        if (illumination > dd[0]) {
 //                            maxData(dd, illumination, sampleValue, sampleNum);
 //                        }
-                        float[] dd = microsphereData.get(1);
+                    float[] dd = microsphereData.get(1);
 
-                        record(dd, illumination, sampleValue, conf);
+                    record(dd, illumination, sampleValue, conf);
 
                     //} else {
 //                        if (dd[0] > 0) {
@@ -375,23 +389,24 @@ public class InterpolatingMicrosphere {
         if (y == 0) {
             return 1;
         } else if (y == -1) {
-            return 1.0f/x;
+            return 1.0f / x;
         } else if (y == -2) {
-            return 1.0f/(x*x);
+            return 1.0f / (x * x);
         } else {
-            return (float)Math.pow(x, y);
+            return (float) Math.pow(x, y);
         }
     }
+
     /**
      * Replace {@code i}-th facet of the microsphere.
      * Method for initializing the microsphere facets.
      *
      * @param normal Facet's normal vector.
-     * @param copy Whether to copy the given array.
+     * @param copy   Whether to copy the given array.
      * @throws DimensionMismatchException if the length of {@code n}
-     * does not match the space dimension.
-     * @throws MaxCountExceededException if the method has been called
-     * more times than the size of the sphere.
+     *                                    does not match the space dimension.
+     * @throws MaxCountExceededException  if the method has been called
+     *                                    more times than the size of the sphere.
      */
     protected void addNormal(@NotNull float[] normal) {
         if (microsphere.size() >= size) {
@@ -404,7 +419,6 @@ public class InterpolatingMicrosphere {
         microsphere.add(normal);
         microsphereData.add(new float[4]);
     }
-
 
 
     /**
@@ -463,13 +477,15 @@ public class InterpolatingMicrosphere {
         float c = totalConf;
         //float c = totalConfDen!=0 ? totalConfNum / totalConfDen : this.backgroundConfidence;
         //float c = totalWeight /                 (size);
-                //(microsphereData.size());
+        //(microsphereData.size());
 
-        return new float[] {v, c};
+        return new float[]{v, c};
     }
 
 
-    /** assumes input vectors already normalized */
+    /**
+     * assumes input vectors already normalized
+     */
     protected static float cosAngleNormalized(@NotNull float[] x, @NotNull float[] y) {
         if (x.length == 1) {
             float x0 = x[0];
@@ -502,14 +518,18 @@ public class InterpolatingMicrosphere {
         d[3] = sampleNum; /* winner */
     }
 
-    /** assumes sampleValue in range 0..1 */
+    /**
+     * assumes sampleValue in range 0..1
+     */
     static float valueIntersection(float a, float b) {
         float s = 1f - Math.abs(a - b);
         return s;
         //return s*s;
     }
 
-    /** accumulate a measure of relevant evidence */
+    /**
+     * accumulate a measure of relevant evidence
+     */
     protected void record(float[] d, float illuminationProportion, float sampleValue, float conf) {
 
         //d[0] illumination doesnt change
@@ -524,7 +544,7 @@ public class InterpolatingMicrosphere {
 
         d[0] += illuminationProportion;
         d[1] += (illuminationProportion) * sampleValue; //(conf * illuminationProportion) * sampleValue; //weighted value
-        d[2] += conf;
+        d[2] += conf * illuminationProportion;
         //d[2] += conf; //valueIntersection(existingValue, sampleValue);
     }
 

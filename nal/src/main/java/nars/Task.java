@@ -6,6 +6,7 @@ import nars.index.TermIndex;
 import nars.nal.Stamp;
 import nars.nal.Tense;
 import nars.task.MutableTask;
+import nars.task.Revision;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
@@ -59,13 +60,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         Task pt = task.getParentTask();
         if (pt != null) {
             //sb.append("  PARENT ");
-            proof(pt, indent+1, sb);
+            proof(pt, indent + 1, sb);
         }
 
         Task pb = task.getParentBelief();
         if (pb != null) {
             //sb.append("  BELIEF ");
-            proof(pb, indent+1, sb);
+            proof(pb, indent + 1, sb);
         }
     }
 
@@ -82,11 +83,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    }
 
 
-
-    /** performs some (but not exhaustive) tests on a term to determine some cases where it is invalid as a sentence content
+    /**
+     * performs some (but not exhaustive) tests on a term to determine some cases where it is invalid as a sentence content
      * returns the compound valid for a Task if so,
      * otherwise returns null
-     * */
+     */
     @Nullable
     static boolean taskContentPreTest(@NotNull Term t, char punc, @NotNull Memory memory, boolean safe) {
 
@@ -96,9 +97,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         //t = memory.index.normalize(t, !safe);
 
         //if (!(t instanceof Compound))
-            //return test(t, "Task Term Does Not Normalize to Compound", safe);
+        //return test(t, "Task Term Does Not Normalize to Compound", safe);
 
-        Compound ct = (Compound)t;
+        Compound ct = (Compound) t;
 
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
@@ -110,13 +111,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //            throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
 //        }
 
-        if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op ==Op.IMPL || op == Op.EQUI))
+        if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op == Op.IMPL || op == Op.EQUI))
             return test(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
 
         if (t.volume() > memory.compoundVolumeMax.intValue())
             return test(t, "Term exceeds maximum volume", safe);
-        if (!t.levelValid( memory.nal() ) )
+        if (!t.levelValid(memory.nal()))
             return test(t, "Term exceeds maximum NAL level", safe);
 
         return true;
@@ -170,7 +171,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @Override
     @NotNull
-    default Task task() { return this; }
+    default Task task() {
+        return this;
+    }
 
 
     /**
@@ -181,9 +184,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      */
     boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime);
 
-    /** called when a Concept processes this Task; return false to cancel pocessing
+    /**
+     * called when a Concept processes this Task; return false to cancel pocessing
+     *
      * @param c null for command tasks, otherwise it is the concept which has has been changed by this task after its processing
-     * */
+     */
     boolean onConcept(@Nullable Concept c);
 
 
@@ -256,14 +261,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     boolean isGoal();
 
-    default boolean isCommand()  {
+    default boolean isCommand() {
         return (punc() == Symbols.COMMAND);
     }
 
     default boolean hasQueryVar() {
         return term().hasVarQuery();
     }
-
 
 
     @Nullable
@@ -280,7 +284,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Override
     boolean delete();
 
-    /** you should use this delete, not the other */
+    /**
+     * you should use this delete, not the other
+     */
     default void delete(@NotNull NAR nar) {
         nar.tasks.remove(this);
         delete();
@@ -291,7 +297,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return n.concept(term(), true);
     }
 
-    @NotNull @Override Compound<?> term();
+    @NotNull
+    @Override
+    Compound<?> term();
 
 
     default boolean isQuestOrQuestion() {
@@ -307,9 +315,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //        return true;
 //    }
 
-    /** for question tasks: when an answer appears.
-     *  return false if this question is finished and should be removed from a table containing it */
-    default boolean onAnswered(Task answer) { return true; }
+    /**
+     * for question tasks: when an answer appears.
+     * return false if this question is finished and should be removed from a table containing it
+     */
+    default boolean onAnswered(Task answer) {
+        return true;
+    }
 
 
 //    @NotNull
@@ -321,8 +333,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //                MutableTask.project(this, adjustedTruth, now, projOcc);
 //
 //    }
-
-
 
 
 //    /** get the absolute time of an event subterm, if present, TIMELESS otherwise */
@@ -373,12 +383,14 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @NotNull
-    @Deprecated default String toStringWithoutBudget() {
+    @Deprecated
+    default String toStringWithoutBudget() {
         return toStringWithoutBudget(null);
     }
 
     @NotNull
-    @Deprecated default String toStringWithoutBudget(Memory memory) {
+    @Deprecated
+    default String toStringWithoutBudget(Memory memory) {
         StringBuilder b = new StringBuilder();
         appendTo(b, memory, true, false,
                 false, //budget
@@ -390,7 +402,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Nullable
     @Deprecated
     default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/Memory memory, boolean showStamp) {
-        boolean notCommand = punc()!=Symbols.COMMAND;
+        boolean notCommand = punc() != Symbols.COMMAND;
         return appendTo(buffer, memory, true, showStamp && notCommand,
                 notCommand, //budget
                 showStamp //log
@@ -401,18 +413,16 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/@Nullable Memory memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
 
 
-
         Compound t = term();
         String contentName = t.toString();
 
         CharSequence tenseString;
-        if (memory!=null) {
+        if (memory != null) {
             tenseString = getTense(memory.time(), 1);
-        }
-        else {
+        } else {
             //TODO dont bother craeting new StringBuilder and calculating the entire length etc.. just append it to a reusable StringReader?
             appendOccurrenceTime(
-                    (StringBuilder)(tenseString = new StringBuilder()));
+                    (StringBuilder) (tenseString = new StringBuilder()));
         }
 
 
@@ -424,23 +434,22 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             stringLength += 11;
 
         if (showStamp)
-            stringLength += stampString.length()+1;
+            stringLength += stampString.length() + 1;
 
         /*if (showBudget)*/
         //"$0.8069;0.0117;0.6643$ "
-        stringLength += 1 + 6 + 1 + 6 + 1 + 6 + 1  + 1;
+        stringLength += 1 + 6 + 1 + 6 + 1 + 6 + 1 + 1;
 
         String finalLog;
         if (showLog) {
             Object ll = lastLogged();
 
-            finalLog = (ll!=null ? ll.toString() : null);
-            if (finalLog!=null)
-                stringLength += finalLog.length()+1;
+            finalLog = (ll != null ? ll.toString() : null);
+            if (finalLog != null)
+                stringLength += finalLog.length() + 1;
             else
                 showLog = false;
-        }
-        else
+        } else
             finalLog = null;
 
 
@@ -459,7 +468,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         if (tenseString.length() > 0)
             buffer.append(' ').append(tenseString);
 
-        if (truth()!= null) {
+        if (truth() != null) {
             buffer.append(' ');
             truth().appendString(buffer, 2);
         }
@@ -480,8 +489,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         List<String> log = log();
         return log == null || log.isEmpty() ? null : log.get(log.size() - 1);
     }
-
-
 
 
     @NotNull
@@ -505,15 +512,21 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @Nullable Object log(int index);
 
-    /** append a log entry; returns this task */
+    /**
+     * append a log entry; returns this task
+     */
     @NotNull
     Task log(Object entry);
 
-    /** append log entries; returns this task */
+    /**
+     * append log entries; returns this task
+     */
     @NotNull
     Task log(List entries);
 
-    /** get the recorded log entries */
+    /**
+     * get the recorded log entries
+     */
     @Nullable
     List log();
 
@@ -538,8 +551,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    }
 
 
-    /** if unnormalized, returns a normalized version of the task,
-     *  null if not normalizable
+    /**
+     * if unnormalized, returns a normalized version of the task,
+     * null if not normalizable
      */
     void normalize(@NotNull NAR memory) throws NAR.InvalidTaskException, TermIndex.InvalidConceptException;
 
@@ -593,7 +607,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     default boolean isEternal() {
-        return occurrence()== ETERNAL;
+        return occurrence() == ETERNAL;
     }
 
 
@@ -674,7 +688,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         int base = LongString.maxBase();
         for (int i = 0; i < len; i++) {
 
-            if (ev[i] == Long.MAX_VALUE && i == len-1) {
+            if (ev[i] == Long.MAX_VALUE && i == len - 1) {
                 buffer.append(';'); //trailing cyclic value
             } else {
                 buffer.append(
@@ -702,8 +716,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-
-
 //    default Truth projection(long targetTime, long now) {
 //        return projection(targetTime, now, true);
 //    }
@@ -715,43 +727,19 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
         Truth currentTruth = truth();
+        long occ = occurrence();
 
-        if ((targetTime == ETERNAL)) {
+        if (targetTime == ETERNAL) {
 
             return isEternal() ? new ProjectedTruth(currentTruth, ETERNAL) : eternalize(currentTruth);
 
         } else {
 
-
-            long occ = occurrence();
-            if (occ == targetTime)
-                return new ProjectedTruth(currentTruth, ETERNAL);
-
-            float conf = currentTruth.conf();
-
-            float nextConf;
-            long nextOcc = targetTime;
-
-
-            float projConf = nextConf =
-                    conf * projection(  targetTime, occ, now );
-
-            if (eternalizeIfWeaklyTemporal) {
-                float eternConf = eternalize(conf);
-
-                if (projConf < eternConf) {
-                    nextConf = eternConf;
-                    nextOcc = ETERNAL;
-                }
-            }
-
-            if (nextConf < Param.TRUTH_EPSILON)
-                return null;
-
-            return new ProjectedTruth(currentTruth.freq(), nextConf, nextOcc);
+            return Revision.project(currentTruth, targetTime, now, occ, eternalizeIfWeaklyTemporal);
         }
 
     }
+
 
 //    final class ExpectationComparator implements Comparator<Task>, Serializable {
 //        static final Comparator the = new ExpectationComparator();
@@ -768,7 +756,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    }
 
 
-
     @Nullable
     default Term term(int i) {
         return term().term(i);
@@ -778,6 +765,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     default Task getParentTask() {
         return null;
     }
+
     @Nullable
     default Task getParentBelief() {
         return null;
@@ -789,13 +777,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @Override
     default boolean delete(@Nullable Object removalReason) {
-        if (removalReason!=null)
+        if (removalReason != null)
             log(removalReason);
         return delete();
     }
 
     default boolean temporal() {
-        return occurrence()!=ETERNAL;
+        return occurrence() != ETERNAL;
     }
 
 

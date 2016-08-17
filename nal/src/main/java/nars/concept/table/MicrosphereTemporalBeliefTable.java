@@ -14,6 +14,7 @@ import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
@@ -338,28 +339,31 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     @Override
     public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
 
-        //make a copy so that truthpolation can freely operate asynchronously
-        int s = size();
-        if (s == 0) return null;
 
+        int s;
         Task[] copy;
         synchronized (this) {
-
-
-            copy = toArray(new Task[s]);
+            //clone a copy so that truthpolation can freely operate asynchronously
+            s = size();
+            if (s == 0) return null;
+            copy = toArrayExact(new Task[s]);
         }
 
         Truth res;
-        if (s == 1)
-            res = copy[0].projectTruth(when, now, false);
-        else
+        if (s == 1) {
+            Task the = copy[0];
+            res = the.truth();
+            if (when == now && the.occurrence() == when) //optimization: if at the current time and when
+                return res;
+
+        } else {
             res = truthpolations.get().truth(when, copy);
+        }
 
-        float confLimit = 1f - Param.TRUTH_EPSILON;
-        if (res != null && res.conf() > confLimit) //clip at max conf
-            res = $.t(res.freq(), confLimit);
-
-        return res;
+        return (res!=null && when!=now) ?
+                Revision.project(res, when, now, Revision.closestTo(copy, now).occurrence(), false) : /* projection adjustment */
+                res/* unprojected */
+                ;
     }
 
 

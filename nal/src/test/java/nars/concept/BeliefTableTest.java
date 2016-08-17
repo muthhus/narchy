@@ -86,7 +86,7 @@ public class BeliefTableTest  {
 
         Param.DEBUG = true;
 
-        int maxBeliefs = 6; //includes 3 eternal beliefs we arent using:
+        int maxBeliefs = 3; //includes 3 eternal beliefs we arent using:
         NAR n = newNAR(maxBeliefs*2);
 
 
@@ -95,28 +95,37 @@ public class BeliefTableTest  {
         //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
 
         int spacing = 2;
+        float conf = 0.85f;
 
         //create linear gradient of belief across time, freq beginning at 0 and increasing to 1
         for (int i = 0; i < maxBeliefs; i++) {
-            b.believe(0.5f, i/(float)maxBeliefs, 0.85f, i * spacing).run(spacing);
+            b.believe(0.5f, i/((float)maxBeliefs-1), conf, i * spacing).run(spacing);
             assertEquals(i+1, b.size());
         }
 
         b.print();
+        System.out.println();
+
         assertEquals(maxBeliefs, b.size());
 
-
         int margin = spacing * (maxBeliefs/2);
+
+        @NotNull BeliefTable table = b.concept().beliefs();
+
+
         for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
-            System.out.println(i + "\t" + b.concept().beliefs().truth(i));
+            System.out.println(i + "\t" + table.truth(i));
         }
         System.out.println();
         for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
-            System.out.println(i + "\t" + b.concept().beliefs().truth(i, 0   /* relative to zero */));
+            System.out.println(i + "\t" + table.truth(i, 0   /* relative to zero */));
         }
 
-        /* first */ assertEquals(0, b.concept().beliefs().truth(0).freq(), 0.05f);
-        /* last */ assertEquals(0.8f, b.concept().beliefs().truth(spacing * (maxBeliefs-1)).freq(), 0.05f);
+        /* first */
+        assertEquals(0f, table.truth(0).freq(), 0.05f);
+
+        /* last */
+        assertEquals(1f, table.truth(spacing * (maxBeliefs)).freq(), 0.05f);
 
     }
 

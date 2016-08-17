@@ -168,6 +168,15 @@ tasks (as data points in truth-time space) can be merged to empty room for incom
   belief/goal, if exists, is applied as the "background" light source in which
   temporal beliefs shine their frequency "color" to the evaluated time point.
 
+### Multithreaded Execution
+As an alternative to the original streamlined Single-thread execution mode, a multi-threaded "Executioner"
+implementation offers scalable and safe parallelism when an application of a NAR demands more throughput.
+It utilizes LMAX Disruptor (https://lmax-exchange.github.io/disruptor/) ring-buffer to dispatch tasks from multiple producers to a number of worker
+threads.  Use this in combination with a concurrent index such as CaffeineIndex, powered by Caffeine Cache (https://github.com/ben-manes/caffeine).
+Tasks and Runnable's are submitted to the Executioner from the various reasoner processes and plugins.
+By default, all activity is synchronized each frame, meaning all tasks and runnables will have been processed
+by the end of a frame.  A completely asynchronous frame-less mode is possible and will have more support in the future.
+
 ### Full-spectrum Negation
 In keeping with a design preference for unity and balanced spectral continuity, negations are 
  also handled
@@ -246,8 +255,8 @@ In keeping with a design preference for unity and balanced spectral continuity, 
   of "performatives" offered by
   classical multi-agent communication protocols like FIPA and ACL, but perhaps in a more
   natural way, and enhanced with the added expressiveness of shades of NAL truth and budget. 
-   
-   
+
+
  _Many other changes remain to be documented._
  
 

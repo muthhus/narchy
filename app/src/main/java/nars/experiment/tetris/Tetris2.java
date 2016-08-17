@@ -52,14 +52,14 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Tetris2 extends NAREnvironment {
 
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
-    public static final int DEFAULT_INDEX_WEIGHT = 5 * 1000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 8 * 1000000;
 
-    public static final Executioner exe = new MultiThreadExecutioner(3, 512);
+    public static final Executioner exe = new MultiThreadExecutioner(2, 4096);
 
 
 
     public static final int runFrames = 10000;
-    public static final int cyclesPerFrame = 16;
+    public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 2;

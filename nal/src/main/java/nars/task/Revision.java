@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.DefaultTruth;
+import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Util;
@@ -25,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.eternalize;
+import static nars.truth.TruthFunctions.projection;
 
 /**
  * Revision / Projection / Revection Utilities
@@ -326,6 +329,54 @@ public class Revision {
         Term r = $.compound(a.op(), dt, aterm.terms());
         return !(r instanceof Compound) ? strongest(aterm, bterm, aProp) : (Compound) r;
     }
+
+    @Nullable public static ProjectedTruth project(@NotNull Truth t, long target, long now, long occ, boolean eternalizeIfWeaklyTemporal) {
+
+        if (occ == target)
+            return new ProjectedTruth(t, target);
+
+        float conf = t.conf();
+
+        float nextConf;
+
+
+        float projConf = nextConf = conf * projection(target, occ, now);
+
+        if (eternalizeIfWeaklyTemporal) {
+            float eternConf = eternalize(conf);
+
+            if (projConf < eternConf) {
+                nextConf = eternConf;
+                target = ETERNAL;
+            }
+        }
+
+        if (nextConf < Param.TRUTH_EPSILON)
+            return null;
+
+        float maxConf = 1f - Param.TRUTH_EPSILON;
+        if (nextConf > maxConf) //clip at max conf
+            nextConf = maxConf;
+
+        return new ProjectedTruth(t.freq(), nextConf, target);
+    }
+
+    /** get the task which occurrs nearest to the target time */
+    @NotNull public static Task closestTo(@NotNull Task[] t, long when) {
+        Task best = t[0];
+        long bestDiff = Math.abs(when - best.occurrence());
+        for (int i = 1; i < t.length; i++) {
+            Task x = t[i];
+            long o = x.occurrence();
+            long diff = Math.abs(when - o);
+            if (diff < bestDiff) {
+                best = x;
+                bestDiff = diff;
+            }
+        }
+        return best;
+    }
+
 }
 
 

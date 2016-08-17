@@ -38,9 +38,10 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 32;
+    private static final int cyclesPerFrame = 16;
     public static final int runFrames = 20000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 64;
+    public static final int INDEX_SIZE = 6 * 1000000;
     final Arkanoid noid;
     private final SwingCamera cam;
 
@@ -207,7 +208,7 @@ public class Arkancide extends NAREnvironment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 3 * 1000000, false, exe)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), INDEX_SIZE, false, exe)
                 , new FrameClock(), exe) {
 
             VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);

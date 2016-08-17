@@ -22,7 +22,7 @@ import static nars.truth.TruthFunctions.c2w;
  */
 public final class TruthPolation extends InterpolatingMicrosphere {
 
-    public static final float[] ZEROTIME = { 0.1f }; //a value in (0..1.0) represents a partial time-step offset so that no time-points being compared will be the same as this (either to the left or right), given that the task times are long int
+    public static final float[] ZEROTIME = { 0f };
 
     @NotNull final float[][] times;
     @NotNull final float[] freq;
@@ -54,12 +54,11 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         //float ecap = eternal.capacity();
         //float eternalization = ecap / (ecap + tcap));
 
-        float minWeight = Param.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
+        @Deprecated float minWeight = 0; //Param.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
 
-        float thresh = Param.TRUTH_EPSILON;
+        @Deprecated float thresh = 0; //Param.TRUTH_EPSILON;
 
-        return truth(when, tasks,
-                minWeight, thresh);
+        return truth(when, tasks, minWeight, thresh);
 
     }
 
