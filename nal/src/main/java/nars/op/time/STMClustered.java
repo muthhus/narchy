@@ -202,8 +202,8 @@ public class STMClustered extends STM {
         /** current centroid */
         @Nullable TasksNode node;
 
-        public TLink(@NotNull Task t, float p, float d, float q) {
-            super(t, p, d, q);
+        public TLink(@NotNull Task t, Budgeted b) {
+            super(t, b);
             this.coord = getCoord(t);
         }
 
@@ -296,9 +296,10 @@ public class STMClustered extends STM {
 
             @NotNull
             @Override
-            protected BLink<Task> newLink(@NotNull Task i, float p, float d, float q) {
-                return new TLink(i, p, d, q);
+            protected BLink<Task> newLink(Task i, Budgeted b) {
+                return new TLink(i, b);
             }
+
 
             @Override
             protected BLink<Task> prePutNew(Task k, BLink<Task> v) {

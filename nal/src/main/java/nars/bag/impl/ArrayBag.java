@@ -180,11 +180,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
         Insertion ii = new Insertion(this, b, scale, overflow);
-        //synchronized (map) {
-        BLink<V> r = compute(key, ii);
-        //}
+        BLink<V> r = map.compute(key, ii);
 
-        BLink<V> dd = ii.displaced;
+        BLink<V> dd;
 
         if (ii.activated > 0) {
 
@@ -199,13 +197,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
             putActive(key);
 
-        } else {
-            dd = ii.displaced;
-        }
+            if (dd != null) {
+                removeKeyForValue(dd);
+                dd.delete();
+            }
 
-        if (dd != null) {
-            removeKeyForValue(dd);
-            dd.delete();
         }
 
         if (ii.activated < 0) {
@@ -215,24 +211,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    /**
-     * the applied budget will not become effective until commit()
-     */
-    @NotNull
-    protected final void putExists(@NotNull Budgeted b, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
-
-        if (existing == b) {
-            throw new RuntimeException("budget self merge");
-        }
-
-        float pBefore = existing.priNext() * existing.durNext();
-        float o = mergeFunction.merge(existing, b, 1f);
-        if (overflow != null)
-            overflow.add(o);
-
-        this.mass += existing.priNext() * existing.durNext() - pBefore;
-
-    }
+//    /**
+//     * the applied budget will not become effective until commit()
+//     */
+//    @NotNull
+//    protected final void putExists(@NotNull Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
+//
+//
+//
+//    }
 
 //    @NotNull
 //    protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b) {
@@ -245,11 +232,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //    }
 
     @NotNull
-    protected BLink<V> newLink(@NotNull V i, float p, float d, float q) {
+    protected BLink<V> newLink(@NotNull V i, Budgeted b) {
+
         if (i instanceof Budgeted)
-            return new StrongBLinkToBudgeted((Budgeted) i, p, d, q);
+            return new StrongBLinkToBudgeted((Budgeted) i, b);
         else
-            return new StrongBLink(i, p, d, q);
+            return new StrongBLink(i,b);
     }
 
     protected @Nullable BLink<V> prePutNew(@NotNull V k, @NotNull BLink<V> v) {
@@ -626,9 +614,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @NotNull
     @Override
     public String toString() {
-        synchronized (map) {
+        //synchronized (map) {
             return super.toString() + '{' + items.getClass().getSimpleName() + '}';
-        }
+        //}
     }
 
 
@@ -681,21 +669,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * Created by me on 8/15/16.
      */
-    static final class Insertion<V> implements BiFunction<V, BLink<V>, BLink<V>> {
+    static final class Insertion<V> implements BiFunction<V, BLink, BLink> {
 
-        private ArrayBag<V> arrayBag;
+        private ArrayBag arrayBag;
         @Nullable
         private final MutableFloat overflow;
         private final Budgeted b;
 
-        private final float scale;
-
         /**
+         * TODO this field can be re-used for 'activated' return value
          * -1 = deactivated, +1 = activated, 0 = no change
          */
-        int activated = 0;
+        private final float scale;
 
-        @Nullable BLink<V> displaced = null;
+        int activated = 0;
 
         public Insertion(ArrayBag arrayBag, Budgeted b, float scale, @Nullable MutableFloat overflow) {
             this.arrayBag = arrayBag;
@@ -704,37 +691,43 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             this.overflow = overflow;
         }
 
-        private BLink<V> newLink(@NotNull V key) {
-            return arrayBag.newLink(key, b.pri() * scale, b.qua(), b.dur());
-        }
 
         @Nullable
         @Override
-        public BLink<V> apply(@NotNull V key, @Nullable BLink<V> existing) {
+        public BLink apply(@NotNull Object key, @Nullable BLink existing) {
 
 
             if (existing != null) {
-                arrayBag.putExists(newLink(key), existing, overflow);
+
+                if (existing == b) {
+                    throw new RuntimeException("budget self merge");
+                }
+
+                float pBefore = existing.priNext() * existing.durNext();
+                float o = arrayBag.mergeFunction.merge(existing, b, scale);
+                if (overflow != null)
+                    overflow.add(o);
+
+                arrayBag.mass += existing.priNext() * existing.durNext() - pBefore;
+
                 return existing;
             } else {
 
-                BLink d, r;
+                BLink r;
                 float bp = b.pri() * scale;
                 int activated;
                 if (arrayBag.minPriIfFull > bp) {
                     //insufficient budget
                     arrayBag.pending += bp * b.dur(); //include failed input in pending
-                    d = null;
                     activated = -1;
                     r = null;
                 } else {
                     //successfully displaced another item
-                    BLink nvv = newLink(key);
-
+                    BLink nvv = arrayBag.newLink(key, b);
+                    nvv.priMult(scale);
 
                     //if (d != nvv) {
                         activated = +1;
-                        d = null;
                         r = nvv;
                     //} else {
                       //  activated = -1;
@@ -742,7 +735,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     //}
                 }
                 this.activated = activated;
-                this.displaced = d;
                 return r;
             }
         }

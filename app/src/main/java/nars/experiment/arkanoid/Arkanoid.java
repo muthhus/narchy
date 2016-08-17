@@ -313,6 +313,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 		//this.createBufferStrategy(2);
 
+		paddle.x = SCREEN_WIDTH / 2;
 
 		reset();
 
@@ -323,8 +324,6 @@ public class Arkanoid extends JFrame implements KeyListener {
 		score = 0;
 		ball.x = SCREEN_WIDTH / 2;
 		ball.y = SCREEN_HEIGHT / 2;
-		paddle.x = SCREEN_WIDTH / 2;
-
 	}
 
 //	void run() {

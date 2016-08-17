@@ -57,6 +57,8 @@ public class VariableCompressor implements Consumer<Task> {
         int n = nar.compoundVolumeMax.intValue();
         if (contnt.volume() + VOLUME_SAFETY_THRESH >= n)
             return null;
+        if (contnt.size() < 2)
+            return null;
 
         //if (contnt.op() == CONJ) {
 
@@ -68,7 +70,7 @@ public class VariableCompressor implements Consumer<Task> {
             //        contents.forEachWithOccurrences((x, o) -> {
             //            System.out.println(o + " x " + x);
             //        });
-            if (contents.size() > 1) {
+            if (contents.size() > 0) {
 
                 final Term[] max = {null};
                 final int[] score = {0};

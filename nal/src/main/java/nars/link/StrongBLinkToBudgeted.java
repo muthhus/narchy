@@ -10,11 +10,10 @@ import org.jetbrains.annotations.NotNull;
 public final class StrongBLinkToBudgeted<B extends Budgeted> extends StrongBLink<B> {
 
 
-    public StrongBLinkToBudgeted(@NotNull B id, float p, float d, float q) {
-        super(id, p, d, q);
+    public StrongBLinkToBudgeted(@NotNull B id, Budgeted b) {
+        super(id, b);
+
     }
-
-
 
     @Override
     public void commit() {

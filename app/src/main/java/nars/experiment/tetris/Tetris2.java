@@ -61,14 +61,14 @@ public class Tetris2 extends NAREnvironment {
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 2;
-    static boolean easy = true;
+    static boolean easy = false;
 
     static int frameDelay;
 
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
+    private final int visionSyncPeriod = 16; //16 * TIME_DILATION;
 
     public class View {
 
@@ -283,7 +283,6 @@ public class Tetris2 extends NAREnvironment {
         //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
         float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().freq(now) : 0.5f;
 
-        System.out.println(leftRightMotivation);
 
         float actionMargin = 0.33f; //divide the range into 3 sections: left/nothing/right
         float actionThresholdHigh = 1f - actionMargin;
@@ -335,7 +334,7 @@ public class Tetris2 extends NAREnvironment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Param.DEBUG = true;
+        Param.DEBUG = false;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1300,
@@ -359,7 +358,7 @@ public class Tetris2 extends NAREnvironment {
         nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.7f);
+        nar.beliefConfidence(0.85f);
         nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
@@ -401,8 +400,8 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 4);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 4);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
