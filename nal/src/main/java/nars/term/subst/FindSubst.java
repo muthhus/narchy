@@ -603,9 +603,9 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
         //assert (y != null);
-        xy.put(x, y);
-        return true;
+        return xy.tryPut(x, y);
     }
+
 
     /**
      * true if the match assignment is allowed by constraints
@@ -640,6 +640,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
         xy.forEachVersioned(each);
+    }
+
+    public final boolean isFull() {
+        return versioning.isFull();
     }
 
 

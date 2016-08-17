@@ -39,8 +39,6 @@ public final class CommutivePermutations extends Termutator {
     @Override
     public void run(@NotNull FindSubst f, Termutator[] chain, int current) {
         int start = f.now();
-        if (start >= Param.UnificationStackMax)
-            return; //HACK prevent this another way before reaching here
 
         ShuffledSubterms p = this.perm;
         p.reset();

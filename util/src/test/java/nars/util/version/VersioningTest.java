@@ -6,10 +6,11 @@ import org.junit.Test;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
- * Created by me on 12/3/15.
+ * TODO test capacity restriction
  */
 public class VersioningTest {
 
@@ -68,7 +69,9 @@ public class VersioningTest {
 
     public void initTestSequence1(boolean print) {
 
-        if (print) System.out.println(v);      a.set("a0");
+        if (print) System.out.println(v);
+        Versioned z = a.set("a0");
+        assertNotNull(z);
         if (print) System.out.println(v);      a.set("a1");
         if (print) System.out.println(v);      b.set("b0");
         if (print) System.out.println(v);      a.set("a2");

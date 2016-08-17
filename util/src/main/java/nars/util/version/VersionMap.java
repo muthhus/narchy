@@ -101,14 +101,15 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     @Override
     public void putAll(Map<? extends X, ? extends Y> m) {
-        if (m instanceof VersionMap) {
-            VersionMap<X,Y> o = (VersionMap)m;
-            o.map.forEach((k,v) -> put(k, v.get()));
-        }
-        else {
-            //default
-            super.putAll(m);
-        }
+        throw new UnsupportedOperationException();
+//        if (m instanceof VersionMap) {
+//            VersionMap<X,Y> o = (VersionMap)m;
+//            o.map.forEach((k,v) -> put(k, v.get()));
+//        }
+//        else {
+//            //default
+//            super.putAll(m);
+//        }
     }
 
     /**
@@ -117,9 +118,14 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
      */
     @Override
     public final Y put(X key, Y value) {
-        getOrCreateIfAbsent(key).set(value);
-        return null;
+        throw new UnsupportedOperationException("use tryPut(k,v)");
     }
+
+    public final boolean tryPut(X key, Y value) {
+        return getOrCreateIfAbsent(key).set(value)!=null;
+    }
+
+
 
 
     public final Versioned getOrCreateIfAbsent(X key) {
@@ -181,16 +187,16 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return v != null ? v.get() : null;
     }
 
-    @Nullable
-    public Y get(X key, @NotNull Supplier<Y> ifAbsentPut) {
-        //TODO use compute... Map methods
-        Y o = get(key);
-        if (o == null) {
-            o = ifAbsentPut.get();
-            put(key, o);
-        }
-        return o;
-    }
+//    @Nullable
+//    public Y get(X key, @NotNull Supplier<Y> ifAbsentPut) {
+//        //TODO use compute... Map methods
+//        Y o = get(key);
+//        if (o == null) {
+//            o = ifAbsentPut.get();
+//            put(key, o);
+//        }
+//        return o;
+//    }
 
     public final Versioned<Y> version(X key) {
         //return map.computeIfPresent(key, (k, v) -> v == null || v.isEmpty() ? null : v);
@@ -213,13 +219,11 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
             final Y y = this.y;
             BiPredicate<X, Y> a = this.assigner;
             if (vy == null) {
-                return a.test(x, y) ? map.newEntry(x).set(y) : null;
+                return a.test(x, y) ?  map.newEntry(x).set(y) : null;
             } else {
                 Y yy = vy.get();
                 if (yy == null) {
-                    if (a.test(x, y))
-                        vy.set(y);
-                    else
+                    if (!a.test(x, y) || (vy.set(y)==null))
                         return null;
                 } else if (!yy.equals(y)) {
                     return null; //conflict

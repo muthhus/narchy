@@ -55,11 +55,11 @@ public class Tetris2 extends NAREnvironment {
 
 
 
-    public static final int runFrames = 300;
-    public static final int cyclesPerFrame = 32;
+    public static final int runFrames = 3000;
+    public static final int cyclesPerFrame = 8;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 2;
+    public static final int TIME_PER_FALL = 4;
     static boolean easy = false;
 
     static int frameDelay;
@@ -337,7 +337,7 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1300,
-                32, 2, 2, rng,
+                64, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
 
                 , new FrameClock(), exe
@@ -357,14 +357,14 @@ public class Tetris2 extends NAREnvironment {
         nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.85f);
-        nar.goalConfidence(0.7f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.03f);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -399,8 +399,8 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 4);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 4);
+        MySTMClustered stm = new MySTMClustered(nar, 512, '.', 5);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);

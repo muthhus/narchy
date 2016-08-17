@@ -97,12 +97,17 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 
     /**
      * sets thens commits
+     * returns null if the capacity was hit, or some other error
      */
-    @NotNull
-    public Versioned set(X nextValue) {
+    @Nullable
+    public Versioned<X> set(X nextValue) {
         @Nullable X current = this.current;
-        if (current == null || !current.equals(nextValue)) {
-            set(context.newChange(this), this.current = nextValue);
+        if (current!=nextValue) {
+        //if (current == null || !current.equals(nextValue)) {
+            int next = context.nextChange(this);
+            if (next == -1)
+                return null;
+            set(next, this.current = nextValue);
         }
         return this;
     }

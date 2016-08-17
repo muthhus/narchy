@@ -53,8 +53,7 @@ public class PremiseEval extends FindSubst {
             assert(t!=null); //confMin should be greater than or equal to truthResolution
         }
 
-        this.punct.set(new PremiseEval.TruthPuncEvidence(t, p, evidence));
-        return true;
+        return this.punct.set(new PremiseEval.TruthPuncEvidence(t, p, evidence))!=null;
     }
 
     @Nullable public Truth dither(@NotNull Truth t) {
@@ -192,8 +191,10 @@ public class PremiseEval extends FindSubst {
             finish = false;
         }
 
-        if (constraints != null)
-            this.constraints.set(constraints);
+        if (constraints != null) {
+            if (this.constraints.set(constraints)==null)
+                return;
+        }
 
         matchAll(x, y, finish);
 

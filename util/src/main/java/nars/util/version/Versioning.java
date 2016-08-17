@@ -8,8 +8,11 @@ import java.util.Arrays;
 /** versioning context that holds versioned instances */
 abstract public class Versioning extends FasterList<Versioned> {
 
+    private final int capacity;
+
     public Versioning(int capacity) {
         super(0, new Versioned[capacity]);
+        this.capacity = capacity;
     }
 
 
@@ -30,12 +33,18 @@ abstract public class Versioning extends FasterList<Versioned> {
     }
 
 
-    /** start a new version with a commit, returns current version  */
-    public final int newChange(Versioned v) {
+    /** start a new version with a commit, returns current version
+     *  @return -1 if capacity exceeded
+     * */
+    public final int nextChange(Versioned v) {
         int c = ++now;
-        if (!addIfCapacity(v))
-            throw new RuntimeException("Versioned stack fault");
-        return c;
+        if (c == capacity) {
+            now--; //return to original value
+            return -1;
+        } else {
+            add(v);
+            return c;
+        }
     }
 
     /** track change on current commit, returns current version */
@@ -112,5 +121,9 @@ abstract public class Versioning extends FasterList<Versioned> {
 
     public <Y> void delete(Versioned<Y> v) {
         v.delete();
+    }
+
+    public final boolean isFull() {
+        return now+1 >= capacity;
     }
 }

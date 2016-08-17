@@ -49,7 +49,7 @@ public abstract class Param /*extends Container*/ implements Level {
      * maximum changes logged in deriver's stack.
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationStackMax = 64;
+    public final static int UnificationStackMax = 48;
     /**
      * max # of chained termutes which can be active
      * bigger number means deeper unification depth for bigger compounds and more permutations
