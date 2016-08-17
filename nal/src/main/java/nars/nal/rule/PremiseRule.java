@@ -271,6 +271,8 @@ public class PremiseRule extends GenericCompound {
         put("PatternOp1", 25);
 
         put(TaskPunctuation.class, 22);
+        put(TaskPositive.class, 21); //includes either positive or negative
+
         put(events.class, 20);
 
         put("PatternOp0", 20);
@@ -286,8 +288,8 @@ public class PremiseRule extends GenericCompound {
 
 
 
-//        put(TaskNegative.class, 8);
-//        put(TaskPositive.class, 8);
+
+
 //        put(BeliefNegative.class, 7);
 //        put(BeliefPositive.class, 7);
 
@@ -306,6 +308,8 @@ public class PremiseRule extends GenericCompound {
         if (b instanceof AbstractPatternOp.PatternOp)
             return "PatternOp" + (((AbstractPatternOp.PatternOp) b).subterm == 0 ? "0" : "1"); //split
 
+
+        if ((b == TaskPositive.the) || (b == TaskNegative.the)) return TaskPositive.class;
 
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;

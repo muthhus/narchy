@@ -28,8 +28,8 @@ public final class TermNotEquals extends AtomicBoolCondition {
         this.b = b;
         this.bPath = bPath;
         String s = getClass().getSimpleName() + '(' +
-                        Integer.toString(a) + ':' + Arrays.toString(aPath) + ',' +
-                        Integer.toString(b) + ':' + Arrays.toString(bPath) +
+                        Integer.toString(a) + ((aPath.length > 0) ?  ':' + Arrays.toString(aPath) + ',' : "")+
+                        Integer.toString(b) + ((bPath.length > 0) ?  ':' + Arrays.toString(bPath) : "")+
                 ')';
         s = s.replace('[', '(').replace(']',')'); //make the path into a product ( )
         this.id = s;
