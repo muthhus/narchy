@@ -1,5 +1,6 @@
 package nars.nal.op;
 
+import nars.$;
 import nars.Op;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
@@ -8,6 +9,7 @@ import nars.term.subst.OneMatchFindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.NEG;
 import static nars.nal.TermBuilder.False;
 
 /**
@@ -53,8 +55,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 
         @Nullable Op op = unifying();
 
-        final Term x = xx[1];
-        final Term y = xx[2];
+        Term x = xx[1];
+        Term y = xx[2];
 
         boolean hasAnyOp = term.hasAny(op);
 
@@ -62,8 +64,20 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return False; //FAILED?
         }
 
+
+        boolean xNegated = (x.op() == NEG);
+        if (xNegated)
+            x = $.unneg(x).term();
+        boolean yNegated = (y.op() == NEG);
+        if (yNegated)
+            y = $.unneg(y).term();
+
+        boolean equals = Term.equalAtemporally(x, y);
+        //boolean equals = x.equals(y);
+
+
         //boolean equals = Term.equalAtemporally(x, y);
-        boolean equals = x.equals(y);
+
         if (!equals && hasAnyOp) {
             OneMatchFindSubst m = this.subMatcher;
             m.clear();
