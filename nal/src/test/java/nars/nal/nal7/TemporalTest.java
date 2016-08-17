@@ -377,7 +377,7 @@ public class TemporalTest {
 
         n.input("(x ==>+5 y).");
         n.input("(y ==>-5 x).");
-        n.next();
+        n.next().next();
 
         StringBuilder cc = new StringBuilder();
         TreeSet d = new TreeSet((x,y)-> x.toString().compareTo(y.toString()));

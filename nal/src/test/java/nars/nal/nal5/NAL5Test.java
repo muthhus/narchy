@@ -450,7 +450,7 @@ public class NAL5Test extends AbstractNALTest {
 
     @Test public void testNegPosImplicationSubj() {
         test()
-                //.log()
+                .log()
                 .input("(x). %0.0;0.90%")
                 .input("((--,(x)) ==> (y)).")
                 .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
@@ -484,6 +484,23 @@ public class NAL5Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(y)", '.', 0.5f, 1f, 0, 1, ETERNAL)
         ;
     }
-
+    @Test public void testNegNegEquivPred() {
+        test()
+                .log()
+                .input("(--,(y)).")
+                .input("((--,(x)) <=> (--,(y))).")
+                .mustBelieve(cycles, "(x)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(x)", '.', 0.5f, 1f, 0, 1, ETERNAL)
+        ;
+    }
+    @Test public void testNegNegEquivPredInv() {
+        test()
+                .log()
+                .input("(y).")
+                .input("((--,(x)) <=> (--,(y))).")
+                .mustBelieve(cycles, "(x)", 1.0f, 0.81f)
+                .mustNotOutput(cycles, "(x)", '.', 0f, 0.5f, 0, 1, ETERNAL)
+        ;
+    }
 
 }
