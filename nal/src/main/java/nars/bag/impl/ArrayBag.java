@@ -696,6 +696,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         @Override
         public BLink apply(@NotNull Object key, @Nullable BLink existing) {
 
+            float scale = this.scale;
+            Budgeted b = this.b;
+            ArrayBag bag = this.arrayBag;
 
             if (existing != null) {
 
@@ -704,11 +707,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 }
 
                 float pBefore = existing.priNext() * existing.durNext();
-                float o = arrayBag.mergeFunction.merge(existing, b, scale);
+                float o = bag.mergeFunction.merge(existing, b, scale);
                 if (overflow != null)
                     overflow.add(o);
 
-                arrayBag.mass += existing.priNext() * existing.durNext() - pBefore;
+                bag.mass += existing.priNext() * existing.durNext() - pBefore;
 
                 return existing;
             } else {
@@ -716,23 +719,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 BLink r;
                 float bp = b.pri() * scale;
                 int activated;
-                if (arrayBag.minPriIfFull > bp) {
+                if (bag.minPriIfFull > bp) {
                     //insufficient budget
-                    arrayBag.pending += bp * b.dur(); //include failed input in pending
+                    bag.pending += bp * b.dur(); //include failed input in pending
                     activated = -1;
                     r = null;
                 } else {
                     //successfully displaced another item
-                    BLink nvv = arrayBag.newLink(key, b);
+                    BLink nvv = bag.newLink(key, b);
                     nvv.priMult(scale);
 
-                    //if (d != nvv) {
-                        activated = +1;
-                        r = nvv;
-                    //} else {
-                      //  activated = -1;
-                      //  r = null;
-                    //}
+                    activated = +1;
+                    r = nvv;
                 }
                 this.activated = activated;
                 return r;

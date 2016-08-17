@@ -174,6 +174,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
      */
     public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
 
+        if (!finish) {
+            termutes.clear(); //HACK this only allows 2-step matchAll, for N-step use an extra boolean 'start' parameter to clear it here
+        }
+
         if (match(x, y)) {
 
             if (finish) {

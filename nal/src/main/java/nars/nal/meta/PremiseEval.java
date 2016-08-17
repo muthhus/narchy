@@ -9,6 +9,7 @@ import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
+import nars.nal.op.Derive;
 import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
 import nars.term.Compound;
@@ -207,11 +208,17 @@ public class PremiseEval extends FindSubst {
 
     @Override
     public boolean onMatch() {
-        if (termutes-- >= 0) {
+        if (termutes-- < 0) {
+            return false;
+        }
+        try {
             forEachMatch.accept(this);
             return true;
+        } catch (Exception e) {
+            if (Param.DEBUG_DERIVER)
+                Derive.logger.warn("{}\n\tderiving {}", e.toString(), ((Derive)forEachMatch).rule.source);
+            return false;
         }
-        return false;
     }
 
 
@@ -280,12 +287,12 @@ public class PremiseEval extends FindSubst {
 
         this.conclusion = c;
 
+        revert(start); //do this before starting in case the last execution was interrupted
         deriver.run(this);
-        revert(start);
 
+        this.premise = null;
         this.conclusion = null; //forget a reference to the local field copy but return this instance
         this.evidenceDouble = this.evidenceSingle = null;
-        this.premise = null;
 
         return c;
     }

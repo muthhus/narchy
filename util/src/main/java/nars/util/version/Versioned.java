@@ -100,7 +100,8 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      */
     @NotNull
     public Versioned set(X nextValue) {
-        if (this.current!=nextValue) {
+        @Nullable X current = this.current;
+        if (current == null || !current.equals(nextValue)) {
             set(context.newChange(this), this.current = nextValue);
         }
         return this;

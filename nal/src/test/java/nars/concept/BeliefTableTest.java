@@ -160,7 +160,7 @@ public class BeliefTableTest  {
 
         //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
 
-        int spacing = 2;
+        int spacing = 4;
         float conf = 0.85f;
 
         //create linear gradient of belief across time, freq beginning at 0 and increasing to 1
@@ -189,20 +189,20 @@ public class BeliefTableTest  {
 
         /* first */
         @Nullable Truth firstBeliefTruth = table.truth(0);
-        assertEquals(0f, firstBeliefTruth.freq(), 0.15f);
+        assertEquals(0f, firstBeliefTruth.freq(), 0.2f);
 
         /* last */
         @Nullable Truth lastBeliefTruth = table.truth(spacing * (maxBeliefs - 1));
-        assertEquals(1f, lastBeliefTruth.freq(), 0.15f);
+        assertEquals(1f, lastBeliefTruth.freq(), 0.2f);
 
         /** closer to 0.5 as uncertainty grows */
         @Nullable Truth endTruth = table.truth(spacing * (maxBeliefs - 1) + margin);
-        assertEquals(0.5f, endTruth.freq(), 0.15f);
+        assertEquals(0.5f, endTruth.freq(), 0.2f);
         assertTrue(lastBeliefTruth.conf() > endTruth.conf());
 
         /** closer to 0.5 as uncertainty grows */
         @Nullable Truth startTruth = table.truth(0 - margin);
-        assertEquals(0.5f, startTruth.freq(), 0.15f);
+        assertEquals(0.5f, startTruth.freq(), 0.2f);
         assertTrue(firstBeliefTruth.conf() > startTruth.conf());
     }
 

@@ -43,14 +43,16 @@ public abstract class Param /*extends Container*/ implements Level {
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public static final MutableInteger compoundVolumeMax = new MutableInteger(72);
+    public static final MutableInteger compoundVolumeMax = new MutableInteger(64);
 
     /**
-     * maximum changes logged in deriver's stack
+     * maximum changes logged in deriver's stack.
+     * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationStackMax = 96;
+    public final static int UnificationStackMax = 64;
     /**
      * max # of chained termutes which can be active
+     * bigger number means deeper unification depth for bigger compounds and more permutations
      */
     public final static int UnificationTermutesMax = 8;
     /**
@@ -143,17 +145,17 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
 
-    /** confidence factor to multiply eternalizable temporal beliefs.
-     *  displaced temporal beliefs and goals can be eternalized before being deleted, possibly preserving some of their truth value
-     *  should be equal to or less than 1.0, so that resulting eternal beliefs dont override temporal beliefs of the smae confidence.
-     *  (although revision can accumulate higher confidence).
-     *
-     *  this is applied after the usual TruthFunctions.eternalize function
-     *  that determines a (lower) confidence value for the given temporal.
-     *
-     *  set to 0.0 to disable this functionality.
-     */
-    public static float ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR = 1f;
+//    /** confidence factor to multiply eternalizable temporal beliefs.
+//     *  displaced temporal beliefs and goals can be eternalized before being deleted, possibly preserving some of their truth value
+//     *  should be equal to or less than 1.0, so that resulting eternal beliefs dont override temporal beliefs of the smae confidence.
+//     *  (although revision can accumulate higher confidence).
+//     *
+//     *  this is applied after the usual TruthFunctions.eternalize function
+//     *  that determines a (lower) confidence value for the given temporal.
+//     *
+//     *  set to 0.0 to disable this functionality.
+//     */
+//    public static float ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR = 1f;
 
     /** confidence multiplier for revection merges during temporal belief table compression.
      *

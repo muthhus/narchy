@@ -36,7 +36,7 @@ import static nars.nal.Tense.*;
 public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
-    final static Logger logger = LoggerFactory.getLogger(Derive.class);
+    public final static Logger logger = LoggerFactory.getLogger(Derive.class);
 
     public final boolean eternalize;
 
@@ -102,19 +102,13 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
         Term r;
-        try {
+
             Term cp = this.conclusionPattern;
             r = m.index.resolve(cp, m);
 
             if (r instanceof Compound) { //includes null test
                 derive(m, (Compound) r, ct);
             }
-
-        } catch (Exception e) {
-            if (Param.DEBUG_DERIVER)
-                logger.warn("{}\n\tderiving concluson {}", e.toString(), rule.source);
-            return;
-        }
 
     }
 

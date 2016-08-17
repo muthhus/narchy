@@ -173,7 +173,7 @@ public abstract class AbstractCore {
 
                 nar.inputLater(derive);
             } catch (Exception e) {
-                logger.error("run {}", e);
+                logger.error("run {}", e.toString());
             }
 
 

@@ -110,7 +110,7 @@ public class PatrickTests extends AbstractNALTest {
         //tt.log();
 
         tt.mustOutput(0, 500, "lighter({SELF}, toothbrush)", '!', 1f, 1f,
-                0.1f, 1f, //at least 30% confidence
+                0.07f, 1f, //at least some confidence
                 /*@*/ -30L);  //is this correct time? might be off by +/-10 , will check
 
         tt.input("made_of:(toothbrush,plastic).",

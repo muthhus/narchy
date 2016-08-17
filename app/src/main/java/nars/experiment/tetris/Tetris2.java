@@ -52,7 +52,7 @@ public class Tetris2 extends NAREnvironment {
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
     public static final int DEFAULT_INDEX_WEIGHT = 6 * 1000000;
 
-    public static final Executioner exe = new MultiThreadExecutioner(2, 4096);
+    public static final Executioner exe = new MultiThreadExecutioner(3, 4096);
 
 
 
