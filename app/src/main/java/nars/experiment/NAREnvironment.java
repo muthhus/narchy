@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.SimpleSpatial;
 
 import java.util.List;
 
@@ -57,6 +58,9 @@ abstract public class NAREnvironment {
 
     int ticksBeforeObserve = 0, ticksBeforeDecide = 0;
     protected long now;
+    private long stopTime;
+    private NARLoop loop;
+
 
     public NAREnvironment(NAR nar) {
         this.nar = nar;
@@ -104,7 +108,7 @@ abstract public class NAREnvironment {
      */
     protected abstract float act();
 
-    public void next() {
+    protected void next() {
 
         for (int i = 0; i < ticksBeforeObserve; i++)
             nar.clock.tick();
@@ -114,7 +118,6 @@ abstract public class NAREnvironment {
         for (int i = 0; i < ticksBeforeDecide; i++)
             nar.clock.tick();
 
-        //nar.next();
 
 
         now = nar.time();
@@ -124,6 +127,13 @@ abstract public class NAREnvironment {
         if (trace)
             System.out.println(summary());
 
+
+        if (now >= stopTime) {
+            if (loop!=null) {
+                loop.stop();
+                this.loop = null;
+            }
+        }
     }
 
     public String summary() {
@@ -195,34 +205,24 @@ abstract public class NAREnvironment {
 
     }
 
-    public NARLoop run(int cycles, int frameDelayMS) {
-        return run(cycles, frameDelayMS, 0);
-    }
-
-    public NARLoop run(final int cycles, int frameDelayMS, final int timeDilation) {
+    public NARLoop run(final int cycles, int frameDelayMS) {
 
         ticksBeforeDecide = 0;
-        ticksBeforeObserve = timeDilation;
+        ticksBeforeObserve = 0;
+
+        this.stopTime = nar.time() + cycles;
+
+        System.gc();
 
         init(nar);
 
         mission();
 
-        System.gc();
+        nar.onFrame(nn -> next());
 
-        NARLoop l = new NARLoop(nar, frameDelayMS) {
+        this.loop = new NARLoop(nar, frameDelayMS);
 
-            @Override
-            public void frame(@NotNull NAR nar) {
-                super.frame(nar);
-                next();
-                if (nar.time() >= cycles*(1+timeDilation))
-                    stop();
-            }
-        };
-
-
-        return l;
+        return loop;
 
 //        nar.next(); //step one for any mission() results to process first
 //

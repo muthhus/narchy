@@ -3,7 +3,6 @@ package nars;
 
 import com.google.common.collect.Sets;
 import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.LiteBlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.WorkHandler;
 import com.lmax.disruptor.dsl.Disruptor;

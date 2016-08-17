@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.util.*;
 
 import static nars.$.t;
-import static nars.experiment.arkanoid.Arkancide.newBeliefChart;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.HORIZONTAL;
@@ -56,7 +55,7 @@ public class Tetris2 extends NAREnvironment {
 
 
 
-    public static final int runFrames = 10000;
+    public static final int runFrames = 300;
     public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -591,7 +590,7 @@ public class Tetris2 extends NAREnvironment {
         //addCamera(t, nar, 8, 8);
 
 
-        NARLoop loop = t.run(runFrames, frameDelay, TIME_DILATION);
+        NARLoop loop = t.run(runFrames, frameDelay);
 
 //        NARController meta = new NARController(nar, loop, t);
 //

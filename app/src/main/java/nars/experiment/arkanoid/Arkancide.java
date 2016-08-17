@@ -281,7 +281,7 @@ public class Arkancide extends NAREnvironment {
         Arkancide t = new Arkancide(nar);
 
 
-        NARLoop loop = t.run(runFrames, 0,0);
+        NARLoop loop = t.run(runFrames, 0);
 
         //Tetris2.NARController meta = new Tetris2.NARController(nar, loop, t);
         //newBeliefChart(meta, 500);

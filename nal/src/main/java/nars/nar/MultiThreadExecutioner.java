@@ -1,11 +1,9 @@
 package nars.nar;
 
-import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.LiteBlockingWaitStrategy;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.WorkHandler;
+import com.lmax.disruptor.*;
 import com.lmax.disruptor.dsl.BasicExecutor;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.ProducerType;
 import nars.NAR;
 import nars.Task;
@@ -14,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -22,14 +21,16 @@ import java.util.function.Consumer;
 public class MultiThreadExecutioner extends Executioner {
 
 
-
     private final int threads;
     private final RingBuffer<TaskEvent> ring;
+    private SequenceBarrier barrier;
 
 
     static final class TaskEvent {
-        @Nullable public Task[] tasks;
-        @Nullable public Runnable r;
+        @Nullable
+        public Task[] tasks;
+        @Nullable
+        public Runnable r;
     }
 
     @NotNull
@@ -41,19 +42,21 @@ public class MultiThreadExecutioner extends Executioner {
 
     public MultiThreadExecutioner(int threads, int ringSize, Executor exe) {
 
-        //this.runWorker = (ForkJoinPool) Executors.newWorkStealingPool(runThreads);
         this.threads = threads;
 
 
         this.disruptor = new Disruptor<>(
-                () -> new TaskEvent(),
+                TaskEvent::new,
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
+                new SleepingWaitStrategy()
+                //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
-                new LiteBlockingWaitStrategy()
+                //new LiteBlockingWaitStrategy()
         );
         this.ring = disruptor.getRingBuffer();
+
 
     }
 
@@ -82,8 +85,10 @@ public class MultiThreadExecutioner extends Executioner {
         WorkHandler[] taskWorker = new WorkHandler[threads];
         for (int i = 0; i < threads; i++)
             taskWorker[i] = new TaskEventWorkHandler(nar);
-        disruptor.handleEventsWithWorkerPool(taskWorker);
+        EventHandlerGroup workers = disruptor.handleEventsWithWorkerPool(taskWorker);
 
+        //barrier = workers.asSequenceBarrier();
+        barrier = workers.asSequenceBarrier();
 
         disruptor.start();
     }
@@ -96,22 +101,40 @@ public class MultiThreadExecutioner extends Executioner {
 //                }
         //}
 
-        //long used = size - ring.remainingCapacity();
 
-        RingBuffer<TaskEvent> ring = this.ring;
-        while (ring.remainingCapacity() < ring.getBufferSize()) {
-            //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
+        //long cap = ring.remainingCapacity();
+        //int size = ring.getBufferSize();
+        //if (cap!= size) {
+        /*while ((cap = ring.remainingCapacity()) < ring.getBufferSize())*/
 
-            //logger.info( "<-- seq=" + ring.getCursor() + " remain=" + cap);// + " last=" + last[0]);
-
-            //Thread.yield();
-            //Util.pause(1);
+        //System.out.println("waiting for: " + e + " free=" + cap);
             try {
-                Thread.sleep(0);
-            } catch (InterruptedException e) {
-
+                barrier.waitFor(ring.getCursor());
+            } catch (AlertException e1) {
+                e1.printStackTrace();
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            } catch (TimeoutException e1) {
+                e1.printStackTrace();
             }
-        }
+        //}
+
+        //long used = size - ring.remainingCapacity();
+//
+//        RingBuffer<TaskEvent> ring = this.ring;
+//        while (ring.remainingCapacity() < ring.getBufferSize()) {
+//            //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
+//
+//            //logger.info( "<-- seq=" + ring.getCursor() + " remain=" + cap);// + " last=" + last[0]);
+//
+//            //Thread.yield();
+//            //Util.pause(1);
+//            try {
+//                Thread.sleep(0);
+//            } catch (InterruptedException e) {
+//
+//            }
+//        }
 
 
     }
@@ -135,7 +158,7 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public boolean executeMaybe(Runnable r) {
-       return ring.tryPublishEvent(runPublisher, r);
+        return ring.tryPublishEvent(runPublisher, r);
     }
 
     private final static class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
@@ -149,7 +172,7 @@ public class MultiThreadExecutioner extends Executioner {
         @Override
         public void onEvent(@NotNull TaskEvent te) throws Exception {
             Task[] tt = te.tasks;
-            if (tt!=null) {
+            if (tt != null) {
                 te.tasks = null;
                 try {
                     nar.input(tt);
@@ -158,7 +181,7 @@ public class MultiThreadExecutioner extends Executioner {
                 }
             }
             Runnable rr = te.r;
-            if (rr!=null) {
+            if (rr != null) {
                 te.r = null;
                 try {
                     rr.run();
