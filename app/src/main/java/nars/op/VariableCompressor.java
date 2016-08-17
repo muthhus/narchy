@@ -68,7 +68,7 @@ public class VariableCompressor implements Consumer<Task> {
             //        contents.forEachWithOccurrences((x, o) -> {
             //            System.out.println(o + " x " + x);
             //        });
-            if (contents.size() > 0) {
+            if (contents.size() > 1) {
 
                 final Term[] max = {null};
                 final int[] score = {0};

@@ -50,9 +50,9 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Tetris2 extends NAREnvironment {
 
     public static final int TIME_DILATION = 0; //resolution in between frames for interpolation space
-    public static final int DEFAULT_INDEX_WEIGHT = 8 * 1000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 6 * 1000000;
 
-    public static final Executioner exe = new MultiThreadExecutioner(4, 4096);
+    public static final Executioner exe = new MultiThreadExecutioner(3, 4096);
 
 
 
@@ -61,7 +61,7 @@ public class Tetris2 extends NAREnvironment {
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 2;
-    static boolean easy = false;
+    static boolean easy = true;
 
     static int frameDelay;
 
@@ -285,7 +285,7 @@ public class Tetris2 extends NAREnvironment {
 
         System.out.println(leftRightMotivation);
 
-        float actionMargin = 0.25f;
+        float actionMargin = 0.33f; //divide the range into 3 sections: left/nothing/right
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
 
@@ -335,11 +335,11 @@ public class Tetris2 extends NAREnvironment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Param.DEBUG = false;
+        Param.DEBUG = true;
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(2048,
-                32, 3, 3, rng,
+        Default nar = new Default(1300,
+                32, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
 
                 , new FrameClock(), exe
@@ -355,18 +355,18 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.1f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.7f);
+        nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -401,7 +401,7 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 2);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new ArithmeticInduction(nar);
@@ -536,7 +536,7 @@ public class Tetris2 extends NAREnvironment {
                     float p = nar.conceptPriority(s);
                     g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
-                    return b.conf();
+                    return b!=null ? b.conf() : 0;
                 };
             }
         };

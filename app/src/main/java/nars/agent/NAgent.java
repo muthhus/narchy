@@ -323,16 +323,15 @@ public class NAgent implements Agent {
     public static float varPct(NAR nar) {
         if (nar instanceof Default) {
             DoubleSummaryStatistics is = new DoubleSummaryStatistics();
-            ((Default)nar).core.concepts.forEach(x -> {
-                if (x!=null) {
-                    @Nullable Concept xx = x.get();
-                    if (xx != null) {
-                        Term tt = xx.term();
-                        float v = tt.volume();
-                        int c = tt.complexity();
-                        is.accept((v - c) / v);
-                    }
+            nar.forEachActiveConcept(xx -> {
+
+                if (xx != null) {
+                    Term tt = xx.term();
+                    float v = tt.volume();
+                    int c = tt.complexity();
+                    is.accept((v - c) / v);
                 }
+
             });
 
             return (float) is.getAverage();

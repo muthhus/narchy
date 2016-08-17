@@ -133,15 +133,16 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         return super.remove(object);
     }
 
-    private final void remove(@NotNull Task removed, @NotNull List<Task> displ) {
+    private final boolean remove(@NotNull Task removed, @NotNull List<Task> displ) {
         int i = indexOf(removed);
         if (i == -1)
-            return;
+            return false;
 
         Task x = remove(i, displ);
         if (x != removed) {
             throw new RuntimeException("equal but different instances: " + removed);
         }
+        return x!=null;
     }
 
 
@@ -223,15 +224,13 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         if (a == null)
             return null;
 
-        remove(a, displ);
+        if (!remove(a, displ)) {
+            return null; //dont continue if there was a problem removing a (like it got removed already by a different thread or something)
+        }
 
         Task b = weakest(now, a, Float.POSITIVE_INFINITY);
 
-        if (b != null) {
-
-            //TaskTable.removeTask(b, "Revection Revision", displ);
-            remove(b, displ);
-
+        if (b != null && remove(b, displ)) {
             return merge(a, b, now, concept, eternal);
         } else {
             return input;
@@ -253,48 +252,48 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
         float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
 
-        /**
-         * compute an integration of the area under the trapezoid formed by
-         * computing the projected truth at the 'a' and 'b' time points
-         * and mixing them by their relative confidence.
-         * this is to represent a loss of confidence due to diffusion of
-         * truth across a segment of time spanned by these two tasks as
-         * they are merged into one.
-         */
-        float diffuseCost;
-        /*if (minTime()==ETERNAL) {
-            throw new RuntimeException(); //shouldnt happen
-        } else {*/
-        long aocc = a.occurrence();
-        long bocc = b.occurrence();
-        float aProj = projection(mid, now, aocc);
-        float bProj = projection(mid, now, bocc);
+//        /**
+//         * compute an integration of the area under the trapezoid formed by
+//         * computing the projected truth at the 'a' and 'b' time points
+//         * and mixing them by their relative confidence.
+//         * this is to represent a loss of confidence due to diffusion of
+//         * truth across a segment of time spanned by these two tasks as
+//         * they are merged into one.
+//         */
+//        float diffuseCost;
+//        /*if (minTime()==ETERNAL) {
+//            throw new RuntimeException(); //shouldnt happen
+//        } else {*/
+//        long aocc = a.occurrence();
+//        long bocc = b.occurrence();
+//        float aProj = projection(mid, now, aocc);
+//        float bProj = projection(mid, now, bocc);
+//
+//        //TODO lerp blend these values ? avg? min?
+//        diffuseCost =
+//                //aveAri(aProj + bProj)/2f;
+//                //Math.min(aProj, bProj);
+//                and(aProj, bProj);
+//
+////        float relMin = projection(minTime(), mid, now);
+////        float relMax = projection(maxTime(), mid, now);
+////        float relevance = Math.max(relMin, relMax );
+//
+//
+        float confScale = Param.REVECTION_CONFIDENCE_FACTOR * (1f - overlap);
+//
+//        if (confScale < Param.BUDGET_EPSILON) //TODO use NAR.confMin which will be higher than this
+//            return null;
+//
+//        confScale = Math.min(1f, confScale);
 
-        //TODO lerp blend these values ? avg? min?
-        diffuseCost =
-                //aveAri(aProj + bProj)/2f;
-                //Math.min(aProj, bProj);
-                and(aProj, bProj);
+        Truth t = truth(mid, now, eternal);
 
-//        float relMin = projection(minTime(), mid, now);
-//        float relMax = projection(maxTime(), mid, now);
-//        float relevance = Math.max(relMin, relMax );
+        if (t != null) {
+            t = t.confMult(confScale);
 
-
-        float confScale = Param.REVECTION_CONFIDENCE_FACTOR * diffuseCost * (1f - overlap);
-
-        if (confScale < Param.BUDGET_EPSILON) //TODO use NAR.confMin which will be higher than this
-            return null;
-
-        confScale = Math.min(1f, confScale);
-
-        Truth truth = truth(mid, now, eternal);
-
-        if (truth != null) {
-            truth = truth.confMult(confScale);
-
-            if (truth != null)
-                return Revision.merge(a, b, mid, now, truth, concept);
+            if (t != null)
+                return Revision.merge(a, b, mid, now, t, concept);
         }
 
         return null;
