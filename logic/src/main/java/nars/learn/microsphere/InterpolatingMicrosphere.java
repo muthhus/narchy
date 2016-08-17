@@ -21,6 +21,7 @@ import nars.util.data.list.FasterList;
 import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
 import org.apache.commons.math3.util.FastMath;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -195,6 +196,7 @@ public class InterpolatingMicrosphere {
         return size;
     }
 
+
     /**
      * Estimate the value at the requested location.
      * This microsphere is placed at the given {@code point}, contribution
@@ -206,7 +208,7 @@ public class InterpolatingMicrosphere {
      * @param samplePoints Sampling data points.
      * @param sampleValues Sampling data values at the corresponding
      *                     {@code samplePoints}.
-     * @param exponent     Exponent used in the power law that computes
+     * @param distanceToLuminosity     Exponent used in the power law that computes
      *                     the weights (distance dimming factor) of the sample data.
      * @return the estimated value at the given {@code point}.
      * @throws NotPositiveException if {@code exponent < 0}.
@@ -216,20 +218,15 @@ public class InterpolatingMicrosphere {
                          float[][] samplePoints,
                          float[] sampleValues,
                          float[] sampleWeights,
-                         float exponent,
+                         FloatToFloatFunction distanceToLuminosity,
                          int numSamples) {
-
-
-
-        assert (exponent >= 0);
-
 
         clear();
 
 
         // Contribution of each sample point to the illumination of the
         // microsphere's facets.
-        illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, exponent, numSamples);
+        illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, distanceToLuminosity, numSamples);
 
         return interpolate();
 
@@ -308,27 +305,21 @@ public class InterpolatingMicrosphere {
         return (float) var24;
     }
 
-    public void illuminate(@NotNull float[] targetPoint, float[][] samplePoints, float[] sampleValues, @Nullable float[] sampleWeights, float exponent, int numSamples) {
+    public void illuminate(@NotNull float[] targetPoint, float[][] samplePoints, float[] sampleValues, @Nullable float[] sampleWeights, FloatToFloatFunction distanceToLuminosity, int numSamples) {
         float epsilon = 0.01f;
 
         for (int i = 0; i < numSamples; i++) {
             // Vector between interpolation point and current sample point.
             final float[] diff = ebeSubtract(samplePoints[i], targetPoint);
-            final float diffNorm = safeNorm(epsilon, diff);
+            final float distance = safeNorm(epsilon, diff);
 
-            /*if (noInterpolationTolerance>0 && Math.abs(diffNorm) < noInterpolationTolerance) {
-                // No need to interpolate, as the interpolation point is
-                // actually (very close to) one of the sampled points.
-                return new float[] { sampleValues[i], sampleWeights == null ? 1f : sampleWeights[i] };
-            } else {*/
+            float luminosity = distanceToLuminosity.valueOf(distance);
 
-            float weight = pow(1f + diffNorm, -exponent);
-
-            @Nullable float[] sampleDirection = diffNorm > 0 ? diff : null;
+            @Nullable float[] sampleDirection = distance!=0 ? diff : null;
             float conf = sampleWeights == null ? 1f : sampleWeights[i];
 
 
-            int vectors = diffNorm!=0  ? this.size : 1; //if exactly on-point then only compute once, otherwise compute for each microsphere vecctor
+            int vectors = distance!=0  ? this.size : 1; //if exactly on-point then only compute once, otherwise compute for each microsphere vecctor
 
             for (int i1 = 0; i1 < vectors; i1++) {
 
@@ -336,7 +327,7 @@ public class InterpolatingMicrosphere {
                 final float cos = sampleDirection != null ? cosAngleNormalized(n, sampleDirection) : 1f;
 
                 if (cos > 0) {
-                    final float illumination = cos * weight;
+                    final float illumination = cos * luminosity;
                     if (illumination > 0) {
                         record(microsphereData.get(1), illumination, sampleValues[i], conf);
                     }
@@ -351,6 +342,8 @@ public class InterpolatingMicrosphere {
             return 1;
         } else if (y == -1) {
             return 1.0f / x;
+        } else if (y == -0.5f) {
+            return 1f / (float)Math.sqrt(y);
         } else if (y == -2) {
             return 1.0f / (x * x);
         } else {
@@ -388,7 +381,7 @@ public class InterpolatingMicrosphere {
      * @return the value estimated from the current illumination of the
      * microsphere.
      */
-    @Nullable
+    @NotNull
     private float[] interpolate() {
 
         int size = this.size;
@@ -443,14 +436,14 @@ public class InterpolatingMicrosphere {
         d[3] = sampleNum; /* winner */
     }
 
-    /**
-     * assumes sampleValue in range 0..1
-     */
-    static float valueIntersection(float a, float b) {
-        float s = 1f - Math.abs(a - b);
-        return s;
-        //return s*s;
-    }
+//    /**
+//     * assumes sampleValue in range 0..1
+//     */
+//    static float valueIntersection(float a, float b) {
+//        float s = 1f - Math.abs(a - b);
+//        return s;
+//        //return s*s;
+//    }
 
     /**
      * accumulate a measure of relevant evidence

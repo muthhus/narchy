@@ -54,10 +54,10 @@ public class Arkancide extends NAREnvironment {
     final int visH = 18;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 24;
+    private int visionSyncPeriod = 160;
     float noiseLevel = 0;
 
-    float paddleSpeed = 25f;
+    float paddleSpeed = 75f;
     private float prevScore;
 
     public class View {
@@ -144,7 +144,7 @@ public class Arkancide extends NAREnvironment {
 
         actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b,d)->{
 
-            noid.paddle.move((motorLeftRight.goals().freq(now) - 0.5f) * paddleSpeed);
+            noid.paddle.move((motorLeftRight.goals().expectation(now) - 0.5f) * paddleSpeed);
             return d;
             //return $.t((float)(noid.paddle.x / noid.SCREEN_WIDTH), 0.9f);
 
@@ -224,12 +224,12 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.25f);
-        nar.derivedActivation.setValue(0.25f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.75f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;

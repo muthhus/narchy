@@ -116,12 +116,13 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 //            this.setBackground(0.5f, 0);
 //        }
 
-        float exp = Param.TEMPORAL_MICROSPHERE_EXPONENT;
+
+
         float[] v = this.value(
                 ZEROTIME,
                 times,
                 freq, conf,
-                exp,
+                Param.timeToLuminosity,
                 n);
         return $.t(v[0], w2c(v[1]));
     }

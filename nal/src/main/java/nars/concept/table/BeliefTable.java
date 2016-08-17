@@ -359,8 +359,8 @@ public interface BeliefTable extends TaskTable {
 
 
 
-    @Nullable default Truth truth(long now) {
-        return truth(now, now);
+    @Nullable default Truth truth(long when) {
+        return truth(when, ETERNAL);
     }
 
     /** finds the strongest matching belief for the given term (and its possible 'dt' value) and the given occurrence time.

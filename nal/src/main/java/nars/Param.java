@@ -9,6 +9,7 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -128,7 +129,17 @@ public abstract class Param /*extends Container*/ implements Level {
      * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
      * see: the microsphere interpolation paper for analysis on this parameter
      */
-    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1f;
+    public static FloatToFloatFunction timeToLuminosity = (dt) -> {
+        //luminosity curve function
+        // see: https://en.wikipedia.org/wiki/Inverse-square_law
+        //      https://en.wikipedia.org/wiki/Distance_decay
+        //      https://en.wikipedia.org/wiki/Proportionality_(mathematics)#Inverse_proportionality
+        //float timeRate = 1f;
+        //return InterpolatingMicrosphere.pow(Math.max(0.5f, diffNorm)*timeRate, -exponent);
+
+        return 1 / (1 + dt);
+
+    };
 
 
 
