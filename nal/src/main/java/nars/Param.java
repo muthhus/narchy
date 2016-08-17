@@ -66,15 +66,11 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.001f;
+    public static final float BUDGET_EPSILON = 0.0005f;
 
 
     public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
     public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
-
-
-    /** yielding interval for waiting to finish worker threads */
-    public static final int QUIESENCE_TIMEOUT_MS = 50;
 
 
 
@@ -139,7 +135,9 @@ public abstract class Param /*extends Container*/ implements Level {
         //float timeRate = 1f;
         //return InterpolatingMicrosphere.pow(Math.max(0.5f, diffNorm)*timeRate, -exponent);
 
-        return 1 / (1 + dt);
+        return 1f / (1f + dt);
+        //return 1f / ( (float)Math.sqrt(1+dt));
+        //return 1f / ( (float)Math.pow(1+dt, 1.5f));
 
     };
 

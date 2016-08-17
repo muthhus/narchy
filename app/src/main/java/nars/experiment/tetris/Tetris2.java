@@ -48,17 +48,17 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 8 * 1000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 8 * 100000;
 
-    public static final Executioner exe = new MultiThreadExecutioner(2, 4096);
+    public static final Executioner exe = new MultiThreadExecutioner(3, 4096);
 
 
 
     public static final int runFrames = 50000;
-    public static final int cyclesPerFrame = 8;
+    public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 6;
+    public static final int TIME_PER_FALL = 3;
     static boolean easy = false;
 
     static int frameDelay;
@@ -66,7 +66,7 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 16; //16 * TIME_DILATION;
+    private final int visionSyncPeriod = 8; //16 * TIME_DILATION;
 
     public class View {
 
@@ -336,7 +336,7 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1300,
-                64, 3, 2, rng,
+                16, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
 
                 , new FrameClock(), exe
@@ -356,14 +356,14 @@ public class Tetris2 extends NAREnvironment {
         nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.6f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.03f);
+        nar.confMin.setValue(0.02f);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -413,7 +413,7 @@ public class Tetris2 extends NAREnvironment {
                 super.init(nar);
 
                 AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                        tetris_width/2, 8 /* states */,
+                        tetris_width/2, 5 /* states */,
                         0.05f);
                 view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 
@@ -523,10 +523,10 @@ public class Tetris2 extends NAREnvironment {
                         float c = dt.conf();
                         if (f > 0.5f) {
                             dr = 0;
-                            dg = (f - 0.5f) * 2f * c;
+                            dg = (f - 0.5f) * 2f;// * c;
                         } else {
                             dg = 0;
-                            dr = (0.5f - f) * 2f * c;
+                            dr = (0.5f - f) * 2f;// * c;
                         }
                     }
 
@@ -811,7 +811,7 @@ public class Tetris2 extends NAREnvironment {
 
                     new MotorConcept("(envCuriosity)", nar, (b, d) -> {
                         float exp = d.freq();
-                        env.epsilon = exp;
+                        env.epsilonProbability = exp;
                         env.gammaEpsilonFactor = exp*exp;
                         return d;
                     })

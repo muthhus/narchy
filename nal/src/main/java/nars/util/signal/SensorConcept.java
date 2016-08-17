@@ -66,8 +66,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     /** originating from this sensor, or a future prediction */
     @Override
     public boolean validBelief(@NotNull Task t, @NotNull NAR nar) {
-        return onlyDerivationsIfFuture(t, nar);
-        //return true;
+        //return onlyDerivationsIfFuture(t, nar);
+        return true;
     }
     @Override
     public boolean validGoal(@NotNull Task t, @NotNull NAR nar) {
@@ -138,7 +138,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             }
 
             if (t!=null) {
-                this.desire = new MutableTask(term(), Symbols.GOAL, t).log("Sensor Goal");
+                this.desire = new MutableTask(term(), Symbols.GOAL, t).budget(1f, 1f).log("Sensor Goal");
                 //policy(policy(), nar.time()); //trigger capacity update
                 sensor.nar.inputLater(this.desire);
             }

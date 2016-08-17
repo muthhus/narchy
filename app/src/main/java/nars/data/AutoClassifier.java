@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
 
     private static final Logger logger = LoggerFactory.getLogger(AutoClassifier.class);
+    public static final @NotNull Atom AE = $.the("ae");
 
     private final NAR nar;
     private final List<? extends SensorConcept> input;
@@ -37,8 +38,9 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
     private final int strides;
     private final int stride;
     private final float conf;
+    private final Compound aeBase;
 
-    private int metaInterval = 16;
+    private int metaInterval = 100;
 
     public AutoClassifier(Term base, NAR nar, List<? extends SensorConcept> input, int stride, int output, float alpha) {
         super(stride, output, nar.random );
@@ -46,6 +48,7 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
         this.input = input;
         this.alpha = alpha;
         this.base = base;
+        this.aeBase = $.p(base, AE);
         this.epsilon = 0.01f;
         this.conf = nar.confidenceDefault(Symbols.BELIEF);
         this.stride = stride;
@@ -103,13 +106,18 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
     }
 
     @NotNull
-    private Atom state(int which) {
+    private Term state(int which) {
+        //even though the state can be identified by an integer,
+        //it does not have the same meaning as integers used
+        //elsewhere. however once the autoencoder stabilizes
+        //these can be relied on as semantically secure in their context
+        //return $.p(aeBase, new Termject.IntTerm(which));
         return $.the("X" + which);
     }
 
     @NotNull
     private Compound input(int stride, Term state) {
-        return $.instprop(stride(stride), state);
+        return $.inst(stride(stride), state);
         //return $.image(2, false, base, new Termject.IntTerm(stride), state);
     }
 
@@ -125,8 +133,10 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
         for (int i = 0; i < strides; i++) {
             List<? extends SensorConcept> l = input.subList(k, Math.min(n, k + stride));
             //TODO re-use the same eternal belief to reactivate itself
-            Compound x = $.inh($.sete(
-                    l.stream().map(CompoundConcept::term).toArray(Term[]::new)),
+            Compound x = $.inh(
+                    $.sete(
+                        l.stream().map(CompoundConcept::term).toArray(Term[]::new)
+                    ),
                     //input(i, unknown).term(0) //the image internal
                     stride(i)
             );

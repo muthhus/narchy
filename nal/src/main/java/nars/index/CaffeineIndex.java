@@ -22,6 +22,9 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static nars.nal.UtilityFunctions.or;
+import static nars.truth.TruthFunctions.c2w;
+
 
 public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
@@ -50,15 +53,12 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         } else {
             scale = 1f;
         }
-        float w = 1 + v.complexity() * 10f;
-
-
-        return (int)(w * scale);
+        return Math.round( 1 + v.complexity() * scale);
     };
 
     private static float maxConfidence(@NotNull CompoundConcept v) {
         //return Math.max(v.beliefs().confMax(), v.goals().confMax());
-        return v.beliefs().confMax() + v.goals().confMax();
+        return ((v.beliefs().confMax()) + (v.goals().confMax()));
     }
 
 
@@ -75,7 +75,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor executor) {
         super(conceptBuilder);
 
-        long maxSubtermWeight = maxWeight * 2; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
+        long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
         Caffeine<Termed, Termed> builder = prepare(Caffeine.newBuilder(), soft);
 

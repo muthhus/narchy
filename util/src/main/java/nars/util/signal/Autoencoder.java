@@ -196,6 +196,7 @@ public class Autoencoder {
 		return y;
 	}
 
+	/** returns the total error (not avg_error = error sum divided by # items) */
 	public float train(float[] x, float learningRate,
 					   float noiseLevel, float corruptionRate,
 					   boolean sigmoid) {
@@ -239,7 +240,7 @@ public class Autoencoder {
 			vbias[i] += learningRate * lv;
 		}
 
-		error /= n_visible;
+		//error /= n_visible;
 
 		int n = n_visible;
 		float[] y = this.y;

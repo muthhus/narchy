@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.SimpleSpatial;
 
 import java.util.List;
 
@@ -48,9 +47,9 @@ abstract public class NAREnvironment {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<MotorConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilon;
+    public float alpha, gamma, epsilonProbability = 0.02f;
 
-    @Deprecated public float gammaEpsilonFactor = 0.25f;
+    @Deprecated public float gammaEpsilonFactor = 0.5f;
 
     public float rewardValue;
     private final FasterList<MutableTask> predictors = $.newArrayList();
@@ -72,7 +71,6 @@ abstract public class NAREnvironment {
                 //gamma
         ;
 
-        epsilon = 0.07f;
         this.reinforcementAttention = gamma;
 
         float rewardConf = alpha;
@@ -246,7 +244,7 @@ abstract public class NAREnvironment {
 
 
             for (MotorConcept c : actions) {
-                if (Math.random() < epsilon) {
+                if (nar.random.nextFloat() < epsilonProbability) {
                     nar.inputLater(new GeneratedTask(c, '!',
                             $.t(nar.random.nextFloat()
                             //Math.random() > 0.5f ? 1f : 0f

@@ -39,10 +39,10 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 16;
+    private static final int cyclesPerFrame = 4;
     public static final int runFrames = 20000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
-    public static final int INDEX_SIZE = 6 * 1000000;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 128;
+    public static final int INDEX_SIZE = 6 * 100000;
     final Arkanoid noid;
     private final SwingCamera cam;
 
@@ -123,18 +123,19 @@ public class Arkancide extends NAREnvironment {
                 float c = d.conf();
                 if (f > 0.5f) {
                     dr = 0;
-                    dg = (f - 0.5f) * 2f * c;
+                    dg = (f - 0.5f) * 2f;// * c;
                 } else {
                     dg = 0;
-                    dr = (0.5f - f) * 2f * c;
+                    dr = (0.5f - f) * 2f;// * c;
                 }
             }
 
             float maxConceptPriority = ((Default)nar).core.concepts.priMax(); //TODO cache this
-            float p = nar.conceptPriority(s) / maxConceptPriority;
+            float p = nar.conceptPriority(s);
+            p /= maxConceptPriority;
             g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
-            return or(b!=null ? b.conf() : 0 , d!=null ? d.conf() : 0);
+            return (b!=null ? b.conf() : 0) + (d!=null ? d.conf() : 0);
 
         };
 
@@ -224,18 +225,18 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.2f);
+        nar.derivedActivation.setValue(0.2f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.6f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.01f);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
