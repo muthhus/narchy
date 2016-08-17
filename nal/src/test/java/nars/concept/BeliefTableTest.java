@@ -4,12 +4,15 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.table.BeliefTable;
 import nars.truth.DefaultTruth;
+import nars.truth.Truth;
 import nars.util.analyze.BeliefAnalysis;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
-import static nars.concept.RevisionTest.newNAR;
+import static nars.task.RevisionTest.newNAR;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 7/5/15.
@@ -81,54 +84,6 @@ public class BeliefTableTest  {
     }
 
 
-    @Test
-    public void testInterpolation() {
-
-        Param.DEBUG = true;
-
-        int maxBeliefs = 3; //includes 3 eternal beliefs we arent using:
-        NAR n = newNAR(maxBeliefs*2);
-
-
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
-
-        //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
-
-        int spacing = 2;
-        float conf = 0.85f;
-
-        //create linear gradient of belief across time, freq beginning at 0 and increasing to 1
-        for (int i = 0; i < maxBeliefs; i++) {
-            b.believe(0.5f, i/((float)maxBeliefs-1), conf, i * spacing).run(spacing);
-            assertEquals(i+1, b.size());
-        }
-
-        b.print();
-        System.out.println();
-
-        assertEquals(maxBeliefs, b.size());
-
-        int margin = spacing * (maxBeliefs/2);
-
-        @NotNull BeliefTable table = b.concept().beliefs();
-
-
-        for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
-            System.out.println(i + "\t" + table.truth(i));
-        }
-        System.out.println();
-        for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
-            System.out.println(i + "\t" + table.truth(i, 0   /* relative to zero */));
-        }
-
-        /* first */
-        assertEquals(0f, table.truth(0).freq(), 0.05f);
-
-        /* last */
-        assertEquals(1f, table.truth(spacing * (maxBeliefs)).freq(), 0.05f);
-
-    }
-
 
     @Test
     public void testEternalBeliefRanking() {
@@ -192,6 +147,65 @@ public class BeliefTableTest  {
         //b.print();
 
     }
+    @Test
+    public void testPolation0() {
+
+        Param.DEBUG = true;
+
+        int maxBeliefs = 3; //includes 3 eternal beliefs we arent using:
+        NAR n = newNAR(maxBeliefs*2);
+
+
+        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+
+        //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
+
+        int spacing = 2;
+        float conf = 0.85f;
+
+        //create linear gradient of belief across time, freq beginning at 0 and increasing to 1
+        for (int i = 0; i < maxBeliefs; i++) {
+            b.believe(0.5f, i/((float)maxBeliefs-1), conf, i * spacing).run(spacing);
+            assertEquals(i+1, b.size());
+        }
+
+        b.print();
+        System.out.println();
+
+        assertEquals(maxBeliefs, b.size());
+
+        int margin = spacing * (maxBeliefs/2);
+
+        @NotNull BeliefTable table = b.concept().beliefs();
+
+
+        for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
+            System.out.println(i + "\t" + table.truth(i));
+        }
+        System.out.println();
+        for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
+            System.out.println(i + "\t" + table.truth(i, 0   /* relative to zero */));
+        }
+
+        /* first */
+        @Nullable Truth firstBeliefTruth = table.truth(0);
+        assertEquals(0f, firstBeliefTruth.freq(), 0.15f);
+
+        /* last */
+        @Nullable Truth lastBeliefTruth = table.truth(spacing * (maxBeliefs - 1));
+        assertEquals(1f, lastBeliefTruth.freq(), 0.15f);
+
+        /** closer to 0.5 as uncertainty grows */
+        @Nullable Truth endTruth = table.truth(spacing * (maxBeliefs - 1) + margin);
+        assertEquals(0.5f, endTruth.freq(), 0.15f);
+        assertTrue(lastBeliefTruth.conf() > endTruth.conf());
+
+        /** closer to 0.5 as uncertainty grows */
+        @Nullable Truth startTruth = table.truth(0 - margin);
+        assertEquals(0.5f, startTruth.freq(), 0.15f);
+        assertTrue(firstBeliefTruth.conf() > startTruth.conf());
+    }
+
 
 
 //    @Ignore

@@ -211,25 +211,15 @@ public class InterpolatingMicrosphere {
      * @return the estimated value at the given {@code point}.
      * @throws NotPositiveException if {@code exponent < 0}.
      */
-    @Nullable
+    @NotNull
     public float[] value(@NotNull float[] targetPoint,
                          float[][] samplePoints,
                          float[] sampleValues,
                          float[] sampleWeights,
                          float exponent,
-                         float minWeight,
-                         float darkThreshold,
                          int numSamples) {
 
 
-//
-//        if (maxDarkFraction < 0 ||
-//                maxDarkFraction > 1) {
-//            throw new OutOfRangeException(maxDarkFraction, 0, 1);
-//        }
-        if (darkThreshold < 0) {
-            throw new NotPositiveException(darkThreshold);
-        }
 
         assert (exponent >= 0);
 
@@ -239,9 +229,9 @@ public class InterpolatingMicrosphere {
 
         // Contribution of each sample point to the illumination of the
         // microsphere's facets.
-        illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, exponent, numSamples, darkThreshold);
+        illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, exponent, numSamples);
 
-        return interpolate(minWeight);
+        return interpolate();
 
     }
 
@@ -318,7 +308,7 @@ public class InterpolatingMicrosphere {
         return (float) var24;
     }
 
-    public void illuminate(@NotNull float[] targetPoint, float[][] samplePoints, float[] sampleValues, @Nullable float[] sampleWeights, float exponent, int numSamples, float darkThreshold) {
+    public void illuminate(@NotNull float[] targetPoint, float[][] samplePoints, float[] sampleValues, @Nullable float[] sampleWeights, float exponent, int numSamples) {
         float epsilon = 0.01f;
 
         for (int i = 0; i < numSamples; i++) {
@@ -334,54 +324,25 @@ public class InterpolatingMicrosphere {
 
             float weight = pow(1f + diffNorm, -exponent);
 
-            illuminate(i, diffNorm > 0 ? diff : null, sampleValues[i],
-                    weight,
-                    sampleWeights == null ? 1f : sampleWeights[i],
-                    darkThreshold);
-            //}
-        }
-    }
-
-    /**
-     * Illumination.
-     *
-     * @param sampleDirection Vector whose origin is at the interpolation
-     *                        point and tail is at the sample location.
-     * @param sampleValue     Data value of the sample.
-     * @param weight          Weight.
-     */
-    private void illuminate(int sampleNum, @Nullable float[] sampleDirection,
-                            float sampleValue,
-                            float weight,
-                            float conf, float darkThreshold) {
-
-        float visibleThreshold = 0; // darkThreshold * backgroundConfidence;
+            @Nullable float[] sampleDirection = diffNorm > 0 ? diff : null;
+            float conf = sampleWeights == null ? 1f : sampleWeights[i];
 
 
-        for (int i = 0; i < size; i++) {
-            final float[] n = microsphere.get(i);
-            final float cos = sampleDirection != null ? cosAngleNormalized(n, sampleDirection) : 1f;
+            int vectors = diffNorm!=0  ? this.size : 1; //if exactly on-point then only compute once, otherwise compute for each microsphere vecctor
 
-            if (cos > 0) {
-                final float illumination = cos * weight;
+            for (int i1 = 0; i1 < vectors; i1++) {
 
+                final float[] n = microsphere.get(i1);
+                final float cos = sampleDirection != null ? cosAngleNormalized(n, sampleDirection) : 1f;
 
-                if (illumination > visibleThreshold) {
-                    //if (phase) {
-//                        if (illumination > dd[0]) {
-//                            maxData(dd, illumination, sampleValue, sampleNum);
-//                        }
-                    float[] dd = microsphereData.get(1);
-
-                    record(dd, illumination, sampleValue, conf);
-
-                    //} else {
-//                        if (dd[0] > 0) {
-//                            confData(i, illumination / dd[0], sampleValue, conf);
-//                        }
-                    //}
+                if (cos > 0) {
+                    final float illumination = cos * weight;
+                    if (illumination > 0) {
+                        record(microsphereData.get(1), illumination, sampleValues[i], conf);
+                    }
                 }
             }
+            //}
         }
     }
 
@@ -428,58 +389,22 @@ public class InterpolatingMicrosphere {
      * microsphere.
      */
     @Nullable
-    private float[] interpolate(float minWeight) {
+    private float[] interpolate() {
 
         int size = this.size;
 
-        int darkCount = 0;
-
-        float value = 0;
-        float totalWeight = 0, totalConf = 0;
-        //float totalConfDen = 0, totalConfNum = 0;
-        //float maxConf = 0;
+        float weightedValue = 0, illumination = 0;
 
         for (int i = 0; i < size; i++) {
             float[] fd = microsphereData.get(i);
 
-            float ill = fd[0]; /* weighted illumination */
-            float conf = fd[2];
-
-
-            //float conf = fd[2];
-            if (ill != 0d) {
-
-                value += fd[1]; /* sample */
-                totalConf += (conf);
-                totalWeight += (ill);
-
-
-                //maxConf = Math.max(conf*iV, maxConf);
-                //totalConfNum += conf * iV; //how much this confidence actually applied to the outcome
-            } else {
-                ++darkCount;
-            }
+            illumination += fd[0];
+            weightedValue += fd[1]; /* sample */
 
         }
 
-        //final float darkFraction = darkCount / (float) size;
 
-
-        if ((size == darkCount /*&& maxDarkFraction >= 1.0f*/)/* || (mdf < 1.0 && !float.isFinite(background)))*/) {
-            throw new RuntimeException("no illumination accepted or background value not used or invalid");
-        }
-
-        if (totalWeight < minWeight)
-            return null;
-
-        float v = value / totalWeight;
-
-        float c = totalConf;
-        //float c = totalConfDen!=0 ? totalConfNum / totalConfDen : this.backgroundConfidence;
-        //float c = totalWeight /                 (size);
-        //(microsphereData.size());
-
-        return new float[]{v, c};
+        return new float[] { weightedValue / illumination, illumination };
     }
 
 
@@ -542,10 +467,9 @@ public class InterpolatingMicrosphere {
         }*/
 
 
-        d[0] += illuminationProportion;
-        d[1] += (illuminationProportion) * sampleValue; //(conf * illuminationProportion) * sampleValue; //weighted value
-        d[2] += conf * illuminationProportion;
-        //d[2] += conf; //valueIntersection(existingValue, sampleValue);
+        float i = conf * illuminationProportion;
+        d[0] += i;
+        d[1] += i * sampleValue; //(conf * illuminationProportion) * sampleValue; //weighted value
     }
 
     /**

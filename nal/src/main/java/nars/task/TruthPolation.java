@@ -14,8 +14,10 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static nars.nal.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.projection;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
@@ -45,26 +47,18 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
 
     @Nullable
-    public Truth truth(long when, @NotNull Collection<Task> tasks) {
-        return truth(when, tasks.toArray(new Task[tasks.size()]));
+    public Truth truth(long when, Task... tasks) {
+        return truth(when, when, tasks);
     }
 
     @Nullable
-    public Truth truth(long when, @NotNull Task... tasks) {
-        //float ecap = eternal.capacity();
-        //float eternalization = ecap / (ecap + tcap));
-
-        @Deprecated float minWeight = 0; //Param.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
-
-        @Deprecated float thresh = 0; //Param.TRUTH_EPSILON;
-
-        return truth(when, tasks, minWeight, thresh);
-
+    public Truth truth(long when, long now, @NotNull Collection<Task> tasks) {
+        return truth(when, now, tasks.toArray(new Task[tasks.size()]));
     }
 
-
     @Nullable
-    public Truth truth(long when, @NotNull Task[] tasks,  /* background */float minWeight, float darkThresold) {
+    public Truth truth(long when, long now, @NotNull Task... tasks) {
+
         int n = tasks.length;
         assert(times.length <= n);
 
@@ -104,11 +98,12 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
             //float window = 0.01f;
 
-            times[i][0] = -when + t.occurrence();// + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
+            long o = t.occurrence();
+            times[i][0] = -when + o;// + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
             freq[i] = t.freq();
 
             float c = Math.min(t.conf(), 1f-Param.TRUTH_EPSILON); //clip maximum confidence
-            conf[i] = c2w(c);
+            conf[i] = c2w(c) * (now == ETERNAL ? 1f : projection(when, o, now));
             //TODO dt
 
             i++;
@@ -127,11 +122,8 @@ public final class TruthPolation extends InterpolatingMicrosphere {
                 times,
                 freq, conf,
                 exp,
-                minWeight, darkThresold,
                 n);
-        if (v!=null)
-            return $.t(v[0], w2c(v[1]));
-        return null;
+        return $.t(v[0], w2c(v[1]));
     }
 
 

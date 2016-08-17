@@ -350,22 +350,19 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             copy = toArrayExact(new Task[s]);
         }
 
-        boolean projectionUnnecessary = now == ETERNAL || when == now;
-
         Truth res;
         if (s == 1) {
             Task the = copy[0];
             res = the.truth();
-            if (projectionUnnecessary && the.occurrence() == when) //optimization: if at the current time and when
+            long o = the.occurrence();
+            if ((now == ETERNAL || when == now) && o == when) //optimization: if at the current time and when
                 return res;
+            return res!=null ? Revision.project(res, when, now, o, false) : null;
 
         } else {
-            res = truthpolations.get().truth(when, copy);
+            return truthpolations.get().truth(when, now, copy);
         }
 
-        return (res==null || projectionUnnecessary) ?
-                res :
-                Revision.project(res, when, now, Revision.closestTo(copy, now).occurrence(), false);
     }
 
 

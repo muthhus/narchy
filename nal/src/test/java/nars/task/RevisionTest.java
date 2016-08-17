@@ -1,4 +1,4 @@
-package nars.concept;
+package nars.task;
 
 import nars.*;
 import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
