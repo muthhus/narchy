@@ -76,6 +76,7 @@ import java.util.Map;
 
     }
 
+    @Override
     public void reset() {
         pipeline = null;
         population = null;

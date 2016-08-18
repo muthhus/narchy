@@ -5,10 +5,10 @@
  */
 package objenome;
 
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import objenome.solution.dependency.*;
 import objenome.util.InjectionUtils;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import java.util.Map;
 import java.util.Set;

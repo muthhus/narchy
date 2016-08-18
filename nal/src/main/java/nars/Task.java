@@ -23,7 +23,6 @@ import java.util.List;
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
-import static nars.truth.TruthFunctions.projection;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.

@@ -1,7 +1,7 @@
 package nars.bag;
 
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.util.math.Distributor;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.junit.Test;
 
 import java.util.ArrayList;

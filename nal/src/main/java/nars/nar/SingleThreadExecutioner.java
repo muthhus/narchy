@@ -17,6 +17,11 @@ public class SingleThreadExecutioner extends Executioner {
     }
 
     @Override
+    public void stop() {
+
+    }
+
+    @Override
     public void synchronize() {
 
     }

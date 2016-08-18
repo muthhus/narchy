@@ -1,8 +1,8 @@
 package objenome.solution.dependency;
 
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import objenome.util.FindMethod;
 import objenome.util.InjectionUtils;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 
 import java.lang.reflect.Method;
 import java.util.Map;

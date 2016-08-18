@@ -19,4 +19,7 @@ abstract public class Executioner implements Executor {
     abstract public void next(@NotNull NAR nar);
 
     abstract public boolean executeMaybe(Runnable r);
+
+    abstract public void stop();
+
 }

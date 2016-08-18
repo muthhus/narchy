@@ -66,7 +66,7 @@ public class Line1D implements DiscreteEnvironment {
 
         float dist =  ((float)Math.abs(yHidden - yEst)) / size;
 
-        float closeness = 1f - dist;
+        //float closeness = 1f - dist;
         //float reward = ((closeness*closeness*closeness) -0.5f)*2f;
         //float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
         float reward = -dist + 0.1f;
@@ -151,56 +151,6 @@ public class Line1D implements DiscreteEnvironment {
 
         //+ 0.05f * (a * (float)Math.cos(t / (targetPeriod/3f))-1)
         //return 0.5f + 0.5f * (float)Math.tan(t / (targetPeriod)) + (float)Math.random()*0.1f;
-    }
-
-    public static void main(String[] args) {
-
-
-        Default nar = new Default(1024, 4, 1, 3);
-
-        nar.beliefConfidence(0.51f);
-        nar.goalConfidence(0.51f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.2f;
-
-        nar.cyclesPerFrame.setValue(32);
-
-        //nar.log();
-
-        new MySTMClustered(nar, 4, '.', 2);
-        int cycles = 3000;
-
-        NAgent nagent = new NAgent(nar);
-
-        Line1D line = new Line1D(8,
-                random(50)
-                //sine(30)
-        );
-
-        float score = line.run(
-                nagent,
-                //new DQN(),
-                //new HaiQAgent(),
-                cycles);
-
-
-        System.out.println();
-        NAR.printTasks(nar, true);
-        NAR.printTasks(nar, false);
-        nar.index.forEach(t -> {
-            if (t instanceof Concept) {
-                Concept c = (Concept)t;
-                if (c.hasQuestions()) {
-                    System.out.println(c.questions().iterator().next());
-                }
-            }
-        });
-        nagent.printActions();
-
-        System.err.println(score);
-
     }
 
 

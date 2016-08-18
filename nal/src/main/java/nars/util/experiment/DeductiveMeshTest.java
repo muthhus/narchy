@@ -29,6 +29,10 @@ public class DeductiveMeshTest {
 
 
 
+    public DeductiveMeshTest(@NotNull NAR n, @NotNull int[] dims) {
+        this(n, dims, -1);
+    }
+
     public DeductiveMeshTest(@NotNull NAR n, @NotNull int[] dims, int timeLimit) {
         this(new TestNAR(n), dims, timeLimit);
     }
@@ -72,8 +76,8 @@ public class DeductiveMeshTest {
             return true;
         });
 
-
-        n.mustBelieve(timeLimit, q.toString(), 1f, 1f, 0.01f, 1f);
+        if (timeLimit>0)
+            n.mustBelieve(timeLimit, q.toString(), 1f, 1f, 0.01f, 1f);
 
     }
 

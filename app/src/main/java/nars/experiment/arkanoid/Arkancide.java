@@ -39,9 +39,9 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 4;
+    private static final int cyclesPerFrame = 32;
     public static final int runFrames = 20000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 128;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 8;
     public static final int INDEX_SIZE = 6 * 100000;
     final Arkanoid noid;
     private final SwingCamera cam;
@@ -50,11 +50,11 @@ public class Arkancide extends NAREnvironment {
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 32;
-    final int visH = 18;
+    final int visW = 24;
+    final int visH = 14;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 32;
+    private int visionSyncPeriod = 128;
     float noiseLevel = 0;
 
     float paddleSpeed = 75f;
@@ -135,7 +135,7 @@ public class Arkancide extends NAREnvironment {
             p /= maxConceptPriority;
             g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
-            return (b!=null ? b.conf() : 0) + (d!=null ? d.conf() : 0);
+            return ((b!=null ? b.conf() : 0) + (d!=null ? d.conf() : 0))/4f;
 
         };
 
@@ -225,8 +225,8 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.2f);
-        nar.derivedActivation.setValue(0.2f);
+        nar.inputActivation.setValue(0.04f);
+        nar.derivedActivation.setValue(0.04f);
 
 
         nar.beliefConfidence(0.8f);

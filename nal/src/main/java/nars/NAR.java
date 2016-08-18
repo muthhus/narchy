@@ -2,14 +2,10 @@ package nars;
 
 
 import com.google.common.collect.Sets;
-import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.WorkHandler;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.concept.AbstractConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
@@ -20,7 +16,6 @@ import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.nar.Executioner;
 import nars.nar.SingleThreadExecutioner;
-import nars.nar.util.AbstractCore;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -47,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -638,11 +632,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     if (p > 0) {
                         //propagate budget
                         //try {
-                        Activation activation = new Activation(input, c);
-
-                        c.link(1f, null/* linkActivation */, Param.BUDGET_EPSILON, this, activation);
-
-                        activation.run(this, conceptActivation); //values will already be scaled
+                        Activation activation = new Activation(input, c, this, conceptActivation);
 
                         emotion.busy(p);
                         emotion.stress(activation.overflow);
@@ -727,12 +717,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * Exits an iteration loop if running
      */
     public void stop() {
-
-        exe.synchronize();
-
-        if (!running) {
-            throw new RuntimeException("wasnt running");
+//        if (!running) {
+//            throw new RuntimeException("wasnt running");
+//        }
+        synchronized (exe) {
+            exe.synchronize();
+            exe.stop();
         }
+
     }
 
     /**
@@ -1402,8 +1394,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
         public final MutableFloat overflow = new MutableFloat(0);
 
-        public Activation(@NotNull Termed in, @NotNull NAR n) {
-            this((Budgeted) in, n.concept(in.term()));
+        public Activation(@NotNull Task in, @NotNull NAR n, float scale) {
+            this((Budgeted) in, in.concept(n));
+            link(n , scale);
         }
 
         public Activation(Budgeted in, Concept src) {
@@ -1413,11 +1406,73 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         }
 
-        public void run(@NotNull NAR nar) {
-            run(nar, 1f);
+        /** runs the task activation procedure */
+        public Activation(Budgeted in, Concept c, NAR nar, float scale) {
+            this(in, c);
+
+            link(nar, scale);
+
         }
 
-        public void run(@NotNull NAR nar, float activation) {
+        protected final void link(NAR nar, float scale) {
+            src.link(1f, null/* linkActivation */, Param.BUDGET_EPSILON, nar, this);
+
+            activate(nar, scale); //values will already be scaled
+        }
+
+        public void linkTermLinks(Concept src, float scale, NAR nar) {
+            src.termlinks().forEach(n -> {
+                linkTerm(src, nar, scale, n.get());
+            });
+        }
+
+        public void linkTerms(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
+
+
+            Concept asrc = src;
+            if (asrc != null && asrc != this) {
+                //link the src to this
+                AbstractConcept.linkSub(src, asrc, scale, this, nar);
+            } else {
+                activate(src, scale); //activate self
+            }
+
+            int n = tgt.length;
+            float tStrength = 1f / n;
+            float subScale = scale * tStrength;
+
+            if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
+
+                //then link this to terms
+                for (int i = 0; i < n; i++) {
+                    Term tt = tgt[i];
+
+                    if (!tt.isNormalized()) {
+                        continue; //HACK
+                    }
+
+                    //Link the peer termlink bidirectionally
+                    linkTerm(src, nar, subScale, tt);
+                }
+            }
+
+
+        }
+
+        public void linkTerm(Concept src, @NotNull NAR nar, float subScale, Term tt) {
+            Concept target = AbstractConcept.linkSub(src, tt, subScale, this, nar);
+
+            if (target != null && in instanceof Task) {
+                //insert recursive tasklink
+                target.linkTask((Task) in, subScale);
+            }
+        }
+
+        public void run(@NotNull NAR nar) {
+            activate(nar, 1f);
+        }
+
+        public void activate(@NotNull NAR nar, float activation) {
             if (!concepts.isEmpty()) {
                 float total = 1;
                 //(float) concepts.sum();

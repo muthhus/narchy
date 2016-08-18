@@ -1,10 +1,10 @@
 package nars.util.graph;
 
-import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
+import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jgrapht.graph.SimpleDirectedGraph;
 

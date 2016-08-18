@@ -1,7 +1,7 @@
 package nars.util.data;
 
-import org.eclipse.collections.api.block.function.primitive.BooleanFunction;
 import org.apache.commons.math3.primes.Primes;
+import org.eclipse.collections.api.block.function.primitive.BooleanFunction;
 import org.junit.Test;
 
 import static java.lang.Math.random;

@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -23,6 +22,7 @@ public class MultiThreadExecutioner extends Executioner {
 
     private final int threads;
     private final RingBuffer<TaskEvent> ring;
+    private final Executor exec;
     private SequenceBarrier barrier;
 
 
@@ -43,6 +43,7 @@ public class MultiThreadExecutioner extends Executioner {
     public MultiThreadExecutioner(int threads, int ringSize, Executor exe) {
 
         this.threads = threads;
+        this.exec = exe;
 
 
         this.disruptor = new Disruptor<>(
@@ -58,6 +59,14 @@ public class MultiThreadExecutioner extends Executioner {
         this.ring = disruptor.getRingBuffer();
 
 
+    }
+
+    @Override
+    public void stop() {
+        synchronized (disruptor) {
+            disruptor.shutdown();
+            disruptor.halt();
+        }
     }
 
     @Override

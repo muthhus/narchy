@@ -4,6 +4,7 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
+import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.term.Compound;
 import nars.term.Term;
@@ -100,6 +101,28 @@ public interface AbstractConcept extends Concept {
                     return false;
             }
         }
+        return true;
+    }
+
+    /**
+     * attempt insert a tasklink into this concept's tasklink bag
+     * return true if successfully inserted
+     *
+     * when a task is processed, a tasklink
+     * can be created at the concept of its term
+     *
+     * @return whether the link successfully was completed
+     */
+    static boolean link(Concept c, float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+
+        if (scale < minScale)
+            return false;
+
+        Budgeted b = activation.in;
+        if (b instanceof Task) {
+            c.linkTask((Task)b, scale);
+        }
+
         return true;
     }
 

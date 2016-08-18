@@ -1,6 +1,5 @@
 package nars.concept.table;
 
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -14,13 +13,10 @@ import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.nal.Tense.ETERNAL;
-import static nars.nal.UtilityFunctions.and;
-import static nars.truth.TruthFunctions.projection;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal
@@ -60,7 +56,9 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         return capacity;
     }
 
-    public static float rank(@NotNull Task t, long when, long now) {
+
+     /** according to a balance of temporal proximity and confidence */
+     public static float rank(@NotNull Task t, long when, long now) {
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
         return rankTemporalByConfidence(t, when, now, -1);
     }
@@ -302,32 +300,41 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
     @Nullable
     @Override
-    public Task strongest(long when, long now, @Nullable Task against) {
+    public final Task strongest(long when, long now, @Nullable Task against) {
 
         //removeDeleted();
 
-        //find the best balance of temporal proximity and confidence
         int ls = size();
-        if (ls == 1)
-            return get(0); //the only task
+        if (ls == 0)
+            return null;
 
-        Task best = null;
+        Task best;
+        synchronized (this) {
+            best = get(0);
+            if (ls == 1)
+                return best; //early optimization: the only task
 
-        float bestRank = -1;
+            float bestRank = rank(best, when, now); //the first one
 
-        for (int i = 0; i < ls; i++) {
-            Task x = get(i);
-            if (x == null) continue;
+            for (int i = 1; i < ls; ) {
+                Task x = get(i);
+                if (x != null) {
 
-            float r = rank(x, when, now);
+                    if (x.isDeleted()) {
+                        remove(i);
+                        ls--;
+                        continue;
+                    }
 
-//            if (against != null && Stamp.overlapping(x.evidence(), against.evidence())) {
-//                r *= Param.PREMISE_MATCH_OVERLAP_MULTIPLIER;
-//            }
+                    float r = rank(x, when, now);
 
-            if (r > bestRank) {
-                best = x;
-                bestRank = r;
+                    if (r > bestRank) {
+                        best = x;
+                        bestRank = r;
+                    }
+
+                }
+                i++;
             }
         }
 

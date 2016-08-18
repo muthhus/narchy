@@ -252,7 +252,7 @@ public final class SloppyMath {
       negDiff = lx - ly;
     }
     if (max == Double.NEGATIVE_INFINITY) {
-      return max;
+      return Float.NEGATIVE_INFINITY;
     } else if (negDiff < -LOGTOLERANCE_F) {
       return max;
     } else {
@@ -285,7 +285,7 @@ public final class SloppyMath {
       negDiff = lx - ly;
     }
     if (max == Double.NEGATIVE_INFINITY) {
-      return max;
+      return Double.NEGATIVE_INFINITY;
     } else if (negDiff < -LOGTOLERANCE) {
       return max;
     } else {
@@ -1002,7 +1002,7 @@ public final class SloppyMath {
       return 0.0;
     }
     if (a == Double.NEGATIVE_INFINITY) {
-      return a;
+      return Double.NEGATIVE_INFINITY;
     }
     return a-b;
   }
@@ -1012,7 +1012,7 @@ public final class SloppyMath {
       return 0.0;
     }
     if (a == Double.POSITIVE_INFINITY) {
-      return a;
+      return Double.POSITIVE_INFINITY;
     }
     return a+b;
   }

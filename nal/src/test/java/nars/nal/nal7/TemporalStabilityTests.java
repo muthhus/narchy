@@ -1,10 +1,10 @@
 package nars.nal.nal7;
 
-import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
-import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import nars.NAR;
 import nars.Param;
 import nars.nar.Default;
+import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

@@ -5,9 +5,9 @@
  */
 package nars.util.meter.func;
 
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.util.meter.Metrics;
 import nars.util.meter.Signal;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 
 import java.util.List;
 

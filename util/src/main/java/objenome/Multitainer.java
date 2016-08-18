@@ -33,9 +33,9 @@ import static java.util.stream.Collectors.toList;
  early 20th century: of German Gen, of Pangen, a supposed ultimate unit of heredity (of Greek pan * ‘all’ + genos ‘race, kind, offspring’) + of Latin tenere 'to hold.’"
  */
 public class Multitainer extends AbstractPrototainer implements AbstractMultitainer {       
-    private int intMinDefault = 0;
+    private int intMinDefault;
     private int intMaxDefault = 1;
-    private int doubleMinDefault = 0;
+    private int doubleMinDefault;
     private int doubleMaxDefault = 1;
     
     public Multitainer(Class... useClasses) {

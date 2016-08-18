@@ -1,6 +1,9 @@
 package nars.task;
 
-import nars.*;
+import nars.$;
+import nars.IO;
+import nars.NAR;
+import nars.Task;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.term.Compound;

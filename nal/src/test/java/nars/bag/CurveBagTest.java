@@ -1,6 +1,5 @@
 package nars.bag;
 
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Param;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
@@ -10,6 +9,7 @@ import nars.link.BLink;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

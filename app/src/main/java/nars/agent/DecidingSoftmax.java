@@ -82,7 +82,7 @@ public class DecidingSoftmax implements Deciding {
         }
 
         decisiveness = motivation[i] / sumMotivation;
-        System.out.println("decisiveness: " + decisiveness );
+        //System.out.println("decisiveness: " + decisiveness );
 
         return i;
     }

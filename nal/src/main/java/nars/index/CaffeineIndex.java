@@ -18,12 +18,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import static nars.nal.UtilityFunctions.or;
-import static nars.truth.TruthFunctions.c2w;
 
 
 public class CaffeineIndex extends MaplikeIndex implements RemovalListener {

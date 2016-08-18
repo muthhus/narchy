@@ -111,6 +111,11 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
     }
 
     @Override
+    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+        return AbstractConcept.link(this, scale, src, minScale, nar, activation);
+    }
+
+    @Override
     public void linkTask(@NotNull Task t, float scale) {
 
         tasklinks().put(t, t, scale, null);
@@ -132,9 +137,5 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
     }
 
 
-    /** does nothing, should never get called */
-    @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation) {
 
-    }
 }

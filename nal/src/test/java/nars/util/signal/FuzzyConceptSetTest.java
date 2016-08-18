@@ -1,7 +1,6 @@
 package nars.util.signal;
 
 import com.google.common.collect.Iterables;
-import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import nars.NAR;
 import nars.nar.Default;
 import nars.truth.Truth;
@@ -10,6 +9,7 @@ import nars.util.Util;
 import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.junit.Test;
 
 import java.util.stream.StreamSupport;

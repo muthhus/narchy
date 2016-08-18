@@ -1,9 +1,6 @@
 package nars.experiment;
 
-import nars.$;
-import nars.NAR;
-import nars.NARLoop;
-import nars.Symbols;
+import nars.*;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
@@ -52,10 +49,10 @@ abstract public class NAREnvironment {
     @Deprecated public float gammaEpsilonFactor = 0.5f;
 
     public float rewardValue;
-    private final FasterList<MutableTask> predictors = $.newArrayList();
-    private boolean trace = true;
+    private final FasterList<Task> predictors = $.newArrayList();
+    private final boolean trace = true;
 
-    int ticksBeforeObserve = 0, ticksBeforeDecide = 0;
+    int ticksBeforeObserve, ticksBeforeDecide;
     protected long now;
     private long stopTime;
     private NARLoop loop;
@@ -81,7 +78,7 @@ abstract public class NAREnvironment {
                 rewardNormalized,
                 (x) -> t(x, rewardConf)
         );
-        happy.desire($.t(1f, rewardGamma));
+        predictors.add(happy.desire($.t(1f, rewardGamma)));
 
 
         joy = new SensorConcept("(joy)", nar,
@@ -164,42 +161,47 @@ abstract public class NAREnvironment {
 
 
     protected void mission() {
-        int dt = ticksBeforeObserve + ticksBeforeDecide;
+        int dt = 1 + ticksBeforeObserve + ticksBeforeDecide;
 
 
         @NotNull Term what = $.$("?w"); //#w
 
         predictors.add(
-                //what imples reward R
-                (MutableTask) nar.ask($.impl(what, happy.term()), '?', ETERNAL)
+                //what will soon imply reward R
+                nar.ask($.impl(what, dt, happy.term()), '?', ETERNAL)
         );
 
         //what co-occurs with reward R
         predictors.add(
-                (MutableTask) nar.ask($.conj(what, dt, happy.term()), '?', ETERNAL)
+                nar.ask($.conj(what, dt, happy.term()), '?', ETERNAL)
         );
         predictors.add(
-                (MutableTask) nar.ask($.conj(what, dt, happy.term()), '?', nar.time())
+                nar.ask($.conj(what, dt, happy.term()), '?', now)
+        );
+        predictors.add( //+2 cycles ahead
+                nar.ask($.conj(what, dt*2, happy.term()), '?', now)
         );
 
 
         for (Concept x : actions) {
 
             //quest for each action
-            predictors.add((MutableTask) nar.ask(x, '@', ETERNAL));
-            predictors.add((MutableTask) nar.ask(x, '@', nar.time()));
+            predictors.add(nar.ask(x, '@', ETERNAL));
+            predictors.add(nar.ask(x, '@', now));
 
             //does action A co-occur with reward R?
             predictors.add(
-                (MutableTask) nar.ask($.conj(x.term(), dt, happy.term()), '?', ETERNAL)
+                    nar.ask($.conj(x.term(), dt, happy.term()), '?', ETERNAL)
             );
-//            //does not action A co-occur with reward R?
-//            predictors.add(
-//                (MutableTask) nar.ask($.conj($.neg(x.term()), dt, happy.term()), '?', ETERNAL)
-//            );
+            predictors.add(
+                    nar.ask($.conj(x.term(), dt, happy.term()), '?', now)
+            );
+
 
 
         }
+
+        System.out.println(predictors);
 
     }
 
@@ -239,7 +241,7 @@ abstract public class NAREnvironment {
         if (reinforcementAttention > 0) {
 
             //boost(happy);
-            boost(happy);
+            //boost(happy); //boosted by the (happy)! task that is boosted below
             //boost(sad);
 
 
@@ -269,7 +271,7 @@ abstract public class NAREnvironment {
                 boost(c);
             }
 
-            for (MutableTask x : predictors)
+            for (Task x : predictors)
                 boost(x);
 
 
@@ -281,26 +283,40 @@ abstract public class NAREnvironment {
     @Nullable
     protected Concept boost(Concept c) {
 
-        ((Default)nar).core.concepts.put(c, UnitBudget.One);
+        new NAR.Activation(UnitBudget.One, c, nar, alpha) {
+
+            @Override
+            public void activate(@NotNull NAR nar, float activation) {
+                linkTermLinks(c, alpha, nar);
+                super.activate(nar, activation);
+            }
+        };
+
         return c;
         //return c;
         //return nar.activate(c, null);
     }
 
 
-    private void boost(@NotNull MutableTask t) {
+    private void boost(@NotNull Task t) {
         BudgetMerge.max.apply(t.budget(), UnitBudget.One, reinforcementAttention);
         if (t.isDeleted())
             throw new RuntimeException();
 
         float REINFORCEMENT_DURABILITY = 0.9f;
-        long now = nar.time();
         if (t.occurrence() != ETERNAL) {
             nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(now, now)
-                    .budget(reinforcementAttention, REINFORCEMENT_DURABILITY, 0.5f).log("Predictor"));
+                    .budget(reinforcementAttention, REINFORCEMENT_DURABILITY, 0.9f).log("Predictor"));
         } else {
-            nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(now, ETERNAL)
-                    .budget(reinforcementAttention, REINFORCEMENT_DURABILITY, 0.5f).log("Predictor"));
+            //re-use existing eternal task
+            NAR.Activation a = new NAR.Activation(t, nar, 1f) {
+                @Override
+                public void linkTerms(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
+                    super.linkTerms(src, tgt, scale, minScale, nar);
+
+                    linkTermLinks(src, scale, nar);
+                }
+            };
         }
 
     }

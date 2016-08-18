@@ -1,10 +1,10 @@
 package objenome.solver;
 
-import org.eclipse.collections.api.map.primitive.MutableObjectDoubleMap;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import objenome.goal.DoubleFitness;
 import objenome.solver.evolve.Fitness;
 import objenome.solver.evolve.TypedOrganism;
+import org.eclipse.collections.api.map.primitive.MutableObjectDoubleMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;

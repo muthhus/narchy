@@ -1,6 +1,5 @@
 package nars.term.transform;
 
-import org.eclipse.collections.impl.factory.Sets;
 import nars.*;
 import nars.concept.Concept;
 import nars.index.PatternIndex;
@@ -11,6 +10,7 @@ import nars.term.Termed;
 import nars.term.subst.FindSubst;
 import nars.util.signal.RuleTest;
 import nars.util.signal.TestNAR;
+import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Ignore;

@@ -14,8 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static nars.task.RevisionTest.newNAR;
 import static nars.nal.UtilityFunctions.w2c;
+import static nars.task.RevisionTest.newNAR;
 import static nars.truth.TruthFunctions.c2w;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

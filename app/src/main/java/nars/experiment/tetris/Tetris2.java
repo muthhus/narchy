@@ -2,6 +2,7 @@ package nars.experiment.tetris;
 
 import com.google.common.collect.Lists;
 import nars.*;
+import nars.gui.BagChart;
 import nars.nar.Executioner;
 import nars.nar.MultiThreadExecutioner;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -57,8 +58,8 @@ public class Tetris2 extends NAREnvironment {
     public static final int runFrames = 50000;
     public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
-    public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 3;
+    public static final int tetris_height = 12;
+    public static final int TIME_PER_FALL = 8;
     static boolean easy = false;
 
     static int frameDelay;
@@ -66,7 +67,7 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 8; //16 * TIME_DILATION;
+    private final int visionSyncPeriod = 16; //16 * TIME_DILATION;
 
     public class View {
 
@@ -363,7 +364,7 @@ public class Tetris2 extends NAREnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.15f);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -429,7 +430,7 @@ public class Tetris2 extends NAREnvironment {
 //                );
 
 
-                //BagChart.show((Default) nar, 1024);
+                //BagChart.show((Default) nar, 256);
 
                 //STMView.show(stm, 800, 600);
 

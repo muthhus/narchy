@@ -19,8 +19,8 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 

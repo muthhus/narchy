@@ -181,10 +181,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
         return target.link(scale, src, minScale, nar, activation);
     }
 
-    @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
-        target.linkAny(b, scale, minScale, nar, activation);
-    }
+
 
     @Override
     public void policy(@NotNull ConceptPolicy c, long now, @NotNull List<Task> removed) {

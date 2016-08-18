@@ -1,12 +1,12 @@
 package objenome;
 
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import nars.util.data.list.FasterList;
 import objenome.solution.dependency.*;
 import objenome.util.InjectionUtils;
 import objenome.util.InjectionUtils.Provider;
 import objenome.util.bean.BeanProxyBuilder;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

@@ -2,7 +2,6 @@ package nars.util.data;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Simple object pool implemented by a Deque (ex: ArrayDeque)

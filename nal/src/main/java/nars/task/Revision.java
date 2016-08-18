@@ -25,9 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.c2w;
-import static nars.truth.TruthFunctions.eternalize;
-import static nars.truth.TruthFunctions.projection;
+import static nars.truth.TruthFunctions.*;
 
 /**
  * Revision / Projection / Revection Utilities

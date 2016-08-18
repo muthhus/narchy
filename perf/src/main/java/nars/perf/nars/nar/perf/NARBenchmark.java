@@ -32,49 +32,75 @@
 package nars.perf.nars.nar.perf;
 
 import nars.NAR;
+import nars.agent.NAgent;
+import nars.concept.Concept;
+import nars.experiment.Line1D;
+import nars.nal.Deriver;
 import nars.nar.Default;
+import nars.op.time.MySTMClustered;
 import nars.term.Compound;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Mode;
+import nars.util.experiment.DeductiveMeshTest;
+import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
 import static nars.$.$;
 import static nars.perf.Main.perf;
 
+@State(Scope.Benchmark)
 public class NARBenchmark {
 
-	@Benchmark
-	@BenchmarkMode(value = Mode.SingleShotTime)
-	public void nal1Deduction() {
-		NAR n = new Default();
-		n.nal(1);
-		Compound a = $("<a-->b>");
-		Compound b = $("<b-->c>");
+    Default n;
 
-		n.believe(a);
-		n.believe(b);
-		n.run(10000);
-	}
-
-	@Benchmark
-	@BenchmarkMode(value = Mode.SingleShotTime)
-	public void nal1DeductionInNAL8() {
-		NAR n = new Default();
-		n.nal(8);
-		Compound a = $("<a-->b>");
-		Compound b = $("<b-->c>");
-
-		n.believe(a);
-		n.believe(b);
-		n.run(10000);
-	}
+    @Setup
+    public void prepare() {
+        n = new Default();
+    }
 
 
 
+    @Benchmark
+    @BenchmarkMode(value = Mode.AverageTime)
+    public void deductiveChainTest1() {
 
-	public static void main(String[] args) throws RunnerException {
-		perf(NARBenchmark.class, 4, 5);
-	}
+        //n.inputActivation.setValue(0.5f);
+        //n.derivedActivation.setValue(0.5f);
+        //n.nal(4);
+
+
+        new DeductiveMeshTest(n, new int[]{4, 4});
+        //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
+
+        n.run(500);
+
+    }
+
+    @Benchmark
+    @BenchmarkMode(value = Mode.AverageTime)
+    public void nal1Deduction() {
+        n.nal(1);
+        Compound a = $("<a-->b>");
+        Compound b = $("<b-->c>");
+
+        n.believe(a);
+        n.believe(b);
+        n.run(10000);
+    }
+
+    @Benchmark
+    @BenchmarkMode(value = Mode.AverageTime)
+    public void nal1DeductionInNAL8() {
+        n.nal(8);
+        Compound a = $("<a-->b>");
+        Compound b = $("<b-->c>");
+
+        n.believe(a);
+        n.believe(b);
+        n.run(10000);
+    }
+
+
+    public static void main(String[] args) throws RunnerException {
+        perf(NARBenchmark.class, 5, 1);
+    }
 
 }

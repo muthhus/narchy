@@ -1,5 +1,6 @@
 package nars.util.data.map;
 
+import net.jcip.annotations.NotThreadSafe;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function0;
 import org.eclipse.collections.api.block.function.Function2;
@@ -26,7 +27,6 @@ import org.eclipse.collections.impl.tuple.ImmutableEntry;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.eclipse.collections.impl.utility.Iterate;
-import net.jcip.annotations.NotThreadSafe;
 
 import java.io.*;
 import java.lang.ref.WeakReference;

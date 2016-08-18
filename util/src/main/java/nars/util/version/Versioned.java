@@ -100,7 +100,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      * returns null if the capacity was hit, or some other error
      */
     @Nullable
-    public Versioned<X> set(X nextValue) {
+    public final Versioned<X> set(X nextValue) {
         @Nullable X current = this.current;
         if (current!=nextValue) {
         //if (current == null || !current.equals(nextValue)) {

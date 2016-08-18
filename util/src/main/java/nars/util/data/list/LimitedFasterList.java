@@ -14,12 +14,7 @@ public final class LimitedFasterList<X> extends FasterList<X> {
     }
 
     final boolean ensureLimit() {
-        if (size() + 1 > max) {
-            //throw new RuntimeException("limit exceeded");
-            //+ this + " while trying to add " + x);
-            return false;
-        }
-        return true;
+        return size() + 1 <= max;
     }
 
     @Override

@@ -8,10 +8,10 @@ package nars.util.meter;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.util.Texts;
 import nars.util.meter.event.DoubleMeter;
 import nars.util.meter.event.HitMeter;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

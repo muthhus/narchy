@@ -92,12 +92,12 @@ public interface Concept extends Termed {
 
     @Nullable
     default Truth belief(long now) {
-        return belief(now, now);
+        return hasBeliefs() ? beliefs().truth(now) : null;
     }
 
     @Nullable
     default Truth desire(long now) {
-        return desire(now, now);
+        return hasGoals() ? goals().truth(now) : null;
     }
 
 
@@ -158,36 +158,9 @@ public interface Concept extends Termed {
      */
     boolean process(@NotNull Task task, @NotNull NAR nar, List<Task> removed);
 
-
-    /**
-     * attempt insert a tasklink into this concept's tasklink bag
-     * return true if successfully inserted
-     *
-     * when a task is processed, a tasklink
-     * can be created at the concept of its term
-     *
-     * @return whether the link successfully was completed
-     */
-    default boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
-
-        if (scale < minScale)
-            return false;
-
-        Budgeted b = activation.in;
-        if (b instanceof Task) {
-            linkTask((Task)b, scale);
-        }
-
-        linkAny(b, scale, minScale, nar, activation);
-
-        return true;
-    }
-
-    void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, NAR.Activation activation);
-
+    boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation);
 
     void linkTask(@NotNull Task t, float scale);
-
 
 
     default boolean link(float initialScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {

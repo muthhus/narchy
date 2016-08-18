@@ -31,7 +31,7 @@ public class BooleanSATTest {
     float best;
     long bestAt;
 
-    public final Truth unknown = new DefaultTruth(0.5f, 0);
+    public final Truth unknown = new DefaultTruth(0.5f, 0.01f);
     private final NAR nar;
     private final Map<String, BooleanConcept> variables = $.newHashMap();
 

@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.Budgeted;
 import nars.concept.CompoundConcept;
-import nars.nal.Tense;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
@@ -167,7 +166,7 @@ public interface BeliefTable extends TaskTable {
      * @return
      */
     static float rankTemporalByConfidence(@NotNull Task t, long when, long now, float bestSoFar) {
-        float c = t.truth().conf();
+        float c = t.conf();
         //float c = t.confWeight(); //<- doesnt seem to work, produces values too high
 
         if (c < bestSoFar)

@@ -16,7 +16,6 @@ import nars.link.TermLinkBuilder;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.container.TermSet;
 import org.jetbrains.annotations.NotNull;
@@ -402,102 +401,16 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
 
     @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
-        linkSubs(scale, activation.src, minScale, activation, nar);
-    }
-
-    /**
-     * link to subterms, hierarchical downward
-     */
-    public void linkSubs(float scale, Concept src, float minScale, @Nullable NAR.Activation conceptOverflow, @NotNull NAR nar) {
-
-
-        linkDistribute(scale, src, minScale, templates, conceptOverflow, nar);
-
-
-//            /*if (subScale >= minScale)*/
-//            MutableFloat subConceptOverflow = new MutableFloat(/*0*/);
-//
-//            //int numUnder = 0;
-//
-//            linkDistribute(b, scale, minScale, nar, templates, subConceptOverflow);
-//
-//
-//            float scOver = subConceptOverflow.floatValue();
-//            if (scOver > minScale) {
-//                // recursive overflow accumulated to callee's overflow
-//
-//
-//                //Simple method: just dispense equal proportion of the overflow to all template concepts equally
-//                linkDistribute(b, scOver, minScale, nar, templates, conceptOverflow);
-//
-//                //TODO More fair method:
-////                    //iterate over templates, psuedorandomly by choosing a random start index and visiting each modulo N
-////                    int i = nar.random.nextInt(numTemplates);
-////                    for (int n = 0; n < numTemplates; n++) {
-////                        Termed nt = templates.get((i + n) % numTemplates);
-////
-////                    }
-//
-//            }
-        //logger.debug("{} link: {} budget overflow {}", this, b, overflow);
-
-
-//                //redistribute overflow to termlink templates:
-//                if ((sumOver > 0) && (numUnder > 0)) {
-//
-//                    /** the last visited termlink will have the opportunity to receive the biggest bonus,
-//                     *  so ordering the templates by volume could allow the most complex ones to receive the most bonus */
-//                    for (int i = 0; i < numTemplates; i++) {
-//                        float subScale1 = sumOver / (numUnder--);
-//                        Concept target = nar.conceptualize(templates.get(i), b, subScale1);
-//                        assert(target!=null);
-//
-//                        //2. Link the peer termlink bidirectionally
-//                        linkTerm(this, target, b, subScale1, true, true, null);
-//                        sumOver += linkTemplate(b, templates.get(i),
-//                                sumOver / (numUnder--), nar);
-//
-//                        if (numUnder == 0) break; //finished
-//                    }
-//
-//                }
-    }
-
-
-    final void linkDistribute(float scale, @Nullable Concept src, float minScale, @NotNull TermSet templates, @NotNull NAR.Activation activation, @NotNull NAR nar) {
-
-        int n = templates.size();
-        float tStrength = 1f / n;
-        float subScale = scale * tStrength;
-
-        if (src != null && src != this) {
-            //link the src to this
-            AbstractConcept.linkSub(this, src, scale, activation, nar);
-        } else {
-            activation.activate(this, scale); //activate self
+    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+        if (AbstractConcept.link(this, scale, src, minScale, nar, activation)) {
+            activation.linkTerms(this, templates.terms(), scale, minScale, nar);
+            return true;
         }
 
-        //then link this to templates
-        Term[] t = templates.terms();
-        for (int i = 0; i < n; i++) {
-            Term tt = t[i];
-
-            if (!tt.isNormalized()) {
-                continue; //HACK
-            }
-
-            //Link the peer termlink bidirectionally
-            if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
-                Concept target = AbstractConcept.linkSub(this, tt, subScale, activation, nar);
-
-                if (target != null && activation.in instanceof Task) {
-                    //insert recursive tasklink
-                    target.linkTask((Task) activation.in, subScale);
-                }
-            }
-        }
+        return false;
     }
+
+
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
 

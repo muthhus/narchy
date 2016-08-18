@@ -1482,7 +1482,7 @@ public enum IntArrays {
 		ExecutorService executorService = Executors.newFixedThreadPool( numberOfThreads, Executors.defaultThreadFactory() );
 		ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorService);
 		for ( int i = numberOfThreads; i-- != 0; )
-			executorCompletionService.submit((Callable<Void>) () -> {
+			executorCompletionService.submit(() -> {
                 int[] count = new int[ 1 << DIGIT_BITS ];
                 int[] pos = new int[ 1 << DIGIT_BITS ];
                 while (true) {
@@ -1693,7 +1693,7 @@ public enum IntArrays {
 		ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorService);
 		int[] support = stable ? new int[ perm.length ] : null;
 		for ( int i = numberOfThreads; i-- != 0; )
-			executorCompletionService.submit((Callable<Void>) () -> {
+			executorCompletionService.submit(() -> {
                 int[] count = new int[ 1 << DIGIT_BITS ];
                 int[] pos = new int[ 1 << DIGIT_BITS ];
                 while (true) {
@@ -1908,7 +1908,7 @@ public enum IntArrays {
 		ExecutorService executorService = Executors.newFixedThreadPool( numberOfThreads, Executors.defaultThreadFactory() );
 		ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorService);
 		for ( int i = numberOfThreads; i-- != 0; )
-			executorCompletionService.submit((Callable<Void>) () -> {
+			executorCompletionService.submit(() -> {
                 int[] count = new int[ 1 << DIGIT_BITS ];
                 int[] pos = new int[ 1 << DIGIT_BITS ];
                 while (true) {
