@@ -22,6 +22,7 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 //don't touch this file - patham9
 
@@ -93,7 +94,7 @@ public class LinkageTest extends AbstractNALTest {
     //interlinked with an intermediate concept, this is needed in order to select one as task and the other as belief
     public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, char punc, @NotNull String spremise2) throws Exception {
 
-        int frames = 5;
+        int frames = 1;
 
         NAR nar = test().nar;
 
@@ -117,9 +118,17 @@ public class LinkageTest extends AbstractNALTest {
         //List<String> fails = new ArrayList();
 
 
+        @Nullable Concept p1 = nar.concept(premise1);
+        assertNotNull(p1.policy());
+        p1.print();
 
-        boolean passed = linksIndirectly(nar, premise2, nar.concept(premise1));
-        boolean passed2 = linksIndirectly(nar, premise1, nar.concept(premise2));
+        boolean passed = linksIndirectly(nar, premise2, p1);
+
+        @Nullable Concept p2 = nar.concept(premise2);
+        assertNotNull(p2.policy());
+        p2.print();
+
+        boolean passed2 = linksIndirectly(nar, premise1, p2);
 
 
         //System.err.println(premise1 + " not linked with " + premise2);
@@ -127,7 +136,7 @@ public class LinkageTest extends AbstractNALTest {
         assertTrue(g.vertexSet().size() > 0);
         assertTrue(g.toString(), g.edgeSet().size() > 0);
 
-        //g.print(System.out);
+        g.print(System.out);
         //System.out.println(g.isConnected() + " " + g.vertexSet().size() + " " + g.edgeSet().size());
         if (!g.isConnected()) {
 //        if (!g.isStronglyConnected()) {

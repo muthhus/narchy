@@ -48,6 +48,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.nal.Tense.ETERNAL;
+
 public interface Concept extends Termed {
 
     @NotNull Bag<Task> tasklinks();
@@ -445,5 +447,9 @@ public interface Concept extends Termed {
         @NotNull ConceptPolicy sleep();
 
         void start(NAR nar);
+
+        default void init(Concept c) {
+            c.policy(init(), ETERNAL, Task.EmptyTaskList);
+        }
     }
 }

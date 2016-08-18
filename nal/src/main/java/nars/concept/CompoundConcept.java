@@ -341,10 +341,9 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         if (current != p) {
             this.policy = p;
             linkCapacity(p);
-            //synchronized (tasks) {
+
             beliefCapacity(p, now, removed);
             questionCapacity(p, removed);
-            //}
         }
     }
 

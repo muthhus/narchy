@@ -191,9 +191,6 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
 
         //logger.trace("{} conceptualized to {}", term, result);
-
-        result.policy(init(), ETERNAL, Task.EmptyTaskList);
-
         return result;
 
     }

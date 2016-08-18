@@ -577,7 +577,11 @@ public abstract class TermIndex extends TermBuilder {
         }
 
 
-        return (Concept) c;
+        Concept cc = (Concept)c;
+        if (cc.policy() == null) {
+            conceptBuilder().init(cc);
+        }
+        return cc;
     }
 
     /**

@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements Table<K, V>, Iterable<V> {
 
 
-    protected int capacity = -1;
+    protected int capacity = 0;
 
     public ArrayListTable(@NotNull Map<K, V> map) {
         super(map);
@@ -63,6 +63,7 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
         synchronized (_items()) {
             listClear();
         }
+
     }
 
     abstract protected void listClear();
@@ -133,12 +134,14 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     @Override
     public boolean setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
-            this.capacity = newCapacity;
+            synchronized (_items()) {
+                this.capacity = newCapacity;
 
-            if (newCapacity == 0) {
-                clear();
-            } else {
-                commit();
+                if (newCapacity == 0) {
+                    clear();
+                } else {
+                    commit();
+                }
             }
             return true;
         }

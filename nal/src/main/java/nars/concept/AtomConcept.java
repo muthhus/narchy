@@ -52,8 +52,11 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
     }
     @Override
     public void policy(@NotNull  ConceptPolicy p, long now, List<Task> removed) {
-        this.policy = p;
-        linkCapacity(p);
+        ConceptPolicy current = this.policy;
+        if (current!=p) {
+            this.policy = p;
+            linkCapacity(p);
+        }
     }
 
 

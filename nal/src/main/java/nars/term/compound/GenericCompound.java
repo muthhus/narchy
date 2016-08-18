@@ -3,6 +3,7 @@ package nars.term.compound;
 import nars.IO;
 import nars.Op;
 import nars.Param;
+import nars.Task;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
@@ -97,7 +98,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
             cthat = (Compound)that;
 
-        } else if (that instanceof Termed) {
+        } else if (that instanceof Termed)  {
             Term tthat = ((Termed) that).term();
             if (tthat instanceof Compound) {
 
@@ -114,7 +115,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         }
 
 
-        if (hash != that.hashCode())
+        if (hash != cthat.hashCode())
             return false;
 
 

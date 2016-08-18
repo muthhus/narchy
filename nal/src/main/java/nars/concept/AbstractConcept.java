@@ -238,7 +238,6 @@ public interface AbstractConcept extends Concept {
 
         termlinks().setCapacity( p.linkCap(this, true) );
         tasklinks().setCapacity( p.linkCap(this, false) );
-
     }
 
 

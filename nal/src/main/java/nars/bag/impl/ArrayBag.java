@@ -42,7 +42,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      */
     private float mass = 0;
 
-    public ArrayBag(int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
+    public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
         super(BLink[]::new, map);
 
         this.mergeFunction = mergeFunction;
@@ -59,8 +59,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     protected void update(BLink<V> toAdd) {
 
-
-        int vacated = 0;
         int remaining;
         while ((remaining = ((size() - capacity()) + (toAdd != null ? 1 : 0))) > 0) {
             List<BLink<V>> toRemove = $.newArrayList();
@@ -89,8 +87,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 onRemoved(k, w);
 
                 w.delete();
-
-                vacated++;
             }
         }
 
@@ -99,10 +95,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 //the item key,value should already be in the map before reaching here
                 items.add(toAdd, this);
             }
-            updateRange();
-        } else if (vacated > 0) {
-            updateRange();
         }
+
+        updateRange(); //regardless, this also handles case when policy changed and allowed more capacity which should cause minPri to go to -1
+
     }
 
     @Override
@@ -460,6 +456,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         //return ((willRemoveFromMap > 0) && (map.values().removeIf(BLink::isDeleted))) || (removedFromMap > 0);
         return removedFromMap;
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        updateRange();
     }
 
     private final void updateRange() {
