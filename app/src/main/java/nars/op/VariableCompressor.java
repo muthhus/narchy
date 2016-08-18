@@ -2,7 +2,6 @@ package nars.op;
 
 import nars.Param;
 import nars.Task;
-import nars.term.var.Variable;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import nars.$;
 import nars.NAR;
@@ -103,7 +102,7 @@ public class VariableCompressor implements Consumer<Task> {
                 //$.varIndep("c");
 
         Compound<?> oldContent = task.term();
-        Term newContent = $.terms.remap(oldContent, max, var);
+        Term newContent = $.terms.replace(oldContent, max, var);
         //if (newContent != null) {
 
             newContent =

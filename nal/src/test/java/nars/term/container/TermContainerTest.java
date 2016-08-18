@@ -63,7 +63,7 @@ public class TermContainerTest {
         Compound x = $("{x,y}");
         Compound y = $("{x,y}");
         assertTrue(
-                $.terms.builder().intersect(x.op(), x, y) == x
+                $.terms.intersect(x.op(), x, y) == x
         );
     }
 
@@ -72,7 +72,7 @@ public class TermContainerTest {
         Compound x = $("{e,f}");
         Compound y = $("{e,d}");
 
-        System.out.println($.terms.builder().intersect(x.op(), x, y));
+        System.out.println($.terms.intersect(x.op(), x, y));
         System.out.println(differ.difference($.terms, x, y));
         System.out.println($.terms.union(x.op(), x, y));
 

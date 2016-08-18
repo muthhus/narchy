@@ -72,6 +72,8 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
     public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
 
+    /** size of each thread's normalization cache, in entries */
+    public static final int NORMALIZATION_CACHE_SIZE_PER_THREAD = 8 * 1024;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;

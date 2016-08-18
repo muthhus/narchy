@@ -73,24 +73,9 @@ public class Memory extends Param {
 
     @NotNull public final TaskIndex tasks;
 
-    public final ThreadLocal<Map<Compound,Compound>> normalizations =
-            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
-            ThreadLocal.withInitial( () -> new CapacityLinkedHashMap(16*1024) );
-
-    //public final ChainBag<Compound> normalizations =
-            //Caffeine.newBuilder().maximumSize(16*1024).build();
-            //new ChainBag(new XORShiftRandom(1), 32);
-
-
-
-
-
 
     /** maximum NAL level currently supported by this memory, for restricting it to activity below NAL8 */
     int level;
-
-
-
 
     /**
      * Create a new memory

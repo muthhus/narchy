@@ -20,35 +20,41 @@ import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
+import nars.util.data.map.CapacityLinkedHashMap;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.$.unneg;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.TermBuilder.FalseProduct;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;
 
 /**
  *
  */
-public interface TermIndex {
+public abstract class TermIndex extends TermBuilder {
 
 
     String VARIABLES_ARE_NOT_CONCEPTUALIZABLE = "Variables are not conceptualizable";
+    public static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
 
     /**
      * getOrAdd the term
      */
-    default @Nullable Termed the(@NotNull Termed t) {
+    public @Nullable Termed the(@NotNull Termed t) {
         return get(t, true);
     }
 
@@ -56,57 +62,45 @@ public interface TermIndex {
      * get if not absent
      */
     @Nullable
-    default Termed get(@NotNull Termed t) {
+    public Termed get(@NotNull Termed t) {
         return get(t, false);
     }
 
     //use concept(key, craeteIfMissing) instead
-    @Nullable Termed get(@NotNull Termed key, boolean createIfMissing);
+    @Nullable
+    public abstract Termed get(@NotNull Termed key, boolean createIfMissing);
 
 
     /**
      * set whether absent or not
      */
-    void set(@NotNull Termed src, Termed target);
+    public abstract void set(@NotNull Termed src, Termed target);
 
-    default void set(@NotNull Termed t) {
+    public void set(@NotNull Termed t) {
         set(t, t);
     }
 
 
-    void clear();
+    public abstract void clear();
 
-    void forEach(Consumer<? super Termed> c);
+    abstract public void forEach(Consumer<? super Termed> c);
 
 
-    default public void start(NAR nar) { }
+    public void start(NAR nar) { }
 
     /**
      * # of contained terms
      */
-    int size();
+    public abstract int size();
 
-    /**
-     * implications, equivalences, and interval
-     */
-    int InvalidEquivalenceTerm = or(IMPL, EQUI);
-    /**
-     * equivalences and intervals (not implications, they are allowed
-     */
-    int InvalidImplicationSubject = or(EQUI, IMPL);
-    int InvalidImplicationPredicate = or(EQUI);
-
-
-    @NotNull TermBuilder builder();
-
-    @Nullable Concept.ConceptBuilder conceptBuilder();
+    @Nullable abstract public Concept.ConceptBuilder conceptBuilder();
 
 
     @Nullable
-    TermContainer theSubterms(TermContainer s);
+    protected abstract TermContainer theSubterms(TermContainer s);
 
 //    @Nullable
-//    default TermContainer normalize(TermContainer s) {
+//    public TermContainer normalize(TermContainer s) {
 //        if (s instanceof TermVector)
 //            return normalize((TermVector) s);
 //
@@ -119,7 +113,7 @@ public interface TermIndex {
 //     * should be called after a new entry needed to be created for the novel termcontainer
 //     */
 //    @Nullable
-//    default TermContainer normalize(@NotNull TermVector s) {
+//    public TermContainer normalize(@NotNull TermVector s) {
 //        Term[] x = s.terms();
 //        int l = x.length;
 //        for (int i = 0; i < l; i++) {
@@ -136,23 +130,23 @@ public interface TermIndex {
 //    }
 
 
-    int subtermsCount();
+    public abstract int subtermsCount();
 
-//    default TermContainer internSubterms(Term[] t) {
+//    public TermContainer internSubterms(Term[] t) {
 //        return new TermVector<>(t, this::the);
 //    }
 
-    @Nullable
-    default Term build(@NotNull Compound csrc, @NotNull Term[] newSubs) {
-        return builder().build(csrc.op(), csrc.dt(), newSubs);
-    }
+//    @Nullable
+//    public Term build(@NotNull Compound csrc, @NotNull Term[] newSubs) {
+//        return builder().build(csrc.op(), csrc.dt(), newSubs);
+//    }
 
 
     /**
      * returns the resolved term according to the substitution
      */
     @Nullable
-    default Term resolve(@NotNull Term src, @NotNull Subst f) {
+    public Term resolve(@NotNull Term src, @NotNull Subst f) {
 
 
         Term y = f.term(src);
@@ -222,7 +216,7 @@ public interface TermIndex {
         return changed ? build(crc, sub.toArray(new Term[sub.size()])) : crc;
     }
 
-//    default Term immediates(@NotNull Subst f, Term result) {
+//    public Term immediates(@NotNull Subst f, Term result) {
 //        Atomic op = Operator.operator(result);
 //        if (op!=null) {
 //            ImmediateTermTransform tf = f.getTransform(op);
@@ -235,7 +229,7 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term transform(Subst f, @NotNull Compound result, TermTransform tf) {
+    public Term transform(Subst f, @NotNull Compound result, TermTransform tf) {
 
         //Compound args = (Compound) Operator.opArgs((Compound) result).apply(f);
         Compound args = Operator.opArgs(result);
@@ -321,7 +315,7 @@ public interface TermIndex {
 //
 //    }
 
-//    /** default memory-based (Guava) cache */
+//    /** public memory-based (Guava) cache */
 //    @NotNull
 //    static TermIndex memory(int capacity) {
 ////        CacheBuilder builder = CacheBuilder.newBuilder()
@@ -329,13 +323,13 @@ public interface TermIndex {
 //        return new MapIndex2(
 //            new HashMap(capacity*2),
 //                //new UnifriedMap()
-//                new DefaultConceptBuilder());
+//                new publicConceptBuilder());
 ////        return new MapIndex2(
 ////                new HashMap(capacity)
 ////                //new UnifriedMap()
 ////        );
 //    }
-//    /** default memory-based (Guava) cache */
+//    /** public memory-based (Guava) cache */
 //    @NotNull
 //    static TermIndex softMemory(int capacity) {
 ////        CacheBuilder builder = CacheBuilder.newBuilder()
@@ -358,14 +352,38 @@ public interface TermIndex {
 //////        );
 ////    }
 
-    default void print(@NotNull PrintStream out) {
+    public void print(@NotNull PrintStream out) {
         forEach(out::println);
         out.println();
     }
 
+    //can not be static because of some issue with unnormalized variables equality or something
+    final ThreadLocal<Map<Compound,Compound>> normalizations =
+            ThreadLocal.withInitial( () -> new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD) );
+            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
+
+
+    final Function<? super Compound, ? extends Compound> normalizer = u -> {
+        //bmiss[0] = true;
+        try {
+            return _normalize(u);
+        } catch (Exception e) {
+            if (Param.DEBUG_EXTRA)
+                logger.warn("normalization: {}", e);
+            return FalseProduct; //since computeIfAbsent uses null as a dont-modify signal
+        }
+
+    };
+
+    public final Compound normalize(@NotNull Compound t) {
+        Compound v = normalizations.get().computeIfAbsent(t, normalizer);
+        return v == FalseProduct ? null : v;
+    }
+
+
 
     @NotNull
-    default Compound normalize(@NotNull Termed<Compound> t) {
+    public Compound _normalize(@NotNull Termed<Compound> t) {
         Compound r;
         if (!t.isNormalized()) {
             Compound ct = (Compound) t;
@@ -412,13 +430,13 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term build(@NotNull Compound src, @NotNull List<Term> newSubs) {
+    public Term build(@NotNull Compound src, @NotNull List<Term> newSubs) {
         return build(src, newSubs.toArray(new Term[newSubs.size()]));
     }
 
 
     @NotNull
-    default Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
+    public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
         if (src == null || !t.testSuperTerm(src))
             return src;
 
@@ -434,7 +452,7 @@ public interface TermIndex {
             Term y = x;
 
             if (t.test(x)) {
-                y = t.apply(src, x).term();
+                y = t.apply(src, x);
             } else if (x instanceof Compound) {
                 y = transform((Compound) x, t); //recurse
             }
@@ -449,19 +467,19 @@ public interface TermIndex {
         }
 
         return modifications > 0 ?
-                builder().build(src.op(), src.dt(), target) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
+                build(src.op(), src.dt(), target) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
                 src;
 
     }
 
 
     @Nullable
-    default Term transform(@NotNull Compound src, @NotNull ByteList path, Term replacement) {
+    public Term transform(@NotNull Compound src, @NotNull ByteList path, Term replacement) {
         return transform(src, path, 0, replacement);
     }
 
     @Nullable
-    default Term transform(@NotNull Term src, @NotNull ByteList path, int depth, Term replacement) {
+    public Term transform(@NotNull Term src, @NotNull ByteList path, int depth, Term replacement) {
         int ps = path.size();
         if (ps == depth)
             return replacement;
@@ -488,17 +506,17 @@ public interface TermIndex {
 
         }
 
-        return builder().build(csrc.op(), csrc.dt(), target);
+        return build(csrc.op(), csrc.dt(), target);
     }
 
 
     @NotNull
-    default Term parseRaw(@NotNull String termToParse) throws Narsese.NarseseException {
+    public Term parseRaw(@NotNull String termToParse) throws Narsese.NarseseException {
         return Narsese.the().term(termToParse, this, false);
     }
 
     @Nullable
-    default <T extends Termed> T parse(@NotNull String termToParse) throws Narsese.NarseseException {
+    public <T extends Termed> T parse(@NotNull String termToParse) throws Narsese.NarseseException {
         return (T) /*the*/(Narsese.the().term(termToParse, this, true));
     }
 
@@ -517,7 +535,7 @@ public interface TermIndex {
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
     @Nullable
-    default Concept concept(@NotNull Termed term, boolean createIfMissing) throws InvalidConceptException {
+    public Concept concept(@NotNull Termed term, boolean createIfMissing) throws InvalidConceptException {
 
         if (term instanceof Atomic) {
 
@@ -531,18 +549,15 @@ public interface TermIndex {
 
             term = unneg(term);
 
-            Termed prenormalized = term;
+            Compound prenormalized = (Compound) term.term();
 
-            if (!((term = normalize(term)) instanceof Compound))
+            Compound cterm;
+            if ((cterm = normalize(prenormalized)) == null)
                 throw new InvalidConceptException(prenormalized, "Failed normalization");
 
-            Term aterm = Terms.atemporalize((Compound) term);
+            Compound aterm = Terms.atemporalize(cterm);
             if (!(aterm instanceof Compound))
                 throw new InvalidConceptException(term, "Failed atemporalization");
-
-            if (aterm instanceof Concept) {
-                return (Concept) aterm;
-            }
 
             term = unneg(aterm);
 //            term = aterm;
@@ -569,27 +584,21 @@ public interface TermIndex {
      * a string containing statistics of the index's current state
      */
     @NotNull
-    default String summary() {
-        return "";
-    }
+    public abstract String summary();
+
+    public abstract void remove(@NotNull Termed entry);
 
     @Nullable
-    default Term remap(@NotNull Term src, Map<Term, Term> m) {
+    public Term replace(@NotNull Term src, Map<Term, Term> m) {
         return termOrNull(resolve(src, new MapSubst(m)));
     }
 
     @Nullable
-    default Term remap(@NotNull Term src, Term from, Term to) {
-        return remap(src, Maps.mutable.of(from, to));
+    public Term replace(@NotNull Term src, Term from, Term to) {
+        return replace(src, Maps.mutable.of(from, to));
     }
 
-    default void remove(Termed entry) {
-        throw new UnsupportedOperationException();
-    }
-
-
-
-    final class InvalidConceptException extends RuntimeException {
+    public static final class InvalidConceptException extends RuntimeException {
 
         @NotNull
         public final Termed term;
@@ -609,7 +618,7 @@ public interface TermIndex {
     }
 
 
-    default void loadBuiltins() {
+    public void loadBuiltins() {
         for (TransformConcept t : TransformConcept.BuiltIn) {
             set(t);
         }
@@ -621,7 +630,7 @@ public interface TermIndex {
 //    }
 //
 //    @NotNull
-//    default Term atemporalize2(@NotNull Compound c) {
+//    public Term atemporalize2(@NotNull Compound c) {
 //        if (!possiblyTemporal(c))
 //            return c;
 //        return new CompoundAtemporalizer(this, c).result;

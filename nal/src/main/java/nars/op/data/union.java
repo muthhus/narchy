@@ -12,7 +12,7 @@ public class union extends BinaryTermOperator {
     @Override public Term apply(@NotNull Term a, @NotNull Term b) {
         ensureCompounds(a, b);
 
-        return $.terms.builder().union(a.op(), (Compound) a, (Compound) b );
+        return $.terms.union(a.op(), (Compound) a, (Compound) b );
     }
 
 }

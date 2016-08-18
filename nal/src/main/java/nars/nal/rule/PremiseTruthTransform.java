@@ -3,12 +3,10 @@ package nars.nal.rule;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.transform.CompoundTransform;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -33,7 +31,7 @@ abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term
     }
 
     @Override
-    public @Nullable Termed<?> apply(@NotNull Compound parent, @NotNull Term subterm) {
+    public Term apply(@NotNull Compound parent, @NotNull Term subterm) {
 
         Compound tf = (Compound) subterm;
         Term func = tf.term(0);

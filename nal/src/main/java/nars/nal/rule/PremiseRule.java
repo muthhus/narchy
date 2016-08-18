@@ -24,7 +24,6 @@ import nars.nal.op.SolvePuncFromTask;
 import nars.nal.op.SolvePuncOverride;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -486,9 +485,8 @@ public class PremiseRule extends GenericCompound {
             return false;
         }
 
-        @NotNull
         @Override
-        public Termed apply(@NotNull Compound containingCompound, @NotNull Term v) {
+        public Term apply(@NotNull Compound containingCompound, @NotNull Term v) {
 
             //do not alter postconditions
             if ((containingCompound.op() == Op.INH)
@@ -1138,7 +1136,7 @@ public class PremiseRule extends GenericCompound {
         m.put(getConclusionTermPattern(), newR);
 
 
-        Compound remapped = (Compound) terms.remap(this, m);
+        Compound remapped = (Compound) terms.replace(this, m);
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.term(0);
@@ -1244,7 +1242,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         @NotNull
-        public Termed applyAfter(@NotNull Variable secondary) {
+        public Term applyAfter(@NotNull Variable secondary) {
             offset++;
             return apply(null, secondary);
         }

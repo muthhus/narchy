@@ -131,33 +131,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         System.out.println("\nrootOp:\n" + rootOp);
     }
 
-    //long miss= 0, hit  = 0;
+
     @Nullable public final Compound normalize(Compound t) {
-//        Compound x = normalizations.get(t);
-//        if (x == null) {
-//            normalizations.put(x = index.normalize(t, true));
-//            //miss++;
-//        }/* else {
-//            hit++;
-//        }*/
-//        System.out.println("size=" + normalizations.validatedSize());
-//        return x;
-
-        //final boolean[] bmiss = {false};
-        Compound v = normalizations.get().computeIfAbsent(t, u -> {
-            //bmiss[0] = true;
-            try {
-                return index.normalize(u);
-            } catch (Exception e) {
-                if (Param.DEBUG_EXTRA)
-                    logger.warn("normalization: {}", e);
-                return FalseProduct; //since computeIfAbsent uses null as a dont-modify signal
-            }
-
-        });
-        //if (bmiss[0]) miss++; else hit++;
-        //System.out.println( Texts.n2(1 - (double)miss/hit) + " hit rate, size=" + normalizations.get().size());
-        return v == FalseProduct ? null : v;
+        return index.normalize(t);
     }
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, Executioner exe) {

@@ -3,7 +3,6 @@ package nars.nal;
 import nars.$;
 import nars.Op;
 import nars.Param;
-import nars.index.TermIndex;
 import nars.nal.meta.match.Ellipsislike;
 import nars.nal.op.TermTransform;
 import nars.term.Compound;
@@ -41,6 +40,15 @@ public abstract class TermBuilder {
     public static final Atom False = $.the("Ø");
     private static final Term[] TrueArray = new Term[]{True};
     public static final Compound FalseProduct = new GenericCompound(Op.PROD, TermVector.the(False));
+    /**
+     * implications, equivalences, and interval
+     */
+    public static int InvalidEquivalenceTerm = or(IMPL, EQUI);
+    /**
+     * equivalences and intervals (not implications, they are allowed
+     */
+    public static int InvalidImplicationSubject = or(EQUI, IMPL);
+    public static int InvalidImplicationPredicate = or(EQUI);
 
 
     @NotNull
@@ -193,7 +201,7 @@ public abstract class TermBuilder {
 
 
     static boolean validEquivalenceTerm(@NotNull Term t) {
-        return !t.isAny(TermIndex.InvalidEquivalenceTerm);
+        return !t.isAny(InvalidEquivalenceTerm);
 //        if ( instanceof Implication) || (subject instanceof Equivalence)
 //                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
 //                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
@@ -574,9 +582,9 @@ public abstract class TermBuilder {
 
                 case IMPL:
                     if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
-                        if (subject.isAny(TermIndex.InvalidImplicationSubject))
+                        if (subject.isAny(InvalidImplicationSubject))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
-                        if (predicate.isAny(TermIndex.InvalidImplicationPredicate))
+                        if (predicate.isAny(InvalidImplicationPredicate))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
                     }
 

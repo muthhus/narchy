@@ -22,7 +22,7 @@ import static nars.term.Termed.termOrNull;
 /**
  * Index which is supported by Map/Cache-like operations
  */
-public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
+public abstract class MaplikeIndex extends TermIndex {
 
 
 
@@ -189,11 +189,6 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
      */
     abstract protected TermContainer put(TermContainer s);
 
-    @NotNull
-    @Override
-    public final TermBuilder builder() {
-        return this;
-    }
 
     @Nullable
     @Override

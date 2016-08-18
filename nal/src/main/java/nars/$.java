@@ -942,7 +942,7 @@ public enum $ {
     }
 
 
-    public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
+    public static final class StaticTermBuilder extends TermIndex {
 
         @NotNull
         @Override
@@ -969,15 +969,23 @@ public enum $ {
 
 
         @Override
-        public
-        @Nullable
-        TermContainer theSubterms(TermContainer s) {
+        protected @Nullable TermContainer theSubterms(TermContainer s) {
             return s;
         }
 
         @Override
         public int subtermsCount() {
             return 0;
+        }
+
+        @Override
+        public @NotNull String summary() {
+            return "";
+        }
+
+        @Override
+        public void remove(@NotNull Termed entry) {
+
         }
 
 
@@ -998,12 +1006,6 @@ public enum $ {
             throw new UnsupportedOperationException();
         }
 
-
-        @NotNull
-        @Override
-        public TermBuilder builder() {
-            return this;
-        }
 
         @Nullable
         @Override

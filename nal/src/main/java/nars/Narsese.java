@@ -1067,7 +1067,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * returns number of tasks created
      */
-    public static int tasks(@NotNull String input, @NotNull Collection<Task> c, @NotNull Consumer<Object[]> unparsed, @NotNull Memory m)  {
+    public static int tasks(@NotNull String input, @NotNull Collection<Task> c, @NotNull Consumer<Object[]> unparsed, @NotNull NAR m)  {
         int[] i = new int[1];
         tasks(input, t -> {
             c.add(t);
@@ -1083,7 +1083,7 @@ public class Narsese extends BaseParser<Object> {
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(@NotNull String input, @NotNull Consumer<Task> c, @NotNull Consumer<Object[]> unparsed, @NotNull Memory m) {
+    public static void tasks(@NotNull String input, @NotNull Consumer<Task> c, @NotNull Consumer<Object[]> unparsed, @NotNull NAR m) {
         tasksRaw(input, o -> {
             Task t = decodeTask(m, o);
             if (t == null) {
@@ -1135,7 +1135,7 @@ public class Narsese extends BaseParser<Object> {
      * parse one task
      */
     @NotNull
-    public Task task(@NotNull String input, @NotNull Memory memory) throws NarseseException {
+    public Task task(@NotNull String input, @NotNull NAR memory) throws NarseseException {
         ParsingResult r;
         try {
             r = singleTaskParser.run(input);
@@ -1159,14 +1159,14 @@ public class Narsese extends BaseParser<Object> {
      * returns null if the Task is invalid (ex: invalid term)
      */
     @NotNull
-    public static Task decodeTask(@NotNull Memory m, @NotNull Object[] x) throws NarseseException  {
+    public static Task decodeTask(@NotNull NAR m, @NotNull Object[] x) throws NarseseException  {
         if (x.length == 1 && x[0] instanceof Task) {
             return (Task) x[0];
         }
         Term contentRaw = (Term) x[1];
-        if (contentRaw == null)
+        if (!(contentRaw instanceof Compound))
             throw new NarseseException("Invalid task term");
-        Termed content = m.index.normalize(contentRaw);
+        Termed content = m.normalize((Compound)contentRaw);
         if (content == null)
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
 
@@ -1218,10 +1218,10 @@ public class Narsese extends BaseParser<Object> {
         Term y = term(s);
         if (normalize) {
             if (y instanceof Compound) {
-                Termed x = index.normalize(y);
+                Compound x = index.normalize((Compound)y);
                 if (x == null)
                     throw new NarseseException("Un-normalizable: " + y);
-                return x.term();
+                return x;
             }
 
         }

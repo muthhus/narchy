@@ -2,7 +2,7 @@ package nars.term.transform;
 
 import nars.$;
 import nars.term.Compound;
-import nars.term.Termed;
+import nars.term.Term;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
 import nars.util.data.map.UnifriedMap;
@@ -84,8 +84,8 @@ public class VariableNormalization extends VariableTransform implements Function
     /** for use with compounds that have exactly one variable */
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
-        @NotNull @Override
-        public Termed apply(@NotNull Compound containing, @NotNull Variable current) {
+        @Override
+        public Term apply(@NotNull Compound containing, @NotNull Variable current) {
 
             //if (current instanceof Ellipsis)
                //throw new RuntimeException("not allowed");
@@ -107,8 +107,8 @@ public class VariableNormalization extends VariableTransform implements Function
         return rvv;
     }
 
-    @NotNull @Override
-    public final Termed apply(@Nullable Compound ct, @NotNull Variable v) {
+    @Override
+    public final Term apply(@Nullable Compound ct, @NotNull Variable v) {
         return rename.computeIfAbsent(v, this);
     }
 

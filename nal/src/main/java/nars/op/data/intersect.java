@@ -12,7 +12,7 @@ public class intersect extends BinaryTermOperator {
     @Override public Term apply(@NotNull Term a, @NotNull Term b) {
         ensureCompounds(a, b);
 
-        return $.terms.builder().intersect(a.op(), (Compound)a, (Compound) b);
+        return $.terms.intersect(a.op(), (Compound)a, (Compound) b);
     }
 
 

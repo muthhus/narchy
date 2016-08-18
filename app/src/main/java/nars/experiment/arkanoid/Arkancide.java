@@ -39,25 +39,23 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 32;
+    private static final int cyclesPerFrame = 16;
     public static final int runFrames = 20000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 8;
-    public static final int INDEX_SIZE = 6 * 100000;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
+    public static final int INDEX_SIZE = 3 * 100000;
     final Arkanoid noid;
     private final SwingCamera cam;
-
-
 
     private MotorConcept motorLeftRight;
 
     final int visW = 24;
-    final int visH = 14;
+    final int visH = 12;
     final SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 128;
+    private int visionSyncPeriod = 64;
     float noiseLevel = 0;
 
-    float paddleSpeed = 75f;
+    float paddleSpeed = 45f;
     private float prevScore;
 
     public class View {
@@ -236,7 +234,7 @@ public class Arkancide extends NAREnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.01f);
+        nar.confMin.setValue(0.03f);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {

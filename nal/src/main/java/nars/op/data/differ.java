@@ -19,7 +19,7 @@ public class differ extends BinaryTermOperator {
      */
     @Nullable
     public static Term difference(@NotNull Op op, @NotNull Compound a, @NotNull Compound b) {
-        return $.terms.builder().difference(op, a, b);
+        return $.terms.difference(op, a, b);
     }
 
     @NotNull
@@ -32,6 +32,6 @@ public class differ extends BinaryTermOperator {
     public Term apply(@NotNull Term a, @NotNull Term b) {
         ensureCompounds(a, b);
 
-        return $.terms.builder().difference( a.op(), (Compound) a, (Compound) b );
+        return $.terms.difference( a.op(), (Compound) a, (Compound) b );
     }
 }

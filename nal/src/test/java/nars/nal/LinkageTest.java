@@ -93,7 +93,7 @@ public class LinkageTest extends AbstractNALTest {
     //interlinked with an intermediate concept, this is needed in order to select one as task and the other as belief
     public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, char punc, @NotNull String spremise2) throws Exception {
 
-        int frames = 2;
+        int frames = 5;
 
         NAR nar = test().nar;
 
@@ -165,30 +165,30 @@ public class LinkageTest extends AbstractNALTest {
     }
 
     public boolean linksIndirectly(@NotNull NAR nar, @NotNull Termed premise2, @NotNull Concept ret) {
-        boolean passed = false;
-        if (ret.termlinks()!=null) {
-            for (BLink<Term> entry : ret.termlinks()) {
-                Term p2Term = premise2.term();
-                if(entry.get().term().equals(p2Term)) {
-                    passed = true;
-                    break;
-                }
 
-                Term w = entry.get().term();
-                if (!(w instanceof Variable)) {
-                    Concept Wc = nar.concept(w);
-                    if (Wc != null) {
-                        for (BLink<Term> entry2 : Wc.termlinks()) {
-                            if (entry2.get().term().equals(p2Term)) {
-                                passed = true;
-                                break;
-                            }
+        Term p2Term = premise2.term();
+
+        for (BLink<Term> entry : ret.termlinks()) {
+            Term w = entry.get();
+
+            //test 1st level link
+            if(w.equals(p2Term)) {
+                return true;
+            }
+
+            //test 2nd level link
+            if (!(w instanceof Variable)) {
+                Concept Wc = nar.concept(w);
+                if (Wc != null) {
+                    for (BLink<Term> entry2 : Wc.termlinks()) {
+                        if (entry2.get().equals(p2Term)) {
+                            return true;
                         }
                     }
                 }
             }
         }
-        return passed;
+        return false;
     }
 
 
