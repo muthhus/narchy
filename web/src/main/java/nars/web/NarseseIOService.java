@@ -42,7 +42,7 @@ public class NarseseIOService extends WebsocketService {
                 nar.eventTaskProcess.on(this::queue),
 //                nar.eventAnswer.on(t -> send(
 //                        "ANS: " + t)),
-                nar.eventError.on(this::queue),
+                //nar.eventError.on(this::queue),
                 nar.eventFrameStart.on(this::flush)
         );
 

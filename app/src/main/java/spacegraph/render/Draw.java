@@ -226,7 +226,6 @@ public enum Draw {
                                     normal.normalize();
 
                                     gl.glNormal3f(normal.x, normal.y, normal.z);
-                                    gl.glColor3f(1f, 0.5f, 0f);
                                     gl.glVertex3f(v1.x, v1.y, v1.z);
                                     gl.glVertex3f(v2.x, v2.y, v2.z);
                                     gl.glVertex3f(v3.x, v3.y, v3.z);

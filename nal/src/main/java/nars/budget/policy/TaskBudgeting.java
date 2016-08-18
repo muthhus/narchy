@@ -15,8 +15,13 @@ import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
+import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static nars.nal.UtilityFunctions.and;
+import static nars.nal.UtilityFunctions.aveAri;
+import static nars.util.Texts.n2;
 
 /**
  * Created by me on 5/23/16.
@@ -43,14 +48,13 @@ public class TaskBudgeting {
 
         Premise pp = p.premise;
 
-        Task parentTask = pp.task;
+
 
         //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
 
-        float parentComplexity = Math.max(parentTask.complexity(), pp.term.complexity());
-        int derivedComplexity = derived.complexity();
-
-        float volRatioScale = 1f / (1f + (derivedComplexity / (derivedComplexity + parentComplexity)));
+        float volRatioScale =
+                //occamBasic(derived, pp);
+                occamSquareWithDeadzone(derived, pp);
 
         //volRatioScale = volRatioScale * volRatioScale; //sharpen
 
@@ -95,6 +99,63 @@ public class TaskBudgeting {
             return new BudgetValue(priority, durability, quality);
          */
     }
+
+    /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by */
+    public static float occamBasic(@NotNull Termed derived, Premise pp) {
+        Task parentTask = pp.task;
+        float parentComplexity = parentTask.complexity();
+        Task parentBelief = pp.belief;
+        if (parentBelief!=null && parentBelief.complexity() > parentComplexity)
+            parentComplexity = parentBelief.complexity();
+
+        int derivedComplexity = derived.complexity();
+        return 1f / (1f + (derivedComplexity / (derivedComplexity + parentComplexity)));
+    }
+
+    /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by */
+    public static float occamSquareWithDeadzone(@NotNull Termed derived, Premise pp) {
+        Task parentTask = pp.task;
+        float parentComplexity = parentTask.complexity();
+        Task parentBelief = pp.belief;
+
+        int derivedComplexity = derived.complexity();
+
+        //choose the task or belief (if present) which has the complexity nearest the derived (optimistic)
+        Term parentTerm;
+        float delta = Math.abs(derivedComplexity - parentComplexity);
+        if (parentBelief!=null && delta > Math.abs(derivedComplexity - parentBelief.complexity())) {
+            parentTerm = parentBelief.term();
+            parentComplexity = parentTerm.complexity();
+            delta = Math.abs(derivedComplexity - parentComplexity); //recompute delta for new value
+        } else {
+            parentTerm = parentTask.term();
+        }
+
+        if (Math.max(derived.term().vars(), parentTerm.vars()) >= delta) {
+            //no penalty if the difference in complexity is within a range bounded by the number of variables in the derived.
+            //this is the 'dead-zone' of the curve which encourages variable introduction and substitution
+            return 1f;
+        } else {
+            //otherwise, the penalty is proportional to the absolute change in complexity
+            //this includes whether the complexity decreased (ex: decomposition/substition) or increased (composition)
+            //the theory behind penalizing decrease in complexity is to marginalize
+            //potentially useless runaway decomposition results that could be considered noisy echos or residue of
+            //its premise components
+
+            float relDelta = delta /
+                    aveAri(parentComplexity); //TODO could be LERP based on compared confidence of premise to derived (if belief/goal)
+
+            //the decay rate is given a polynomial boost here to further enforce the
+            //need to avoid complexity
+            float divisor = 1f + relDelta;
+            float scale = 1f / (divisor*divisor);
+
+            //System.out.println(parentTerm + " :: " + derived + "  -- " + n2(scale) + " vs " + n2(occamBasic(derived, pp)));
+
+            return scale;
+        }
+    }
+
 
     /**
      * Backward logic with CompoundTerm conclusion, stronger case
@@ -148,7 +209,7 @@ public class TaskBudgeting {
             float taskPriority = question.pri();
 
             budget = new UnitBudget(
-                    UtilityFunctions.and(taskPriority, quality),
+                    and(taskPriority, quality),
                     //UtilityFunctions.or(taskPriority, quality),
                     question.dur(), BudgetFunctions.truthToQuality(solution.truth()));
             question.budget().setPriority(Math.min(1 - quality, taskPriority));

@@ -24,6 +24,7 @@ import java.util.*;
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.XTERNAL;
 import static nars.term.compound.Statement.pred;
 import static nars.term.compound.Statement.subj;
 
@@ -394,7 +395,7 @@ public abstract class TermBuilder {
         }
 
 
-        if ((dt == DTERNAL) || (dt == 0)) {
+        if ((dt == DTERNAL) || (dt == 0) || (dt == XTERNAL)) {
             return junctionFlat(CONJ, dt, u);
         } else {
 
@@ -677,7 +678,7 @@ public abstract class TermBuilder {
                     subject = x;
                 }
 
-                if (reversed && (dt != DTERNAL && dt != 0) ) {
+                if (reversed && (dt != DTERNAL && dt!=XTERNAL && dt != 0) ) {
                     dt = -dt;
                 }
 

@@ -69,7 +69,7 @@
             self.__id, url, protocols, proxyHost || null, proxyPort || 0, headers || null);
       });
     }, 0);
-  };
+  }
 
   /**
    * Send data to the web socket.

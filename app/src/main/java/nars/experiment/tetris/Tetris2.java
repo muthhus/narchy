@@ -49,13 +49,13 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 8 * 100000;
+    public static final int DEFAULT_INDEX_WEIGHT = 2 * 100000;
 
-    public static final Executioner exe = new MultiThreadExecutioner(3, 4096);
+    public static final Executioner exe = new MultiThreadExecutioner(4, 4096);
 
 
 
-    public static final int runFrames = 50000;
+    public static final int runFrames = 5000;
     public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -357,14 +357,14 @@ public class Tetris2 extends NAREnvironment {
         nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.7f);
+        nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.15f);
+        nar.confMin.setValue(0.02f);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -399,7 +399,7 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 384, '.', 4);
+        MySTMClustered stm = new MySTMClustered(nar, 384, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new ArithmeticInduction(nar);
@@ -639,11 +639,14 @@ public class Tetris2 extends NAREnvironment {
         Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
         plot2.add("Busy", () -> nar.emotion.busy.getSum());
         plot2.add("Lern", () -> nar.emotion.busy.getSum() - nar.emotion.frustration.getSum());
-        //plot2.add("Strs", ()->nar.emotion.stress.getSum());
 
         Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
-        plot3.add("Hapy", () -> nar.emotion.happy.getSum());
-        plot3.add("Sad", () -> nar.emotion.sad.getSum());
+        plot3.add("Strs", () -> nar.emotion.stress.getSum());
+
+
+        Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
+        plot4.add("Hapy", () -> nar.emotion.happy.getSum());
+        plot4.add("Sad", () -> nar.emotion.sad.getSum());
 
 //                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
 //                plot4.add("Errr", ()->nar.emotion.errr.getSum());
@@ -652,9 +655,10 @@ public class Tetris2 extends NAREnvironment {
             plot.update();
             plot2.update();
             plot3.update();
+            plot4.update();
         });
 
-        return new GridSurface(VERTICAL, plot, plot2, plot3);
+        return new GridSurface(VERTICAL, plot, plot2, plot3, plot4);
     }
 
     public static class NARController extends NAREnvironment {

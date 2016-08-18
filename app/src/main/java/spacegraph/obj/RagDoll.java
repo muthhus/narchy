@@ -26,6 +26,9 @@
 
 package spacegraph.obj;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import spacegraph.SimpleSpatial;
 import spacegraph.math.v3;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
@@ -39,13 +42,18 @@ import spacegraph.phys.shape.CapsuleShape;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.BulletStack;
 import spacegraph.phys.util.Motion;
+import spacegraph.render.Draw;
 import spacegraph.render.JoglPhysics;
 import spacegraph.render.JoglPhysics.ExtraGlobals;
+
+import static spacegraph.render.JoglPhysics.defaultRenderer;
 
 /**
  * @author jezek2
  */
 public class RagDoll  {
+
+    private Dynamic head;
 
     public RagDoll() {
         super();
@@ -166,7 +174,29 @@ public class RagDoll  {
         transform.setIdentity();
         transform.set(0f, scale_ragdoll * 1.6f, 0f);
         tmpTrans.mul(offset, transform);
-        Dynamic head = bodies[BodyPart.BODYPART_HEAD.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_HEAD.ordinal()]);
+        this.head = bodies[BodyPart.BODYPART_HEAD.ordinal()] =
+                localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_HEAD.ordinal()]);
+
+        head.setRenderer((Object gl, Object dd)->{
+            GL2 g = (GL2) gl;
+            Dynamic d = (Dynamic) dd;
+
+            defaultRenderer.accept(g, d); //HACK cast sucks
+
+            g.glPushMatrix();
+
+            Draw.transform(g, d.transform());
+
+            g.glColor4f((float)Math.random(),0.25f,1f,0.75f); //HACK cast sucks
+            g.glRotatef((float)Math.PI/2f, 0, 0, 1);
+            Draw.rect(g, -0.5f,-0.5f,1,1, 0.5f);
+
+            g.glPopMatrix();
+
+            g.glColor4f(0.75f,0.75f,0.75f,1f); //HACK restore white color
+
+        });
+
 
         transform.setIdentity();
         transform.set(-0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
@@ -190,7 +220,7 @@ public class RagDoll  {
 
         transform.setIdentity();
         transform.set(-0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-        MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, ExtraGlobals.SIMD_HALF_PI);
+        MatrixUtil.setEulerZYX(transform.basis, 0, 0, ExtraGlobals.SIMD_HALF_PI);
         tmpTrans.mul(offset, transform);
         bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()]);
 

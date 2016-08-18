@@ -227,11 +227,11 @@ public class WebServer /*extends PathHandler*/ {
         nar.cyclesPerFrame.set(4);
 
         //nar.log();
-        nar.with(
-                Anticipate.class,
-                Inperience.class
-        );
-        nar.with(new Abbreviation(nar,"is"));
+//        nar.with(
+//                Anticipate.class,
+//                Inperience.class
+//        );
+//        nar.with(new Abbreviation(nar,"is"));
 
         return nar;
     }
