@@ -48,6 +48,11 @@ public final class Transform extends v3 {
 	public Transform() {
 	}
 
+	public Transform(float x, float y, float z) {
+		setIdentity();
+		this.set(x, y, z);
+	}
+
 	public Transform(v3 v) {
 		setIdentity();
 		this.set(v);

@@ -43,13 +43,15 @@ public class TetrahedronShapeEx extends BU_Simplex1to4 {
 			vertices[i] = new v3();
 		}
 	}
-
-	public void setVertices(v3 v0, v3 v1, v3 v2, v3 v3) {
+	public TetrahedronShapeEx(v3 v0, v3 v1, v3 v2, v3 v3) {
+		this();
 		vertices[0].set(v0);
 		vertices[1].set(v1);
 		vertices[2].set(v2);
 		vertices[3].set(v3);
 		recalcLocalAabb();
+
 	}
+
 	
 }

@@ -40,8 +40,13 @@ import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.*;
 import spacegraph.phys.util.BulletStack;
+import spacegraph.phys.util.IntArrayList;
+import spacegraph.phys.util.OArrayList;
 
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
+import static spacegraph.math.v3.v;
+import static spacegraph.phys.collision.broad.BroadphaseNativeType.CONVEX_HULL_SHAPE_PROXYTYPE;
+import static spacegraph.phys.collision.broad.BroadphaseNativeType.SPHERE_SHAPE_PROXYTYPE;
 import static spacegraph.render.JoglSpace.glut;
 import static spacegraph.test.Lesson14.renderString;
 
@@ -169,14 +174,73 @@ public enum Draw {
                     useWireframeFallback = false;
                     break;
                 }
+                case CONVEX_HULL_SHAPE_PROXYTYPE:
                 case TRIANGLE_SHAPE_PROXYTYPE:
                 case TETRAHEDRAL_SHAPE_PROXYTYPE: {
-                    //todo:
-                    //					useWireframeFallback = false;
+                    //glutSolidCube(1.0);
+
+
+                    if (shape.isConvex()) {
+                        ConvexShape convexShape = (ConvexShape) shape;
+                        if (shape.getUserPointer() == null) {
+                            // create a hull approximation
+                            ShapeHull hull = new ShapeHull(convexShape);
+
+                            // JAVA NOTE: not needed
+                            ///// cleanup memory
+                            //m_shapeHulls.push_back(hull);
+
+                            float margin = shape.getMargin();
+                            hull.buildHull(margin);
+                            convexShape.setUserPointer(hull);
+
+                            //printf("numTriangles = %d\n", hull->numTriangles ());
+                            //printf("numIndices = %d\n", hull->numIndices ());
+                            //printf("numVertices = %d\n", hull->numVertices ());
+                        }
+
+                        if (shape.getUserPointer() != null) {
+                            ShapeHull hull = (ShapeHull) shape.getUserPointer();
+
+                            int tris = hull.numTriangles();
+                            if (tris > 0) {
+                                int index = 0;
+                                IntArrayList idx = hull.getIndexPointer();
+                                OArrayList<v3> vtx = hull.getVertexPointer();
+
+                                v3 normal = v();
+                                v3 tmp1 = v();
+                                v3 tmp2 = v();
+
+                                gl.glBegin(gl.GL_TRIANGLES);
+
+                                for (int i = 0; i < tris; i++) {
+
+                                    v3 v1 = vtx.get(idx.get(index++));
+                                    v3 v2 = vtx.get(idx.get(index++));
+                                    v3 v3 = vtx.get(idx.get(index++));
+
+                                    tmp1.sub(v3, v1);
+                                    tmp2.sub(v2, v1);
+                                    normal.cross(tmp1, tmp2);
+                                    normal.normalize();
+
+                                    gl.glNormal3f(normal.x, normal.y, normal.z);
+                                    gl.glColor3f(1f, 0.5f, 0f);
+                                    gl.glVertex3f(v1.x, v1.y, v1.z);
+                                    gl.glVertex3f(v2.x, v2.y, v2.z);
+                                    gl.glVertex3f(v3.x, v3.y, v3.z);
+
+                                }
+
+                                gl.glEnd();
+                            }
+                        }
+                    }
+
+                    useWireframeFallback = false;
                     break;
                 }
-                case CONVEX_HULL_SHAPE_PROXYTYPE:
-                    break;
                 case SPHERE_SHAPE_PROXYTYPE: {
                     SphereShape sphereShape = (SphereShape) shape;
                     float radius = sphereShape.getMargin(); // radius doesn't include the margin, so draw with margin
@@ -642,11 +706,11 @@ public enum Draw {
         }
 
         public void processTriangle(v3[] triangle, int partId, int triangleIndex) {
-            ImmModeSink vbo = ImmModeSink.createFixed(GL.GL_STATIC_DRAW, 10,
+            ImmModeSink vbo = ImmModeSink.createFixed(10,
                     3, GL.GL_FLOAT,  // vertex
                     4, GL.GL_FLOAT,  // color
                     0, GL.GL_FLOAT,  // normal
-                    0, GL.GL_FLOAT); // texture
+                    0, GL.GL_FLOAT, GL.GL_STATIC_DRAW); // texture
             if (wireframe) {
                 vbo.glBegin(gl.GL_LINES);
                 vbo.glColor4f(1, 0, 0, 1);

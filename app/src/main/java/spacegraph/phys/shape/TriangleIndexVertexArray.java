@@ -38,12 +38,11 @@ import java.nio.ByteBuffer;
  */
 public class TriangleIndexVertexArray extends StridingMeshInterface {
 
-	protected OArrayList<IndexedMesh> indexedMeshes = new OArrayList<>();
+	protected final OArrayList<IndexedMesh> indexedMeshes = new OArrayList<>();
 
 	private final ByteBufferVertexData data = new ByteBufferVertexData();
 
-	public TriangleIndexVertexArray() {
-	}
+
 
 	/**
 	 * Just to be backwards compatible.

@@ -258,7 +258,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
 //    }
 
     @Override
-    public final void update(Dynamics world) {
+    public void update(Dynamics world) {
         if (body == null) {
             this.bodies = enter(world);
         } else {

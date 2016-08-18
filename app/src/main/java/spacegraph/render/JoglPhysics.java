@@ -397,12 +397,13 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
                 camUp.x, camUp.y, camUp.z);
 
 
-        gl.glMatrixMode(gl.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
 //        stack.vectors.pop();
 //        stack.matrices.pop();
 //        stack.quats.pop();
 
+        gl.glShadeModel(GL2.GL_SMOOTH);
     }
 
     private final float[] matTmp = new float[16];

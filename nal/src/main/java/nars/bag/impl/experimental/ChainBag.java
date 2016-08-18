@@ -14,6 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
+ * NOT READY YET
+ *
  * ChainBag repeatedly cycles through a linked list containing
  * the set of items, stored in an arbitrary order.
  * <p>

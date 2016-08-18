@@ -125,16 +125,14 @@ public class BvhTriangleMeshShape extends TriangleMeshShape {
 	}
 
 	public void performRaycast(TriangleCallback callback, v3 raySource, v3 rayTarget) {
-		MyNodeOverlapCallback myNodeCallback = new MyNodeOverlapCallback();
-		myNodeCallback.init(callback, meshInterface);
+		MyNodeOverlapCallback myNodeCallback = new MyNodeOverlapCallback(callback, meshInterface);
 
 		bvh.reportRayOverlappingNodex(myNodeCallback, raySource, rayTarget);
 
 	}
 
 	public void performConvexcast(TriangleCallback callback, v3 raySource, v3 rayTarget, v3 aabbMin, v3 aabbMax) {
-		MyNodeOverlapCallback myNodeCallback = new MyNodeOverlapCallback();
-		myNodeCallback.init(callback, meshInterface);
+		MyNodeOverlapCallback myNodeCallback = new MyNodeOverlapCallback(callback, meshInterface);
 
 		bvh.reportBoxCastOverlappingNodex(myNodeCallback, raySource, rayTarget, aabbMin, aabbMax);
 	}
@@ -150,8 +148,7 @@ public class BvhTriangleMeshShape extends TriangleMeshShape {
 		//#else
 
 		// first get all the nodes
-		MyNodeOverlapCallback myNodeCallback = new MyNodeOverlapCallback();
-		myNodeCallback.init(callback, meshInterface);
+		MyNodeOverlapCallback myNodeCallback = new MyNodeOverlapCallback(callback, meshInterface);
 
 		bvh.reportAabbOverlappingNodex(myNodeCallback, aabbMin, aabbMax);
 		//#endif//DISABLE_BVH
@@ -235,19 +232,16 @@ public class BvhTriangleMeshShape extends TriangleMeshShape {
 	////////////////////////////////////////////////////////////////////////////
 
 	protected static class MyNodeOverlapCallback extends NodeOverlapCallback {
-		public StridingMeshInterface meshInterface;
-		public TriangleCallback callback;
+		public final StridingMeshInterface meshInterface;
+		public final TriangleCallback callback;
 
 		private final v3[] triangle/*[3]*/ = new v3[] { new v3(), new v3(), new v3() };
 
-		public MyNodeOverlapCallback() {
-		}
-		
-		public void init(TriangleCallback callback, StridingMeshInterface meshInterface) {
+		public MyNodeOverlapCallback(TriangleCallback callback, StridingMeshInterface meshInterface) {
 			this.meshInterface = meshInterface;
 			this.callback = callback;
 		}
-
+		
 		@Override
         public void processNode(int nodeSubPart, int nodeTriangleIndex) {
 			VertexData data = meshInterface.getLockedReadOnlyVertexIndexBase(nodeSubPart);

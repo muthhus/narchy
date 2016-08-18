@@ -1,35 +1,192 @@
 package spacegraph.obj;
 
-import nars.util.data.random.XorShift128PlusRandom;
-import spacegraph.Spatial;
+import nars.$;
+import spacegraph.*;
+import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
+import spacegraph.phys.Dynamic;
+import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.TypedConstraint;
+import spacegraph.phys.math.Transform;
+import spacegraph.phys.math.convexhull.HullDesc;
+import spacegraph.phys.math.convexhull.HullLibrary;
+import spacegraph.phys.math.convexhull.HullResult;
+import spacegraph.phys.shape.*;
+import spacegraph.phys.util.Motion;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
+import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+
+import static spacegraph.math.v3.v;
 
 /**
- * Created by me on 8/12/16.
+ * TODO extend CompoundSpatial
  */
-public class Maze extends Spatial {
+public class Maze extends SimpleSpatial {
+
+    private List<Collidable> bodies;
+
+    public static void main(String[] args) {
+        SpaceGraph s = new SpaceGraph(
+            new Maze("x", 20, 20)
+        );
+        s.setGravity(v(0,0,-5));
+        s.show(1000,1000);
+    }
+
+
 
     boolean[][] cells;
 
-    public Maze(int x, int y) {
+    public Maze(String id, int x, int y) {
+        super(id);
         cells = new boolean[x][y];
         build(0,0,x-1,y-1);
-        for (boolean[] c : cells) {
-            for (boolean cc : c) {
-                System.out.print(cc ? 'X' : ' ');
-            }
-            System.out.println();
+
+
+    }
+
+    @Override
+    public void update(Dynamics world) {
+        if (bodies == null) {
+            this.bodies = enter(world);
+        } else {
+            next(world);
         }
     }
 
-    public static void main(String[] ags) {
-        new Maze(10,75);
+    @Override
+    protected List<Collidable> enter(Dynamics world) {
+        List<Collidable> l = $.newArrayList();
+
+        float dx = 1, dy = 1;
+        float y = 0;
+        for (boolean[] c : cells) {
+            float x = 0;
+            for (boolean cc : c) {
+
+
+                if (cc) {
+
+
+                    Dynamic b;
+                    b = Dynamics.newBody(
+                            1f, //mass
+                            new BoxShape(0.9f, 0.9f, 0.9f), new Motion(),
+                            +1, //group
+                            -1//collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
+                    );
+                    b.setCenterOfMassTransform(new Transform(x, y, 0));
+
+                    //b.setLinearFactor(1,1,0); //restricts movement to a 2D plane
+
+
+                    b.setDamping(0.9f, 0.5f);
+                    b.setFriction(0.9f);
+
+                    l.add(b);
+                }
+
+                x+=dx;
+
+            }
+            y+=dy;
+        }
+
+
+
+        CollisionShape groundShape = new BoxShape(v(20f, 20f, 10f));
+        Dynamic ground = Dynamics.newBody(0f, groundShape, new Motion(), +1, -1);
+        ground.setCenterOfMassTransform(new Transform(0, 0, -15f));
+        l.add(ground);
+
+
+        /*ConvexShape blobShape = new BvhTriangleMeshShape(
+                new TriangleIndexVertexArray(), true
+        );*/
+        //ConvexShape blobShape =new TetrahedronShapeEx(v(-10,0,0), v(10, 0, 10), v(10, -10, 10), v(-10, -10, 10));
+        //CollisionShape blobShape = terrain(5, 0.25f, 1, v(5,5,5));
+        ConvexHullShape blobShape = hull();
+        Dynamic blob = Dynamics.newBody(4f, blobShape, new Motion(), +1, -1);
+        blob.setCenterOfMassTransform(new Transform(0, 0, 15f));
+        l.add(blob);
+
+
+
+        Collections.addAll( l,  new RagDoll().build(world, v(0,0,20), 3f) );
+
+        return l;
+    }
+
+
+    public ConvexHullShape hull() {
+        ConvexHullShape c = new ConvexHullShape().add(
+            v(-3,0,0), v(-3, 0, 3), v(-3, -3, 3), v(-3, 3, 3),
+            v(0, 3, 1.5f)
+        );
+
+        return c;
+    }
+
+    protected CollisionShape terrain(int tesselation, float height, int seed, v3 scale) {
+
+
+        int count, countsq, countsqp, indCount = 0, nsscroll;
+
+        count = tesselation;
+        countsq = count * count;
+        countsqp = countsq + (count * 2 + 1);
+
+        nsscroll = seed;
+        v3[] pvert = new v3[countsqp];
+
+        ByteBuffer ind, vert;
+
+        float hdim =  count * .5f;
+        float nscl = .09f;
+        float zscl = 7.5f;
+        ind = ByteBuffer.allocateDirect(countsq * 24);
+        vert = ByteBuffer.allocateDirect(countsqp * 12);
+        for (int a = 0; a < countsqp; a++) {
+            int xi = a % (count + 1);
+            int yi = (int) Math.floor(a / (count + 1));
+            float xx = xi - hdim;
+            float zz = yi  - hdim;
+            float yy = 0;
+            yy += noise((nsscroll + xx + 1) * nscl, zz * nscl);
+            yy += noise((nsscroll + xx + 1) * nscl, (zz + 1) * nscl);
+            yy += noise((nsscroll + xx - 1) * nscl, zz * nscl);
+            yy += noise((nsscroll + xx) * nscl, (zz - 1) * nscl);
+            yy *= height * zscl;
+            if (xi == 0 || xi == count || yi == 0 || yi == count)
+                yy -= zscl * .2;
+            pvert[a] = new v3(xx, yy, zz);
+
+            vert.putFloat(xx);
+            vert.putFloat(yy);
+            vert.putFloat(zz);
+            if (a != 0 && (xi == count || a > countsq + (count - 2))) {
+                continue;
+            }
+            indCount += 2;
+            ind.putInt(a);
+            ind.putInt(a + 1);
+            ind.putInt(a + count + 1);
+            ind.putInt(a + 1);
+            ind.putInt(a + count + 2);
+            ind.putInt(a + count + 1);
+        }
+        TriangleIndexVertexArray tiva = new TriangleIndexVertexArray(indCount, ind, 12, countsq, vert, 12);
+
+        BvhTriangleMeshShape cs = new BvhTriangleMeshShape(tiva, true);
+        cs.setLocalScaling(scale);
+        return cs;
+    }
+
+    private float noise(float a, float b) {
+        //TODO perlin noise
+        return (float)Math.random();
     }
 
     public static int irand(int x) {
@@ -74,7 +231,7 @@ public class Maze extends Spatial {
 
     @Override
     public List<Collidable> bodies() {
-        return null;
+        return bodies;
     }
 
     @Override
