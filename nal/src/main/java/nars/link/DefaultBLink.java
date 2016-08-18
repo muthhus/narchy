@@ -56,10 +56,10 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
     @Override
     public boolean delete() {
-        float p = pri();
+        float p = PRI;
         if (p==p) {
             //not already deleted
-            PRI = (Float.NaN);
+            this.PRI = (Float.NaN);
             return true;
         }
         return false;

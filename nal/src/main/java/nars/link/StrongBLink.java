@@ -8,8 +8,8 @@ import org.jetbrains.annotations.Nullable;
 public class StrongBLink<X> extends DefaultBLink<X> {
 
     ///** the referred item */
-    @Nullable
-    public X id;
+    @NotNull
+    public final X id;
 
     public StrongBLink(@NotNull X id, Budgeted b) {
         this(id, b.pri(), b.dur(), b.qua());
@@ -20,13 +20,7 @@ public class StrongBLink<X> extends DefaultBLink<X> {
         this.id = id;
     }
 
-    @Override
-    public boolean delete() {
-        id = null;
-        return super.delete();
-    }
-
-    @Nullable
+    @NotNull
     @Override
     public final X get() {
         return id;

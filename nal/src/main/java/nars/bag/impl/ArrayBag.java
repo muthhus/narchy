@@ -54,18 +54,22 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return size() == 0;
     }
 
-    @Override
-    protected final void removeWeakest(Object reason) {
-        if (!removeDeletedAtBottom()) {
-            @NotNull V w = weakest();
-            if (w != null) {
-                BLink<V> ww = remove(w);
-                if (ww != null)
-                    ww.delete(reason);
-            }
-        }
-    }
 
+    @Override
+    protected void removeWeakest(int num) {
+
+        //first step: remove any nulls and deleted values
+        int r = removeDeletedAtBottom();
+        num -= r;
+
+        //second step: remove the lowest ranked items until quota is met
+        while (r > 0) {
+            remove(weakest()).delete();
+            r--;
+        }
+
+        updateRange();
+    }
 
     @Override
     public final int compare(@Nullable BLink o1, @Nullable BLink o2) {
@@ -237,7 +241,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         if (i instanceof Budgeted)
             return new StrongBLinkToBudgeted((Budgeted) i, b);
         else
-            return new StrongBLink(i,b);
+            return new StrongBLink(i, b);
     }
 
     protected @Nullable BLink<V> prePutNew(@NotNull V k, @NotNull BLink<V> v) {
@@ -249,7 +253,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     protected final BLink<V> addItem(@NotNull BLink<V> x) {
         BLink<V> y = super.addItem(x);
         if (y != x) {
-            updateRange(size());
+            updateRange();
         }
         return y;
     }
@@ -259,26 +263,25 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public final Bag<V> commit() {
 
         if (!isEmpty()) {
-            commit(autoforget());
+            float existing = this.mass;
+            Consumer<BLink> a;
+            if (existing == 0) {
+                a = null; //nothing to forget
+            } else {
+                float pending = this.pending;
+                this.pending = 0; //reset pending accumulator
+
+                float r = 1f - (existing / (existing + pending));
+
+                a = (r >= Param.BUDGET_EPSILON) ? new Forget(r) : null;
+            }
+
+            commit(a);
         }
 
         return this;
     }
 
-    private @Nullable Consumer<BLink> autoforget() {
-
-        float existing = this.mass;
-        if (existing == 0)
-            return null; //nothing to forget
-
-        float pending = this.pending;
-        this.pending = 0; //reset pending accumulator
-
-        float r = 1f - (existing / (existing + pending));
-
-
-        return r >= Param.BUDGET_EPSILON ? new Forget(r) : null;
-    }
 
     private static final class Forget implements Consumer<BLink> {
         public final float r;
@@ -315,20 +318,19 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public Bag<V> commit(@Nullable Consumer<BLink> each) {
 
-
         int s = size();
         if (s > 0) {
             synchronized (items) {
                 int lowestUnsorted = updateExisting(each, s);
 
                 if (lowestUnsorted != -1) {
-                    int[] qsortStack = new int[24];
-                    qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, s);
+                    qsort(new int[24 /* estimate */], items.array(), 0 /*dirtyStart - 1*/, s);
                 } // else: perfectly sorted
 
-            }
+                removeDeletedAtBottom();
 
-            removeDeletedAtBottom();
+                updateRange();
+            }
 
         }
 
@@ -417,60 +419,48 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return lowestUnsorted;
     }
 
-    private boolean removeDeletedAtBottom() {
+    /** must be called in synchronized(items) block */
+    private int removeDeletedAtBottom() {
         //remove deleted items they will collect at the end
-        int i = size() - 1;
-        BLink<V> ii;
+
         SortedArray<BLink<V>> items = this.items;
-        int removed = 0;
-        int toRemoveFromMap = 0;
+        int i, j;
+        BLink<V>[] l = items.array();
 
-        synchronized (items) {
-            BLink<V>[] l = items.array();
+        j = i = size() - 1;
 
+        int removedFromMap = 0;
 
-            while (i > 0 && ((ii = l[i]) == null || (ii.isDeleted()))) {
-                if (ii != null && removeKeyForValue(ii) == null) {
-                    //
-                    //throw new RuntimeException("Bag fault while trying to remove key by item value");
-
-                    //exhaustive removal, since the BLink has lost its key
-                    toRemoveFromMap++;
-                } else {
-                    removed++;
-                }
-
-                //remove by known index rather than have to search for it by key or something
-                //different from removeItem which also removes the key, but we have already done that above
-                items.remove(i);
-                i--;
-            }
+        while ((i > 0) && (l[i] == null)) {
+            i--;
+            removedFromMap++;
         }
 
-        updateRange(i);
+        if (i != j)
+            items._setSize(i); //quickly remove null entries from the end by skipping past them
 
+        BLink<V> ii;
+        while (i > 0 && (ii = l[i]).isDeleted()) {
 
-        if (toRemoveFromMap > 0) {
-//            int sizeBefore = map.size();
-            if (map.values().removeIf(BLink::isDeleted)) {
-                return true;
+            if (removeKeyForValue(ii) == null) {
+                //if this happens it requires exhaustive removal, since the BLink has lost its key
+                //willRemoveFromMap++;
+                throw new RuntimeException("bag fault");
             }
 
+            removedFromMap++;
 
-            //EXTRA checks but which dont apply if dealing with weak links becaues they can get removed in the middle of checking them (heisenbug):
-//            int currentSize = map.size();
-//            if (sizeBefore - currentSize < toRemoveFromMap)
-//                throw new RuntimeException("bag fault");
-//            if (currentSize!=items.size())
-//                throw new RuntimeException("bag fault");
+            //remove by known index rather than have to search for it by key or something
+            //different from removeItem which also removes the key, but we have already done that above
+            items.remove(i--);
         }
 
-
-        return removed > 0;
+        //return ((willRemoveFromMap > 0) && (map.values().removeIf(BLink::isDeleted))) || (removedFromMap > 0);
+        return removedFromMap;
     }
 
-    private void updateRange(int sizeKnown) {
-        minPriIfFull = (sizeKnown == capacity()) ? items.last().pri() : -1f;
+    private final void updateRange() {
+        this.minPriIfFull = (size() == capacity()) ? items.last().pri() : -1f;
     }
 
 
@@ -609,7 +599,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public String toString() {
         //synchronized (map) {
-            return super.toString() + '{' + items.getClass().getSimpleName() + '}';
+        return super.toString() + '{' + items.getClass().getSimpleName() + '}';
         //}
     }
 

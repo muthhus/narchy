@@ -1,6 +1,7 @@
 package nars.concept.table;
 
 import nars.bag.Table;
+import nars.link.BLink;
 import nars.util.CollectorMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,9 +55,9 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
 
     @Override
     public void clear() {
-        synchronized (map) {
-            super.clear();
-        }
+
+        super.clear(); //clears map
+
         synchronized (_items()) {
             listClear();
         }
@@ -127,12 +128,14 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
     /** returns whether the capacity has changed */
     @Override public boolean setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
-            synchronized (this.map) {
+            synchronized (this._items()) {
                 this.capacity = newCapacity;
-                int toRemove = size() - newCapacity;
-                while (toRemove > 0) {
-                    removeWeakest("Shrink");
-                    toRemove--;
+                if (newCapacity == 0) {
+                    clear();
+                } else {
+                    int diff = size() - newCapacity;
+                    if (diff > 0)
+                        removeWeakest(diff);
                 }
             }
             return true;
@@ -140,7 +143,8 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
         return false;
     }
 
-    protected abstract void removeWeakest(Object reason);
+    protected abstract void removeWeakest(int num);
+
 
     @Nullable
     abstract public V weakest();

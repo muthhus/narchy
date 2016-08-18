@@ -117,10 +117,8 @@ public class LinkageTest extends AbstractNALTest {
         //List<String> fails = new ArrayList();
 
 
-        @Nullable Concept premise1Concept = nar.concept(premise1);
-        assertNotNull(premise1Concept);
-        boolean passed = linksIndirectly(nar, premise2, premise1Concept);
 
+        boolean passed = linksIndirectly(nar, premise2, nar.concept(premise1));
         boolean passed2 = linksIndirectly(nar, premise1, nar.concept(premise2));
 
 

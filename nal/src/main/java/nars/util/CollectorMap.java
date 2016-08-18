@@ -150,11 +150,7 @@ public abstract class CollectorMap<K, V> {
 
     protected final @Nullable V removeKeyForValue(@NotNull V value) {
         @Nullable K key = key(value);
-        if (key == null) {
-            return null;
-        } else {
-            return map.remove(key);
-        }
+        return key != null ? map.remove(key) : null;
     }
 
 

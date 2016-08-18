@@ -76,6 +76,12 @@ public class SortedArray<E> implements Iterable<E> {
         return previous;
     }
 
+
+    /** set the size as a quick way to remove null entries from the end */
+    public void _setSize(int s) {
+        this.size = s;
+    }
+
     public boolean remove(E removed, Comparator<E> cmp) {
         int i = indexOf(removed, cmp);
         return i != -1 && remove(i) != null;
