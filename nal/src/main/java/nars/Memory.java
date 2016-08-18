@@ -121,13 +121,12 @@ public class Memory extends Param {
         if (prev != p) {
             List<Task> removed = $.newArrayList();
 
-            c.commit();
             c.policy(p, now, removed);
-
             tasks.remove(removed);
 
-            index.set(c); //update in the cache (weight, etc.)
+            c.commit();
 
+            index.set(c); //update in the cache (weight, etc.)
 
         }
 

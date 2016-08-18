@@ -22,6 +22,7 @@ package nars.concept;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
+import nars.Param;
 import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
@@ -386,18 +387,15 @@ public interface Concept extends Termed {
         tasklinks().commit();
         termlinks().commit();
 
-        if ((((ArrayBag) termlinks()).map).size() > termlinks().capacity() + tasklinks().capacity()) {
-            //inconsistent item
-
-
-
-            System.err.println(
-                    term() + "\tmap=" +
-                            (((ArrayBag) termlinks()).map).size() + ":  " +
-                            termlinks().size() + "/" + termlinks().capacity() + "\t" +
-                            tasklinks().size() + "/" + tasklinks().capacity());
-
-
+        if (Param.DEBUG) {
+            if ((((ArrayBag) termlinks()).map).size() > termlinks().capacity() + tasklinks().capacity()) {
+                //inconsistent item
+                System.err.println(
+                        term() + "\tmap=" +
+                                (((ArrayBag) termlinks()).map).size() + ":  " +
+                                termlinks().size() + "/" + termlinks().capacity() + "\t" +
+                                tasklinks().size() + "/" + tasklinks().capacity());
+            }
         }
 
 

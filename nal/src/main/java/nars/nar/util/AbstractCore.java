@@ -1,9 +1,6 @@
 package nars.nar.util;
 
-import nars.$;
-import nars.Memory;
-import nars.NAR;
-import nars.Task;
+import nars.*;
 import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
 import nars.concept.Concept;
@@ -173,7 +170,10 @@ public abstract class AbstractCore {
 
                 nar.inputLater(derive);
             } catch (Exception e) {
-                e.printStackTrace();
+
+                if (Param.DEBUG)
+                    e.printStackTrace();
+
                 logger.error("run {}", e.toString());
             }
 
