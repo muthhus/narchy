@@ -23,7 +23,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
      * subterm vector
      */
     @NotNull
-    public final TermVector subterms;
+    protected TermVector subterms;
 
 
     /**
@@ -89,8 +89,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public final boolean equals(@Nullable Object that) {
 
-
-
         Compound cthat;
         if (that instanceof Compound) {
 
@@ -119,12 +117,21 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         if (hash != that.hashCode())
             return false;
 
-        if (op == cthat.op())
-            if (dt == cthat.dt())
-                if (subterms.equals(cthat.subterms()))
-                    return true;
 
-        return false;
+        //subterm sharing:
+        TermContainer cs = cthat.subterms();
+        TermVector as = this.subterms;
+        if (as != cs) {
+            if (!as.equals(cs)) {
+                return false;
+            } else {
+                //share the subterms vector
+                this.subterms = (TermVector) cs; //HACK cast sucks
+            }
+        }
+
+        return (op == cthat.op()) && (dt == cthat.dt());
+
     }
 
     @Override

@@ -246,15 +246,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Nullable
     @Override
-    protected BLink<V> addItem(@NotNull BLink<V> x) {
-        BLink<V> y;
-        synchronized (items) {
-            y = super.addItem(x);
-        }
+    protected final BLink<V> addItem(@NotNull BLink<V> x) {
+        BLink<V> y = super.addItem(x);
         if (y != x) {
-            int s = size();
-            if (s == capacity())
-                updateRange(s);
+            updateRange(size());
         }
         return y;
     }
@@ -266,7 +261,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         if (!isEmpty()) {
             commit(autoforget());
         }
-
 
         return this;
     }
@@ -475,8 +469,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return removed > 0;
     }
 
-    private void updateRange(int size) {
-        minPriIfFull = (size == capacity()) ? items.last().pri() : -1f;
+    private void updateRange(int sizeKnown) {
+        minPriIfFull = (sizeKnown == capacity()) ? items.last().pri() : -1f;
     }
 
 

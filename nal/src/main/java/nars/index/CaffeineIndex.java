@@ -31,26 +31,29 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     @NotNull
     private final Map<Termed,Termed> atomics;
 
-    @NotNull
-    public final Cache<Termed, Termed> compounds;
 
-    @NotNull
-    private final Cache<TermContainer, TermContainer> subs;
+    /** holds compounds and subterm vectors */
+    @NotNull public final Cache<Termlike, Termlike> compounds;
+
+//    @NotNull
+//    private final Cache<TermContainer, TermContainer> subs;
 
 
     private static final Weigher<Termlike, Termlike> complexityAndConfidenceWeigher = (k, v) -> {
 
-        float scale;
-        if (v instanceof CompoundConcept) {
-            if (v instanceof WiredConcept) {
-                return 0; //special concept implementation: dont allow removal
-            }
-            scale = 1f/ (1f + maxConfidence((CompoundConcept)v)); //discount factor for belief/goal confidence
-        } else {
-            scale = 1f;
+        if (v instanceof WiredConcept) {
+            return 0; //special concept implementation: dont allow removal
         }
-        return Math.round( 1 + v.complexity() * scale);
+
+        return weigh(v);
     };
+
+    private static int weigh(Termlike v) {
+        float beliefDiscount = (v instanceof CompoundConcept) ?
+                    (1f + maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
+                    1;
+        return Math.round( 1f + v.complexity() / beliefDiscount);
+    }
 
     private static float maxConfidence(@NotNull CompoundConcept v) {
         //return Math.max(v.beliefs().confMax(), v.goals().confMax());
@@ -71,11 +74,9 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor executor) {
         super(conceptBuilder);
 
-        long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
+        //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
-        Caffeine<Termed, Termed> builder = prepare(Caffeine.newBuilder(), soft);
-
-
+        Caffeine<Termlike, Termlike> builder = prepare(Caffeine.newBuilder(), soft);
         builder
                .weigher(complexityAndConfidenceWeigher)
                .maximumWeight(maxWeight)
@@ -92,17 +93,17 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 //                .removalListener(this)
 //                .executor(executor);
 //        atomics = buildera.build();
-        atomics = new ConcurrentHashMap<>(256 /* estimate */);
+        atomics = new ConcurrentHashMap<>(256 /* estimate */); //TODO this should probably be a Caffeine again, with a limit and restriction on removing WiredConcept's
 
 
-        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), false);
+//        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), false);
 
-        subs = builderSubs
-                //.weakValues() //.softValues()
-                .weigher(complexityAndConfidenceWeigher)
-                .maximumWeight(maxSubtermWeight)
-                .executor(executor)
-                .build();
+//        subs = builderSubs
+//                //.weakValues() //.softValues()
+//                .weigher(complexityAndConfidenceWeigher)
+//                .maximumWeight(maxSubtermWeight)
+//                .executor(executor)
+//                .build();
 
 //        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), soft);
 //        subs = builderSubs
@@ -147,7 +148,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public Termed get(@NotNull Termed x) {
         Term tx = x.term();
         if (tx instanceof Compound)
-            return compounds.getIfPresent(tx);
+            return (Termed) compounds.getIfPresent(tx);
         else
             return atomics.get(tx);
     }
@@ -161,7 +162,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public void set(@NotNull Termed src, @NotNull Termed target) {
         Term tx = src.term();
         if (tx instanceof Compound)
-            compounds.put(tx, target);
+            compounds.put(tx, (Termlike)target);
         else
             atomics.put(tx, target);
 
@@ -180,17 +181,19 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public void clear() {
         compounds.invalidateAll();
         //atomics.invalidateAll();
-        subs.invalidateAll();
     }
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {
-        BiConsumer<Termed, Termed> e = (k, v) -> c.accept(v);
+        //BiConsumer<Termed, Termed> e = (k, v) -> c.accept(v);
 
         atomics.values().forEach(c);
         //atomics.asMap().forEach(e);
 
-        compounds.asMap().forEach(e);
+        compounds.asMap().values().forEach(x -> {
+           if (x instanceof Termed)
+               c.accept((Termed)x);
+        });
     }
 
     @Override
@@ -200,20 +203,21 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public int subtermsCount() {
-        return (int) subs.estimatedSize();
+        return -1; //not calculated when they share the same cache
+        //return (int) subs.estimatedSize();
     }
 
 
     @Override
     protected TermContainer getSubterms(@NotNull TermContainer t) {
-        return subs.getIfPresent(t);
+        return (TermContainer) compounds.getIfPresent(t);
     }
 
 
     @NotNull
     @Override
     protected TermContainer put(@NotNull TermContainer s) {
-        return subs.get(s, ss -> ss);
+        return (TermContainer) compounds.get(s, ss -> ss);
         //subs.put(s, s);
         //return s;
     }
@@ -241,7 +245,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public @NotNull String summary() {
-        return atomics.size() + " atoms " + compounds.estimatedSize() + " compounds / " + subtermsCount() + " subterms";
+        return atomics.size() + " atoms " + compounds.estimatedSize() + " compounds+subterms";// / " + subtermsCount() + " subterms";
     }
 
     @Override
@@ -256,4 +260,5 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public void start(NAR nar) {
         this.nar = nar;
     }
+
 }
