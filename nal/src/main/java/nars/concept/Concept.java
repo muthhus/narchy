@@ -25,6 +25,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
+import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
@@ -379,6 +380,27 @@ public interface Concept extends Termed {
 
     default boolean active() {
         return policy()!=null;
+    }
+
+    default void commit() {
+        tasklinks().commit();
+        termlinks().commit();
+
+        if ((((ArrayBag) termlinks()).map).size() > termlinks().capacity() + tasklinks().capacity()) {
+            //inconsistent item
+
+
+
+            System.err.println(
+                    term() + "\tmap=" +
+                            (((ArrayBag) termlinks()).map).size() + ":  " +
+                            termlinks().size() + "/" + termlinks().capacity() + "\t" +
+                            tasklinks().size() + "/" + tasklinks().capacity());
+
+
+        }
+
+
     }
 
 

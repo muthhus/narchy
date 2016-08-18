@@ -13,8 +13,6 @@ import org.jetbrains.annotations.Nullable;
 public abstract class BLink<X> implements Budget, Link<X> {
 
 
-
-    @Nullable
     @Override abstract public X get();
 
     protected void init(@NotNull Budgeted c, float scale) {

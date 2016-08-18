@@ -62,7 +62,6 @@ public class DefaultCore extends AbstractCore {
         public MonitoredCurveBag(NAR nar, int capacity, @NotNull CurveSampler sampler) {
             super(capacity, sampler, BudgetMerge.plusBlend, new ConcurrentHashMap<>(capacity));
             this.nar = nar;
-            setCapacity(capacity);
         }
 
         @Override
@@ -72,13 +71,14 @@ public class DefaultCore extends AbstractCore {
         }
 
         @Override
-        protected void putActive(@NotNull Concept c) {
+        protected void onActive(@NotNull Concept c) {
             awake(c);
         }
 
         @Override
-        protected void putFail(@NotNull Concept c) {
-            sleep(c);
+        protected void onRemoved(@NotNull Concept c, BLink<Concept> value) {
+            if (value!=null)
+                sleep(c);
         }
 
         @Override

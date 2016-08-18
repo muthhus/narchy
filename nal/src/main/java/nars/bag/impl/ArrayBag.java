@@ -44,8 +44,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         super(BLink[]::new, map);
 
         this.mergeFunction = mergeFunction;
-
-        setCapacity(cap);
+        this.capacity = cap;
     }
 
 
@@ -56,16 +55,32 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
 
     @Override
-    protected void removeWeakest(int num) {
+    protected void removeWeakest(int toRemove) {
 
         //first step: remove any nulls and deleted values
         int r = removeDeletedAtBottom();
-        num -= r;
+        toRemove -= r;
 
         //second step: remove the lowest ranked items until quota is met
-        while (r > 0) {
-            remove(weakest()).delete();
-            r--;
+        int s = size();
+        //BLink<V>[] a = items.array();
+        while (toRemove > 0) {
+
+            BLink<V> w = items.remove(--s);
+
+            V k = w.get();
+
+            BLink<V> removed = map.remove(k);
+            if (removed == null)
+                throw new RuntimeException("key " + k + " missing");
+            if (removed != w)
+                throw new RuntimeException("bag inconsistency: " + w + " removed but " + removed + " may still be in the items list");
+
+            onRemoved(k, w);
+
+            w.delete();
+
+            toRemove--;
         }
 
         updateRange();
@@ -179,37 +194,23 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public final void put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
         float bp = b.pri();
-        if (bp != bp) { //deleted
+        if (bp != bp) { //already deleted
             return;
         }
+
 
         Insertion ii = new Insertion(this, b, scale, overflow);
         BLink<V> r = map.compute(key, ii);
 
-        BLink<V> dd;
+        int a = ii.activated;
 
-        if (ii.activated > 0) {
-
-            dd = putNewAndReturnDisplaced(key, r);
-
-            if (dd == r) {
-                dd.delete();
-                dd = null;
-                r = null;
-                ii.activated = -1;
-            }
-
-            putActive(key);
-
-            if (dd != null) {
-                removeKeyForValue(dd);
-                dd.delete();
-            }
-
-        }
-
-        if (ii.activated < 0) {
-            putFail(key);
+        if (a == 0) {
+            updateRange(); //for the merged item:
+        } else if (a < 0) {
+            onRemoved(key, null);
+        } else if (a > 0) {
+            addItemForNewKey(r);
+            onActive(key);
         }
 
 
@@ -244,18 +245,24 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             return new StrongBLink(i, b);
     }
 
-    protected @Nullable BLink<V> prePutNew(@NotNull V k, @NotNull BLink<V> v) {
-        return mergeList(k, v, null);
+    protected @Nullable void addItemForNewKey(@NotNull BLink<V> v) {
+        synchronized (items) {
+
+            int toRemove = (size()+1) - capacity;
+            if (toRemove > 0)
+                removeWeakest(toRemove);
+
+            items.add(v, this);
+
+            updateRange();
+
+        }
     }
 
     @Nullable
     @Override
-    protected final BLink<V> addItem(@NotNull BLink<V> x) {
-        BLink<V> y = super.addItem(x);
-        if (y != x) {
-            updateRange();
-        }
-        return y;
+    protected BLink<V> addItem(BLink<V> i) {
+        throw new UnsupportedOperationException();
     }
 
     @NotNull
@@ -338,29 +345,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return this;
     }
 
+
     /**
-     * wraps the putNew call with a suffix that destroys the link at the end
+     * value will be null if this is an event which was rejected on input
      */
-    @Nullable
-    protected final BLink<V> putNewAndReturnDisplaced(@NotNull V key, @Nullable BLink<V> value) {
-        BLink<V> displaced = prePutNew(key, value);
-        if (displaced != value) {
-            float dp = value.pri() * value.dur();
-
-            if (displaced != null) {
-                dp -= displaced.priIfFiniteElseZero() * displaced.dur();
-            }
-
-            this.mass += dp;
-        }
-        return displaced;
-    }
-
-    protected void putFail(V key) {
+    protected void onRemoved(@NotNull V key, @Nullable BLink<V> value) {
 
     }
 
-    protected void putActive(V key) {
+    protected void onActive(V key) {
 
     }
 
@@ -391,10 +384,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         final boolean eachNotNull = each != null;
 
         BLink<V>[] l = items.array();
-        int t = s - 1;
+        int i = s - 1;
         float weightedMass = 0;
-        @NotNull BLink<V> beneath = l[t]; //compares with self below to avoid a null check in subsequent iterations
-        for (int i = t; i >= 0; i--) {
+        @NotNull BLink<V> beneath = l[i]; //compares with self below to avoid a null check in subsequent iterations
+        for (; i >= 0; ) {
             BLink<V> b = l[i];
 
             if (eachNotNull)
@@ -412,6 +405,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             }
 
             beneath = b;
+            i--;
         }
 
         this.mass = weightedMass;
@@ -419,7 +413,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return lowestUnsorted;
     }
 
-    /** must be called in synchronized(items) block */
+    /**
+     * must be called in synchronized(items) block
+     */
     private int removeDeletedAtBottom() {
         //remove deleted items they will collect at the end
 
@@ -431,16 +427,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         int removedFromMap = 0;
 
-        while ((i > 0) && (l[i] == null)) {
+        while ((i >= 0) && (l[i] == null)) {
             i--;
             removedFromMap++;
         }
 
-        if (i != j)
-            items._setSize(i); //quickly remove null entries from the end by skipping past them
 
         BLink<V> ii;
-        while (i > 0 && (ii = l[i]).isDeleted()) {
+        while (i >= 0 && (ii = l[i]).isDeleted()) {
 
             if (removeKeyForValue(ii) == null) {
                 //if this happens it requires exhaustive removal, since the BLink has lost its key
@@ -448,19 +442,26 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 throw new RuntimeException("bag fault");
             }
 
-            removedFromMap++;
 
             //remove by known index rather than have to search for it by key or something
             //different from removeItem which also removes the key, but we have already done that above
-            items.remove(i--);
+            l[i--] = null;
+
+            removedFromMap++;
         }
+
+        if (i != j)
+            items._setSize(i+1); //quickly remove null entries from the end by skipping past them
+
 
         //return ((willRemoveFromMap > 0) && (map.values().removeIf(BLink::isDeleted))) || (removedFromMap > 0);
         return removedFromMap;
     }
 
     private final void updateRange() {
-        this.minPriIfFull = (size() == capacity()) ? items.last().pri() : -1f;
+        synchronized (items) {
+            this.minPriIfFull = (size() >= capacity()) ? items.last().pri() : -1f;
+        }
     }
 
 
@@ -689,6 +690,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 if (existing == b) {
                     throw new RuntimeException("budget self merge");
                 }
+                if (existing.isDeleted()) {
+                    throw new RuntimeException("existing item is deleted");
+                }
 
                 float pBefore = existing.priNext() * existing.durNext();
                 float o = bag.mergeFunction.merge(existing, b, scale);
@@ -702,21 +706,19 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 BLink r;
                 float bp = b.pri() * scale;
-                int activated;
                 if (bag.minPriIfFull > bp) {
-                    //insufficient budget
+                    //reject due to insufficient budget
                     bag.pending += bp * b.dur(); //include failed input in pending
-                    activated = -1;
+                    this.activated = -1;
                     r = null;
                 } else {
-                    //successfully displaced another item
+                    //accepted for insert
                     BLink nvv = bag.newLink(key, b);
                     nvv.priMult(scale);
 
-                    activated = +1;
+                    this.activated = +1;
                     r = nvv;
                 }
-                this.activated = activated;
                 return r;
             }
         }

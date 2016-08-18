@@ -154,16 +154,19 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
 
-    public boolean add(final E element, Comparator<E> cmp) {
+    public void add(final E element, Comparator<E> cmp) {
         // use the linked-list sorting if the type is set or if the list-size
         // is to small
         int s = this.size;
 
-        return s < binarySearchThreshold ? addLinear(element, s, cmp) : addBinary(element, s, cmp);
+        if (s < binarySearchThreshold)
+            addLinear(element, s, cmp);
+        else
+            addBinary(element, s, cmp);
 
     }
 
-    public boolean addBinary(E element, int s, Comparator<E> cmp) {
+    public void addBinary(E element, int s, Comparator<E> cmp) {
         // use the binary search
         final int index = this.findInsertionIndex(element, 0, s - 1, new int[1], cmp);
 
@@ -176,27 +179,26 @@ public class SortedArray<E> implements Iterable<E> {
             else
                 addInternal(index, element);
         }
-        return true;
     }
 
-    public boolean addLinear(E element, int s, Comparator<E> cmp) {
+    public void addLinear(E element, int s, Comparator<E> cmp) {
         if (list.length > 0) {
             for (int i = 0; i < s; i++) {
                 final E current = list[i];
                 if (0 <= cmp.compare(current, element)) {
                     addInternal(i, element);
-                    return true;
+                    return;
                 }
             }
         }
-        return addInternal(element); //add to end
+        addInternal(element); //add to end
     }
 
     public final boolean isEmpty() {
         return size == 0;
     }
 
-    public boolean addInternal(E e) {
+    public void addInternal(E e) {
         int s = this.size;
         E[] l = this.list;
         if (l.length == s) {
@@ -205,7 +207,6 @@ public class SortedArray<E> implements Iterable<E> {
             this.list = l = newList;
 		}
         l[this.size++] = e;
-        return true;
     }
 
     public void addInternal(int index, E e) {

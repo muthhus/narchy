@@ -187,6 +187,7 @@ public class MultiThreadExecutioner extends Executioner {
                     nar.input(tt);
                 } catch (Throwable e) {
                     NAR.logger.error("task: {}", e);
+                    e.printStackTrace();
                 }
             }
             Runnable rr = te.r;
@@ -196,6 +197,7 @@ public class MultiThreadExecutioner extends Executioner {
                     rr.run();
                 } catch (Throwable e) {
                     NAR.logger.error("run: {}", e);
+                    e.printStackTrace();
                 }
             }
         }

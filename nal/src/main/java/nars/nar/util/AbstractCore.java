@@ -5,6 +5,7 @@ import nars.Memory;
 import nars.NAR;
 import nars.Task;
 import nars.bag.Bag;
+import nars.bag.impl.ArrayBag;
 import nars.concept.Concept;
 import nars.data.Range;
 import nars.link.BLink;
@@ -39,7 +40,6 @@ public abstract class AbstractCore {
     private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
 
-
     //public final MutableFloat activationFactor = new MutableFloat(1.0f);
 
 //        final Function<Task, Task> derivationPostProcess = d -> {
@@ -65,13 +65,11 @@ public abstract class AbstractCore {
 
 
     private static final ThreadLocal<@NotNull PremiseEval> matcher = ThreadLocal.withInitial(
-            ()->new PremiseEval(new XorShift128PlusRandom((int)Thread.currentThread().getId()), Deriver.getDefaultDeriver())
+            () -> new PremiseEval(new XorShift128PlusRandom((int) Thread.currentThread().getId()), Deriver.getDefaultDeriver())
     );
 
 //
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
-
-
 
 
     protected AbstractCore(@NotNull NAR nar) {
@@ -103,8 +101,8 @@ public abstract class AbstractCore {
 
         int cpf = conceptsFiredPerCycle.intValue();
 
-        short  taskLinks = (short)tasklinksFiredPerFiredConcept.intValue();
-        short  termLinks = (short)termlinksFiredPerFiredConcept.intValue();
+        short taskLinks = (short) tasklinksFiredPerFiredConcept.intValue();
+        short termLinks = (short) termlinksFiredPerFiredConcept.intValue();
 
         List<BLink<Concept>> toFire = $.newArrayList();
         for (int cycleNum = 0; cycleNum < cycles; cycleNum++) {
@@ -116,7 +114,7 @@ public abstract class AbstractCore {
 
             for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
                 @Nullable Concept c = toFire.get(i).get();
-                if (c!=null) {
+                if (c != null) {
                     if (!nar.runLaterMaybe(new FireConcept(c, nar, taskLinks, termLinks)))
                         return;
                 }
@@ -132,19 +130,21 @@ public abstract class AbstractCore {
         concepts.clear();
     }
 
-    /** shared combined conclusion */
+    /**
+     * shared combined conclusion
+     */
     public static class FireConcept extends Conclusion implements Runnable, Supplier<Conclusion> {
 
         private static final Logger logger = LoggerFactory.getLogger(FireConcept.class);
 
-        private final Concept concept;
+        private final Concept c;
         private final NAR nar;
         private final short tasklinks;
         private final short termlinks;
 
         public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks) {
             super($.newHashSet(2 * tasklinks * termlinks));
-            this.concept = c;
+            this.c = c;
             this.nar = nar;
             this.tasklinks = tasklinks;
             this.termlinks = termlinks;
@@ -162,17 +162,18 @@ public abstract class AbstractCore {
 
             try {
 
-                concept.tasklinks().commit();
-                concept.termlinks().commit();
+                c.commit();
 
                 firePremiseSquared(
-                        concept,
+                        c,
                         tasklinks,
                         termlinks
                 );
 
+
                 nar.inputLater(derive);
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.error("run {}", e.toString());
             }
 
@@ -207,7 +208,7 @@ public abstract class AbstractCore {
                                 tasksBuffer.get(i),
                                 mm,
                                 this
-                                );
+                        );
 
                     }
 
@@ -225,7 +226,6 @@ public abstract class AbstractCore {
     }
 
 
-
 //    public void conceptualize(@NotNull Concept c, @NotNull Budgeted b, float conceptActivation, float linkActivation, NAR.Activation activation) {
 //
 //        concepts.put(c, b, conceptActivation, activation.overflow);
@@ -235,7 +235,6 @@ public abstract class AbstractCore {
 //        if (linkActivation > 0)
 //            c.link(b, linkActivation, nar, activation);
 //    }
-
 
 
     //try to implement some other way, this is here because of serializability

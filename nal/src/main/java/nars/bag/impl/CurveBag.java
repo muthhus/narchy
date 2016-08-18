@@ -59,29 +59,29 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         return this;
     }
 
-    public @Nullable BLink<V> peekNext(boolean remove) {
-
-        synchronized (map) {
-            while (!isEmpty()) {
-
-                int index = sampleIndex();
-
-                BLink<V> i = remove ?
-                        removeItem(index) : get(index);
-
-                if (!i.isDeleted()) {
-                    return i;
-                }
-
-                //ignore this Deleted item now that it's removed from the bag
-                //if it wasnt already removed above
-                if (!remove)
-                    remove(i.get());
-
-            }
-        }
-        return null; // empty bag
-    }
+//    public @Nullable BLink<V> peekNext(boolean remove) {
+//
+//        synchronized (map) {
+//            while (!isEmpty()) {
+//
+//                int index = sampleIndex();
+//
+//                BLink<V> i = remove ?
+//                        removeItem(index) : get(index);
+//
+//                if (!i.isDeleted()) {
+//                    return i;
+//                }
+//
+//                //ignore this Deleted item now that it's removed from the bag
+//                //if it wasnt already removed above
+//                if (!remove)
+//                    remove(i.get());
+//
+//            }
+//        }
+//        return null; // empty bag
+//    }
 
 
     /**
@@ -147,10 +147,10 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     }
 
 
-    @Override
-    public final @Nullable BLink<V> sample() {
-        return peekNext(false);
-    }
+//    @Override
+//    public final @Nullable BLink<V> sample() {
+//        return peekNext(false);
+//    }
 
 
     //    public static long fastRound(final double d) {

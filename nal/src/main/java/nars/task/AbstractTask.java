@@ -310,7 +310,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     public final void setTruth(@Nullable Truth t) {
 
         if (t == null && isBeliefOrGoal())
-            throw new NullPointerException();
+            throw new NAR.InvalidTaskException(this, "null truth for belief or goal");
 
         if (!Objects.equals(truth, t)) {
             truth = t;

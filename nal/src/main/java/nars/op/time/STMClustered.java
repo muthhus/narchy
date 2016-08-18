@@ -302,12 +302,11 @@ public class STMClustered extends STM {
 
 
             @Override
-            protected BLink<Task> prePutNew(Task k, BLink<Task> v) {
-                BLink<Task> displaced = super.prePutNew(k, v);
-                if (displaced != null)
-                    drop((TLink)displaced);
-                return displaced;
+            protected void onRemoved(Task key, BLink<Task> value) {
+                if (value!=null)
+                    drop((TLink)value);
             }
+
         };
 
         this.net = new NeuralGasNet<>(DIMENSIONS, clusters) {

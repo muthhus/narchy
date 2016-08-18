@@ -5,6 +5,7 @@ import nars.*;
 import nars.gui.BagChart;
 import nars.nar.Executioner;
 import nars.nar.MultiThreadExecutioner;
+import nars.nar.SingleThreadExecutioner;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.data.AutoClassifier;
 import nars.experiment.NAREnvironment;
@@ -49,13 +50,15 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 2 * 100000;
+    public static final int DEFAULT_INDEX_WEIGHT = 6 * 100000;
 
-    public static final Executioner exe = new MultiThreadExecutioner(2, 4096);
+    public static final Executioner exe =
+            new MultiThreadExecutioner(4, 4096);
+            //new SingleThreadExecutioner();
 
 
 
-    public static final int runFrames = 50000;
+    public static final int runFrames = 100;
     public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -399,8 +402,8 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 384, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
+        //MySTMClustered stm = new MySTMClustered(nar, 384, '.', 3);
+        //MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);

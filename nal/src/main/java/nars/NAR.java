@@ -3,6 +3,7 @@ package nars;
 
 import com.google.common.collect.Sets;
 import nars.Narsese.NarseseException;
+import nars.bag.impl.ArrayBag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.AbstractConcept;
@@ -119,16 +120,33 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         Frequency volume = new Frequency();
         Frequency rootOp = new Frequency();
         AtomicInteger i = new AtomicInteger(0);
+
+        LongSummaryStatistics termlinksCap = new LongSummaryStatistics();
+        LongSummaryStatistics termlinksUsed = new LongSummaryStatistics();
+        LongSummaryStatistics tasklinksCap = new LongSummaryStatistics();
+        LongSummaryStatistics tasklinksUsed = new LongSummaryStatistics();
+
         forEachConcept(c -> {
             i.incrementAndGet();
             complexity.addValue(c.complexity());
             volume.addValue(c.volume());
             rootOp.addValue(c.op());
+
+            termlinksCap.accept(c.termlinks().capacity());
+            termlinksUsed.accept(c.termlinks().size());
+            tasklinksCap.accept(c.tasklinks().capacity());
+            tasklinksUsed.accept(c.tasklinks().size());
+                    
         });
         System.out.println("Total Concepts:\n" + i.get());
+        System.out.println("\ntermLinksUsed:\n" + termlinksUsed);
+        System.out.println("\ntermLinksCapacity:\n" + termlinksCap);
+        System.out.println("\ntaskLinksUsed:\n" + tasklinksUsed);
+        System.out.println("\ntaskLinksCapacity:\n" + tasklinksCap);
         System.out.println("\nComplexity:\n" + complexity);
-        System.out.println("\nvolume:\n" + volume);
         System.out.println("\nrootOp:\n" + rootOp);
+        System.out.println("\nvolume:\n" + volume);
+
     }
 
 

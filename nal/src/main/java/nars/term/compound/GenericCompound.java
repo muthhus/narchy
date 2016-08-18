@@ -23,7 +23,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
      * subterm vector
      */
     @NotNull
-    protected TermVector subterms;
+    protected final TermVector subterms;
 
 
     /**
@@ -118,19 +118,19 @@ public class GenericCompound<T extends Term> implements Compound<T> {
             return false;
 
 
-        //subterm sharing:
-        TermContainer cs = cthat.subterms();
-        TermVector as = this.subterms;
-        if (as != cs) {
-            if (!as.equals(cs)) {
-                return false;
-            } else {
-                //share the subterms vector
-                this.subterms = (TermVector) cs; //HACK cast sucks
-            }
-        }
+//        //subterm sharing:
+//        TermContainer cs = cthat.subterms();
+//        TermVector as = this.subterms;
+//        if (as != cs) {
+//            if (!as.equals(cs)) {
+//                return false;
+//            } else {
+//                //share the subterms vector
+//                this.subterms = (TermVector) cs; //HACK cast sucks
+//            }
+//        }
 
-        return (op == cthat.op()) && (dt == cthat.dt());
+        return (op == cthat.op()) && (dt == cthat.dt()) && subterms.equals(cthat.subterms());
 
     }
 

@@ -54,14 +54,15 @@ public class MySTMClustered extends STMClustered {
 
     @Override
 	protected void iterate() {
-		super.iterate();
-
-		confMin = nar.confMin.floatValue();
-
-		//LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
 
 
 		try {
+			super.iterate();
+
+			confMin = nar.confMin.floatValue();
+
+			//LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
+
 			//clusters where all terms occurr simultaneously at precisely the same time
 			//cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
 			cluster(maxGroupSize);

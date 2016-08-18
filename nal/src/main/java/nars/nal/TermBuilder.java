@@ -194,7 +194,7 @@ public abstract class TermBuilder {
                 y[j++] = uu;
         }
         if (j != y.length)
-            throw new NullPointerException();
+            throw new RuntimeException("invalid conjunction after filtration");
 
         return y;
     }

@@ -91,7 +91,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
     @Nullable
     @Override
-    protected L addItem(@NotNull L i) {
+    @Deprecated protected L addItem(@NotNull L i) {
         int cap = capacity();
         if (cap < 1) {
             return i; //bounce

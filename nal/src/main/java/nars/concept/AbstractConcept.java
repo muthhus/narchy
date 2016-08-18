@@ -4,6 +4,7 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
+import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.term.Compound;
@@ -234,8 +235,10 @@ public interface AbstractConcept extends Concept {
 
 
     default void linkCapacity(@NotNull ConceptPolicy p) {
+
         termlinks().setCapacity( p.linkCap(this, true) );
         tasklinks().setCapacity( p.linkCap(this, false) );
+
     }
 
 

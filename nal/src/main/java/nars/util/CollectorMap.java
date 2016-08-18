@@ -15,7 +15,8 @@ import java.util.function.BiFunction;
  */
 public abstract class CollectorMap<K, V> {
 
-    @NotNull public final Map<K, V> map;
+    @NotNull
+    public final Map<K, V> map;
 
     protected CollectorMap(@NotNull Map<K, V> map) {
         this.map = map;
@@ -29,7 +30,9 @@ public abstract class CollectorMap<K, V> {
         return map.toString();
     }
 
-    /** returns an object that stores the items so that it can be synchronized upon */
+    /**
+     * returns an object that stores the items so that it can be synchronized upon
+     */
     abstract protected Object _items();
 
     /**
@@ -61,84 +64,83 @@ public abstract class CollectorMap<K, V> {
 //    }
 
 
-    @Nullable
-    public V put(@NotNull K key, @NotNull V value) {
+//    @Nullable
+//    public V put(@NotNull K key, @NotNull V value) {
+//
+//
+//        V removed = map.put(key, value);
+//
+//        V displaced;
+//        synchronized (_items()) {
+//            displaced = mergeList(key, value, removed);
+//        }
+//
+//        if (displaced!=null) {
+//            removeKeyForValue(displaced);
+//        }
+//        return displaced;
+//
+//    }
 
-
-        V removed = map.put(key, value);
-
-        V displaced;
-        synchronized (_items()) {
-            displaced = mergeList(key, value, removed);
-        }
-
-        if (displaced!=null) {
-            removeKeyForValue(displaced);
-        }
-        return displaced;
-
-    }
-
-    /** the key of the displaced item needs to be removed from the table sometime after calling this */
-    public @Nullable V mergeList(@NotNull K key, @NotNull V value, @Nullable V removed) {
-
-        if (removed != null) {
-
-            if (removed == value) {
-                //rejected input
-                return value;
-            } else {
-                //displaced other
-                V remd;
-                synchronized (_items()) {
-                    remd = removeItem(removed);
-                }
-                if (remd == null)
-                    throw new RuntimeException("unable to remove item corresponding to key " + key);
-
-            }
-        }
-
-        V displaced;
-        synchronized (_items()) {
-            displaced = addItem(value);
-        }
-
-        if (displaced != null) { //&& (!key(removed2).equals(key))) {
-            if (removed != null && removed != displaced) {
-                throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + displaced);
-            }
-            removed = displaced;
-        }
-
-        return removed;
-    }
+//    /** the key of the displaced item needs to be removed from the table sometime after calling this */
+//    public @Nullable V mergeList(@NotNull K key, @NotNull V value, @Nullable V removed) {
+//
+//        if (removed != null) {
+//
+//            if (removed == value) {
+//                //rejected input
+//                return value;
+//            } else {
+//                //displaced other
+//                V remd;
+//                synchronized (_items()) {
+//                    remd = removeItem(removed);
+//                }
+//                if (remd == null)
+//                    throw new RuntimeException("unable to remove item corresponding to key " + key);
+//
+//            }
+//        }
+//
+//        V displaced;
+//        synchronized (_items()) {
+//            displaced = addItem(value);
+//        }
+//
+//        if (displaced != null) { //&& (!key(removed2).equals(key))) {
+//            if (removed != null && removed != displaced) {
+//                throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + displaced);
+//            }
+//            removed = displaced;
+//        }
+//
+//        return removed;
+//    }
 
     @Nullable
     public V remove(@NotNull K x) {
 
-        V e = map.remove(x);
+        synchronized (_items()) {
+            V e = map.remove(x);
 
-        if (e != null) {
-            V removed;
-            synchronized (_items()) {
+            if (e != null) {
+                V removed;
                 removed = removeItem(e);
                 //            if (removed == null) {
                 //                /*if (Global.DEBUG)
                 //                    throw new RuntimeException(key + " removed from index but not from items list");*/
                 //                //return null;
                 //            }
-            }
-            if (removed != e) {
-                throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
-            }
-            return removed;
-        }
 
+                if (removed!=null && removed != e) {
+                    throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
+                }
+                return removed;
+            }
+        }
 
         return null;
     }
-
 
 
 //    /** does a more exhaustive removal in case the BLink no longer has the key (ex: weakref) */
@@ -162,13 +164,15 @@ public abstract class CollectorMap<K, V> {
         map.clear();
     }
 
-    @Nullable public final V get(@NotNull Object key) {
+    @Nullable
+    public final V get(@NotNull Object key) {
         return map.get(key);
     }
 
     public final V merge(@NotNull K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> c) {
         return map.merge(key, value, c);
     }
+
     public final V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> c) {
         return map.compute(key, c);
     }
