@@ -33,6 +33,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.ETERNAL;
 
 /**
  * Created by me on 2/24/16.
@@ -105,13 +106,13 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     @NotNull
     public Bag<Task> taskbag(Map map) {
-        return new CurveBag<>(1, defaultCurveSampler, mergeDefault, map);
+        return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
     }
 
 
     @NotNull
     public Bag<Term> termbag(Map map) {
-        return new CurveBag<>(1, defaultCurveSampler, mergeDefault, map);
+        return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
     }
 
 
@@ -190,6 +191,8 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
 
         //logger.trace("{} conceptualized to {}", term, result);
+
+        result.policy(init(), ETERNAL, Task.EmptyTaskList);
 
         return result;
 

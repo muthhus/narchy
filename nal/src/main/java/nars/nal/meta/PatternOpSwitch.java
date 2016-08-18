@@ -24,10 +24,10 @@ public final class PatternOpSwitch extends Atom /* TODO represent as some Generi
     }
 
     @Override
-    public void accept(@NotNull PremiseEval m) {
+    public void accept(@NotNull PremiseEval m, int now) {
         ProcTerm p = proc[m.subOp(subterm)];
         if (p!=null) {
-            p.accept(m);
+            p.accept(m, now);
         }
     }
 }

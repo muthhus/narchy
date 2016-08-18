@@ -120,10 +120,12 @@ public abstract class CollectorMap<K, V> {
     @Nullable
     public V remove(@NotNull K x) {
 
-        synchronized (_items()) {
-            V e = map.remove(x);
+        V e = map.remove(x);
 
-            if (e != null) {
+        if (e != null) {
+
+            synchronized (_items()) {
+
                 V removed;
                 removed = removeItem(e);
                 //            if (removed == null) {
@@ -132,7 +134,7 @@ public abstract class CollectorMap<K, V> {
                 //                //return null;
                 //            }
 
-                if (removed!=null && removed != e) {
+                if (/*removed!=null && */removed != e) {
                     throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
                 }
                 return removed;

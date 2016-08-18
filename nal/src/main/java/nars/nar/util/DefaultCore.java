@@ -21,8 +21,8 @@ import org.jetbrains.annotations.Nullable;
 public class DefaultCore extends AbstractCore {
 
 
-    public DefaultCore(@NotNull NAR nar) {
-        super(nar);
+    public DefaultCore(@NotNull NAR nar, int initialCapacity) {
+        super(nar, initialCapacity);
     }
 
 
@@ -48,9 +48,9 @@ public class DefaultCore extends AbstractCore {
 
     @NotNull
     @Override
-    protected Bag<Concept> newConceptBag() {
+    protected Bag<Concept> newConceptBag(int cap) {
 
-        return new MonitoredCurveBag(nar, 1, ((DefaultConceptBuilder)nar.index.conceptBuilder()).defaultCurveSampler);
+        return new MonitoredCurveBag(nar, cap, ((DefaultConceptBuilder)nar.index.conceptBuilder()).defaultCurveSampler);
 
     }
 

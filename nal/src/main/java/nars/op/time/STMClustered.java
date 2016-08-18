@@ -112,8 +112,8 @@ public class STMClustered extends STM {
         }
 
         public void insert(@NotNull TLink x) {
-            @Nullable Task xx = x.get();
-            if (xx != null && !xx.isDeleted()) {
+            Task xx = x.get();
+            if (!xx.isDeleted()) {
                 if (x.node == this)
                     return;
 
@@ -328,15 +328,13 @@ public class STMClustered extends STM {
         start();
     }
 
-    final AtomicBoolean ready = new AtomicBoolean(true);
+
 
     @Override
     protected void start() {
         super.start();
         nar.onFrame((nn) -> {
-            if (ready.compareAndSet(true, false)) {
-                iterate();
-            }
+            iterate();
         });
     }
 
@@ -359,7 +357,6 @@ public class STMClustered extends STM {
 
         input.commit();
 
-        ready.set(true);
 
     }
 

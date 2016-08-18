@@ -51,11 +51,9 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
         return policy;
     }
     @Override
-    public void policy(@Nullable ConceptPolicy p, long now, List<Task> removed) {
+    public void policy(@NotNull  ConceptPolicy p, long now, List<Task> removed) {
         this.policy = p;
-        if (p!=null) {
-            linkCapacity(p);
-        }
+        linkCapacity(p);
     }
 
 
@@ -106,7 +104,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
 
 
     @Override
-    public boolean process(@NotNull Task task, @NotNull NAR nar, List<Task> removed) {
+    public boolean process(@NotNull Task task, @NotNull NAR nar) {
         throw new UnsupportedOperationException();
     }
 

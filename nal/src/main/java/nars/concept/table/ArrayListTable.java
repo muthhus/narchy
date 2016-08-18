@@ -1,7 +1,6 @@
 package nars.concept.table;
 
 import nars.bag.Table;
-import nars.link.BLink;
 import nars.util.CollectorMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,22 +13,22 @@ import java.util.function.Predicate;
 /**
  * Items are available by an integer index
  */
-abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements Table<V, L>, Iterable<L> {
+abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements Table<K, V>, Iterable<V> {
 
 
     protected int capacity = -1;
 
-    public ArrayListTable(@NotNull Map<V, L> map) {
+    public ArrayListTable(@NotNull Map<K, V> map) {
         super(map);
     }
 
-    abstract public L get(int i);
+    abstract public V get(int i);
 
     @Override
     abstract public int size();
 
     @Override
-    public final void forEachKey(@NotNull Consumer<? super V> each) {
+    public final void forEachKey(@NotNull Consumer<? super K> each) {
         forEach(t -> {
             if (t != null)
                 each.accept(key(t));
@@ -38,10 +37,10 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
 
     @NotNull
     @Override
-    abstract public Iterator<L> iterator();
+    abstract public Iterator<V> iterator();
 
     @Override
-    public void topWhile(@NotNull Predicate<? super L> action, int n) {
+    public void topWhile(@NotNull Predicate<? super V> action, int n) {
         int s = size();
         if (n < 0)
             n = s;
@@ -49,7 +48,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
             n = Math.min(s, n);
 
         for (int i = 0; i < n; i++) {
-            L x = get(i);
+            V x = get(i);
             if (x == null || (!action.test(x)))
                 break;
         }
@@ -74,23 +73,23 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
      * @param k An item
      * @return Whether the Item is in the Bag
      */
-    public final boolean contains(@NotNull V k) {
+    public final boolean contains(@NotNull K k) {
         return this.containsKey(k);
     }
 
 
     @Nullable
     @Override
-    protected final L removeItem(@NotNull L removed) {
+    protected final V removeItem(@NotNull V removed) {
         return listRemove(removed) ? removed : null;
     }
 
-    protected abstract boolean listRemove(L removed);
+    protected abstract boolean listRemove(V removed);
 
 
     @Nullable
     @Override
-    protected L addItem(@NotNull L i) {
+    protected V addItem(@NotNull V i) {
         if (isFull())
             throw new RuntimeException("table full");
 
@@ -98,7 +97,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
         return null;
     }
 
-    protected abstract void listAdd(L i);
+    protected abstract void listAdd(V i);
 
 
     /**
@@ -107,9 +106,9 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
      * @return The first Item
      */
     @NotNull
-    public final L removeItem(int index) {
+    public final V removeItem(int index) {
 
-        L ii = get(index);
+        V ii = get(index);
         /*if (ii == null)
             throw new RuntimeException("invalid index: " + index + ", size=" + size());*/
 
@@ -134,26 +133,29 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
     @Override
     public boolean setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
-            synchronized (this._items()) {
-                this.capacity = newCapacity;
-                if (newCapacity == 0) {
-                    clear();
-                } else {
-                    int diff = size() - newCapacity;
-                    if (diff > 0)
-                        removeWeakest(diff);
-                }
+            this.capacity = newCapacity;
+
+            if (newCapacity == 0) {
+                clear();
+            } else {
+                commit();
             }
             return true;
         }
         return false;
     }
 
-    protected abstract void removeWeakest(int num);
+    /** a commit should invoke update(null) when its finished
+     * @return this instance, HACK due to inheritance fuckup
+     * */
+    protected abstract Object commit();
+
+    /** if v is non-null it will be added after making capacity for it */
+    protected abstract void update(@Nullable V v);
 
 
     @Nullable
-    abstract public V weakest();
+    abstract public K weakest();
 
 //    @Override
 //    public final void forEach(@NotNull Consumer<? super L> action) {
@@ -175,7 +177,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
     /**
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
-    public void forEach(int max, @NotNull Consumer<? super L> action) {
+    public void forEach(int max, @NotNull Consumer<? super V> action) {
         int n = Math.min(size(), max);
         //TODO let the list implementation decide this because it can use the array directly in ArraySortedIndex
         for (int i = 0; i < n; i++) {

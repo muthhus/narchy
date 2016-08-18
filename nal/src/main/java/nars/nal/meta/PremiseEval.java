@@ -213,7 +213,7 @@ public class PremiseEval extends FindSubst {
             return false;
         }
         try {
-            forEachMatch.accept(this);
+            forEachMatch.accept(this, now());
             return true;
         } catch (Exception e) {
             if (Param.DEBUG_DERIVER)

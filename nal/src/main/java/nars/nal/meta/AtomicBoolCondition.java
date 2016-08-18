@@ -30,7 +30,7 @@ public abstract class AtomicBoolCondition extends AtomicString implements BoolCo
 
 
     /** just attempts to evaluate the condition, causing any desired side effects as a result */
-    @Override public final void accept(@NotNull PremiseEval m) {
+    @Override public final void accept(@NotNull PremiseEval m, int now) {
         BoolCondition.run(this, m);
     }
 

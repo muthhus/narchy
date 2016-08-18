@@ -69,27 +69,19 @@ public abstract class AbstractCore {
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
 
-    protected AbstractCore(@NotNull NAR nar) {
+    protected AbstractCore(@NotNull NAR nar, int initialCapacity) {
 
         this.nar = nar;
 
-//        this.matcher = new ThreadLocal<PremiseEval>() {
-//            @Override
-//            protected PremiseEval initialValue() {
-//                return matcher;
-//            }
-//        };
-
-
         this.conceptsFiredPerCycle = new MutableInteger(1);
 
-        this.concepts = newConceptBag();
+        this.concepts = newConceptBag(initialCapacity);
 
 
     }
 
     @NotNull
-    protected abstract Bag<Concept> newConceptBag();
+    protected abstract Bag<Concept> newConceptBag(int cap);
 
     public void frame(@NotNull NAR nar) {
 
@@ -155,7 +147,6 @@ public abstract class AbstractCore {
 
         @Override
         public void run() {
-            //Concept concept = conceptLink.get();
 
             try {
 
@@ -167,8 +158,8 @@ public abstract class AbstractCore {
                         termlinks
                 );
 
-
-                nar.inputLater(derive);
+                if (!derive.isEmpty())
+                    nar.inputLater(derive);
             } catch (Exception e) {
 
                 if (Param.DEBUG)
@@ -212,10 +203,10 @@ public abstract class AbstractCore {
 
                     }
 
-                    tasksBuffer.clear();
+                    //tasksBuffer.clear();
                 }
 
-                termsBuffer.clear();
+                //termsBuffer.clear();
             }
 
 

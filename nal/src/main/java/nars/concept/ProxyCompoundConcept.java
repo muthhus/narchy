@@ -1,5 +1,6 @@
 package nars.concept;
 
+import nars.$;
 import nars.IO;
 import nars.NAR;
 import nars.Task;
@@ -119,8 +120,8 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public boolean process(@NotNull Task task, @NotNull NAR nar, @NotNull List<Task> removed) {
-        return target.process(task, nar, removed);
+    public boolean process(@NotNull Task task, @NotNull NAR nar) {
+        return target.process(task, nar);
     }
 
     @NotNull

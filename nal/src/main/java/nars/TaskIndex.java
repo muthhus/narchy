@@ -80,6 +80,7 @@ public final class TaskIndex {
 
     public final void remove(@NotNull Task tt) {
         tasks.remove(tt);
+        tt.delete();
     }
 
     public final void remove(@NotNull List<Task> tt) {
@@ -88,28 +89,9 @@ public final class TaskIndex {
         if (s == 0)
             return;
 
-        //synchronized (this.tasks) {
         for (int i = 0; i < s; i++) {
-            Task x = tt.get(i);
-            tasks.remove(x);
-            x.delete();
-
-            /*
-            TODO eternalization for non-deleted temporal tasks that reach here:
-
-            float eternalizationFactor = Param.ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR;
-            if (eternalizationFactor > 0f && displaced.size() > 0 && eternal.capacity() > 0) {
-                eternalizeForgottenTemporals(displaced, nar, eternalizationFactor);
-            }
-             */
-
+            this.remove(tt.get(i));
         }
-
-
-    }
-
-    public void replace(Task in, @NotNull Task out) {
-        add(out);
     }
 
     public void clear() {

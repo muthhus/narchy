@@ -336,16 +336,15 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     @Override
-    public final void policy(@Nullable ConceptPolicy p, long now, List<Task> removed) {
+    public final void policy(@NotNull ConceptPolicy p, long now, @NotNull List<Task> removed) {
         ConceptPolicy current = this.policy;
         if (current != p) {
-            if ((this.policy = p) != null) {
-                linkCapacity(p);
-                //synchronized (tasks) {
-                beliefCapacity(p, now, removed);
-                questionCapacity(p, removed);
-                //}
-            }
+            this.policy = p;
+            linkCapacity(p);
+            //synchronized (tasks) {
+            beliefCapacity(p, now, removed);
+            questionCapacity(p, removed);
+            //}
         }
     }
 
@@ -396,7 +395,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         }
 
 
-        return questionTable.add(q, answerTable, displaced, nar)!=null;
+        return questionTable.add(q, answerTable, displaced, nar) != null;
     }
 
 
@@ -409,7 +408,6 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         return false;
     }
-
 
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
@@ -427,40 +425,41 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * --a revised/projected task which may or may not remain in the belief table
      */
     @Override
-    public final boolean process(@NotNull Task input, @NotNull NAR nar, @NotNull List<Task> displaced) {
+    public final boolean process(@NotNull Task input, @NotNull NAR nar) {
 
+        List<Task> toRemove = $.newArrayList();
 
         boolean output;
 
-        synchronized (term) {
+        //synchronized (term) {
 
-            switch (input.punc()) {
-                case Symbols.BELIEF:
-                    output = processBelief(input, nar, displaced);
-                    break;
+        switch (input.punc()) {
+            case Symbols.BELIEF:
+                output = processBelief(input, nar, toRemove);
+                break;
 
-                case Symbols.GOAL:
-                    output = processGoal(input, nar, displaced);
-                    break;
+            case Symbols.GOAL:
+                output = processGoal(input, nar, toRemove);
+                break;
 
-                case Symbols.QUESTION:
-                    output = processQuestion(input, nar, displaced);
-                    break;
+            case Symbols.QUESTION:
+                output = processQuestion(input, nar, toRemove);
+                break;
 
-                case Symbols.QUEST:
-                    output = processQuest(input, nar, displaced);
-                    break;
+            case Symbols.QUEST:
+                output = processQuest(input, nar, toRemove);
+                break;
 
-                default:
-                    throw new RuntimeException("Invalid sentence type: " + input);
-            }
-
-
-            if (!output) {
-                //which was added above
-                displaced.add(input);
-            }
+            default:
+                throw new RuntimeException("Invalid sentence type: " + input);
         }
+
+
+        if (!output) {
+            nar.tasks.remove(input); //which was added in the callee
+        }
+
+        nar.tasks.remove(toRemove);
 
 
         return output;

@@ -18,6 +18,7 @@ import nars.util.data.LongString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 import static nars.nal.Tense.ETERNAL;
@@ -34,6 +35,8 @@ import static nars.truth.TruthFunctions.eternalize;
  */
 public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked {
 
+
+    public final static List<Task> EmptyTaskList = Collections.emptyList();
 
     static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder

@@ -95,7 +95,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      * false to stop it
      */
     @Override
-    public final void accept(@NotNull PremiseEval m) {
+    public final void accept(@NotNull PremiseEval m, int now) {
 
         Term r = m.index.resolve(this.conclusionPattern, m);
 

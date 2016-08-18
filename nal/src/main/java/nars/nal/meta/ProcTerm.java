@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ProcTerm extends Term {
 
-    default void appendJavaProcedure(@NotNull StringBuilder s) {
-        s.append("/* TODO: ").append(this).append(" */\n");
-    }
+//    /*default void appendJavaProcedure(@NotNull StringBuilder s) {
+//        s.append("/* TODO: ").append(this).append(" */\n");
+//    }*/
 
-    void accept(PremiseEval c);
+    void accept(PremiseEval c, int now);
 }

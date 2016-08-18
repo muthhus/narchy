@@ -102,8 +102,9 @@ public class TrieDeriver extends Deriver {
 
     @Override
     public final void run(@NotNull PremiseEval m) {
+        int now = m.now();
         for (ProcTerm r : roots)
-            r.accept(m);
+            r.accept(m, now);
     }
 
     /**
@@ -437,50 +438,50 @@ public class TrieDeriver extends Deriver {
         }
     }
 
-    //TODO not complete
-    protected void compile(@NotNull ProcTerm p) throws IOException, CannotCompileException, NotFoundException {
-        StringBuilder s = new StringBuilder();
-
-        final String header = "public final static String wtf=" +
-                '"' + this + ' ' + new Date() + "\"+\n" +
-                "\"COPYRIGHT (C) OPENNARS. ALL RIGHTS RESERVED.\"+\n" +
-                "\"THIS SOURCE CODE AND ITS GENERATOR IS PROTECTED BY THE AFFERO GENERAL PUBLIC LICENSE: https://gnu.org/licenses/agpl.html\"+\n" +
-                "\"http://github.com/opennars/opennars\";\n";
-
-        //System.out.print(header);
-        p.appendJavaProcedure(s);
-
-
-        ClassPool pool = ClassPool.getDefault();
-        pool.importPackage("nars.truth");
-        pool.importPackage("nars.nal");
-
-        CtClass cc = pool.makeClass("nars.nal.CompiledDeriver");
-        CtClass parent = pool.get("nars.nal.Deriver");
-
-        cc.addField(CtField.make(header, cc));
-
-        cc.setSuperclass(parent);
-
-        //cc.addConstructor(parent.getConstructors()[0]);
-
-        String initCode = "nars.Premise p = m.premise;";
-
-        String m = "public void run(nars.nal.PremiseMatch m) {\n" +
-                '\t' + initCode + '\n' +
-                '\t' + s + '\n' +
-                '}';
-
-        System.out.println(m);
-
-
-        cc.addMethod(CtNewMethod.make(m, cc));
-        cc.writeFile("/tmp");
-
-        //System.out.println(cc.toBytecode());
-        System.out.println(cc);
-    }
-
+//    //TODO not complete
+//    protected void compile(@NotNull ProcTerm p) throws IOException, CannotCompileException, NotFoundException {
+//        StringBuilder s = new StringBuilder();
+//
+//        final String header = "public final static String wtf=" +
+//                '"' + this + ' ' + new Date() + "\"+\n" +
+//                "\"COPYRIGHT (C) OPENNARS. ALL RIGHTS RESERVED.\"+\n" +
+//                "\"THIS SOURCE CODE AND ITS GENERATOR IS PROTECTED BY THE AFFERO GENERAL PUBLIC LICENSE: https://gnu.org/licenses/agpl.html\"+\n" +
+//                "\"http://github.com/opennars/opennars\";\n";
+//
+//        //System.out.print(header);
+//        p.appendJavaProcedure(s);
+//
+//
+//        ClassPool pool = ClassPool.getDefault();
+//        pool.importPackage("nars.truth");
+//        pool.importPackage("nars.nal");
+//
+//        CtClass cc = pool.makeClass("nars.nal.CompiledDeriver");
+//        CtClass parent = pool.get("nars.nal.Deriver");
+//
+//        cc.addField(CtField.make(header, cc));
+//
+//        cc.setSuperclass(parent);
+//
+//        //cc.addConstructor(parent.getConstructors()[0]);
+//
+//        String initCode = "nars.Premise p = m.premise;";
+//
+//        String m = "public void run(nars.nal.PremiseMatch m) {\n" +
+//                '\t' + initCode + '\n' +
+//                '\t' + s + '\n' +
+//                '}';
+//
+//        System.out.println(m);
+//
+//
+//        cc.addMethod(CtNewMethod.make(m, cc));
+//        cc.writeFile("/tmp");
+//
+//        //System.out.println(cc.toBytecode());
+//        System.out.println(cc);
+//    }
+//
 
     //final static Logger logger = LoggerFactory.getLogger(TrieDeriver.class);
 

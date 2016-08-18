@@ -3,7 +3,6 @@ package nars;
 
 import com.google.common.collect.Sets;
 import nars.Narsese.NarseseException;
-import nars.bag.impl.ArrayBag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.AbstractConcept;
@@ -51,7 +50,6 @@ import java.util.stream.Stream;
 
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
-import static nars.nal.TermBuilder.FalseProduct;
 import static org.fusesource.jansi.Ansi.ansi;
 
 
@@ -598,15 +596,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             try {
 
                 Concept c = input.concept(this);
-                if (c.policy() == null) {
-                    policy(c, index.conceptBuilder().init(), time());
-                }
 
-                List<Task> removed = $.newArrayList();
-
-                boolean entered = c.process(input, this, removed);
-
-                tasks.remove(removed);
+                boolean entered = c.process(input, this);
 
                 if (entered) {
 

@@ -50,15 +50,13 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 6 * 100000;
+    public static final int DEFAULT_INDEX_WEIGHT = 32 * 100000;
 
     public static final Executioner exe =
-            new MultiThreadExecutioner(4, 4096);
+            new MultiThreadExecutioner(4, 8192);
             //new SingleThreadExecutioner();
 
-
-
-    public static final int runFrames = 100;
+    public static final int runFrames = 1500;
     public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
@@ -402,7 +400,7 @@ public class Tetris2 extends NAREnvironment {
 
         //new Abbreviation2(nar, "_");
 
-        //MySTMClustered stm = new MySTMClustered(nar, 384, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 384, '.', 3);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new ArithmeticInduction(nar);

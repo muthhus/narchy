@@ -155,10 +155,9 @@ public interface Concept extends Termed {
      * process a task in this concept
      *
      * @param displaced collects tasks which have been displaced by the potential insertion of this task
-     * @param removed
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    boolean process(@NotNull Task task, @NotNull NAR nar, List<Task> removed);
+    boolean process(@NotNull Task task, @NotNull NAR nar);
 
     boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation);
 

@@ -28,12 +28,11 @@ public final class IfThen extends GenericCompound<Term> implements ProcTerm {
         this.conseq = conseq; //(ProcTerm) term(1);
     }
 
-    @Override public void accept(@NotNull PremiseEval m) {
-        final int stack = m.now();
+    @Override public void accept(@NotNull PremiseEval m, int now) {
         if (cond.booleanValueOf(m)) {
-            conseq.accept(m);
+            conseq.accept(m, -1);
         }
-        m.revert(stack);
+        m.revert(now);
     }
 
 

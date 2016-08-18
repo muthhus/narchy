@@ -40,12 +40,9 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         this.capacity = newCapacity;
 
         synchronized (this) {
-            int s = removeAlreadyDeleted(removed);
-            //compress(displ, now);
-            if (s > newCapacity) {
-                do {
-                    remove(weakest(now), removed);
-                } while (this.size() > newCapacity);
+            removeAlreadyDeleted(removed);
+            while (this.size() > newCapacity) {
+                remove(weakest(now), removed);
             }
         }
 
@@ -57,8 +54,10 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-     /** according to a balance of temporal proximity and confidence */
-     public static float rank(@NotNull Task t, long when, long now) {
+    /**
+     * according to a balance of temporal proximity and confidence
+     */
+    public static float rank(@NotNull Task t, long when, long now) {
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
         return rankTemporalByConfidence(t, when, now, -1);
     }
@@ -73,30 +72,28 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
         //the result of compression is processed separately
         Task next;
+        long now = nar.time();
+
         synchronized (this) {
-            next = compress(input, nar.time(), eternal, displ, concept);
-        }
-
-        if (next!=null && !isFull()) {
-
-            synchronized (this) {
-                add(input);
+            next = compress(input, now, eternal, displ, concept);
+            if (next == null || isFull()) {
+                //not compressible with respect to this input, so reject the input
+                // HACK DOES THIS HAPPEN and WHY, IS IT DANGEROUS
+                //if (Global.DEBUG)
+                //throw new RuntimeException(this + " compression failed");
+                return false;
             }
 
-            if (next != input)
-                nar.inputLater(next);
-
-            return true;
+            add(input);
         }
 
+        if (next != input)
+            nar.inputLater(next);
 
-        //not compressible with respect to this input, so reject the input
-        // HACK DOES THIS HAPPEN and WHY, IS IT DANGEROUS
-        //if (Global.DEBUG)
-        //throw new RuntimeException(this + " compression failed");
-        return false;
-
+        return true;
     }
+
+
 
     @Override
     public final boolean isFull() {
@@ -140,7 +137,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         if (x != removed) {
             throw new RuntimeException("equal but different instances: " + removed);
         }
-        return x!=null;
+        return x != null;
     }
 
 
@@ -363,7 +360,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             long o = the.occurrence();
             if ((now == ETERNAL || when == now) && o == when) //optimization: if at the current time and when
                 return res;
-            return res!=null ? Revision.project(res, when, now, o, false) : null;
+            return res != null ? Revision.project(res, when, now, o, false) : null;
 
         } else {
             return truthpolations.get().truth(when, now, copy);
@@ -377,8 +374,10 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         for (int i = 0; i < s; ) {
             Task x = get(i);
             if (x == null || x.isDeleted()) {
-                remove(i, displ);
-                s--;
+                if (remove(i, displ)!=null)
+                    s--;
+                else
+                    break;
             } else {
                 i++;
             }

@@ -25,11 +25,10 @@ public final class Fork extends GenericCompound<ProcTerm> implements ProcTerm {
     }
 
     @Override
-    public final void accept(@NotNull PremiseEval m) {
-        final int stack = m.now();
+    public final void accept(@NotNull PremiseEval m, int now) {
         for (ProcTerm s : termCache) {
-            s.accept(m);
-            m.revert(stack);
+            s.accept(m, now);
+            m.revert(now);
         }
     }
 
@@ -46,15 +45,15 @@ public final class Fork extends GenericCompound<ProcTerm> implements ProcTerm {
         }
     }
 
-    @Override
-    public void appendJavaProcedure(@NotNull StringBuilder s) {
-        //s.append("/* " + this + "*/");
-        for (ProcTerm p : terms()) {
-            s.append("\t\t");
-            p.appendJavaProcedure(s);
-            s.append('\n');
-        }
-    }
+//    @Override
+//    public void appendJavaProcedure(@NotNull StringBuilder s) {
+//        //s.append("/* " + this + "*/");
+//        for (ProcTerm p : terms()) {
+//            s.append("\t\t");
+//            p.appendJavaProcedure(s);
+//            s.append('\n');
+//        }
+//    }
 
 
 //    public static PremiseMatch fork(PremiseMatch m, ProcTerm<PremiseMatch> proc) {

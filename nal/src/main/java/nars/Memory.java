@@ -119,12 +119,11 @@ public class Memory extends Param {
 
         @Nullable ConceptPolicy prev = c.policy();
         if (prev != p) {
-            List<Task> removed = $.newArrayList();
 
+            List<Task> removed = $.newArrayList();
             c.policy(p, now, removed);
             tasks.remove(removed);
 
-            c.commit();
 
             index.set(c); //update in the cache (weight, etc.)
 
