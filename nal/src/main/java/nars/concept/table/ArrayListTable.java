@@ -152,9 +152,6 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     protected abstract void update(@Nullable V v);
 
 
-    @Nullable
-    abstract public K weakest();
-
 //    @Override
 //    public final void forEach(@NotNull Consumer<? super L> action) {
 //

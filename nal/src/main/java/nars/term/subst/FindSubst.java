@@ -210,10 +210,11 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         } else {
 
             final Op xOp = x.op();
+            final Op yOp = y.op();
 
             switch (xOp) {
                 case OBJECT:
-                    if (y.op()==OBJECT)
+                    if (yOp ==OBJECT)
                         return ((Termject)x).match(y, this);
                     break; //continue to end
                 case VAR_INDEP:
@@ -221,7 +222,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                 case VAR_QUERY:
                 case VAR_PATTERN:
                     //Var
-                    if (xOp == y.op()) {
+                    if (xOp == yOp) {
                         return putCommon(x, y);
                     } else if (matching(xOp))
                         return matchVarX(x, y);
@@ -234,13 +235,13 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                 default:
                     //Compound
                     if (y instanceof Compound) {
-                        return (xOp == y.op()) &&
+                        return (xOp == yOp) &&
                                 ((Compound) x).match((Compound) y, this);
                     }
                     break; //continue to end
             }
 
-            return (matching(y.op())) && matchVarY(x, y);
+            return (matching(yOp)) && matchVarY(x, y);
         }
 
 //            else if (x instanceof Compound) {

@@ -60,23 +60,23 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     protected void update(BLink<V> toAdd) {
 
         int s = size();
-        SortedArray<BLink<V>> items = this.items;
-        if (s > 0) {
+        int c = capacity();
 
-            List<BLink<V>> toRemove = $.newArrayList();
+        boolean forceClean = toAdd == null; //force clean if this is a commit and not an addition update
+
+        int sizeThresh = forceClean ? 0 : c + ((toAdd!=null) ? 1 : 0);
+        boolean modified = false;
+
+        SortedArray<BLink<V>> items = this.items;
+        if (s > sizeThresh) {
+
+            List<BLink<V>> toRemove = $.newArrayList(s - sizeThresh);
 
             //first step: remove any nulls and deleted values
             s -= removeDeletedAtBottom(toRemove);
 
             //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
-            while (!isEmpty() && ((s - capacity()) + (toAdd != null ? 1 : 0)) > 0) {
-                BLink<V> w;
-                synchronized (items) {
-                    w = items.remove(size() - 1);
-                }
-                toRemove.add(w);
-                s--;
-            }
+            removeWeakestUntilUnderCapacity(s, toRemove, toAdd != null);
 
 
             //do full removal outside of the synchronized phase, possibly interleaving with another thread doing the same thing
@@ -96,19 +96,34 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 onRemoved(k, w);
 
                 w.delete();
+
+                modified = true;
             }
         }
-
 
         if (toAdd != null) {
             synchronized (items) {
                 //the item key,value should already be in the map before reaching here
                 items.add(toAdd, this);
+                modified = true;
             }
         }
 
-        updateRange(); //regardless, this also handles case when policy changed and allowed more capacity which should cause minPri to go to -1
+        if (modified)
+            updateRange(); //regardless, this also handles case when policy changed and allowed more capacity which should cause minPri to go to -1
 
+    }
+
+    private void removeWeakestUntilUnderCapacity(int s, List<BLink<V>> toRemove, boolean pendingAddition) {
+        SortedArray<BLink<V>> items = this.items;
+        while (!isEmpty() && ((s - capacity()) + (pendingAddition ? 1 : 0)) > 0) {
+            BLink<V> w;
+            synchronized (items) {
+                w = items.remove(size() - 1);
+            }
+            toRemove.add(w);
+            s--;
+        }
     }
 
     @Override
