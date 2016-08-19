@@ -6,9 +6,11 @@ import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.link.BLink;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
+//import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * groups each derivation's tasks as a group before inputting into

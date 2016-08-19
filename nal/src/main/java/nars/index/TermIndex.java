@@ -40,7 +40,6 @@ import java.util.function.Function;
 import static nars.$.unneg;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.TermBuilder.FalseProduct;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;
 
@@ -50,7 +49,6 @@ import static nars.term.Terms.compoundOrNull;
 public abstract class TermIndex extends TermBuilder {
 
 
-    String VARIABLES_ARE_NOT_CONCEPTUALIZABLE = "Variables are not conceptualizable";
     public static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
 
     /**
@@ -351,10 +349,12 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     //can not be static because of some issue with unnormalized variables equality or something
-//    final ThreadLocal<Map<Compound,Compound>> normalizations =
-//            ThreadLocal.withInitial( () -> new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD) );
+    final ThreadLocal<Map<Compound,Compound>> normalizations =
+            ThreadLocal.withInitial( () -> new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD) );
+
 //            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
-    final Cache<Compound,Compound> normalizations = Caffeine.newBuilder().maximumSize(16*1024*4).build();
+
+    //final Cache<Compound,Compound> normalizations = Caffeine.newBuilder().maximumSize(16*1024*4).build();
 
 
     final Function<? super Compound, ? extends Compound> normalizer = u -> {
@@ -370,8 +370,9 @@ public abstract class TermIndex extends TermBuilder {
     };
 
     public final Compound normalize(@NotNull Compound t) {
-        //Compound v = normalizations.get().computeIfAbsent(t, normalizer);
-        Compound v = normalizations.get(t, normalizer);
+        Compound v = normalizations.get().computeIfAbsent(t, normalizer);  //threadlocal/linked
+
+        //Compound v = normalizations.get(t, normalizer); //caffeine
 
         return v == FalseProduct ? null : v;
 
@@ -539,7 +540,7 @@ public abstract class TermIndex extends TermBuilder {
 
             if (term instanceof Variable) {
                 //if (createIfMissing)
-                throw new InvalidConceptException(term, VARIABLES_ARE_NOT_CONCEPTUALIZABLE);
+                throw new InvalidConceptException(term, "Variables are not conceptualizable");
                 //return null;
             }
 

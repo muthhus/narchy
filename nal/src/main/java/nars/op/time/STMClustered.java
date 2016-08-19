@@ -291,7 +291,7 @@ public class STMClustered extends STM {
         clusters = (short)Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.input = new ArrayBag<>(1, BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity.intValue())) {
+        this.input = new ArrayBag<>(capacity.intValue(), BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity.intValue())) {
 
 
             @NotNull

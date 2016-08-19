@@ -86,7 +86,7 @@ public class InfinispanIndex extends MaplikeIndex {
     }
 
     @Override
-    public TermContainer theSubterms(@NotNull TermContainer t) {
+    public TermContainer internSubterms(@NotNull TermContainer t) {
         return subtermsLocal.get(key(t));
     }
 
@@ -156,10 +156,10 @@ strictlyLocal.put("local_3", "only");
         return subtermsLocal.size();
     }
 
-    @Override
-    protected TermContainer put(TermContainer x) {
-        return subtermsLocal.putIfAbsent(key(x), x);
-    }
+//    @Override
+//    protected TermContainer put(TermContainer x) {
+//        return subtermsLocal.putIfAbsent(key(x), x);
+//    }
 
     @Override
     public @NotNull String summary() {
