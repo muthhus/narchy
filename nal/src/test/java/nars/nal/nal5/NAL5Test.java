@@ -475,6 +475,7 @@ public class NAL5Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(x)", '.', 0.5f, 1f, 0, 1, ETERNAL)
         ;
     }
+
     @Test public void testNegNegImplicationConc() {
         test()
                 .log()
