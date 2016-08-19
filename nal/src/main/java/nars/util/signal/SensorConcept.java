@@ -70,7 +70,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return true;
     }
     @Override
-    public boolean validGoal(@NotNull Task t, @NotNull NAR nar) {
+    public boolean validGoal(@NotNull Task goal, @NotNull NAR nar) {
         //return onlyDerivationsIfFuture(t, nar);
         return true;
     }

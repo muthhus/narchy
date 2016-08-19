@@ -60,14 +60,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     protected void update(BLink<V> toAdd) {
 
         int s = size();
+        SortedArray<BLink<V>> items = this.items;
         if (s > 0) {
 
             List<BLink<V>> toRemove = $.newArrayList();
 
-            synchronized (items) {
-                //first step: remove any nulls and deleted values
-                s -= removeDeletedAtBottom(toRemove);
-            }
+            //first step: remove any nulls and deleted values
+            s -= removeDeletedAtBottom(toRemove);
 
             //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
             while (!isEmpty() && ((s - capacity()) + (toAdd != null ? 1 : 0)) > 0) {
@@ -87,8 +86,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 V k = w.get();
                 BLink<V> k2 = map.remove(k);
 
-                if (k2 != w)
-                    throw new RuntimeException("bag inconsistency: " + w + " removed but " + w + " may still be in the items list");
+                if (k2 != w) {
+                    //throw new RuntimeException(
+                    System.err.println("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
+                    //reinsert it because it must have been added in the mean-time:
+                    map.putIfAbsent(k, k2);
+                }
 
                 onRemoved(k, w);
 
@@ -443,27 +446,27 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         int removedFromMap = 0;
 
-        while ((i >= 0) && (l[i] == null)) {
-            i--;
-            removedFromMap++;
+        synchronized (items) {
+            while ((i >= 0) && (l[i] == null)) {
+                i--;
+                removedFromMap++;
+            }
+
+            BLink<V> ii;
+            while (i >= 0 && (ii = l[i]).isDeleted()) {
+
+                removed.add(ii);
+
+                l[i--] = null;
+
+                removedFromMap++;
+            }
+
+            if (i != j)
+                items._setSize(i + 1); //quickly remove null entries from the end by skipping past them
         }
 
 
-        BLink<V> ii;
-        while (i >= 0 && (ii = l[i]).isDeleted()) {
-
-            removed.add(ii);
-
-            l[i--] = null;
-
-            removedFromMap++;
-        }
-
-        if (i != j)
-            items._setSize(i + 1); //quickly remove null entries from the end by skipping past them
-
-
-        //return ((willRemoveFromMap > 0) && (map.values().removeIf(BLink::isDeleted))) || (removedFromMap > 0);
         return removedFromMap;
     }
 
@@ -718,9 +721,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 if (existing == b) {
                     throw new RuntimeException("budget self merge");
                 }
-                if (existing.isDeleted()) {
-                    throw new RuntimeException("existing item is deleted");
-                }
+
+                //existing.isDeleted() /* if deleted, we will merge replacing it as if it were zero:
 
                 float pBefore = existing.priNext() * existing.durNext();
                 float o = bag.mergeFunction.merge(existing, b, scale);

@@ -19,6 +19,7 @@ import nars.term.atom.Atomic;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -41,12 +42,15 @@ import static nars.nal.Tense.ETERNAL;
 public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
-    private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 16;
+    private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 32;
 
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> {
                 Map map1 = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
-                Map map2 = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
+                Map map2 =
+                        map1; //shared
+                        //newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
+
                 switch (a.op()) {
                     case OBJECT:
                         return new TermjectConcept<>((Termject)a, termbag(map1), taskbag(map2));
@@ -59,8 +63,9 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     @NotNull
     private static Map newBagMap(int cap) {
         //return new HashMap(cap);
-
         return new ConcurrentHashMap(cap);
+        //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
+                        //ConcurrentHashMapUnsafe(cap);
     }
 
     @NotNull
@@ -80,7 +85,10 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
             throw new RuntimeException("temporality in concept term: " + t);
 
         Map map1 = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
-        Map map2 = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
+        Map map2 =
+                map1; //shared
+                //newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
+
         @NotNull Bag<Term> termbag = termbag(map1);
         @NotNull Bag<Task> taskbag = taskbag(map2);
 
@@ -146,10 +154,10 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                         //CurveBag.power6BagCurve,
                         rng);
 
-        this.sleep = new DefaultConceptPolicy(7, 8, 2, 24, 16);
+        this.sleep = new DefaultConceptPolicy(7, 8, 2, 16, 8);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy(12, 10, 4, 32, 24);
+        this.awake = new DefaultConceptPolicy(12, 10, 4, 24, 12);
     }
 
     @Override

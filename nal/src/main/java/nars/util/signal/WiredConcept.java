@@ -130,7 +130,7 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
 
 
     public abstract boolean validBelief(@NotNull Task belief, @NotNull NAR nar);
-    public abstract boolean validGoal(@NotNull Task belief, @NotNull NAR nar);
+    public abstract boolean validGoal(@NotNull Task goal, @NotNull NAR nar);
 
 
 

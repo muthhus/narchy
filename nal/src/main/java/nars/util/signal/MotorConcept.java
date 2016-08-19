@@ -89,7 +89,7 @@ public class MotorConcept extends WiredConcept  {
     }
 
     @Override
-    public boolean validGoal(@NotNull Task belief, @NotNull NAR nar) {
+    public boolean validGoal(@NotNull Task goal, @NotNull NAR nar) {
         return true;
     }
 

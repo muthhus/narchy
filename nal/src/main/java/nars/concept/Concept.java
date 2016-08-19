@@ -389,7 +389,7 @@ public interface Concept extends Termed {
         termlinks().commit();
 
         if (Param.DEBUG) {
-            if ((((ArrayBag) termlinks()).map).size() > termlinks().capacity() + tasklinks().capacity()) {
+            if ((((ArrayBag) termlinks()).map).size() > 1 + termlinks().capacity() + tasklinks().capacity()) {
                 //inconsistent item
                 System.err.println(
                         term() + "\tmap=" +

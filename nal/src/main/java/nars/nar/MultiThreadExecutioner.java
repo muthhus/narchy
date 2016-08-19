@@ -14,7 +14,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+
+import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 
 /**
  * Created by me on 8/16/16.
@@ -26,6 +30,7 @@ public class MultiThreadExecutioner extends Executioner {
     private final RingBuffer<TaskEvent> ring;
     private final Executor exec;
     private SequenceBarrier barrier;
+    private long cursor;
 
 
     static final class TaskEvent {
@@ -41,7 +46,8 @@ public class MultiThreadExecutioner extends Executioner {
     public MultiThreadExecutioner(int threads, int ringSize) {
         this(threads, ringSize,
                 //new BasicExecutor(Executors.defaultThreadFactory())
-                new ForkJoinPool(threads)
+                new ForkJoinPool(threads, defaultForkJoinWorkerThreadFactory, null, true /* async */,
+                        0,  0x7fff /* max #workers - 1*/, 1, null, 60000L, TimeUnit.MILLISECONDS)
         );
     }
 
@@ -61,8 +67,9 @@ public class MultiThreadExecutioner extends Executioner {
                 //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
                 //new LiteBlockingWaitStrategy()
         );
-        this.ring = disruptor.getRingBuffer();
 
+        this.ring = disruptor.getRingBuffer();
+        this.cursor = ring.getCursor();
 
     }
 
@@ -131,7 +138,10 @@ public class MultiThreadExecutioner extends Executioner {
                     //if (ring.hasAvailableCapacity(1)) {
 
                     //do {
-                        barrier.waitFor(ring.getCursor());
+                long lastCursor = this.cursor;
+                if (lastCursor!=(this.cursor = ring.getCursor()))
+                    barrier.waitFor(cursor);
+
                     //} while (!ring.hasAvailableCapacity(ring.getBufferSize()/2));
 
                         //break;

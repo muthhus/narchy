@@ -56,8 +56,8 @@ public class Tetris2 extends NAREnvironment {
             new MultiThreadExecutioner(4, 16384);
             //new SingleThreadExecutioner();
 
-    public static final int runFrames = 1500;
-    public static final int cyclesPerFrame = 32;
+    public static final int runFrames = 55500;
+    public static final int cyclesPerFrame = 64;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
     public static final int TIME_PER_FALL = 8;
@@ -337,8 +337,8 @@ public class Tetris2 extends NAREnvironment {
         Param.DEBUG = false;
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(1300,
-                16, 2, 2, rng,
+        Default nar = new Default(1024,
+                8, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
 
                 , new FrameClock(), exe
@@ -354,18 +354,18 @@ public class Tetris2 extends NAREnvironment {
 
         };
 
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
+        nar.inputActivation.setValue(0.01f);
+        nar.derivedActivation.setValue(0.01f);
 
 
-        nar.beliefConfidence(0.7f);
-        nar.goalConfidence(0.7f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
         nar.DEFAULT_GOAL_PRIORITY = 0.75f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.03f);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -396,11 +396,10 @@ public class Tetris2 extends NAREnvironment {
 //			return false;
 //		});
 
-        //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 384, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new ArithmeticInduction(nar);
@@ -431,7 +430,7 @@ public class Tetris2 extends NAREnvironment {
 //                );
 
 
-                //BagChart.show((Default) nar, 256);
+                //BagChart.show((Default) nar, 512);
 
                 //STMView.show(stm, 800, 600);
 
@@ -477,16 +476,15 @@ public class Tetris2 extends NAREnvironment {
                 });
 
 
-                int window = 32;
-                GridSurface camHistory = new GridSurface(HORIZONTAL,
-                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window * 2)),
-                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window)),
-                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)),
-                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window)),
-                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window * 2))
-                );
-
-                newControlWindow(12f,4f, new Object[] { camHistory } );
+//                int window = 32;
+//                GridSurface camHistory = new GridSurface(HORIZONTAL,
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window * 2)),
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, -window)),
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)),
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window)),
+//                        new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, +window * 2))
+//                );
+//                newControlWindow(12f,4f, new Object[] { camHistory } );
 
                 newControlWindow(view);
 

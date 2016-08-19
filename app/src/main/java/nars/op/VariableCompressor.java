@@ -186,7 +186,7 @@ public class VariableCompressor implements Consumer<Task> {
 
             } catch (Exception e) {
                 if (Param.DEBUG)
-                    logger.error("{}", e);
+                    logger.error("{}", e.toString());
                 return input;
             }
 

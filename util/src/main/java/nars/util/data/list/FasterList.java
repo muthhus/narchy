@@ -152,8 +152,7 @@ public class FasterList<X> extends FastList<X> {
         X[] a = this.items;
         for (int i = 0; i < s; ) {
             X ai = a[i];
-            if (filter.test(ai)) {
-                displaced.add(ai);
+            if (ai == null || (filter.test(ai) && displaced.add(ai))) {
                 s--;
                 System.arraycopy(a, i+1, a, i, s - i);
                 Arrays.fill(a, s, ps,null);
