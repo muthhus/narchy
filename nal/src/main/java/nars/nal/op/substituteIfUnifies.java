@@ -68,20 +68,24 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         if (!equals) {
             boolean xn = (x.op()==NEG);
             boolean yn = (y.op()==NEG);
-            boolean opposite = xn ^ yn;
-            Term px = (opposite && xn) ? $.unneg(x).term() : x; //positive X
-            Term py = (opposite && yn) ? $.unneg(y).term() : y; //positive Y
+            Term px = (xn) ? $.unneg(x).term() : x; //positive X
+            Term py = (yn) ? $.unneg(y).term() : y; //positive Y
             if (Term.equalAtemporally(px, py)) {
                 equals = true;
-                if (opposite) {
+                if (xn ^ yn) {
                     if (yn && !xn) { //x isnt negated and y is, so
                         y = py;
                     } else { //if (xn && !yn) { //x is negated and y isn't, so
                         y = $.neg(y);
                     }
 
+                    term = $.neg(term);
 
                     //now x and y have matching polarities
+                } else if (xn && yn) {
+                    //both negated
+                } else {
+                    //shouldnt hapen?
                 }
             }
         }

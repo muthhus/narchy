@@ -215,9 +215,9 @@ public class NAL4Test extends AbstractNALTest {
 
             //.log()
         t   .believe("(x-->(/,y,_,z))")
-            .askAt(50, "((x,z)-->?a)")
-            .mustBelieve(250, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f)
-            .mustBelieve(250, "((x,z)-->(x,(/,y,x,_)))", 1f, 0.81f);
+            .askAt(10, "((x,z)-->?a)")
+            .mustBelieve(750, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f);
+            //.mustBelieve(750, "((x,z)-->(x,(/,y,x,_)))", 1f, 0.81f);
 
     }
 

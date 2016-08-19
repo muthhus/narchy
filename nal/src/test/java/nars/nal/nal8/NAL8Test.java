@@ -695,6 +695,17 @@ public class NAL8Test extends AbstractNALTest {
             .mustDesire(cycles, "(bad)", 0.0f, 0.81f);
 
     }
+
+    @Test
+    public void testInhibition0()  {
+        test()
+                //.log()
+                .goal("(reward)")
+                .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
+                .mustDesire(cycles, "(bad)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(bad)", '!', 0.5f, 1f, 0f, 1f, ETERNAL);
+    }
+
     @Test
     public void testInhibition1()  {
         test()

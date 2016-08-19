@@ -217,29 +217,30 @@ public class TrieDeriverTest {
 
     @Test public void testPatternIndexContainsNoConcepts() {
         PatternIndex p = d.rules.patterns;
-        //out.println(p.data);
-        //out.println(p.atoms);
-        p.forEach(t -> {
-
-            if (!(t instanceof TransformConcept))
-                assertFalse( t instanceof Concept);
-
-            //test all subterms are in the pattern index too
-            t.term().recurseTerms((s, parent)->{
-                if (s instanceof Variable)
-                    return;
-
-
-                Termed sub = p.concept(s, false);
-                if (sub == null) {
-                    System.out.println("subterm " + s + " of " + parent + " not in PatternIndex");
-                }
-                assertNotNull(sub);
-            });
-
-            //out.println(t);
-        });
-        //System.out.println("compounds: "+ p.internings + " internings, " + p.size() + " unique");
+        assertNull(p.conceptBuilder());
+//        //out.println(p.data);
+//        //out.println(p.atoms);
+//        p.forEach(t -> {
+//
+//            if (!(t instanceof TransformConcept))
+//                assertFalse( t instanceof Concept);
+//
+//            //test all subterms are in the pattern index too
+//            t.term().recurseTerms((s, parent)->{
+//                if (s instanceof Variable)
+//                    return;
+//
+//
+//                Termed sub = p.concept(s, false);
+//                if (sub == null) {
+//                    System.out.println("subterm " + s + " of " + parent + " not in PatternIndex");
+//                }
+//                assertNotNull(sub);
+//            });
+//
+//            //out.println(t);
+//        });
+//        //System.out.println("compounds: "+ p.internings + " internings, " + p.size() + " unique");
 
     }
 
