@@ -38,6 +38,10 @@ public abstract class TermBuilder {
      */
     public static final Atom True = $.the("†");
     public static final Atom False = $.the("Ø");
+
+    /** when a conjunction cancels itself, the truth that should replace it (as it may fall through to a superterm, etc)*/
+    public static final Atom SELF_CANCELLED_CONJ_TRUTH = False;
+
     private static final Term[] TrueArray = new Term[]{True};
     public static final Compound FalseProduct = new GenericCompound(Op.PROD, TermVector.the(False));
     /**
@@ -100,7 +104,7 @@ public abstract class TermBuilder {
         switch (op) {
             case NEG:
                 if (u.length != 1)
-                    throw new RuntimeException("invalid negation subterms: " + Arrays.toString(u));
+                    throw new InvalidTermException(op, dt, u, "negation requires 1 subterm");
 
                 return negation(u[0]);
 
@@ -149,7 +153,7 @@ public abstract class TermBuilder {
             case SIM:
             case EQUI:
             case IMPL:
-                if (u.length != 2) {//throw new RuntimeException("invalid statement: args=" + Arrays.toString(u));
+                if (u.length != 2) {
                     throw new InvalidTermException(op, dt, u, "Statement without exactly 2 arguments");
                 }
                 return statement(op, dt, u[0], u[1]);
@@ -193,8 +197,9 @@ public abstract class TermBuilder {
             if (!uu.equals(True)) // && (!uu.equals(False)))
                 y[j++] = uu;
         }
-        if (j != y.length)
-            throw new RuntimeException("invalid conjunction after filtration");
+
+        assert(j == y.length);
+
 
         return y;
     }
@@ -302,12 +307,14 @@ public abstract class TermBuilder {
         //check for any imdex terms that may have not been removed
         for (Term x : args.terms()) {
             if (isTrueOrFalse(x)) {
-                //return null;
-                // throw new RuntimeException(op + " term with imdex in subterms: " + args);
+                if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
+                    throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
+
+                //any other term causes it to be invalid/meaningless
                 return False;
             }
         }
-        //}
+
 
         return newCompound(op, dt, args);
     }
@@ -373,7 +380,7 @@ public abstract class TermBuilder {
         }
 
         if (index == DTERNAL)
-            throw new RuntimeException("invalid image subterms: " + Arrays.toString(res));
+            throw new InvalidTermException(o, index, res, "image missing '_' (Imdex)");
 
         int serN = res.length - 1;
         Term[] ser = new Term[serN];
@@ -388,11 +395,11 @@ public abstract class TermBuilder {
 
         Term[] u = conjTrueFalseFilter(uu);
 
-        int ul = u.length;
-        if (ul == 0)
+        int n = u.length;
+        if (n == 0)
             return False;
 
-        if (ul == 1) {
+        if (n == 1) {
             Term only = u[0];
 
             if (only instanceof Ellipsislike) {
@@ -403,33 +410,46 @@ public abstract class TermBuilder {
         }
 
 
-        if ((dt == DTERNAL) || (dt == 0) || (dt == XTERNAL)) {
-            return junctionFlat(CONJ, dt, u);
-        } else {
+        if (dt == XTERNAL) {
+            if (n!=2)
+                throw new InvalidTermException(CONJ, XTERNAL, u, "XTERNAL only applies to 2 subterms, as dt placeholder");
 
-            if (ul == 2) {
-
-                Term a = u[0];
-                Term b = u[1];
-                if (a.equals(b))
-                    return a;
-
-                //if dternal or parallel, dont allow the subterms to be conegative:
-                if (((dt == DTERNAL) || (dt == 0)) &&
-                        (((a.op() == NEG) && ($.unneg(a).equals(b))) ||
-                                ((b.op() == NEG) && ($.unneg(b).equals(a))))) {
-                    return False;
-                }
-
-                return finish(CONJ,
-                        (u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
-                        u);
-            } else {
-                throw new InvalidTermException(CONJ, dt, u, "temporal conjunction requires exactly 2 arguments");
-            }
-
+            //preserve grouping (don't flatten) but use normal commutive ordering as dternal &&
+            return finish(CONJ, XTERNAL, u);
         }
+
+        if (commutive(dt)) {
+            return junctionFlat(CONJ, dt, u);
+        }
+
+        if (n == 2) {
+
+            Term a = u[0];
+            Term b = u[1];
+            if (a.equals(b))
+                return a;
+
+//            //if dternal or parallel, dont allow the subterms to be conegative:
+//            if (commutive(dt) &&
+//                    (((a.op() == NEG) && ($.unneg(a).equals(b))) ||
+//                            ((b.op() == NEG) && ($.unneg(b).equals(a))))) {
+//                return False;
+//            }
+
+            return finish(CONJ,
+                    (u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
+                    u);
+        } else {
+            throw new InvalidTermException(CONJ, dt, u, "temporal conjunction requires exactly 2 arguments");
+        }
+
     }
+
+    public boolean commutive(int dt) {
+        return (dt == DTERNAL) || (dt == 0);
+    }
+
+
 
 
     /**
@@ -451,13 +471,13 @@ public abstract class TermBuilder {
         int n = s.size();
         switch (n) {
             case 0:
-                return False;
+                return SELF_CANCELLED_CONJ_TRUTH;
             case 1:
                 return s.iterator().next();
             default:
                 s = junctionGroupNonDTSubterms(s, dt);
                 if (s.isEmpty())
-                    return False; //wtf
+                    return SELF_CANCELLED_CONJ_TRUTH; //wtf
                 return finish(op, dt, TermSet.the(s));
         }
 
@@ -531,20 +551,19 @@ public abstract class TermBuilder {
     }
 
     /**
-     * returns # of terms negated
+     * for commutive conjunction (0 or DTERNAL)
      */
     static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
 
         for (Term x : u) {
 
-            if ((x.op() == op) && (((Compound) x).dt() == dt) /* 0 or DTERNAL */) {
+            if ((x.op() == op) && (((Compound) x).dt() == dt)) {
                 flatten(op, ((Compound) x).terms(), dt, s); //recurse
             } else {
                 if (x instanceof Compound) {
                     //cancel co-negations TODO optimize this?
                     if (!s.isEmpty()) {
-                        Term negX = $.neg(x);
-                        if (s.remove(negX)) {
+                        if (s.remove($.neg(x))) {
                             continue;
                         }
                     }
@@ -589,9 +608,9 @@ public abstract class TermBuilder {
                     }
 
 
-                    if (subject.equals(True)) {
+                    if (isTrue(subject)) {
                         return predicate;
-                    } else if (subject.equals(False)) {
+                    } else if (isFalse(subject)) {
                         return False;
                         //throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
                         //return negation(predicate); /??
@@ -603,7 +622,7 @@ public abstract class TermBuilder {
                         if (!Param.ALLOW_RECURSIVE_IMPLICATIONS && (oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Implication circularity");
                         else {
-                            if ((dt == 0) || (dt == DTERNAL))
+                            if (commutive(dt) || dt==XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */)
                                 return impl2Conj(dt, subject, predicate, oldCondition);
                         }
                     }
@@ -613,7 +632,7 @@ public abstract class TermBuilder {
                     if ((subject.op() == CONJ) && (predicate.op() == CONJ)) {
                         Compound csub = (Compound) subject;
                         Compound cpred = (Compound) predicate;
-                        if ((dt == DTERNAL || dt == 0)) {
+                        if (commutive(dt) || dt==XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */) {
 
                             TermContainer subjs = csub.subterms();
                             TermContainer preds = cpred.subterms();
@@ -635,7 +654,7 @@ public abstract class TermBuilder {
 
 
             //compare unneg'd if it's not temporal or eternal/parallel
-            boolean preventInverse = !op.temporal || (dt == DTERNAL || dt == 0);
+            boolean preventInverse = !op.temporal || (commutive(dt) || dt == XTERNAL);
             Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject).term() : subject;
             Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate).term() : predicate;
             if (Terms.equalsAnonymous(sRoot, pRoot))
@@ -644,20 +663,24 @@ public abstract class TermBuilder {
 
             //TODO its possible to disqualify invalid statement if there is no structural overlap here??
 //
-            if (sRoot.op() == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
+            @NotNull Op sop = sRoot.op();
+            if (sop == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
                 //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
                 return True;
             }
 
 
-            if (pRoot.op() == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
+            @NotNull Op pop = pRoot.op();
+            if (pop == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
                 //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
                 return True;
             }
 
-            if (sRoot.op().statement && pRoot.op().statement) {
-                if ((((Compound) sRoot).term(0).equals(((Compound) pRoot).term(1))) ||
-                        (((Compound) sRoot).term(1).equals(((Compound) pRoot).term(0))))
+            if (sop.statement && pop.statement) {
+                Compound csroot = (Compound) sRoot;
+                Compound cproot = (Compound) pRoot;
+                if ((csroot.term(0).equals(cproot.term(1))) ||
+                        (csroot.term(1).equals(cproot.term(0))))
                     throw new InvalidTermException(op, new Term[]{subject, predicate}, "inner subject cross-linked with predicate");
 
             }
@@ -686,7 +709,7 @@ public abstract class TermBuilder {
                     subject = x;
                 }
 
-                if (reversed && (dt != DTERNAL && dt!=XTERNAL && dt != 0) ) {
+                if (reversed && (dt != DTERNAL && dt != XTERNAL && dt != 0)) {
                     dt = -dt;
                 }
 
