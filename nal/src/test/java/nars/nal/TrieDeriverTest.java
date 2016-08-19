@@ -229,6 +229,7 @@ public class TrieDeriverTest {
                 if (s instanceof Variable)
                     return;
 
+
                 Termed sub = p.concept(s, false);
                 if (sub == null) {
                     System.out.println("subterm " + s + " of " + parent + " not in PatternIndex");

@@ -26,6 +26,7 @@ public final class Fork extends GenericCompound<ProcTerm> implements ProcTerm {
 
     @Override
     public final void accept(@NotNull PremiseEval m, int now) {
+
         for (ProcTerm s : termCache) {
             s.accept(m, now);
             m.revert(now);

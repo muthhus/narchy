@@ -52,7 +52,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         float beliefDiscount = (v instanceof CompoundConcept) ?
                     (1f + maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
                     1;
-        return Math.round( 1f + v.complexity() / beliefDiscount);
+        return Math.round( 1f + 100 * v.complexity() / beliefDiscount);
     }
 
     private static float maxConfidence(@NotNull CompoundConcept v) {

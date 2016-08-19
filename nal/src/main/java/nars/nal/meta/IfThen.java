@@ -30,7 +30,7 @@ public final class IfThen extends GenericCompound<Term> implements ProcTerm {
 
     @Override public void accept(@NotNull PremiseEval m, int now) {
         if (cond.booleanValueOf(m)) {
-            conseq.accept(m, m.now() /* since evaluating the bool will have added to the stack */);
+            conseq.accept(m /* since evaluating the bool will have added to the stack */);
         }
         m.revert(now);
     }

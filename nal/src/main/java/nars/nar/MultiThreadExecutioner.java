@@ -7,11 +7,13 @@ import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.ProducerType;
 import nars.NAR;
 import nars.Task;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 
 /**
@@ -37,7 +39,10 @@ public class MultiThreadExecutioner extends Executioner {
     final Disruptor<TaskEvent> disruptor;
 
     public MultiThreadExecutioner(int threads, int ringSize) {
-        this(threads, ringSize, new BasicExecutor(Executors.defaultThreadFactory()));
+        this(threads, ringSize,
+                //new BasicExecutor(Executors.defaultThreadFactory())
+                new ForkJoinPool(threads)
+        );
     }
 
     public MultiThreadExecutioner(int threads, int ringSize, Executor exe) {
@@ -96,8 +101,10 @@ public class MultiThreadExecutioner extends Executioner {
             taskWorker[i] = new TaskEventWorkHandler(nar);
         EventHandlerGroup workers = disruptor.handleEventsWithWorkerPool(taskWorker);
 
-        //barrier = workers.asSequenceBarrier();
+        //barrier = ring.newBarrier();
         barrier = workers.asSequenceBarrier();
+        //barrier = workers.asSequenceBarrier();
+
 
         disruptor.start();
     }
@@ -117,8 +124,22 @@ public class MultiThreadExecutioner extends Executioner {
         /*while ((cap = ring.remainingCapacity()) < ring.getBufferSize())*/
 
         //System.out.println("waiting for: " + e + " free=" + cap);
+
             try {
-                barrier.waitFor(ring.getCursor());
+
+                //while (true) {
+                    //if (ring.hasAvailableCapacity(1)) {
+
+                    //do {
+                        barrier.waitFor(ring.getCursor());
+                    //} while (!ring.hasAvailableCapacity(ring.getBufferSize()/2));
+
+                        //break;
+                    //} else {
+                        //System.err.println("no available capacity");
+                        //Util.pause(0);
+                    //}
+                //}
             } catch (AlertException e1) {
                 e1.printStackTrace();
             } catch (InterruptedException e1) {
@@ -187,7 +208,7 @@ public class MultiThreadExecutioner extends Executioner {
                     nar.input(tt);
                 } catch (Throwable e) {
                     NAR.logger.error("task: {}", e);
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
             Runnable rr = te.r;
@@ -197,7 +218,7 @@ public class MultiThreadExecutioner extends Executioner {
                     rr.run();
                 } catch (Throwable e) {
                     NAR.logger.error("run: {}", e);
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         }

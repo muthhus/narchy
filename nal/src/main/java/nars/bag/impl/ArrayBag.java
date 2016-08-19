@@ -123,7 +123,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * true iff o1 > o2
      */
-    static final boolean cmpGT(@NotNull BLink o1, @Nullable BLink o2) {
+    static final boolean cmpGT(@Nullable BLink o1, @Nullable BLink o2) {
         return (priIfFiniteElseNeg1(o1) < priIfFiniteElseNeg1(o2));
     }
 
@@ -137,7 +137,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * true iff o1 < o2
      */
-    static final boolean cmpLT(@NotNull BLink o1, @NotNull BLink o2) {
+    static final boolean cmpLT(@Nullable BLink o1, @Nullable BLink o2) {
         return (priIfFiniteElseNeg1(o1) > priIfFiniteElseNeg1(o2));
     }
 
