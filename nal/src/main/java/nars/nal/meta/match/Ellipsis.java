@@ -105,7 +105,8 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
     }
 
 
-    //    @Override
+
+//    @Override
 //    public final boolean equals(Object obj) {
 //        return //((obj instanceof Ellipsis) && id == ((Ellipsis)obj).id)
 //                //||
@@ -302,8 +303,8 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
     @Override
     public int vars() {
-        return 1;
-    }
+        return 0;
+    } //varpattern doesnt count as var
 
     //    public static Ellipsis getFirstUnmatchedEllipsis(Compound X, Subst ff) {
 //        final int xsize = X.size();

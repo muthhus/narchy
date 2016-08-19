@@ -208,19 +208,12 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
 
-    @Override
-    protected TermContainer getSubterms(@NotNull TermContainer t) {
-        return (TermContainer) compounds.getIfPresent(t);
+    @NotNull @Override
+    public TermContainer internSubterms(@NotNull TermContainer t) {
+        return (TermContainer) compounds.get(t, tt -> tt);
     }
 
 
-    @NotNull
-    @Override
-    protected TermContainer put(@NotNull TermContainer s) {
-        return (TermContainer) compounds.get(s, ss -> ss);
-        //subs.put(s, s);
-        //return s;
-    }
 
 
     @NotNull

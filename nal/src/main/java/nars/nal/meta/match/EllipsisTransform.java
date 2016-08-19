@@ -18,12 +18,16 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     public final Term to;
 
     public EllipsisTransform(@NotNull AbstractVariable name, @NotNull Term from, @NotNull Term to) {
-        super(name, GenericNormalizedVariable.multiVariable(name.hashCode(),
-                from==Op.Imdex ? 0 : from.hashCode(),
-                to==Op.Imdex ? 0 : to.hashCode()
+        super(name, multiVariable(name.hashCode(),
+                from.equals(Op.Imdex) ? to.hashCode() : from.hashCode(), //hashcode of the non-imdex term
+                from.equals(Op.Imdex) //bit indicating which one it refers to
         ));
         this.from = from;
         this.to = to;
+    }
+
+    public static int multiVariable(int a, int b, boolean fromOrTo) {
+        return ((a+1) << (1+8)) | ((b+1) << 1) | (fromOrTo ? 0 : 1);
     }
 
     @NotNull

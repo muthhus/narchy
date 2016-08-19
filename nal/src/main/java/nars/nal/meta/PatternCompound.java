@@ -15,6 +15,7 @@ import nars.term.subst.choice.Choose1;
 import nars.term.subst.choice.Choose2;
 import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -45,6 +46,18 @@ abstract public class PatternCompound extends GenericCompound {
 
     }
 
+//    @Override
+//    public boolean equals(@Nullable Object that) {
+//        if (super.equals(that)) {
+//            if (!toString().equals(that.toString()))
+//                System.err.println("warning: " + this + " and " + that + " are not but considered equal");
+//            return true;
+//        } else {
+//            if (toString().equals(that.toString()))
+//                System.err.println("warning: " + this + " and " + that + " are but considered not equal");
+//            return false;
+//        }
+//    }
 
     abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {
 

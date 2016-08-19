@@ -134,15 +134,6 @@ public abstract class TermIndex extends TermBuilder {
 
     public abstract int subtermsCount();
 
-//    public TermContainer internSubterms(Term[] t) {
-//        return new TermVector<>(t, this::the);
-//    }
-
-//    @Nullable
-//    public Term build(@NotNull Compound csrc, @NotNull Term[] newSubs) {
-//        return builder().build(csrc.op(), csrc.dt(), newSubs);
-//    }
-
 
     /**
      * returns the resolved term according to the substitution

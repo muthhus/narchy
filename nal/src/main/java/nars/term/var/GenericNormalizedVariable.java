@@ -19,9 +19,7 @@ public abstract class GenericNormalizedVariable extends AbstractVariable {
     public static int multiVariable(int a, int b) {
         return ((a+1) << 8) | (b+1);
     }
-    public static int multiVariable(int a, int b, int c) {
-        return ((a+1) << 16) | ((b+1) << 8) | c;
-    }
+
 
 
     @Override

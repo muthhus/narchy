@@ -39,11 +39,6 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
     public final void set(@NotNull Termed src, Termed target) {
         concepts.put(src, target);
 
-
-        //return data.putIfAbsent(src, target);
-//        /*if ((existing !=null) && (existing!=target))
-//            throw new RuntimeException("pre-existing value");*/
-//        return target;
     }
 
     @Override
@@ -62,11 +57,4 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
     }
 
 
-
-
-//    @NotNull
-//    @Override
-//    public String summary() {
-//        return concepts.size() + " concepts ";
-//    }
 }

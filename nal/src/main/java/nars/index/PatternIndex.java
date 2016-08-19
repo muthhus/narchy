@@ -6,8 +6,11 @@ import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +43,7 @@ public class PatternIndex extends RawTermIndex {
         return make(t);
 
     }
+
 
     @NotNull
     private PatternCompound make(@NotNull Compound seed) {

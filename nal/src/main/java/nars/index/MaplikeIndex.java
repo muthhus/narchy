@@ -51,7 +51,7 @@ public abstract class MaplikeIndex extends TermIndex {
     }
 
     @Nullable
-    private Termed theAtom(@NotNull Atomic x, boolean createIfMissing) {
+    protected Termed theAtom(@NotNull Atomic x, boolean createIfMissing) {
         return createIfMissing ?
                 getNewAtom(x) :
                 get(x);
@@ -137,23 +137,10 @@ public abstract class MaplikeIndex extends TermIndex {
     @Override
     abstract public void set(@NotNull Termed src, Termed target);
 
-    /* default */
-    @Nullable
-    protected TermContainer getSubterms(@NotNull TermContainer t) {
-        return null;
-    }
 
 
-    @Override public final @Nullable TermContainer theSubterms(@NotNull TermContainer s) {
-
-        //early existence test:
-        TermContainer existing = getSubterms(s);
-
-        return existing != null ? existing : internSubs(s);
-
-    }
-
-    private @NotNull TermContainer internSubs(@NotNull TermContainer s) {
+    @Override
+    public final @NotNull TermContainer theSubterms(@NotNull TermContainer s) {
         int ss = s.size();
         Term[] bb = new Term[ss];
         boolean changed = false;//, temporal = false;
@@ -180,14 +167,52 @@ public abstract class MaplikeIndex extends TermIndex {
             bb[i] = b;
         }
 
-        return put(changed ? TermVector.the(bb) : s);
+        return internSubterms(changed ? TermVector.the(bb) : s);
     }
 
-    /**
-     * subterms put;
-     * returns the interned subterm
-     */
-    abstract protected TermContainer put(TermContainer s);
+
+    abstract public @NotNull TermContainer internSubterms(@NotNull TermContainer s);
+
+//    {
+//
+////        //early existence test:
+////        TermContainer existing = getSubterms(s);
+////
+////        return existing != null ? existing : internSubs(s);
+//
+//        return s;
+//    }
+
+//    private @NotNull TermContainer internSubs(@NotNull TermContainer s) {
+//        int ss = s.size();
+//        Term[] bb = new Term[ss];
+//        boolean changed = false;//, temporal = false;
+//        for (int i = 0; i < ss; i++) {
+//            Term a = s.term(i);
+//
+//            Term b;
+//            if (a instanceof Compound) {
+//
+//                if (!canBuildConcept(a) || a.hasTemporal()) {
+//                    //temporal = true;//dont store subterm arrays containing temporal compounds
+//                    b = a;
+//                } else {
+//                    /*if (b != a && a.isNormalized())
+//                        ((GenericCompound) b).setNormalized();*/
+//                    b = theCompound((Compound) a, true).term();
+//                }
+//            } else {
+//                b = theAtom((Atomic) a, true).term();
+//            }
+//            if (a != b) {
+//                changed = true;
+//            }
+//            bb[i] = b;
+//        }
+//
+//        return put(changed ? TermVector.the(bb) : s);
+//    }
+
 
 
     @Nullable

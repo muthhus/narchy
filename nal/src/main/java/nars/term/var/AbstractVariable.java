@@ -46,7 +46,8 @@ public abstract class AbstractVariable implements Variable {
         this.str = type.ch + Integer.toString(id);
     }
 
-    @Override public final int id() {
+    @Override
+    public final int id() {
         return id;
     }
 
@@ -59,12 +60,26 @@ public abstract class AbstractVariable implements Variable {
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
 
+//    @Override
+//    public boolean equals(Object that) {
+//        boolean e = that == this ||
+//                (that instanceof AbstractVariable && that.hashCode() == hash);
+//
+//        if (e) {
+//            if (!toString().equals(that.toString()))
+//                System.err.println("warning: " + this + " and " + that + " are not but considered equal");
+//            return true;
+//        } else {
+//            if (toString().equals(that.toString()))
+//                System.err.println("warning: " + this + " and " + that + " are but considered not equal");
+//            return false;
+//        }
+//    }
 
     @Override
     public final int hashCode() {
         return hash;
     }
-
 
 
     @NotNull
@@ -92,7 +107,8 @@ public abstract class AbstractVariable implements Variable {
         }
         throw new RuntimeException(c + " not a variable");
     }
-//    @NotNull
+
+    //    @NotNull
 //    static Op varCacheFor(Op c) {
 //        switch (c) {
 //            case Op.VAR_PATTERN:
@@ -108,10 +124,14 @@ public abstract class AbstractVariable implements Variable {
 //    }
     static int typeIndex(@NotNull Op o) {
         switch (o) {
-            case VAR_PATTERN:  return 0;
-            case VAR_DEP:  return 1;
-            case VAR_INDEP:  return 2;
-            case VAR_QUERY: return 3;
+            case VAR_PATTERN:
+                return 0;
+            case VAR_DEP:
+                return 1;
+            case VAR_INDEP:
+                return 2;
+            case VAR_QUERY:
+                return 3;
             default:
                 throw new UnsupportedOperationException();
         }
@@ -123,7 +143,7 @@ public abstract class AbstractVariable implements Variable {
 
     static {
         //precompute cached variable instances
-        for (Op o : new Op[] { Op.VAR_PATTERN, Op.VAR_QUERY, Op.VAR_DEP, Op.VAR_INDEP } ) {
+        for (Op o : new Op[]{Op.VAR_PATTERN, Op.VAR_QUERY, Op.VAR_DEP, Op.VAR_INDEP}) {
             int t = typeIndex(o);
             for (int i = 0; i < Param.MAX_VARIABLE_CACHED_PER_TYPE; i++) {
                 varCache[t][i] = vNew(o, i);
@@ -143,14 +163,20 @@ public abstract class AbstractVariable implements Variable {
 //        }
     }
 
-    /** TODO move this to TermBuilder */
+    /**
+     * TODO move this to TermBuilder
+     */
     @NotNull
     static AbstractVariable vNew(@NotNull Op type, int counter) {
         switch (type) {
-            case VAR_PATTERN: return new VarPattern(counter);
-            case VAR_QUERY: return  new VarQuery(counter);
-            case VAR_DEP: return  new VarDep(counter);
-            case VAR_INDEP: return  new VarIndep(counter);
+            case VAR_PATTERN:
+                return new VarPattern(counter);
+            case VAR_QUERY:
+                return new VarQuery(counter);
+            case VAR_DEP:
+                return new VarDep(counter);
+            case VAR_INDEP:
+                return new VarIndep(counter);
             default:
                 throw new UnsupportedOperationException();
         }
@@ -167,10 +193,6 @@ public abstract class AbstractVariable implements Variable {
 ////        });
 ////        return has[0];
 //    }
-
-
-
-
 
 
 }

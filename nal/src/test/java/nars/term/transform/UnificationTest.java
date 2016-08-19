@@ -2,12 +2,15 @@ package nars.term.transform;
 
 import nars.*;
 import nars.concept.Concept;
+import nars.index.Indexes;
 import nars.index.PatternIndex;
 import nars.nar.Default;
+import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.subst.FindSubst;
+import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.RuleTest;
 import nars.util.signal.TestNAR;
 import org.eclipse.collections.impl.factory.Sets;
@@ -31,8 +34,8 @@ public class UnificationTest {
     @Before
     public void start() {
         t = new TestNAR(
-                //new Terminal()
-                new Default() //TODO return to using Terminal as a demo of its minimal functionality
+                new Terminal()
+                //new Default() //TODO return to using Terminal as a demo of its minimal functionality
         );
     }
 
@@ -55,9 +58,7 @@ public class UnificationTest {
 
             //special handling
             final PatternIndex pi = new PatternIndex();
-            Termed ts1 = Narsese.the().term(s1, pi);
-            //nar.believe(ts1);
-            t1 = new PatternIndex().the(ts1.term()).term();
+            t1 = pi.the(pi.parse(s1)).term();
 
         } else {
             nar.believe(s1);
@@ -82,7 +83,7 @@ public class UnificationTest {
         AtomicBoolean subbed = new AtomicBoolean(false);
 
         final Term finalT = t1;
-        FindSubst sub = new FindSubst($.terms, type, nar.random) {
+        FindSubst sub = new FindSubst($.terms /* new Indexes.DefaultTermIndex(256, new XorShift128PlusRandom(1)) */, type, nar.random) {
 
 //            @Override
 //            public void onPartial() {
@@ -786,10 +787,13 @@ public class UnificationTest {
     }
 
     @Test
-    public void ellipsisImage() {
+    public void ellipsisImage1() {
         test(Op.VAR_PATTERN,
                 "<A --> (/,_, %X..+)>",
                 "<A --> (/,_, B)>", true);
+    }
+    @Test
+    public void ellipsisImage2() {
         test(Op.VAR_PATTERN,
                 "<A --> (/,_, %X..+)>",
                 "<A --> (/,_, B,C)>", true);

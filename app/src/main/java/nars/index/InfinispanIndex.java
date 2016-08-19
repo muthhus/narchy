@@ -86,7 +86,7 @@ public class InfinispanIndex extends MaplikeIndex {
     }
 
     @Override
-    protected TermContainer getSubterms(@NotNull TermContainer t) {
+    public TermContainer theSubterms(@NotNull TermContainer t) {
         return subtermsLocal.get(key(t));
     }
 

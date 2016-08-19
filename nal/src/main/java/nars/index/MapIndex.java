@@ -18,8 +18,6 @@ public class MapIndex extends SimpleMapIndex {
         this.subterms = subterms;
     }
 
-
-
     @Override
     public int subtermsCount() {
         return subterms.size(); //unsupported
@@ -52,11 +50,12 @@ public class MapIndex extends SimpleMapIndex {
     }
 
     @Override
-    protected TermContainer put(TermContainer x) {
+    @NotNull public TermContainer internSubterms(@NotNull TermContainer x) {
         TermContainer prev = subterms.putIfAbsent(x, x);
-        if (prev != null)
-            x = prev;
-        return x;
+        if (prev == null)
+            return x; //which was inserted
+        else
+            return prev;
     }
 }
 
