@@ -113,7 +113,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
 
     @Override
     public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
-        return AbstractConcept.link(this, scale, src, minScale, nar, activation);
+        return AbstractConcept.link(this, scale, minScale, activation);
     }
 
     @Override

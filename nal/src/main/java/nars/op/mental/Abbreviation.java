@@ -45,7 +45,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
      * generated abbreviation belief's confidence
      */
     public final MutableFloat abbreviationConfidence = new MutableFloat(0.95f);
-    public final MutableFloat abbreviationProbability = new MutableFloat(0.0001f);
+    public final MutableFloat abbreviationProbability = new MutableFloat(0.00001f);
     @NotNull
     protected final NAR nar;
     private final String termPrefix;

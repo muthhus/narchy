@@ -114,7 +114,7 @@ public interface AbstractConcept extends Concept {
      *
      * @return whether the link successfully was completed
      */
-    static boolean link(Concept c, float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    static boolean link(Concept c, float scale, float minScale, @NotNull NAR.Activation activation) {
 
         if (scale < minScale)
             return false;
