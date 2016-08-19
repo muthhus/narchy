@@ -250,19 +250,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
 
         Insertion ii = new Insertion(this, b, scale, overflow);
-        BLink<V> r = map.compute(key, ii);
+        BLink<V> v = map.compute(key, ii);
 
-        int a = ii.activated;
-
-        if (a == 0) {
-            updateRange(); //for the merged item:
-        } else if (a < 0) {
-            onRemoved(key, null);
-        } else if (a > 0) {
-            addItemForNewKey(r);
-            onActive(key);
+        int r = ii.result;
+        switch (r) {
+            case 0:
+                updateRange(); //in case the merged item determined the min priority
+                break;
+            case +1:
+                update(v);
+                onActive(key);
+                break;
+            case -1:
+                onRemoved(key, null);
+                break;
         }
-
 
     }
 
@@ -293,12 +295,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             return new StrongBLinkToBudgeted((Budgeted) i, b);
         else
             return new StrongBLink(i, b);
-    }
-
-    protected @Nullable void addItemForNewKey(@NotNull BLink<V> v) {
-
-        update(v);
-
     }
 
     @Nullable
@@ -731,7 +727,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
          */
         private final float scale;
 
-        int activated = 0;
+        int result = 0;
 
         public Insertion(ArrayBag arrayBag, Budgeted b, float scale, @Nullable MutableFloat overflow) {
             this.arrayBag = arrayBag;
@@ -772,14 +768,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 if (bag.minPriIfFull > bp) {
                     //reject due to insufficient budget
                     bag.pending += bp * b.dur(); //include failed input in pending
-                    this.activated = -1;
+                    this.result = -1;
                     r = null;
                 } else {
                     //accepted for insert
                     BLink nvv = bag.newLink(key, b);
                     nvv.priMult(scale);
 
-                    this.activated = +1;
+                    this.result = +1;
                     r = nvv;
                 }
                 return r;

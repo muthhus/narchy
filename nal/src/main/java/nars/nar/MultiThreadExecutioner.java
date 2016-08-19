@@ -48,7 +48,7 @@ public class MultiThreadExecutioner extends Executioner {
                 //new BasicExecutor(Executors.defaultThreadFactory())
                 new ForkJoinPool(threads, defaultForkJoinWorkerThreadFactory, null, true /* async */,
                         0,
-                        threads*2,
+                        threads*2, //max threads (safe to increase)
                         threads/2, //minimum threads to keep running otherwise new ones will be created
                         null, 60000L, TimeUnit.MILLISECONDS)
         );
