@@ -156,7 +156,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
 
             //attempt to replace all subterms of an embedded conjunction subterm
-            Compound<?> tn = in.term();
+            Compound tn = in.term();
             if ((o != CONJ && o!=EQUI && o!=IMPL) && tn.subterms().hasAny(CONJ)) {
 
 
@@ -204,8 +204,8 @@ public class ArithmeticInduction implements Consumer<Task> {
 
 
     protected void compress(Termed<Compound> b, Consumer<Term> each) {
-        Compound<?> bt = b.term();
-        TermContainer<?> subs = bt.subterms();
+        Compound bt = b.term();
+        TermContainer subs = bt.subterms();
         int negs = subs.count(x -> x.op() == Op.NEG);
 
         int subCount = bt.size();
@@ -316,7 +316,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     final static Function<Term,Term> xx = x -> x;
 
-    private boolean equalNonIntegerAtoms(TermContainer<?> subs) {
+    private boolean equalNonIntegerAtoms(TermContainer subs) {
         Term first = subs.term(0);
         int ss = subs.size();
         return first.pathsTo(xx, (ByteList p, Term x)-> {

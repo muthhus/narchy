@@ -39,7 +39,7 @@ public class TetrisState {
     public float[] seen;
 
     private final Random randomGenerator = new Random();
-    
+
     public boolean running = true;
     public int currentBlockId;/*which block we're using in the block table*/
 
@@ -59,9 +59,6 @@ public class TetrisState {
     private int time = 0;
 
     private int timePerFall;
-    private int nextRotation;
-    private int nextX;
-    private int nextY;
 
     //private double[] worldObservation;
 
@@ -84,15 +81,13 @@ public class TetrisState {
     }
 
     public void reset() {
-        nextX = currentX = width / 2 - 1;
-        nextY = currentY = 0;
-        nextRotation = currentRotation = 0;
-
+        currentX = width / 2 - 1;
+        currentY = 0;
         score = 0;
         for (int i = 0; i < worldState.length; i++) {
             worldState[i] = 0;
         }
-
+        currentRotation = 0;
         is_game_over = false;
     }
 
@@ -100,15 +95,15 @@ public class TetrisState {
         //eget observation with only the state space
 
         Arrays.fill(target, -1);
-            
-            int x = 0;
-            for (double i : worldState) {
-                if (monochrome)
-                    target[x] = i > 0 ? 1.0f : -1.0f;
-                else
-                    target[x] = i > 0 ? (float)i : - 1.0f;
-                x++;
-            }
+
+        int x = 0;
+        for (double i : worldState) {
+            if (monochrome)
+                target[x] = i > 0 ? 1.0f : -1.0f;
+            else
+                target[x] = i > 0 ? (float)i : - 1.0f;
+            x++;
+        }
 
         writeCurrentBlock(target, 0.5f);
 
@@ -135,8 +130,7 @@ public class TetrisState {
                         Thread.dumpStack();
                         System.exit(1);
                     }*/
-                    if (linearIndex >= 0 && linearIndex < f.length)
-                        f[linearIndex] = color;
+                    f[linearIndex] = color;
                 }
             }
         }
@@ -148,30 +142,31 @@ public class TetrisState {
     }
 
     /* This code applies the action, but doesn't do the default fall of 1 square */
-    public synchronized boolean take_action(int theAction) {
+    public boolean take_action(int theAction) {
 
 
-        int nextRotation = this.nextRotation;
-        int nextX = this.nextX;
-        int nextY = this.nextY;
+        int nextRotation = currentRotation;
+        int nextX = currentX;
+        int nextY = currentY;
 
         switch (theAction) {
             case CW:
-                nextRotation = (nextRotation + 1) % 4;
+                nextRotation = (currentRotation + 1) % 4;
                 break;
             case CCW:
-                nextRotation = (nextRotation - 1);
+                nextRotation = (currentRotation - 1);
                 if (nextRotation < 0) {
                     nextRotation = 3;
                 }
                 break;
             case LEFT:
-                nextX = nextX - 1;
+                nextX = currentX - 1;
                 break;
             case RIGHT:
-                nextX = nextX + 1;
+                nextX = currentX + 1;
                 break;
             case FALL:
+                nextY = currentY;
 
                 boolean isInBounds = true;
                 boolean isColliding = false;
@@ -189,31 +184,24 @@ public class TetrisState {
             case NONE:
                 break;
             //default:
-                //throw new RuntimeException("unknown action");
+            //throw new RuntimeException("unknown action");
         }
         //Check if the resulting position is legal. If so, accept it.
         //Otherwise, don't change anything
         if (inBounds(nextX, nextY, nextRotation)) {
             if (!colliding(nextX, nextY, nextRotation)) {
-                //apply valid state
-                this.nextRotation = nextRotation;
-                this.nextX = nextX;
-                this.nextY = nextY;
+                currentRotation = nextRotation;
+                currentX = nextX;
+                currentY = nextY;
                 return true;
             }
         }
-
-        //reset to a valid state
-        this.nextRotation = currentRotation;
-        this.nextX = currentX;
-        this.nextY = currentY;
-
 
         return false;
     }
 
     /**
-     * Calculate the learn array position from (x,y) components based on 
+     * Calculate the learn array position from (x,y) components based on
      * worldWidth.
      * Package level access so we can use it in tests.
      * @param x
@@ -249,13 +237,13 @@ public class TetrisState {
                 for (int x = 0; x < ll; ++x) {
                     if (thePiece[x][y] != 0) {
                         //First check if a filled in piece of the block is out of bounds!
-                        //if the height of this square is negative or the X of 
+                        //if the height of this square is negative or the X of
                         //this square is negative, then we're "colliding" with the wall
                         if (checkY + y < 0 || checkX + x < 0) {
                             return true;
                         }
 
-                        //if the height of this square is more than the board size or the X of 
+                        //if the height of this square is more than the board size or the X of
                         //this square is more than the board size, then we're "colliding" with the wall
                         if (checkY + y >= height || checkX + x >= width) {
                             return true;
@@ -293,7 +281,7 @@ public class TetrisState {
 
                         //This checks to see if x and y are in bounds
                         if ((checkX + x >= 0 && checkX + x < width && checkY + y >= 0 && checkY + y < height)) {
-                            //This array location is in bounds  
+                            //This array location is in bounds
                             //Check if it hits another piece
                             int linearArrayIndex = i(checkX + x, checkY + y);
                             if (worldState[linearArrayIndex] != 0) {
@@ -335,7 +323,7 @@ public class TetrisState {
                         //if ! (thisX is non-negative AND thisX is less than width
                         // AND thisY is non-negative AND thisY is less than height)
                         //Through demorgan's law is
-                        //if thisX is negative OR thisX is too big or 
+                        //if thisX is negative OR thisX is too big or
                         //thisY is negative OR this Y is too big
                         if (!(checkX + x >= 0 && checkX + x < width && checkY + y >= 0 && checkY + y < height)) {
                             return false;
@@ -392,10 +380,8 @@ public class TetrisState {
             writeCurrentBlock(worldState, -1);
         } else {
             //fall
-            if (time % timePerFall == 0) {
-                nextY += 1;
-                commit();
-            }
+            if (time % timePerFall == 0)
+                currentY += 1;
         }
 
     }
@@ -405,32 +391,24 @@ public class TetrisState {
 
         currentBlockId = nextBlock();
 
-        nextRotation = 0;
-        nextX = (width / 2) - 2;
-        nextY = -4;
-        
+        currentRotation = 0;
+        currentX = (width / 2) - 2;
+        currentY = -4;
+
         //score += getWidth() / 2;
 
 //Colliding checks both bounds and piece/piece collisions.  We really only want the piece to be falling
 //If the filled parts of the 5x5 piece are out of bounds.. IE... we want to stop falling when its all on the screen
         boolean hitOnWayIn = false;
-        while (!inBounds(nextX, nextY, currentRotation)) {
+        while (!inBounds(currentX, currentY, currentRotation)) {
             //We know its not in bounds, and we're bringing it in.  Let's see if it would have hit anything...
-            hitOnWayIn = collidingCheckOnlySpotsInBounds(nextX, nextY, currentRotation);
-            nextY++;
+            hitOnWayIn = collidingCheckOnlySpotsInBounds(currentX, currentY, currentRotation);
+            currentY++;
         }
-        is_game_over = colliding(nextX, nextY, currentRotation) || hitOnWayIn;
+        is_game_over = colliding(currentX, currentY, currentRotation) || hitOnWayIn;
         if (is_game_over) {
             running = false;
-        } else {
-            commit();
         }
-    }
-
-    public void commit() {
-        this.currentRotation = this.nextRotation;
-        this.currentX = this.nextX;
-        this.currentY = this.nextY;
     }
 
     protected int nextBlock() {
@@ -534,7 +512,7 @@ public class TetrisState {
         }
 
     }
-    
+
     public int numEmptyRows() {
         int t = 0;
         for (int y = 0; y < getHeight(); y++)
@@ -568,7 +546,7 @@ public class TetrisState {
 
     /**
      * Utility methd for debuggin
-     * 
+     *
      */
     public void printState() {
         int index = 0;
@@ -587,7 +565,7 @@ public class TetrisState {
         return randomGenerator;
     }
 
-    
+
 //    /*End of Tetris Helper Functions*/
 //
 //    public TetrisState(TetrisState stateToCopy) {

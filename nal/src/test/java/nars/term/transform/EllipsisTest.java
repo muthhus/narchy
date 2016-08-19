@@ -61,7 +61,7 @@ public class EllipsisTest {
             Compound r = getResult();
             assertTrue(r.isNormalized());
 
-            Compound<?> x = getPattern();
+            Compound x = getPattern();
             assertTrue(x.isNormalized());
 
             //no unmatched variables

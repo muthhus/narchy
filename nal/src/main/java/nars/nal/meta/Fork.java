@@ -11,7 +11,7 @@ import java.util.List;
 
 
 /** parallel branching */
-public final class Fork extends GenericCompound<ProcTerm> implements ProcTerm {
+public final class Fork extends GenericCompound implements ProcTerm {
     @NotNull
     public final ProcTerm[] termCache;
 

@@ -1,6 +1,5 @@
 package nars.concept;
 
-import nars.$;
 import nars.IO;
 import nars.NAR;
 import nars.Task;
@@ -25,7 +24,7 @@ import java.util.function.BiFunction;
  *  in abbreviation/compression cases the target will likely be of higher
  *  volume than the alias which need only be a term or a product-wrapped singleton compound.
  */
-public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Term>> {
+public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound> {
 
     @NotNull
     private final CompoundConcept<?> target;

@@ -585,7 +585,7 @@ public abstract class TermBuilder {
 
                 case INH:
                     if (predicate instanceof TermTransform && transformImmediates() && subject.op() == PROD) {
-                        return ((TermTransform) predicate).function((Compound<?>) subject);
+                        return ((TermTransform) predicate).function((Compound) subject);
                     }
                     break;
 

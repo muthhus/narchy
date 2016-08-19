@@ -53,7 +53,7 @@ import static nars.nal.Tense.DTERNAL;
  * a compound term
  * TODO make this an interface extending Subterms
  */
-public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> {
+public interface Compound extends Term, IPair, TermContainer {
 
 
     /**
@@ -83,7 +83,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     default boolean termsToSet(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
         boolean r = false;
         for (int i = 0; i < size(); i++) {
-            @NotNull T s = term(i);
+            @NotNull Term s = term(i);
             if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
                 if (addOrRemoved)
                     r |= t.add(s);
@@ -273,7 +273,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     @NotNull
-    default Compound<T> term() {
+    default Compound term() {
         return this;
     }
 
@@ -318,7 +318,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
     @NotNull
-    TermContainer<T> subterms();
+    TermContainer subterms();
 
 
     /*@Override
@@ -401,19 +401,19 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @NotNull
     @Override
-    default T term(int i) {
+    default Term term(int i) {
         return subterms().term(i);
     }
 
     @NotNull
     @Override
-    default T[] terms() {
+    default Term[] terms() {
         return subterms().terms();
     }
 
 
     @Override
-    default void forEach(@NotNull Consumer<? super T> c) {
+    default void forEach(@NotNull Consumer<? super Term> c) {
         subterms().forEach(c);
     }
 
@@ -455,12 +455,12 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
     @Override
-    default void forEach(@NotNull Consumer<? super T> action, int start, int stop) {
+    default void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
         subterms().forEach(action, start, stop);
     }
 
     @Override
-    default Iterator<T> iterator() {
+    default Iterator<Term> iterator() {
         return subterms().iterator();
     }
 
@@ -1171,7 +1171,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    }
 
 
-//boolean transform(CompoundTransform<Compound<T>, T> trans, int depth);
+//boolean transform(CompoundTransform<Compound<Term>, T> trans, int depth);
 
 
 //    /**
@@ -1189,7 +1189,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    /**
 //     * from: http://stackoverflow.com/a/19333201
 //     */
-//    public static <T> void shuffle(final T[] array, final Random random) {
+//    public static <Term> void shuffle(final T[] array, final Random random) {
 //        int count = array.length;
 //
 //        //probabality for no shuffle at all:

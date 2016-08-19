@@ -29,7 +29,7 @@ import static org.eclipse.collections.impl.factory.Sets.mutable;
  * Methods common to both Term and Subterms
  * T = subterm type
  */
-public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
+public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
     static TermContainer union(@NotNull TermContainer a, @NotNull TermContainer b) {
@@ -76,7 +76,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     /**
      * gets subterm at index i
      */
-    @NotNull T term(int i);
+    @NotNull Term term(int i);
 
     /**
      * returns subterm automatically casted as compound (Use with caution)
@@ -252,16 +252,16 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
      * if this creates a new array, consider using .term(i) to access
      * subterms iteratively.
      */
-    @NotNull T[] terms();
+    @NotNull Term[] terms();
 
 
     @NotNull
-    default Term[] terms(@NotNull IntObjectPredicate<T> filter) {
-        List<T> l = $.newArrayList(size());
+    default Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
+        List<Term> l = $.newArrayList(size());
         int s = size();
         int added = 0;
         for (int i = 0; i < s; i++) {
-            T t = term(i);
+            Term t = term(i);
             if (filter.accept(i, t)) {
                 l.add(t);
                 added++;
@@ -289,11 +289,11 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     }
 
 
-    void forEach(Consumer<? super T> action, int start, int stop);
+    void forEach(Consumer<? super Term> action, int start, int stop);
 
 
     @Override
-    default void forEach(Consumer<? super T> action) {
+    default void forEach(Consumer<? super Term> action) {
         forEach(action, 0, size());
     }
 
@@ -471,7 +471,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
 
     /** note: if the function returns null, null will not be added to the result set */
     @NotNull
-    default Set<Term> unique(@NotNull Function<Term,Term> each) {
+    default Set<Term> unique(@NotNull Function<Term, Term> each) {
         Set<Term> r = new HashSet(size());
         int s = size();
         for (int i = 0; i < s; i++) {
@@ -644,7 +644,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     }
 
     @NotNull
-    default TermContainer filter(Predicate<T> p) {
+    default TermContainer filter(Predicate<Term> p) {
         if (!(this instanceof TermVector))
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");
 

@@ -3,7 +3,6 @@ package nars.term.compound;
 import nars.IO;
 import nars.Op;
 import nars.Param;
-import nars.Task;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
@@ -18,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import static nars.nal.Tense.DTERNAL;
 
 
-public class GenericCompound<T extends Term> implements Compound<T> {
+public class GenericCompound implements Compound {
 
     /**
      * subterm vector

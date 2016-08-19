@@ -2,7 +2,6 @@ package nars.nal.meta;
 
 import com.google.common.collect.Lists;
 import nars.Op;
-import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import org.apache.commons.lang3.ArrayUtils;
@@ -15,7 +14,7 @@ import java.util.List;
 /**
  * Created by me on 12/31/15.
  */
-public final class AndCondition extends GenericCompound<Term> implements BoolCondition {
+public final class AndCondition extends GenericCompound implements BoolCondition {
 
     @NotNull
     public final BoolCondition[] termCache;

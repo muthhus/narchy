@@ -51,7 +51,7 @@ public class VariableCompressor implements Consumer<Task> {
     }
 
     public Task compress(Task task) {
-        Compound<?> contnt = task.term();
+        Compound contnt = task.term();
 
         int n = nar.compoundVolumeMax.intValue();
         if (contnt.volume() + VOLUME_SAFETY_THRESH >= n)
@@ -101,7 +101,7 @@ public class VariableCompressor implements Consumer<Task> {
                 $.varDep("c");
                 //$.varIndep("c");
 
-        Compound<?> oldContent = task.term();
+        Compound oldContent = task.term();
         Term newContent = $.terms.replace(oldContent, max, var);
         //if (newContent != null) {
 

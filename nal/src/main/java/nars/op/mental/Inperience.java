@@ -150,7 +150,7 @@ public class Inperience {
 
         Truth tr = s.truth();
         Term[] arg = new Term[1 + (tr == null ? 1 : 2)];
-        Compound<?> tt = s.term();
+        Compound tt = s.term();
 
         boolean negated = tt.op() == Op.NEG;
         int k = 0;

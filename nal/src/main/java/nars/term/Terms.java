@@ -57,7 +57,7 @@ public class Terms   {
     }
 
     /** should be consistent with the other hash method(s) */
-    public static int hashSubterms(@NotNull TermContainer<?> container) {
+    public static int hashSubterms(@NotNull TermContainer container) {
         int h = 1;
         int s = container.size();
         for (int i = 0; i < s; i++) {
@@ -328,7 +328,7 @@ public class Terms   {
         out.println();
 
         if (x instanceof Compound) {
-            for (Term z : ((Compound<?>) x))
+            for (Term z : ((Compound) x))
                 printRecursive(out, z, level + 1);
         }
     }
@@ -349,7 +349,7 @@ public class Terms   {
         line.append(x);
 
         if (x instanceof Compound) {
-            for (Term z : ((Compound<?>) x))
+            for (Term z : ((Compound) x))
                 printRecursive(z, level + 1, c);
         }
 
@@ -569,7 +569,7 @@ public class Terms   {
     }
 
 
-    public static boolean allNegated(@NotNull TermContainer<?> subterms) {
+    public static boolean allNegated(@NotNull TermContainer subterms) {
         return subterms.and((Term t)-> t.op() == NEG);
     }
 

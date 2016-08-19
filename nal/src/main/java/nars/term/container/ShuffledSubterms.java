@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 /**
  * proxy to a TermContainer providing access to its subterms via a shuffling order
  */
-public final class ShuffledSubterms extends ShuffledPermutations implements TermContainer<Term> {
+public final class ShuffledSubterms extends ShuffledPermutations implements TermContainer {
 
     public final TermContainer srcsubs;
     private final Random rng;

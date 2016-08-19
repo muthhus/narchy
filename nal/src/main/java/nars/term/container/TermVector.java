@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  * TODO make this class immutable and term field private
  * provide a MutableTermVector that holds any write/change methods
  */
-public class TermVector implements TermContainer<Term> {
+public class TermVector implements TermContainer {
 
 
     /**
