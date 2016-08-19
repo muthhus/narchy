@@ -33,7 +33,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
 
     public CurveBag(@NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
-        this(1, c, mergeFunction, map);
+        this(64 /* this should be updated soon, but this allows some room to start */, c, mergeFunction, map);
     }
 
     public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, Map<V, BLink<V>> map) {

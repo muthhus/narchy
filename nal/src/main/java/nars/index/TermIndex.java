@@ -378,12 +378,14 @@ public abstract class TermIndex extends TermBuilder {
     public final Compound normalize(@NotNull Compound t) {
         Compound v = normalizations.get().computeIfAbsent(t, normalizer);
         return v == FalseProduct ? null : v;
+
+        //return _normalize(t);
     }
 
 
 
     @NotNull
-    public Compound _normalize(@NotNull Termed<Compound> t) {
+    public Compound _normalize(@NotNull Compound t) {
         Compound r;
         if (!t.isNormalized()) {
             Compound ct = (Compound) t;

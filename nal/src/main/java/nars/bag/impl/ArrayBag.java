@@ -59,36 +59,43 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     protected void update(BLink<V> toAdd) {
 
-        int remaining;
-        while ((remaining = ((size() - capacity()) + (toAdd != null ? 1 : 0))) > 0) {
+        int s = size();
+        if (s > 0) {
+
             List<BLink<V>> toRemove = $.newArrayList();
 
-            int removed;
             synchronized (items) {
                 //first step: remove any nulls and deleted values
-                removed = removeDeletedAtBottom(toRemove);
-
-                //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
-                if (removed < remaining) {
-                    BLink<V> w = items.remove(size() - 1);
-                    toRemove.add(w);
-                }
+                s -= removeDeletedAtBottom(toRemove);
             }
 
+            //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
+            while (!isEmpty() && ((s - capacity()) + (toAdd != null ? 1 : 0)) > 0) {
+                BLink<V> w;
+                synchronized (items) {
+                    w = items.remove(size() - 1);
+                }
+                toRemove.add(w);
+                s--;
+            }
+
+
             //do full removal outside of the synchronized phase, possibly interleaving with another thread doing the same thing
-            for (BLink<V> w : toRemove) {
+            for (int i = 0, toRemoveSize = toRemove.size(); i < toRemoveSize; i++) {
+                BLink<V> w = toRemove.get(i);
 
                 V k = w.get();
                 BLink<V> k2 = map.remove(k);
 
                 if (k2 != w)
-                    throw new RuntimeException("bag inconsistency: " + w + " removed but " + removed + " may still be in the items list");
+                    throw new RuntimeException("bag inconsistency: " + w + " removed but " + w + " may still be in the items list");
 
                 onRemoved(k, w);
 
                 w.delete();
             }
         }
+
 
         if (toAdd != null) {
             synchronized (items) {
@@ -291,6 +298,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             }
 
             commit(a);
+        } else {
+            minPriIfFull = -1;
         }
 
         return this;
@@ -394,7 +403,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         for (; i >= 0; ) {
             BLink<V> b = l[i];
 
-            if (b!=null) {
+            if (b != null) {
                 if (eachNotNull)
                     each.accept(b);
 
@@ -471,11 +480,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         float min = -1;
         if (s >= cap) {
             BLink<V>[] a = items.array();
-            int e = Math.min(a.length, cap); //in case the array size shrunk
-            BLink<V> last = a[e - 1];
-            if (last != null) {
-                min = last.priIfFiniteElseNeg1();
-            }
+            if (a.length >= cap - 1) {
+                BLink<V> last = a[cap - 1];
+                if (last != null) {
+                    min = last.priIfFiniteElseNeg1();
+                }
+            } //else the array hasnt even grown large enough to reach the capacity so it is not full
         }
 
         this.minPriIfFull = min;

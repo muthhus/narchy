@@ -134,14 +134,9 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     @Override
     public boolean setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
+            this.capacity = newCapacity;
             synchronized (_items()) {
-                this.capacity = newCapacity;
-
-                if (newCapacity == 0) {
-                    clear();
-                } else {
-                    commit();
-                }
+                commit();
             }
             return true;
         }
