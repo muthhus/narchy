@@ -6,6 +6,7 @@ import nars.gui.BagChart;
 import nars.nar.Executioner;
 import nars.nar.MultiThreadExecutioner;
 import nars.nar.SingleThreadExecutioner;
+import nars.op.mental.Abbreviation;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.data.AutoClassifier;
 import nars.experiment.NAREnvironment;
@@ -53,14 +54,14 @@ public class Tetris2 extends NAREnvironment {
     public static final int DEFAULT_INDEX_WEIGHT = 16 * 10000000;
 
     public static final Executioner exe =
-            new MultiThreadExecutioner(4, 4096);
+            new MultiThreadExecutioner(3, 8192);
             //new SingleThreadExecutioner();
 
-    public static final int runFrames = 55500;
+    public static final int runFrames = 2500;
     public static final int cyclesPerFrame = 64;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 8;
+    public static final int TIME_PER_FALL = 1;
     static boolean easy = false;
 
     static int frameDelay;
@@ -266,11 +267,44 @@ public class Tetris2 extends NAREnvironment {
         }
 
 
+        float actionMargin =
+                //0.33f; //divide the range into 3 sections: left/nothing/right
+                0.33f;
+
+        float actionThresholdHigh = 1f - actionMargin;
+        float actionThresholdLow = actionMargin;
+
+
+        actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b,d)->{
+            float x = d.freq();
+            //System.out.println(d + " " + x);
+            if (x > actionThresholdHigh) {
+                if (state.take_action(RIGHT))
+                    return d; //legal move
+            } else if (x < actionThresholdLow) {
+                if (state.take_action(LEFT))
+                    return d; //legal move
+            }
+            return null; //no action taken or move ineffective
+        }));
+
         if (rotate) {
-            actions.add(motorRotate = new MotorConcept("(rotate)", nar));
+            actions.add(motorRotate = new MotorConcept("(rotate)", nar, (b,d)->{
+                float r = d.freq();
+                if (r > actionThresholdHigh) {
+                    if (state.take_action(CW))
+                        return d;
+                } else if (r < actionThresholdLow) {
+                    if (state.take_action(CCW))
+                        return d;
+                }
+                return null;
+            }));
         }
         //actions.add(motorDown = new MotorConcept("(down)", nar));
-        actions.add(motorLeftRight = new MotorConcept("(leftright)", nar));
+//        if (downMotivation > actionThresholdHigh) {
+//            state.take_action(FALL);
+//        }
 
         reset();
     }
@@ -279,29 +313,6 @@ public class Tetris2 extends NAREnvironment {
     public float act() {
 
 
-        float rotateMotivation = (motorRotate != null && motorRotate.hasGoals()) ? motorRotate.goals().freq(now) : 0.5f;
-        //float downMotivation = motorDown.hasGoals() ? motorDown.goals().expectation(now) : 0.5f;
-        float leftRightMotivation = motorLeftRight.hasGoals() ? motorLeftRight.goals().freq(now) : 0.5f;
-
-
-        float actionMargin = 0.33f; //divide the range into 3 sections: left/nothing/right
-        float actionThresholdHigh = 1f - actionMargin;
-        float actionThresholdLow = actionMargin;
-
-        if (rotateMotivation > actionThresholdHigh) {
-            state.take_action(CW);
-        } else if (rotateMotivation < actionThresholdLow) {
-            state.take_action(CCW);
-        }
-//        if (downMotivation > actionThresholdHigh) {
-//            state.take_action(FALL);
-//        }
-
-        if (leftRightMotivation > actionThresholdHigh) {
-            state.take_action(RIGHT);
-        } else if (leftRightMotivation < actionThresholdLow) {
-            state.take_action(LEFT);
-        }
 
         if (state.running) {
             state.take_action(-1); //actions already taken above
@@ -404,6 +415,8 @@ public class Tetris2 extends NAREnvironment {
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
+
+        new Abbreviation(nar,"aKa_");
 
 
 

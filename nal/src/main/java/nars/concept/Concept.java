@@ -180,21 +180,21 @@ public interface Concept extends Termed {
     }
 
     /**
-     * @param thisTask  task with a term equal to this concept's
-     * @param otherTask task with a term equal to another concept's
+     * @param src  task with a term equal to this concept's
+     * @param tgt task with a term equal to another concept's
      * @return number of links created (0, 1, or 2)
      */
-    default void crossLink(@NotNull Budgeted thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
+    default void crossLink(@NotNull Budgeted src, @NotNull Task tgt, float scale, @NotNull NAR nar) {
 
-        Concept other = otherTask.concept(nar);
+        Concept other = tgt.concept(nar);
         if (other == null || other.equals(this))
             return; //null or same concept
 
-        crossLink(thisTask, scale, nar, other, otherTask);
+        crossLink(src, tgt, scale, other, nar);
 
     }
 
-    default void crossLink(Budgeted thisInput, float scale, @NotNull NAR nar, @NotNull Concept other, Budgeted otherTask) {
+    default void crossLink(Budgeted thisInput, Budgeted otherTask, float scale, @NotNull Concept other, @NotNull NAR nar) {
         float halfScale = scale / 2f;
 
         NAR.Activation a = new NAR.Activation(otherTask, null);

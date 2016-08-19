@@ -2,9 +2,14 @@ package nars.op.mental;
 
 import nars.$;
 import nars.NAR;
+import nars.Symbols;
 import nars.Task;
+import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
+import nars.task.GeneratedTask;
+import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -17,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import static nars.nal.Tense.ETERNAL;
+
 /**
  * 1-step abbreviation, which calls ^abbreviate directly and not through an added Task.
  * Experimental alternative to Abbreviation plugin.
@@ -28,7 +35,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
 
     private static final AtomicInteger currentTermSerial = new AtomicInteger(1);
     //when a concept is important and exceeds a syntactic complexity, let NARS name it:
-    public final MutableInt abbreviationVolMin = new MutableInt(6);
+    public final MutableInt abbreviationVolMin = new MutableInt(5);
     public final MutableInt abbreviationVolMax = new MutableInt(1000);
     public final MutableFloat abbreviationQualityMin = new MutableFloat(0.75f);
 
@@ -38,11 +45,11 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
      * generated abbreviation belief's confidence
      */
     public final MutableFloat abbreviationConfidence = new MutableFloat(0.95f);
-    public final MutableFloat abbreviationProbability = new MutableFloat(Inperience.INTERNAL_EXPERIENCE_RARE_PROBABILITY);
+    public final MutableFloat abbreviationProbability = new MutableFloat(0.0001f);
     @NotNull
     protected final NAR nar;
     private final String termPrefix;
-    private final nars.budget.Budgeted NewAbbreviationBudget = UnitBudget.One.cloneMult(0.9f, 0.5f, 0.5f);
+    private final nars.budget.Budgeted defaultAbbreviationBudget = UnitBudget.One.cloneMult(0.9f, 0.5f, 0.5f);
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix) {
@@ -56,7 +63,10 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
 
     @Nullable
     static Compound newAbbreviation(@NotNull Concept abbreviated, @NotNull Term id) {
-        return $.sim(abbreviated.term(), id);
+        return
+                //$.sim(abbreviated.term(), id);
+                //(Compound) $.equi(abbreviated.term(), id);
+                (Compound) $.secte(abbreviated.term(), id);
 
         /*
         //old 1.6 pattern:
@@ -113,35 +123,59 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
     public void accept(@NotNull Task task) {
 //
 //        //is it complex and also important? then give it a name:
-//        if (canAbbreviate(task)) {
-//            if (nar.random.nextFloat() <= abbreviationProbability.floatValue()) {
-//
-//                Concept abbreviated = task.concept(nar);
-//                if (abbreviated != null && abbreviated.get(Abbreviation.class) == null) {
-//
-//                    Term id = newSerialTerm();
-//
-//                    abbreviate(abbreviated, id);
-//                }
-//            }
-//        }
+        if (canAbbreviate(task)) {
+            if (nar.random.nextFloat() <= abbreviationProbability.floatValue()) {
+
+                Concept abbreviated = task.concept(nar);
+                if (abbreviated != null && abbreviated.get(Abbreviation.class) == null) {
+
+                    Term id = newSerialTerm();
+
+                    abbreviate(abbreviated, id);
+                }
+            }
+        }
     }
 
-    protected  void abbreviate(@NotNull Concept abbreviated, @NotNull Term alias) {
-//        Concept abbreviation = nar.activate(newAbbreviation(abbreviated, alias), NewAbbreviationBudget);
-//        if (abbreviation != null) {
-//
-//            abbreviation.put(Abbreviation.class, abbreviation); //abbreviated by itself
-//            abbreviated.put(Abbreviation.class, alias); //abbreviated by the serial
-//
-//            logger.info("Abbreviation {}", abbreviation);
-//
-//            nar.input(
-//                    new MutableTask(abbreviation, Symbols.BELIEF,
-//                            $.t(1, abbreviationConfidence.floatValue()))
-//            );
-//
-//        }
+    protected void abbreviate(@NotNull Concept abbreviated, @NotNull Term alias) {
+        //Concept abbreviation = nar.activate(, NewAbbreviationBudget);
+        Compound abbreviation = newAbbreviation(abbreviated, alias);
+        if (abbreviation != null) {
+
+
+            abbreviated.put(Abbreviation.class, alias); //abbreviated by the serial
+
+            //logger.info("Abbreviation {}", abbreviation);
+
+            Budgeted b = defaultAbbreviationBudget;
+
+
+            MutableTask t = new GeneratedTask(abbreviation, Symbols.BELIEF,
+                    $.t(1, abbreviationConfidence.floatValue())) {
+                @Override
+                public boolean onConcept(@NotNull Concept c) {
+                    Concept abbreviatedConcept = nar.concept(abbreviated, true);
+
+                    Concept aliasConcept = nar.concept(alias, true);
+                    if (abbreviatedConcept!=null) {
+                        abbreviatedConcept.put(Abbreviation.class, abbreviation);
+                        abbreviatedConcept.crossLink(b, this, 1f, aliasConcept, nar);
+                    } else {
+                        logger.error("alias unconceptualized: {}", alias);
+                        return false;
+                    }
+                    return true;
+                }
+            };
+            t.time(nar.time(), ETERNAL);
+            t.budget(b);
+            t.log("Abbreviation Link");
+
+            nar.inputLater( t );
+
+            logger.info("new: {}", t);
+
+        }
     }
 
 

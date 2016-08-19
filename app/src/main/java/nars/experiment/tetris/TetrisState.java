@@ -59,6 +59,9 @@ public class TetrisState {
     private int time = 0;
 
     private int timePerFall;
+    private int nextRotation;
+    private int nextX;
+    private int nextY;
 
     //private double[] worldObservation;
 
@@ -81,13 +84,15 @@ public class TetrisState {
     }
 
     public void reset() {
-        currentX = width / 2 - 1;
-        currentY = 0;
+        nextX = currentX = width / 2 - 1;
+        nextY = currentY = 0;
+        nextRotation = currentRotation = 0;
+
         score = 0;
         for (int i = 0; i < worldState.length; i++) {
             worldState[i] = 0;
         }
-        currentRotation = 0;
+
         is_game_over = false;
     }
 
@@ -130,7 +135,8 @@ public class TetrisState {
                         Thread.dumpStack();
                         System.exit(1);
                     }*/
-                    f[linearIndex] = color;
+                    if (linearIndex >= 0 && linearIndex < f.length)
+                        f[linearIndex] = color;
                 }
             }
         }
@@ -142,31 +148,30 @@ public class TetrisState {
     }
 
     /* This code applies the action, but doesn't do the default fall of 1 square */
-    public void take_action(int theAction) {
+    public synchronized boolean take_action(int theAction) {
 
 
-        int nextRotation = currentRotation;
-        int nextX = currentX;
-        int nextY = currentY;
+        int nextRotation = this.nextRotation;
+        int nextX = this.nextX;
+        int nextY = this.nextY;
 
         switch (theAction) {
             case CW:
-                nextRotation = (currentRotation + 1) % 4;
+                nextRotation = (nextRotation + 1) % 4;
                 break;
             case CCW:
-                nextRotation = (currentRotation - 1);
+                nextRotation = (nextRotation - 1);
                 if (nextRotation < 0) {
                     nextRotation = 3;
                 }
                 break;
             case LEFT:
-                nextX = currentX - 1;
+                nextX = nextX - 1;
                 break;
             case RIGHT:
-                nextX = currentX + 1;
+                nextX = nextX + 1;
                 break;
             case FALL:
-                nextY = currentY;
 
                 boolean isInBounds = true;
                 boolean isColliding = false;
@@ -190,12 +195,21 @@ public class TetrisState {
         //Otherwise, don't change anything
         if (inBounds(nextX, nextY, nextRotation)) {
             if (!colliding(nextX, nextY, nextRotation)) {
-                currentRotation = nextRotation;
-                currentX = nextX;
-                currentY = nextY;
+                //apply valid state
+                this.nextRotation = nextRotation;
+                this.nextX = nextX;
+                this.nextY = nextY;
+                return true;
             }
         }
 
+        //reset to a valid state
+        this.nextRotation = currentRotation;
+        this.nextX = currentX;
+        this.nextY = currentY;
+
+
+        return false;
     }
 
     /**
@@ -378,8 +392,10 @@ public class TetrisState {
             writeCurrentBlock(worldState, -1);
         } else {
             //fall
-            if (time % timePerFall == 0)
-                currentY += 1;
+            if (time % timePerFall == 0) {
+                nextY += 1;
+                commit();
+            }
         }
 
     }
@@ -389,24 +405,32 @@ public class TetrisState {
 
         currentBlockId = nextBlock();
 
-        currentRotation = 0;
-        currentX = (width / 2) - 2;
-        currentY = -4;
+        nextRotation = 0;
+        nextX = (width / 2) - 2;
+        nextY = -4;
         
         //score += getWidth() / 2;
 
 //Colliding checks both bounds and piece/piece collisions.  We really only want the piece to be falling
 //If the filled parts of the 5x5 piece are out of bounds.. IE... we want to stop falling when its all on the screen
         boolean hitOnWayIn = false;
-        while (!inBounds(currentX, currentY, currentRotation)) {
+        while (!inBounds(nextX, nextY, currentRotation)) {
             //We know its not in bounds, and we're bringing it in.  Let's see if it would have hit anything...
-            hitOnWayIn = collidingCheckOnlySpotsInBounds(currentX, currentY, currentRotation);
-            currentY++;
+            hitOnWayIn = collidingCheckOnlySpotsInBounds(nextX, nextY, currentRotation);
+            nextY++;
         }
-        is_game_over = colliding(currentX, currentY, currentRotation) || hitOnWayIn;
+        is_game_over = colliding(nextX, nextY, currentRotation) || hitOnWayIn;
         if (is_game_over) {
             running = false;
+        } else {
+            commit();
         }
+    }
+
+    public void commit() {
+        this.currentRotation = this.nextRotation;
+        this.currentX = this.nextX;
+        this.currentY = this.nextY;
     }
 
     protected int nextBlock() {
