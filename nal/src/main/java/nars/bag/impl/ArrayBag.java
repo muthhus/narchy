@@ -113,8 +113,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     public final int compare(@Nullable BLink o1, @Nullable BLink o2) {
-        float f1 = priIfFiniteElseNeg1(o1);
-        float f2 = priIfFiniteElseNeg1(o2);
+        float f1 = cmp(o1);
+        float f2 = cmp(o2);
 
         if (f1 < f2)
             return 1;           // Neither val is NaN, thisVal is smaller
@@ -123,28 +123,38 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return 0;
     }
 
+
+
     /**
      * true iff o1 > o2
      */
     static final boolean cmpGT(@Nullable BLink o1, @Nullable BLink o2) {
-        return (priIfFiniteElseNeg1(o1) < priIfFiniteElseNeg1(o2));
+        return (cmp(o1) < cmp(o2));
+    }
+    static final boolean cmpGT(@Nullable BLink o1, float o2) {
+        return (cmp(o1) < o2);
     }
 
     /**
      * true iff o1 > o2
      */
     static final boolean cmpGT(float o1PriElseNeg1, @Nullable BLink o2) {
-        return (o1PriElseNeg1 < priIfFiniteElseNeg1(o2));
+        return (o1PriElseNeg1 < cmp(o2));
     }
+
 
     /**
      * true iff o1 < o2
      */
     static final boolean cmpLT(@Nullable BLink o1, @Nullable BLink o2) {
-        return (priIfFiniteElseNeg1(o1) > priIfFiniteElseNeg1(o2));
+        return (cmp(o1) > cmp(o2));
+    }
+    static final boolean cmpLT(@Nullable BLink o1, float o2) {
+        return (cmp(o1) > o2);
     }
 
-    static float priIfFiniteElseNeg1(@Nullable Budgeted b) {
+    /** gets the scalar float value used in a comparison of BLink's */
+    static float cmp(@Nullable Budgeted b) {
         if (b == null) return -1;
         float p = b.pri();
         return p == p ? p : -1;
@@ -413,12 +423,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 b.commit();
             }
 
-            float o1PriElseNeg1 = priIfFiniteElseNeg1(b);
-            if (o1PriElseNeg1 > 0) {
-                weightedMass += o1PriElseNeg1 * b.dur();
+            float bCmp = cmp(b);
+            if (bCmp > 0) {
+                weightedMass += bCmp * b.dur();
             }
 
-            if (lowestUnsorted == -1 && cmpGT(o1PriElseNeg1, beneath)) {
+            if (lowestUnsorted == -1 && cmpGT(bCmp, beneath)) {
                 lowestUnsorted = i + 1;
             }
 
@@ -436,36 +446,38 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      */
     private int removeDeletedAtBottom(List<BLink<V>> removed) {
 
-        //remove deleted items they will collect at the end
 
         SortedArray<BLink<V>> items = this.items;
+
         int i, j;
         BLink<V>[] l = items.array();
-
-        j = i = size() - 1;
+        j = i = Math.min(l.length, size()) - 1;
 
         int removedFromMap = 0;
 
-        synchronized (items) {
-            while ((i >= 0) && (l[i] == null)) {
-                i--;
-                removedFromMap++;
+        if (i > 0) {
+
+            synchronized (items) {
+                while ((i >= 0) && (l[i] == null)) {
+                    i--;
+                    removedFromMap++;
+                }
+
+                BLink<V> ii;
+                while (i >= 0 && (ii = l[i]).isDeleted()) {
+
+                    removed.add(ii);
+
+                    l[i--] = null;
+
+                    removedFromMap++;
+                }
+
+                if (i != j)
+                    items._setSize(i + 1); //quickly remove null entries from the end by skipping past them
             }
 
-            BLink<V> ii;
-            while (i >= 0 && (ii = l[i]).isDeleted()) {
-
-                removed.add(ii);
-
-                l[i--] = null;
-
-                removedFromMap++;
-            }
-
-            if (i != j)
-                items._setSize(i + 1); //quickly remove null entries from the end by skipping past them
         }
-
 
         return removedFromMap;
     }
@@ -515,15 +527,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public static void qsort(int[] stack, BLink[] c, int start, int size) {
         int left = start, right = size - 1, stack_pointer = -1;
         while (true) {
-            int i;
-            int j;
-            BLink swap;
+            int i, j;
             if (right - left <= 7) {
+                BLink swap;
                 //bubble sort on a region of size less than 8?
                 for (j = left + 1; j <= right; j++) {
                     swap = c[j];
                     i = j - 1;
-                    while (i >= left && cmpGT(c[i], swap)) {
+                    float swapV = cmp(swap);
+                    while (i >= left && cmpGT(c[i], swapV)) {
                         BLink x = c[i];
                         c[i] = c[i + 1];
                         c[i + 1] = x;
@@ -533,11 +545,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 }
                 if (stack_pointer != -1) {
                     right = stack[stack_pointer--];
-                    left = stack[stack_pointer--];
+                    left =  stack[stack_pointer--];
                 } else {
                     break;
                 }
             } else {
+                BLink swap;
+
                 int median = (left + right) >> 1;
                 i = left + 1;
                 j = right;
@@ -559,21 +573,25 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     c[left] = c[i];
                     c[i] = swap;
                 }
-                BLink temp = c[i];
 
-                while (true) {
-                    while (cmpLT(c[++i], temp)) ;
-                    while (cmpGT(c[--j], temp)) ;
-                    if (j < i) {
-                        break;
+                {
+                    BLink temp = c[i];
+                    float tempV = cmp(temp);
+
+                    while (true) {
+                        while (cmpLT(c[++i], tempV)) ;
+                        while (cmpGT(c[--j], tempV)) ;
+                        if (j < i) {
+                            break;
+                        }
+                        swap = c[i];
+                        c[i] = c[j];
+                        c[j] = swap;
                     }
-                    swap = c[i];
-                    c[i] = c[j];
-                    c[j] = swap;
-                }
 
-                c[left + 1] = c[j];
-                c[j] = temp;
+                    c[left + 1] = c[j];
+                    c[j] = temp;
+                }
 
                 int a, b;
                 if ((right - i + 1) >= (j - left)) {

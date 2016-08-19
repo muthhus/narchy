@@ -42,13 +42,13 @@ public final class TaskIndex {
     }
 
     public void start(@NotNull NAR nar) {
-        if (Param.DEBUG) {
-            int sweepInterval = 32;
-            nar.onFrame(nn -> {
-                if (nn.time()%sweepInterval == 0)
-                    removeDeleted();
-            });
-        }
+//        if (Param.DEBUG) {
+//            int sweepInterval = 32;
+//            nar.onFrame(nn -> {
+//                if (nn.time()%sweepInterval == 0)
+//                    removeDeleted();
+//            });
+//        }
     }
 
     public void removeDeleted() {

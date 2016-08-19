@@ -154,9 +154,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
         super(clock, rng, index);
-
-
         this.self = self;
+
+        (this.exe = exe).start(this);
+
 
 
 //        eventError.on(e -> {
@@ -184,7 +185,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         tasks.start(this);
 
-        (this.exe = exe).start(this);
 
     }
 
