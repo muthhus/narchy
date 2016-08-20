@@ -412,7 +412,7 @@ public abstract class TermIndex extends TermBuilder {
 
             result = tgt != src ? TermVector.the(tgt) : u;
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
 
             if (Param.DEBUG_EXTRA)
                 logger.warn("normalize {} : {}", u, e);

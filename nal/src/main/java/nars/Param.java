@@ -73,7 +73,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
 
     /** size of each thread's normalization cache, in entries */
-    public static final int NORMALIZATION_CACHE_SIZE = 2048;
+    public static final int NORMALIZATION_CACHE_SIZE = 16384;
     public static final int TERM_CACHE_SIZE = 16384;
 
 

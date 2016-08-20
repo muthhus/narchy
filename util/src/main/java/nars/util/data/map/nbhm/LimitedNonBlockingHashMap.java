@@ -87,6 +87,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     private static final Unsafe _unsafe = Util.getUnsafe();
     private static final int _Obase = _unsafe.arrayBaseOffset(Object[].class);
     private static final int _Oscale = _unsafe.arrayIndexScale(Object[].class);
+    private final int capacity;
     private long hit = 0, miss = 0;
 
     private static long rawIndex(/*final Object[] ary, */final int idx) {
@@ -271,7 +272,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     }
 
     public String summary() {
-        return size() + " entries, " + hit + "/" + (hit+miss)  + " hit rate (" +
+        return hit + "/" + (hit+miss)  + " hit rate (" +
                 Texts.n2(100.0 * ((double)hit)/((double)hit+miss)) +
                 "%)";
     }
@@ -309,6 +310,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
      * initial size will be rounded up internally to the next larger power of 2.
      */
     public LimitedNonBlockingHashMap(final int capacity, final int maxReprobes) {
+        this.capacity = capacity;
         initialize(capacity);
         this.reprobes = maxReprobes;
     }
@@ -320,7 +322,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         for (i = MIN_SIZE_LOG; (1 << i) < (initial_sz << 2); i++) ;
         // Double size for K,V pairs, add 1 for CHM and 1 for hashes
         _kvs = new Object[((1 << i) << 1) + 2];
-        _kvs[0] = new CHM(new ConcurrentAutoTable(), reprobes); // CHM in slot 0
+        _kvs[0] = new CHM(reprobes); // CHM in slot 0
         _kvs[1] = new int[1 << i];          // Matching hash entries
         //_last_resize_milli = System.currentTimeMillis();
     }
@@ -333,13 +335,11 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     // --- wrappers ------------------------------------------------------------
 
     /**
-     * Returns the number of key-value mappings in this map.
-     *
-     * @return the number of key-value mappings in this map
+     * Returns the capacity of the map, not how many actual entries are in it
      */
     @Override
     public int size() {
-        return chm(_kvs).size();
+        return capacity;
     }
 
     /**
@@ -739,13 +739,18 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 assert K != null;       // If keys[idx] is null, CAS shoulda worked
             } else if (++reprobe_cnt >= reprobes) {
                 //probe expired on a non-empty index, hijack this location erasing the old value of another key
-                set_key(kvs, idx, key);
-                //chm._slots.add(1);      // Raise key-slots-used count
-                hashes[idx] = fullhash; // Memoize fullhash
-                if (compute)
-                    set_val(kvs, idx, ticket = topmap.next());
-                emptyValue = true;
-                break;                  // Got it!
+                if (CAS_key(kvs, idx, K, key)) {
+                    //chm._slots.add(1);      // Raise key-slots-used count
+                    hashes[idx] = fullhash; // Memoize fullhash
+                    if (compute)
+                        set_val(kvs, idx, ticket = topmap.next());
+                    emptyValue = true;
+                    break;                  // Got it!
+                } else {
+                    //seriously fucked - just compute the value
+                    topmap.miss++;
+                    return (((Function) putval).apply(key));
+                }
             }
 
             // Key slot was not null, there exists a Key here
@@ -843,8 +848,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                     // does not (effectively) increase the number of live k/v pairs.
                     if (expVal != null) {
                         // Adjust sizes - a striped counter
-                        if ((V == null || V == TOMBSTONE) && putval != TOMBSTONE) chm._size.add(1);
-                        if (!(V == null || V == TOMBSTONE) && putval == TOMBSTONE) chm._size.add(-1);
+                        //if ((V == null || V == TOMBSTONE) && putval != TOMBSTONE) chm._size.add(1);
+                        //if (!(V == null || V == TOMBSTONE) && putval == TOMBSTONE) chm._size.add(-1);
                     }
                     return (V == null && expVal != null) ? TOMBSTONE : V;
                 }
@@ -853,28 +858,20 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 V = val(kvs, idx);
             } else {
 
-                V = val(kvs, idx);
-                if (ticket!=null && V == ticket) {
+                if (ticket!=null) {
 
-//                    Throwable error = null;
-//                    try {
-                    V = (((Function) putval).apply(key)); //must not be interrupted otherwise the thread claim will remain at the position, TODO add some counter to the claim so that subsequent call from the same thread will clear itself
-//                    } catch (Throwable t) {
-//                        //clear the Thread claim here
-//                        error = t;
-//                    }
+                    if (CAS_val(kvs, idx, ticket, V = (((Function) putval).apply(key)))) {
 
-                    if (CAS_val(kvs, idx, ticket, V)) { //only write the value if this thread is set at the location prior to the apply() is the same
-
-                        if (emptyValue) //was inserted on an empty index, otherwise it was previously full so no need to increase size
-                            chm._size.add(1);
+                        //if (emptyValue) //was inserted on an empty index, otherwise it was previously full so no need to increase size
+                            //chm._size.add(1);
 
                         topmap.miss++;
                         return V; //done, return the fresh new value
 
                     } else {
                         //must retry, the function was too slow to capture this slot before another one
-                        V = new Prime(V);
+                        //V = new Prime(V);
+                        return V; //wont be able to store this value but return it anyway since its computed
                     }
 
 
@@ -921,12 +918,12 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     // The control structure for the LimitedNonBlockingHashMap
     private static final class CHM<TypeK, TypeV> {
         // Size in active K,V pairs
-        private final ConcurrentAutoTable _size;
+        //private final ConcurrentAutoTable _size;
         private final int reprobes;
 
-        public int size() {
-            return (int) _size.get();
-        }
+//        public int size() {
+//            return (int) _size.get();
+//        }
 
         // ---
         // These next 2 fields are used in the resizing heuristics, to judge when
@@ -981,8 +978,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
         // ---
         // Simple constructor
-        CHM(ConcurrentAutoTable size, int reprobes) {
-            _size = size;
+        CHM(int reprobes) {
+            //_size = size;
             //_slots = new ConcurrentAutoTable();
             this.reprobes = reprobes;
         }
