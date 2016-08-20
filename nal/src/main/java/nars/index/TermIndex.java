@@ -98,9 +98,9 @@ public abstract class TermIndex extends TermBuilder {
     public abstract int subtermsCount();
 
     public final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
-            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 3 );
+            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 5 );
     public final LimitedNonBlockingHashMap<ProtoCompound,Term> terms =
-            new LimitedNonBlockingHashMap<>(Param.TERM_CACHE_SIZE, 3 );
+            new LimitedNonBlockingHashMap<>(Param.TERM_CACHE_SIZE, 5 );
 
 //    final ThreadLocal<Map<Compound,Compound>> normalizations =
 //            ThreadLocal.withInitial( () ->
@@ -137,10 +137,10 @@ public abstract class TermIndex extends TermBuilder {
 //                throw new RuntimeException(failure[0]);
 //            }
 
-            //SANITY TEST:
-            @NotNull Term retry = super.the(p.op(), p.dt(), p.terms());
-            if (!t.equals(retry))
-                throw new RuntimeException("cache fault");
+//            //SANITY TEST:
+//            @NotNull Term retry = super.the(p.op(), p.dt(), p.terms());
+//            if (!t.equals(retry))
+//                throw new RuntimeException("cache fault");
 
             return t;
 

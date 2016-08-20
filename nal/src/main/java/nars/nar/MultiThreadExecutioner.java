@@ -1,18 +1,17 @@
 package nars.nar;
 
 import com.lmax.disruptor.*;
-import com.lmax.disruptor.dsl.BasicExecutor;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.ProducerType;
 import nars.NAR;
 import nars.Task;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -25,6 +24,7 @@ import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFacto
  */
 public class MultiThreadExecutioner extends Executioner {
 
+    private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutioner.class);
 
     private final int threads;
     private final RingBuffer<TaskEvent> ring;
@@ -192,7 +192,14 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public void inputLater(@NotNull Task[] t) {
-        disruptor.publishEvent(taskPublisher, t);
+        if (!ring.tryPublishEvent(taskPublisher, t)) {
+            overflow(t);
+        }
+    }
+
+    public void overflow(@NotNull Task[] t) {
+        //TODO use a bag to collect these
+        logger.warn("dropped: {}", t);
     }
 
     final static EventTranslatorOneArg<TaskEvent, Runnable> runPublisher = (TaskEvent x, long seq, Runnable b) -> {
