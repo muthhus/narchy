@@ -85,7 +85,7 @@ public class VariableNormalization extends VariableTransform implements Function
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
         @Override
-        public Term apply(@NotNull Compound containing, @NotNull Variable current) {
+        public Term apply(@Nullable Compound containing, @NotNull Variable current) {
 
             //if (current instanceof Ellipsis)
                //throw new RuntimeException("not allowed");

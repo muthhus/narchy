@@ -47,12 +47,13 @@ public class MultiThreadExecutioner extends Executioner {
     public MultiThreadExecutioner(int threads, int ringSize) {
         this(threads, ringSize,
                 //new BasicExecutor(Executors.defaultThreadFactory())
-                new ForkJoinPool(Runtime.getRuntime().availableProcessors(),
+                new ForkJoinPool(
+                        Runtime.getRuntime().availableProcessors()-1 /* leave one thread available */,
                         defaultForkJoinWorkerThreadFactory, null, true /* async */,
                         threads,
-                        threads*8, //max threads (safe to increase)
+                        threads*128, //max threads (safe to increase)
                         threads, //minimum threads to keep running otherwise new ones will be created
-                        null, 4000L, TimeUnit.MILLISECONDS)
+                        null, 60000L, TimeUnit.MILLISECONDS)
         );
     }
 

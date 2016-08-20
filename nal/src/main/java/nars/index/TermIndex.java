@@ -15,6 +15,7 @@ import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
@@ -351,89 +352,96 @@ public abstract class TermIndex extends TermBuilder {
 //            ThreadLocal.withInitial( () ->
 //                new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD)
 //            );
-    final LimitedNonBlockingHashMap<Compound,Compound> normalizations =
+    final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
         new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 2 );
 
 
 //            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
 
-    //final Cache<Compound,Compound> normalizations = Caffeine.newBuilder().maximumSize(16*1024*4).build();
+    //final Cache<Compound,Compound> normalizations = Caffeine.newBuilder().maximumSize(Param.NORMALIZATION_CACHE_SIZE).build();
 
 
-    final Function<? super Compound, ? extends Compound> normalizer = u -> {
+    final Function<? super TermContainer, ? extends TermContainer> normalizer = u -> {
         //bmiss[0] = true;
+
+        TermContainer result;
+
         try {
-            return _normalize(u);
+            int numVars = u.vars();
+
+            @NotNull Term[] src = u.terms();
+
+            Term[] tgt =
+                transform(src, null,
+                    (numVars == 1 && u.varPattern() == 0) ?
+                            VariableNormalization.singleVariableNormalization :
+                            new VariableNormalization(numVars /* estimate */)
+                );
+
+            result = tgt != src ? TermVector.the(tgt) : u;
+
         } catch (Exception e) {
+
             if (Param.DEBUG_EXTRA)
-                logger.warn("normalization: {}", e);
-            return FalseProduct; //since computeIfAbsent uses null as a dont-modify signal
+                logger.warn("normalize {} : {}", u, e);
+
+            result = InvalidSubterms;
         }
 
+        return result;
     };
 
-    public final Compound normalize(@NotNull Compound t) {
+    @Nullable public final Compound normalize(@NotNull Compound t) {
+
         if (t.isNormalized())
             return t;
 
-        Compound v = normalizations/*.get()*/.computeIfAbsent(t, normalizer);  //threadlocal/linked
-
-        //Compound v = normalizations.get(t, normalizer); //caffeine
-
-        /*if (Math.random() < 0.01)
-            System.err.println(normalizations.summary());*/
-
-        return v == FalseProduct ? null : v;
-
-        //return _normalize(t);
-    }
-
-
-
-    @NotNull
-    public Compound _normalize(@NotNull Compound t) {
-        Compound r;
-        if (!t.isNormalized()) {
-            Compound ct = (Compound) t;
-            int numVars = ct.vars();
-
-            Term t2;
-            if (numVars == 1 && ct.varPattern() == 0) {
-                t2 = transform(ct, VariableNormalization.singleVariableNormalization);
-            } else {
-                t2 = transform(ct, new VariableNormalization(numVars));
-            }
-
-            /*if (!(t2 instanceof Compound)) { //includes null test
-                if (Global.DEBUG)
-                    System.err.println(t + " TermIndex.normalize() produced null");
-                return null;
-            }*/
-
-            if (!(t2 instanceof Compound)) {
-                throw new InvalidTermException(ct.op(), ct.dt(), ct.terms(),
-                    Param.DEBUG ? "normalized to non-compound: " + t2 : "normalized to non-compound"
-                );
-            }
-
-            ((GenericCompound) t2).setNormalized();
-            r = (Compound) t2;
-
-        } else {
-            r = compoundOrNull(t);
-            if (r == null)
-                throw new InvalidTermException(t.op(), DTERNAL, new Term[]{},
-                    Param.DEBUG ? "normalizing non-compound: " + t : "normalizing non-compound"
-                );
+        TermContainer src = t.subterms();
+        TermContainer tgt = normalize(src);
+        if (src == tgt) {
+            //no change
+            ((GenericCompound)t).setNormalized();
+            return t;
         }
 
-//        if (insert) {
-//            Compound s = (Compound) termOrNull(get(r, false));
-//            return s == null ? r : s; //if a concept does not exist, do not create one yet and just return the key
-//        } else {
-            return r;
-//        }
+        if (tgt != InvalidSubterms) {
+            Compound c = compoundOrNull(build(t, tgt));
+            if (c!=null) {
+                ((GenericCompound)c).setNormalized();
+                return c;
+            }
+        }
 
+        return null;
+
+
+        //        if (v == null)
+        //            throw new InvalidTermException(t.op(), t.dt(), new Term[]{}, "unnormalizable");
+        //
+        //
+        ////        if (insert) {
+        ////            Compound s = (Compound) termOrNull(get(r, false));
+        ////            return s == null ? r : s; //if a concept does not exist, do not create one yet and just return the key
+        ////        } else {
+        ////        }
+        //
+        //
+        //
+        //
+        ////Compound v = normalizations.get(t, normalizer); //caffeine
+        //
+        //        /*if (Math.random() < 0.01)
+        //            System.err.println(normalizations.summary());*/
+        //
+        //        return v == InvalidSubterms ? null : v;
+        //
+        //    //return _normalize(t);
+        //
+
+    }
+
+    @Nullable public final TermContainer normalize(@NotNull TermContainer t) {
+        return normalizations.computeIfAbsent(t, normalizer);
     }
 
 
@@ -448,36 +456,42 @@ public abstract class TermIndex extends TermBuilder {
         if (src == null || !t.testSuperTerm(src))
             return src;
 
-        int n = src.size();
+        Term[] srcSubs = src.terms();
+        Term[] tgtSubs = transform(srcSubs, src, t);
+
+        return tgtSubs!=srcSubs ?
+                build(src.op(), src.dt(), tgtSubs) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
+                src;
+
+    }
+
+    @NotNull
+    public Term[] transform(@NotNull Term[] src, Compound superterm, @NotNull CompoundTransform t) {
 
         int modifications = 0;
 
-        Term[] target = new Term[n];
+        Term[] target = src.clone();
 
-        for (int i = 0; i < n; i++) {
-            Term x = src.term(i);
+        for (int i = 0, n = src.length; i < n; i++) {
 
-            Term y = x;
+            Term x = src[i], y;
 
             if (t.test(x)) {
-                y = t.apply(src, x);
+                y = t.apply(superterm, x);
             } else if (x instanceof Compound) {
                 y = transform((Compound) x, t); //recurse
+            } else {
+                continue;
             }
-
 
             if (x != y) { //must be refernce equality test for some variable normalization cases
                 modifications++;
-                x = y;
+                target[i] = y;
             }
 
-            target[i] = x;
         }
 
-        return modifications > 0 ?
-                build(src.op(), src.dt(), target) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
-                src;
-
+        return modifications > 0 ? target : src;
     }
 
 

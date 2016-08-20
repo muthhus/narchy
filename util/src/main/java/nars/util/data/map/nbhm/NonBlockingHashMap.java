@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.*;
 
 import com.lmax.disruptor.util.Util;
+import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 /**
@@ -345,7 +346,7 @@ public class NonBlockingHashMap<TypeK, TypeV>
         return putIfMatch( key, newValue, oldValue ) == oldValue;
     }
 
-    private final TypeV putIfMatch( Object key, Object newVal, Object oldVal ) {
+    private final TypeV putIfMatch(Object key, @NotNull Object newVal, @NotNull Object oldVal ) {
         if (oldVal == null || newVal == null) throw new NullPointerException();
         final Object res = putIfMatch( this, _kvs, key, newVal, oldVal );
         assert !(res instanceof Prime);

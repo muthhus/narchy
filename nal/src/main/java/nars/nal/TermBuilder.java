@@ -43,7 +43,7 @@ public abstract class TermBuilder {
     public static final Atom SELF_CANCELLED_CONJ_TRUTH = False;
 
     private static final Term[] TrueArray = new Term[]{True};
-    public static final Compound FalseProduct = new GenericCompound(Op.PROD, TermVector.the(False));
+    public static final TermContainer InvalidSubterms = TermVector.the(False);
     /**
      * implications, equivalences, and interval
      */

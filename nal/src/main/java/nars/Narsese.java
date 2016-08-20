@@ -31,6 +31,8 @@ import nars.term.var.Variable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Texts;
+import nars.util.data.map.CapacityLinkedHashMap;
+import nars.util.data.map.nbhm.LimitedNonBlockingHashMap;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -65,6 +68,12 @@ public class Narsese extends BaseParser<Object> {
     //private final Map<String,Term> termCache = new HashMap();
 
     static final ThreadLocal<Narsese> parsers = ThreadLocal.withInitial(() -> Grappa.createParser(Narsese.class));
+
+    static final ThreadLocal<Map<Pair<Op,List>,Term>> vectorTerms = ThreadLocal.withInitial(() ->
+            new CapacityLinkedHashMap<Pair<Op, List>, Term>(2048));
+
+    //static final Map<Pair<Op,List>,Term> vectorTerms = new LimitedNonBlockingHashMap<>(2048, 2);
+
 
     public static Narsese the() {
         return parsers.get();
@@ -1003,7 +1012,7 @@ public class Narsese extends BaseParser<Object> {
         if (vectorterms.isEmpty()) return null;
 
 
-        return vectorTerms.get(Tuples.pair(op, (List) vectorterms), popTermFunction);
+        return vectorTerms.get().computeIfAbsent(Tuples.pair(op, (List) vectorterms), popTermFunction);
     }
 
 
@@ -1012,11 +1021,6 @@ public class Narsese extends BaseParser<Object> {
         return _popTerm(x.getOne(), x.getTwo());
     };
 
-    static final Cache<Pair<Op,List>,Term> vectorTerms = Caffeine.newBuilder()
-            .maximumSize(2048)
-            .initialCapacity(2048)
-            .expireAfterAccess(1, TimeUnit.MINUTES)
-            .build();
 
 
     @Nullable

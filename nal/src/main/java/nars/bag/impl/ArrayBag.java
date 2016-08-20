@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import com.mxgraph.util.svg.DefaultErrorHandler;
 import nars.$;
 import nars.Param;
 import nars.bag.Bag;
@@ -15,6 +16,8 @@ import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedur
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +44,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * mass as calculated in previous commit
      */
     private float mass = 0;
+    private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
 
     public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
         super(BLink[]::new, map);
@@ -86,9 +90,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 V k = w.get();
                 BLink<V> k2 = map.remove(k);
 
-                if (k2 != w) {
+                if (k2 != w && k2!=null) {
                     //throw new RuntimeException(
-                    System.err.println("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
+                    logger.error("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
                     //reinsert it because it must have been added in the mean-time:
                     map.putIfAbsent(k, k2);
                 }

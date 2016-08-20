@@ -366,6 +366,14 @@ public enum Util {
         return hashCombine(hashCombine(a, b), c);
     }
 
+    public static int hashCombine(Object[] t) {
+        int x = t[0].hashCode();
+        for (int i = 1; i < t.length; i++) {
+            x = hashCombine(x, t[i].hashCode());
+        }
+        return x;
+    }
+
 
     public static int ELFHashNonZero(byte[] str, int seed) {
         int i  = (int) ELFHash(str, seed);

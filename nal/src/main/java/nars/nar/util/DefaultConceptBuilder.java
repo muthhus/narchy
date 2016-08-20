@@ -20,6 +20,7 @@ import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+import nars.util.data.map.nbhm.NonBlockingHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -62,8 +63,9 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     @NotNull
     private static Map newBagMap(int cap) {
+        return new NonBlockingHashMap(cap);
+        //return new ConcurrentHashMap(cap);
         //return new HashMap(cap);
-        return new ConcurrentHashMap(cap);
         //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
                         //ConcurrentHashMapUnsafe(cap);
     }

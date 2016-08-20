@@ -54,14 +54,14 @@ public class Tetris2 extends NAREnvironment {
     public static final int DEFAULT_INDEX_WEIGHT = 16 * 10000000;
 
     public static final Executioner exe =
-            new MultiThreadExecutioner(4, 8192);
+            new MultiThreadExecutioner(4, 16384);
             //new SingleThreadExecutioner();
 
-    public static final int runFrames = 2500;
-    public static final int cyclesPerFrame = 16;
+    public static final int runFrames = 12500;
+    public static final int cyclesPerFrame = 64;
     public static final int tetris_width = 6;
     public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 1;
+    public static final int TIME_PER_FALL = 3;
     static boolean easy = false;
 
     static int frameDelay;
