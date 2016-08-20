@@ -1,7 +1,5 @@
 package nars.index;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
@@ -22,7 +20,6 @@ import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
-import nars.util.data.map.CapacityLinkedHashMap;
 import nars.util.data.map.nbhm.LimitedNonBlockingHashMap;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
@@ -355,7 +352,7 @@ public abstract class TermIndex extends TermBuilder {
 //                new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD)
 //            );
     final LimitedNonBlockingHashMap<Compound,Compound> normalizations =
-        new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD, 2 );
+        new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 2 );
 
 
 //            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
@@ -383,8 +380,8 @@ public abstract class TermIndex extends TermBuilder {
 
         //Compound v = normalizations.get(t, normalizer); //caffeine
 
-        if (Math.random() < 0.01)
-            System.err.println(normalizations.summary());
+        /*if (Math.random() < 0.01)
+            System.err.println(normalizations.summary());*/
 
         return v == FalseProduct ? null : v;
 

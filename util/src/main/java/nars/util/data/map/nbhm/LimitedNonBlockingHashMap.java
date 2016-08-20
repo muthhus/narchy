@@ -574,11 +574,17 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     // the hashes are unequal (fast negative test) and finally do the full-on
     // 'equals' v-call.
     private static boolean keyeq(Object K, Object key, int[] hashes, int hash, int fullhash) {
-        return
-                K == key ||                 // Either keys match exactly OR
-                        // hash exists and matches?  hash can be zero during the install of a
-                        // new key/value pair.
-                        ((hashes[hash] == 0 || hashes[hash] == fullhash) &&
+
+        if (K == key)
+            return true;
+
+        final int hh = hashes[hash];
+
+//        return
+//                K == key ||                 // Either keys match exactly OR
+//                        // hash exists and matches?  hash can be zero during the install of a
+//                        // new key/value pair.
+        return     ((hh == 0 || hh == fullhash) &&
                                 // Do not call the users' "equals()" call with a Tombstone, as this can
                                 // surprise poorly written "equals()" calls that throw exceptions
                                 // instead of simply returning false.
