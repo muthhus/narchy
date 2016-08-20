@@ -241,11 +241,10 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         return atomics.size() + " atoms " + compounds.estimatedSize() + " compounds+subterms";// / " + subtermsCount() + " subterms";
     }
 
-    @Override
-    public final void onRemoval(Object key, Object value, @Nonnull RemovalCause cause) {
+    /** this will be called from within a worker task */
+    @Override public final void onRemoval(Object key, Object value, @Nonnull RemovalCause cause) {
         if (value instanceof Concept) {
-            Concept c = (Concept) value;
-            c.delete(nar);
+            ((Concept) value).delete(nar);
         }
     }
 
@@ -253,5 +252,6 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public void start(NAR nar) {
         this.nar = nar;
     }
+
 
 }

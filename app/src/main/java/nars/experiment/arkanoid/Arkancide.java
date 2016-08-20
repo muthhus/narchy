@@ -39,18 +39,18 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 16;
-    public static final int runFrames = 20000;
+    private static final int cyclesPerFrame = 32;
+    public static final int runFrames = 50000;
     public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
-    public static final int INDEX_SIZE = 3 * 100000;
+    public static final int INDEX_SIZE = 20 * 10000000;
     final Arkanoid noid;
-    private final SwingCamera cam;
+    private SwingCamera cam;
 
     private MotorConcept motorLeftRight;
 
     final int visW = 24;
     final int visH = 12;
-    final SensorConcept[][] ss;
+    SensorConcept[][] ss;
 
     private int visionSyncPeriod = 64;
     float noiseLevel = 0;
@@ -68,18 +68,16 @@ public class Arkancide extends NAREnvironment {
     public Arkancide(NAR nar) {
         super(nar);
         noid = new Arkanoid();
-
         ss = new SensorConcept[visW][visH];
-
-        cam = new SwingCamera(noid, visW, visH);
-        cam.update();
-
-
-
     }
 
     @Override
     protected void init(NAR n) {
+
+
+        cam = new SwingCamera(noid, visW, visH);
+        cam.update();
+
         for (int x = 0; x < visW; x++) {
             int xx = x;
             for (int y = 0; y < visH; y++) {
@@ -95,6 +93,7 @@ public class Arkancide extends NAREnvironment {
                 ss[x][y] = sss;
             }
         }
+
 
 
         AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
@@ -157,7 +156,7 @@ public class Arkancide extends NAREnvironment {
         //view.attention.add(nar.inputActivation);
         //view.attention.add(nar.derivedActivation);
 
-        newBeliefChartWindow(this, 500);
+        newBeliefChartWindow(this, 200);
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
@@ -166,6 +165,7 @@ public class Arkancide extends NAREnvironment {
         );
 
         //newConceptWindow((Default) n, 64, 4);
+
 
     }
 
@@ -223,12 +223,12 @@ public class Arkancide extends NAREnvironment {
             }
 
         };
-        nar.inputActivation.setValue(0.04f);
-        nar.derivedActivation.setValue(0.04f);
+        nar.inputActivation.setValue(0.05f);
+        nar.derivedActivation.setValue(0.05f);
 
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.7f);
+        nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
@@ -293,6 +293,7 @@ public class Arkancide extends NAREnvironment {
         NAR.printTasks(nar, false);
 
         nar.printConceptStatistics();
+
     }
 
 

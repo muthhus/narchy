@@ -23,6 +23,7 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
 import nars.util.data.map.CapacityLinkedHashMap;
+import nars.util.data.map.nbhm.LimitedNonBlockingHashMap;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
@@ -348,9 +349,14 @@ public abstract class TermIndex extends TermBuilder {
         out.println();
     }
 
-    //can not be static because of some issue with unnormalized variables equality or something
-    final ThreadLocal<Map<Compound,Compound>> normalizations =
-            ThreadLocal.withInitial( () -> new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD) );
+//    //can not be static because of some issue with unnormalized variables equality or something
+//    final ThreadLocal<Map<Compound,Compound>> normalizations =
+//            ThreadLocal.withInitial( () ->
+//                new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD)
+//            );
+    final LimitedNonBlockingHashMap<Compound,Compound> normalizations =
+        new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD, 2 );
+
 
 //            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
 
@@ -370,9 +376,15 @@ public abstract class TermIndex extends TermBuilder {
     };
 
     public final Compound normalize(@NotNull Compound t) {
-        Compound v = normalizations.get().computeIfAbsent(t, normalizer);  //threadlocal/linked
+        if (t.isNormalized())
+            return t;
+
+        Compound v = normalizations/*.get()*/.computeIfAbsent(t, normalizer);  //threadlocal/linked
 
         //Compound v = normalizations.get(t, normalizer); //caffeine
+
+        if (Math.random() < 0.01)
+            System.err.println(normalizations.summary());
 
         return v == FalseProduct ? null : v;
 

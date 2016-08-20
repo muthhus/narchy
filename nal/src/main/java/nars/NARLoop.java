@@ -108,7 +108,7 @@ public class NARLoop implements Runnable {
 
         //thread priority control
         if (thread != null) {
-            int pri = thread.getPriority();
+            //int pri = thread.getPriority();
 
             thread.interrupt();
 
@@ -158,21 +158,19 @@ public class NARLoop implements Runnable {
 
         prevTime = System.currentTimeMillis();
 
-        do {
-            while (!stopping) {
-                try {
-                    frame(nar);
-                } catch (Throwable e) {
-                    logger.error("{}",e.toString());
-                    e.printStackTrace();
-                    /*nar.eventError.emit(e);
-                    if (Param.DEBUG) {
-                        stop();
-                        break;
-                    }*/
-                }
+        while (!stopping) {
+            try {
+                frame(nar);
+            } catch (Throwable e) {
+                logger.error("{}",e.toString());
+                e.printStackTrace();
+                /*nar.eventError.emit(e);
+                if (Param.DEBUG) {
+                    stop();
+                    break;
+                }*/
             }
-        } while (!stopping);
+        }
 
         logger.info("stopped");
         stopped = true;
@@ -191,7 +189,7 @@ public class NARLoop implements Runnable {
 
             //if (!nar.running.get()) {
 
-            nar.next();
+            nar.run(1);
 
                 //this.prevTime = Util.pauseLockUntil(prevTime + periodMS);
             long prevPrevTime = this.prevTime;

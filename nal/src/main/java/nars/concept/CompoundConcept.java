@@ -236,17 +236,15 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     @Override
     public void delete(NAR nar) {
-        termlinks().clear();
-        tasklinks().clear();
+        policy = null;
 
         //remove all tasks from the index:
-
-        List<Task> removed = $.newArrayList();
         visitTasks((t) -> {
-            removed.add(t);
+            nar.tasks.remove(t);
         }, true, true, true, true);
 
-        nar.tasks.remove(removed);
+        termlinks().clear();
+        tasklinks().clear();
 
         beliefs = null;
         goals = null;

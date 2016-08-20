@@ -28,6 +28,7 @@ import spacegraph.phys.util.OArrayList;
 import spacegraph.render.JoglPhysics;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static com.jogamp.opengl.math.FloatUtil.sin;
@@ -44,7 +45,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     final List<AbstractSpace<X,?>> inputs = new FasterList<>(1);
 
-    final Cache<X, Spatial> atoms;
+    final ConcurrentHashMap<X,Spatial> atoms;
 
     public SpaceGraph() {
         this(64 * 1024);
@@ -57,12 +58,13 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     public SpaceGraph(int cacheCapacity) {
         super();
 
-        this.atoms = Caffeine.newBuilder()
+        this.atoms = new ConcurrentHashMap(cacheCapacity);
+                //Caffeine.newBuilder()
                 //.softValues().build();
                 //.removalListener(this::onEvicted)
-                .maximumSize(cacheCapacity)
-                .weakValues()
-                .build();
+                //.maximumSize(cacheCapacity)
+                //.weakValues()
+                //.build();
 
 
     }
@@ -124,11 +126,11 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     public @NotNull <Y extends Spatial> Y getOrAdd(X t, Function<X, Y> materializer) {
-        return (Y) update(atoms.get(t, materializer));
+        return (Y) update(atoms.computeIfAbsent(t, materializer));
     }
 
     public @Nullable Spatial getIfActive(X t) {
-        Spatial v = atoms.getIfPresent(t);
+        Spatial v = atoms.get(t);
         return v != null && v.active() ? v : null;
     }
 
@@ -232,7 +234,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     void print(AbstractSpace s) {
         System.out.println();
         //+ active.size() + " active, "
-        System.out.println(s + ": "   + this.atoms.estimatedSize() + " cached; "+ "\t" + dyn.summary());
+        System.out.println(s + ": "   + this.atoms.size() + " cached; "+ "\t" + dyn.summary());
         /*s.forEach(System.out::println);
         dyn.objects().forEach(x -> {
             System.out.println("\t" + x.getUserPointer());

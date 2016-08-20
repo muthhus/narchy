@@ -31,6 +31,7 @@ public class MultiThreadExecutioner extends Executioner {
     private final Executor exec;
     private SequenceBarrier barrier;
     private long cursor;
+    //private long cursor;
 
 
     static final class TaskEvent {
@@ -46,11 +47,12 @@ public class MultiThreadExecutioner extends Executioner {
     public MultiThreadExecutioner(int threads, int ringSize) {
         this(threads, ringSize,
                 //new BasicExecutor(Executors.defaultThreadFactory())
-                new ForkJoinPool(threads, defaultForkJoinWorkerThreadFactory, null, true /* async */,
-                        0,
-                        threads*2, //max threads (safe to increase)
-                        threads/2, //minimum threads to keep running otherwise new ones will be created
-                        null, 60000L, TimeUnit.MILLISECONDS)
+                new ForkJoinPool(Runtime.getRuntime().availableProcessors(),
+                        defaultForkJoinWorkerThreadFactory, null, true /* async */,
+                        threads,
+                        threads*8, //max threads (safe to increase)
+                        threads, //minimum threads to keep running otherwise new ones will be created
+                        null, 4000L, TimeUnit.MILLISECONDS)
         );
     }
 
@@ -72,7 +74,7 @@ public class MultiThreadExecutioner extends Executioner {
         );
 
         this.ring = disruptor.getRingBuffer();
-        this.cursor = ring.getCursor();
+        //this.cursor = ring.getCursor();
 
     }
 
@@ -142,8 +144,9 @@ public class MultiThreadExecutioner extends Executioner {
 
                     //do {
                 long lastCursor = this.cursor;
-                if (lastCursor!=(this.cursor = ring.getCursor()))
+                if (lastCursor!=(this.cursor = ring.getCursor())) {
                     barrier.waitFor(cursor);
+                }
 
                     //} while (!ring.hasAvailableCapacity(ring.getBufferSize()/2));
 

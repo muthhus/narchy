@@ -104,8 +104,10 @@ public abstract class AbstractCore {
             for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
                 @Nullable Concept c = toFire.get(i).get();
                 if (c != null) {
-                    if (!nar.runLaterMaybe(new FireConcept(c, nar, taskLinks, termLinks)))
-                        return;
+                    FireConcept f = new FireConcept(c, nar, taskLinks, termLinks);
+                    nar.runLater(f);
+//                    if (!nar.runLaterMaybe(f))
+//                        return;
                 }
             }
 

@@ -44,9 +44,9 @@ abstract public class NAREnvironment {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<MotorConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.02f;
+    public float alpha, gamma, epsilonProbability = 0.2f;
 
-    @Deprecated public float gammaEpsilonFactor = 0.5f;
+    @Deprecated public float gammaEpsilonFactor = 0.25f;
 
     public float rewardValue;
     private final FasterList<Task> predictors = $.newArrayList();
@@ -72,7 +72,7 @@ abstract public class NAREnvironment {
 
         float rewardConf = alpha;
 
-        rewardNormalized = new RangeNormalizedFloat(() -> rewardValue);
+        rewardNormalized = new PolarRangeNormalizedFloat(() -> rewardValue);
 
         happy = new SensorConcept("(happy)", nar,
                 rewardNormalized,
@@ -214,13 +214,17 @@ abstract public class NAREnvironment {
 
         System.gc();
 
+
+        this.loop = new NARLoop(nar, frameDelayMS);
+
         init(nar);
 
         mission();
 
-        nar.onFrame(nn -> next());
-
-        this.loop = new NARLoop(nar, frameDelayMS);
+        nar.runLater(()->{
+            //begin
+            nar.onFrame(nn -> next());
+        });
 
         return loop;
 
