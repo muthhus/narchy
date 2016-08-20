@@ -4,10 +4,10 @@ import nars.*;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
-import nars.nar.Default;
 import nars.task.GeneratedTask;
-import nars.task.MutableTask;
 import nars.term.Term;
+import nars.truth.Truth;
+import nars.util.Texts;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.PolarRangeNormalizedFloat;
@@ -15,6 +15,7 @@ import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import java.util.List;
 import static nars.$.t;
 import static nars.agent.NAgent.varPct;
 import static nars.nal.Tense.ETERNAL;
+import static nars.nal.UtilityFunctions.w2c;
 import static nars.util.Texts.n4;
 
 /**
@@ -45,8 +47,13 @@ abstract public class NAREnvironment {
     public final List<MotorConcept> actions = $.newArrayList();
 
     public float alpha, gamma, epsilonProbability = 0.2f;
-
     @Deprecated public float gammaEpsilonFactor = 0.25f;
+
+    final int CURIOSITY_DURATION = 32; //frames
+    DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(CURIOSITY_DURATION);
+
+
+
 
     public float rewardValue;
     private final FasterList<Task> predictors = $.newArrayList();
@@ -207,6 +214,9 @@ abstract public class NAREnvironment {
 
     public NARLoop run(final int cycles, int frameDelayMS) {
 
+        if (this.loop!=null)
+            throw new UnsupportedOperationException();
+
         ticksBeforeDecide = 0;
         ticksBeforeObserve = 0;
 
@@ -248,9 +258,21 @@ abstract public class NAREnvironment {
             //boost(happy); //boosted by the (happy)! task that is boosted below
             //boost(sad);
 
-
+            float m = 0;
+            int a = actions.size();
             for (MotorConcept c : actions) {
-                if (nar.random.nextFloat() < epsilonProbability) {
+                Truth d = c.desire(now);
+                if (d!=null)
+                    m += d.confWeight();
+            }
+            motorDesireEvidence.addValue(m);
+
+            float motorDesireConfMean = Math.min(1f, w2c((float)motorDesireEvidence.getMean()));
+            System.out.println(Texts.n2(motorDesireConfMean) + " motorDesireConfMean");
+
+            float motorEpsilonProbability = epsilonProbability/a * (1f - motorDesireConfMean);
+            for (MotorConcept c : actions) {
+                if (nar.random.nextFloat() < motorEpsilonProbability) {
                     nar.inputLater(new GeneratedTask(c, '!',
                             $.t(nar.random.nextFloat()
                             //Math.random() > 0.5f ? 1f : 0f
@@ -272,6 +294,7 @@ abstract public class NAREnvironment {
                     }*/.
                             present(now).log("Curiosity"));
                 }
+
                 boost(c);
             }
 

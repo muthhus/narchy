@@ -352,7 +352,7 @@ public abstract class TermIndex extends TermBuilder {
 //            ThreadLocal.withInitial( () ->
 //                new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD)
 //            );
-    final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
+    public final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
         new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 2 );
 
 
@@ -395,6 +395,7 @@ public abstract class TermIndex extends TermBuilder {
 
         if (t.isNormalized())
             return t;
+
 
         TermContainer src = t.subterms();
         TermContainer tgt = normalize(src);

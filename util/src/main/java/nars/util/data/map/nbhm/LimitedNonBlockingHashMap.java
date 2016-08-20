@@ -15,6 +15,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.lmax.disruptor.util.Util;
+import nars.util.Texts;
 import sun.misc.Unsafe;
 
 /**
@@ -86,10 +87,10 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     private static final Unsafe _unsafe = Util.getUnsafe();
     private static final int _Obase = _unsafe.arrayBaseOffset(Object[].class);
     private static final int _Oscale = _unsafe.arrayIndexScale(Object[].class);
-    private static long hit = 0, miss = 0;
+    @Deprecated private static long hit = 0, miss = 0;
 
-    private static long rawIndex(final Object[] ary, final int idx) {
-        assert idx >= 0 && idx < ary.length;
+    private static long rawIndex(/*final Object[] ary, */final int idx) {
+        //assert idx >= 0 && idx < ary.length;
         return _Obase + idx * _Oscale;
     }
 
@@ -204,15 +205,15 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     }
 
     private static final boolean CAS_key(Object[] kvs, int idx, Object old, Object key) {
-        return _unsafe.compareAndSwapObject(kvs, rawIndex(kvs, (idx << 1) + 2), old, key);
+        return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), old, key);
     }
 
     private static final boolean CAS_val(Object[] kvs, int idx, Object old, Object val) {
-        return _unsafe.compareAndSwapObject(kvs, rawIndex(kvs, (idx << 1) + 3), old, val);
+        return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), old, val);
     }
 
     private static final void set_val(Object[] kvs, int idx, Object val) {
-        _unsafe.putOrderedObject(kvs, rawIndex(kvs, (idx << 1) + 3), val);
+        _unsafe.putOrderedObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), val);
     }
 
 
@@ -267,7 +268,9 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     }
 
     public String summary() {
-        return size() + " entries, " + hit + "/" + (hit+miss)  + " hit rate";
+        return size() + " entries, " + hit + "/" + (hit+miss)  + " hit rate (" +
+                Texts.n2(100.0 * ((double)hit)/((double)hit+miss)) +
+                "%)";
     }
 
     // Count of reprobes
@@ -827,8 +830,9 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                     if (free) //was inserted on an empty index, otherwise it was previously full so no need to increase size
                         chm._size.add(1);
                     miss++;
+                } else {
+                    hit++;
                 }
-                hit++;
                 return V;
             }
 

@@ -2,6 +2,7 @@ package spacegraph;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import nars.util.data.map.nbhm.NonBlockingHashMap;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
@@ -45,10 +46,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     final List<AbstractSpace<X,?>> inputs = new FasterList<>(1);
 
-    final ConcurrentHashMap<X,Spatial> atoms;
+    final NonBlockingHashMap<X,Spatial> atoms;
 
     public SpaceGraph() {
-        this(64 * 1024);
+        this(16 * 1024);
     }
 
     /**
@@ -58,7 +59,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     public SpaceGraph(int cacheCapacity) {
         super();
 
-        this.atoms = new ConcurrentHashMap(cacheCapacity);
+
+        this.atoms =
+                new NonBlockingHashMap(cacheCapacity);
+                //new ConcurrentHashMap(cacheCapacity);
                 //Caffeine.newBuilder()
                 //.softValues().build();
                 //.removalListener(this::onEvicted)
