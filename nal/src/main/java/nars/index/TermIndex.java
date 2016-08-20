@@ -98,9 +98,9 @@ public abstract class TermIndex extends TermBuilder {
     public abstract int subtermsCount();
 
     public final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
-            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 2 );
+            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 3 );
     public final LimitedNonBlockingHashMap<ProtoCompound,Term> terms =
-            new LimitedNonBlockingHashMap<>(Param.TERM_CACHE_SIZE, 2 );
+            new LimitedNonBlockingHashMap<>(Param.TERM_CACHE_SIZE, 3 );
 
 //    final ThreadLocal<Map<Compound,Compound>> normalizations =
 //            ThreadLocal.withInitial( () ->
@@ -111,20 +111,56 @@ public abstract class TermIndex extends TermBuilder {
 
 
     @NotNull public final Term the(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
-        ProtoCompound p = ProtoCompound.the(op, dt, u);
-        return terms.computeIfAbsent(p, pc->{
-            try {
-                return super.the(pc.op(), pc.dt(), pc.terms());
-            } catch (InvalidTermException e) {
-                if (Param.DEBUG_EXTRA) {
-                    logger.warn("compound build: {}", e);
+
+        if (cacheable(op, u)) {
+            ProtoCompound p = ProtoCompound.the(op, dt, u);
+
+            final Throwable[] failure = new Throwable[1];
+            Term t = terms.computeIfAbsent(p, pc -> {
+                //try {
+                try {
+                    return super.the(pc.op(), pc.dt(), pc.terms());
+                } catch (Throwable x) {
+                    failure[0] = x;
+                    return False;
                 }
-                return False;
-            } catch (Exception e) {
-                logger.error("compound build: {}", e);
-                return False;
+
+                //            } catch (InvalidTermException e) {
+                //                if (Param.DEBUG_EXTRA) {
+                //                    logger.warn("compound build: {}", e);
+                //                }
+                //                return False;
+                //            } catch (Throwable e) {
+                //                logger.error("compound build: {}", e);
+                //                return False;
+                //            }
+            });
+
+            if (failure[0] != null) {
+                Throwable f = failure[0];
+                if (f instanceof InvalidTermException)
+                    throw ((InvalidTermException) f);
+                throw new RuntimeException(failure[0]);
             }
-        });
+
+            @NotNull Term retry = super.the(p.op(), p.dt(), p.terms());
+            if (!t.equals(retry))
+                throw new RuntimeException("cache fault");
+            return t;
+
+        } else {
+            return super.the(op, dt, u);
+        }
+
+
+    }
+
+    private static boolean cacheable(Op op, Term[] u) {
+        if (op == INH) {
+            if (u[1] instanceof TermTransform) //skip any immediate transforms as these must be dynamically computed
+                return false;
+        }
+        return true;
     }
 
 
@@ -431,7 +467,7 @@ public abstract class TermIndex extends TermBuilder {
 
 
     @Nullable
-    public Term build(@NotNull Compound src, @NotNull List<Term> newSubs) {
+    public Term the(@NotNull Compound src, @NotNull List<Term> newSubs) {
         return the(src, newSubs.toArray(new Term[newSubs.size()]));
     }
 

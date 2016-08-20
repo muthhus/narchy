@@ -33,6 +33,7 @@ import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.$.inh;
 import static nars.Op.*;
+import static nars.nal.TermBuilder.False;
 import static org.junit.Assert.*;
 
 /**
@@ -853,7 +854,8 @@ public class TermTest {
     public static void assertInvalid(@NotNull Supplier<Term> o) {
         try {
             Term recv = o.get();
-            assertTrue(recv.toString() + " was not null", false);
+            if (recv!=False) //False also signals invalid reduction
+                assertTrue(recv.toString() + " was not null", false);
         } catch (InvalidTermException e) {
             //correct if happens here
         } catch (Narsese.NarseseException e) {

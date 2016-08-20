@@ -207,7 +207,7 @@ public abstract class TermBuilder {
 
 
     static boolean validEquivalenceTerm(@NotNull Term t) {
-        return !t.isAny(InvalidEquivalenceTerm);
+        return !t.isAny(InvalidEquivalenceTerm) || isTrueOrFalse(t);
 //        if ( instanceof Implication) || (subject instanceof Equivalence)
 //                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
 //                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
@@ -309,7 +309,7 @@ public abstract class TermBuilder {
         for (Term x : args.terms()) {
             if (isTrueOrFalse(x)) {
                 if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI))
-                    throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
+                   throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
 
                 //any other term causes it to be invalid/meaningless
                 return False;
@@ -611,7 +611,7 @@ public abstract class TermBuilder {
 
                     if (isTrue(subject)) {
                         return predicate;
-                    } else if (isFalse(subject)) {
+                    } else if (isFalse(subject) || isTrueOrFalse(predicate)) {
                         return False;
                         //throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
                         //return negation(predicate); /??

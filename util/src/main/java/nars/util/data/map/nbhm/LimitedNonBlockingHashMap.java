@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import com.lmax.disruptor.util.Util;
 import nars.util.Texts;
@@ -87,7 +86,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     private static final Unsafe _unsafe = Util.getUnsafe();
     private static final int _Obase = _unsafe.arrayBaseOffset(Object[].class);
     private static final int _Oscale = _unsafe.arrayIndexScale(Object[].class);
-    @Deprecated private static long hit = 0, miss = 0;
+    private long hit = 0, miss = 0;
 
     private static long rawIndex(/*final Object[] ary, */final int idx) {
         //assert idx >= 0 && idx < ary.length;
@@ -455,7 +454,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
     private final TypeV putIfMatch(Object key, Object newVal, Object oldVal) {
         if (oldVal == null || newVal == null) throw new NullPointerException();
-        final Object res = putIfMatch(this, _kvs, key, newVal, oldVal, reprobes);
+        final Object res = putIfMatch(this, _kvs, key, newVal, oldVal);
         assert !(res instanceof Prime);
         assert res != null;
         return res == TOMBSTONE ? null : (TypeV) res;
@@ -616,17 +615,19 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     @Override
     public TypeV get(Object key) {
         final int fullhash = hash(key); // throws NullPointerException if key is null
-        final Object V = get_impl(this, _kvs, key, fullhash, reprobes);
+        final Object V = get_impl(this, _kvs, key, fullhash);
         assert !(V instanceof Prime); // Never return a Prime
         return (TypeV) V;
     }
 
-    private static final Object get_impl(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, final int fullhash, int reprobes) {
+    private static final Object get_impl(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, final int fullhash) {
         final int len = len(kvs); // Count of key/value pairs, reads kvs.length
         final CHM chm = chm(kvs); // The CHM, for a volatile read below; reads slot 0 of kvs
         final int[] hashes = hashes(kvs); // The memoized hashes; reads slot 1 of kvs
 
         int idx = fullhash & (len - 1); // First key hash
+
+        int reprobes = topmap.reprobes;
 
         // Main spin/reprobe loop, looking for a Key hit
         int reprobe_cnt = 0;
@@ -655,14 +656,14 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                     return (V == TOMBSTONE) ? null : V; // Return the value
                 // Key hit - but slot is (possibly partially) copied to the new table.
                 // Finish the copy & retry in the new table.
-                return get_impl(topmap, chm.copy_slot_and_check(topmap, kvs, idx, key), key, fullhash, reprobes); // Retry in the new table
+                return get_impl(topmap, chm.copy_slot_and_check(topmap, kvs, idx, key), key, fullhash); // Retry in the new table
             }
             // get and put must have the same key lookup logic!  But only 'put'
             // needs to force a table-resize for a too-long key-reprobe sequence.
             // Check for too-many-reprobes on get - and flip to the new table.
             if (++reprobe_cnt >= reprobes || // too many probes
                     key == TOMBSTONE) // found a TOMBSTONE key, means no more keys in this table
-                return newkvs == null ? null : get_impl(topmap, topmap.help_copy(newkvs), key, fullhash, reprobes); // Retry in the new table
+                return newkvs == null ? null : get_impl(topmap, topmap.help_copy(newkvs), key, fullhash); // Retry in the new table
 
             idx = (idx + 1) & (len - 1);    // Reprobe by 1!  (could now prefetch)
         }
@@ -674,7 +675,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     // assumed to work (although might have been immediately overwritten).  Only
     // the path through copy_slot passes in an expected value of null, and
     // putIfMatch only returns a null if passed in an expected null.
-    private static final Object putIfMatch(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, Object putval, final Object expVal, int reprobes) {
+    private static final Object putIfMatch(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, Object putval, final Object expVal) {
         assert putval != null;
         assert !(putval instanceof Prime);
         assert !(expVal instanceof Prime);
@@ -684,13 +685,17 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         final int[] hashes = hashes(kvs); // Reads kvs[1], read before kvs[0]
         int idx = fullhash & (len - 1);
 
+        int reprobes = topmap.reprobes;
         // ---
         // Key-Claim stanza: spin till we can claim a Key (or force a resizing).
         int reprobe_cnt = 0;
         Object K = null, V = null;
         Object[] newkvs = null;
 
+        Thread thisThread = Thread.currentThread();
+
         boolean emptyValue = false;
+        boolean compute = (putval instanceof Function);
 
         while (true) {             // Spin till we get a Key slot
             V = val(kvs, idx);         // Get old value (before volatile read below!)
@@ -705,6 +710,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
                     chm._slots.add(1);      // Raise key-slots-used count
                     hashes[idx] = fullhash; // Memoize fullhash
+                    if (compute) //set the value here to claim the index before calling .apply()
+                        set_val(kvs, idx, thisThread);
                     emptyValue = true;
                     break;                  // Got it!
                 }
@@ -725,8 +732,10 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 assert K != null;       // If keys[idx] is null, CAS shoulda worked
             } else if (++reprobe_cnt >= reprobes) {
                 //probe expired on a non-empty index, hijack this location erasing the old value of another key
+                chm._slots.add(1);      // Raise key-slots-used count
                 hashes[idx] = fullhash; // Memoize fullhash
-                set_val(kvs, idx, null);
+                if (compute)
+                    set_val(kvs, idx, thisThread);
                 emptyValue = true;
                 break;                  // Got it!
             }
@@ -794,9 +803,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         // See if we are moving to a new table.
         // If so, copy our slot and retry in the new table.
         if (newkvs != null)
-            return putIfMatch(topmap, chm.copy_slot_and_check(topmap, kvs, idx, expVal), key, putval, expVal, reprobes);
+            return putIfMatch(topmap, chm.copy_slot_and_check(topmap, kvs, idx, expVal), key, putval, expVal);
 
-        boolean compute = (putval instanceof Function);
 
 
         // ---
@@ -834,33 +842,48 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 // Else CAS failed
                 V = val(kvs, idx);
             } else {
-                V = val(kvs, idx);
-                if (V == null) {
 
-                    V = (((Function) putval).apply(key));
-                    if (CAS_val(kvs, idx, null, V)) { //only write the value if the temporary function set at the location prior to the apply() is the same
+                V = val(kvs, idx);
+                assert(V!=null); //should have been set to either a value or the Function itself already
+
+                if (V == thisThread) { //its either empty (null) or re-claimed (this Function will be at the location)
+
+//                    Throwable error = null;
+//                    try {
+                    V = (((Function) putval).apply(key)); //must not be interrupted otherwise the thread claim will remain at the position, TODO add some counter to the claim so that subsequent call from the same thread will clear itself
+//                    } catch (Throwable t) {
+//                        //clear the Thread claim here
+//                        error = t;
+//                    }
+
+                    if (CAS_val(kvs, idx, thisThread, V)) { //only write the value if this thread is set at the location prior to the apply() is the same
 
                         if (emptyValue) //was inserted on an empty index, otherwise it was previously full so no need to increase size
                             chm._size.add(1);
 
-                        miss++;
+                        topmap.miss++;
+                        return V;
 
                     } else {
                         //must retry, the function was too slow to capture this slot before another one
-                        reprobe_cnt--;
-                        continue;
+                        V = new Prime(V);
                     }
+
+//                    if (error)
+//                        throw error;
+
                 } else {
-                    hit++;
+                    assert(!(V instanceof Function));
+                    topmap.hit++;
+                    return V;
                 }
-                return V;
             }
 
             // If a Prime'd value got installed, we need to re-run the put on the
             // new table.  Otherwise we lost the CAS to another racing put.
             // Simply retry from the start.
             if (V instanceof Prime)
-                return putIfMatch(topmap, chm.copy_slot_and_check(topmap, kvs, idx, expVal), key, putval, expVal, reprobes);
+                return putIfMatch(topmap, chm.copy_slot_and_check(topmap, kvs, idx, expVal), key, putval, expVal);
         }
     }
 
@@ -1247,7 +1270,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
             // transition in this copy.
             Object old_unboxed = ((Prime) oldval)._V;
             assert old_unboxed != TOMBSTONE;
-            boolean copied_into_new = (putIfMatch(topmap, newkvs, key, old_unboxed, null, this.reprobes) == null);
+            boolean copied_into_new = (putIfMatch(topmap, newkvs, key, old_unboxed, null) == null);
 
             // ---
             // Finally, now that any old value is exposed in the new table, we can
@@ -1327,7 +1350,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
         public void remove() {
             if (_prevV == null) throw new IllegalStateException();
-            putIfMatch(LimitedNonBlockingHashMap.this, _sskvs, _prevK, TOMBSTONE, _prevV, reprobes);
+            putIfMatch(LimitedNonBlockingHashMap.this, _sskvs, _prevK, TOMBSTONE, _prevV);
             _prevV = null;
         }
 
