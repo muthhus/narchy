@@ -2,7 +2,6 @@ package nars.index;
 
 import nars.Op;
 import nars.concept.Concept;
-import nars.nal.TermBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -235,7 +234,7 @@ public abstract class MaplikeIndex extends TermIndex {
         if (s == null)
             return null;
         if (op == INH && (subs.term(1).op() == OPER) && subs.term(0).op() == PROD)
-            return termOrNull(build(INH, dt, s.terms())); //HACK send through the full build process in case it is an immediate transform
+            return termOrNull(the(INH, dt, s.terms())); //HACK send through the full build process in case it is an immediate transform
         else
             return finish(op, dt, s);
     }

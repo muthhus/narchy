@@ -10,7 +10,7 @@ import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.compound.GenericCompound;
+import nars.term.compound.ProtoCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
@@ -24,6 +24,7 @@ import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.XTERNAL;
+import static nars.term.Terms.compoundOrNull;
 import static nars.term.compound.Statement.pred;
 import static nars.term.compound.Statement.subj;
 
@@ -92,15 +93,15 @@ public abstract class TermBuilder {
         } else if (retained == 0) {
             return False; //empty set
         } else {
-            return build(o, terms.toArray(new Term[retained]));
+            return the(o, terms.toArray(new Term[retained]));
         }
 
     }
 
-    @NotNull
-    public final Term build(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
 
-        /* special handling */
+    /** main entry point for compound construction - creates an immutable result  */
+    @NotNull public Term the(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
+
         switch (op) {
             case NEG:
                 if (u.length != 1)
@@ -230,8 +231,8 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    public Term build(@NotNull Op op, @NotNull Term... tt) {
-        return build(op, DTERNAL, tt);
+    public Term the(@NotNull Op op, @NotNull Term... tt) {
+        return the(op, DTERNAL, tt);
     }
 
 
@@ -286,7 +287,7 @@ public abstract class TermBuilder {
 
 
     /**
-     * step before calling Make, do not call manually from outside
+     * final step in compound construction
      */
     @NotNull
     protected final Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
@@ -322,17 +323,17 @@ public abstract class TermBuilder {
 
     @Nullable
     public Compound inst(Term subj, Term pred) {
-        return (Compound) build(INH, build(SETe, subj), pred);
+        return compoundOrNull(the(INH, the(SETe, subj), pred));
     }
 
     @Nullable
     public Compound prop(Term subj, Term pred) {
-        return (Compound) build(INH, subj, build(SETi, pred));
+        return compoundOrNull(the(INH, subj, the(SETi, pred)));
     }
 
     @Nullable
     public Compound instprop(@NotNull Term subj, @NotNull Term pred) {
-        return (Compound) build(INH, build(SETe, subj), build(SETi, pred));
+        return compoundOrNull(the(INH, the(SETe, subj), the(SETi, pred)));
     }
 
     @Nullable
@@ -639,8 +640,8 @@ public abstract class TermBuilder {
 
                             MutableSet<Term> common = TermContainer.intersect(subjs, preds);
                             if (!common.isEmpty()) {
-                                Term newSubject = build(csub, TermContainer.except(subjs, common));
-                                Term newPredicate = build(cpred, TermContainer.except(preds, common));
+                                Term newSubject = the(csub, TermContainer.except(subjs, common));
+                                Term newPredicate = the(cpred, TermContainer.except(preds, common));
                                 subject = newSubject;
                                 predicate = newPredicate;
                                 continue;
@@ -733,7 +734,7 @@ public abstract class TermBuilder {
 
     @NotNull
     public Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
-        return build(IMPL, conj(t, subject, oldCondition), pred(predicate));
+        return the(IMPL, conj(t, subject, oldCondition), pred(predicate));
     }
 
     @Nullable
@@ -844,13 +845,13 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    public final Term build(@NotNull Compound csrc, @NotNull Term[] newSubs) {
-        return build(csrc.op(), csrc.dt(), newSubs);
+    public final Term the(@NotNull Compound csrc, @NotNull Term[] newSubs) {
+        return the(csrc.op(), csrc.dt(), newSubs);
     }
 
     @NotNull
-    public final Term build(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
-        return csrc.subterms().equals(newSubs) ? csrc : build(csrc.op(), csrc.dt(), newSubs.terms());
+    public final Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
+        return csrc.subterms().equals(newSubs) ? csrc : the(csrc.op(), csrc.dt(), newSubs.terms());
     }
 
     public final Term disjunction(@NotNull Term[] u) {

@@ -689,7 +689,9 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         int reprobe_cnt = 0;
         Object K = null, V = null;
         Object[] newkvs = null;
-        boolean free = false;
+
+        boolean emptyValue = false;
+
         while (true) {             // Spin till we get a Key slot
             V = val(kvs, idx);         // Get old value (before volatile read below!)
             K = key(kvs, idx);         // Get current key
@@ -703,7 +705,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
                     chm._slots.add(1);      // Raise key-slots-used count
                     hashes[idx] = fullhash; // Memoize fullhash
-                    free = true;
+                    emptyValue = true;
                     break;                  // Got it!
                 }
                 // CAS to claim the key-slot failed.
@@ -721,7 +723,14 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 // by not allowing Keys to ever change.
                 K = key(kvs, idx);       // CAS failed, get updated value
                 assert K != null;       // If keys[idx] is null, CAS shoulda worked
+            } else if (++reprobe_cnt >= reprobes) {
+                //probe expired on a non-empty index, hijack this location erasing the old value of another key
+                hashes[idx] = fullhash; // Memoize fullhash
+                set_val(kvs, idx, null);
+                emptyValue = true;
+                break;                  // Got it!
             }
+
             // Key slot was not null, there exists a Key here
 
             // We need a volatile-read here to preserve happens-before semantics on
@@ -733,20 +742,25 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
             if (keyeq(K, key, hashes, idx, fullhash))
                 break;                  // Got it!
 
+            if (key == TOMBSTONE) { // found a TOMBSTONE key
+                break;
+            }
+
             // get and put must have the same key lookup logic!  Lest 'get' give
             // up looking too soon.
             //topmap._reprobes.add(1);
-            if (++reprobe_cnt >= reprobes || // too many probes or
-                    key == TOMBSTONE) { // found a TOMBSTONE key, means no more keys
-                break; //claim this location
-
-//                // We simply must have a new table to do a 'put'.  At this point a
-//                // 'get' will also go to the new table (if any).  We do not need
-//                // to claim a key slot (indeed, we cannot find a free one to claim!).
-//                newkvs = chm.resize(topmap,kvs);
-//                if( expVal != null ) topmap.help_copy(newkvs); // help along an existing copy
-//                return putIfMatch(topmap,newkvs,key,putval,expVal);
-            }
+//            if () // too many probes
+//                //claim this location by removing any previous key
+//
+//                break;
+//
+////                // We simply must have a new table to do a 'put'.  At this point a
+////                // 'get' will also go to the new table (if any).  We do not need
+////                // to claim a key slot (indeed, we cannot find a free one to claim!).
+////                newkvs = chm.resize(topmap,kvs);
+////                if( expVal != null ) topmap.help_copy(newkvs); // help along an existing copy
+////                return putIfMatch(topmap,newkvs,key,putval,expVal);
+//            }
 
             idx = (idx + 1) & (len - 1); // Reprobe!
         } // End of spinning till we get a Key slot
@@ -782,7 +796,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         if (newkvs != null)
             return putIfMatch(topmap, chm.copy_slot_and_check(topmap, kvs, idx, expVal), key, putval, expVal, reprobes);
 
-        boolean compute = false;
+        boolean compute = (putval instanceof Function);
+
 
         // ---
         // We are finally prepared to update the existing table
@@ -801,10 +816,6 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                     (expVal == null || !expVal.equals(V))) // Expensive equals check at the last
                 return V;                                 // Do not update!
 
-
-            if (putval instanceof Function) {
-                compute = true;
-            }
 
             // Actually change the Value in the Key,Value pair
             if (!compute) {
@@ -825,11 +836,20 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
             } else {
                 V = val(kvs, idx);
                 if (V == null) {
+
                     V = (((Function) putval).apply(key));
-                    set_val(kvs, idx, V);
-                    if (free) //was inserted on an empty index, otherwise it was previously full so no need to increase size
-                        chm._size.add(1);
-                    miss++;
+                    if (CAS_val(kvs, idx, null, V)) { //only write the value if the temporary function set at the location prior to the apply() is the same
+
+                        if (emptyValue) //was inserted on an empty index, otherwise it was previously full so no need to increase size
+                            chm._size.add(1);
+
+                        miss++;
+
+                    } else {
+                        //must retry, the function was too slow to capture this slot before another one
+                        reprobe_cnt--;
+                        continue;
+                    }
                 } else {
                     hit++;
                 }

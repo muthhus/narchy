@@ -117,7 +117,12 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
 
     @NotNull
     private Compound input(int stride, Term state) {
-        return $.inst(stride(stride), state);
+        Compound c = $.inst(stride(stride), state);
+        if (c == null)  {
+            $.inst(stride(stride), state);
+            throw new NullPointerException();
+        }
+        return c;
         //return $.image(2, false, base, new Termject.IntTerm(stride), state);
     }
 
@@ -129,7 +134,7 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
     protected void meta() {
         int k = 0;
         int n = input.size();
-        final Term unknown = $.varDep(2);
+        //final Term unknown = $.varDep(2);
         for (int i = 0; i < strides; i++) {
             List<? extends SensorConcept> l = input.subList(k, Math.min(n, k + stride));
             //TODO re-use the same eternal belief to reactivate itself

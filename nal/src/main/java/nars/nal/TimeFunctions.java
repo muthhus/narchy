@@ -913,7 +913,7 @@ public interface TimeFunctions {
         }
         if (derived.dt() != dt) {
             Term[] derivedSubterms = derived.subterms().terms();
-            @NotNull Term n = p.index.build(o, dt, derivedSubterms);
+            @NotNull Term n = p.index.the(o, dt, derivedSubterms);
             if (!(n instanceof Compound))
                 throw new InvalidTermException(o, dt, derivedSubterms, "Untemporalizable to new DT");
             return (Compound) n;

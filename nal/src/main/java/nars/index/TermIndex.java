@@ -1,9 +1,6 @@
 package nars.index;
 
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Param;
+import nars.*;
 import nars.concept.Concept;
 import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseAware;
@@ -14,6 +11,7 @@ import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
+import nars.term.compound.ProtoCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.MapSubst;
@@ -38,7 +36,6 @@ import java.util.function.Function;
 
 import static nars.$.unneg;
 import static nars.Op.*;
-import static nars.nal.Tense.DTERNAL;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;
 
@@ -98,38 +95,37 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     protected abstract TermContainer theSubterms(TermContainer s);
 
-//    @Nullable
-//    public TermContainer normalize(TermContainer s) {
-//        if (s instanceof TermVector)
-//            return normalize((TermVector) s);
-//
-//
-//        //TODO implement normalization for any non-container types
-//        throw new UnsupportedOperationException();
-//    }
-
-//    /**
-//     * should be called after a new entry needed to be created for the novel termcontainer
-//     */
-//    @Nullable
-//    public TermContainer normalize(@NotNull TermVector s) {
-//        Term[] x = s.terms();
-//        int l = x.length;
-//        for (int i = 0; i < l; i++) {
-//            Term a = x[i];
-//            Termed b = the(a);
-//            if (b == null)
-//                return null;
-//            if (a != b) {
-//                //different instance but still equal so replace it in the origin array, otherwise leave as-is
-//                x[i] = b.term();
-//            }
-//        }
-//        return s;
-//    }
-
-
     public abstract int subtermsCount();
+
+    public final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
+            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 2 );
+    public final LimitedNonBlockingHashMap<ProtoCompound,Term> terms =
+            new LimitedNonBlockingHashMap<>(Param.TERM_CACHE_SIZE, 2 );
+
+//    final ThreadLocal<Map<Compound,Compound>> normalizations =
+//            ThreadLocal.withInitial( () ->
+//                new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD)
+//            );
+//            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
+    //final Cache<Compound,Compound> normalizations = Caffeine.newBuilder().maximumSize(Param.NORMALIZATION_CACHE_SIZE).build();
+
+
+    @NotNull public final Term the(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
+        ProtoCompound p = ProtoCompound.the(op, dt, u);
+        return terms.computeIfAbsent(p, pc->{
+            try {
+                return super.the(pc.op(), pc.dt(), pc.terms());
+            } catch (InvalidTermException e) {
+                if (Param.DEBUG_EXTRA) {
+                    logger.warn("compound build: {}", e);
+                }
+                return False;
+            } catch (Exception e) {
+                logger.error("compound build: {}", e);
+                return False;
+            }
+        });
+    }
 
 
     /**
@@ -203,7 +199,7 @@ public abstract class TermIndex extends TermBuilder {
             }
         }
 
-        return changed ? build(crc, sub.toArray(new Term[sub.size()])) : crc;
+        return changed ? the(crc, sub.toArray(new Term[sub.size()])) : crc;
     }
 
 //    public Term immediates(@NotNull Subst f, Term result) {
@@ -347,18 +343,6 @@ public abstract class TermIndex extends TermBuilder {
         out.println();
     }
 
-//    //can not be static because of some issue with unnormalized variables equality or something
-//    final ThreadLocal<Map<Compound,Compound>> normalizations =
-//            ThreadLocal.withInitial( () ->
-//                new CapacityLinkedHashMap(Param.NORMALIZATION_CACHE_SIZE_PER_THREAD)
-//            );
-    public final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
-        new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 2 );
-
-
-//            //Collections.synchronizedMap( new CapacityLinkedHashMap(16*1024) );
-
-    //final Cache<Compound,Compound> normalizations = Caffeine.newBuilder().maximumSize(Param.NORMALIZATION_CACHE_SIZE).build();
 
 
     final Function<? super TermContainer, ? extends TermContainer> normalizer = u -> {
@@ -406,7 +390,7 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         if (tgt != InvalidSubterms) {
-            Compound c = compoundOrNull(build(t, tgt));
+            Compound c = compoundOrNull(the(t, tgt));
             if (c!=null) {
                 ((GenericCompound)c).setNormalized();
                 return c;
@@ -448,7 +432,7 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable
     public Term build(@NotNull Compound src, @NotNull List<Term> newSubs) {
-        return build(src, newSubs.toArray(new Term[newSubs.size()]));
+        return the(src, newSubs.toArray(new Term[newSubs.size()]));
     }
 
 
@@ -461,7 +445,7 @@ public abstract class TermIndex extends TermBuilder {
         Term[] tgtSubs = transform(srcSubs, src, t);
 
         return tgtSubs!=srcSubs ?
-                build(src.op(), src.dt(), tgtSubs) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
+                the(src.op(), src.dt(), tgtSubs) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
                 src;
 
     }
@@ -529,7 +513,7 @@ public abstract class TermIndex extends TermBuilder {
 
         }
 
-        return build(csrc.op(), csrc.dt(), target);
+        return the(csrc.op(), csrc.dt(), target);
     }
 
 

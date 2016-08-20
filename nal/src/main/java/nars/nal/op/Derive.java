@@ -179,7 +179,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             // this (probably!) indicates a temporal placeholder in the rules that needs to be set to DTERNAL
             Op o = content.op();
             if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
-                Term ete = m.index.build(o, DTERNAL, content.terms());
+                Term ete = m.index.the(o, DTERNAL, content.terms());
                 if (!(ete instanceof Compound)) {
                     //throw new InvalidTermException(o, content.dt(), content.terms(), "untemporalization failed");
                     return;

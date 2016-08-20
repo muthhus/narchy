@@ -233,7 +233,7 @@ public class IO {
         if (o.isImage() || o.temporal) //TODO o.hasNumeric
             dt = in.readInt();
 
-        return (Compound) t.build(o, dt, v);
+        return (Compound) t.the(o, dt, v);
 //        if (key == null)
 //            throw new UnsupportedOperationException();
 //        return (Compound) t.normalize(key, true);

@@ -74,6 +74,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
     /** size of each thread's normalization cache, in entries */
     public static final int NORMALIZATION_CACHE_SIZE = 8192;
+    public static final int TERM_CACHE_SIZE = 1024;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;

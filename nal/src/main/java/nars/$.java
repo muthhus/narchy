@@ -10,7 +10,6 @@ import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.index.TermIndex;
-import nars.nal.TermBuilder;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -552,7 +551,7 @@ public enum $ {
 
     @Nullable
     public static Term compound(@NotNull Op op, int dt, @NotNull Term... subterms) {
-        return terms.build(op, dt, subterms);
+        return terms.the(op, dt, subterms);
     }
 
     @Nullable
