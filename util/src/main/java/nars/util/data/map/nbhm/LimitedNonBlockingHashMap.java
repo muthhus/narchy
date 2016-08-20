@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 import com.lmax.disruptor.util.Util;
 import nars.util.Texts;
+import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 /**
@@ -391,6 +392,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         return putIfMatch(key, val, NO_MATCH_OLD);
     }
 
+
+
     @Override
     public final TypeV computeIfAbsent(TypeK key, Function<? super TypeK, ? extends TypeV> mappingFunction) {
         return putIfMatch(key, mappingFunction, NO_MATCH_OLD);
@@ -452,7 +455,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         return putIfMatch(key, newValue, oldValue) == oldValue;
     }
 
-    private final TypeV putIfMatch(Object key, Object newVal, Object oldVal) {
+    private final TypeV putIfMatch(@NotNull Object key, @NotNull Object newVal, @NotNull Object oldVal) {
         if (oldVal == null || newVal == null) throw new NullPointerException();
         final Object res = putIfMatch(this, _kvs, key, newVal, oldVal);
         assert !(res instanceof Prime);
@@ -686,7 +689,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         int idx = fullhash & (len - 1);
 
         int reprobes = topmap.reprobes;
-        // ---
+
         // Key-Claim stanza: spin till we can claim a Key (or force a resizing).
         int reprobe_cnt = 0;
         Object K = null, V = null;
@@ -696,6 +699,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
         boolean emptyValue = false;
         boolean compute = (putval instanceof Function);
+
+        Integer ticket = null;
 
         while (true) {             // Spin till we get a Key slot
             V = val(kvs, idx);         // Get old value (before volatile read below!)
@@ -710,8 +715,9 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
                     chm._slots.add(1);      // Raise key-slots-used count
                     hashes[idx] = fullhash; // Memoize fullhash
-                    if (compute) //set the value here to claim the index before calling .apply()
-                        set_val(kvs, idx, thisThread);
+                    if (compute) { //set the value here to claim the index before calling .apply()
+                        set_val(kvs, idx, ticket = topmap.next());
+                    }
                     emptyValue = true;
                     break;                  // Got it!
                 }
@@ -735,7 +741,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 chm._slots.add(1);      // Raise key-slots-used count
                 hashes[idx] = fullhash; // Memoize fullhash
                 if (compute)
-                    set_val(kvs, idx, thisThread);
+                    set_val(kvs, idx, ticket = topmap.next());
                 emptyValue = true;
                 break;                  // Got it!
             }
@@ -748,8 +754,9 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
             // Annoyingly this means we have to volatile-read before EACH key compare.
             newkvs = chm._newkvs;     // VOLATILE READ before key compare
 
-            if (keyeq(K, key, hashes, idx, fullhash))
+            if (keyeq(K, key, hashes, idx, fullhash)) {
                 break;                  // Got it!
+            }
 
             if (key == TOMBSTONE) { // found a TOMBSTONE key
                 break;
@@ -844,9 +851,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
             } else {
 
                 V = val(kvs, idx);
-                assert(V!=null); //should have been set to either a value or the Function itself already
-
-                if (V == thisThread) { //its either empty (null) or re-claimed (this Function will be at the location)
+                if (ticket!=null && V == ticket) {
 
 //                    Throwable error = null;
 //                    try {
@@ -856,21 +861,19 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 //                        error = t;
 //                    }
 
-                    if (CAS_val(kvs, idx, thisThread, V)) { //only write the value if this thread is set at the location prior to the apply() is the same
+                    if (CAS_val(kvs, idx, ticket, V)) { //only write the value if this thread is set at the location prior to the apply() is the same
 
                         if (emptyValue) //was inserted on an empty index, otherwise it was previously full so no need to increase size
                             chm._size.add(1);
 
                         topmap.miss++;
-                        return V;
+                        return V; //done, return the fresh new value
 
                     } else {
                         //must retry, the function was too slow to capture this slot before another one
                         V = new Prime(V);
                     }
 
-//                    if (error)
-//                        throw error;
 
                 } else {
                     assert(!(V instanceof Function));
@@ -885,6 +888,12 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
             if (V instanceof Prime)
                 return putIfMatch(topmap, chm.copy_slot_and_check(topmap, kvs, idx, expVal), key, putval, expVal);
         }
+    }
+
+    final AtomicInteger ticket = new AtomicInteger(1);
+
+    private final int next() {
+        return ticket.getAndIncrement();
     }
 
 

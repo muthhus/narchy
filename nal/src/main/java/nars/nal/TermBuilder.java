@@ -653,6 +653,9 @@ public abstract class TermBuilder {
 
             }
 
+            //if either the subject or pred are True/False by this point, fail
+            if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
+                return False;
 
             //compare unneg'd if it's not temporal or eternal/parallel
             boolean preventInverse = !op.temporal || (commutive(dt) || dt == XTERNAL);

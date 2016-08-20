@@ -115,15 +115,17 @@ public abstract class TermIndex extends TermBuilder {
         if (cacheable(op, u)) {
             ProtoCompound p = ProtoCompound.the(op, dt, u);
 
-            final Throwable[] failure = new Throwable[1];
+            //Term t = terms.computeIfAbsent(p, pc -> {
+
+            //final Throwable[] failure = new Throwable[1];
             Term t = terms.computeIfAbsent(p, pc -> {
+
                 //try {
-                try {
                     return super.the(pc.op(), pc.dt(), pc.terms());
-                } catch (Throwable x) {
+                /*} catch (Throwable x) {
                     failure[0] = x;
                     return False;
-                }
+                }*/
 
                 //            } catch (InvalidTermException e) {
                 //                if (Param.DEBUG_EXTRA) {
@@ -136,16 +138,18 @@ public abstract class TermIndex extends TermBuilder {
                 //            }
             });
 
-            if (failure[0] != null) {
-                Throwable f = failure[0];
-                if (f instanceof InvalidTermException)
-                    throw ((InvalidTermException) f);
-                throw new RuntimeException(failure[0]);
-            }
+//            if (failure[0] != null) {
+//                Throwable f = failure[0];
+//                if (f instanceof InvalidTermException)
+//                    throw ((InvalidTermException) f);
+//                throw new RuntimeException(failure[0]);
+//            }
 
+            //SANITY TEST:
             @NotNull Term retry = super.the(p.op(), p.dt(), p.terms());
             if (!t.equals(retry))
                 throw new RuntimeException("cache fault");
+
             return t;
 
         } else {
