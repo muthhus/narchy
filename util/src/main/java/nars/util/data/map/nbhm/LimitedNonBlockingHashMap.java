@@ -212,6 +212,9 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), old, val);
     }
 
+    private static final void set_key(Object[] kvs, int idx, Object val) {
+        _unsafe.putOrderedObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), val);
+    }
     private static final void set_val(Object[] kvs, int idx, Object val) {
         _unsafe.putOrderedObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), val);
     }
@@ -678,7 +681,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     // assumed to work (although might have been immediately overwritten).  Only
     // the path through copy_slot passes in an expected value of null, and
     // putIfMatch only returns a null if passed in an expected null.
-    private static final Object putIfMatch(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, Object putval, final Object expVal) {
+    private static final Object putIfMatch(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, final Object putval, final Object expVal) {
         assert putval != null;
         assert !(putval instanceof Prime);
         assert !(expVal instanceof Prime);
@@ -694,8 +697,6 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         int reprobe_cnt = 0;
         Object K = null, V = null;
         Object[] newkvs = null;
-
-        Thread thisThread = Thread.currentThread();
 
         boolean emptyValue = false;
         boolean compute = (putval instanceof Function);
@@ -713,7 +714,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
                 // Claim the null key-slot
                 if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
-                    chm._slots.add(1);      // Raise key-slots-used count
+                    //chm._slots.add(1);      // Raise key-slots-used count
                     hashes[idx] = fullhash; // Memoize fullhash
                     if (compute) { //set the value here to claim the index before calling .apply()
                         set_val(kvs, idx, ticket = topmap.next());
@@ -738,7 +739,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 assert K != null;       // If keys[idx] is null, CAS shoulda worked
             } else if (++reprobe_cnt >= reprobes) {
                 //probe expired on a non-empty index, hijack this location erasing the old value of another key
-                chm._slots.add(1);      // Raise key-slots-used count
+                set_key(kvs, idx, key);
+                //chm._slots.add(1);      // Raise key-slots-used count
                 hashes[idx] = fullhash; // Memoize fullhash
                 if (compute)
                     set_val(kvs, idx, ticket = topmap.next());
@@ -786,7 +788,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         // never put a null, so Value slots monotonically move from null to
         // not-null (deleted Values use Tombstone).  Thus if 'V' is null we
         // fail this fast cutout and fall into the check for table-full.
-        if (!(putval instanceof Function) && putval == V) return V; // Fast cutout for no-change
+        if (!(putval instanceof Function) && putval == V)
+            return V; // Fast cutout for no-change
 
 //        // See if we want to move to a new table (to avoid high average re-probe
 //        // counts).  We only check on the initial set of a Value from null to
@@ -935,11 +938,11 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         // keys) then we need a larger table to cut down on the churn.
 
         // Count of used slots, to tell when table is full of dead unusable slots
-        private final ConcurrentAutoTable _slots;
+//        private final ConcurrentAutoTable _slots;
 
-        public int slots() {
-            return (int) _slots.get();
-        }
+//        public int slots() {
+//            return (int) _slots.get();
+//        }
 
         // ---
         // New mappings, used during resizing.
@@ -980,7 +983,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         // Simple constructor
         CHM(ConcurrentAutoTable size, int reprobes) {
             _size = size;
-            _slots = new ConcurrentAutoTable();
+            //_slots = new ConcurrentAutoTable();
             this.reprobes = reprobes;
         }
 

@@ -847,15 +847,14 @@ public abstract class TermBuilder {
             return (Compound) finish(o, u);
     }
 
-    @Nullable
-    public final Term the(@NotNull Compound csrc, @NotNull Term[] newSubs) {
+    @NotNull
+    public Term the(@NotNull Compound csrc, @NotNull Term[] newSubs) {
         return the(csrc.op(), csrc.dt(), newSubs);
     }
-
-    @NotNull
-    public final Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
-        return csrc.subterms().equals(newSubs) ? csrc : the(csrc.op(), csrc.dt(), newSubs.terms());
+    @NotNull public Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
+        return the(csrc.op(), csrc.dt(), newSubs.terms());
     }
+
 
     public final Term disjunction(@NotNull Term[] u) {
         return negation(conj(DTERNAL, negation(u)));

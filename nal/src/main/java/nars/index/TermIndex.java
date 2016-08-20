@@ -110,32 +110,24 @@ public abstract class TermIndex extends TermBuilder {
     //final Cache<Compound,Compound> normalizations = Caffeine.newBuilder().maximumSize(Param.NORMALIZATION_CACHE_SIZE).build();
 
 
-    @NotNull public final Term the(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
+    @NotNull public final Term cached(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
 
         if (cacheable(op, u)) {
             ProtoCompound p = ProtoCompound.the(op, dt, u);
 
-            //Term t = terms.computeIfAbsent(p, pc -> {
 
-            //final Throwable[] failure = new Throwable[1];
             Term t = terms.computeIfAbsent(p, pc -> {
 
-                //try {
+                try {
                     return super.the(pc.op(), pc.dt(), pc.terms());
-                /*} catch (Throwable x) {
-                    failure[0] = x;
+                } catch (InvalidTermException x) {
+                    if (Param.DEBUG_EXTRA)
+                        logger.info("the {}", x);
+                    return False; //place a False placeholder so that a repeat call will not have to discover this manually
+                }/* catch (Throwable e) {
                     return False;
                 }*/
 
-                //            } catch (InvalidTermException e) {
-                //                if (Param.DEBUG_EXTRA) {
-                //                    logger.warn("compound build: {}", e);
-                //                }
-                //                return False;
-                //            } catch (Throwable e) {
-                //                logger.error("compound build: {}", e);
-                //                return False;
-                //            }
             });
 
 //            if (failure[0] != null) {
@@ -155,18 +147,7 @@ public abstract class TermIndex extends TermBuilder {
         } else {
             return super.the(op, dt, u);
         }
-
-
     }
-
-    private static boolean cacheable(Op op, Term[] u) {
-        if (op == INH) {
-            if (u[1] instanceof TermTransform) //skip any immediate transforms as these must be dynamically computed
-                return false;
-        }
-        return true;
-    }
-
 
     /**
      * returns the resolved term according to the substitution
@@ -240,6 +221,33 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         return changed ? the(crc, sub.toArray(new Term[sub.size()])) : crc;
+    }
+
+    @NotNull
+    public final Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
+        if (csrc.subterms().equals(newSubs)) {
+            return csrc;
+        } else {
+            return the(csrc, newSubs.terms());
+        }
+    }
+
+    @NotNull
+    public final Term the(@NotNull Compound csrc, @NotNull Term[] args) {
+        @NotNull Op op = csrc.op();
+        if (cacheable(op, args))
+            return cached(op, csrc.dt(), args);
+        else
+            return super.the(op, csrc.dt(), args);
+    }
+
+
+    private static boolean cacheable(Op op, Term[] u) {
+        if (op == INH) {
+            if (u[1] instanceof TermTransform) //skip any immediate transforms as these must be dynamically computed
+                return false;
+        }
+        return true;
     }
 
 //    public Term immediates(@NotNull Subst f, Term result) {
