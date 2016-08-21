@@ -1,4 +1,4 @@
-package nars.experiment.rogue.ui;
+package nars.experiment.rogue;
 
 import java.awt.Container;
 import java.awt.Font;
@@ -22,9 +22,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import nars.experiment.rogue.ui.Console;
+import nars.experiment.rogue.ui.IAnimated;
+import nars.experiment.rogue.ui.IGameScreen;
+import nars.experiment.rogue.ui.MainMenuDialog;
 import org.xml.sax.SAXException;
 
-import nars.experiment.rogue.Game;
 import nars.experiment.rogue.map.Map;
 import nars.experiment.rogue.util.GameSettings;
 
