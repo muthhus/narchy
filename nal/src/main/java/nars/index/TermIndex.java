@@ -92,7 +92,7 @@ public abstract class TermIndex extends TermBuilder {
     public abstract int subtermsCount();
 
     public final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
-            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 2 );
+            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 3 );
     public final LimitedNonBlockingHashMap<ProtoCompound,Term> terms =
             new LimitedNonBlockingHashMap<>(Param.TERM_CACHE_SIZE, 3 );
 

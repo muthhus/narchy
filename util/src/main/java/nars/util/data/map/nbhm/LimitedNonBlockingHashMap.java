@@ -19,12 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 /**
- *
  * THIS IS A LOSSY VERSION OF NonBlockingHashMap WHICH OPERATES WITHIN A
  * SET CAPACITY AND REPLACES ELEMENTS WITHOUT WARNING.
- *
+ * <p>
  * IT CAN BE USED AS A PASSIVE CACHE FOR THE CONSTRUCTION OF IMMUTABLE INSTANCES
- *
+ * <p>
  * A lock-free alternate implementation of {@link java.util.concurrent.ConcurrentHashMap}
  * with better scaling properties and generally lower costs to mutate the Map.
  * It provides identical correctness properties as ConcurrentHashMap.  All
@@ -86,7 +85,6 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         implements ConcurrentMap<TypeK, TypeV>, Cloneable, Serializable {
 
     private static final long serialVersionUID = 1234123412341234123L;
-
 
 
     // --- Bits to allow Unsafe access to arrays
@@ -235,6 +233,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         _unsafe.putOrderedObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), key);
         //System.out.println("key " + idx + " to " + key);
     }
+
     private static final void set_val(Object[] kvs, int idx, Object val) {
         _unsafe.putOrderedObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), val);
         //System.out.println("val " + idx + " to " + val);
@@ -292,15 +291,15 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     }
 
     public String summary() {
-        return hit + "/" + (hit+miss)  + " hit rate (" +
-                Texts.n2(100.0 * ((double)hit)/((double)hit+miss)) +
+        return hit + "/" + (hit + miss) + " hit rate (" +
+                Texts.n2(100.0 * ((double) hit) / ((double) hit + miss)) +
                 "%)";
     }
 
     // Count of reprobes
     private transient ConcurrentAutoTable _reprobes = new ConcurrentAutoTable();
 
-//    /**
+    //    /**
 //     * Get and clear the current count of reprobes.  Reprobes happen on key
 //     * collisions, and a high reprobe rate may indicate a poor hash function or
 //     * weaknesses in the table resizing function.
@@ -316,10 +315,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     private int reprobes = 4; // Too many reprobes then force a table-resize
 
 
-
     // --- LimitedNonBlockingHashMap --------------------------------------------------
     // Constructors
-
 
 
     /**
@@ -414,7 +411,6 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     public TypeV put(TypeK key, TypeV val) {
         return putIfMatch(key, val, NO_MATCH_OLD);
     }
-
 
 
     @Override
@@ -612,17 +608,17 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 //                K == key ||                 // Either keys match exactly OR
 //                        // hash exists and matches?  hash can be zero during the install of a
 //                        // new key/value pair.
-        return     ((hh == 0 || hh == fullhash) &&
-                                // Do not call the users' "equals()" call with a Tombstone, as this can
-                                // surprise poorly written "equals()" calls that throw exceptions
-                                // instead of simply returning false.
-                                K != TOMBSTONE &&        // Do not call users' equals call with a Tombstone
-                                // Do the match the hard way - with the users' key being the loop-
-                                // invariant "this" pointer.  I could have flipped the order of
-                                // operands (since equals is commutative), but I'm making mega-morphic
-                                // v-calls in a reprobing loop and nailing down the 'this' argument
-                                // gives both the JIT and the hardware a chance to prefetch the call target.
-                                key.equals(K));          // Finally do the hard match
+        return ((hh == 0 || hh == fullhash) &&
+                // Do not call the users' "equals()" call with a Tombstone, as this can
+                // surprise poorly written "equals()" calls that throw exceptions
+                // instead of simply returning false.
+                K != TOMBSTONE &&        // Do not call users' equals call with a Tombstone
+                // Do the match the hard way - with the users' key being the loop-
+                // invariant "this" pointer.  I could have flipped the order of
+                // operands (since equals is commutative), but I'm making mega-morphic
+                // v-calls in a reprobing loop and nailing down the 'this' argument
+                // gives both the JIT and the hardware a chance to prefetch the call target.
+                key.equals(K));          // Finally do the hard match
     }
 
     // --- get -----------------------------------------------------------------
@@ -701,20 +697,22 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     // assumed to work (although might have been immediately overwritten).  Only
     // the path through copy_slot passes in an expected value of null, and
     // putIfMatch only returns a null if passed in an expected null.
-    private static final Object putIfMatch(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, final Object putval, final Object expVal) {
+    private static final Object putIfMatch(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, Object putval, final Object expVal) {
         assert putval != null;
         assert !(putval instanceof Prime);
         assert !(expVal instanceof Prime);
         final int fullhash = hash(key); // throws NullPointerException if key null
         final int len = len(kvs); // Count of key/value pairs, reads kvs.length
-        final CHM chm = chm(kvs); // Reads kvs[0]
+        //final CHM chm = chm(kvs); // Reads kvs[0]
         final int[] hashes = hashes(kvs); // Reads kvs[1], read before kvs[0]
         int idx = fullhash & (len - 1);
+        int startIdx = idx;
 
-        int reprobes = topmap.reprobes;
+        int maxReprobes = topmap.reprobes;
+        int retriesRemain = 1;
 
         // Key-Claim stanza: spin till we can claim a Key (or force a resizing).
-        int reprobe_cnt = 0;
+        int reprobe = 0;
         Object K = null;
         Object V = null;
         //Object[] newkvs = null;
@@ -723,80 +721,82 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
         Integer ticket = null;
 
-        while (true) {             // Spin till we get a Key slot
+        do {
 
-            //URGENT HIJACK
-            if (++reprobe_cnt >= reprobes) {
-                //probe expired on a non-empty index, hijack this location erasing the old value of another key
-                if (compute)
-                    ticket = topmap.next(); //compute the ticket before the delicate operations:
+            while (true) {             // Spin till we get a Key slot
 
-                set_key(kvs, idx, key);
-                hashes[idx] = fullhash; // Memoize fullhash
-                if (compute)
-                    set_val(kvs, idx, ticket);
-                break;                  // Got it!
+                //URGENT HIJACK
+                if (reprobe++ >= maxReprobes) {
+                    //probe expired on a non-empty index, hijack this location erasing the old value of another key
+                    if (compute)
+                        ticket = topmap.next(); //compute the ticket before the delicate operations:
 
-            }
-
-            V = val(kvs, idx);         // Get old value (before volatile read below!)
-            K = key(kvs, idx);         // Get current key
-            if (K==null) {         // Slot is free?
-                // Found an empty Key slot - which means this Key has never been in
-                // this table.  No need to put a Tombstone - the Key is not here!
-                if (putval == TOMBSTONE)
-                    return putval; // Not-now & never-been in this table
-
-                if (compute)
-                    ticket = topmap.next(); //compute the ticket before the delicate operations:
-
-                // Claim the null key-slot
-                if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
-                    //chm._slots.add(1);      // Raise key-slots-used count
+                    set_key(kvs, idx, key);
                     hashes[idx] = fullhash; // Memoize fullhash
-                    if (compute) { //set the value here to claim the index before calling .apply()
+                    if (compute)
                         set_val(kvs, idx, ticket);
+                    break;                  // Got it!
+
+                }
+
+                V = val(kvs, idx);         // Get old value (before volatile read below!)
+                K = key(kvs, idx);         // Get current key
+                if (K == null) {         // Slot is free?
+                    // Found an empty Key slot - which means this Key has never been in
+                    // this table.  No need to put a Tombstone - the Key is not here!
+                    if (putval == TOMBSTONE)
+                        return putval; // Not-now & never-been in this table
+
+                    if (compute)
+                        ticket = topmap.next(); //compute the ticket before the delicate operations:
+
+                    // Claim the null key-slot
+                    if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
+                        //chm._slots.add(1);      // Raise key-slots-used count
+                        hashes[idx] = fullhash; // Memoize fullhash
+                        if (compute) { //set the value here to claim the index before calling .apply()
+                            set_val(kvs, idx, ticket);
+                        }
+                        break;                  // Got it!
                     }
+                    // CAS to claim the key-slot failed.
+                    //
+                    // This re-read of the Key points out an annoying short-coming of Java
+                    // CAS.  Most hardware CAS's report back the existing value - so that
+                    // if you fail you have a *witness* - the value which caused the CAS
+                    // to fail.  The Java API turns this into a boolean destroying the
+                    // witness.  Re-reading does not recover the witness because another
+                    // thread can write over the memory after the CAS.  Hence we can be in
+                    // the unfortunate situation of having a CAS fail *for cause* but
+                    // having that cause removed by a later store.  This turns a
+                    // non-spurious-failure CAS (such as Azul has) into one that can
+                    // apparently spuriously fail - and we avoid apparent spurious failure
+                    // by not allowing Keys to ever change.
+                    K = key(kvs, idx);       // CAS failed, get updated value
+                    //assert K != null;       // If keys[idx] is null, CAS shoulda worked
+                }
+
+                if (keyeq(K, key, hashes, idx, fullhash)) {
                     break;                  // Got it!
                 }
-                // CAS to claim the key-slot failed.
-                //
-                // This re-read of the Key points out an annoying short-coming of Java
-                // CAS.  Most hardware CAS's report back the existing value - so that
-                // if you fail you have a *witness* - the value which caused the CAS
-                // to fail.  The Java API turns this into a boolean destroying the
-                // witness.  Re-reading does not recover the witness because another
-                // thread can write over the memory after the CAS.  Hence we can be in
-                // the unfortunate situation of having a CAS fail *for cause* but
-                // having that cause removed by a later store.  This turns a
-                // non-spurious-failure CAS (such as Azul has) into one that can
-                // apparently spuriously fail - and we avoid apparent spurious failure
-                // by not allowing Keys to ever change.
-                K = key(kvs, idx);       // CAS failed, get updated value
-                //assert K != null;       // If keys[idx] is null, CAS shoulda worked
+
+                if (key == TOMBSTONE) { // found a TOMBSTONE key
+                    break;
+                }
+
+
+                idx = (idx + 1) & (len - 1); // Reprobe!
             }
-
-            if (keyeq(K, key, hashes, idx, fullhash)) {
-                break;                  // Got it!
-            }
-
-            if (key == TOMBSTONE) { // found a TOMBSTONE key
-                break;
-            }
+            // End of spinning till we get a Key slot
 
 
-            idx = (idx + 1) & (len - 1); // Reprobe!
-        }
-        // End of spinning till we get a Key slot
-
-
-        // ---
-        // Found the proper Key slot, now update the matching Value slot.  We
-        // never put a null, so Value slots monotonically move from null to
-        // not-null (deleted Values use Tombstone).  Thus if 'V' is null we
-        // fail this fast cutout and fall into the check for table-full.
-        if (!(putval instanceof Function) && putval == V)
-            return V; // Fast cutout for no-change
+            // ---
+            // Found the proper Key slot, now update the matching Value slot.  We
+            // never put a null, so Value slots monotonically move from null to
+            // not-null (deleted Values use Tombstone).  Thus if 'V' is null we
+            // fail this fast cutout and fall into the check for table-full.
+            if (!(putval instanceof Function) && putval == V)
+                return V; // Fast cutout for no-change
 
 //        // See if we want to move to a new table (to avoid high average re-probe
 //        // counts).  We only check on the initial set of a Value from null to
@@ -823,10 +823,8 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 //            return putIfMatch(topmap, chm.copy_slot_and_check(topmap, kvs, idx, expVal), key, putval, expVal);
 
 
-
-        // ---
-        // We are finally prepared to update the existing table
-        while (true) {
+            // ---
+            // We are finally prepared to update the existing table
             assert !(V instanceof Prime);
 
             // Must match old, and we do not?  Then bail out now.  Note that either V
@@ -856,43 +854,58 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                     return (V == null && expVal != null) ? TOMBSTONE : V;
                 }
 
-                // Else CAS failed
-                V = val(kvs, idx);
             } else {
 
-                if (ticket!=null) {
+                if (ticket != null) {
 
                     if (CAS_val(kvs, idx, ticket, V = (((Function) putval).apply(key)))) {
 
                         //if (emptyValue) //was inserted on an empty index, otherwise it was previously full so no need to increase size
-                            //chm._size.add(1);
+                        //chm._size.add(1);
 
                         topmap.miss++;
                         return V; //done, return the fresh new value
 
                     } else {
                         //must retry, the function was too slow to capture this slot before another one
-                        //V = new Prime(V);
-
-                        topmap.miss++;
-                        return V; //done, return the fresh new value
 
                     }
 
 
                 } else {
-                    assert(!(V instanceof Function));
+                    assert (!(V instanceof Function));
                     topmap.hit++;
                     return V;
                 }
             }
 
-            // If a Prime'd value got installed, we need to re-run the put on the
-            // new table.  Otherwise we lost the CAS to another racing put.
-            // Simply retry from the start.
-            if (V instanceof Prime)
-                return putIfMatch(topmap, chm.copy_slot_and_check(topmap, kvs, idx, expVal), key, putval, expVal);
-        }
+            if (retriesRemain-- <= 0) {
+                topmap.miss++;
+                return compute ? V : putval;
+            } else {
+                if (compute) {
+                    putval = V;
+                    compute = false;
+                }
+                reprobe = 0; //start from the beginning in this retry
+
+                //TODO maybe randomize the next location to try
+                if (idx==startIdx)
+                    idx = (idx + 1) & (len - 1); // go to the next dont just stay
+                else
+                    idx = startIdx; //start at the beginning
+
+                continue; //keep going but in normal put mode
+            }
+
+
+//            // If a Prime'd value got installed, we need to re-run the put on the
+//            // new table.  Otherwise we lost the CAS to another racing put.
+//            // Simply retry from the start.
+//            if (V instanceof Prime)
+//                return putIfMatch(topmap, chm.copy_slot_and_check(topmap, kvs, idx, expVal), key, putval, expVal);
+        } while (true);
+
     }
 
     final AtomicInteger ticket = new AtomicInteger(1);
