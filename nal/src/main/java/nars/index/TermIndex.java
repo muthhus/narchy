@@ -134,12 +134,12 @@ public abstract class TermIndex extends TermBuilder {
 //                throw new RuntimeException(failure[0]);
 //            }
 
-            //SANITY TEST:
-            @NotNull Term retry = super.the(p.op(), p.dt(), p.terms());
-            if (!t.equals(retry)) {
-                terms.computeIfAbsent(p, termizer);
-                throw new RuntimeException("cache fault");
-            }
+//            //SANITY TEST:
+//            @NotNull Term retry = super.the(p.op(), p.dt(), p.terms());
+//            if (!t.equals(retry)) {
+//                terms.computeIfAbsent(p, termizer);
+//                throw new RuntimeException("cache fault");
+//            }
 
             return t;
 

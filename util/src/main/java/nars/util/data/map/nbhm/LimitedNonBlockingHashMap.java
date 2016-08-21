@@ -709,7 +709,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         int startIdx = idx;
 
         int maxReprobes = topmap.reprobes;
-        int retriesRemain = 1;
+        int retriesRemain = 0; //experimental
 
         // Key-Claim stanza: spin till we can claim a Key (or force a resizing).
         int reprobe = 0;
