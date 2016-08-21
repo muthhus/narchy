@@ -213,8 +213,9 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
     private static final boolean CAS_key(Object[] kvs, int idx, Object old, Object key) {
         //return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), old, key);
+
         if (_unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), old, key)) {
-            System.out.println("key " + idx + " to " + key + " <- " + old);
+            //System.out.println("key " + idx + " to " + key + " <- " + old);
             return true;
         }
         return false;
@@ -222,8 +223,9 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
     private static final boolean CAS_val(Object[] kvs, int idx, Object old, Object val) {
         //return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), old, val);
+
         if (_unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), old, val)) {
-            System.out.println("val " + idx + " to " + val + " <- " + old);
+            //System.out.println("val " + idx + " to " + val + " <- " + old);
             return true;
         }
         return false;
@@ -231,11 +233,11 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
     private static final void set_key(Object[] kvs, int idx, Object key) {
         _unsafe.putOrderedObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), key);
-        System.out.println("key " + idx + " to " + key);
+        //System.out.println("key " + idx + " to " + key);
     }
     private static final void set_val(Object[] kvs, int idx, Object val) {
         _unsafe.putOrderedObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), val);
-        System.out.println("val " + idx + " to " + val);
+        //System.out.println("val " + idx + " to " + val);
     }
 
 

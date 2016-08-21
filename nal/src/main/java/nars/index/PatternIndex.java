@@ -11,8 +11,11 @@ import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static nars.Op.NEG;
 
 /**
  * Index which specifically holds the term components of a deriver ruleset.
@@ -44,17 +47,53 @@ public class PatternIndex extends RawTermIndex {
 
     }
 
+    static protected boolean canBuildConcept(@NotNull Term y) {
+        if (y instanceof Compound) {
+            if (y.op() == NEG)
+                return false;
+            return true; //return !y.isAny(invalidConceptBitVector) && !y.hasTemporal();
+        } else {
+            return !(y instanceof Variable);
+        }
+
+    }
 
     @NotNull
-    private PatternCompound make(@NotNull Compound seed) {
+    private PatternCompound make(@NotNull Compound c) {
 
-        TermContainer v = theSubterms(seed.subterms());
-        //TermContainer vv = v; //TermVector.the(v);
+        TermContainer s = c.subterms();
+        int ss = s.size();
+        Term[] bb = new Term[ss];
+        boolean changed = false;//, temporal = false;
+        for (int i = 0; i < ss; i++) {
+            Term a = s.term(i);
+
+            Term b;
+            if (a instanceof Compound) {
+
+                if (!canBuildConcept(a) || a.hasTemporal()) {
+                    //temporal = true;//dont store subterm arrays containing temporal compounds
+                    b = a;
+                } else {
+                    /*if (b != a && a.isNormalized())
+                        ((GenericCompound) b).setNormalized();*/
+                    b = theCompound((Compound) a, true).term();
+                }
+            } else {
+                b = theAtom((Atomic) a, true).term();
+            }
+            if (a != b) {
+                changed = true;
+            }
+            bb[i] = b;
+        }
+
+        TermContainer v = internSubterms(changed ? TermVector.the(bb) : s);
 
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
-                makeEllipsis(seed, v, e) :
-                new PatternCompound.PatternCompoundSimple(seed, v);
+                makeEllipsis(c, v, e) :
+                new PatternCompound.PatternCompoundSimple(c, v);
     }
 
     @NotNull

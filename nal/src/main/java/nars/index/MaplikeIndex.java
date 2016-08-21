@@ -73,7 +73,7 @@ public abstract class MaplikeIndex extends TermIndex {
     /**
      * default lowest common denominator impl, subclasses may reimpl for more efficiency
      */
-    @Nullable
+    @NotNull
     protected Termed getConceptCompound(@NotNull Compound x) {
 
         if (!x.isNormalized())
