@@ -1221,7 +1221,7 @@ public class Narsese extends BaseParser<Object> {
                 Compound x = index.normalize((Compound)y);
                 if (x == null)
                     throw new NarseseException("Un-normalizable: " + y);
-                y = x;
+                return x;
             }
 
         }
