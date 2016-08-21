@@ -595,35 +595,35 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public Concept concept(@NotNull Termed term, boolean createIfMissing) throws InvalidConceptException {
 
-        if (term instanceof Atomic) {
-
-            if (term instanceof Variable) {
-                //if (createIfMissing)
-                throw new InvalidConceptException(term, "Variables are not conceptualizable");
-                //return null;
-            }
-
-        } else {
-
-            term = unneg(term);
-
-            Compound prenormalized = (Compound) term.term();
-
-            Compound cterm;
-            if ((cterm = normalize(prenormalized)) == null)
-                throw new InvalidConceptException(prenormalized, "Failed normalization");
-
-            Compound aterm = Terms.atemporalize(cterm);
-            if (!(aterm instanceof Compound))
-                throw new InvalidConceptException(term, "Failed atemporalization");
-
-            term = unneg(aterm);
-//            term = aterm;
-
-            //if (aterm.op() == NEG)
-            //throw new InvalidConceptException(term, "Negation re-appeared");
-
-        }
+//        if (term instanceof Atomic) {
+//
+//            if (term instanceof Variable) {
+//                //if (createIfMissing)
+//                throw new InvalidConceptException(term, "Variables are not conceptualizable");
+//                //return null;
+//            }
+//
+//        } else {
+//
+//            term = unneg(term);
+//
+//            Compound prenormalized = (Compound) term.term();
+//
+//            Compound cterm;
+//            if ((cterm = normalize(prenormalized)) == null)
+//                throw new InvalidConceptException(prenormalized, "Failed normalization");
+//
+//            Compound aterm = Terms.atemporalize(cterm);
+//            if (!(aterm instanceof Compound))
+//                throw new InvalidConceptException(term, "Failed atemporalization");
+//
+//            term = unneg(aterm);
+////            term = aterm;
+//
+//            //if (aterm.op() == NEG)
+//            //throw new InvalidConceptException(term, "Negation re-appeared");
+//
+//        }
 
 
         @Nullable Termed c = get(term, createIfMissing);
@@ -634,11 +634,11 @@ public abstract class TermIndex extends TermBuilder {
             return null;
         }
 
-
         Concept cc = (Concept)c;
         if (cc.policy() == null) {
             conceptBuilder().init(cc);
         }
+
         return cc;
     }
 

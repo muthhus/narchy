@@ -76,16 +76,7 @@ public abstract class MaplikeIndex extends TermIndex {
     @NotNull
     protected Termed getConceptCompound(@NotNull Compound x) {
 
-        if (!x.isNormalized())
-            throw new InvalidConceptException(x, "not normalized");
-
-        Term xx = $.unneg(Terms.atemporalize(x)).term();
-
-        if (xx.op().var)
-            throw new InvalidConceptException(x, "variables can not be conceptualized");
-
-        //TODO use getIfPresent or compute w/ lambda rather than this 2-step process which is not thread-safe
-
+        Term xx = conceptualize(x);
         Termed y = get(xx, false);
         if (y == null) {
             set(y = buildConcept(xx));
@@ -94,6 +85,19 @@ public abstract class MaplikeIndex extends TermIndex {
     }
 
 
+    /** translaes a compound to one which can name a concept */
+    @NotNull public Compound conceptualize(@NotNull Compound x) {
+
+        if (!x.isNormalized())
+            throw new InvalidConceptException(x, "not normalized");
+
+        Term xx = $.unneg(Terms.atemporalize(x)).term();
+
+        if (xx.op().var)
+            throw new InvalidConceptException(x, "variables can not be conceptualized");
+
+        return (Compound)xx;
+    }
 
 
     @Override
@@ -200,14 +204,14 @@ public abstract class MaplikeIndex extends TermIndex {
         return conceptBuilder.apply(interned.term());
     }
 
-    @Nullable
-    protected final Term buildCompound(@NotNull Op op, int dt, @NotNull TermContainer subs) {
-        TermContainer s = theSubterms(subs);
-        if (op == INH && (subs.term(1).op() == OPER) && subs.term(0).op() == PROD)
-            return termOrNull(the(INH, dt, s.terms())); //HACK send through the full build process in case it is an immediate transform
-        else
-            return finish(op, dt, s);
-    }
+//    @Nullable
+//    protected final Term buildCompound(@NotNull Op op, int dt, @NotNull TermContainer subs) {
+//        TermContainer s = theSubterms(subs);
+//        if (op == INH && (subs.term(1).op() == OPER) && subs.term(0).op() == PROD)
+//            return termOrNull(the(INH, dt, s.terms())); //HACK send through the full build process in case it is an immediate transform
+//        else
+//            return finish(op, dt, s);
+//    }
 
     @Override
     public final Concept.ConceptBuilder conceptBuilder() {
