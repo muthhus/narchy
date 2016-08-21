@@ -142,7 +142,7 @@ public class IO {
                 throw new UnsupportedOperationException();
         }
 
-        return (Atomic)t.the(key);
+        return (Atomic) t.get(key, true);
     }
 
 

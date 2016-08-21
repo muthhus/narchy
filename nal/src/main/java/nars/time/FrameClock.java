@@ -41,12 +41,12 @@ public class FrameClock implements Clock {
     /**
      * produces a new stamp serial #, used to uniquely identify inputs
      */
-    @Override public final long newStampSerial() {
+    @Override public final long nextStamp() {
         return nextStamp.getAndIncrement();
     }
 
     /** used to ensure that the next system stamp serial is beyond the range of any input */
-    protected final void ensureStampSerialGreater(long s) {
+    protected final void ensureNextStampExceeds(long s) {
         if (s == Long.MAX_VALUE) //ignore cyclic indicator
             return;
         long nextStamp = this.nextStamp.longValue();
@@ -57,9 +57,9 @@ public class FrameClock implements Clock {
             this.nextStamp.set(s+1);
     }
 
-    public final void ensureStampSerialGreater(@NotNull long[] s) {
+    public final void ensureNextStampExceeds(@NotNull long[] s) {
         //assume that the evidence is sorted, and that the max value is in the last position
-        ensureStampSerialGreater(s[s.length-1]);
+        ensureNextStampExceeds(s[s.length-1]);
     }
 
 }

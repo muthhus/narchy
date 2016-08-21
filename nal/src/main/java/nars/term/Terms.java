@@ -581,7 +581,7 @@ public class Terms   {
 //        return c;
 //    }
 
-    @Nullable
+    @NotNull
     public static Compound atemporalize(@NotNull Compound c) {
 
 

@@ -459,8 +459,8 @@ public class PremiseRule extends GenericCompound {
      */
     public void compile(@NotNull TermIndex index) {
         Term[] premisePattern = ((Compound) term(0)).terms();
-        premisePattern[0] = index.the(premisePattern[0]).term(); //task pattern
-        premisePattern[1] = index.the(premisePattern[1]).term(); //belief pattern
+        premisePattern[0] = index.get(premisePattern[0], true).term(); //task pattern
+        premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
 
     @Nullable
@@ -515,7 +515,7 @@ public class PremiseRule extends GenericCompound {
             if (tt == null)
                 throw new RuntimeException("unnormalizable: " + this);
 
-            Compound premiseComponents = (Compound) index.the(tt);
+        Compound premiseComponents = (Compound) index.get(tt, true);
 
 
             return new PremiseRule(premiseComponents);

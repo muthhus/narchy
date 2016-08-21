@@ -54,7 +54,7 @@ public class Tetris2 extends NAREnvironment {
     public static final int DEFAULT_INDEX_WEIGHT = 16 * 10000000;
 
     public static final Executioner exe =
-            new MultiThreadExecutioner(2, 4096);
+            new MultiThreadExecutioner(2, 8192);
             //new SingleThreadExecutioner();
 
     public static final int runFrames = 12500;
@@ -349,7 +349,7 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                8, 2, 2, rng,
+                8, 2, 4, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
 
                 , new FrameClock(), exe

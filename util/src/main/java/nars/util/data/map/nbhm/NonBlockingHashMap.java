@@ -191,7 +191,7 @@ public class NonBlockingHashMap<TypeK, TypeV>
         System.out.println("=========");
     }
     // print the entire state of the table
-    private final void print( Object[] kvs ) {
+    private static void print(Object[] kvs) {
         for( int i=0; i<len(kvs); i++ ) {
             Object K = key(kvs,i);
             if( K != null ) {
@@ -210,7 +210,7 @@ public class NonBlockingHashMap<TypeK, TypeV>
         }
     }
     // print only the live values, broken down by the table they are in
-    private final void print2( Object[] kvs) {
+    private static void print2(Object[] kvs) {
         for( int i=0; i<len(kvs); i++ ) {
             Object key = key(kvs,i);
             Object val = val(kvs,i);
@@ -319,7 +319,8 @@ public class NonBlockingHashMap<TypeK, TypeV>
      *  @return the previous value associated with the specified key,
      *         or <tt>null</tt> if there was no mapping for the key
      *  @throws NullPointerException if the specified key or value is null  */
-    public TypeV   putIfAbsent( TypeK  key, TypeV val ) { return putIfMatch( key,      val, TOMBSTONE   ); }
+    @Override
+    public TypeV   putIfAbsent(@NotNull TypeK  key, TypeV val ) { return putIfMatch( key,      val, TOMBSTONE   ); }
 
     /** Removes the key (and its corresponding value) from this map.
      *  This method does nothing if the key is not in the map.
@@ -332,17 +333,20 @@ public class NonBlockingHashMap<TypeK, TypeV>
     /** Atomically do a {@link #remove(Object)} if-and-only-if the key is mapped
      *  to a value which is <code>equals</code> to the given value.
      *  @throws NullPointerException if the specified key or value is null */
-    public boolean remove     ( Object key,Object val ) { return putIfMatch( key,TOMBSTONE, val ) == val; }
+    @Override
+    public boolean remove     (@NotNull Object key, Object val ) { return putIfMatch( key,TOMBSTONE, val ) == val; }
 
     /** Atomically do a <code>put(key,val)</code> if-and-only-if the key is
      *  mapped to some value already.
      *  @throws NullPointerException if the specified key or value is null */
-    public TypeV   replace    ( TypeK  key, TypeV val ) { return putIfMatch( key,      val,MATCH_ANY   ); }
+    @Override
+    public TypeV   replace    (TypeK  key, TypeV val ) { return putIfMatch( key,      val,MATCH_ANY   ); }
 
     /** Atomically do a <code>put(key,newValue)</code> if-and-only-if the key is
      *  mapped a value which is <code>equals</code> to <code>oldValue</code>.
      *  @throws NullPointerException if the specified key or value is null */
-    public boolean replace    ( TypeK  key, TypeV  oldValue, TypeV newValue ) {
+    @Override
+    public boolean replace    (TypeK  key, TypeV  oldValue, TypeV newValue ) {
         return putIfMatch( key, newValue, oldValue ) == oldValue;
     }
 
@@ -1017,7 +1021,7 @@ public class NonBlockingHashMap<TypeK, TypeV>
         // not-null must have been from a copy_slot (or other old-table overwrite)
         // and not from a thread directly writing in the new table.  Thus we can
         // count null-to-not-null transitions in the new table.
-        private boolean copy_slot( NonBlockingHashMap topmap, int idx, Object[] oldkvs, Object[] newkvs ) {
+        private static boolean copy_slot(NonBlockingHashMap topmap, int idx, Object[] oldkvs, Object[] newkvs) {
             // Blindly set the key slot from null to TOMBSTONE, to eagerly stop
             // fresh put's from inserting new values in the old table when the old
             // table is mid-resize.  We don't need to act on the results here,
@@ -1103,7 +1107,9 @@ public class NonBlockingHashMap<TypeK, TypeV>
         private int _idx;              // Varies from 0-keys.length
         private Object _nextK, _prevK; // Last 2 keys found
         private TypeV  _nextV, _prevV; // Last 2 values found
+        @Override
         public boolean hasNext() { return _nextV != null; }
+        @Override
         public TypeV next() {
             // 'next' actually knows what the next value will be - it had to
             // figure that out last go-around lest 'hasNext' report true and
@@ -1125,13 +1131,16 @@ public class NonBlockingHashMap<TypeK, TypeV>
             }                         // Else keep scanning
             return _prevV;            // Return current value.
         }
+        @Override
         public void remove() {
             if( _prevV == null ) throw new IllegalStateException();
             putIfMatch( NonBlockingHashMap.this, _sskvs, _prevK, TOMBSTONE, _prevV );
             _prevV = null;
         }
 
+        @Override
         public TypeV nextElement() { return next(); }
+        @Override
         public boolean hasMoreElements() { return hasNext(); }
     }
 
@@ -1156,11 +1165,26 @@ public class NonBlockingHashMap<TypeK, TypeV>
      *  to construction. */
     @Override
     public Collection<TypeV> values() {
-        return new AbstractCollection<TypeV>() {
-            @Override public void    clear   (          ) {        NonBlockingHashMap.this.clear        ( ); }
-            @Override public int     size    (          ) { return NonBlockingHashMap.this.size         ( ); }
-            @Override public boolean contains( Object v ) { return NonBlockingHashMap.this.containsValue(v); }
-            @Override public Iterator<TypeV> iterator()   { return new SnapshotV(); }
+        return new AbstractCollection<>() {
+            @Override
+            public void clear() {
+                NonBlockingHashMap.this.clear();
+            }
+
+            @Override
+            public int size() {
+                return NonBlockingHashMap.this.size();
+            }
+
+            @Override
+            public boolean contains(Object v) {
+                return NonBlockingHashMap.this.containsValue(v);
+            }
+
+            @Override
+            public Iterator<TypeV> iterator() {
+                return new SnapshotV();
+            }
         };
     }
 
@@ -1168,10 +1192,15 @@ public class NonBlockingHashMap<TypeK, TypeV>
     private class SnapshotK implements Iterator<TypeK>, Enumeration<TypeK> {
         final SnapshotV _ss;
         public SnapshotK() { _ss = new SnapshotV(); }
+        @Override
         public void remove() { _ss.remove(); }
+        @Override
         public TypeK next() { _ss.next(); return (TypeK)_ss._prevK; }
+        @Override
         public boolean hasNext() { return _ss.hasNext(); }
+        @Override
         public TypeK nextElement() { return next(); }
+        @Override
         public boolean hasMoreElements() { return hasNext(); }
     }
 
@@ -1195,12 +1224,31 @@ public class NonBlockingHashMap<TypeK, TypeV>
      *  to construction.  */
     @Override
     public Set<TypeK> keySet() {
-        return new AbstractSet<TypeK> () {
-            @Override public void    clear   (          ) {        NonBlockingHashMap.this.clear   ( ); }
-            @Override public int     size    (          ) { return NonBlockingHashMap.this.size    ( ); }
-            @Override public boolean contains( Object k ) { return NonBlockingHashMap.this.containsKey(k); }
-            @Override public boolean remove  ( Object k ) { return NonBlockingHashMap.this.remove  (k) != null; }
-            @Override public Iterator<TypeK> iterator()   { return new SnapshotK(); }
+        return new AbstractSet<>() {
+            @Override
+            public void clear() {
+                NonBlockingHashMap.this.clear();
+            }
+
+            @Override
+            public int size() {
+                return NonBlockingHashMap.this.size();
+            }
+
+            @Override
+            public boolean contains(Object k) {
+                return NonBlockingHashMap.this.containsKey(k);
+            }
+
+            @Override
+            public boolean remove(Object k) {
+                return NonBlockingHashMap.this.remove(k) != null;
+            }
+
+            @Override
+            public Iterator<TypeK> iterator() {
+                return new SnapshotK();
+            }
         };
     }
 
@@ -1209,6 +1257,7 @@ public class NonBlockingHashMap<TypeK, TypeV>
     // Warning: Each call to 'next' in this iterator constructs a new NBHMEntry.
     private class NBHMEntry extends AbstractEntry<TypeK,TypeV> {
         NBHMEntry( final TypeK k, final TypeV v ) { super(k,v); }
+        @Override
         public TypeV setValue(final TypeV val) {
             if( val == null ) throw new NullPointerException();
             _val = val;
@@ -1219,8 +1268,11 @@ public class NonBlockingHashMap<TypeK, TypeV>
     private class SnapshotE implements Iterator<Map.Entry<TypeK,TypeV>> {
         final SnapshotV _ss;
         public SnapshotE() { _ss = new SnapshotV(); }
+        @Override
         public void remove() { _ss.remove(); }
+        @Override
         public Map.Entry<TypeK,TypeV> next() { _ss.next(); return new NBHMEntry((TypeK)_ss._prevK,_ss._prevV); }
+        @Override
         public boolean hasNext() { return _ss.hasNext(); }
     }
 
@@ -1247,21 +1299,36 @@ public class NonBlockingHashMap<TypeK, TypeV>
      */
     @Override
     public Set<Map.Entry<TypeK,TypeV>> entrySet() {
-        return new AbstractSet<Map.Entry<TypeK,TypeV>>() {
-            @Override public void    clear   (          ) {        NonBlockingHashMap.this.clear( ); }
-            @Override public int     size    (          ) { return NonBlockingHashMap.this.size ( ); }
-            @Override public boolean remove( final Object o ) {
-                if( !(o instanceof Map.Entry)) return false;
-                final Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+        return new AbstractSet<>() {
+            @Override
+            public void clear() {
+                NonBlockingHashMap.this.clear();
+            }
+
+            @Override
+            public int size() {
+                return NonBlockingHashMap.this.size();
+            }
+
+            @Override
+            public boolean remove(final Object o) {
+                if (!(o instanceof Map.Entry)) return false;
+                final Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
                 return NonBlockingHashMap.this.remove(e.getKey(), e.getValue());
             }
-            @Override public boolean contains(final Object o) {
-                if( !(o instanceof Map.Entry)) return false;
-                final Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+
+            @Override
+            public boolean contains(final Object o) {
+                if (!(o instanceof Map.Entry)) return false;
+                final Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
                 TypeV v = get(e.getKey());
                 return v.equals(e.getValue());
             }
-            @Override public Iterator<Map.Entry<TypeK,TypeV>> iterator() { return new SnapshotE(); }
+
+            @Override
+            public Iterator<Map.Entry<TypeK, TypeV>> iterator() {
+                return new SnapshotE();
+            }
         };
     }
 

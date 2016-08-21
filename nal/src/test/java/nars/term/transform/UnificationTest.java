@@ -2,15 +2,12 @@ package nars.term.transform;
 
 import nars.*;
 import nars.concept.Concept;
-import nars.index.Indexes;
 import nars.index.PatternIndex;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.subst.FindSubst;
-import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.RuleTest;
 import nars.util.signal.TestNAR;
 import org.eclipse.collections.impl.factory.Sets;
@@ -58,7 +55,7 @@ public class UnificationTest {
 
             //special handling
             final PatternIndex pi = new PatternIndex();
-            t1 = pi.the(pi.parse(s1)).term();
+            t1 = pi.get(pi.parse(s1), true).term();
 
         } else {
             nar.believe(s1);

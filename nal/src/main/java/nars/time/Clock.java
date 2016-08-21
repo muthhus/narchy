@@ -14,7 +14,7 @@ public interface Clock extends Serializable {
 	long time();
 
 	/** returns a new stamp evidence id */
-	long newStampSerial();
+	long nextStamp();
 
 		/** called each cycle */
 	void tick();

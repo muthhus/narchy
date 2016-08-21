@@ -18,7 +18,7 @@ public abstract class RealtimeClock implements Clock {
     final AtomicInteger nextStamp = new AtomicInteger(1);
 
     @Override
-    public long newStampSerial() {
+    public long nextStamp() {
         return seed | nextStamp.getAndIncrement();
     }
 

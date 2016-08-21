@@ -150,11 +150,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable public final Compound normalize(Compound t) {
 
-        //TODO debug only
-        if (random.nextFloat() < 0.001f) {
-            logger.info("normalization cache: {}", index.normalizations.summary());
-            logger.info("term cache: {}", index.terms.summary());
-        }
+//        //TODO debug only
+//        if (random.nextFloat() < 0.001f) {
+//            logger.info("normalization cache: {}", index.normalizations.summary());
+//            logger.info("term cache: {}", index.terms.summary());
+//        }
 
         return index.normalize(t);
     }
@@ -610,7 +610,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
                     if (clock instanceof FrameClock) {
                         //HACK for unique serial number w/ frameclock
-                        ((FrameClock) clock).ensureStampSerialGreater(input.evidence());
+                        ((FrameClock) clock).ensureNextStampExceeds(input.evidence());
                     }
 
                     /*

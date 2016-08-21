@@ -1,10 +1,12 @@
 package nars.index;
 
+import nars.$;
 import nars.Op;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -73,57 +75,25 @@ public abstract class MaplikeIndex extends TermIndex {
      */
     @Nullable
     protected Termed getConceptCompound(@NotNull Compound x) {
-        Termed y = get(x, false);
+
+        if (!x.isNormalized())
+            throw new InvalidConceptException(x, "not normalized");
+
+        Term xx = $.unneg(Terms.atemporalize(x)).term();
+
+        if (xx.op().var)
+            throw new InvalidConceptException(x, "variables can not be conceptualized");
+
+        //TODO use getIfPresent or compute w/ lambda rather than this 2-step process which is not thread-safe
+
+        Termed y = get(xx, false);
         if (y == null) {
-            //Term yy = x;//buildCompound(x.op(), x.dt(), x.subterms()    /* TODO make this sometimes false */);
-            //if (yy == null)
-                //return null;
-
-
-            if (canBuildConcept(x)) {
-                boolean xnormalized = x.isNormalized();
-
-                TermContainer xs = x.subterms();
-                TermContainer ys = theSubterms(xs);
-                Term yy;
-                if (xs != ys) {
-                    //x should have already been atemporalized by this point, so any 'dt' will be from Images
-                    yy = new GenericCompound(x.op(), x.dt(), ys);
-                    if (xnormalized)
-                        ((GenericCompound) yy).setNormalized();
-
-                    //                if (xnormalized && !yy.isNormalized()) {
-                    //                    yy = normalize(yy, false);
-                    //                }
-                } else {
-                    yy = x;
-                }
-
-                set(y = buildConcept(yy));
-            } else {
-                y = x;
-            }
-
-//            if (/*xnormalized && */canBuildConcept(yy)) {
-//
-//            } else {
-//                //set(x, y = yy);
-//
-//            }
+            set(y = buildConcept(xx));
         }
         return y;
     }
 
-    static protected boolean canBuildConcept(@NotNull Term y) {
-        if (y instanceof Compound) {
-            if (y.op() == NEG)
-                return false;
-            return true; //return !y.isAny(invalidConceptBitVector) && !y.hasTemporal();
-        } else {
-            return !(y instanceof Variable);
-        }
 
-    }
 
 
     @Override
@@ -140,33 +110,35 @@ public abstract class MaplikeIndex extends TermIndex {
 
     @Override
     public final @NotNull TermContainer theSubterms(@NotNull TermContainer s) {
-        int ss = s.size();
-        Term[] bb = new Term[ss];
-        boolean changed = false;//, temporal = false;
-        for (int i = 0; i < ss; i++) {
-            Term a = s.term(i);
+        return s;
 
-            Term b;
-            if (a instanceof Compound) {
-
-                if (!canBuildConcept(a) || a.hasTemporal()) {
-                    //temporal = true;//dont store subterm arrays containing temporal compounds
-                    b = a;
-                } else {
-                    /*if (b != a && a.isNormalized())
-                        ((GenericCompound) b).setNormalized();*/
-                    b = theCompound((Compound) a, true).term();
-                }
-            } else {
-                b = theAtom((Atomic) a, true).term();
-            }
-            if (a != b) {
-                changed = true;
-            }
-            bb[i] = b;
-        }
-
-        return internSubterms(changed ? TermVector.the(bb) : s);
+//        int ss = s.size();
+//        Term[] bb = new Term[ss];
+//        boolean changed = false;//, temporal = false;
+//        for (int i = 0; i < ss; i++) {
+//            Term a = s.term(i);
+//
+//            Term b;
+//            if (a instanceof Compound) {
+//
+//                if (!canBuildConcept(a) || a.hasTemporal()) {
+//                    //temporal = true;//dont store subterm arrays containing temporal compounds
+//                    b = a;
+//                } else {
+//                    /*if (b != a && a.isNormalized())
+//                        ((GenericCompound) b).setNormalized();*/
+//                    b = theCompound((Compound) a, true).term();
+//                }
+//            } else {
+//                b = theAtom((Atomic) a, true).term();
+//            }
+//            if (a != b) {
+//                changed = true;
+//            }
+//            bb[i] = b;
+//        }
+//
+//        return internSubterms(changed ? TermVector.the(bb) : s);
     }
 
 
@@ -230,9 +202,7 @@ public abstract class MaplikeIndex extends TermIndex {
 
     @Nullable
     protected final Term buildCompound(@NotNull Op op, int dt, @NotNull TermContainer subs) {
-        @Nullable TermContainer s = theSubterms(subs);
-        if (s == null)
-            return null;
+        TermContainer s = theSubterms(subs);
         if (op == INH && (subs.term(1).op() == OPER) && subs.term(0).op() == PROD)
             return termOrNull(the(INH, dt, s.terms())); //HACK send through the full build process in case it is an immediate transform
         else

@@ -312,7 +312,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
     public final Termed p(int x, int y) {
         return terms.getIfAbsentPutWithKey(l(x, y),
-                xy -> nar.index.the(pixelTerm.pixel(x(xy), y(xy))));
+                xy -> nar.index.get(pixelTerm.pixel(x(xy), y(xy)), true));
     }
 
     private int x(long xy) {

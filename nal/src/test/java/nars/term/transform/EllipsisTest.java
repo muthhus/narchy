@@ -170,9 +170,7 @@ public class EllipsisTest {
             this.prefix = prefix;
             this.suffix = suffix;
             this.ellipsisTerm = ellipsisTerm;
-            p = (Compound) new PatternIndex().the(
-                    getPattern(prefix, suffix)
-                ).term();
+            p = (Compound) new PatternIndex().get(getPattern(prefix, suffix), true).term();
         }
 
 
@@ -388,7 +386,7 @@ public class EllipsisTest {
     }
 
     static void testCombinations(Compound X, @NotNull Compound Y, int expect) {
-        X = (Compound) new PatternIndex().the(X).term();
+        X = (Compound) new PatternIndex().get(X, true).term();
         //Y = (Compound) new PatternIndex().the(Y).term();
 
         for (int seed = 0; seed < 1 /*expect*5*/; seed++) {

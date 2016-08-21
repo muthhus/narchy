@@ -35,6 +35,7 @@ abstract class AbstractEntry<TypeK, TypeV> implements Map.Entry<TypeK, TypeV> {
     /**
      * Return key
      */
+    @Override
     public TypeK getKey() {
         return _key;
     }
@@ -42,6 +43,7 @@ abstract class AbstractEntry<TypeK, TypeV> implements Map.Entry<TypeK, TypeV> {
     /**
      * Return val
      */
+    @Override
     public TypeV getValue() {
         return _val;
     }

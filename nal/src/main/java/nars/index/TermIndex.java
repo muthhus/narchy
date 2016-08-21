@@ -36,6 +36,7 @@ import java.util.function.Function;
 
 import static nars.$.unneg;
 import static nars.Op.*;
+import static nars.nal.Tense.DTERNAL;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;
 
@@ -46,13 +47,6 @@ public abstract class TermIndex extends TermBuilder {
 
 
     public static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
-
-    /**
-     * getOrAdd the term
-     */
-    public @Nullable Termed the(@NotNull Termed t) {
-        return get(t, true);
-    }
 
     /**
      * get if not absent
@@ -98,9 +92,9 @@ public abstract class TermIndex extends TermBuilder {
     public abstract int subtermsCount();
 
     public final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
-            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 5 );
+            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 2 );
     public final LimitedNonBlockingHashMap<ProtoCompound,Term> terms =
-            new LimitedNonBlockingHashMap<>(Param.TERM_CACHE_SIZE, 5 );
+            new LimitedNonBlockingHashMap<>(Param.TERM_CACHE_SIZE, 3 );
 
 //    final ThreadLocal<Map<Compound,Compound>> normalizations =
 //            ThreadLocal.withInitial( () ->
@@ -110,25 +104,28 @@ public abstract class TermIndex extends TermBuilder {
     //final Cache<Compound,Compound> normalizations = Caffeine.newBuilder().maximumSize(Param.NORMALIZATION_CACHE_SIZE).build();
 
 
+    final Function<? super ProtoCompound, ? extends Term> termizer = pc -> {
+
+        try {
+            return super.the(pc.op(), pc.dt(), pc.terms());
+        } catch (InvalidTermException x) {
+            if (Param.DEBUG_EXTRA)
+                logger.info("the {}", x);
+            return False; //place a False placeholder so that a repeat call will not have to discover this manually
+        }/* catch (Throwable e) {
+                    return False;
+                }*/
+    };
+
     @NotNull public final Term cached(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
 
         if (cacheable(op, u)) {
+
             ProtoCompound p = ProtoCompound.the(op, dt, u);
 
 
-            Term t = terms.computeIfAbsent(p, pc -> {
 
-                try {
-                    return super.the(pc.op(), pc.dt(), pc.terms());
-                } catch (InvalidTermException x) {
-                    if (Param.DEBUG_EXTRA)
-                        logger.info("the {}", x);
-                    return False; //place a False placeholder so that a repeat call will not have to discover this manually
-                }/* catch (Throwable e) {
-                    return False;
-                }*/
-
-            });
+            Term t = terms.computeIfAbsent(p, termizer);
 
 //            if (failure[0] != null) {
 //                Throwable f = failure[0];
@@ -137,15 +134,17 @@ public abstract class TermIndex extends TermBuilder {
 //                throw new RuntimeException(failure[0]);
 //            }
 
-//            //SANITY TEST:
-//            @NotNull Term retry = super.the(p.op(), p.dt(), p.terms());
-//            if (!t.equals(retry))
-//                throw new RuntimeException("cache fault");
+            //SANITY TEST:
+            @NotNull Term retry = super.the(p.op(), p.dt(), p.terms());
+            if (!t.equals(retry)) {
+                terms.computeIfAbsent(p, termizer);
+                throw new RuntimeException("cache fault");
+            }
 
             return t;
 
         } else {
-            return super.the(op, dt, u);
+            return super.the(op,dt,u);
         }
     }
 
@@ -234,13 +233,17 @@ public abstract class TermIndex extends TermBuilder {
 
     @NotNull
     public final Term the(@NotNull Compound csrc, @NotNull Term[] args) {
-        @NotNull Op op = csrc.op();
-        if (cacheable(op, args))
-            return cached(op, csrc.dt(), args);
-        else
-            return super.the(op, csrc.dt(), args);
+        return the(csrc.op(), csrc.dt(), args);
     }
 
+    @Override
+    public final @NotNull Term the(@NotNull Op op, int dt, @NotNull Term[] args) throws InvalidTermException {
+        return cached(op, dt, args);
+    }
+
+    @Deprecated @Override public final @NotNull Term the(@NotNull Op op, @NotNull Term... tt) {
+        return the(op, DTERNAL, tt); //call this implementation's, not super class's
+    }
 
     private static boolean cacheable(Op op, Term[] u) {
         if (op == INH) {

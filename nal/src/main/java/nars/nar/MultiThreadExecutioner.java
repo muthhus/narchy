@@ -51,9 +51,9 @@ public class MultiThreadExecutioner extends Executioner {
                         threads,
                         //Runtime.getRuntime().availableProcessors()-1 /* leave one thread available */,
                         defaultForkJoinWorkerThreadFactory, null, true /* async */,
-                        0,
-                        threads*2, //max threads (safe to increase)
-                        1, //minimum threads to keep running otherwise new ones will be created
+                        1,
+                        threads*64, //max threads (safe to increase)
+                        threads, //minimum threads to keep running otherwise new ones will be created
                         null, 1000L, TimeUnit.MILLISECONDS)
         );
     }
@@ -69,10 +69,10 @@ public class MultiThreadExecutioner extends Executioner {
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
-                new SleepingWaitStrategy()
+                //new SleepingWaitStrategy() //low-power
                 //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
-                //new LiteBlockingWaitStrategy()
+                new LiteBlockingWaitStrategy()
         );
 
         this.ring = disruptor.getRingBuffer();

@@ -1,7 +1,5 @@
 package nars;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.fge.grappa.Grappa;
 import com.github.fge.grappa.annotations.Cached;
 import com.github.fge.grappa.matchers.MatcherType;
@@ -32,7 +30,6 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Texts;
 import nars.util.data.map.CapacityLinkedHashMap;
-import nars.util.data.map.nbhm.LimitedNonBlockingHashMap;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +39,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -70,7 +66,7 @@ public class Narsese extends BaseParser<Object> {
     static final ThreadLocal<Narsese> parsers = ThreadLocal.withInitial(() -> Grappa.createParser(Narsese.class));
 
     static final ThreadLocal<Map<Pair<Op,List>,Term>> vectorTerms = ThreadLocal.withInitial(() ->
-            new CapacityLinkedHashMap<Pair<Op, List>, Term>(2048));
+            new CapacityLinkedHashMap<Pair<Op, List>, Term>(512));
 
     //static final Map<Pair<Op,List>,Term> vectorTerms = new LimitedNonBlockingHashMap<>(2048, 2);
 
@@ -1225,11 +1221,11 @@ public class Narsese extends BaseParser<Object> {
                 Compound x = index.normalize((Compound)y);
                 if (x == null)
                     throw new NarseseException("Un-normalizable: " + y);
-                return x;
+                y = x;
             }
 
         }
-        return index.the(y).term(); //y;
+        return index.get(y, true).term(); //y;
     }
 
 //    public TaskRule taskRule(String input) {

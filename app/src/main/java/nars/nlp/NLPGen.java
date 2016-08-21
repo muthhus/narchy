@@ -55,7 +55,7 @@ public class NLPGen {
 
         Task t = Narsese.the().task(narsese, terminal);
 
-        Term pattern = index.the(t.term()).term();
+        Term pattern = index.get(t.term(), true).term();
 
         rules.add((tt, freq, conf, tense) -> {
             if (timeMatch(t, tense)) {

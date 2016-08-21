@@ -304,16 +304,6 @@ public class TermTest {
 
 
 
-//        try {
-        Termed<Compound> forced = n.term("<a --> b>");
-        assertNotNull(forced);
-
-        forced.term().terms()[0] = subj;
-        forced.term().terms()[1] = pred;
-
-        assertEquals(t, forced.toString());
-
-
 //        } catch (Throwable ex) {
 //            assertTrue(ex.toString(), false);
 //        }
