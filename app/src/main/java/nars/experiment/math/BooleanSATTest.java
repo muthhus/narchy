@@ -1,4 +1,4 @@
-package nars.experiment;
+package nars.experiment.math;
 
 import com.google.common.base.Joiner;
 import nars.$;

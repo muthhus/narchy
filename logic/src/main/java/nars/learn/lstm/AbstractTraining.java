@@ -1,6 +1,8 @@
 package nars.learn.lstm;
 
 
+import nars.util.Util;
+
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -39,7 +41,7 @@ public abstract class AbstractTraining {
                 else
                     actual_output = agent.learn(inter.actual, inter.expected, learningRate);
 
-                if (util.argmax(actual_output) == util.argmax(inter.expected))
+                if (Util.argmax(actual_output) == Util.argmax(inter.expected))
                     fit[0]++;
 
                 max_fit[0]++;

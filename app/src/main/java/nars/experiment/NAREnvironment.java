@@ -212,6 +212,10 @@ abstract public class NAREnvironment {
 
     }
 
+    public NARLoop run(final int cycles) {
+        return run(cycles, 0);
+    }
+
     public NARLoop run(final int cycles, int frameDelayMS) {
 
         if (this.loop!=null)

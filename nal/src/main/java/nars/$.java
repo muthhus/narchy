@@ -31,6 +31,7 @@ import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
@@ -319,6 +321,25 @@ public enum $ {
                         .collect( Collectors.toSet() )
         );
     }
+
+    @NotNull
+    public static Compound p(char[] c, CharToObjectFunction<Term> f) {
+        Term[] x = new Term[c.length];
+        for (int i = 0; i < c.length; i++) {
+            x[i] = f.valueOf(c[i]);
+        }
+        return $.p(x);
+    }
+
+    @NotNull
+    public static <X> Compound p(@NotNull X[] x, @NotNull Function<X, Term> toTerm) {
+        return $.p( (Term[])terms(x, toTerm) );
+    }
+
+    public static <X> Term[] terms(@NotNull X[] map, @NotNull Function<X, Term> toTerm) {
+        return Stream.of(map).map(e -> toTerm.apply(e)).toArray(n -> new Term[n]);
+    }
+
     @NotNull
     public static <X> Compound seteMap(@NotNull Map<Term,? extends X> map, @NotNull Function<X, Term> toTerm) {
         return $.sete(

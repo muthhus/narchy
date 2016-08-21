@@ -1,5 +1,6 @@
-package nars.experiment;
+package nars.experiment.math;
 
+import nars.experiment.DiscreteEnvironment;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
 import nars.agent.NAgent;

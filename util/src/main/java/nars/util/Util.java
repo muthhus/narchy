@@ -1108,4 +1108,35 @@ public enum Util {
         }
         return y;
     }
+
+    public static int argmax(final double[] vec) {
+        int result = -1;
+        double max = Double.NEGATIVE_INFINITY;
+
+        int l = vec.length;
+        for (int i = 0; i < l; i++) {
+            final double v = vec[i];
+            if (v > max)  {
+                max = v;
+                result = i;
+            }
+        }
+        return result;
+    }
+
+    public static int argmax(final float[] vec) {
+        int result = -1;
+        float max = Float.NEGATIVE_INFINITY;
+
+        int l = vec.length;
+        for (int i = 0; i < l; i++) {
+            final float v = vec[i];
+            if (v > max)  {
+                max = v;
+                result = i;
+            }
+        }
+        return result;
+    }
+
 }
