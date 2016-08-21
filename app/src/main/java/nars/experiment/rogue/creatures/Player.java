@@ -21,7 +21,9 @@ import nars.experiment.rogue.items.Equipment;
 
 public class Player extends Humanoid implements Serializable
 {
-	public Player() 
+	public boolean immortal = true;
+
+    public Player()
 	{
 		super("Player", "Generic Player");
 		setSymbol('@');
@@ -31,13 +33,8 @@ public class Player extends Humanoid implements Serializable
 		setCurrentCloseAttackN(0);
 		countAll();
 		hp=stats[MHP].getBasicValue();
-	}	
-
-	public void countAll()
-	{
-		super.countAll();
 	}
-	
+
 	public int getSkillpoints()
 	{
 		return skillpoints;
@@ -53,6 +50,7 @@ public class Player extends Humanoid implements Serializable
 		if ((!created)&&skillpoints>0) skillpoints--;
 	}
 	
+	@Override
 	public void setName(String s)
 	{
 		if (!created) super.setName(s);		
@@ -64,12 +62,14 @@ public class Player extends Humanoid implements Serializable
 		
 	}
 	
+	@Override
 	public void setSex(int s)
 	{
 		if (!created) sex=s;
 	}
 	
 
+	@Override
 	public void refreshAttackTypes()
 	{
 		super.refreshAttackTypes();
@@ -196,6 +196,7 @@ public class Player extends Humanoid implements Serializable
 		return s;
 	}	
 
+	@Override
 	public void turn()
 	{
 		if (events!=null)
@@ -248,23 +249,21 @@ public class Player extends Humanoid implements Serializable
 	
 	private int playerclass;
 	
-	public static final String[] CLASSNAMES=new String[]{"Street fighter",
+	public static final String[] CLASSNAMES= {"Street fighter",
 														 "Soldier",
 														 "Extrasensor",
 														 "Assassin"};
 
 	
 													 	
-	public static final int[][] CLASS_PRIMARY_SKILLS = new int[][]
-	{
+	public static final int[][] CLASS_PRIMARY_SKILLS = {
 		{SKL_UNARMED, SKL_MELEE, SKL_ATHLETICS},	//Street Fighter
 		{SKL_SMG, SKL_ASSAULT, SKL_THROWING}, 		//Soldier
 		{SKL_EXS, SKL_PSI},							//Exsor
 		{SKL_HIDE, SKL_TRAPS, SKL_PISTOLS}			//Assasin
 	};
 
-	public static final int[][] CLASS_SECONDARY_SKILLS = new int[][]
-	{
+	public static final int[][] CLASS_SECONDARY_SKILLS = {
 		{SKL_PISTOLS, SKL_SMG, SKL_RIFLES, SKL_THROWING, SKL_DODGE, SKL_TRADE, SKL_CHAT},	//Street Fighter
 		{SKL_UNARMED, SKL_MELEE, SKL_PISTOLS, SKL_HEAVY, SKL_RIFLES, SKL_DODGE, SKL_SWIM, SKL_SURVIVE}, 		//Soldier
 		{SKL_UNARMED, SKL_ANIMALEMP, SKL_PISTOLS, SKL_MEDICINE, SKL_CHAT, SKL_LEADERSHIP},							//Exsor

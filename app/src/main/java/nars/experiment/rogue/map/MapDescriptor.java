@@ -26,9 +26,9 @@ public class MapDescriptor implements Serializable
 		this.x=x;
 		this.y=y;
 		this.z=z;
-		setSymbol('x');
-		setBgColor(PtrlConstants.BLACK);
-		setFgColor(PtrlConstants.WHITE);
+		this.symbol = 'x';
+		this.bgColor = PtrlConstants.BLACK;
+		this.fgColor = PtrlConstants.WHITE;
 		knownByPlayer=false;
 		surface="";
 		generator="";
@@ -184,9 +184,9 @@ public class MapDescriptor implements Serializable
 	
 	public String toString()
 	{
-		String s=surface.toString();
+		String s= surface;
 		if (generator!=null
-				&&!generator.equals(""))
+				&& !generator.isEmpty())
 			s+=", "+generator;
 		return s;
 	}

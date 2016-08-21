@@ -14,7 +14,8 @@ public class SimpleDialog implements IGameScreen
 		
 	}
 	
-	public boolean getKeyEvent(KeyEvent ke)
+	@Override
+    public boolean getKeyEvent(KeyEvent ke)
 	{
 		boolean res=false;
 		int code=ke.getKeyCode();
@@ -33,8 +34,8 @@ public class SimpleDialog implements IGameScreen
 		c.clear();
 		int w=head.length();
 		int h=options.length+2;
-		int y = (int)c.getSymHeight()/2 - (int)h/2;			
-		int x = (int)c.getSymWidth()/2 - (int)w/2;
+		int y = c.getSymHeight() /2 - h /2;
+		int x = c.getSymWidth() /2 - w /2;
 		c.printString(head, x, y, PtrlConstants.LCYAN);
 		short col;
 		for (int i=0;i<options.length;i++)
@@ -51,6 +52,6 @@ public class SimpleDialog implements IGameScreen
 	}
 		
 		private int cur; //no. of option selected
-		private String[] options;
-		private String head;
+		private final String[] options;
+		private final String head;
 }

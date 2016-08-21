@@ -15,7 +15,8 @@ public class GenderDialog implements IGameScreen
 		options = new String[] {"Male", "Female"}; 
 	}
 	
-	public void paint(Console c)
+	@Override
+    public void paint(Console c)
 	{
 		c.clear();
 		int sh=c.getSymHeight();
@@ -23,8 +24,8 @@ public class GenderDialog implements IGameScreen
 		String head = "Select your sex:";
 		int w=head.length();
 		int h=4;
-		int y = (int)c.getSymHeight()/2 - (int)h/2;			
-		int x = (int)c.getSymWidth()/2 - (int)w/2;
+		int y = c.getSymHeight() /2 - h /2;
+		int x = c.getSymWidth() /2 - w /2;
 		c.printString(head, x, y, PtrlConstants.LCYAN);
 		short col;
 		for (int i=0;i<options.length;i++)
@@ -35,7 +36,8 @@ public class GenderDialog implements IGameScreen
 			c.printString(options[i], x, y+i+2, col); 
 		}
 	}
-	public boolean getKeyEvent(KeyEvent ke)
+	@Override
+    public boolean getKeyEvent(KeyEvent ke)
 	{
 		char ch=ke.getKeyChar();
 		if ((ch=='8'||ke.getKeyCode()==KeyEvent.VK_UP)&&cur>0) cur--;
@@ -49,7 +51,7 @@ public class GenderDialog implements IGameScreen
 		return false;	
 	}
 	
-	private Player pc;
+	private final Player pc;
 	private int cur;
-	private String[] options;
+	private final String[] options;
 }

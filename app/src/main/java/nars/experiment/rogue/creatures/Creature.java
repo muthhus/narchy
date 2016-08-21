@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import javax.xml.parsers.*;
 
@@ -67,7 +68,7 @@ public class Creature implements Serializable
 		skills[26] = new Skill (0, DEX);								
 		skills[27] = new Skill (0, EXS);								
 		skills[28] = new Skill (0, EXS);
-		protection = new Protection(new int[9], (float)0);
+		protection = new Protection(new int[9], id_counter);
 	}	
 	
 	 public Creature(String filename, String t, int l, String n) throws URISyntaxException {
@@ -123,7 +124,7 @@ public class Creature implements Serializable
 	 	//System.out.println(name);
 	  	String f = e.getAttribute("file");
 	 	//System.out.println(f); 	
-	  	if (f!="")
+	  	if (!Objects.equals(f, ""))
 	  	{
 			try {
 				fillFromFile(f, type, l);
@@ -153,8 +154,9 @@ public class Creature implements Serializable
 			return true;
 		if (e.getTagName().equals("symbol")) 
 			symbol = value.charAt(0);
-		else if (e.getTagName().equals("color")) 
-			setColor(PtrlConstants.strToColor(value));
+		else if (e.getTagName().equals("color")) {
+            color= PtrlConstants.strToColor(value);
+        }
 		else if (e.getTagName().equals("con")) 
 			getAttribute(CON).setBasicValue(Integer.parseInt(value));
 		else if (e.getTagName().equals("str")) 
@@ -169,8 +171,6 @@ public class Creature implements Serializable
 			getAttribute(CHA).setBasicValue(Integer.parseInt(value));
 		else if (e.getTagName().equals("exs")) 
 			getAttribute(EXS).setBasicValue(Integer.parseInt(value));
-		else if (e.getTagName().equals("luc")) 
-			getAttribute(LUC).setBasicValue(Integer.parseInt(value));
 		else if (e.getTagName().equals("luc")) 
 			getAttribute(LUC).setBasicValue(Integer.parseInt(value));
 		else if (e.getTagName().equals("close_attack_type")) 
@@ -374,8 +374,8 @@ public class Creature implements Serializable
 	
 	public String getTheName(boolean capitalise)
 	{
-		if (name==""&&capitalise) return "The "+type;
-		else if (name==""&&!capitalise) return "the "+type;
+		if (Objects.equals(name, "") &&capitalise) return "The "+type;
+		else if (Objects.equals(name, "") &&!capitalise) return "the "+type;
 		else return name+" the "+type;
 	}
 
@@ -383,23 +383,17 @@ public class Creature implements Serializable
 	{
 		at.setAttacker(this);
 		UnarmedAttackType[] newcat = new UnarmedAttackType[close_attacks.length+1];
-		for (int i=0; i<close_attacks.length; i++)
-		{
-			newcat[i]=close_attacks[i];
-		}
+        System.arraycopy(close_attacks, 0, newcat, 0, close_attacks.length);
 		newcat[close_attacks.length]=at;
 		close_attacks=newcat;
 	}
 	
 	public void addRangedAttackType(RangedAttackType at)
 	{
-		if (at.getMinSkill()>getSkills()[at.getSkillN()].getValue()) return;
+        if (at.getMinSkill()> skills[at.getSkillN()].getValue()) return;
 		at.setAttacker(this);
 		RangedAttackType[] newcat = new RangedAttackType[ranged_attacks.length+1];
-		for (int i=0; i<ranged_attacks.length; i++)
-		{
-			newcat[i]=ranged_attacks[i];
-		}
+        System.arraycopy(ranged_attacks, 0, newcat, 0, ranged_attacks.length);
 		newcat[ranged_attacks.length]=at;
 		ranged_attacks=newcat;
 	}
@@ -454,7 +448,7 @@ public class Creature implements Serializable
 	
 	public UnarmedAttackType getCurrentCloseAttackType()
 	{
-		return getCloseAttackTypes()[close_at_number];
+        return close_attacks[close_at_number];
 	}
 
 	public int getCurrentRangedAttackN()
@@ -473,7 +467,7 @@ public class Creature implements Serializable
 		if (ranged_attacks==null) return null;
 		if (ranged_attacks.length==0) return null;
 		if (ranged_at_number>=ranged_attacks.length) ranged_at_number=ranged_attacks.length-1;
-		return getRangedAttackTypes()[ranged_at_number];
+        return ranged_attacks[ranged_at_number];
 	}
 
 	
@@ -488,10 +482,7 @@ public class Creature implements Serializable
 		else 
 		{
 			MapEvent[] new_events=new MapEvent[events.length+1];
-			for (int i=0; i<events.length; i++)
-			{
-				new_events[i]=events[i];
-			}
+            System.arraycopy(events, 0, new_events, 0, events.length);
 			new_events[events.length]=me;
 			events=new_events;
 		}
@@ -540,9 +531,9 @@ public class Creature implements Serializable
 	private int ranged_at_number;
 
 	
-	private static long id_counter=0;
+	private static final long id_counter = 0;
 	
-	private static float SIN45=(float)0.7071;
+	private static final float SIN45=(float)0.7071;
 	
 	protected MapEvent[] events;
 	
@@ -597,7 +588,7 @@ public class Creature implements Serializable
 	public static final int SKL_PSI=28;
 
 	  
-	public static final String[] ATTR_NAMES = new String[]{ "Str", 
+	public static final String[] ATTR_NAMES = { "Str",
 															"Con", 
 															"Dex", 
 															"Per", 
@@ -606,13 +597,13 @@ public class Creature implements Serializable
 															"Exs", 
 															"Luc" };
 	
-	public static final String[] STAT_NAMES = new String[]{ "Vision", 
+	public static final String[] STAT_NAMES = { "Vision",
 															"Hearing", 
 															"Mental", 
 															"Max HP", 
 															"Speed"}; 
 	
-	public static final String[] SKILL_NAMES = new String[]{"Unarmed combat", 
+	public static final String[] SKILL_NAMES = {"Unarmed combat",
 															"Melee weapons", 
 															"Pistols",
 															"Smg's", 

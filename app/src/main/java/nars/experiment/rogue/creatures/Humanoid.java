@@ -24,7 +24,8 @@ public class Humanoid extends Creature implements Serializable
 		hp=stats[MHP].getBasicValue();
 	}
 
-	public void countAll()
+	@Override
+    public void countAll()
 	{
 		refreshEffects();
 		super.countAll();
@@ -108,7 +109,7 @@ public class Humanoid extends Creature implements Serializable
 		if (weap==null) return;
 		Ammo old_ammo=weap.loadAmmo(new_ammo);
 		if (old_ammo!=null)
-			if (old_ammo.getQty()>0) inventory.AddItem(old_ammo);
+			if (old_ammo.getQty()>0) inventory.add(old_ammo);
 		inventory.clean(Item.IS_AMMO);
 	}
 	

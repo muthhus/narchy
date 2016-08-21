@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Objects;
 
 import nars.experiment.rogue.combat.Attack;
 import nars.experiment.rogue.combat.AttackResult;
@@ -152,7 +153,7 @@ public class Actor implements Serializable
 		}
 		catch (Exception e)
 		{
-			System.out.println("!!!"+getCreature().getName()+", xy=("+getCreature().getX()+", "+getCreature().getY()+")");
+			System.out.println("!!!"+ creature.getName()+", xy=("+ creature.getX()+", "+ creature.getY()+")");
 			e.printStackTrace();
 			System.exit(0);
 		}
@@ -169,15 +170,15 @@ public class Actor implements Serializable
 			System.out.println(activity+", dest x: "+dest_x+", dest y: "+dest_y);
 			System.out.println("time_tail="+time_tail);
 
-			if (activity=="aimless")
+			if (Objects.equals(activity, "aimless"))
 			{
 				havetime=aimless();
 			}
-			else if (activity=="attack")
+			else if (Objects.equals(activity, "attack"))
 			{
 				havetime=attackDest();
 			}
-			else if (activity=="none")
+			else if (Objects.equals(activity, "none"))
 			{
 				havetime=none();
 			}
@@ -219,10 +220,10 @@ public class Actor implements Serializable
 		{
 			xy[0]=1;
 		}
-		if (getCreature().getX()+xy[0]<0
-				||getCreature().getX()+xy[0]>=map.getWidth()
-				||getCreature().getY()+xy[1]<0
-				||getCreature().getY()+xy[1]>=map.getHeight())
+		if (creature.getX()+xy[0]<0
+				|| creature.getX()+xy[0]>=map.getWidth()
+				|| creature.getY()+xy[1]<0
+				|| creature.getY()+xy[1]>=map.getHeight())
 			return true;
 		if (move(xy)!=0) return true;
 		else
@@ -246,7 +247,7 @@ public class Actor implements Serializable
 
 		if (!getNearestEnemy()) //&&
 		{
-			if (getCreature().getX()==dest_x&&getCreature().getY()==dest_y)
+			if (creature.getX()==dest_x&& creature.getY()==dest_y)
 			{
 				activity="aimless";
 				return none();
@@ -261,7 +262,7 @@ public class Actor implements Serializable
 
 					if (path_is_found)
 					{
-						Tile tl=this.getTile(getCreature().getX()+current_path[0][0], getCreature().getY()+current_path[0][1]);
+						Tile tl=this.getTile(creature.getX()+current_path[0][0], creature.getY()+current_path[0][1]);
 						if (tl instanceof DoorTile)
 						{
 							DoorTile dtl=(DoorTile)tl;
@@ -298,7 +299,7 @@ public class Actor implements Serializable
 						return none();
 					}
 					int[] xy=current_path[path_counter];
-					Tile tl=this.getTile(getCreature().getX()+xy[0], getCreature().getY()+xy[1]);
+					Tile tl=this.getTile(creature.getX()+xy[0], creature.getY()+xy[1]);
 					if (tl instanceof DoorTile)
 					{
 						DoorTile dtl=(DoorTile)tl;
@@ -324,15 +325,15 @@ public class Actor implements Serializable
 				}
 			}
 		}
-		int dx=dest_x-getCreature().getX();
-		int dy=dest_y-getCreature().getY();
+		int dx=dest_x- creature.getX();
+		int dy=dest_y- creature.getY();
 //		System.out.println("x="+getCreature().getX());
 //		System.out.println("y="+getCreature().getY());
 //		System.out.println("dest_x="+dest_x);
 //		System.out.println("dest_y="+dest_y);
 		if (setAviableRangedAttack(dest_x, dest_y))
 		{
-			if (getCreature().getCurrentRangedAttackType().getTime()*1000<=time_tail) 
+			if (creature.getCurrentRangedAttackType().getTime()*1000<=time_tail)
 			{
 				rangedAttack(dest_x, dest_y);
 				return true;
@@ -342,7 +343,7 @@ public class Actor implements Serializable
 		else if (!setAviableCloseAttack()) return none();
 		else if (dx>=-1&&dx<=1&&dy>=-1&&dy<=1)
 		{
-			long t=getCreature().getCurrentCloseAttackType().getTime()*1000;
+			long t= creature.getCurrentCloseAttackType().getTime()*1000;
 			closeAttack(new int[]{dx, dy});
 			time_tail-=t;
 			return true;
@@ -382,8 +383,8 @@ public class Actor implements Serializable
 	{
 		System.out.println("findWavePath");
 		//wave map
-		int sx=getCreature().getX();
-		int sy=getCreature().getY();
+		int sx= creature.getX();
+		int sy= creature.getY();
 		boolean path_is_found=false;
 		//boolean cannot_found;
 		int wave=0;
@@ -505,8 +506,8 @@ public class Actor implements Serializable
 	
 	public boolean findStraightPath(int dx, int dy)
 	{
-		int x1=getCreature().getX();
-		int y1=getCreature().getY();
+		int x1= creature.getX();
+		int y1= creature.getY();
 		int x2=dx;
 		int y2=dy;
 		int y=y1;
@@ -604,7 +605,7 @@ public class Actor implements Serializable
 		int py=creature.getY();
 		int mw=map.getWidth();
 		int mh=map.getHeight();
-		int l=getCreature().getFOVRange();
+		int l= creature.getFOVRange();
 		//System.out.println("px:"+px+"; py:"+py+"; l:"+l);
 		int ffov[][] = new int[mw][mh];
 		for (int i=0; i<ffov.length; i++)
@@ -859,22 +860,25 @@ public class Actor implements Serializable
 	
 	public AttackResult takeAttack(Attack a)
 	{
-		Protection p = getCreature().getProtection();
+		Protection p = creature.getProtection();
 		if (!p.isHit(a)) return null;
 		else 
 		{
-			AttackResult ar=new AttackResult(this.getCreature(), p.getAttackDamage(a), getCreature().getX(),  getCreature().getY());
-			getCreature().damage(ar.getDamage());
-			getCreature().takeEvent(new MapEvent("hit", MapEvent.T_UNDER_ATTACK, ar.getDamage(), getCreature().getX(), getCreature().getY(), a.getAttacker()));
+			AttackResult ar=new AttackResult(creature, p.getAttackDamage(a), creature.getX(),  creature.getY());
+			creature.damage(ar.getDamage());
+			creature.takeEvent(new MapEvent("hit", MapEvent.T_UNDER_ATTACK, ar.getDamage(), creature.getX(), creature.getY(), a.getAttacker()));
 			Creature attacker = a.getAttacker();
-			if (attacker!=null&&getCreature().getHP()+ar.getDamage()>0) 
-				attacker.takeEvent(new MapEvent("you_hit", MapEvent.T_UNDER_ATTACK, ar.getDamage(), getCreature().getX(), getCreature().getY(), getCreature())); 
-			if (getCreature().getHP()<=0) 
+			if (attacker!=null&& creature.getHP()+ar.getDamage()>0) {
+				attacker.takeEvent(new MapEvent("you_hit", MapEvent.T_UNDER_ATTACK, ar.getDamage(), getCreature().getX(), getCreature().getY(), creature));
+			}
+			if (creature.getHP()<=0)
 			{
-				map.getTile(getCreature().getX(), getCreature().getY()).pour(1);
+				map.getTile(creature.getX(), creature.getY()).pour(1);
 				map.deathEvent();
-				getCreature().takeEvent(new MapEvent("death", MapEvent.T_UNDER_ATTACK, 0, getCreature().getX(), getCreature().getY(), a.getAttacker()));
-				if (getCreature().getHP()+ar.getDamage()>0) attacker.takeEvent(new MapEvent("you_kill", MapEvent.T_UNDER_ATTACK, ar.getDamage(), getCreature().getX(), getCreature().getY(), getCreature())); 
+				creature.takeEvent(new MapEvent("death", MapEvent.T_UNDER_ATTACK, 0, creature.getX(), creature.getY(), a.getAttacker()));
+				if (creature.getHP()+ar.getDamage()>0) {
+					attacker.takeEvent(new MapEvent("you_kill", MapEvent.T_UNDER_ATTACK, ar.getDamage(), getCreature().getX(), getCreature().getY(), creature));
+				}
 			}
 			return ar; 
 		}
@@ -882,15 +886,17 @@ public class Actor implements Serializable
 	
 	public AttackResult[] closeAttack (int[] xy)
 	{
-		
-		Creature c = getCreature();
+
+		Creature c = creature;
 		Actor target = map.getActor(c.getX()+xy[0], c.getY()+xy[1]);
 		if (target==null) return new AttackResult[0];
 		AttackResult[] ar = new AttackResult[c.getCurrentCloseAttackType().getAttacksN()];
 		for (int i=0; i<ar.length; i++)
 		{
 			ar[i]=target.takeAttack(c.getCurrentCloseAttackType().getAttack());
-			if (ar[i]==null) target.getCreature().takeEvent(new MapEvent("miss", MapEvent.T_UNDER_ATTACK, 0, c.getX(), c.getY(), this.getCreature()));
+			if (ar[i]==null) {
+				target.getCreature().takeEvent(new MapEvent("miss", MapEvent.T_UNDER_ATTACK, 0, c.getX(), c.getY(), creature));
+			}
 			//else target.getCreature().takeEvent(new MapEvent("hit", MapEvent.T_UNDER_ATTACK, ar[i].getDamage(), c.getX(), c.getY(), this));
 		}
 		return ar; 
@@ -898,25 +904,25 @@ public class Actor implements Serializable
 	
 	public void rangedAttack (int x, int y)
 	{
-		if (getCreature().getCurrentRangedAttackType()==null) return; 
-		RangedAttack[] ret = getCreature().getCurrentRangedAttackType().getShotRangedAttacks(getCreature());
+		if (creature.getCurrentRangedAttackType()==null) return;
+		RangedAttack[] ret = creature.getCurrentRangedAttackType().getShotRangedAttacks(creature);
 		for (int i=0; i<ret.length; i++)
 		{
-			ret[i].init(getCreature().getX(), getCreature().getY(), x, y);
+			ret[i].init(creature.getX(), creature.getY(), x, y);
 			map.addProjectile(ret[i]);
 		}
-		time_tail-=getCreature().getCurrentRangedAttackType().getTime()*1000;
+		time_tail-= creature.getCurrentRangedAttackType().getTime()*1000;
 		turnInterrupt=true;
 	}
 	
 	public boolean setAviableCloseAttack()
 	{
-		UnarmedAttackType[] ars=getCreature().getCloseAttackTypes();
+		UnarmedAttackType[] ars= creature.getCloseAttackTypes();
 		for (int i=0; i<ars.length; i++)
 		{
 			if (ars[i].getTime()*1000<=time_tail) 
 			{
-				getCreature().setCurrentCloseAttackN(i);
+				creature.setCurrentCloseAttackN(i);
 				return true;
 			}
 		}
@@ -925,17 +931,17 @@ public class Actor implements Serializable
 	
 	public boolean setAviableRangedAttack(int tx, int ty)
 	{
-		RangedAttackType[] ras=getCreature().getRangedAttackTypes();	
+		RangedAttackType[] ras= creature.getRangedAttackTypes();
 		if (ras==null) return false;
 		else if (ras.length==0) return false;
 		for (int i=0; i<ras.length; i++)
 		{
-			double d=Math.sqrt((getCreature().getX()-tx)*(getCreature().getX()-tx)+(getCreature().getY()-ty)*(getCreature().getY()-ty));
+			double d=Math.sqrt((creature.getX()-tx)*(creature.getX()-tx)+(creature.getY()-ty)*(creature.getY()-ty));
 			//System.out.println("d="+d);
 			//System.out.println("Range="+ras[i].getRange());
 			if (d<=ras[i].getRange()||ras[i].getRange()==-1) 
 			{
-				getCreature().setCurrentRangedAttackN(i);
+				creature.setCurrentRangedAttackN(i);
 				
 				System.out.println("ready to fire");
 				return true;
@@ -946,15 +952,17 @@ public class Actor implements Serializable
 	
 	public int seeActor(Actor a)
 	{
-		int x1=getCreature().getX();
-		int y1=getCreature().getY();
-		int x2=a.getCreature().getX();
-		int y2=a.getCreature().getY();
+		int x1= creature.getX();
+		int y1= creature.getY();
+		int x2= a.creature.getX();
+		int y2= a.creature.getY();
 		int y=y1;
 		int x=x1;
-		float viz=getCreature().getFOVRange();
+		float viz= creature.getFOVRange();
 		float ret=0;
-		if (x1==x2&&y1==y2) return getCreature().getFOVRange();
+		if (x1==x2&&y1==y2) {
+			return creature.getFOVRange();
+		}
 		if (Math.abs(x2-x1)>=Math.abs(y2-y1))
 		{
 			float deltaerr=(float)(y2-y1)/Math.abs(x2-x1); //(Math.abs(dy-py))/(Math.abs(dx-px));
@@ -1016,14 +1024,14 @@ public class Actor implements Serializable
 	
 	public ArrayList<Actor> getVisibleActors()
 	{
-		int x=getCreature().getX();
-		int y=getCreature().getY();
-		int l=getCreature().getFOVRange();
+		int x= creature.getX();
+		int y= creature.getY();
+		int l= creature.getFOVRange();
 		Actor[] a = map.getActorsInRect(x-l, x+l, y-l, y+l);
 		ArrayList visible = new ArrayList();
 		for (int i=0; i<a.length; i++)
 		{
-			if (seeActor(a[i])>0&&a[i].getCreature()!=getCreature()) visible.add(a[i]);
+			if (seeActor(a[i])>0&& a[i].creature != creature) visible.add(a[i]);
 		}
 		return visible;
 	}
@@ -1035,10 +1043,10 @@ public class Actor implements Serializable
 		while (i.hasNext())
 		{
 			Actor a=i.next();
-			if (a.getFraction()=="player")
+			if (Objects.equals(a.getFraction(), "player"))
 			{
-				dest_x=a.getCreature().getX();
-				dest_y=a.getCreature().getY();
+				dest_x= a.creature.getX();
+				dest_y= a.creature.getY();
 				//System.out.println("See the player: x="+dest_x+", y="+dest_y+";");
 				return true;
 			}
@@ -1078,9 +1086,9 @@ public class Actor implements Serializable
 		turnInterrupt=false;
 	}
 	
-	private String fraction; //eg. citizens, monsters, raiders, player
+	private final String fraction; //eg. citizens, monsters, raiders, player
 	private String activity;
-	private Creature creature;
+	private final Creature creature;
 	private long time_tail;
 	private long old_tt;
 	private int[][] current_path;

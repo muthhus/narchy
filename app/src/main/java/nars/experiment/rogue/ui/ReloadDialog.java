@@ -139,7 +139,8 @@ public class ReloadDialog implements IGameScreen
 		
 	}
 
-	public boolean getKeyEvent(KeyEvent ke)
+	@Override
+    public boolean getKeyEvent(KeyEvent ke)
 	{
 		char ch=ke.getKeyChar();
 		if (ke.getKeyCode()==KeyEvent.VK_ESCAPE) return true;
@@ -171,12 +172,12 @@ public class ReloadDialog implements IGameScreen
 	}
 
 	
-	private Player pc;
-	private RangedAttackType rat;
-	private Ammo[] variants;
-	private int[] indexes;
-	private MessageStack ms;
-	private GameTime gt;
+	private final Player pc;
+	private final RangedAttackType rat;
+	private final Ammo[] variants;
+	private final int[] indexes;
+	private final MessageStack ms;
+	private final GameTime gt;
 	private int cursor;
 	private boolean reloaded;
 	public boolean isReloaded()

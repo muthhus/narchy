@@ -2,6 +2,7 @@ package nars.experiment.rogue.map;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import nars.experiment.rogue.util.GameSettings;
 import org.w3c.dom.*;
@@ -56,6 +57,7 @@ public class DoorTile extends Tile implements Serializable
 	 	super(e);
 	 } 
 	
+ @Override
  public Tile copy()
  {
  	Item wreck_copy;
@@ -77,18 +79,21 @@ public class DoorTile extends Tile implements Serializable
 
 
 
+	@Override
 	public char getSymbol()
 	{
 		if (opened)	{return opensymbol;}
 		else {return symbol;}
 	}
 	
+	@Override
 	public int getTimeMultiplier()
  	{
  		if (opened) {return open_time_m;}
 	 	else {return time_m;}
  	}
 
+	@Override
 	public int getHeight()
  	{
  		if (opened) {return open_height;}
@@ -99,10 +104,11 @@ public class DoorTile extends Tile implements Serializable
  	/**
   	* @returns time multiplier, used for pathfinding (open door time_m)
   	*/
- 	public int getPathTM()
+ 	@Override
+	public int getPathTM()
  	{
 
-	 	if (isOpen()) return open_time_m;
+		if (opened) return open_time_m;
 	 	else return open_time_m+10;
  	} 	
 	
@@ -114,6 +120,7 @@ public class DoorTile extends Tile implements Serializable
 		opened = true;
 	}
 
+	@Override
 	public Item destroyTile()
 	{
 		Item i = super.destroyTile();
@@ -147,6 +154,7 @@ public class DoorTile extends Tile implements Serializable
 		return opened;
 	}
 
+	@Override
 	protected void fillFromElement(Element e) throws ParserConfigurationException, SAXException, IOException
  	{
     	name = e.getAttribute("name");
@@ -155,9 +163,9 @@ public class DoorTile extends Tile implements Serializable
  		//System.out.println(f);
  		String opn = e.getAttribute("open");
  		opened = false;
- 		if (opn!="") {opened = Boolean.valueOf(opn).booleanValue();}
+ 		if (!Objects.equals(opn, "")) {opened = Boolean.valueOf(opn).booleanValue();}
  		
-  		if (f!="")
+  		if (!Objects.equals(f, ""))
   		{
 			try {
 				fillFromFile(f, name);
@@ -203,7 +211,7 @@ public class DoorTile extends Tile implements Serializable
     				
     		}
     	}
-    	if (s!="")
+    	if (!Objects.equals(s, ""))
     	{
 	    	if (s.equalsIgnoreCase("black")) default_color=PtrlConstants.BLACK;
     		else if (s.equalsIgnoreCase("dblue")) default_color=PtrlConstants.DBLUE;
@@ -226,6 +234,7 @@ public class DoorTile extends Tile implements Serializable
     	//Toolkit.readCharacter();
  	} 	
 	
+	@Override
 	protected void fillFromFile(String filename, String tilename) throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
 	 	File f = GameSettings.xml(filename);
 		//System.out.println("name:" + f);

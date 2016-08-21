@@ -24,8 +24,8 @@ public class AttribsDialog implements IGameScreen
 		int n=Creature.ATTR_NAMES.length;
 		int w=head.length();
 		int h=n+2;
-		int y = (int)sh/2 - (int)h/2 - 2;			
-		int x = (int)sw/2 - (int)w/2;
+		int y = sh /2 - h /2 - 2;
+		int x = sw /2 - w /2;
 		c.printString(head, x, y, PtrlConstants.LCYAN);
 		short col;
 		for (int i=0;i<n;i++)
@@ -103,5 +103,5 @@ public class AttribsDialog implements IGameScreen
 */
 	private int cur;
 	private int points;
-	private Player pc;
+	private final Player pc;
 }

@@ -269,10 +269,10 @@ public class RangedAttackType implements Serializable
 			actor_spread = 0; // TODO: calculate creature-dependent spreading
 			for (int j = 0; j < m; j++)
 			{
-				int d = 1
+                int d = 1
 						+ (int) Math.ceil(Math.random()
 								* attacker.getAttributeValue(damageAttrib)
-								* getDamageAttribPart() - 1)
+								* damageAttribPart - 1)
 						+ (int) Math.ceil(Math.random() * getDamageRandomPart())
 						+ getDamageFixedPart();
 				double th = basicTohit
@@ -291,20 +291,22 @@ public class RangedAttackType implements Serializable
 
 	public int getProjectiles()
 	{
-		if (caliber!=null)
+        if (caliber!=null)
 			if (projectiles==-1)
-				if (getHost()!=null)
-					if (getHost().getAmmo(caliber)!=null)
-						return getHost().getAmmo(caliber).getProjectiles();
+				if (this.host !=null)
+					if (this.host.getAmmo(caliber)!=null) {
+                        return this.host.getAmmo(caliber).getProjectiles();
+                    }
 		return projectiles;
 	}
 
 	public double getSpeading()
 	{
-		if (caliber!=null)
-			if (getHost()!=null)
-				if (getHost().getAmmo(caliber)!=null)
-					return spreading+getHost().getAmmo(caliber).getSpreading();
+        if (caliber!=null)
+			if (this.host !=null)
+				if (this.host.getAmmo(caliber)!=null) {
+                    return spreading+ this.host.getAmmo(caliber).getSpreading();
+                }
 		return spreading;
 	}
 
@@ -411,38 +413,42 @@ public class RangedAttackType implements Serializable
 
 	public int getDamageFixedPart()
 	{
-		if (caliber!=null)
-			if (getHost()!=null)
-				if (getHost().getAmmo(caliber)!=null)
-					return damageFixedPart+getHost().getAmmo(caliber).getDamageFixedPart();
+        if (caliber!=null)
+			if (this.host !=null)
+				if (this.host.getAmmo(caliber)!=null) {
+                    return damageFixedPart+ this.host.getAmmo(caliber).getDamageFixedPart();
+                }
 		return damageFixedPart;
 	}
 
 	public int getDamageRandomPart()
 	{
-		if (caliber!=null)
-			if (getHost()!=null)
-				if (getHost().getAmmo(caliber)!=null)
-					return damageRandomPart+getHost().getAmmo(caliber).getDamageRandomPart();
+        if (caliber!=null)
+			if (this.host !=null)
+				if (this.host.getAmmo(caliber)!=null) {
+                    return damageRandomPart+ this.host.getAmmo(caliber).getDamageRandomPart();
+                }
 		return damageRandomPart;
 	}
 
 	public int getDamageType()
 	{
-		if (caliber!=null)
+        if (caliber!=null)
 			if (damageType==-1)
-				if (getHost()!=null)
-					if (getHost().getAmmo(caliber)!=null)
-						return getHost().getAmmo(caliber).getDamageType();
+				if (this.host !=null)
+					if (this.host.getAmmo(caliber)!=null) {
+                        return this.host.getAmmo(caliber).getDamageType();
+                    }
 		return damageType;
 	}
 
 	public double getSpreading()
 	{
-		if (caliber!=null)
-			if (getHost()!=null)
-				if (getHost().getAmmo(caliber)!=null)
-					return spreading+getHost().getAmmo(caliber).getSpreading();
+        if (caliber!=null)
+			if (this.host !=null)
+				if (this.host.getAmmo(caliber)!=null) {
+                    return spreading+ this.host.getAmmo(caliber).getSpreading();
+                }
 		return spreading;
 	}
 

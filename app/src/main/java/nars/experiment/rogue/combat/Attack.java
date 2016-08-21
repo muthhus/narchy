@@ -62,15 +62,15 @@ public class Attack
 	
 	
 	
-	private int damage_type;
+	private final int damage_type;
 	private int damage;
 	//protected int from_x;
 	//protected int from_y;
-	private Creature attacker;
+	private final Creature attacker;
 	private int source_x;
 	private int source_y;	
 	private int[] effects;
-	private float tohit;
+	private final float tohit;
 	public Creature getAttacker()
 	{
 		return attacker;

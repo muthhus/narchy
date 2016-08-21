@@ -71,19 +71,39 @@ public class MessageStack implements Serializable
 	 */
 	public Message[] getMessages()
 	{
-		if (getSize()==0) return new Message[0];
-		Message[] r = new Message[getSize()];
-		if (getSize()<getMaxSize()) 
+		/*int size;
+		if (start<=cursor) size=cursor-start;
+		else size=getMaxSize()-(start-cursor)+1;
+		return size;*/
+		if (msgs_num ==0) return new Message[0];
+		/*int size;
+		if (start<=cursor) size=cursor-start;
+		else size=getMaxSize()-(start-cursor)+1;
+		return size;*/
+		Message[] r = new Message[msgs_num];
+		/*int size;
+		if (start<=cursor) size=cursor-start;
+		else size=getMaxSize()-(start-cursor)+1;
+		return size;*/
+		if (msgs_num <getMaxSize())
 		{
-			for (int i=0; i<getSize(); i++)
+			/*int size;
+            if (start<=cursor) size=cursor-start;
+            else size=getMaxSize()-(start-cursor)+1;
+            return size;*/
+			for (int i = 0; i< msgs_num; i++)
 			{
-				r[i]=(Message)msgs[i];
+				r[i]= msgs[i];
 			}
 		}
 		else 
 		{
 			int cur=start;
-			for (int i=0; i<getSize(); i++)
+			/*int size;
+            if (start<=cursor) size=cursor-start;
+            else size=getMaxSize()-(start-cursor)+1;
+            return size;*/
+			for (int i = 0; i< msgs_num; i++)
 			{
 				r[i]=(Message)msgs[cur].clone();
 				if (cur<getMaxSize()-1) cur++;
@@ -94,7 +114,7 @@ public class MessageStack implements Serializable
 
 	}
 	
-	private Message[] msgs;
+	private final Message[] msgs;
 //	private int cursor;
 	private int start;
 	private int msgs_num;

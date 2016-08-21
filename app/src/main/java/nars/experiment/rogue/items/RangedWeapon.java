@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -20,7 +21,7 @@ public class RangedWeapon extends Weapon implements Serializable
 	public RangedWeapon()
 	{
 		super();
-		ranged_attacks=new ArrayList<RangedAttackType>();
+		ranged_attacks= new ArrayList<>();
 	}
 	
 	public RangedWeapon(Element e) throws ParserConfigurationException, SAXException, IOException
@@ -29,6 +30,7 @@ public class RangedWeapon extends Weapon implements Serializable
 		fillFromElement(e);
 	}
 	
+	@Override
 	protected boolean parseElement(Element e)
 	{
 		if (super.parseElement(e)) 
@@ -44,7 +46,7 @@ public class RangedWeapon extends Weapon implements Serializable
 		else if (e.getTagName().equals("ammo"))
 		{
 			String typ=e.getAttribute("type");
-			if (typ!="") addAmmoType(typ, Integer.parseInt(value));
+			if (!Objects.equals(typ, "")) addAmmoType(typ, Integer.parseInt(value));
 		}
 		else 
 			return false;
@@ -66,10 +68,7 @@ public class RangedWeapon extends Weapon implements Serializable
 		else 
 		{
 			String[] new_at = new String[ammoTypes.length+1];
-			for (int i=0; i<ammoTypes.length; i++)
-			{
-				new_at[i]=ammoTypes[i];
-			}
+            System.arraycopy(ammoTypes, 0, new_at, 0, ammoTypes.length);
 			new_at[new_at.length-1]=cal;
 			ammoTypes=new_at;
 		}
@@ -81,10 +80,7 @@ public class RangedWeapon extends Weapon implements Serializable
 		else 
 		{
 			int[] new_ma = new int[maxAmmo.length+1];
-			for (int i=0; i<maxAmmo.length; i++)
-			{
-				new_ma[i]=maxAmmo[i];
-			}
+            System.arraycopy(maxAmmo, 0, new_ma, 0, maxAmmo.length);
 			new_ma[new_ma.length-1]=max;
 			maxAmmo=new_ma;
 		}	
@@ -95,10 +91,7 @@ public class RangedWeapon extends Weapon implements Serializable
 		else 
 		{
 			Ammo[] new_a = new Ammo[ammos.length+1];
-			for (int i=0; i<ammos.length; i++)
-			{
-				new_a[i]=ammos[i];
-			}
+            System.arraycopy(ammos, 0, new_a, 0, ammos.length);
 			new_a[new_a.length-1]=null;
 			ammos=new_a;
 		}	
@@ -106,9 +99,10 @@ public class RangedWeapon extends Weapon implements Serializable
 	private String ammoTypes[]; //calibers
 	private int maxAmmo[];
 	private Ammo[] ammos; //Ammo
-	private ArrayList<RangedAttackType> ranged_attacks; //Ranged
+	private final ArrayList<RangedAttackType> ranged_attacks; //Ranged
 	
-    public Item copySingle()
+    @Override
+	public Item copySingle()
 	{
 		RangedWeapon cloned=new RangedWeapon();
 		cloned.color=color;

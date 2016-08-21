@@ -38,8 +38,8 @@ public class SkillsDialog implements IGameScreen
 		int y2=0;
 		if (n<=sh-11) {y1=(sh-n)/2; y2=y1+n-1;} //Full list on screen
 		else  {y1=3; y2=sh-8;}		  		    //Part of list on screen: scroll needed
-		int x1 = (int)sw/2 - 20;
-		int x2 = (int)sw/2 + 10;
+		int x1 = sw /2 - 20;
+		int x2 = sw /2 + 10;
 		if (cur<window) {window=cur;} //cursor is above the window
 		else if (cur>window+y2-y1) {window=cur-(y2-y1);}	  //cursor is below the window
 		if (window>0) uclr = PtrlConstants.LGRAY;
@@ -91,14 +91,14 @@ public class SkillsDialog implements IGameScreen
 		else if (ch=='-'&&pc.getSkills()[cur].getValue()>oldvals[cur])
 		{
 			pc.getSkills()[cur].dec();
-			pc.incSkillPoints();;
-		}
+			pc.incSkillPoints();
+        }
 		else if (code==KeyEvent.VK_ENTER||code==KeyEvent.VK_SPACE||code==KeyEvent.VK_ESCAPE) return true;
 		return false;
 	}
 
-	private int[] oldvals;
-	private Player pc;
+	private final int[] oldvals;
+	private final Player pc;
 	private int cur;
 	int window;
 }

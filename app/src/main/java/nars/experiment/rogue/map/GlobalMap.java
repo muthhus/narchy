@@ -3,6 +3,7 @@ package nars.experiment.rogue.map;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 import nars.experiment.rogue.combat.PtrlConstants;
 import nars.experiment.rogue.util.CityNameGenerator;
@@ -11,9 +12,9 @@ import nars.experiment.rogue.util.GameSettings;
 public class GlobalMap implements Serializable
 {
 	
-	private MapDescriptor[][][] tilemap;
+	private final MapDescriptor[][][] tilemap;
 	int[][] heights;
-	private String name;
+	private final String name;
 	private int pcX;
 	private int pcY;
 	private int pcZ;
@@ -26,8 +27,8 @@ public class GlobalMap implements Serializable
 	private static final double CITIES=0.0020;
 
 	private static final int FOREST_ITERATIONS=70;
-	private int w;
-	private int h;
+	private final int w;
+	private final int h;
 	
 	
 	//private static final int UNEVEN_FACTOR=30;
@@ -59,15 +60,15 @@ public class GlobalMap implements Serializable
 			int x=2+(int)Math.round(Math.random()*(w-4));
 			int y=2+(int)Math.round(Math.random()*(h-4));
 //			System.out.println("x="+x+", y="+y+";");
-			if (tilemap[x][y][0].getSurface()!="sea"&&
-					tilemap[x][y][0].getSurface()!="lake"&&
-					tilemap[x][y][0].getSurface()!="river")
+			if (!Objects.equals(tilemap[x][y][0].getSurface(), "sea") &&
+					!Objects.equals(tilemap[x][y][0].getSurface(), "lake") &&
+					!Objects.equals(tilemap[x][y][0].getSurface(), "river"))
 				makeRiver(x, y);
 		}
 		seaSides();
 		citiesAndRoads();
-		setPCX(1);
-		setPCY(1);
+		this.pcX = 1;
+		this.pcY = 1;
 		makeAllVisible();
 	}
 
@@ -168,7 +169,7 @@ public class GlobalMap implements Serializable
 		}
 	}
 	
-	private void normalize(int[][] arr)
+	private static void normalize(int[][] arr)
 	{
 		int min=LEVELS;
 		int max=0;
@@ -197,7 +198,7 @@ public class GlobalMap implements Serializable
 	
 	public void makeRiver(int startX, int startY)
 	{
-		ArrayList<int[]> riverPath = new ArrayList<int[]>();
+		ArrayList<int[]> riverPath = new ArrayList<>();
 		int x=startX;
 		int y=startY;
 		int newX=x;
@@ -259,21 +260,21 @@ public class GlobalMap implements Serializable
 		for (int x=1; x<tilemap.length-1; x++)
 			for (int y=1; y<tilemap[x].length-1; y++)
 			{
-				if (tilemap[x][y][0].getSurface()!="river"
-					&&tilemap[x][y][0].getSurface()!="lake"
-					&&tilemap[x][y][0].getSurface()!="sea")
+				if (!Objects.equals(tilemap[x][y][0].getSurface(), "river")
+					&& !Objects.equals(tilemap[x][y][0].getSurface(), "lake")
+					&& !Objects.equals(tilemap[x][y][0].getSurface(), "sea"))
 				{
 					int seas=0; 
 					int waters=0;
 					for (int i=x-1; i<=x+1; i++)
 						for (int j=y-1; j<=y+1; j++)
 							if ((i!=x||j!=y))
-								if (tilemap[i][j][0].getSurface()=="river"
-									||tilemap[i][j][0].getSurface()=="lake"
-									||tilemap[i][j][0].getSurface()=="sea")
+								if (Objects.equals(tilemap[i][j][0].getSurface(), "river")
+									|| Objects.equals(tilemap[i][j][0].getSurface(), "lake")
+									|| Objects.equals(tilemap[i][j][0].getSurface(), "sea"))
 								{
 									waters++;
-									if (tilemap[i][j][0].getSurface()=="sea")
+									if (Objects.equals(tilemap[i][j][0].getSurface(), "sea"))
 										seas++;
 								}
 					if (waters>=4)
@@ -451,7 +452,7 @@ public class GlobalMap implements Serializable
 	{
 		int cities_n=(int)Math.round(CITIES*w*h);
 		CityNameGenerator cng = new CityNameGenerator();
-		ArrayList<int[]> cities = new ArrayList<int[]>();
+		ArrayList<int[]> cities = new ArrayList<>();
 		boolean[][] roadsMatrix=new boolean[cities_n][cities_n];
 		int[][][] pathfindArray=new int[w][h][];
 		for(int i=0; i<w; i++)
@@ -578,7 +579,7 @@ public class GlobalMap implements Serializable
 		
 	}
 	
-	private void processRoadMatrix(boolean[][] matrix)
+	private static void processRoadMatrix(boolean[][] matrix)
 	{
 		boolean changes=true;
 		while (changes)
@@ -608,12 +609,11 @@ public class GlobalMap implements Serializable
 		}
 	}
 	
-	private boolean allPathsFound(boolean[][] matrix)
+	private static boolean allPathsFound(boolean[][] matrix)
 	{
 		boolean[][] matrix2=new boolean[matrix.length][matrix[0].length];
 		for (int i=0; i<matrix.length; i++)
-			for (int j=0; j<matrix.length; j++)
-				matrix2[i][j]=matrix[i][j];
+            System.arraycopy(matrix[i], 0, matrix2[i], 0, matrix.length);
 		//processRoadMatrix(matrix2);
 		for (int i=0; i<matrix2.length; i++)
 			for (int j=0; j<matrix2[i].length; j++)
@@ -688,7 +688,7 @@ public class GlobalMap implements Serializable
 				tilemap[x][y][0].setSymbol(':');
 			}
 			
-			int[] min_delta=new int[]{0,0};
+			int[] min_delta= {0,0};
 			int min=arr[x][y][0];
 			if (forcedXY==null)
 			{
@@ -729,7 +729,7 @@ public class GlobalMap implements Serializable
 	
 	public MapDescriptor getCurrentTile()
 	{
-		return getTile(getPCX(), getPCY(), getPCZ());
+		return getTile(pcX, pcY, pcZ);
 	}
 	
 	public Map getMap()

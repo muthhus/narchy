@@ -30,7 +30,7 @@ import nars.experiment.rogue.util.GameSettings;
 
 public class ConsoleFrame extends JFrame
 {
-	public static void main(String[] args) throws SAXException, IOException, Exception
+	public static void main(String[] args) throws Exception
 	{
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice gd = ge.getScreenDevices()[0];
@@ -55,7 +55,7 @@ public class ConsoleFrame extends JFrame
 	 * @throws IOException 
 	 * @throws SAXException 
 	 */
-	public ConsoleFrame() throws SAXException, IOException, Exception
+	public ConsoleFrame() throws Exception
 	{
 		setSize(800, 600);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -77,8 +77,7 @@ class ConsolePanel extends JPanel
 	 * @throws Exception 
 	 */
 	
-	public ConsolePanel() throws Exception, SAXException, IOException
-	{
+	public ConsolePanel() throws Exception {
 		game=null;
 		game_started=false;
 		gs=new MainMenuDialog();
@@ -94,8 +93,7 @@ class ConsolePanel extends JPanel
 	 * @param fs font size.
 	 * @param ff font, used for output.
 	 */
-	public ConsolePanel(int fs, Font ff) throws Exception, SAXException, IOException
-	{
+	public ConsolePanel(int fs, Font ff) throws Exception {
 		this();
 	}	
 	
@@ -118,7 +116,8 @@ class ConsolePanel extends JPanel
 		//c=new Console(g, new Font("monospaced",Font.PLAIN,14),getWidth(), getHeight());
 	}
 		
-	public void paintComponent(Graphics g)
+	@Override
+    public void paintComponent(Graphics g)
 	{
 		if (printfonts) fontsOut(g);
 		super.paintComponent(g);
@@ -188,11 +187,12 @@ class ConsolePanel extends JPanel
 	private boolean game_started;
 	private boolean animate;
 	private Timer timer;
-	private boolean printfonts=false;
+	private boolean printfonts;
 	
 	private class MyKeyHandler implements KeyListener
 	{
-		public void keyPressed(KeyEvent ke)
+		@Override
+        public void keyPressed(KeyEvent ke)
 		{
 			if (animate) return;
 			if (gs==null) return;
@@ -225,13 +225,16 @@ class ConsolePanel extends JPanel
 				}
 			}
 		}
-		public void keyReleased(KeyEvent ke){}
-		public void keyTyped(KeyEvent ke){}
+		@Override
+        public void keyReleased(KeyEvent ke){}
+		@Override
+        public void keyTyped(KeyEvent ke){}
 	}
 	
 	private class TimeListener implements ActionListener
 	{
-		public void actionPerformed(ActionEvent arg0)
+		@Override
+        public void actionPerformed(ActionEvent arg0)
 		{
 			if (gs instanceof IAnimated)
 			{

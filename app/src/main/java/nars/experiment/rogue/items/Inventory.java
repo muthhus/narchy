@@ -25,7 +25,7 @@ public class Inventory implements Serializable
 		max_weight=mw;
 	}
 
-	public void AddItem(Item i)
+	public void add(Item i)
 	{
 		if (i.getType()>=items.length) return; 
 		addItemToSection(i, i.getType());
@@ -50,10 +50,7 @@ public class Inventory implements Serializable
 			}
 		}
 		Item[] newsec= new Item[l+1];
-		for (int i=0; i<l; i++)
-		{
-			newsec[i]=items[s][i];
-		}
+        System.arraycopy(items[s], 0, newsec, 0, l);
 		newsec[l]=it;
 		items[s]=newsec;
 	}
@@ -62,11 +59,8 @@ public class Inventory implements Serializable
 	{
 		Item itm = items[section][n];
 		Item[] newsec=new Item[items[section].length-1];
-		for (int i=0; i<n; i++) newsec[i]=items[section][i];
-		for (int i=n+1; i<items[section].length; i++)
-		{
-			newsec[i-1]=items[section][i];
-		}
+        System.arraycopy(items[section], 0, newsec, 0, n);
+        System.arraycopy(items[section], n + 1, newsec, n + 1 - 1, items[section].length - (n + 1));
 		items[section]=newsec;
 		return itm;
 	}
@@ -91,7 +85,7 @@ public class Inventory implements Serializable
 		items[sect]=newSecArr;
 	}
 	
-	private Item[][] items;
+	private final Item[][] items;
 	private int max_weight;
 	private int current_weight;
 	

@@ -39,7 +39,7 @@ public class Skill implements Serializable
 	 */
 	public boolean prove(int d)
 	{
-		if (Math.round(Math.random()*getValue())>=d)
+        if (Math.round(Math.random()* value)>=d)
 		{
 			use();
 			return true;
@@ -93,7 +93,7 @@ public class Skill implements Serializable
 	 */
 	public boolean inc()
 	{
-		if (getValue()<getPotential()) 
+        if (value < potential)
 		{
 			value++;
 			return true;
@@ -108,9 +108,9 @@ public class Skill implements Serializable
 	
 	public void refreshPotential()
 	{
-		if (cur_pot+getValue()>getPotential())
+        if (cur_pot+ value > potential)
 		{
-			potential=cur_pot+getValue();
+            potential=cur_pot+ value;
 			cur_pot=0;
 		}
 	}
@@ -126,6 +126,6 @@ public class Skill implements Serializable
 	private int cur_marks;
 	private int cur_pot;
 	private float lcurve;
-	private int main_attrib;
+	private final int main_attrib;
 	private boolean primary;
 }

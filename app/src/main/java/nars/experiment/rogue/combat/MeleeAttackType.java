@@ -44,7 +44,8 @@ public class MeleeAttackType extends UnarmedAttackType implements Serializable
 		return false;    
 	}
 	
-	public Attack getAttack()
+	@Override
+    public Attack getAttack()
 	{
 		int d=1+(int)Math.ceil(Math.random()*attacker.getAttributeValue(damage_attrib)*damageAttribPart-1)+(int)Math.ceil(Math.random()*damageRandomPart)+damageFixedPart;
 		float th=tohit_mod+(float)attacker.getSkills()[skill_n].getValue()/50;
@@ -52,7 +53,8 @@ public class MeleeAttackType extends UnarmedAttackType implements Serializable
 		return new Attack(d, damage_type, attacker, th);
 	}
 	
-	public String getShortInfoString()
+	@Override
+    public String getShortInfoString()
 	{
 		return "["+host.getName()+": "+name+"]";
 	}

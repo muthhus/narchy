@@ -79,7 +79,7 @@ public class Equipment implements Serializable
 		return slots[n];
 	}
 	
-	private EquipmentSlot[] slots;
+	private final EquipmentSlot[] slots;
 	
 	public static final int EQ_HEAD=0;
 	public static final int EQ_FACE=1;
@@ -95,18 +95,17 @@ public class Equipment implements Serializable
 	public static final int EQ_LEGS=11;
 	public static final int EQ_FEET=12;
 	
-	public static final String[] SLOT_NAMES = new String[]
-	                              {"Head",
-								  "Face",
-								  "Neck",
-								  "Cloak",
-								  "Body",
-								  "Right hand",
-								  "Left hand",
-								  "Holster",
-								  "Right wrist",
-								  "Left wrist",
-								  "Girdle",
-								  "Legs",
-								  "Feet"};
+	public static final String[] SLOT_NAMES = {"Head",
+    "Face",
+    "Neck",
+    "Cloak",
+    "Body",
+    "Right hand",
+    "Left hand",
+    "Holster",
+    "Right wrist",
+    "Left wrist",
+    "Girdle",
+    "Legs",
+    "Feet"};
 }

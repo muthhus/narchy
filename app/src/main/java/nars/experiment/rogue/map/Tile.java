@@ -3,6 +3,7 @@ package nars.experiment.rogue.map;
 import java.lang.*;
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import nars.experiment.rogue.util.GameSettings;
 import org.w3c.dom.*;
@@ -121,7 +122,7 @@ public class Tile implements Serializable
  	//System.out.println(name);
   	String f = e.getAttribute("filename");
  	//System.out.println(f); 	
-  	if (f!="")
+  	if (!Objects.equals(f, ""))
   	{
 		try {
 			fillFromFile(f, name);
@@ -161,7 +162,7 @@ public class Tile implements Serializable
     			
     	}
     }
-    if (s!="")
+    if (!Objects.equals(s, ""))
     {
     	if (s.equalsIgnoreCase("black")) default_color=PtrlConstants.BLACK;
     	else if (s.equalsIgnoreCase("dblue")) default_color=PtrlConstants.DBLUE;

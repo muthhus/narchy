@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  *Abstract item
@@ -56,7 +57,7 @@ public class Item implements Serializable
  }
  public Item()
  {
-	attrMods=new ArrayList<AttribModifier>();
+	attrMods= new ArrayList<>();
  	weight=1;
  	name="Null item";
  	price=0;
@@ -92,9 +93,9 @@ public class Item implements Serializable
  	name = e.getAttribute("name");
  	String f = e.getAttribute("file");
  	String q = e.getAttribute("qty");
- 	if (q!="") {qty = Integer.parseInt(q);}
+ 	if (!Objects.equals(q, "")) {qty = Integer.parseInt(q);}
 	if (qty==0) {qty=1;}
- 	if (f!="")
+ 	if (!Objects.equals(f, ""))
  	{
 		try {
 			fillFromFile(f, name);
@@ -149,8 +150,12 @@ public class Item implements Serializable
 	try
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
 		DocumentBuilder builder = factory.newDocumentBuilder();
+
 		Document doc = builder.parse(f);
+
+
 		//System.out.println(doc);
 		Element root = doc.getDocumentElement();
 		NodeList nl = root.getChildNodes();
@@ -208,7 +213,7 @@ public class Item implements Serializable
  	if (getClass() != otherObject.getClass()) return false;
  	Item other = (Item)otherObject;
  	return weight==other.weight
- 		&&name==other.name
+ 		&& Objects.equals(name, other.name)
  		&&price==other.price
  		&&level==other.level
  		&&symbol==other.symbol
@@ -220,7 +225,7 @@ public class Item implements Serializable
   */
  public float getWeight()
  {
- 	return weight*getQty();
+	 return weight* qty;
  }
 
  /**
@@ -331,7 +336,7 @@ public class Item implements Serializable
 	cloned.level=level;
 	cloned.symbol=symbol;
  	cloned.inventory_section=inventory_section;
- 	cloned.attrMods=new ArrayList<AttribModifier>();
+ 	cloned.attrMods= new ArrayList<>();
  	Iterator<AttribModifier>  i= attrMods.iterator();
  	while (i.hasNext())
  		cloned.attrMods.add(i.next());
@@ -388,27 +393,26 @@ public class Item implements Serializable
   
  
  
- public static final String[] TYPE_NAMES = new String[]
-                              {"Materials",
-	 						   "Head gear",
-	 						   "Masks",
-	 						   "Neck gear",
-	 						   "Cloaks",
-	 						   "Body armor",
-	 						   "Wrists",
-	 						   "Girdes",
-	 						   "Pants",
-	 						   "Boots",
-	 						   "Melee weapons",
-	 						   "Small firearms",
-	 						   "Medium firearms",
-	 						   "Big firearms",
-	 						   "Ammo",
-	 						   "Mods",
-	 						   "Tools",
-	 						   "Explosives",
-	 						   "Media",
-	 						   "Drugs",
-	 						   "Food"};
+ public static final String[] TYPE_NAMES = {"Materials",
+   "Head gear",
+   "Masks",
+   "Neck gear",
+   "Cloaks",
+   "Body armor",
+   "Wrists",
+   "Girdes",
+   "Pants",
+   "Boots",
+   "Melee weapons",
+   "Small firearms",
+   "Medium firearms",
+   "Big firearms",
+   "Ammo",
+   "Mods",
+   "Tools",
+   "Explosives",
+   "Media",
+   "Drugs",
+   "Food"};
 	 
 }

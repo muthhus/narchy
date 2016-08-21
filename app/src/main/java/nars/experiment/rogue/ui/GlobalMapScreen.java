@@ -10,10 +10,10 @@ import static nars.experiment.rogue.ui.Controls.*;
 
 public class GlobalMapScreen implements IGameScreen
 {
-	private int HEADER=2;
-	private int FOOTER=2;
-	private GlobalMap map;
-	private Player pc;
+	private final int HEADER=2;
+	private final int FOOTER=2;
+	private final GlobalMap map;
+	private final Player pc;
 	//private boolean lockPlayerPos;
 	
 	public GlobalMapScreen(GlobalMap map, Player pc)
@@ -82,7 +82,8 @@ public class GlobalMapScreen implements IGameScreen
 
 	}
 	
-	public boolean getKeyEvent(KeyEvent ke)
+	@Override
+    public boolean getKeyEvent(KeyEvent ke)
 	{
 		char ch=ke.getKeyChar();
 		if (ke.getKeyCode()==KeyEvent.VK_ENTER||ch=='>') return true;
@@ -121,7 +122,8 @@ public class GlobalMapScreen implements IGameScreen
 		return false;
 	}
 
-	public void paint(Console c)
+	@Override
+    public void paint(Console c)
 	{
 		drawMap(c);
 	}

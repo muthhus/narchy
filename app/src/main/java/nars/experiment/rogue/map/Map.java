@@ -153,9 +153,9 @@ public class Map implements Serializable
 		{
 			Item i = (Item)items.get(j);
 			if (i.getX()==x&&i.getY()==y)
-				{al.add(new Integer(j));}
+				{al.add(j);}
 		}
-		if (al.size()==0) return new int[0];
+		if (al.isEmpty()) return new int[0];
 		int[] arr = new int[al.size()];
 		for (int i=0; i<al.size(); i++)
 		{
@@ -264,7 +264,7 @@ public class Map implements Serializable
 	public Actor getPlayerActor()
 	{
 		if (actors!=null)
-			if (actors.size()>0) return (Actor)actors.get(actors.size()-1);
+			if (!actors.isEmpty()) return (Actor)actors.get(actors.size()-1);
 		return null;
 	}
 	
@@ -272,7 +272,6 @@ public class Map implements Serializable
 	{
 		Actor a = getPlayerActor();
 		actor_shadows[a.getCreature().getX()][a.getCreature().getY()]=false;
-		if (a==null) System.exit(0);
 		long t=0;
 		if (xy[0]==0&&xy[1]==0) t=1000;
 		if (a.getCreature().getX()+xy[0]>=0&&a.getCreature().getX()+xy[0]<getWidth()&&a.getCreature().getY()+xy[1]>=0&&a.getCreature().getY()+xy[1]<getHeight())
@@ -345,7 +344,7 @@ public class Map implements Serializable
 		int[][] fov = a.getFov();
 		int x=a.getCreature().getX();
 		int y=a.getCreature().getY();
-		int l=(int)((fov.length-1)/2);
+		int l=Math.round((fov.length-1)/2f);
 		for (int i=0; i<fov.length; i++)
 			for (int j=0; j<fov[0].length; j++)
 			{
@@ -417,7 +416,7 @@ public class Map implements Serializable
 	
 	public boolean needAnimation() //...to repaint shots and explosives
 	{
-		if (projectiles.size()>0) return true;
+		if (!projectiles.isEmpty()) return true;
 		else return false;
 	}
 	
@@ -456,15 +455,15 @@ public class Map implements Serializable
 	private boolean someone_dies;
 	private GameTime gt;
 	private MessageStack mstack;
-	private Tile[][] tilemap;
+	private final Tile[][] tilemap;
 	private ArrayList actors;
-	private ArrayList items;
-	private boolean kbp[][];	//known by player 	
+	private final ArrayList items;
+	private final boolean[][] kbp;	//known by player
 	private ArrayList projectiles;
-	private boolean hits;
+	private final boolean hits;
 	private int current_actor; //-1 if player turn
 	private long turn_time;
-	private boolean[][] actor_shadows;
+	private final boolean[][] actor_shadows;
 	public MapDescriptor getDescriptor()
 	{
 		return descriptor;

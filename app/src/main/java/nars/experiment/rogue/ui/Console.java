@@ -89,7 +89,7 @@ public class Console
 	public void clear()
 	{
 		graph.setColor(Color.BLACK);
-		graph.fillRect(0,0,getWidth(),getHeight());
+        graph.fillRect(0,0, width, height);
 	}
 	
 	/**
@@ -100,7 +100,9 @@ public class Console
 	public int getSymWidth()
 	{
 		int rw;
-		if (font_w!=0) rw=getWidth()/font_w;
+		if (font_w!=0) {
+            rw= width /font_w;
+        }
 		else  rw=0;
 		return rw;
 	}
@@ -113,7 +115,9 @@ public class Console
 	public int getSymHeight()
 	{
 		int rh;
-		if (font_h!=0) rh=getHeight()/font_h;
+		if (font_h!=0) {
+            rh= height /font_h;
+        }
 		else  rh=0;
 		return rh;
 	}
@@ -128,13 +132,13 @@ public class Console
 		return width;
 	}	
 	
-	private Color[] colors;
+	private final Color[] colors;
 	
-	private int font_w;
-	private int font_h;
-	private int width;
-	private int height;
-	private Graphics graph;
-	private Font font;
+	private final int font_w;
+	private final int font_h;
+	private final int width;
+	private final int height;
+	private final Graphics graph;
+	private final Font font;
 
 }

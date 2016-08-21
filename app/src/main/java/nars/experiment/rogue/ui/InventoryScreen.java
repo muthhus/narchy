@@ -145,7 +145,8 @@ public class InventoryScreen implements IGameScreen
 		}
 	}
 
-	public boolean getKeyEvent(KeyEvent ke)
+	@Override
+    public boolean getKeyEvent(KeyEvent ke)
 	{
 		int page=20;
 		int code = ke.getKeyCode();

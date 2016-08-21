@@ -20,7 +20,7 @@ public class Weapon extends Item implements Serializable
 	public Weapon()
 	{
 		super();
-		melee_attacks=new ArrayList<MeleeAttackType>();
+		melee_attacks= new ArrayList<>();
 	}
 	
 	public Weapon(Element e) throws ParserConfigurationException, SAXException, IOException
@@ -30,6 +30,7 @@ public class Weapon extends Item implements Serializable
 	}
 
 
+	@Override
 	protected boolean parseElement(Element e)
 	{
 		if (super.parseElement(e)) 
@@ -58,6 +59,7 @@ public class Weapon extends Item implements Serializable
 		return melee_attacks;
 	}
 	
+	 @Override
 	 public Item copySingle()
 	 {
 		Weapon cloned=new Weapon();

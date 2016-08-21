@@ -2,6 +2,7 @@ package nars.experiment.rogue.map;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,8 +49,8 @@ public class TileSet
 		chances=new ArrayList[ROLE_NAMES.length];
 		for (int i=0; i<set.length; i++)
 		{
-			set[i] = new ArrayList<Tile>();
-			chances[i]=new ArrayList<Float>();
+			set[i] = new ArrayList<>();
+			chances[i]= new ArrayList<>();
 			
 		}
 	}
@@ -76,22 +77,21 @@ public class TileSet
 			else System.out.println(ROLE_NAMES[i]+": "+set[i].size()+" tile(s).");
 		}
 	 }
-	 
-	 public Tile getPiece(int n)
-	 {
-		 if (set[n].size()==0)
-		 {
-			 if (n==0)
-				 return null;
-			 else 
-				 return getPiece(0); //return default tile 
-		 }
-			 
-		 else if (set[n].size()==1) 
-			 return getSingleSetPiece(n);
-		 else 
-			 return getMultiSetPiece(n);
-	 }
+
+	public Tile getPiece(int n) {
+		while (true) {
+			if (set[n].size() == 0) {
+				if (n == 0)
+					return null;
+				else {
+					n = 0;
+				}
+			} else if (set[n].size() == 1)
+				return getSingleSetPiece(n);
+			else
+				return getMultiSetPiece(n);
+		}
+	}
 	 
 	 private Tile getSingleSetPiece(int n)
 	 {
@@ -130,9 +130,9 @@ public class TileSet
 			Document doc = builder.parse(f);
 			//System.out.println(doc);
 			Element root = doc.getDocumentElement();
-			if (root.getTagName()!="tileset") throw new Exception("It's not a tileset");
+			if (!Objects.equals(root.getTagName(), "tileset")) throw new Exception("It's not a tileset");
 			String exts=root.getAttribute("inherits");
-			if (!exts.equals(""))
+			if (!exts.isEmpty())
 				loadFromFile(exts);
 			name=root.getAttribute("name");
 			NodeList nl = root.getChildNodes();
@@ -180,11 +180,11 @@ public class TileSet
            		Element e_child = (Element)n_child;
            		float chance=1.0f; 
            		String chStr = e_child.getAttribute("chance");
-           		if (!chStr.equals(""))
+           		if (!chStr.isEmpty())
            			chance=Float.parseFloat(chStr);
-           		if (e_child.getTagName()=="tile") 
+           		if (Objects.equals(e_child.getTagName(), "tile"))
            			addTile(role, chance, new Tile(e_child));
-           		else if (e_child.getTagName()=="door")
+           		else if (Objects.equals(e_child.getTagName(), "door"))
            			addTile(role, chance, new DoorTile(e_child));
 
         	}
@@ -202,8 +202,8 @@ public class TileSet
 				break;
 			}
 		}
-		set[rn]=new ArrayList<Tile>();
-		chances[rn]=new ArrayList<Float>();
+		set[rn]= new ArrayList<>();
+		chances[rn]= new ArrayList<>();
 		
 	}
 
@@ -229,8 +229,8 @@ public class TileSet
 	
 	
 	
-	private ArrayList<Tile>[] set;
-	private ArrayList<Float>[] chances;
+	private final ArrayList<Tile>[] set;
+	private final ArrayList<Float>[] chances;
 
 	
 	
@@ -249,7 +249,7 @@ public class TileSet
 	public static final int P_BARRICADE=12;
 
 
-	public static String[] ROLE_NAMES = new String[]{"default_tile",
+	public static String[] ROLE_NAMES = {"default_tile",
 											   "ground",
 											   "floor_a",
 											   "floor_b",

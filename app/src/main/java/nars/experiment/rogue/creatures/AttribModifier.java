@@ -63,7 +63,8 @@ public class AttribModifier implements Cloneable, Serializable
 		return mod;
 	}
 
-	public Object clone()
+	@Override
+    public Object clone()
 	{
 		return new AttribModifier(this.attrib, this.mod, this.permanent);
 	}

@@ -43,7 +43,8 @@ public class TargetDialog implements IGameScreen
 				
 	}
 
-	public void paint(Console c)
+	@Override
+    public void paint(Console c)
 	{
 		drawMap(c);
 		
@@ -419,9 +420,9 @@ public class TargetDialog implements IGameScreen
 	private int ty;
 	private int[][] line;
 	private double[] chances;
-	private Map map;
-	private Player pc;
-	private static Actor lastTarget=null;
-	private ArrayList<Actor> visibleActors;
+	private final Map map;
+	private final Player pc;
+	private static Actor lastTarget;
+	private final ArrayList<Actor> visibleActors;
 	private int visibleActorsCursor;
 }	

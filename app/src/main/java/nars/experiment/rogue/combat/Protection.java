@@ -54,7 +54,7 @@ public class Protection implements Serializable
 		return defence;
 	}
 	
-	private int[] armor;
-	private float defence;
+	private final int[] armor;
+	private final float defence;
 
 }

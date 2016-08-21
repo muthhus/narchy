@@ -22,7 +22,8 @@ public class MainMenuDialog implements IGameScreen
 		menu=new String[]{"Start a new game", "Load a saved game", "Read manual", "Quit"};
 	}
 	
-	public void paint(Console c)
+	@Override
+    public void paint(Console c)
 	{
 		if (dialogs!=null) 
 		{
@@ -30,11 +31,11 @@ public class MainMenuDialog implements IGameScreen
 			return;
 		}
 		c.clear();
-		String head="Welcome to Plutonium Roguelike";
+		String head="Plutonium Roguelike";
 		int w=head.length();
 		int h=menu.length+2;
-		int y = (int)c.getSymHeight()/2 - (int)h/2;			
-		int x = (int)c.getSymWidth()/2 - (int)w/2;
+		int y = c.getSymHeight() /2 - h /2;
+		int x = c.getSymWidth() /2 - w /2;
 		c.printString(head, x, y, PtrlConstants.LCYAN);
 		short col;
 		for (int i=0;i<menu.length;i++)
@@ -45,7 +46,8 @@ public class MainMenuDialog implements IGameScreen
 		}
 	}
 
-	public boolean getKeyEvent(KeyEvent ke)
+	@Override
+    public boolean getKeyEvent(KeyEvent ke)
 	{
 		char ch=ke.getKeyChar();
 		if (dialogs!=null)
@@ -88,24 +90,9 @@ public class MainMenuDialog implements IGameScreen
 		{
 			if (cur==0) //new game
 			{
-				try
-				{
-					game=new Game();
-				} catch (ParserConfigurationException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SAXException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+                game=new Game();
 
-				dialogs=new IGameScreen[]{new NameDialog(game.getPlayer()), new GenderDialog(game.getPlayer()), new ClassDialog(game.getPlayer()), new AttribsDialog(game.getPlayer(), 7)};
+                dialogs=new IGameScreen[]{new NameDialog(game.getPlayer()), new GenderDialog(game.getPlayer()), new ClassDialog(game.getPlayer()), new AttribsDialog(game.getPlayer(), 7)};
 				cur_dlg=0;
 				System.out.println("New game");
 			}
@@ -144,6 +131,6 @@ public class MainMenuDialog implements IGameScreen
 	private int cur;
 	private int cur_dlg;
 	private Game game;
-	private String[] menu;
+	private final String[] menu;
 	private IGameScreen[] dialogs;
 }
