@@ -35,33 +35,14 @@ public class PatternIndex extends RawTermIndex {
 
     @Override
     protected @Nullable
-    Termed theCompound(@NotNull Compound t, boolean createIfMissing) {
+    Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
 
         //dont store the actual rules, they are guaranteed unique by other means
-        if (t instanceof PremiseRule) {
-            return t;
+        if (x instanceof PremiseRule) {
+            return x;
         }
 
-        //process Patterns
-        return make(t);
-
-    }
-
-    static protected boolean canBuildConcept(@NotNull Term y) {
-        if (y instanceof Compound) {
-            if (y.op() == NEG)
-                return false;
-            return true; //return !y.isAny(invalidConceptBitVector) && !y.hasTemporal();
-        } else {
-            return !(y instanceof Variable);
-        }
-
-    }
-
-    @NotNull
-    private PatternCompound make(@NotNull Compound c) {
-
-        TermContainer s = c.subterms();
+        TermContainer s = x.subterms();
         int ss = s.size();
         Term[] bb = new Term[ss];
         boolean changed = false;//, temporal = false;
@@ -90,10 +71,20 @@ public class PatternIndex extends RawTermIndex {
 
         TermContainer v = internSubterms(changed ? TermVector.the(bb) : s);
 
+
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
-                makeEllipsis(c, v, e) :
-                new PatternCompound.PatternCompoundSimple(c, v);
+                makeEllipsis(x, v, e) :
+                new PatternCompound.PatternCompoundSimple(x, v);
+    }
+
+    static protected boolean canBuildConcept(@NotNull Term y) {
+        if (y instanceof Compound) {
+            return y.op() != NEG;
+        } else {
+            return !(y instanceof Variable);
+        }
+
     }
 
     @NotNull

@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 
 public class TemporalTest {
 
-    @NotNull NAR n = new Terminal(128); //for cycle/frame clock, not realtime like Terminal
+    @NotNull NAR n = new Default();
 
 
     @Test public void parsedCorrectOccurrenceTime() {
@@ -75,11 +75,21 @@ public class TemporalTest {
         Task a = n.inputTask("((x) ==>+10 (y)).");
         Task c = n.inputTask("((x) ==>+9 (y)).");
         Task b = n.inputTask("((x) <-> (y)).");
+        n.next();
 
-        assertTrue( n.concept(a.term()) == n.concept(c.term()));
+        @NotNull Compound aa = a.term();
+        assertNotNull(aa);
 
-        assertTrue( ((CompoundConcept)n.concept(a.term())).term(0) == ((CompoundConcept)n.concept(c.term())).term(0));
-        assertTrue( ((CompoundConcept)n.concept(b.term())).term(0) == ((CompoundConcept)n.concept(c.term())).term(0));
+        @Nullable Concept na = a.concept(n);
+        assertNotNull(na);
+
+        @Nullable Concept nc = c.concept(n);
+        assertNotNull(nc);
+
+        assertTrue( na == nc );
+
+        assertTrue( ((CompoundConcept) na).term(0) == ((CompoundConcept)nc).term(0));
+        assertTrue( ((CompoundConcept)b.concept(n)).term(0) == ((CompoundConcept)c.concept(n)).term(0));
 
     }
 

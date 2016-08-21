@@ -151,10 +151,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable public final Compound normalize(Compound t) {
 
 //        //TODO debug only
-//        if (random.nextFloat() < 0.001f) {
-//            logger.info("normalization cache: {}", index.normalizations.summary());
-//            logger.info("term cache: {}", index.terms.summary());
-//        }
+        if (random.nextFloat() < 0.001f) {
+            logger.info("normalization cache: {}", index.normalizations.summary());
+            logger.info("term cache: {}", index.terms.summary());
+        }
 
         return index.normalize(t);
     }
@@ -532,7 +532,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         MutableTask t = new MutableTask(term, questionOrQuest, null);
         t.time(time(), when);
 
-        inputLater(t);
+        input(t);
 
         return t;
 

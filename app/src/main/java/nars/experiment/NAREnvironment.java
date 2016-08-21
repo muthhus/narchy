@@ -225,16 +225,19 @@ abstract public class NAREnvironment {
         System.gc();
 
 
-        this.loop = new NARLoop(nar, frameDelayMS);
 
-        init(nar);
 
-        mission();
 
         nar.runLater(()->{
-            //begin
+            init(nar);
+
+            mission();
+
             nar.onFrame(nn -> next());
         });
+
+        this.loop = new NARLoop(nar, frameDelayMS);
+
 
         return loop;
 

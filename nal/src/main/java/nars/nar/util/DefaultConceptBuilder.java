@@ -63,8 +63,8 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     @NotNull
     private static Map newBagMap(int cap) {
-        return new NonBlockingHashMap(cap);
-        //return new ConcurrentHashMap(cap);
+        //return new NonBlockingHashMap(cap);
+        return new ConcurrentHashMap(cap);
         //return new HashMap(cap);
         //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
                         //ConcurrentHashMapUnsafe(cap);

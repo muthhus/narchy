@@ -219,7 +219,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
      */
     @NotNull
     protected Termed getConceptCompound(@NotNull Compound x) {
-        return (Termed) compounds.get(x, y -> (Termlike)buildConcept((Compound)y));
+        return (Termed) compounds.get(conceptualize(x), y -> (Termlike)buildConcept((Compound)y));
     }
 
 
