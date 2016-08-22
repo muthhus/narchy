@@ -18,6 +18,8 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Param.TRUTH_EPSILON;
+
 /**
  * Created by me on 8/22/16.
  */
@@ -80,10 +82,12 @@ public class Activation {
         Truth before = delta.before;
         Truth after = delta.after;
 
+        float deltaSatisfaction, deltaConf;
+
         if (before !=null && after !=null) {
 
             float deltaFreq = after.freq() - before.conf();
-            float deltaConf = after.conf() - before.conf();
+            deltaConf = after.conf() - before.conf();
 
             Truth other;
             float polarity =  0;
@@ -100,15 +104,17 @@ public class Activation {
                 other = null;
             }
 
-            float deltaSatisfaction = 0;
 
             if (other!=null) {
 
-                float gf = other.freq();
+                float f = other.freq();
 
-                if (Util.equals(gf, 0.5f, Param.TRUTH_EPSILON)) {
-                    //no change
-                } else if (gf > 0.5f) {
+                if (Util.equals(f, 0.5f, TRUTH_EPSILON)) {
+
+                    //ambivalence: no change
+                    deltaSatisfaction = 0;
+
+                } else if (f > 0.5f) {
                     //measure how much the freq increased since goal is positive
                     deltaSatisfaction = +polarity * deltaFreq / (2f * (other.freq() - 0.5f));
                 } else {
@@ -118,15 +124,23 @@ public class Activation {
 
                 nar.emotion.happy(deltaSatisfaction, input.term());
 
+            } else {
+                deltaSatisfaction = 0;
             }
 
+        } else {
+            if (before == null && after!=null) {
+                deltaConf = after.conf();
+            } else {
+                deltaConf = 0;
+            }
+            deltaSatisfaction = 0;
+        }
+
+        if (!Util.equals(deltaConf, 0f, TRUTH_EPSILON))
             nar.emotion.confident(deltaConf, input.term());
 
-            if (input instanceof DerivedTask) {
-                ((DerivedTask)input).feedback(delta, deltaConf, deltaSatisfaction, nar);
-            }
-
-        }
+        input.feedback(delta, deltaConf, deltaSatisfaction, nar);
 
     }
 

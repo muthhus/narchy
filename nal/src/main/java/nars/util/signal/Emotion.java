@@ -36,7 +36,8 @@ public final class Emotion implements Serializable {
     @NotNull
     public final FloatGuage sad;
 
-    @NotNull private final FloatGuage confident;
+    @NotNull
+    public final FloatGuage confident;
 
 
     /** count of errors */

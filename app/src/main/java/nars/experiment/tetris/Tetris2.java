@@ -276,27 +276,31 @@ public class Tetris2 extends NAREnvironment {
 
 
         actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b,d)->{
-            float x = d.freq();
-            //System.out.println(d + " " + x);
-            if (x > actionThresholdHigh) {
-                if (state.take_action(RIGHT))
-                    return d; //legal move
-            } else if (x < actionThresholdLow) {
-                if (state.take_action(LEFT))
-                    return d; //legal move
+            if (d!=null) {
+                float x = d.freq();
+                //System.out.println(d + " " + x);
+                if (x > actionThresholdHigh) {
+                    if (state.take_action(RIGHT))
+                        return d; //legal move
+                } else if (x < actionThresholdLow) {
+                    if (state.take_action(LEFT))
+                        return d; //legal move
+                }
             }
             return null; //no action taken or move ineffective
         }));
 
         if (rotate) {
             actions.add(motorRotate = new MotorConcept("(rotate)", nar, (b,d)->{
-                float r = d.freq();
-                if (r > actionThresholdHigh) {
-                    if (state.take_action(CW))
-                        return d;
-                } else if (r < actionThresholdLow) {
-                    if (state.take_action(CCW))
-                        return d;
+                if (d!=null) {
+                    float r = d.freq();
+                    if (r > actionThresholdHigh) {
+                        if (state.take_action(CW))
+                            return d;
+                    } else if (r < actionThresholdLow) {
+                        if (state.take_action(CCW))
+                            return d;
+                    }
                 }
                 return null;
             }));
@@ -636,6 +640,9 @@ public class Tetris2 extends NAREnvironment {
         Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
         plot.add("Rwrd", reward);
 
+        Plot2D plot1 = new Plot2D(plotHistory, Plot2D.Line);
+        plot1.add("Conf", () -> nar.emotion.confident.getSum());
+
         Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
         plot2.add("Busy", () -> nar.emotion.busy.getSum());
         plot2.add("Lern", () -> nar.emotion.busy.getSum() - nar.emotion.frustration.getSum());
@@ -653,12 +660,13 @@ public class Tetris2 extends NAREnvironment {
 
         nar.onFrame(f -> {
             plot.update();
+            plot1.update();
             plot2.update();
             plot3.update();
             plot4.update();
         });
 
-        return new GridSurface(VERTICAL, plot, plot2, plot3, plot4);
+        return new GridSurface(VERTICAL, plot, plot1, plot2, plot3, plot4);
     }
 
     public static class NARController extends NAREnvironment {
