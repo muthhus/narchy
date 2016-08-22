@@ -49,8 +49,8 @@ abstract public class NAREnvironment {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<MotorConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.05f;
-    @Deprecated public float gammaEpsilonFactor = 0.75f;
+    public float alpha, gamma, epsilonProbability = 0.2f;
+    @Deprecated public float gammaEpsilonFactor = 0.5f;
 
     final int CURIOSITY_DURATION = 16; //frames
     final DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(CURIOSITY_DURATION);

@@ -144,14 +144,18 @@ public interface Budget extends Budgeted {
         setPriority(Util.lerp(target, p, speed));
     }
 
-    default void priLerpMult(float factor, float speed) {
+    /** returns the delta */
+    default float priLerpMult(float factor, float speed) {
 
         if (Util.equals(factor, 1f, Param.BUDGET_EPSILON))
-            return; //no change
+            return 0; //no change
 
         float p = pri();
-        float target = p * factor;
+        float target = Util.clamp(p * factor);
+        float delta = target - p;
         setPriority(Util.lerp(target, p, speed));
+        return delta;
+
     }
 
     default void durMult(float factor) {

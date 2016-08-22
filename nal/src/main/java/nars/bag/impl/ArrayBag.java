@@ -38,7 +38,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * inbound pressure sum since last commit
      */
-    float pressure = 0;
+    public float pressure = 0;
 
     /**
      * mass as calculated in previous commit

@@ -3,13 +3,17 @@ package nars.task;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.bag.impl.ArrayBag;
+import nars.concept.Concept;
 import nars.concept.TruthDelta;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,8 +31,7 @@ abstract public class DerivedTask extends MutableTask {
 
         evidence(evidence);
 
-        if (Param.DEBUG)
-            this.premise = p.premise;
+        this.premise = p.premise;
     }
 
 
@@ -73,18 +76,15 @@ abstract public class DerivedTask extends MutableTask {
     }
 
 
-
     @Override
     public boolean delete() {
+
         if (!Param.DEBUG) {
             this.premise = null;
         }
         return super.delete();
     }
 
-    @Override public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
-
-    }
 
     public static class DefaultDerivedTask extends DerivedTask {
 
@@ -92,19 +92,56 @@ abstract public class DerivedTask extends MutableTask {
             super(tc, punct, truth, premise, evidence);
         }
 
-        //        void feedback(float score) {
-////            ConceptProcess p = this.premise.get();
-////            if (p != null) {
-////                BLink<? extends Term> termlink = p.termLink;
-////                BLink<? extends Task> tasklink = p.taskLink;
-////                //BLink<? extends Concept> pc = p.conceptLink;
-////                if (!termlink.isDeleted())
-////                    termlink.priLerpMult(score, feedbackRate);
-////                if (!tasklink.isDeleted())
-////                    tasklink.priLerpMult(score, feedbackRate);
-////
-////            }
-//        }
+
+        @Override
+        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+            float boost = Math.abs(deltaConfidence) * Math.abs(deltaSatisfaction);
+            if (!Util.equals(boost, 0, Param.TRUTH_EPSILON ) ) {
+
+                Premise p;
+                synchronized (this.truth()) {
+                    p = this.premise;
+                    if (p != null) {
+                        this.premise = null;
+                    }
+                }
+
+                //apply feedback outside of synchronized
+                if (p!=null) {
+                    feedback(1f + boost, nar);
+                }
+            } else {
+                this.premise = null;
+            }
+
+        }
+
+        void feedback(float score, NAR nar) {
+
+            float feedbackRate = 0.25f;
+
+            @Nullable Premise premise = this.premise;
+            Concept c = nar.concept(premise.term);
+            if (c!=null) {
+
+                //TODO make a Bag method specifically for this (modifying the priority only, if the link exists)
+
+                BLink<? extends Task> tasklink = premise.tasklink(c);
+                if (tasklink != null && !tasklink.isDeleted()) {
+                    float dp = tasklink.priLerpMult(score, feedbackRate);
+                    ((ArrayBag)c.tasklinks()).pressure += dp; //HACK cast
+                }
+
+
+                BLink<? extends Termed> termlink = premise.termlink(c);
+                if (termlink != null && !termlink.isDeleted()) {
+                    float dp = termlink.priLerpMult(score, feedbackRate);
+                    ((ArrayBag)c.termlinks()).pressure += dp; //HACK cast
+                }
+
+            }
+
+        }
 
     }
 

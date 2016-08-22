@@ -4,6 +4,7 @@
  */
 package nars.nal;
 
+import nars.NAR;
 import nars.Task;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
@@ -26,19 +27,25 @@ import org.jetbrains.annotations.Nullable;
 public final class Premise extends RawBudget implements Tasked {
 
 
+    @NotNull private final Term concept;
+
     @NotNull public final Task task;
 
     @NotNull public final Term term;
 
     @Nullable public final Task belief;
 
+
+
     ///** not used in creating a Premise key, because the same premise components may be generated from different originating concepts or even other methods of forming them*/
     //@NotNull transient private final Term conceptLink;
 
 
-    public Premise(@NotNull Task taskLink,
+    public Premise(@NotNull Term concept, @NotNull Task taskLink,
                    @NotNull Term termLink,
                    @Nullable Task belief) {
+
+        this.concept = concept;
 
         this.task = taskLink;
 
@@ -92,11 +99,19 @@ public final class Premise extends RawBudget implements Tasked {
 //        return n.concept(conceptLink);
 //    }
 
-    @Nullable public final BLink<? extends Termed> termlink(@NotNull Concept c) {
+    @Nullable public final BLink<? extends Termed> termlink(NAR nar) {
+        return termlink(nar.concept(concept));
+    }
+
+    @Nullable public final BLink<? extends Termed> termlink(Concept c) {
         return c.termlinks().get(term);
     }
 
-    @Nullable public final BLink<? extends Task> tasklink(@NotNull Concept c) {
+    @Nullable public final BLink<? extends Task> tasklink(NAR nar) {
+        return tasklink(nar.concept(concept));
+    }
+
+    @Nullable public final BLink<? extends Task> tasklink(Concept c) {
         return c.tasklinks().get(task);
     }
 }

@@ -147,7 +147,7 @@ public enum PremiseBuilder {
             }
         }
 
-        Premise p = new Premise(task, termLinkTerm, belief);
+        Premise p = new Premise(c.term(), task, termLinkTerm, belief);
         p.budget(b);
         return p;
     }
