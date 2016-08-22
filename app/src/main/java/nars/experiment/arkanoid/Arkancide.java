@@ -39,9 +39,9 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 32;
+    private static final int cyclesPerFrame = 4;
     public static final int runFrames = 50000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 4;
     public static final int INDEX_SIZE = 20 * 10000000;
     final Arkanoid noid;
     private SwingCamera cam;
@@ -49,7 +49,7 @@ public class Arkancide extends NAREnvironment {
     private MotorConcept motorLeftRight;
 
     final int visW = 24;
-    final int visH = 12;
+    final int visH = 10;
     SensorConcept[][] ss;
 
     private int visionSyncPeriod = 64;

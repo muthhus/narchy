@@ -5,6 +5,7 @@ import nars.Param;
 import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.concept.TruthDelta;
 import nars.task.AnswerTask;
 import nars.task.Revision;
 import nars.task.RevisionTask;
@@ -28,6 +29,7 @@ import static nars.nal.Tense.ETERNAL;
 public class EternalTable extends SortedArray<Task> implements TaskTable, Comparator<Task> {
 
     int capacity;
+    private Truth truth;
 
     public EternalTable(int initialCapacity) {
         super(Task[]::new);
@@ -51,7 +53,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
     @Override
     public void forEach(Consumer<? super Task> action) {
-        synchronized (builder) {
+        synchronized (this) {
             super.forEach(action);
         }
     }
@@ -80,11 +82,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         while (n > 0 && (w = (Task) l[n]) != null) n--; //scan upwards for first non-null
         return w;
 
-//        synchronized(builder) {
-//            int s = size();
-//            if (s==0) return null;
-//            return list[s - 1];
-//        }
     }
 
     protected static float rank(@NotNull Task w) {
@@ -180,7 +177,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
                 conclusion,
                 nar.time(),
                 ETERNAL,
-                concept
+                (CompoundConcept)concept
             ).budget(oldBelief, newBelief)
              .log("Insertion Revision");
     }
@@ -225,20 +222,20 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 //    }
 
     @Nullable
-    public boolean add(@NotNull Task input, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {
             if (input.isInput())
                 throw new RuntimeException("input task rejected (0 capacity): " + input);
-            return false;
+            return null;
         }
 
-        synchronized (builder) {
+        synchronized (this) {
             if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
                 //AXIOMATIC/CONSTANT BELIEF/GOAL
                 addEternalAxiom(input, this, displaced);
-                return true;
+                return new TruthDelta(input.truth(), input.truth()); //special
             }
 
             removeDeleted(displaced);
@@ -262,8 +259,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
             }
 
 
+
             //Finally try inserting this task.  If successful, it will be returned for link activation etc
-            boolean inserted = insert(input, displaced);
+            TruthDelta delta = insert(input, displaced);
             if (revised != null) {
 
                 //            revised = insert(revised, displaced) ? revised : null;
@@ -286,7 +284,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
                 //                    nar.input(revised);
                 //            });
             }
-            return inserted;
+
+            return delta;
         }
 
     }
@@ -296,7 +295,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
      * try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      * returns true if it was inserted, false if not
      */
-    private boolean insert(@NotNull Task incoming, @NotNull List<Task> displ) {
+    private TruthDelta insert(@NotNull Task incoming, @NotNull List<Task> displ) {
+
+        Truth before = this.truth;
 
         Task displaced = put(incoming);
 
@@ -307,8 +308,11 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
             );
         }
 
-        boolean inserted = (displaced == null) || (displaced != incoming);//!displaced.equals(t);
-        return inserted;
+        if ((displaced == null) || (displaced != incoming)) {
+            return new TruthDelta(before, this.truth = truth());
+        }
+
+        return null;
     }
 
     private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, @NotNull List<Task> displ) {
@@ -346,7 +350,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
      */
     public void removeDeleted(@NotNull List<Task> displ) {
 
-        synchronized (builder) {
+        synchronized (this) {
             int s = size();
             for (int i = 0; i < s; ) {
                 Task n = list[i];

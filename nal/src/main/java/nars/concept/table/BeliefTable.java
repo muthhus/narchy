@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.Budgeted;
 import nars.concept.CompoundConcept;
+import nars.concept.TruthDelta;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
@@ -59,8 +60,8 @@ public interface BeliefTable extends TaskTable {
 
 
         @Override
-        public boolean add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
-            return false;
+        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+            return null;
         }
 
 
@@ -187,9 +188,10 @@ public interface BeliefTable extends TaskTable {
 //    }
 
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected)
-     *  TODO return boolean, input should not be transformed
+     *
+     *  return null if wasn't added
      * */
-    boolean add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar);
+    @Nullable TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar);
 
 
 //    @Nullable

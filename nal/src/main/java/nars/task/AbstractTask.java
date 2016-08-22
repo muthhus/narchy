@@ -3,6 +3,7 @@ package nars.task;
 import nars.*;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
+import nars.concept.TruthDelta;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.term.Compound;
@@ -289,17 +290,16 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         return h;
     }
 
-    @Override
-    public boolean onConcept(@NotNull Concept c) {
-        return true;
-    }
-
     @NotNull @Override
     public final Compound term() {
         return term;
     }
 
 
+    @Override
+    public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+
+    }
 
     @Nullable @Override
     public final Truth truth() {

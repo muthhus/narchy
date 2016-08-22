@@ -2,14 +2,9 @@ package nars.concept;
 
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
-import nars.Op;
 import nars.Task;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,67 +37,6 @@ public interface AbstractConcept extends Concept {
 
     //public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
 
-    /** crosslinks termlinks */
-    @Nullable
-    static Concept linkSub(@NotNull Concept source, @NotNull Termed target,
-                           float subScale,
-                           @Nullable NAR.Activation activation, @NotNull NAR nar) {
-
-        /* activate concept */
-        Concept targetConcept;
-
-        Term targetTerm = target.term();
-
-        if (!linkable(targetTerm)) {
-            targetConcept = null;
-        } else {
-            targetConcept = nar.concept(target, true);
-            if (targetConcept == null)
-                throw new NullPointerException(target + " did not resolve to a concept");
-            //if (targetConcept!=null)
-
-
-            activation.activate(targetConcept, subScale);
-//            targetConcept = nar.activate(target,
-//                    activation);
-            //if (targetConcept == null)
-                //throw new RuntimeException("termlink to null concept: " + target);
-        }
-
-//        if (tt.equals( source.term() ))
-//            throw new RuntimeException("termlink self-loop");
-
-
-//        /* insert termlink target to source */
-        boolean alsoReverse = true;
-        if (targetConcept!=null && alsoReverse) {
-            subScale /= 2; //divide among both directions
-
-            targetConcept.termlinks().put(source.term(), activation.in, subScale, activation.linkOverflow);
-        }
-
-        /* insert termlink source to target */
-        source.termlinks().put(targetTerm, activation.in, subScale, activation.linkOverflow);
-
-
-
-        return targetConcept;
-    }
-
-    static boolean linkable(@NotNull Term x) {
-//        return !(target instanceof Variable);
-        if (x instanceof Variable) {
-            return false;
-        }
-        if (x instanceof Compound) {
-
-            if (x.op() == Op.NEG) {
-                if (((Compound) x).term(0) instanceof Variable)
-                    return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * attempt insert a tasklink into this concept's tasklink bag
@@ -113,7 +47,7 @@ public interface AbstractConcept extends Concept {
      *
      * @return whether the link successfully was completed
      */
-    static boolean link(Concept c, float scale, float minScale, @NotNull NAR.Activation activation) {
+    static boolean link(Concept c, float scale, float minScale, @NotNull Activation activation) {
 
         if (scale < minScale)
             return false;

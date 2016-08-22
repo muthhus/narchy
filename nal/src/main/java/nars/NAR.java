@@ -5,9 +5,7 @@ import com.google.common.collect.Sets;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.concept.AbstractConcept;
-import nars.concept.Concept;
-import nars.concept.OperationConcept;
+import nars.concept.*;
 import nars.concept.table.BeliefTable;
 import nars.index.TermIndex;
 import nars.nal.Level;
@@ -598,45 +596,21 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         if (tasks.add(input)) {
 
+            if (clock instanceof FrameClock) {
+                //HACK for unique serial number w/ frameclock
+                ((FrameClock) clock).ensureNextStampExceeds(input.evidence());
+            }
+
             try {
 
                 Concept c = input.concept(this);
 
-                if (c.process(input, this)) {
+                emotion.busy(input.pri());
 
-                    if (clock instanceof FrameClock) {
-                        //HACK for unique serial number w/ frameclock
-                        ((FrameClock) clock).ensureNextStampExceeds(input.evidence());
-                    }
+                Activation a = ((CompoundConcept)c).process(input, this);
+                if (a!=null) {
 
-                    /*
-                    long numTasks = tasks.tasks.estimatedSize();
-                    int concepts = index.size();
-                    float per = numTasks/concepts;
-                    System.out.println("tasks=" + numTasks + ", ~" + per + " per concept");
-                    */
-
-                    float p = input.pri();
-                    if (p > 0) {
-                        //propagate budget
-                        //try {
-                        Activation activation = new Activation(input, c, this, 1f);
-
-                        emotion.busy(p);
-                        emotion.stress(activation.linkOverflow);
-                        //                } catch (Exception e) {
-                        //                    emotion.errr();
-                        //
-                        //                    if (Param.DEBUG)
-                        //                        logger.warn("activation error: {}", e.toString());
-                        //
-                        //                    inputted.delete();
-                        //                    return c;
-                        //                }
-                    }
-
-
-                    input.onConcept(c);
+                    emotion.stress(a.linkOverflow);
 
                     eventTaskProcess.emit(input); //signal any additional processes
                     //eventTaskProcess.emitAsync(inputted, concurrency, runWorker);
@@ -1374,109 +1348,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //    }
 
 
-    public static class Activation {
-        public final Budgeted in;
-
-        public Concept src;
-        //final ObjectFloatHashMap<BLink<Task>> tasks = new ObjectFloatHashMap<>();
-        //public final ObjectFloatHashMap<BLink<Term>> termlinks = new ObjectFloatHashMap<>();
-        public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
-        public final MutableFloat linkOverflow = new MutableFloat(0);
-        public final MutableFloat conceptOverflow = new MutableFloat(0);
-
-        public Activation(@NotNull Task in, @NotNull NAR n, float scale) {
-            this((Budgeted) in, in.concept(n));
-            link(n , scale);
-        }
-
-        public Activation(Budgeted in, Concept src) {
-
-            this.in = in;
-            this.src = src;
-
-        }
-
-        /** runs the task activation procedure */
-        public Activation(Budgeted in, Concept c, NAR nar, float scale) {
-            this(in, c);
-
-            link(nar, scale);
-
-        }
-
-        protected final void link(NAR nar, float scale) {
-            src.link(1f, null/* linkActivation */, Param.BUDGET_EPSILON, nar, this);
-
-            activate(nar, scale); //values will already be scaled
-        }
-
-        public void linkTermLinks(Concept src, float scale, NAR nar) {
-            src.termlinks().forEach(n -> {
-                linkTerm(src, nar, scale, n.get());
-            });
-        }
-
-        public void linkTerms(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
-
-
-            Concept asrc = src;
-            if (asrc != null && asrc != this) {
-                //link the src to this
-                AbstractConcept.linkSub(src, asrc, scale, this, nar);
-            } else {
-                activate(src, scale); //activate self
-            }
-
-            int n = tgt.length;
-            float tStrength = 1f / n;
-            float subScale = scale * tStrength;
-
-            if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
-
-                //then link this to terms
-                for (int i = 0; i < n; i++) {
-                    Term tt = tgt[i];
-
-                    if (!tt.isNormalized()) {
-                        continue; //HACK
-                    }
-
-                    //Link the peer termlink bidirectionally
-                    linkTerm(src, nar, subScale, tt);
-                }
-            }
-
-
-        }
-
-        public void linkTerm(Concept src, @NotNull NAR nar, float subScale, Term tt) {
-            Concept target = AbstractConcept.linkSub(src, tt, subScale, this, nar);
-
-            if (target != null && in instanceof Task) {
-                //insert recursive tasklink
-                target.linkTask((Task) in, subScale);
-            }
-        }
-
-        public void run(@NotNull NAR nar) {
-            activate(nar, 1f);
-        }
-
-        public void activate(@NotNull NAR nar, float activation) {
-            if (!concepts.isEmpty()) {
-                float total = 1 / (float) concepts.sum();
-                ;
-                nar.activate(concepts, in, activation / total, conceptOverflow);
-            }
-        }
-
-        public void activate(Concept targetConcept, float scale) {
-            concepts.addToValue(targetConcept, scale);
-        }
-
-    }
-
-    abstract protected void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow);
+    /** batched concept activation */
+    abstract public void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow);
 
 
 //    public final void activate(@NotNull Task t) {

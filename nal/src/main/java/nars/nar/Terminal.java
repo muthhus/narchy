@@ -70,7 +70,7 @@ public class Terminal extends AbstractNAR {
 
 
     @Override
-    protected void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
+    public void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
         //nothing
     }
 

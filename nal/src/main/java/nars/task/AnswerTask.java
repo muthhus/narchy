@@ -1,8 +1,10 @@
 package nars.task;
 
+import nars.NAR;
 import nars.Task;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
+import nars.concept.TruthDelta;
 import nars.nal.Stamp;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -74,9 +76,8 @@ public class AnswerTask extends MutableTask {
     }
 
     @Override
-    public boolean onConcept(@NotNull Concept c) {
+    public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
         unlink();
-        return true;
     }
 
     @Override

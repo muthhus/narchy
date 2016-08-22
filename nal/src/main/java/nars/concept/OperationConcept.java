@@ -48,21 +48,23 @@ public class OperationConcept extends CompoundConcept<Compound> implements Consu
     }
 
     @Override
-    public boolean processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
-        if (super.processGoal(goal, nar, displaced)){
+    public TruthDelta processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
+        TruthDelta truthDelta = super.processGoal(goal, nar, displaced);
+        if (truthDelta!=null){
             executeLater(goal, nar);
-            return true;
+            return truthDelta;
         }
-        return false;
+        return null;
     }
 
     @Override
-    public boolean processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
-        if (super.processBelief(belief, nar, displaced)){
+    public TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
+        TruthDelta truthDelta = super.processBelief(belief, nar, displaced);
+        if (truthDelta!=null){
             executeLater(belief, nar);
-            return true;
+            return truthDelta;
         }
-        return false;
+        return null;
     }
 
     @Nullable

@@ -107,12 +107,7 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
 
 
     @Override
-    public boolean process(@NotNull Task task, @NotNull NAR nar) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
         return AbstractConcept.link(this, scale, minScale, activation);
     }
 

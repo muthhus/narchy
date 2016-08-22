@@ -196,15 +196,16 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         synchronized (list) {
             questioned = insert(question, displ);
         }
-//        //inserted if questioned!=null
-//        if (questioned != null && !answers.isEmpty()) {
-//            Task a = answers.top(questioned.occurrence());
-//
-//            if (a != null && !a.isDeleted()) {
-//
-//                answer(questioned, a, scale, n);
-//            }
-//        }
+
+        //inserted if questioned!=null
+        if (questioned != null && !answers.isEmpty()) {
+            Task a = answers.top(questioned.occurrence());
+
+            if (a != null && !a.isDeleted()) {
+
+                answer(questioned, a, 1/size(), n);
+            }
+        }
 
 
         return questioned;

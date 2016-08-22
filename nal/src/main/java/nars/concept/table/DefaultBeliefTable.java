@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.CompoundConcept;
+import nars.concept.TruthDelta;
 import nars.task.EternalizedTask;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
@@ -148,19 +149,19 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
 
-    @Override public boolean add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+    @Override public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
 
 
         //Filter duplicates; return null if duplicate
         // (no link activation will propagate and TaskProcess event will not be triggered)
-        boolean result;
+        TruthDelta result;
         if (input.isEternal()) {
             result = eternal.add(input, displaced, concept, nar);
         } else {
             result = temporal.add(input, eternal, displaced, concept, nar);
         }
 
-        if (result) {
+        if (result!=null) {
             questions.answer(input, nar, displaced);
         }
 

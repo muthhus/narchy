@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.Task;
 import nars.concept.CompoundConcept;
+import nars.concept.TruthDelta;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +33,8 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     }
 
     @Override
-    public boolean add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
-        return input == current ? true : false;
+    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+        return null;
     }
 
     @Nullable

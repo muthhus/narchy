@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
+import nars.concept.TruthDelta;
 import nars.nal.Stamp;
 import nars.task.Revision;
 import nars.task.TruthPolation;
@@ -62,35 +63,45 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         return rankTemporalByConfidence(t, when, now, -1);
     }
 
+
     @Nullable
     @Override
-    public final boolean add(@NotNull Task input, EternalTable eternal, @NotNull List<Task> displ, Concept concept, @NotNull NAR nar) {
+    public final TruthDelta add(@NotNull Task input, EternalTable eternal, @NotNull List<Task> displ, Concept concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0)
-            return false;
+            return null;
 
         //the result of compression is processed separately
         Task next;
         long now = nar.time();
 
+
+        Truth before, after;
         synchronized (this) {
+
             next = compress(input, now, eternal, displ, concept);
+
             if (next == null || isFull()) {
                 //not compressible with respect to this input, so reject the input
                 // HACK DOES THIS HAPPEN and WHY, IS IT DANGEROUS
                 //if (Global.DEBUG)
                 //throw new RuntimeException(this + " compression failed");
-                return false;
+                return null;
             }
 
+            before = truth(now, now, null);
+
             add(input);
+
+            after = truth(now, now, null);
+
         }
 
         if (next != input)
             nar.inputLater(next);
 
-        return true;
+        return new TruthDelta(before, after);
     }
 
 

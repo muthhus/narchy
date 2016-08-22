@@ -1,7 +1,9 @@
 package nars;
 
 import nars.budget.Budgeted;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.concept.TruthDelta;
 import nars.index.TermIndex;
 import nars.nal.Stamp;
 import nars.nal.Tense;
@@ -36,7 +38,7 @@ import static nars.truth.TruthFunctions.eternalize;
 public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked {
 
 
-    public final static List<Task> EmptyTaskList = Collections.emptyList();
+    List<Task> EmptyTaskList = Collections.emptyList();
 
     static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
@@ -117,7 +119,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             return test(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
 
-        if (t.volume() > memory.compoundVolumeMax.intValue())
+        if (t.volume() > Param.compoundVolumeMax.intValue())
             return test(t, "Term exceeds maximum volume", safe);
         if (!t.levelValid(memory.nal()))
             return test(t, "Term exceeds maximum NAL level", safe);
@@ -186,12 +188,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      */
     boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime);
 
-    /**
-     * called when a Concept processes this Task; return false to cancel pocessing
-     *
-     * @param c null for command tasks, otherwise it is the concept which has has been changed by this task after its processing
-     */
-    boolean onConcept(@Nullable Concept c);
+
 
 
 //
@@ -298,6 +295,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     default Concept concept(@NotNull NAR n) {
         return n.concept(term(), true);
     }
+
+    /** called if this task is entered into a concept's belief tables
+     *  TODO what about for questions/quests
+     * */
+    void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar);
 
     @NotNull
     @Override

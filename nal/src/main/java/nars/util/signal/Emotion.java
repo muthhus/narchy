@@ -1,5 +1,7 @@
 package nars.util.signal;
 
+import nars.op.time.STMClustered;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.util.meter.event.FloatGuage;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -34,7 +36,7 @@ public final class Emotion implements Serializable {
     @NotNull
     public final FloatGuage sad;
 
-
+    @NotNull private final FloatGuage confident;
 
 
     /** count of errors */
@@ -49,6 +51,7 @@ public final class Emotion implements Serializable {
     public final FloatGuage alert;
 
 
+
     public Emotion() {
         super();
 
@@ -59,6 +62,7 @@ public final class Emotion implements Serializable {
         this.happy = new FloatGuage("happy");
         this.sad = new FloatGuage("sad");
 
+        this.confident = new FloatGuage("happy");
 
         this.stress = new FloatGuage("stress");
         this.frustration = new FloatGuage("frustration");
@@ -77,6 +81,7 @@ public final class Emotion implements Serializable {
         frustration.clear();
         alert.clear();
         errr.clear();
+        confident.clear();
     }
 
     /** percentage of business which was not frustration */
@@ -171,6 +176,12 @@ public final class Emotion implements Serializable {
         frustration.accept( pri );
 
     }
+
+    public void confident(float deltaConf, @NotNull Compound term) {
+        confident.accept( deltaConf );
+
+    }
+
     @Deprecated public void alert(float percentFocusChange) {
         alert.accept( percentFocusChange );
     }
@@ -183,6 +194,8 @@ public final class Emotion implements Serializable {
 
         return happy.getSum() + sad.getSum();
     }
+
+
 
 
 

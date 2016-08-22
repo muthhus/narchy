@@ -1,7 +1,9 @@
 package nars.task;
 
+import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.concept.TruthDelta;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
@@ -78,6 +80,10 @@ abstract public class DerivedTask extends MutableTask {
             this.premise = null;
         }
         return super.delete();
+    }
+
+    @Override public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+
     }
 
     public static class DefaultDerivedTask extends DerivedTask {

@@ -118,10 +118,10 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound> {
         return (target.quests());
     }
 
-    @Override
-    public boolean process(@NotNull Task task, @NotNull NAR nar) {
-        return target.process(task, nar);
-    }
+//    @Override
+//    public TruthDelta process(@NotNull Task task, @NotNull NAR nar) {
+//        return target.process(task, nar);
+//    }
 
     @NotNull
     @Override
@@ -177,7 +177,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound> {
     }
 
     @Override
-    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
         return target.link(scale, src, minScale, nar, activation);
     }
 

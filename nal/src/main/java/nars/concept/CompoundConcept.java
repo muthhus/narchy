@@ -1,9 +1,6 @@
 package nars.concept;
 
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
@@ -58,11 +55,6 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     @Nullable
     private transient ConceptPolicy policy;
 
-    private transient float satisfaction = 0;
-    //private transient long min = Tense.ETERNAL, max = Tense.ETERNAL;
-
-
-    //final HashMap<Task, Task> tasks = new HashMap<>();
 
     /**
      * Constructor, called in Memory.getConcept only
@@ -257,7 +249,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * To accept a new judgment as belief, and check for revisions and solutions
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    public boolean processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
+    public @Nullable TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
         return processBeliefOrGoal(belief, nar, beliefsOrNew(), questions(), displaced);
     }
 
@@ -266,7 +258,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * decide whether to actively pursue it
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    public boolean processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
+    public @Nullable TruthDelta processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
         return processBeliefOrGoal(goal, nar, goalsOrNew(), quests(), displaced);
     }
 
@@ -274,58 +266,13 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      * TODO remove synchronized by lock-free technique
      */
-    private final boolean processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions, List<Task> displaced) {
+    private final @Nullable TruthDelta processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions, List<Task> displaced) {
 
-        //this may be helpful but we need a different way of applying it to keep the two table's ranges consistent
+        return target.add(belief, questions, displaced, this, nar);
 
-//        if (belief.temporal() && (hasBeliefs()&&hasGoals())) {
-//
-//            //finds the temporal intersection of the two temporal belief tables:
-//            //this affects the temporal belief compression's focus in time
-//
-//            long minT = Long.MAX_VALUE;
-//            long maxT = Long.MIN_VALUE;
-//
-//                //max of the min
-//                minT = Math.max( minT,  (((DefaultBeliefTable)beliefs()).temporal.minTime() ));
-//                minT = Math.max( minT,  (((DefaultBeliefTable)goals()).temporal.minTime() ));
-//
-//                //..and min of the max
-//                maxT = Math.min( maxT,  (((DefaultBeliefTable)beliefs()).temporal.maxTime() ));
-//                maxT = Math.min( maxT,  (((DefaultBeliefTable)goals()).temporal.maxTime() ));
-//
-//            ((DefaultBeliefTable)beliefs()).temporal.minTime(minT);
-//            ((DefaultBeliefTable)beliefs()).temporal.maxTime(maxT);
-//            ((DefaultBeliefTable)goals()).temporal.minTime(minT);
-//            ((DefaultBeliefTable)goals()).temporal.maxTime(maxT);
-//        }
-
-        //synchronized (target) {
-        boolean b = target.add(belief, questions, displaced, this, nar);
-        if (b) {
-            updateSatisfaction(nar);
-            return true;
-        }
-        return false;
-        //}
     }
 
-    protected final void updateSatisfaction(@NotNull NAR nar) {
-        if (hasGoals()) {
-            BeliefTable b = beliefs();
-            BeliefTable g = goals();
 
-            long now = nar.time();
-
-            float nextSatisfaction = b.expectation(now) - g.expectation(now);
-
-            float deltaSatisfaction = nextSatisfaction - satisfaction;
-
-            this.satisfaction = nextSatisfaction;
-
-            nar.emotion.happy(deltaSatisfaction, term);
-        }
-    }
 
 
     @Override
@@ -397,7 +344,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
 
     @Override
-    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
         if (AbstractConcept.link(this, scale, minScale, activation)) {
             activation.linkTerms(this, templates.terms(), scale, minScale, nar);
             return true;
@@ -416,27 +363,23 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * <p>
      * called in Memory.immediateProcess only
      *
-     * @return the relevant, non-null, non-Deleted Task, which will either be:
-     * --the input
-     * --an existing one which absorbed the input and will re-fire
-     * --a revised/projected task which may or may not remain in the belief table
+     * @return null if not processed, or an Activation instance to continue with link activation and feedback
      */
-    @Override
-    public final boolean process(@NotNull Task input, @NotNull NAR nar) {
+    public final Activation process(@NotNull Task input, @NotNull NAR nar) {
 
         List<Task> toRemove = $.newArrayList();
 
-        boolean output;
+        boolean output = false;
 
-        //synchronized (term) {
+        TruthDelta delta = null;
 
         switch (input.punc()) {
             case Symbols.BELIEF:
-                output = processBelief(input, nar, toRemove);
+                delta = processBelief(input, nar, toRemove);
                 break;
 
             case Symbols.GOAL:
-                output = processGoal(input, nar, toRemove);
+                delta = processGoal(input, nar, toRemove);
                 break;
 
             case Symbols.QUESTION:
@@ -451,15 +394,21 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
                 throw new RuntimeException("Invalid sentence type: " + input);
         }
 
+        if (delta!=null)
+            output = true;
 
         if (!output) {
             nar.tasks.remove(input); //which was added in the callee
         }
-
         nar.tasks.remove(toRemove);
 
 
-        return output;
+        if (output) {
+            return new Activation(input, this, nar, 1f, delta);
+        } else {
+            return null;
+        }
+
     }
 
 //    private void checkConsistency() {

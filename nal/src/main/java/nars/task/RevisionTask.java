@@ -4,7 +4,9 @@ import nars.NAR;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.BudgetFunctions;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.concept.TruthDelta;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -23,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 public class RevisionTask extends AnswerTask  {
 
 
-    @Nullable
     private Concept concept;
 
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long occTime, Concept target) {
@@ -80,29 +81,28 @@ public class RevisionTask extends AnswerTask  {
     }
 
 
-
-
     /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
-    @Override public boolean onConcept(@NotNull Concept c) {
+    @Override
+    public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
 
         //TODO reimplement again
 
         float resultPri = pri();
         if (resultPri!=resultPri) {
-            return false;
+            unlink();
+            return;
         }
-
 
         Task parentNewBelief = getParentTask();
         if (parentNewBelief==null) {
             unlink();
-            return true; //HACK
+            return; //HACK
         }
 
         Task parentOldBelief = getParentBelief();
         if (parentOldBelief==null) {
             unlink();
-            return true; //HACK
+            return; //HACK
         }
 
         float newBeliefContribution;
@@ -121,7 +121,7 @@ public class RevisionTask extends AnswerTask  {
                 newBeliefContribution);
 
         //Balance Tasklinks
-        Bag<Task> tasklinks = c.tasklinks();
+        Bag<Task> tasklinks = concept(nar).tasklinks();
         BudgetFunctions.balancePri(
                 tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
                 resultPri,
@@ -136,7 +136,6 @@ public class RevisionTask extends AnswerTask  {
 ////            weaken(parentOldBelief);
 ////            //oldBelief.onRevision(this);
 
-        return super.onConcept(c);
     }
 
 //    private void weaken(Task parent) {

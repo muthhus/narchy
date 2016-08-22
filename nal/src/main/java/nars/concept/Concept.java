@@ -153,20 +153,14 @@ public interface Concept extends Termed {
         return Revision.merge(x, y, when, now, truth, concept);
     }
 
-    /**
-     * process a task in this concept
-     *
-     * @param displaced collects tasks which have been displaced by the potential insertion of this task
-     * @return true if process affected the concept (ie. was inserted into a belief table)
-     */
-    boolean process(@NotNull Task task, @NotNull NAR nar);
 
-    boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull NAR.Activation activation);
+
+    boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation);
 
     void linkTask(@NotNull Task t, float scale);
 
 
-    default boolean link(float initialScale, @NotNull NAR nar, @NotNull NAR.Activation activation) {
+    default boolean link(float initialScale, @NotNull NAR nar, @NotNull Activation activation) {
 
         float p = activation.in.priIfFiniteElseNeg1();
         float minScale = nar.taskLinkThreshold.floatValue() / p;
@@ -197,11 +191,11 @@ public interface Concept extends Termed {
     default void crossLink(Budgeted thisInput, Budgeted otherTask, float scale, @NotNull Concept other, @NotNull NAR nar) {
         float halfScale = scale / 2f;
 
-        NAR.Activation a = new NAR.Activation(otherTask, null);
+        Activation a = new Activation(otherTask, null);
 
         this.link(halfScale, nar, a);
 
-        NAR.Activation b = new NAR.Activation(thisInput, null);
+        Activation b = new Activation(thisInput, null);
 
         other.link(halfScale, nar, b);
 

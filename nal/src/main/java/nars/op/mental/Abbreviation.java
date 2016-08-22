@@ -8,6 +8,7 @@ import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
+import nars.concept.TruthDelta;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -152,8 +153,11 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
 
             MutableTask t = new GeneratedTask(abbreviation, Symbols.BELIEF,
                     $.t(1, abbreviationConfidence.floatValue())) {
+                //@Override
+                //TODO
+
                 @Override
-                public boolean onConcept(@NotNull Concept c) {
+                public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
                     Concept abbreviatedConcept = nar.concept(abbreviated, true);
 
                     Concept aliasConcept = nar.concept(alias, true);
@@ -162,9 +166,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
                         abbreviatedConcept.crossLink(b, this, 1f, aliasConcept, nar);
                     } else {
                         logger.error("alias unconceptualized: {}", alias);
-                        return false;
                     }
-                    return true;
                 }
             };
             t.time(nar.time(), ETERNAL);

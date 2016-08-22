@@ -4,11 +4,11 @@ import nars.*;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
+import nars.concept.Activation;
 import nars.concept.Concept;
 import nars.task.GeneratedTask;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.util.Texts;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.PolarRangeNormalizedFloat;
@@ -336,7 +336,7 @@ abstract public class NAREnvironment {
     @Nullable
     protected Concept boost(Concept c) {
 
-        new NAR.Activation(boostBudget, c, nar, 1) {
+        new Activation(boostBudget, c, nar, 1) {
 
             @Override
             public void activate(@NotNull NAR nar, float activation) {
@@ -362,7 +362,7 @@ abstract public class NAREnvironment {
                     .budget(boostBudget).log("Predictor"));
         } else {
             //re-use existing eternal task
-            NAR.Activation a = new NAR.Activation(t, nar, 1f) {
+            Activation a = new Activation(t, nar, 1f) {
                 @Override
                 public void linkTerms(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
                     super.linkTerms(src, tgt, scale, minScale, nar);
