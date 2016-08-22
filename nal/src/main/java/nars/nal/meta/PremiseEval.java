@@ -12,6 +12,7 @@ import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.op.Derive;
 import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
+import nars.nal.op.substituteIfUnifies.substituteIfUnifiesDep;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -27,6 +28,7 @@ import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.op.substituteIfUnifies.*;
 
 
 /**
@@ -152,10 +154,11 @@ public class PremiseEval extends FindSubst {
         put(new substitute(this));
 
         OneMatchFindSubst subMatcher = new OneMatchFindSubst(index, r);
-        put(new substituteIfUnifies.substituteIfUnifiesDep(this, subMatcher));
-        put(new substituteIfUnifies.substituteOnlyIfUnifiesDep(this, subMatcher));
-        put(new substituteIfUnifies.substituteIfUnifiesIndep(this, subMatcher));
-        put(new substituteIfUnifies.substituteOnlyIfUnifiesIndep(this, subMatcher));
+        put(new substituteIfUnifiesDep(this, subMatcher));
+        put(new substituteOnlyIfUnifiesDep(this, subMatcher));
+        put(new substituteIfUnifiesIndep(this, subMatcher));
+        put(new substituteIfUnifiesIndepForward(this, subMatcher));
+        put(new substituteOnlyIfUnifiesIndep(this, subMatcher));
 
         this.start = now();
 

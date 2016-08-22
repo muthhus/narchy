@@ -10,16 +10,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.NEG;
+import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.ETERNAL;
 import static nars.nal.TermBuilder.False;
 
 /**
- * substituteIfUnifies(term, variableType, varFrom, varTo)
- * TODO is this better named "substituteAll"
+ * substituteIfUnifies....(term, varFrom, varTo)
  */
 abstract public class substituteIfUnifies extends TermTransformOperator  {
 
     private final OneMatchFindSubst subMatcher;
-    private final PremiseEval parent; //parent matcher context
+    protected final PremiseEval parent; //parent matcher context
 
     protected substituteIfUnifies(String id, PremiseEval parent, OneMatchFindSubst sub) {
         super(id);
@@ -46,17 +47,20 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     @Override
     //public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
     public Term function(@NotNull Compound p) {
-        final Term[] xx = p.terms();
+        final Term[] a = p.terms();
 //        if (xx.length < 3) {
 //            throw new UnsupportedOperationException();
 //        }
 
-        Term term = xx[0];
+        Term term = a[0];
+        Term x = a[1];
+        Term y = a[2];
 
+        return unify(term, x, y);
+    }
+
+    public @NotNull Term unify(Term term, Term x, Term y) {
         @Nullable Op op = unifying();
-
-        Term x = xx[1];
-        Term y = xx[2];
 
         boolean hasAnyOp = term.hasAny(op);
 
@@ -89,7 +93,6 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
                 }
             }
         }
-        //boolean equals = x.equals(y);
 
 
         if (!equals && hasAnyOp) {
@@ -146,6 +149,51 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return Op.VAR_INDEP;
         }
     }
+
+
+    /** specifies a forward ordering constraint, for example:
+     *      B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndepForward(C,A,B), (Desire:Strong)
+     *
+     *  if B unifies with A then A must be eternal, simultaneous, or future with respect to C
+     *
+     *  for now, this assumes the decomposed term is in the belief position
+     */
+    public static final class substituteIfUnifiesIndepForward extends substituteIfUnifies {
+
+        public substituteIfUnifiesIndepForward(PremiseEval parent, OneMatchFindSubst sub) {
+            super("substituteIfUnifiesIndepForward",parent, sub);
+        }
+
+        @Override
+        public @NotNull Term unify(Term C, Term A, Term B) {
+            Compound decomposed = (Compound) parent.beliefTerm;
+            int dt = decomposed.dt();
+            if (dt == DTERNAL || dt == 0) {
+                //valid
+            } else {
+                //check C's position
+
+                if (decomposed.term(0).equals(C)) {
+                    if (dt < 0)
+                        return False;
+                } else if (decomposed.term(1).equals(C)) {
+                    if (dt > 0)
+                        return False;
+                } else {
+                    throw new RuntimeException("missing C in decomposed");
+                }
+            }
+
+            return super.unify(C, A, B);
+        }
+
+        @NotNull
+        @Override
+        public Op unifying() {
+            return Op.VAR_INDEP;
+        }
+    }
+
     public static final class substituteOnlyIfUnifiesIndep extends substituteIfUnifies {
 
         public substituteOnlyIfUnifiesIndep(PremiseEval parent, OneMatchFindSubst sub) {

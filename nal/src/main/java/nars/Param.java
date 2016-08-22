@@ -139,7 +139,7 @@ public abstract class Param /*extends Container*/ implements Level {
         //return InterpolatingMicrosphere.pow(Math.max(0.5f, diffNorm)*timeRate, -exponent);
 
         return 1f / (1f + dt);
-        //return 1f / ( (float)Math.sqrt(1+dt));
+        //return 1f / ( 1f + (float)Math.sqrt(dt));
         //return 1f / ( (float)Math.pow(1+dt, 1.5f));
 
     };

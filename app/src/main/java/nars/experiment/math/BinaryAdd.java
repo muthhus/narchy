@@ -1,19 +1,33 @@
 package nars.experiment.math;
 
-import nars.$;
-import nars.NAR;
+import nars.*;
 import nars.experiment.NAREnvironment;
-import nars.nal.Tense;
+import nars.experiment.arkanoid.Arkancide;
+import nars.index.CaffeineIndex;
 import nars.nar.Default;
+import nars.nar.util.DefaultConceptBuilder;
+import nars.op.VariableCompressor;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.obj.Termject;
+import nars.time.FrameClock;
 import nars.truth.Truth;
+import nars.util.Util;
+import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
+import nars.util.signal.SensorConcept;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.Random;
+import java.util.function.BiFunction;
 
+import static java.lang.Integer.toBinaryString;
+import static nars.NAR.printTasks;
+import static nars.experiment.tetris.Tetris2.DEFAULT_INDEX_WEIGHT;
+import static nars.experiment.tetris.Tetris2.exe;
+import static nars.util.Texts.n2;
 import static nars.util.Util.argmax;
 
 /**
@@ -23,6 +37,7 @@ public class BinaryAdd extends NAREnvironment {
 
     private CharSensor a, b;
     private CharMotor c;
+    private char[] expect;
 
     public BinaryAdd(NAR nar) {
         super(nar);
@@ -31,42 +46,61 @@ public class BinaryAdd extends NAREnvironment {
     public static class CharSensor {
 
         private final Term id;
-        private final NAR nar;
 
         char[] data = {};
 
-        public CharSensor(String id, NAR nar) {
-            this($.the(id), nar);
-        }
-        public CharSensor(Term id, NAR nar) {
+        public CharSensor(Term id, NAREnvironment env, int size, char[] vocab) {
             this.id = id;
-            this.nar = nar;
-//            nar.onFrame(f -> {
-//
-//            });
+
+            data = new char[size];
+
+            for (int i = 0; i < vocab.length; i++) {
+                for (int j = 0; j < size; j++) {
+
+                    int jj = j, ii = i;
+
+                    char c = vocab[ii];
+                    Compound t = charTerm(id, jj, c);
+                    env.sensors.add(new SensorConcept(t, env.nar, ()->
+                        data[jj] == c ? 1f : 0f,
+                        (v) -> $.t(v, env.alpha)
+                    ));
+                }
+            }
         }
 
-        public CharSensor input() {
-            Term t = $.inh(
-                $.p(data, c -> $.the(c)),
-                id
-            );
-            nar.believe(t, Tense.Present, 1f);
-            return this;
-        }
+//        public CharSensor input() {
+//            Term t = $.inh(
+//                $.p(data, c -> $.the(c)),
+//                id
+//            );
+//            nar.believe(t,
+//                    //Tense.Present,
+//                    Tense.Present,
+//                    1f);
+//            return this;
+//        }
 
         @NotNull public char[] get() {
             return data;
         }
 
         public CharSensor set(@NotNull char[] newData) {
-            if (!Arrays.equals(data, newData)) {
-                this.data = newData;
-                input();
-            }
+            //if (!Arrays.equals(data, newData)) {
+            System.arraycopy(newData, 0, data, 0, data.length);
+                //input();
+            //}
             return this;
         }
 
+        public CharSensor set(@NotNull String s) {
+            //TODO re-use buffer if the same sze
+            return set(s.toCharArray());
+        }
+
+        public String string() {
+            return new String(data);
+        }
     }
 
     public static class CharMotor {
@@ -77,8 +111,11 @@ public class BinaryAdd extends NAREnvironment {
         final float[][] desire;
 
         private final char[] vocab;
+        private final NAR nar;
 
         public CharMotor(Term id, NAREnvironment env, int length, char[] vocab /* characters it can choose from */) {
+
+            this.nar = env.nar;
 
             this.buffer = new char[length];
             this.vocab = vocab;
@@ -88,15 +125,26 @@ public class BinaryAdd extends NAREnvironment {
 
             for (int i = 0; i < vocab.length; i++) {
                 for (int j = 0; j < length; j++) {
-                    Compound t = $.p(id, new Termject.IntTerm(j), $.the(vocab[i]));
-                    int jj = j;
-                    int ii = i;
+
+                    int jj = j, ii = i;
+
+                    Compound t = charTerm(id, jj, vocab[ii]);
                     env.actions.add(new MotorConcept(t, env.nar, (Truth b, Truth d)->{
-                        desire[jj][ii] = d!=null ? d.freq() : 0.5f;
+                        float e = d.expectation();
+                        desire[jj][ii] = e;
+                        float s = desireTotal(jj); //this is approximate unless we make an async motor feedback mode that calculates after all other motors have updated
+                        float p = s > 0 ? e / (s) : 1;
+
+                        //return d.confMultViaWeight(p); //share the feedback with the other motors for this position
+
                         return d;
                     }));
                 }
             }
+        }
+
+        public float desireTotal(int j) {
+            return Util.sum(desire[j]);
         }
 
         public char[] get() {
@@ -111,8 +159,12 @@ public class BinaryAdd extends NAREnvironment {
 
         }
 
+        //DecidingSoftmax decide = new DecidingSoftmax(0.6f, 0.4f, 0.999f);
+
+
         private char decide(int j) {
             return vocab[argmax(desire[j])];
+            //return vocab[decide.decide(desire[j], -1, nar.random)];
         }
 
         public String string() {
@@ -121,23 +173,200 @@ public class BinaryAdd extends NAREnvironment {
 
     }
 
+    public
+    @Nullable
+    static Compound charTerm(Term id, int jj, char c) {
+        //return $.inh($.p(new Termject.IntTerm(jj), $.the(c)), id);
+        return $.p($.p(id,
+                new Termject.IntTerm(jj)),
+                //$.the(jj)),
+                $.quote(String.valueOf(c)));
+    }
+
+    int period = 10;
+    int N = 2;
+    int W = 1; //width of output buffer
+    int ax, bx;
+    char[] vocab = {'0', '1'};
+    char padChar = '0';
+    int timeSpacing = 0;
+    //int rewardIntensity;
+    static IntIntToIntFunction f = (a,b) ->
+            //a + b;
+            a ^ b;
+
+
+    BiFunction<char[],char[],Float> distance = (x,y) -> BinaryAdd.difference(x,y); //ex: Levenshtein, etc
+
+    final DescriptiveStatistics rMean = new DescriptiveStatistics((period+1)*5); //reward mean
+
     @Override
     protected void init(NAR n) {
-        a = new CharSensor("a", n);
-        b = new CharSensor("b", n);
-        c = new CharMotor($.the("c"), this, 4, new char[] { '0', '1' });
+        a = new CharSensor($.the("a"), this, W, vocab);
+        b = new CharSensor($.the("b"), this, W, vocab);
+
+        c = new CharMotor($.the("c"), this, W, vocab);
+
+        ticksBeforeObserve = timeSpacing;
     }
+
+
+
+    interface IntIntToIntFunction {
+        int valueOf(int x1, int x2);
+    }
+
 
     @Override
     protected float act() {
-        System.out.println(c.string());
-        return 0.5f;
+
+
+        if (desireConf() > 0.45f && rMean.getMean() > 0.75f) {
+            //lock into logical mode
+            epsilonProbability = 0;
+        }
+
+        if (expect == null || now % period == 0) {
+
+            //set for the remainder of the period
+            ax = nar.random.nextInt(N);
+            bx = nar.random.nextInt(N);
+            //rewardIntensity = 0;
+        } else {
+            //rewardIntensity++;
+        }
+
+        a.set(pad(toBinaryString(ax), W, padChar));
+        b.set(pad(toBinaryString(bx), W, padChar));
+        String s = pad(toBinaryString(f.valueOf(ax, bx)), W, padChar);
+        expect = s.toCharArray();
+
+
+        float d = distance.apply(expect, c.get());
+        float r0 = (1f - d);
+        float r =
+                //Util.lerp(
+                    r0;
+                    //(float)rMean.getMean(),
+                //0.5f);
+
+        if (epsilonProbability == 0 && d!=1.0f) {
+            //it caused a mistake
+
+            actions.forEach(a -> {
+               a.goals().forEach(ag -> {
+                   System.out.println(ag.proof());
+
+               });
+            });
+
+            System.out.println("\n---\n");
+
+            System.exit(1);
+        }
+
+        rMean.addValue(r0);
+
+
+        /*
+        System.err.println("score=" + n2(rMean.getMean()) + " conf=" + n2(desireConf())
+                 + "\t" + a.string() + " " + b.string() + " --> " + new String(expect) + " ?? " +
+                c.string() );
+                */
+
+
+        return r;
+    }
+
+    /** also truncates if exceeds the size */
+    private String pad(String s, int size, char padChar) {
+        if (s.length() > size) {
+            s = s.substring(0, size);
+        }
+        while (s.length() < size) {
+            s = padChar + s;
+        }
+        return s;
+    }
+
+
+    /** x and y have to be same length */
+    static float difference(char[] x, char[] y) {
+        int sum = 0;
+        int n = x.length;
+        for (int i = 0; i < n; i++) {
+            if (x[i]!=y[i])
+                sum++;
+        }
+        return ((float)sum)/n;
     }
 
     public static void main(String[] args) {
-        Default nar = new Default();
+        Random rng = new XorShift128PlusRandom(1);
 
-        new BinaryAdd(nar).run(1000);
+        Param.DEBUG = false;
+
+        //Multi nar = new Multi(3,512,
+        Default nar = new Default(1024,
+                8, 2, 3, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
+
+                , new FrameClock(), exe
+
+        ) {
+
+            VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
+
+            @Override
+            protected Task preprocess(Task input) {
+                return p.pre(input);
+            }
+
+        };
+
+        nar.inputActivation.setValue(0.01f);
+        nar.derivedActivation.setValue(0.01f);
+
+
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.7f);
+        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.1f;
+        nar.cyclesPerFrame.set(10);
+        nar.compoundVolumeMax.set(30);
+        //nar.confMin.setValue(0.05f);
+        //nar.truthResolution.setValue(0.02f);
+
+
+        //MySTMClustered stm = new MySTMClustered(nar, 32, '.', 3);
+        //MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 3);
+
+        //new ArithmeticInduction(nar);
+        //new VariableCompressor(nar);
+
+        //new Abbreviation(nar,"aKa_");
+
+        BinaryAdd b = new BinaryAdd(nar);
+
+        Param.DEBUG = true;
+        //b.trace = false;
+
+        NARLoop bLoop = b.run(100000, 0);
+
+//        System.out.println(b.sensors);
+//        System.out.println(b.actions);
+
+        Arkancide.newBeliefChartWindow(b, 2000);
+        //BagChart.show((Default) nar, 256);
+
+        bLoop.join();
+
+
+        printTasks(nar, true);
+        printTasks(nar, false);
+        nar.printConceptStatistics();
     }
 
 

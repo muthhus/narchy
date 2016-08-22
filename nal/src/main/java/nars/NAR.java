@@ -114,7 +114,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     public void printConceptStatistics() {
-        Frequency complexity = new Frequency();
+        //Frequency complexity = new Frequency();
         Frequency volume = new Frequency();
         Frequency rootOp = new Frequency();
         AtomicInteger i = new AtomicInteger(0);
@@ -126,7 +126,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         forEachConcept(c -> {
             i.incrementAndGet();
-            complexity.addValue(c.complexity());
+            //complexity.addValue(c.complexity());
             volume.addValue(c.volume());
             rootOp.addValue(c.op());
 
@@ -141,7 +141,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         System.out.println("\ntermLinksCapacity:\n" + termlinksCap);
         System.out.println("\ntaskLinksUsed:\n" + tasklinksUsed);
         System.out.println("\ntaskLinksCapacity:\n" + tasklinksCap);
-        System.out.println("\nComplexity:\n" + complexity);
+        //System.out.println("\nComplexity:\n" + complexity);
         System.out.println("\nrootOp:\n" + rootOp);
         System.out.println("\nvolume:\n" + volume);
 
@@ -150,11 +150,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable public final Compound normalize(Compound t) {
 
-//        //TODO debug only
-        if (random.nextFloat() < 0.001f) {
-            logger.info("normalization cache: {}", index.normalizations.summary());
-            logger.info("term cache: {}", index.terms.summary());
-        }
+////        //TODO debug only
+//        if (random.nextFloat() < 0.001f) {
+//            logger.info("normalization cache: {}", index.normalizations.summary());
+//            logger.info("term cache: {}", index.terms.summary());
+//        }
 
         return index.normalize(t);
     }
@@ -1467,8 +1467,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         public void activate(@NotNull NAR nar, float activation) {
             if (!concepts.isEmpty()) {
-                float total = 1;
-                //(float) concepts.sum();
+                float total = (float) concepts.sum(); //normalize
                 nar.activate(concepts, in, activation / total, overflow);
             }
         }

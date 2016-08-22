@@ -1,6 +1,7 @@
 package nars.experiment;
 
 import nars.*;
+import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
@@ -26,7 +27,9 @@ import java.util.List;
 import static nars.$.t;
 import static nars.agent.NAgent.varPct;
 import static nars.nal.Tense.ETERNAL;
+import static nars.nal.UtilityFunctions.or;
 import static nars.nal.UtilityFunctions.w2c;
+import static nars.util.Texts.n2;
 import static nars.util.Texts.n4;
 
 /**
@@ -57,12 +60,14 @@ abstract public class NAREnvironment {
 
     public float rewardValue;
     private final FasterList<Task> predictors = $.newArrayList();
-    private final boolean trace = true;
+    public boolean trace = true;
 
-    int ticksBeforeObserve, ticksBeforeDecide;
+    protected int ticksBeforeObserve;
+    int ticksBeforeDecide;
     protected long now;
     private long stopTime;
     private NARLoop loop;
+    private Budget boostBudget;
 
 
     public NAREnvironment(NAR nar) {
@@ -75,7 +80,7 @@ abstract public class NAREnvironment {
                 //gamma
         ;
 
-        this.reinforcementAttention = gamma;
+        this.reinforcementAttention = or(nar.DEFAULT_BELIEF_PRIORITY, nar.DEFAULT_GOAL_PRIORITY);
 
         float rewardConf = alpha;
 
@@ -85,7 +90,7 @@ abstract public class NAREnvironment {
                 rewardNormalized,
                 (x) -> t(x, rewardConf)
         );
-        predictors.add(happy.desire($.t(1f, rewardGamma)));
+        predictors.add(happy.desire($.t(1f, rewardGamma), reinforcementAttention, 0.75f));
 
 
         joy = new SensorConcept("(joy)", nar,
@@ -151,8 +156,9 @@ abstract public class NAREnvironment {
 //                             + "," +
 //                     n4( happy.beliefs().truth(now).motivation() )
 //                 + "] "
-                  "rwrd=" + n4(rewardValue) + "\t" +
-                  "hapy=" + n4(emotion.happy()) + " "
+                  "rwrd=" + n2(rewardValue) + "\t"
+                + "conf=" + n4(desireConf()) + " "
+                + "hapy=" + n4(emotion.happy()) + " "
                 + "busy=" + n4(emotion.busy.getSum()) + " "
                 + "lern=" + n4(emotion.learning()) + " "
                 + "strs=" + n4(emotion.stress.getSum()) + " "
@@ -261,6 +267,8 @@ abstract public class NAREnvironment {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
         if (reinforcementAttention > 0) {
 
+            boostBudget = UnitBudget.One.clone().multiplied(reinforcementAttention, 0.5f, 0.5f);
+
             //boost(happy);
             //boost(happy); //boosted by the (happy)! task that is boosted below
             //boost(sad);
@@ -274,13 +282,13 @@ abstract public class NAREnvironment {
             }
             motorDesireEvidence.addValue(m);
 
-            float motorDesireConfMean = Math.min(1f, w2c((float)motorDesireEvidence.getMean()));
-            System.out.println(Texts.n2(motorDesireConfMean) + " motorDesireConfMean");
 
-            float motorEpsilonProbability = epsilonProbability/a * (1f - motorDesireConfMean);
+
+            float motorEpsilonProbability = epsilonProbability/a * (1f - desireConf());
             for (MotorConcept c : actions) {
                 if (nar.random.nextFloat() < motorEpsilonProbability) {
-                    nar.inputLater(new GeneratedTask(c, '!',
+                    nar.inputLater(
+                        new GeneratedTask(c, '!',
                             $.t(nar.random.nextFloat()
                             //Math.random() > 0.5f ? 1f : 0f
                             , gamma * gammaEpsilonFactor))
@@ -299,7 +307,7 @@ abstract public class NAREnvironment {
                             return false;
                         }
                     }*/.
-                            present(now).log("Curiosity"));
+                            present(now).budget(boostBudget).log("Curiosity"));
                 }
 
                 boost(c);
@@ -314,10 +322,14 @@ abstract public class NAREnvironment {
 
     }
 
+    public float desireConf() {
+        return Math.min(1f, w2c((float)motorDesireEvidence.getMean()));
+    }
+
     @Nullable
     protected Concept boost(Concept c) {
 
-        new NAR.Activation(UnitBudget.One, c, nar, alpha) {
+        new NAR.Activation(boostBudget, c, nar, 1) {
 
             @Override
             public void activate(@NotNull NAR nar, float activation) {
@@ -333,14 +345,14 @@ abstract public class NAREnvironment {
 
 
     private void boost(@NotNull Task t) {
-        BudgetMerge.max.apply(t.budget(), UnitBudget.One, reinforcementAttention);
+        BudgetMerge.max.apply(t.budget(), boostBudget, 1);
         if (t.isDeleted())
             throw new RuntimeException();
 
         float REINFORCEMENT_DURABILITY = 0.9f;
         if (t.occurrence() != ETERNAL) {
             nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(now, now)
-                    .budget(reinforcementAttention, REINFORCEMENT_DURABILITY, 0.9f).log("Predictor"));
+                    .budget(boostBudget).log("Predictor"));
         } else {
             //re-use existing eternal task
             NAR.Activation a = new NAR.Activation(t, nar, 1f) {

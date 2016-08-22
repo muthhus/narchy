@@ -94,13 +94,22 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         synchronized (list) {
 
-            for (int i = 0; !a.isDeleted() && i < list.size(); ) {
-                Task q = list.get(i);
-                if (!q.isDeleted()) {
-                    answer(q, a, nar);
-                    i++;
-                } else {
-                    remove(i, null, displ);
+            int size = list.size();
+            if (size > 0) {
+
+                //each question is only responsible for 1/N of the effect on the answer
+                //TODO calculate this based on fraction of each question's priority of the total
+
+
+                for (int i = 0; !a.isDeleted() && i < size; ) {
+                    Task q = list.get(i);
+                    if (!q.isDeleted()) {
+                        answer(q, a, 1f/size, nar);
+                        i++;
+                    } else {
+                        remove(i, null, displ);
+                        size--;
+                    }
                 }
             }
         }
@@ -109,7 +118,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     /**
      * returns false if the question should be removed after retuning
      */
-    private static void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar) {
+    private static void answer(@NotNull Task q, @NotNull Task a, float scale, @NotNull NAR nar) {
 //        if (Stamp.overlapping(q.evidence(), a.evidence()))
 //            return;
 
@@ -118,14 +127,14 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         boolean aEtern = a.isEternal();
         boolean qEtern = q.isEternal();
-        float factor = 1f;
+        float factor = scale;
         if (aEtern) {
             if (qEtern)
-                factor = 1f - a.conf();
+                factor = scale * (1f - a.conf());
         } else {
             if (!qEtern) {
                 //TODO BeliefTable.rankTemporalByConfidence()
-                factor = 1f - a.conf();
+                factor = scale * (1f - a.conf());
             }
         }
 
@@ -145,7 +154,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
                 Concept qc = nar.concept(q);
                 if (qc != null) {
-                    qc.crossLink(q, a, aConf, nar);
+                    qc.crossLink(q, a, scale * aConf, nar);
                 }
             }
             //nar.activate(a, qBudget);
@@ -187,13 +196,15 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         synchronized (list) {
             questioned = insert(question, displ);
         }
-        //inserted if questioned!=null
-        if (questioned != null && !answers.isEmpty()) {
-            Task a = answers.top(questioned.occurrence());
-            if (a != null && !a.isDeleted()) {
-                answer(questioned, a, n);
-            }
-        }
+//        //inserted if questioned!=null
+//        if (questioned != null && !answers.isEmpty()) {
+//            Task a = answers.top(questioned.occurrence());
+//
+//            if (a != null && !a.isDeleted()) {
+//
+//                answer(questioned, a, scale, n);
+//            }
+//        }
 
 
         return questioned;

@@ -81,12 +81,20 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
                             goal = gt.conf();
                     }
 
-                    r = 0;
-                    g = belief;
-                    b = goal;
+                    if (belief > 0 || goal > 0) {
+                        r = 0;
+                        g = 0.25f + 0.75f * belief;
+                        b = 0.25f + 0.75f * goal;
+                    } else if (c.hasQuestions() || c.hasQuests()) {
+                        r = 1; //yellow
+                        g = 1/2;
+                        b = 0;
+                    } else {
+                        r = g = b = 0;
+                    }
                 }
                 else {
-                    r = g = b = 0;
+                    r = g = b = 0.5f;
                 }
 
                 y.update(p, r, g, b);

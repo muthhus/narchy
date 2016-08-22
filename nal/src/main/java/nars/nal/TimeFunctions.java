@@ -222,6 +222,8 @@ public interface TimeFunctions {
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
 
         Task premBelief = p.belief;
+        //if (premBelief == null)
+            //premBelief = p.task; //it is the task itself being decomposed
 
         Compound decomposedTerm = (Compound) (decomposeTask ? $.pos(p.taskTerm) : p.beliefTerm).term();
         int dtDecomposed = decomposedTerm.dt();
@@ -441,7 +443,7 @@ public interface TimeFunctions {
 
 
         if (dtTerm instanceof Compound && Op.isTemporal(derived, ((Compound) dtTerm).dt())) {
-            int dtdt = dtTerm instanceof Compound ? ((Compound) dtTerm).dt() : DTERNAL;
+            int dtdt = ((Compound) dtTerm).dt();
             return deriveDT(derived, +1, p, dtdt, occReturn);
         } else
             return derived;
@@ -584,8 +586,8 @@ public interface TimeFunctions {
             occReturn[0] = taskOcc;
         } else {
             //merge in proportion to their conf
-            float tConf = p.task.conf();
-            float bConf = p.belief.conf();
+            double tConf = p.task.conf();
+            double bConf = p.belief.conf();
             double newOcc = Util.lerp(taskOcc, beliefOcc, tConf / (bConf + tConf));
             occReturn[0] = (long)newOcc;
         }

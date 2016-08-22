@@ -367,10 +367,18 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void subgoal_2()  {
         test()
-            //.log()
+                .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) && open({t001})))! :|:")
+                .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
+                .mustNotOutput(cycles, "hold:(SELF,{t002})", '!', ETERNAL);
+    }
+
+    @Test
+    public void subgoal_2_inner_dt()  {
+        test()
+            .log()
             .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001})))! :|:")
-            .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
-            .mustNotOutput(cycles, "hold:(SELF,{t002})", '!', ETERNAL);
+            .mustDesire(cycles*4, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
+            .mustNotOutput(cycles*4, "hold:(SELF,{t002})", '!', ETERNAL);
     }
 
     @Test
@@ -381,8 +389,8 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 //.log()
                 .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001}))). :|:")
-                .mustBelieve(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
-                .mustBelieve(cycles, "(at:(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f, 5)
+                .mustBelieve(cycles*4, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
+                .mustBelieve(cycles*4, "(at:(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f, 5)
         ;
     }
     @Test
@@ -456,12 +464,12 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_belief_deduction_2_easier()  {
 
         test()
-                //.log()
-                .input(              "on:(t002,t003). :|:")
-                .inputAt(4,         "(on:(t002,#1) &&+0 at:(SELF,#1)).")
-                .mustBelieve(cycles*4,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
-                .mustNotOutput(cycles*4, "at:(SELF,t003)", '.', 0, 1f, 0, 1f, ETERNAL);
+                .input(      "on:(t002,t003). :|:")
+                .inputAt(2,  "(on:(t002,#1) &&+0 at:(SELF,#1)).")
+                .mustBelieve(cycles*8,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
+                .mustNotOutput(cycles*8, "at:(SELF,t003)", '.', 0, 1f, 0, 1f, ETERNAL);
     }
+
     @Ignore
     @Test
     public void condition_belief_deduction_2_dternal()  {
@@ -488,22 +496,21 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test
-    public void temporal_goal_detachment_2()  {
+    public void temporal_goal_detachment_2_invalid()  {
+        //this is the reverse case which should not be derived by decomposing the belief
         test()
-                //.log()
                 .input("(hold)! :|:")
-                .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) ).") //should not decomposed by the goal task
-                .mustDesire(cycles, "((at) &&+5 (open))", 1f, 0.81f, 5)
-                .mustNotOutput(cycles, "((at) &&+5 (open))", '!', ETERNAL, 15)
+                .inputAt(2, "( (hold) &&+5 (eat) ).") //should not decomposed by the goal task
+                .mustNotOutput(cycles, "(eat)", '!', ETERNAL, 15, 5)
         ;
     }
     @Test
-    public void temporal_goal_detachment_3()  {
+    public void temporal_goal_detachment_3_valid()  {
         test()
-                //.log()
-                .input("(hold)! :|:")
-                .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) )!") //should not decomposed by the goal task
-                .mustNotOutput(cycles, "((at) &&+5 (open))", '!', 5, ETERNAL, 15)
+                .input("(use)! :|:")
+                .inputAt(2, "( (hold) &&+5 (use) ).") //should be decomposed by the goal task
+                .mustDesire(cycles, "(hold)", 1f, 0.81f, -5)
+                .mustNotOutput(cycles, "(use)", '!', ETERNAL) //not eternal, we have a temporal basis here
         ;
     }
 

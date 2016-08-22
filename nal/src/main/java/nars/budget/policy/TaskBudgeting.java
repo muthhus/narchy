@@ -115,17 +115,17 @@ public class TaskBudgeting {
     /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by */
     public static float occamSquareWithDeadzone(@NotNull Termed derived, Premise pp) {
         Task parentTask = pp.task;
-        float parentComplexity = parentTask.complexity();
+        float parentComplexity = parentTask.volume();
         Task parentBelief = pp.belief;
 
-        int derivedComplexity = derived.complexity();
+        int derivedComplexity = derived.volume();
 
         //choose the task or belief (if present) which has the complexity nearest the derived (optimistic)
         Term parentTerm;
         float delta = Math.abs(derivedComplexity - parentComplexity);
-        if (parentBelief!=null && delta > Math.abs(derivedComplexity - parentBelief.complexity())) {
+        if (parentBelief!=null && delta > Math.abs(derivedComplexity - parentBelief.volume())) {
             parentTerm = parentBelief.term();
-            parentComplexity = parentTerm.complexity();
+            parentComplexity = parentTerm.volume();
             delta = Math.abs(derivedComplexity - parentComplexity); //recompute delta for new value
         } else {
             parentTerm = parentTask.term();

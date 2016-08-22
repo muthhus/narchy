@@ -370,12 +370,12 @@ public class NAgent implements Agent {
         //nar.believe("((A:#x && I:#y) ==>+0 (R)).");
 
         //TODO specify goal via a method in the sensor/digitizers
-        this.beHappy = (MutableTask) happy.desire($.t(1f, eternalGoalSeekConf));
+        this.beHappy = (MutableTask) happy.desire($.t(1f, eternalGoalSeekConf), 0.75f, 0.75f);
                 //nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
         //nar.goal(happy, Tense.Present, 1f, gamma);
 
         if (sad!=happy)
-            this.dontBeSad = (MutableTask) sad.desire($.t(0f, eternalGoalSeekConf));
+            this.dontBeSad = (MutableTask) sad.desire($.t(0f, eternalGoalSeekConf), 0.75f, 0.75f);
                     //nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
         else
             this.dontBeSad = null;

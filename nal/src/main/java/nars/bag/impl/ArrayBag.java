@@ -1,6 +1,5 @@
 package nars.bag.impl;
 
-import com.mxgraph.util.svg.DefaultErrorHandler;
 import nars.$;
 import nars.Param;
 import nars.bag.Bag;
@@ -10,6 +9,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
 import nars.link.StrongBLinkToBudgeted;
+import nars.util.Util;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
@@ -36,9 +36,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
 
     /**
-     * pending mass since last commit
+     * inbound pressure sum since last commit
      */
-    float pending = 0;
+    float pressure = 0;
 
     /**
      * mass as calculated in previous commit
@@ -317,12 +317,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             if (existing == 0) {
                 a = null; //nothing to forget
             } else {
-                float pending = this.pending;
-                this.pending = 0; //reset pending accumulator
+                float pending = this.pressure;
+                this.pressure = 0; //reset pending accumulator
 
-                float r = 1f - (existing / (existing + pending));
+                float r = Util.clamp(pending / (existing + pending));
 
-                a = (r >= Param.BUDGET_EPSILON) ? new Forget(r) : null;
+                a = (r >= Param.BUDGET_EPSILON /* TODO find a better cutoff formula */) ? new Forget(r) : null;
             }
 
             commit(a);
@@ -749,6 +749,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             Budgeted b = this.b;
             ArrayBag bag = this.arrayBag;
 
+
             if (existing != null) {
 
                 if (existing == b) {
@@ -769,15 +770,19 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 BLink r;
                 float bp = b.pri() * scale;
+                float incoming = bp * b.dur();
+
                 if (bag.minPriIfFull > bp) {
                     //reject due to insufficient budget
-                    bag.pending += bp * b.dur(); //include failed input in pending
+                    bag.pressure += incoming;
                     this.result = -1;
                     r = null;
                 } else {
                     //accepted for insert
                     BLink nvv = bag.newLink(key, b);
                     nvv.priMult(scale);
+
+                    bag.mass += incoming;
 
                     this.result = +1;
                     r = nvv;

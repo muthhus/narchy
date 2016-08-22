@@ -48,7 +48,7 @@ public class DecidingSoftmax implements Deciding {
         float sumMotivation = Util.sum(motivation);
         if (sumMotivation < Param.TRUTH_EPSILON) {
             decisiveness = 0;
-            return -1;
+            return random.nextInt(motivation.length);
         }
 
         if (normalize) {
