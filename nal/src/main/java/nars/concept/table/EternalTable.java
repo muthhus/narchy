@@ -182,23 +182,21 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
              .log("Insertion Revision");
     }
 
-    public final Task put(@NotNull final Task t) {
+    @Nullable public final Task put(@NotNull final Task incoming) {
         Task displaced = null;
 
         if (size() == capacity()) {
-            Task l = weakest();
-            if (l!=null) {
-                float lc = rank(l);
-                float tc = rank(t);
-                if (lc <= tc) {
+            Task weakestPresent = weakest();
+            if (weakestPresent!=null) {
+                if (rank(weakestPresent) <= rank(incoming)) {
                     displaced = removeWeakest();
                 } else {
-                    return null; //insufficient confidence
+                    return incoming; //insufficient confidence
                 }
             }
         }
 
-        add(t, this);
+        add(incoming, this);
 
         return displaced;
     }
@@ -295,24 +293,22 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
      * try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      * returns true if it was inserted, false if not
      */
-    private TruthDelta insert(@NotNull Task incoming, @NotNull List<Task> displ) {
+    private TruthDelta insert(@NotNull Task input, @NotNull List<Task> displ) {
 
         Truth before = this.truth;
 
-        Task displaced = put(incoming);
+        Task displaced = put(input);
 
-        if (displaced != null && !displaced.isDeleted()) {
+        if (displaced == input) {
+            return null; //rejected
+        } else if (displaced!=null) {
             TaskTable.removeTask(displaced,
                     "Displaced", displ
                     //"Displaced by " + incoming,
             );
         }
 
-        if ((displaced == null) || (displaced != incoming)) {
-            return new TruthDelta(before, this.truth = truth());
-        }
-
-        return null;
+        return new TruthDelta(before, this.truth = truth());
     }
 
     private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, @NotNull List<Task> displ) {
@@ -333,6 +329,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         //NAR.logger.info("axiom: {}", input);
 
         et.put(input);
+
     }
 
 

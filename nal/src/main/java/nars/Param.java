@@ -38,12 +38,16 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     public static final int STAMP_CAPACITY = 10;
 
+    /** used in linear interpolating link adjustments during feedback */
+    public static float LINK_FEEDBACK_RATE = 0.75f;
+
+
     /**
      * hard upper-bound limit on Compound term complexity;
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public static final MutableInteger compoundVolumeMax = new MutableInteger(64);
+    public final MutableInteger compoundVolumeMax = new MutableInteger(64);
 
     /**
      * maximum changes logged in deriver's stack.

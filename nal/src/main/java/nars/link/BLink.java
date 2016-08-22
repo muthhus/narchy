@@ -43,6 +43,8 @@ public abstract class BLink<X> implements Budget, Link<X> {
         return obj == this || equalsReferenced(obj);
     }
 
+
+
     private boolean equalsReferenced(@Nullable Object obj) {
         @Nullable X x = get();
         if (obj instanceof BLink) {

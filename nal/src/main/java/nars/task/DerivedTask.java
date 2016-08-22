@@ -17,6 +17,8 @@ import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.nal.UtilityFunctions.or;
+
 
 abstract public class DerivedTask extends MutableTask {
 
@@ -78,11 +80,13 @@ abstract public class DerivedTask extends MutableTask {
 
     @Override
     public boolean delete() {
-
-        if (!Param.DEBUG) {
-            this.premise = null;
+        if (super.delete()) {
+            if (!Param.DEBUG) { //keep premise information in DEBUG mode for analysis
+                this.premise = null;
+            }
+            return true;
         }
-        return super.delete();
+        return false;
     }
 
 
@@ -95,30 +99,27 @@ abstract public class DerivedTask extends MutableTask {
 
         @Override
         public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
-            float boost = Math.abs(deltaConfidence) * Math.abs(deltaSatisfaction);
-            if (!Util.equals(boost, 0, Param.TRUTH_EPSILON ) ) {
 
-                Premise p;
-                synchronized (this.truth()) {
-                    p = this.premise;
-                    if (p != null) {
-                        this.premise = null;
-                    }
-                }
+            if (delta == null) {
 
-                //apply feedback outside of synchronized
-                if (p!=null) {
+                feedback(1f - pri() /* HEURISTIC */, nar);
+
+            } else {
+
+                float boost = or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction)); /* HEURISTIC */
+
+                if (!Util.equals(boost, 0, Param.TRUTH_EPSILON)) {
                     feedback(1f + boost, nar);
                 }
-            } else {
-                this.premise = null;
+
             }
 
+            if (!Param.DEBUG) {
+                this.premise = null;
+            }
         }
 
         void feedback(float score, NAR nar) {
-
-            float feedbackRate = 0.25f;
 
             @Nullable Premise premise = this.premise;
             Concept c = nar.concept(premise.term);
@@ -127,16 +128,18 @@ abstract public class DerivedTask extends MutableTask {
                 //TODO make a Bag method specifically for this (modifying the priority only, if the link exists)
 
                 BLink<? extends Task> tasklink = premise.tasklink(c);
+                System.out.println("feedback " + score + " to " + tasklink);
                 if (tasklink != null && !tasklink.isDeleted()) {
-                    float dp = tasklink.priLerpMult(score, feedbackRate);
-                    ((ArrayBag)c.tasklinks()).pressure += dp; //HACK cast
+                    float dp = tasklink.priLerpMult(score, Param.LINK_FEEDBACK_RATE);
+                    ((ArrayBag)c.tasklinks()).pressure += dp * tasklink.dur(); //HACK cast
                 }
 
 
                 BLink<? extends Termed> termlink = premise.termlink(c);
+                System.out.println("feedback " + score + " to " + termlink);
                 if (termlink != null && !termlink.isDeleted()) {
-                    float dp = termlink.priLerpMult(score, feedbackRate);
-                    ((ArrayBag)c.termlinks()).pressure += dp; //HACK cast
+                    float dp = termlink.priLerpMult(score, Param.LINK_FEEDBACK_RATE);
+                    ((ArrayBag)c.termlinks()).pressure += dp * termlink.dur(); //HACK cast
                 }
 
             }

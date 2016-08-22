@@ -117,7 +117,7 @@ public class MySTMClustered extends STMClustered {
 				}
 
 				float finalFreq = freq;
-				node.termSet(maxGroupSize,  Param.compoundVolumeMax.intValue()-1).forEach(tt -> {
+				node.termSet(maxGroupSize,  nar.compoundVolumeMax.intValue()-1).forEach(tt -> {
 
 					Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 

@@ -93,7 +93,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * otherwise returns null
      */
     @Nullable
-    static boolean taskContentPreTest(@NotNull Term t, char punc, @NotNull Memory memory, boolean safe) {
+    static boolean taskContentPreTest(@NotNull Term t, char punc, @NotNull NAR nar, boolean safe) {
 
         if (!(t instanceof Compound))
             return test(t, "Task Term is null or not a Compound", safe);
@@ -119,9 +119,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             return test(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
 
-        if (t.volume() > Param.compoundVolumeMax.intValue())
+        if (t.volume() > nar.compoundVolumeMax.intValue())
             return test(t, "Term exceeds maximum volume", safe);
-        if (!t.levelValid(memory.nal()))
+        if (!t.levelValid(nar.nal()))
             return test(t, "Term exceeds maximum NAL level", safe);
 
         return true;

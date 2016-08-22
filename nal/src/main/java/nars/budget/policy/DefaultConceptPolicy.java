@@ -74,7 +74,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         int max = _max.intValue();
 
         float v = c.complexity();
-        float complexityFactor = v / (Param.compoundVolumeMax.intValue()/2f); //HEURISTIC
+        float complexityFactor = v / 64; //(nar.compoundVolumeMax.intValue()/2f); //HEURISTIC
         complexityFactor = Math.min(complexityFactor, 1f); //clip at +1
 
         int l = Math.round(Util.lerp(min, max, complexityFactor));

@@ -322,6 +322,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 float r = Util.clamp(pending / (existing + pending));
 
+                //TODO some way to increase 'r' in proportion to minPriIfFull so that a higher floor will cause faster decay
+
                 a = (r >= Param.BUDGET_EPSILON /* TODO find a better cutoff formula */) ? new Forget(r) : null;
             }
 

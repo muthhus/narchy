@@ -256,7 +256,7 @@
     B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)
 
     B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndepForward(C,A,B), (Desire:Strong)
-        //^ this is only valid if A occurrs after C. the opposite is not logical and would also produce redundant results
+        //^ this is only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
 
     //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////

@@ -369,7 +369,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         List<Task> toRemove = $.newArrayList();
 
-        boolean output = false;
+        boolean accepted = false;
 
         TruthDelta delta = null;
 
@@ -383,11 +383,11 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
                 break;
 
             case Symbols.QUESTION:
-                output = processQuestion(input, nar, toRemove);
+                accepted = processQuestion(input, nar, toRemove);
                 break;
 
             case Symbols.QUEST:
-                output = processQuest(input, nar, toRemove);
+                accepted = processQuest(input, nar, toRemove);
                 break;
 
             default:
@@ -395,20 +395,22 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         }
 
         if (delta!=null)
-            output = true;
+            accepted = true;
 
-        if (!output) {
+        Activation a;
+        if (accepted) {
+            a = new Activation(input, this, nar, 1f, delta);
+        } else {
+            input.feedback(null, Float.NaN, Float.NaN, nar);
+            a = null;
+        }
+
+        if (!accepted) {
             nar.tasks.remove(input); //which was added in the callee
         }
         nar.tasks.remove(toRemove);
 
-
-        if (output) {
-            return new Activation(input, this, nar, 1f, delta);
-        } else {
-            return null;
-        }
-
+        return a;
     }
 
 //    private void checkConsistency() {
