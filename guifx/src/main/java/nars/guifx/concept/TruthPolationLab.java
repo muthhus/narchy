@@ -139,7 +139,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
             double dx = w / range;
             double h = ch * 0.9;
             for (int i = 0; i < range; i++) {
-                Truth tc = truth.truth(i, tasks  /* TODO add eternal background control widget */ );
+                Truth tc = truth.truth(i, i, tasks  /* TODO add eternal background control widget */ );
                 double x = dx * i;
                 double y = (1f - tc.freq()) * h;
                 double r = 5 + tc.conf() * rad;

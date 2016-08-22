@@ -6,6 +6,7 @@ import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
+import nars.concept.Concept;
 import nars.link.BLink;
 import nars.link.StrongBLink;
 import nars.link.StrongBLinkToBudgeted;
@@ -128,6 +129,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             toRemove.add(w);
             s--;
         }
+    }
+
+    @Override
+    public V boost(Object key, float boost) {
+        BLink<V> c = map.get(key);
+        if (c!=null && !c.isDeleted()) {
+            float dur = c.dur();
+            float pBefore = c.priNext();
+            c.priMult(boost);
+            float delta = c.priNext() - pBefore;
+            pressure += delta * dur;
+            return c.get();
+        }
+        return null;
+
     }
 
     @Override

@@ -124,7 +124,7 @@ public class TuffySmokesTest {
 		//n.conceptActivation.setValue(0.75f);
 		//n.conceptRemembering.setValue(12);
 
-		n.cyclesPerFrame.set(8);
+		//n.cyclesPerFrame.set(8);
 		n.logSummaryGT(System.out, 0.15f);
 
 

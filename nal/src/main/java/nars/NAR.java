@@ -621,6 +621,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             } catch (Exception e) {
 
+                input.feedback(null, Float.NaN, Float.NaN, this);
+
                 tasks.remove(input);
 
                 emotion.errr();
@@ -628,6 +630,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 if (Param.DEBUG)
                     logger.warn("process error: {}", e);
             }
+        } else {
+            input.feedback(null, Float.NaN, Float.NaN, this);
+
         }
 
 
@@ -1208,6 +1213,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public boolean runLaterMaybe(Runnable r) {
         return exe.executeMaybe(r);
     }
+
+    /** if the concept is active, returns the Concept while applying the boost factor to its budget */
+    abstract public Concept concept(Term term, float boost);
 
 
 //    @Nullable

@@ -407,7 +407,7 @@ public class DemoRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.inputActivation.setValue(0.25f);
+        //nar.inputActivation.setValue(0.25f);
 
 
 

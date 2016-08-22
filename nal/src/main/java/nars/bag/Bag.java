@@ -3,6 +3,7 @@ package nars.bag;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.link.BLink;
+import nars.term.Term;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
@@ -480,6 +481,11 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
 
         @Override
+        public Object boost(Object key, float boost) {
+            return null;
+        }
+
+        @Override
         public int size() {
             return 0;
         }
@@ -555,4 +561,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
 
     void put(ObjectFloatHashMap<? extends V> values, Budgeted in, float scale, MutableFloat overflow);
+
+    /** gets the link if present, applies a scale factor boost, and returns the link */
+    V boost(Object key, float boost);
+
 }

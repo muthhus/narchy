@@ -162,7 +162,7 @@ public class NarseseIRCBot extends Talk {
         Random rng = new XorShift128PlusRandom(1);
         Default nar = new Default(
                 1024, 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 2000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 2000000)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)
                 //new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -178,7 +178,7 @@ public class NarseseIRCBot extends Talk {
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 
 
-        nar.inputActivation.setValue(0.1f);
+        //nar.inputActivation.setValue(0.1f);
         nar.cyclesPerFrame.set(16);
 
         nar.logSummaryGT(System.out, 0.75f);
@@ -205,15 +205,15 @@ public class NarseseIRCBot extends Talk {
         for (Task t : goals) {
             nar.input(t);
         }
-
-        new Thread(()->{
-            while (true) {
-                for (Task t : goals) {
-                    nar.activate(t, 1f);
-                }
-                Util.pause(10000);
-            }
-        }).start();
+//
+//        new Thread(()->{
+//            while (true) {
+//                for (Task t : goals) {
+//                    nar.activate(t, 1f);
+//                }
+//                Util.pause(10000);
+//            }
+//        }).start();
 
 
         nar.loop(20f);

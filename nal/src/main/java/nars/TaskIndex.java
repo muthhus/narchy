@@ -69,7 +69,6 @@ public final class TaskIndex {
         Task existing = tasks.putIfAbsent(x,x);
         if (existing!=null) {
             DuplicateMerge.merge(existing.budget(), x, 1f);
-            x.delete();
             return false;
         } else {
             return true;

@@ -84,7 +84,8 @@ public class NARMenu extends HBox {
                     try {
                         NQuadsRDF.input(n, f);
                     } catch (Exception e) {
-                        n.eventError.emit(e);
+                        //n.eventError.emit(e);
+                        e.printStackTrace();
                     }
                 }
             }

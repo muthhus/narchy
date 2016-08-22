@@ -81,6 +81,7 @@ abstract public class DerivedTask extends MutableTask {
     @Override
     public boolean delete() {
         if (super.delete()) {
+
             if (!Param.DEBUG) { //keep premise information in DEBUG mode for analysis
                 this.premise = null;
             }
@@ -103,6 +104,7 @@ abstract public class DerivedTask extends MutableTask {
             if (delta == null) {
 
                 feedback(1f - pri() /* HEURISTIC */, nar);
+                delete();
 
             } else {
 
@@ -122,24 +124,13 @@ abstract public class DerivedTask extends MutableTask {
         void feedback(float score, NAR nar) {
 
             @Nullable Premise premise = this.premise;
-            Concept c = nar.concept(premise.term);
-            if (c!=null) {
+            if (premise !=null) {
 
-                //TODO make a Bag method specifically for this (modifying the priority only, if the link exists)
+                Concept c = nar.concept(premise.term, score);
 
-                BLink<? extends Task> tasklink = premise.tasklink(c);
-                System.out.println("feedback " + score + " to " + tasklink);
-                if (tasklink != null && !tasklink.isDeleted()) {
-                    float dp = tasklink.priLerpMult(score, Param.LINK_FEEDBACK_RATE);
-                    ((ArrayBag)c.tasklinks()).pressure += dp * tasklink.dur(); //HACK cast
-                }
-
-
-                BLink<? extends Termed> termlink = premise.termlink(c);
-                System.out.println("feedback " + score + " to " + termlink);
-                if (termlink != null && !termlink.isDeleted()) {
-                    float dp = termlink.priLerpMult(score, Param.LINK_FEEDBACK_RATE);
-                    ((ArrayBag)c.termlinks()).pressure += dp * termlink.dur(); //HACK cast
+                if (c != null) {
+                    c.termlinks().boost(premise.term, score);
+                    c.tasklinks().boost(premise.task, score);
                 }
 
             }

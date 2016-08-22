@@ -246,7 +246,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public @NotNull String summary() {
-        return atomics.size() + " atoms " + compounds.estimatedSize() + " compounds+subterms";// / " + subtermsCount() + " subterms";
+        return atomics.size() + " atoms " + compounds.estimatedSize() + " compounds";// / " + subtermsCount() + " subterms";
     }
 
     /** this will be called from within a worker task */

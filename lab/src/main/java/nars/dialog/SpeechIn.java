@@ -21,30 +21,35 @@ public class SpeechIn {
                 .setDictionaryPath("resource:/edu/cmu/sphinx/models/en-us/cmudict-en-us.dict");
         configuration
                 .setLanguageModelPath("resource:/edu/cmu/sphinx/models/en-us/en-us.lm.bin");
-        configuration.setSampleRate(8000);
+
+        configuration.setSampleRate(16000);
+        configuration.setUseGrammar(false);
+
 
 
 
         LiveSpeechRecognizer recognizer = new LiveSpeechRecognizer(configuration);
 
-        recognizer.startRecognition(true);
-        System.out.println("recognition start");
 
-        Util.pause(5000);
 
-        System.out.println("recognition stop");
-        SpeechResult result = recognizer.getResult();
-        recognizer.stopRecognition();
+        while (true) {
+            recognizer.startRecognition(true);
+            System.out.println("recognition start");
 
-        for (WordResult r : result.getWords()) {
-            System.out.println(r);
+            SpeechResult result = recognizer.getResult();
+            System.out.println(result.getHypothesis());
+
+            recognizer.stopRecognition();
+
+            for (WordResult r : result.getWords()) {
+                System.out.println("\t" + r);
+            }
+
+            System.out.println("\t" + result.getNbest(2));
+            System.out.println("\t" + result.getResult().getActiveTokens());
+            //System.out.println("\t" + result.getLattice());
+            System.out.println("\t" + result);
         }
-
-        System.out.println(result.getNbest(10));
-        System.out.println(result.getHypothesis());
-        System.out.println(result.getResult().getActiveTokens());
-        System.out.println(result.getLattice());
-        System.out.println(result);
 
     }
 

@@ -39,7 +39,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAREnvironment {
 
-    private static final int cyclesPerFrame = 4;
+    private static final int cyclesPerFrame = 12;
     public static final int runFrames = 50000;
     public static final int CONCEPTS_FIRE_PER_CYCLE = 4;
     public static final int INDEX_SIZE = 20 * 10000000;
@@ -52,7 +52,7 @@ public class Arkancide extends NAREnvironment {
     final int visH = 10;
     SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 64;
+    private int visionSyncPeriod = 32;
     float noiseLevel = 0;
 
     float paddleSpeed = 45f;

@@ -161,7 +161,7 @@ abstract public class NAREnvironment {
 //                     n4( happy.beliefs().truth(now).motivation() )
 //                 + "] "
                   "rwrd=" + n2(rewardValue) + "\t"
-                + "conf=" + n4(desireConf()) + " "
+                + "motv=" + n4(desireConf()) + " "
                 + "hapy=" + n4(emotion.happy()-emotion.sad()) + " "
                 + "busy=" + n4(emotion.busy.getSum()) + " "
                 + "lern=" + n4(emotion.learning()) + " "

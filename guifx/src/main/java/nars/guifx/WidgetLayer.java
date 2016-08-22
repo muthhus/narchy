@@ -60,10 +60,10 @@ public class WidgetLayer extends MDICanvas {
 
     public void update() {
 
-        Map<String, Object> ss = nar.getSingletons();
-
-        List<Node> toAdd = $.newArrayList(ss.size());
-        ss.forEach((k, v) -> toAdd.add(node(k, v)));
+//        Map<String, Object> ss = nar.getSingletons();
+//
+//        List<Node> toAdd = $.newArrayList(ss.size());
+//        ss.forEach((k, v) -> toAdd.add(node(k, v)));
 
 //        //TODO use faster comparison method
 //

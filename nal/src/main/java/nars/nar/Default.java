@@ -8,6 +8,7 @@ import nars.index.Indexes;
 import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nar.util.ConceptBagCycle;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -92,6 +93,11 @@ public class Default extends AbstractNAR {
 
         //);
         return c;
+    }
+
+    @Override
+    public final Concept concept(Term term, float boost) {
+        return core.concepts.boost(term, boost);
     }
 
     @Override

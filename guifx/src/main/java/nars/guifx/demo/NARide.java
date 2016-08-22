@@ -418,7 +418,7 @@ public class NARide extends StackPane {
 //    }
 
     public void addIcon(FXIconPaneBuilder n) {
-        nar.the(n);
+        //nar.the(n);
         pp.update();
     }
 
