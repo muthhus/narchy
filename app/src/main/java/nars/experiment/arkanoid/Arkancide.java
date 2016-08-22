@@ -215,17 +215,9 @@ public class Arkancide extends NAREnvironment {
         Default nar = new Default(1024,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), INDEX_SIZE, false, exe)
-                , new FrameClock(), exe) {
+                , new FrameClock(), exe);
 
-            VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
-            @Override protected Task preprocess(Task input) {
-                return p.pre(input);
-            }
-
-        };
-        nar.inputActivation.setValue(0.05f);
-        nar.derivedActivation.setValue(0.05f);
-
+        nar.preprocess(new VariableCompressor.Precompressor(nar));
 
         nar.beliefConfidence(0.7f);
         nar.goalConfidence(0.7f);

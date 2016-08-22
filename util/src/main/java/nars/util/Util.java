@@ -20,6 +20,7 @@ import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import nars.util.data.list.FasterList;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -1124,16 +1125,30 @@ public enum Util {
         return result;
     }
 
-    public static int argmax(final float[] vec) {
+    // Implementing Fisher–Yates shuffle
+    static void shuffle(Object[] ar, Random rnd) {
+        for (int i = ar.length - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            Object a = ar[index];
+            ar[index] = ar[i];
+            ar[i] = a;
+        }
+    }
+
+    public static int argmax(float[] vec, Random random) {
         int result = -1;
         float max = Float.NEGATIVE_INFINITY;
 
         int l = vec.length;
+        int start = random.nextInt(l);
         for (int i = 0; i < l; i++) {
-            final float v = vec[i];
+            int ii = (i + start) % l;
+            final float v = vec[ii];
             if (v > max)  {
                 max = v;
-                result = i;
+                result = ii;
             }
         }
         return result;

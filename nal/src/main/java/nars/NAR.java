@@ -45,6 +45,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -107,6 +108,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     private NARLoop loop;
 
     private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
+
+    private Function<Task, Task> preprocessor = (t) -> t; //by default, pass-through
 
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
@@ -558,8 +561,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         });
     }
 
-    protected Task preprocess(Task input) {
-        return input;
+
+
+    @NotNull public NAR preprocess(@NotNull Function<Task,Task> preprocessor) {
+        this.preprocessor = preprocessor;
+        return this;
     }
 
     /**
@@ -572,16 +578,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable
     protected final Concept input(@NotNull Task input) {
 
-        if (input.isDeleted()) {
-            //throw new InvalidTaskException(input, "Deleted");
-            emotion.errr();
-            logger.warn("input deleted: {}", input);
-            return null;
-        }
-
         //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {
-            input = preprocess(input);
+            input = preprocessor.apply(input);
             input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
             emotion.frustration(input.priIfFiniteElseZero());
@@ -596,7 +595,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             return null;
         }
 
-        float conceptActivation = input.isInput() ? this.inputActivation.floatValue() : this.derivedActivation.floatValue();
 
         if (tasks.add(input)) {
 
@@ -604,9 +602,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
                 Concept c = input.concept(this);
 
-                boolean entered = c.process(input, this);
-
-                if (entered) {
+                if (c.process(input, this)) {
 
                     if (clock instanceof FrameClock) {
                         //HACK for unique serial number w/ frameclock
@@ -624,10 +620,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     if (p > 0) {
                         //propagate budget
                         //try {
-                        Activation activation = new Activation(input, c, this, conceptActivation);
+                        Activation activation = new Activation(input, c, this, 1f);
 
                         emotion.busy(p);
-                        emotion.stress(activation.overflow);
+                        emotion.stress(activation.linkOverflow);
                         //                } catch (Exception e) {
                         //                    emotion.errr();
                         //
@@ -1385,7 +1381,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //final ObjectFloatHashMap<BLink<Task>> tasks = new ObjectFloatHashMap<>();
         //public final ObjectFloatHashMap<BLink<Term>> termlinks = new ObjectFloatHashMap<>();
         public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
-        public final MutableFloat overflow = new MutableFloat(0);
+        public final MutableFloat linkOverflow = new MutableFloat(0);
+        public final MutableFloat conceptOverflow = new MutableFloat(0);
 
         public Activation(@NotNull Task in, @NotNull NAR n, float scale) {
             this((Budgeted) in, in.concept(n));
@@ -1467,8 +1464,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         public void activate(@NotNull NAR nar, float activation) {
             if (!concepts.isEmpty()) {
-                float total = (float) concepts.sum(); //normalize
-                nar.activate(concepts, in, activation / total, overflow);
+                float total = 1 / (float) concepts.sum();
+                ;
+                nar.activate(concepts, in, activation / total, conceptOverflow);
             }
         }
 

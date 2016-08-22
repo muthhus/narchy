@@ -35,7 +35,6 @@ public class TimeSpace extends NARSpace implements TriConsumer<NAR, SpaceGraph, 
     public static void main(String[] args) {
 
         Default n = new Default(1024, 4, 2, 2);
-        n.inputActivation.setValue(0.5f);
         //n.nal(4);
 
 

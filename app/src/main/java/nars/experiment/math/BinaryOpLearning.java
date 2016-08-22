@@ -3,10 +3,14 @@ package nars.experiment.math;
 import nars.*;
 import nars.experiment.NAREnvironment;
 import nars.experiment.arkanoid.Arkancide;
+import nars.gui.BagChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
+import nars.nar.Executioner;
+import nars.nar.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.VariableCompressor;
+import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.obj.Termject;
@@ -20,6 +24,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.function.BiFunction;
 
@@ -33,13 +38,13 @@ import static nars.util.Util.argmax;
 /**
  * Created by me on 8/21/16.
  */
-public class BinaryAdd extends NAREnvironment {
+public class BinaryOpLearning extends NAREnvironment {
 
     private CharSensor a, b;
     private CharMotor c;
     private char[] expect;
 
-    public BinaryAdd(NAR nar) {
+    public BinaryOpLearning(NAR nar) {
         super(nar);
     }
 
@@ -123,18 +128,26 @@ public class BinaryAdd extends NAREnvironment {
             this.motor = new MotorConcept[length][vocab.length];
             this.desire = new float[length][vocab.length];
 
+
+
             for (int i = 0; i < vocab.length; i++) {
                 for (int j = 0; j < length; j++) {
 
-                    int jj = j, ii = i;
+                    int ll = j, cc = i;
 
-                    Compound t = charTerm(id, jj, vocab[ii]);
+                    Compound t = charTerm(id, ll, vocab[cc]);
                     env.actions.add(new MotorConcept(t, env.nar, (Truth b, Truth d)->{
-                        float e = d.expectation();
-                        desire[jj][ii] = e;
-                        float s = desireTotal(jj); //this is approximate unless we make an async motor feedback mode that calculates after all other motors have updated
-                        float p = s > 0 ? e / (s) : 1;
+                        float e;
+                        if (d!=null) {
+                            e = d.expectation();
+                        } else {
+                            e = 0.5f;
+                        }
 
+                        //float s = desireTotal(jj); //this is approximate unless we make an async motor feedback mode that calculates after all other motors have updated
+                        //float p = s > 0 ? e / (s) : 1;
+
+                        desire[ll][cc] = e;
                         //return d.confMultViaWeight(p); //share the feedback with the other motors for this position
 
                         return d;
@@ -163,7 +176,7 @@ public class BinaryAdd extends NAREnvironment {
 
 
         private char decide(int j) {
-            return vocab[argmax(desire[j])];
+            return vocab[argmax(desire[j], nar.random)];
             //return vocab[decide.decide(desire[j], -1, nar.random)];
         }
 
@@ -176,16 +189,25 @@ public class BinaryAdd extends NAREnvironment {
     public
     @Nullable
     static Compound charTerm(Term id, int jj, char c) {
-        //return $.inh($.p(new Termject.IntTerm(jj), $.the(c)), id);
-        return $.p($.p(id,
-                new Termject.IntTerm(jj)),
-                //$.the(jj)),
-                $.quote(String.valueOf(c)));
+        return $.inh($.p(new Termject.IntTerm(jj), $.the(c)), id);
+
+//        return $.p($.p(id,
+//                new Termject.IntTerm(jj)),
+//                //$.the(jj)),
+//                $.quote(String.valueOf(c)));
+//
+        //return $.inh($.p($.the(jj + "_" + c)), id);
+
+    }
+
+    @Override
+    public String summary() {
+        return n2(rMean.getMean()) + " " + super.summary();
     }
 
     int period = 10;
-    int N = 2;
-    int W = 1; //width of output buffer
+    int W = 4; //width of output buffer
+    int N = (int)Math.pow(2, W)-1;
     int ax, bx;
     char[] vocab = {'0', '1'};
     char padChar = '0';
@@ -193,10 +215,10 @@ public class BinaryAdd extends NAREnvironment {
     //int rewardIntensity;
     static IntIntToIntFunction f = (a,b) ->
             //a + b;
-            a ^ b;
+            a & b;
 
 
-    BiFunction<char[],char[],Float> distance = (x,y) -> BinaryAdd.difference(x,y); //ex: Levenshtein, etc
+    BiFunction<char[],char[],Float> distance = (x,y) -> BinaryOpLearning.difference(x,y); //ex: Levenshtein, etc
 
     final DescriptiveStatistics rMean = new DescriptiveStatistics((period+1)*5); //reward mean
 
@@ -220,11 +242,11 @@ public class BinaryAdd extends NAREnvironment {
     @Override
     protected float act() {
 
-
-        if (desireConf() > 0.45f && rMean.getMean() > 0.75f) {
-            //lock into logical mode
-            epsilonProbability = 0;
-        }
+//
+//        if (now > 1000 || desireConf() > 0.45f && rMean.getMean() > 0.75f) {
+//            //lock into logical mode
+//            epsilonProbability = 0;
+//        }
 
         if (expect == null || now % period == 0) {
 
@@ -243,26 +265,28 @@ public class BinaryAdd extends NAREnvironment {
 
 
         float d = distance.apply(expect, c.get());
-        float r0 = (1f - d);
+        float r0 = (1f - 2 * d);
         float r =
                 //Util.lerp(
                     r0;
                     //(float)rMean.getMean(),
                 //0.5f);
 
-        if (epsilonProbability == 0 && d!=1.0f) {
+        if (now > 500 && rMean.getMean() < 0.5f) {
             //it caused a mistake
+
+            System.out.println("\nWHY I DONT SEEM TO LEARN\n");
 
             actions.forEach(a -> {
                a.goals().forEach(ag -> {
                    System.out.println(ag.proof());
 
                });
+                System.out.println("\n---\n");
             });
 
-            System.out.println("\n---\n");
+            System.out.println("\n------\n");
 
-            System.exit(1);
         }
 
         rMean.addValue(r0);
@@ -307,59 +331,51 @@ public class BinaryAdd extends NAREnvironment {
         Param.DEBUG = false;
 
         //Multi nar = new Multi(3,512,
+        Executioner exe = new SingleThreadExecutioner();
         Default nar = new Default(1024,
-                8, 2, 3, rng,
+                16, 2, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
 
                 , new FrameClock(), exe
 
-        ) {
+        );
 
-            VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
+        nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-            @Override
-            protected Task preprocess(Task input) {
-                return p.pre(input);
-            }
-
-        };
-
-        nar.inputActivation.setValue(0.01f);
-        nar.derivedActivation.setValue(0.01f);
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.7f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        nar.goalConfidence(0.8f);
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
-        nar.cyclesPerFrame.set(10);
-        nar.compoundVolumeMax.set(30);
+        nar.cyclesPerFrame.set(2);
+        nar.compoundVolumeMax.set(40);
         //nar.confMin.setValue(0.05f);
         //nar.truthResolution.setValue(0.02f);
 
 
-        //MySTMClustered stm = new MySTMClustered(nar, 32, '.', 3);
-        //MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 32, '.', 2);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
 
         //new Abbreviation(nar,"aKa_");
 
-        BinaryAdd b = new BinaryAdd(nar);
+        BinaryOpLearning b = new BinaryOpLearning(nar);
 
         Param.DEBUG = true;
         //b.trace = false;
 
-        NARLoop bLoop = b.run(100000, 0);
+        NARLoop bLoop = b.run(20000, 0);
 
 //        System.out.println(b.sensors);
 //        System.out.println(b.actions);
 
-        Arkancide.newBeliefChartWindow(b, 2000);
-        //BagChart.show((Default) nar, 256);
+        Arkancide.newBeliefChartWindow(b, 100);
+        //BagChart.show((Default) nar, 1024);
 
         bLoop.join();
 

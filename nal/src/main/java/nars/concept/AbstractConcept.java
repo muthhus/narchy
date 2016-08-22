@@ -4,7 +4,6 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.term.Compound;
@@ -79,11 +78,11 @@ public interface AbstractConcept extends Concept {
         if (targetConcept!=null && alsoReverse) {
             subScale /= 2; //divide among both directions
 
-            targetConcept.termlinks().put(source.term(), activation.in, subScale, activation.overflow);
+            targetConcept.termlinks().put(source.term(), activation.in, subScale, activation.linkOverflow);
         }
 
         /* insert termlink source to target */
-        source.termlinks().put(targetTerm, activation.in, subScale, activation.overflow);
+        source.termlinks().put(targetTerm, activation.in, subScale, activation.linkOverflow);
 
 
 

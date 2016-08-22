@@ -112,10 +112,10 @@ public abstract class MaplikeIndex extends TermIndex {
 
 
 
-    @Override
-    public final @NotNull TermContainer theSubterms(@NotNull TermContainer s) {
-        return s;
-
+//    @Override
+//    public final @NotNull TermContainer theSubterms(@NotNull TermContainer s) {
+//        return s;
+//
 //        int ss = s.size();
 //        Term[] bb = new Term[ss];
 //        boolean changed = false;//, temporal = false;
@@ -143,7 +143,7 @@ public abstract class MaplikeIndex extends TermIndex {
 //        }
 //
 //        return internSubterms(changed ? TermVector.the(bb) : s);
-    }
+//    }
 
 
     abstract public @NotNull TermContainer internSubterms(@NotNull TermContainer s);

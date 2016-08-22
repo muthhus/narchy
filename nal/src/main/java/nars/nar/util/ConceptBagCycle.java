@@ -2,7 +2,8 @@ package nars.nar.util;
 
 import nars.*;
 import nars.bag.Bag;
-import nars.bag.impl.ArrayBag;
+import nars.bag.impl.CurveBag;
+import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.data.Range;
 import nars.link.BLink;
@@ -13,20 +14,25 @@ import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
+import nars.util.data.map.nbhm.NonBlockingHashMap;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * The original deterministic memory cycle implementation that is currently used as a standard
  * for development and testing.
+ *
  */
-public abstract class AbstractCore {
+public class ConceptBagCycle implements Consumer<NAR> {
     /**
      * How many concepts to fire each cycle; measures degree of parallelism in each cycle
      */
@@ -34,14 +40,8 @@ public abstract class AbstractCore {
     public final @NotNull MutableInteger conceptsFiredPerCycle;
 
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConceptBagCycle.class);
 
-
-    //public final MutableFloat activationFactor = new MutableFloat(1.0f);
-
-//        final Function<Task, Task> derivationPostProcess = d -> {
-//            return LimitDerivationPriority.limitDerivation(d);
-//        };
 
 
     /**
@@ -64,29 +64,59 @@ public abstract class AbstractCore {
     private static final ThreadLocal<@NotNull PremiseEval> matcher = ThreadLocal.withInitial(
             () -> new PremiseEval(new XorShift128PlusRandom((int) Thread.currentThread().getId()), Deriver.getDefaultDeriver())
     );
+    private final MutableInteger cyclesPerFrame;
+    private final Concept.ConceptBuilder conceptBuilder;
 
 //
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
 
-    protected AbstractCore(@NotNull NAR nar, int initialCapacity) {
+    public ConceptBagCycle(@NotNull NAR nar, int initialCapacity, MutableInteger cyclesPerFrame) {
 
         this.nar = nar;
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
+        this.cyclesPerFrame = cyclesPerFrame;
+        this.conceptBuilder = nar.index.conceptBuilder();
 
-        this.concepts = newConceptBag(initialCapacity);
+        this.concepts = new MonitoredCurveBag(nar, initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
 
+        nar.onFrame(this);
+        nar.eventReset.on(this::reset);
 
     }
 
-    @NotNull
-    protected abstract Bag<Concept> newConceptBag(int cap);
+    /** called when a concept is displaced from the concept bag */
+    protected void sleep(@NotNull Concept c) {
+        NAR n = this.nar;
 
-    public void frame(@NotNull NAR nar) {
+        n.policy(c, conceptBuilder.sleep(), n.time());
+
+        n.emotion.alert(1f / concepts.size());
+    }
+
+    /** called when a concept enters the concept bag
+     * @return whether to accept the item into the bag
+     * */
+    protected boolean awake(@NotNull Concept c) {
+
+        NAR n = this.nar;
+        n.policy(c, conceptBuilder.awake(), n.time());
+
+        return true;
+    }
 
 
-        int cycles = nar.cyclesPerFrame.intValue();
+    public void reset(Memory m) {
+        concepts.clear();
+    }
+
+
+
+    /** called each frame */
+    @Override public void accept(NAR nar) {
+
+        int cycles = cyclesPerFrame.intValue();
 
         int cpf = conceptsFiredPerCycle.intValue();
 
@@ -104,21 +134,15 @@ public abstract class AbstractCore {
             for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
                 @Nullable Concept c = toFire.get(i).get();
                 if (c != null) {
-                    FireConcept f = new FireConcept(c, nar, taskLinks, termLinks);
-                    nar.runLater(f);
-//                    if (!nar.runLaterMaybe(f))
-//                        return;
+                    new FireConcept(c, nar,
+                            taskLinks, termLinks,
+                            new LinkedHashSet<>( 2 * (taskLinks*termLinks) /* estimate */ ))
+                        .run();
                 }
             }
 
-            toFire.clear();
         }
 
-    }
-
-
-    public void reset(Memory m) {
-        concepts.clear();
     }
 
     /**
@@ -133,8 +157,8 @@ public abstract class AbstractCore {
         private final short tasklinks;
         private final short termlinks;
 
-        public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks) {
-            super($.newHashSet(2 * tasklinks * termlinks));
+        public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks, Collection<Task> batch) {
+            super(batch);
             this.c = c;
             this.nar = nar;
             this.tasklinks = tasklinks;
@@ -162,6 +186,7 @@ public abstract class AbstractCore {
 
                 if (!derive.isEmpty())
                     nar.inputLater(derive);
+
             } catch (Exception e) {
 
                 if (Param.DEBUG)
@@ -169,7 +194,6 @@ public abstract class AbstractCore {
 
                 logger.error("run {}", e.toString());
             }
-
 
         }
 
@@ -213,6 +237,48 @@ public abstract class AbstractCore {
 
 
             return count;
+        }
+
+
+    }
+
+    /** extends CurveBag to invoke entrance/exit event handler lambda */
+    public final class MonitoredCurveBag extends CurveBag<Concept> {
+
+        final NAR nar;
+
+        public MonitoredCurveBag(NAR nar, int capacity, @NotNull CurveSampler sampler) {
+            super(capacity, sampler, BudgetMerge.plusBlend,
+                    //new ConcurrentHashMap<>(capacity)
+                    new NonBlockingHashMap<>(capacity*2)
+            );
+            this.nar = nar;
+        }
+
+        @Override
+        public void clear() {
+            forEach((BLink<Concept> v) -> { if (v!=null) sleep(v.get()); }); //HACK allow opportunity to process removals
+            super.clear();
+        }
+
+        @Override
+        protected void onActive(@NotNull Concept c) {
+            awake(c);
+        }
+
+        @Override
+        protected void onRemoved(@NotNull Concept c, BLink<Concept> value) {
+            if (value!=null)
+                sleep(c);
+        }
+
+        @Override
+        public @Nullable BLink<Concept> remove(@NotNull Concept x) {
+            BLink<Concept> r = super.remove(x);
+            if (r!=null) {
+                sleep(x);
+            }
+            return r;
         }
 
 

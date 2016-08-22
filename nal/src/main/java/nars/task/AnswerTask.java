@@ -26,8 +26,6 @@ public class AnswerTask extends MutableTask {
 
         //evidence(Stamp.zip(aBelief.evidence(), bBelief.evidence()));
         evidence( Stamp.zip(aBelief.evidence(), bBelief.evidence(), aMix) );
-        if (evidence().length < 2)
-            throw new RuntimeException("where is the evidence");
 
         time(creationTime, occTime);
     }

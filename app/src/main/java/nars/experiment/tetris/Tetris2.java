@@ -51,16 +51,16 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 16 * 10000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 12 * 10000000;
 
     public static final Executioner exe =
-            new MultiThreadExecutioner(2, 16384);
-            //new SingleThreadExecutioner();
+            //new MultiThreadExecutioner(3, 16384);
+            new SingleThreadExecutioner();
 
     public static final int runFrames = 12500;
-    public static final int cyclesPerFrame = 64;
+    public static final int cyclesPerFrame = 8;
     public static final int tetris_width = 6;
-    public static final int tetris_height = 16;
+    public static final int tetris_height = 13;
     public static final int TIME_PER_FALL = 3;
     static boolean easy = false;
 
@@ -349,34 +349,22 @@ public class Tetris2 extends NAREnvironment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                8, 2, 4, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
+                8, 2, 3, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
+                new FrameClock(), exe
 
-                , new FrameClock(), exe
+        );
 
-        ) {
-
-            VariableCompressor.Precompressor p = new VariableCompressor.Precompressor(this);
-
-            @Override
-            protected Task preprocess(Task input) {
-                return p.pre(input);
-            }
-
-        };
-
-        nar.inputActivation.setValue(0.01f);
-        nar.derivedActivation.setValue(0.01f);
-
+        nar.preprocess(new VariableCompressor.Precompressor(nar));
 
         nar.beliefConfidence(0.8f);
         nar.goalConfidence(0.8f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.75f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.4f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.2f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.2f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.03f);
+        nar.confMin.setValue(0.01f);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -411,7 +399,7 @@ public class Tetris2 extends NAREnvironment {
         //new Abbreviation2(nar, "_");
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
-        //MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
@@ -712,8 +700,6 @@ public class Tetris2 extends NAREnvironment {
                        protected void initHigherNAL() {
                            super.initHigherNAL();
                            cyclesPerFrame.setValue(16);
-                           inputActivation.setValue(0.25f);
-                           derivedActivation.setValue(0.25f);
                            //ctl.confMin.setValue(0.01f);
                            //ctl.truthResolution.setValue(0.01f);
                            beliefConfidence(0.5f);
@@ -800,16 +786,16 @@ public class Tetris2 extends NAREnvironment {
                         worker.confMin.setValue(newConfMin);
                         return d;
                     }),
-
-                    new MotorConcept("(inputActivation)", nar, (b, d) -> {
-                        worker.inputActivation.setValue(d.freq());
-                        return d;
-                    }),
-
-                    new MotorConcept("(derivedActivation)", nar, (b, d) -> {
-                        worker.derivedActivation.setValue(d.freq());
-                        return d;
-                    }),
+//
+//                    new MotorConcept("(inputActivation)", nar, (b, d) -> {
+//                        worker.inputActivation.setValue(d.freq());
+//                        return d;
+//                    }),
+//
+//                    new MotorConcept("(derivedActivation)", nar, (b, d) -> {
+//                        worker.derivedActivation.setValue(d.freq());
+//                        return d;
+//                    }),
 
                     new MotorConcept("(conceptsPerFrame)", nar, (b, d) -> {
                         ((Default) worker).core.conceptsFiredPerCycle.setValue((int) (d.freq() * MAX_CONCEPTS_FIRE_PER_CYCLE));

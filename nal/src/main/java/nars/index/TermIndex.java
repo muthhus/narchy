@@ -86,8 +86,6 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable abstract public Concept.ConceptBuilder conceptBuilder();
 
 
-    @Deprecated @Nullable
-    protected abstract TermContainer theSubterms(TermContainer s);
 
     public abstract int subtermsCount();
 

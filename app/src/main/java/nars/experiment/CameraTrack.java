@@ -288,7 +288,6 @@ public class CameraTrack implements DiscreteEnvironment {
         nar.beliefConfidence(0.7f);
         nar.goalConfidence(0.7f);
         nar.confMin.setValue(0.3f);
-        nar.inputActivation.setValue(0.1f);
 
         //new MySTMClustered(nar, 16, '.', 4);
 

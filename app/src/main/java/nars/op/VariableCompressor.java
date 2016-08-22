@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.nal.Tense.DTERNAL;
 
@@ -154,7 +155,7 @@ public class VariableCompressor implements Consumer<Task> {
 
     }
 
-    public static class Precompressor {
+    public static class Precompressor implements Function<Task,Task> {
         private final NAR nar;
         VariableCompressor c;
         ArithmeticInduction i;
@@ -165,7 +166,7 @@ public class VariableCompressor implements Consumer<Task> {
             this.i = new ArithmeticInduction(nar);
         }
 
-        public Task pre(Task input) {
+        @Override public Task apply(Task input) {
             try {
                 //stage 1
                 input = c.tryCompress(input);

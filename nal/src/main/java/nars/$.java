@@ -989,11 +989,6 @@ public enum $ {
 
 
         @Override
-        protected @Nullable TermContainer theSubterms(TermContainer s) {
-            return s;
-        }
-
-        @Override
         public int subtermsCount() {
             return 0;
         }

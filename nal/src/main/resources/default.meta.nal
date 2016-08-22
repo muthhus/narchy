@@ -258,22 +258,14 @@
     B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndepForward(C,A,B), (Desire:Strong)
         //^ this is only valid if A occurrs after C. the opposite is not logical and would also produce redundant results
 
-        //B, (C && (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Desire:StrongN)
 
-//    M, (M ==> P), shift_occurrence_forward(unused,"==>") |- P, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
-//    B, (A ==> C), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"==>") |- C, (Truth:Deduction, Order:ForAllSame)
-//    X, (XI ==> B), substitute_if_unifies("$",XI,(&/,X,/0)), shift_occurrence_forward(XI,"==>") |- B, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
-//    (A ==> C), B, time(decomposeTask) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+    //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
+    //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
-//    M, (P ==> M), shift_occurrence_backward(unused,"==>") |- P, (Truth:Abduction, Desire:Deduction, Order:ForAllSame)
-//    B, (C ==> A), substitute_if_unifies("$",A,B), shift_occurrence_backward(unused,"==>") |- C, (Truth:Abduction, Order:ForAllSame)
-//    X, (BI ==> Y), substitute_if_unifies("$",Y,X), shift_occurrence_backward(BI,"==>") |- BI, (Truth:Abduction, Desire:Deduction, Order:ForAllSame)
-    //(C ==> A), B, time(decomposeTask) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Desire:Deduction)
-
-//    M, (S <=> M), shift_occurrence_backward(unused,"<=>") |- S, (Truth:Analogy, Desire:Strong, Order:ForAllSame)
-//      ?? B, (A <=> C), substitute_if_unifies("$",A,B), shift_occurrence_backward(unused,"<=>") |- C, (Truth:Deduction, Order:ForAllSame)
-//      ?? B, (C <=> A), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"<=>") |- C, (Truth:Deduction, Order:ForAllSame)
-    //(A <=> C), B, time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)
+    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
+        //S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
+    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
+        //S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
 
@@ -294,10 +286,6 @@
 
      //structural decompose any component of a conjunction
      (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Desire:StructuralStrong)
-     //(&&,(--,%X),A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeductionN,Desire:StructuralStrongN)
-
-
-        //(&&,(--,%X),A..+), X, time(decomposeTask) |- (--,%X), (Belief:StructuralDeduction)
      (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Desire:StructuralStrong)
 
      (&&,X,A), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Desire:Strong)
@@ -318,17 +306,6 @@
 
         //TODO use ellipsis here?
 
-
-//// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
-//If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
-
-    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
-        //%S, (||,%S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-
-//Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
-
-    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
-        //%S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
@@ -391,8 +368,6 @@
     A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
         //A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
 
-    //A, B,   time(dtBefore), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B &&+- A), (Desire:Intersection)
-
 
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
@@ -416,7 +391,7 @@
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
-    (U --> L), ((&&,A..*,(#X --> L),(#X --> R)) ==> Z), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
+    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
 
 
 

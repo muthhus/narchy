@@ -35,14 +35,12 @@ import nars.guifx.nars.*;
 import nars.guifx.remote.VncClientApp;
 import nars.guifx.util.*;
 import nars.index.TermIndex;
-import nars.nar.util.AbstractCore;
-import nars.nar.util.DefaultCore;
+import nars.nar.util.ConceptBagCycle;
 import nars.term.Term;
 import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;
 import nars.util.FX;
 import nars.util.Util;
-import spacegraph.video.WebcamSurface;
 import org.jewelsea.willow.browser.WebBrowser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -425,7 +423,6 @@ public class NARide extends StackPane {
     }
 
     public void addView(Node n) {
-        nar.the(n);
 
         content.getTabs().add(new TabX(
                 n.getClass().getSimpleName(),
@@ -479,8 +476,8 @@ public class NARide extends StackPane {
         icon(FrameClock.class, (c) -> new NARMenu.CycleClockPane(nar));
         icon(RealtimeMSClock.class, (c) -> new NARMenu.RTClockPane(nar));
         //icon(NARLoop.class, (ll) -> loopPane);
-        icon(DefaultCore.class, (c) ->
-                new DefaultCyclePane((AbstractCore) c) //cast is hack
+        icon(ConceptBagCycle.class, (c) ->
+                new DefaultCyclePane((ConceptBagCycle) c) //cast is hack
         );
 
         pp = new WidgetLayer(this);
@@ -620,7 +617,7 @@ public class NARide extends StackPane {
         private final NAR nar;
         //final NSlider activation;
 
-        public DefaultCyclePane(AbstractCore l) {
+        public DefaultCyclePane(ConceptBagCycle l) {
 
             nar = l.nar;
 

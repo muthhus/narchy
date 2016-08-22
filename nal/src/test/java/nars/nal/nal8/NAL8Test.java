@@ -511,6 +511,17 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(2, "( (hold) &&+5 (use) ).") //should be decomposed by the goal task
                 .mustDesire(cycles, "(hold)", 1f, 0.81f, -5)
                 .mustNotOutput(cycles, "(use)", '!', ETERNAL) //not eternal, we have a temporal basis here
+                .mustNotOutput(cycles, "(hold)", '!', ETERNAL)
+        ;
+    }
+
+    @Test
+    public void temporal_goal_detachment_3_valid_negate()  {
+        test()
+                .input("(--,(use))! :|:")
+                .inputAt(2, "( (hold) &&+5 (--,(use)) ).") //should be decomposed by the goal task
+                .mustDesire(cycles, "(hold)", 1f, 0.81f, -5)
+                .mustNotOutput(cycles, "(use)", '!', ETERNAL) //not eternal, we have a temporal basis here
         ;
     }
 

@@ -41,11 +41,11 @@ public class MotorConcept extends WiredConcept  {
     @FunctionalInterface  public interface MotorFunction {
 
         /**
-         * @param desired current desire - not called if no desire Truth can be determined
-         * @param believed current belief - may be null if on belief Truth can be determined
+         * @param desired current desire - null if no desire Truth can be determined
+         * @param believed current belief - null if no belief Truth can be determined
          * @return truth of a new feedback belief, or null to disable the creation of any feedback this iteration
          */
-        @Nullable Truth motor(@Nullable Truth believed, @NotNull Truth desired);
+        @Nullable Truth motor(@Nullable Truth believed, @Nullable Truth desired);
 
         /** all desire passes through to affect belief */
         MotorFunction Direct = (believed, desired) -> desired;
@@ -135,19 +135,18 @@ public class MotorConcept extends WiredConcept  {
             return;
 
         long now = nar.time();
-        @Nullable Truth d = this.desire(now+ decisionDT);
-        if (d!=null) {
-            @Nullable Truth b = this.belief(now + decisionDT);
+        @Nullable Truth d = this.desire(now + decisionDT);
+        @Nullable Truth b = this.belief(now + decisionDT);
 
-            Truth feedback = motor.motor(b, d);
-            if (feedback != null) {
-                Task next = feedback(feedback, now);
-                if (lastFeedback == null || !lastFeedback.equalsTruth(next, feedbackResolution)) { //if feedback is different from last
-                    lastFeedback = next;
-                    nar.inputLater(next);
-                }
+        Truth feedback = motor.motor(b, d);
+        if (feedback != null) {
+            Task next = feedback(feedback, now);
+            if (lastFeedback == null || !lastFeedback.equalsTruth(next, feedbackResolution)) { //if feedback is different from last
+                lastFeedback = next;
+                nar.inputLater(next);
             }
         }
+
     }
 
     protected final Task feedback(Truth t, long when) {

@@ -83,8 +83,7 @@ public class Pong extends Player implements DiscreteEnvironment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(32);
-        nar.inputActivation.setValue(0.1f);
-        nar.derivedActivation.setValue(0.1f);
+
         nar.confMin.setValue(0.03f);
 
 

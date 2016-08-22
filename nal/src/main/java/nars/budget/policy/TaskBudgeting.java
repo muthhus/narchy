@@ -53,8 +53,8 @@ public class TaskBudgeting {
         //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
 
         float volRatioScale =
-                //occamBasic(derived, pp);
-                occamSquareWithDeadzone(derived, pp);
+                occamBasic(derived, pp);
+                //occamSquareWithDeadzone(derived, pp);
 
         //volRatioScale = volRatioScale * volRatioScale; //sharpen
 
@@ -112,50 +112,51 @@ public class TaskBudgeting {
         return 1f / (1f + (derivedComplexity / (derivedComplexity + parentComplexity)));
     }
 
-    /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by */
-    public static float occamSquareWithDeadzone(@NotNull Termed derived, Premise pp) {
-        Task parentTask = pp.task;
-        float parentComplexity = parentTask.volume();
-        Task parentBelief = pp.belief;
-
-        int derivedComplexity = derived.volume();
-
-        //choose the task or belief (if present) which has the complexity nearest the derived (optimistic)
-        Term parentTerm;
-        float delta = Math.abs(derivedComplexity - parentComplexity);
-        if (parentBelief!=null && delta > Math.abs(derivedComplexity - parentBelief.volume())) {
-            parentTerm = parentBelief.term();
-            parentComplexity = parentTerm.volume();
-            delta = Math.abs(derivedComplexity - parentComplexity); //recompute delta for new value
-        } else {
-            parentTerm = parentTask.term();
-        }
-
-        if (Math.max(derived.term().vars(), parentTerm.vars()) >= delta) {
-            //no penalty if the difference in complexity is within a range bounded by the number of variables in the derived.
-            //this is the 'dead-zone' of the curve which encourages variable introduction and substitution
-            return 1f;
-        } else {
-            //otherwise, the penalty is proportional to the absolute change in complexity
-            //this includes whether the complexity decreased (ex: decomposition/substition) or increased (composition)
-            //the theory behind penalizing decrease in complexity is to marginalize
-            //potentially useless runaway decomposition results that could be considered noisy echos or residue of
-            //its premise components
-
-            float relDelta = delta /
-                    aveAri(parentComplexity); //TODO could be LERP based on compared confidence of premise to derived (if belief/goal)
-
-            //the decay rate is given a polynomial boost here to further enforce the
-            //need to avoid complexity
-            float divisor = 1f + relDelta;
-            float scale = 1f / (divisor*divisor);
-
-            //System.out.println(parentTerm + " :: " + derived + "  -- " + n2(scale) + " vs " + n2(occamBasic(derived, pp)));
-
-            return scale;
-        }
-    }
-
+//    /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by
+//     *  NOT TESTED may have math problems
+//     * */
+//    public static float occamSquareWithDeadzone(@NotNull Termed derived, Premise pp) {
+//        Task parentTask = pp.task;
+//        float parentComplexity = parentTask.volume();
+//        Task parentBelief = pp.belief;
+//
+//        int derivedComplexity = derived.volume();
+//
+//        //choose the task or belief (if present) which has the complexity nearest the derived (optimistic)
+//        Term parentTerm;
+//        float delta = Math.abs(derivedComplexity - parentComplexity);
+//        if (parentBelief!=null && delta > Math.abs(derivedComplexity - parentBelief.volume())) {
+//            parentTerm = parentBelief.term();
+//            parentComplexity = parentTerm.volume();
+//            delta = Math.abs(derivedComplexity - parentComplexity); //recompute delta for new value
+//        } else {
+//            parentTerm = parentTask.term();
+//        }
+//
+//        if (Math.max(derived.term().vars(), parentTerm.vars()) >= delta) {
+//            //no penalty if the difference in complexity is within a range bounded by the number of variables in the derived.
+//            //this is the 'dead-zone' of the curve which encourages variable introduction and substitution
+//            return 1f;
+//        } else {
+//            //otherwise, the penalty is proportional to the absolute change in complexity
+//            //this includes whether the complexity decreased (ex: decomposition/substition) or increased (composition)
+//            //the theory behind penalizing decrease in complexity is to marginalize
+//            //potentially useless runaway decomposition results that could be considered noisy echos or residue of
+//            //its premise components
+//
+//            float relDelta = delta /
+//                    aveAri(parentComplexity); //TODO could be LERP based on compared confidence of premise to derived (if belief/goal)
+//
+//            //the decay rate is given a polynomial boost here to further enforce the
+//            //need to avoid complexity
+//            float divisor = 1f + relDelta;
+//            float scale = 1f / (divisor*divisor);
+//
+//            //System.out.println(parentTerm + " :: " + derived + "  -- " + n2(scale) + " vs " + n2(occamBasic(derived, pp)));
+//
+//            return scale;
+//        }
+//    }
 
     /**
      * Backward logic with CompoundTerm conclusion, stronger case

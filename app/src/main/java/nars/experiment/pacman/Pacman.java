@@ -96,9 +96,7 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		//nar.premiser.confMin.setValue(0.03f);
-		nar.inputActivation.setValue(0.02f);
-		nar.derivedActivation.setValue(0.02f);
+
 
 		//new MemoryManager(nar);
 

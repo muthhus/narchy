@@ -41,7 +41,7 @@ abstract public class NAREnvironment {
     static final Logger logger = LoggerFactory.getLogger(NAREnvironment.class);
 
     public final SensorConcept happy;
-    private final float reinforcementAttention;
+
     public final SensorConcept joy;
     public final RangeNormalizedFloat rewardNormalized;
     public NAR nar;
@@ -49,11 +49,12 @@ abstract public class NAREnvironment {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<MotorConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.2f;
-    @Deprecated public float gammaEpsilonFactor = 0.25f;
+    public float alpha, gamma, epsilonProbability = 0.05f;
+    @Deprecated public float gammaEpsilonFactor = 0.75f;
 
-    final int CURIOSITY_DURATION = 32; //frames
-    DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(CURIOSITY_DURATION);
+    final int CURIOSITY_DURATION = 16; //frames
+    final DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(CURIOSITY_DURATION);
+    final DescriptiveStatistics rewardWindow = new DescriptiveStatistics(CURIOSITY_DURATION);
 
 
 
@@ -67,8 +68,9 @@ abstract public class NAREnvironment {
     protected long now;
     private long stopTime;
     private NARLoop loop;
-    private Budget boostBudget;
-
+    private Budget boostBudget, curiosityBudget;
+    private final float reinforcementAttention;
+    private float curiosityAttention;
 
     public NAREnvironment(NAR nar) {
         this.nar = nar;
@@ -81,6 +83,7 @@ abstract public class NAREnvironment {
         ;
 
         this.reinforcementAttention = or(nar.DEFAULT_BELIEF_PRIORITY, nar.DEFAULT_GOAL_PRIORITY);
+
 
         float rewardConf = alpha;
 
@@ -130,6 +133,7 @@ abstract public class NAREnvironment {
         now = nar.time();
 
         rewardValue = act();
+        rewardWindow.addValue(rewardValue);
 
         if (trace)
             System.out.println(summary());
@@ -158,7 +162,7 @@ abstract public class NAREnvironment {
 //                 + "] "
                   "rwrd=" + n2(rewardValue) + "\t"
                 + "conf=" + n4(desireConf()) + " "
-                + "hapy=" + n4(emotion.happy()) + " "
+                + "hapy=" + n4(emotion.happy()-emotion.sad()) + " "
                 + "busy=" + n4(emotion.busy.getSum()) + " "
                 + "lern=" + n4(emotion.learning()) + " "
                 + "strs=" + n4(emotion.stress.getSum()) + " "
@@ -174,7 +178,9 @@ abstract public class NAREnvironment {
 
 
     protected void mission() {
+
         int dt = 1 + ticksBeforeObserve + ticksBeforeDecide;
+        this.curiosityAttention = reinforcementAttention / actions.size();
 
 
         @NotNull Term what = $.$("?w"); //#w
@@ -268,6 +274,7 @@ abstract public class NAREnvironment {
         if (reinforcementAttention > 0) {
 
             boostBudget = UnitBudget.One.clone().multiplied(reinforcementAttention, 0.5f, 0.5f);
+            curiosityBudget = UnitBudget.One.clone().multiplied(curiosityAttention, 0.1f, 0f);
 
             //boost(happy);
             //boost(happy); //boosted by the (happy)! task that is boosted below
@@ -307,7 +314,7 @@ abstract public class NAREnvironment {
                             return false;
                         }
                     }*/.
-                            present(now).budget(boostBudget).log("Curiosity"));
+                            present(now).budget(curiosityBudget).log("Curiosity"));
                 }
 
                 boost(c);

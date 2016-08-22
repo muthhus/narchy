@@ -7,10 +7,11 @@ import nars.concept.Concept;
 import nars.index.Indexes;
 import nars.index.TermIndex;
 import nars.link.BLink;
-import nars.nar.util.DefaultCore;
+import nars.nar.util.ConceptBagCycle;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
+import nars.util.data.MutableInteger;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
@@ -26,7 +27,8 @@ public class Default extends AbstractNAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    public final @NotNull DefaultCore core;
+    public final @NotNull ConceptBagCycle core;
+    public final MutableInteger cyclesPerFrame = new MutableInteger(1); //this is specific to a Core implementation, not the entire NAR
 
     @Deprecated
     public Default() {
@@ -75,9 +77,9 @@ public class Default extends AbstractNAR {
     }
 
 
-    protected @NotNull DefaultCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
+    protected @NotNull ConceptBagCycle newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
 
-        DefaultCore c = new DefaultCore(this, activeConcepts);
+        ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts, cyclesPerFrame);
 
         //TODO move these to a PremiseGenerator which supplies
         c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
@@ -86,8 +88,8 @@ public class Default extends AbstractNAR {
         c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
         //this.handlers = new Active(
-        eventFrameStart.on(c::frame);
-        eventReset.on(c::reset);
+
+
         //);
         return c;
     }

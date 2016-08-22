@@ -175,7 +175,6 @@ public abstract class Param /*extends Container*/ implements Level {
 
     private Truth defaultGoalTruth, defaultBeliefTruth;
 
-    @Deprecated public final MutableInteger cyclesPerFrame = new MutableInteger(1); //this is specific to a Core implementation, not the entire NAR
 
 
     public static final float TRUTH_EPSILON = 0.01f;
@@ -235,17 +234,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public final MutableFloat truthResolution = new MutableFloat(TRUTH_EPSILON);
 
 
-    /**
-     * factor for concept activation [0 <= c <= 1] by input tasks
-     */
-    public final MutableFloat inputActivation = new MutableFloat(1f);
-
-    /**
-     * factor for concept activation [0 <= c <= 1] by derived tasks
-     */
-    public final MutableFloat derivedActivation = new MutableFloat(1f);
-
-     /*
+    /*
      BUDGET THRESHOLDS
      * Increasing this value decreases the resolution with which
      *   budgets are propagated or otherwise measured, which can result

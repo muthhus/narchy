@@ -98,6 +98,9 @@ public final class Emotion implements Serializable {
     public float happy() {
         return (float) happy.getSum();
     }
+    public float sad() {
+        return (float) sad.getSum();
+    }
 
 //    public void print(@NotNull OutputStream output) {
 //        final FSTConfiguration conf = FSTConfiguration.createJsonConfiguration(true,false);
@@ -155,11 +158,14 @@ public final class Emotion implements Serializable {
     @Deprecated public void busy(float pri) {
         busy.accept( pri );
     }
+
+
     public final void stress(@NotNull MutableFloat pri) {
         float v = pri.floatValue();
         if (v > 0)
             stress.accept( v );
     }
+
     @Deprecated public void frustration(float pri) {
 
         frustration.accept( pri );
