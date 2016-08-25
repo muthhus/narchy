@@ -47,7 +47,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
+public abstract class FindSubst extends Termunator implements Subst, Supplier<Versioned<Term>> {
 
 
     public final Random random;
@@ -86,7 +86,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     public final Versioned<Compound> parent;
 
 
-    public final List<Termutator> termutes = new LimitedFasterList(Param.UnificationTermutesMax);
 
 
     @NotNull
@@ -112,7 +111,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
     protected FindSubst(TermIndex index, Op type, Random random, @NotNull Versioning versioning) {
-        //super(Global.UnificationStackMax, 8);
+        super(Param.UnificationTermutesMax);
 
         this.index = index;
 
@@ -167,7 +166,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
 
-    private final Termunator termunator = new Termunator(this);
 
     /**
      * setting finish=false allows matching in pieces before finishing
@@ -179,15 +177,39 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         }
 
         if (match(x, y)) {
-
             if (finish) {
-                if (!termutes.isEmpty())
-                    termunator.run(this, null, -1);
-                else
-                    onMatch();
+                run(this, null, -1);
             }
         }
     }
+
+    @Override
+    public final void run(@NotNull FindSubst f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
+        Termutator[] n = next();
+        if (n != null) {
+            Termutator.next(f, n, -1); //combinatorial recurse starts here
+        } else {
+            f.onMatch(); //ends here when termutes exhausted
+        }
+    }
+
+    @Nullable
+    private final Termutator[] next() {
+        List<Termutator> t = termutes;
+        int n = t.size();
+        if (n == 0) {
+            return null;
+        } else {
+            Termutator[] tt = t.toArray(new Termutator[n + 1]);
+            t.clear();
+
+            tt[tt.length - 1] = this; //add this as the final termutator (termunator)
+
+            return tt;
+        }
+    }
+
+
 
 
 //    private void print(String prefix, @Nullable Term a, Term b) {

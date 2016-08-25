@@ -32,7 +32,9 @@ public final class AndCondition extends GenericCompound implements BoolCondition
 
     /** just attempts to evaluate the condition, causing any desired side effects as a result */
     @Override public final void accept(@NotNull PremiseEval m, int now) {
-        BoolCondition.run(this, m);
+        //BoolCondition.run(this, m);
+        booleanValueOf(m);
+        m.revert(now);
     }
 
     @Override

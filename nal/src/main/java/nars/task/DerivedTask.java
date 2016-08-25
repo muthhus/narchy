@@ -103,15 +103,18 @@ abstract public class DerivedTask extends MutableTask {
 
             if (delta == null) {
 
-                feedback(1f - pri() /* HEURISTIC */, nar);
+                feedback(1f - priIfFiniteElseZero() /* HEURISTIC */, nar);
                 delete();
 
             } else {
 
-                float boost = or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction)); /* HEURISTIC */
+                /* HEURISTIC */
+                float boost =
+                        1f + or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
+                        //1f + deltaConfidence * Math.abs(deltaSatisfaction);
 
-                if (!Util.equals(boost, 0, Param.TRUTH_EPSILON)) {
-                    feedback(1f + boost, nar);
+                if (!Util.equals(boost, 1f, Param.TRUTH_EPSILON)) {
+                    feedback(boost, nar);
                 }
 
             }
@@ -122,6 +125,9 @@ abstract public class DerivedTask extends MutableTask {
         }
 
         void feedback(float score, NAR nar) {
+
+            //reduce the score factor intensity by lerping it closer to 1.0
+            score = Util.lerp(score, 1f, Param.LINK_FEEDBACK_RATE);
 
             @Nullable Premise premise = this.premise;
             if (premise !=null) {

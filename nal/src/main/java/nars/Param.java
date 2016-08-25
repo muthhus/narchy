@@ -39,7 +39,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int STAMP_CAPACITY = 10;
 
     /** used in linear interpolating link adjustments during feedback */
-    public static float LINK_FEEDBACK_RATE = 0.75f;
+    public static float LINK_FEEDBACK_RATE = 0.5f;
 
 
     /**
