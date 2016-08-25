@@ -210,7 +210,7 @@ public class UnificationTest {
                 true);
     }
 
-    @Ignore @Test
+    @Test
     public void pattern_trySubs_Indep_Var_2_product_and_common_depvar_bidirectional() {
         FindSubst sub = test(Op.VAR_INDEP,
                 "(<($1,x) --> on>,<(SELF,x) --> at>)",

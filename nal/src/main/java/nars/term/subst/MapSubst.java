@@ -46,7 +46,7 @@ public class MapSubst implements Subst {
      */
     @Nullable
     @Override
-    public Term term(Term t) {
+    public Term xy(Term t) {
         return xy.get(t);
     }
 
@@ -76,8 +76,8 @@ public class MapSubst implements Subst {
         }
 
         @Override
-        public Term term(@NotNull Term t) {
-            return t.equals(ox) ? oy : super.term(t);
+        public Term xy(@NotNull Term t) {
+            return t.equals(ox) ? oy : super.xy(t);
         }
 //
 //        @Override

@@ -14,7 +14,7 @@ public interface Subst  {
     boolean isEmpty();
 
     @Nullable
-    Term term(Term t);
+    Term xy(Term t);
 
 //    @NotNull
 //    default Term termOrOriginal(@NotNull Term t) {

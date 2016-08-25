@@ -83,7 +83,7 @@ public class EllipsisTest {
                     public boolean onMatch() {
                         //System.out.println(x + "\t" + y + "\t" + this);
 
-                        Term a = term(ellipsisTerm);
+                        Term a = xy(ellipsisTerm);
                         if (a instanceof EllipsisMatch) {
                             EllipsisMatch varArgs = (EllipsisMatch) a;
 
@@ -92,7 +92,7 @@ public class EllipsisTest {
                             assertEquals(getExpectedUniqueTerms(arity), varArgs.size());
 
                             Set<Term> varArgTerms = $.newHashSet(1);
-                            Term u = term(varArgs);
+                            Term u = xy(varArgs);
                             if (u == null) {
                                 u = varArgs;
                             }
@@ -226,7 +226,7 @@ public class EllipsisTest {
 
         @Override public void testFurther(Set<Term> selectedFixed, @NotNull FindSubst f, @NotNull Set<Term> varArgTerms) {
             assertEquals(2, f.xy.size());
-            Term fixedTermValue = f.term(fixedTerm);
+            Term fixedTermValue = f.xy(fixedTerm);
             assertNotNull(f.toString(), fixedTermValue);
             assertTrue(fixedTermValue instanceof Atomic);
             assertFalse(varArgTerms.contains(fixedTermValue));

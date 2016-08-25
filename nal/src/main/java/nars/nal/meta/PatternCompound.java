@@ -129,7 +129,7 @@ abstract public class PatternCompound extends GenericCompound {
                 if (x instanceof Ellipsis) {
                     int available = ysize - j;
 
-                    Term eMatched = subst.term(x); //EllipsisMatch, or null
+                    Term eMatched = subst.xy(x); //EllipsisMatch, or null
                     if (eMatched == null) {
 
                         //COLLECT
@@ -259,7 +259,7 @@ abstract public class PatternCompound extends GenericCompound {
 
                     return matchEllipsedLinear(y, subst) &&
                             subst.replaceXY(et,
-                                    ImageMatch.put(subst.term(et), n, y));
+                                    ImageMatch.put(subst.xy(et), n, y));
 
                 }
             } else {
@@ -276,7 +276,7 @@ abstract public class PatternCompound extends GenericCompound {
                     if (imageIndex != -1)
                         return matchEllipsedLinear(y, subst) &&
                                 subst.replaceXY(et,
-                                        ImageMatch.take(subst.term(et), imageIndex));
+                                        ImageMatch.take(subst.xy(et), imageIndex));
                 }
             }
             return false;
@@ -337,7 +337,7 @@ abstract public class PatternCompound extends GenericCompound {
                 if (x == ellipsis)
                     continue;
 
-                Term v = subst.term(x); //xVar ? getXY(x) : x;
+                Term v = subst.xy(x); //xVar ? getXY(x) : x;
 
                 if (v instanceof EllipsisMatch) {
 

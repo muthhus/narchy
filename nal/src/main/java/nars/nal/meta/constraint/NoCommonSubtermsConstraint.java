@@ -27,7 +27,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
         if (y instanceof Variable)
             return false;
 
-        Term B = f.term(b);
+        Term B = f.xy(b);
 
         if (B == null || B instanceof Variable)
             return false;

@@ -9,7 +9,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
-import nars.term.obj.Termject;
 import nars.term.subst.choice.CommutivePermutations;
 import nars.term.subst.choice.Termunator;
 import nars.term.subst.choice.Termutator;
@@ -27,8 +26,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
-
-import static nars.Op.OBJECT;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -156,7 +153,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
 
     @Nullable
     @Override
-    public final Term term(@NotNull Term t) {
+    public final Term xy(@NotNull Term t) {
         return xy.get(t);
     }
 
@@ -265,7 +262,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
      * x's and y's ops already determined inequal
      */
     public final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
-        Term x2 = term(x);
+        Term x2 = xy(x);
         return (x2 != null) ?
                 unify(x2, y) :
                 putXY(/* (Variable) */ x, y);
@@ -379,12 +376,6 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
         return resolve(t, this);
     }
 
-    @Nullable
-    public final Term resolveNormalized(@NotNull Term t, @NotNull NAR nar) {
-        //TODO make a half resolve that only does xy?
-        t = resolve(t);
-        return (t instanceof Compound) ? nar.normalize((Compound) t) : t;
-    }
 
     @Nullable
     public final Term resolve(@NotNull Term t, @NotNull Subst subst) {

@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.$.unneg;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.term.Termed.termOrNull;
@@ -153,7 +152,7 @@ public abstract class TermIndex extends TermBuilder {
     public Term resolve(@NotNull Term src, @NotNull Subst f) {
 
 
-        Term y = f.term(src);
+        Term y = f.xy(src);
         if (y != null)
             return y; //an assigned substitution, whether a variable or other type of term
 
@@ -174,16 +173,15 @@ public abstract class TermIndex extends TermBuilder {
             return src;
 
         int len = src.size();
-
-        Compound crc = (Compound) src;
-
         List<Term> sub = $.newArrayList(len /* estimate */);
 
         boolean strict = f instanceof PremiseEval;
 
         boolean changed = false;
+        Compound crc = (Compound) src;
+        Term[] cct = crc.terms();
         for (int i = 0; i < len; i++) {
-            Term t = crc.term(i);
+            Term t = cct[i];
             Term u = resolve(t, f);
 
 
@@ -244,6 +242,9 @@ public abstract class TermIndex extends TermBuilder {
     }
 
     private static boolean cacheable(Op op, Term[] u) {
+        if (u.length < 2) {
+            return false; //probably not worth caching small compounds
+        }
         if (op == INH) {
             if (u[1] instanceof TermTransform) //skip any immediate transforms as these must be dynamically computed
                 return false;

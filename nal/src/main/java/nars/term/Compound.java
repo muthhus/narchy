@@ -268,13 +268,10 @@ public interface Compound extends Term, IPair, TermContainer {
                         TermContainer ysubs = y.subterms();
 
                         return
-                                xsubs.equals(ysubs)     //fast (hashcode-based) test for equality first, then do further matching
-
-                                        ||
 
                                 Compound.commutative(op, xs) ?
-                                subst.matchPermute(xsubs, ysubs) :
-                                subst.matchLinear(xsubs, ysubs);
+                                    subst.matchPermute(xsubs, ysubs) :
+                                    subst.matchLinear(xsubs, ysubs);
 
                     }
 

@@ -254,7 +254,7 @@ public interface TimeFunctions {
 
                 long shift = ETERNAL;
 
-                Term d0 = p.resolveNormalized(decomposedTerm.term(0), p.nar);
+                Term d0 = p.resolve(decomposedTerm.term(0));
                 boolean derivedIsDecomposedZero = Terms.equalOrNegationOf(d0, derived);
 
 
@@ -266,7 +266,7 @@ public interface TimeFunctions {
                             edtDecomposed;
 
                 } else {
-                    Term d1 = p.resolveNormalized(decomposedTerm.term(1), p.nar);
+                    Term d1 = p.resolve(decomposedTerm.term(1));
 
                     if (derivedIsDecomposedZero && Terms.equalOrNegationOf(d1, otherTerm)) {
                         shift = -edtDecomposed; //shift negative
