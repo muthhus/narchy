@@ -58,14 +58,14 @@ public class PrologInvocationContext {
         }
         for (i=0;i<tlist.length;i++) {
             if (tlist[i] == null) {
-                tlist[i] = new Var<Term<?>>("PJVAR"+i);
+                tlist[i] = new Var<>("PJVAR" + i);
             }
         }
         return Cons.make(predicateName,tlist);        
     }
     
     private void initPredicateName(Method m, PrologMethod pm) {
-        if (pm.predicate().equals("")) {
+        if (pm.predicate().isEmpty()) {
             predicateName = m.getName();
         }
         else {
@@ -75,8 +75,8 @@ public class PrologInvocationContext {
     }
     
     private void initVariableNames(Method m, PrologMethod pm) {
-        variableNames = new Vector<String>();
-        if (pm.predicate().equals("")) {
+        variableNames = new Vector<>();
+        if (pm.predicate().isEmpty()) {
             for (TypeVariable<?> tv : m.getTypeParameters()) {                
                 if (tv.getName().startsWith("$")) {
                     variableNames.add(tv.getName());
@@ -93,8 +93,8 @@ public class PrologInvocationContext {
     }
     
     private void initInputVariables(Method m, PrologMethod pm) {
-        inputVariables = new Vector<String>();
-        if (pm.signature().equals("")) {
+        inputVariables = new Vector<>();
+        if (pm.signature().isEmpty()) {
             for (Type t : m.getGenericParameterTypes()) {
                 if (t instanceof TypeVariable<?>) {                    
                     inputVariables.add(((TypeVariable<?>)t).getName());                    
@@ -111,8 +111,8 @@ public class PrologInvocationContext {
     }
     
     private void initOutputVariables(Method m, PrologMethod pm) {
-        outputVariables = new Vector<String>();        
-        if (pm.signature().equals("")) {
+        outputVariables = new Vector<>();
+        if (pm.signature().isEmpty()) {
             Type returnType = m.getGenericReturnType();
             if (Iterable.class.equals(m.getReturnType())) {
                 multipleResult = true;
@@ -313,10 +313,7 @@ public class PrologInvocationContext {
                         return _result.hasNext();
                     }
                 }
-                return new Iterable<Object>() {
-                    @Override
-                    public Iterator<Object> iterator() {return new SolutionIterator();}
-                };                
+                return (Iterable<Object>) () -> new SolutionIterator();
             }        
             else { //single solution
                 PrologSolution<?,? extends Cons<?,?>> si = _engine.solve(theGoal);                            

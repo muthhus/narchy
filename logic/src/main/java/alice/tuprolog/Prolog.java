@@ -543,7 +543,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @param t1 second term to be unified
 	 * @return true if the unification was successful
 	 */
-	public boolean match(Term t0, Term t1) {	//no syn
+	public static boolean match(Term t0, Term t1) {	//no syn
 		return t0.match(t1);
 	}
 
@@ -1080,7 +1080,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 		}
 	}
 
-	public void warn(String s) {
+	public static void warn(String s) {
 		logger.warn(s);
 	}
 

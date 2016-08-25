@@ -40,7 +40,7 @@ public class Double extends Term<Double> {
         }
         
 	public String toString() {
-		return "Double("+_theDouble+")";
+		return "Double("+_theDouble+ ')';
 	}
 
 }

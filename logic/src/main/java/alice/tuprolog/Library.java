@@ -78,7 +78,7 @@ public abstract class Library implements Serializable, IPrimitives {
         return "";
     }
     
-    public String getTheory(int a) {
+    public static String getTheory(int a) {
     	return "";
     }
     
@@ -122,7 +122,7 @@ public abstract class Library implements Serializable, IPrimitives {
      * is deployed and altered.
      */
     protected boolean match(Term a0,Term a1) {
-        return engine.match(a0,a1);
+        return Prolog.match(a0,a1);
     }
     
     

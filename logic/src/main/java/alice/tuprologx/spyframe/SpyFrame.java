@@ -22,8 +22,9 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
 
 	private static final long serialVersionUID = 1L;
 /**An anonymous singleton instance building a tree out of a list of ExecutionContexts. */
-  public static final ToTree<List<ExecutionContext>> contexts2tree=new ToTree<List<ExecutionContext>>(){
-    /**Constructs a tree using the information given in SpyEvents. Every entry
+  public static final ToTree<List<ExecutionContext>> contexts2tree= new ToTree<List<ExecutionContext>>() {
+    /**
+     * Constructs a tree using the information given in SpyEvents. Every entry
      * in the provided list is supposed to have a clause and some subgoals, one
      * of which is the current goal. The name of the clause is displayed as the
      * current subgoal of one level up whereas the arguments of the clause
@@ -32,74 +33,66 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
      * is therefore used.
      */
     @Override
-    public Node makeTreeFrom(List<ExecutionContext> eclist){
-      return TermFrame.term2tree.makeTreeFrom(makeTermFrom(eclist));
+    public Node makeTreeFrom(List<ExecutionContext> eclist) {
+        return TermFrame.term2tree.makeTreeFrom(makeTermFrom(eclist));
     }
 
     private ArrayList<Term> elementi;
-    
-    Term makeTermFrom(List<ExecutionContext> eclist){
-      int levels=eclist.size();
-      if(levels<1) return null;
-      Term bottom=null;
-      for(int i=0; i<levels; i++){
-        ExecutionContext ec=eclist.get(i);
-        Term c=ec.getClause();
-        if(c instanceof Struct){
-          Struct s=(Struct)c;
-          String name=s.name();
-          ArrayList<Term> sub=new ArrayList<Term>();
-          for(AbstractSubGoalTree sgt: ec.getSubGoalStore().getSubGoals())
-          {
-        	  if (sgt.isRoot())
-        	  {
-        		  //SubGoalTree
-        		  cerca(sgt);
-        		  for (Term t : elementi)
-        		  {
-        			  sub.add(t);
-        		  }
-        	  }
-        	  else
-        	  {
-        		  //SubGoalElement
-                sub.add(((SubGoalElement) sgt).term);
-        	  }
-          }
-          if(":-".equals(name))
-            sub.add(0, i+1<levels?eclist.get(i+1).getCurrentGoal():s.term(0));
-          else if(",".equals(name)) name=" ";//don't want to build the ,-tree
-          else name=null;//indicates that we have a normal compound
-          int pos=sub.indexOf(ec.getCurrentGoal());
-          if(bottom!=null) sub.set(pos, bottom);
-          if(name==null) bottom=sub.get(0);
-          else{
-            Term[] subt=new Term[sub.size()];
-            bottom=new Struct(name, sub.toArray(subt));
-          }
-        } else bottom=c;
-      }
-      return bottom;//is at last the top
+
+
+    public Term makeTermFrom(List<ExecutionContext> eclist) {
+        int levels = eclist.size();
+        if (levels < 1) return null;
+        Term bottom = null;
+        for (int i = 0; i < levels; i++) {
+            ExecutionContext ec = eclist.get(i);
+            Term c = ec.getClause();
+            if (c instanceof Struct) {
+                Struct s = (Struct) c;
+                String name = s.name();
+                ArrayList<Term> sub = new ArrayList<>();
+                for (AbstractSubGoalTree sgt : ec.getSubGoalStore().getSubGoals()) {
+                    if (sgt.isRoot()) {
+                        //SubGoalTree
+                        cerca(sgt);
+                        for (Term t : elementi) {
+                            sub.add(t);
+                        }
+                    } else {
+                        //SubGoalElement
+                        sub.add(((SubGoalElement) sgt).term);
+                    }
+                }
+                if (":-".equals(name))
+                    sub.add(0, i + 1 < levels ? eclist.get(i + 1).getCurrentGoal() : s.term(0));
+                else if (",".equals(name)) name = " ";//don't want to build the ,-tree
+                else name = null;//indicates that we have a normal compound
+                int pos = sub.indexOf(ec.getCurrentGoal());
+                if (bottom != null) sub.set(pos, bottom);
+                if (name == null) bottom = sub.get(0);
+                else {
+                    Term[] subt = new Term[sub.size()];
+                    bottom = new Struct(name, sub.toArray(subt));
+                }
+            } else bottom = c;
+        }
+        return bottom;//is at last the top
     }
 
-	private void cerca(AbstractSubGoalTree sgt) {
-		elementi=new ArrayList<Term>();
-		int dim = ((SubGoalTree)sgt).size();
-		for (int i=0; i<dim; i++)
-		{
-			AbstractSubGoalTree ab = ((SubGoalTree)sgt).getChild(i);
-			if (ab.isLeaf())
-			{
-              elementi.add(((SubGoalElement) ab).term);
-			}
-			else
-			{
-				cerca(ab);
-			}
-		}
-		
-	}
-  };
+    private void cerca(AbstractSubGoalTree sgt) {
+        elementi = new ArrayList<>();
+        int dim = ((SubGoalTree) sgt).size();
+        for (int i = 0; i < dim; i++) {
+            AbstractSubGoalTree ab = ((SubGoalTree) sgt).getChild(i);
+            if (ab.isLeaf()) {
+                elementi.add(((SubGoalElement) ab).term);
+            } else {
+                cerca(ab);
+            }
+        }
+
+    }
+};
   Prolog prolog;
   Thread pprocess;
   JTextField number;
@@ -132,7 +125,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
     steps=1;
     c.add(topp, BorderLayout.NORTH);
     //JSplitPane at CENTER containing the tree and the results
-    tree=new Tree<List<ExecutionContext>>(contexts2tree);
+    tree= new Tree<>(contexts2tree);
     results=new JTextArea("", 4, 40);
     JSplitPane jsp=new JSplitPane(
         JSplitPane.VERTICAL_SPLIT,

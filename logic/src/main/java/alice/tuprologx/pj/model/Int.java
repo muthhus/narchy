@@ -40,7 +40,7 @@ public class Int extends Term<Int> {
         }
         
 	public String toString() {
-		return "Int("+_theInt+")";
+		return "Int("+_theInt+ ')';
 	}
 
 }

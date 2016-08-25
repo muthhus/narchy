@@ -106,7 +106,7 @@ public class PJLibraryNew extends OOLibrary {
 	
 	//----------------------------------------------------------------------------
 
-    public boolean prolog_class_1(Term classname) {
+    public static boolean prolog_class_1(Term classname) {
         if (!classname.isAtom())
             return false;
         Class<?> clazz = null;
@@ -296,7 +296,7 @@ public class PJLibraryNew extends OOLibrary {
         }
     }
 
-    private Object[] getArrayFromList(Struct list) {
+    private static Object[] getArrayFromList(Struct list) {
 		Object args[] = new Object[list.listSize()];
 		Iterator<? extends Term> it = list.listIterator();
 		int count = 0;
@@ -352,7 +352,7 @@ public class PJLibraryNew extends OOLibrary {
             return false;
         }
         if (o == null || !(o instanceof Method)) {
-            getEngine().warn("Method not found: " + method);
+            Prolog.warn("Method not found: " + method);
             return false;
         }
         else {
@@ -373,7 +373,7 @@ public class PJLibraryNew extends OOLibrary {
                     res = m.invoke(receiver, args);
                 }
             } catch (Throwable ex) {
-                getEngine().warn("Method invocation failed: " + method);
+                Prolog.warn("Method invocation failed: " + method);
                 ex.printStackTrace();
                 return false;
             }
@@ -401,10 +401,10 @@ public class PJLibraryNew extends OOLibrary {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().warn("Java class not found: " + clName);
+					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {				
@@ -444,7 +444,7 @@ public class PJLibraryNew extends OOLibrary {
 			
 			return true;
 		} catch (NoSuchFieldException ex) {
-			getEngine().warn("Field " + fieldName + " not found in class " + objId);
+			Prolog.warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -527,10 +527,10 @@ public class PJLibraryNew extends OOLibrary {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().warn("Java class not found: " + clName);
+					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {
@@ -569,10 +569,10 @@ public class PJLibraryNew extends OOLibrary {
 			//ex.printStackTrace();
 			//    return false;
 		} catch (NoSuchFieldException ex) {
-			getEngine().warn("Field " + fieldName + " not found in class " + objId);
+			Prolog.warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
-			getEngine().warn("Generic error in accessing the field");
+			Prolog.warn("Generic error in accessing the field");
 			//ex.printStackTrace();
 			return false;
 		}
@@ -739,7 +739,7 @@ public class PJLibraryNew extends OOLibrary {
 					} else if (castTo_name.equals("double[]")) {
 						castTo_name = "[D";
 					} else {
-						castTo_name = "[L" + castTo_name.substring(0, castTo_name.length() - 2) + ";";
+						castTo_name = "[L" + castTo_name.substring(0, castTo_name.length() - 2) + ';';
 					}
 				}
 				if (!castWhat_name.equals("null")) {
@@ -747,9 +747,9 @@ public class PJLibraryNew extends OOLibrary {
 					if (obj_to_cast == null) {
 						if (castTo_name.equals("boolean")) {
 							if (castWhat_name.equals("true")) {
-								values[i] = new Boolean(true);
+								values[i] = Boolean.TRUE;
 							} else if (castWhat_name.equals("false")) {
-								values[i] = new Boolean(false);
+								values[i] = Boolean.FALSE;
 							} else {
 								return false;
 							}
@@ -763,7 +763,7 @@ public class PJLibraryNew extends OOLibrary {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().warn("Java class not found: " + castTo_name);
+							Prolog.warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -789,7 +789,7 @@ public class PJLibraryNew extends OOLibrary {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().warn("Java class not found: " + castTo_name);
+							Prolog.warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -820,7 +820,7 @@ public class PJLibraryNew extends OOLibrary {
 				}
 			}
 		} catch (Exception ex) {
-			getEngine().warn("Casting " + castWhat + " to " + castTo + " failed");
+			Prolog.warn("Casting " + castWhat + " to " + castTo + " failed");
 			return false;
 		}
 		return true;

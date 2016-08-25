@@ -58,7 +58,7 @@ public class Clause<H extends Term<?>, B extends Term<?>> extends Compound2<H,B>
     }
     
     public String toString() {
-        return "Clause{"+getHead()+(isFact() ? "" : " :- "+getBody())+"}";
+        return "Clause{"+getHead()+(isFact() ? "" : " :- "+getBody())+ '}';
     }
 
     @Override

@@ -106,22 +106,17 @@ public class JEditTextArea extends JComponent
 		painter.addMouseMotionListener(new DragHandler());
 		addFocusListener(new FocusHandler());
 
-		addMouseWheelListener(new MouseWheelListener() {
-
-
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL)
-				{
-					vertical.setValue(vertical.getValue() + e.getUnitsToScroll());
-				}
-				else
-				{ 
-					//in questo caso si ha che scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
-					vertical.setValue(vertical.getBlockIncrement(vertical.getValue() + e.getWheelRotation() > 0 ? 1 : -1));
-				}
-			}
-		});
+		addMouseWheelListener(e -> {
+            if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL)
+            {
+                vertical.setValue(vertical.getValue() + e.getUnitsToScroll());
+            }
+            else
+            {
+                //in questo caso si ha che scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+                vertical.setValue(vertical.getBlockIncrement(vertical.getValue() + e.getWheelRotation() > 0 ? 1 : -1));
+            }
+        });
 
 		// Load the defaults
 		setInputHandler(defaults.inputHandler);
@@ -1081,7 +1076,7 @@ public class JEditTextArea extends JComponent
 		if(newStart < 0 || newEnd > getDocumentLength())
 		{
 			throw new IllegalArgumentException("Bounds out of"
-					+ " range: " + newStart + "," +
+					+ " range: " + newStart + ',' +
 					newEnd);
 		}
 
@@ -1792,7 +1787,7 @@ public class JEditTextArea extends JComponent
 		private Component center;
 		private Component right;
 		private Component bottom;
-		private final Vector<Component> leftOfScrollBar = new Vector<Component>();
+		private final Vector<Component> leftOfScrollBar = new Vector<>();
 	}
 
 	static class CaretBlinker implements ActionListener
@@ -1837,16 +1832,12 @@ public class JEditTextArea extends JComponent
 			// If this is not done, mousePressed events accumilate
 			// and the result is that scrolling doesn't stop after
 			// the mouse is released
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run()
-				{
-					if(evt.getAdjustable() == vertical)
-						setFirstLine(vertical.getValue());
-					else
-						setHorizontalOffset(-horizontal.getValue());
-				}
-			});
+			SwingUtilities.invokeLater(() -> {
+                if(evt.getAdjustable() == vertical)
+                    setFirstLine(vertical.getValue());
+                else
+                    setHorizontalOffset(-horizontal.getValue());
+            });
 		}
 	}
 

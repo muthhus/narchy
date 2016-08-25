@@ -146,7 +146,7 @@ public class Agent extends Prolog {
     }
     
     
-    final class AgentThread extends Thread {
+    static final class AgentThread extends Thread {
         Agent agent;
         AgentThread(Agent agent){
             this.agent=agent;

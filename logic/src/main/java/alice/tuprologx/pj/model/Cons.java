@@ -39,7 +39,7 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
         	return uncheckedCast(new Compound3<Term<?>, Term<?>, Term<?>>(f,termList[0],termList[1],termList[2]));
         else if (termList.length > 3)
             //return (Z)new Cons<Term<?>, Compound<?>>(f,termList);
-        	return uncheckedCast(new Cons<Term<?>, Compound<?>>(f,termList));
+        	return uncheckedCast(new Cons<>(f, termList));
         else
             throw new UnsupportedOperationException();
     }
@@ -70,23 +70,28 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
     */
     @Override
     public Iterator<Term<?>> iterator() {
-        return new Iterator<Term<?>>() {
-            Cons<?, ?> theTuple = (Cons<?,?>)Cons.this;	
+        return new Iterator<>() {
+            Cons<?, ?> theTuple = (Cons<?, ?>) Cons.this;
+
             @Override
             public Term<?> next() {
                 if (theTuple == null) {
                     throw new java.util.NoSuchElementException();
                 }
                 Term<?> head = theTuple.getHead();
-                theTuple=(theTuple.getRest() instanceof Cons ? (Cons<?,?>)theTuple.getRest() : null);
+                theTuple = (theTuple.getRest() instanceof Cons ? (Cons<?, ?>) theTuple.getRest() : null);
                 return head;
             }
+
             @Override
             public boolean hasNext() {
                 return theTuple != null;
             }
+
             @Override
-            public void remove() {throw new UnsupportedOperationException();}
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
         };
     }
     
@@ -95,14 +100,14 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
             // _theHead = (H)termList.remove(0);  
             _theHead = uncheckedCast(termList.remove(0));
             // _theRest = !termList.isEmpty() ? (R)new Cons<Term<?>, Compound<?>>(null,termList) : (R)new Nil();
-            _theRest = uncheckedCast(uncheckedCast(!termList.isEmpty() ? new Cons<Term<?>, Compound<?>>(null, termList) : new Nil()));
+            _theRest = uncheckedCast(uncheckedCast(!termList.isEmpty() ? new Cons<>(null, termList) : new Nil()));
             return;
         }
         throw new UnsupportedOperationException(); //cannot create a 0-sized compound
     }
 
     public Cons(String name, Term<?>[] termArr) {
-        this(name,new Vector<Term<?>>(Arrays.asList(termArr)));
+        this(name, new Vector<>(Arrays.asList(termArr)));
     }
 
     public H getHead() {
@@ -124,7 +129,7 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
         Term<?>[] newTermArr = new Term<?>[termArr.length+1];
         System.arraycopy(termArr,0,newTermArr,0,termArr.length);
         newTermArr[termArr.length] = z;            
-        return new Cons<H,R2>(_theName,newTermArr);
+        return new Cons<>(_theName, newTermArr);
     }
 
     @Override
@@ -138,13 +143,13 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
         if (res.lastIndexOf(',')!=-1) {
             res = res.substring(0,res.lastIndexOf(','));
         }
-        return res+")";
+        return res+ ')';
     }    
 
     static <Z extends Cons<?,?>> Z unmarshal(alice.tuprolog.Struct s) {
         if (!matches(s))
             throw new UnsupportedOperationException();
-        Vector<Term<?>> termList = new Vector<Term<?>>();
+        Vector<Term<?>> termList = new Vector<>();
         for (int i=0;i<s.getArity();i++) {       
             termList.add(Term.unmarshal(s.term(i)));
         }
@@ -161,7 +166,7 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
     /*    if (isPrologObject())
             return (Z)toPrologObject();
         else {*/
-            Vector<Term<?>> _javaList = new Vector<Term<?>>();            
+            Vector<Term<?>> _javaList = new Vector<>();
             for (Term<?> t : this) {
                 _javaList.add(t/*((Compound<?,?>)c).getHead()*/);                
             }

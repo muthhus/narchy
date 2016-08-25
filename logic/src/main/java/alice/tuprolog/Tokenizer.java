@@ -576,7 +576,7 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
      * tokenizer stopped itself to correct the offset
      * 
      */
-    String removeTrailing(String input,int tokenOffset){
+    static String removeTrailing(String input, int tokenOffset){
     	int i = tokenOffset;
     	String out=input;
     	

@@ -241,60 +241,60 @@ public class BasicLibrary extends Library {
     // term type inspection
     //
 
-    public boolean constant_1(Term t) {
+    public static boolean constant_1(Term t) {
         t = t.getTerm();
         return (t.isAtomic());
     }
 
-    public boolean number_1(Term t) {
+    public static boolean number_1(Term t) {
         return (t.getTerm() instanceof Number);
     }
 
-    public boolean integer_1(Term t) {
+    public static boolean integer_1(Term t) {
         if (!(t.getTerm()  instanceof Number))
             return false;
         alice.tuprolog.Number n = (alice.tuprolog.Number) t.getTerm();
         return (n.isInteger());
     }
 
-    public boolean float_1(Term t) {
+    public static boolean float_1(Term t) {
         if (!(t instanceof Number))
             return false;
         alice.tuprolog.Number n = (alice.tuprolog.Number) t.getTerm();
         return (n.isReal());
     }
 
-    public boolean atom_1(Term t) {
+    public static boolean atom_1(Term t) {
         t = t.getTerm();
         return (t.isAtom());
     }
 
-    public boolean compound_1(Term t) {
+    public static boolean compound_1(Term t) {
         t = t.getTerm();
         return t.isCompound();
     }
 
-    public boolean list_1(Term t) {
+    public static boolean list_1(Term t) {
         t = t.getTerm();
         return (t.isList());
     }
 
-    public boolean var_1(Term t) {
+    public static boolean var_1(Term t) {
         t = t.getTerm();
         return (t instanceof Var);
     }
 
-    public boolean nonvar_1(Term t) {
+    public static boolean nonvar_1(Term t) {
         t = t.getTerm();
         return !(t instanceof Var);
     }
 
-    public boolean atomic_1(Term t) {
+    public static boolean atomic_1(Term t) {
         t = t.getTerm();
         return t.isAtomic();
     }
 
-    public boolean ground_1(Term t) {
+    public static boolean ground_1(Term t) {
         t = t.getTerm();
         return (t.isGround());
     }
@@ -399,8 +399,8 @@ public class BasicLibrary extends Library {
                 (alice.tuprolog.Number) val1);
     }
 
-    private boolean expression_greater_than(alice.tuprolog.Number num0,
-            alice.tuprolog.Number num1) {
+    private static boolean expression_greater_than(alice.tuprolog.Number num0,
+                                                   alice.tuprolog.Number num1) {
         return num0.isInteger() && num1.isInteger() ? num0.longValue() > num1.longValue() : num0.doubleValue() > num1.doubleValue();
     }
 
@@ -460,25 +460,25 @@ public class BasicLibrary extends Library {
                 (alice.tuprolog.Number) val1);
     }
 
-    private boolean expression_less_than(alice.tuprolog.Number num0,
-            alice.tuprolog.Number num1) {
+    private static boolean expression_less_than(alice.tuprolog.Number num0,
+                                                alice.tuprolog.Number num1) {
         return num0.isInteger() && num1.isInteger() ? num0.longValue() < num1.longValue() : num0.doubleValue() < num1.doubleValue();
     }
 
-    public boolean term_equality_2(Term arg0, Term arg1) throws PrologError {
+    public static boolean term_equality_2(Term arg0, Term arg1) throws PrologError {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         return arg0.isEqual(arg1);
     }
 
-    public boolean term_greater_than_2(Term arg0, Term arg1) throws PrologError {
+    public static boolean term_greater_than_2(Term arg0, Term arg1) throws PrologError {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         //System.out.println("Confronto "+arg0+" con "+arg1);
         return arg0.isGreater(arg1);
     }
 
-    public boolean term_less_than_2(Term arg0, Term arg1) throws PrologError {
+    public static boolean term_less_than_2(Term arg0, Term arg1) throws PrologError {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         return !(arg0.isGreater(arg1) || arg0.isEqual(arg1));
@@ -529,7 +529,7 @@ public class BasicLibrary extends Library {
         return val0 != null && val0 instanceof Number ? new alice.tuprolog.Long(~((Number) val0).longValue()) : null;
     }
 
-    alice.tuprolog.Number getIntegerNumber(long num) {
+    static alice.tuprolog.Number getIntegerNumber(long num) {
         return num > Integer.MIN_VALUE && num < Integer.MAX_VALUE ? new Int((int) num) : new alice.tuprolog.Long(num);
     }
 
@@ -907,7 +907,7 @@ public class BasicLibrary extends Library {
     }
 
     // throw/1
-    public boolean throw_1(Term error) throws PrologError {
+    public static boolean throw_1(Term error) throws PrologError {
         throw new PrologError(error);
     }
 

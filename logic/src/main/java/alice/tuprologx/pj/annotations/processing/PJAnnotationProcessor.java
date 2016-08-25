@@ -95,7 +95,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         String theory="";
         PrologClass pc = d.getAnnotation(PrologClass.class);
         for (String s : pc.clauses()) {
-            theory+=s+"\n";
+            theory+=s+ '\n';
         }
         classTheory = checkTheory(theory);
         if (classTheory == null) { //invalid theory
@@ -116,7 +116,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         if (pm != null) {                
             String theory = "";
             for (String s : pm.clauses()) {
-                theory = theory + s +"\n";
+                theory = theory + s + '\n';
             }            
             //methodTheory = checkTheory(theory);                        
             checkPredicate(pm.predicate(),d);
@@ -161,7 +161,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
     }
      */
     private void checkPredicate(String p,ExecutableElement md) {                        
-        if (p.equals("")) {
+        if (p.isEmpty()) {
             return;
         } 
         try {
@@ -174,7 +174,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
     }
     
     private void checkSignature(String s,ExecutableElement md) {                        
-        if (s.equals("")) {
+        if (s.isEmpty()) {
             return;
         }
         try {
@@ -186,7 +186,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         }        
     }
     
-    private Theory checkTheory(String theory) {        
+    private static Theory checkTheory(String theory) {
         Theory t = null;                  
         t = new Theory(theory);                            
         /*if (t == null) {
@@ -243,7 +243,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
             requiredType=boolType;
         }
         else {
-            Vector<TypeMirror> parameters = new Vector<TypeMirror>();            
+            Vector<TypeMirror> parameters = new Vector<>();
             for (VariableExpr i : signature.outputTree.variables) {                
                 VariableExpr decl = predicate.variables.get(predicate.variables.indexOf(i));
                 parameters.add(formType(new TypeParser(pm.types()[predicate.variables.indexOf(i)]).parseType(),decl.annotations,keepSubstitutions));
@@ -287,7 +287,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
             i++;
         }                
         if (!env.getTypeUtils().isSameType(formType(baseType,annotations,true),pd.asType())) {        
-            env.getMessager().printMessage(ERROR,ERR_ARG_BAD_TYPE+ " "+formType(baseType,annotations,true),pd);        
+            env.getMessager().printMessage(ERROR,ERR_ARG_BAD_TYPE+ ' ' +formType(baseType,annotations,true),pd);
         }
     }
     
@@ -312,14 +312,14 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
             i++;
         }                
         if (!env.getTypeUtils().isSameType(formType(baseType,annotations,true),pd.getBounds().get(0))) {        
-            env.getMessager().printMessage(ERROR,ERR_TVAR_BAD_BOUND+ " "+formType(baseType,annotations,true),pd);        
+            env.getMessager().printMessage(ERROR,ERR_TVAR_BAD_BOUND+ ' ' +formType(baseType,annotations,true),pd);
         }
     }
     
     private TypeMirror generalize(TypeMirror baseType) {        
         if (baseType instanceof DeclaredType) {
             DeclaredType dt = (DeclaredType)baseType;            
-            Vector<TypeMirror> types = new Vector<TypeMirror>();
+            Vector<TypeMirror> types = new Vector<>();
             for (TypeMirror t : dt.getTypeArguments()) {
                 types.add(env.getTypeUtils().getWildcardType(env.getTypeUtils().getDeclaredType(teTerm, generalize(t)),null));
             }
@@ -460,12 +460,12 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
 
     @Override
     public Set<String> getSupportedOptions() {
-        return new java.util.TreeSet<String>();
+        return new java.util.TreeSet<>();
     }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return new java.util.TreeSet<String>(Arrays.asList(supportedAnnotations));        
+        return new java.util.TreeSet<>(Arrays.asList(supportedAnnotations));
     }
     
     private class TypeParser {
@@ -500,7 +500,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         }
 
         public TypeMirror[] parseTypes() {                
-            Vector<TypeMirror> types = new Vector<TypeMirror>();
+            Vector<TypeMirror> types = new Vector<>();
             if (currentToken.equals("<")) {
                 while (!currentToken.equals(">")) {                
                     currentToken = lexer.nextToken();                

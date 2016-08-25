@@ -35,7 +35,7 @@ public class VersionInfo
 	
 	public static String getCompleteVersion()
 	{
-		return getEngineVersion() + "." + getSpecificVersion();
+		return getEngineVersion() + '.' + getSpecificVersion();
 	}
 	
 	/* Ant Task Implementation (for the the build file */

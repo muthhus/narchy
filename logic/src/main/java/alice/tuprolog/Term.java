@@ -132,6 +132,7 @@ public abstract class Term implements Serializable {
     public void resolveTerm() {
         resolveTerm(System.currentTimeMillis());
     }
+
     
     
     /**
@@ -179,10 +180,13 @@ public abstract class Term implements Serializable {
      * @param t1 the term to unify
      * @return true if the term is unifiable with this one
      */
-    public boolean unify(Prolog mediator, Term t1) {
+    public final boolean unify(Prolog mediator, Term t1) {
         EngineManager engine = mediator.getEngineManager();
-        resolveTerm();
-        t1.resolveTerm();
+
+        long now = System.currentTimeMillis();
+        resolveTerm(now);
+        t1.resolveTerm(now);
+
         List<Var> v1 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
         List<Var> v2 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
         boolean ok = unify(v1,v2,t1);
@@ -194,7 +198,8 @@ public abstract class Term implements Serializable {
                 ec.trailingVars = new OneWayList<>(v1, ec.trailingVars);
                 // Renaming after unify because its utility regards not the engine but the user
                 int count = 0;
-                int id = (engine.getEnv()==null)? Var.PROGRESSIVE : engine.getEnv().nDemoSteps;
+                Engine env = engine.getEnv();
+                int id = (env ==null)? Var.PROGRESSIVE : env.nDemoSteps;
                 for(Var v:v1){
                     v.rename(id,count);
                     if(id>=0){
@@ -230,8 +235,9 @@ public abstract class Term implements Serializable {
      * @return true if the term is unifiable with this one
      */
     public boolean match(Term t) {
-        resolveTerm();
-        t.resolveTerm();
+        long now = System.currentTimeMillis();
+        resolveTerm(now);
+        t.resolveTerm(now);
         List<Var> v1 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
         List<Var> v2 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
         boolean ok = unify(v1,v2,t);

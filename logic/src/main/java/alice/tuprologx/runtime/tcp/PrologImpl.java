@@ -22,7 +22,7 @@ public class PrologImpl implements java.io.Serializable {
 
     public void getTheory(ObjectInputStream in,ObjectOutputStream out) throws Exception {
         Theory th=core.getTheory();
-        out.writeObject(new Boolean(false));
+        out.writeObject(Boolean.FALSE);
         out.writeObject(th);
     }
 
@@ -30,9 +30,9 @@ public class PrologImpl implements java.io.Serializable {
         try {
             Theory th=(Theory)in.readObject();
             core.setTheory(th);
-            out.writeObject(new Boolean(true));
+            out.writeObject(Boolean.TRUE);
         } catch (InvalidTheoryException ex){
-            out.writeObject(new Boolean(false));
+            out.writeObject(Boolean.FALSE);
         }
     }
 
@@ -40,9 +40,9 @@ public class PrologImpl implements java.io.Serializable {
         try {
             Theory th=(Theory)in.readObject();
             core.addTheory(th);
-            out.writeObject(new Boolean(true));
+            out.writeObject(Boolean.TRUE);
         } catch (InvalidTheoryException ex){
-            out.writeObject(new Boolean(false));
+            out.writeObject(Boolean.FALSE);
         }
     }
 
@@ -50,31 +50,31 @@ public class PrologImpl implements java.io.Serializable {
         try {
             String st=(String)in.readObject();
             Solution info=core.solve(st);
-            out.writeObject(new Boolean(true));
+            out.writeObject(Boolean.TRUE);
             out.writeObject(info);
         } catch (MalformedGoalException ex){
-            out.writeObject(new Boolean(false));
+            out.writeObject(Boolean.FALSE);
         }
     }
 
     public void hasOpenAlternatives(ObjectInputStream in,ObjectOutputStream out)  throws Exception {
-        out.writeObject(new Boolean(core.hasOpenAlternatives()));
+        out.writeObject(Boolean.valueOf(core.hasOpenAlternatives()));
     }
 
     public void solveTerm(ObjectInputStream in,ObjectOutputStream out)  throws Exception {
         Term th=(Term)in.readObject();
         Solution info=core.solve(th);
-        out.writeObject(new Boolean(true));
+        out.writeObject(Boolean.TRUE);
         out.writeObject(info);
     }
 
     public void solveNext(ObjectInputStream in,ObjectOutputStream out) throws Exception {
         try {
             Solution info=core.solveNext();
-            out.writeObject(new Boolean(true));
+            out.writeObject(Boolean.TRUE);
             out.writeObject(info);
         } catch (NoMoreSolutionException ex){
-            out.writeObject(new Boolean(false));
+            out.writeObject(Boolean.FALSE);
         }
     }
 
@@ -91,9 +91,9 @@ public class PrologImpl implements java.io.Serializable {
         try {
             String st=(String)in.readObject();
             core.loadLibrary(st);
-            out.writeObject(new Boolean(true));
+            out.writeObject(Boolean.TRUE);
         } catch (InvalidLibraryException ex){
-            out.writeObject(new Boolean(false));
+            out.writeObject(Boolean.FALSE);
         }
     }
 
@@ -101,9 +101,9 @@ public class PrologImpl implements java.io.Serializable {
         try {
             String st=(String)in.readObject();
             core.unloadLibrary(st);
-            out.writeObject(new Boolean(true));
+            out.writeObject(Boolean.TRUE);
         } catch (InvalidLibraryException ex){
-            out.writeObject(new Boolean(false));
+            out.writeObject(Boolean.FALSE);
         }
     }
 }

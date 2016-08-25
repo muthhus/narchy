@@ -41,7 +41,7 @@ public class Daemon {
             int index=hostName.indexOf('/');
             if (index>=0)
                 hostName=hostName.substring(0,index);
-            Naming.rebind("//"+hostName+":"+portString+"/"+engineName,engine);
+            Naming.rebind("//"+hostName+ ':' +portString+ '/' +engineName,engine);
             System.out.println("RMI server at "+portString+": "+engineName+" engine ready.");
         } catch (Exception ex){
             ex.printStackTrace();

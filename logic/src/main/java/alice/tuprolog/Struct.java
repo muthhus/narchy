@@ -819,7 +819,7 @@ public class Struct extends Term {
     @Override
     String toStringAsArg(OperatorManager op, int prio, boolean x) {
         int      p = 0;
-        String   v = "";
+        String   v;
         
         if (name.equals(".") && arity == 2) {
             return arg[0].isEmptyList() ? "[]" : '[' + toStringAsList(op) + ']';

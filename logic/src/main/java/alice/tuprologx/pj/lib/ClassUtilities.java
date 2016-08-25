@@ -17,7 +17,7 @@ import java.util.Set;
 final class ClassUtilities {
 
     /** Mapping from primitive wrapper Classes to their corresponding primitive Classes. */
-    private static final Map<Class<?>,Class<?>> OBJECT_PRIMITIVE_MAP = new HashMap<Class<?>, Class<?>>(13);
+    private static final Map<Class<?>,Class<?>> OBJECT_PRIMITIVE_MAP = new HashMap<>(13);
 
     static {
         OBJECT_PRIMITIVE_MAP.put(Boolean.class, Boolean.TYPE);
@@ -30,7 +30,7 @@ final class ClassUtilities {
         OBJECT_PRIMITIVE_MAP.put(Short.class, Short.TYPE);
     }
 
-    private static final Map<Class<?>,Class<?>> PRIMITIVE_OBJECT_MAP = new HashMap<Class<?>,Class<?>>(13);
+    private static final Map<Class<?>,Class<?>> PRIMITIVE_OBJECT_MAP = new HashMap<>(13);
 
     static {
         PRIMITIVE_OBJECT_MAP.put(Boolean.TYPE, Boolean.class);
@@ -44,7 +44,7 @@ final class ClassUtilities {
     }
 
     /** Mapping from primitive names to primitive Classes. */
-    private static final Map<String,Class<?>> PRIMITIVE_NAME_MAP = new HashMap<String,Class<?>>(13);
+    private static final Map<String,Class<?>> PRIMITIVE_NAME_MAP = new HashMap<>(13);
 
     static {
         PRIMITIVE_NAME_MAP.put("boolean", Boolean.TYPE);
@@ -64,10 +64,10 @@ final class ClassUtilities {
      * Mapping from primitive wrapper Classes to the sets of primitive classes
      * whose instances can be assigned an instance of the first.
      */
-    private static final Map<Class<?>,Set<Class<?>>> PRIMITIVE_WIDENINGS_MAP = new HashMap<Class<?>,Set<Class<?>>>(11);
+    private static final Map<Class<?>,Set<Class<?>>> PRIMITIVE_WIDENINGS_MAP = new HashMap<>(11);
 
     static {
-        Set<Class<?>> set = new HashSet<Class<?>>();
+        Set<Class<?>> set = new HashSet<>();
         set.add(Short.TYPE);
         set.add(Integer.TYPE);
         set.add(Long.TYPE);
@@ -75,7 +75,7 @@ final class ClassUtilities {
         set.add(Double.TYPE);
         PRIMITIVE_WIDENINGS_MAP.put(Byte.TYPE, set);
 
-        set = new HashSet<Class<?>>();
+        set = new HashSet<>();
         set.add(Integer.TYPE);
         set.add(Long.TYPE);
         set.add(Float.TYPE);
@@ -83,18 +83,18 @@ final class ClassUtilities {
         PRIMITIVE_WIDENINGS_MAP.put(Short.TYPE, set);
         PRIMITIVE_WIDENINGS_MAP.put(Character.TYPE, set);
 
-        set = new HashSet<Class<?>>();
+        set = new HashSet<>();
         set.add(Long.TYPE);
         set.add(Float.TYPE);
         set.add(Double.TYPE);
         PRIMITIVE_WIDENINGS_MAP.put(Integer.TYPE, set);
 
-        set = new HashSet<Class<?>>();
+        set = new HashSet<>();
         set.add(Float.TYPE);
         set.add(Double.TYPE);
         PRIMITIVE_WIDENINGS_MAP.put(Long.TYPE, set);
 
-        set = new HashSet<Class<?>>();
+        set = new HashSet<>();
         set.add(Double.TYPE);
         PRIMITIVE_WIDENINGS_MAP.put(Float.TYPE, set);
     }

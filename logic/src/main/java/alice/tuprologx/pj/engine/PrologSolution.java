@@ -68,7 +68,7 @@ public class PrologSolution<Q extends Term<?>, S extends Term<?>> /*implements I
     public List<Term<?>> getBindingVars() throws alice.tuprolog.NoSolutionException {
         List<alice.tuprolog.Var> retValue;        
         retValue = _solveInfo.getBindingVars();
-        Vector<Term<?>> bindings = new Vector<Term<?>>();
+        Vector<Term<?>> bindings = new Vector<>();
         for (alice.tuprolog.Term t : retValue) {
             bindings.add(Term.unmarshal(t));
         }

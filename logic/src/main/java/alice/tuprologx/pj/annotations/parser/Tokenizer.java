@@ -22,7 +22,7 @@ public class Tokenizer {
     
     Tokenizer(String s) {
         value = null;
-        charBuffer = new Stack<Character>();
+        charBuffer = new Stack<>();
         char[] charArr = s.toCharArray();
         for (int i = charArr.length-1;i>=0;i--) {
             charBuffer.push(charArr[i]);

@@ -61,11 +61,11 @@ public class Theory extends List<Clause<?,?>> {
     }
     
     public static Theory unmarshal(alice.tuprolog.Theory t) {
-        Vector<Clause<?,?>> clauses = new Vector<Clause<?,?>>();                
+        Vector<Clause<?,?>> clauses = new Vector<>();
         for (java.util.Iterator<? extends alice.tuprolog.Term> it = t.iterator(engine); it.hasNext();) {
             alice.tuprolog.Struct st = (alice.tuprolog.Struct) it.next();                        
             //Clause<?,?> clause = new Clause(Term.unmarshal(st.getArg(0)),Term.unmarshal(st.getArg(1)));
-            Clause<?,?> clause = new Clause<Term<?>, Term<?>>(st);
+            Clause<?,?> clause = new Clause<>(st);
             clauses.add(clause);            
         }        
         return new Theory(clauses);
@@ -146,7 +146,7 @@ public class Theory extends List<Clause<?,?>> {
 //    }
     
     private static Collection<Clause<?,?>> parseTheory(String s) {         
-        Vector<Clause<?,?>> clauses = new Vector<Clause<?,?>>();
+        Vector<Clause<?,?>> clauses = new Vector<>();
         alice.tuprolog.Theory t = null;
         try {
             t = new alice.tuprolog.Theory(s);
@@ -157,7 +157,7 @@ public class Theory extends List<Clause<?,?>> {
         for (java.util.Iterator<? extends alice.tuprolog.Term> it = t.iterator(engine); it.hasNext();) {
             alice.tuprolog.Struct st = (alice.tuprolog.Struct) it.next();                        
             //Clause<?,?> clause = new Clause(Term.unmarshal(st.getArg(0)),Term.unmarshal(st.getArg(1)));
-            Clause<?,?> clause = new Clause<Term<?>, Term<?>>(st);
+            Clause<?,?> clause = new Clause<>(st);
             clauses.add(clause);            
         }        
         return clauses;
@@ -166,13 +166,13 @@ public class Theory extends List<Clause<?,?>> {
     private static Collection<Clause<?,?>> parseTheoryArray(String[] arr) {
         String temp="";
         for (String s : arr) {
-            temp+=s+"\n";
+            temp+=s+ '\n';
         }
         return parseTheory(temp);
     }
     
     public Clause<?,?>[] find(String name, int arity) {
-        Vector<Clause<?,?>> temp = new Vector<Clause<?,?>>(); 
+        Vector<Clause<?,?>> temp = new Vector<>();
         for (Clause<?,?> c: this) {
             if (c.match(name,arity))
                 temp.add(c);

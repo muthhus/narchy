@@ -198,7 +198,7 @@ public class Float extends Number {
      */
     @Override
     public int compareTo(Number o) {
-        return (new java.lang.Float(value)).compareTo(o.floatValue());
+        return java.lang.Float.compare((float)value, o.floatValue());
     }
     
 }

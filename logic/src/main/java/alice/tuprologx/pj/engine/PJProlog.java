@@ -42,7 +42,7 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
                 @Override
                 public Iterator<PrologSolution<G,S>> iterator() {
                     PrologSolution<G,S> first = PJProlog.this.solve(query);
-                    return new SolutionIterator<G,S>(first);
+                    return new SolutionIterator<>(first);
                 }
             }
         return new SolutionProxy();
@@ -51,7 +51,7 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
     public <G extends Term<?>, S extends Term<?>> PrologSolution<G,S> solve(G g) {
         Solution retValue;
         retValue = engine.solve(g.marshal());        
-        return new PrologSolution<G,S>(retValue);
+        return new PrologSolution<>(retValue);
     }
     
     public <G extends Term<?>, S extends Term<?>> PrologSolution<G,S> solveNext() throws NoSolutionException {
@@ -62,7 +62,7 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
         catch (Exception e) {
             throw new NoSolutionException();
         }
-        return new PrologSolution<G,S>(retValue);
+        return new PrologSolution<>(retValue);
     }
 
     public void setTheory(Theory theory) throws alice.tuprolog.InvalidTheoryException {
@@ -112,7 +112,7 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
         public boolean hasNext() {
             if (next == null) {
                 try {
-                    next = new PrologSolution<G,S>(engine.solveNext());                    
+                    next = new PrologSolution<>(engine.solveNext());
                 }
                 catch (alice.tuprolog.NoMoreSolutionException e) {
                     next = null;

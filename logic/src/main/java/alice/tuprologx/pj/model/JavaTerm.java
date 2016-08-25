@@ -19,7 +19,7 @@ import java.util.Vector;
  */
 public class JavaTerm<O> extends Compound<JavaTerm<O>> {
 
-    public static HashMap<String, Class<?>> hashtable = new HashMap<String, Class<?>>();
+    public static HashMap<String, Class<?>> hashtable = new HashMap<>();
 
     @SuppressWarnings("serial")
 	static class TermifiableStruct<O> extends alice.tuprolog.Struct {
@@ -76,14 +76,14 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
     private static Vector<Term<?>>  getProperties(Object _object) {
         Vector<Term<?>> termArr = null;
         try {
-            termArr = new java.util.Vector<Term<?>>();
+            termArr = new java.util.Vector<>();
             java.beans.BeanInfo binfo = java.beans.Introspector.getBeanInfo(_object.getClass());
             int count = 0;
             for (java.beans.PropertyDescriptor pdesc : binfo.getPropertyDescriptors()) {
                 //only read-write properties are translated into a compound
                 if (pdesc.getReadMethod()!=null && pdesc.getWriteMethod()!=null) {
                     Object o = pdesc.getReadMethod().invoke(_object);
-                    Term<?> t = o != null ? Term.fromJava(o) : new Var<Term<?>>("X"+count);
+                    Term<?> t = o != null ? Term.fromJava(o) : new Var<>("X" + count);
                     termArr.add(t);
                     count++;
                 }
@@ -191,11 +191,11 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
         if (!matches(s))
             throw new UnsupportedOperationException();
         Class<?> termKlass = hashtable.get(s.name());
-        Vector<Term<?>> terms = new Vector<Term<?>>();
+        Vector<Term<?>> terms = new Vector<>();
         for (int i = 0; i < s.getArity() ; i ++) {
             terms.add(Term.unmarshal(s.term(i)));
         }
-        return new JavaTerm<Z>(termKlass, terms);
+        return new JavaTerm<>(termKlass, terms);
     }
 
     public String toString() {

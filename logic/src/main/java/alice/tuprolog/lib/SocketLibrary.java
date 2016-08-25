@@ -514,7 +514,7 @@ public boolean aread_from_socket_2(Term Socket, Struct Options) throws PrologErr
 /*
  * Transform the Struct s in a LinkedList
  */
-private LinkedList<Term> StructToList(Struct s) {
+private static LinkedList<Term> StructToList(Struct s) {
 	LinkedList<Term> list = new LinkedList<>();
 	Term temp;
 	temp = s;
@@ -604,7 +604,7 @@ public boolean getAddress_2(Term sock, Term addr) throws PrologError {
 /*
  * Definition of thread Reader. It waits until a message is received and assert it.
  */
-private class ThreadReader extends Thread {
+private static class ThreadReader extends Thread {
 	private final Socket socket;				// Socket associated to the Reader
 	private final Prolog mainEngine;
 	private boolean assertA;			// Should it use assertA or assertZ?

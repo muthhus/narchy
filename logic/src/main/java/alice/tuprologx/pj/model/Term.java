@@ -36,11 +36,11 @@ public abstract class Term<X extends Term<?>> {
 		}
 		else if (o instanceof java.util.Collection<?>) {
 			// return (Z)new List<Term<?>>((java.util.Collection<?>)o);
-			return uncheckedCast(new List<Term<?>>((java.util.Collection<?>)o));
+			return uncheckedCast(new List<>((java.util.Collection<?>) o));
 		}
         else if (o instanceof Term<?>[]) {
 			// return (Z)new Cons<Term<?>, Compound<?>>("_",(Term<?>[])o);
-			return uncheckedCast(new Cons<Term<?>, Compound<?>>("_",(Term<?>[])o));
+			return uncheckedCast(new Cons<>("_", (Term<?>[]) o));
 		}
 		else if (o instanceof Term<?>) {
 			//return (Z)o;
@@ -48,14 +48,14 @@ public abstract class Term<X extends Term<?>> {
 		}
         else if (o.getClass().isAnnotationPresent(Termifiable.class)) {
             // return (Z)new JavaTerm<Object>(o);
-        	return uncheckedCast(new JavaTerm<Object>(o));
+        	return uncheckedCast(new JavaTerm<>(o));
 		}                
 		/*else {
 			throw new UnsupportedOperationException();
 		}*/
         else {
             // return (Z)new JavaObject<Object>(o);
-        	return uncheckedCast(new JavaObject<Object>(o));
+        	return uncheckedCast(new JavaObject<>(o));
         }
 	}
         

@@ -62,7 +62,7 @@ public class Var<X extends Term<?>> extends Term<X> {
         if (!matches(a))
             throw new UnsupportedOperationException();
         //return new Var<Term<?>>(a.getName(),a.isBound() ? Term.unmarshal(a.getTerm()) : null);            
-        return a.isBound() ? Term.unmarshal(a.getTerm()) : new Var<Term<?>>(a.getName(), null);
+        return a.isBound() ? Term.unmarshal(a.getTerm()) : new Var<>(a.getName(), null);
     }
     
     static boolean matches(alice.tuprolog.Term t) {
@@ -74,7 +74,7 @@ public class Var<X extends Term<?>> extends Term<X> {
     }
     
     public String toString() {
-		return "Var("+_theName+(_theValue != null ? "/"+_theValue : "")+")";
+		return "Var("+_theName+(_theValue != null ? "/"+_theValue : "")+ ')';
 	}
         
     private static void setLink(alice.tuprolog.Var v, Object o) {

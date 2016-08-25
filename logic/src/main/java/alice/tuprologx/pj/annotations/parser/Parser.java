@@ -59,7 +59,7 @@ public class Parser {
     }
     
     public List<VariableExpr> parseTermList() {        
-        Vector<VariableExpr> variables = new Vector<VariableExpr>();        
+        Vector<VariableExpr> variables = new Vector<>();
         lexer.next();
         while (lexer.lastToken() != TK_PAR_CLOSE && lexer.lastToken() != TK_BRA_CLOSE) {
             variables.add(parseVariable());            
@@ -73,7 +73,7 @@ public class Parser {
     
     public VariableExpr parseVariable() throws UnsupportedOperationException {                                        
         String token = lexer.lastValue();
-        Vector<Character> annotations = new Vector<Character>();
+        Vector<Character> annotations = new Vector<>();
         while (lexer.lastToken() == TK_AT || lexer.lastToken() == TK_PLUS || lexer.lastToken() == TK_MINUS || lexer.lastToken() == TK_INOUT || lexer.lastToken() == TK_GROUND) {
             annotations.add(token.toCharArray()[0]);
             lexer.next();            

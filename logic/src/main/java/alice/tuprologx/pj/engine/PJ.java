@@ -18,7 +18,7 @@ public class PJ implements MethodHandler {
 
     private static final PJ pj = new PJ();
 
-    private static final ArrayList<PJProlog> _stack = new ArrayList<PJProlog>();
+    private static final ArrayList<PJProlog> _stack = new ArrayList<>();
     private static int current = -1;
 
     static {pushEngine();}
@@ -119,10 +119,10 @@ public class PJ implements MethodHandler {
         }
         engine().setTheory(class_t);
         if (receiver != null) {
-            JavaObject<Object> jo = new JavaObject<Object>(receiver);                        
-            Compound1<JavaObject<?>> head = new Compound1<JavaObject<?>>("this", jo);
-            Clause<Compound1<?>, Nil> ct = new Clause<Compound1<?>, Nil>(head,null);            
-            ArrayList<Clause<?,?>> list = new ArrayList<Clause<?,?>>();
+            JavaObject<Object> jo = new JavaObject<>(receiver);
+            Compound1<JavaObject<?>> head = new Compound1<>("this", jo);
+            Clause<Compound1<?>, Nil> ct = new Clause<>(head, null);
+            ArrayList<Clause<?,?>> list = new ArrayList<>();
             list.add(ct);
             Theory t = new Theory(list);
             engine().addTheory(t);
@@ -152,7 +152,7 @@ public class PJ implements MethodHandler {
         return result;
     }
 
-    public Object invokeInternal(Object receiver, Method method, Object[] args) {        
+    public static Object invokeInternal(Object receiver, Method method, Object[] args) {
         if (method.getName().equals("getMetaPrologClass")) {
             return getMetaClass(receiver);
         } 
@@ -163,7 +163,7 @@ public class PJ implements MethodHandler {
         return null;                        
     }
 
-    private PrologMetaClass getMetaClass(Object o) {
+    private static PrologMetaClass getMetaClass(Object o) {
         try {
             java.lang.reflect.Field metaclass_field = o.getClass().getField("_meta$Prolog$Class");
             PrologMetaClass metaClass = (PrologMetaClass)metaclass_field.get(o);                
@@ -178,7 +178,7 @@ public class PJ implements MethodHandler {
         }            
     }
     
-    private Theory getTheory(Object o) {
+    private static Theory getTheory(Object o) {
         try {
             java.lang.reflect.Field metaclass_field = o.getClass().getField("_prolog$Theory");
             Theory t = (Theory)metaclass_field.get(o);            
@@ -189,7 +189,7 @@ public class PJ implements MethodHandler {
         }            
     }
     
-    private Void setTheory(Object o, Theory t) {
+    private static Void setTheory(Object o, Theory t) {
         try {
             java.lang.reflect.Field metaclass_field = o.getClass().getField("_prolog$Theory");
             metaclass_field.set(o, t);  
@@ -228,7 +228,7 @@ public class PJ implements MethodHandler {
         try {
             pushEngine();
             engine().setTheory(po.getTheory());
-            Compound1<Term<?>> goal = new Compound1<Term<?>>("assert", Term.unmarshal(clause));
+            Compound1<Term<?>> goal = new Compound1<>("assert", Term.unmarshal(clause));
             engine().solve(goal);
             po.setTheory(engine().getTheory());
         }
@@ -244,7 +244,7 @@ public class PJ implements MethodHandler {
         try {
             pushEngine();
             engine().setTheory(po.getTheory());
-            Compound1<Term<?>> goal = new Compound1<Term<?>>("retract", Term.unmarshal(clause));
+            Compound1<Term<?>> goal = new Compound1<>("retract", Term.unmarshal(clause));
             engine().solve(goal);
             po.setTheory(engine().getTheory());
         }

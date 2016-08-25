@@ -52,14 +52,14 @@ public class PJLibrary extends Library {
 	/**
 	 * java objects referenced by prolog terms (keys)
 	 */
-	private HashMap<String,Object> currentObjects = new HashMap<String,Object>();
+	private HashMap<String,Object> currentObjects = new HashMap<>();
 	/**
 	 * inverse map useful for implementation issue
 	 */
-	private IdentityHashMap<Object,Struct> currentObjects_inverse = new IdentityHashMap<Object,Struct>();
+	private IdentityHashMap<Object,Struct> currentObjects_inverse = new IdentityHashMap<>();
 	
-	private final HashMap<String,Object> staticObjects = new HashMap<String, Object>();
-	private final IdentityHashMap<Object,Struct> staticObjects_inverse = new IdentityHashMap<Object, Struct>();
+	private final HashMap<String,Object> staticObjects = new HashMap<>();
+	private final IdentityHashMap<Object,Struct> staticObjects_inverse = new IdentityHashMap<>();
 	
 	/**
 	 * progressive conter used to identify registered objects
@@ -181,26 +181,26 @@ public class PJLibrary extends Library {
 				//
 				//
 				if (co==null){
-					getEngine().warn("Constructor not found: class " + clName);
+					Prolog.warn("Constructor not found: class " + clName);
 					return false;
 				}
 				
 				Object obj = co.newInstance(args_value);
 				return bindDynamicObject(id, obj);
 			} catch (ClassNotFoundException ex) {
-				getEngine().warn("Java class not found: " + clName);
+				Prolog.warn("Java class not found: " + clName);
 				return false;
 			} catch (InvocationTargetException ex) {
-				getEngine().warn("Invalid constructor arguments.");
+				Prolog.warn("Invalid constructor arguments.");
 				return false;
 			} catch (NoSuchMethodException ex) {
-				getEngine().warn("Constructor not found: " + args.getTypes());
+				Prolog.warn("Constructor not found: " + args.getTypes());
 				return false;
 			} catch (InstantiationException ex) {
-				getEngine().warn("Objects of class " + clName + " cannot be instantiated");
+				Prolog.warn("Objects of class " + clName + " cannot be instantiated");
 				return false;
 			} catch (IllegalArgumentException ex) {
-				getEngine().warn("Illegal constructor arguments  " + args);
+				Prolog.warn("Illegal constructor arguments  " + args);
 				return false;
 			}
 		} catch (Exception ex) {
@@ -262,31 +262,31 @@ public class PJLibrary extends Library {
 				file.write(text);
 				file.close();
 			} catch (IOException ex) {
-				getEngine().warn("Compilation of java sources failed");
-				getEngine().warn("(creation of " + fullClassPath + ".java fail failed)");
+				Prolog.warn("Compilation of java sources failed");
+				Prolog.warn("(creation of " + fullClassPath + ".java fail failed)");
 				return false;
 			}
-			String cmd = "javac " + cp + " " + fullClassPath + ".java";
+			String cmd = "javac " + cp + ' ' + fullClassPath + ".java";
 			//System.out.println("EXEC: "+cmd);
 			try {
 				Process jc = Runtime.getRuntime().exec(cmd);
 				int res = jc.waitFor();
 				if (res != 0) {
-					getEngine().warn("Compilation of java sources failed");
-					getEngine().warn("(java compiler (javac) has stopped with errors)");
+					Prolog.warn("Compilation of java sources failed");
+					Prolog.warn("(java compiler (javac) has stopped with errors)");
 					return false;
 				}
 			} catch (IOException ex) {
-				getEngine().warn("Compilation of java sources failed");
-				getEngine().warn("(java compiler (javac) invocation failed)");
+				Prolog.warn("Compilation of java sources failed");
+				Prolog.warn("(java compiler (javac) invocation failed)");
 				return false;
 			}
 			try {
 				Class<?> the_class = Class.forName(fullClassName, true, new ClassLoader());
 				return bindDynamicObject(id, the_class);
 			} catch (ClassNotFoundException ex) {
-				getEngine().warn("Compilation of java sources failed");
-				getEngine().warn("(Java Class compiled, but not created: " + fullClassName + " )");
+				Prolog.warn("Compilation of java sources failed");
+				Prolog.warn("(Java Class compiled, but not created: " + fullClassName + " )");
 				return false;
 			}
 		} catch (Exception ex) {
@@ -364,12 +364,12 @@ public class PJLibrary extends Library {
 						res = m.invoke(obj, args_values);
 						
 					} catch (IllegalAccessException ex) {
-						getEngine().warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
+						Prolog.warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
 						ex.printStackTrace();
 						return false;                        
 					}                    
 				} else {
-					getEngine().warn("Method not found: " + methodName+ "( signature: " + args + " )");
+					Prolog.warn("Method not found: " + methodName+ "( signature: " + args + " )");
 					return false;
 				}
 			} else {
@@ -383,7 +383,7 @@ public class PJLibrary extends Library {
 							res = m.invoke(null, args.getValues());
 						} catch (ClassNotFoundException ex) {
 							// if not found even as a class id -> consider as a String object value
-							getEngine().warn("Unknown class.");
+							Prolog.warn("Unknown class.");
 							ex.printStackTrace();
 							return false;
 						}
@@ -402,22 +402,22 @@ public class PJLibrary extends Library {
 			}
 			return parseResult(idResult, res);
 		} catch (InvocationTargetException ex) {
-			getEngine().warn("Method failed: " + methodName + " - ( signature: " + args +
+			Prolog.warn("Method failed: " + methodName + " - ( signature: " + args +
 					" ) - Original Exception: "+ex.getTargetException());
 			ex.printStackTrace();
 			return false;
 		} catch (NoSuchMethodException ex) {
 			ex.printStackTrace();
-			getEngine().warn("Method not found: " + methodName+ " - ( signature: " + args + " )");
+			Prolog.warn("Method not found: " + methodName+ " - ( signature: " + args + " )");
 			return false;
 		} catch (IllegalArgumentException ex) {
 			ex.printStackTrace();
-			getEngine().warn("Invalid arguments " + args+ " - ( method: " + methodName + " )");
+			Prolog.warn("Invalid arguments " + args+ " - ( method: " + methodName + " )");
 			//ex.printStackTrace();
 			return false;
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			getEngine().warn("Generic error in method invocation " + methodName);
+			Prolog.warn("Generic error in method invocation " + methodName);
 			return false;
 		}
 	}
@@ -441,10 +441,10 @@ public class PJLibrary extends Library {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().warn("Java class not found: " + clName);
+					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {
@@ -491,7 +491,7 @@ public class PJLibrary extends Library {
 			
 			return true;
 		} catch (NoSuchFieldException ex) {
-			getEngine().warn("Field " + fieldName + " not found in class " + objId);
+			Prolog.warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -517,10 +517,10 @@ public class PJLibrary extends Library {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().warn("Java class not found: " + clName);
+					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {
@@ -560,10 +560,10 @@ public class PJLibrary extends Library {
 			//ex.printStackTrace();
 			//    return false;
 		} catch (NoSuchFieldException ex) {
-			getEngine().warn("Field " + fieldName + " not found in class " + objId);
+			Prolog.warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
-			getEngine().warn("Generic error in accessing the field");
+			Prolog.warn("Generic error in accessing the field");
 			//ex.printStackTrace();
 			return false;
 		}
@@ -869,7 +869,7 @@ public class PJLibrary extends Library {
 					} else if (castTo_name.equals("double[]")) {
 						castTo_name = "[D";
 					} else {
-						castTo_name = "[L" + castTo_name.substring(0, castTo_name.length() - 2) + ";";
+						castTo_name = "[L" + castTo_name.substring(0, castTo_name.length() - 2) + ';';
 					}
 				}
 				if (!castWhat_name.equals("null")) {
@@ -877,9 +877,9 @@ public class PJLibrary extends Library {
 					if (obj_to_cast == null) {
 						if (castTo_name.equals("boolean")) {
 							if (castWhat_name.equals("true")) {
-								values[i] = new Boolean(true);
+								values[i] = Boolean.TRUE;
 							} else if (castWhat_name.equals("false")) {
-								values[i] = new Boolean(false);
+								values[i] = Boolean.FALSE;
 							} else {
 								return false;
 							}
@@ -893,7 +893,7 @@ public class PJLibrary extends Library {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().warn("Java class not found: " + castTo_name);
+							Prolog.warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -919,7 +919,7 @@ public class PJLibrary extends Library {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().warn("Java class not found: " + castTo_name);
+							Prolog.warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -950,7 +950,7 @@ public class PJLibrary extends Library {
 				}
 			}
 		} catch (Exception ex) {
-			getEngine().warn("Casting " + castWhat + " to " + castTo + " failed");
+			Prolog.warn("Casting " + castWhat + " to " + castTo + " failed");
 			return false;
 		}
 		return true;
@@ -998,7 +998,7 @@ public class PJLibrary extends Library {
 		}
 	}
 	
-	private Object[] getArrayFromList(Struct list) {
+	private static Object[] getArrayFromList(Struct list) {
 		Object args[] = new Object[list.listSize()];
 		Iterator<? extends Term> it = list.listIterator();
 		int count = 0;
@@ -1275,8 +1275,8 @@ public class PJLibrary extends Library {
 	 */
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
-		currentObjects = new HashMap<String, Object>();
-		currentObjects_inverse = new IdentityHashMap<Object, Struct>();
+		currentObjects = new HashMap<>();
+		currentObjects_inverse = new IdentityHashMap<>();
 		preregisterObjects();
 	}
 	
@@ -1296,7 +1296,7 @@ public class PJLibrary extends Library {
 		
 		// go the more complicated route
 		Method[] methods = target.getMethods();
-		Vector<Method> goodMethods = new Vector<Method>();
+		Vector<Method> goodMethods = new Vector<>();
 		for (int i = 0; i != methods.length; i++) {
 			if (name.equals(methods[i].getName()) &&
 					matchClasses(methods[i].getParameterTypes(), argClasses))
@@ -1348,7 +1348,7 @@ public class PJLibrary extends Library {
 		
 		// go the more complicated route
 		Constructor<?>[] constructors = target.getConstructors();
-		Vector<Constructor<?>> goodConstructors = new Vector<Constructor<?>>();
+		Vector<Constructor<?>> goodConstructors = new Vector<>();
 		for (int i = 0; i != constructors.length; i++) {
 			if (matchClasses(constructors[i].getParameterTypes(), argClasses))
 				goodConstructors.addElement(constructors[i]);

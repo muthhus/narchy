@@ -75,7 +75,7 @@ public class TheoryManager {
 		if (dyn) {
 			dynamicDBase.add(key, d, true);
 			if (staticDBase.containsKey(key)) {
-				engine.warn("A static predicate with signature " + key + " has been overriden.");
+				Prolog.warn("A static predicate with signature " + key + " has been overriden.");
 			}
 		} else
 			staticDBase.add(key, d, true);
@@ -92,7 +92,7 @@ public class TheoryManager {
 		if (dyn) {
 			dynamicDBase.add(key, d, false);
 			if (engine.isSpy() && staticDBase.containsKey(key)) {
-				engine.warn("A static predicate with signature " + key + " has been overriden.");
+				Prolog.warn("A static predicate with signature " + key + " has been overriden.");
 			}
 		} else
 			staticDBase.add(key, d, false);
@@ -280,9 +280,9 @@ public class TheoryManager {
 			Struct dir = (Struct) c.getTerm(0);
 			try {
 				if (!primitiveManager.evalAsDirective(dir))
-					engine.warn("The directive " + dir.getPredicateIndicator() + " is unknown.");
+					Prolog.warn("The directive " + dir.getPredicateIndicator() + " is unknown.");
 			} catch (Throwable t) {
-				engine.warn("An exception has been thrown during the execution of the " +
+				Prolog.warn("An exception has been thrown during the execution of the " +
 						dir.getPredicateIndicator() + " directive.\n" + t.getMessage());
 			}
 			return true;

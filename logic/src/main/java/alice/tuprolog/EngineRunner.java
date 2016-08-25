@@ -117,7 +117,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     }
     
     void warn(String message) {
-        mediator.warn(message);
+        Prolog.warn(message);
     }
     
     /*Castagna 06/2011*/

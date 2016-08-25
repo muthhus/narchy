@@ -34,8 +34,8 @@ public class TheoryFilter {
     
     @SuppressWarnings("unchecked")
 	public Theory apply() {                
-        Var<List<Clause<?,?>>> filtered_list = new Var<List<Clause<?,?>>>("X");
-        Compound2<List<Clause<?,?>>,Var<List<Clause<?,?>>>> goal = new Compound2<List<Clause<?,?>>,Var<List<Clause<?,?>>>>("filter",_theory,filtered_list);
+        Var<List<Clause<?,?>>> filtered_list = new Var<>("X");
+        Compound2<List<Clause<?,?>>,Var<List<Clause<?,?>>>> goal = new Compound2<>("filter", _theory, filtered_list);
         try {
             PJProlog p = new PJProlog();        
             p.setTheory(_filter);
@@ -46,7 +46,7 @@ public class TheoryFilter {
             PrologSolution<?,?> sol = p.solve(goal);
             List<Term<?>> res = sol.getTerm("X");            
             //System.out.println("PIPPO="+res);            
-            Vector<Clause<?,?>> filtered_clauses = new Vector<Clause<?,?>>();
+            Vector<Clause<?,?>> filtered_clauses = new Vector<>();
             for (Term<?> t : res) {
                 if (t instanceof Compound2 && ((Compound2<Term<?>,Term<?>>)t).getName().equals(":-")) {
                     filtered_clauses.add(new Clause<Term<?>,Term<?>>(((Compound2<Term<?>,Term<?>>)t).get0(),((Compound2<Term<?>,Term<?>>)t).get1()));

@@ -204,8 +204,8 @@ public class Double extends Number {
      * @author Paolo Contessi
      */
     @Override
-    public int compareTo(Number o) {
-        return (new java.lang.Double(value)).compareTo(o.doubleValue());
+    public final int compareTo(Number o) {
+        return java.lang.Double.compare(value, o.doubleValue()); //(new java.lang.Double(value)).compareTo(o.doubleValue());
     }
     
 }

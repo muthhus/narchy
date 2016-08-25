@@ -55,17 +55,17 @@ public final class MethodFinder {
     /**
 	 * Mapping from method name to the Methods in the target class with that name.
 	 */
-    private final Map<String,List<Member>> methodMap = new HashMap<String, List<Member>>();
+    private final Map<String,List<Member>> methodMap = new HashMap<>();
 
     /**
 	 * List of the Constructors in the target class.
 	 */
-    private final List<Member> ctorList = new ArrayList<Member>();
+    private final List<Member> ctorList = new ArrayList<>();
 
     /**
 	 * Mapping from a Constructor or Method object to the Class objects representing its formal parameters.
 	 */
-    private final Map<Member,Class<?>[]> paramMap = new HashMap<Member, Class<?>[]>();
+    private final Map<Member,Class<?>[]> paramMap = new HashMap<>();
 
     /**
      * @param  clazz  Class in which I will look for methods and constructors
@@ -126,7 +126,7 @@ public final class MethodFinder {
      * method will be either all Constructor objects or all Method objects.
      */
     private Member findMemberIn(final List<Member> memberList, final Class<?>[] parameterTypes) throws NoSuchMethodException {
-        List<Member> matchingMembers = new ArrayList<Member>();
+        List<Member> matchingMembers = new ArrayList<>();
         for (Member member: memberList) {
             Class<?>[] methodParamTypes = paramMap.get(member);
 
@@ -165,7 +165,7 @@ public final class MethodFinder {
     public Method findMethod(final String methodName, final Class<?>[] parameterTypes) throws NoSuchMethodException {
         List<Member> methodList = methodMap.get(methodName);
         if (methodList == null) {
-            throw new NoSuchMethodException("no method named " + clazz.getName() + "." + methodName);
+            throw new NoSuchMethodException("no method named " + clazz.getName() + '.' + methodName);
         }
         return (Method) findMemberIn(methodList, parameterTypes == null ? new Class[0] : parameterTypes);
     }
@@ -177,7 +177,7 @@ public final class MethodFinder {
      *                most specific
      */
     private Member findMostSpecificMemberIn(final List<Member> memberList) throws NoSuchMethodException {
-        List<Member> mostSpecificMembers = new ArrayList<Member>();
+        List<Member> mostSpecificMembers = new ArrayList<>();
 
         for (Member member: memberList) {
 
@@ -328,7 +328,7 @@ public final class MethodFinder {
             Class<?>[] paramTypes = m.getParameterTypes();
             List<Member> list = methodMap.get(methodName);
             if (list == null) {
-                list = new ArrayList<Member>();
+                list = new ArrayList<>();
                 methodMap.put(methodName, list);
             }
             if (!ClassUtilities.classIsAccessible(clazz)) {
@@ -342,7 +342,7 @@ public final class MethodFinder {
     }
 
     private List<Member> getAllMethods() {
-        List<Member> allMethods = new ArrayList<Member>();
+        List<Member> allMethods = new ArrayList<>();
         Class<?> c = clazz;
         while ((c != null)) {
             Method[] methods = c.getDeclaredMethods();

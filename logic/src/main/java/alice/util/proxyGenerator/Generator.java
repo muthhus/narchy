@@ -4,6 +4,7 @@ import javax.tools.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.Collections;
 
 /* This class uses the private static "defineClass0" method found in Proxy to add the class into the ClassLoader: 
  * an exception is raised if the class already exists in that class loader. 
@@ -39,7 +40,7 @@ public class Generator {
   public static Class<?> make(ClassLoader loader, String className, CharSequence javaSource) {
 	  
     GeneratedClassFile gcf = new GeneratedClassFile();
-    DiagnosticCollector<JavaFileObject> dc = new DiagnosticCollector<JavaFileObject>();
+    DiagnosticCollector<JavaFileObject> dc = new DiagnosticCollector<>();
 
     boolean result = compile(className, javaSource, gcf, dc);
     return processResults(loader, javaSource, gcf, dc, result);
@@ -50,7 +51,7 @@ public class Generator {
 		  							DiagnosticCollector<JavaFileObject> dc) {
 	GeneratedJavaSourceFile gjsf = new GeneratedJavaSourceFile(className, javaSource);
     GeneratingJavaFileManager fileManager = new GeneratingJavaFileManager(jc.getStandardFileManager(dc, null, null), gcf);
-    JavaCompiler.CompilationTask task = jc.getTask(null, fileManager, dc, null, null, Arrays.asList(gjsf));
+    JavaCompiler.CompilationTask task = jc.getTask(null, fileManager, dc, null, null, Collections.singletonList(gjsf));
     return task.call();
   }
 

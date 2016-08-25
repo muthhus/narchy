@@ -50,7 +50,7 @@ public class ExecutionContext {
     
     
     public String toString(){
-        return "         id: " + id + "\n" + "     currentGoal:  " + currentGoal + "\n" + "     clause:       " + clause + "\n" + "     subGoalStore: " + goalsToEval + "\n" + "     trailingVars: " + trailingVars + "\n";
+        return "         id: " + id + '\n' + "     currentGoal:  " + currentGoal + '\n' + "     clause:       " + clause + '\n' + "     subGoalStore: " + goalsToEval + '\n' + "     trailingVars: " + trailingVars + '\n';
     }
     
     

@@ -66,7 +66,7 @@ public class SyntaxDocument extends PlainDocument
      */
     public void tokenizeLines(int start, int len)
     {
-        if(tokenMarker == null || !tokenMarker.supportsMultilineTokens())
+        if(tokenMarker == null || !TokenMarker.supportsMultilineTokens())
             return;
 
         Segment lineSegment = new Segment();

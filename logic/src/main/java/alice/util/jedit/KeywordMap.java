@@ -80,7 +80,7 @@ public class KeywordMap
     public void add(String keyword, byte id)
     {
         int key = getStringMapKey(keyword);
-        map[key] = new Keyword(keyword.toCharArray(),id,map[key]);
+        map[key] = new Keyword(keyword.toCharArray(), id, map[key]);
     }
 
     /**
@@ -122,7 +122,7 @@ public class KeywordMap
     }
 
     // private members
-    class Keyword
+    static class Keyword
     {
         public Keyword(char[] keyword, byte id, Keyword next)
         {

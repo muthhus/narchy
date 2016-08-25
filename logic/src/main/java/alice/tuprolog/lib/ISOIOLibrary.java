@@ -21,7 +21,7 @@ import java.util.*;
 
 public class ISOIOLibrary extends Library{
 	private static final long serialVersionUID = 1L;
-    protected final int files = 1000; //numero casuale abbastanza alto per evitare eccezioni sulle dimensioni delle hashtable
+    protected static final int files = 1000; //numero casuale abbastanza alto per evitare eccezioni sulle dimensioni delle hashtable
     protected Hashtable<InputStream, Hashtable<String, Term>> inputStreams = new Hashtable<>(files);
     protected Hashtable<OutputStream, Hashtable<String, Term>> outputStreams = new Hashtable<>(files);
     
@@ -1521,7 +1521,7 @@ public class ISOIOLibrary extends Library{
         }
     }
     
-    private void analize_term(List<Term> variables,Term t){
+    private static void analize_term(List<Term> variables, Term t){
         if(!t.isCompound()){
             variables.add(t);
         }
@@ -1946,7 +1946,7 @@ public class ISOIOLibrary extends Library{
     }
     
     //serve per inizializzare la hashmap delle propriet?
-    private boolean inizialize_properties(Hashtable<String,Term> map){
+    private static boolean inizialize_properties(Hashtable<String, Term> map){
         Struct s = new Struct();
         map.put("file_name", s);
         map.put("mode", s);

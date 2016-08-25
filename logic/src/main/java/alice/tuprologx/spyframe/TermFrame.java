@@ -23,33 +23,33 @@ public class TermFrame extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 
 /**Transforms prolog terms into trees.*/
-  public static final ToTree<Term> term2tree=new ToTree<Term>(){
+  public static final ToTree<Term> term2tree= new ToTree<>() {
     @Override
-    public Node makeTreeFrom(Term term){
-      Node node=new Node(""+term);
-      node.textcolor=node.bordercolor=Color.BLACK;
-      //make it more specific if possible
-      if(term instanceof Var){
-        Var var=(Var)term;
-        node.text=var.getName();
-        node.textcolor=node.bordercolor=Color.BLUE;
-        if(var.isBound()){
-          node.kids=new Node[1];
-          node.kids[0]=makeTreeFrom(var.getTerm());
+    public Node makeTreeFrom(Term term) {
+        Node node = new Node("" + term);
+        node.textcolor = node.bordercolor = Color.BLACK;
+        //make it more specific if possible
+        if (term instanceof Var) {
+            Var var = (Var) term;
+            node.text = var.getName();
+            node.textcolor = node.bordercolor = Color.BLUE;
+            if (var.isBound()) {
+                node.kids = new Node[1];
+                node.kids[0] = makeTreeFrom(var.getTerm());
+            }
+        } else if (term instanceof alice.tuprolog.Number) {
+            node.textcolor = node.bordercolor = Color.MAGENTA;
+        } else if (term instanceof Struct) {
+            Struct struct = (Struct) term;
+            node.text = struct.name();
+            int n = struct.getArity();
+            node.kids = new Node[n];
+            for (int i = 0; i < n; i++)
+                node.kids[i] = makeTreeFrom(struct.term(i));
         }
-      } else if(term instanceof alice.tuprolog.Number){
-        node.textcolor=node.bordercolor=Color.MAGENTA;
-      } else if(term instanceof Struct){
-        Struct struct=(Struct)term;
-        node.text=struct.name();
-        int n=struct.getArity();
-        node.kids=new Node[n];
-        for(int i=0; i<n; i++)
-          node.kids[i]=makeTreeFrom(struct.term(i));
-      }
-      return node;
+        return node;
     }
-  };
+};
 
   JTextField input;
   Tree<Term> ptt;
@@ -61,7 +61,7 @@ public class TermFrame extends JFrame implements ActionListener{
     super("termframe");
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     Container c=getContentPane();
-    ptt=new Tree<Term>(term2tree, term);
+    ptt= new Tree<>(term2tree, term);
     c.add(new JScrollPane(ptt));
     input=new JTextField();
     c.add(input, BorderLayout.SOUTH);

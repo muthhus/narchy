@@ -129,7 +129,7 @@ public class J2PProxyFactory extends ProxyFactory {
     private static final String HANDLER_TYPE
         = 'L' + MethodHandler.class.getName().replace('.', '/') + ';';
     private static final String HANDLER_SETTER = "setHandler";
-    private static final String HANDLER_SETTER_TYPE = "(" + HANDLER_TYPE + ")V";
+    private static final String HANDLER_SETTER_TYPE = '(' + HANDLER_TYPE + ")V";
 
     private static final String METACLASS_FIELD = "_meta$Prolog$Class";
     //private static final String METACLASS_TYPE = "Lalice/tuprologx/pj/meta/PrologMetaClass;";
@@ -148,7 +148,7 @@ public class J2PProxyFactory extends ProxyFactory {
      */
     public static boolean useCache = true; 
 
-    private static final WeakHashMap<ClassLoader,Map<CacheKey,CacheKey>> proxyCache = new WeakHashMap<ClassLoader, Map<CacheKey,CacheKey>>();
+    private static final WeakHashMap<ClassLoader,Map<CacheKey,CacheKey>> proxyCache = new WeakHashMap<>();
 
     static class CacheKey {
         String classes;
@@ -276,7 +276,7 @@ public class J2PProxyFactory extends ProxyFactory {
         // synchronized (proxyCache) {
             Map<CacheKey,CacheKey> cacheForTheLoader = proxyCache.get(cl);
             if (cacheForTheLoader == null) {
-                cacheForTheLoader = new HashMap<J2PProxyFactory.CacheKey, J2PProxyFactory.CacheKey>();
+                cacheForTheLoader = new HashMap<>();
                 proxyCache.put(cl, cacheForTheLoader);
                 cacheForTheLoader.put(key, key);
             }
@@ -299,14 +299,14 @@ public class J2PProxyFactory extends ProxyFactory {
             Class<?> c = isValidEntry(key);
             if (c == null) {
                 createClass3(cl);
-                key.proxyClass = new WeakReference<Class<?>>(thisClass);
+                key.proxyClass = new WeakReference<>(thisClass);
             }
             else
                 thisClass = c; 
         // }
     }
 
-    private Class<?> isValidEntry(CacheKey key) {
+    private static Class<?> isValidEntry(CacheKey key) {
         WeakReference<Class<?>> ref = key.proxyClass;
         if (ref != null) {
             Class<?> c = ref.get();
@@ -387,12 +387,7 @@ public class J2PProxyFactory extends ProxyFactory {
 	 * @since   3.4
 	 */
     public ClassLoaderProvider classLoaderProvider
-        = new ClassLoaderProvider() {
-              @Override
-              public ClassLoader get(ProxyFactory pf) {
-                  return ((J2PProxyFactory)pf).getClassLoader0();
-              }
-          };
+        = pf -> ((J2PProxyFactory)pf).getClassLoader0();
 
     @Override
     protected ClassLoader getClassLoader() {
@@ -643,8 +638,8 @@ public class J2PProxyFactory extends ProxyFactory {
         return index;
     }
 
-    private void override(String thisClassname, Method meth, String prefix,
-                          int index, String desc, ClassFile cf, ConstPool cp)
+    private static void override(String thisClassname, Method meth, String prefix,
+                                 int index, String desc, ClassFile cf, ConstPool cp)
         throws CannotCompileException
     {
         Class<?> declClass = meth.getDeclaringClass();
@@ -732,7 +727,7 @@ public class J2PProxyFactory extends ProxyFactory {
     }
 
     private static HashMap<String,Method> getMethods(Class<?> superClass, Class<?>[] interfaceTypes) {
-        HashMap<String,Method> hash = new HashMap<String, Method>();
+        HashMap<String,Method> hash = new HashMap<>();
         for (int i = 0; i < interfaceTypes.length; i++)
             getMethods(hash, interfaceTypes[i]);
 

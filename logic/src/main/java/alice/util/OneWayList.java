@@ -25,7 +25,7 @@ public final class OneWayList<E> {
     public static <T> OneWayList<T> transform2(List<T> list){
         return list.isEmpty() ?
                 null :
-                new OneWayList<T>(
+                new OneWayList<>(
                         list.get(0),
                         list.size() > 1 ? transform2(list.subList(1, list.size())) : null
                 );
@@ -100,8 +100,8 @@ public final class OneWayList<E> {
         String elem;
         if(head==null) elem = "null";
             else elem = head.toString();
-        if(tail==null) return elems+","+elem;
-        return elems+","+tail.toString(elem);
+        if(tail==null) return elems+ ',' +elem;
+        return elems+ ',' +tail.toString(elem);
     }
     
 }

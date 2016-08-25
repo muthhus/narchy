@@ -43,14 +43,14 @@ public class JavaObject<O> extends Term<JavaObject<O>> {
         if (matches(s)) {           
             //return new JavaObject<Z>((Z)(PJ.getRegisteredJavaObject(s)));
         	Z auxJavaObject = uncheckedCast(PJ.getRegisteredJavaObject(s));
-            return new JavaObject<Z>( auxJavaObject );
+            return new JavaObject<>(auxJavaObject);
         }
         else
             throw new UnsupportedOperationException();
     }
 
     public String toString() {        
-        return "JavaObject{"+_theObject+"}";
+        return "JavaObject{"+_theObject+ '}';
     }
     
     

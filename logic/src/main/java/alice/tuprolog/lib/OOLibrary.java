@@ -227,7 +227,7 @@ public class OOLibrary extends Library {
                 Object[] args_value = args.getValues();
                 Constructor<?> co = lookupConstructor(cl, args.getTypes(),args_value);
                 if (co == null) {
-                    getEngine().warn("Constructor not found: class " + clName);
+                    Prolog.warn("Constructor not found: class " + clName);
                     throw new JavaException(new NoSuchMethodException(
                             "Constructor not found: class " + clName));
                 }
@@ -238,21 +238,21 @@ public class OOLibrary extends Library {
                 else
                     throw new JavaException(new Exception());
             } catch (ClassNotFoundException ex) {
-                getEngine().warn("Java class not found: " + clName);
+                Prolog.warn("Java class not found: " + clName);
                 throw new JavaException(ex);
             } catch (InvocationTargetException ex) {
-                getEngine().warn("Invalid constructor arguments.");
+                Prolog.warn("Invalid constructor arguments.");
                 throw new JavaException(ex);
             } catch (NoSuchMethodException ex) {
-                getEngine().warn("Constructor not found: " + args.getTypes());
+                Prolog.warn("Constructor not found: " + args.getTypes());
                 throw new JavaException(ex);
             } catch (InstantiationException ex) {
-                getEngine().warn(
+                Prolog.warn(
                         "Objects of class " + clName
                                 + " cannot be instantiated");
                 throw new JavaException(ex);
             } catch (IllegalArgumentException ex) {
-                getEngine().warn("Illegal constructor arguments  " + args);
+                Prolog.warn("Illegal constructor arguments  " + args);
                 throw new JavaException(ex);
             }
         } catch (Exception ex) {
@@ -369,8 +369,8 @@ public class OOLibrary extends Library {
                 file.write(text);
                 file.close();
             } catch (IOException ex) {
-                getEngine().warn("Compilation of java sources failed");
-                getEngine().warn(
+                Prolog.warn("Compilation of java sources failed");
+                Prolog.warn(
                         "(creation of " + fullClassPath + ".java fail failed)");
                 throw new JavaException(ex);
             }
@@ -380,14 +380,14 @@ public class OOLibrary extends Library {
                 Process jc = Runtime.getRuntime().exec(cmd);
                 int res = jc.waitFor();
                 if (res != 0) {
-                    getEngine().warn("Compilation of java sources failed");
-                    getEngine().warn(
+                    Prolog.warn("Compilation of java sources failed");
+                    Prolog.warn(
                             "(java compiler (javac) has stopped with errors)");
                     throw new IOException("Compilation of java sources failed");
                 }
             } catch (IOException ex) {
-                getEngine().warn("Compilation of java sources failed");
-                getEngine().warn("(java compiler (javac) invocation failed)");
+                Prolog.warn("Compilation of java sources failed");
+                Prolog.warn("(java compiler (javac) invocation failed)");
                 throw new JavaException(ex);
             }
             try 
@@ -407,8 +407,8 @@ public class OOLibrary extends Library {
                 else
                     throw new JavaException(new Exception());
             } catch (ClassNotFoundException ex) {
-                getEngine().warn("Compilation of java sources failed");
-                getEngine().warn(
+                Prolog.warn("Compilation of java sources failed");
+                Prolog.warn(
                         "(Java Class compiled, but not created: "
                                 + fullClassName + " )");
                 throw new JavaException(ex);
@@ -473,11 +473,11 @@ public class OOLibrary extends Library {
 						m.setAccessible(true);
 						res = m.invoke(obj, args_values);
 					} catch (IllegalAccessException ex) {
-						getEngine().warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
+						Prolog.warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
 						throw new JavaException(ex);
 					}
 				} else {
-					getEngine().warn("Method not found: " + methodName + "( signature: "+ args + " )");
+					Prolog.warn("Method not found: " + methodName + "( signature: "+ args + " )");
 					throw new JavaException(new NoSuchMethodException("Method not found: " + methodName + "( signature: "+ args + " )"));
 				}
 			} else {
@@ -496,7 +496,7 @@ public class OOLibrary extends Library {
 						} catch (ClassNotFoundException ex) {
 							// if not found even as a class id -> consider as a
 							// String object value
-							getEngine().warn("Unknown class.");
+							Prolog.warn("Unknown class.");
 							throw new JavaException(ex);
 						}
 					}
@@ -519,23 +519,23 @@ public class OOLibrary extends Library {
 			else
 				throw new JavaException(new Exception());
 		} catch (InvocationTargetException ex) {
-			getEngine().warn(
+			Prolog.warn(
 					"Method failed: " + methodName + " - ( signature: " + args
 					+ " ) - Original Exception: "
 					+ ex.getTargetException());
 			throw new JavaException(new IllegalArgumentException());
 		} catch (NoSuchMethodException ex) {
-			getEngine().warn(
+			Prolog.warn(
 					"Method not found: " + methodName + " - ( signature: "
 							+ args + " )");
 			throw new JavaException(ex);
 		} catch (IllegalArgumentException ex) {
-			getEngine().warn(
+			Prolog.warn(
 					"Invalid arguments " + args + " - ( method: " + methodName
 					+ " )");
 			throw new JavaException(ex);
 		} catch (Exception ex) {
-			getEngine()
+			Prolog
 			.warn("Generic error in method invocation " + methodName);
 			throw new JavaException(ex);
 		}
@@ -561,7 +561,7 @@ public class OOLibrary extends Library {
         	return true;
     	}catch(IllegalArgumentException e)
         {
-        	getEngine().warn("Illegal list of paths " + paths);
+        	Prolog.warn("Illegal list of paths " + paths);
             throw new JavaException(e);
         }
         catch (Exception e) {
@@ -605,7 +605,7 @@ public class OOLibrary extends Library {
         	return unify(paths, pathTerm);
     	}catch(IllegalArgumentException e)
         {
-        	getEngine().warn("Illegal list of paths " + paths);
+        	Prolog.warn("Illegal list of paths " + paths);
             throw new JavaException(e);
         }
         catch (Exception e) {
@@ -635,10 +635,10 @@ public class OOLibrary extends Library {
             		try {
                         cl = Class.forName(clName, true, dynamicLoader);
                     } catch (ClassNotFoundException ex) {
-                        getEngine().warn("Java class not found: " + clName);
+                        Prolog.warn("Java class not found: " + clName);
                         return false;
                     } catch (Exception ex) {
-                        getEngine().warn(
+                        Prolog.warn(
                                 "Static field "
                                         + fieldName
                                         + " not found in class "
@@ -688,7 +688,7 @@ public class OOLibrary extends Library {
             }
             return true;
         } catch (NoSuchFieldException ex) {
-            getEngine().warn(
+            Prolog.warn(
                     "Field " + fieldName + " not found in class " + objId);
             return false;
         } catch (Exception ex) {
@@ -717,10 +717,10 @@ public class OOLibrary extends Library {
             		try {
                         cl = Class.forName(clName, true, dynamicLoader);
                     } catch (ClassNotFoundException ex) {
-                        getEngine().warn("Java class not found: " + clName);
+                        Prolog.warn("Java class not found: " + clName);
                         return false;
                     } catch (Exception ex) {
-                        getEngine().warn(
+                        Prolog.warn(
                                 "Static field "
                                         + fieldName
                                         + " not found in class "
@@ -762,11 +762,11 @@ public class OOLibrary extends Library {
             }
             
         } catch (NoSuchFieldException ex) {
-            getEngine().warn(
+            Prolog.warn(
                     "Field " + fieldName + " not found in class " + objId);
             return false;
         } catch (Exception ex) {
-            getEngine().warn("Generic error in accessing the field");
+            Prolog.warn("Generic error in accessing the field");
             return false;
         }
     }
@@ -945,8 +945,7 @@ public class OOLibrary extends Library {
                                 .toString()));
                 }
                 case "class [C": {
-                    Term value = new Struct(""
-                            + Array.getChar(obj, index.intValue()));
+                    Term value = new Struct(String.valueOf(Array.getChar(obj, index.intValue())));
                     if (unify(what, value))
                         return true;
                     else
@@ -1042,7 +1041,7 @@ public class OOLibrary extends Library {
      *
      * @throws JavaException
      */
-    private URL[] getURLsFromStringArray(String[] paths) throws MalformedURLException  
+    private static URL[] getURLsFromStringArray(String[] paths) throws MalformedURLException
     {
     	URL[] urls = null;
     	if(paths != null)
@@ -1070,7 +1069,7 @@ public class OOLibrary extends Library {
      * @throws JavaException
      */
     
-    private String[] getStringArrayFromStruct(Struct list) {
+    private static String[] getStringArrayFromStruct(Struct list) {
         String args[] = new String[list.listSize()];
         Iterator<? extends Term> it = list.listIterator();
         int count = 0;
@@ -1231,10 +1230,10 @@ public class OOLibrary extends Library {
                         if (castTo_name.equals("boolean")) {
                             switch (castWhat_name) {
                                 case "true":
-                                    values[i] = new Boolean(true);
+                                    values[i] = Boolean.TRUE;
                                     break;
                                 case "false":
-                                    values[i] = new Boolean(false);
+                                    values[i] = Boolean.FALSE;
                                     break;
                                 default:
                                     return false;
@@ -1249,7 +1248,7 @@ public class OOLibrary extends Library {
                         try {
                             types[i] = Class.forName(castTo_name, true, dynamicLoader);
                         } catch (ClassNotFoundException ex) {
-                            getEngine().warn(
+                            Prolog.warn(
                                     "Java class not found: " + castTo_name);
                             return false;
                         }
@@ -1285,7 +1284,7 @@ public class OOLibrary extends Library {
                             try {
                                 types[i] = Class.forName(castTo_name, true, dynamicLoader);
                             } catch (ClassNotFoundException ex) {
-                                getEngine().warn(
+                                Prolog.warn(
                                         "Java class not found: " + castTo_name);
                                 return false;
                             }
@@ -1325,7 +1324,7 @@ public class OOLibrary extends Library {
                 }
             }
         } catch (Exception ex) {
-            getEngine().warn(
+            Prolog.warn(
                     "Casting " + castWhat + " to " + castTo + " failed");
             return false;
         }
@@ -1370,7 +1369,7 @@ public class OOLibrary extends Library {
         }
     }
 
-    private Object[] getArrayFromList(Struct list) {
+    private static Object[] getArrayFromList(Struct list) {
         Object args[] = new Object[list.listSize()];
         Iterator<? extends Term> it = list.listIterator();
         int count = 0;
@@ -1442,7 +1441,7 @@ public class OOLibrary extends Library {
         	return register((Struct)id, obj);
         }catch(InvalidObjectIdException e)
         {
-        	getEngine().warn("Illegal object id " + id.toString());
+        	Prolog.warn("Illegal object id " + id.toString());
             throw new JavaException(e);
         }
     }
@@ -1467,7 +1466,7 @@ public class OOLibrary extends Library {
         	return unregister((Struct)id);
         }catch(InvalidObjectIdException e)
         {
-        	getEngine().warn("Illegal object id " + id.toString());
+        	Prolog.warn("Illegal object id " + id.toString());
             throw new JavaException(e);
         }
     }

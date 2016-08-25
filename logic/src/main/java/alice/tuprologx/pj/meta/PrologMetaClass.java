@@ -39,7 +39,7 @@ public class PrologMetaClass {
     }
     
     private void initPrologFields() {        
-        Vector<PrologMetaField> temp = new Vector<PrologMetaField>();
+        Vector<PrologMetaField> temp = new Vector<>();
         Field[] fields = _theClass.getFields();
         for (Field f : fields) {
             if (f.isAnnotationPresent(PrologField.class)) {
@@ -51,7 +51,7 @@ public class PrologMetaClass {
     }
     
     private void initPrologMethods() {
-        Vector<PrologMetaMethod> temp = new Vector<PrologMetaMethod>();
+        Vector<PrologMetaMethod> temp = new Vector<>();
         Method[] methods = _theClass.getMethods();
         for (Method m : methods) {
             if (m.isAnnotationPresent(PrologMethod.class)) {
@@ -70,7 +70,7 @@ public class PrologMetaClass {
             if (pa != null) {
                 String[] clauses = pa.clauses();
                 for (int i = 0; i < clauses.length;i++) {
-                    theory+=clauses[i]+"\n";
+                    theory+=clauses[i]+ '\n';
                 }                                   
             }
             cl = cl.getSuperclass(); 

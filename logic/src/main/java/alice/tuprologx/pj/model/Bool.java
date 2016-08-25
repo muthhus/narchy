@@ -41,7 +41,7 @@ public class Bool extends Term<Bool> {
         }
         
 	public String toString() {
-		return "Bool("+_theBool+")";
+		return "Bool("+_theBool+ ')';
 	}
 
 }

@@ -49,7 +49,7 @@ public class JavaDynamicClassLoader extends AbstractDynamicClassLoader
 	    			is = aURL.openConnection().getInputStream();
 	    		}
 	    		
-	    		if(aURL.toString().indexOf("/", aURL.toString().length() - 1) != -1)
+	    		if(aURL.toString().indexOf('/', aURL.toString().length() - 1) != -1)
 	    		{
 	    			aURL = new URL(aURL.toString() + classNameReplaced + ".class");
 	    			is = aURL.openConnection().getInputStream();
@@ -71,7 +71,7 @@ public class JavaDynamicClassLoader extends AbstractDynamicClassLoader
 	    throw new ClassNotFoundException(className);
 	}  
 	
-	private byte[] getClassData(InputStream is) throws IOException
+	private static byte[] getClassData(InputStream is) throws IOException
 	{
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		int nextValue= is.read();  

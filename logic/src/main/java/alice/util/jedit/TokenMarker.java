@@ -133,7 +133,7 @@ public abstract class TokenMarker
      * The default implementation returns true; it should be overridden
      * to return false on simpler token markers for increased speed.
      */
-    public boolean supportsMultilineTokens()
+    public static boolean supportsMultilineTokens()
     {
         return true;
     }
@@ -300,7 +300,7 @@ public abstract class TokenMarker
     /**
      * Inner class for storing information about tokenized lines.
      */
-    public class LineInfo
+    public static class LineInfo
     {
         /**
          * Creates a new LineInfo object with token = Token.NULL

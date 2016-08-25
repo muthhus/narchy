@@ -254,7 +254,7 @@ public final class BuiltIn extends Library {
 		 }
 	 }
 
-	 private String[] getStringArrayFromStruct(Struct list) {
+	 private static String[] getStringArrayFromStruct(Struct list) {
 	        String args[] = new String[list.listSize()];
 	        Iterator<? extends Term> it = list.listIterator();
 	        int count = 0;

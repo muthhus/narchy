@@ -9,6 +9,8 @@
 
 package alice.tuprologx.pj.model;
 
+import java.util.Collections;
+
 /**
  *
  * @author maurizio
@@ -25,7 +27,7 @@ public class Atom extends Term<Atom> {
 	}
 
 	public String toString() {
-		return "Atom("+_theAtom+")";
+		return "Atom("+_theAtom+ ')';
 	}
         
         @Override
@@ -45,18 +47,16 @@ public class Atom extends Term<Atom> {
         
         public List<Atom> toCharList() {
             char[] carr = _theAtom.toCharArray();
-            java.util.Vector<String> vs = new java.util.Vector<String>();
+            java.util.Vector<String> vs = new java.util.Vector<>();
             for (char c : carr) {
                 vs.add(c+"");
             }
-            return new List<Atom>(vs);
+            return new List<>(vs);
         }
         
         public List<Atom> split(String regexp) {
-            java.util.Vector<String> vs = new java.util.Vector<String>();
-            for (String s : _theAtom.split(regexp)) {      
-                vs.add(s);
-            }      
-            return new List<Atom>(vs);
+            java.util.Vector<String> vs = new java.util.Vector<>();
+            Collections.addAll(vs, _theAtom.split(regexp));
+            return new List<>(vs);
         }
 }
