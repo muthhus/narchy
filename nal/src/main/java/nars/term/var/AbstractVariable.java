@@ -23,7 +23,9 @@ package nars.term.var;
 
 import nars.Op;
 import nars.Param;
+import nars.term.Term;
 import nars.term.Terms;
+import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.VAR_QUERY;
@@ -60,7 +62,22 @@ public abstract class AbstractVariable implements Variable {
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
 
-//    @Override
+    @Override
+    public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+
+        Op op = op();
+        Op yOp = y.op();
+        Op type = subst.type;
+        if (op == yOp) {
+            return subst.putCommon(this, y);
+        } else if (op == type) { //TODO is this necessary? probably to allow the matchVarY condition below
+            return subst.matchVarX(this, y);
+        }
+
+        return false;
+    }
+
+    //    @Override
 //    public boolean equals(Object that) {
 //        boolean e = that == this ||
 //                (that instanceof AbstractVariable && that.hashCode() == hash);

@@ -48,8 +48,7 @@ public class Line1DTest {
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
                 new FrameClock(), exe
         );
-        nar.inputActivation.setValue(1f/conceptsPerCycle);
-        nar.derivedActivation.setValue(1f/conceptsPerCycle);
+
 
 
         nar.cyclesPerFrame.setValue(cyclesPerFrame);

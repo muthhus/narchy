@@ -111,6 +111,9 @@ public class Islands {
 	}
 
 	public <X> void buildIslands(Intersecter intersecter, OArrayList<Collidable<X>> collidables) {
+
+		//System.out.println("build islands");
+
 		BulletStats.pushProfile("islandUnionFindAndQuickSort");
 		try {
 			islandmanifold.clear();
@@ -126,8 +129,8 @@ public class Islands {
 
 			// update the sleeping state for bodies, if all are sleeping
 			for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
-                int islandId = find.get(startIslandIndex)[0];
-                for (endIslandIndex = startIslandIndex + 1; (endIslandIndex < numElem) && (find.get(endIslandIndex)[0] == islandId); endIslandIndex++) {
+                int islandId = find.getId(startIslandIndex);
+                for (endIslandIndex = startIslandIndex + 1; (endIslandIndex < numElem) && (find.getId(endIslandIndex) == islandId); endIslandIndex++) {
 				}
 
 				//int numSleeping = 0;
@@ -136,12 +139,13 @@ public class Islands {
 
 				int idx;
 				for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                    int i = find.get(idx)[1];
+                    int i = find.getSz(idx);
 
 					//return array[index];
 					Collidable colObj0 = collidables.get(i);
 					if ((colObj0.getIslandTag() != islandId) && (colObj0.getIslandTag() != -1)) {
-						System.err.println("error in island management\n");
+						islandError(colObj0);
+						continue;
 					}
 
 					assert ((colObj0.getIslandTag() == islandId) || (colObj0.getIslandTag() == -1));
@@ -159,11 +163,12 @@ public class Islands {
 				if (allSleeping) {
 					//int idx;
 					for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                        int i = find.get(idx)[1];
+                        int i = find.getSz(idx);
 						//return array[index];
 						Collidable colObj0 = collidables.get(i);
 						if ((colObj0.getIslandTag() != islandId) && (colObj0.getIslandTag() != -1)) {
-							System.err.println("error in island management\n");
+							islandError(colObj0);
+							continue;
 						}
 
 						assert ((colObj0.getIslandTag() == islandId) || (colObj0.getIslandTag() == -1));
@@ -177,13 +182,14 @@ public class Islands {
 
 					//int idx;
 					for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                        int i = find.get(idx)[1];
+                        int i = find.getSz(idx);
 
 						//return array[index];
 						Collidable colObj0 = collidables.get(i);
 						int tag = colObj0.getIslandTag();
 						if ((tag != islandId) && (tag != -1)) {
-							System.err.println("error in island management\n");
+							islandError(colObj0);
+							continue;
 						}
 
 						assert ((tag == islandId) || (tag == -1));
@@ -236,6 +242,10 @@ public class Islands {
 		}
 	}
 
+	public void islandError(Collidable colObj0) {
+		//System.err.println("error in island management: " + colObj0 + " " + colObj0.data());
+	}
+
 	public <X> void buildAndProcessIslands(Intersecter intersecter, OArrayList<Collidable<X>> collidables, IslandCallback callback) {
 		buildIslands(intersecter, collidables);
 
@@ -274,11 +284,11 @@ public class Islands {
 
 			// traverse the simulation islands, and call the solver, unless all objects are sleeping/deactivated
 			for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
-                int islandId = find.get(startIslandIndex)[0];
+                int islandId = find.getId(startIslandIndex);
 				boolean islandSleeping = false;
 
-				for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((find.get(endIslandIndex)[0] == islandId)); endIslandIndex++) {
-					int i = find.get(endIslandIndex)[1];
+				for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((find.getId(endIslandIndex) == islandId)); endIslandIndex++) {
+					int i = find.getSz(endIslandIndex);
 					//return array[index];
 					Collidable colObj0 = collidables.get(i);
 					islandBodies.add(colObj0);

@@ -6,6 +6,7 @@ import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Activation;
 import nars.concept.Concept;
+import nars.task.AbstractTask;
 import nars.task.GeneratedTask;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -315,6 +316,7 @@ abstract public class NAREnvironment {
                         }
                     }*/.
                             present(now).budget(curiosityBudget).log("Curiosity"));
+
                 }
 
                 boost(c);

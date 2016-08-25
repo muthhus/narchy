@@ -18,6 +18,8 @@ import spacegraph.render.Draw;
 import java.util.Collections;
 import java.util.List;
 
+import static spacegraph.math.v3.v;
+
 /** simplified implementation which manages one body and N constraints. useful for simple objects */
 public class SimpleSpatial<X> extends Spatial<X> {
 
@@ -26,7 +28,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
     /** physics motion state */
     public final Motion motion = new Motion();
     private final String label;
-    private final CollisionShape shape;
+    protected CollisionShape shape;
 
     /** prevents physics movement */
     public boolean motionLock;
@@ -147,14 +149,20 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     public void scale(float sx, float sy, float sz) {
 
-        ((BoxShape)shape).size(sx, sy, sz);
+        if (shape instanceof BoxShape)
+            ((BoxShape)shape).size(sx, sy, sz);
+        else
+            shape.setLocalScaling(v(sx,sy,sz));
+
         this.radius = Math.max(sx, Math.max(sy, sz));
 
     }
 
+
+
     //TODO make abstract
     protected CollisionShape newShape() {
-        return new BoxShape(v3.v(1, 1, 1));
+        return new BoxShape(v(1, 1, 1));
     }
 
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {
@@ -190,24 +198,32 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
         renderRelative(gl, body);
 
-        gl.glPushMatrix();
-        BoxShape shape = (BoxShape) body.shape();
-        float sx = shape.x(); //HACK
-        float sy = shape.y(); //HACK
-        float tx, ty;
-        //if (sx > sy) {
-        ty = sy;
-        tx = sy/sx;
-        //} else {
-        //  tx = sx;
-        //  ty = sx/sy;
-        //}
+        CollisionShape shape = body.shape();
 
-        //gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
+        if (shape instanceof BoxShape) {
+            //render surface on BoxShape face
 
-        gl.glScalef(tx, ty, 1f);
+            BoxShape bshape = (BoxShape)shape;
 
-        renderRelativeAspect(gl);
+            gl.glPushMatrix();
+            float sx, sy;
+            sx = bshape.x(); //HACK
+            sy = bshape.y(); //HACK
+            float tx, ty;
+            //if (sx > sy) {
+            ty = sy;
+            tx = sy/sx;
+            //} else {
+            //  tx = sx;
+            //  ty = sx/sy;
+            //}
+
+            //gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
+
+            gl.glScalef(tx, ty, 1f);
+
+            renderRelativeAspect(gl);
+        }
         gl.glPopMatrix();
 
         gl.glPopMatrix();

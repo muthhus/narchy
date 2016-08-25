@@ -16,7 +16,6 @@ import nars.term.subst.choice.Termutator;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
 import nars.util.data.list.FasterList;
-import nars.util.data.list.LimitedFasterList;
 import nars.util.version.HeapVersioning;
 import nars.util.version.VersionMap;
 import nars.util.version.Versioned;
@@ -161,22 +160,26 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
         return xy.get(t);
     }
 
-    public final void matchAll(@NotNull Term x, @NotNull Term y) {
-        matchAll(x, y, true);
+    public final void unifyAll(@NotNull Term x, @NotNull Term y) {
+        unify(x, y, false, true);
     }
 
 
 
     /**
+     * unifies the next component, which can either be at the start (true, false), middle (false, false), or end (false, true)
+     * of a matching context
+     *
      * setting finish=false allows matching in pieces before finishing
      */
-    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public void unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
 
-        if (!finish) {
-            termutes.clear(); //HACK this only allows 2-step matchAll, for N-step use an extra boolean 'start' parameter to clear it here
+        if (start) {
+            termutes.clear();
         }
 
-        if (match(x, y)) {
+        if (unify(x, y)) {
+
             if (finish) {
                 run(this, null, -1);
             }
@@ -210,88 +213,36 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
     }
 
 
+    public final boolean unify(@NotNull Term x, @NotNull Term y) {
 
+        return x.equals(y) || x.unify(y, this)
+                    ||
+               ((y.op() == type) && matchVarY(x, y));
+    }
 
-//    private void print(String prefix, @Nullable Term a, Term b) {
-//        System.out.print(prefix);
-//        if (a != null)
-//            System.out.println(" " + a + " ||| " + b);
-//        else
-//            System.out.println();
-//        System.out.println("     " + this);
-//    }
-
-
-    /**
-     * recurses into the next sublevel of the term
-     */
-    public final boolean match(@NotNull Term x, @NotNull Term y) {
-
-        if (x.equals(y)) {
-            return true;
-        } else {
-
-            final Op xOp = x.op();
-            final Op yOp = y.op();
-
-            switch (xOp) {
-                case OBJECT:
-                    if (yOp ==OBJECT)
-                        return ((Termject)x).match(y, this);
-                    break; //continue to end
-                case VAR_INDEP:
-                case VAR_DEP:
-                case VAR_QUERY:
-                case VAR_PATTERN:
-                    //Var
-                    if (xOp == yOp) {
-                        return putCommon(x, y);
-                    } else if (matching(xOp))
-                        return matchVarX(x, y);
-                    else
-                        break; //continue to end
-                case OPER:
-                case ATOM:
-                    //Atomic
-                    break; //continue to end
-                default:
-                    //Compound
-                    if (y instanceof Compound) {
-                        return (xOp == yOp) &&
-                                ((Compound) x).match((Compound) y, this);
-                    }
-                    break; //continue to end
-            }
-
-            return (matching(yOp)) && matchVarY(x, y);
-        }
-
-//            else if (x instanceof Compound) {
-//                return ((Compound) x).match((Compound) y, this);
-//            } else if (x instanceof Variable) {
-//                return putCommon( x, y );
-//            }
-//
+//        if (x.equals(y)) {
+//            return true;
 //        } else {
 //
-//            Op t = type;
+//            final Op xOp = x.op();
+//            final Op yOp = y.op();
 //
-//            if (xOp == t) {
-//                //if both are variables of the target type, but different; they need to be common variable
-//                return matchVarX(x, y);
-//            } else if (yOp == t) {
-//                return matchVarY(x, y);
+//            switch (xOp) {
+//                case OBJECT:
+//                    if (yOp ==OBJECT)
+//                        return ((Termject)x).match(y, this);
+//                    break; //continue to end
+//
+//
+//                case OPER:
+//                case ATOM:
+//                    //Atomic
+//                    break; //continue to end
+//
 //            }
 //
-//
-//        }
-//
-//        return false;
-    }
-
-    public final boolean matching(Op o) {
-        return o == type;
-    }
+//            return false;
+//            //return (matching(yOp)) && matchVarY(x, y);
 
 //    private static boolean hasAnyVar(Compound x) {
 //        return x.complexity()<x.volume() || x.firstEllipsis()!=null;
@@ -316,7 +267,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
     public final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
         Term x2 = term(x);
         return (x2 != null) ?
-                match(x2, y) :
+                unify(x2, y) :
                 putXY(/* (Variable) */ x, y);
 
         //return matcherXY.computeMatch(x, y);
@@ -328,7 +279,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
 
         Term y2 = yx.get(y);
         return (y2 != null) ?
-                match(x, y2) :
+                unify(x, y2) :
                 putYX(/*(Variable)*/ x, y);  // && putXY(y, /*(Variable)*/ x));
 
         //return matcherYX.computeMatch(y, x);
@@ -546,7 +497,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
 //    }
 
 
-    private boolean putCommon(@NotNull Term /* var */ x, @NotNull Term y) {
+    public boolean putCommon(@NotNull Term /* var */ x, @NotNull Term y) {
         Variable commonVar = CommonVariable.make((Variable) x, (Variable) y);
         return putBidi(x, y, commonVar);
     }
@@ -593,7 +544,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
     }
 
     public final boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
-        return match(X.term(i), Y.term(i));
+        return unify(X.term(i), Y.term(i));
     }
 
     /**
@@ -601,7 +552,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
      */
     public final boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
         int other = 1 - first;
-        return match(X.term(first), Y.term(first)) && match(X.term(other), Y.term(other));
+        return unify(X.term(first), Y.term(first)) && unify(X.term(other), Y.term(other));
     }
 
 

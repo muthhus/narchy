@@ -136,10 +136,13 @@ public class BinaryOpLearning extends NAREnvironment {
                     int ll = j, cc = i;
 
                     Compound t = charTerm(id, ll, vocab[cc]);
-                    env.actions.add(new MotorConcept(t, env.nar, (Truth b, Truth d)->{
+                    MotorConcept m;
+                    env.actions.add(m = new MotorConcept(t, env.nar, (Truth b, Truth d)->{
                         float e;
                         if (d!=null) {
-                            e = d.expectation();
+                            e =
+                                //d.expectation();
+                                d.freq();
                         } else {
                             e = 0.5f;
                         }
@@ -148,6 +151,7 @@ public class BinaryOpLearning extends NAREnvironment {
                         //float p = s > 0 ? e / (s) : 1;
 
                         desire[ll][cc] = e;
+
                         //return d.confMultViaWeight(p); //share the feedback with the other motors for this position
 
                         return d;
@@ -274,18 +278,18 @@ public class BinaryOpLearning extends NAREnvironment {
 
         if (now > 500 && rMean.getMean() < 0.5f) {
             //it caused a mistake
-
-            System.out.println("\nWHY I DONT SEEM TO LEARN\n");
-
-            actions.forEach(a -> {
-               a.goals().forEach(ag -> {
-                   System.out.println(ag.proof());
-
-               });
-                System.out.println("\n---\n");
-            });
-
-            System.out.println("\n------\n");
+//
+//            System.out.println("\nWHY I DONT SEEM TO LEARN\n");
+//
+//            actions.forEach(a -> {
+//               a.goals().forEach(ag -> {
+//                   System.out.println(ag.proof());
+//
+//               });
+//                System.out.println("\n---\n");
+//            });
+//
+//            System.out.println("\n------\n");
 
         }
 
@@ -345,13 +349,13 @@ public class BinaryOpLearning extends NAREnvironment {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
-        nar.cyclesPerFrame.set(2);
-        nar.compoundVolumeMax.set(40);
+        nar.cyclesPerFrame.set(8);
+        nar.compoundVolumeMax.set(80);
         //nar.confMin.setValue(0.05f);
         //nar.truthResolution.setValue(0.02f);
 
@@ -369,7 +373,7 @@ public class BinaryOpLearning extends NAREnvironment {
         Param.DEBUG = true;
         //b.trace = false;
 
-        NARLoop bLoop = b.run(20000, 0);
+        NARLoop bLoop = b.run(500, 0);
 
 //        System.out.println(b.sensors);
 //        System.out.println(b.actions);

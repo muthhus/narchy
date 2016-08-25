@@ -12,9 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
+import spacegraph.phys.Dynamic;
 import spacegraph.render.Draw;
 
 import java.util.function.Predicate;
+
+import static spacegraph.math.v3.v;
 
 
 public class ConceptWidget extends SimpleSpatial<Term> {
@@ -44,6 +47,28 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
     }
 
+    @Override
+    public Dynamic newBody(boolean collidesWithOthersLikeThis) {
+        Dynamic x = super.newBody(collidesWithOthersLikeThis);
+
+
+
+        int zOffset = -10;
+        final float initDistanceEpsilon = 10f;
+        final float initImpulseEpsilon = 25f;
+
+        //place in a random direction
+        x.transform().set(SpaceGraph.r(initDistanceEpsilon),
+                SpaceGraph.r(initDistanceEpsilon),
+                SpaceGraph.r(initDistanceEpsilon) + zOffset);
+
+        //impulse in a random direction
+        x.impulse(v(SpaceGraph.r(initImpulseEpsilon),
+                SpaceGraph.r(initImpulseEpsilon),
+                SpaceGraph.r(initImpulseEpsilon)));
+
+        return x;
+    }
 
     public void clearEdges() {
         this.numEdges = 0;
@@ -77,17 +102,17 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         Draw.hsb( (tt.op().ordinal()/16f), 0.75f, 0.75f  , 0.25f + 0.5f * p, shapeColor);
 
-        Concept cc = nar.concept(tt);
-        if (cc == null) {
-            //remove? hide?
-        }
+//        Concept cc = nar.concept(tt);
+//        if (cc == null) {
+//            //remove? hide?
+//        }
 //            float lastConceptForget = instance.getLastForgetTime();
 //            if (lastConceptForget != lastConceptForget)
 //                lastConceptForget = now;
 
-        @NotNull Bag<Term> termlinks = cc.termlinks();
-        @NotNull Bag<Task> tasklinks = cc.tasklinks();
-//
+//        @NotNull Bag<Term> termlinks = cc.termlinks();
+//        @NotNull Bag<Task> tasklinks = cc.tasklinks();
+
 //        if (!termlinks.isEmpty()) {
 //            float lastTermlinkForget = ((BLink) (((ArrayBag) termlinks).get(0))).getLastForgetTime();
 //            if (lastTermlinkForget != lastTermlinkForget)
@@ -98,12 +123,12 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         //lag = now - lastConceptForget;
         //float act = 1f / (1f + (timeSinceLastUpdate/3f));
 
-        clearEdges();
-        int maxEdges = edges.length;
-
-        Predicate<BLink<? extends Termed>> linkAdder = l -> addLink(s, l);
-        tasklinks.topWhile(linkAdder, maxEdges / 2);
-        termlinks.topWhile(linkAdder, maxEdges - edgeCount()); //fill remaining edges
+//        clearEdges();
+//        int maxEdges = edges.length;
+//
+//        Predicate<BLink<? extends Termed>> linkAdder = l -> addLink(s, l);
+//        tasklinks.topWhile(linkAdder, maxEdges / 2);
+//        termlinks.topWhile(linkAdder, maxEdges - edgeCount()); //fill remaining edges
 
     }
 
@@ -120,11 +145,11 @@ public class ConceptWidget extends SimpleSpatial<Term> {
             return true;
 
 
-        return addEdge(ll, target, gg instanceof Task);
+        return addEdge(ll, target, gg instanceof Task)!=null;
     }
 
 
-    public boolean addEdge(BLink l, SimpleSpatial target, boolean task) {
+    public EDraw addEdge(BLink l, SimpleSpatial target, boolean task) {
 
         EDraw[] ee = edges;
 
@@ -133,8 +158,8 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         float qua = l.qua();
 
         //width relative to the radius of the atom
-        float minLineWidth = 0.02f;
-        float maxLineWidth = 0.15f;
+        float minLineWidth = 0.1f;
+        float maxLineWidth = 0.25f;
         float width = minLineWidth + (maxLineWidth - minLineWidth) * (1 + pri + (dur) * (qua));
 
         float r, g, b;
@@ -171,7 +196,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
             r = g = b = hp;
         }
 
-        a = 0.25f + 0.25f * pri;
+        a = 0.5f + 0.5f * pri;
 
 
 
@@ -179,7 +204,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         ee[n = (numEdges++)].set(target, width,
                 r, g, b, a
         );
-        return (n - 1 <= ee.length);
+        return (n - 1 <= ee.length) ? ee[n] : null;
     }
 
     @Override

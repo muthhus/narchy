@@ -11,6 +11,7 @@ import nars.util.experiment.DeductiveMeshTest;
 import nars.util.time.Between;
 import nars.util.time.IntervalTree;
 import org.infinispan.util.function.TriConsumer;
+import spacegraph.ForceDirected;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
@@ -60,7 +61,7 @@ public class TimeSpace extends NARSpace implements TriConsumer<NAR, SpaceGraph, 
                         //new FastOrganicLayout()
                 )
         );
-        SpaceGraph.ForceDirected forceDirect = new SpaceGraph.ForceDirected();
+        ForceDirected forceDirect = new ForceDirected();
         forceDirect.repelSpeed = 0.5f;
         s.dyn.addBroadConstraint(forceDirect);
 

@@ -117,9 +117,9 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
 
     @NotNull
     private Compound input(int stride, Term state) {
-        Compound c = $.inst(stride(stride), state);
+        Compound c = $.prop(stride(stride), state);
         if (c == null)  {
-            $.inst(stride(stride), state);
+            $.prop(stride(stride), state);
             throw new NullPointerException();
         }
         return c;

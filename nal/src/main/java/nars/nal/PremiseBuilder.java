@@ -218,7 +218,7 @@ public enum PremiseBuilder {
 
     static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief) {
         List<Termed> result = $.newArrayList(1);
-        new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH).matchAll(
+        new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH).unifyAll(
                 task.term(), belief.term()
         );
         if (!result.isEmpty()) {

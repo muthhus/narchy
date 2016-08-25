@@ -247,24 +247,40 @@ public interface Compound extends Term, IPair, TermContainer {
      * @param y     compound to match against (the instance executing this method is considered 'x')
      * @param subst the substitution context holding the match state
      * @return whether match was successful or not, possibly having modified subst regardless
-     * <p>
-     * implementations may assume that y's .op() already matches this, and that
-     * equality has already determined to be false.
      */
-    default boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
+    @Override default boolean unify(@NotNull Term ty, @NotNull FindSubst subst) {
 
-        TermContainer xsubs = subterms();
-        int xs = xsubs.size();
-        TermContainer ysubs = y.subterms();
-        if (xs == ysubs.size()) {
+        if (ty instanceof Compound) {
 
+            Compound y = (Compound)ty;
 
-            @NotNull Op op = op();
-            if (!op.isImage() || (dt() == y.dt())) {
-                return Compound.commutative(op, xs) ?
-                        subst.matchPermute(xsubs, ysubs) :
-                        subst.matchLinear(xsubs, ysubs);
+            Op op = op();
+
+            int xs;
+            if (op == y.op()) {
+
+                TermContainer xsubs = subterms();
+
+                if ((xs = xsubs.size()) == y.size()) {
+
+                    if (!op.isImage() || (dt() == y.dt())) {
+
+                        TermContainer ysubs = y.subterms();
+
+                        return
+                                xsubs.equals(ysubs)     //fast (hashcode-based) test for equality first, then do further matching
+
+                                        ||
+
+                                Compound.commutative(op, xs) ?
+                                subst.matchPermute(xsubs, ysubs) :
+                                subst.matchLinear(xsubs, ysubs);
+
+                    }
+
+                }
             }
+
         }
 
         return false;

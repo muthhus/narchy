@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable<Y> {
 
     //final AtomicBoolean busy = new AtomicBoolean(true);
-    protected SpaceGraph<X> space;
+    public SpaceGraph<X> space;
     private long now;
     private float dt;
 
@@ -53,6 +53,7 @@ abstract public class AbstractSpace<X, Y extends Spatial<X>> implements Iterable
 
     /** needs to call update(space) for each active item */
     public void update(SpaceGraph<X> s) {
+
 
         this.forEach(a -> a.update(s));
 

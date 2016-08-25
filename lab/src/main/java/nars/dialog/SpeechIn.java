@@ -28,27 +28,28 @@ public class SpeechIn {
 
 
 
+
         LiveSpeechRecognizer recognizer = new LiveSpeechRecognizer(configuration);
 
 
+        System.gc();
 
+        recognizer.startRecognition(true);
         while (true) {
-            recognizer.startRecognition(true);
             System.out.println("recognition start");
 
             SpeechResult result = recognizer.getResult();
             System.out.println(result.getHypothesis());
 
-            recognizer.stopRecognition();
 
             for (WordResult r : result.getWords()) {
                 System.out.println("\t" + r);
             }
 
             System.out.println("\t" + result.getNbest(2));
-            System.out.println("\t" + result.getResult().getActiveTokens());
+            //System.out.println("\t" + result.getResult().getActiveTokens());
             //System.out.println("\t" + result.getLattice());
-            System.out.println("\t" + result);
+            //System.out.println("\t" + result);
         }
 
     }

@@ -76,11 +76,11 @@ public class UnionFind2 {
             e[1] = 1;
         }
 
-        //fill any remaining entries with zeros
+        //empty any remaining entries
         for (int j = N; j < elements.length; j++) {
             int[] e = ee[j];
-            e[0] = 0;
-            e[1] = 0;
+            e[0] = -1;
+            e[1] = -1;
         }
     }
 
@@ -149,14 +149,19 @@ public class UnionFind2 {
             //return array[index];
             //return array[index];
             //return array[index];
-            e[x][0] = e[e[x][0]][0];
+            int i = e[x][0];
+            if (!valid(i, numElements))
+                return x;
+
+            e[x][0] = e[i][0];
             //#endif //
             //return array[index];
             x = e[x][0];
             //assert(x < m_N);
             //assert(x >= 0);
 
-            valid(x, numElements);
+            if (!valid(x, numElements))
+                return x;
         }
         return x;
     }
@@ -165,10 +170,17 @@ public class UnionFind2 {
         valid(x, numElements);
     }
 
-    static void valid(int x, int numElements) {
+    static boolean valid(int x, int numElements) {
 
-        if (x < 0 || (x >= numElements))
-            throw new RuntimeException("overflow");
+        return !(x < 0 || (x >= numElements));
+            ///throw new RuntimeException("overflow");
+    }
+
+    public final int getId(int i) {
+        return get(i)[0];
+    }
+    public final int getSz(int i) {
+        return get(i)[1];
     }
 
     ////////////////////////////////////////////////////////////////////////////

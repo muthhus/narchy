@@ -3,6 +3,7 @@ package nars.experiment.tetris;
 import com.google.common.collect.Lists;
 import nars.*;
 import nars.gui.BagChart;
+import nars.gui.NARSpace;
 import nars.nar.Executioner;
 import nars.nar.MultiThreadExecutioner;
 import nars.nar.SingleThreadExecutioner;
@@ -54,11 +55,11 @@ public class Tetris2 extends NAREnvironment {
     public static final int DEFAULT_INDEX_WEIGHT = 12 * 10000000;
 
     public static final Executioner exe =
-            new MultiThreadExecutioner(3, 16384);
-            //new SingleThreadExecutioner();
+            //new MultiThreadExecutioner(3, 16384);
+            new SingleThreadExecutioner();
 
-    public static final int runFrames = 500;
-    public static final int cyclesPerFrame = 8;
+    public static final int runFrames = 4500;
+    public static final int cyclesPerFrame = 4;
     public static final int tetris_width = 6;
     public static final int tetris_height = 13;
     public static final int TIME_PER_FALL = 3;
@@ -503,7 +504,7 @@ public class Tetris2 extends NAREnvironment {
 //                        sensors.get(5)
 //                ), 200);
 
-                //NARSpace.newConceptWindow((Default) nar, 128, 8);
+                //NARSpace.newConceptWindow((Default) nar, 32, 8);
             }
 
 

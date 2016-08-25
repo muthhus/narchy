@@ -38,13 +38,13 @@ public class UnifySubst extends FindSubst  {
     }
 
     @Override
-    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public void unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
         this.a = x;
         this.matches = 0;
 
         if (x.hasAny(type) || y.hasAny(type)) { //no need to unify if there is actually no variable
             clear();
-            super.matchAll(x, y, finish);
+            super.unify(x, y, start, finish);
         }
 
     }

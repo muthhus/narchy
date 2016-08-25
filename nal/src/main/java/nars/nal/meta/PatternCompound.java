@@ -15,7 +15,6 @@ import nars.term.subst.choice.Choose1;
 import nars.term.subst.choice.Choose2;
 import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -46,18 +45,18 @@ abstract public class PatternCompound extends GenericCompound {
 
     }
 
-//    @Override
-//    public boolean equals(@Nullable Object that) {
-//        if (super.equals(that)) {
-//            if (!toString().equals(that.toString()))
-//                System.err.println("warning: " + this + " and " + that + " are not but considered equal");
-//            return true;
-//        } else {
-//            if (toString().equals(that.toString()))
-//                System.err.println("warning: " + this + " and " + that + " are but considered not equal");
-//            return false;
-//        }
-//    }
+
+    @NotNull
+    @Override
+    public Term[] terms() {
+        return termsCached;
+    }
+
+    @Override
+    public final int structure() {
+        return structureCached;
+    }
+
 
     abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {
 
@@ -76,13 +75,20 @@ abstract public class PatternCompound extends GenericCompound {
         abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst);
 
         protected boolean canMatch(@NotNull Compound y) {
-            int yStructure = y.structure();
-            return ((yStructure | structureCached) == yStructure);
+            if (op() == y.op()) {
+                int yStructure = y.structure();
+                return ((yStructure | structureCached) == yStructure);
+            }
+            return false;
         }
 
         @Override
-        public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
-            return canMatch(y) && matchEllipsis(y, subst);
+        public boolean unify(@NotNull Term ty, @NotNull FindSubst subst) {
+            if (ty instanceof Compound) {
+                Compound y = (Compound)ty;
+                return canMatch(y) && matchEllipsis(y, subst);
+            }
+            return false;
         }
 
 
@@ -97,7 +103,7 @@ abstract public class PatternCompound extends GenericCompound {
 
         @Override
         protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
-            return matchEllipsedLinear(subst, y);
+            return matchEllipsedLinear(y, subst);
         }
 
         /**
@@ -109,7 +115,7 @@ abstract public class PatternCompound extends GenericCompound {
          * WARNING this implementation only works if there is one ellipse in the subterms
          * this is not tested for either
          */
-        protected final boolean matchEllipsedLinear(@NotNull FindSubst subst, @NotNull Compound Y) {
+        protected final boolean matchEllipsedLinear(@NotNull Compound Y, @NotNull FindSubst subst) {
 
             int i = 0, j = 0;
             int xsize = sizeCached;
@@ -164,7 +170,7 @@ abstract public class PatternCompound extends GenericCompound {
 
                     }
                 } else {
-                    if (ysize <= j || !subst.match(x, Y.term(j++)))
+                    if (ysize <= j || !subst.unify(x, Y.term(j++)))
                         return false;
                 }
             }
@@ -251,7 +257,7 @@ abstract public class PatternCompound extends GenericCompound {
                     //being processed. (this is the opposite
                     //of the other condition of this if { })
 
-                    return matchEllipsedLinear(subst, y) &&
+                    return matchEllipsedLinear(y, subst) &&
                             subst.replaceXY(et,
                                     ImageMatch.put(subst.term(et), n, y));
 
@@ -268,7 +274,7 @@ abstract public class PatternCompound extends GenericCompound {
                 if (n != null /*&& n.op() != subst.type*/) {
                     int imageIndex = y.indexOf(n);
                     if (imageIndex != -1)
-                        return matchEllipsedLinear(subst, y) &&
+                        return matchEllipsedLinear(y, subst) &&
                                 subst.replaceXY(et,
                                         ImageMatch.take(subst.term(et), imageIndex));
                 }
@@ -417,47 +423,27 @@ abstract public class PatternCompound extends GenericCompound {
             this.subStructureCached = subterms().structure();
         }
 
-        @Override
-        public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
-
-            //since the compound op will already have been determined equal prior to calling this method,
-            // compare the subterms structure (without the compound superterm's bit contribution)
-            // because this will be more specific in cases where the bits are already set
-
-            TermContainer ysubs = y.subterms();
-
-            return ysubs.hasAll(sizeCached, subStructureCached, volCached) &&
-                    (
-                        commutative ?
-                            (subst.matchPermute(subterms, ysubs))
-                            :
-                            ((!imgCached || (dt == y.dt())) && subst.matchLinear(subterms, ysubs))
-                    );
-        }
+//        @Override
+//        public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+//
+//            //since the compound op will already have been determined equal prior to calling this method,
+//            // compare the subterms structure (without the compound superterm's bit contribution)
+//            // because this will be more specific in cases where the bits are already set
+//
+//            TermContainer ysubs = y.subterms();
+//
+//            return ysubs.hasAll(sizeCached, subStructureCached, volCached) &&
+//                    (
+//                        commutative ?
+//                            (subst.matchPermute(subterms, ysubs))
+//                            :
+//                            ((!imgCached || (dt == y.dt())) && subst.matchLinear(subterms, ysubs))
+//                    );
+//        }
 
 
     }
 
-
-//    PatternCompound(@NotNull Compound seed) {
-//        this(seed, (TermVector) seed.subterms());
-//    }
-
-
-    @NotNull
-    @Override
-    public Term[] terms() {
-        return termsCached;
-    }
-
-    @Override
-    public final int structure() {
-        return structureCached;
-    }
-
-    @Override
-    abstract public boolean match(@NotNull Compound y, @NotNull FindSubst subst);
-    //abstract protected boolean canMatch(@NotNull Compound y);
 
 
 }

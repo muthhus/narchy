@@ -148,6 +148,14 @@ public class UnionFind {
 		return x;
 	}
 
+	public final int getSz(int i) {
+		return get(i).sz;
+	}
+
+	public int getId(int i) {
+		return get(i).id;
+	}
+
 	////////////////////////////////////////////////////////////////////////////
 
 	public static class Element {

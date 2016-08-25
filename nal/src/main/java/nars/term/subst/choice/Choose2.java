@@ -90,11 +90,11 @@ public class Choose2 extends Termutator {
 
             Term y1 = yy.term(c0);
 
-            if (f.match(x[0], y1)) {
+            if (f.unify(x[0], y1)) {
 
                 Term y2 = yy.term(c1);
 
-                if (f.match(x[1], y2) &&
+                if (f.unify(x[1], y2) &&
                         f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)))) {
 
                     next(f, chain, current);

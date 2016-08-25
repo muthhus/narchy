@@ -84,7 +84,7 @@ public class NLPGen {
                             }
                         };
 
-                        u.matchAll(pattern, tt);
+                        u.unifyAll(pattern, tt);
 
                         if (result[0]!=null)
                             return result[0];

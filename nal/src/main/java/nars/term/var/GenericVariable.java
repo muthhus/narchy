@@ -40,6 +40,7 @@ public class GenericVariable extends AtomicString implements Variable {
     }
 
 
+
     @Override
     public final int complexity() {
         return 0;

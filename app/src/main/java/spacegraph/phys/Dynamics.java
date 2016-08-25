@@ -232,7 +232,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
     protected final void updateObjects() {
-        nextBodyID = 0;
+        //nextBodyID = 0;
         collidable.clear(); //populate in 'saveKinematicState'
         forEachIntSpatial((i, s) -> {
 
@@ -518,7 +518,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
 
-    protected void internalSingleStepSimulation(float timeStep) {
+    protected synchronized void internalSingleStepSimulation(float timeStep) {
         BulletStats.pushProfile("internalSingleStepSimulation");
         try {
             if (preTickCallback != null) {

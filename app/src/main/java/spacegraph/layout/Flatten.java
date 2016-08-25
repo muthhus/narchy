@@ -27,7 +27,7 @@ public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
 
         if (ss instanceof SimpleSpatial) {
             SimpleSpatial s = (SimpleSpatial) ss;
-            s.move(s.x(), s.y(), 0, 0.9f);
+            s.move(s.x(), s.y(), 0, 0.75f);
             s.rotate(up, 0.9f, tmp);
         }
     }

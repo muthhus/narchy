@@ -124,7 +124,7 @@
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
-      <version>1.4.19</version>
+      <version>1.4.20</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

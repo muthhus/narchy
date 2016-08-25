@@ -124,7 +124,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
         //HACK
         matches = 0;
 
-        p.matchAll(a, b);
+        p.unifyAll(a, b);
         p.clear();
 
 

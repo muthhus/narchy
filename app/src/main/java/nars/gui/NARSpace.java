@@ -6,16 +6,18 @@ import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.op.ArithmeticInduction;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
-import nars.util.experiment.DeductiveChainTest;
 import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
+import spacegraph.layout.Flatten;
 import spacegraph.phys.Dynamic;
+import spacegraph.phys.shape.SphereShape;
 
 import java.util.List;
 
@@ -34,21 +36,23 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(256, 3, 3, 3);
-
+        Default n = new Default(256, 2, 3, 4 );
         //n.nal(4);
 
 
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 256, 32);
+        newConceptWindow(n, 256, 0);
 
         //n.run(20); //headstart
 
-        n.loop(25f);
+        n.loop(55f);
 
-        new DeductiveMeshTest(n, new int[]{3, 3}, 16384);
+        //n.log();
+        //n.input("(a<->b).", "(b<->c).");
+
+        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
     }
@@ -60,35 +64,64 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
             //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
 
+
             x.topWhile(b -> {
 
-                final float initDistanceEpsilon = 10f;
-                final float initImpulseEpsilon = 25f;
+                //Concept Core
+                Concept concept = b.get();
 
-                ConceptWidget w = space.update(b.get().term(),
-                        t -> new ConceptWidget(t, maxEdges, nar) {
-                            @Override
-                            public Dynamic newBody(boolean collidesWithOthersLikeThis) {
-                                Dynamic x = super.newBody(collidesWithOthersLikeThis);
+                ConceptWidget core = space.update(concept.term(),
+                        t -> new ConceptWidget(t, maxEdges, nar));
 
-                                //place in a random direction
-                                x.transform().set(SpaceGraph.r(initDistanceEpsilon),
-                                        SpaceGraph.r(initDistanceEpsilon),
-                                        SpaceGraph.r(initDistanceEpsilon));
-
-                                //impulse in a random direction
-                                x.impulse(v(SpaceGraph.r(initImpulseEpsilon),
-                                        SpaceGraph.r(initImpulseEpsilon),
-                                        SpaceGraph.r(initImpulseEpsilon)));
-
-                                return x;
-                            }
-                        });
-
-                w.pri = b.priIfFiniteElseZero();
+                core.pri = b.priIfFiniteElseZero();
+                target.add(core);
 
 
-                target.add(w);
+                concept.termlinks().forEach(bt -> {
+
+                    Term tlSrc = concept.term();
+                    final Term tlTarget = bt.get();
+                    if (tlTarget.equals(tlSrc))
+                        return; //no self loop
+
+                    SimpleSpatial targetSpatial = (SimpleSpatial) space.getIfActive(tlTarget);
+                    if (targetSpatial==null)
+                        return;
+
+                    @NotNull Compound vTerm = $.p($.the("termlink"), $.p(tlSrc, tlTarget));
+
+                    ConceptWidget termLink = space.update(vTerm,
+                            t -> new ConceptWidget(t, 2, nar) {
+
+                                @Override
+                                public Dynamic newBody(boolean collidesWithOthersLikeThis) {
+                                    shape = new SphereShape(.5f);
+                                    Dynamic bb = super.newBody(collidesWithOthersLikeThis);
+                                    return bb;
+                                }
+
+                                @Override
+                                public void update(SpaceGraph<Term> s) {
+                                    super.update(s);
+
+                                    clearEdges();
+
+
+                                        EDraw in = addEdge(bt, core, false);
+                                        in.attraction = 2f;
+
+                                        EDraw out = addEdge(bt, targetSpatial, false);
+                                        //out.attraction = 1f;
+
+
+                                    //nothing
+                                }
+                            });
+
+                    termLink.pri = bt.priIfFiniteElseZero();
+
+                    target.add(termLink);
+                });
 
                 return true;
 
@@ -97,25 +130,28 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         }, maxNodes);
 
 
-        SpaceGraph s = new SpaceGraph<Term>(
+        SpaceGraph s = new SpaceGraph<>(
+
                 n.with(
-                        new SpaceTransform<Term>() {
-                            @Override
-                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
-                                float cDepth = -9f;
-                                src.forEach(s -> {
-                                    ((SimpleSpatial)s).moveZ(
-                                            s.key.volume() * cDepth, 0.05f );
-                                });
-                            }
-                        }
+//                        new SpaceTransform<Term>() {
+//                            @Override
+//                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
+//                                float cDepth = -9f;
+//                                src.forEach(s -> {
+//                                    ((SimpleSpatial)s).moveZ(
+//                                            s.key.volume() * cDepth, 0.05f );
+//                                });
+//                            }
+//                        }
                         //new Flatten()
-                        //new Spiral()
-                        //new FastOrganicLayout()
+//                        //new Spiral()
+//                        //new FastOrganicLayout()
                 )
         );
 
-        s.dyn.addBroadConstraint(new SpaceGraph.ForceDirected());
+        s.dyn.addBroadConstraint(new ForceDirected());
+
+
 
         return s.show(1300, 900);
     }
@@ -165,7 +201,10 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
     }
 
 
+
     protected void update(AbstractSpace _notused) {
+
+        this.space = _notused.space;
 
         List<Y> prev = active;
 
