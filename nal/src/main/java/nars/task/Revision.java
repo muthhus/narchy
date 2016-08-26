@@ -5,6 +5,7 @@ import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.concept.Concept;
+import nars.concept.table.DefaultBeliefTable;
 import nars.nal.Stamp;
 import nars.nal.UtilityFunctions;
 import nars.term.Compound;
@@ -61,108 +62,121 @@ public class Revision {
     }
 
 
-    public static Task merge(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, Concept concept) {
+//    public static Task merge(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, Concept concept) {
+//
+//        if (a.isBeliefOrGoal() && b.isBeliefOrGoal() && Term.equalAtemporally(a.term(), b.term())) {
+//            return mergeInterpolate(a, b, when, now, newTruth, concept);
+//
+//
+//        } else {
+//            return mergeSolution(a, b, when, now, newTruth);
+//
+//        }
+//    }
 
-        if (a.isBeliefOrGoal() && b.isBeliefOrGoal() && Term.equalAtemporally(a.term(), b.term())) {
-            float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question
-            float bw = b.confWeight();
+    public static Task mergeSolution(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth) {
+        //just project 'b' to 'a' time
 
-            float aMix = aw / (aw + bw);
+        //    @Nullable
+        //    default Task answerProjected(@NotNull Task question, @NotNull Memory memory) {
+        //
+        //        float termRelevance = Terms.termRelevance(term(), question.term());
+        //        if (termRelevance == 0)
+        //            return null;
+        //
+        //        long now = memory.time();
+        //
+        //        //TODO avoid creating new Truth instances
+        //        Truth solTruth = projectTruth(question.occurrence(), now, true);
+        //        if (solTruth == null)
+        //            return null;
+        //
+        //        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
+        //        long solutionOcc = solTruth instanceof ProjectedTruth ?
+        //                ((ProjectedTruth)solTruth).when : occurrence();
+        //
+        //        if (solTruth.conf() < conf()) return this;
+        //
+        //        solTruth = solTruth.confMult(termRelevance);
+        //                //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
+        //                //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
+        //
+        //        if (solTruth.conf() < conf())
+        //            return this;
+        //
+        //        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
+        //        if (solutionBudget == null)
+        //            return null;
+        //
+        //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
 
-            FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term(), aMix);
-            float adjustedDifference = c.getOne();
+        @NotNull Budget bb = b.budget();
 
-            float confScale;
-            if (adjustedDifference > 0) {
-                //normalize relative to the total difference involved
-                long aocc = a.occurrence();
-                if (aocc == ETERNAL) aocc = when;
-                long bocc = b.occurrence();
-                if (bocc == ETERNAL) bocc = when;
-                confScale = (1f - (adjustedDifference /
-                        (1 + Math.abs(aocc - when) + Math.abs(bocc - when))));
-            } else {
-                confScale = 1f;
-            }
+        if (bb.isDeleted()) return null;
 
-            float newConf = newTruth.conf() * confScale;
-            if (newConf < Param.TRUTH_EPSILON) {
-                //too weak
-                return null;
-            }
-
-            RevisionTask t = new RevisionTask(c.getTwo(),
-                    a, b, now, when, aMix,
-                    newTruth.withConf(newConf),
-                    concept
-            );
-
-            t.budget(a, b, aMix);
-
-            if (Param.REVECTION_PRIORITY_ZERO)
-                t.setPriority(0);
-
-
-            t.log("Revection Merge");
-            return t;
-
-
-        } else {
-            //just project 'b' to 'a' time
-
-            //    @Nullable
-            //    default Task answerProjected(@NotNull Task question, @NotNull Memory memory) {
-            //
-            //        float termRelevance = Terms.termRelevance(term(), question.term());
-            //        if (termRelevance == 0)
-            //            return null;
-            //
-            //        long now = memory.time();
-            //
-            //        //TODO avoid creating new Truth instances
-            //        Truth solTruth = projectTruth(question.occurrence(), now, true);
-            //        if (solTruth == null)
-            //            return null;
-            //
-            //        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
-            //        long solutionOcc = solTruth instanceof ProjectedTruth ?
-            //                ((ProjectedTruth)solTruth).when : occurrence();
-            //
-            //        if (solTruth.conf() < conf()) return this;
-            //
-            //        solTruth = solTruth.confMult(termRelevance);
-            //                //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
-            //                //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
-            //
-            //        if (solTruth.conf() < conf())
-            //            return this;
-            //
-            //        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
-            //        if (solutionBudget == null)
-            //            return null;
-            //
-            //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
-
-            @NotNull Budget bb = b.budget();
-
-            if (bb.isDeleted()) return null;
-
-            Task solution = new AnswerTask(b.term() /* question term in case it has different temporality */,
-                    b, a, newTruth, now, when, 0.5f)
-                    .budget(bb)
-                    //.state(state())
-                    //.setEvidence(evidence())
-                    .log("Projected Answer")
-                    //.log("Projected from " + this)
-                    ;
+        Task solution = new AnswerTask(b.term() /* question term in case it has different temporality */,
+                b, a, newTruth, now, when, 0.5f)
+                .budget(bb)
+                //.state(state())
+                //.setEvidence(evidence())
+                .log("Projected Answer")
+                //.log("Projected from " + this)
+                ;
 
 
-            ////TODO avoid adding repeat & equal Solution instances
-            //solution.log(new Solution(question));
+        ////TODO avoid adding repeat & equal Solution instances
+        //solution.log(new Solution(question));
 
-            return solution;
+        return solution;
+    }
 
-        }
+    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, Concept concept) {
+        assert(a.punc() == b.punc());
+
+        float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question
+        float bw = b.confWeight();
+
+        float aMix = aw / (aw + bw);
+
+        FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term(), aMix);
+//        float adjustedDifference = c.getOne();
+
+//        float confScale;
+//        if (adjustedDifference > 0) {
+//            //normalize relative to the total difference involved
+//            long aocc = a.occurrence();
+//            if (aocc == ETERNAL) aocc = when;
+//            long bocc = b.occurrence();
+//            if (bocc == ETERNAL) bocc = when;
+//            confScale = (1f - (adjustedDifference /
+//                    (1 + Math.abs(aocc - when) + Math.abs(bocc - when))));
+//        } else {
+//            confScale = 1f;
+//        }
+
+//        float newConf = newTruth.conf() * confScale;
+//        if (newConf < Param.TRUTH_EPSILON) {
+//            //too weak
+//            return null;
+//        }
+
+        //get a stamp collecting all evidence from the table, since it all contributes to the result
+        //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
+        long[] evidence = Stamp.zip(  ((DefaultBeliefTable)concept.tableFor(a.punc())).temporal );
+
+        RevisionTask t = new RevisionTask(c.getTwo(), a.punc(),
+                newTruth,
+                now, when,
+                evidence
+        );
+
+        t.budget(a, b, aMix);
+
+        if (Param.REVECTION_PRIORITY_ZERO)
+            t.setPriority(0);
+
+        t.log("Revection Merge");
+        return t;
     }
 
 

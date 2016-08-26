@@ -299,7 +299,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             t = t.confMult(confScale);
 
             if (t != null)
-                return Revision.merge(a, b, mid, now, t, concept);
+                return Revision.mergeInterpolate(a, b, mid, now, t, concept);
         }
 
         return null;

@@ -1,5 +1,6 @@
 package nars.op.time;
 
+import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -14,6 +15,7 @@ import nars.truth.TruthFunctions;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
+import org.eclipse.collections.impl.factory.Iterables;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -127,7 +129,7 @@ public class MySTMClustered extends STMClustered {
 					if (conf < confMin)
 						return;
 
-					long[] evidence = Stamp.zip(Stream.of(uu), uu.length, Param.STAMP_CAPACITY);
+					long[] evidence = Stamp.zip(Lists.newArrayList(uu), uu.length, Param.STAMP_CAPACITY);
 
 					@Nullable Term conj = group(negated, uu);
 

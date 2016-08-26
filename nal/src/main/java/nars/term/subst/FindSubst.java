@@ -12,6 +12,7 @@ import nars.term.container.TermContainer;
 import nars.term.subst.choice.CommutivePermutations;
 import nars.term.subst.choice.Termunator;
 import nars.term.subst.choice.Termutator;
+import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
 import nars.util.data.list.FasterList;
@@ -212,9 +213,11 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
 
     public final boolean unify(@NotNull Term x, @NotNull Term y) {
 
-        return x.equals(y) || x.unify(y, this)
-                    ||
-               ((y.op() == type) && matchVarY(x, y));
+        return  x.equals(y)
+                ||
+                x.unify(y, this)
+                ||
+                (y instanceof AbstractVariable && (y.op() == type) && matchVarY(x, y));
     }
 
 //        if (x.equals(y)) {

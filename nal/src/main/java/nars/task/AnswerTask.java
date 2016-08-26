@@ -20,16 +20,17 @@ public class AnswerTask extends MutableTask {
     @Nullable
     protected Task aBelief, bBelief;
 
+    public AnswerTask(@NotNull Termed<Compound> term, char punc, Truth conclusion, long creationTime, long occTime, long[] evidence) {
+        super(term, punc, conclusion);
+        evidence(evidence);
+        time(creationTime, occTime);
+    }
+
     public AnswerTask(@NotNull Termed<Compound> term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long occTime, float aMix) {
-        super(term, aBelief.punc(), conclusion);
+        this(term, aBelief.punc(), conclusion, creationTime, occTime, Stamp.zip(aBelief.evidence(), bBelief.evidence(), aMix) );
 
         this.aBelief = aBelief;
         this.bBelief = bBelief;
-
-        //evidence(Stamp.zip(aBelief.evidence(), bBelief.evidence()));
-        evidence( Stamp.zip(aBelief.evidence(), bBelief.evidence(), aMix) );
-
-        time(creationTime, occTime);
     }
 
     /** rather than store weakrefs to these tasks, just use normal refs but be sure to nullify them before returning from onConcept */

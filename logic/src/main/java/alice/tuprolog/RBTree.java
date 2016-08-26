@@ -41,13 +41,13 @@ enum Color { RED, BLACK }
  * @param <K>   It's the type of the key used to recall values
  * @param <V>   It's the type of the values stored in the tree
  */
-class Node<K extends Comparable<? super K>,V>
+final class Node<K extends Comparable<? super K>,V>
 {
     public K key;
    public V value;
    public Node<K,V> left;
    public Node<K,V> right;
-    public Node<K,V> parent;
+    public  Node<K,V> parent;
     public Color color;
 
     public Node(K key, V value, Color nodeColor, Node<K,V> left, Node<K,V> right) {
@@ -302,7 +302,7 @@ public class RBTree<K extends Comparable<? super K>,V>
         }
     }
 
-    public void delete(K key, ClauseInfo c) {
+    public void remove(K key, ClauseInfo c) {
     	
         Node<K,V> n = lookupNode(key);
         if (n == null)

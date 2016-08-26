@@ -372,16 +372,16 @@
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //, not_equal(A, (M --> S))
-    (A ==> (M --> P)), (M --> S), neq(S,P), neq(A, (M --> S)), time(dtTaskExact) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction)
+    (A ==> (M --> P)), (M --> S), neq(S,P), neq(A, (M --> S)), time(dtTaskExact) |- ((&&,A,($X --> S)) ==>+- ($X --> P)), (Belief:Induction)
     (A ==> (M --> P)), (M --> S), neq(S,P), neq(A, (M --> S)), time(dtTaskExact) |- (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
 
-    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction)
+    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (($Y --> S) ==>+- (&&,($Y --> P), A..+)), (Belief:Induction)
     (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
 
-    (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction)
+    (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==>+- (S --> $X)), (Belief:Abduction)
     (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
 
-    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction)
+    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- ((S --> $Y) ==>+- (&&,(P --> $Y), A..+)), (Belief:Abduction)
     (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
 
 
@@ -391,7 +391,7 @@
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
-    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
+    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U), (Belief:Deduction)
 
 
 
@@ -401,8 +401,8 @@
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)), time(dtBeliefExact) |- substitute((&&, (#X --> L), A), $Y,B), (Belief:Deduction)
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> (&&,A..+))), time(dtBeliefExact) |- substitute((&&,(#X --> L),A..+),$Y,B), (Belief:Deduction)
 
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), time(dtBeliefExact) |- substitute((($X --> L) ==> (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A)), time(dtBeliefExact) |- substitute((($X --> L) ==> A),#Y,B), (Belief:AnonymousAnalogy)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), time(dtBeliefExact) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A)), time(dtBeliefExact) |- substitute((($X --> L) ==>+- A),#Y,B), (Belief:AnonymousAnalogy)
 
 
 
@@ -416,8 +416,8 @@
 
 //second level variable introduction
 
-    (Y --> L), ((Y --> S) ==> R), neq(L,S), time(dtBeliefExact) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction)
-    (Y --> L), ((&&,(Y --> S),A..+) ==> R), neq(L,S), time(dtBeliefExact) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
+    (Y --> L), ((Y --> S) ==> R), neq(L,S), time(dtBeliefExact) |- substitute(((&&,(#X --> L),(#X --> S)) ==>+- R),Y,#X), (Belief:Induction)
+    (Y --> L), ((&&,(Y --> S),A..+) ==> R), neq(L,S), time(dtBeliefExact) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==>+- R),Y,#X), (Belief:Intersection)
 
 
 

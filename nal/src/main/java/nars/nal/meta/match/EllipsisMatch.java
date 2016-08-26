@@ -97,12 +97,13 @@ public final class EllipsisMatch extends TermVector implements Term {
 
     @Override
     public boolean isCommutative() {
-        return false;
+        throw new UnsupportedOperationException();
+        //return false;
     }
 
     @Override
     public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
-        throw new UnsupportedOperationException("?");
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -112,12 +113,13 @@ public final class EllipsisMatch extends TermVector implements Term {
 
 
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
+        int n = 0;
         for (Term e : term) {
-            if (!y.containsTerm(e)) return false;
-            if (!target.add(e))
+            if (!y.containsTerm(e) || !target.add(e))
                 return false;
+            n++;
         }
-        return (target.size() >= min);
+        return (n >= min);
     }
 
 

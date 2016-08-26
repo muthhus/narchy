@@ -160,7 +160,7 @@ public enum PremiseBuilder {
 
         //project the belief to the question's time
         if (taskOcc != ETERNAL) {
-            solution = beliefConcept.merge(taskLink, solution, taskOcc, beliefConcept, nar);
+            solution = beliefConcept.merge(taskLink, solution, taskOcc, nar);
         }
 
         if (solution != null) { //may have become null as a result of projection

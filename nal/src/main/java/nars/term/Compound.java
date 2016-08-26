@@ -250,6 +250,7 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     @Override default boolean unify(@NotNull Term ty, @NotNull FindSubst subst) {
 
+
         if (ty instanceof Compound) {
 
             Compound y = (Compound)ty;

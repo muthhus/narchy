@@ -22,6 +22,7 @@ package nars.nal;
 
 import nars.Param;
 import nars.Task;
+import nars.concept.table.TemporalBeliefTable;
 import nars.truth.TruthFunctions;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
@@ -277,7 +278,11 @@ public interface Stamp {
         return evidenceLength(a.evidence().length, b.evidence().length);
     }
 
-    static long[] zip(@NotNull Stream<Task> s, int num, int maxLen) {
+    static long[] zip(@NotNull TemporalBeliefTable s) {
+        return zip(s, s.size(), Param.STAMP_CAPACITY);
+    }
+
+    static long[] zip(@NotNull Iterable<Task> s, @Deprecated int num, int maxLen) {
         final int extra = 1;
         int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
         LongHashSet l = new LongHashSet(maxLen);
@@ -285,7 +290,10 @@ public interface Stamp {
             long[] e = t.evidence();
             int el = e.length;
             for (int i = Math.max(0, el - maxPer); i < el; i++) {
-                l.add(e[i]);
+                long ee = e[i];
+                if (ee !=Long.MAX_VALUE) {
+                    l.add(ee);
+                }
             }
         } );
         int ls = l.size();

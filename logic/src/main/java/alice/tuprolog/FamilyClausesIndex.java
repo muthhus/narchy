@@ -31,13 +31,7 @@ class FamilyClausesIndex<K extends Comparable<? super K>>
         return new Node<>(key, list, Color.RED, null, null);
     }
 
-    /**
-     * @deprecated 
-     */
-    @Override
-    public void insert(K key, LinkedList<ClauseInfo> value){
-        super.insert(key, value);
-    }
+
 
     /*
      * Voglio memorizzare un riferimento alla clausola, rispettando l'ordine
@@ -127,36 +121,26 @@ class FamilyClausesIndex<K extends Comparable<? super K>>
         verifyProperties();
     }
 
-    /**
-     * Removes all clauses related to the given key
-     *
-     * @param key   The key
-     */
-    public void remove(K key,ClauseInfo clause ){
-        super.delete(key,clause);
-    }
 
     public void removeShared(ClauseInfo clause){
         if(varsClauses.remove(clause)){
             if(root != null){
-                if(root != null){
-            LinkedList<Node<K, LinkedList<ClauseInfo>>> buf = new LinkedList<>();
-            buf.add(root);
+                LinkedList<Node<K, LinkedList<ClauseInfo>>> buf = new LinkedList<>();
+                buf.add(root);
 
-            while(buf.size() > 0){
-                Node<K, LinkedList<ClauseInfo>> n = buf.remove();
-                
-                n.value.remove(clause);
+                while(!buf.isEmpty()){
+                    Node<K, LinkedList<ClauseInfo>> n = buf.remove();
 
-                if(n.left != null){
-                    buf.addLast(n.left);
+                    n.value.remove(clause);
+
+                    if(n.left != null){
+                        buf.addLast(n.left);
+                    }
+
+                    if(n.right != null){
+                        buf.addLast(n.right);
+                    }
                 }
-
-                if(n.right != null){
-                    buf.addLast(n.right);
-                }
-            }
-        }
             }
         } else {
             throw new IllegalArgumentException("Invalid clause: not registered in this index");
@@ -172,13 +156,10 @@ class FamilyClausesIndex<K extends Comparable<? super K>>
     public LinkedList<ClauseInfo> get(K key){
         LinkedList<ClauseInfo> res = null;
         if(root != null){
-            res = super.lookup(key);
-        } 
-
-        if(res == null){
-            return varsClauses;
+            res = lookup(key);
         }
 
-        return res;
+        return res != null ? res : varsClauses;
+
     }
 }
