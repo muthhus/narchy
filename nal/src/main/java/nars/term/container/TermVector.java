@@ -1,6 +1,7 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
+import com.sun.deploy.util.ArrayUtil;
 import nars.Op;
 import nars.Param;
 import nars.term.Compound;
@@ -126,6 +127,10 @@ public class TermVector implements TermContainer {
     @NotNull
     @Override public final Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
         return Terms.filter(term, filter);
+    }
+
+    public TermVector append(Term x) {
+        return new TermVector(ArrayUtils.add(term,x));
     }
 
     @Override

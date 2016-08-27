@@ -36,7 +36,10 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 10;
+    public static final int STAMP_CAPACITY = 12;
+
+    /** factor applied to budgeting backward question derivations */
+    public static final float BACKWARD_DERIVATION_FACTOR = 0.1f;
 
     /** used in linear interpolating link adjustments during feedback */
     public static float LINK_FEEDBACK_RATE = 0.5f;

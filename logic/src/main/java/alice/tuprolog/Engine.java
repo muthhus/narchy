@@ -68,17 +68,20 @@ public class Engine /*Castagna 06/2011*/implements IEngine/**/{
 	 * Core of engine. Finite State Machine
 	 */
 	StateEnd run() {
-		String action;
+
+
 
 		do {
 			if (mustStop) {
 				nextState = manager.END_FALSE;
 				break;
 			}
-			action = nextState.toString();
 
 			nextState.doJob(this);
-			manager.spy(action, this);
+
+			if (manager.isSpy()) {
+				manager.spy(nextState.toString(), this);
+			}
 			
 
 		} while (!(nextState instanceof StateEnd));

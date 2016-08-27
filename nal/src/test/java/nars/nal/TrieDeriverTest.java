@@ -124,7 +124,7 @@ public class TrieDeriverTest {
 
     @Test public void testEllipsisRule() {
         TrieDeriver d = testRule(
-            "(&&, A..+, X), B |- substituteIfUnifies((&&,A..+),\"#\",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame, SequenceIntervals:FromTask)\n"
+            "(&&, A..+, X), B |- substituteIfUnifies((&&,A..+),\"#\",X,B), (Belief:AnonymousAnalogy, Goal:Strong, Order:ForAllSame, SequenceIntervals:FromTask)\n"
         );
         //test that A..+ survives as an ellipsis
         assertTrue(d.trie.getSummary().contains("..+"));

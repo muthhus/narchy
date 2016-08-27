@@ -644,7 +644,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     @NotNull
-    default TermContainer filter(Predicate<Term> p) {
+    default TermVector filter(Predicate<Term> p) {
         if (!(this instanceof TermVector))
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");
 

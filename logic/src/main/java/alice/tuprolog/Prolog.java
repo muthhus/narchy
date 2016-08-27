@@ -445,7 +445,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 		return sinfo;
 	}
 
-	public void solve(Term g, Consumer<Solution> eachSolution) {
+	public void solve(Term g, Consumer<Solution> eachSolution, long timeoutMS) {
 		//System.out.println("ENGINE SOLVE #0: "+g);
 
 
@@ -454,7 +454,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 		eachSolution.accept(sinfo);
 		while (hasOpenAlternatives()) {
 			try {
-				Solution next = engineManager.solveNext();
+				Solution next = engineManager.solveNext( /* TODO subdivide input time */);
 				eachSolution.accept(next);
 			} catch (NoMoreSolutionException e) {
 				throw new RuntimeException(e);

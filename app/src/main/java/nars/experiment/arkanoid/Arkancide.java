@@ -52,7 +52,7 @@ public class Arkancide extends NAREnvironment {
     final int visH = 10;
     SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 32;
+    private int visionSyncPeriod = 8;
     float noiseLevel = 0;
 
     float paddleSpeed = 45f;
@@ -219,8 +219,8 @@ public class Arkancide extends NAREnvironment {
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-        nar.beliefConfidence(0.7f);
-        nar.goalConfidence(0.7f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;

@@ -51,7 +51,7 @@ public class PremiseRuleTest {
         assertEquals(1, p.term("<%A --> %B>").complexity());
 
         {
-            PremiseRule x = (PremiseRule) p.term("<A, A |- A, (Belief:Revision, Desire:Weak)>");
+            PremiseRule x = (PremiseRule) p.term("<A, A |- A, (Belief:Revision, Goal:Weak)>");
             assertNotNull(x);
             //assertEquals("((A,A),(A,((Revision-->Belief),(Weak-->Desire))))", x.toString());
             // assertEquals(12, x.getVolume());
@@ -60,14 +60,14 @@ public class PremiseRuleTest {
 
         int vv = 19;
         {
-            PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Desire:Weak)>");
+            PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Goal:Weak)>");
             x = rule(x);
             assertEquals(vv, x.volume());
             //assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Revision-->Belief),(Weak-->Desire))))", x.toString());
 
         }
         {
-            PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Desire:Weak)>");
+            PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Goal:Weak)>");
             x = rule(x);
             assertEquals(vv, x.volume()); //same volume as previous block
             //assertEquals("(((%1-->%2),(%2-->%1)),((nonvar<->%1),((Revision-->Belief),(Weak-->Desire))))", x.toString());
@@ -87,7 +87,7 @@ public class PremiseRuleTest {
 //        }
 
         //and the first complete rule:
-        PremiseRule x = (PremiseRule) p.term("<(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Desire:Strong)>");
+        PremiseRule x = (PremiseRule) p.term("<(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Goal:Strong)>");
         x = rule(x);
         //assertEquals("(((%1-->%2),(%3-->%2)),((%1<->%3),((Comparison-->Belief),(Strong-->Desire))))", x.toString());
         assertEquals(vv, x.volume());
@@ -172,7 +172,7 @@ public class PremiseRuleTest {
     public void testBackwardPermutations() {
         if (Param.BACKWARD_QUESTION_RULES) {
             Set<PremiseRule> s = PremiseRuleSet.permute(
-                    rule("<(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Desire:Strong, Derive:AllowBackward)>")
+                    rule("<(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Derive:AllowBackward)>")
             );
             assertNotNull(s);
             //System.out.println(Joiner.on('\n').join(s));
@@ -195,7 +195,7 @@ public class PremiseRuleTest {
     }
 
     @Test public void testSubstIfUnifies() {
-        PremiseRule r = rule("<(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Desire:Induction)>");
+        PremiseRule r = rule("<(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Goal:Induction)>");
         System.out.println(r);
         System.out.println(r.source);
         Set<PremiseRule> s = PremiseRuleSet.permute(r);

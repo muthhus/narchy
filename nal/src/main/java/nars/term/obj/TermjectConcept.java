@@ -45,8 +45,5 @@ public class TermjectConcept<X> extends AtomConcept implements Termject<X> {
         return termject.type();
     }
 
-    @Override
-    public boolean match(Term y, FindSubst f) {
-        return termject.match(y, f);
-    }
+
 }

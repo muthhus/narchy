@@ -111,7 +111,11 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         semaphore = new Object();
         return this;
     }
-    
+
+    public boolean isSpy() {
+        return mediator.isSpy();
+    }
+
     void spy(String action, Engine env) {
         mediator.spy(action,env);
     }

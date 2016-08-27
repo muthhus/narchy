@@ -56,8 +56,7 @@ public interface Termject<X> extends Atomic {
         return 0;
     }
 
-    /** when called, equality to this term has already been tested */
-    boolean match(Term y, FindSubst f);
+
 
     abstract class PrimTermject<X> implements Termject<X> {
 
@@ -117,12 +116,11 @@ public interface Termject<X> extends Atomic {
         }
 
         @Override
-        public boolean match(Term y, FindSubst f) {
-//            y = y.term(); //make sure to fully resolve
-//
-//            if (y instanceof Termject.IntPred) {
-//                return ((IntPred)y).match(this, f, true); //reverse x,y necessary?
-//            }
+        public boolean unify(@NotNull Term y, @NotNull FindSubst f) {
+
+            if (y instanceof IntInterval) {
+                return y.unify(this, f); //reverse x,y necessary?
+            }
             return false;
         }
     }
@@ -219,8 +217,9 @@ public interface Termject<X> extends Atomic {
             return "`" + l + "<=?<=" + u + '`';
         }
 
+
         @Override
-        public boolean match(Term y, FindSubst f) {
+        public boolean unify(Term y, FindSubst f) {
             if (y instanceof IntTerm) {
                 int yi = ((IntTerm)y).val;
                 if (val.contains(yi)) {

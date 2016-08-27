@@ -7,6 +7,7 @@ import nars.gui.NARSpace;
 import nars.nar.Executioner;
 import nars.nar.MultiThreadExecutioner;
 import nars.nar.SingleThreadExecutioner;
+import nars.op.PrologCore;
 import nars.op.mental.Abbreviation;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.data.AutoClassifier;
@@ -55,8 +56,8 @@ public class Tetris2 extends NAREnvironment {
     public static final int DEFAULT_INDEX_WEIGHT = 12 * 10000000;
 
     public static final Executioner exe =
-            //new MultiThreadExecutioner(3, 16384);
-            new SingleThreadExecutioner();
+            new MultiThreadExecutioner(3, 16384);
+            //new SingleThreadExecutioner();
 
     public static final int runFrames = 4500;
     public static final int cyclesPerFrame = 4;
@@ -353,12 +354,13 @@ public class Tetris2 extends NAREnvironment {
         Param.DEBUG = false;
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(512,
+        Default nar = new Default(1024,
                 8, 2, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
                 new FrameClock(), exe
 
         );
+
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
@@ -401,15 +403,15 @@ public class Tetris2 extends NAREnvironment {
 //		});
 
 
+        //new Abbreviation(nar,"aKa_");
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 4);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 4);
 
         //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
 
-        new Abbreviation(nar,"aKa_");
 
 
 

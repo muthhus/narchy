@@ -47,7 +47,7 @@ public class PostCondition implements Serializable, Level //since there can be m
     public static final Set<Atom> reservedMetaInfoCategories = new LinkedHashSet() {{
         add(the("Belief"));
         add(the("Stamp"));
-        add(the("Desire"));
+        add(the("Goal"));
         add(the("Order"));
         add(the("Derive"));
         add(the("Info"));
@@ -85,7 +85,7 @@ public class PostCondition implements Serializable, Level //since there can be m
      * @throws RuntimeException
      */
     @NotNull public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term pattern,
-                                     @NotNull Term... modifiers) throws RuntimeException, UnsupportedOperationException {
+                                     @NotNull Term... modifiers) throws RuntimeException {
 
 
         Term beliefTruth = null, goalTruth = null;
@@ -130,13 +130,13 @@ public class PostCondition implements Serializable, Level //since there can be m
                     break;
 
                 case "Truth":
-                    throw new UnsupportedOperationException("Use Belief:.. or Desire:..");
+                    throw new UnsupportedOperationException("Use Belief:.. or Goal:..");
 
                 case "Belief":
                     beliefTruth = which;
                     break;
 
-                case "Desire":
+                case "Goal":
                     goalTruth = which;
                     break;
 

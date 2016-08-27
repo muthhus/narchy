@@ -851,6 +851,9 @@ public class PremiseRule extends GenericCompound {
                             pres.add( TaskPunctuation.Goal );
                             taskPunc = '!';
                             break;
+                        case "all":
+                            taskPunc = 0;
+                            break;
                         default:
                             throw new RuntimeException("Unknown task punctuation type: " + arg1.toString());
                     }
@@ -1052,7 +1055,7 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
-    static final Term TaskQuestionTerm = exec($.oper("task"), $.quote("?"));
+    static final Term TaskAny = exec($.oper("task"), $.the("all"));
 
 //    static final Term BELIEF = $.the("Belief");
 //    static final Term DESIRE = $.the("Desire");
@@ -1147,15 +1150,20 @@ public class PremiseRule extends GenericCompound {
 
         if (question) {
 
-            newPremise = p(concat(pp, TaskQuestionTerm));
+            newPremise = p(concat(pp, TaskAny));
+            //newPremise = pc; //same
 
-            //remove truth values
-//            TermContainer<?> ss = ((Compound)newConclusion.term(1)).subterms();
-//            newConclusion = p(
-//                newConclusion.term(0), p(ss.filter((x) -> {
-//                        return !(((Compound)x).op() == Op.INHERIT && (((Compound) x).term(1).equals(BELIEF) || ((Compound) x).term(1).equals(DESIRE)));
-//                }))
-//            );
+
+            //remove truth values and add '?' punct
+            TermContainer ss = ((Compound)newConclusion.term(1)).subterms();
+            newConclusion = p(
+
+                newConclusion.term(0), $.p(ss.filter((x) -> {
+                        return !(((Compound)x).op() == Op.INH && (
+                                   ((Compound) x).term(1).equals($.the("Belief"))
+                                || ((Compound) x).term(1).equals($.the("Goal"))));
+                }).append($("Punctuation:Question")))
+            );
 
         } else {
             if (swapTruth) {

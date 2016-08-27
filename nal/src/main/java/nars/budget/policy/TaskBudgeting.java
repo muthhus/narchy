@@ -2,6 +2,7 @@ package nars.budget.policy;
 
 import nars.$;
 import nars.Memory;
+import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
@@ -37,7 +38,10 @@ public class TaskBudgeting {
             p.budget(taskLink);
             if (termLink.isDeleted())
                 return;
-            BudgetMerge.plusBlend.apply(p, termLink, 1f);
+            BudgetMerge.
+                    //plusBlend
+                    avgBlend
+                    .apply(p, termLink, 1f);
         } catch (Budget.BudgetException e) {
             //HACK - this isnt a full solution, but it should work temporarily
             return;
@@ -57,7 +61,7 @@ public class TaskBudgeting {
                 //occamSquareWithDeadzone(derived, pp);
 
         //volRatioScale = volRatioScale * volRatioScale; //sharpen
-
+        //volRatioScale = (float) Math.pow(volRatioScale, 2);
 
 
         final float durability = pp.dur() * volRatioScale;
@@ -70,6 +74,7 @@ public class TaskBudgeting {
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 pp.pri()
                     * volRatioScale
+                    * qual
         ;
         //if (priority * durability < Param.BUDGET_EPSILON)
             //return null;
@@ -163,7 +168,7 @@ public class TaskBudgeting {
      */
     @Nullable
     public static Budget derivationBackward(@NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
-        return derivation(premise.premise.qua(), content, premise, minDur);
+        return derivation(premise.premise.qua() * Param.BACKWARD_DERIVATION_FACTOR, content, premise, minDur);
     }
 
     /**

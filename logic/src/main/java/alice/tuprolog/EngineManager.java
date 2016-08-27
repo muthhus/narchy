@@ -210,6 +210,7 @@ public class EngineManager implements java.io.Serializable {
         runner().pushSubGoal(goals);
     }
 
+
     public Solution solve(Term query) {
         this.clearSinfoSetOf();
         synchronized (er1) {
@@ -248,6 +249,7 @@ public class EngineManager implements java.io.Serializable {
             }
         }
     }
+
 
     public Solution solveNext() throws NoMoreSolutionException {
         synchronized (er1) {

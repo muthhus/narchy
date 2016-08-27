@@ -24,7 +24,7 @@ public interface Atomic extends Term {
 
     /** default atomic unification is equality */
     @Override default boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
-        return equals(y);
+        return false;
     }
 
     @Override

@@ -11,30 +11,30 @@
 
 
 //desire spreading by similarity
-     S, (S <-> P), task("!") |- P, (Desire:Intersection)
+     S, (S <-> P), task("!") |- P, (Goal:Intersection)
 
 
 
 //Set Definition Similarity to Inheritance
 
-    ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
+    ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
+    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
 
 
 //Set Definition Unwrap
 
-    ({S} <-> {P}), {S} |- (S <-> P), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [S] |- (S <-> P), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
+    ({S} <-> {P}), {S} |- (S <-> P), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
+    ([S] <-> [P]), [S] |- (S <-> P), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
 
 //Nothing is more specific than a instance, so its similar
 
-    (S --> {P}),  S  |- (S <-> {P}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    (S --> {P}), {P} |- (S <-> {P}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
+    (S --> {P}),  S  |- (S <-> {P}), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
+    (S --> {P}), {P} |- (S <-> {P}), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
 
 //nothing is more general than a property, so its similar
 
-    ([S] --> P), [S] |- ([S] <-> P), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ([S] --> P),  P  |- ([S] <-> P), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
+    ([S] --> P), [S] |- ([S] <-> P), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
+    ([S] --> P),  P  |- ([S] <-> P), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
 
 
 //Inheritance to Similarity
@@ -62,32 +62,32 @@
 //                (A --> C)
 //If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
 
-(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
-(A --> B), (A --> C), neq(B,C) |- (C --> B), (Belief:Abduction, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
-(A --> C), (B --> C), neq(A,B) |- (A --> B), (Belief:Induction, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
-(A --> B), (B --> C), neq(C,A) |- (C --> A), (Belief:Exemplification, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
+(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+(A --> B), (A --> C), neq(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+(A --> C), (B --> C), neq(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+(A --> B), (B --> C), neq(C,A) |- (C --> A), (Belief:Exemplification, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
 
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
 
-    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
 
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
-    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
-    (P --> M), (S --> M), neq(S,P) |- (S <-> P), (Belief:Comparison, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
-    (M --> P), (M --> S), neq(S,P) |- (S <-> P), (Belief:Comparison, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
+    (P --> M), (S --> M), neq(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+    (M --> P), (M --> S), neq(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
-    (M --> P), (S <-> M), neq(S,P) |- (S --> P), (Belief:Analogy, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
-    (P --> M), (S <-> M), neq(S,P) |- (P --> S), (Belief:Analogy, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
-    (M <-> P), (S <-> M), neq(S,P) |- (S <-> P), (Belief:Resemblance, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (M --> P), (S <-> M), neq(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (P --> M), (S <-> M), neq(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (M <-> P), (S <-> M), neq(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
 
 //// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:
@@ -163,18 +163,18 @@
 //    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
 //    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
 //    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
-    (C --> {X,A..+}), {X,A..+}, no_common_subterm(X,C) |- (C --> {X}), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    (C --> [X,A..+]), [X,A..+], no_common_subterm(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    ({X,A..+} --> C), {X,A..+}, no_common_subterm(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    ([X,A..+] --> C), [X,A..+], no_common_subterm(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    (C --> {X,A..+}), {X,A..+}, no_common_subterm(X,C) |- (C --> {X}), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (C --> [X,A..+]), [X,A..+], no_common_subterm(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ({X,A..+} --> C), {X,A..+}, no_common_subterm(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ([X,A..+] --> C), [X,A..+], no_common_subterm(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 //NAL3 single premise inference
 
-    ((|,X,A..+) --> M), (|,X,A..+), no_common_subterm(X,M) |- (X --> M), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    (M --> (&,X,A..+)), (&,X,A..+), no_common_subterm(X,M) |- (M --> X), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ((|,X,A..+) --> M), (|,X,A..+), no_common_subterm(X,M) |- (X --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (M --> (&,X,A..+)), (&,X,A..+), no_common_subterm(X,M) |- (M --> X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-    ((B ~ G) --> S), S, no_common_subterm(S,B) |- (B --> S), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    (R --> (B - S)), R, no_common_subterm(S,B) |- (R --> B), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ((B ~ G) --> S), S, no_common_subterm(S,B) |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (R --> (B - S)), R, no_common_subterm(S,B) |- (R --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)
@@ -248,14 +248,14 @@
 //      //NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
-    B, (A ==> C), task(positive), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
-        B, ((--,%A) ==> C), task(negative), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:DeductionN, Desire:InductionN, Event:Anticipate)
-    B, (C ==> A), task(positive), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Desire:Deduction)
-        B, (C ==> (--,%A)), task(negative), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:AbductionN, Desire:Deduction)
+    B, (A ==> C), task(positive), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Goal:Induction, Event:Anticipate)
+        B, ((--,%A) ==> C), task(negative), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:DeductionN, Goal:InductionN, Event:Anticipate)
+    B, (C ==> A), task(positive), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Goal:Deduction)
+        B, (C ==> (--,%A)), task(negative), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:AbductionN, Goal:Deduction)
 
-    B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)
+    B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Goal:Strong)
 
-    B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndepForward(C,A,B), (Desire:Strong)
+    B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndepForward(C,A,B), (Goal:Strong)
         //^ this is only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
 
@@ -285,22 +285,22 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //structural decompose any component of a conjunction
-     (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Desire:StructuralStrong)
-     (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Desire:StructuralStrong)
+     (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Goal:StructuralStrong)
+     (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralStrong)
 
-     (&&,X,A), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Desire:Strong)
-     (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     (&&,X,A), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
+     (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
-     //(&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     //(&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
 
     //decompose (only) the leading event in a conjunction goal
-    //(&&,X,A..+), X, time(decomposeTaskIfTermLinkBefore), task("!") |- X, (Desire:StructuralStrong)
-        //(&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- (--,%X), (Desire:StructuralStrong)
-    //(&&,X,A..+), X, time(decomposeTaskIfBeliefBefore), task("!") |- (&&,A..+), (Desire:StructuralStrong)
+    //(&&,X,A..+), X, time(decomposeTaskIfTermLinkBefore), task("!") |- X, (Goal:StructuralStrong)
+        //(&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- (--,%X), (Goal:StructuralStrong)
+    //(&&,X,A..+), X, time(decomposeTaskIfBeliefBefore), task("!") |- (&&,A..+), (Goal:StructuralStrong)
 
-        //(&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- A, (Desire:StructuralStrong)
+        //(&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- A, (Goal:StructuralStrong)
         //TODO as above
 
 
@@ -489,23 +489,23 @@
 ////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
 //Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate
 
-    (B --> (/, M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Desire:Identity)
+    (B --> (/, M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity)
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Goal:Identity)
 
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Desire:Identity)
+    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Goal:Identity)
 
-    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
+    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity)
 
 //Recursion Force - TODO use varargs
 
   //2
-//    ((A,B) --> Y), A |- ((A,B)-->((/,Y,_,B), B)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-//    ((A,B) --> Y), B |- ((A,B)-->(A, (/,Y,A,_))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+//    ((A,B) --> Y), A |- ((A,B)-->((/,Y,_,B), B)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+//    ((A,B) --> Y), B |- ((A,B)-->(A, (/,Y,A,_))), (Belief:StructuralDeduction, Goal:StructuralDeduction)
   //3
-//    ((A,B,C) --> Y), A |- ((A,B,C)-->((/,Y, _, B, C), B, C)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-//    ((A,B,C) --> Y), B |- ((A,B,C)-->(A, (/,Y, A, _, C), C)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-//    ((A,B,C) --> Y), C |- ((A,B,C)-->(A, B, (/,Y, A, B, _))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+//    ((A,B,C) --> Y), A |- ((A,B,C)-->((/,Y, _, B, C), B, C)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+//    ((A,B,C) --> Y), B |- ((A,B,C)-->(A, (/,Y, A, _, C), C)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+//    ((A,B,C) --> Y), C |- ((A,B,C)-->(A, B, (/,Y, A, B, _))), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 
 
