@@ -67,7 +67,7 @@ public class SubGoalStore {
                 if (s instanceof SubGoalTree) {
                     pushSubGoal((SubGoalTree) s);
                 } else {
-                    return ((SubGoalElement) s).term;
+                    return (Term) s;
                 }
 
             }

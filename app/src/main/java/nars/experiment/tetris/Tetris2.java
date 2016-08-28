@@ -53,17 +53,17 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris2 extends NAREnvironment {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 12 * 10000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 24 * 10000000;
 
     public static final Executioner exe =
-            new MultiThreadExecutioner(3, 16384);
-            //new SingleThreadExecutioner();
+            //new MultiThreadExecutioner(2, 16384);
+            new SingleThreadExecutioner();
 
-    public static final int runFrames = 4500;
-    public static final int cyclesPerFrame = 4;
+    public static final int runFrames = 14500;
+    public static final int cyclesPerFrame = 3;
     public static final int tetris_width = 6;
     public static final int tetris_height = 13;
-    public static final int TIME_PER_FALL = 3;
+    public static final int TIME_PER_FALL = 4;
     static boolean easy = false;
 
     static int frameDelay;
@@ -71,7 +71,7 @@ public class Tetris2 extends NAREnvironment {
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 16; //16 * TIME_DILATION;
+    private final int visionSyncPeriod = 7; //16 * TIME_DILATION;
 
     public class View {
 
@@ -364,8 +364,8 @@ public class Tetris2 extends NAREnvironment {
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.2f;

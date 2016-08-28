@@ -242,7 +242,7 @@ public class TheoryManager {
 	public void rebindPrimitives() {
 		for (ClauseInfo d:dynamicDBase){
 			for(AbstractSubGoalTree sge:d.getBody()){
-				Term t = ((SubGoalElement) sge).term;
+				Term t = (Term) sge;
 				primitiveManager.identifyPredicate(t);
 			}
 		}

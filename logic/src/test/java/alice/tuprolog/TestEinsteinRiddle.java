@@ -1,5 +1,7 @@
 package alice.tuprolog;
 
+import alice.tuprolog.event.SpyEvent;
+import alice.tuprolog.event.SpyListener;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -33,7 +33,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     //private static final Truth EterNull = $.t(0.5f, Param.TRUTH_EPSILON);
 
     public TruthPolation(int size) {
-        super(1, 2 /* must be 2 for 1D */, null);
+        super(1, 2 /* must be 2 for 1-D microsphere */, null);
 
         times = new float[size][];
         for (int i = 0; i < size; i++) {
@@ -59,6 +59,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     @Nullable
     public Truth truth(long when, long now, @NotNull Task... tasks) {
 
+
         int n = tasks.length;
         assert(times.length <= n);
 
@@ -83,10 +84,10 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         int i = 0;
         for (Task t : tasks) {
 
-            if (t == null) {
-                n--;
-                continue;
-            }
+            assert(t != null);// {
+                //n--;
+                //continue;
+            //}
             //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
 
             //offset the specified occurence time to a small window around the pure occurrence time,

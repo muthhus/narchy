@@ -1,10 +1,10 @@
 package alice.tuprolog;
 
 
-public abstract class AbstractSubGoalTree {
+public interface AbstractSubGoalTree {
     
-    public abstract boolean isLeaf();
+    boolean isLeaf();
     
-    public abstract boolean isRoot();
+    boolean isRoot();
     
 }

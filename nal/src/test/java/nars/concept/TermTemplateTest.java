@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.Task;
 import nars.nar.Default;
+import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ public class TermTemplateTest {
 
         Concept c = t.concept(n);
 
-        TermSet templates = ((CompoundConcept)c).templates;
+        TermContainer templates = ((CompoundConcept)c).templates;
         assertEquals(8, templates.size());
 
         String s = Joiner.on('\n').join(templates);

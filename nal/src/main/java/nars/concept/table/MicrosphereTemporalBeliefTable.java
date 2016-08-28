@@ -24,7 +24,7 @@ import static nars.nal.Tense.ETERNAL;
  */
 public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements TemporalBeliefTable {
 
-    static final int MAX_TRUTHPOLATION_SIZE = 64;
+    static final int MAX_TRUTHPOLATION_SIZE = 32;
     static final ThreadLocal<TruthPolation> truthpolations = ThreadLocal.withInitial(() -> {
         return new TruthPolation(MAX_TRUTHPOLATION_SIZE);
     });
@@ -90,11 +90,11 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
                 return null;
             }
 
-            before = truth(now, now, null);
+            before = truth(now, null);
 
             add(input);
 
-            after = truth(now, now, null);
+            after = truth(now, null);
 
         }
 
@@ -256,7 +256,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
-        float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
+        //float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
 
 //        /**
 //         * compute an integration of the area under the trapezoid formed by
@@ -286,7 +286,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 ////        float relevance = Math.max(relMin, relMax );
 //
 //
-        float confScale = Param.REVECTION_CONFIDENCE_FACTOR * (1f - overlap);
+        //float confScale = Param.REVECTION_CONFIDENCE_FACTOR * (1f - overlap);
 //
 //        if (confScale < Param.BUDGET_EPSILON) //TODO use NAR.confMin which will be higher than this
 //            return null;
@@ -296,7 +296,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         Truth t = truth(mid, now, eternal);
 
         if (t != null) {
-            t = t.confMult(confScale);
+            //t = t.confMult(confScale);
 
             if (t != null)
                 return Revision.mergeInterpolate(a, b, mid, now, t, concept);
@@ -348,6 +348,11 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
         return best;
 
+    }
+
+    @Nullable
+    public final Truth truth(long when, @Nullable EternalTable eternal) {
+        return truth(when, ETERNAL, eternal);
     }
 
     @Nullable

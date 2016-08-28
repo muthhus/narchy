@@ -753,6 +753,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 */
 	@Override
 	public synchronized void addSpyListener(SpyListener l) {
+		spy = true;
 		spyListeners.add(l);
 	}
 
@@ -831,6 +832,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	@Override
 	public synchronized void removeSpyListener(SpyListener l) {
 		spyListeners.remove(l);
+		spy = !(spyListeners.isEmpty());
 	}
 
 	/**
@@ -838,6 +840,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 */
 	@Override
 	public synchronized void removeAllSpyListeners() {
+		spy = false;
 		spyListeners.clear();
 	}
 
@@ -954,8 +957,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @param e the event
 	 */
-	protected void notifySpy(SpyEvent e) {
-		for(SpyListener sl:spyListeners){
+	private void notifySpy(SpyEvent e) {
+		for (SpyListener sl : spyListeners) {
 			sl.onSpy(e);
 		}
 	}

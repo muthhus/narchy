@@ -55,12 +55,10 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
                     if (sgt.isRoot()) {
                         //SubGoalTree
                         cerca(sgt);
-                        for (Term t : elementi) {
-                            sub.add(t);
-                        }
+                        sub.addAll(elementi);
                     } else {
                         //SubGoalElement
-                        sub.add(((SubGoalElement) sgt).term);
+                        sub.add((Term) sgt);
                     }
                 }
                 if (":-".equals(name))
@@ -85,7 +83,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
         for (int i = 0; i < dim; i++) {
             AbstractSubGoalTree ab = ((SubGoalTree) sgt).getChild(i);
             if (ab.isLeaf()) {
-                elementi.add(((SubGoalElement) ab).term);
+                elementi.add((Term) ab);
             } else {
                 cerca(ab);
             }

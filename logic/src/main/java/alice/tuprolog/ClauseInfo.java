@@ -162,8 +162,8 @@ public class ClauseInfo {
     private static void bodyCopy(SubGoalTree source, SubGoalTree destination, AbstractMap<Var, Var> map, int id) {
         for(AbstractSubGoalTree s: source){
             if (s.isLeaf()) {
-                SubGoalElement l = (SubGoalElement)s;
-                Term t = l.term.copy(map,id);
+                Term l = (Term)s;
+                Term t = l.copy(map,id);
                 destination.addChild(t);
             } else {
                 SubGoalTree src  = (SubGoalTree)s; 

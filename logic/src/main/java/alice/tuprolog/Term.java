@@ -28,7 +28,7 @@ import java.util.*;
  * @see Var
  * @see  Number
  */
-public abstract class Term implements Serializable {
+public abstract class Term implements Serializable, AbstractSubGoalTree {
 	private static final long serialVersionUID = 1L;
 
     // true and false constants
@@ -353,4 +353,12 @@ public abstract class Term implements Serializable {
 	 */
 	public abstract void accept(TermVisitor tv);
     /**/
+
+
+    @Override
+    public final boolean isLeaf() { return true; }
+    @Override
+    public final boolean isRoot() { return false; }
+
+
 }

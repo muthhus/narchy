@@ -14,7 +14,9 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
+import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +39,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      */
 
     @NotNull
-    public final TermSet templates;
+    public final TermContainer templates;
     @NotNull
     private final T term;
 
@@ -66,7 +68,9 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     public CompoundConcept(@NotNull T term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, @NotNull NAR nar) {
         this.term = term;
 
-        this.templates = TermSet.the(TermLinkBuilder.components(term, nar));
+        TermSet tt = TermSet.the(TermLinkBuilder.components(term, nar));
+        TermContainer ts = term.subterms();
+        this.templates = tt.equals(ts) ? ts : tt; //re-use the term's own subterms as the termlink templates if they are equal
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;

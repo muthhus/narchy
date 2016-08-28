@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 
-public class SubGoalTree extends AbstractSubGoalTree implements Iterable<AbstractSubGoalTree> {
+public final class SubGoalTree implements AbstractSubGoalTree, Iterable<AbstractSubGoalTree> {
     
     private final ArrayList<AbstractSubGoalTree> terms;
         //private LinkedList terms;
@@ -14,13 +14,12 @@ public class SubGoalTree extends AbstractSubGoalTree implements Iterable<Abstrac
                 //terms = new LinkedList();
     }
 
-        public SubGoalTree(ArrayList<AbstractSubGoalTree> terms) {
+    public SubGoalTree(ArrayList<AbstractSubGoalTree> terms) {
         this.terms=terms;
     }
     
     public void addChild(Term term) {
-        SubGoalElement l = new SubGoalElement(term);
-        terms.add(l);
+        terms.add(term);
     }
     
     public SubGoalTree addChild() {
@@ -58,14 +57,15 @@ public class SubGoalTree extends AbstractSubGoalTree implements Iterable<Abstrac
         return result + " ] ";
     }
 
-    public boolean removeChild(int i) {
-        try {
-            terms.remove(i);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+//    public boolean removeChild(int i) {
+//        try {
+//            terms.remove(i);
+//            return true;
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
+
     public SubGoalTree copy(){
         return new SubGoalTree(terms);
     }
