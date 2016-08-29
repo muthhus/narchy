@@ -1,6 +1,5 @@
 package nars.util.signal;
 
-import nars.op.time.STMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.util.meter.event.FloatGuage;

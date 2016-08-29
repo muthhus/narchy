@@ -6,7 +6,6 @@ import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
-import nars.concept.Concept;
 import nars.link.BLink;
 import nars.link.StrongBLink;
 import nars.link.StrongBLinkToBudgeted;

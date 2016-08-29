@@ -10,15 +10,10 @@ import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
-
-import static nars.Op.*;
-import static nars.term.Termed.termOrNull;
 
 /**
  * Index which is supported by Map/Cache-like operations

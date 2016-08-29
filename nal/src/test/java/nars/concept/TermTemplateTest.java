@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Task;
 import nars.nar.Default;
 import nars.term.container.TermContainer;
-import nars.term.container.TermSet;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

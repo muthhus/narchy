@@ -81,7 +81,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
         elementi = new ArrayList<>();
         int dim = ((SubGoalTree) sgt).size();
         for (int i = 0; i < dim; i++) {
-            AbstractSubGoalTree ab = ((SubGoalTree) sgt).getChild(i);
+            AbstractSubGoalTree ab = ((SubGoalTree) sgt).get(i);
             if (ab.isLeaf()) {
                 elementi.add((Term) ab);
             } else {

@@ -5,8 +5,6 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.Budgeted;
-import nars.concept.table.BeliefTable;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

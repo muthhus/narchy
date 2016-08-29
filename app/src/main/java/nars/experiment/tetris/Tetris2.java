@@ -2,13 +2,9 @@ package nars.experiment.tetris;
 
 import com.google.common.collect.Lists;
 import nars.*;
-import nars.gui.BagChart;
-import nars.gui.NARSpace;
 import nars.nar.Executioner;
-import nars.nar.MultiThreadExecutioner;
 import nars.nar.SingleThreadExecutioner;
-import nars.op.PrologCore;
-import nars.op.mental.Abbreviation;
+import nars.term.obj.IntTerm;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.data.AutoClassifier;
 import nars.experiment.NAREnvironment;
@@ -45,7 +41,6 @@ import java.util.*;
 import static nars.$.t;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
-import static spacegraph.obj.GridSurface.HORIZONTAL;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
 /**
@@ -59,7 +54,7 @@ public class Tetris2 extends NAREnvironment {
             //new MultiThreadExecutioner(2, 16384);
             new SingleThreadExecutioner();
 
-    public static final int runFrames = 14500;
+    public static final int runFrames = 1500;
     public static final int cyclesPerFrame = 3;
     public static final int tetris_width = 6;
     public static final int tetris_height = 13;
@@ -215,7 +210,7 @@ public class Tetris2 extends NAREnvironment {
             return; //too low confidence
 
         Term range = new Termject.IntInterval(start, end);
-        Term fixed = new Termject.IntTerm(axis);
+        Term fixed = new IntTerm(axis);
 
         //TODO collect evidence stamp
         nar.believe(
@@ -250,7 +245,7 @@ public class Tetris2 extends NAREnvironment {
             int yy = y;
             for (int x = 0; x < state.width; x++) {
                 int xx = x;
-                Compound squareTerm = $.p(new Termject.IntTerm(x), new Termject.IntTerm(y));
+                Compound squareTerm = $.p(new IntTerm(x), new IntTerm(y));
                 @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
                         () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
 
@@ -406,10 +401,9 @@ public class Tetris2 extends NAREnvironment {
         //new Abbreviation(nar,"aKa_");
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 4);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 4);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 5);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 5);
 
-        //new ArithmeticInduction(nar);
         //new VariableCompressor(nar);
 
 

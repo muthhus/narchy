@@ -2,7 +2,6 @@ package nars.link;
 
 import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 public class StrongBLink<X> extends DefaultBLink<X> {

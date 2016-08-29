@@ -1,6 +1,9 @@
 package nars.concept;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Symbols;
+import nars.Task;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
@@ -16,7 +19,6 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
-import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

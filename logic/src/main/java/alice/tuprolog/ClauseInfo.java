@@ -82,11 +82,11 @@ public class ClauseInfo {
             if (t instanceof Struct && ((Struct)t).name().equals(",")) {
                 extractBody(parent.addChild(),t);
             } else {
-                parent.addChild(t);
+                parent.add(t);
             }
             body = ((Struct)body).term(1);
         }
-        parent.addChild(body);
+        parent.add(body);
     }
     
     
@@ -164,7 +164,7 @@ public class ClauseInfo {
             if (s.isLeaf()) {
                 Term l = (Term)s;
                 Term t = l.copy(map,id);
-                destination.addChild(t);
+                destination.add(t);
             } else {
                 SubGoalTree src  = (SubGoalTree)s; 
                 SubGoalTree dest = destination.addChild();

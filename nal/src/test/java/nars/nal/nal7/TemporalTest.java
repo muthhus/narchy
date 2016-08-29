@@ -11,7 +11,6 @@ import nars.concept.Concept;
 import nars.io.NarseseTest;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

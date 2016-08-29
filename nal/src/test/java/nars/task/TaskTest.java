@@ -122,7 +122,7 @@ public class TaskTest {
 
         long[] ev = {1, 2};
         d.eventTaskProcess.on(t -> {
-            if (t.getParentBelief()!=null)
+            if (t.getParentBelief()!=null && !t.cyclic())
                 assertArrayEquals("all double-premise derived terms have this evidence: "
                         + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.evidence()), ev, t.evidence());
 
@@ -133,4 +133,5 @@ public class TaskTest {
 
 
     }
+
 }

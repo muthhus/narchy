@@ -15,7 +15,6 @@ import nars.truth.TruthFunctions;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
-import org.eclipse.collections.impl.factory.Iterables;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

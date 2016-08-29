@@ -11,7 +11,7 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
-import nars.term.obj.Termject;
+import nars.term.obj.IntTerm;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.Util;
@@ -81,7 +81,7 @@ public class Arkancide extends NAREnvironment {
         for (int x = 0; x < visW; x++) {
             int xx = x;
             for (int y = 0; y < visH; y++) {
-                Compound squareTerm = $.p(new Termject.IntTerm(x), new Termject.IntTerm(y));
+                Compound squareTerm = $.p(new IntTerm(x), new IntTerm(y));
                 int yy = y;
                 SensorConcept sss;
                 sensors.add(sss = new SensorConcept(squareTerm, nar,

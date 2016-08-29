@@ -6,14 +6,20 @@ import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.term.atom.Atomic;
+import nars.term.atom.AtomicString;
+import nars.term.compound.GenericCompound;
+import nars.term.container.TermVector;
 import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
-public interface Termject<X> extends Atomic {
+import java.io.IOException;
+
+import static nars.Op.INT;
+import static nars.Op.INTRANGE;
+
+public interface Termject<X> extends Term {
 
     /** the associated data value of this term */
     X val();
@@ -23,51 +29,40 @@ public interface Termject<X> extends Atomic {
     /** the native type of the value */
     Class<? super X> type();
 
-
-
-
-    @Override
-    default @NotNull Op op() {
-        return Op.OBJECT;
-    }
-
     @Override
     default int complexity() {
         return 1;
     }
 
-    @Override
-    default int varIndep() {
-        return 0;
-    }
+//    @Override
+//    default int varIndep() {
+//        return 0;
+//    }
+//
+//    @Override
+//    default int varDep() {
+//        return 0;
+//    }
+//
+//    @Override
+//    default int varQuery() {
+//        return 0;
+//    }
+//
+//    @Override
+//    default int varPattern() {
+//        return 0;
+//    }
 
-    @Override
-    default int varDep() {
-        return 0;
-    }
-
-    @Override
-    default int varQuery() {
-        return 0;
-    }
-
-    @Override
-    default int varPattern() {
-        return 0;
-    }
 
 
-
-    abstract class PrimTermject<X> implements Termject<X> {
+    abstract class PrimTermject<X> extends AtomicString implements Termject<X> {
 
         @NotNull
         final X val;
-        private final int _hash;
 
         public PrimTermject(@NotNull X val) {
-
             this.val = val;
-            this._hash = val.hashCode();
         }
 
         @NotNull
@@ -76,102 +71,103 @@ public interface Termject<X> extends Atomic {
             return val;
         }
 
+
+
         @NotNull
         @Override
         public String toString() {
             return '`' + val.toString() + '`'; //TODO escape any '`' which appear in the string
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            return (obj instanceof Termject) && val.equals(((Termject)obj).val());
-        }
-
-        @Override
-        public final int hashCode() {
-            //return val.hashCode();
-            return _hash;
-        }
-
-
-    }
-
-    class IntTerm extends PrimTermject<Integer> {
-
-        public IntTerm(@NotNull Integer val) {
-            super(val);
-        }
 
 
         @Override
-        public int compareVal(Integer v) {
-            return Integer.compare(val(), v);
-        }
-
-        @NotNull
-        @Override
-        public Class type() {
-            return Integer.class;
+        public int varIndep() {
+            return 0;
         }
 
         @Override
-        public boolean unify(@NotNull Term y, @NotNull FindSubst f) {
+        public int varDep() {
+            return 0;
+        }
 
-            if (y instanceof IntInterval) {
-                return y.unify(this, f); //reverse x,y necessary?
-            }
-            return false;
+        @Override
+        public int varQuery() {
+            return 0;
+        }
+
+        @Override
+        public int varPattern() {
+            return 0;
         }
     }
 
-    interface IntPred  {
-
-
-//        default boolean match(IntPred x, Term y, FindSubst f) {
-//            return match(x, y, f, false);
-//        }
+    //    interface IntPred  {
 //
-//        static boolean match(IntPred x, Term y, FindSubst f, boolean reverse) {
-//            y = y.term(); //make sure to fully resolve
 //
-//            if (y instanceof Termject) {
-//                if (y instanceof IntTerm) {
-//                    int i = ((IntTerm) y).val;
-//                    //return f.putXY($.negIf(this, !val.test(i)), y);
-//                    //@Nullable Term yy = $.negIf(y, !val.test(i));
-//                    if (!x.test(i)) {
-//                        return false; //TODO use a negate method which perfectly inverts the boolean condition of the predicate, not using (--,..)
-//                    }
+////        default boolean match(IntPred x, Term y, FindSubst f) {
+////            return match(x, y, f, false);
+////        }
+////
+////        static boolean match(IntPred x, Term y, FindSubst f, boolean reverse) {
+////            y = y.term(); //make sure to fully resolve
+////
+////            if (y instanceof Termject) {
+////                if (y instanceof IntTerm) {
+////                    int i = ((IntTerm) y).val;
+////                    //return f.putXY($.negIf(this, !val.test(i)), y);
+////                    //@Nullable Term yy = $.negIf(y, !val.test(i));
+////                    if (!x.test(i)) {
+////                        return false; //TODO use a negate method which perfectly inverts the boolean condition of the predicate, not using (--,..)
+////                    }
+////
+////                    if (!reverse)
+////                        return f.matchVarX(this, y);
+////                    else
+////                        return f.matchVarY(this, y);
+////
+////                } else if (y instanceof Termject.IntPred) {
+////                    return match((IntPred) y, f);
+////                }
+////            }
+////            return false;
+////        }
 //
-//                    if (!reverse)
-//                        return f.matchVarX(this, y);
-//                    else
-//                        return f.matchVarY(this, y);
 //
-//                } else if (y instanceof Termject.IntPred) {
-//                    return match((IntPred) y, f);
-//                }
-//            }
-//            return false;
-//        }
+//        //abstract public boolean match(IntPred y, FindSubst f);
+//
+//
+//    }
 
+    class IntInterval extends GenericCompound implements Termject<Range<Integer>> {
 
-        //abstract public boolean match(IntPred y, FindSubst f);
-
-
-    }
-
-    class IntInterval extends PrimTermject<Range<Integer>> {
+        public final Range<Integer> val;
+        //extends PrimTermject<Range<Integer>> {
 
 
         public IntInterval(int a, int b) {
-            this(Range.closed(a,b).canonical( DiscreteDomain.integers() ));
+            //this(Range.closed(a,b).canonical( DiscreteDomain.integers() ));
+            super(INTRANGE, TermVector.the(new IntTerm(a), new IntTerm(b-a)));
+
+            //int a = ((IntTerm) (term(0))).val;
+            //int ba = ((IntTerm) (term(1))).val;
+            val = Range.closed(
+                    a, b
+            ).canonical( DiscreteDomain.integers() );
         }
 
-        public IntInterval(@NotNull Range<Integer> span) {
-            super(span.canonical( DiscreteDomain.integers() ));
+
+
+        //        public IntInterval(@NotNull Range<Integer> span) {
+//
+//            //super(span.canonical( DiscreteDomain.integers() ));
+//        }
+
+        @Override
+        public Range<Integer> val() {
+            return val;
         }
+
 
         @Override
         public int complexity() {
@@ -202,10 +198,16 @@ public interface Termject<X> extends Atomic {
             return Range.class;
         }
 
+
+        @Override
+        public void append(@NotNull Appendable p) throws IOException {
+            p.append(toString());
+        }
+
         @NotNull
         @Override
         public String toString() {
-            Range<Integer> r = val();
+            Range<Integer> r = val;
             int l = r.lowerEndpoint();
             int u = r.upperEndpoint();
             if (r.upperBoundType()== BoundType.OPEN) {
@@ -218,15 +220,16 @@ public interface Termject<X> extends Atomic {
         }
 
 
+
         @Override
         public boolean unify(Term y, FindSubst f) {
-            if (y instanceof IntTerm) {
+            if (y.op()==INT) {
                 int yi = ((IntTerm)y).val;
                 if (val.contains(yi)) {
                     //return f.matchVarX(this, y);
                     return true;
                 }
-            } else if (y instanceof IntInterval) {
+            } else if (y.op() == INTRANGE) {
                 Range<Integer> yr = ((IntInterval) y).val;
                 //if (val.isConnected(yr)) {
 //                    Range<Integer> combinedRange = val.span(yr);

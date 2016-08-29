@@ -24,7 +24,6 @@ package nars.term;
 import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.obj.Termject;
 import nars.term.subst.FindSubst;
 import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
@@ -364,15 +363,6 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         } else if (this instanceof AbstractVariable) {
             //hashcode serves as the ordering too
             return Integer.compare(this.hashCode(), y.hashCode());
-        } else if (this instanceof Termject) {
-
-            Termject tx = (Termject) this;
-            Termject ty = (Termject) y;
-            int cc = tx.type().getName().compareTo(ty.type().getName());
-            if (cc == 0) {
-                return tx.compareVal(ty.val());
-            }
-            return cc;
         } else if (this instanceof Atomic) {
             //if the op is the same, it is required to be a subclass of Atomic
             //which should have an ordering determined by its toString()

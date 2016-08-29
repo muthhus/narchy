@@ -456,6 +456,7 @@ public class IO {
             final Op op = c.op();
 
             switch (op) {
+
                 case SETi:
                 case SETe:
                     setAppend(c, p);

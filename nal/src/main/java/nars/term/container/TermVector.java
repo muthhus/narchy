@@ -1,7 +1,6 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
-import com.sun.deploy.util.ArrayUtil;
 import nars.Op;
 import nars.Param;
 import nars.term.Compound;

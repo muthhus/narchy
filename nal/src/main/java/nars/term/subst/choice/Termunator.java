@@ -1,7 +1,5 @@
 package nars.term.subst.choice;
 
-import nars.Param;
-import nars.term.subst.FindSubst;
 import nars.util.data.list.LimitedFasterList;
 import org.jetbrains.annotations.NotNull;
 

@@ -3,7 +3,6 @@ package nars.bag;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.link.BLink;
-import nars.term.Term;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;

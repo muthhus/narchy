@@ -5,7 +5,6 @@ import nars.nal.rule.PremiseRule;
 import nars.term.Term;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.AbstractVariable;
-import nars.term.var.GenericNormalizedVariable;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 

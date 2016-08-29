@@ -10,7 +10,6 @@ import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.compound.ProtoCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
@@ -103,6 +102,11 @@ public abstract class TermBuilder {
     @NotNull public Term the(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
 
         switch (op) {
+//            case INT:
+//            case INTRANGE:
+//                System.out.println(op + " " + dt + " " + Arrays.toString(u));
+//                break;
+
             case NEG:
                 if (u.length != 1)
                     throw new InvalidTermException(op, dt, u, "negation requires 1 subterm");
@@ -292,17 +296,8 @@ public abstract class TermBuilder {
     @NotNull
     protected final Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
 
-        int s = args.size();
 
-        if (s == 1 && op.minSize > 1) {
-            //special case: allow for ellipsis to occupy one item even if minArity>1
-            Term a0 = args.term(0);
-            if (!(a0 instanceof Ellipsislike)) {
-                //return null;
-                //throw new RuntimeException("invalid size " + s + " for " + op);
-                return a0; //reduction
-            }
-        }
+
 
         //if (Param.DEBUG ) {
         //check for any imdex terms that may have not been removed
@@ -316,8 +311,27 @@ public abstract class TermBuilder {
             }
         }
 
+        if (commutive(op, dt) && args.hasAny(Op.INT)) {
+            args = ArithmeticInduction.compress(args);
+        }
+
+        int s = args.size();
+        if (s == 1 && op.minSize > 1) {
+            //special case: allow for ellipsis to occupy one item even if minArity>1
+            Term a0 = args.term(0);
+            if (!(a0 instanceof Ellipsislike)) {
+                //return null;
+                //throw new RuntimeException("invalid size " + s + " for " + op);
+                return a0; //reduction
+            }
+        }
 
         return newCompound(op, dt, args);
+    }
+
+    private static boolean commutive(Op op, int dt) {
+        return op.commutative &&
+                ((dt == DTERNAL) || (dt == 0) || (dt == XTERNAL));
     }
 
 
@@ -482,39 +496,6 @@ public abstract class TermBuilder {
                 return finish(op, dt, TermSet.the(s));
         }
 
-
-        //Co-Negated Subterms - any commutive terms with both a subterm and its negative are invalid
-        //if (unwrappedNegs!=null) {
-//            if (op == DISJ && unwrappedNegs.anySatisfy(s::contains))
-//                return null; //throw new InvalidTerm(op, u);
-//            //for conjunction, this is handled by the Task normalization process to allow the co-negations for naming concepts
-//            if (s.removeAll(unwrappedNegs)) {
-//                //remove their negative counterparts
-//                s.removeIf(x -> {
-//                    return (x.op()==NEG) && unwrappedNegs.contains(((Compound)x).term(0));
-//                });
-//
-//                n = s.size();
-//                if (n == 0)
-//                    return null;
-//                if (n == 1)
-//                    return s.iterator().next();
-//
-//            } else {
-//                //if all subterms negated; apply DeMorgan's Law
-//                if ((dt == DTERNAL) && (unwrappedNegs.size() == n)) {
-//                    op = (op == CONJ) ? DISJ : CONJ;
-//                    negate = true;
-//                }
-//            }
-        //}
-
-//        if (negate) {
-//            return negation( finish(op, dt, unwrappedNegs.toArray(new Term[n])) );
-//        } else {
-        //if (dt == 0) {
-
-        //}
     }
 
     /**
@@ -859,5 +840,7 @@ public abstract class TermBuilder {
     public final Term disjunction(@NotNull Term[] u) {
         return negation(conj(DTERNAL, negation(u)));
     }
+
+
 
 }

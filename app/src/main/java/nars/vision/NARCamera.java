@@ -1,6 +1,8 @@
 package nars.vision;
 
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
+import nars.term.atom.Atomic;
+import nars.term.obj.IntTerm;
 import org.eclipse.collections.api.block.predicate.primitive.IntIntPredicate;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
@@ -14,7 +16,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.obj.Termject;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.signal.MotorConcept;
@@ -440,7 +441,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 //					$.seti($.the(c1), $.the(c2), $.the(area)) :
 //					$.seti($.the(c1), $.the(c2) );
         Term d = level > 0 ?
-                $.secte($.the(c1), $.the(c2), new Termject.IntTerm(area)) :
+                $.secte($.the(c1), $.the(c2), new IntTerm(area)) :
                 $.secte($.the(c1), $.the(c2));
 
         //Term dir = $.p(d,$.the(area));
@@ -511,7 +512,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         int i = s.length() - 1;
         Term n = null;
         for (int d = 0; d < depth; d++, i--) {
-            Atom next = $.the(i < 0 || s.charAt(i) == '0' ? 0 : 1);
+            Atomic next = $.the(i < 0 || s.charAt(i) == '0' ? 0 : 1);
 
             //next = $.the( ((char)(d+'a')) + "" + next.toString());
 

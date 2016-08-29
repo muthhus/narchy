@@ -1,6 +1,5 @@
 package nars.budget.policy;
 
-import nars.Param;
 import nars.concept.AbstractConcept;
 import nars.concept.CompoundConcept;
 import nars.util.Util;

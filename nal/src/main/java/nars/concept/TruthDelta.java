@@ -1,9 +1,6 @@
 package nars.concept;
 
-import nars.NAR;
-import nars.concept.table.BeliefTable;
 import nars.truth.Truth;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Records a change in truth state from before and after a task is inserteed into a belief table.

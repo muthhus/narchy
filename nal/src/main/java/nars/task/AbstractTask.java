@@ -2,7 +2,6 @@ package nars.task;
 
 import nars.*;
 import nars.budget.UnitBudget;
-import nars.concept.Concept;
 import nars.concept.TruthDelta;
 import nars.index.TermIndex;
 import nars.nal.Tense;

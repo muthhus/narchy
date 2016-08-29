@@ -1,7 +1,6 @@
 package nars;
 
 import nars.budget.Budgeted;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.TruthDelta;
 import nars.index.TermIndex;

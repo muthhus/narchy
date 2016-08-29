@@ -21,7 +21,7 @@ import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.term.obj.Termject;
+import nars.term.obj.IntTerm;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.term.var.VarPattern;
@@ -106,9 +106,11 @@ public enum $ {
 
 
     @NotNull
-    public static Atom the(int i) {
-        return the(i, 10);
+    public static IntTerm the(int i) {
+        //return the(i, 10);
+        return new IntTerm(i);
     }
+
     @NotNull
     public static Atom the(char c) {
         return the(String.valueOf(c));
@@ -593,7 +595,7 @@ public enum $ {
 
 
     @NotNull
-    public static Atom the(Number o) {
+    public static Atomic the(Number o) {
 
         if (o instanceof Byte) return the(o.intValue());
         if (o instanceof Short) return the(o.intValue());
@@ -640,7 +642,7 @@ public enum $ {
     }
 
     @NotNull
-    public static Atom the(float v) {
+    public static Atomic the(float v) {
         if (Util.equals( (float)Math.floor(v), v, Float.MIN_VALUE*2 )) {
             //close enough to be an int, so it doesnt need to be quoted
             return the((int)v);
@@ -833,7 +835,7 @@ public enum $ {
         int l = i.length;
         Term[] x = new Term[l];
         for (int j = 0; j < l; j++) {
-            x[j] = new Termject.IntTerm(i[j]);
+            x[j] = new IntTerm(i[j]);
         }
         return x;
     }
@@ -961,7 +963,11 @@ public enum $ {
         return term;
     }
 
-
+    public static <X> List<X> newArrayList(X... x) {
+        FasterList<X> l = $.newArrayList(x.length);
+        l.addAll(x);
+        return l;
+    }
 
 
     public static final class StaticTermBuilder extends TermIndex {

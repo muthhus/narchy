@@ -8,7 +8,7 @@ import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.obj.Termject;
+import nars.term.obj.IntTerm;
 import nars.util.signal.Autoencoder;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
@@ -127,7 +127,7 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
     }
 
     private Term stride(int stride) {
-        return $.p(base, new Termject.IntTerm(stride));
+        return $.p(base, new IntTerm(stride));
     }
 
     /** input the 'metadata' of the autoencoder that connects the virtual concepts to their semantic inputs */

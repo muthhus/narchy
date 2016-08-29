@@ -19,28 +19,26 @@ import nars.term.atom.Atomic;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
-//import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
-import nars.util.data.map.nbhm.NonBlockingHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static nars.Op.INT;
+import static nars.Op.INTRANGE;
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
+
+//import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
 /**
  * Created by me on 2/24/16.
  */
-public class DefaultConceptBuilder implements Concept.ConceptBuilder {
+ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
     private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 32;
@@ -53,13 +51,12 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                         //newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
 
                 switch (a.op()) {
-                    case OBJECT:
-                        return new TermjectConcept<>((Termject)a, termbag(map1), taskbag(map2));
                     default:
                         return new AtomConcept(a, termbag(map1), taskbag(map2));
                 }
 
             };
+
 
     @NotNull
     private static Map newBagMap(int cap) {
@@ -178,16 +175,26 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
         }
 
         Concept result = null;
-        if (term instanceof Compound) {
-            result = newConcept(  (Compound) term );
+
+        if (term instanceof Termject) {
+        //if (term.op() == INT || term.op() == INTRANGE) {
+            Map m = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
+            result = new TermjectConcept((Termject)term, termbag(m), taskbag(m));
+        }
+        else if (term instanceof Compound) {
+
+            result = newConcept((Compound) term);
+
         } else {
+
 
             if (term instanceof Variable) {
                 //final int s = this.serial;
                 //serial++;
                 //result = varBuilder.apply((Variable) term);
                 return term;
-            } else if (term instanceof Atomic) {
+            }
+            else if (term instanceof Atomic) {
                 result = atomBuilder.apply((Atomic) term);
             }
 

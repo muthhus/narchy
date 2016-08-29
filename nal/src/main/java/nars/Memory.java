@@ -24,10 +24,8 @@ package nars;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.index.TermIndex;
-import nars.term.Compound;
 import nars.term.atom.Atom;
 import nars.time.Clock;
-import nars.util.data.map.CapacityLinkedHashMap;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import nars.util.signal.Emotion;
@@ -35,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 

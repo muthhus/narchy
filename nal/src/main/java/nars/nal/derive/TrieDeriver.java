@@ -1,7 +1,6 @@
 package nars.nal.derive;
 
 import com.google.common.collect.Lists;
-import javassist.*;
 import nars.$;
 import nars.Op;
 import nars.nal.Deriver;
@@ -17,10 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.magnos.trie.TrieNode;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;

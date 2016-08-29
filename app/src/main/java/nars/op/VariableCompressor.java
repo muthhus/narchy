@@ -2,6 +2,7 @@ package nars.op;
 
 import nars.Param;
 import nars.Task;
+import nars.nal.ArithmeticInduction;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import nars.$;
 import nars.NAR;
@@ -163,7 +164,7 @@ public class VariableCompressor implements Consumer<Task> {
         public Precompressor(NAR nar) {
             this.nar = nar;
             this.c = new VariableCompressor(nar);
-            this.i = new ArithmeticInduction(nar);
+            //this.i = new ArithmeticInduction(nar);
         }
 
         @Override public Task apply(Task input) {
@@ -173,15 +174,14 @@ public class VariableCompressor implements Consumer<Task> {
 
 
                 //stage 2
-                Set<Task> inputs = i.compress(input);
-
-                if (!inputs.isEmpty()) {
-                    Iterator<Task> ii = inputs.iterator();
-                    input = ii.next();
-                    while (ii.hasNext()) {
-                        nar.inputLater(ii.next());
-                    }
-                }
+                //Set<Task> inputs = i.compress(input);
+//                if (!inputs.isEmpty()) {
+//                    Iterator<Task> ii = inputs.iterator();
+//                    input = ii.next();
+//                    while (ii.hasNext()) {
+//                        nar.inputLater(ii.next());
+//                    }
+//                }
 
                 return input;
 

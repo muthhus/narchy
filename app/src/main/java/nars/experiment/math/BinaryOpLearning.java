@@ -3,7 +3,6 @@ package nars.experiment.math;
 import nars.*;
 import nars.experiment.NAREnvironment;
 import nars.experiment.arkanoid.Arkancide;
-import nars.gui.BagChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.Executioner;
@@ -13,7 +12,7 @@ import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.obj.Termject;
+import nars.term.obj.IntTerm;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.Util;
@@ -24,14 +23,12 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.function.BiFunction;
 
 import static java.lang.Integer.toBinaryString;
 import static nars.NAR.printTasks;
 import static nars.experiment.tetris.Tetris2.DEFAULT_INDEX_WEIGHT;
-import static nars.experiment.tetris.Tetris2.exe;
 import static nars.util.Texts.n2;
 import static nars.util.Util.argmax;
 
@@ -193,7 +190,7 @@ public class BinaryOpLearning extends NAREnvironment {
     public
     @Nullable
     static Compound charTerm(Term id, int jj, char c) {
-        return $.inh($.p(new Termject.IntTerm(jj), $.the(c)), id);
+        return $.inh($.p(new IntTerm(jj), $.the(c)), id);
 
 //        return $.p($.p(id,
 //                new Termject.IntTerm(jj)),

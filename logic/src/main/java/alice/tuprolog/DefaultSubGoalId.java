@@ -34,7 +34,7 @@ public class DefaultSubGoalId implements SubGoalId {
     
    
     public String toString() {
-        return root.getChild(index).toString();
+        return root.get(index).toString();
     }
 
 }

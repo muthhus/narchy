@@ -63,7 +63,8 @@ public class SubGoalStore {
                 }
             } else {
 
-                AbstractSubGoalTree s = commaStruct.getChild(index++);
+                int i = index++;
+                AbstractSubGoalTree s = commaStruct.get(i);
                 if (s instanceof SubGoalTree) {
                     pushSubGoal((SubGoalTree) s);
                 } else {

@@ -1,6 +1,9 @@
 package nars.term.transform;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
 import nars.concept.Concept;
 import nars.index.PatternIndex;
 import nars.nar.Default;

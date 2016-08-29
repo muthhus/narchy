@@ -11,18 +11,14 @@ import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.Tense;
-import nars.nal.UtilityFunctions;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
-import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.UtilityFunctions.and;
-import static nars.nal.UtilityFunctions.aveAri;
-import static nars.util.Texts.n2;
 
 /**
  * Created by me on 5/23/16.

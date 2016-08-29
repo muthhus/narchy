@@ -4,7 +4,6 @@ import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.Task;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;

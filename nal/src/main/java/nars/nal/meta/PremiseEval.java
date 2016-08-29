@@ -11,7 +11,6 @@ import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.op.Derive;
 import nars.nal.op.substitute;
-import nars.nal.op.substituteIfUnifies.substituteIfUnifiesDep;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

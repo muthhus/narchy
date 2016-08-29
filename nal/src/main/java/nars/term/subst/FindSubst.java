@@ -1,6 +1,5 @@
 package nars.term.subst;
 
-import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.index.TermIndex;

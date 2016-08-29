@@ -21,6 +21,7 @@ package nars.experiment.pacman;
 
 import com.github.benmanes.caffeine.cache.Policy;
 import com.google.common.collect.Iterables;
+import nars.term.obj.IntTerm;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
 import nars.$;
@@ -33,13 +34,12 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.ArithmeticInduction;
+import nars.nal.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.predict.LSTMPredictor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.util.Texts;
 import nars.util.Util;
@@ -136,7 +136,6 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 		MySTMClustered stm = new MySTMClustered(nar, 96, '.', 4);
 		MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 2);
 
-		new ArithmeticInduction(nar);
 
 		Pacman pacman = new Pacman(1 /* ghosts  */, 4 /* visionRadius */);
 
@@ -345,9 +344,9 @@ public class Pacman extends cpcman implements DiscreteEnvironment {
 				else /*if (dy < 0)*/ dirY = $.the("d"); //down
 				Term squareTerm = $.p(
 						//$.p(dirX, $.the(Math.abs(dx))),
-						$.p(new Termject.IntTerm(Math.abs(dx)), dirX),
+						$.p(new IntTerm(Math.abs(dx)), dirX),
 						//$.p(dirY, $.the(Math.abs(dy)))
-						$.p(new Termject.IntTerm(Math.abs(dy)), dirY)
+						$.p(new IntTerm(Math.abs(dy)), dirY)
 				);
 				//System.out.println(dx + " " + dy + " " + squareTerm);
 

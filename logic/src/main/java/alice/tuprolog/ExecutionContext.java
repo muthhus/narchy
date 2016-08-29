@@ -18,6 +18,7 @@
 package alice.tuprolog;
 
 import alice.util.OneWayList;
+import nars.util.data.list.FasterList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +85,7 @@ public class ExecutionContext {
     
     public List<List<Var>> getTrailingVars() {
         OneWayList<List<Var>> t = trailingVars;
-        ArrayList<List<Var>> l = new ArrayList<>();
+        List<List<Var>> l = new FasterList<>();
 
         while (t != null) {
             l.add(t.getHead());

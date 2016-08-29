@@ -76,7 +76,7 @@ public class StateException extends State {
                 Struct handler = (Struct) handlerTerm;
                 c.identify(handler);
                 SubGoalTree sgt = new SubGoalTree();
-                sgt.addChild(handler);
+                sgt.add(handler);
                 c.pushSubGoal(sgt);
                 e.currentContext.currentGoal = handler;
 
@@ -170,11 +170,11 @@ public class StateException extends State {
                 Struct handler = (Struct) handlerTerm;
                 c.identify(handler);
                 SubGoalTree sgt = new SubGoalTree();
-                sgt.addChild(handler);
+                sgt.add(handler);
                 if (isFinally) {
                     Struct finallyStruct = (Struct) finallyTerm;
                     c.identify(finallyStruct);
-                    sgt.addChild(finallyStruct);
+                    sgt.add(finallyStruct);
                 }
                 c.pushSubGoal(sgt);
                 e.currentContext.currentGoal = handler;

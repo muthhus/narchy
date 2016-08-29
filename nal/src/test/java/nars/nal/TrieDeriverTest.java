@@ -1,15 +1,11 @@
 package nars.nal;
 
 import com.google.common.collect.Sets;
-import nars.concept.Concept;
 import nars.index.PatternIndex;
-import nars.index.TransformConcept;
 import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.BoolCondition;
 import nars.nal.rule.PremiseRule;
 import nars.nar.Default;
-import nars.term.Termed;
-import nars.term.var.Variable;
 import org.apache.commons.math3.stat.Frequency;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -18,7 +14,8 @@ import java.util.*;
 
 import static java.lang.System.out;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by me on 12/12/15.

@@ -268,4 +268,9 @@ public class FasterList<X> extends FastList<X> {
         }
         return size();
     }
+
+    public void addAll(X... x) {
+        for (X y : x)
+            add(y);
+    }
 }
