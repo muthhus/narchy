@@ -120,11 +120,6 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 		super("CRK MAN");
 		this.numGhosts = ghosts;
 
-
-	}
-
-	public void init() {
-
 		setIgnoreRepaint(true);
 
 		// init variables

@@ -54,6 +54,12 @@ public class ArithmeticInductionTest {
                 conj(p(the("x"), the(1)), p(the("x"), the(2)), p(the("y"), the(2))).toString()
         );
     }
+    @Test public void testInvalidDueToDT() {
+        assertEquals(
+                "((x,`1`) &&+1 (x,`2`))",
+                conj(p(the("x"), the(1)), 1, p(the("x"), the(2))).toString()
+        );
+    }
 
     @Test
     public void testIntRangeCompressionPartial() {

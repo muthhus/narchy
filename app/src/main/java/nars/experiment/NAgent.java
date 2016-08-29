@@ -6,7 +6,6 @@ import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Activation;
 import nars.concept.Concept;
-import nars.task.AbstractTask;
 import nars.task.GeneratedTask;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -26,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static nars.$.t;
-import static nars.agent.NAgent.varPct;
+import static nars.agent.NAgentOld.varPct;
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.or;
 import static nars.nal.UtilityFunctions.w2c;
@@ -36,10 +35,10 @@ import static nars.util.Texts.n4;
 /**
  * explicit management of sensor concepts and motor functions
  */
-abstract public class NAREnvironment {
+abstract public class NAgent {
 
 
-    static final Logger logger = LoggerFactory.getLogger(NAREnvironment.class);
+    static final Logger logger = LoggerFactory.getLogger(NAgent.class);
 
     public final SensorConcept happy;
 
@@ -73,7 +72,7 @@ abstract public class NAREnvironment {
     private final float reinforcementAttention;
     private float curiosityAttention;
 
-    public NAREnvironment(NAR nar) {
+    public NAgent(NAR nar) {
         this.nar = nar;
         alpha = this.nar.confidenceDefault(Symbols.BELIEF);
         gamma = this.nar.confidenceDefault(Symbols.GOAL);

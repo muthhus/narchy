@@ -40,7 +40,7 @@ import static nars.util.Texts.n4;
 /**
  * Agent interface wrapping a NAR
  */
-public class NAgent implements Agent {
+public class NAgentOld implements Agent {
 
     public final NAR nar;
 
@@ -111,7 +111,7 @@ public class NAgent implements Agent {
     private FasterList<MutableTask> predictors;
 
 
-    public NAgent(NAR n) {
+    public NAgentOld(NAR n) {
 
         this(n,
             new DecidingSoftmax(0.6f, 0.4f, 0.999f)
@@ -119,7 +119,7 @@ public class NAgent implements Agent {
         );
     }
 
-    public NAgent(NAR n, Deciding deciding) {
+    public NAgentOld(NAR n, Deciding deciding) {
         this.nar = n;
         this.deciding = deciding;
 

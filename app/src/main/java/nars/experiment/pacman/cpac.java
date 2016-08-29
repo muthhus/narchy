@@ -153,6 +153,15 @@ public class cpac
 	{
 		return (maze.iMaze[icol][iRow] & (cmaze.WALL | cmaze.DOOR)) == 0;
 	}
+
+	/** returns if moved */
+	public boolean move(int d, int s) {
+		int px = iX;
+		int py = iY;
+		for ( ; s >= 0; s--)
+			move(d);
+		return (px!=iX) || (py!=iY);
+	}
 }
 
 

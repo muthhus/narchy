@@ -1,7 +1,7 @@
 package nars.experiment.math;
 
 import nars.*;
-import nars.experiment.NAREnvironment;
+import nars.experiment.NAgent;
 import nars.experiment.arkanoid.Arkancide;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -35,7 +35,7 @@ import static nars.util.Util.argmax;
 /**
  * Created by me on 8/21/16.
  */
-public class BinaryOpLearning extends NAREnvironment {
+public class BinaryOpLearning extends NAgent {
 
     private CharSensor a, b;
     private CharMotor c;
@@ -51,7 +51,7 @@ public class BinaryOpLearning extends NAREnvironment {
 
         char[] data = {};
 
-        public CharSensor(Term id, NAREnvironment env, int size, char[] vocab) {
+        public CharSensor(Term id, NAgent env, int size, char[] vocab) {
             this.id = id;
 
             data = new char[size];
@@ -115,7 +115,7 @@ public class BinaryOpLearning extends NAREnvironment {
         private final char[] vocab;
         private final NAR nar;
 
-        public CharMotor(Term id, NAREnvironment env, int length, char[] vocab /* characters it can choose from */) {
+        public CharMotor(Term id, NAgent env, int length, char[] vocab /* characters it can choose from */) {
 
             this.nar = env.nar;
 

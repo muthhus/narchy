@@ -430,13 +430,13 @@ public class NarseseTest {
 
     @Test public void testNonNegativeIntegerAtoms() {
         //TODO test parsing to numeric atom types
-        Atom a = term("1");
+        Term a = term("1");
         assertEquals("1", a.toString());
     }
 
     @Test public void testNegativeIntegerAtoms() {
         //TODO test parsing to numeric atom types
-        Atom a = term("-1");
+        Term a = term("-1");
         assertNotNull(a);
         assertEquals("-1", a.toString());
     }

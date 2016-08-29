@@ -3,12 +3,7 @@ package nars.experiment;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
-import nars.NAR;
-import nars.agent.NAgent;
-import nars.concept.Concept;
 import nars.learn.Agent;
-import nars.nar.Default;
-import nars.op.time.MySTMClustered;
 
 import java.util.Arrays;
 

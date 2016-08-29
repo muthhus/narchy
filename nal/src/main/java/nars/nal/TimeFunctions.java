@@ -908,6 +908,9 @@ public interface TimeFunctions {
 
     @NotNull static Compound dt(@NotNull Compound derived, int dt, @NotNull PremiseEval p, long[] occReturn) {
         Op o = derived.op();
+        if (!o.temporal) {
+            dt = DTERNAL;
+        }
         if (!o.temporal && dt!=DTERNAL && dt!=0 && occReturn[0]!=ETERNAL) {
             //something got reduced to a non-temporal, so shift it to the midpoint of what the actual term would have been:
             occReturn[0] += dt/2;

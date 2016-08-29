@@ -113,6 +113,9 @@ public abstract class TermBuilder {
 
                 return negation(u[0]);
 
+//            case INTRANGE:
+//                System.err.println("intRange: " + Arrays.toString(u));
+//                break;
 
             case INSTANCE:
                 if (u.length != 2 || dt != DTERNAL) throw new InvalidTermException(INSTANCE, dt, u, "needs 2 arg");
@@ -316,6 +319,9 @@ public abstract class TermBuilder {
         }
 
         int s = args.size();
+        if (s == 0) {
+            throw new RuntimeException("should not have zero args here");
+        }
         if (s == 1 && op.minSize > 1) {
             //special case: allow for ellipsis to occupy one item even if minArity>1
             Term a0 = args.term(0);

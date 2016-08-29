@@ -244,7 +244,7 @@ public interface Termject<X> extends Term {
                 //}
 
             }
-            return false;
+            return super.unify(y, f);
         }
 
 

@@ -13,7 +13,7 @@ import java.io.PrintStream;
 /**
  * Created by me on 5/5/16.
  */
-public class NAgentDebug extends NAgent  {
+public class NAgentDebug extends NAgentOld {
 
     private final PrintStream log;
 

@@ -3,7 +3,7 @@ package nars.experiment.arkanoid;
 
 import nars.*;
 import nars.data.AutoClassifier;
-import nars.experiment.NAREnvironment;
+import nars.experiment.NAgent;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -37,7 +37,7 @@ import static nars.nal.UtilityFunctions.or;
 import static nars.vision.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
-public class Arkancide extends NAREnvironment {
+public class Arkancide extends NAgent {
 
     private static final int cyclesPerFrame = 8;
     public static final int runFrames = 50000;
@@ -169,12 +169,12 @@ public class Arkancide extends NAREnvironment {
 
     }
 
-    public static void newBeliefChartWindow(NAREnvironment narenv, long window) {
+    public static void newBeliefChartWindow(NAgent narenv, long window) {
         GridSurface chart = newBeliefChart(narenv, window);
         new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
     }
 
-    public static GridSurface newBeliefChart(NAREnvironment narenv, long window) {
+    public static GridSurface newBeliefChart(NAgent narenv, long window) {
         NAR nar = narenv.nar;
         long[] btRange = new long[2];
         nar.onFrame(nn -> {

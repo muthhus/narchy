@@ -4,21 +4,14 @@ import nars.$;
 import nars.index.CaffeineIndex;
 import nars.nar.Executioner;
 import nars.nar.MultiThreadExecutioner;
-import nars.nar.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
-import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.tuple.Tuples;
 import nars.NAR;
-import nars.agent.NAgent;
-import nars.concept.Concept;
-import nars.learn.Agent;
 import nars.nar.Default;
-import nars.op.time.MySTMClustered;
 
 import java.util.Arrays;
 
@@ -29,7 +22,7 @@ import static nars.experiment.tetris.Tetris2.DEFAULT_INDEX_WEIGHT;
 /**
  * Created by me on 5/4/16.
  */
-public class Line1DContinuous extends NAREnvironment {
+public class Line1DContinuous extends NAgent {
 
 
     private final IntToFloatFunction targetFunc;

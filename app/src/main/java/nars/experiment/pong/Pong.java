@@ -10,11 +10,10 @@ import com.google.common.collect.Iterables;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
 import nars.NAR;
-import nars.agent.NAgent;
+import nars.agent.NAgentOld;
 import nars.concept.Concept;
 import nars.experiment.DiscreteEnvironment;
 import nars.gui.BagChart;
-import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -58,7 +57,7 @@ public class Pong extends Player implements DiscreteEnvironment {
     private final PongModel pong;
 
     float bias; //pain of boredom
-    private NAgent nagent;
+    private NAgentOld nagent;
     final SwingCamera swingCamera;
 
 
@@ -89,7 +88,7 @@ public class Pong extends Player implements DiscreteEnvironment {
 
         List<SensorConcept> cheats = new ArrayList();
 
-        NAgent a = new NAgent(nar) {
+        NAgentOld a = new NAgentOld(nar) {
             @Override
             public void start(int inputs, int ac) {
                 super.start(inputs, ac);
@@ -289,7 +288,7 @@ public class Pong extends Player implements DiscreteEnvironment {
     }
 
 
-    public static void beliefChart(NAgent a, List<? extends Concept> additional) {
+    public static void beliefChart(NAgentOld a, List<? extends Concept> additional) {
         List<Concept> charted = new ArrayList(a.actions);
         Iterables.addAll(charted, a.rewardConcepts);
         charted.addAll(additional);
@@ -298,10 +297,10 @@ public class Pong extends Player implements DiscreteEnvironment {
 
     @Override
     public void preStart(Agent a) {
-        if (a instanceof NAgent) {
+        if (a instanceof NAgentOld) {
             //provide custom sensor input names for the nars agent
 
-            nagent = (NAgent) a;
+            nagent = (NAgentOld) a;
 
 //			for (int i = 1; i < Math.max(width,height); i++) {
 //				nar.believe("(" + (i-1) + " <-> " + i + ")", 0.85f, 1f);

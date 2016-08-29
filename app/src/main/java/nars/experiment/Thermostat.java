@@ -3,7 +3,7 @@ package nars.experiment;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
 import nars.NAR;
-import nars.agent.NAgent;
+import nars.agent.NAgentOld;
 import nars.learn.Agent;
 import nars.learn.ql.DQN;
 import nars.nar.Default;
@@ -160,7 +160,7 @@ public class Thermostat implements DiscreteEnvironment {
                 .call("conceptAct", 0.1f, 0.8f, 0.05f,  "conceptActivation.setValue(#x)")
 
                 .run(3500, (x) ->
-                    new Thermostat().run(new NAgent(x), cycles)
+                    new Thermostat().run(new NAgentOld(x), cycles)
                 );
 
         System.out.println();

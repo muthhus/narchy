@@ -176,17 +176,18 @@ import static nars.nal.Tense.DTERNAL;
 
         Concept result = null;
 
-        if (term instanceof Termject) {
-        //if (term.op() == INT || term.op() == INTRANGE) {
-            Map m = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
-            result = new TermjectConcept((Termject)term, termbag(m), taskbag(m));
-        }
-        else if (term instanceof Compound) {
+
+        if (term instanceof Compound) {
 
             result = newConcept((Compound) term);
 
         } else {
 
+            if (term instanceof Termject) {
+                //if (term.op() == INT || term.op() == INTRANGE) {
+                Map m = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
+                result = new TermjectConcept((Termject)term, termbag(m), taskbag(m));
+            }
 
             if (term instanceof Variable) {
                 //final int s = this.serial;

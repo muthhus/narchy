@@ -3,7 +3,7 @@ package nars.experiment.math;
 import nars.experiment.DiscreteEnvironment;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
-import nars.agent.NAgent;
+import nars.agent.NAgentOld;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -275,7 +275,7 @@ abstract public class Algorithmic implements DiscreteEnvironment {
         //n.logSummaryGT(System.out, 0.2f);
         //n.log();
 
-        final NAgent a = new NAgent(n) {
+        final NAgentOld a = new NAgentOld(n) {
             @Override
             public void start(int inputs, int actions) {
                 super.start(inputs, actions);

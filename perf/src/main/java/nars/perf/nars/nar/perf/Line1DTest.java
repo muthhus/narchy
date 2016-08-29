@@ -1,15 +1,12 @@
 package nars.perf.nars.nar.perf;
 
-import nars.NAR;
-import nars.agent.NAgent;
-import nars.concept.Concept;
+import nars.agent.NAgentOld;
 import nars.experiment.Line1D;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.Executioner;
 import nars.nar.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.openjdk.jmh.annotations.*;
@@ -17,7 +14,6 @@ import org.openjdk.jmh.runner.RunnerException;
 
 import static nars.experiment.Line1D.random;
 import static nars.experiment.tetris.Tetris2.DEFAULT_INDEX_WEIGHT;
-import static nars.experiment.tetris.Tetris2.exe;
 import static nars.perf.Main.perf;
 
 /**
@@ -62,7 +58,7 @@ public class Line1DTest {
 
         //new MySTMClustered(nar, 4, '.', 2);
 
-        NAgent nagent = new NAgent(nar);
+        NAgentOld nagent = new NAgentOld(nar);
 
         Line1D line = new Line1D(width,
                 random(50)

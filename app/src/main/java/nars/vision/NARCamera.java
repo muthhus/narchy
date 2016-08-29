@@ -9,7 +9,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
-import nars.agent.NAgent;
+import nars.agent.NAgentOld;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Term;
@@ -39,7 +39,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     public static final float minZoom = 0.25f;
     public static final float maxZoom = 1f;
 
-    public final NAgent controller;
+    public final NAgentOld controller;
     public final PixelCamera cam;
     private final PixelToTerm pixelTerm;
 
@@ -66,7 +66,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         this.nar = nar;
         this.cam = c;
         this.pixelTerm = pixelTerm;
-        this.controller = new NAgent(nar);
+        this.controller = new NAgentOld(nar);
         this.z = 0.25f;
         controller.start(
                 Collections.emptyList(),

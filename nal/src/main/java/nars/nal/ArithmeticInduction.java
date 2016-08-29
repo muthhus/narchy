@@ -227,7 +227,7 @@ public class ArithmeticInduction {
                     /*if (!pp.equals(ppp))*/
 
             List<Term> ff = features(nn.getTwo());
-            if (ff.size() >= numInvolved) {
+            if (ff.isEmpty() || ff.size() >= numInvolved) {
                 //nothing would be gained; dont bother
                 continue;
             }

@@ -31,13 +31,7 @@
 
 package nars.perf.nars.nar.perf;
 
-import nars.NAR;
-import nars.agent.NAgent;
-import nars.concept.Concept;
-import nars.experiment.Line1D;
-import nars.nal.Deriver;
 import nars.nar.Default;
-import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.util.experiment.DeductiveMeshTest;
 import org.openjdk.jmh.annotations.*;

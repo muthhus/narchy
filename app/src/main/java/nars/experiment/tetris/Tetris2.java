@@ -3,11 +3,11 @@ package nars.experiment.tetris;
 import com.google.common.collect.Lists;
 import nars.*;
 import nars.nar.Executioner;
-import nars.nar.SingleThreadExecutioner;
+import nars.nar.MultiThreadExecutioner;
 import nars.term.obj.IntTerm;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.data.AutoClassifier;
-import nars.experiment.NAREnvironment;
+import nars.experiment.NAgent;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.index.CaffeineIndex;
@@ -46,13 +46,13 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 /**
  * Created by me on 7/28/16.
  */
-public class Tetris2 extends NAREnvironment {
+public class Tetris2 extends NAgent {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 24 * 10000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 20 * 10000000;
 
     public static final Executioner exe =
-            //new MultiThreadExecutioner(2, 16384);
-            new SingleThreadExecutioner();
+            new MultiThreadExecutioner(2, 16384);
+            //new SingleThreadExecutioner();
 
     public static final int runFrames = 1500;
     public static final int cyclesPerFrame = 3;
@@ -401,8 +401,8 @@ public class Tetris2 extends NAREnvironment {
         //new Abbreviation(nar,"aKa_");
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 5);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 5);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new VariableCompressor(nar);
 
@@ -666,11 +666,11 @@ public class Tetris2 extends NAREnvironment {
         return new GridSurface(VERTICAL, plot, plot1, plot2, plot3, plot4);
     }
 
-    public static class NARController extends NAREnvironment {
+    public static class NARController extends NAgent {
 
         private final NARLoop loop;
         private final NAR worker;
-        private final NAREnvironment env;
+        private final NAgent env;
         private final FloatSupplier learn;
         private final RangeNormalizedFloat busy;
         public float score;
@@ -695,7 +695,7 @@ public class Tetris2 extends NAREnvironment {
         }
 
 
-        public NARController( NAR worker, NARLoop loop, NAREnvironment env) {
+        public NARController( NAR worker, NARLoop loop, NAgent env) {
 
             super( new Default(384, 4, 3, 2, new XORShiftRandom(2),
                     new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 5*100000, false, exe),
