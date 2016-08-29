@@ -2,10 +2,12 @@ package nars.nal.meta.op;
 
 import nars.Task;
 import nars.nal.meta.AtomicBoolCondition;
+import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -41,6 +43,20 @@ abstract public class events extends AtomicBoolCondition {
         public boolean booleanValueOf(@NotNull PremiseEval m) {
             @Nullable Task b = m.belief;
             return b != null && beliefBeforeOrDuringTask(b, m.task);
+        }
+
+    };
+    public static final BoolCondition taskNotDTernal = new events() {
+
+        @Override
+        public String toString() {
+            return "taskNotDTernal";
+        }
+
+        @Override
+        public boolean booleanValueOf(@NotNull PremiseEval m) {
+            int dt = m.task.dt();
+            return (dt != DTERNAL);
         }
 
     };

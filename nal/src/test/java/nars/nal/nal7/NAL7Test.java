@@ -677,10 +677,10 @@ public class NAL7Test extends AbstractNALTest {
     @Test public void testWTFDontDecomposeConjunctionDTERNAL() {
         test()
                 .input("((x)&&(y)). :|:")
-                .mustBelieve(cycles,"(x)",1f,0.81f,0)
-                .mustBelieve(cycles,"(y)",1f,0.81f,0)
-                .mustNotOutput(cycles,"(x)",'.',ETERNAL)
-                .mustNotOutput(cycles,"(y)",'.',ETERNAL);
+//                .mustBelieve(cycles,"(x)",1f,0.81f,0)
+//                .mustBelieve(cycles,"(y)",1f,0.81f,0)
+                .mustNotOutput(cycles,"(x)",'.',ETERNAL, 0)
+                .mustNotOutput(cycles,"(y)",'.',ETERNAL, 0);
     }
 //    @Test public void testWTFDontDecomposeConjunction1() {
 //        test()

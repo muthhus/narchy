@@ -20,12 +20,15 @@
  */
 package nars.truth;
 
+import nars.$;
 import nars.Param;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 import static java.lang.Math.abs;
 import static nars.$.t;
@@ -443,6 +446,17 @@ public final class TruthFunctions extends UtilityFunctions {
                 t(and(f1, f2), c);
     }
 
+    public static Truth intersection(@Nullable List<Truth> truths, float minConf) {
+        float f = 1f;
+        float c = 1f;
+        for (Truth t : truths) {
+            f *= t.freq();
+            c *= t.conf();
+            if (c < minConf)
+                return null;
+        }
+        return $.t(f, c);
+    }
 
 //    private static float freqInterp(float f1, float f2, float c1, float c2) {
 //        float w1 = c2w(c1);

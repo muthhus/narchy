@@ -182,6 +182,11 @@ public enum $ {
         if (negate) return (Compound) neg(x);
         return x;
     }
+    @Nullable public static Truth negIf(@NotNull Truth x, boolean negate) {
+        if (negate)
+            return x.negated();
+        return x;
+    }
 
     @NotNull
     public static Compound p(@NotNull Collection<? super Term> t) {

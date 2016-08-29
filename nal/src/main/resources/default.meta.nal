@@ -285,10 +285,10 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //structural decompose any component of a conjunction
-     (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Goal:StructuralStrong)
+     (&&,X,A..+), X, time(decomposeTaskIfTemporal) |- X, (Belief:StructuralDeduction,Goal:StructuralStrong)
      (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralStrong)
 
-     (&&,X,A), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
+     (&&,X,A), B, time(decomposeTask) |- substituteIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
      (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)

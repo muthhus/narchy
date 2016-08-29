@@ -9,11 +9,14 @@ import nars.data.Range;
 import nars.link.BLink;
 import nars.nal.Conclusion;
 import nars.nal.Deriver;
+import nars.nal.Premise;
 import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
+import nars.util.Texts;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
+import nars.util.data.map.CapacityLinkedHashMap;
 import nars.util.data.map.nbhm.NonBlockingHashMap;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +73,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
 //
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
+    private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
+    long novel=0, total=0;
 
     public ConceptBagCycle(@NotNull NAR nar, int initialCapacity, MutableInteger cyclesPerFrame) {
 
@@ -136,19 +141,33 @@ public class ConceptBagCycle implements Consumer<NAR> {
                 if (c != null) {
                     new FireConcept(c, nar,
                             taskLinks, termLinks,
-                            new LinkedHashSet<>( 2 * (taskLinks*termLinks) /* estimate */ ))
+                            new LinkedHashSet<>( 2 * (taskLinks*termLinks) /* estimate */ )) {
+                        @Override
+                        public void accept(Premise p) {
+                            total++;
+                            if (recent.putIfAbsent(p,p)==null) {
+                                super.accept(p);
+                                novel++;
+                            } else {
+                                //System.err.println("duplicate (novel=" + Texts.n2(((float)novel/total)*100f) + "%)" );
+                            }
+
+                        }
+                    }
                         .run();
                 }
             }
 
         }
 
+        recent.clear();
+
     }
 
     /**
      * shared combined conclusion
      */
-    public static class FireConcept extends Conclusion implements Runnable, Supplier<Conclusion> {
+    public static class FireConcept extends Conclusion implements Runnable, Consumer<Premise> {
 
         private static final Logger logger = LoggerFactory.getLogger(FireConcept.class);
 
@@ -156,6 +175,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
         private final NAR nar;
         private final short tasklinks;
         private final short termlinks;
+        private PremiseEval mm;
+        private int count;
 
         public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks, Collection<Task> batch) {
             super(batch);
@@ -165,11 +186,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
             this.termlinks = termlinks;
         }
 
-        @NotNull
-        @Override
-        public final Conclusion get() {
-            return this;
-        }
+
 
         @Override
         public void run() {
@@ -177,6 +194,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
             try {
 
                 c.commit();
+
 
                 firePremiseSquared(
                         c,
@@ -205,7 +223,9 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
             FasterList<BLink<Term>> termsBuffer = $.newArrayList(termlinks);
             c.termlinks().sample(termlinks, termsBuffer::addIfNotNull);
-            int count = 0;
+
+            count = 0;
+
             if (!termsBuffer.isEmpty()) {
 
 
@@ -214,11 +234,11 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
                 if (!tasksBuffer.isEmpty()) {
 
-                    PremiseEval mm = matcher.get();
+                    mm = matcher.get();
                     mm.init(nar);
 
                     for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
-                        count += PremiseBuilder.run(
+                        PremiseBuilder.run(
                                 c,
                                 nar,
                                 termsBuffer,
@@ -240,6 +260,11 @@ public class ConceptBagCycle implements Consumer<NAR> {
         }
 
 
+        @Override
+        public void accept(Premise p) {
+            mm.run(p, this);
+            count++;
+        }
     }
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */

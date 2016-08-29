@@ -3,6 +3,7 @@ package nars.nal;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
+import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.TaskBudgeting;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
@@ -11,19 +12,26 @@ import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.task.AnswerTask;
+import nars.task.RevisionTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.subst.UnifySubst;
+import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static nars.Op.CONJ;
+import static nars.Op.NEG;
 import static nars.concept.Activation.linkable;
 import static nars.nal.Tense.ETERNAL;
 
@@ -50,16 +58,15 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static int run(@NotNull Concept c, @NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, @NotNull Supplier<Conclusion> conclusions) {
+    public static void run(@NotNull Concept c, @NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, @NotNull Consumer<Premise> each) {
 
-        int count = 0;
         long now = nar.time();
 
         float minDur = nar.durMin.floatValue();
 
         Task task = taskLink.get();
         if (task == null)
-            return 0;
+            return;
 
         Compound taskTerm = task.term();
 
@@ -72,8 +79,8 @@ public enum PremiseBuilder {
 
             BLink<Term> termLink = termLinks.get(i);
             Term term = termLink.get();
-            if (term == null)
-                continue;
+            /*if (term == null)
+                continue;*/
 
             if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
                 continue;
@@ -81,15 +88,12 @@ public enum PremiseBuilder {
             if (budget(pBudget, taskLink, termLink, minDur)) {
 
                 Premise p = newPremise(nar, c, now, task, term, pBudget);
+                each.accept(p);
 
-                matcher.run(p, conclusions.get());
-
-                count++;
 
             }
         }
 
-        return count;
     }
 
     private static boolean budget(@NotNull RawBudget pBudget, @NotNull BLink<Task>taskLink, @NotNull BLink<Term> termLink, float minDur) {
@@ -129,9 +133,12 @@ public enum PremiseBuilder {
                     Task solution = table.match(task, now);
                     if (solution!=null) {
                         try {
-                            Task answered = answer(nar, c, task, solution, beliefConcept);
+                            Task answered = answer(nar, task, solution, beliefConcept);
                             if (task.isQuestion())
                                 belief = answered;
+                            else
+                                belief = currentBelief(task, beliefConcept, now, nar); //in case of quest, proceed with matching belief
+
                         } catch (TermIndex.InvalidConceptException e) {
                             logger.warn("{}", e.getMessage());
                         }
@@ -141,7 +148,7 @@ public enum PremiseBuilder {
 
                 } else {
 
-                    belief = beliefConcept.beliefs().match(task, now);
+                    belief = currentBelief(task, beliefConcept, now, nar);
 
                 }
             }
@@ -152,9 +159,81 @@ public enum PremiseBuilder {
         return p;
     }
 
+    private static Task currentBelief(@NotNull Task task, Concept beliefConcept, long now, @NotNull NAR nar) {
+        BeliefTable beliefs = beliefConcept.beliefs();
+
+        Task x = beliefs.match(task,now);
+
+
+        //experimental dynamic eval
+        Compound term = (Compound) beliefConcept.term();
+        int n = term.size();
+        if (term.vars() == 0 && beliefConcept.op() == CONJ && n > 2) {
+            long occThresh = 1;
+            if (x == null || Math.abs(now - x.occurrence() ) >= occThresh) {
+
+                boolean uncomputable = false;
+                List<Truth> t = $.newArrayList(n);
+                List<Task> e = $.newArrayList(n);
+                Budget b = null;
+                for (Term s : ((Compound) term).terms()) {
+                    if (!(s instanceof Compound) || s.hasTemporal()) {
+                        uncomputable = true; break;
+                    }
+
+                    boolean negated = s.op()==NEG;
+                    if (negated)
+                        s = $.unneg(s).term();
+
+                    Concept p = nar.concept(s);
+                    if (p == null || !p.hasBeliefs()) {
+                        uncomputable = true; break;
+                    }
+
+                    @Nullable Truth nt = p.belief(now);
+                    if (nt==null) {
+                        uncomputable = true; break;
+                    }
+                    t.add($.negIf(nt,negated));
+
+                    @Nullable Task bt = p.beliefs().top(now);
+                    if (bt!=null) {
+                        Budget btb = bt.budget();
+                        if (b == null && !btb.isDeleted())
+                            b = btb;
+                        else
+                            BudgetMerge.plusBlend.apply(b, btb, 1f);
+
+                        e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
+                    }
+                }
+
+                if (!uncomputable) {
+                    Truth y = TruthFunctions.intersection(t, nar.confMin.floatValue());
+                    if (y != null) {
+
+                        ///@NotNull Termed<Compound> newTerm = term.dt() != 0 ? $.parallel(term.terms()) : term;
+
+                        RevisionTask xx = new RevisionTask(term, Symbols.BELIEF, y, now, now, Stamp.zip((Collection)e));
+                        xx.budget(b);
+                        xx.log("Dynamic");
+
+                        nar.inputLater(xx);
+
+                        //System.err.println(xx + "\tvs\t" + x);
+
+                        x = xx;
+                    }
+                }
+            }
+        }
+
+        return x;
+    }
+
 
     @Nullable
-    private static Task answer(@NotNull NAR nar, @NotNull Concept c, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {
+    private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {
 
         long taskOcc = taskLink.occurrence();
 

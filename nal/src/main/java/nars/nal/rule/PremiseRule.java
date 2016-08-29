@@ -696,6 +696,10 @@ public class PremiseRule extends GenericCompound {
                         case "decomposeTask":
                             timeFunction = TimeFunctions.decomposeTask;
                             break;
+                        case "decomposeTaskIfTemporal":
+                            pres.add( events.taskNotDTernal);
+                            timeFunction = TimeFunctions.decomposeTask;
+                            break;
 
 
                         case "decomposeTaskIfTermLinkBefore":

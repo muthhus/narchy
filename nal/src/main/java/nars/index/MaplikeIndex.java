@@ -36,6 +36,8 @@ public abstract class MaplikeIndex extends TermIndex {
 
     @Nullable Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
 
+        x = conceptualize(x);
+
         return createIfMissing ?
                 getConceptCompound(x) :
                 get(x);
@@ -69,9 +71,8 @@ public abstract class MaplikeIndex extends TermIndex {
      * default lowest common denominator impl, subclasses may reimpl for more efficiency
      */
     @NotNull
-    protected Termed getConceptCompound(@NotNull Compound x) {
+    protected Termed getConceptCompound(@NotNull Compound xx) {
 
-        Term xx = conceptualize(x);
         Termed y = get(xx, false);
         if (y == null) {
             set(y = buildConcept(xx));

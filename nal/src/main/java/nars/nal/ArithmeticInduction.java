@@ -246,12 +246,18 @@ public class ArithmeticInduction {
                 j++;
             }
 
-            for (Term f : ff) {
-                Term y = template instanceof Compound ? $.negIf((Compound) $.terms.transform((Compound) template, pp, f), negate) : f;
-                s.add(y);
+            try {
+                for (Term f : ff) {
+                    Term y = template instanceof Compound ? $.negIf((Compound) $.terms.transform((Compound) template, pp, f), negate) : f;
+                    s.add(y);
+                }
+
+                return TermSet.the(s);
+            } catch (ClassCastException eee) {
+                //return subs; //HACK
+                continue; //HACK
             }
 
-            return TermSet.the(s);
 
 //
 //                for (Term ff : fff) {

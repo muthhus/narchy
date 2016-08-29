@@ -101,12 +101,12 @@ public class RawBudget implements Budget {
 
 
     public boolean equals(Object that) {
-        throw new RuntimeException("N/A");
+        throw new RuntimeException("RawBudget equality is N/A");
     }
 
     @Override
     public int hashCode() {
-        throw new RuntimeException("N/A");
+        throw new RuntimeException("RawBudget hashcode is N/A");
      }
 
     /**

@@ -114,4 +114,26 @@ public final class Premise extends RawBudget implements Tasked {
     @Nullable public final BLink<? extends Task> tasklink(Concept c) {
         return c.tasklinks().get(task);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Premise)) return false;
+
+        Premise premise = (Premise) o;
+
+        if (!task.equals(premise.task)) return false;
+        if (!term.equals(premise.term)) return false;
+        return belief != null ? belief.equals(premise.belief) : premise.belief == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        result = 31 * result + task.hashCode();
+        result = 31 * result + term.hashCode();
+        result = 31 * result + (belief != null ? belief.hashCode() : 0);
+        return result;
+    }
 }

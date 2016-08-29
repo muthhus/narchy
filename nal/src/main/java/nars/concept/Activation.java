@@ -243,6 +243,8 @@ public class Activation {
                 if (((Compound) x).term(0) instanceof Variable)
                     return false;
             }
+            if (!x.isNormalized())
+                return false;
         }
         return true;
     }

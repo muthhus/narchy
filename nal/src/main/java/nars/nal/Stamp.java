@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 public interface Stamp {
 
@@ -278,6 +279,10 @@ public interface Stamp {
     }
 
     static long[] zip(@NotNull TemporalBeliefTable s) {
+        return zip(s, s.size(), Param.STAMP_CAPACITY);
+    }
+
+    static long[] zip(@NotNull Collection<Task> s) {
         return zip(s, s.size(), Param.STAMP_CAPACITY);
     }
 
