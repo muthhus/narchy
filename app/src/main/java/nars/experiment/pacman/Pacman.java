@@ -21,6 +21,7 @@ package nars.experiment.pacman;
 
 import nars.experiment.NAgent;
 import nars.gui.BeliefTableChart;
+import nars.op.VariableCompressor;
 import nars.truth.Truth;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -42,6 +43,8 @@ import java.util.List;
 import java.util.Random;
 
 import static nars.experiment.pong.Pong.numericSensor;
+import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
+import static nars.experiment.tetris.Tetris.exe;
 
 /**
  * the java application class of pacman 
@@ -84,16 +87,14 @@ public class Pacman extends NAgent {
 
         //Param.CONCURRENCY_DEFAULT = 2;
 
-        //Multi nar = new Multi(4,512,
+        //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                8, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 10 * 10000000)
-                //new Cache2kIndex(100000, rng)
-                //new InfinispanIndex(new DefaultConceptBuilder(rng))
-                //new Indexes.WeakTermIndex(128 * 1024, rng)
-                //new Indexes.SoftTermIndex(128 * 1024, rng)
-                //new Indexes.DefaultTermIndex(128 *1024, rng)
-                , new FrameClock());
+                8, 2, 3, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
+                new FrameClock(), exe
+
+        );
+        nar.preprocess(new VariableCompressor.Precompressor(nar));
 
 
         //new MemoryManager(nar);
@@ -106,7 +107,7 @@ public class Pacman extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.5f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.confMin.setValue(0.05f);
-        nar.compoundVolumeMax.set(40);
+        //nar.compoundVolumeMax.set(40);
 
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -132,11 +133,11 @@ public class Pacman extends NAgent {
         //Param.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 96, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 96, '.', 2);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 2);
 
 
-        Pacman pacman = new Pacman(nar, 1 /* ghosts  */, 6 /* visionRadius */);
+        Pacman pacman = new Pacman(nar, 1 /* ghosts  */, 3 /* visionRadius */);
 
 
 

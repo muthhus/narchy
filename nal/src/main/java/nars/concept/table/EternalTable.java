@@ -28,6 +28,24 @@ import static nars.nal.Tense.ETERNAL;
  */
 public class EternalTable extends SortedArray<Task> implements TaskTable, Comparator<Task> {
 
+    public static final EternalTable EMPTY = new EternalTable(0) {
+
+        @Override
+        public @Nullable Task put(@NotNull Task incoming) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void forEach(Consumer<? super Task> action) {
+
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+    };
+
     int capacity;
     private Truth truth;
 
@@ -89,10 +107,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         return w.conf();
     }
 
-    public final float minRank() {
-        Task w = weakest();
-        return w == null ? 0 : rank(w);
-    }
+//    public final float minRank() {
+//        Task w = weakest();
+//        return w == null ? 0 : rank(w);
+//    }
 
     @Override
     public final int compare(@NotNull Task o1, @NotNull Task o2) {
@@ -182,7 +200,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
              .log("Insertion Revision");
     }
 
-    @Nullable public final Task put(@NotNull final Task incoming) {
+    @Nullable public Task put(@NotNull final Task incoming) {
         Task displaced = null;
 
         if (size() == capacity()) {

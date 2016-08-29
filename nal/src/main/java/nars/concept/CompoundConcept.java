@@ -191,7 +191,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     @NotNull
     protected BeliefTable newBeliefTable(int eCap, int tCap) {
-        return new DefaultBeliefTable(eCap, tCap);
+        return new DefaultBeliefTable(tCap);
     }
 
     @NotNull
@@ -203,7 +203,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     @NotNull
     protected BeliefTable newGoalTable(int eCap, int tCap) {
-        return new DefaultBeliefTable(eCap, tCap);
+        return new DefaultBeliefTable(tCap);
     }
 
     /**

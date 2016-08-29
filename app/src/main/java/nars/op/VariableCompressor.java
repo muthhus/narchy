@@ -98,10 +98,11 @@ public class VariableCompressor implements Consumer<Task> {
         return null;
     }
 
+    final static Term var =
+            $.varDep("c");
+    //$.varIndep("c");
+
     private Task compress(Task task, Term max) {
-        Term var =
-                $.varDep("c");
-                //$.varIndep("c");
 
         Compound oldContent = task.term();
         Term newContent = $.terms.replace(oldContent, max, var);

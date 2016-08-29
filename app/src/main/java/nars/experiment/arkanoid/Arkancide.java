@@ -31,8 +31,8 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.t;
-import static nars.experiment.tetris.Tetris2.arrayRenderer;
-import static nars.experiment.tetris.Tetris2.exe;
+import static nars.experiment.tetris.Tetris.arrayRenderer;
+import static nars.experiment.tetris.Tetris.exe;
 import static nars.nal.UtilityFunctions.or;
 import static nars.vision.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;

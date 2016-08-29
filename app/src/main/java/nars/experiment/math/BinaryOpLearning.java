@@ -28,7 +28,7 @@ import java.util.function.BiFunction;
 
 import static java.lang.Integer.toBinaryString;
 import static nars.NAR.printTasks;
-import static nars.experiment.tetris.Tetris2.DEFAULT_INDEX_WEIGHT;
+import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.util.Texts.n2;
 import static nars.util.Util.argmax;
 

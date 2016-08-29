@@ -16,7 +16,7 @@ import nars.nar.Default;
 import java.util.Arrays;
 
 import static java.lang.System.out;
-import static nars.experiment.tetris.Tetris2.DEFAULT_INDEX_WEIGHT;
+import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 
 
 /**

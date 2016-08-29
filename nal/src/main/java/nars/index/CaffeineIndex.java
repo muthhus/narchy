@@ -20,6 +20,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+import static nars.nal.UtilityFunctions.or;
+
 
 public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
@@ -48,15 +50,18 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     };
 
     private static int weigh(Termlike v) {
-        float beliefDiscount = (v instanceof CompoundConcept) ?
-                    (1f + maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
-                    1;
-        return Math.round( 1f + 100 * v.complexity() / beliefDiscount);
+        float beliefCost = (v instanceof CompoundConcept) ?
+                    (1f - maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
+                    0;
+        int c = v.complexity();
+        //return Math.round( 1f + 100 * c * beliefCost);
+        return Math.round( 1f + 10 * (c*c) * beliefCost);
     }
 
     private static float maxConfidence(@NotNull CompoundConcept v) {
         //return Math.max(v.beliefs().confMax(), v.goals().confMax());
-        return ((v.beliefs().confMax()) + (v.goals().confMax()));
+        //return ((v.beliefs().confMax()) + (v.goals().confMax()));
+        return or((v.beliefs().confMax()), (v.goals().confMax()));
     }
 
 

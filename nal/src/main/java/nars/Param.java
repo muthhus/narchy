@@ -42,7 +42,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float BACKWARD_DERIVATION_FACTOR = 0.1f;
 
     /** used in linear interpolating link adjustments during feedback */
-    public static float LINK_FEEDBACK_RATE = 0.5f;
+    public static float LINK_FEEDBACK_RATE = 0.25f;
 
 
     /**

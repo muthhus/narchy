@@ -13,7 +13,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
 import static nars.experiment.Line1D.random;
-import static nars.experiment.tetris.Tetris2.DEFAULT_INDEX_WEIGHT;
+import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.perf.Main.perf;
 
 /**
