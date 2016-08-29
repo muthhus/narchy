@@ -155,11 +155,14 @@ public class cpac
 	}
 
 	/** returns if moved */
-	public boolean move(int d, int s) {
+	public boolean move(int d, int s, cpcman c) {
 		int px = iX;
 		int py = iY;
-		for ( ; s >= 0; s--)
-			move(d);
+		int eaten = 0;
+		for ( ; s >= 0; s--) {
+			eaten += move(d);
+		}
+		c.eatDots(eaten);
 		return (px!=iX) || (py!=iY);
 	}
 }

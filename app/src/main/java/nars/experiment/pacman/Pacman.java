@@ -50,15 +50,18 @@ public class Pacman extends NAgent {
 
     final cpcman pacman;
     public static final int cyclesPerFrame = 4;
+
     final int visionRadius;
     final int itemTypes = 3;
     final static int runCycles = 10000;
     final static int runDelay = 0 /* ms */;
 
-    boolean trace = true;
 
     final int inputs;
-    private final int pacmanCyclesPerFrame = 2;
+
+    private final int pacmanCyclesPerFrame = 1;
+    int pacMovesPerCycle = 16;
+
     float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
     public float scoretoReward = 1f;
 
@@ -102,7 +105,8 @@ public class Pacman extends NAgent {
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
+        nar.compoundVolumeMax.set(40);
 
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -125,14 +129,14 @@ public class Pacman extends NAgent {
 //			return false;
 //		});
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 96, '.', 4);
+        MySTMClustered stm = new MySTMClustered(nar, 96, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 3);
 
 
-        Pacman pacman = new Pacman(nar, 1 /* ghosts  */, 4 /* visionRadius */);
+        Pacman pacman = new Pacman(nar, 1 /* ghosts  */, 6 /* visionRadius */);
 
 
 
@@ -260,17 +264,17 @@ public class Pacman extends NAgent {
 //				}
 //			}
 
-        int s = 4;
-        float minFreq = 0.33f;
-        float maxFreq = 0.66f;
+
+
         actions.add(new MotorConcept("(leftright)",nar,(b,d)->{
             if (d!=null) {
-                float f = d.freq();
-                if (f < minFreq) {
-                    if (!pacman.pac.move(ctables.LEFT, s))
+
+                int sc = Math.round(2f * (d.expectation()-0.5f) * pacMovesPerCycle);
+                if (sc < 0) {
+                    if (!pacman.pac.move(ctables.LEFT, -sc, pacman))
                         return null;
-                } else if (f > maxFreq) {
-                    if (!pacman.pac.move(ctables.RIGHT, s))
+                } else if (sc > 0) {
+                    if (!pacman.pac.move(ctables.RIGHT, sc, pacman))
                         return null;
                 }
             }
@@ -278,12 +282,12 @@ public class Pacman extends NAgent {
         }));
         actions.add(new MotorConcept("(updown)",nar,(b,d)->{
             if (d!=null) {
-                float f = d.freq();
-                if (f < minFreq) {
-                    if (!pacman.pac.move(ctables.UP, s))
+                int sc = Math.round(2f * (d.expectation()-0.5f) * pacMovesPerCycle);
+                if (sc < 0) {
+                    if (!pacman.pac.move(ctables.UP, -sc, pacman))
                         return null;
-                } else if (f > maxFreq) {
-                    if (!pacman.pac.move(ctables.DOWN, s))
+                } else if (sc > 0) {
+                    if (!pacman.pac.move(ctables.DOWN, sc, pacman))
                         return null;
                 }
             }

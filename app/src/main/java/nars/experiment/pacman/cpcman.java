@@ -400,12 +400,14 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 		if (k==1)	// eaten a dot
 		{
 			changeScore=1;
-			score+= 10 * ((round+1)/2) ;
+
 		}
 		else if (k==2)	// eaten a powerDot
 		{
 			scoreGhost=200;
 		}
+		if (k > 0)
+			eatDots(k);
 
 		if (maze.iTotalDotcount==0)
 		{
@@ -446,6 +448,10 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 				changePacRemain=1;
 			}
 		}
+	}
+
+	protected void eatDots(int k) {
+		score += k * (10 * ((round+1)/2)) ;
 	}
 
 	public void killedByGhost() {

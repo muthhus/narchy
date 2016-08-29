@@ -38,9 +38,9 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
     private final int strides;
     private final int stride;
     private final float conf;
-    private final Compound aeBase;
+    //private final Compound aeBase;
 
-    private int metaInterval = 100;
+    //private int metaInterval = 100;
 
     public AutoClassifier(Term base, NAR nar, List<? extends SensorConcept> input, int stride, int output, float alpha) {
         super(stride, output, nar.random );
@@ -48,7 +48,7 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
         this.input = input;
         this.alpha = alpha;
         this.base = base;
-        this.aeBase = $.p(base, AE);
+        //this.aeBase = $.p(base, AE);
         this.epsilon = 0.01f;
         this.conf = nar.confidenceDefault(Symbols.BELIEF);
         this.stride = stride;
@@ -56,6 +56,8 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
 
         assert(!input.isEmpty());
 
+
+        meta();
 
         nar.onFrame(this);
     }
@@ -85,10 +87,10 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
 
 
 
-        if (nar.time() % metaInterval == 0) {
-            logger.info("{} errorAvg={}", base, errorSum/strides);
-            meta();
-        }
+//        if (nar.time() % metaInterval == 0) {
+//            logger.info("{} errorAvg={}", base, errorSum/strides);
+//            meta();
+//        }
 
     }
 

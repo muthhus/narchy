@@ -36,7 +36,8 @@ public class TaskBudgeting {
                 return;
             BudgetMerge.
                     //plusBlend
-                    avgBlend
+                    //avgBlend
+                    andBlend
                     .apply(p, termLink, 1f);
         } catch (Budget.BudgetException e) {
             //HACK - this isnt a full solution, but it should work temporarily
