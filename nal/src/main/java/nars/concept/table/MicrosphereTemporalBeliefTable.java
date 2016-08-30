@@ -90,11 +90,11 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
                 return null;
             }
 
-            before = truth(now, null);
+            before = truth(now, eternal);
 
             add(input);
 
-            after = truth(now, null);
+            after = truth(now, eternal);
 
         }
 
@@ -360,14 +360,20 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
 
 
+        Task topEternal = eternal.strongest();
+
         int s;
         Task[] copy;
         synchronized (this) {
             //clone a copy so that truthpolation can freely operate asynchronously
             s = size();
             if (s == 0) return null;
+            if (topEternal!=null) s++;
             copy = toArrayExact(new Task[s]);
         }
+
+        if (topEternal!=null)
+            copy[s-1] = topEternal;
 
         Truth res;
         if (s == 1) {

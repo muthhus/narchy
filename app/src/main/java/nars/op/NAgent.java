@@ -49,10 +49,10 @@ abstract public class NAgent {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<MotorConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.2f;
-    @Deprecated public float gammaEpsilonFactor = 0.5f;
+    public float alpha, gamma, epsilonProbability = 0.1f;
+    @Deprecated public float gammaEpsilonFactor = 0.4f;
 
-    final int CURIOSITY_DURATION = 16; //frames
+    final int CURIOSITY_DURATION = 32; //frames
     final DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(CURIOSITY_DURATION);
     final DescriptiveStatistics rewardWindow = new DescriptiveStatistics(CURIOSITY_DURATION);
 

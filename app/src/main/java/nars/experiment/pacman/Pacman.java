@@ -57,14 +57,14 @@ public class Pacman extends NAgent {
 
     final int visionRadius;
     final int itemTypes = 3;
-    final static int runCycles = 10000;
+    final static int runCycles = 200000;
     final static int runDelay = 0 /* ms */;
 
 
     final int inputs;
 
-    private final int pacmanCyclesPerFrame = 1;
-    int pacMovesPerCycle = 16;
+    private final int pacmanCyclesPerFrame = 2;
+    int pacMovesPerCycle = 8;
 
     float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
     public float scoretoReward = 1f;
@@ -94,7 +94,7 @@ public class Pacman extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 8, 2, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 6 * DEFAULT_INDEX_WEIGHT, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 1 * DEFAULT_INDEX_WEIGHT, false, exe),
                 new FrameClock(), exe
 
         );
@@ -104,15 +104,15 @@ public class Pacman extends NAgent {
         //new MemoryManager(nar);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.3f);
-        nar.compoundVolumeMax.set(20);
+        nar.confMin.setValue(0.2f);
+        nar.compoundVolumeMax.set(30);
         nar.truthResolution.setValue(0.1f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -138,8 +138,8 @@ public class Pacman extends NAgent {
         //Param.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 96, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 3);
 
 
         Pacman pacman = new Pacman(nar, 2 /* ghosts  */, 3 /* visionRadius */);
@@ -279,7 +279,10 @@ public class Pacman extends NAgent {
         actions.add(new MotorConcept("(leftright)",nar,(b,d)->{
             if (d!=null) {
 
-                int sc = Math.round(2f * (d.expectation()-0.5f) * pacMovesPerCycle);
+                float f =
+                        //d.expectation();
+                        d.freq();
+                int sc = Math.round(2f * (f -0.5f) * pacMovesPerCycle);
                 if (sc < 0) {
                     if (!pacman.pac.move(ctables.LEFT, -sc, pacman))
                         return null;
@@ -292,7 +295,11 @@ public class Pacman extends NAgent {
         }));
         actions.add(new MotorConcept("(updown)",nar,(b,d)->{
             if (d!=null) {
-                int sc = Math.round(2f * (d.expectation()-0.5f) * pacMovesPerCycle);
+                float f =
+                        //d.expectation();
+                        d.freq();
+
+                int sc = Math.round(2f * (f-0.5f) * pacMovesPerCycle);
                 if (sc < 0) {
                     if (!pacman.pac.move(ctables.UP, -sc, pacman))
                         return null;

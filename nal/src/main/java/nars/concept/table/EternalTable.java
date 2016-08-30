@@ -84,14 +84,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 //    }
 
 
-    @Deprecated
     public final Task strongest() {
         Object[] l = this.list;
         if (l.length == 0) return null;
         return (Task) l[0];
     }
 
-    @Deprecated
     public final Task weakest() {
         Object[] l = this.list;
         if (l.length == 0) return null;

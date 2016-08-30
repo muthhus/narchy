@@ -100,24 +100,20 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             //float window = 0.01f;
 
             long o = t.occurrence();
-            times[i][0] = -when + o;// + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
+            long then;
+            if (o == ETERNAL)
+                then = -when;
+            else
+                then = -when + o;
+            times[i][0] = then;// + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
             freq[i] = t.freq();
 
             float c = Math.min(t.conf(), 1f-Param.TRUTH_EPSILON); //clip maximum confidence
-            conf[i] = c2w(c) * (now == ETERNAL ? 1f : projection(when, o, now));
+            conf[i] = c2w(c) * ((now == ETERNAL || o == ETERNAL) ? 1f : projection(when, o, now));
             //TODO dt
 
             i++;
         }
-
-//        if (topEternal!=null) {
-//            this.setBackground(topEternal.freq(), topEternal.confWeight());
-//
-//        } else {
-//            this.setBackground(0.5f, 0);
-//        }
-
-
 
         float[] v = this.value(
                 ZEROTIME,

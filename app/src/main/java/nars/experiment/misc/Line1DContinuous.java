@@ -31,7 +31,7 @@ public class Line1DContinuous extends NAgent {
     boolean print = false;
     private float yHidden;
     private float yEst;
-    float speed = 7f;
+    float speed = 4f;
     final float[] ins;
 
     public Line1DContinuous(NAR nar, int size, IntToFloatFunction target) {
@@ -52,12 +52,12 @@ public class Line1DContinuous extends NAgent {
         for (int i = 0; i < size; i++) {
             int ii = i;
             //hidden
-            sensors.add(new SensorConcept("(h," + i + ")", n, ()->{
+            sensors.add(new SensorConcept($.p($.the("h"), $.the(i)), n, ()->{
                 return ins[ii];
             }, (v) -> $.t(v, alpha)));
 
             //estimated
-            sensors.add(new SensorConcept("(e," + i + ")", n, ()->{
+            sensors.add(new SensorConcept($.p($.the("e"), $.the(i)), n, ()->{
                 return ins[size + ii];
             }, (v) -> $.t(v, alpha)));
         }
@@ -65,8 +65,8 @@ public class Line1DContinuous extends NAgent {
         actions.add(new MotorConcept("(leftright)", n, (b, d) -> {
             if (d!=null) {
                 float v =
-                        d.expectation();
-                        //d.freq();
+                        //d.expectation();
+                        d.freq();
                 yEst += (v -0.5f)*speed;
             }
             return d;
@@ -183,8 +183,8 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int cyclesPerFrame = 4;
-        int conceptsPerCycle = cyclesPerFrame;
+        int cyclesPerFrame = 6;
+        int conceptsPerCycle = 8;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
@@ -199,7 +199,7 @@ public class Line1DContinuous extends NAgent {
         nar.cyclesPerFrame.setValue(cyclesPerFrame);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.75f);
+        nar.goalConfidence(0.55f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
@@ -207,10 +207,12 @@ public class Line1DContinuous extends NAgent {
 
         //nar.compoundVolumeMax.set(20);
 
-        new Line1DContinuous(nar, 16,
-                //sine(30)
-                random(120)
-        ).run(5000).join();
+        Line1DContinuous l = new Line1DContinuous(nar, 16,
+                sine(30)
+                //random(120)
+        );
+        l.print = true;
+        l.runSync(5000);
     }
 
 }
