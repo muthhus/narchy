@@ -17,3 +17,5 @@ rapper $i
 done
 # http://resources.mpi-inf.mpg.de/yago-naga/yago/download/yago/yago3_entire_ttl.7z
 # https://sweet.jpl.nasa.gov/sites/default/files/2.3.zip
+# https://github.com/knowrob/knowrob/tree/master/knowrob_common/owl
+# http://ias.cs.tum.edu/kb/knowrob.owl

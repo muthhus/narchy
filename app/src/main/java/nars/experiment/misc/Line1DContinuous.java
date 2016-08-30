@@ -1,10 +1,11 @@
-package nars.experiment;
+package nars.experiment.misc;
 
 import nars.$;
 import nars.index.CaffeineIndex;
 import nars.nar.Executioner;
-import nars.nar.MultiThreadExecutioner;
+import nars.nar.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.NAgent;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
@@ -27,7 +28,7 @@ public class Line1DContinuous extends NAgent {
 
     private final IntToFloatFunction targetFunc;
     int size;
-    boolean print = true;
+    boolean print = false;
     private float yHidden;
     private float yEst;
     float speed = 7f;
@@ -182,14 +183,14 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int cyclesPerFrame = 24;
+        int cyclesPerFrame = 4;
         int conceptsPerCycle = cyclesPerFrame;
 
         final Executioner exe =
-                new MultiThreadExecutioner(2, 2048);
-                //new SingleThreadExecutioner();
+                //new MultiThreadExecutioner(2, 2048);
+                new SingleThreadExecutioner();
 
-        Default nar = new Default(512,
+        Default nar = new Default(1024,
                 conceptsPerCycle, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 4*DEFAULT_INDEX_WEIGHT, false, exe),
                 new FrameClock(), exe
@@ -204,11 +205,11 @@ public class Line1DContinuous extends NAgent {
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
 
-        nar.compoundVolumeMax.set(20);
+        //nar.compoundVolumeMax.set(20);
 
-        new Line1DContinuous(nar, 4,
+        new Line1DContinuous(nar, 16,
                 //sine(30)
-                random(40)
+                random(120)
         ).run(5000).join();
     }
 

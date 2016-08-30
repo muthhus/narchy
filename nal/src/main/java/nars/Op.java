@@ -303,10 +303,6 @@ public enum Op {
         //return in(ImageBits);
     }
 
-    public boolean isConjunctive() {
-        return this == CONJ; //in(ConjunctivesBits);
-    }
-
 
     public boolean isStatement() {
         return statement;

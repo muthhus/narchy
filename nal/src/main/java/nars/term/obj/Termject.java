@@ -6,8 +6,10 @@ import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
 import nars.$;
 import nars.NAR;
+import nars.Op;
 import nars.nar.Default;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.atom.AtomicString;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
@@ -59,7 +61,7 @@ public interface Termject<X> extends Term {
     abstract class PrimTermject<X> extends AtomicString implements Termject<X> {
 
         @NotNull
-        final X val;
+        public final X val;
 
         public PrimTermject(@NotNull X val) {
             this.val = val;
@@ -139,21 +141,20 @@ public interface Termject<X> extends Term {
 //
 //    }
 
-    class IntInterval extends GenericCompound implements Termject<Range<Integer>> {
+    class IntInterval extends PrimTermject<Range<Integer>> {
 
-        public final Range<Integer> val;
         //extends PrimTermject<Range<Integer>> {
 
 
         public IntInterval(int a, int b) {
+            super(Range.closed(
+                    a, b
+            ).canonical( DiscreteDomain.integers() ));
             //this(Range.closed(a,b).canonical( DiscreteDomain.integers() ));
-            super(INTRANGE, TermVector.the(new IntTerm(a), new IntTerm(b-a)));
+            //super(INTRANGE, TermVector.the(new IntTerm(a), new IntTerm(b-a)));
 
             //int a = ((IntTerm) (term(0))).val;
             //int ba = ((IntTerm) (term(1))).val;
-            val = Range.closed(
-                    a, b
-            ).canonical( DiscreteDomain.integers() );
         }
 
 
@@ -163,10 +164,13 @@ public interface Termject<X> extends Term {
 //            //super(span.canonical( DiscreteDomain.integers() ));
 //        }
 
+
         @Override
-        public Range<Integer> val() {
-            return val;
+        public @NotNull Op op() {
+            return INTRANGE;
         }
+
+
 
 
         @Override
@@ -181,11 +185,11 @@ public interface Termject<X> extends Term {
 
         @Override
         public int compareVal(@NotNull Range<Integer> v) {
-            int l = val().lowerEndpoint();
+            int l = val.lowerEndpoint();
             int vl = v.lowerEndpoint();
             int lc = Integer.compare(l, vl);
             if (lc == 0) {
-                int u = val().upperEndpoint();
+                int u = val.upperEndpoint();
                 int vu = v.upperEndpoint();
                 return Integer.compare(u, vu);
             }

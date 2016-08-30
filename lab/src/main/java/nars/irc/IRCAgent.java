@@ -1,7 +1,7 @@
 package nars.irc;
 
 import nars.Task;
-import nars.experiment.Talk;
+import nars.experiment.misc.Talk;
 import nars.index.TermIndex;
 import nars.inter.InterNAR;
 import nars.nal.Tense;
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static nars.experiment.Talk.context;
+import static nars.experiment.misc.Talk.context;
 
 /**
  * Created by me on 7/10/16.

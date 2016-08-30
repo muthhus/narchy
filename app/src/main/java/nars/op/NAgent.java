@@ -1,4 +1,4 @@
-package nars.experiment;
+package nars.op;
 
 import nars.*;
 import nars.budget.Budget;
@@ -61,7 +61,7 @@ abstract public class NAgent {
 
     public float rewardValue;
     private final FasterList<Task> predictors = $.newArrayList();
-    public boolean trace = true;
+    public boolean trace = false;
 
     protected int ticksBeforeObserve;
     int ticksBeforeDecide;
@@ -71,6 +71,7 @@ abstract public class NAgent {
     private Budget boostBudget, curiosityBudget;
     private final float reinforcementAttention;
     private float curiosityAttention;
+    private float rewardSum = 0;
 
     public NAgent(NAR nar) {
         this.nar = nar;
@@ -132,14 +133,15 @@ abstract public class NAgent {
 
         now = nar.time();
 
-        rewardValue = act();
+        float r = rewardValue = act();
+        rewardSum += r;
         rewardWindow.addValue(rewardValue);
 
         if (trace)
             System.out.println(summary());
 
 
-        if (now >= stopTime) {
+        if (stopTime > 0 && now >= stopTime) {
             if (loop!=null) {
                 loop.stop();
                 this.loop = null;
@@ -220,7 +222,7 @@ abstract public class NAgent {
 
         }
 
-        System.out.println(predictors);
+        //System.out.println(predictors);
 
     }
 
@@ -228,29 +230,18 @@ abstract public class NAgent {
         return run(cycles, 0);
     }
 
+    public NAgent runSync(final int cycles) {
+        //run(cycles, 0).join();
+        start();
+        nar.run(cycles);
+        return this;
+    }
+
     public NARLoop run(final int cycles, int frameDelayMS) {
 
-        if (this.loop!=null)
-            throw new UnsupportedOperationException();
-
-        ticksBeforeDecide = 0;
-        ticksBeforeObserve = 0;
+        start();
 
         this.stopTime = nar.time() + cycles;
-
-        System.gc();
-
-
-
-
-
-        nar.runLater(()->{
-            init(nar);
-
-            mission();
-
-            nar.onFrame(nn -> next());
-        });
 
         this.loop = new NARLoop(nar, frameDelayMS);
 
@@ -265,6 +256,22 @@ abstract public class NAgent {
 //            if (frameDelayMS > 0)
 //                Util.pause(frameDelayMS);
 //        }
+    }
+
+    private void start() {
+        if (this.loop!=null)
+            throw new UnsupportedOperationException();
+
+        ticksBeforeDecide = 0;
+        ticksBeforeObserve = 0;
+
+        nar.runLater(()->{
+            init(nar);
+
+            mission();
+
+            nar.onFrame(nn -> next());
+        });
     }
 
     protected void reinforce() {
@@ -374,4 +381,9 @@ abstract public class NAgent {
         }
 
     }
+
+    public float rewardSum() {
+        return rewardSum;
+    }
+
 }

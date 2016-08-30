@@ -1,4 +1,4 @@
-package nars.experiment;
+package nars.experiment.misc;
 
 import com.google.common.collect.Iterables;
 import org.eclipse.collections.api.tuple.Twin;
@@ -11,7 +11,6 @@ import nars.learn.Agent;
 import nars.learn.ql.DQN;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.math.FloatSupplier;

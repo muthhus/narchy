@@ -61,14 +61,16 @@ public class cghost
 		graphics=g;
 		maze=m;
 
-		imageGhost=applet.createImage(18,18);
-		cimage.drawGhost(imageGhost, 0, color);
+		if (applet!=null) {
+			imageGhost = applet.createImage(18, 18);
+			cimage.drawGhost(imageGhost, 0, color);
 
-		imageBlind=applet.createImage(18,18);
-		cimage.drawGhost(imageBlind,1, Color.white);
+			imageBlind = applet.createImage(18, 18);
+			cimage.drawGhost(imageBlind, 1, Color.white);
 
-		imageEye=applet.createImage(18,18);
-		cimage.drawGhost(imageEye,2, Color.lightGray);
+			imageEye = applet.createImage(18, 18);
+			cimage.drawGhost(imageEye, 2, Color.lightGray);
+		}
 	}
 
 	public void start(int initialPosition, int round)

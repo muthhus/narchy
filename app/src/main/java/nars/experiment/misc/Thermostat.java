@@ -1,4 +1,4 @@
-package nars.experiment;
+package nars.experiment.misc;
 
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -142,22 +142,22 @@ public class Thermostat implements DiscreteEnvironment {
 
         Optimize.Result r = new Optimize<NAR>(() -> new Default())
 
-                .call("beliefConf", 0.1f, 0.95f, 0.1f, "beliefConfidence(#x)")
-                .call("goalConf", 0.1f, 0.95f, 0.1f, "goalConfidence(#x)")
+                .tweak("beliefConf", 0.1f, 0.95f, 0.1f, "beliefConfidence(#x)")
+                .tweak("goalConf", 0.1f, 0.95f, 0.1f, "goalConfidence(#x)")
 
 
-                .call("conceptsPerCyc", 2, 3, 1f, "core.conceptsFiredPerCycle.setValue(#i)")
-                .call("termLinksPerConcept", 1, 3, 1f, "premiser.termlinksFiredPerFiredConcept.setValue(#i)")
+                .tweak("conceptsPerCyc", 2, 3, 1f, "core.conceptsFiredPerCycle.setValue(#i)")
+                .tweak("termLinksPerConcept", 1, 3, 1f, "premiser.termlinksFiredPerFiredConcept.setValue(#i)")
 
-                .call("cycPerFrame", 4, 24, 1f, "cyclesPerFrame.setValue(#i)")
+                .tweak("cycPerFrame", 4, 24, 1f, "cyclesPerFrame.setValue(#i)")
 
-                .call("conceptRem", 1f, 6f, 0.25f, "conceptRemembering.setValue(#x)")
-                .call("taskRem",    1f, 8f, 0.25f, "taskLinkRemembering.setValue(#x)")
-                .call("termRem",    1f, 8f, 0.25f, "termLinkRemembering.setValue(#x)")
+                .tweak("conceptRem", 1f, 6f, 0.25f, "conceptRemembering.setValue(#x)")
+                .tweak("taskRem",    1f, 8f, 0.25f, "taskLinkRemembering.setValue(#x)")
+                .tweak("termRem",    1f, 8f, 0.25f, "termLinkRemembering.setValue(#x)")
 
                 //((DefaultConceptBuilder)new Default(512, 1, 1, 3).index.conceptBuilder()).termLinkBagSize
 
-                .call("conceptAct", 0.1f, 0.8f, 0.05f,  "conceptActivation.setValue(#x)")
+                .tweak("conceptAct", 0.1f, 0.8f, 0.05f,  "conceptActivation.setValue(#x)")
 
                 .run(3500, (x) ->
                     new Thermostat().run(new NAgentOld(x), cycles)

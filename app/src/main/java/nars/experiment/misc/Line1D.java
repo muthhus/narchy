@@ -1,4 +1,4 @@
-package nars.experiment;
+package nars.experiment.misc;
 
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Twin;

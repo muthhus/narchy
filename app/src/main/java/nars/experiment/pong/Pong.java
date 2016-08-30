@@ -12,7 +12,7 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import nars.NAR;
 import nars.agent.NAgentOld;
 import nars.concept.Concept;
-import nars.experiment.DiscreteEnvironment;
+import nars.experiment.misc.DiscreteEnvironment;
 import nars.gui.BagChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;

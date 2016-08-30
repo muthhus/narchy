@@ -10,6 +10,7 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.MultiDirectionalSimplex;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.NelderMeadSimplex;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.SimplexOptimizer;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
@@ -27,26 +28,35 @@ import java.util.function.Supplier;
 public class Optimize<X> {
     public final Supplier<X> subject;
 
-    final List<Tweak> tweaks = new ArrayList();
+    final List<Tweak<X>> tweaks = new ArrayList();
     private final boolean trace = true;
 
     public Optimize(Supplier<X> subject) {
         this.subject = subject;
     }
 
-//        public Optimization<X> with(FloatParameterSweep<X> f) {
-//            this.tweaks.add(f);
-//            return this;
-//        }
 
     public @NotNull Optimize<X> with(String parameter, float min, float max, float inc, FloatObjectProcedure<X> apply) {
         tweaks.add(new FloatRange(parameter, min, max, inc, apply));
         return this;
     }
-    public @NotNull Optimize<X> call(String parameter, float min, float max, float inc, @NotNull String invoker) {
+
+    public @NotNull Optimize<X> tweak(int min, int max, @NotNull String invoker) {
+        return tweak(invoker, min, max, 1f, invoker);
+    }
+
+    public @NotNull Optimize<X> tweak(String parameter, int min, int max, @NotNull String invoker) {
+        return tweak(parameter, min, max, 1f, invoker);
+    }
+
+    public @NotNull Optimize<X> tweak(float min, float max, float inc, @NotNull String invoker) {
+        return tweak(invoker, min, max, inc, invoker);
+    }
+
+    public @NotNull Optimize<X> tweak(String parameter, float min, float max, float inc, @NotNull String invoker) {
         Map m = new HashMap(4);
 
-        tweaks.add(new FloatRange(parameter, min, max, inc, (v,x) -> {
+        tweaks.add(new FloatRange<>(parameter, min, max, inc, (v,x) -> {
             //accessible by both these:
             m.put(parameter, v);
             m.put("x", v);
@@ -65,8 +75,11 @@ public class Optimize<X> {
 
     @NotNull
     public Result run(int maxIterations, @NotNull FloatFunction<X> eval) {
+        return run(maxIterations, 1, eval);
+    }
 
-
+    @NotNull
+    public Result run(int maxIterations, int repeats, @NotNull FloatFunction<X> eval) {
 
         int i = 0;
         int n = tweaks.size();
@@ -93,15 +106,16 @@ public class Optimize<X> {
         System.out.println(Joiner.on(",").join(tweaks) + ",\tScore");
 
         ObjectiveFunction func = new ObjectiveFunction(point -> {
-            X x = subject.get();
-            int i1 = 0;
-            for (Tweak w : tweaks) {
-                w.apply.value((float) point[i1++], x);
-            }
+
 
             float score;
             try {
-                score = eval.floatValueOf(x);
+                float sum = 0;
+                for (int r = 0; r < repeats; r++) {
+                    X x = newSubject(point);
+                    sum += eval.floatValueOf(x);
+                }
+                score = sum/repeats;
             } catch (Exception e) {
                 e.printStackTrace();
                 score = Float.NEGATIVE_INFINITY;
@@ -139,12 +153,21 @@ public class Optimize<X> {
                 func,
                 GoalType.MAXIMIZE,
                 new InitialGuess(mid),
-                //new NelderMeadSimplex(inc)
-                new MultiDirectionalSimplex(inc)
+                new NelderMeadSimplex(inc)
+                //new MultiDirectionalSimplex(inc)
         );
 
         return new Result(r);
 
+    }
+
+    private X newSubject(double[] point) {
+        X x = subject.get();
+        int i1 = 0;
+        for (Tweak w : tweaks) {
+            w.apply.value((float) point[i1++], x);
+        }
+        return x;
     }
 
     public class Result {
@@ -169,7 +192,7 @@ public class Optimize<X> {
     /**
      * a knob but cooler
      */
-    public class Tweak {
+    public static class Tweak<X> {
         public final FloatObjectProcedure<X> apply;
         private final String id;
 
@@ -184,7 +207,7 @@ public class Optimize<X> {
         }
     }
 
-    private class FloatRange extends Tweak {
+    private static class FloatRange<X> extends Tweak<X> {
         private final String parameter;
         private final float min;
         private final float max;

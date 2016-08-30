@@ -1,4 +1,4 @@
-package nars.experiment;
+package nars.experiment.misc;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;

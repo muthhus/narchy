@@ -113,6 +113,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     private Function<Task, Task> preprocessor = (t) -> t; //by default, pass-through
 
 
+
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         this(clock, index, rng, self, new SingleThreadExecutioner());
     }

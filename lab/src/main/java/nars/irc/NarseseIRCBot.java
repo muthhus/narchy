@@ -5,7 +5,7 @@ import nars.*;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
-import nars.experiment.Talk;
+import nars.experiment.misc.Talk;
 import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
 import nars.inter.InterNAR;

@@ -55,7 +55,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                     0;
         int c = v.complexity();
         //return Math.round( 1f + 100 * c * beliefCost);
-        return Math.round( 1f + 10 * (c*c) * beliefCost);
+        return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
     }
 
     private static float maxConfidence(@NotNull CompoundConcept v) {

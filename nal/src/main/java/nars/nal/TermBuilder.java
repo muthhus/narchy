@@ -314,7 +314,7 @@ public abstract class TermBuilder {
             }
         }
 
-        if (commutive(op, dt) && args.hasAny(Op.INT)) {
+        if (args.hasAny(Op.INT) && (op==CONJ && commutive(op, dt)) || (op.isSet() || op.isIntersect())) {
             args = ArithmeticInduction.compress(args);
         }
 

@@ -19,7 +19,8 @@
 
 package nars.experiment.pacman;
 
-import nars.experiment.NAgent;
+import nars.Param;
+import nars.op.NAgent;
 import nars.gui.BeliefTableChart;
 import nars.op.VariableCompressor;
 import nars.truth.Truth;
@@ -28,7 +29,6 @@ import nars.util.signal.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static nars.Op.PROD;
 import static nars.experiment.pong.Pong.numericSensor;
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.experiment.tetris.Tetris.exe;
@@ -52,7 +53,7 @@ import static nars.experiment.tetris.Tetris.exe;
 public class Pacman extends NAgent {
 
     final cpcman pacman;
-    public static final int cyclesPerFrame = 4;
+    public static final int cyclesPerFrame = 2;
 
     final int visionRadius;
     final int itemTypes = 3;
@@ -69,8 +70,11 @@ public class Pacman extends NAgent {
     public float scoretoReward = 1f;
 
     public Pacman(NAR nar, int ghosts, int visionRadius) {
+        this(nar, ghosts, visionRadius, true);
+    }
+    public Pacman(NAR nar, int ghosts, int visionRadius, boolean window) {
         super(nar);
-        pacman = new cpcman(ghosts) {
+        pacman = new cpcman(ghosts, window) {
             @Override
             public void killedByGhost() {
                 super.killedByGhost();
@@ -90,7 +94,7 @@ public class Pacman extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 8, 2, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 6 * DEFAULT_INDEX_WEIGHT, false, exe),
                 new FrameClock(), exe
 
         );
@@ -103,12 +107,13 @@ public class Pacman extends NAgent {
         nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
-        //nar.compoundVolumeMax.set(40);
 
+        nar.confMin.setValue(0.3f);
+        nar.compoundVolumeMax.set(20);
+        nar.truthResolution.setValue(0.1f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
         //nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
@@ -133,12 +138,12 @@ public class Pacman extends NAgent {
         //Param.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 96, '.', 2);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 96, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 96, '!', 3);
 
 
-        Pacman pacman = new Pacman(nar, 1 /* ghosts  */, 3 /* visionRadius */);
-
+        Pacman pacman = new Pacman(nar, 2 /* ghosts  */, 3 /* visionRadius */);
+        pacman.trace = true;
 
 
 
@@ -164,7 +169,13 @@ public class Pacman extends NAgent {
         });
 
 
-        pacman.run(runCycles, runDelay).join();
+//        Param.DEBUG = true;
+//        nar.onTask(t->{
+//           if (t.op()==PROD && t.term().size()==2) {
+//               System.out.println(t);
+//           }
+//        });
+        pacman.runSync(runCycles);
 
 //		pacman.run(
 //				//new DQN(),
@@ -179,7 +190,7 @@ public class Pacman extends NAgent {
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
         //n.printActions();
-        nar.forEachActiveConcept(System.out::println);
+        //nar.forEachActiveConcept(System.out::println);
 
 //		nar.index.forEach(t -> {
 //			if (t instanceof Concept) {
@@ -194,8 +205,6 @@ public class Pacman extends NAgent {
     @Override
     protected void init(NAR n) {
 
-        cmaze maze = pacman.maze;
-        cpac pac = pacman.pac;
 
         FloatToObjectFunction<Truth> truther = (f) -> $.t(f, alpha);
 
@@ -359,20 +368,20 @@ public class Pacman extends NAgent {
 ////				}
 
 
-        if (nar instanceof Default) {
-
-            //new BeliefTableChart(nar, charted).show(700, 900);
-            BeliefTableChart.newBeliefChart(nar, charted, 400);
+//        if (nar instanceof Default) {
 //
-//					BagChart.show((Default) nar, 1024);
+//            //new BeliefTableChart(nar, charted).show(700, 900);
+//            BeliefTableChart.newBeliefChart(nar, charted, 400);
+////
+////					BagChart.show((Default) nar, 1024);
+////
+//            //STMView.show(stm, 500, 500);
 //
-            //STMView.show(stm, 500, 500);
-
-            //TimeSpace.newTimeWindow((Default)nar, 128);
-            //NARSpace.newConceptWindow((Default) nar, 128, 6);
-
-
-        }
+//            //TimeSpace.newTimeWindow((Default)nar, 128);
+//            //NARSpace.newConceptWindow((Default) nar, 128, 6);
+//
+//
+//        }
 
 
     }

@@ -73,8 +73,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
 //
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
-    private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
-    long novel=0, total=0;
+    //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
+    //long novel=0, total=0;
 
     public ConceptBagCycle(@NotNull NAR nar, int initialCapacity, MutableInteger cyclesPerFrame) {
 
@@ -141,8 +141,9 @@ public class ConceptBagCycle implements Consumer<NAR> {
                 if (c != null) {
                     new FireConcept(c, nar,
                             taskLinks, termLinks,
-                            new LinkedHashSet<>( 2 * (taskLinks*termLinks) /* estimate */ )) {
-                        @Override
+                            new LinkedHashSet<>( 2 * (taskLinks*termLinks) /* estimate */ ))
+
+                        /*@Override
                         public void accept(Premise p) {
                             total++;
                             if (recent.putIfAbsent(p,p)==null) {
@@ -152,15 +153,15 @@ public class ConceptBagCycle implements Consumer<NAR> {
                                 //System.err.println("duplicate (novel=" + Texts.n2(((float)novel/total)*100f) + "%)" );
                             }
 
-                        }
-                    }
+                        }*/
+
                         .run();
                 }
             }
 
         }
 
-        recent.clear();
+        //recent.clear();
 
     }
 

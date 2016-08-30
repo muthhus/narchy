@@ -38,12 +38,17 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     public static final int STAMP_CAPACITY = 12;
 
+
+    /**
+     * permute certain rules backward to questions (experimental, generates a lot of questions)
+     */
+    public static final boolean BACKWARD_QUESTION_RULES = true;
+
     /** factor applied to budgeting backward question derivations */
     public static final float BACKWARD_DERIVATION_FACTOR = 0.1f;
 
     /** used in linear interpolating link adjustments during feedback */
-    public static float LINK_FEEDBACK_RATE = 0.25f;
-
+    public final MutableFloat linkFeedbackRate = new MutableFloat(0.5f);
 
     /**
      * hard upper-bound limit on Compound term complexity;
@@ -63,10 +68,6 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     public final static int UnificationTermutesMax = 8;
     /**
-     * permute certain rules backward to questions (experimental, generates a lot of questions)
-     */
-    public static final boolean BACKWARD_QUESTION_RULES = true;
-    /**
      * swap task and belief in eligible rules ("forward" permutation)
      */
     public static final boolean SWAP_RULES = true;
@@ -80,8 +81,8 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
 
     /** size of each thread's normalization cache, in entries */
-    public static final int NORMALIZATION_CACHE_SIZE = 16384;
-    public static final int TERM_CACHE_SIZE = 32768;
+    public static final int NORMALIZATION_CACHE_SIZE = 32*1024;
+    public static final int TERM_CACHE_SIZE = 64*1024;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;

@@ -368,7 +368,6 @@ public interface BeliefTable extends TaskTable {
      *
      *  TODO consider similarity of any of term's recursive 'dt' temporality in ranking
      * */
-    @Nullable
     default Task match(@NotNull Task target, long now) {
 
         int size = size();

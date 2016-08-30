@@ -57,14 +57,15 @@ public class cpac
 
 		//      cAuto=new cpacmove(this, cghost, m);
 
-		// initialize pac and pac image
-		imagePac=new Image[4][4];
-		for (int i=0; i<4; i++)
-			for (int j=0; j<4; j++)
-			{
-				imagePac[i][j]=applet.createImage(18,18);
-				cimage.drawPac(imagePac[i][j],i,j);
-			}	
+		if (a!=null) {
+			// initialize pac and pac image
+			imagePac = new Image[4][4];
+			for (int i = 0; i < 4; i++)
+				for (int j = 0; j < 4; j++) {
+					imagePac[i][j] = applet.createImage(18, 18);
+					cimage.drawPac(imagePac[i][j], i, j);
+				}
+		}
 	}
 
 	public void start()

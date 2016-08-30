@@ -1,7 +1,7 @@
 package nars.experiment.math;
 
 import nars.*;
-import nars.experiment.NAgent;
+import nars.op.NAgent;
 import nars.experiment.arkanoid.Arkancide;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;

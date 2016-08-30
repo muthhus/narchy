@@ -1,4 +1,4 @@
-package nars.experiment;
+package nars.experiment.misc;
 
 import org.eclipse.collections.api.tuple.Twin;
 import nars.learn.Agent;

@@ -58,11 +58,13 @@ public class cmaze
 	cmaze(Window a, Graphics g)
 	{
 		// setup associations
-		applet=a;
-		graphics=g;
+		if (a!=null) {
+			applet = a;
+			graphics = g;
 
-		imageMaze=applet.createImage(iWidth, iHeight);
-		imageDot=applet.createImage(2,2);
+			imageMaze = applet.createImage(iWidth, iHeight);
+			imageDot = applet.createImage(2, 2);
+		}
 
 		// create data
 		iMaze=new int[HEIGHT][WIDTH];
@@ -100,8 +102,9 @@ public class cmaze
 				}
 				iMaze[i][j]=k;
 			}
-		// create initial maze image
-		createImage();	
+
+		if (applet!=null) // create initial maze image
+			createImage();
 	}
 
 	public void draw()

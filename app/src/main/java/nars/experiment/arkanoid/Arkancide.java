@@ -1,9 +1,10 @@
 package nars.experiment.arkanoid;
 
 
+import com.google.common.collect.Lists;
 import nars.*;
 import nars.data.AutoClassifier;
-import nars.experiment.NAgent;
+import nars.op.NAgent;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -11,6 +12,8 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
 import nars.term.obj.IntTerm;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -26,6 +29,7 @@ import spacegraph.obj.ControlSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.MatrixView;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -173,6 +177,10 @@ public class Arkancide extends NAgent {
         GridSurface chart = newBeliefChart(narenv, window);
         new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
     }
+    public static void newBeliefChartWindow(NAR nar, long window, Term... t) {
+        GridSurface chart = newBeliefChart(nar, Lists.newArrayList(t), window);
+        new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
+    }
 
     public static GridSurface newBeliefChart(NAgent narenv, long window) {
         NAR nar = narenv.nar;
@@ -189,7 +197,17 @@ public class Arkancide extends NAgent {
 
         return new GridSurface(VERTICAL, actionTables);
     }
+    public static GridSurface newBeliefChart(NAR nar, Collection<Termed> narenv, long window) {
+        long[] btRange = new long[2];
+        nar.onFrame(nn -> {
+            long now = nn.time();
+            btRange[0] = now - window;
+            btRange[1] = now + window;
+        });
+        List<Surface> actionTables = narenv.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
 
+        return new GridSurface(VERTICAL, actionTables);
+    }
     private float noise(float v) {
         if (noiseLevel > 0) {
             return Util.clamp(v + (nar.random.nextFloat() * noiseLevel));

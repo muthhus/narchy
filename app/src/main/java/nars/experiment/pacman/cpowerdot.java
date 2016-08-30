@@ -56,13 +56,15 @@ public class cpowerdot
 		// initialize power dot	and image
 		iValid = new int[4];
 
-		imagePowerDot=applet.createImage(16,16);
-		cimage.drawPowerDot(imagePowerDot);
+		if (a!=null) {
+			imagePowerDot = applet.createImage(16, 16);
+			cimage.drawPowerDot(imagePowerDot);
 
-		imageBlank=applet.createImage(16,16);
-		Graphics imageG=imageBlank.getGraphics();
-		imageG.setColor(Color.black);
-		imageG.fillRect(0,0,16,16);
+			imageBlank = applet.createImage(16, 16);
+			Graphics imageG = imageBlank.getGraphics();
+			imageG.setColor(Color.black);
+			imageG.fillRect(0, 0, 16, 16);
+		}
 
 		frameCount=iShowCount;
 		showStatus=1;	// show
@@ -77,7 +79,8 @@ public class cpowerdot
 
 	void clear(int dot)
 	{
-		graphics.drawImage(imageBlank, iX[dot]*16, iY[dot]*16, applet);
+		if (graphics!=null)
+			graphics.drawImage(imageBlank, iX[dot]*16, iY[dot]*16, applet);
 	}
 
 	void eat(int iCol, int iRow)

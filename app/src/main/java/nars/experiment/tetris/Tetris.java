@@ -3,12 +3,11 @@ package nars.experiment.tetris;
 import com.google.common.collect.Lists;
 import nars.*;
 import nars.nar.Executioner;
-import nars.nar.MultiThreadExecutioner;
 import nars.nar.SingleThreadExecutioner;
 import nars.term.obj.IntTerm;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.data.AutoClassifier;
-import nars.experiment.NAgent;
+import nars.op.NAgent;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.index.CaffeineIndex;
@@ -49,17 +48,17 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris extends NAgent {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 20 * 10000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 26 * 10000000;
 
     public static final Executioner exe =
             //new MultiThreadExecutioner(2, 16384);
             new SingleThreadExecutioner();
 
     public static final int runFrames = 5500;
-    public static final int cyclesPerFrame = 3;
+    public static final int cyclesPerFrame = 6;
     public static final int tetris_width = 6;
     public static final int tetris_height = 13;
-    public static final int TIME_PER_FALL = 4;
+    public static final int TIME_PER_FALL = 6;
     static boolean easy = false;
 
     static int frameDelay;
@@ -491,6 +490,9 @@ public class Tetris extends NAgent {
                 newControlWindow(view);
 
                 Arkancide.newBeliefChartWindow(this, 200);
+
+                //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
+
 //                BeliefTableChart.newBeliefChart(nar, Lists.newArrayList(
 //                        sensors.get(0),
 //                        sensors.get(1),

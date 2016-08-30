@@ -24,10 +24,7 @@ package nars.op.mental;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
 import nars.task.MutableTask;
 import nars.task.Temporal;
 import nars.term.Compound;
@@ -90,7 +87,7 @@ public final class Anticipate {
         }
 
         Compound tt = t.term();
-        if(tt.op().isConjunctive()) { //not observable, TODO probably revise
+        if(tt.op() == Op.CONJ) { //not observable, TODO probably revise
             return;
         }
 

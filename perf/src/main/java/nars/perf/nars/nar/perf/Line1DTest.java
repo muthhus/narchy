@@ -1,7 +1,7 @@
 package nars.perf.nars.nar.perf;
 
 import nars.agent.NAgentOld;
-import nars.experiment.Line1D;
+import nars.experiment.misc.Line1D;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.Executioner;
@@ -12,7 +12,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
-import static nars.experiment.Line1D.random;
+import static nars.experiment.misc.Line1D.random;
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.perf.Main.perf;
 

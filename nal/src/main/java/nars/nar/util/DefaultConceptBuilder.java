@@ -8,10 +8,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
-import nars.concept.AtomConcept;
-import nars.concept.CompoundConcept;
-import nars.concept.Concept;
-import nars.concept.OperationConcept;
+import nars.concept.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -68,7 +65,7 @@ import static nars.nal.Tense.DTERNAL;
     }
 
     @NotNull
-    private final ConceptPolicy init, awake, sleep;
+    private ConceptPolicy init, awake, sleep;
     private NAR nar;
 
 
@@ -91,6 +88,8 @@ import static nars.nal.Tense.DTERNAL;
         @NotNull Bag<Term> termbag = termbag(map1);
         @NotNull Bag<Task> taskbag = taskbag(map2);
 
+        boolean dynamic = false;
+
         switch (t.op()) {
 
             case INH:
@@ -98,12 +97,20 @@ import static nars.nal.Tense.DTERNAL;
                     return new OperationConcept(t, termbag, taskbag, nar);
                 break;
 
+            case CONJ:
+                if (t.size() > 2 && t.vars() == 0)
+                    dynamic = true;
+                break;
+
             case NEG:
                 throw new RuntimeException("negation terms must not be conceptualized");
 
         }
 
-        return new CompoundConcept<>(t, termbag, taskbag, nar);
+        return (!dynamic) ?
+                new CompoundConcept<>(t, termbag, taskbag, nar) :
+                new DynamicCompoundConcept(t, termbag, taskbag, nar);
+
     }
 
 
@@ -138,7 +145,7 @@ import static nars.nal.Tense.DTERNAL;
     @NotNull
     public final Random rng; //shared
     @NotNull
-    public final CurveBag.CurveSampler defaultCurveSampler; //shared
+    public CurveBag.CurveSampler defaultCurveSampler; //shared
 
 
     public DefaultConceptBuilder(@NotNull Random r) {
