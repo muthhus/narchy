@@ -19,19 +19,24 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     private final MutableInteger goalsMaxTemp;
 
     public DefaultConceptPolicy(int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
-        this(new MutableInteger(Math.max(1, beliefsCapTotal / 2)),
-                new MutableInteger(Math.max(1, goalsCapTotal / 2)),
+        this(
+                new MutableInteger(Math.max(1, beliefsCapTotal / 4)), //belief ete ~1/4
+                new MutableInteger(Math.max(1, goalsCapTotal / 4)),   //goal ete  ~1/4
+                new MutableInteger(Math.max(1, beliefsCapTotal * 3 / 4)), //belief temp ~3/4
+                new MutableInteger(Math.max(1, beliefsCapTotal * 3 / 4)), //goal temp  ~3/4
                 new MutableInteger(questionsMax),
                 new MutableInteger(termlinksCapacity),
                 new MutableInteger(taskLinksCapacity)
         );
     }
 
-    DefaultConceptPolicy(MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte, MutableInteger questionsMax, @NotNull MutableInteger termlinksCapacity, @NotNull MutableInteger taskLinksCapacity) {
+    DefaultConceptPolicy(MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte,
+                         MutableInteger beliefsMaxTemp, MutableInteger goalsMaxTemp,
+                         MutableInteger questionsMax, @NotNull MutableInteger termlinksCapacity, @NotNull MutableInteger taskLinksCapacity) {
         this.beliefsMaxEte = beliefsMaxEte;
-        this.beliefsMaxTemp = beliefsMaxEte;
+        this.beliefsMaxTemp = beliefsMaxTemp;
         this.goalsMaxEte = goalsMaxEte;
-        this.goalsMaxTemp = goalsMaxEte;
+        this.goalsMaxTemp = goalsMaxTemp;
         this.questionsMax = questionsMax;
         this.termLinksCapacityMin = new MutableInteger(Math.max(1,termlinksCapacity.intValue()/2));
         this.termLinksCapacityMax = termlinksCapacity;

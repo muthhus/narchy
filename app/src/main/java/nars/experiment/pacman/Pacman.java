@@ -20,6 +20,7 @@
 package nars.experiment.pacman;
 
 import nars.Param;
+import nars.gui.BagChart;
 import nars.op.NAgent;
 import nars.gui.BeliefTableChart;
 import nars.op.VariableCompressor;
@@ -53,7 +54,7 @@ import static nars.experiment.tetris.Tetris.exe;
 public class Pacman extends NAgent {
 
     final cpcman pacman;
-    public static final int cyclesPerFrame = 2;
+    public static final int cyclesPerFrame = 4;
 
     final int visionRadius;
     final int itemTypes = 3;
@@ -63,8 +64,8 @@ public class Pacman extends NAgent {
 
     final int inputs;
 
-    private final int pacmanCyclesPerFrame = 2;
-    int pacMovesPerCycle = 8;
+    private final int pacmanCyclesPerFrame = 1;
+    int pacMovesPerCycle = 4;
 
     float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
     public float scoretoReward = 1f;
@@ -94,7 +95,7 @@ public class Pacman extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 8, 2, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 1 * DEFAULT_INDEX_WEIGHT, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
                 new FrameClock(), exe
 
         );
@@ -111,7 +112,7 @@ public class Pacman extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.2f);
+        nar.confMin.setValue(0.1f);
         nar.compoundVolumeMax.set(30);
         nar.truthResolution.setValue(0.1f);
 
@@ -380,7 +381,7 @@ public class Pacman extends NAgent {
 //            //new BeliefTableChart(nar, charted).show(700, 900);
 //            BeliefTableChart.newBeliefChart(nar, charted, 400);
 ////
-////					BagChart.show((Default) nar, 1024);
+            BagChart.show((Default) nar, 32);
 ////
 //            //STMView.show(stm, 500, 500);
 //

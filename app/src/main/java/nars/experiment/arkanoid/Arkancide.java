@@ -43,10 +43,10 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAgent {
 
-    private static final int cyclesPerFrame = 8;
+    private static final int cyclesPerFrame = 4;
     public static final int runFrames = 50000;
     public static final int CONCEPTS_FIRE_PER_CYCLE = 6;
-    public static final int INDEX_SIZE = 10 * 10000000;
+    public static final int INDEX_SIZE = 4 * 10000000;
     final Arkanoid noid;
     private SwingCamera cam;
 
@@ -56,7 +56,7 @@ public class Arkancide extends NAgent {
     final int visH = 10;
     SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 8;
+    private int visionSyncPeriod = 12;
     float noiseLevel = 0;
 
     float paddleSpeed = 45f;

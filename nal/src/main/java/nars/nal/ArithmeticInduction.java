@@ -189,9 +189,7 @@ public class ArithmeticInduction {
                     c.getOne().add((byte) ii);
                     c.getTwo().add(t);
                 }
-                if (t instanceof IntInterval) {
-                    return false; //end recursion here
-                }
+
                 return true;
             };
 

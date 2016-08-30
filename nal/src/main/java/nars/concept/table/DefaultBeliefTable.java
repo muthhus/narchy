@@ -3,13 +3,14 @@ package nars.concept.table;
 import com.google.common.collect.Iterators;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
+import nars.budget.UnitBudget;
 import nars.concept.CompoundConcept;
 import nars.concept.TruthDelta;
 import nars.task.EternalizedTask;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
-import org.apache.commons.math3.FieldElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -151,16 +152,13 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
 
-
-
-
         TruthDelta result;
         if (input.isEternal()) {
             result = nonEmptyEternal(concept, input).add(input, displaced, concept, nar);
         } else {
             result = temporal.add(input, eternal, displaced, concept, nar);
-            if (result!=null && !displaced.isEmpty()) {
-                eternalizeForgottenTemporals(displaced,nar,1f);
+            if (result!=null && !displaced.isEmpty() && Param.eternalizeForgottenTemporal(input.op())) {
+                eternalizeForgottenTemporals(displaced,nar, Param.ETERNALIZATION_CONFIDENCE_FACTOR);
             }
         }
 
@@ -207,7 +205,7 @@ public class DefaultBeliefTable implements BeliefTable {
                             )
                                 .time(nar.time(), ETERNAL)
                                 .evidence(d)
-                                .budget(d.budget())
+                                .budget(UnitBudget.Zero)
                                 .log("Eternalized");
 
                         nar.inputLater(ee);

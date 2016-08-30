@@ -533,4 +533,13 @@ public abstract class Param /*extends Container*/ implements Level {
     public void beliefConfidence(float v) {
         defaultBeliefTruth = new DefaultTruth(1.0f, v);
     }
+
+
+    /** eternalize if... */
+    public static boolean eternalizeForgottenTemporal(Op op) {
+        return op.statement;
+    }
+
+    public static final float ETERNALIZATION_CONFIDENCE_FACTOR = 0.5f;
+
 }

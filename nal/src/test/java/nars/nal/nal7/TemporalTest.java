@@ -201,7 +201,7 @@ public class TemporalTest {
 
         a.beliefs().print();
 
-        assertEquals(7, a.beliefs().size());
+        assertEquals(3, a.beliefs().size());
     }
 
     @Nullable
