@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static nars.Op.NEG;
+import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.ETERNAL;
 
 /**
  * Adds support for dynamically calculated truth values
@@ -67,80 +69,105 @@ public class DynamicCompoundConcept extends CompoundConcept {
     protected BeliefTable newBeliefTable(int eCap, int tCap) {
 
         //ASSUMES belief, not goal table
-        return new DefaultBeliefTable(tCap) {
+        return new DynamicBeliefTable(tCap);
+    }
 
-            @Override
-            public @Nullable Truth truth(long when) {
-                DynTruth d = truth(when, false);
-                if (d == null)
-                    return super.truth(when);
-                return d.truth(op(),nar);
-            }
+    private class DynamicBeliefTable extends DefaultBeliefTable {
 
-            @Nullable private DynTruth truth(long when, boolean evidence) {
+        public DynamicBeliefTable(int tCap) {
+            super(tCap);
+        }
 
-                int n = size();
-                final List<Truth> t = $.newArrayList(n);
-                final List<Task> e = evidence ? $.newArrayList(n) : null;
-                Budget b = evidence ? new RawBudget() : null;
 
-                Term[] subs = term().terms();
+        @Nullable
+        public Truth truth(long when, long now) {
+            DynTruth d = truth(when, now, term(), false);
+            return d != null ? d.truth(op(), nar) : super.truth(when, now);
+        }
 
-                for (Term s : subs) {
-                    if (!(s instanceof Compound) || s.hasTemporal()) {
-                        return null;
-                    }
+        @Nullable private DynamicCompoundConcept.DynTruth truth(long when, Compound template, boolean evidence) {
+            return truth(when, ETERNAL, template, evidence);
+        }
 
-                    boolean negated = s.op()==NEG;
-                    if (negated)
-                        s = $.unneg(s).term();
+        @Nullable private DynamicCompoundConcept.DynTruth truth(long when, long now, Compound template, boolean evidence) {
 
-                    Concept p = nar.concept(s);
-                    if (p == null || !p.hasBeliefs()) {
-                        return null;
-                    }
+            int n = size();
+            final List<Truth> t = $.newArrayList(n);
+            final List<Task> e = evidence ? $.newArrayList(n) : null;
+            Budget b = evidence ? new RawBudget() : null;
 
-                    @Nullable Truth nt = p.belief(when);
-                    if (nt==null) {
-                        return null;
-                    }
-                    t.add($.negIf(nt,negated));
+            Term[] subs = template.terms();
 
-                    if (evidence) {
-                        @Nullable Task bt = p.beliefs().top(when);
-                        if (bt != null) {
-                            Budget btb = bt.budget();
-                            if (b == null && !btb.isDeleted())
-                                b = btb;
-                            else
-                                BudgetMerge.plusBlend.apply(b, btb, 1f);
-
-                            e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
-                        }
-                    }
+            for (Term s : subs) {
+                if (!(s instanceof Compound) || s.hasTemporal()) {
+                    return null;
                 }
 
-                return new DynTruth(t, e, b);
+                Term ss = s; //original subterm for dt relative calculation
+
+                boolean negated = s.op()==NEG;
+                if (negated)
+                    s = $.unneg(s).term();
+
+                Concept p = nar.concept(s);
+                if (p == null || !p.hasBeliefs()) {
+                    return null;
+                }
+
+                int dt = template.subtermTime(ss);
+
+
+                @Nullable Truth nt = null;
+                if ((p instanceof DynamicCompoundConcept) && (p.hasBeliefs())) {
+                    @Nullable DynTruth ndt = ((DynamicBeliefTable) p.beliefs()).truth(when + dt, now, (Compound) s, false);
+                    if (ndt!=null) {
+                        nt = ndt.truth(s.op(), nar);
+                    }
+                } else {
+                    nt = p.belief(when + dt, now);
+                }
+
+                if (nt==null) {
+                    return null;
+                }
+                t.add($.negIf(nt,negated));
+
+                if (evidence) {
+                    @Nullable Task bt = p.beliefs().top(when+dt, now);
+                    if (bt != null) {
+                        Budget btb = bt.budget();
+                        if (!btb.isDeleted())
+                            b = btb;
+                        else
+                            BudgetMerge.plusBlend.apply(b, btb, 1f);
+
+                        e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
+                    }
+                }
             }
 
-
-            @Override
-            public Task match(@NotNull Task target, long now) {
-
-                Task x = super.match(target, now);
-
-                //experimental dynamic eval
-                long occThresh = 1;
-                if (x == null || Math.abs(now - x.occurrence() ) >= occThresh) {
+            return new DynTruth(t, e, b);
+        }
 
 
-                    DynTruth dt = truth(now, true);
-                    if (dt!=null) {
-                        Truth y = dt.truth(op(), nar);
+        @Override
+        public Task match(@NotNull Task target, long now) {
 
-                        ///@NotNull Termed<Compound> newTerm = term.dt() != 0 ? $.parallel(term.terms()) : term;
+            Task x = super.match(target, now);
 
-                        RevisionTask xx = new RevisionTask(term(), Symbols.BELIEF, y, now, now, dt.evidence());
+            //experimental dynamic eval
+            long occThresh = 1;
+            if (x == null || Math.abs(now - x.occurrence() ) >= occThresh) {
+
+                //template which may contain temporal relationship to emulate
+                Compound template = x!=null ?  x.term() : term();
+
+                DynTruth dt = truth(now, template, true);
+                if (dt!=null) {
+                    Truth y = dt.truth(op(), nar);
+                    if (y!=null) {
+
+                        RevisionTask xx = new RevisionTask(template, Symbols.BELIEF, y, now, now, dt.evidence());
                         xx.budget(dt.b);
                         xx.log("Dynamic");
 
@@ -149,12 +176,12 @@ public class DynamicCompoundConcept extends CompoundConcept {
                         //System.err.println(xx + "\tvs\t" + x);
 
                         x = xx;
-
                     }
-                }
 
-                return null;
+                }
             }
-        };
+
+            return x;
+        }
     }
 }

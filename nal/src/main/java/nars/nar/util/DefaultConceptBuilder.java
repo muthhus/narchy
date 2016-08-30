@@ -98,7 +98,7 @@ import static nars.nal.Tense.DTERNAL;
                 break;
 
             case CONJ:
-                if (t.size() > 2 && t.vars() == 0)
+                if (t.vars() == 0)
                     dynamic = true;
                 break;
 

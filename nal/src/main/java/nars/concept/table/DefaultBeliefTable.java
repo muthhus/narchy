@@ -43,7 +43,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     /** TODO this value can be cached per cycle (when,now) etc */
     @Override
-    public final Truth truth(long when, long now) {
+    public Truth truth(long when, long now) {
 
         final Truth tt;
 
