@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.util.Util;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by me on 7/8/16.
  */
+@Ignore
 public class InterNARTest {
 
     static void testAB(BiConsumer<InterNAR, InterNAR> ab) {

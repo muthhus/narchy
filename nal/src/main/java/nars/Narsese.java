@@ -76,7 +76,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @NotNull
-    public static Task makeTask(@NotNull Memory memory, @Nullable float[] b, Termed content, char p, @Nullable Truth t, @NotNull Tense tense) {
+    public static Task makeTask(Memory memory, @Nullable float[] b, Termed content, char p, @Nullable Truth t, Tense tense) {
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");
@@ -303,7 +303,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    Rule Budget(@NotNull Var<float[]> budget) {
+    Rule Budget(Var<float[]> budget) {
         return sequence(
                 BUDGET_VALUE_MARK,
 
@@ -319,25 +319,25 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
-    boolean BudgetPriority(@NotNull Var<float[]> budget) {
+    boolean BudgetPriority(Var<float[]> budget) {
         return budget.set(new float[]{(float) pop()});
     }
 
-    Rule BudgetPriorityDurability(@NotNull Var<float[]> budget) {
+    Rule BudgetPriorityDurability(Var<float[]> budget) {
         return sequence(
                 VALUE_SEPARATOR, ShortFloat(),
                 budget.set(new float[]{(float) pop(), (float) pop()}) //intermediate representation
         );
     }
 
-    Rule BudgetPriorityDurabilityQuality(@NotNull Var<float[]> budget) {
+    Rule BudgetPriorityDurabilityQuality(Var<float[]> budget) {
         return sequence(
                 VALUE_SEPARATOR, ShortFloat(), VALUE_SEPARATOR, ShortFloat(),
                 budget.set(new float[]{(float) pop(), (float) pop(), (float) pop()}) //intermediate representation
         );
     }
 
-    Rule Tense(@NotNull Var<Tense> tense) {
+    Rule Tense(Var<Tense> tense) {
         return firstOf(
                 sequence(TENSE_PRESENT, tense.set(Tense.Present)),
                 sequence(TENSE_PAST, tense.set(Tense.Past)),
@@ -345,7 +345,7 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
-    Rule Truth(@NotNull Var<Truth> truth, @NotNull Var<Tense> tense) {
+    Rule Truth(Var<Truth> truth, Var<Tense> tense) {
         return sequence(
 
                 TRUTH_VALUE_MARK,
@@ -375,7 +375,7 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
-    Rule TruthTenseSeparator(char defaultChar, @NotNull Var<Tense> tense) {
+    Rule TruthTenseSeparator(char defaultChar, Var<Tense> tense) {
         return firstOf(
                 defaultChar,
                 sequence('|', tense.set(Tense.Present)),
@@ -415,7 +415,7 @@ public class Narsese extends BaseParser<Object> {
 //        );
 //    }
 
-    Rule SentencePunctuation(@NotNull Var<Character> punc) {
+    Rule SentencePunctuation(Var<Character> punc) {
         return firstOf(
 
                 sequence(anyOf(".?!@;"), punc.set(matchedChar())),
@@ -532,13 +532,13 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
-    public Rule seq(@NotNull Object rule, @NotNull Object rule2,
+    public Rule seq(Object rule, Object rule2,
                     Object... moreRules) {
         return sequence(rule, rule2, moreRules);
     }
 
 
-    Rule EmptyCompound(char c, @NotNull Op op) {
+    Rule EmptyCompound(char c, Op op) {
         return sequence(
             s(), c, push(TermBuilder.empty(op))
         );
@@ -568,7 +568,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @Nullable
-    public static Term TemporalRelationBuilder(Term pred, int cycles, @NotNull Op o, Term subj) {
+    public static Term TemporalRelationBuilder(Term pred, int cycles, Op o, Term subj) {
         return $.compound(o, cycles, subj, pred);
     }
 
@@ -634,7 +634,7 @@ public class Narsese extends BaseParser<Object> {
         }
 
         @Override
-        public <V> boolean match(@NotNull MatcherContext<V> context) {
+        public <V> boolean match(MatcherContext<V> context) {
             int count = 0;
             int max = context.getInputBuffer().length() - context.getCurrentIndex();
 
@@ -1020,7 +1020,7 @@ public class Narsese extends BaseParser<Object> {
 
 
     @Nullable
-    private static Term _popTerm(@NotNull Op op, @NotNull List vectorterms) {
+    private static Term _popTerm(Op op, List vectorterms) {
         Collections.reverse(vectorterms);
 
         for (int i = 0, vectortermsSize = vectorterms.size(); i < vectortermsSize; i++) {
@@ -1046,7 +1046,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * whitespace, optional
      */
-    @NotNull Rule s() {
+    Rule s() {
         return zeroOrMore(anyOf(" \t\f\n\r"));
     }
 
@@ -1067,7 +1067,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * returns number of tasks created
      */
-    public static int tasks(@NotNull String input, @NotNull Collection<Task> c, @NotNull Consumer<Object[]> unparsed, @NotNull NAR m)  {
+    public static int tasks(String input, Collection<Task> c, Consumer<Object[]> unparsed, NAR m)  {
         int[] i = new int[1];
         tasks(input, t -> {
             c.add(t);
@@ -1083,7 +1083,7 @@ public class Narsese extends BaseParser<Object> {
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(@NotNull String input, @NotNull Consumer<Task> c, @NotNull Consumer<Object[]> unparsed, @NotNull NAR m) {
+    public static void tasks(String input, Consumer<Task> c, Consumer<Object[]> unparsed, NAR m) {
         tasksRaw(input, o -> {
             Task t = decodeTask(m, o);
             if (t == null) {
@@ -1099,7 +1099,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * supplies the source array of objects that can construct a Task
      */
-    public static void tasksRaw(@NotNull CharSequence input, @NotNull Consumer<Object[]> c) {
+    public static void tasksRaw(CharSequence input, Consumer<Object[]> c) {
 
         ParsingResult r = the().inputParser.run(input);
 
@@ -1135,7 +1135,7 @@ public class Narsese extends BaseParser<Object> {
      * parse one task
      */
     @NotNull
-    public Task task(@NotNull String input, @NotNull NAR memory) throws NarseseException {
+    public Task task(String input, NAR memory) throws NarseseException {
         ParsingResult r;
         try {
             r = singleTaskParser.run(input);
@@ -1159,7 +1159,7 @@ public class Narsese extends BaseParser<Object> {
      * returns null if the Task is invalid (ex: invalid term)
      */
     @NotNull
-    public static Task decodeTask(@NotNull NAR m, @NotNull Object[] x) throws NarseseException  {
+    public static Task decodeTask(NAR m, Object[] x) throws NarseseException  {
         if (x.length == 1 && x[0] instanceof Task) {
             return (Task) x[0];
         }
@@ -1182,7 +1182,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * parse one term NOT NORMALIZED
      */
-    @NotNull public Term term(@NotNull CharSequence s) throws NarseseException {
+    public Term term(CharSequence s) throws NarseseException {
 
         Exception errorCause = null;
         ParsingResult r = null;
@@ -1209,12 +1209,12 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    @NotNull public Term term(@NotNull String s, @NotNull TermIndex t) throws NarseseException  {
+    public Term term(String s, TermIndex t) throws NarseseException  {
         return term(s, t, t!=null);
     }
 
     @NotNull
-    public Term term(@NotNull String s, @Nullable TermIndex index, boolean normalize) throws NarseseException  {
+    public Term term(String s, @Nullable TermIndex index, boolean normalize) throws NarseseException  {
         Term y = term(s);
         if (normalize) {
             if (y instanceof Compound) {

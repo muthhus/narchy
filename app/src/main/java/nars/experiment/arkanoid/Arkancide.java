@@ -4,6 +4,7 @@ package nars.experiment.arkanoid;
 import com.google.common.collect.Lists;
 import nars.*;
 import nars.data.AutoClassifier;
+import nars.gui.BagChart;
 import nars.op.NAgent;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
@@ -56,7 +57,7 @@ public class Arkancide extends NAgent {
     final int visH = 10;
     SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 12;
+    private int visionSyncPeriod = 24;
     float noiseLevel = 0;
 
     float paddleSpeed = 45f;
@@ -85,7 +86,7 @@ public class Arkancide extends NAgent {
         for (int x = 0; x < visW; x++) {
             int xx = x;
             for (int y = 0; y < visH; y++) {
-                Compound squareTerm = $.p(new IntTerm(x), new IntTerm(y));
+                Compound squareTerm = $.p(x, y);
                 int yy = y;
                 SensorConcept sss;
                 sensors.add(sss = new SensorConcept(squareTerm, nar,
@@ -164,7 +165,7 @@ public class Arkancide extends NAgent {
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
-                //BagChart.newBagChart((Default)nar, 1024),
+                BagChart.newBagChart((Default)nar, 1024),
                 camView, view
         );
 

@@ -149,7 +149,6 @@ public class Json {
         public static final SerializedString VAL_S = new SerializedString(VAL);
         public static final SerializedString REF_S = new SerializedString(REF);
 
-        boolean typing;
 
         JsonFactory fac;
         FSTConfiguration conf;

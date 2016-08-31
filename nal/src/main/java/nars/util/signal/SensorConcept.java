@@ -53,9 +53,10 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         this.input = input;
 
-        final float gain = 0.5f; //1f;
-        final float base = 0.1f;
-        this.sensor.pri(()->Math.min(1f, base + gain * n.conceptPriority(term)));
+        final float gain = nar.priorityDefault(Symbols.BELIEF); //1f;
+        this.sensor.pri(()->
+            Math.max(Param.BUDGET_EPSILON*2, Math.min(1f, gain * n.conceptPriority(term)))
+        );
     }
 
     protected void input(Task t) {

@@ -79,8 +79,8 @@ abstract public class NAgent {
         gamma = this.nar.confidenceDefault(Symbols.GOAL);
 
         float rewardGamma =
-                1.0f
-                //gamma
+                //1.0f
+                gamma
         ;
 
         this.reinforcementAttention = or(nar.DEFAULT_BELIEF_PRIORITY, nar.DEFAULT_GOAL_PRIORITY);

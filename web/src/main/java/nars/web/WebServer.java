@@ -1,6 +1,7 @@
 package nars.web;
 
 import io.undertow.Undertow;
+import io.undertow.UndertowOptions;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.cache.DirectBufferCache;
 import io.undertow.server.handlers.resource.CachingResourceManager;
@@ -37,6 +38,7 @@ import java.nio.file.Paths;
 import java.util.Random;
 
 import static io.undertow.Handlers.*;
+import static io.undertow.UndertowOptions.*;
 import static java.util.zip.Deflater.BEST_SPEED;
 
 
@@ -71,7 +73,6 @@ public class WebServer /*extends PathHandler*/ {
                 //System.getProperty("user.home")
                 cp
         );//.toAbsolutePath();
-        logger.info("Serving resources: {}", p);
 
 
 
@@ -80,6 +81,8 @@ public class WebServer /*extends PathHandler*/ {
         PathResourceManager resourcePath = new PathResourceManager(p, 0, true, true);
         server = Undertow.builder()
                 .addHttpListener(httpPort, "0.0.0.0")
+                .setServerOption(ENABLE_HTTP2, true)
+                .setServerOption(ENABLE_SPDY, true)
                 //.setIoThreads(4)
                 .setHandler(
                     path()
@@ -145,8 +148,10 @@ public class WebServer /*extends PathHandler*/ {
         this.nar = nar;
         this.loop = nar.loop(initialFPS);
 
-        logger.info("HTTP+Websocket start: port={} staticFiles={}", httpPort, resourcePath.getBasePath());
-        server.start();
+        logger.info("http/ws start: port={} staticFiles={}", httpPort, resourcePath.getBasePath());
+        synchronized (server) {
+            server.start();
+        }
 
 
     }
