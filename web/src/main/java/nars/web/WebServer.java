@@ -77,6 +77,7 @@ public class WebServer /*extends PathHandler*/ {
 
         //https://github.com/undertow-io/undertow/blob/master/examples/src/main/java/io/undertow/examples/sessionhandling/SessionServer.java
 
+        PathResourceManager resourcePath = new PathResourceManager(p, 0, true, true);
         server = Undertow.builder()
                 .addHttpListener(httpPort, "localhost")
                 //.setIoThreads(4)
@@ -87,7 +88,7 @@ public class WebServer /*extends PathHandler*/ {
                                         16384,
                                         16*1024*1024,
                                         new DirectBufferCache(100, 10, 1000),
-                                        new PathResourceManager(p, 0, true, true),
+                                        resourcePath,
                                         0 //7 * 24 * 60 * 60 * 1000
                                 )
                             )
@@ -144,7 +145,7 @@ public class WebServer /*extends PathHandler*/ {
         this.nar = nar;
         this.loop = nar.loop(initialFPS);
 
-        logger.info("HTTP+Websocket start: port={}", httpPort);
+        logger.info("HTTP+Websocket start: port={} staticFiles={}", httpPort, resourcePath.getBasePath());
         server.start();
 
 

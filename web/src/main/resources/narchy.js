@@ -216,11 +216,11 @@ function SocketNARGraph(path) {
 
 
     function d(x, key) {
-        return x._private.data[key];
+        return x._private.data[key] || 0;
     }
 
     var sizeFunc = function(x) {
-        var p1 = 1 + d(x, 'pri') * d(x, 'belief');
+        var p1 = 1 + d(x, 'pri');// * d(x, 'belief');
         return parseInt(24 + 48 * (p1 * p1));
     };
 

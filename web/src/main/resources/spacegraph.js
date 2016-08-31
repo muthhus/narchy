@@ -789,10 +789,9 @@ function spacegraph(targetWrapper, opt) {
                         var cx = 0.5 * (ex.x1 + ex.x2);
                         var cy = 0.5 * (ex.y1 + ex.y2);
 
-                        try {
+                        //try {
                             nn.position({x: cx, y: cy});
-                        }
-                        catch (e) { }
+                        //} catch (e) { }
                     }
                 }
             }
@@ -862,7 +861,6 @@ function spacegraph(targetWrapper, opt) {
         var l;
         c.on('graphChange', function(graph, nodesAdded, edgesAdded, nodesRemoved, edgesRemoved) {
             "use strict";
-
             that.updateChannel(c);
         });
 
@@ -881,11 +879,8 @@ function spacegraph(targetWrapper, opt) {
     /** get an element (node or edge) */
     s.get = function(id) {
         //return s.nodes()._private.ids[id];
-        var nowpublic = s._private;
-        var index = nowpublic.id2index[id];
-        if (index!==undefined) {
-            return nowpublic.elements[index];
-        }
+
+        return s._private.elements._private.ids[id];
     };
 
 
