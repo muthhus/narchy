@@ -12,9 +12,12 @@ import nars.NARLoop;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
+import nars.index.CaffeineIndex;
 import nars.index.Indexes;
 import nars.link.BLink;
 import nars.nar.Default;
+import nars.nar.SingleThreadExecutioner;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
@@ -76,7 +79,7 @@ public class WebServer /*extends PathHandler*/ {
 
         server = Undertow.builder()
                 .addHttpListener(httpPort, "localhost")
-                .setIoThreads(4)
+                //.setIoThreads(4)
                 .setHandler(
                     path()
                         .addPrefixPath("/", resource(
@@ -141,8 +144,9 @@ public class WebServer /*extends PathHandler*/ {
         this.nar = nar;
         this.loop = nar.loop(initialFPS);
 
-        logger.info("HTTP+Websocket server starting: port={}", httpPort);
+        logger.info("HTTP+Websocket start: port={}", httpPort);
         server.start();
+
 
     }
 
@@ -150,6 +154,7 @@ public class WebServer /*extends PathHandler*/ {
     public void stop() {
         synchronized (server) {
             server.stop();
+            logger.info("stop");
 
             loop.stop();
         }
@@ -215,12 +220,14 @@ public class WebServer /*extends PathHandler*/ {
         Random random = new XorShift128PlusRandom(1);
         int numConceptsPerCycle = 32;
 
+        SingleThreadExecutioner exe = new SingleThreadExecutioner();
         Default nar = new Default(1024, numConceptsPerCycle, 3, 3, random,
-                new Indexes.WeakTermIndex(256*1024,random),
+                new CaffeineIndex(new DefaultConceptBuilder(random),10000000,false,exe),
+                //new Indexes.WeakTermIndex(256*1024,random),
 //                new GroupedMapIndex(
 //                    new SoftValueHashMap(256*1024),
 //                    new DefaultConceptBuilder(random)),
-                new RealtimeMSClock()
+                new RealtimeMSClock(),exe
         );
 
         //nar.conceptActivation.setValue(1f/numConceptsPerCycle);
