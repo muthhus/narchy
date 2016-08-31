@@ -50,7 +50,7 @@ abstract public class NAgent {
     public final List<MotorConcept> actions = $.newArrayList();
 
     public float alpha, gamma, epsilonProbability = 0.1f;
-    @Deprecated public float gammaEpsilonFactor = 0.4f;
+    @Deprecated public float gammaEpsilonFactor = 0.5f;
 
     final int CURIOSITY_DURATION = 32; //frames
     final DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(CURIOSITY_DURATION);
@@ -70,7 +70,7 @@ abstract public class NAgent {
     private NARLoop loop;
     private Budget boostBudget, curiosityBudget;
     private final float reinforcementAttention;
-    private float curiosityAttention;
+    //private float curiosityAttention;
     private float rewardSum = 0;
 
     public NAgent(NAR nar) {
@@ -182,7 +182,7 @@ abstract public class NAgent {
     protected void mission() {
 
         int dt = 1 + ticksBeforeObserve + ticksBeforeDecide;
-        this.curiosityAttention = reinforcementAttention / actions.size();
+        //this.curiosityAttention = reinforcementAttention / actions.size();
 
 
         @NotNull Term what = $.$("?w"); //#w
@@ -282,7 +282,7 @@ abstract public class NAgent {
         if (reinforcementAttention > 0) {
 
             boostBudget = UnitBudget.One.clone().multiplied(reinforcementAttention, 0.5f, 0.5f);
-            curiosityBudget = UnitBudget.One.clone().multiplied(curiosityAttention, 0.1f, 0f);
+            curiosityBudget = UnitBudget.One.clone().multiplied(0, 0f, 0f);
 
             //boost(happy);
             //boost(happy); //boosted by the (happy)! task that is boosted below
@@ -299,11 +299,11 @@ abstract public class NAgent {
 
 
 
-            float motorEpsilonProbability = epsilonProbability/a * (1f - desireConf());
+            float motorEpsilonProbability = epsilonProbability/a * (1f - (desireConf()/gamma));
             for (MotorConcept c : actions) {
                 if (nar.random.nextFloat() < motorEpsilonProbability) {
                     nar.inputLater(
-                        new GeneratedTask(c, '!',
+                        new GeneratedTask(c, Symbols.GOAL,
                             $.t(nar.random.nextFloat()
                             //Math.random() > 0.5f ? 1f : 0f
                             , gamma * gammaEpsilonFactor))

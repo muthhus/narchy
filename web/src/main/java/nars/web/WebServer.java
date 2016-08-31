@@ -79,7 +79,7 @@ public class WebServer /*extends PathHandler*/ {
 
         PathResourceManager resourcePath = new PathResourceManager(p, 0, true, true);
         server = Undertow.builder()
-                .addHttpListener(httpPort, "localhost")
+                .addHttpListener(httpPort, "0.0.0.0")
                 //.setIoThreads(4)
                 .setHandler(
                     path()

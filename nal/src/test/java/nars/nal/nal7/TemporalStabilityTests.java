@@ -24,7 +24,7 @@ public class TemporalStabilityTests {
         private final IntHashSet whens;
         private final IntToObjectFunction<String> eventer;
         private final int minT, maxT;
-        final int tolerance = 2;
+        final int tolerance = 1;
 
         public T1(IntToObjectFunction<String> eventer, int... whens) {
             this.whens = new IntHashSet(whens);

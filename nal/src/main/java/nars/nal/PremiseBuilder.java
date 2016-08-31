@@ -111,6 +111,7 @@ public enum PremiseBuilder {
 
         Task belief = null;
 
+
         Term termLinkTermConceptTerm = $.unneg(termLinkTerm).term();
         if (termLinkTerm instanceof Compound && linkable(termLinkTermConceptTerm)) { //atomic concepts will have no beliefs to match
 

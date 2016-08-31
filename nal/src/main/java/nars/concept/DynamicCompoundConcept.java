@@ -93,7 +93,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         }
 
         @Nullable private DynamicCompoundConcept.DynTruth truth(long when, Compound template, boolean evidence) {
-            return truth(when, ETERNAL, template, evidence);
+            return truth(when, when, template, evidence);
         }
 
         @Nullable private DynamicCompoundConcept.DynTruth truth(long when, long now, Compound template, boolean evidence) {
@@ -125,7 +125,11 @@ public class DynamicCompoundConcept extends CompoundConcept {
                     return null;
                 }
 
+
                 int dt = template.subtermTime(ss);
+                if (dt == DTERNAL) dt = 0;
+
+                //System.out.println(ss + " "+ dt + " in " + template);
 
 
                 @Nullable Truth nt = null;
@@ -166,20 +170,21 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
             Task x = super.match(target, now);
 
+            long then = target.occurrence();
             //experimental dynamic eval
             long occThresh = 1;
-            if (x == null || Math.abs(now - x.occurrence() ) >= occThresh) {
+            if (x == null || Math.abs(then - x.occurrence() ) >= occThresh) {
 
                 //template which may contain temporal relationship to emulate
                 Compound template = x!=null ?  x.term() : term();
 
-                DynTruth dt = truth(now, template, true);
+                DynTruth dt = truth(then, template, true);
                 if (dt!=null) {
                     Truth y = dt.truth(op(), nar);
-                    if (y!=null) {
+                    if (y!=null && !y.equals(x.truth())) {
 
                         RevisionTask xx = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
-                                y, now, now, dt.evidence());
+                                y, nar.time(), then, dt.evidence());
                         xx.budget(dt.b);
                         xx.log("Dynamic");
 

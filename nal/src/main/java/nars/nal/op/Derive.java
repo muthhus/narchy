@@ -160,11 +160,12 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
             //apply the confidence scale
             if (truth != null) {
-                float projection;
-                projection = Param.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent() ? TruthFunctions.projection(m.task.occurrence(), m.belief.occurrence(), nar.time()) : 1f;
+                //float projection;
+                //projection =
+                        //Param.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent() ? TruthFunctions.projection(m.task.occurrence(), m.belief.occurrence(), nar.time()) : 1f;
                 float cf = confScale[0];
-                if ((cf != 1 || projection != 1)) {
-                    truth = truth.confMultViaWeightMaxEternal(cf * projection);
+                if (cf != 1) {
+                    truth = truth.confMultViaWeightMaxEternal(cf);
                     if (truth == null) {
                         throw new RuntimeException("temporal leak: " + premise);
                         //return;

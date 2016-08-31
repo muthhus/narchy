@@ -4,9 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /** https://gist.github.com/Miretz/f10b18df01f9f9ebfad5 */
 public class Arkanoid extends JFrame implements KeyListener {
@@ -42,7 +43,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	public final Paddle paddle = new Paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - PADDLE_HEIGHT);
 	private final Ball ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-	private final List<Brick> bricks = new ArrayList<Arkanoid.Brick>();
+	private final Collection<Brick> bricks = new ConcurrentSkipListSet<Brick>();
 
 	//private double lastFt;
 	//private double currentSlice;
@@ -169,8 +170,12 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 	}
 
-	class Brick extends Rectangle {
 
+	static final AtomicInteger brickSerial = new AtomicInteger(0);
+
+	class Brick extends Rectangle implements Comparable<Brick> {
+
+		int id;
 		boolean destroyed;
 
 		Brick(double x, double y) {
@@ -178,11 +183,17 @@ public class Arkanoid extends JFrame implements KeyListener {
 			this.y = y;
 			this.sizeX = BLOCK_WIDTH;
 			this.sizeY = BLOCK_HEIGHT;
+			this.id = brickSerial.incrementAndGet();
 		}
 
 		void draw(Graphics g) {
 			g.setColor(Color.WHITE);
 			g.fillRect((int) left(), (int) top(), (int) sizeX, (int) sizeY);
+		}
+
+		@Override
+		public int compareTo(Brick o) {
+			return Integer.compare(id, o.id);
 		}
 	}
 
@@ -286,7 +297,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 	}
 
-	void initializeBricks(List<Brick> bricks) {
+	void initializeBricks(Collection<Brick> bricks) {
 		// deallocate old bricks
 		//synchronized(bricks) {
 			bricks.clear();

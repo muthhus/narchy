@@ -24,8 +24,6 @@ import static nars.truth.TruthFunctions.projection;
  */
 public final class TruthPolation extends InterpolatingMicrosphere {
 
-    public static final float[] ZEROTIME = { 0f };
-
     @NotNull final float[][] times;
     @NotNull final float[] freq;
     @NotNull final float[] conf;
@@ -100,23 +98,19 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             //float window = 0.01f;
 
             long o = t.occurrence();
-            long then;
-            if (o == ETERNAL)
-                then = -when;
-            else
-                then = -when + o;
-            times[i][0] = then;// + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
+            times[i][0] = (o!=ETERNAL) ? o : when;// + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
             freq[i] = t.freq();
 
             float c = Math.min(t.conf(), 1f-Param.TRUTH_EPSILON); //clip maximum confidence
-            conf[i] = c2w(c) * ((now == ETERNAL || o == ETERNAL) ? 1f : projection(when, o, now));
-            //TODO dt
 
+            conf[i] = c2w(c)
+                    //* ((now == ETERNAL || o == ETERNAL) ? 1f : projection(when, o, now));
+                    ;
             i++;
         }
 
         float[] v = this.value(
-                ZEROTIME,
+                new float[] { when },
                 times,
                 freq, conf,
                 Param.timeToLuminosity,

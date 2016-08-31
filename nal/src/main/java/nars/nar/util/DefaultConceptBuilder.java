@@ -107,9 +107,12 @@ import static nars.nal.Tense.DTERNAL;
 
         }
 
-        return (!dynamic) ?
-                new CompoundConcept<>(t, termbag, taskbag, nar) :
-                new DynamicCompoundConcept(t, termbag, taskbag, nar);
+        return
+            (!dynamic) ?
+                new CompoundConcept<>(t, termbag, taskbag, nar)
+                    :
+                new DynamicCompoundConcept(t, termbag, taskbag, nar)
+        ;
 
     }
 

@@ -352,7 +352,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
     @Nullable
     public final Truth truth(long when, @Nullable EternalTable eternal) {
-        return truth(when, ETERNAL, eternal);
+        return truth(when, when, eternal);
     }
 
     @Nullable

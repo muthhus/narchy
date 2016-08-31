@@ -114,9 +114,9 @@ public class Pacman extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.1f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.25f);
-        nar.compoundVolumeMax.set(30);
-        nar.truthResolution.setValue(0.1f);
+        nar.confMin.setValue(0.1f);
+        nar.compoundVolumeMax.set(40);
+        nar.truthResolution.setValue(0.05f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
         //nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
@@ -288,13 +288,15 @@ public class Pacman extends NAgent {
                 int sc = Math.round(2f * (f -0.5f) * pacMovesPerCycle);
                 if (sc < 0) {
                     if (!pacman.pac.move(ctables.LEFT, -sc, pacman))
-                        return null;
+                        return $.t(0.5f, gamma);
                 } else if (sc > 0) {
                     if (!pacman.pac.move(ctables.RIGHT, sc, pacman))
-                        return null;
+                        return $.t(0.5f, gamma);
                 }
+                //return d;
+                return d.withConf(gamma);
             }
-            return d;
+            return null;
         }));
         actions.add(new MotorConcept("(updown)",nar,(b,d)->{
             if (d!=null) {
@@ -305,13 +307,15 @@ public class Pacman extends NAgent {
                 int sc = Math.round(2f * (f-0.5f) * pacMovesPerCycle);
                 if (sc < 0) {
                     if (!pacman.pac.move(ctables.UP, -sc, pacman))
-                        return null;
+                        return $.t(0.5f, gamma);
                 } else if (sc > 0) {
                     if (!pacman.pac.move(ctables.DOWN, sc, pacman))
-                        return null;
+                        return $.t(0.5f, gamma);
                 }
+                //return d;
+                return d.withConf(gamma);
             }
-            return d;
+            return null;
         }));
 
 
@@ -380,10 +384,10 @@ public class Pacman extends NAgent {
 
 //        if (nar instanceof Default) {
 //
-//            //new BeliefTableChart(nar, charted).show(700, 900);
-//            BeliefTableChart.newBeliefChart(nar, charted, 400);
+//          //new BeliefTableChart(nar, charted).show(700, 900);
+            BeliefTableChart.newBeliefChart(nar, charted, 400);
 ////
-            BagChart.show((Default) nar, 512);
+            //BagChart.show((Default) nar, 512);
 ////
 //            //STMView.show(stm, 500, 500);
 //

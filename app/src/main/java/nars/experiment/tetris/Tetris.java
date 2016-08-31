@@ -278,13 +278,18 @@ public class Tetris extends NAgent {
                 //System.out.println(d + " " + x);
                 if (x > actionThresholdHigh) {
                     if (state.take_action(RIGHT))
-                        return d; //legal move
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(1, gamma);
                 } else if (x < actionThresholdLow) {
                     if (state.take_action(LEFT))
-                        return d; //legal move
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(0, gamma);
                 }
             }
-            return null; //no action taken or move ineffective
+            //return null;
+            return $.t(0.5f, gamma); //no action taken or move ineffective
         }));
 
         if (rotate) {
@@ -293,13 +298,18 @@ public class Tetris extends NAgent {
                     float r = d.freq();
                     if (r > actionThresholdHigh) {
                         if (state.take_action(CW))
-                            return d;
+                            //return d; //legal move
+                            //return d.withConf(gamma);
+                            return $.t(1, gamma);
                     } else if (r < actionThresholdLow) {
                         if (state.take_action(CCW))
-                            return d;
+                            //return d; //legal move
+                            //return d.withConf(gamma);
+                            return $.t(0, gamma);
                     }
                 }
-                return null;
+                //return null;
+                return $.t(0.5f, gamma); //no action taken or move ineffective
             }));
         }
         //actions.add(motorDown = new MotorConcept("(down)", nar));
@@ -366,6 +376,7 @@ public class Tetris extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.2f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.confMin.setValue(0.01f);
+        nar.compoundVolumeMax.setValue(40);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {

@@ -113,7 +113,7 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     public static float matchTermutationsMax = 2;
     public static int QUERY_ANSWERS_PER_MATCH = 1;
-    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
+    //public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 
 
     /**
@@ -124,8 +124,9 @@ public abstract class Param /*extends Container*/ implements Level {
 
     /**
      * if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression
+     * if this is true, then there is risk that confidence can hyperinflate
      */
-    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = true;
+    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = false;
 
 //    /**
 //     * relates time and evidence (confidence); how past and future beliefs decay in rank
@@ -146,7 +147,11 @@ public abstract class Param /*extends Container*/ implements Level {
         //float timeRate = 1f;
         //return InterpolatingMicrosphere.pow(Math.max(0.5f, diffNorm)*timeRate, -exponent);
 
-        return 1f / (1f + dt);
+        float duration = 2f;
+        return 1f / (1 + (dt*dt)/(duration*duration));
+
+        //return 1f / (1f + dt);
+        //return 1f / (1f + dt*dt);
         //return 1f / ( 1f + (float)Math.sqrt(dt));
         //return 1f / ( (float)Math.pow(1+dt, 1.5f));
 
@@ -165,13 +170,6 @@ public abstract class Param /*extends Container*/ implements Level {
 //     *  set to 0.0 to disable this functionality.
 //     */
 //    public static float ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR = 1f;
-
-    /** confidence multiplier for revection merges during temporal belief table compression.
-     *
-     *  a value less than 1.0 allows subsequent revections to decay faster, preventing
-     *  a compounding / "snowballing" of mergings into a highly confident rolling average task.
-     */
-    public static final float REVECTION_CONFIDENCE_FACTOR = 1f; //1f; //0.95f;
 
 
     /** if false, then revection will be budgeted with parent's budget mix, otherwise it will have dur/qua mixed but priority set to zero to not trigger linking */
@@ -537,7 +535,8 @@ public abstract class Param /*extends Container*/ implements Level {
 
     /** eternalize if... */
     public static boolean eternalizeForgottenTemporal(Op op) {
-        return op.statement;
+        return false;
+        //return op.statement;
     }
 
     public static final float ETERNALIZATION_CONFIDENCE_FACTOR = 0.5f;
