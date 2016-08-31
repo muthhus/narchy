@@ -4,6 +4,7 @@
         <script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
         <script type="text/javascript" src="lib/lodash/dist/lodash.min.js"></script>
         <script type="text/javascript" src="web_socket.js"></script>
+        <script type="text/javascript" src="socketview.js"></script>
         <style type="text/css">
             @import url("terminal.css");
         </style>
@@ -99,7 +100,7 @@
 
             $(document).ready(function() {
 
-                ws = new window.WebSocket('terminal');
+                ws = new window.socket('terminal');
 
                 var ia = $('#inputArea');
                 ia.keydown(function(e) {

@@ -9,8 +9,7 @@ body {
 #io {
     position: fixed;
     width: 100%;
-    height: 500px;
-    padding-bottom: 2em;
+    height: 90%;
     overflow: auto;
 }
 pre {
