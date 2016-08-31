@@ -230,6 +230,7 @@ abstract public class NAgent {
         return run(cycles, 0);
     }
 
+
     public NAgent runSync(final int cycles) {
         //run(cycles, 0).join();
         start();

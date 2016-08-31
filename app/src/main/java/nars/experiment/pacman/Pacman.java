@@ -94,7 +94,7 @@ public class Pacman extends NAgent {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                8, 2, 3, rng,
+                16, 2, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
                 new FrameClock(), exe
 
@@ -106,13 +106,15 @@ public class Pacman extends NAgent {
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.1f;
+
+        float pMult = 1f/2f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * pMult;
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f * pMult;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.1f * pMult;
+        nar.DEFAULT_QUEST_PRIORITY = 0.1f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.1f);
+        nar.confMin.setValue(0.25f);
         nar.compoundVolumeMax.set(30);
         nar.truthResolution.setValue(0.1f);
 
@@ -381,7 +383,7 @@ public class Pacman extends NAgent {
 //            //new BeliefTableChart(nar, charted).show(700, 900);
 //            BeliefTableChart.newBeliefChart(nar, charted, 400);
 ////
-            BagChart.show((Default) nar, 32);
+            BagChart.show((Default) nar, 512);
 ////
 //            //STMView.show(stm, 500, 500);
 //
@@ -414,9 +416,9 @@ public class Pacman extends NAgent {
     float lastScore;
 
 
-    final Atom PILL = $.the("pill");
-    final Atom WALL = $.the("wall");
-    final Atom GHOST = $.the("ghost");
+//    final Atom PILL = $.the("pill");
+//    final Atom WALL = $.the("wall");
+//    final Atom GHOST = $.the("ghost");
 
 
 //    @Override

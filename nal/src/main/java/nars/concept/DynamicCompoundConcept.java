@@ -67,15 +67,22 @@ public class DynamicCompoundConcept extends CompoundConcept {
     @NotNull
     @Override
     protected BeliefTable newBeliefTable(int eCap, int tCap) {
-
-        //ASSUMES belief, not goal table
-        return new DynamicBeliefTable(tCap);
+        return new DynamicBeliefTable(true, tCap);
+    }
+    @NotNull
+    @Override
+    protected BeliefTable newGoalTable(int eCap, int tCap) {
+        return new DynamicBeliefTable(false, tCap);
     }
 
     private class DynamicBeliefTable extends DefaultBeliefTable {
 
-        public DynamicBeliefTable(int tCap) {
+        private final boolean beliefOrGoal;
+
+        public DynamicBeliefTable(boolean beliefOrGoal, int tCap) {
+
             super(tCap);
+            this.beliefOrGoal = beliefOrGoal;
         }
 
 
@@ -99,7 +106,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
             Term[] subs = template.terms();
 
             for (Term s : subs) {
-                if (!(s instanceof Compound) || s.hasTemporal()) {
+                if (!(s instanceof Compound)) {
                     return null;
                 }
 
@@ -110,7 +117,11 @@ public class DynamicCompoundConcept extends CompoundConcept {
                     s = $.unneg(s).term();
 
                 Concept p = nar.concept(s);
-                if (p == null || !p.hasBeliefs()) {
+                if (p == null)
+                    return null;
+
+                BeliefTable table = beliefOrGoal ? p.beliefs() : p.goals();
+                if (table.isEmpty()) {
                     return null;
                 }
 
@@ -118,13 +129,13 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
 
                 @Nullable Truth nt = null;
-                if ((p instanceof DynamicCompoundConcept) && (p.hasBeliefs())) {
-                    @Nullable DynTruth ndt = ((DynamicBeliefTable) p.beliefs()).truth(when + dt, now, (Compound) s, false);
+                if (p instanceof DynamicCompoundConcept) {
+                    @Nullable DynTruth ndt = ((DynamicBeliefTable)table).truth(when + dt, now, (Compound) s, false);
                     if (ndt!=null) {
                         nt = ndt.truth(s.op(), nar);
                     }
                 } else {
-                    nt = p.belief(when + dt, now);
+                    nt = table.truth(when + dt, now);
                 }
 
                 if (nt==null) {
@@ -133,7 +144,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 t.add($.negIf(nt,negated));
 
                 if (evidence) {
-                    @Nullable Task bt = p.beliefs().top(when+dt, now);
+                    @Nullable Task bt = table.top(when+dt, now);
                     if (bt != null) {
                         Budget btb = bt.budget();
                         if (!btb.isDeleted())
@@ -167,7 +178,8 @@ public class DynamicCompoundConcept extends CompoundConcept {
                     Truth y = dt.truth(op(), nar);
                     if (y!=null) {
 
-                        RevisionTask xx = new RevisionTask(template, Symbols.BELIEF, y, now, now, dt.evidence());
+                        RevisionTask xx = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
+                                y, now, now, dt.evidence());
                         xx.budget(dt.b);
                         xx.log("Dynamic");
 
