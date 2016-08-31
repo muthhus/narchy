@@ -4,6 +4,7 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.*;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +19,7 @@ import java.util.Set;
  */
 public abstract class WebsocketService extends AbstractReceiveListener implements WebSocketCallback<Void>, WebSocketConnectionCallback {
 
-    protected final Set<WebSocketChannel> connections = new LinkedHashSet();
+    protected final Set<WebSocketChannel> connections = new ConcurrentHashSet<>();
 
 
 //    static {
@@ -26,8 +27,8 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
 //    }
 
 
-            //.setForceSerializable(true)
-            //.setForceClzInit(true)
+    //.setForceSerializable(true)
+    //.setForceClzInit(true)
 
     public WebsocketService() {
 
@@ -43,30 +44,29 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
      * broadcast to all
      */
     public void send(Object object) {
-        synchronized(connections) {
-            for (WebSocketChannel s : connections)
-                send(s, object);
-        }
+
+        for (WebSocketChannel s : connections)
+            send(s, object);
+
     }
 
     public void send(WebSocketChannel socket, Object object) {
         //System.out.println("send: " + object);
 
         if (object instanceof Object[]) {
-            WebSockets.sendText(Json.arrayToJson((Object[])object, new StringBuilder()).toString(), socket, this);
+            WebSockets.sendText(Json.arrayToJson((Object[]) object, new StringBuilder()).toString(), socket, this);
         } else if (object instanceof String) {
-            WebSockets.sendText((String)object, socket, this);
+            WebSockets.sendText((String) object, socket, this);
         } else if (object instanceof StringBuilder) {
             WebSockets.sendText(object.toString(), socket, this);
         } else if (object instanceof ByteBuffer) {
-            WebSockets.sendText((ByteBuffer)object, socket, this);
+            WebSockets.sendText((ByteBuffer) object, socket, this);
         } else {
             WebSockets.sendText(jsonize(object), socket, this);
         }
 
 
         //WebSockets.sendText(jsonizer.asJsonString(object), socket, this);
-
 
 
 //            try {
@@ -116,17 +116,16 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
             log.info(socket.getPeerAddress() + " connected websocket");*/
 
 
-        synchronized (connections) {
-            if (connections.isEmpty()) {
-                onStart();
-            }
-
-            socket.getReceiveSetter().set(this);
-            socket.resumeReceives();
-
-            onConnect(socket);
-            connections.add(socket);
+        if (connections.isEmpty()) {
+            onStart();
         }
+
+        socket.getReceiveSetter().set(this);
+        socket.resumeReceives();
+
+        onConnect(socket);
+        connections.add(socket);
+
 
         /*Topic.all(nar.memory(), (k, v) -> {
             send(socket, k + ":" + v);
@@ -173,15 +172,14 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
     @Override
     protected void onClose(WebSocketChannel socket, StreamSourceFrameChannel channel) throws IOException {
 
-        synchronized (connections) {
 
-            onDisconnect(socket);
-            connections.remove(socket);
+        onDisconnect(socket);
+        connections.remove(socket);
 
-            if (connections.isEmpty()) {
-                onStop();
-            }
+        if (connections.isEmpty()) {
+            onStop();
         }
+
 
 
         /*if (log.isInfoEnabled())
