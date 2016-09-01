@@ -5,6 +5,7 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
@@ -40,11 +41,13 @@ public class ArithmeticInduction {
     public static TermContainer compress(@NotNull TermContainer subs) {
 
         int subCount = subs.size();
+        if (subCount == 1 || !subs.hasAny(Op.INT))
+            return subs; //early exit condition
+
 
         ListMultimap<ByteList, Term> subTermStructures = MultimapBuilder.hashKeys().arrayListValues().build();
-        for (Term x : subs) {
+        for (Term x : subs)
             subTermStructures.put(x.structureKey(), x);
-        }
 
         int numUniqueSubstructures = subTermStructures.keySet().size();
         if (numUniqueSubstructures == subCount) {
@@ -53,20 +56,42 @@ public class ArithmeticInduction {
             //recurse with each sub-structure group and re-combine
 
             Set<Term> ss = new TreeSet();
-            for (Collection<Term> g : subTermStructures.asMap().values()) {
-                if (g.size() > 1) {
-                    TermContainer gg = TermSet.the(g);
+            for (Collection<Term> stg : subTermStructures.asMap().values()) {
+                int gs = stg.size();
+
+                if (gs > 1) {
+                    TermContainer gg = TermVector.the(stg);
                     gg = compress(gg);
                     for (Term ggg : gg)
                         ss.add(ggg);
                 } else {
-                    ss.addAll(g); //1-element group, nothing that would be combined
+                    ss.addAll(stg);
                 }
+
             }
 
             return compress(TermSet.the(ss));
         }
-            //else: continue below
+
+        //group again according to appearance of unique atoms
+        ListMultimap<List<Term>, Term> subAtomSeqs = MultimapBuilder.hashKeys().arrayListValues().build();
+        for (Term x : subs)
+            subAtomSeqs.put(atomSeq(x), x);
+
+        int ssa = subAtomSeqs.keySet().size();
+        if (ssa == subCount) {
+            return subs;
+        } else if (ssa > 1) {
+            //process each unique atom seq group:
+            Set<Term> ss = new TreeSet();
+            for (Collection<Term> ssg : subAtomSeqs.asMap().values()) {
+                TermContainer gg = TermVector.the(ssg);
+                gg = compress(gg);
+                for (Term ggg : gg)
+                    ss.add(ggg);
+            }
+            return compress(TermSet.the(ss));
+        }
 
 
         int negs = subs.count(x -> x.op() == Op.NEG);
@@ -191,6 +216,20 @@ public class ArithmeticInduction {
             }
         }
 
+    }
+
+    private static List<Term> atomSeq(Term x) {
+        if (x instanceof Compound) {
+            List<Term> s = $.newArrayList(0);
+            x.recurseTerms(v -> {
+                if ((v instanceof Atomic && v.op()!=INT)) {
+                    s.add(v);
+                }
+            });
+            return s;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
 
