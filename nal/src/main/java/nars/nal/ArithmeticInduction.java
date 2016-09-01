@@ -21,23 +21,178 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import static nars.Op.INT;
-import static nars.Op.INTRANGE;
 
 /**
  * arithmetic rule mining & variable introduction
+ * WARNING: use of ByteArrayLists limits compound terms to max length of ~127
  */
 public class ArithmeticInduction {
 
 
     public static Logger logger = LoggerFactory.getLogger(ArithmeticInduction.class);
+
+    @NotNull
+    public static TermContainer compress(@NotNull TermContainer subs) {
+
+        int subCount = subs.size();
+
+        ListMultimap<ByteList, Term> subTermStructures = MultimapBuilder.hashKeys().arrayListValues().build();
+        for (Term x : subs) {
+            subTermStructures.put(x.structureKey(), x);
+        }
+
+        int numUniqueSubstructures = subTermStructures.keySet().size();
+        if (numUniqueSubstructures == subCount) {
+            return subs; //each subterm has a unique structure so nothing will be combined
+        } else if (numUniqueSubstructures > 1) {
+            //recurse with each sub-structure group and re-combine
+
+            Set<Term> ss = new TreeSet();
+            for (Collection<Term> g : subTermStructures.asMap().values()) {
+                if (g.size() > 1) {
+                    TermContainer gg = TermSet.the(g);
+                    gg = compress(gg);
+                    for (Term ggg : gg)
+                        ss.add(ggg);
+                } else {
+                    ss.addAll(g); //1-element group, nothing that would be combined
+                }
+            }
+
+            return compress(TermSet.the(ss));
+        }
+            //else: continue below
+
+
+        int negs = subs.count(x -> x.op() == Op.NEG);
+        boolean negate = (negs == subCount);
+        if (negs != 0 && !negate) {
+            //only if none or all of the subterms are negated
+            return subs;
+        }
+
+        if (!subs.equivalentStructures())
+            return subs;
+
+        if (!equalNonIntegerAtoms(subs))
+            return subs;
+
+        if (negate) {
+            subs = $.neg((TermVector) subs);
+        }
+
+        //paths * extracted sequence of numbers at given path for each subterm
+        Map<ByteList, Pair<ByteHashSet, List<Term>>> data = new HashMap();
+
+
+        //analyze subtermss
+        for (int i = 0; i < subCount; i++) {
+            //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
+            @NotNull Term f = subs.term(i);
+
+            //first subterm: infer location of all inductables
+            int ii = i;
+            BiPredicate<ByteList, Term> collect = (p, t) -> {
+                if ((!p.isEmpty() || (t instanceof IntTerm) || (t instanceof IntInterval))) {
+                    Pair<ByteHashSet, List<Term>> c = data.computeIfAbsent(p.toImmutable(), (pp) ->
+                            Tuples.pair(new ByteHashSet(), $.newArrayList(1)));
+                    c.getOne().add((byte) ii);
+                    c.getTwo().add(t);
+                }
+
+                return true;
+            };
+
+            //if (f instanceof Compound) {
+            f.pathsTo(x -> x, collect);
+            /*} else {
+                if (f instanceof IntTerm) //raw atomic int term
+                    data.put(new ByteArrayList(new byte[] {0}), $.newArrayList(f));
+            }*/
+        }
+
+        TreeSet<Term> result = new TreeSet();
+
+        for (Map.Entry<ByteList, Pair<ByteHashSet, List<Term>>> e : data.entrySet()) {
+            //data.forEach((pp, nn) -> {
+            ByteList pp = e.getKey();
+            Pair<ByteHashSet, List<Term>> nn = e.getValue();
+
+            ByteHashSet involved = nn.getOne();
+            int numInvolved = involved.size(); //# of subterms involved
+
+            //at least 2 subterms must contribute a value for each path
+            if (numInvolved < 2)
+                continue;
+
+            //for each path where the other numerics are uniformly equal (only one unique value)
+            /*if (new HashSet(nn).size()==1)*/
+
+
+            //List<Term> features = $.newArrayList();
+            //final Compound pattern = (Compound) first;
+
+            //data.forEach((ppp, nnnt) -> {
+
+                    /*if (!pp.equals(ppp))*/
+
+            List<Term> ff = features(nn.getTwo());
+            if (ff.isEmpty() || ff.size() >= numInvolved) {
+                //nothing would be gained; dont bother
+                continue;
+            }
+
+
+            //TreeSet<Term> s = new TreeSet();
+            byte j = 0;
+            Term template = null;
+            for (Term x : subs) {
+                if (!involved.contains(j)) {
+                    result.add(x);
+                } else {
+                    //x is contained within range expression p
+                    result.remove(x);
+                    template = x;
+                }
+                j++;
+            }
+
+            //try {
+                for (Term f : ff) {
+                    Term y = template instanceof Compound ? $.negIf((Compound) $.terms.transform((Compound) template, pp, f), negate) : f;
+                    //s.add(y);
+                    result.add(y);
+                }
+
+                //result.add(s)return TermSet.the(s);
+            /*} catch (ClassCastException eee) {
+                //return subs; //HACK
+                continue; //HACK
+            }*/
+
+
+
+        }
+
+        if (result.isEmpty()) {
+            return subs;
+        } else {
+            TermSet newSubs = TermSet.the(result);
+            if (newSubs.equals(subs))
+                return subs;
+            else {
+                //try reducing further
+                return compress(newSubs);
+            }
+        }
+
+    }
+
 
     @Nullable
     public static IntArrayList ints(List<Term> term) {
@@ -54,9 +209,9 @@ public class ArithmeticInduction {
     public static RangeSet<Integer> ranges(List<Term> term) {
         TreeRangeSet<Integer> r = TreeRangeSet.create();
         for (Term x : term) {
-            if (x.op() == INTRANGE)
+            if (x instanceof IntInterval)
                 r.add(((IntInterval) x).val);
-            else if (x.op() == INT)
+            else if (x instanceof IntTerm)
                 r.add(Range.singleton(((IntTerm) x).val()).canonical(DiscreteDomain.integers()));
         }
         return r;
@@ -146,145 +301,10 @@ public class ArithmeticInduction {
 //
 //    }
 
-    @NotNull
-    public static TermContainer compress(@NotNull TermContainer subs) {
-        int negs = subs.count(x -> x.op() == Op.NEG);
-
-        int subCount = subs.size();
-        boolean negate = (negs == subCount);
-        if (negs != 0 && !negate) {
-            //only if none or all of the subterms are negated
-            return subs;
-        }
-
-        if (!subs.equivalentStructures())
-            return subs;
-
-        if (!equalNonIntegerAtoms(subs))
-            return subs;
-
-        if (negate) {
-            subs = $.neg((TermVector) subs);
-        }
-
-        //paths * extracted sequence of numbers at given path for each subterm
-        Map<ByteList, Pair<ByteHashSet, List<Term>>> data = new HashMap();
-
-
-        //analyze subtermss
-        for (int i = 0; i < subCount; i++) {
-            //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
-            @NotNull Term f = subs.term(i);
-
-            //first subterm: infer location of all inductables
-            int ii = i;
-            BiPredicate<ByteList, Term> collect = (p, t) -> {
-                if ((!p.isEmpty() || (t instanceof IntTerm) || (t instanceof IntInterval))) {
-                    Pair<ByteHashSet, List<Term>> c = data.computeIfAbsent(p.toImmutable(), (pp) ->
-                            Tuples.pair(new ByteHashSet(), $.newArrayList(1)));
-                    c.getOne().add((byte) ii);
-                    c.getTwo().add(t);
-                }
-
-                return true;
-            };
-
-            //if (f instanceof Compound) {
-            f.pathsTo(x -> x, collect);
-            /*} else {
-                if (f instanceof IntTerm) //raw atomic int term
-                    data.put(new ByteArrayList(new byte[] {0}), $.newArrayList(f));
-            }*/
-        }
-
-        for (Map.Entry<ByteList, Pair<ByteHashSet, List<Term>>> e : data.entrySet()) {
-            //data.forEach((pp, nn) -> {
-            ByteList pp = e.getKey();
-            Pair<ByteHashSet, List<Term>> nn = e.getValue();
-
-            ByteHashSet involved = nn.getOne();
-            int numInvolved = involved.size(); //# of subterms involved
-
-            //at least 2 subterms must contribute a value for each path
-            if (numInvolved < 2)
-                continue;
-
-            //for each path where the other numerics are uniformly equal (only one unique value)
-            /*if (new HashSet(nn).size()==1)*/
-
-
-            //List<Term> features = $.newArrayList();
-            //final Compound pattern = (Compound) first;
-
-            //data.forEach((ppp, nnnt) -> {
-
-                    /*if (!pp.equals(ppp))*/
-
-            List<Term> ff = features(nn.getTwo());
-            if (ff.isEmpty() || ff.size() >= numInvolved) {
-                //nothing would be gained; dont bother
-                continue;
-            }
-
-
-            TreeSet<Term> s = new TreeSet();
-            byte j = 0;
-            Term template = null;
-            for (Term x : subs) {
-                if (!involved.contains(j)) {
-                    s.add(x);
-                } else {
-                    //x is contained within range expression p
-                    template = x;
-                }
-                j++;
-            }
-
-            try {
-                for (Term f : ff) {
-                    Term y = template instanceof Compound ? $.negIf((Compound) $.terms.transform((Compound) template, pp, f), negate) : f;
-                    s.add(y);
-                }
-
-                return TermSet.the(s);
-            } catch (ClassCastException eee) {
-                //return subs; //HACK
-                continue; //HACK
-            }
-
-
-//
-//                for (Term ff : fff) {
-//
-////                            //introduce variable
-////                            try {
-////                                @Nullable Term y = $.terms.transform(pattern, ppp, ff);
-////                                if (y instanceof Compound) {
-////                                    @Nullable Compound z = $.negIf(
-////                                            (Compound) y,
-////                                            negate
-////                                    );
-////                                    //return z;
-////                                    //each.accept(z);
-////                                }
-////                            } catch (InvalidTermException e) {
-////                                logger.error("{}",e.toString());
-////                            }
-//
-//
-//                }
-            //});
-
-        }
-
-        return subs;
-
-    }
 
     static boolean compareNonInteger(Term x, Term y) {
-        boolean xint = (x.op() == INT || x.op() == INTRANGE);
-        if (xint) {
-            return (y.op() == INT || y.op() == INTRANGE);
+        if ((x.op() == INT)) {
+            return (y.op() == INT);
         } else if (x instanceof Compound) {
             return x.op() == y.op() && x.size() == y.size() && ((Compound) x).dt() == ((Compound) y).dt();
         } else {
@@ -312,18 +332,7 @@ public class ArithmeticInduction {
         });
     }
 
-    static boolean matchable(List<Term> x) {
-        int intTerms = 0, intPreds = 0;
-        int xSize = x.size();
-        for (int i = 0; i < xSize; i++) {
-            Term t = x.get(i);
-            if (t.op() == INT)
-                intTerms++;
-            else if (t.op() == INTRANGE)
-                intPreds++;
-        }
-        return (intTerms + intPreds == xSize); //all either intTerm or intPred
-    }
+
 
     //protected final GenericVariable var(int i, boolean varDep) {
     //return new GenericVariable(varDep ? Op.VAR_DEP : Op.VAR_INDEP, Integer.toString(i));

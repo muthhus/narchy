@@ -88,7 +88,6 @@ public enum Op {
 //    /** Termject */
 //    OBJECT("`", Op.ANY, OpType.Other),
     INT("`i", Op.ANY, OpType.Other),
-    INTRANGE("`ii", Op.ANY, OpType.Other),
 
     VAR_PATTERN(Symbols.VAR_PATTERN, Op.ANY, OpType.Variable),
 

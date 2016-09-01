@@ -6,7 +6,6 @@ import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.INT;
-import static nars.Op.INTRANGE;
 
 /**
  * Created by me on 8/29/16.
@@ -36,7 +35,7 @@ public class IntTerm extends Termject.PrimTermject<Integer> {
     @Override
     public boolean unify(@NotNull Term y, @NotNull FindSubst f) {
 
-        if (y.op() == INTRANGE) {
+        if (y instanceof IntInterval) {
             return y.unify(this, f); //reverse x,y necessary?
         }
         return false;

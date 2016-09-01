@@ -16,16 +16,19 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 import static nars.Op.INT;
-import static nars.Op.INTRANGE;
 
 public interface Termject<X> extends Term {
 
-    /** the associated data value of this term */
+    /**
+     * the associated data value of this term
+     */
     X val();
 
     int compareVal(X v);
 
-    /** the native type of the value */
+    /**
+     * the native type of the value
+     */
     Class<? super X> type();
 
     @Override
@@ -54,7 +57,6 @@ public interface Termject<X> extends Term {
 //    }
 
 
-
     abstract class PrimTermject<X> extends AtomicString implements Termject<X> {
 
         @NotNull
@@ -71,13 +73,11 @@ public interface Termject<X> extends Term {
         }
 
 
-
         @NotNull
         @Override
         public String toString() {
             return '`' + val.toString() + '`'; //TODO escape any '`' which appear in the string
         }
-
 
 
         @Override
@@ -146,14 +146,13 @@ public interface Termject<X> extends Term {
         public IntInterval(int a, int b) {
             super(Range.closed(
                     a, b
-            ).canonical( DiscreteDomain.integers() ));
+            ).canonical(DiscreteDomain.integers()));
             //this(Range.closed(a,b).canonical( DiscreteDomain.integers() ));
             //super(INTRANGE, TermVector.the(new IntTerm(a), new IntTerm(b-a)));
 
             //int a = ((IntTerm) (term(0))).val;
             //int ba = ((IntTerm) (term(1))).val;
         }
-
 
 
         //        public IntInterval(@NotNull Range<Integer> span) {
@@ -164,10 +163,8 @@ public interface Termject<X> extends Term {
 
         @Override
         public @NotNull Op op() {
-            return INTRANGE;
+            return INT;
         }
-
-
 
 
         @Override
@@ -211,28 +208,29 @@ public interface Termject<X> extends Term {
             Range<Integer> r = val;
             int l = r.lowerEndpoint();
             int u = r.upperEndpoint();
-            if (r.upperBoundType()== BoundType.OPEN) {
+            if (r.upperBoundType() == BoundType.OPEN) {
                 u--;
             }
-            if (r.lowerBoundType()== BoundType.OPEN) {
+            if (r.lowerBoundType() == BoundType.OPEN) {
                 l++;
             }
             return "`" + l + "<=?<=" + u + '`';
         }
 
 
-
         @Override
         public boolean unify(Term y, FindSubst f) {
-            if (y.op()==INT) {
-                int yi = ((IntTerm)y).val;
-                if (val.contains(yi)) {
-                    //return f.matchVarX(this, y);
-                    return true;
-                }
-            } else if (y.op() == INTRANGE) {
-                Range<Integer> yr = ((IntInterval) y).val;
-                //if (val.isConnected(yr)) {
+
+            //if (y.op() == INT) {
+                if (y instanceof IntTerm) {
+                    int yi = ((IntTerm) y).val;
+                    if (val.contains(yi)) {
+                        //return f.matchVarX(this, y);
+                        return true;
+                    }
+                } else if (y instanceof IntInterval) {
+                    Range<Integer> yr = ((IntInterval) y).val;
+                    //if (val.isConnected(yr)) {
 //                    Range<Integer> combinedRange = val.span(yr);
 //                    IntInterval combined;
 //                    if (!combinedRange.equals(val)) {
@@ -242,9 +240,10 @@ public interface Termject<X> extends Term {
 //                    }
 //                    return f.putBidi(this, y, combined);
                     return (val.encloses(yr) || yr.encloses(val));
-                //}
+                    //}
 
-            }
+                }
+            //}
             return super.unify(y, f);
         }
 
@@ -275,16 +274,16 @@ public interface Termject<X> extends Term {
 //        Atom y = $.the("y");
 //        n.believe($.conj($.inh(x, new IntTerm(2)), new IntInterval(0,4)), 1f, 0.9f);
 
-        for (int i = 1 ;i < 10; i++)
-            n.believe($.sim(new IntTerm(i-1), new IntTerm(i)), 1f, 0.9f);
+        for (int i = 1; i < 10; i++)
+            n.believe($.sim(new IntTerm(i - 1), new IntTerm(i)), 1f, 0.9f);
         //n.believe($.sim(new IntTerm(4), $.the("x")), 1f, 0.9f);
-        n.believe($.sim(new IntInterval(0,5), $.the("small")), 1f, 0.9f);
-        n.believe($.sim(new IntInterval(5,10), $.the("large")), 1f, 0.9f);
+        n.believe($.sim(new IntInterval(0, 5), $.the("small")), 1f, 0.9f);
+        n.believe($.sim(new IntInterval(5, 10), $.the("large")), 1f, 0.9f);
         n.ask($.inh($.varDep(1), $.the("large")));
         n.ask($.inh($.varDep(1), $.the("small")));
         n.ask($.inh(new IntTerm(1), $.the("small")));
         n.ask($.inh(new IntTerm(1), $.the("large")));
-        n.ask($.sim(new IntInterval(0,15), $.the("x")));
+        n.ask($.sim(new IntInterval(0, 15), $.the("x")));
         n.run(1000);
     }
 }

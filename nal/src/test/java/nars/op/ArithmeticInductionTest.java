@@ -59,7 +59,7 @@ public class ArithmeticInductionTest {
     @Test
     public void testIntRangeCompressionPartial() {
         assertEquals( //partially covered range of embedded ints
-                "((x,`4`)&&(x,`1<=?<=2`))",
+                "((x,`1<=?<=2`)&&(x,`4`))",
                 conj(p(the("x"), the(1)), p(the("x"), the(2)), p(the("x"), the(4))).toString()
         );
     }
@@ -75,6 +75,30 @@ public class ArithmeticInductionTest {
         );
     }
 
+    @Test public void testIntRangeDual() {
+        //two separate intervals
+        assertEquals(
+                "((x,`1<=?<=2`)&&(`2<=?<=3`,y))",
+                conj(
+                        p(the("x"), the(1)),
+                        p(the("x"), the(2)),
+                        p(the(2), the("y")),
+                        p(the(3), the("y"))
+                )
+                    .toString()
+        );
+    }
+    @Test public void testIntRangeDual2() {
+        //two separate intervals
+        assertEquals(
+                "(`2<=?<=3`,`1<=?<=2`)",
+                conj(
+                        p(the(3), the(1)),
+                        p(the(2), the(2))
+                )
+                        .toString()
+        );
+    }
 
 //        System.out.println(
 //                //n.normalize((Compound)
