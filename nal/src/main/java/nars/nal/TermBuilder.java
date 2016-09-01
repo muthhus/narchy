@@ -214,7 +214,7 @@ public abstract class TermBuilder {
 
 
     static boolean validEquivalenceTerm(@NotNull Term t) {
-        return !t.isAny(InvalidEquivalenceTerm) || isTrueOrFalse(t);
+        return !t.isAny(InvalidEquivalenceTerm);
 //        if ( instanceof Implication) || (subject instanceof Equivalence)
 //                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
 //                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
@@ -586,6 +586,11 @@ public abstract class TermBuilder {
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
                     }
                     break;
+//                case SIM:
+//                    if (isTrueOrFalse(subject) && isTrueOrFalse(predicate)) {
+//                        return subject.equals(predicate) ? True : ;
+//                    }
+//                    break;
 
                 case IMPL:
                     if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
@@ -641,8 +646,9 @@ public abstract class TermBuilder {
             }
 
             //if either the subject or pred are True/False by this point, fail
-            if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
-                return False;
+            if (isTrueOrFalse(subject) || isTrueOrFalse(predicate)) {
+                return subject.equals(predicate) ? True : False;
+            }
 
             //compare unneg'd if it's not temporal or eternal/parallel
             boolean preventInverse = !op.temporal || (commutive(dt) || dt == XTERNAL);

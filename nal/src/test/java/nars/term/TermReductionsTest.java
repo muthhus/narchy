@@ -13,6 +13,7 @@ import static nars.$.*;
 import static nars.Op.CONJ;
 import static nars.io.NarseseTest.assertInvalid;
 import static nars.nal.TermBuilder.False;
+import static nars.nal.TermBuilder.True;
 import static nars.term.TermTest.assertValid;
 import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static org.junit.Assert.*;
@@ -58,10 +59,10 @@ public class TermReductionsTest {
         assertEquals("{P,Q,R,S}", secte(sete(p, q), sete(r, s)).toString());
         assertEquals("{P,Q,R,S}", $("(&,{P,Q},{R,S})").toString());
     }
+
     @Test
     public void testIntersectExtReduction5() {
         assertEquals(False /* emptyset */, secte(seti(p, q), seti(r, s)));
-
     }
 
     @Test
@@ -108,8 +109,8 @@ public class TermReductionsTest {
     public void testInvalidEquivalences() {
         assertEquals("(P<=>Q)", equi(p, q).toString());
 
-        TermTest.assertInvalid(()->equi(impl(p, q), r));
-        TermTest.assertInvalid(()->equi(equi(p, q), r));
+        TermTest.assertInvalid(() -> equi(impl(p, q), r));
+        TermTest.assertInvalid(() -> equi(equi(p, q), r));
         assertInvalid("<<a <=> b> <=> c>");
     }
 
@@ -118,8 +119,8 @@ public class TermReductionsTest {
     public void testSimilarityAndEquivalenceNegatedSubtermsDoubleNeg() {
         assertEquals($("((P)<->(Q))"), $("((--,(P))<->(--,(Q)))"));
         assertEquals($("((P)<=>(Q))"), $("((--,(P))<=>(--,(Q)))"));
-
     }
+
     @Test
     public void testSimilarityAndEquivalenceNegatedSubtermsOpposite() {
         assertEquals($("((P)<->(--,(Q)))"), $("((P)<->(--,(Q)))"));
@@ -236,7 +237,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
                 new Term[]{r, s},
-                ((Compound)differ.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).terms()
+                ((Compound) differ.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).terms()
         );
     }
 
@@ -484,10 +485,10 @@ public class TermReductionsTest {
         assertEquals("(x&&y)",
                 $("(&&,x,y,a:b,(--,a:b))").toString());
 
-        assertEquals(TermBuilder.True,
+        assertEquals(True,
                 $("(||,x,a:b,(--,a:b))"));
 
-        assertEquals(TermBuilder.True,
+        assertEquals(True,
                 $("(||,x,y,a:b,(--,a:b))"));
     }
 
@@ -502,6 +503,7 @@ public class TermReductionsTest {
 
         assertInvalid("((--,(a1)) || (a1))");
     }
+
     @Test
     public void testFilterCoNegatedStatements() {
         assertEquals(TermBuilder.False, $("((--,(a1)) <-> (a1))"));
@@ -515,7 +517,7 @@ public class TermReductionsTest {
         assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a)) ==> (a))"));
         assertValidTermValidConceptInvalidTaskContent(() -> $("((--,(a)) ==>+0 (a))"));
         assertValid($("((--,(a)) ==>+1 (a))"));
-        
+
     }
 
 
@@ -527,6 +529,13 @@ public class TermReductionsTest {
     @Test
     public void testCoNegatedIntersection() {
         //..
+    }
+
+    @Test public void testSimEquivOfAbsoluteTrueFalse() {
+        assertEquals(True, $.sim(True,True));
+        assertEquals(True, $.sim(False,False));
+        assertEquals(False, $.sim(True,False));
+        assertEquals(True, $.sim($.neg(True),False));
     }
 
     /**
@@ -550,6 +559,7 @@ public class TermReductionsTest {
 
         assertInvalid("(||,(a<->a),c:d,e:f)"); //null, singular true
     }
+
     @Test
     public void testSingularStatementsInDisjunction2() {
         assertEquals($("x:y"), $("(&&,(||,(a<->a),c:d,e:f),x:y)")); //double fall-thru
@@ -569,6 +579,7 @@ public class TermReductionsTest {
         assertEquals("(x)", $("(&,(x))").toString());
         assertEquals("(x)", $("(&,(x),(x))").toString());
     }
+
     @Test
     public void testCoNegatedIntersectionAndDiffs() {
         assertInvalid("(|,(x),(--,(x))");
@@ -578,7 +589,8 @@ public class TermReductionsTest {
         assertInvalid("(-,(x),(x))");
     }
 
-    @Test public void testGroupNonDTemporalParallelComponents() {
+    @Test
+    public void testGroupNonDTemporalParallelComponents() {
         //$.76;.45;.70$ ( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right))). :3537: %.64;.15%
         //$.39;.44;.70$ (((--,(ball_left)) &&-233 (ball_right)) &&-1 ((ball_left) &&+0 (ball_right))). :3243: %.53;.23%
         assertEquals("(((--,(ball_left)) &&-270 (ball_right)) &&+0 ((ball_left) &&+0 (ball_right)))",
@@ -586,17 +598,19 @@ public class TermReductionsTest {
                 //HACK: this narsese parser isnt implemented yet:
                 //$("( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right)))")
 
-                $.parallel($("(ball_left)"),$("(ball_right)"),$("((--,(ball_left)) &&-270 (ball_right)))"))
-         .toString());
+                $.parallel($("(ball_left)"), $("(ball_right)"), $("((--,(ball_left)) &&-270 (ball_right)))"))
+                        .toString());
 
     }
 
-    @Test public void testReducibleImpl() {
+    @Test
+    public void testReducibleImpl() {
         assertInvalid("((--,(x)) ==>+0 ((--,(y)) &&+0 (--,(x))))");
         assertInvalid("((--,(x)) ==> ((--,(y)) && (--,(x))))");
     }
-    
-    @Test public void testConjunctiveCoNegationAcrossImpl() {
+
+    @Test
+    public void testConjunctiveCoNegationAcrossImpl() {
         //((--,(&&,(--,(pad_top)),(pad_bottom),(pad_top))) ==>+133 (--,(pad_bottom)))! :4355: %.73;.24%
 
         /*

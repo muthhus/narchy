@@ -137,8 +137,8 @@ public enum $ {
 
 
     @Nullable
-    public static Compound sim(@NotNull Term subj, @NotNull Term pred) {
-        return (Compound) compound(SIM, subj, pred);
+    public static Term sim(@NotNull Term subj, @NotNull Term pred) {
+        return compound(SIM, subj, pred);
     }
 
 
