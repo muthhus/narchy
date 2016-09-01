@@ -157,8 +157,8 @@ import static nars.nal.Tense.DTERNAL;
         this.rng = r;
 
         this.defaultCurveSampler =
-                new CurveBag.DirectSampler(
-                //new CurveBag.NormalizedSampler(
+                //new CurveBag.DirectSampler(
+                new CurveBag.NormalizedSampler(
                         //new CurveBag.DirectSampler(
                         //CurveBag.linearBagCurve,
                         CurveBag.power2BagCurve,

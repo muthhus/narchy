@@ -44,23 +44,23 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAgent {
 
-    private static final int cyclesPerFrame = 4;
+    private static final int cyclesPerFrame = 2;
     public static final int runFrames = 50000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 6;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 24;
     public static final int INDEX_SIZE = 4 * 10000000;
     final Arkanoid noid;
     private SwingCamera cam;
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 24;
-    final int visH = 10;
+    final int visW = 30;
+    final int visH = 14;
     SensorConcept[][] ss;
 
-    private final int visionSyncPeriod = 24;
+    private final int visionSyncPeriod = 16;
     float noiseLevel;
 
-    float paddleSpeed = 45f;
+    float paddleSpeed = 20f;
     private float prevScore;
 
     public class View {
@@ -161,12 +161,12 @@ public class Arkancide extends NAgent {
         //view.attention.add(nar.inputActivation);
         //view.attention.add(nar.derivedActivation);
 
-        newBeliefChartWindow(this, 200);
+        newBeliefChartWindow(this, 400);
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
-                BagChart.newBagChart((Default)nar, 1024),
-                camView, view
+                //BagChart.newBagChart((Default)nar, 1024),
+                camView//, view
         );
 
         //newConceptWindow((Default) n, 64, 4);
@@ -238,8 +238,8 @@ public class Arkancide extends NAgent {
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.95f);
+        nar.goalConfidence(0.6f);
 
         float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
@@ -248,7 +248,7 @@ public class Arkancide extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.1f * p;
 
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.03f);
+        nar.confMin.setValue(0.05f);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {

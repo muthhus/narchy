@@ -78,6 +78,7 @@ public class NAL4Test extends AbstractNALTest {
     @Test
     public void structural_transformation5()  {
         TestNAR tester = test();
+        tester.log();
         tester.believe("<(\\,neutralization,_,base) --> acid>",1.0f,0.9f); //en("Something that can neutralize a base is an acid.");
         tester.mustBelieve(CYCLES, "<neutralization --> (acid,base)>", 1.0f, 0.9f); //en("Neutralization is a relation between an acid and a base.");
     }

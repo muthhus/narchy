@@ -26,7 +26,7 @@ public class ArithmeticInductionTest {
         );
 
         assertEquals( //range can not be formed
-                "(`1`&&`3`)",
+                "(1&&3)",
                 conj(the(1), the(3)).toString()
         );
 
@@ -39,27 +39,27 @@ public class ArithmeticInductionTest {
     @Test
     public void testIntRangeCompressionInvalid1() {
         assertEquals(
-                "((x,`1`)&&(y,`2`))",
+                "((x,1)&&(y,2))",
                 conj(p(the("x"), the(1)), p(the("y"), the(2))).toString()
         );
     }
     @Test
     public void testIntRangeCompressionInvalid2() {
         assertEquals(
-                "((x,`1<=?<=2`)&&(y,`2`))",
+                "((x,`1<=?<=2`)&&(y,2))",
                 conj(p(the("x"), the(1)), p(the("x"), the(2)), p(the("y"), the(2))).toString()
         );
     }
     @Test public void testInvalidDueToDT() {
         assertEquals(
-                "((x,`1`) &&+1 (x,`2`))",
+                "((x,1) &&+1 (x,2))",
                 conj(p(the("x"), the(1)), 1, p(the("x"), the(2))).toString()
         );
     }
 
     @Test public void testNegationNotCombined() {
         assertEquals(
-                "((--,(x,`2`))&&(x,`1`))",
+                "((--,(x,2))&&(x,1))",
                 conj(p(the("x"), the(1)), $.neg(p(the("x"), the(2)))).toString()
         );
     }
@@ -67,7 +67,7 @@ public class ArithmeticInductionTest {
     @Test
     public void testIntRangeCompressionPartial() {
         assertEquals( //partially covered range of embedded ints
-                "((x,`1<=?<=2`)&&(x,`4`))",
+                "((x,4)&&(x,`1<=?<=2`))",
                 conj(p(the("x"), the(1)), p(the("x"), the(2)), p(the("x"), the(4))).toString()
         );
     }
@@ -99,7 +99,7 @@ public class ArithmeticInductionTest {
     @Test public void testIntRangeMultiple() {
         //two separate intervals
         assertEquals(
-                "(&&,(x,`1<=?<=2`),(x,`4<=?<=6`),(x,`8`))",
+                "(&&,(x,8),(x,`1<=?<=2`),(x,`4<=?<=6`))",
                 conj(
                         p(the("x"), the(1)),
                         p(the("x"), the(2)),
@@ -115,7 +115,7 @@ public class ArithmeticInductionTest {
     @Test public void testIntRangeMultipleNegation() {
         //two separate intervals
         assertEquals(
-                "(&&,(--,(x,`4<=?<=6`)),(x,`1<=?<=2`),(x,`8`))",
+                "(&&,(--,(x,`4<=?<=6`)),(x,8),(x,`1<=?<=2`))",
                 conj(
                         p(the("x"), the(1)),
                         p(the("x"), the(2)),
@@ -141,13 +141,12 @@ public class ArithmeticInductionTest {
     @Test public void testGroupOfThree() {
         //(`11`,`9`), (`17`,`2`), (`18`,`2`)
         assertEquals(
-                "((`11`,`9`)&&(`17<=?<=18`,`2`))",
+                "((11,9)&&(`17<=?<=18`,2))",
                 conj(
                         p(the(11), the(9)),
                         p(the(18), the(2)),
                         p(the(17), the(2))
-                )
-                        .toString()
+                ).toString()
         );
 
     }

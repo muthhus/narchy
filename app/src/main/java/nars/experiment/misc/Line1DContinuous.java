@@ -8,11 +8,14 @@ import nars.nar.Executioner;
 import nars.nar.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.NAgent;
+import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -31,7 +34,7 @@ public class Line1DContinuous extends NAgent {
     boolean print;
     private float yHidden;
     private float yEst;
-    float speed = 4f;
+    float speed = 1f;
     final float[] ins;
 
     public Line1DContinuous(NAR nar, int size, IntToFloatFunction target) {
@@ -52,12 +55,14 @@ public class Line1DContinuous extends NAgent {
         for (int i = 0; i < size; i++) {
             int ii = i;
             //hidden
-            sensors.add(new SensorConcept($.p($.the("h"), $.the(i)), n, ()->{
+            @NotNull Term actual = $.the(0 /*"h"*/);
+            sensors.add(new SensorConcept($.p(actual, $.the(i)), n, ()->{
                 return ins[ii];
             }, (v) -> $.t(v, alpha)));
 
             //estimated
-            sensors.add(new SensorConcept($.p($.the("e"), $.the(i)), n, ()->{
+            @NotNull Term estim = $.the(1 /*"e"*/);
+            sensors.add(new SensorConcept($.p(estim, $.the(i)), n, ()->{
                 return ins[size + ii];
             }, (v) -> $.t(v, alpha)));
         }
@@ -199,7 +204,7 @@ public class Line1DContinuous extends NAgent {
         nar.cyclesPerFrame.setValue(cyclesPerFrame);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.2f);
+        nar.goalConfidence(0.6f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.02f;
         nar.DEFAULT_GOAL_PRIORITY = 0.02f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.01f;
@@ -207,12 +212,12 @@ public class Line1DContinuous extends NAgent {
 
         nar.compoundVolumeMax.set(10);
 
-        Line1DContinuous l = new Line1DContinuous(nar, 8,
-                sine(60)
+        Line1DContinuous l = new Line1DContinuous(nar, 16,
+                sine(160)
                 //random(120)
         );
         l.print = true;
-        l.runSync(500);
+        l.runSync(5000);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);

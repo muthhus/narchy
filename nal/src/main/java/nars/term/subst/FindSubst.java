@@ -521,7 +521,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
             case 2:
                 //match the target variable first, if exists:
                 return matchLinear2(X, Y, X.isTerm(0, type) ? 0 : 1);
-                //return matchLinear2(X, Y, 0);
+                //return matchLinear2(X, Y, 0); //<- fails for certain image transformation rules
             default:
                 return matchLinearN(X, Y);
         }
