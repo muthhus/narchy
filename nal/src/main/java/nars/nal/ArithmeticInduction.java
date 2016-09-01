@@ -70,7 +70,7 @@ public class ArithmeticInduction {
 
             }
 
-            return compress(TermSet.the(ss));
+            return recompressIfChanged(subs, ss);
         }
 
         //group again according to appearance of unique atoms
@@ -90,16 +90,16 @@ public class ArithmeticInduction {
                 for (Term ggg : gg)
                     ss.add(ggg);
             }
-            return compress(TermSet.the(ss));
+            return recompressIfChanged(subs, ss);
         }
 
 
-        int negs = subs.count(x -> x.op() == Op.NEG);
-        boolean negate = (negs == subCount);
-        if (negs != 0 && !negate) {
-            //only if none or all of the subterms are negated
-            return subs;
-        }
+//        int negs = subs.count(x -> x.op() == Op.NEG);
+//        boolean negate = (negs == subCount);
+//        if (negs != 0 && !negate) {
+//            //only if none or all of the subterms are negated
+//            return subs;
+//        }
 
         if (!subs.equivalentStructures())
             return subs;
@@ -107,9 +107,9 @@ public class ArithmeticInduction {
         if (!equalNonIntegerAtoms(subs))
             return subs;
 
-        if (negate) {
-            subs = $.neg((TermVector) subs);
-        }
+//        if (negate) {
+//            subs = $.neg((TermVector) subs);
+//        }
 
         //paths * extracted sequence of numbers at given path for each subterm
         Map<ByteList, Pair<ByteHashSet, List<Term>>> data = new HashMap();
@@ -142,6 +142,7 @@ public class ArithmeticInduction {
         }
 
         TreeSet<Term> result = new TreeSet();
+        Set<Term> subsumed = new HashSet();
 
         for (Map.Entry<ByteList, Pair<ByteHashSet, List<Term>>> e : data.entrySet()) {
             //data.forEach((pp, nn) -> {
@@ -159,62 +160,85 @@ public class ArithmeticInduction {
             /*if (new HashSet(nn).size()==1)*/
 
 
-            //List<Term> features = $.newArrayList();
-            //final Compound pattern = (Compound) first;
 
-            //data.forEach((ppp, nnnt) -> {
-
-                    /*if (!pp.equals(ppp))*/
-
-            List<Term> ff = features(nn.getTwo());
+            List<IntInterval> ff = features(nn.getTwo());
             if (ff.isEmpty() || ff.size() >= numInvolved) {
                 //nothing would be gained; dont bother
                 continue;
             }
 
 
-            //TreeSet<Term> s = new TreeSet();
-            byte j = 0;
-            Term template = null;
-            for (Term x : subs) {
-                if (!involved.contains(j)) {
-                    result.add(x);
-                } else {
-                    //x is contained within range expression p
-                    result.remove(x);
-                    template = x;
+            for (IntInterval f : ff) {
+                byte j = 0;
+                for (Term x : subs) {
+
+                    if (!involved.contains(j)) {
+                        result.add(x);
+                        //System.out.println("1: " + result);
+                    } else {
+
+
+                        //x is contained within range expression p
+                        Term xpp = x instanceof Compound ? ((Compound) x).subterm(pp) : x;
+
+                        boolean contained;
+                        if (xpp instanceof IntTerm) {
+                            contained = (f.val.contains(((IntTerm) xpp).val));
+                        } else if (xpp instanceof IntInterval) {
+                            contained = (f.val.encloses(((IntInterval) xpp).val));
+                        } else {
+                            contained = false;
+                        }
+
+                        if (contained) {
+                            Term y = x instanceof Compound ?
+                                    $.terms.transform((Compound) x, pp, f)
+                                    : f;
+                            //if (!y.equals(x)) {
+
+                            if (!x.equals(y)) {
+                                result.remove(x);
+                                subsumed.add(x);
+                            }
+                            result.add(y);
+                            //System.out.println(x + " 3: " + result + "\t + " + y);
+                            //}
+                        } else {
+                            result.add(x);
+                        }
+                    }
+                    j++;
                 }
-                j++;
+
+                if (result.size() == 1) {
+                    break; //reduced to one, go no further
+                }
             }
 
-            //try {
-                for (Term f : ff) {
-                    Term y = template instanceof Compound ? $.negIf((Compound) $.terms.transform((Compound) template, pp, f), negate) : f;
-                    //s.add(y);
-                    result.add(y);
-                }
-
-                //result.add(s)return TermSet.the(s);
-            /*} catch (ClassCastException eee) {
-                //return subs; //HACK
-                continue; //HACK
-            }*/
-
-
-
         }
+
+        result.removeAll(subsumed);
 
         if (result.isEmpty()) {
             return subs;
         } else {
-            TermSet newSubs = TermSet.the(result);
-            if (newSubs.equals(subs))
-                return subs;
-            else {
-                //try reducing further
-                return compress(newSubs);
-            }
+            return recompressIfChanged(subs, result);
         }
+
+    }
+
+    public
+    @NotNull
+    static TermContainer recompressIfChanged(@NotNull TermContainer subs, Set<Term> ss) {
+        //try {
+        TermSet newSubs = TermSet.the(ss);
+        if (newSubs.equals(subs))
+            return subs; //nothing changed
+        else
+            return compress(newSubs);
+//        } catch (StackOverflowError e) {
+//            throw new RuntimeException("compression: " + subs + " " + ss);
+//        }
 
     }
 
@@ -222,7 +246,7 @@ public class ArithmeticInduction {
         if (x instanceof Compound) {
             List<Term> s = $.newArrayList(0);
             x.recurseTerms(v -> {
-                if ((v instanceof Atomic && v.op()!=INT)) {
+                if ((v instanceof Atomic && v.op() != INT)) {
                     s.add(v);
                 }
             });
@@ -372,13 +396,12 @@ public class ArithmeticInduction {
     }
 
 
-
     //protected final GenericVariable var(int i, boolean varDep) {
     //return new GenericVariable(varDep ? Op.VAR_DEP : Op.VAR_INDEP, Integer.toString(i));
     //}
 
-    private static List<Term> features(List<Term> nnnt) {
-        FasterList<Term> ll = $.newArrayList(0);
+    private static List<IntInterval> features(List<Term> nnnt) {
+        FasterList<IntInterval> ll = $.newArrayList(0);
 
         RangeSet<Integer> intIntervals = ranges(nnnt);
 
@@ -395,10 +418,11 @@ public class ArithmeticInduction {
                 l++;
             if (rr.upperBoundType() == BoundType.OPEN)
                 u--;
-            if (u - l == 0)
-                ll.add($.the(l)); //just the individual number
-            else
+            if (u - l == 0) {
+                //ll.add($.the(l)); //just the individual number
+            } else {
                 ll.add(new IntInterval(l, u));
+            }
         }
         //}
         //}

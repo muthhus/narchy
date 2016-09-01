@@ -1,5 +1,6 @@
 package nars.op;
 
+import nars.$;
 import nars.term.obj.Termject;
 import org.junit.Test;
 
@@ -56,6 +57,13 @@ public class ArithmeticInductionTest {
         );
     }
 
+    @Test public void testNegationNotCombined() {
+        assertEquals(
+                "((--,(x,`2`))&&(x,`1`))",
+                conj(p(the("x"), the(1)), $.neg(p(the("x"), the(2)))).toString()
+        );
+    }
+
     @Test
     public void testIntRangeCompressionPartial() {
         assertEquals( //partially covered range of embedded ints
@@ -98,6 +106,20 @@ public class ArithmeticInductionTest {
                 )
                         .toString()
         );
+    }
+
+    @Test public void testGroupOfThree() {
+        //(`11`,`9`), (`17`,`2`), (`18`,`2`)
+        assertEquals(
+                "((`11`,`9`)&&(`17<=?<=18`,`2`))",
+                conj(
+                        p(the(11), the(9)),
+                        p(the(18), the(2)),
+                        p(the(17), the(2))
+                )
+                        .toString()
+        );
+
     }
 
 //        System.out.println(
