@@ -56,7 +56,7 @@ public class Tetris extends NAgent {
             //new MultiThreadExecutioner(2, 16384);
             new SingleThreadExecutioner();
 
-    public static final int runFrames = 55;
+    public static final int runFrames = 55000;
     public static final int cyclesPerFrame = 6;
     public static final int tetris_width = 6;
     public static final int tetris_height = 13;
@@ -413,7 +413,7 @@ public class Tetris extends NAgent {
         //new Abbreviation(nar,"aKa_");
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
         MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new VariableCompressor(nar);

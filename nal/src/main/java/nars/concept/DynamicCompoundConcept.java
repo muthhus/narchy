@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static nars.Op.CONJ;
 import static nars.Op.NEG;
 import static nars.nal.Tense.DTERNAL;
 
@@ -40,32 +41,50 @@ public class DynamicCompoundConcept extends CompoundConcept {
     }
 
     public static final class DynTruth {
-        @NotNull final List<Truth> t;
+        @NotNull private final List<Truth> t;
         @Nullable final List<Task> e;
         @Nullable final Budget b;
+        private final float confMin;
 
-        public DynTruth(List<Truth> t, List<Task> e, Budget b) {
+        @Deprecated float freq, conf; //running product
+
+        public DynTruth(Op o, float confMin, List<Truth> t, List<Task> e, Budget b) {
+            if (o!=CONJ)
+                throw new UnsupportedOperationException("aggregate truth for " + o + " not implemented or not applicable");
+            this.confMin = confMin;
             this.t = t;
             this.e = e;
             this.b = b;
+            freq = conf = 1f;
         }
 
         @Nullable public long[] evidence() {
             return e == null ? null : Stamp.zip((Collection) e);
         }
 
-        @Nullable public Truth truth(Op op, NAR nar) {
-            return truth(op, nar.confMin.floatValue());
+        @Nullable public Truth truth() {
+            if (t.isEmpty())
+                return null;
+            return $.t(freq, conf);
         }
 
-        @Nullable public Truth truth(@NotNull Op op, float confMin) {
-            switch (op) {
-                case CONJ:
-                    return TruthFunctions.intersection(t, confMin);
-                default:
-                    throw new UnsupportedOperationException("aggregate truth for " + op + " not implemented or not applicable");
-            }
+        public boolean add(@NotNull Truth truth) {
+            //specific to Truth.Intersection:
+            conf *= truth.conf();
+            if (conf < confMin)
+                return false;
+            freq *= truth.freq();
+            return true;
         }
+
+//        @Nullable public Truth truth(@NotNull Op op, float confMin) {
+//            switch (op) {
+//                case CONJ:
+//                    return TruthFunctions.intersection(t, confMin);
+//                default:
+//                    throw new UnsupportedOperationException("aggregate truth for " + op + " not implemented or not applicable");
+//            }
+//        }
     }
 
     @NotNull
@@ -94,7 +113,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         @Nullable
         public Truth truth(long when, long now) {
             DynTruth d = truth(when, now, term(), false);
-            return d != null ? d.truth(op(), nar) : super.truth(when, now);
+            return d != null ? d.truth() : super.truth(when, now);
         }
 
         @Nullable private DynamicCompoundConcept.DynTruth truth(long when, Compound template, boolean evidence) {
@@ -108,7 +127,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
             final List<Task> e = evidence ? $.newArrayList(n) : null;
             Budget b = evidence ? new RawBudget() : null;
 
-            DynTruth d = new DynTruth(t, e, b);
+            DynTruth d = new DynTruth(template.op(), nar.confMin.floatValue(), t, e, b);
             Term[] subs = template.terms();
             for (Term s : subs) {
                 if (!(s instanceof Compound))
@@ -153,7 +172,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 if (p instanceof DynamicCompoundConcept) {
                     @Nullable DynamicCompoundConcept.DynTruth ndt = ((DynamicBeliefTable)table).truth(when + dt, now, subterm, false);
                     if (ndt!=null) {
-                        nt = ndt.truth(subterm.op(), nar);
+                        nt = ndt.truth();
                     }
                 } else {
                     nt = table.truth(when + dt, now);
@@ -162,7 +181,8 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 if (nt==null) {
                     return false;
                 }
-                d.t.add($.negIf(nt,negated));
+                if (!d.add($.negIf(nt,negated)))
+                    return false;
 
                 if (d.e!=null) {
                     @Nullable Task bt = table.top(when+dt, now);
@@ -194,18 +214,38 @@ public class DynamicCompoundConcept extends CompoundConcept {
             switch (intervals.size()) {
 
                 case 1: //1D
+                {
                     Map.Entry<ByteList, Termject.IntInterval> e = intervals.entrySet().iterator().next();
                     Termject.IntInterval i1 = e.getValue();
                     int max = i1.max();
                     int min = i1.min();
-                    List<Compound> t = $.newArrayList(1+max-min);
+                    List<Compound> t = $.newArrayList(1 + max - min);
                     for (int i = min; i <= max; i++) {
-                        t.add( (Compound) $.terms.transform(c, e.getKey(), $.the(i) ));
+                        t.add((Compound) $.terms.transform(c, e.getKey(), $.the(i)));
                     }
                     return t.iterator();
+                }
 
                 case 2: //2D
-                    return Iterators.singletonIterator(c);
+                {
+                    Iterator<Map.Entry<ByteList, Termject.IntInterval>> ee = intervals.entrySet().iterator();
+                    Map.Entry<ByteList, Termject.IntInterval> e1 = ee.next();
+                    Map.Entry<ByteList, Termject.IntInterval> e2 = ee.next();
+                    Termject.IntInterval i1 = e1.getValue();
+                    Termject.IntInterval i2 = e2.getValue();
+                    int max1 = i1.max(), min1 = i1.min(), max2 = i2.max(), min2 = i2.min();
+                    List<Compound> t = $.newArrayList( (1 + max2 - min2) * (1 + max1 - min1) ) ;
+
+                    for (int i = min1; i <= max1; i++) {
+                        for (int j = min2; j <= max2; j++) {
+                            Compound d = c;
+                            d = (Compound) $.terms.transform(d, e1.getKey(), $.the(i));
+                            d = (Compound) $.terms.transform(d, e2.getKey(), $.the(j));
+                            t.add(d);
+                        }
+                    }
+                    return t.iterator();
+                }
 
                 default:
                     //either there is none, or too many -- just use the term directly
@@ -231,7 +271,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
                 DynTruth dt = truth(then, template, true);
                 if (dt!=null) {
-                    Truth y = dt.truth(op(), nar);
+                    Truth y = dt.truth();
                     if (y!=null && !y.equals(x.truth())) {
 
                         RevisionTask xx = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
