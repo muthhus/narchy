@@ -20,7 +20,6 @@ import spacegraph.obj.RectWidget;
 import spacegraph.obj.XYSlider;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -222,7 +221,7 @@ public class TimeSpace extends NARSpace implements TriConsumer<NAR, SpaceGraph, 
 
     private void layout(List<Spatial> next) {
 
-        next.forEach((Consumer<Spatial>)(Spatial s) -> {
+        next.forEach((Spatial s) -> {
             float speed = 0.2f;
 
             if (s instanceof SimpleSpatial) {

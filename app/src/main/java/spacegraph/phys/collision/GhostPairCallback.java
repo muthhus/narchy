@@ -36,8 +36,8 @@ public class GhostPairCallback extends OverlappingPairCallback {
 
 	@Override
 	public BroadphasePair addOverlappingPair(Broadphasing proxy0, Broadphasing proxy1) {
-		Collidable colObj0 = (Collidable)proxy0.data;
-		Collidable colObj1 = (Collidable)proxy1.data;
+		Collidable colObj0 = proxy0.data;
+		Collidable colObj1 = proxy1.data;
 		GhostObject ghost0 = GhostObject.upcast(colObj0);
 		GhostObject ghost1 = GhostObject.upcast(colObj1);
 
@@ -52,8 +52,8 @@ public class GhostPairCallback extends OverlappingPairCallback {
 
 	@Override
 	public Object removeOverlappingPair(Broadphasing proxy0, Broadphasing proxy1, Intersecter intersecter) {
-		Collidable colObj0 = (Collidable)proxy0.data;
-		Collidable colObj1 = (Collidable)proxy1.data;
+		Collidable colObj0 = proxy0.data;
+		Collidable colObj1 = proxy1.data;
 		GhostObject ghost0 = GhostObject.upcast(colObj0);
 		GhostObject ghost1 = GhostObject.upcast(colObj1);
 		

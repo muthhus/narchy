@@ -235,7 +235,7 @@ public class BvhTriangleMeshShape extends TriangleMeshShape {
 		public final StridingMeshInterface meshInterface;
 		public final TriangleCallback callback;
 
-		private final v3[] triangle/*[3]*/ = new v3[] { new v3(), new v3(), new v3() };
+		private final v3[] triangle/*[3]*/ = { new v3(), new v3(), new v3() };
 
 		public MyNodeOverlapCallback(TriangleCallback callback, StridingMeshInterface meshInterface) {
 			this.meshInterface = meshInterface;

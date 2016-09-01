@@ -1,13 +1,13 @@
 package nars.op.java;
 
 import com.google.common.collect.ImmutableSet;
-import org.eclipse.collections.api.bimap.MutableBiMap;
-import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.var.Variable;
+import org.eclipse.collections.api.bimap.MutableBiMap;
+import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

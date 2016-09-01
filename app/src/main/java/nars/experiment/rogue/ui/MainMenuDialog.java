@@ -1,17 +1,15 @@
 package nars.experiment.rogue.ui;
 
+import nars.experiment.rogue.Game;
+import nars.experiment.rogue.combat.PtrlConstants;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-
-import nars.experiment.rogue.Game;
-import nars.experiment.rogue.combat.PtrlConstants;
 
 public class MainMenuDialog implements IGameScreen
 {

@@ -1,11 +1,11 @@
 package nars.experiment.rogue.ui;
 
-import java.awt.event.KeyEvent;
-
 import nars.experiment.rogue.combat.PtrlConstants;
 import nars.experiment.rogue.creatures.Player;
 import nars.experiment.rogue.items.Equipment;
 import nars.experiment.rogue.items.Item;
+
+import java.awt.event.KeyEvent;
 
 public class EquipmentScreen implements IGameScreen {
     public EquipmentScreen(Player p) {

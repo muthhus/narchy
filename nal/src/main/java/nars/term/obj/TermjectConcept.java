@@ -8,13 +8,11 @@ import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.AbstractConcept;
 import nars.concept.Activation;
-import nars.concept.AtomConcept;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
-import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
@@ -25,8 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-
-import static nars.nal.Tense.DTERNAL;
 
 /**
  * Created by me on 7/28/16.
@@ -205,12 +201,7 @@ public class TermjectConcept<X> implements AbstractConcept, Termject<X> {
 
     @Override
     public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
-        if (AbstractConcept.link(this, scale, minScale, activation)) {
-            //activation.linkTerms(this, termject.subterms(), scale, minScale, nar);
-            return true;
-        }
-
-        return false;
+        return AbstractConcept.link(this, scale, minScale, activation);
 
     }
 

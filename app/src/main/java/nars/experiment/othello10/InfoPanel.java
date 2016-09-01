@@ -8,8 +8,8 @@ import javax.swing.*;
  *  
  */
 public class InfoPanel extends JPanel {
-    private JLabel blackLabel;
-    private JLabel whiteLabel;
+    private final JLabel blackLabel;
+    private final JLabel whiteLabel;
 
     public InfoPanel() {
         add(new JLabel("BLACK:"));

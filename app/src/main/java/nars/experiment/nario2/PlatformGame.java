@@ -2,8 +2,8 @@
 package nars.experiment.nario2;
 
 
-import java.awt.BorderLayout;
 import javax.swing.*;
+import java.awt.*;
 
 public class PlatformGame extends JFrame
 {

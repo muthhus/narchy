@@ -55,7 +55,7 @@ public class GhostObject extends Collidable {
 	 * This method is mainly for expert/internal use only.
 	 */
 	public void addOverlappingObjectInternal(Broadphasing otherProxy, Broadphasing thisProxy) {
-		Collidable otherObject = (Collidable)otherProxy.data;
+		Collidable otherObject = otherProxy.data;
 		assert(otherObject != null);
 
 		// if this linearSearch becomes too slow (too many overlapping objects) we should add a more appropriate data structure
@@ -70,7 +70,7 @@ public class GhostObject extends Collidable {
 	 * This method is mainly for expert/internal use only.
 	 */
 	public void removeOverlappingObjectInternal(Broadphasing otherProxy, Intersecter intersecter, Broadphasing thisProxy) {
-		Collidable otherObject = (Collidable) otherProxy.data;
+		Collidable otherObject = otherProxy.data;
 		assert(otherObject != null);
 
 		OArrayList<Collidable> o = this.overlappingObjects;
@@ -117,7 +117,7 @@ public class GhostObject extends Collidable {
 				v3 collisionObjectAabbMax = new v3();
 				collidable.shape().getAabb(collidable.getWorldTransform(tmpTrans), collisionObjectAabbMin, collisionObjectAabbMax);
 				AabbUtil2.aabbExpand(collisionObjectAabbMin, collisionObjectAabbMax, castShapeAabbMin, castShapeAabbMax);
-				float[] hitLambda = new float[]{1f}; // could use resultCallback.closestHitFraction, but needs testing
+				float[] hitLambda = {1f}; // could use resultCallback.closestHitFraction, but needs testing
 				v3 hitNormal = new v3();
 				if (AabbUtil2.rayAabb(convexFromWorld, convexToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
 					Collisions.objectQuerySingle(castShape, convexFromTrans, convexToTrans,

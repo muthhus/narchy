@@ -21,7 +21,6 @@ import java.util.List;
 
 import static nars.Op.NEG;
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
 
 /**
  * Adds support for dynamically calculated truth values
@@ -86,6 +85,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         }
 
 
+        @Override
         @Nullable
         public Truth truth(long when, long now) {
             DynTruth d = truth(when, now, term(), false);

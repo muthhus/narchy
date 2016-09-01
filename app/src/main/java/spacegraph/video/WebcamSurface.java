@@ -3,14 +3,7 @@ package spacegraph.video;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import com.github.sarxos.webcam.Webcam;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.gl2.GLUT;
-import com.jogamp.opengl.util.texture.Texture;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.StackPane;
 import nars.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.slf4j.Logger;
@@ -23,8 +16,6 @@ import spacegraph.render.Draw;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-
-import static javafx.application.Platform.runLater;
 
 //TODO convert to SpaceGraph Surface
 public class WebcamSurface extends Surface implements Runnable {

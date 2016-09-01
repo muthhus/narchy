@@ -417,7 +417,7 @@ public class OptimizedBvh implements Serializable {
 
 		int curNodeSubPart = -1;
 
-		v3[] triangleVerts/*[3]*/ = new v3[] { new v3(), new v3(), new v3() };
+		v3[] triangleVerts/*[3]*/ = { new v3(), new v3(), new v3() };
 		v3 aabbMin = new v3(), aabbMax = new v3();
 		v3 meshScaling = meshInterface.getScaling(new v3());
 

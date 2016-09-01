@@ -1,12 +1,9 @@
 package nars.experiment.rogue.creatures;
 
-import java.io.File;
-import java.io.Serializable;
-import java.net.URISyntaxException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import nars.experiment.rogue.combat.PtrlConstants;
+import nars.experiment.rogue.combat.RangedAttackType;
+import nars.experiment.rogue.combat.UnarmedAttackType;
+import nars.experiment.rogue.items.Equipment;
 import nars.experiment.rogue.util.GameSettings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,10 +11,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
 
-import nars.experiment.rogue.combat.PtrlConstants;
-import nars.experiment.rogue.combat.RangedAttackType;
-import nars.experiment.rogue.combat.UnarmedAttackType;
-import nars.experiment.rogue.items.Equipment;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.io.Serializable;
+import java.net.URISyntaxException;
 
 public class Player extends Humanoid implements Serializable
 {

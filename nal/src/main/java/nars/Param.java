@@ -126,7 +126,7 @@ public abstract class Param /*extends Container*/ implements Level {
      * if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression
      * if this is true, then there is risk that confidence can hyperinflate
      */
-    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = false;
+    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE;
 
 //    /**
 //     * relates time and evidence (confidence); how past and future beliefs decay in rank
@@ -176,7 +176,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static boolean REVECTION_PRIORITY_ZERO = true;
 
     /** additional output for when deriver fails before deriving something */
-    public static boolean DEBUG_DERIVER = false;
+    public static boolean DEBUG_DERIVER;
 
 
     private Truth defaultGoalTruth, defaultBeliefTruth;

@@ -1,7 +1,7 @@
 
 package nars.experiment.nario2.mapeditor;
 
-import java.awt.Image; 
+import java.awt.*;
 
 public class MapModel 
 {

@@ -726,11 +726,9 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
             // TODO: btContactSolverInfo info = infoGlobal;
 
-            {
-                int j;
-                for (j = 0; j < numConstraints; j++) {
-                    constraints.get(constraints_offset + j).buildJacobian();
-                }
+            int j;
+            for (j = 0; j < numConstraints; j++) {
+                constraints.get(constraints_offset + j).buildJacobian();
             }
 
 //			int j;

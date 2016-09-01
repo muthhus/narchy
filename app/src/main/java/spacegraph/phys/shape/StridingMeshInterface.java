@@ -39,7 +39,7 @@ public abstract class StridingMeshInterface {
 	
 	public void internalProcessAllTriangles(InternalTriangleIndexCallback callback, v3 aabbMin, v3 aabbMax) {
 		int graphicssubparts = getNumSubParts();
-		v3[] triangle/*[3]*/ = new v3[]{ new v3(), new v3(), new v3() };
+		v3[] triangle/*[3]*/ = { new v3(), new v3(), new v3() };
 
 		v3 meshScaling = getScaling(new v3());
 

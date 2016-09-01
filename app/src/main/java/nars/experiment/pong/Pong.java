@@ -7,8 +7,6 @@ package nars.experiment.pong;
  */
 
 import com.google.common.collect.Iterables;
-import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.tuple.Tuples;
 import nars.NAR;
 import nars.agent.NAgentOld;
 import nars.concept.Concept;
@@ -29,6 +27,8 @@ import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.SensorConcept;
 import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.tuple.Tuples;
 
 import javax.swing.*;
 import java.io.File;
@@ -42,7 +42,7 @@ public class Pong extends Player implements DiscreteEnvironment {
     static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
     public static final int runCycles = 256;
     public static final int cycleDelay = 20;
-    static boolean loadKnowledgeFromFile = false;
+    static boolean loadKnowledgeFromFile;
 
     int actions = 3;
 
@@ -124,11 +124,9 @@ public class Pong extends Player implements DiscreteEnvironment {
         //a.gamma /= 4f;
 
         //new Abbreviation2(nar, "_");
-        {
-            new MySTMClustered(nar, 256, '.', 5);
-            new MySTMClustered(nar, 256, '!', 3);
-            //new ArithmeticInduction(nar);
-        }
+        new MySTMClustered(nar, 256, '.', 5);
+        new MySTMClustered(nar, 256, '!', 3);
+        //new ArithmeticInduction(nar);
 
 
         Pong e = new Pong();
@@ -147,11 +145,7 @@ public class Pong extends Player implements DiscreteEnvironment {
 
         nar.output(new File(KNOWLEDGEFILE), false,
                 t -> {
-                    if (!t.isInput() && t.conf() > 0.75f) {
-                        //System.out.println(t + "\t" + Arrays.toString(t.evidence()));
-                        return true;
-                    }
-                    return false;
+                    return !t.isInput() && t.conf() > 0.75f;
                 });
 
 //		nar.forEachConcept(c -> {
@@ -170,7 +164,7 @@ public class Pong extends Player implements DiscreteEnvironment {
 
         float pri = 0.5f;
 
-        float halfPaddle = pong.PADDLE_HEIGHT / 2f;
+        float halfPaddle = PongModel.PADDLE_HEIGHT / 2f;
 
         return Iterables.concat(
 

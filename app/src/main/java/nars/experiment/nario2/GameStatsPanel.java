@@ -1,10 +1,8 @@
 
 package nars.experiment.nario2;
 
-import javax.swing.JPanel; 
-import javax.swing.JLabel;
-import javax.swing.BoxLayout;
-import java.awt.Graphics; 
+import javax.swing.*;
+import java.awt.*;
 
 public class GameStatsPanel extends JPanel //implements Runnable
 {

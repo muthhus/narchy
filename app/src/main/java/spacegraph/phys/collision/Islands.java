@@ -57,10 +57,10 @@ public class Islands {
 			//return array[index];
 			BroadphasePair collisionPair = pairPtr.get(i);
 
-			Collidable colObj0 = (Collidable) collisionPair.pProxy0.data;
+			Collidable colObj0 = collisionPair.pProxy0.data;
 			if (colObj0 == null)
 				continue;
-			Collidable colObj1 = (Collidable) collisionPair.pProxy1.data;
+			Collidable colObj1 = collisionPair.pProxy1.data;
 			if (colObj1 == null)
 				continue;
 

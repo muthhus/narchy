@@ -288,7 +288,7 @@ public class PremiseRuleSet {
      * whether a rule will be forward permuted
      */
     static boolean permuteSwap(@NotNull PremiseRule r) {
-        boolean[] fwd = new boolean[]{true};
+        boolean[] fwd = {true};
         r.recurseTerms((s) -> {
 
             if (!fwd[0])

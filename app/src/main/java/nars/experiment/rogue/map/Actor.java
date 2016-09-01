@@ -1,19 +1,14 @@
 package nars.experiment.rogue.map;
 
+import nars.experiment.rogue.combat.*;
+import nars.experiment.rogue.creatures.Creature;
+import nars.experiment.rogue.util.MapEvent;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
-
-import nars.experiment.rogue.combat.Attack;
-import nars.experiment.rogue.combat.AttackResult;
-import nars.experiment.rogue.combat.Protection;
-import nars.experiment.rogue.combat.RangedAttack;
-import nars.experiment.rogue.combat.RangedAttackType;
-import nars.experiment.rogue.combat.UnarmedAttackType;
-import nars.experiment.rogue.creatures.Creature;
-import nars.experiment.rogue.util.MapEvent;
 
 public class Actor implements Serializable
 {
@@ -225,11 +220,7 @@ public class Actor implements Serializable
 				|| creature.getY()+xy[1]<0
 				|| creature.getY()+xy[1]>=map.getHeight())
 			return true;
-		if (move(xy)!=0) return true;
-		else
-		{
-			return false; 
-		}
+        return move(xy) != 0;
 	}
 	
 	//wait for events
@@ -269,19 +260,11 @@ public class Actor implements Serializable
 							if (!dtl.isOpen()) 
 							{
 								long t=open(current_path[0]);
-								if (t==0) return false;
-								else return true;
+                                return t != 0;
 							}
 						}
 
-						if (move(current_path[0])!=0) 
-						{
-							return true;
-						}
-						else
-						{
-							return false; 
-						}
+                        return move(current_path[0]) != 0;
 					}else 
 					{
 						activity="aimless";
@@ -307,8 +290,7 @@ public class Actor implements Serializable
 						{
 							System.out.println("closed door("+xy[0]+", "+xy[1]+")");
 							long t=open(current_path[0]);
-							if (t==0) return false;
-							else return true;
+                            return t != 0;
 						}
 					}
 					if (move(xy)!=0) 
@@ -356,12 +338,8 @@ public class Actor implements Serializable
 		if (path_is_found)
 		{
 			//demoPath(1);
-			if (move(current_path[0])!=0) return true;
-			else
-			{
-				//path_counter++;
-				return false; 
-			}
+            //path_counter++;
+            return move(current_path[0]) != 0;
 		}else 
 		{
 			activity="aimless";

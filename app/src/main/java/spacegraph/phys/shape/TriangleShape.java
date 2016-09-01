@@ -35,7 +35,7 @@ import spacegraph.phys.math.VectorUtil;
  */
 public class TriangleShape extends PolyhedralConvexShape {
 	
-	public final v3[] vertices1/*[3]*/ = new v3[] { new v3(), new v3(), new v3() };
+	public final v3[] vertices1/*[3]*/ = { new v3(), new v3(), new v3() };
 
 	// JAVA NOTE: added
 	public TriangleShape() {

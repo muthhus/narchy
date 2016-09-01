@@ -603,7 +603,7 @@ public class TestNAR  {
 
 
             String pattern = "{}\n\t{} {} {}IN \ninputs";
-            Object[] args = new Object[] { id, time, result, eventMeters1 };
+            Object[] args = { id, time, result, eventMeters1 };
 
            if (result!=null) {
                 logger.error(pattern, args);

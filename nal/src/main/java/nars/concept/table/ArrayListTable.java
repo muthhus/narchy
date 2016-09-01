@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements Table<K, V>, Iterable<V> {
 
 
-    protected int capacity = 0;
+    protected int capacity;
 
     public ArrayListTable(@NotNull Map<K, V> map) {
         super(map);

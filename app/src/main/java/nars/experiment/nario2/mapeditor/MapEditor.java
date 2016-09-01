@@ -2,11 +2,10 @@
 package nars.experiment.nario2.mapeditor;
 
 
-
 import nars.experiment.nario2.GameModel;
 
-import java.awt.Image;
 import javax.swing.*;
+import java.awt.*;
 
 public class MapEditor
 {

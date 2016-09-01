@@ -1,10 +1,10 @@
 package spacegraph.obj;
 
-import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
@@ -28,7 +28,7 @@ public class Plot2D extends Surface {
 
         protected transient float maxValue, minValue;
 
-        public float[] color = new float[] { 1, 1, 1, 1 };
+        public float[] color = { 1, 1, 1, 1 };
 
         @Override
         public float[] toArray() {

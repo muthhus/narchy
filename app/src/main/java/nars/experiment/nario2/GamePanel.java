@@ -1,23 +1,16 @@
 
 package nars.experiment.nario2;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JPanel;
-
-import java.awt.image.BufferedImage;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors; 
-import java.util.concurrent.Future;
-
 import java.util.ArrayList;
-import java.applet.AudioClip;
-
-import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class GamePanel extends JPanel implements Runnable
 {
@@ -100,7 +93,7 @@ public class GamePanel extends JPanel implements Runnable
 //        g2.setColor(fade);
 //        g2.fillRect(0, 0, model.viewWidth, model.viewHeight);
         g.setColor(Color.BLACK);
-        g.fillRect(0, 0, model.viewWidth, model.viewHeight);
+        g.fillRect(0, 0, GameModel.viewWidth, GameModel.viewHeight);
         model.paintElements(g);
 
         //g.drawImage(model.backImage, 0, 0, getWidth(), getHeight(), null);

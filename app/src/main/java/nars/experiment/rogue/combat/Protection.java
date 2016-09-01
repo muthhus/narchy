@@ -29,8 +29,7 @@ public class Protection implements Serializable
 	 */
 	public boolean isHit(Attack a)
 	{
-		if (Math.random()*a.getToHit()>Math.random()*defence) return true;
-		else return false;
+        return Math.random() * a.getToHit() > Math.random() * defence;
 	}
 	
 	/**

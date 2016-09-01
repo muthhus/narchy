@@ -1,7 +1,5 @@
 package nars.experiment.misc;
 
-import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.tuple.Tuples;
 import nars.NAR;
 import nars.agent.NAgentOld;
 import nars.learn.Agent;
@@ -10,6 +8,8 @@ import nars.nar.Default;
 import nars.util.Optimize;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.tuple.Tuples;
 
 import static java.lang.System.out;
 

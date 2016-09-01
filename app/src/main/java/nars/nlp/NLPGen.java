@@ -21,8 +21,8 @@ public class NLPGen {
     final static Terminal terminal = new Terminal();
     final PatternIndex index = new PatternIndex();
 
-    public static interface Rule {
-        public String get(Term t, float freq, float conf, Tense tense);
+    public interface Rule {
+        String get(Term t, float freq, float conf, Tense tense);
     }
 
     final List<Rule> rules = new ArrayList();

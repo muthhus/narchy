@@ -38,7 +38,7 @@ import spacegraph.phys.solve.JacobianEntry;
  */
 public class Point2PointConstraint extends TypedConstraint {
 
-	private final JacobianEntry[] jac = new JacobianEntry[]/*[3]*/ { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() }; // 3 orthogonal linear constraints
+	private final JacobianEntry[] jac = { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() }; // 3 orthogonal linear constraints
 
 	private final v3 pivotInA = new v3();
 	private final v3 pivotInB = new v3();

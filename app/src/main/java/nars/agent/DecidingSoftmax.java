@@ -16,8 +16,8 @@ public class DecidingSoftmax implements Deciding {
 
 
     /** whether to exclude negative values */
-    boolean onlyPositive = false;
-    boolean normalize = false;
+    boolean onlyPositive;
+    boolean normalize;
 
     float temperature;
     private float decisiveness;

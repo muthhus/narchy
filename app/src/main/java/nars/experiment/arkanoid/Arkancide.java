@@ -2,20 +2,21 @@ package nars.experiment.arkanoid;
 
 
 import com.google.common.collect.Lists;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NARLoop;
 import nars.data.AutoClassifier;
 import nars.gui.BagChart;
-import nars.op.NAgent;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.NAgent;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.obj.IntTerm;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.Util;
@@ -38,7 +39,6 @@ import static java.util.stream.Collectors.toList;
 import static nars.$.t;
 import static nars.experiment.tetris.Tetris.arrayRenderer;
 import static nars.experiment.tetris.Tetris.exe;
-import static nars.nal.UtilityFunctions.or;
 import static nars.vision.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
@@ -57,8 +57,8 @@ public class Arkancide extends NAgent {
     final int visH = 10;
     SensorConcept[][] ss;
 
-    private int visionSyncPeriod = 24;
-    float noiseLevel = 0;
+    private final int visionSyncPeriod = 24;
+    float noiseLevel;
 
     float paddleSpeed = 45f;
     private float prevScore;

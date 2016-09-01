@@ -35,14 +35,14 @@ public class ChainBag<V> {
 
     @NotNull
     private final transient Mean mean; //priority mean, continuously calculated
-    private Random rng;
+    private final Random rng;
 
-    private boolean ownsNodePool = false;
+    private boolean ownsNodePool;
 
     private int capacity;
 
     @Nullable
-    transient DD<V> current = null;
+    transient DD<V> current;
 
     //public transient Frequency removal = new Frequency();
 
@@ -50,7 +50,7 @@ public class ChainBag<V> {
 
     private final transient DDNodePool<V> nodePool;
 
-    @Nullable DD<V> nextRemoval = null;
+    @Nullable DD<V> nextRemoval;
 
 
     /**
@@ -71,8 +71,8 @@ public class ChainBag<V> {
     private float estimatedMean = 0.5f;
 
     final short[] d;
-    int dp = 0;
-    private float searchFactor = 0.25f;
+    int dp;
+    private final float searchFactor = 0.25f;
 
 
     public ChainBag(Random rng, DDNodePool<V> nodePool, int capacity) {

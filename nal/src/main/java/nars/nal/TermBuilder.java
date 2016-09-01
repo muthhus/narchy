@@ -17,7 +17,10 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
@@ -33,17 +36,11 @@ import static nars.term.compound.Statement.subj;
 public abstract class TermBuilder {
 
 
-    /**
-     * truth singularity subterms
-     */
-    public static final Atom True = $.the("†");
-    public static final Atom False = $.the("Ø");
-
     /** when a conjunction cancels itself, the truth that should replace it (as it may fall through to a superterm, etc)*/
-    public static final Atom SELF_CANCELLED_CONJ_TRUTH = False;
+    public static final Atom SELF_CANCELLED_CONJ_TRUTH = Term.False;
 
-    private static final Term[] TrueArray = new Term[]{True};
-    public static final TermContainer InvalidSubterms = TermVector.the(False);
+    private static final Term[] TrueArray = {Term.True};
+    public static final TermContainer InvalidSubterms = TermVector.the(Term.False);
     /**
      * implications, equivalences, and interval
      */
@@ -62,7 +59,7 @@ public abstract class TermBuilder {
             case PROD:
                 return Terms.ZeroProduct;
             default:
-                return False;
+                return Term.False;
         }
     }
 
@@ -90,7 +87,7 @@ public abstract class TermBuilder {
         if (retained == size) { //same as 'a'
             return a;
         } else if (retained == 0) {
-            return False; //empty set
+            return Term.False; //empty set
         } else {
             return the(o, terms.toArray(new Term[retained]));
         }
@@ -180,13 +177,13 @@ public abstract class TermBuilder {
     private static Term[] conjTrueFalseFilter(@NotNull Term[] u) {
         int trues = 0; //# of True subterms that can be eliminated
         for (Term x : u) {
-            if (x.equals(True)) {
+            if (x.equals(Term.True)) {
                 trues++;
-            } else if (x.equals(False)) {
+            } else if (x.equals(Term.False)) {
 
                 //false subterm in conjunction makes the entire condition false
                 //this will eventually reduce diectly to false in this method's only callee HACK
-                return new Term[]{False};
+                return new Term[]{Term.False};
 
             }
         }
@@ -202,7 +199,7 @@ public abstract class TermBuilder {
         int j = 0;
         for (int i = 0; j < y.length; i++) {
             Term uu = u[i];
-            if (!uu.equals(True)) // && (!uu.equals(False)))
+            if (!uu.equals(Term.True)) // && (!uu.equals(False)))
                 y[j++] = uu;
         }
 
@@ -258,7 +255,7 @@ public abstract class TermBuilder {
                 if ((et0.op() == set && et1.op() == set))
                     return difference(set, (Compound) et0, (Compound) et1);
                 else
-                    return et0.equals(et1) ? False : finish(op, t);
+                    return et0.equals(et1) ? Term.False : finish(op, t);
             default:
                 throw new InvalidTermException(op, t, "diff requires 2 terms");
         }
@@ -285,11 +282,11 @@ public abstract class TermBuilder {
     }
 
     public static boolean isTrue(@NotNull Term x) {
-        return x.equals(True);
+        return x.equals(Term.True);
     }
 
     public static boolean isFalse(@NotNull Term x) {
-        return x.equals(False);
+        return x.equals(Term.False);
     }
 
 
@@ -310,7 +307,7 @@ public abstract class TermBuilder {
                    throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
 
                 //any other term causes it to be invalid/meaningless
-                return False;
+                return Term.False;
             }
         }
 
@@ -371,20 +368,20 @@ public abstract class TermBuilder {
 
         //HACK testing for equality like this is not a complete solution. for that we need a new special term type
 
-        if (isTrue(t)) return False;
-        if (isFalse(t)) return True;
+        if (isTrue(t)) return Term.False;
+        if (isFalse(t)) return Term.True;
 
         if (t.op() == NEG) {
             // (--,(--,P)) = P
             t = ((TermContainer) t).term(0);
 
-            if (isTrue(t)) return False;
-            if (isFalse(t)) return True;
+            if (isTrue(t)) return Term.False;
+            if (isFalse(t)) return Term.True;
 
             return t;
 
         } else {
-            return (t instanceof Compound) || (t.op().var) ? finish(NEG, t) : False;
+            return (t instanceof Compound) || (t.op().var) ? finish(NEG, t) : Term.False;
         }
     }
 
@@ -401,7 +398,7 @@ public abstract class TermBuilder {
         }
 
         if (index == DTERNAL)
-            throw new InvalidTermException(o, index, res, "image missing '_' (Imdex)");
+            throw new InvalidTermException(o, DTERNAL, res, "image missing '_' (Imdex)");
 
         int serN = res.length - 1;
         Term[] ser = new Term[serN];
@@ -418,7 +415,7 @@ public abstract class TermBuilder {
 
         int n = u.length;
         if (n == 0)
-            return False;
+            return Term.False;
 
         if (n == 1) {
             Term only = u[0];
@@ -480,7 +477,7 @@ public abstract class TermBuilder {
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
         if (u.length == 0)
-            return False;
+            return Term.False;
 
         assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
@@ -604,7 +601,7 @@ public abstract class TermBuilder {
                     if (isTrue(subject)) {
                         return predicate;
                     } else if (isFalse(subject) || isTrueOrFalse(predicate)) {
-                        return False;
+                        return Term.False;
                         //throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
                         //return negation(predicate); /??
                     }
@@ -647,7 +644,7 @@ public abstract class TermBuilder {
 
             //if either the subject or pred are True/False by this point, fail
             if (isTrueOrFalse(subject) || isTrueOrFalse(predicate)) {
-                return subject.equals(predicate) ? True : False;
+                return subject.equals(predicate) ? Term.True : Term.False;
             }
 
             //compare unneg'd if it's not temporal or eternal/parallel
@@ -655,7 +652,7 @@ public abstract class TermBuilder {
             Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject).term() : subject;
             Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate).term() : predicate;
             if (Terms.equalsAnonymous(sRoot, pRoot))
-                return subject.op() == predicate.op() ? True : False; //True if same, False if negated
+                return subject.op() == predicate.op() ? Term.True : Term.False; //True if same, False if negated
 
 
             //TODO its possible to disqualify invalid statement if there is no structural overlap here??
@@ -663,14 +660,14 @@ public abstract class TermBuilder {
             @NotNull Op sop = sRoot.op();
             if (sop == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
                 //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
-                return True;
+                return Term.True;
             }
 
 
             @NotNull Op pop = pRoot.op();
             if (pop == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
                 //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
-                return True;
+                return Term.True;
             }
 
             if (sop.statement && pop.statement) {

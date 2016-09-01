@@ -1,11 +1,8 @@
 package nars.experiment.rogue.ui;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-
 import nars.experiment.rogue.combat.PtrlConstants;
+
+import java.awt.*;
 
 public class Console
 {

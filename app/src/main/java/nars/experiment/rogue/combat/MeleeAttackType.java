@@ -1,16 +1,15 @@
 package nars.experiment.rogue.combat;
 
-import java.io.Serializable;
-
+import nars.experiment.rogue.creatures.Attribute;
+import nars.experiment.rogue.creatures.Creature;
+import nars.experiment.rogue.creatures.Skill;
+import nars.experiment.rogue.items.Weapon;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import nars.experiment.rogue.creatures.Attribute;
-import nars.experiment.rogue.creatures.Creature;
-import nars.experiment.rogue.creatures.Skill;
-import nars.experiment.rogue.items.Weapon;
+import java.io.Serializable;
 
 public class MeleeAttackType extends UnarmedAttackType implements Serializable
 {
@@ -40,9 +39,8 @@ public class MeleeAttackType extends UnarmedAttackType implements Serializable
  		
 	public boolean isAviable (int skillv)
 	{
-		if (skillv>=minskill) return true;
-		return false;    
-	}
+        return skillv >= minskill;
+    }
 	
 	@Override
     public Attack getAttack()

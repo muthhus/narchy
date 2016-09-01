@@ -1,10 +1,10 @@
 package spacegraph.video;
 
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import com.jogamp.opengl.GL2;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import nars.util.signal.OneDHaar;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.GridSurface;
@@ -31,10 +31,10 @@ public class WaveCapture implements Runnable {
     private float[] samples;
 
 
-    private int freqSamplesPerFrame = 32;
-    private int freqOffset = 16;
+    private final int freqSamplesPerFrame = 32;
+    private final int freqOffset = 16;
 
-    private int historyFrames = 32;
+    private final int historyFrames = 32;
     private float[] history;
 
     private WaveSource source;
@@ -43,7 +43,7 @@ public class WaveCapture implements Runnable {
      * called when next sample buffer is ready
      */
     final Topic<WaveCapture> nextReady = new DefaultTopic();
-    private boolean normalizeDisplayedWave = false;
+    private final boolean normalizeDisplayedWave = false;
 
     synchronized void start(float FRAME_RATE) {
 

@@ -1,13 +1,15 @@
 package nars.experiment.rogue.map;
 
-import java.io.Serializable;
-import java.util.*;
-import nars.experiment.rogue.items.*;
+import nars.experiment.rogue.combat.RangedAttack;
+import nars.experiment.rogue.creatures.Creature;
+import nars.experiment.rogue.items.Item;
 import nars.experiment.rogue.util.GameTime;
 import nars.experiment.rogue.util.Message;
 import nars.experiment.rogue.util.MessageStack;
-import nars.experiment.rogue.combat.RangedAttack;
-import nars.experiment.rogue.creatures.*;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Map implements Serializable 
 {
@@ -416,8 +418,7 @@ public class Map implements Serializable
 	
 	public boolean needAnimation() //...to repaint shots and explosives
 	{
-		if (!projectiles.isEmpty()) return true;
-		else return false;
+        return !projectiles.isEmpty();
 	}
 	
 	public void newFrame() //animation of shots and explosives

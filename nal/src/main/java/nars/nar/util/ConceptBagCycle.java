@@ -13,10 +13,8 @@ import nars.nal.Premise;
 import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
-import nars.util.Texts;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
-import nars.util.data.map.CapacityLinkedHashMap;
 import nars.util.data.map.nbhm.NonBlockingHashMap;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +26,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * The original deterministic memory cycle implementation that is currently used as a standard

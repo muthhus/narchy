@@ -1,13 +1,13 @@
 package nars.experiment.rogue.creatures;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import nars.experiment.rogue.combat.MeleeAttackType;
 import nars.experiment.rogue.combat.RangedAttackType;
 import nars.experiment.rogue.combat.UnarmedAttackType;
 import nars.experiment.rogue.items.*;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * 

@@ -1,11 +1,12 @@
 package nars.experiment.rogue.ui;
 
-import java.awt.event.KeyEvent;
-
 import nars.experiment.rogue.combat.PtrlConstants;
 import nars.experiment.rogue.creatures.Player;
 import nars.experiment.rogue.map.GlobalMap;
 import nars.experiment.rogue.map.MapDescriptor;
+
+import java.awt.event.KeyEvent;
+
 import static nars.experiment.rogue.ui.Controls.*;
 
 public class GlobalMapScreen implements IGameScreen

@@ -18,7 +18,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -138,8 +137,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             if (nar.nal() < 7)
                 throw new RuntimeException("invalid NAL level");
 
-            long[] occReturn = new long[]{ETERNAL};
-            float[] confScale = new float[]{1f};
+            long[] occReturn = {ETERNAL};
+            float[] confScale = {1f};
 
             Compound temporalized;
             temporalized = this.temporalizer.compute(content,

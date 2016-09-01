@@ -199,7 +199,7 @@ public class DbvtAabbMm {
 	}
 
 	public float ProjectMinimum(v3 v, int signs) {
-		v3[] b = new v3[] { mx, mi };
+		v3[] b = { mx, mi };
 		v3 p = new v3();
 		p.set(b[(signs >> 0) & 1].x,
 		      b[(signs >> 1) & 1].y,
@@ -228,7 +228,7 @@ public class DbvtAabbMm {
 
 		MatrixUtil.transposeTransform(d1, d0, xform.basis);
 
-		float[] s0 = new float[] { 0, 0 };
+		float[] s0 = { 0, 0 };
 		float[] s1 = new float[2];
 		s1[0] = xform.dot(d0);
 		s1[1] = s1[0];
@@ -251,7 +251,7 @@ public class DbvtAabbMm {
 	}
 
 	public static boolean intersect(DbvtAabbMm a, v3 org, v3 invdir, int[] signs) {
-		v3[] bounds = new v3[]{a.mi, a.mx};
+		v3[] bounds = {a.mi, a.mx};
 		float txmin = (bounds[signs[0]].x - org.x) * invdir.x;
 		float txmax = (bounds[1 - signs[0]].x - org.x) * invdir.x;
 		float tymin = (bounds[signs[1]].y - org.y) * invdir.y;

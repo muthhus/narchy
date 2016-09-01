@@ -21,9 +21,9 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
     public float repelSpeed = 1f;
     public float attractSpeed = 2f;
 
-    private float minRepelDist = 0f;
-    private float maxRepelDist = 100f;
-    private float attractDist = 1f;
+    private final float minRepelDist = 0;
+    private final float maxRepelDist = 100f;
+    private final float attractDist = 1f;
 
 //        public static class Edge<X> extends MutablePair<X,X> {
 //            public final X a, b;

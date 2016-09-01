@@ -26,13 +26,10 @@
 
 package spacegraph.obj;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import spacegraph.SimpleSpatial;
 import spacegraph.math.v3;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
-import spacegraph.phys.RigidBodyBuilder;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.constraint.generic.Generic6DofConstraint;
 import spacegraph.phys.math.MatrixUtil;

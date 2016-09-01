@@ -1,7 +1,7 @@
 
 package nars.experiment.nario2;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class Player extends Entity
 {

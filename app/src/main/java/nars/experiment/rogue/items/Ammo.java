@@ -1,18 +1,16 @@
 package nars.experiment.rogue.items;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.util.Iterator;
-
-import javax.xml.parsers.ParserConfigurationException;
-
+import nars.experiment.rogue.combat.PtrlConstants;
+import nars.experiment.rogue.creatures.AttribModifier;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
-import nars.experiment.rogue.combat.PtrlConstants;
-import nars.experiment.rogue.creatures.AttribModifier;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.util.Iterator;
 
 public class Ammo extends Item implements Serializable {
 

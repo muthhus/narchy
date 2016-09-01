@@ -4,17 +4,14 @@ package nars.experiment.nario2;
 import nars.experiment.nario2.levels.Level1;
 import nars.experiment.nario2.mapeditor.MapEditor;
 
+import javax.swing.*;
 import java.applet.Applet;
 import java.applet.AudioClip;
-
-
-import java.awt.Graphics; 
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import javax.swing.*;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class GameModel 

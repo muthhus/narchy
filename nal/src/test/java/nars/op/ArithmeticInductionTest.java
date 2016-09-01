@@ -1,10 +1,5 @@
 package nars.op;
 
-import nars.$;
-import nars.NAR;
-import nars.nar.Default;
-import nars.term.Compound;
-import nars.term.obj.IntTerm;
 import nars.term.obj.Termject;
 import org.junit.Test;
 

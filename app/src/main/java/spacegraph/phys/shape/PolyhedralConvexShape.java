@@ -35,7 +35,7 @@ import spacegraph.phys.math.VectorUtil;
  */
 public abstract class PolyhedralConvexShape extends ConvexInternalShape {
 
-	private static final v3[] _directions = new v3[] {
+	private static final v3[] _directions = {
 		new v3( 1f,  0f,  0f),
 		new v3( 0f,  1f,  0f),
 		new v3( 0f,  0f,  1f),
@@ -44,7 +44,7 @@ public abstract class PolyhedralConvexShape extends ConvexInternalShape {
 		new v3( 0f,  0f, -1f)
 	};
 
-	private static final v3[] _supporting = new v3[] {
+	private static final v3[] _supporting = {
 		new v3(0f, 0f, 0f),
 		new v3(0f, 0f, 0f),
 		new v3(0f, 0f, 0f),

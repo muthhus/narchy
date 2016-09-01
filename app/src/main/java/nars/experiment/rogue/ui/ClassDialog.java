@@ -1,10 +1,10 @@
 package nars.experiment.rogue.ui;
 
-import java.awt.event.KeyEvent;
-
 import nars.experiment.rogue.combat.PtrlConstants;
 import nars.experiment.rogue.creatures.Creature;
 import nars.experiment.rogue.creatures.Player;
+
+import java.awt.event.KeyEvent;
 
 public class ClassDialog implements IGameScreen {
     public ClassDialog(Player p) {

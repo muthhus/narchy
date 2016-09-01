@@ -1,8 +1,8 @@
 package nars.experiment.rogue.ui;
 
-import java.awt.event.KeyEvent;
-
 import nars.experiment.rogue.combat.PtrlConstants;
+
+import java.awt.event.KeyEvent;
 
 public class SimpleDialog implements IGameScreen
 {
@@ -29,7 +29,8 @@ public class SimpleDialog implements IGameScreen
 		return res;
 	}
 
-	public void paint(Console c)
+	@Override
+    public void paint(Console c)
 	{
 		c.clear();
 		int w=head.length();

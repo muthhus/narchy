@@ -1,9 +1,9 @@
 package nars.experiment.misc;
 
+import nars.learn.Agent;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
-import nars.learn.Agent;
 
 import java.util.Arrays;
 

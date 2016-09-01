@@ -23,7 +23,6 @@
 
 package spacegraph.render;
 
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.opengl.GL2;
@@ -32,6 +31,7 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
 import nars.$;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
 import spacegraph.math.Color3f;

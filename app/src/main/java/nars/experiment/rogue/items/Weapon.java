@@ -1,19 +1,16 @@
 package nars.experiment.rogue.items;
 
+import nars.experiment.rogue.combat.MeleeAttackType;
+import nars.experiment.rogue.creatures.AttribModifier;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Element;
-
-import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
-
-import nars.experiment.rogue.combat.MeleeAttackType;
-import nars.experiment.rogue.creatures.AttribModifier;
 
 public class Weapon extends Item implements Serializable
 {

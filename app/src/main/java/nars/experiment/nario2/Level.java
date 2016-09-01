@@ -1,9 +1,8 @@
 
 package nars.experiment.nario2;
 
-import java.awt.Image;
-import java.awt.Graphics; 
-import javax.swing.ImageIcon;
+import javax.swing.*;
+import java.awt.*;
 
 import static nars.experiment.nario2.Entity.res;
 

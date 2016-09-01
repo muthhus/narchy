@@ -1,19 +1,23 @@
 package nars.experiment.rogue.creatures;
 
+import nars.experiment.rogue.combat.Protection;
+import nars.experiment.rogue.combat.PtrlConstants;
+import nars.experiment.rogue.combat.RangedAttackType;
+import nars.experiment.rogue.combat.UnarmedAttackType;
+import nars.experiment.rogue.util.GameSettings;
+import nars.experiment.rogue.util.MapEvent;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Objects;
-
-import javax.xml.parsers.*;
-
-import nars.experiment.rogue.util.GameSettings;
-import org.w3c.dom.*;
-import org.xml.sax.*;
-
-import nars.experiment.rogue.combat.*;
-import nars.experiment.rogue.util.MapEvent;
 /**
  *Describes an abstract creature
  */

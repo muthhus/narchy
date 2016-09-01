@@ -1,8 +1,7 @@
 
 package nars.experiment.nario2.mapeditor;
 
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 
 public class MapView extends javax.swing.JPanel implements Runnable
 {

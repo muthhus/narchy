@@ -143,7 +143,7 @@ public interface TextColor {
      * this</a> commit message to Konsole.
      */
     class Indexed implements TextColor {
-        private static final byte[][] COLOR_TABLE = new byte[][] {
+        private static final byte[][] COLOR_TABLE = {
             //These are the standard 16-color VGA palette entries
             {(byte)0,(byte)0,(byte)0 },
             {(byte)170,(byte)0,(byte)0 },

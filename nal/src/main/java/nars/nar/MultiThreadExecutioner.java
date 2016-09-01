@@ -122,6 +122,7 @@ public class MultiThreadExecutioner extends Executioner {
         disruptor.start();
     }
 
+    @Override
     public void synchronize() {
         //if (!runWorker.isQuiescent()) {
 //                while (!runWorker.awaitQuiescence(QUIESENCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {

@@ -25,7 +25,7 @@ import spacegraph.render.Draw;
 public class STMView  {
 
 
-    private BagChart inputBagChart;
+    private final BagChart inputBagChart;
     private final MySTMClustered stm;
     protected int limit = -1;
     public final NeuralGasNet.NeuralGasNetState state = new NeuralGasNet.NeuralGasNetState();
@@ -84,6 +84,7 @@ public class STMView  {
         s.add(new Facial(
                     new GridSurface(
                         inputBagChart = new BagChart<Task>(stm.input, -1) {
+                            @Override
                             protected ItemVis<BLink<Task>> newItem(BLink<Task> i) {
                                 @Nullable Task ii = i.get();
                                 String label;

@@ -1,7 +1,9 @@
 package nars.experiment.misc;
 
 import nars.$;
+import nars.NAR;
 import nars.index.CaffeineIndex;
+import nars.nar.Default;
 import nars.nar.Executioner;
 import nars.nar.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
@@ -11,8 +13,6 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
-import nars.NAR;
-import nars.nar.Default;
 
 import java.util.Arrays;
 
@@ -28,7 +28,7 @@ public class Line1DContinuous extends NAgent {
 
     private final IntToFloatFunction targetFunc;
     int size;
-    boolean print = false;
+    boolean print;
     private float yHidden;
     private float yEst;
     float speed = 4f;

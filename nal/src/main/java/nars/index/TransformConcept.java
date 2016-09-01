@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class TransformConcept extends AtomConcept implements TermTransform {
 
-    public static final TransformConcept[] BuiltIn = new TransformConcept[]{
+    public static final TransformConcept[] BuiltIn = {
             new TransformConcept(new intersect()),
             new TransformConcept(new differ()),
             new TransformConcept(new union())

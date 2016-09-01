@@ -1,31 +1,25 @@
 package spacegraph;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import nars.util.data.map.nbhm.NonBlockingHashMap;
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
-import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
-import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import com.jogamp.newt.event.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.$;
-import nars.gui.ConceptWidget;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
+import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;
-import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.phys.constraint.Point2PointConstraint;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.MotionState;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.util.Motion;
-import spacegraph.phys.util.OArrayList;
 import spacegraph.render.JoglPhysics;
 
 import java.util.List;

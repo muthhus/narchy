@@ -33,7 +33,7 @@ import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.$.inh;
 import static nars.Op.*;
-import static nars.nal.TermBuilder.False;
+import static nars.term.Term.False;
 import static org.junit.Assert.*;
 
 /**

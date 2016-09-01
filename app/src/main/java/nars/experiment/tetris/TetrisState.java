@@ -56,9 +56,9 @@ public class TetrisState {
 
     //	/*Hold all the possible bricks that can fall*/
     Vector<TetrisPiece> possibleBlocks = new Vector<>();
-    private int time = 0;
+    private int time;
 
-    private int timePerFall;
+    private final int timePerFall;
 
     //private double[] worldObservation;
 

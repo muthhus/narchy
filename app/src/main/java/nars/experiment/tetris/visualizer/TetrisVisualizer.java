@@ -23,7 +23,6 @@ import nars.experiment.tetris.TetrisState;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.math.Vector2f;
 
 import javax.swing.*;
 

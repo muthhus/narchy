@@ -11,7 +11,6 @@ import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;

@@ -1,8 +1,7 @@
 
 package nars.experiment.nario2;
 
-import java.awt.Image; 
-import java.awt.Graphics; 
+import java.awt.*;
 
 public class LevelElement
 {

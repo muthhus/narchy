@@ -458,7 +458,7 @@ public class HullLibrary {
 		v3 tmp1 = new v3();
 		v3 tmp2 = new v3();
 
-		v3[] basis = new v3[/*3*/] { new v3(), new v3(), new v3() };
+		v3[] basis = { new v3(), new v3(), new v3() };
 		basis[0].set(0.01f, 0.02f, 1.0f);
 		int p0 = maxdirsterid(verts, verts_count, basis[0], allow);
 		tmp.negate(basis[0]);
@@ -640,8 +640,8 @@ public class HullLibrary {
 			scale.set(1, 1, 1);
 		}
 
-		float[] bmin = new float[] { Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE };
-		float[] bmax = new float[] { -Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE };
+		float[] bmin = { Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE };
+		float[] bmax = { -Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE };
 
 		OArrayList<v3> vtx_ptr = svertices;
 		int vtx_idx = 0;

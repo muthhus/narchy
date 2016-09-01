@@ -69,6 +69,10 @@ public class WebServer /*extends PathHandler*/ {
         File c = new File("./web/src/main/resources/");
         //File c = new File(WebServer.class.getResource("/").getPath());
         String cp = c.getAbsolutePath().replace("./", "");
+
+        if (cp.contains("web/web")) //happens if run from web/ directory
+            cp = cp.replace("web/web", "web");
+
         Path p = Paths.get(
                 //System.getProperty("user.home")
                 cp
@@ -97,6 +101,7 @@ public class WebServer /*extends PathHandler*/ {
                             )
                                 .setDirectoryListingEnabled(true)
                                 .addWelcomeFiles("index.html")
+
                         )
                         .addPrefixPath("/terminal", socket(new NarseseIOService(nar)))
                         .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 500)))
@@ -141,6 +146,7 @@ public class WebServer /*extends PathHandler*/ {
                                 return Math.round(budgetValue  * 1000);
                             }
                         }))
+
                 )
                 .build();
 

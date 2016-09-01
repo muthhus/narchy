@@ -1,18 +1,17 @@
 package nars.experiment.rogue.map;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Objects;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import nars.experiment.rogue.util.GameSettings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class TileSet
 {

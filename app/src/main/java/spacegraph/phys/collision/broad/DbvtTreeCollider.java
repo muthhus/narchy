@@ -39,8 +39,8 @@ public class DbvtTreeCollider extends Dbvt.ICollide {
 
 	@Override
 	public void process(Dbvt.Node na, Dbvt.Node nb) {
-		DbvtProxy pa = (DbvtProxy) na.data;
-		DbvtProxy pb = (DbvtProxy) nb.data;
+		DbvtProxy pa = na.data;
+		DbvtProxy pb = nb.data;
 		//#if DBVT_BP_DISCRETPAIRS
 		if (DbvtAabbMm.intersect(pa.aabb, pb.aabb))
 		//#endif

@@ -7,14 +7,11 @@ package nars.experiment.nario2;
 
 import nars.experiment.nario2.mapeditor.MapEditor;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Image;
-import java.awt.Color; 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import javax.swing.*;
 
 public class NavigationBar extends JMenuBar 
 {

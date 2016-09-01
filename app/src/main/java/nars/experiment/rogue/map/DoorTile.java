@@ -1,17 +1,20 @@
 package nars.experiment.rogue.map;
 
-import java.io.*;
-import java.net.URISyntaxException;
-import java.util.Objects;
-
+import nars.experiment.rogue.combat.PtrlConstants;
+import nars.experiment.rogue.items.Item;
 import nars.experiment.rogue.util.GameSettings;
 import org.w3c.dom.*;
-import org.xml.sax.*;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
-import javax.xml.parsers.*;
-
-import nars.experiment.rogue.combat.PtrlConstants;
-import nars.experiment.rogue.items.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.util.Objects;
 
 
 public class DoorTile extends Tile implements Serializable

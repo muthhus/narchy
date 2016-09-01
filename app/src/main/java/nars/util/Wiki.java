@@ -405,26 +405,26 @@ public class Wiki implements Serializable
          *  The user has not specified a gender in preferences.
          *  @since 0.24
          */
-        unknown;
+        unknown
     }
 
     private static final String version = "0.31";
 
     // the domain of the wiki
-    private String domain;
+    private final String domain;
     protected String query, base, apiUrl;
     protected String scriptPath = "/w";
     private boolean wgCapitalLinks = true;
     private String timezone = "UTC";
 
     // user management
-    private Map<String, String> cookies = new HashMap<>(12);
+    private final Map<String, String> cookies = new HashMap<>(12);
     private User user;
-    private int statuscounter = 0;
+    private int statuscounter;
 
     // various caches
-    private transient LinkedHashMap<String, Integer> namespaces = null;
-    private transient List<String> watchlist = null;
+    private transient LinkedHashMap<String, Integer> namespaces;
+    private transient List<String> watchlist;
 
     // preferences
     private int max = 500;
@@ -435,14 +435,14 @@ public class Wiki implements Serializable
     private transient int statusinterval = 100; // status check
     private String useragent = "Wiki.java/" + version + " (https://github.com/MER-C/wiki-java/)";
     private boolean zipped = true;
-    private boolean markminor = false, markbot = false;
-    private boolean resolveredirect = false;
+    private boolean markminor, markbot;
+    private boolean resolveredirect;
     private String protocol = "https://";
     private Level loglevel = Level.ALL;
     private static final Logger logger = Logger.getLogger("wiki");
 
     // Store time when the last throttled action was executed
-    private long lastThrottleActionTime = 0;
+    private long lastThrottleActionTime;
     // Store time when next login attempt can be executed
     private long nextLoginTime = -1;
 
@@ -2499,7 +2499,7 @@ public class Wiki implements Serializable
             for (int i = 0; i < size; i++)
             {
                 if (i == 0)
-                    temp[i].sizediff = temp[i].size;
+                    temp[0].sizediff = temp[i].size;
                 else
                     temp[i].sizediff = temp[i].size - temp[i - 1].size;
                 if (i != size - 1)
@@ -3511,7 +3511,7 @@ public class Wiki implements Serializable
      *  @throws IOException if a network error occurs
      *  @since 0.30
      */
-    public boolean getImage(String title, File file) throws FileNotFoundException, IOException
+    public boolean getImage(String title, File file) throws IOException
     {
         return getImage(title, -1, -1, file);
     }
@@ -3555,7 +3555,7 @@ public class Wiki implements Serializable
      *  @throws IOException if a network error occurs
      *  @since 0.30
      */
-    public boolean getImage(String title, int width, int height, File file) throws FileNotFoundException, IOException
+    public boolean getImage(String title, int width, int height, File file) throws IOException
     {
         // this is a two step process - first we fetch the image url
         title = title.replaceFirst("^(File|Image|" + namespaceIdentifier(FILE_NAMESPACE) + "):", "");
@@ -6015,9 +6015,9 @@ public class Wiki implements Serializable
      */
     public class User implements Cloneable, Serializable
     {
-        private String username;
-        private String[] rights = null; // cache
-        private String[] groups = null; // cache
+        private final String username;
+        private String[] rights; // cache
+        private String[] groups; // cache
 
         /**
          *  Creates a new user object. Does not create a new user on the
@@ -6266,11 +6266,11 @@ public class Wiki implements Serializable
         // internal data storage
         private String type;
         private String action;
-        private String reason;
+        private final String reason;
         private User user;
         private String target;
-        private Calendar timestamp;
-        private Object details;
+        private final Calendar timestamp;
+        private final Object details;
 
         /**
          *  Creates a new log entry. WARNING: does not perform the action
@@ -6454,18 +6454,21 @@ public class Wiki implements Serializable
      */
     public class Revision implements Comparable<Revision>
     {
-        private boolean minor, bot, rvnew;
-        private String summary;
-        private long revid, rcid = -1;
-        private long previous = 0, next = 0;
-        private Calendar timestamp;
-        private String user;
-        private String title;
-        private String rollbacktoken = null;
-        private int size = 0;
-        private int sizediff = 0;
-        private boolean summaryDeleted = false, userDeleted = false, contentDeleted = false;
-        private boolean pageDeleted = false;
+        private final boolean minor;
+        private final boolean bot;
+        private final boolean rvnew;
+        private final String summary;
+        private final long revid;
+        private long rcid = -1;
+        private long previous, next;
+        private final Calendar timestamp;
+        private final String user;
+        private final String title;
+        private String rollbacktoken;
+        private int size;
+        private int sizediff;
+        private boolean summaryDeleted, userDeleted, contentDeleted;
+        private boolean pageDeleted;
 
         /**
          *  Constructs a new Revision object.
@@ -7530,7 +7533,7 @@ public class Wiki implements Serializable
             if (level.equals(FULL_PROTECTION))
                 return user.isAllowedTo("editprotected");
         }
-        if ((Boolean)protectionstate.get("cascade") == Boolean.TRUE) // can be null
+        if (protectionstate.get("cascade") == Boolean.TRUE) // can be null
             return user.isAllowedTo("editprotected");
         return true;
     }

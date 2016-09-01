@@ -1,15 +1,15 @@
 package nars.experiment.rogue.ui;
 
-import java.awt.event.KeyEvent;
-
 import nars.experiment.rogue.combat.PtrlConstants;
 import nars.experiment.rogue.combat.RangedAttackType;
 import nars.experiment.rogue.creatures.Player;
 import nars.experiment.rogue.items.Ammo;
 import nars.experiment.rogue.items.Item;
 import nars.experiment.rogue.util.GameTime;
-import nars.experiment.rogue.util.MessageStack;
 import nars.experiment.rogue.util.Message;
+import nars.experiment.rogue.util.MessageStack;
+
+import java.awt.event.KeyEvent;
 
 
 public class ReloadDialog implements IGameScreen
@@ -103,7 +103,8 @@ public class ReloadDialog implements IGameScreen
 	}
 	
 	
-	public void paint(Console c)
+	@Override
+    public void paint(Console c)
 	{
 		if (cursor>=getVariantsN()) cursor=0;
 		int x1=c.getSymWidth()-50;

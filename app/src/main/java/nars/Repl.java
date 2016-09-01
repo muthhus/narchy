@@ -2,14 +2,13 @@ package nars;
 
 import nars.nar.Default;
 import org.fusesource.jansi.AnsiConsole;
-import org.jline.reader.*;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.history.history.MemoryHistory;
-import org.jline.terminal.Attributes;
-import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
-import org.jline.utils.AttributedStringBuilder;
-import org.jline.utils.AttributedStyle;
 
 import java.io.IOException;
 import java.io.PrintStream;

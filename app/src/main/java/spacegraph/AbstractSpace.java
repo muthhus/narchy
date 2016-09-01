@@ -1,7 +1,7 @@
 package spacegraph;
 
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 
 import java.util.Collections;
 import java.util.List;

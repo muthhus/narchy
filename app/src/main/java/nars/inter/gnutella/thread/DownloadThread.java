@@ -137,7 +137,7 @@ public class DownloadThread extends PeerThread {
         }
     }
 
-    public static byte[] sendFile(String file, int rangePosition) throws IOException, FileNotFoundException {
+    public static byte[] sendFile(String file, int rangePosition) throws IOException {
         RandomAccessFile f = new RandomAccessFile(file, "r");
 
         byte[] b = new byte[(int) f.length() - rangePosition];

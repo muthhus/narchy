@@ -1,12 +1,15 @@
 package nars.experiment.rogue;
 
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
+import nars.experiment.rogue.map.Map;
+import nars.experiment.rogue.ui.Console;
+import nars.experiment.rogue.ui.IAnimated;
+import nars.experiment.rogue.ui.IGameScreen;
+import nars.experiment.rogue.ui.MainMenuDialog;
+import nars.experiment.rogue.util.GameSettings;
+import org.xml.sax.SAXException;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -15,21 +18,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import javax.swing.Timer;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import nars.experiment.rogue.ui.Console;
-import nars.experiment.rogue.ui.IAnimated;
-import nars.experiment.rogue.ui.IGameScreen;
-import nars.experiment.rogue.ui.MainMenuDialog;
-import org.xml.sax.SAXException;
-
-import nars.experiment.rogue.map.Map;
-import nars.experiment.rogue.util.GameSettings;
 
 public class ConsoleFrame extends JFrame
 {

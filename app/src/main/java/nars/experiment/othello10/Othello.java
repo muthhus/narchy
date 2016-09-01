@@ -2,8 +2,9 @@ package nars.experiment.othello10;/*
  * �쐬��: 2004/12/17
  *
  */
-import java.awt.*;
+
 import javax.swing.*;
+import java.awt.*;
 /**
  * �I�Z���A�v���P�[�V�����B
  * 

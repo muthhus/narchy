@@ -228,7 +228,8 @@ public class Dynamic<X> extends Collidable<X> {
 		applyCentralForce(gravity);
 	}
 	
-	public void setGravity(v3 acceleration) {
+	@Override
+    public void setGravity(v3 acceleration) {
 		if (inverseMass != 0f) {
 			gravity.scale(1f / inverseMass, acceleration);
 		}

@@ -1,28 +1,25 @@
 package nars.experiment.rogue.map;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.*;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
 import nars.experiment.rogue.creatures.Creature;
 import nars.experiment.rogue.items.Ammo;
 import nars.experiment.rogue.items.Item;
 import nars.experiment.rogue.items.RangedWeapon;
 import nars.experiment.rogue.items.Weapon;
 import nars.experiment.rogue.util.GameSettings;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.StringTokenizer;
 
 /**
  * Class used to generate maps.
@@ -80,7 +77,7 @@ public class MapGenerator {
         }
     }
 
-    protected static void parseLevelElement(Element e, Map m) throws ParserConfigurationException, SAXException, IOException {
+    protected static void parseLevelElement(Element e, Map m) {
         NodeList nl = e.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node n_child = nl.item(i);
@@ -888,7 +885,7 @@ public class MapGenerator {
                             newmap.setTile(dx, dy, door);
                             if (Math.random() <= closeddoorchance)
                                 ((DoorTile) newmap.getTile(dx, dy)).close();
-                            rooms[i][j] = true;
+                            rooms[i][0] = true;
                             allroomsok = false;
                         }
                         if (i != 0 && rooms[i - 1][j] && allroomsok)//W
@@ -922,7 +919,7 @@ public class MapGenerator {
                             newmap.setTile(dx, dy, door);
                             if (Math.random() <= closeddoorchance)
                                 ((DoorTile) newmap.getTile(dx, dy)).close();
-                            rooms[i][j] = true;
+                            rooms[0][j] = true;
                             allroomsok = false;
                         }
                     }

@@ -4,7 +4,7 @@ package nars.experiment.nario2.mapeditor;
 
 import nars.experiment.nario2.GameModel;
 
-import java.awt.Dimension;
+import java.awt.*;
 
 public class MapController 
 {

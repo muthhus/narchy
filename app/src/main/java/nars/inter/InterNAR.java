@@ -1,7 +1,10 @@
 package nars.inter;
 
 
-import nars.*;
+import nars.$;
+import nars.IO;
+import nars.NAR;
+import nars.Task;
 import nars.bag.impl.ArrayBag;
 import nars.budget.merge.BudgetMerge;
 import nars.inter.gnutella.Peer;

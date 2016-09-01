@@ -1,9 +1,12 @@
 package nars.experiment.rogue.map;
 
-import java.io.*;
-
 import nars.experiment.rogue.Game;
 import nars.experiment.rogue.combat.PtrlConstants;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 
 public class MapDescriptor implements Serializable
 {

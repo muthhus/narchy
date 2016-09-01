@@ -25,7 +25,7 @@ import java.awt.*;
 
 public class TetrisBlocksComponent {
 
-	private TetrisVisualizer tetVis;
+	private final TetrisVisualizer tetVis;
 	private final int lastUpdateTimeStep = -1;
 
 	public TetrisBlocksComponent(TetrisVisualizer ev) {

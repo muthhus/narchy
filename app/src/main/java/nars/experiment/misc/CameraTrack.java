@@ -1,8 +1,6 @@
 package nars.experiment.misc;
 
 import com.google.common.collect.Iterables;
-import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -20,6 +18,8 @@ import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.tuple.Tuples;
 
 import javax.swing.*;
 import java.awt.*;

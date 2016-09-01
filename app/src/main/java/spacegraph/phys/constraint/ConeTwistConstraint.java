@@ -43,7 +43,7 @@ import spacegraph.phys.solve.JacobianEntry;
  */
 public class ConeTwistConstraint extends TypedConstraint {
 
-	private final JacobianEntry[] jac/*[3]*/ = new JacobianEntry[] { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() }; //3 orthogonal linear constraints
+	private final JacobianEntry[] jac/*[3]*/ = { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() }; //3 orthogonal linear constraints
 
 	private final Transform rbAFrame = new Transform();
 	private final Transform rbBFrame = new Transform();
@@ -136,7 +136,7 @@ public class ConeTwistConstraint extends TypedConstraint {
 			relPos.sub(pivotBInW, pivotAInW);
 
 			// TODO: stack
-			v3[] normal/*[3]*/ = new v3[]{new v3(), new v3(), new v3()};
+			v3[] normal/*[3]*/ = {new v3(), new v3(), new v3()};
 			if (relPos.lengthSquared() > BulletGlobals.FLT_EPSILON) {
 				normal[0].normalize(relPos);
 			}

@@ -28,7 +28,6 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.util.ImmModeSink;
-import javafx.scene.paint.Color;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.math.AxisAngle4f;
@@ -45,8 +44,6 @@ import spacegraph.phys.util.OArrayList;
 
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.math.v3.v;
-import static spacegraph.phys.collision.broad.BroadphaseNativeType.CONVEX_HULL_SHAPE_PROXYTYPE;
-import static spacegraph.phys.collision.broad.BroadphaseNativeType.SPHERE_SHAPE_PROXYTYPE;
 import static spacegraph.render.JoglSpace.glut;
 import static spacegraph.test.Lesson14.renderString;
 

@@ -4,10 +4,15 @@ import nars.experiment.rogue.combat.PtrlConstants;
 import nars.experiment.rogue.creatures.AttribModifier;
 import nars.experiment.rogue.util.GameSettings;
 import org.w3c.dom.*;
-import org.xml.sax.*;
-import javax.xml.parsers.*;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
-import java.io.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;

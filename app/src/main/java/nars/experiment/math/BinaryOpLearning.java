@@ -1,13 +1,16 @@
 package nars.experiment.math;
 
-import nars.*;
-import nars.op.NAgent;
+import nars.$;
+import nars.NAR;
+import nars.NARLoop;
+import nars.Param;
 import nars.experiment.arkanoid.Arkancide;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.Executioner;
 import nars.nar.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.NAgent;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
@@ -212,7 +215,7 @@ public class BinaryOpLearning extends NAgent {
     int ax, bx;
     char[] vocab = {'0', '1'};
     char padChar = '0';
-    int timeSpacing = 0;
+    int timeSpacing;
     //int rewardIntensity;
     static IntIntToIntFunction f = (a,b) ->
             //a + b;

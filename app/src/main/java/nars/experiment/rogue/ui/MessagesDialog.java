@@ -1,10 +1,10 @@
 package nars.experiment.rogue.ui;
 
-import java.awt.event.KeyEvent;
-
 import nars.experiment.rogue.combat.PtrlConstants;
 import nars.experiment.rogue.util.Message;
 import nars.experiment.rogue.util.MessageStack;
+
+import java.awt.event.KeyEvent;
 
 
 /**

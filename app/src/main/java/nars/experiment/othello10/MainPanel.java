@@ -2,10 +2,11 @@ package nars.experiment.othello10;/*
  * �쐬��: 2004/12/17
  *
  */
-import java.awt.*;
-import java.awt.event.*;
-import java.applet.*;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 /**
  * �I�Z���Ղ̃N���X�B
  * @author mori
@@ -37,7 +38,7 @@ public class MainPanel extends JPanel implements MouseListener {
     private static final int DRAW = 4;
 
     // �Ֆ�
-    private int[][] board = new int[MASU][MASU];
+    private final int[][] board = new int[MASU][MASU];
     // ���̔Ԃ�
     private boolean flagForWhite;
     // �ł��ꂽ�΂̐�
@@ -47,10 +48,10 @@ public class MainPanel extends JPanel implements MouseListener {
     // �Q�[�����
     private int gameState;
     // AI
-    private AI ai;
+    private final AI ai;
 
     // ���p�l���ւ̎Q��
-    private InfoPanel infoPanel;
+    private final InfoPanel infoPanel;
 
     public MainPanel(InfoPanel infoPanel) {
         // Othello��pack()����Ƃ��ɕK�v
@@ -69,6 +70,7 @@ public class MainPanel extends JPanel implements MouseListener {
         gameState = START;
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -106,6 +108,7 @@ public class MainPanel extends JPanel implements MouseListener {
     /**
      * �}�E�X���N���b�N�����Ƃ��B�΂�łB
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
         switch (gameState) {
             case START :
@@ -534,15 +537,19 @@ public class MainPanel extends JPanel implements MouseListener {
         return board[y][x];
     }
     
+    @Override
     public void mousePressed(MouseEvent e) {
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 }

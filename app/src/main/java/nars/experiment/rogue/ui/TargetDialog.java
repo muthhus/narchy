@@ -1,9 +1,5 @@
 package nars.experiment.rogue.ui;
 
-import java.awt.event.KeyEvent;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-
 import nars.experiment.rogue.combat.PtrlConstants;
 import nars.experiment.rogue.combat.RangedAttackType;
 import nars.experiment.rogue.combat.UnarmedAttackType;
@@ -12,6 +8,10 @@ import nars.experiment.rogue.creatures.Player;
 import nars.experiment.rogue.items.Item;
 import nars.experiment.rogue.map.Actor;
 import nars.experiment.rogue.map.Map;
+
+import java.awt.event.KeyEvent;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 
 import static nars.experiment.rogue.ui.Controls.*;
 
@@ -49,7 +49,8 @@ public class TargetDialog implements IGameScreen
 		drawMap(c);
 		
 	}
-	public boolean getKeyEvent(KeyEvent ke)
+	@Override
+    public boolean getKeyEvent(KeyEvent ke)
 	{	
 		if (ke.getKeyCode()==KeyEvent.VK_ESCAPE) return true;
 		if (ke.getKeyCode()==KeyEvent.VK_ENTER)

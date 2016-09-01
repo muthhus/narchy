@@ -1,12 +1,12 @@
 package nars.experiment.math;
 
-import nars.experiment.misc.DiscreteEnvironment;
-import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.tuple.Tuples;
 import nars.agent.NAgentOld;
+import nars.experiment.misc.DiscreteEnvironment;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.tuple.Tuples;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,16 +28,16 @@ abstract public class Algorithmic implements DiscreteEnvironment {
      int[] target;
      int y;
      boolean done;
-    float rewardSum = 0;
-    int correct  = 0, incorrect = 0;
+    float rewardSum;
+    int correct, incorrect;
 
     int xMax; //determines max part of target which is visible to reader
 
     int nextAction = -1;
-    private int time = 0, lastPredictionTime;
+    private int time, lastPredictionTime;
 
-    boolean trace = false;
-    private int rewPrintPeriod = 10;
+    boolean trace;
+    private final int rewPrintPeriod = 10;
 
     public Algorithmic(int[] space) {
         this(space, 10, false);

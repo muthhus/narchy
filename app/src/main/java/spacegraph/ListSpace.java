@@ -1,9 +1,9 @@
 package spacegraph;
 
 import com.google.common.collect.Lists;
-import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 
 import java.util.Collections;
 import java.util.Iterator;

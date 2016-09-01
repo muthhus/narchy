@@ -112,7 +112,7 @@ public abstract class TermIndex extends TermBuilder {
         } catch (InvalidTermException x) {
             if (Param.DEBUG_EXTRA)
                 logger.info("the {}", x);
-            return False; //place a False placeholder so that a repeat call will not have to discover this manually
+            return Term.False; //place a False placeholder so that a repeat call will not have to discover this manually
         }/* catch (Throwable e) {
                     return False;
                 }*/

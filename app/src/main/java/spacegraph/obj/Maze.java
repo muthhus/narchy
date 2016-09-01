@@ -1,16 +1,14 @@
 package spacegraph.obj;
 
 import nars.$;
-import spacegraph.*;
+import spacegraph.SimpleSpatial;
+import spacegraph.SpaceGraph;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.Transform;
-import spacegraph.phys.math.convexhull.HullDesc;
-import spacegraph.phys.math.convexhull.HullLibrary;
-import spacegraph.phys.math.convexhull.HullResult;
 import spacegraph.phys.shape.*;
 import spacegraph.phys.util.Motion;
 

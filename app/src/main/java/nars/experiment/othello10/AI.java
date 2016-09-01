@@ -13,7 +13,7 @@ public class AI {
     // �[�ǂ݂��郌�x���i�傫���l���Ƃ��̂��������Ԃ��������Ă��܂��̂Œ��Ӂj
     private static final int SEARCH_LEVEL = 7;
     // ���C���p�l���ւ̎Q��
-    private MainPanel panel;
+    private final MainPanel panel;
     // �Ֆʂ̊e�ꏊ�̉��l
     private static final int valueOfPlace[][] = {
             {120, -20, 20,  5,  5, 20, -20, 120},

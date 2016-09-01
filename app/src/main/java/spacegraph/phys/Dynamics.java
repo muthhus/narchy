@@ -23,9 +23,9 @@
 
 package spacegraph.phys;
 
-import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import nars.$;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
 import spacegraph.phys.collision.Islands;
@@ -88,7 +88,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected boolean ownsConstrainer;
     protected OArrayList<RaycastVehicle> vehicles = new OArrayList<RaycastVehicle>();
     protected OArrayList<ActionInterface> actions = new OArrayList<ActionInterface>();
-    protected int profileTimings = 0;
+    protected int profileTimings;
     protected InternalTickCallback preTickCallback;
     private float dt;
     private int nextBodyID;
@@ -331,9 +331,8 @@ public abstract class Dynamics<X> extends Collisions<X> {
                         case Collidable.DISABLE_SIMULATION:
                             color.set(255f, 255f, 0f);
                             break;
-                        default: {
+                        default:
                             color.set(255f, 0f, 0f);
-                        }
                     }
 
                     debugDrawObject(debugDrawer, colObj.getWorldTransform(tmpTrans), colObj.shape(), color);
@@ -401,6 +400,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     /**
      * enable/register the body in the engine
      */
+    @Override
     protected final void on(Collidable c) {
         collidable.add(c);
 
@@ -1125,7 +1125,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 return false;
             }
 
-            Collidable otherObj = (Collidable) proxy0.data;
+            Collidable otherObj = proxy0.data;
 
             // call needsResponse, see http://code.google.com/p/bullet/issues/detail?id=179
             if (intersecter.needsResponse(me, otherObj)) {

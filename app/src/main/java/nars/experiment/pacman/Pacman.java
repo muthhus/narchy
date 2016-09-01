@@ -19,32 +19,27 @@
 
 package nars.experiment.pacman;
 
-import nars.Param;
-import nars.gui.BagChart;
-import nars.op.NAgent;
-import nars.gui.BeliefTableChart;
-import nars.op.VariableCompressor;
-import nars.truth.Truth;
-import nars.util.signal.MotorConcept;
-import nars.util.signal.SensorConcept;
-import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
+import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.NAgent;
+import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.time.FrameClock;
+import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.signal.MotorConcept;
+import nars.util.signal.SensorConcept;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static nars.Op.PROD;
-import static nars.experiment.pong.Pong.numericSensor;
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.experiment.tetris.Tetris.exe;
 

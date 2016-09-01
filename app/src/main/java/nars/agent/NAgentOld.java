@@ -2,7 +2,6 @@ package nars.agent;
 
 import com.google.common.base.Joiner;
 import nars.*;
-import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
@@ -22,6 +21,7 @@ import nars.util.signal.Emotion;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -58,7 +58,7 @@ public class GenericCompound implements Compound {
 
         this.subterms = subterms;
 
-        this.normalized = !subterms.hasAny(Op.VariableBits) && (subterms.varPatterns == 0); /* not included in the count */;
+        this.normalized = !subterms.hasAny(Op.VariableBits) && (subterms.varPatterns == 0); /* not included in the count */
         this.op = op;
 
         this.dt = dt;
@@ -112,10 +112,6 @@ public class GenericCompound implements Compound {
         } else {
             return false;
         }
-
-
-        if (structure()!=cthat.structure())
-            return false;
 
         //subterm sharing:
         TermContainer cs = cthat.subterms();

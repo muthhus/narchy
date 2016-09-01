@@ -18,10 +18,6 @@ public abstract class AtomicBoolCondition extends AtomicString implements BoolCo
     @NotNull
     public abstract String toString();
 
-    @Override
-    public int hashCode() {
-        return toString().hashCode();
-    }
 
     @Override
     public @NotNull Op op() {

@@ -59,7 +59,7 @@ public class GjkEpaSolver {
 	
 	public static class Results {
 		public ResultsStatus status;
-		public final v3[] witnesses/*[2]*/ = new v3[] { new v3(), new v3() };
+		public final v3[] witnesses/*[2]*/ = { new v3(), new v3() };
 		public final v3 normal = new v3();
 		public float depth;
 		public int epa_iterations;
@@ -103,8 +103,8 @@ public class GjkEpaSolver {
 		//public btStackAlloc sa;
 		//public Block sablock;
 		public final He[] table = new He[GJK_hashsize];
-		public final Matrix3f[] wrotations/*[2]*/ = new Matrix3f[] { new Matrix3f(), new Matrix3f() };
-		public final v3[] positions/*[2]*/ = new v3[] { new v3(), new v3() };
+		public final Matrix3f[] wrotations/*[2]*/ = { new Matrix3f(), new Matrix3f() };
+		public final v3[] positions/*[2]*/ = { new v3(), new v3() };
 		public final ConvexShape[] shapes = new ConvexShape[2];
 		public final Mkv[] simplex = new Mkv[5];
 		public final v3 ray = new v3();
@@ -386,7 +386,7 @@ public class GjkEpaSolver {
                     v3 ab = new v3();
                     ab.sub(simplex[1].w, simplex[0].w);
 
-                    v3[] b = new v3[] { new v3(), new v3(), new v3() };
+                    v3[] b = { new v3(), new v3(), new v3() };
                     b[0].set(1f, 0f, 0f);
                     b[1].set(0f, 1f, 0f);
                     b[2].set(0f, 0f, 1f);
@@ -395,7 +395,7 @@ public class GjkEpaSolver {
                     b[1].cross(ab, b[1]);
                     b[2].cross(ab, b[2]);
 
-                    float m[] = new float[] { b[0].lengthSquared(), b[1].lengthSquared(), b[2].lengthSquared() };
+                    float m[] = { b[0].lengthSquared(), b[1].lengthSquared(), b[2].lengthSquared() };
 
                     Quat4f tmpQuat = new Quat4f();
                     tmp.normalize(ab);
@@ -446,13 +446,13 @@ public class GjkEpaSolver {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private static final int[] mod3 = new int[] { 0, 1, 2, 0, 1 };
+	private static final int[] mod3 = { 0, 1, 2, 0, 1 };
 
-	private static final int[][] tetrahedron_fidx/*[4][3]*/ = new int[][] {{2,1,0},{3,0,1},{3,1,2},{3,2,0}};
-	private static final int[][] tetrahedron_eidx/*[6][4]*/ = new int[][] {{0,0,2,1},{0,1,1,1},{0,2,3,1},{1,0,3,2},{2,0,1,2},{3,0,2,2}};
+	private static final int[][] tetrahedron_fidx/*[4][3]*/ = {{2,1,0},{3,0,1},{3,1,2},{3,2,0}};
+	private static final int[][] tetrahedron_eidx/*[6][4]*/ = {{0,0,2,1},{0,1,1,1},{0,2,3,1},{1,0,3,2},{2,0,1,2},{3,0,2,2}};
 
-	private static final int[][] hexahedron_fidx/*[6][3]*/ = new int[][] {{2,0,4},{4,1,2},{1,4,0},{0,3,1},{0,2,3},{1,3,2}};
-	private static final int[][] hexahedron_eidx/*[9][4]*/ = new int[][] {{0,0,4,0},{0,1,2,1},{0,2,1,2},{1,1,5,2},{1,0,2,0},{2,2,3,2},{3,1,5,0},{3,0,4,2},{5,1,4,1}};
+	private static final int[][] hexahedron_fidx/*[6][3]*/ = {{2,0,4},{4,1,2},{1,4,0},{0,3,1},{0,2,3},{1,3,2}};
+	private static final int[][] hexahedron_eidx/*[9][4]*/ = {{0,0,4,0},{0,1,2,1},{0,2,1,2},{1,1,5,2},{1,0,2,0},{2,2,3,2},{3,1,5,0},{3,0,4,2},{5,1,4,1}};
 
 	public static class Face {
 		public final Mkv[] v = new Mkv[3];
@@ -474,7 +474,7 @@ public class GjkEpaSolver {
 		public int nfaces;
 		public int iterations;
 		public final v3[][] features = new v3[2][3];
-		public final v3[] nearest/*[2]*/ = new v3[] { new v3(), new v3() };
+		public final v3[] nearest/*[2]*/ = { new v3(), new v3() };
 		public final v3 normal = new v3();
 		public float depth;
 		public boolean failed;
@@ -734,8 +734,8 @@ public class GjkEpaSolver {
 						float d = bf.n.dot(w.w) + bf.d;
 						bestface = bf;
 						if (d < -accuracy) {
-							Face[] cf = new Face[]{null};
-							Face[] ff = new Face[]{null};
+							Face[] cf = {null};
+							Face[] ff = {null};
 							int nf = 0;
 							Detach(bf);
 							bf.mark = ++markid;

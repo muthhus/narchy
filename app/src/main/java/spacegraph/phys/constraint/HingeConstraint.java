@@ -44,8 +44,8 @@ import spacegraph.phys.solve.JacobianEntry;
  */
 public class HingeConstraint extends TypedConstraint {
 
-	private final JacobianEntry[] jac/*[3]*/ = new JacobianEntry[] { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() }; // 3 orthogonal linear constraints
-	private final JacobianEntry[] jacAng/*[3]*/ = new JacobianEntry[] { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() }; // 2 orthogonal angular constraints+ 1 for limit/motor
+	private final JacobianEntry[] jac/*[3]*/ = { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() }; // 3 orthogonal linear constraints
+	private final JacobianEntry[] jacAng/*[3]*/ = { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() }; // 2 orthogonal angular constraints+ 1 for limit/motor
 
 	private final Transform rbAFrame = new Transform(); // constraint axii. Assumes z is hinge axis.
 	private final Transform rbBFrame = new Transform();
@@ -249,7 +249,7 @@ public class HingeConstraint extends TypedConstraint {
 			v3 relPos = new v3();
 			relPos.sub(pivotBInW, pivotAInW);
 
-			v3[] normal/*[3]*/ = new v3[]{new v3(), new v3(), new v3()};
+			v3[] normal/*[3]*/ = {new v3(), new v3(), new v3()};
 			if (relPos.lengthSquared() > BulletGlobals.FLT_EPSILON) {
 				normal[0].set(relPos);
 				normal[0].normalize();

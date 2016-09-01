@@ -1,13 +1,13 @@
 package nars.experiment.rogue.map;
 
+import nars.experiment.rogue.combat.PtrlConstants;
+import nars.experiment.rogue.util.CityNameGenerator;
+import nars.experiment.rogue.util.GameSettings;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
-
-import nars.experiment.rogue.combat.PtrlConstants;
-import nars.experiment.rogue.util.CityNameGenerator;
-import nars.experiment.rogue.util.GameSettings;
 
 public class GlobalMap implements Serializable
 {
@@ -479,8 +479,7 @@ public class GlobalMap implements Serializable
 			tilemap[x][y][0]=desc;
 			pathfindArray[x][y]=new int[]{0, cs};
 			for (int j=0; j<cities_n; j++)
-				if (cs==j) roadsMatrix[cs][j]=true;
-				else roadsMatrix[cs][j]=false;
+                roadsMatrix[cs][j] = cs == j;
 			cs++;
 		}
 		

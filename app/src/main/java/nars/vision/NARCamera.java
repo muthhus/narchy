@@ -1,11 +1,6 @@
 package nars.vision;
 
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
-import nars.term.atom.Atomic;
-import nars.term.obj.IntTerm;
-import org.eclipse.collections.api.block.predicate.primitive.IntIntPredicate;
-import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
@@ -16,9 +11,14 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
+import nars.term.obj.IntTerm;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.signal.MotorConcept;
+import org.eclipse.collections.api.block.predicate.primitive.IntIntPredicate;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;

@@ -1,16 +1,15 @@
 package nars.experiment.rogue.combat;
 
-import java.io.Serializable;
-import java.text.NumberFormat;
-
+import nars.experiment.rogue.creatures.Attribute;
+import nars.experiment.rogue.creatures.Creature;
+import nars.experiment.rogue.creatures.Skill;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import nars.experiment.rogue.creatures.Attribute;
-import nars.experiment.rogue.creatures.Creature;
-import nars.experiment.rogue.creatures.Skill;
+import java.io.Serializable;
+import java.text.NumberFormat;
 
 /**
  * Attack specification. Describes the attack type. 

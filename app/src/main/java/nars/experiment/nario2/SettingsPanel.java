@@ -1,19 +1,10 @@
 
 package nars.experiment.nario2;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel; 
-import javax.swing.JButton; 
-import javax.swing.JSlider;
-import java.awt.Color; 
-import java.awt.Graphics; 
-import java.awt.event.KeyEvent; 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.Dimension; 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.awt.event.KeyEvent;
 
 public class SettingsPanel extends JPanel
 {

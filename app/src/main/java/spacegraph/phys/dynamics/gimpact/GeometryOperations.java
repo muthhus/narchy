@@ -118,7 +118,7 @@ class GeometryOperations {
 
 		v3 N = new v3();
 		N.cross(AD, BD);
-		float[] tp = new float[] { N.lengthSquared() };
+		float[] tp = { N.lengthSquared() };
 
 		Vector4f _M = new Vector4f();//plane
 

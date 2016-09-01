@@ -1,26 +1,24 @@
 package nars.op;
 
 import alice.tuprolog.*;
-import nars.*;
-import nars.nal.Tense;
-import nars.task.MutableTask;
-import nars.truth.Truth;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
+import nars.$;
+import nars.NAR;
+import nars.Op;
+import nars.Task;
 import nars.concept.Concept;
 import nars.data.Range;
+import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
+import nars.truth.Truth;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -84,9 +82,9 @@ public class PrologCore extends Agent implements Consumer<Task> {
     @Range(min = 0, max = 1.0)
     public final MutableFloat answerConf = new MutableFloat(confThreshold.floatValue()*0.9f);
 
-    private float existingAnswerThreshold = 0.5f;
+    private final float existingAnswerThreshold = 0.5f;
 
-    private long timeoutMS = 50;
+    private final long timeoutMS = 50;
 
 
     /*final ObjectBooleanHashMap<Term> beliefs = new ObjectBooleanHashMap() {

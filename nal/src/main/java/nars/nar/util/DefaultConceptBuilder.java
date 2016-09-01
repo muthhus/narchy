@@ -26,8 +26,6 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import static nars.Op.INT;
-import static nars.Op.INTRANGE;
 import static nars.nal.Tense.DTERNAL;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
@@ -65,7 +63,11 @@ import static nars.nal.Tense.DTERNAL;
     }
 
     @NotNull
-    private ConceptPolicy init, awake, sleep;
+    private final ConceptPolicy init;
+    @NotNull
+    private final ConceptPolicy awake;
+    @NotNull
+    private final ConceptPolicy sleep;
     private NAR nar;
 
 

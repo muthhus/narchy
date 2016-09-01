@@ -1,23 +1,25 @@
 package nars.experiment.tetris;
 
 import com.google.common.collect.Lists;
-import nars.*;
-import nars.nar.Executioner;
-import nars.nar.SingleThreadExecutioner;
-import nars.term.obj.IntTerm;
-import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import nars.$;
+import nars.NAR;
+import nars.NARLoop;
+import nars.Param;
 import nars.data.AutoClassifier;
-import nars.op.NAgent;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.index.CaffeineIndex;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.nar.Executioner;
+import nars.nar.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.NAgent;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.obj.IntTerm;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -27,6 +29,7 @@ import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
@@ -36,9 +39,8 @@ import spacegraph.obj.MatrixView;
 import spacegraph.obj.Plot2D;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Random;
 
-import static nars.$.t;
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.VERTICAL;
@@ -59,7 +61,7 @@ public class Tetris extends NAgent {
     public static final int tetris_width = 6;
     public static final int tetris_height = 13;
     public static final int TIME_PER_FALL = 6;
-    static boolean easy = false;
+    static boolean easy;
 
     static int frameDelay;
 

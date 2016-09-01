@@ -2,7 +2,6 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
-import nars.nal.TermBuilder;
 import nars.op.data.differ;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,8 +11,8 @@ import org.junit.Test;
 import static nars.$.*;
 import static nars.Op.CONJ;
 import static nars.io.NarseseTest.assertInvalid;
-import static nars.nal.TermBuilder.False;
-import static nars.nal.TermBuilder.True;
+import static nars.term.Term.False;
+import static nars.term.Term.True;
 import static nars.term.TermTest.assertValid;
 import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static org.junit.Assert.*;
@@ -506,8 +505,8 @@ public class TermReductionsTest {
 
     @Test
     public void testFilterCoNegatedStatements() {
-        assertEquals(TermBuilder.False, $("((--,(a1)) <-> (a1))"));
-        assertEquals(TermBuilder.False, $("((--,(a1)) --> (a1))"));
+        assertEquals(Term.False, $("((--,(a1)) <-> (a1))"));
+        assertEquals(Term.False, $("((--,(a1)) --> (a1))"));
     }
 
 
@@ -550,7 +549,7 @@ public class TermReductionsTest {
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<=>a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a-->a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a==>a),c:d,e:f)"));
-        assertInvalid("(&&,(--,(a==>a)),c:d,e:f)"); //INVALID
+        assertEquals(Term.False, $("(&&,(--,(a==>a)),c:d,e:f)"));
 
     }
 

@@ -1,23 +1,19 @@
 package nars.nal;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.*;
-import nars.*;
-import nars.term.container.TermSet;
-import nars.term.obj.IntTerm;
-import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import nars.task.GeneratedTask;
+import nars.$;
+import nars.Op;
 import nars.term.Compound;
-import nars.term.InvalidTermException;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.container.TermContainer;
+import nars.term.container.TermSet;
 import nars.term.container.TermVector;
+import nars.term.obj.IntTerm;
 import nars.term.obj.Termject.IntInterval;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
@@ -25,23 +21,23 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.Op.*;
-import static nars.nal.Tense.DTERNAL;
+import static nars.Op.INT;
+import static nars.Op.INTRANGE;
 
 /**
  * arithmetic rule mining & variable introduction
  */
 public class ArithmeticInduction {
 
-    final static String tag = ArithmeticInduction.class.getSimpleName();
 
     public static Logger logger = LoggerFactory.getLogger(ArithmeticInduction.class);
-    private static boolean trace = false;
 
     @Nullable
     public static IntArrayList ints(List<Term> term) {

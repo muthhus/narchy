@@ -15,13 +15,10 @@ import org.infinispan.util.function.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
-import spacegraph.layout.Flatten;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.shape.SphereShape;
 
 import java.util.List;
-
-import static spacegraph.math.v3.v;
 
 
 /**
@@ -185,6 +182,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         on = nar.onFrame(nn -> updateIfNotBusy(this::update));
     }
 
+    @Override
     public final synchronized void stop() {
         on.off();
         on = null;

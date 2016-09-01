@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.NEG;
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.TermBuilder.False;
 
 /**
  * substituteIfUnifies....(term, varFrom, varTo)

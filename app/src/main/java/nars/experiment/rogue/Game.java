@@ -1,30 +1,21 @@
 package nars.experiment.rogue;
 
-import java.util.ArrayList;
-import java.awt.event.KeyEvent;
-import java.io.*;
-import java.util.Objects;
-
-import nars.experiment.rogue.combat.AttackResult;
-import nars.experiment.rogue.combat.PtrlConstants;
-import nars.experiment.rogue.combat.RangedAttack;
-import nars.experiment.rogue.combat.RangedAttackType;
-import nars.experiment.rogue.combat.UnarmedAttackType;
+import nars.experiment.rogue.combat.*;
 import nars.experiment.rogue.creatures.Creature;
 import nars.experiment.rogue.creatures.Player;
 import nars.experiment.rogue.items.Equipment;
 import nars.experiment.rogue.items.Item;
 import nars.experiment.rogue.map.*;
-import nars.experiment.rogue.ui.*;
 import nars.experiment.rogue.ui.Console;
-import nars.experiment.rogue.util.GameSettings;
-import nars.experiment.rogue.util.GameTime;
-import nars.experiment.rogue.util.MapEvent;
-import nars.experiment.rogue.util.Message;
-import nars.experiment.rogue.util.MessageStack;
-import org.xml.sax.*;
+import nars.experiment.rogue.ui.*;
+import nars.experiment.rogue.util.*;
+import org.xml.sax.SAXException;
 
-import javax.xml.parsers.*;
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.event.KeyEvent;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Objects;
 
 import static nars.experiment.rogue.ui.Controls.*;
 

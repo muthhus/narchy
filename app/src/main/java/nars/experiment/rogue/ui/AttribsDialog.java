@@ -1,10 +1,10 @@
 package nars.experiment.rogue.ui;
 
-import java.awt.event.KeyEvent;
-
 import nars.experiment.rogue.combat.PtrlConstants;
 import nars.experiment.rogue.creatures.Creature;
 import nars.experiment.rogue.creatures.Player;
+
+import java.awt.event.KeyEvent;
 
 public class AttribsDialog implements IGameScreen
 {
@@ -15,7 +15,8 @@ public class AttribsDialog implements IGameScreen
 		cur=0;
 	}
 	
-	public void paint(Console c)
+	@Override
+    public void paint(Console c)
 	{
 		c.clear();
 		int sh=c.getSymHeight();
@@ -40,7 +41,8 @@ public class AttribsDialog implements IGameScreen
 
 	}
 
-	public boolean getKeyEvent(KeyEvent ke)
+	@Override
+    public boolean getKeyEvent(KeyEvent ke)
 	{
 		int code = ke.getKeyCode();
 		char ch=ke.getKeyChar();

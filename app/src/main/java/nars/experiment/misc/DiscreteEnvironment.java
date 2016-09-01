@@ -1,8 +1,8 @@
 package nars.experiment.misc;
 
-import org.eclipse.collections.api.tuple.Twin;
 import nars.learn.Agent;
 import nars.util.Util;
+import org.eclipse.collections.api.tuple.Twin;
 
 import java.util.Arrays;
 

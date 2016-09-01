@@ -33,7 +33,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
     /** prevents physics movement */
     public boolean motionLock;
 
-    public float radius = 0;
+    public float radius;
     private List<Collidable<X>> bodies = Collections.emptyList();
 
     protected float[] shapeColor;

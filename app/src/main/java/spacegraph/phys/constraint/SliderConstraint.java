@@ -90,10 +90,10 @@ public class SliderConstraint extends TypedConstraint {
 	protected boolean solveLinLim;
 	protected boolean solveAngLim;
 
-	protected JacobianEntry[] jacLin = new JacobianEntry[/*3*/] { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() };
+	protected JacobianEntry[] jacLin = { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() };
 	protected float[] jacLinDiagABInv = new float[3];
 
-	protected JacobianEntry[] jacAng = new JacobianEntry[/*3*/] { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() };
+	protected JacobianEntry[] jacAng = { new JacobianEntry(), new JacobianEntry(), new JacobianEntry() };
 
 	protected float timeStep;
 	protected final Transform calculatedTransformA = new Transform();

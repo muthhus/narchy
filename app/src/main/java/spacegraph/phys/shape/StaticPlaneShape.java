@@ -85,7 +85,7 @@ public class StaticPlaneShape extends ConcaveShape {
 		tmp.scale(planeNormal.dot(center) - planeConstant, planeNormal);
 		projectedCenter.sub(center, tmp);
 
-		v3[] triangle = new v3[] { new v3(), new v3(), new v3() };
+		v3[] triangle = { new v3(), new v3(), new v3() };
 
 		tmp1.scale(radius, tangentDir0);
 		tmp2.scale(radius, tangentDir1);

@@ -133,7 +133,7 @@ class DefaultShapeRenderer implements ShapeRenderer {
     public void fillTriangle(TerminalPosition p1, TerminalPosition p2, TerminalPosition p3, TextCharacter character) {
         //I've used the algorithm described here:
         //http://www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
-        TerminalPosition[] points = new TerminalPosition[]{p1, p2, p3};
+        TerminalPosition[] points = {p1, p2, p3};
         Arrays.sort(points, new Comparator<TerminalPosition>() {
             @Override
             public int compare(TerminalPosition o1, TerminalPosition o2) {

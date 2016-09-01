@@ -3,8 +3,6 @@ package nars.gui;
 import com.jogamp.opengl.GL2;
 import nars.NAR;
 import nars.Task;
-import nars.bag.Bag;
-import nars.concept.Concept;
 import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
@@ -14,8 +12,6 @@ import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.phys.Dynamic;
 import spacegraph.render.Draw;
-
-import java.util.function.Predicate;
 
 import static spacegraph.math.v3.v;
 

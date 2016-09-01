@@ -1,19 +1,17 @@
 package nars.op;
 
+import nars.$;
+import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.nal.ArithmeticInduction;
-import org.eclipse.collections.impl.bag.mutable.HashBag;
-import nars.$;
-import nars.NAR;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
+import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

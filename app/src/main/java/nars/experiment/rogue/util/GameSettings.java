@@ -1,18 +1,13 @@
 package nars.experiment.rogue.util;
 
-import java.awt.Font;
-import java.io.File;
-import java.net.URISyntaxException;
+import org.w3c.dom.*;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-import org.xml.sax.SAXParseException;
+import java.awt.*;
+import java.io.File;
+import java.net.URISyntaxException;
 
 //Singleton pattern used
 public class GameSettings {

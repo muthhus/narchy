@@ -3,24 +3,14 @@ package nars.experiment.nario2.mapeditor;
 
 import nars.experiment.nario2.GameModel;
 
-import java.awt.Image;
-import javax.swing.ImageIcon;
-import java.awt.event.MouseAdapter; 
-import java.awt.event.MouseEvent; 
-import java.awt.Color;
-import javax.swing.JButton; 
-import java.awt.event.ActionEvent; 
-import java.awt.event.ActionListener; 
-import javax.swing.JDialog;
-import javax.swing.JTextArea;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent; 
-import javax.swing.JFileChooser;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
 
 public class ImageSelect extends JPanel
 {
