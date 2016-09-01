@@ -92,8 +92,39 @@ public class ArithmeticInductionTest {
                         p(the("x"), the(2)),
                         p(the(2), the("y")),
                         p(the(3), the("y"))
+                ).toString()
+        );
+    }
+
+    @Test public void testIntRangeMultiple() {
+        //two separate intervals
+        assertEquals(
+                "(&&,(x,`1<=?<=2`),(x,`4<=?<=6`),(x,`8`))",
+                conj(
+                        p(the("x"), the(1)),
+                        p(the("x"), the(2)),
+                        p(the("x"), the(4)),
+                        p(the("x"), the(5)),
+                        p(the("x"), the(6)),
+                        p(the("x"), the(8))
                 )
-                    .toString()
+                        .toString()
+        );
+    }
+
+    @Test public void testIntRangeMultipleNegation() {
+        //two separate intervals
+        assertEquals(
+                "(&&,(--,(x,`4<=?<=6`)),(x,`1<=?<=2`),(x,`8`))",
+                conj(
+                        p(the("x"), the(1)),
+                        p(the("x"), the(2)),
+                        $.neg(p(the("x"), the(4))),
+                        $.neg(p(the("x"), the(5))),
+                        $.neg(p(the("x"), the(6))),
+                        p(the("x"), the(8))
+                )
+                        .toString()
         );
     }
     @Test public void testIntRangeDual2() {
@@ -103,8 +134,7 @@ public class ArithmeticInductionTest {
                 conj(
                         p(the(3), the(1)),
                         p(the(2), the(2))
-                )
-                        .toString()
+                ).toString()
         );
     }
 

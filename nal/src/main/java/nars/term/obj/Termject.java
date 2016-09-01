@@ -167,11 +167,11 @@ public interface Termject<X> extends Term {
         }
 
 
-        @Override
-        public int complexity() {
-            return 0; //it's like a variable
-        }
-
+//        @Override
+//        public int complexity() {
+//            return 0; //it's like a variable
+//        }
+//
 //        @Override
 //        public int varQuery() {
 //            return 1; //pretend to be a query variable to allow unification
@@ -205,16 +205,25 @@ public interface Termject<X> extends Term {
         @NotNull
         @Override
         public String toString() {
-            Range<Integer> r = val;
-            int l = r.lowerEndpoint();
-            int u = r.upperEndpoint();
-            if (r.upperBoundType() == BoundType.OPEN) {
-                u--;
-            }
-            if (r.lowerBoundType() == BoundType.OPEN) {
+            int u = max();
+            int l = min();
+            return "`" + l + "<=?<=" + u + '`';
+        }
+
+        public int min() {
+            int l = val.lowerEndpoint();
+            if (val.lowerBoundType() == BoundType.OPEN) {
                 l++;
             }
-            return "`" + l + "<=?<=" + u + '`';
+            return l;
+        }
+
+        public int max() {
+            int u = val.upperEndpoint();
+            if (val.upperBoundType() == BoundType.OPEN) {
+                u--;
+            }
+            return u;
         }
 
 
