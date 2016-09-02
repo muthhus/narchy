@@ -857,7 +857,8 @@ public enum $ {
         return null;
     }
 
-    @Nullable public static Term conj(Term x, int dt, Term y) {
+    /** conjunction sequence (2-ary) */
+    @Nullable public static Term seq(Term x, int dt, Term y) {
         return compound(CONJ, dt, x, y); //must be a vector, not set
     }
 

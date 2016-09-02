@@ -109,7 +109,7 @@ public class VariableCompressor implements Consumer<Task> {
             newContent =
                 //$.secte( newContent,
                     //$.impl(
-                $.conj(
+                $.seq(
                     $.sim(var, max),
                     task.dt() == 0 ? 0 : DTERNAL, //allow +0 to merge with the other part
                         //DTERNAL,

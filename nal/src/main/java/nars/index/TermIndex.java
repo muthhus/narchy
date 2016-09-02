@@ -38,8 +38,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.Op.INH;
+import static nars.Op.NEG;
 import static nars.Op.VAR_PATTERN;
 import static nars.nal.Tense.DTERNAL;
+import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;
 
@@ -111,11 +113,12 @@ public abstract class TermIndex extends TermBuilder {
             return super.the(pc.op(), pc.dt(), pc.terms());
         } catch (InvalidTermException x) {
             if (Param.DEBUG_EXTRA)
-                logger.info("the {}", x);
-            return Term.False; //place a False placeholder so that a repeat call will not have to discover this manually
-        }/* catch (Throwable e) {
-                    return False;
-                }*/
+                logger.info("the {} {}", pc, x);
+            return False; //place a False placeholder so that a repeat call will not have to discover this manually
+        } catch (Throwable e) {
+            logger.error("the {} {}", pc ,e);
+            return False;
+        }
     };
 
     @NotNull public final Term cached(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
@@ -431,9 +434,11 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable public final Compound normalize(@NotNull Compound t) {
 
+//        if (t.op() == NEG)
+//            throw new RuntimeException("should not be neg");
+
         if (t.isNormalized())
             return t;
-
 
         TermContainer src = t.subterms();
         TermContainer tgt = normalize(src);
@@ -447,7 +452,8 @@ public abstract class TermIndex extends TermBuilder {
             Compound c = compoundOrNull(the(t, tgt));
             if (c!=null) {
                 ((GenericCompound)c).setNormalized();
-                return c;
+
+                return (Compound) $.unneg((Compound)c).term(); //some cases it may normalize to neg
             }
         }
 

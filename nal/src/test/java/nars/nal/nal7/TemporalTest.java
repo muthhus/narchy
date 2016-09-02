@@ -254,8 +254,8 @@ public class TemporalTest {
     @Test public void testCommutiveWithCompoundSubterm() {
         Term a = $("(((--,(b0)) &&+0 (pre_1)) &&+10 (else_0))");
         Term b = $("((else_0) &&-10 ((--,(b0)) &&+0 (pre_1)))");
-        Term c = $.conj($("((--,(b0)) &&+0 (pre_1))"), 10, $("(else_0)"));
-        Term d = $.conj($("(else_0)"), -10, $("((--,(b0)) &&+0 (pre_1))"));
+        Term c = $.seq($("((--,(b0)) &&+0 (pre_1))"), 10, $("(else_0)"));
+        Term d = $.seq($("(else_0)"), -10, $("((--,(b0)) &&+0 (pre_1))"));
 
 //        System.out.println(a);
 //        System.out.println(b);

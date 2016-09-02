@@ -194,13 +194,13 @@ abstract public class NAgent {
 
         //what co-occurs with reward R
         predictors.add(
-                nar.ask($.conj(what, dt, happy.term()), '?', ETERNAL)
+                nar.ask($.seq(what, dt, happy.term()), '?', ETERNAL)
         );
         predictors.add(
-                nar.ask($.conj(what, dt, happy.term()), '?', now)
+                nar.ask($.seq(what, dt, happy.term()), '?', now)
         );
         predictors.add( //+2 cycles ahead
-                nar.ask($.conj(what, dt*2, happy.term()), '?', now)
+                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
         );
 
 
@@ -212,10 +212,10 @@ abstract public class NAgent {
 
             //does action A co-occur with reward R?
             predictors.add(
-                    nar.ask($.conj(x.term(), dt, happy.term()), '?', ETERNAL)
+                    nar.ask($.seq(x.term(), dt, happy.term()), '?', ETERNAL)
             );
             predictors.add(
-                    nar.ask($.conj(x.term(), dt, happy.term()), '?', now)
+                    nar.ask($.seq(x.term(), dt, happy.term()), '?', now)
             );
 
 

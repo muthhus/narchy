@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import static nars.Op.NEG;
+
 
 public enum TermLinkBuilder {
     ;
@@ -60,6 +62,9 @@ public enum TermLinkBuilder {
             if (t instanceof Compound) {
                 t = nar.normalize((Compound) t);
             }
+
+            if (t.op() == NEG)
+                throw new RuntimeException("should not be NEG");
 
             //it seems that its possible that t can become null from normalizing a temporal compound,
             // if it collapses values to atemporal state

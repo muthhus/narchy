@@ -421,10 +421,10 @@ public class NAgentOld implements Agent {
 
             //what co-occurs with reward R
             predictors.add(
-                (MutableTask) nar.ask($.conj(what, dt, x.term()), '?', ETERNAL)
+                (MutableTask) nar.ask($.seq(what, dt, x.term()), '?', ETERNAL)
             );
             predictors.add(
-                (MutableTask) nar.ask($.conj(what, dt, x.term()), '?', nar.time())
+                (MutableTask) nar.ask($.seq(what, dt, x.term()), '?', nar.time())
             );
         }
 
@@ -437,7 +437,7 @@ public class NAgentOld implements Agent {
             for (Concept y : rewardConcepts) {
                 //does action A imply reward R?
                 predictors.add(
-                    (MutableTask) nar.ask($.conj(x.term(), dt, y.term()), '?', ETERNAL)
+                    (MutableTask) nar.ask($.seq(x.term(), dt, y.term()), '?', ETERNAL)
                 );
             }
 

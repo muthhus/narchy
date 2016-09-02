@@ -21,6 +21,7 @@ package nars.experiment.pacman;
 
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;

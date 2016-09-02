@@ -182,7 +182,7 @@ public class MySTMClustered extends STMClustered {
 			int dt = (int)(late.occurrence() - early.occurrence());
 
 
-			return $.conj(
+			return $.seq(
 					$.negIf(early.term(), negated),
 					dt,
 					$.negIf(late.term(), negated)

@@ -26,6 +26,7 @@ import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.XTERNAL;
+import static nars.term.Term.False;
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.compound.Statement.pred;
 import static nars.term.compound.Statement.subj;
@@ -36,11 +37,8 @@ import static nars.term.compound.Statement.subj;
 public abstract class TermBuilder {
 
 
-    /** when a conjunction cancels itself, the truth that should replace it (as it may fall through to a superterm, etc)*/
-    public static final Atom SELF_CANCELLED_CONJ_TRUTH = Term.False;
-
     private static final Term[] TrueArray = {Term.True};
-    public static final TermContainer InvalidSubterms = TermVector.the(Term.False);
+    public static final TermContainer InvalidSubterms = TermVector.the(False);
     /**
      * implications, equivalences, and interval
      */
@@ -59,7 +57,7 @@ public abstract class TermBuilder {
             case PROD:
                 return Terms.ZeroProduct;
             default:
-                return Term.False;
+                return False;
         }
     }
 
@@ -87,7 +85,7 @@ public abstract class TermBuilder {
         if (retained == size) { //same as 'a'
             return a;
         } else if (retained == 0) {
-            return Term.False; //empty set
+            return False; //empty set
         } else {
             return the(o, terms.toArray(new Term[retained]));
         }
@@ -173,17 +171,30 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    @NotNull
-    private static Term[] conjTrueFalseFilter(@NotNull Term[] u) {
+    /** collection implementation of the conjunction true/false filter */
+    private TreeSet<Term> conjTrueFalseFilter(TreeSet<Term> terms) {
+        Iterator<Term> ii = terms.iterator();
+        while (ii.hasNext()) {
+            Term n = ii.next();
+            if (isTrue(n))
+                ii.remove();
+            else if (isFalse(n))
+                return null;
+        }
+        return terms;
+    }
+
+    /** array implementation of the conjunction true/false filter */
+    @NotNull private static Term[] conjTrueFalseFilter(@NotNull Term[] u) {
         int trues = 0; //# of True subterms that can be eliminated
         for (Term x : u) {
             if (x.equals(Term.True)) {
                 trues++;
-            } else if (x.equals(Term.False)) {
+            } else if (x.equals(False)) {
 
                 //false subterm in conjunction makes the entire condition false
                 //this will eventually reduce diectly to false in this method's only callee HACK
-                return new Term[]{Term.False};
+                return new Term[]{False};
 
             }
         }
@@ -255,7 +266,7 @@ public abstract class TermBuilder {
                 if ((et0.op() == set && et1.op() == set))
                     return difference(set, (Compound) et0, (Compound) et1);
                 else
-                    return et0.equals(et1) ? Term.False : finish(op, t);
+                    return et0.equals(et1) ? False : finish(op, t);
             default:
                 throw new InvalidTermException(op, t, "diff requires 2 terms");
         }
@@ -286,7 +297,7 @@ public abstract class TermBuilder {
     }
 
     public static boolean isFalse(@NotNull Term x) {
-        return x.equals(Term.False);
+        return x.equals(False);
     }
 
 
@@ -307,7 +318,7 @@ public abstract class TermBuilder {
                    throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
 
                 //any other term causes it to be invalid/meaningless
-                return Term.False;
+                return False;
             }
         }
 
@@ -368,20 +379,20 @@ public abstract class TermBuilder {
 
         //HACK testing for equality like this is not a complete solution. for that we need a new special term type
 
-        if (isTrue(t)) return Term.False;
+        if (isTrue(t)) return False;
         if (isFalse(t)) return Term.True;
 
         if (t.op() == NEG) {
             // (--,(--,P)) = P
             t = ((TermContainer) t).term(0);
 
-            if (isTrue(t)) return Term.False;
+            if (isTrue(t)) return False;
             if (isFalse(t)) return Term.True;
 
             return t;
 
         } else {
-            return (t instanceof Compound) || (t.op().var) ? finish(NEG, t) : Term.False;
+            return (t instanceof Compound) || (t.op().var) ? finish(NEG, t) : False;
         }
     }
 
@@ -415,7 +426,7 @@ public abstract class TermBuilder {
 
         int n = u.length;
         if (n == 0)
-            return Term.False;
+            return False;
 
         if (n == 1) {
             Term only = u[0];
@@ -477,7 +488,7 @@ public abstract class TermBuilder {
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
         if (u.length == 0)
-            return Term.False;
+            return False;
 
         assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
@@ -489,17 +500,22 @@ public abstract class TermBuilder {
         int n = s.size();
         switch (n) {
             case 0:
-                return SELF_CANCELLED_CONJ_TRUTH;
+                return False;
             case 1:
                 return s.iterator().next();
             default:
-                s = junctionGroupNonDTSubterms(s, dt);
-                if (s.isEmpty())
-                    return SELF_CANCELLED_CONJ_TRUTH; //wtf
-                return finish(op, dt, TermSet.the(s));
+                @Nullable TreeSet<Term> cs = junctionGroupNonDTSubterms(s, dt);
+                if (cs == null)
+                    return False;
+                TreeSet<Term> ts = conjTrueFalseFilter(cs);
+                if (ts == null || ts.isEmpty())
+                    return False;
+                return finish(op, dt, TermSet.the(ts));
         }
 
     }
+
+
 
     /**
      * this is necessary to keep term structure consistent for intermpolation.
@@ -507,13 +523,17 @@ public abstract class TermBuilder {
      * flattening and intermpolation is prevented from destroying temporal
      * measurements.
      */
-    @NotNull
+    @Nullable
     protected TreeSet<Term> junctionGroupNonDTSubterms(@NotNull TreeSet<Term> s, int innerDT) {
         TreeSet<Term> outer = new TreeSet();
         Iterator<Term> ss = s.iterator();
         while (ss.hasNext()) {
             Term x = ss.next();
-            if (x.op() == CONJ /* dt will be something other than 'innerDT' having just been flattened */) {
+            if (isTrue(x)) {
+                ss.remove();
+            } else if (isFalse(x)) {
+                return null;
+            } else if (x.op() == CONJ /* dt will be something other than 'innerDT' having just been flattened */) {
                 outer.add(x);
                 ss.remove();
             }
@@ -522,17 +542,21 @@ public abstract class TermBuilder {
             return s; //no change
         }
 
+        Term next = null;
         switch (s.size()) {
             case 0:
                 return outer;
             case 1:
-                outer.add(s.iterator().next());
-                return outer;
+                next = s.iterator().next();
+                break;
             default:
-                outer.add(finish(CONJ, innerDT, TermSet.the(s)));
-                return outer;
+                next = finish(CONJ, innerDT, TermSet.the(s));
+                break;
         }
 
+        outer.add(next);
+
+        return outer;
     }
 
     /**
@@ -601,7 +625,7 @@ public abstract class TermBuilder {
                     if (isTrue(subject)) {
                         return predicate;
                     } else if (isFalse(subject) || isTrueOrFalse(predicate)) {
-                        return Term.False;
+                        return False;
                         //throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
                         //return negation(predicate); /??
                     }
@@ -644,7 +668,7 @@ public abstract class TermBuilder {
 
             //if either the subject or pred are True/False by this point, fail
             if (isTrueOrFalse(subject) || isTrueOrFalse(predicate)) {
-                return subject.equals(predicate) ? Term.True : Term.False;
+                return subject.equals(predicate) ? Term.True : False;
             }
 
             //compare unneg'd if it's not temporal or eternal/parallel
@@ -652,7 +676,7 @@ public abstract class TermBuilder {
             Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject).term() : subject;
             Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate).term() : predicate;
             if (Terms.equalsAnonymous(sRoot, pRoot))
-                return subject.op() == predicate.op() ? Term.True : Term.False; //True if same, False if negated
+                return subject.op() == predicate.op() ? Term.True : False; //True if same, False if negated
 
 
             //TODO its possible to disqualify invalid statement if there is no structural overlap here??

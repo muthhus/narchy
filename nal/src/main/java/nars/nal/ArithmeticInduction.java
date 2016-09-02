@@ -39,6 +39,11 @@ public class ArithmeticInduction {
 
     @NotNull
     public static TermContainer compress(@NotNull TermContainer subs) {
+        return compress(subs, 2);
+    }
+
+    @NotNull
+    public static TermContainer compress(@NotNull TermContainer subs, int depthRemain) {
 
         int subCount = subs.size();
         if (subCount == 1 || !subs.hasAny(Op.INT))
@@ -61,7 +66,7 @@ public class ArithmeticInduction {
 
                 if (gs > 1) {
                     TermContainer gg = TermVector.the(stg);
-                    gg = compress(gg);
+                    gg = compress(gg, depthRemain-1);
                     for (Term ggg : gg)
                         ss.add(ggg);
                 } else {
@@ -70,7 +75,7 @@ public class ArithmeticInduction {
 
             }
 
-            return recompressIfChanged(subs, ss);
+            return recompressIfChanged(subs, ss, depthRemain-1);
         }
 
         //group again according to appearance of unique atoms
@@ -86,11 +91,11 @@ public class ArithmeticInduction {
             Set<Term> ss = new TreeSet();
             for (Collection<Term> ssg : subAtomSeqs.asMap().values()) {
                 TermContainer gg = TermVector.the(ssg);
-                gg = compress(gg);
+                gg = compress(gg, depthRemain-1);
                 for (Term ggg : gg)
                     ss.add(ggg);
             }
-            return recompressIfChanged(subs, ss);
+            return recompressIfChanged(subs, ss, -1);
         }
 
 
@@ -222,20 +227,26 @@ public class ArithmeticInduction {
         if (result.isEmpty()) {
             return subs;
         } else {
-            return recompressIfChanged(subs, result);
+            return recompressIfChanged(subs, result, depthRemain-1);
         }
 
     }
 
     public
     @NotNull
-    static TermContainer recompressIfChanged(@NotNull TermContainer subs, Set<Term> ss) {
+    static TermContainer recompressIfChanged(@NotNull TermContainer subs, Set<Term> ss, int depthRemain) {
         //try {
+
         TermSet newSubs = TermSet.the(ss);
-        if (newSubs.equals(subs))
+        if (newSubs.equals(subs)) {
             return subs; //nothing changed
-        else
-            return compress(newSubs);
+        } else {
+            if (depthRemain == 0)
+                return newSubs;
+            else
+                return compress(newSubs, depthRemain);
+            //return newSubs;
+        }
 //        } catch (StackOverflowError e) {
 //            throw new RuntimeException("compression: " + subs + " " + ss);
 //        }

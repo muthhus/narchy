@@ -2,6 +2,7 @@ package nars.index;
 
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
@@ -31,6 +32,12 @@ public abstract class MaplikeIndex extends TermIndex {
     @NotNull
     @Override
     public Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
+        if (Param.DEBUG) {
+            for (Term x : subterms) {
+                if (isTrueOrFalse(x))
+                    throw new RuntimeException(x + " in " + subterms + " making " + op + " " + dt);
+            }
+        }
         return new GenericCompound(op, dt, subterms);
     }
 

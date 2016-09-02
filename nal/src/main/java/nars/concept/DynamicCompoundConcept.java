@@ -221,7 +221,10 @@ public class DynamicCompoundConcept extends CompoundConcept {
                     int min = i1.min();
                     List<Compound> t = $.newArrayList(1 + max - min);
                     for (int i = min; i <= max; i++) {
-                        t.add((Compound) $.terms.transform(c, e.getKey(), $.the(i)));
+                        @Nullable Term c1 = $.terms.transform(c, e.getKey(), $.the(i));
+                        if (!(c1 instanceof Compound))
+                            continue;
+                        t.add((Compound) c1);
                     }
                     return t.iterator();
                 }
@@ -238,10 +241,15 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
                     for (int i = min1; i <= max1; i++) {
                         for (int j = min2; j <= max2; j++) {
-                            Compound d = c;
-                            d = (Compound) $.terms.transform(d, e1.getKey(), $.the(i));
-                            d = (Compound) $.terms.transform(d, e2.getKey(), $.the(j));
-                            t.add(d);
+                            Term c1 = $.terms.transform(c, e1.getKey(), $.the(i));
+                            if (!(c1 instanceof Compound))
+                                //throw new RuntimeException("how not transformed to compound");
+                                continue;
+                            Term c2 = $.terms.transform((Compound)c1, e2.getKey(), $.the(j));
+                            if (!(c2 instanceof Compound))
+                                //throw new RuntimeException("how not transformed to compound");
+                                continue;
+                            t.add((Compound)c2);
                         }
                     }
                     return t.iterator();

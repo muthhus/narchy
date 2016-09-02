@@ -53,7 +53,7 @@ public class ArithmeticInductionTest {
     @Test public void testInvalidDueToDT() {
         assertEquals(
                 "((x,1) &&+1 (x,2))",
-                conj(p(the("x"), the(1)), 1, p(the("x"), the(2))).toString()
+                seq(p(the("x"), the(1)), 1, p(the("x"), the(2))).toString()
         );
     }
 
