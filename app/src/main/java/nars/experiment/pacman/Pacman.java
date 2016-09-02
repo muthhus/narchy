@@ -54,7 +54,7 @@ public class Pacman extends NAgent {
 
     final int visionRadius;
     final int itemTypes = 3;
-    final static int runCycles = 200000;
+    final static int runCycles = 200;
     final static int runDelay = 0 /* ms */;
 
 
