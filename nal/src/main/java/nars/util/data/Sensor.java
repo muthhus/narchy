@@ -49,11 +49,11 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     char punc = '.';
 
-    private long lastInput;
+    public long lastInputTime;
 
     public final static FloatToFloatFunction direct = n -> n;
     @Nullable
-    private Task next;
+    public Task next;
     private int dt;
 
 
@@ -70,7 +70,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         pri(pri);
         this.dur = dur;
-        this.lastInput = n.time() - 1;
+        this.lastInputTime = n.time() - 1;
 
         this.prevF = Float.NaN;
         init();
@@ -102,18 +102,18 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     /** clears timing information so it thinks it will need to input on next attempt */
     public void ready() {
-        this.lastInput = nar.time() - minTimeBetweenUpdates;
+        this.lastInputTime = nar.time() - minTimeBetweenUpdates;
     }
 
     @Override
     public void accept(@NotNull NAR nar) {
 
         long now = nar.time();
-        int timeSinceLastInput = (int) (now - lastInput);
+        int timeSinceLastInput = (int) (now - lastInputTime);
 
 
         float next = value.floatValueOf(term);
-        if (!Float.isFinite(next))
+        if (next!=next)
             return; //allow the value function to prevent input by returning NaN
 
         float f = Util.round(next, resolution);
@@ -131,9 +131,9 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
             Task t = newInputTask(f, now);
             if (t!=null) {
-                this.next = t;
-                input(t);
-                this.lastInput = now;
+                Task prev = this.next;;
+                input(prev, this.next = t);
+                this.lastInputTime = now;
                 this.prevF = f;
             }
 
@@ -141,8 +141,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     }
 
-    public void input(Task t) {
-        nar.inputLater(t);
+    public void input(Task prev, Task next) {
+        nar.inputLater(next);
     }
 
     @Nullable
@@ -170,10 +170,27 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     @Nullable
     protected Task newInputTask(float v, long now) {
         Truth t = truthFloatFunction.valueOf(v);
-        return t != null ? new MutableTask(term(), punc, t)
-                .time(now, now + dt())
+        if (t == null)
+            return null;
+        long when = now + dt();
+        return newInputTask(t, now, when);
+    }
+
+    /** provides an immediate truth assessment with the last known signal value */
+    public final Truth truth() {
+        float f = this.prevF;
+        if (f == f)
+            return truthFloatFunction.valueOf(f);
+        else
+            return null;
+    }
+
+    @NotNull
+    protected Task newInputTask(Truth t, long now, long when) {
+        return new MutableTask(term(), punc, t)
+                .time(now, when)
                 .budget(pri.asFloat() /*(v, now, prevF, lastInput)*/, dur)
-                .log(this) : null;
+                .log(this);
     }
 
 //    public float pri(float v, long now, float prevV, long lastV) {

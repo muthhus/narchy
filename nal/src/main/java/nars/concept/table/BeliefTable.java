@@ -19,6 +19,7 @@ import java.util.List;
 import static java.util.stream.StreamSupport.stream;
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.and;
+import static nars.truth.TruthFunctions.c2w;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
@@ -148,7 +149,8 @@ public interface BeliefTable extends TaskTable {
 
     /** returns a value <= 1.0 */
     static float temporalIrrelevance(long delta /* positive only */, float duration /* <1, divides usually */) {
-        return (1f + (float)Math.log(1+delta/duration));
+        //return (1f + (float)Math.log(1+delta/duration));
+        return (1f+delta/duration);
     }
 
 //    @NotNull
@@ -173,9 +175,12 @@ public interface BeliefTable extends TaskTable {
         if (c < bestSoFar)
             return -1; //give up early since anything multiplied by relevance (<=1f) wont exceed the current best
         else {
-            long dt = Math.abs(t.occurrence() - now) + Math.abs(when - now);
+            long tOcc = t.occurrence();
+            long dWhenNow = Math.abs(when - now);
+            //long dtCre = Math.abs(tOcc - t.creation());
+            long dtOcc = Math.abs(tOcc - now);
 
-            float rank = c / temporalIrrelevance(dt, 1f);
+            float rank = c2w(c) / (1 + temporalIrrelevance(dtOcc+dWhenNow, 1f)); // + temporalIrrelevance(dtCre, 1f));
             //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);
             return rank;
         }

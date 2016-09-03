@@ -39,7 +39,7 @@ public class Revision {
      * Revision for Eternal tasks
      */
     @Nullable
-    public static Truth revisionEternal(@NotNull Truthed a, @NotNull Truthed b, float match, float minConf) {
+    public static Truth revision(@NotNull Truthed a, @NotNull Truthed b, float match, float minConf) {
         float w1 = a.confWeight();
         float w2 = b.confWeight();
         float w = (w1 + w2);
@@ -58,7 +58,7 @@ public class Revision {
 
     @Nullable
     public static Truth revision(@NotNull Truthed a, @NotNull Truthed b) {
-        return revisionEternal(a, b, 1f, 0f);
+        return revision(a, b, 1f, 0f);
     }
 
 

@@ -24,6 +24,16 @@ import static nars.nal.Tense.ETERNAL;
 /**
  * Default Task implementation
  * TODO move all mutable methods to MutableTask and call this ImmutableTask
+ *
+ * NOTE:
+     if evidence length == 1 (input) then do not include
+     truth or occurrence time as part of the hash, equality, and
+     comparison tests.
+
+     this allows an input task to modify itself in these two
+     fields without changing its hash and equality consistency.
+
+     once input, input tasks will have unique serial numbers anyway
  */
 public abstract class AbstractTask extends UnitBudget implements Task, Temporal {
 
@@ -95,19 +105,14 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 //        setOccurrence(task.occurrence());
 //    }
 
-    void setTime(long creation, long occurrence) {
-        this.creation = creation;
-        setOccurrence(occurrence);
-    }
 
-
-    protected final void setTerm(@NotNull Termed<Compound> t) {
-        Termed existing = term;
-        term = t.term(); //use the provided instance even if equals
-        if (!existing.equals(t)) {
-            invalidate();
-        }
-    }
+//    protected final void setTerm(@NotNull Termed<Compound> t) {
+//        Termed existing = term;
+//        term = t.term(); //use the provided instance even if equals
+//        if (!existing.equals(t)) {
+//            invalidate();
+//        }
+//    }
 
 
     public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q) {
@@ -142,7 +147,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (isDeleted())
             throw new NAR.InvalidTaskException(this, "Deleted");
 
-        Compound t = term();
+        Compound t = term;
 
         if (!t.levelValid( nar.nal() ))
             throw new NAR.InvalidTaskException(this, "Unsupported NAL level");
@@ -185,8 +190,10 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (ntt == null)
             throw new NAR.InvalidTaskException(t, "Failed normalization");
 
-        if (ntt!=t)
-            setTerm(ntt);
+        if (ntt!=t) {
+            this.term = ntt;
+            invalidate();
+        }
 
         // if a task has an unperceived creationTime,
         // set it to the memory's current time here,
@@ -198,7 +205,8 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             if (oc != ETERNAL)
                 oc += now;
 
-            setTime(now, oc);
+            this.creation = now;
+            setOccurrence(oc);
         }
 
 
@@ -262,29 +270,29 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     /** includes: evidentialset, occurrencetime, truth, term, punctuation */
     private final int rehash() {
 
-        int h = Util.hashCombine( Util.hashCombine(
+        @Nullable long[] e = this.evidence;
+
+        int h = Util.hashCombine(
                 term.hashCode(),
                 punc,
-                Arrays.hashCode(evidence)
-            ),
-            Long.hashCode( occurrence )
+                Arrays.hashCode(e)
         );
 
-        Truth t = truth();
 
-        h = (t != null) ?
-            Util.hashCombine(h, t.hashCode() ) :
-            h;
+        if (e.length > 1) {
 
-//        int h = Objects.hash(
-//                Arrays.hashCode(evidence()),
-//                occurrence(),
-//                punc(),
-//                term(),
-//                truth()
-//        );
+            Truth t = truth();
 
-        if (h == 0) return 1; //reserve 0 for non-hashed
+            h = Util.hashCombine(
+                    h,
+                    Long.hashCode(occurrence),
+                    t!=null ? t.hashCode() : 1
+            );
+
+        }
+
+
+        if (h == 0) h = 1; //reserve 0 for non-hashed
 
         return h;
     }
@@ -384,32 +392,38 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     @Override
     public int compareTo(@NotNull Task obj) {
-        if (this == obj) return 0;
+
+        if (this == obj)
+            return 0;
 
         Task o = (Task)obj;
 
-        int c = Util.compare(evidence(), o.evidence());
+        int c = Util.compare(evidence, o.evidence());
         if (c != 0)
             return c;
 
-        Truth tr = this.truth();
-        if (tr !=null) {
-            @Nullable Truth otruth = o.truth();
-            if (otruth == null)
-                return 1;
-            int tu = Truth.compare(tr, otruth);
-            if (tu!=0) return tu;
+        if (!isInput()) {
+            Truth tr = this.truth;
+
+            if (tr != null) {
+                @Nullable Truth otruth = o.truth();
+                if (otruth == null)
+                    return 1;
+                int tu = Truth.compare(tr, otruth);
+                if (tu != 0) return tu;
+            }
+
+
+            int to = Long.compare(occurrence, o.occurrence());
+            if (to != 0) return to;
         }
 
 
-        int to = Long.compare( occurrence(), o.occurrence() );
-        if (to!=0) return to;
-
-
-        int tc = Character.compare(punc(), o.punc());
+        int tc = term.compareTo(o.term());
         if (tc != 0) return tc;
 
-        return term().compareTo(o.term());
+        return Character.compare(punc(), o.punc())
+                ;
 
     }
 
@@ -475,67 +489,36 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     public final boolean equals(@Nullable Object that) {
 
         return this == that ||
-                (that!=null && hashCode() == that.hashCode() && that instanceof Task && equivalentTo((Task) that, true, true, true, true, false));
+                (that!=null  &&
+                    hashCode() == that.hashCode() &&
+                    that instanceof Task &&
+                    equivalentTo((Task) that, true, true, true, true, true));
 
     }
 
     @Override
-    public final boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime) {
+    public final boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean occurrenceTime) {
 
-        if (stamp) {
-            //uniqueness includes every aspect of stamp except creation time
-            //<patham9> if they are only different in creation time, then they are the same
-            if (!equalStamp(that, true, creationTime, true))
+        if (stamp && (!Arrays.equals(this.evidence, that.evidence())))
+            return false;
+
+        if (term && !this.term.equals(that.term()))
+            return false;
+
+        if (!isInput()) {
+            if (occurrenceTime && (this.occurrence != that.occurrence()))
+                return false;
+
+            if (truth && !Objects.equals(this.truth, that.truth()))
                 return false;
         }
 
-        if (truth) {
-            Truth thisTruth = this.truth;
-            if (thisTruth == null) {
-                //equal punctuation will ensure thatTruth is also null
-            } else {
-                if (!thisTruth.equals(that.truth())) return false;
-            }
-        }
-
-        if (punctuation) {
-            if (this.punc != that.punc()) return false;
-        }
-
-        if (term) {
-            if (!this.term.equals(that.term())) return false;
-        }
+        if (punctuation && (this.punc != that.punc()))
+            return false;
 
         return true;
     }
 
-    /**
-     * Check if two stamps contains the same types of content
-     * <p>
-     * NOTE: hashcode will include within it the creationTime & occurrenceTime, so if those are not to be compared then avoid comparing hash
-     *
-     * @param s The Stamp to be compared
-     * @return Whether the two have contain the same evidential base
-     */
-    public final boolean equalStamp(@NotNull Task s, boolean evidentialSet, boolean creationTime, boolean occurrenceTime) {
-        if (this == s) return true;
-
-        /*if (hash && (!occurrenceTime || !evidentialSet))
-            throw new RuntimeException("Hash equality test must be followed by occurenceTime and evidentialSet equality since hash incorporates them");
-
-        if (hash)
-            if (hashCode() != s.hashCode()) return false;*/
-        if (creationTime)
-            if (creation() != s.creation()) return false;
-        if (occurrenceTime)
-            if (occurrence() != s.occurrence()) return false;
-        if (evidentialSet) {
-            return Arrays.equals(evidence(), s.evidence());
-        }
-
-
-        return true;
-    }
 
 
     @NotNull

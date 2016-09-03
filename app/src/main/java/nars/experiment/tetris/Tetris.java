@@ -68,7 +68,7 @@ public class Tetris extends NAgent {
 
 
     private final TetrisState state;
-    private final int visionSyncPeriod = 7; //16 * TIME_DILATION;
+    //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
     public class View {
 
@@ -255,7 +255,9 @@ public class Tetris extends NAgent {
 
                         (v) -> $.t(v, alpha )
 
-                ).timing(0, visionSyncPeriod);
+                )
+                        //timing(0, visionSyncPeriod)
+                ;
 
 //                FloatSupplier defaultPri = s.sensor.pri;
 //                s.pri( () -> defaultPri.asFloat() * 0.25f );
@@ -372,12 +374,12 @@ public class Tetris extends NAgent {
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.7f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.2f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.2f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.01f);
+        nar.confMin.setValue(0.04f);
         nar.compoundVolumeMax.setValue(40);
         //nar.truthResolution.setValue(0.02f);
 

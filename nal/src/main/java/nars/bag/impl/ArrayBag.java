@@ -335,6 +335,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 float pending = this.pressure;
                 this.pressure = 0; //reset pending accumulator
 
+                pending = Math.max(0, pending); //disallow negative pressure
+
                 float r = Util.clamp(pending / (existing + pending));
 
                 //TODO some way to increase 'r' in proportion to minPriIfFull so that a higher floor will cause faster decay

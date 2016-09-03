@@ -241,7 +241,7 @@ public class ArithmeticInduction {
         if (newSubs.equals(subs)) {
             return subs; //nothing changed
         } else {
-            if (depthRemain == 0)
+            if (depthRemain <= 0)
                 return newSubs;
             else
                 return compress(newSubs, depthRemain);

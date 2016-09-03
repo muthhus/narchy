@@ -46,7 +46,7 @@ public class Arkancide extends NAgent {
 
     private static final int cyclesPerFrame = 2;
     public static final int runFrames = 50000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 24;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 64;
     public static final int INDEX_SIZE = 4 * 10000000;
     final Arkanoid noid;
     private SwingCamera cam;
@@ -57,7 +57,7 @@ public class Arkancide extends NAgent {
     final int visH = 14;
     SensorConcept[][] ss;
 
-    private final int visionSyncPeriod = 16;
+    //private final int visionSyncPeriod = 16;
     float noiseLevel;
 
     float paddleSpeed = 20f;
@@ -93,8 +93,8 @@ public class Arkancide extends NAgent {
                         () -> noise(decodeRed(cam.out.getRGB(xx, yy))) ,// > 0.5f ? 1 : 0,
                         (v) -> t(v, alpha)
                 ));
-                sss.sensor.dur = 0.1f;
-                sss.timing(0,visionSyncPeriod);
+                //sss.sensor.dur = 0.1f;
+                //sss.timing(0,visionSyncPeriod);
                 ss[x][y] = sss;
             }
         }
@@ -147,8 +147,12 @@ public class Arkancide extends NAgent {
 
         actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b,d)->{
 
-            noid.paddle.move((motorLeftRight.goals().freq(now) - 0.5f) * paddleSpeed);
-            return d;
+            if (d!=null) {
+                noid.paddle.move((d.freq() - 0.5f) * paddleSpeed);
+                return d.withConf(alpha);
+            }
+            return null;
+
             //return $.t((float)(noid.paddle.x / noid.SCREEN_WIDTH), 0.9f);
 
             //@Nullable Truth tNow = motorLeftRight.goals().truth(now);
@@ -241,14 +245,15 @@ public class Arkancide extends NAgent {
         nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.6f);
 
-        float p = 0.1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f * p;
+        float p = 1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.9f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f * p;
 
         nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.confMin.setValue(0.05f);
+        nar.compoundVolumeMax.setValue(45);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {

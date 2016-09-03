@@ -95,11 +95,26 @@ public enum DesireFunction implements TruthOperator {
 //        }
 //    },
 
+
+    Union() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+            return ((B == null) || (T == null)) ? null : TruthFunctions.union(T, B, minConf);
+        }
+    },
+
+
     Intersection() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            if (B == null) return null;
-            return TruthFunctions.intersection(T,B,minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.intersection(T, B, minConf);
+        }
+    },
+
+    Difference() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+            return ((B == null) || (T == null)) ? null : TruthFunctions.difference(T, B, minConf);
         }
     },
 

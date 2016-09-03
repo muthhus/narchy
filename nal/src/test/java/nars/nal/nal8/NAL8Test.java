@@ -795,7 +795,7 @@ public class NAL8Test extends AbstractNALTest {
 //                .mustNotOutput(cycles, "(((in)|(left))-->^cam)", '!', 0, ETERNAL);
 //    }
 
-    @Test public void testInheritanceDecompositionTemporalGoal() {
+    @Ignore @Test public void testInheritanceDecompositionTemporalGoal() {
         //(((in)|(left))-->^cam)!
         //   cam(in)!
         //   cam(out)!

@@ -59,20 +59,20 @@ public class PremiseRule extends GenericCompound {
     public boolean allowBackward;
     public boolean allowForward = true;
 
-    @NotNull
-    @Override
-    public String toString() {
-        return "PremiseRule{" +
-                "\t prePreconditions=" + Arrays.toString(precon) +
-                "\t match=" + match +
-                "\t postconditions=" + Arrays.toString(postconditions) +
-                "\t temporalize=" + timeFunction +
-                "\t eternalize=" + eternalize +
-                "\t anticipate=" + anticipate +
-                "\t minNAL=" + minNAL +
-                "\t source='" + source + '\'' +
-                '}';
-    }
+//    @NotNull
+//    @Override
+//    public String toString() {
+//        return "PremiseRule{" +
+//                "\t prePreconditions=" + Arrays.toString(precon) +
+//                "\t match=" + match +
+//                "\t postconditions=" + Arrays.toString(postconditions) +
+//                "\t temporalize=" + timeFunction +
+//                "\t eternalize=" + eternalize +
+//                "\t anticipate=" + anticipate +
+//                "\t minNAL=" + minNAL +
+//                "\t source='" + source + '\'' +
+//                '}';
+//    }
 
     //    /**
 //     * blank marker trie node indicating the derivation and terminating the branch
@@ -208,7 +208,7 @@ public class PremiseRule extends GenericCompound {
             s.add(truth);
 
 
-            addAll(s, match.pre);
+            addAll(s, match.preconditions);
         }
 
         List<Term> l = sort(new FasterList(s));
@@ -216,7 +216,7 @@ public class PremiseRule extends GenericCompound {
         //SUFFIX (order already determined for matching)
         {
 
-            addAll(l, match.code);
+            addAll(l, match.procedure);
 
             l.add(truth.derive); //will be linked to and invoked by match callbacks
         }
@@ -384,7 +384,6 @@ public class PremiseRule extends GenericCompound {
         }
 
         Derive der = new Derive(rule, p.pattern,
-                belief, desire,
                 /*anticipate,*/
                 eternalize, temporalizer);
 

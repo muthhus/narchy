@@ -4,6 +4,8 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
 import nars.Task;
+import nars.concept.table.BeliefTable;
+import nars.concept.table.DefaultBeliefTable;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -27,9 +29,10 @@ public class MotorConcept extends WiredConcept  {
     private final float feedbackPriority;
     private final float feedbackDurability;
 
-    private Task lastFeedback;
+    private Task nextFeedback;
 
     float feedbackResolution = 0.05f;
+
 
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept
@@ -141,8 +144,8 @@ public class MotorConcept extends WiredConcept  {
         Truth feedback = motor.motor(b, d);
         if (feedback != null) {
             Task next = feedback(feedback, now);
-            if (lastFeedback == null || !lastFeedback.equalsTruth(next, feedbackResolution)) { //if feedback is different from last
-                lastFeedback = next;
+            if (nextFeedback == null || !nextFeedback.equalsTruth(next, feedbackResolution)) { //if feedback is different from last
+                nextFeedback = next;
                 nar.inputLater(next);
             }
         }
@@ -157,6 +160,57 @@ public class MotorConcept extends WiredConcept  {
     }
 
 
+    @NotNull
+    @Override
+    protected BeliefTable newBeliefTable(int eCap, int tCap) {
+        return new SensorBeliefTable(tCap);
+    }
+
+    private final class SensorBeliefTable extends DefaultBeliefTable {
+
+        public SensorBeliefTable(int tCap) {
+            super(tCap);
+        }
+
+        @Override
+        public Truth truth(long when, long now) {
+//            if (when == now || when == ETERNAL)
+//                return sensor.truth();
+
+            // if when is between the last input time and now, evaluate the truth at the last input time
+            // to avoid any truth decay across time. this emulates a persistent latched sensor value
+            // ie. if it has not changed
+            if (nextFeedback !=null && when <= now && when >= nextFeedback.occurrence()) {
+                //now = when = sensor.lastInputTime;
+                return nextFeedback.truth();
+            }
+
+            return super.truth(when, now);
+        }
+
+        @Override
+        public Task match(@NotNull Task target, long now) {
+            long when = target.occurrence();
+
+            Task f = MotorConcept.this.nextFeedback;
+            if (f !=null && when <= now && when >= f.occurrence()) {
+                return f;
+            }
+
+            return super.match(target, now);
+        }
+
+        //        @Override
+//        public Task match(@NotNull Task target, long now) {
+//            long when = target.occurrence();
+//            if (when == now || when == ETERNAL) {
+//                sensor.
+//                return sensor.truth();
+//            }
+//
+//            return super.match(target, now);
+//        }
+    }
 
 
 

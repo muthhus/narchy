@@ -6,6 +6,7 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
+import nars.concept.TruthDelta;
 import nars.nal.Premise;
 import nars.nal.TimeFunctions;
 import nars.nal.meta.PremiseEval;
@@ -18,11 +19,16 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
-import nars.truth.func.TruthOperator;
+import nars.util.Texts;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
@@ -31,6 +37,8 @@ import static nars.nal.Tense.*;
 /**
  * Handles matched derivation results
  * < (&&, postMatch1, postMatch2) ==> derive(term) >
+ *
+ * Each Rule correpsonds to an instance of this
  */
 public final class Derive extends AtomicStringConstant implements ProcTerm {
 
@@ -54,7 +62,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
-                  @Nullable TruthOperator belief, @Nullable TruthOperator goal, @Deprecated boolean eternalize, @NotNull TimeFunctions temporalizer) {
+                  @Deprecated boolean eternalize, @NotNull TimeFunctions temporalizer) {
         super("Derive(" +
                 Joiner.on(',').join(
                         term,
@@ -175,8 +183,9 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
             occ = occReturn[0];
         } else {
-            //the derived compound has a dt but the premise was entirely atemporal;
-            // this (probably!) indicates a temporal placeholder in the rules that needs to be set to DTERNAL
+            //the derived compound indicated a potential dt, but the premise was actually atemporal;
+            // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
+
             Op o = content.op();
             if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
                 Term ete = m.index.the(o, DTERNAL, content.terms());
@@ -205,7 +214,9 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
         try {
-            DerivedTask dt = newDerivedTask(c, truth, punc, evidence, p);
+            DerivedTask dt =
+                    new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p);
+                    //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
 
             dt.time(now, occ)
                     .budget(budget) // copied in, not shared
@@ -245,12 +256,63 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     }
 
+    public static class RuleFeedbackDerivedTask extends DerivedTask.DefaultDerivedTask {
 
-    public
-    @NotNull
-    static DerivedTask newDerivedTask(@NotNull Termed<Compound> c, Truth truth, char punc, long[] evidence, @NotNull PremiseEval p) {
-        return new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p);
+        private final @NotNull PremiseRule rule;
+
+        public RuleFeedbackDerivedTask(@NotNull Termed<Compound> tc, @Nullable Truth truth, char punct, long[] evidence, @NotNull PremiseEval premise, @NotNull PremiseRule rule) {
+            super(tc, truth, punct, evidence, premise);
+            this.rule = rule;
+        }
+
+        @Override
+        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+            if (!isDeleted())
+                Derive.feedback(premise, rule, this, delta, deltaConfidence, deltaSatisfaction, nar);
+            super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
+
+        }
     }
 
+    static class RuleStats {
+        final SummaryStatistics pri = new SummaryStatistics();
+        final SummaryStatistics dSat = new SummaryStatistics();
+        final SummaryStatistics dConf = new SummaryStatistics();
 
+        public long count() {
+            return dSat.getN();
+        }
+
+    }
+
+    static final Map<NAR, Map<PremiseRule,RuleStats>> stats = new ConcurrentHashMap();
+
+    private static void feedback(Premise premise, @NotNull PremiseRule rule, RuleFeedbackDerivedTask t, TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+        Map<PremiseRule, RuleStats> x = stats.computeIfAbsent(nar, n -> new ConcurrentHashMap<>());
+
+        RuleStats s = x.computeIfAbsent(rule, d -> new RuleStats());
+
+        s.pri.addValue( t.pri() );
+
+        if (delta!=null) {
+            s.dSat.addValue( Math.abs(deltaSatisfaction) );
+            s.dConf.addValue( Math.abs(deltaConfidence) );
+        }
+
+    }
+
+    static public void printStats(NAR nar) {
+        stats.get(nar).forEach((r, s) -> {
+            long n = s.count();
+
+            System.out.println(
+                    r + "\t" +
+                    Texts.n4(s.pri.getSum()) + "\t" +
+                    Texts.n4(s.dConf.getSum()) + "\t" +
+                    Texts.n4(s.dSat.getSum()) + "\t" +
+                    n
+                    //" \t " + mean +
+                    );
+        });
+    }
 }

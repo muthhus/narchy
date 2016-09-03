@@ -79,8 +79,9 @@ abstract public class NAgent {
         gamma = this.nar.confidenceDefault(Symbols.GOAL);
 
         float rewardGamma =
+                1.0f - Param.TRUTH_EPSILON
                 //1.0f
-                gamma
+                //gamma
         ;
 
         this.reinforcementAttention = or(nar.DEFAULT_BELIEF_PRIORITY, nar.DEFAULT_GOAL_PRIORITY);
@@ -184,6 +185,29 @@ abstract public class NAgent {
         int dt = 1 + ticksBeforeObserve + ticksBeforeDecide;
         //this.curiosityAttention = reinforcementAttention / actions.size();
 
+
+        /** set the sensor budget policy */
+        int numSensors = sensors.size();
+
+        /** represents the approx equivalent number of sensors which can be fully budgeted at any time */
+        float activeSensors =
+                //(float) Math.sqrt(numSensors); //HEURISTIC
+                numSensors / 2f;
+
+        for (SensorConcept sensor : sensors) {
+            Term ts = sensor.term();
+            sensor.pri(() -> {
+
+                        final float gain = nar.priorityDefault(Symbols.BELIEF); //1f;
+
+                        float cp = nar.conceptPriority(ts);
+
+                        float p = gain/activeSensors - cp;
+
+                        return Math.max(gain/numSensors, Math.min(1f, p));
+                    }
+            );
+        }
 
         @NotNull Term what = $.$("?w"); //#w
 

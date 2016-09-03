@@ -48,7 +48,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float BACKWARD_DERIVATION_FACTOR = 0.1f;
 
     /** used in linear interpolating link adjustments during feedback */
-    public final MutableFloat linkFeedbackRate = new MutableFloat(0.5f);
+    public final MutableFloat linkFeedbackRate = new MutableFloat(0.25f);
 
     /**
      * hard upper-bound limit on Compound term complexity;
@@ -122,11 +122,9 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     //public static float PREMISE_MATCH_OVERLAP_MULTIPLIER = 1f; //0.1f;
 
-    /**
-     * if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression
-     * if this is true, then there is risk that confidence can hyperinflate
-     */
-    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE;
+
+    /** the result of an overlap will reduce the confidence by a proportional amount of the evidential overlap */
+    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = true;
 
 //    /**
 //     * relates time and evidence (confidence); how past and future beliefs decay in rank
@@ -147,7 +145,7 @@ public abstract class Param /*extends Container*/ implements Level {
         //float timeRate = 1f;
         //return InterpolatingMicrosphere.pow(Math.max(0.5f, diffNorm)*timeRate, -exponent);
 
-        float duration = 2f;
+        float duration = 1f;
         return 1f / (1 + (dt*dt)/(duration*duration));
 
         //return 1f / (1f + dt);

@@ -154,7 +154,6 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-
     Intersection() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
@@ -162,14 +161,6 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-//    IntersectionNeg() {
-//        @Nullable
-//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-//            return ((B == null) || (T == null)) ? null : TruthFunctions.intersection(T, B, true, minConf);
-//        }
-//    },
-
-    //@AllowOverlap
     Difference() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
@@ -177,7 +168,6 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    //@AllowOverlap
     Analogy() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {

@@ -125,6 +125,7 @@ abstract public class DerivedTask extends MutableTask {
         void feedback(float score, NAR nar) {
 
             //reduce the score factor intensity by lerping it closer to 1.0
+            score = Util.lerp(score, 1f, nar.linkFeedbackRate.floatValue());
 
             @Nullable Premise premise = this.premise;
             if (premise !=null) {
@@ -132,13 +133,13 @@ abstract public class DerivedTask extends MutableTask {
                 Concept c = nar.concept(premise.term, score);
 
                 if (c != null) {
-                    score = Util.lerp(score, 1f, nar.linkFeedbackRate.floatValue());
                     c.termlinks().boost(premise.term, score);
                     c.tasklinks().boost(premise.task, score);
                 }
 
             }
 
+            budget().priMult(score);
         }
 
     }

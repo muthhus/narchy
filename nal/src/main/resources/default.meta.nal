@@ -17,24 +17,24 @@
 
 //Set Definition Similarity to Inheritance
 
-    ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
+    ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Derive:AllowBackward)
+    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Derive:AllowBackward)
 
 
 //Set Definition Unwrap
 
-    ({S} <-> {P}), {S} |- (S <-> P), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [S] |- (S <-> P), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
+    ({S} <-> {P}), {S} |- (S <-> P), (Belief:Identity, Derive:AllowBackward)
+    ([S] <-> [P]), [S] |- (S <-> P), (Belief:Identity, Derive:AllowBackward)
 
 //Nothing is more specific than a instance, so its similar
 
-    (S --> {P}),  S  |- (S <-> {P}), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
-    (S --> {P}), {P} |- (S <-> {P}), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
+    (S --> {P}),  S  |- (S <-> {P}), (Belief:Identity, Derive:AllowBackward)
+    (S --> {P}), {P} |- (S <-> {P}), (Belief:Identity, Derive:AllowBackward)
 
 //nothing is more general than a property, so its similar
 
-    ([S] --> P), [S] |- ([S] <-> P), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
-    ([S] --> P),  P  |- ([S] <-> P), (Belief:Identity, Goal:Identity, Derive:AllowBackward)
+    ([S] --> P), [S] |- ([S] <-> P), (Belief:Identity, Derive:AllowBackward)
+    ([S] --> P),  P  |- ([S] <-> P), (Belief:Identity, Derive:AllowBackward)
 
 
 //Inheritance to Similarity
@@ -163,18 +163,18 @@
 //    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
 //    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
 //    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
-    (C --> {X,A..+}), {X,A..+}, no_common_subterm(X,C) |- (C --> {X}), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (C --> [X,A..+]), [X,A..+], no_common_subterm(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    ({X,A..+} --> C), {X,A..+}, no_common_subterm(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    ([X,A..+] --> C), [X,A..+], no_common_subterm(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (C --> {X,A..+}), {X,A..+}, no_common_subterm(X,C) |- (C --> {X}), (Belief:StructuralDeduction)
+    (C --> [X,A..+]), [X,A..+], no_common_subterm(X,C) |- (C --> [X]), (Belief:StructuralDeduction)
+    ({X,A..+} --> C), {X,A..+}, no_common_subterm(X,C) |- ({X} --> C), (Belief:StructuralDeduction)
+    ([X,A..+] --> C), [X,A..+], no_common_subterm(X,C) |- ([X] --> C), (Belief:StructuralDeduction)
 
 //NAL3 single premise inference
 
-    ((|,X,A..+) --> M), (|,X,A..+), no_common_subterm(X,M) |- (X --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (M --> (&,X,A..+)), (&,X,A..+), no_common_subterm(X,M) |- (M --> X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ((|,X,A..+) --> M), (|,X,A..+), no_common_subterm(X,M) |- (X --> M), (Belief:StructuralDeduction)
+    (M --> (&,X,A..+)), (&,X,A..+), no_common_subterm(X,M) |- (M --> X), (Belief:StructuralDeduction)
 
-    ((B ~ G) --> S), S, no_common_subterm(S,B) |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (R --> (B - S)), R, no_common_subterm(S,B) |- (R --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ((B ~ G) --> S), S, no_common_subterm(S,B) |- (B --> S), (Belief:StructuralDeduction)
+    (R --> (B - S)), R, no_common_subterm(S,B) |- (R --> B), (Belief:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)
@@ -491,11 +491,11 @@
 
     (B --> (/, M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity)
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Goal:Identity)
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity)
 
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Goal:Identity)
+    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity)
 
-    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity)
+    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity)
 
 //Recursion Force - TODO use varargs
 

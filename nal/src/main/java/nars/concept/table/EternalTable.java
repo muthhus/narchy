@@ -162,7 +162,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
             Truth oldBeliefTruth = x.truth();
 
-            Truth c = Revision.revisionEternal(newBeliefTruth, oldBeliefTruth, 1f, bestConf);
+            Truth c = Revision.revision(newBeliefTruth, oldBeliefTruth, 1f, bestConf);
 
             //avoid a weak or duplicate truth
             if (c == null || c.equals(oldBeliefTruth) || c.equals(newBeliefTruth))

@@ -24,6 +24,7 @@ import nars.NAR;
 import nars.Param;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
+import nars.nal.op.Derive;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.NAgent;
@@ -50,18 +51,17 @@ import static nars.experiment.tetris.Tetris.exe;
 public class Pacman extends NAgent {
 
     final cpcman pacman;
-    public static final int cyclesPerFrame = 4;
+    public static final int cyclesPerFrame = 1;
 
     final int visionRadius;
     final int itemTypes = 3;
-    final static int runCycles = 200;
-    final static int runDelay = 0 /* ms */;
+    final static int runCycles = 21500;
 
 
     final int inputs;
 
     private final int pacmanCyclesPerFrame = 1;
-    int pacMovesPerCycle = 4;
+    int pacMovesPerCycle = 3;
 
     float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
     public float scoretoReward = 1f;
@@ -90,7 +90,7 @@ public class Pacman extends NAgent {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                16, 2, 3, rng,
+                128, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
                 new FrameClock(), exe
 
@@ -101,18 +101,18 @@ public class Pacman extends NAgent {
         //new MemoryManager(nar);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
 
-        float pMult = 1f/2f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * pMult;
+        float pMult = 1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.4f * pMult;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f * pMult;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f * pMult;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.1f);
+        nar.confMin.setValue(0.05f);
         nar.compoundVolumeMax.set(40);
-        nar.truthResolution.setValue(0.05f);
+        nar.truthResolution.setValue(0.02f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
         //nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
@@ -190,6 +190,8 @@ public class Pacman extends NAgent {
         NAR.printTasks(nar, false);
         //n.printActions();
         //nar.forEachActiveConcept(System.out::println);
+
+        Derive.printStats(nar);
 
 //		nar.index.forEach(t -> {
 //			if (t instanceof Concept) {
@@ -284,13 +286,13 @@ public class Pacman extends NAgent {
                 int sc = Math.round(2f * (f -0.5f) * pacMovesPerCycle);
                 if (sc < 0) {
                     if (!pacman.pac.move(ctables.LEFT, -sc, pacman))
-                        return $.t(0.5f, gamma);
+                        return $.t(0.5f, alpha);
                 } else if (sc > 0) {
                     if (!pacman.pac.move(ctables.RIGHT, sc, pacman))
-                        return $.t(0.5f, gamma);
+                        return $.t(0.5f, alpha);
                 }
                 //return d;
-                return d.withConf(gamma);
+                return d.withConf(alpha);
             }
             return null;
         }));
@@ -303,13 +305,13 @@ public class Pacman extends NAgent {
                 int sc = Math.round(2f * (f-0.5f) * pacMovesPerCycle);
                 if (sc < 0) {
                     if (!pacman.pac.move(ctables.UP, -sc, pacman))
-                        return $.t(0.5f, gamma);
+                        return $.t(0.5f, alpha);
                 } else if (sc > 0) {
                     if (!pacman.pac.move(ctables.DOWN, sc, pacman))
-                        return $.t(0.5f, gamma);
+                        return $.t(0.5f, alpha);
                 }
                 //return d;
-                return d.withConf(gamma);
+                return d.withConf(alpha);
             }
             return null;
         }));
@@ -381,7 +383,7 @@ public class Pacman extends NAgent {
 //        if (nar instanceof Default) {
 //
 //          //new BeliefTableChart(nar, charted).show(700, 900);
-            BeliefTableChart.newBeliefChart(nar, charted, 400);
+            BeliefTableChart.newBeliefChart(nar, charted, 500);
 ////
             //BagChart.show((Default) nar, 512);
 ////

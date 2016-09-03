@@ -18,6 +18,7 @@ import java.util.List;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.nal.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.c2w;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal
@@ -80,17 +81,14 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         Truth before, after;
         synchronized (this) {
 
+            before = truth(now, eternal);
+
             next = compress(input, now, eternal, displ, concept);
 
             if (next == null || isFull()) {
-                //not compressible with respect to this input, so reject the input
-                // HACK DOES THIS HAPPEN and WHY, IS IT DANGEROUS
-                //if (Global.DEBUG)
-                //throw new RuntimeException(this + " compression failed");
+                //input too weak or some other capacity problem
                 return null;
             }
-
-            before = truth(now, eternal);
 
             add(input);
 
@@ -183,7 +181,10 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         float weakestRank = minRank;
         int n = size();
 
+
         long[] mergeEvidence = toMergeWith != null ? toMergeWith.evidence() : null;
+        long then = toMergeWith!=null ? toMergeWith.occurrence() : now;
+
         for (int i = 0; i < n; i++) {
 
             Task ii = get(i);
@@ -195,6 +196,16 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
             //consider ii for being the weakest ranked task to remove
             float r = rank(ii, now, now);
+
+            if (toMergeWith!=null) {
+                r *=
+                     (1 + Math.abs(ii.freq() - toMergeWith.freq())); //similar frequency makes them more likely to be paired
+
+                   //* (1 + Math.abs(ii.occurrence() - toMergeWith.occurrence()));
+
+
+            }
+
             //(toMergeWith!=null ? (1f / (1f + Math.abs(ii.freq()-toMergeWith.freq()))) : 1f); //prefer close freq match
             if (r < weakestRank) {
                 weakestRank = r;
@@ -227,11 +238,9 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         float inputRank = input != null ? rank(input, now, now) : Float.POSITIVE_INFINITY;
 
         Task a = weakest(now, null, inputRank);
-        if (a == null)
+        if (a == null || !remove(a, displ)) {
+            //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
-
-        if (!remove(a, displ)) {
-            return null; //dont continue if there was a problem removing a (like it got removed already by a different thread or something)
         }
 
         Task b = weakest(now, a, Float.POSITIVE_INFINITY);
@@ -249,58 +258,17 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
      */
     @Nullable
     private Task merge(@NotNull Task a, @NotNull Task b, long now, Concept concept, @Nullable EternalTable eternal) {
-        double ac = a.conf();
-        double bc = b.conf();
+        double ac = c2w(a.conf());
+        double bc = c2w(b.conf());
         long mid = (long) Math.round(Util.lerp((double) a.occurrence(), (double) b.occurrence(), ac / (ac + bc)));
-        //long mid = (long)Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
-        //float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
+        float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
 
-//        /**
-//         * compute an integration of the area under the trapezoid formed by
-//         * computing the projected truth at the 'a' and 'b' time points
-//         * and mixing them by their relative confidence.
-//         * this is to represent a loss of confidence due to diffusion of
-//         * truth across a segment of time spanned by these two tasks as
-//         * they are merged into one.
-//         */
-//        float diffuseCost;
-//        /*if (minTime()==ETERNAL) {
-//            throw new RuntimeException(); //shouldnt happen
-//        } else {*/
-//        long aocc = a.occurrence();
-//        long bocc = b.occurrence();
-//        float aProj = projection(mid, now, aocc);
-//        float bProj = projection(mid, now, bocc);
-//
-//        //TODO lerp blend these values ? avg? min?
-//        diffuseCost =
-//                //aveAri(aProj + bProj)/2f;
-//                //Math.min(aProj, bProj);
-//                and(aProj, bProj);
-//
-////        float relMin = projection(minTime(), mid, now);
-////        float relMax = projection(maxTime(), mid, now);
-////        float relevance = Math.max(relMin, relMax );
-//
-//
-        //float confScale = Param.REVECTION_CONFIDENCE_FACTOR * (1f - overlap);
-//
-//        if (confScale < Param.BUDGET_EPSILON) //TODO use NAR.confMin which will be higher than this
-//            return null;
-//
-//        confScale = Math.min(1f, confScale);
-
-        Truth t = truth(mid, now, eternal);
-
-        if (t != null) {
-            //t = t.confMult(confScale);
-
-            if (t != null)
-                return Revision.mergeInterpolate(a, b, mid, now, t, concept);
-        }
+        Truth t = Revision.revision(a, b, 1f - (overlap/2f), Param.TRUTH_EPSILON /*nar.confMin*/);
+        if (t != null)
+            return Revision.mergeInterpolate(a, b, mid, now, t, concept);
 
         return null;
     }

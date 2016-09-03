@@ -3,6 +3,7 @@ package nars.util.signal;
 import nars.*;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
+import nars.concept.table.DefaultBeliefTable;
 import nars.task.DerivedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -37,6 +38,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     /** implicit motivation task */
     private Task desire;
 
+
+
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
         this($.$(term), n, input, truth);
     }
@@ -46,22 +49,26 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         this.sensor = new Sensor(n, this, this, truth) {
             @Override
-            public void input(Task t) {
-                SensorConcept.this.input(t);
+            public void input(Task prev, Task next) {
+
+                SensorConcept.this.input(next);
+
             }
         };
 
-        this.input = input;
+        setInput(input);
 
-        final float gain = nar.priorityDefault(Symbols.BELIEF); //1f;
-        this.sensor.pri(()->
-            Math.max(Param.BUDGET_EPSILON*2, Math.min(1f, gain * n.conceptPriority(term)))
-        );
+        pri(() -> {
+            return nar.priorityDefault(Symbols.BELIEF);
+        });
+
+
     }
 
     protected void input(Task t) {
         nar.inputLater(t);
     }
+
 
 
     /** originating from this sensor, or a future prediction */
@@ -167,7 +174,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return this;
     }
 
-    @NotNull public SensorConcept pri(FloatSupplier v) {
+    @NotNull public final SensorConcept pri(FloatSupplier v) {
         sensor.pri(v);
         return this;
     }
@@ -186,5 +193,55 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     @Override
     public float asFloat() {
         return current;
+    }
+
+    @NotNull
+    @Override
+    protected BeliefTable newBeliefTable(int eCap, int tCap) {
+        return new SensorBeliefTable(tCap);
+    }
+
+    private final class SensorBeliefTable extends DefaultBeliefTable {
+
+        public SensorBeliefTable(int tCap) {
+            super(tCap);
+        }
+
+        @Override
+        public Truth truth(long when, long now) {
+//            if (when == now || when == ETERNAL)
+//                return sensor.truth();
+
+            // if when is between the last input time and now, evaluate the truth at the last input time
+            // to avoid any truth decay across time. this emulates a persistent latched sensor value
+            // ie. if it has not changed
+            if (when <= now && when >= sensor.lastInputTime) {
+                //now = when = sensor.lastInputTime;
+                return sensor.truth();
+            }
+
+            return super.truth(when, now);
+        }
+        @Override
+        public Task match(@NotNull Task target, long now) {
+            long when = target.occurrence();
+            @Nullable Task next = sensor.next;
+            if (next !=null && when <= now && when >= next.occurrence()) {
+                //use the last known sensor value as-is
+                return next;
+            }
+            return super.match(target, now);
+        }
+
+//        @Override
+//        public Task match(@NotNull Task target, long now) {
+//            long when = target.occurrence();
+//            if (when == now || when == ETERNAL) {
+//                sensor.
+//                return sensor.truth();
+//            }
+//
+//            return super.match(target, now);
+//        }
     }
 }

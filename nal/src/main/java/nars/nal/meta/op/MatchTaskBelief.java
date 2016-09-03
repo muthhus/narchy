@@ -38,9 +38,9 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
 
     @NotNull
-    public final Term[] code;
+    public final Term[] procedure;
     @NotNull
-    public final Term[] pre;
+    public final Term[] preconditions;
 
     @NotNull
     public final Term term;
@@ -60,8 +60,8 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
         compile(pattern, pre, code, constraints);
 
-        this.pre = pre.toArray(new BoolCondition[pre.size()]);
-        this.code = code.toArray(new BoolCondition[code.size()]);
+        this.preconditions = pre.toArray(new BoolCondition[pre.size()]);
+        this.procedure = code.toArray(new BoolCondition[code.size()]);
 
 
         //Term beliefPattern = pattern.term(1);
