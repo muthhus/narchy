@@ -21,7 +21,6 @@ package nars.experiment.pacman;
 
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
@@ -104,7 +103,7 @@ public class Pacman extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
 
-        float pMult = 1f;
+        float pMult = 0.01f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.4f * pMult;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f * pMult;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f * pMult;
@@ -112,8 +111,8 @@ public class Pacman extends NAgent {
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
         nar.confMin.setValue(0.05f);
-        nar.compoundVolumeMax.set(40);
-        nar.truthResolution.setValue(0.02f);
+        nar.compoundVolumeMax.set(60);
+        nar.truthResolution.setValue(0.05f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
         //nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
@@ -385,7 +384,7 @@ public class Pacman extends NAgent {
 //
 //          //new BeliefTableChart(nar, charted).show(700, 900);
             BeliefTableChart.newBeliefChart(nar, charted, 500);
-            HistogramChart.newChart(nar, 50);
+            HistogramChart.budgetChart(nar, 50);
 
 ////
             //BagChart.show((Default) nar, 512);

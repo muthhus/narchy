@@ -21,7 +21,7 @@ public class StrongBLink<X> extends DefaultBLink<X> {
 
     @NotNull
     @Override
-    public final X get() {
+    public X get() {
         return id;
     }
 

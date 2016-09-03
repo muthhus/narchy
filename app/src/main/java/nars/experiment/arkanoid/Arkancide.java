@@ -6,7 +6,6 @@ import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.data.AutoClassifier;
-import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
@@ -167,7 +166,7 @@ public class Arkancide extends NAgent {
         //view.attention.add(nar.derivedActivation);
 
         newBeliefChartWindow(this, 400);
-        HistogramChart.newChart(nar, 50);
+        HistogramChart.budgetChart(nar, 50);
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
@@ -244,18 +243,18 @@ public class Arkancide extends NAgent {
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-        nar.beliefConfidence(0.95f);
+        nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.5f;
+        float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.9f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f * p;
 
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
-        nar.compoundVolumeMax.setValue(45);
+        nar.confMin.setValue(0.03f);
+        nar.compoundVolumeMax.setValue(40);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {

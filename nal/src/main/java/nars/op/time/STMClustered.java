@@ -2,6 +2,7 @@ package nars.op.time;
 
 import nars.NAR;
 import nars.Task;
+import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
@@ -18,6 +19,7 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -39,6 +41,8 @@ public class STMClustered extends STM {
 
     @NotNull
     public final NeuralGasNet<TasksNode> net;
+
+    //final Map<TLink,TasksNode> transfer = new ConcurrentHashMap();
 
     protected long now;
 
@@ -112,7 +116,10 @@ public class STMClustered extends STM {
 
         public void insert(@NotNull TLink x) {
             Task xx = x.get();
+            //priSub(cycleCost(id));
+
             if (!xx.isDeleted()) {
+
                 if (x.node == this)
                     return;
 
@@ -216,17 +223,15 @@ public class STMClustered extends STM {
                     ">>";
         }
 
-        @Override
-        public void commit() {
-            @Nullable Task id = this.id;
 
-            if (id == null || id.isDeleted()) {
+
+
+        @NotNull public Task get() {
+            @Nullable Task id = this.id;
+            if (id.isDeleted()) {
                 delete();
-            } else {
-                //priSub(cycleCost(id));
-                nearest().transfer(this);
-                super.commit();
             }
+            return id;
         }
 
         private TasksNode nearest() {
@@ -292,6 +297,16 @@ public class STMClustered extends STM {
         this.punc = punc;
         this.input = new ArrayBag<>(capacity.intValue(), BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity.intValue())) {
 
+            @NotNull
+            @Override
+            public Bag<Task> commit(Consumer<BLink> each) {
+                super.commit(each);
+                forEach(t -> {
+                    TLink tt = (TLink) t;
+                    tt.nearest().transfer(tt);
+                });
+                return this;
+            }
 
             @NotNull
             @Override

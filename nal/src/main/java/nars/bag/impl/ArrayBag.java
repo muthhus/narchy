@@ -135,9 +135,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         BLink<V> c = map.get(key);
         if (c!=null && !c.isDeleted()) {
             //float dur = c.dur();
-            float pBefore = c.priNext();
+            float pBefore = c.pri();
             c.priMult(boost);
-            float delta = c.priNext() - pBefore;
+            float delta = c.pri() - pBefore;
             pressure += delta;// * dur;
             return c.get();
         }
@@ -450,11 +450,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         for (; i >= 0; ) {
             BLink<V> b = l[i];
 
-            if (b != null) {
+            if (b != null && b.get()!=null ) {
                 if (eachNotNull)
                     each.accept(b);
-
-                b.commit();
             }
 
             float bCmp = cmp(b);
@@ -777,12 +775,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 //existing.isDeleted() /* if deleted, we will merge replacing it as if it were zero:
 
-                float pBefore = existing.priNext();
+                float pBefore = existing.pri();
                 float o = bag.mergeFunction.merge(existing, b, scale);
                 if (overflow != null)
                     overflow.add(o);
 
-                bag.mass += existing.priNext() - pBefore;
+                bag.mass += existing.pri() - pBefore;
 
                 return existing;
             } else {

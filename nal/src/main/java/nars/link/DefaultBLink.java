@@ -16,23 +16,18 @@ import static nars.util.Util.clamp;
  */
 abstract public class DefaultBLink<X> extends BLink<X> {
 
-    /** changed status bit */
-    boolean changed;
 
     /** priority */
     private float PRI;
-    /** delta pri */
-    private float dPri;
+
 
     /** durability */
     private float DUR;
-    /** delta dur */
-    private float dDur;
+
 
     /** quality */
     private float QUA;
-    /** delta qua */
-    private float dQua;
+
 
 
     public DefaultBLink(@NotNull X id, float p, float d, float q) {
@@ -48,10 +43,23 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     }
 
 
-    @Override public void init(float p, float d, float q) {
-        PRI = clamp(p);
-        DUR = clamp(d);
-        QUA = clamp(q);
+    @Override public final void init(float p, float d, float q) {
+        _setPriority(p);
+        _setDurability(d);
+        _setQuality(q);
+    }
+
+    @Override
+    public final void _setPriority(float p) {
+        this.PRI = clamp(p);
+    }
+    @Override
+    public final void _setDurability(float d) {
+        this.DUR = clamp(d);
+    }
+    @Override
+    public final void _setQuality(float q) {
+        this.QUA = clamp(q);
     }
 
     @Override
@@ -66,91 +74,26 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     }
 
 
-    @Override public final float priDelta() {
-        return dPri;
-    }
-
-    @Override
-    public void commit() {
-        if (changed) {
-            float p = PRI;
-            if (p == p) /* not NaN */ {
-
-                PRI = clamp( p  + dPri);   dPri = 0;
-                DUR = clamp(DUR + dDur);   dDur = 0;
-                QUA = clamp(QUA + dQua);   dQua = 0;
-
-
-            }
-            changed = false;
-        }
-    }
-
     @Override
     public final float pri() {
         return PRI;
     }
 
-    @Override
-    public float priNext() {
-        return Util.clamp(PRI + dPri);
-    }
 
-    @Override
-    public float durNext() {
-        return Util.clamp(DUR + dDur);
-    }
 
-    public float quaNext() {
-        return Util.clamp(QUA + dQua);
-    }
-
-    @Override
-    public final void _setPriority(float p) {
-        float delta = p - priNext();
-        if (delta >= Param.BUDGET_EPSILON || delta <= -Param.BUDGET_EPSILON) {
-            dPri += delta;
-            changed = true;
-        } /*else {
-            throw new RuntimeException("insignificant priority change detected");
-        }*/
-    }
 
     @Override
     public final float dur() {
         return DUR;
     }
 
-    @Override
-    public final void _setDurability(float d) {
-        float delta = d - durNext();
-        if (delta >= Param.BUDGET_EPSILON || delta <= -Param.BUDGET_EPSILON) {
-            dDur += delta;
 
-            changed = true;
-        }
-    }
 
     @Override
     public final float qua() {
         return QUA;
     }
 
-    @Override
-    public final void _setQuality(float q) {
-        float delta = q - quaNext();
-        if (delta >= Param.BUDGET_EPSILON || delta <= -Param.BUDGET_EPSILON) {
-            dQua += delta;
-            changed = true;
-        }
-    }
-
-
-
-    @NotNull
-    @Override public String toString2() {
-        return toString() + "+/-:" + dPri + ';' + dDur + ';' + dQua;
-    }
 
 
 }

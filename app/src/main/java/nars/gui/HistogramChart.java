@@ -65,7 +65,7 @@ public class HistogramChart extends Surface {
 
     }
 
-    public static void newChart(NAR nar, int bins) {
+    public static void budgetChart(NAR nar, int bins) {
         new SpaceGraph().add(new Facial(
                 new GridSurface(VERTICAL,
                     new HistogramChart(nar, c -> c.pri(), bins, new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)),

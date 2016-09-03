@@ -35,8 +35,8 @@ public class TaskBudgeting {
             if (termLink.isDeleted())
                 return;
             BudgetMerge.
-                    plusBlend
-                    //avgBlend
+                    //plusBlend
+                    avgBlend
                     //andBlend
                     .apply(p, termLink, 1f);
         } catch (Budget.BudgetException e) {

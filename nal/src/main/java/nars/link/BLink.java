@@ -21,8 +21,6 @@ public abstract class BLink<X> implements Budget, Link<X> {
 
     abstract public void init(float p, float d, float q);
 
-    abstract public float priDelta();
-
     @Override
     public boolean isDeleted() {
         float p = pri(); //b[PRI];
@@ -40,20 +38,17 @@ public abstract class BLink<X> implements Budget, Link<X> {
 //            return equalsBudget((Budget) obj);
 //        }
 //        return id.equals(((BagBudget)obj).id);
-        return obj == this || equalsReferenced(obj);
-    }
-
-
-
-    private boolean equalsReferenced(@Nullable Object obj) {
+        boolean result;
         @Nullable X x = get();
         if (obj instanceof BLink) {
             Object o = ((BLink) obj).get();
-            return Objects.equal(x, o);
+            result = Objects.equal(x, o);
         } else {
-            return Objects.equal(x, obj);
+            result = Objects.equal(x, obj);
         }
+        return obj == this || result;
     }
+
 
     @Override public final int hashCode() {
         Object x = get();
@@ -67,14 +62,4 @@ public abstract class BLink<X> implements Budget, Link<X> {
     }
 
 
-    public abstract void commit();
-
-    /** show additional information */
-    @NotNull
-    public String toString2() {
-        return toString();
-    }
-
-    public abstract float priNext();
-    public abstract float durNext();
 }
