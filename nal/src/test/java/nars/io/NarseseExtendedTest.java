@@ -1,7 +1,7 @@
 package nars.io;
 
 import nars.*;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import static nars.io.NarseseTest.task;
 import static nars.io.NarseseTest.term;
-import static nars.nal.Tense.*;
+import static nars.time.Tense.*;
 import static org.junit.Assert.*;
 
 /**

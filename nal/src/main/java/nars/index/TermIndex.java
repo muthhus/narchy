@@ -38,9 +38,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.Op.INH;
-import static nars.Op.NEG;
 import static nars.Op.VAR_PATTERN;
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;

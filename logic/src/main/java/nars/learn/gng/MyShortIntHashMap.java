@@ -91,48 +91,45 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     }
 
-    public void filter(IntPredicate toKeep, ShortArrayList tmp) {
+    public void filter(IntPredicate toKeep) {
+        int ss = size();
+        if (ss == 0)
+            return;
+
         SentinelValues sv = this.sentinelValues;
         {
-            if (sv != null) {
-                if (sv.containsZeroKey) {
-                    if (!toKeep.accept(sv.zeroValue)) {
-                        removeKey((short) 0);
-                        sv = this.sentinelValues; //because it may have changed
-                    }
+            if (sv != null && sv.containsZeroKey) {
+                if (!toKeep.accept(sv.zeroValue)) {
+                    removeKey((short) 0);
+                    sv = this.sentinelValues; //because it may have changed
                 }
             }
         }
         {
-            if (sv != null) { //must check again
-                if (sv.containsOneKey) {
-                    if (!toKeep.accept(sv.oneValue)) {
-                        removeKey((short) 1);
-                        sv = this.sentinelValues; //because it may have changed
-                    }
+            if (sv != null && sv.containsOneKey) {
+                if (!toKeep.accept(sv.oneValue)) {
+                    removeKey((short) 1);
+                    sv = this.sentinelValues; //because it may have changed
                 }
             }
         }
 
+
+        ShortArrayList tmp = new ShortArrayList(ss / 2 /* ESTIMATE */);
 
         short[] keys = this.keys;
         int sizeBefore = keys.length;
         int[] values = this.values;
         for (int i = 0; i < sizeBefore; ++i) {
             short k = keys[i];
-            if (isNonSentinel(k)) {
-                if (!toKeep.accept(values[i])) {
-                    tmp.add(k);
-                }
+            if (isNonSentinel(k) && !toKeep.accept(values[i])) {
+                tmp.add(k);
             }
         }
 
         int s = tmp.size();
         if (s > 0) {
-            for (int i = 0; i < s; i++) {
-                removeKey(tmp.get(i));
-            }
-            tmp.clear();
+            tmp.forEach(this::removeKey);
         }
     }
 
@@ -401,7 +398,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         });
     }
 
-    public void removeKey(short key) {
+    public final void removeKey(short key) {
         if (isEmptyKey(key)) {
             if (this.sentinelValues != null && this.sentinelValues.containsZeroKey) {
                 this.removeEmptyKey();

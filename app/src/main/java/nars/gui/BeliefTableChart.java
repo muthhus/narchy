@@ -21,7 +21,7 @@ import java.util.function.BiFunction;
 
 import static java.lang.Math.PI;
 import static java.util.stream.Collectors.toList;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
 

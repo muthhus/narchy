@@ -7,8 +7,8 @@ import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 7/11/16.

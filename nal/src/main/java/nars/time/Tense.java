@@ -1,4 +1,4 @@
-package nars.nal;
+package nars.time;
 
 import nars.Memory;
 import nars.Task;

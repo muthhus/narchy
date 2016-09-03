@@ -7,7 +7,7 @@ import nars.Param;
 import nars.experiment.pong.Pong;
 import nars.learn.Agent;
 import nars.learn.ql.DQN;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;

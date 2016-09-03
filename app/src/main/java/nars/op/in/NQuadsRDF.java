@@ -4,7 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.Task;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;

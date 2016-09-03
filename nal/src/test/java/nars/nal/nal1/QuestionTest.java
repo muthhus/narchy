@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

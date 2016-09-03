@@ -24,8 +24,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.*;
 
 /**

@@ -1,7 +1,7 @@
 package nars.op.math;
 
 import nars.index.TermIndex;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;

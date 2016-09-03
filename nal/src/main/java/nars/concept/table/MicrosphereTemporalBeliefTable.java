@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 
 /**

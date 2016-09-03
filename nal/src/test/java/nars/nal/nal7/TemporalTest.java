@@ -9,7 +9,7 @@ import nars.bag.impl.ArrayBag;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.io.NarseseTest;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;

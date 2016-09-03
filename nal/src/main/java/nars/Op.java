@@ -1,7 +1,7 @@
 package nars;
 
 
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**

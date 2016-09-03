@@ -26,10 +26,9 @@ import java.util.List;
 
 import static nars.$.t;
 import static nars.agent.NAgentOld.varPct;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
-import static nars.nal.UtilityFunctions.w2c;
 import static nars.util.Texts.n2;
 import static nars.util.Texts.n4;
 

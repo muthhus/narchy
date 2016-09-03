@@ -10,7 +10,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 1/9/16.

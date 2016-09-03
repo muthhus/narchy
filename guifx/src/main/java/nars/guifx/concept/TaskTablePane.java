@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.PI;
 import static javafx.application.Platform.runLater;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 3/18/16.

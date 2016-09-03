@@ -50,12 +50,14 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     };
 
     private static int weigh(Termlike v) {
-        float beliefCost = (v instanceof CompoundConcept) ?
-                    (1f - maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
-                    0;
+//        float beliefCost = (v instanceof CompoundConcept) ?
+//                    (1f - maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
+//                    0;
         int c = v.complexity();
+
+        return c;
         //return Math.round( 1f + 100 * c * beliefCost);
-        return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
+        //return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
     }
 
     private static float maxConfidence(@NotNull CompoundConcept v) {

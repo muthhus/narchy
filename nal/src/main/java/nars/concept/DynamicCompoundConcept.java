@@ -1,6 +1,5 @@
 package nars.concept;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import nars.*;
 import nars.bag.Bag;
@@ -15,18 +14,15 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.obj.Termject;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
-import org.apache.commons.collections4.IteratorUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * Adds support for dynamically calculated truth values

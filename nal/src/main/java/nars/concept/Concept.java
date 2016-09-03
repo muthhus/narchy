@@ -48,7 +48,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 
 public interface Concept extends Termed {
 

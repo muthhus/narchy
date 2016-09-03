@@ -4,9 +4,8 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.op.PrologCore;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 1/28/16.

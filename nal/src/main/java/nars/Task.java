@@ -5,7 +5,7 @@ import nars.concept.Concept;
 import nars.concept.TruthDelta;
 import nars.index.TermIndex;
 import nars.nal.Stamp;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.task.MutableTask;
 import nars.task.Revision;
 import nars.task.Tasked;
@@ -22,8 +22,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-import static nars.nal.Tense.ETERNAL;
-import static nars.nal.Tense.TIMELESS;
+import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
 
 /**

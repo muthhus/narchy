@@ -34,7 +34,7 @@ import static java.lang.Math.max;
 import static java.util.stream.Collectors.toList;
 import static nars.$.$;
 import static nars.$.t;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.util.Texts.n4;
 
 /**

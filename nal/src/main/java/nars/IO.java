@@ -3,7 +3,7 @@ package nars;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.index.TermIndex;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.term.Compound;

@@ -7,7 +7,7 @@ import nars.$;
 import nars.Op;
 import nars.index.PatternIndex;
 import nars.index.TermIndex;
-import nars.nal.TimeFunctions;
+import nars.time.TimeFunctions;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PostCondition;
 import nars.nal.meta.TaskBeliefPair;

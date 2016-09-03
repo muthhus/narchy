@@ -25,7 +25,7 @@ public class MyShortIntHashMapTest {
                 assertEquals(5, v);
             });
 
-            m.filter(v -> v == 0, new ShortArrayList());
+            m.filter(v -> v == 0);
 
             assertTrue(m.isEmpty());
         }

@@ -12,7 +12,7 @@ import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
 import nars.index.TermIndex;
 import nars.nal.Level;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.nar.Executioner;
@@ -51,7 +51,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.Symbols.*;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
 
 

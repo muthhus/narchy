@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 4/21/16.

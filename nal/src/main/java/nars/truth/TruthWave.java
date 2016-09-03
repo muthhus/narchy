@@ -2,7 +2,7 @@ package nars.truth;
 
 import nars.NAR;
 import nars.concept.table.BeliefTable;
-import nars.nal.Tense;
+import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

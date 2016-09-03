@@ -1,6 +1,6 @@
 package nars.task;
 
-import nars.nal.Tense;
+import nars.time.Tense;
 
 /**
  * interface for the temporal information about the

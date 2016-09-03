@@ -1,66 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>opennars</groupId>
-  <artifactId>logic</artifactId>
-  <version>1.8-SNAPSHOT</version>
-  <inceptionYear>2016</inceptionYear>
-  <packaging>jar</packaging>
-  <parent>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
     <groupId>opennars</groupId>
-    <artifactId>narchy</artifactId>
+    <artifactId>logic</artifactId>
     <version>1.8-SNAPSHOT</version>
-  </parent>
-  <licenses>
-    <license>
-      <name>GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)</name>
-      <url>https://www.gnu.org/licenses/agpl.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <dependencies>
-    <dependency>
-      <groupId>opennars</groupId>
-      <artifactId>util</artifactId>
-      <version>1.8-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
+    <inceptionYear>2016</inceptionYear>
+    <packaging>jar</packaging>
+    <parent>
+        <groupId>opennars</groupId>
+        <artifactId>narchy</artifactId>
+        <version>1.8-SNAPSHOT</version>
+    </parent>
+    <licenses>
+        <license>
+            <name>GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)</name>
+            <url>https://www.gnu.org/licenses/agpl.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <dependencies>
+        <dependency>
+            <groupId>opennars</groupId>
+            <artifactId>util</artifactId>
+            <version>1.8-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.4</version>
-      <scope>compile</scope>
-    </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.encog</groupId>-->
-      <!--<artifactId>encog-core</artifactId>-->
-      <!--<version>3.3.0</version>-->
-      <!--<scope>compile</scope>-->
-      <!--<exclusions>-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.encog</groupId>-->
+        <!--<artifactId>encog-core</artifactId>-->
+        <!--<version>3.3.0</version>-->
+        <!--<scope>compile</scope>-->
+        <!--<exclusions>-->
         <!--<exclusion><groupId>org.apache.commons</groupId><artifactId>commons-math3</artifactId></exclusion>-->
-      <!--</exclusions>-->
-    <!--</dependency>-->
+        <!--</exclusions>-->
+        <!--</dependency>-->
 
 
-    <!--<dependency>-->
-      <!--<groupId>org.clojure</groupId>-->
-      <!--<artifactId>clojure</artifactId>-->
-      <!--<version>1.9.0-master-SNAPSHOT</version>-->
-      <!--<scope>compile</scope>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.clojure</groupId>-->
-      <!--<artifactId>core.logic</artifactId>-->
-      <!--<version>0.8.11-SNAPSHOT</version>-->
-      <!--<scope>compile</scope>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+        <!--<dependency>-->
+        <!--<groupId>org.clojure</groupId>-->
+        <!--<artifactId>clojure</artifactId>-->
+        <!--<version>1.9.0-master-SNAPSHOT</version>-->
+        <!--<scope>compile</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.clojure</groupId>-->
+        <!--<artifactId>core.logic</artifactId>-->
+        <!--<version>0.8.11-SNAPSHOT</version>-->
+        <!--<scope>compile</scope>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
 </project>

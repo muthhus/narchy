@@ -1,7 +1,7 @@
 package nars.inter;
 
 import nars.NAR;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nar.Default;
 import nars.util.Util;
 import org.junit.Ignore;

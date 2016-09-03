@@ -78,15 +78,20 @@ public class cpac
 
 	public void draw()
 	{
-		maze.DrawDot(iX/16, iY/16);
-		maze.DrawDot(iX/16+(iX%16>0?1:0), iY/16+(iY%16>0?1:0));
 
-		int iImageStep=(iX%16 + iY%16)/2; 	// determine shape of PAc
-		if (iImageStep<4)
-			iImageStep=3-iImageStep;
-		else
-			iImageStep-=4;
-		graphics.drawImage(imagePac[iDir][iImageStep], iX-1, iY-1, applet);
+		try {
+			maze.DrawDot(iX/16, iY/16);
+			maze.DrawDot(iX/16+(iX%16>0?1:0), iY/16+(iY%16>0?1:0));
+
+			int iImageStep=(iX%16 + iY%16)/2; 	// determine shape of PAc
+			if (iImageStep<4)
+				iImageStep=3-iImageStep;
+			else
+				iImageStep-=4;
+			graphics.drawImage(imagePac[iDir][iImageStep], iX - 1, iY - 1, applet);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			//grr
+		}
 	}	
 
 	// return 1 if eat a dot

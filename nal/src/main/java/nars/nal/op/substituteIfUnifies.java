@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.NEG;
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * substituteIfUnifies....(term, varFrom, varTo)

@@ -255,11 +255,15 @@ public class TermVector implements TermContainer {
 
     @Override
     public final boolean equals(Object obj) {
-        if (this == obj) {
+        if (this == obj)
             return true;
-        } else if (obj instanceof TermVector) {
+
+        if (hash!=obj.hashCode())
+            return false;
+
+        if (obj instanceof TermVector) {
             TermVector ot = (TermVector) obj;
-            return (hash == ot.hash && Util.equals(term, ot.term));
+            return Util.equals(term, ot.term);
         } else {
             return (obj instanceof TermContainer) && (equalTo((TermContainer) obj));
         }

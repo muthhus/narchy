@@ -3,7 +3,6 @@ package nars.learn.gng;
 import org.eclipse.collections.api.block.predicate.primitive.IntPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.ShortIntProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.ShortProcedure;
-import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 
 /**
  * Created by me on 5/25/16.
@@ -13,7 +12,7 @@ public class SemiDenseIntUndirectedGraph implements IntUndirectedGraph {
 
     protected final int V; //# of vertices
     protected final MyShortIntHashMap[] adj;  //Array of adjacency lists
-    final ShortArrayList tmp = new ShortArrayList();
+
 
     //Constructor with a pre-supplied number of vertices
     public SemiDenseIntUndirectedGraph(short V) {
@@ -89,7 +88,7 @@ public class SemiDenseIntUndirectedGraph implements IntUndirectedGraph {
     public void removeEdgeIf(IntPredicate filter) {
         MyShortIntHashMap[] e = this.adj;
         for (MyShortIntHashMap h : e) {
-            h.filter(filter, tmp);
+            h.filter(filter);
         }
     }
 

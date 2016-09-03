@@ -3,7 +3,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.term.Term;
 import nars.util.signal.TestNAR;
 import org.junit.Ignore;
@@ -13,7 +13,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)

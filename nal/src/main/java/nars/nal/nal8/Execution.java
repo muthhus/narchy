@@ -2,7 +2,7 @@ package nars.nal.nal8;
 
 import nars.*;
 import nars.concept.OperationConcept;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;

@@ -5,7 +5,7 @@ import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
 import nars.agent.NAgentOld;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

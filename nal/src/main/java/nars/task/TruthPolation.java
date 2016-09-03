@@ -14,7 +14,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.truth.TruthFunctions.c2w;
 

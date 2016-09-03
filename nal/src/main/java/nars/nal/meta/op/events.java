@@ -7,8 +7,8 @@ import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * True if the premise task and belief are both non-eternal events

@@ -9,7 +9,7 @@ import nars.experiment.misc.Talk;
 import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
 import nars.inter.InterNAR;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;

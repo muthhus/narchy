@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 
 
 public class VariableCompressor implements Consumer<Task> {

@@ -8,7 +8,7 @@ import nars.Task;
 import nars.budget.Budget;
 import nars.concept.TruthDelta;
 import nars.nal.Premise;
-import nars.nal.TimeFunctions;
+import nars.time.TimeFunctions;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
 import nars.nal.rule.PremiseRule;
@@ -20,7 +20,6 @@ import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import nars.util.Texts;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
-import static nars.nal.Tense.*;
+import static nars.time.Tense.*;
 
 /**
  * Handles matched derivation results

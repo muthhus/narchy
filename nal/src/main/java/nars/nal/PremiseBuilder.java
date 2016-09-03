@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.concept.Activation.linkable;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Entry point for using the NAL+ Internal Reasoner

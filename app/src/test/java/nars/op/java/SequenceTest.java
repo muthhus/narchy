@@ -4,7 +4,7 @@ import nars.$;
 import nars.Param;
 import nars.Task;
 import nars.index.TermIndex;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.op.in.Twenglish;

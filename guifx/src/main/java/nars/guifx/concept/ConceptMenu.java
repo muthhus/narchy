@@ -9,7 +9,7 @@ import nars.NAR;
 import nars.guifx.NARfx;
 import nars.guifx.nars.NARActionButton;
 import nars.guifx.util.SimpleMenuItem;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Termed;

@@ -6,7 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.policy.DefaultConceptPolicy;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.Compound;

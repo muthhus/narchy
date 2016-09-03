@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * Prolog mental coprocessor for accelerating reasoning

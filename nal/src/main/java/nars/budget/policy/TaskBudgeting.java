@@ -10,7 +10,7 @@ import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.nal.Premise;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import nars.term.Termed;

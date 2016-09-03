@@ -137,11 +137,11 @@ public class Pacman extends NAgent {
         //Param.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 256, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
 
-        Pacman pacman = new Pacman(nar, 2 /* ghosts  */, 3 /* visionRadius */);
+        Pacman pacman = new Pacman(nar, 2 /* ghosts  */, 4 /* visionRadius */);
         pacman.trace = true;
 
 

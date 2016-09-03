@@ -10,10 +10,11 @@ import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
-import nars.nal.Tense;
+import nars.nar.SingleThreadExecutioner;
+import nars.time.Tense;
 import nars.nar.Default;
 import nars.nar.Executioner;
-import nars.nar.SingleThreadExecutioner;
+import nars.nar.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.NAgent;
 import nars.op.VariableCompressor;
@@ -51,7 +52,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris extends NAgent {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 26 * 10000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 40 * 10000000;
 
     public static final Executioner exe =
             //new MultiThreadExecutioner(2, 16384);

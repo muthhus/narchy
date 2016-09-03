@@ -18,6 +18,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,39 +44,43 @@ public class PremiseRuleSet {
     public final List<PremiseRule> rules;
 
 
+    static final BiConsumer<Pair<Compound, String>, DataOutput> encoder = (x, o) ->{
+        try {
+            IO.writeTerm(o, x.getOne());
+            o.writeUTF(x.getTwo());
+        } catch (IOException e) {
+            throw new RuntimeException(e); //e.printStackTrace();
+        }
+    };
 
     @NotNull
     public static PremiseRuleSet resource(String name) throws IOException, URISyntaxException {
 
         PatternIndex p = new PatternIndex();
 
-        BiConsumer<Pair<Compound, String>, DataOutput> encoder = (x, o) ->{
+        Function<DataInput,Pair<Compound,String>> decoder = (i) -> {
             try {
-                IO.writeTerm(o, x.getOne());
-                o.writeUTF(x.getTwo());
+                return Tuples.pair(
+                        (Compound)readTerm(i, p),
+                        i.readUTF()
+                );
             } catch (IOException e) {
                 throw new RuntimeException(e); //e.printStackTrace();
+                //return null;
             }
         };
-        Function<DataInput,Pair<Compound,String>> decoder = (i) -> {
-                try {
-                    return Tuples.pair(
-                            (Compound)readTerm(i, p),
-                            i.readUTF()
-                    );
-                } catch (IOException e) {
-                    throw new RuntimeException(e); //e.printStackTrace();
-                    //return null;
-                }
-        };
 
-        Path path = Paths.get(Deriver.class.getClassLoader().getResource(name).toURI());
+        //Path path = Paths.get(Deriver.class.getClassLoader().getResource(name).toURI());
+
+        URL path = Deriver.class.getClassLoader().getResource(name);
+
         Stream<Pair<Compound, String>> parsed =
                 Util.fileCache(path, PremiseRuleSet.class.getSimpleName(),
                         () -> {
                             try {
-                                return parse(load(Files.readAllLines(path)), p);
-                            } catch (IOException e) {
+
+                                return parse(load(Files.readAllLines(Paths.get(path.toURI()))), p);
+                            } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
                         },

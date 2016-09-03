@@ -3,7 +3,7 @@ package nars.term.compound;
 import nars.IO;
 import nars.Op;
 import nars.Param;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
@@ -14,7 +14,7 @@ import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 
 
 public class GenericCompound implements Compound {

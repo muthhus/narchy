@@ -10,7 +10,7 @@ import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

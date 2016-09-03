@@ -8,11 +8,10 @@ import org.jetbrains.annotations.NotNull;
 public class Atom extends AtomicStringConstant {
 
     public Atom(@NotNull String id) {
-        super(id);
-        validateAtomID(id);
+        super(validateAtomID(id));
     }
 
-    static void validateAtomID(@NotNull String id) {
+    private static String validateAtomID(@NotNull String id) {
         if (id.isEmpty())
             throw new UnsupportedOperationException("Empty Atom ID");
 
@@ -25,6 +24,8 @@ public class Atom extends AtomicStringConstant {
             case '$':
                 throw new RuntimeException("invalid Atom name \"" + id + "\": leading character imitates another operation type");
         }
+
+        return id.intern();
     }
 
     @NotNull

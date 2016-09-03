@@ -4,7 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.task.Tasked;
 import nars.util.analyze.EventCount;
 import nars.util.condition.EternalTaskCondition;

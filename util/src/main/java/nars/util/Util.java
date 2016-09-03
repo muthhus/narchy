@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -1048,16 +1050,60 @@ public enum Util {
         logger.info("{} ({} ms)", procName, (end-start));
     }
 
+//    public static File resourceAsFile(String resourcePath) {
+//        try {
+//            long modified = ClassLoader.getSystemClassLoader().getResource(resourcePath).openConnection().getLastModified();
+//
+//            InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream(resourcePath);
+//            if (in == null) {
+//                return null;
+//            }
+//
+//            File tempFile = File.createTempFile(String.valueOf(in.hashCode()), ".tmp");
+//            tempFile.deleteOnExit();
+//
+//            try (FileOutputStream out = new FileOutputStream(tempFile)) {
+//                //copy stream
+//                byte[] buffer = new byte[1024];
+//                int bytesRead;
+//                while ((bytesRead = in.read(buffer)) != -1) {
+//                    out.write(buffer, 0, bytesRead);
+//                }
+//            }
+//            tempFile.setLastModified(modified);
+//
+//            return tempFile;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+    public static <X> Stream<X> fileCache(URL u, String baseName, Supplier<Stream<X>> o,
+                                          BiConsumer<X,DataOutput> encoder,
+                                          Function<DataInput,X> decoder,
+                                          Logger logger
+    ) throws IOException, URISyntaxException {
+        return fileCache(new File(u.toURI()), baseName, o, encoder, decoder, logger);
+    }
+
     public static <X> Stream<X> fileCache(Path p, String baseName, Supplier<Stream<X>> o,
+                                          BiConsumer<X,DataOutput> encoder,
+                                          Function<DataInput,X> decoder,
+                                          Logger logger
+    ) throws IOException {
+        return fileCache(p.toFile(), baseName, o, encoder, decoder, logger);
+    }
+
+    public static <X> Stream<X> fileCache(File f, String baseName, Supplier<Stream<X>> o,
                                           BiConsumer<X,DataOutput> encoder,
                                           Function<DataInput,X> decoder,
                                           Logger logger
                                           ) throws IOException {
 
-        File f = p.toFile();
         long lastModified = f.lastModified();
         long size = f.length();
-        String suffix = "_" + p.getFileName() + "_" + lastModified + "_" + size;
+        String suffix = "_" + f.getName() + "_" + lastModified + "_" + size;
 
         List<X> buffer = new FasterList(1024 /* estimate */);
 

@@ -10,7 +10,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 
 @RunWith(Parameterized.class)
 public class NAL3Test extends AbstractNALTest {

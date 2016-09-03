@@ -50,7 +50,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         //n.log();
         //n.input("(a<->b).", "(b<->c).");
 
-        new DeductiveMeshTest(n, new int[]{5, 5}, 16384);
+        new DeductiveMeshTest(n, new int[]{6, 6}, 16384);
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
     }

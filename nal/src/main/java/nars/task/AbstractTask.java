@@ -4,7 +4,7 @@ import nars.*;
 import nars.budget.UnitBudget;
 import nars.concept.TruthDelta;
 import nars.index.TermIndex;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -18,8 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Default Task implementation

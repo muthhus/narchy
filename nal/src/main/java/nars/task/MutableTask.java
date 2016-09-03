@@ -3,7 +3,7 @@ package nars.task;
 import nars.*;
 import nars.budget.BudgetFunctions;
 import nars.budget.Budgeted;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.DefaultTruth;

@@ -15,7 +15,7 @@ import nars.guifx.nars.TaskLabel;
 import nars.guifx.treemap.Item;
 import nars.guifx.treemap.TreemapChart;
 import nars.nal.Premise;
-import nars.nal.Tense;
+import nars.time.Tense;
 
 import java.util.Collection;
 import java.util.HashSet;

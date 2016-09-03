@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static nars.Op.*;
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 import static nars.term.Terms.compoundOrNull;
 
 /***
@@ -827,7 +827,7 @@ public enum $ {
 
     @NotNull
     public static Atom the(@NotNull byte[] id) {
-        return new Atom(new String(id));
+        return the(new String(id));
     }
 
     @NotNull

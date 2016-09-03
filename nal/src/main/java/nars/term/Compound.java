@@ -23,7 +23,7 @@ package nars.term;
 import nars.$;
 import nars.IO;
 import nars.Op;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import nars.term.visit.SubtermVisitor;
@@ -47,7 +47,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * a compound term

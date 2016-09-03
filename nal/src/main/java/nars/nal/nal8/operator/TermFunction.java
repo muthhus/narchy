@@ -8,7 +8,7 @@ import nars.budget.Budgeted;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
 import nars.index.TermIndex;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.task.MutableTask;

@@ -22,7 +22,7 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import static nars.Op.*;
-import static nars.nal.Tense.DTERNAL;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * Static utility class for static methods related to Terms

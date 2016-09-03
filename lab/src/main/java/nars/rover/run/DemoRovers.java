@@ -14,7 +14,7 @@ import nars.guifx.NARfx;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
 import nars.index.Indexes;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
 import nars.rover.Sim;

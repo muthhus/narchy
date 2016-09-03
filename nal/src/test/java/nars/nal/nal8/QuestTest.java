@@ -2,14 +2,14 @@ package nars.nal.nal8;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nal.Tense;
+import nars.time.Tense;
 import nars.nar.Default;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.$.$;
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertTrue;
 
 /**

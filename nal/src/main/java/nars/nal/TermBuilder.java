@@ -9,7 +9,6 @@ import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
@@ -24,8 +23,8 @@ import java.util.TreeSet;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
-import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.XTERNAL;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 import static nars.term.Term.False;
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.compound.Statement.pred;

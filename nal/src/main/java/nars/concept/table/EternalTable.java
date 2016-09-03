@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nars.nal.Tense.ETERNAL;
+import static nars.time.Tense.ETERNAL;
 
 
 /**
