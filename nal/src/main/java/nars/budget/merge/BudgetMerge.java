@@ -43,7 +43,8 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     enum PriMerge {
         PLUS,
         AVERAGE,
-        AND
+        AND,
+        OR
     }
 
     /** srcScale only affects the amount of priority adjusted; for the other components, the 'score'
@@ -79,6 +80,9 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 break;
             case AND:
                 newPri = Util.lerp(targetPri * srcPri, targetPri, srcScale);
+                break;
+            case OR:
+                newPri = Util.lerp(or(targetPri,srcPri), targetPri, srcScale);
                 break;
             case AVERAGE:
                 newPri = Util.lerp((srcPri + targetPri)/2f, targetPri, srcScale);
@@ -148,6 +152,10 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 
     /** avg priority, LERP other components in proportion to the priorities */
     BudgetMerge avgBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVERAGE);
+
+    /** or priority, LERP other components in proportion to the priorities */
+    BudgetMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
+
 
     /** AND priority, LERP other components in proportion to the priorities */
     BudgetMerge andBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AND);

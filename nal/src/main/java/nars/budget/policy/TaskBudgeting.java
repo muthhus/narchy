@@ -35,8 +35,9 @@ public class TaskBudgeting {
             if (termLink.isDeleted())
                 return;
             BudgetMerge.
+                    orBlend
                     //plusBlend
-                    avgBlend
+                    //avgBlend
                     //andBlend
                     .apply(p, termLink, 1f);
         } catch (Budget.BudgetException e) {
@@ -70,7 +71,7 @@ public class TaskBudgeting {
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 pp.pri()
-                    * volRatioScale
+                    //* volRatioScale
                     * qual
         ;
         //if (priority * durability < Param.BUDGET_EPSILON)
@@ -107,11 +108,11 @@ public class TaskBudgeting {
         Task parentTask = pp.task;
         float parentComplexity = parentTask.complexity();
         Task parentBelief = pp.belief;
-        if (parentBelief!=null && parentBelief.complexity() > parentComplexity)
-            parentComplexity = parentBelief.complexity();
+        if (parentBelief!=null) // && parentBelief.complexity() > parentComplexity)
+            parentComplexity += parentBelief.complexity();
 
         int derivedComplexity = derived.complexity();
-        return 1f / (1f + (derivedComplexity / (derivedComplexity + parentComplexity)));
+        return (1f - (derivedComplexity / (derivedComplexity + parentComplexity)));
     }
 
 //    /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by

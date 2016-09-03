@@ -286,7 +286,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
                     return true;
 
                 int a = now();
-                //x needs to be assigned to both
+                //experimental: x needs to be assigned to both ?
                 if (putYX(x, y) && putYX(x, y2)) {
                     return true;
                 } else {

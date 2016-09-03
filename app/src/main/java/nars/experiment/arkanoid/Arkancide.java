@@ -246,7 +246,7 @@ public class Arkancide extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 1f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.9f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f * p;
@@ -254,7 +254,7 @@ public class Arkancide extends NAgent {
 
         nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.confMin.setValue(0.03f);
-        nar.compoundVolumeMax.setValue(40);
+        nar.compoundVolumeMax.setValue(50);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
