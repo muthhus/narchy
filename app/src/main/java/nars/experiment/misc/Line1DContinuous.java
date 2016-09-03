@@ -4,12 +4,11 @@ import nars.$;
 import nars.NAR;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
-import nars.nar.Executioner;
-import nars.nar.SingleThreadExecutioner;
+import nars.nar.exe.Executioner;
+import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.NAgent;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
@@ -204,20 +203,20 @@ public class Line1DContinuous extends NAgent {
         nar.cyclesPerFrame.setValue(cyclesPerFrame);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.6f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.02f;
         nar.DEFAULT_GOAL_PRIORITY = 0.02f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.01f;
         nar.DEFAULT_QUEST_PRIORITY = 0.01f;
 
-        nar.compoundVolumeMax.set(10);
+        nar.compoundVolumeMax.set(25);
 
         Line1DContinuous l = new Line1DContinuous(nar, 16,
                 sine(160)
                 //random(120)
         );
         l.print = true;
-        l.runSync(5000);
+        l.runSync(15000);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);

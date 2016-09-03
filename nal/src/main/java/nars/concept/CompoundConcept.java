@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
+import nars.budget.Activation;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;

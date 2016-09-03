@@ -1,4 +1,4 @@
-package nars.nar;
+package nars.nar.exe;
 
 import nars.NAR;
 import nars.Task;
@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 8/16/16.
  */
-public class SingleThreadExecutioner extends Executioner {
+public final class SingleThreadExecutioner extends Executioner {
 
     private NAR nar;
 
@@ -19,6 +19,11 @@ public class SingleThreadExecutioner extends Executioner {
     @Override
     public void stop() {
 
+    }
+
+    @Override
+    public final boolean concurrent() {
+        return false;
     }
 
     @Override

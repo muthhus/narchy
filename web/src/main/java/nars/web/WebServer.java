@@ -1,7 +1,6 @@
 package nars.web;
 
 import io.undertow.Undertow;
-import io.undertow.UndertowOptions;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.cache.DirectBufferCache;
 import io.undertow.server.handlers.resource.CachingResourceManager;
@@ -14,16 +13,11 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.index.CaffeineIndex;
-import nars.index.Indexes;
 import nars.link.BLink;
 import nars.nar.Default;
-import nars.nar.SingleThreadExecutioner;
+import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.mental.Abbreviation;
-import nars.op.mental.Anticipate;
-import nars.op.mental.Inperience;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.time.RealtimeMSClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;

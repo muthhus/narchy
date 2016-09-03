@@ -7,6 +7,8 @@ import nars.concept.Concept;
 import nars.index.Indexes;
 import nars.index.TermIndex;
 import nars.link.BLink;
+import nars.nar.exe.Executioner;
+import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.ConceptBagCycle;
 import nars.term.Term;
 import nars.term.Termed;

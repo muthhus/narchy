@@ -1,4 +1,4 @@
-package nars.nar;
+package nars.nar.exe;
 
 import nars.NAR;
 import nars.Task;
@@ -22,4 +22,6 @@ abstract public class Executioner implements Executor {
 
     abstract public void stop();
 
+    /** true if this executioner executes procedures concurrently */
+    public abstract boolean concurrent();
 }

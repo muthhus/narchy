@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nars.concept.Activation.linkable;
+import static nars.budget.Activation.linkable;
 import static nars.time.Tense.ETERNAL;
 
 /**

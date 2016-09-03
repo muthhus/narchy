@@ -1,4 +1,4 @@
-package nars.nar;
+package nars.nar.exe;
 
 import com.lmax.disruptor.*;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -88,6 +88,11 @@ public class MultiThreadExecutioner extends Executioner {
     }
 
     @Override
+    public final boolean concurrent() {
+        return true;
+    }
+
+    @Override
     public void next(@NotNull NAR nar) {
         //nar.eventFrameStart.emitAsync(nar, runWorker);
 
@@ -124,66 +129,15 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public void synchronize() {
-        //if (!runWorker.isQuiescent()) {
-//                while (!runWorker.awaitQuiescence(QUIESENCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
-//                    //logger.warn("runWorker lag: {}", runWorker);
-//                    Thread.yield();
-//                }
-        //}
-
-
-        //long cap = ring.remainingCapacity();
-        //int size = ring.getBufferSize();
-        //if (cap!= size) {
-        /*while ((cap = ring.remainingCapacity()) < ring.getBufferSize())*/
-
-        //System.out.println("waiting for: " + e + " free=" + cap);
 
             try {
-
-                //while (true) {
-                    //if (ring.hasAvailableCapacity(1)) {
-
-                    //do {
                 long lastCursor = this.cursor;
                 if (lastCursor!=(this.cursor = ring.getCursor())) {
                     barrier.waitFor(cursor);
                 }
-
-                    //} while (!ring.hasAvailableCapacity(ring.getBufferSize()/2));
-
-                        //break;
-                    //} else {
-                        //System.err.println("no available capacity");
-                        //Util.pause(0);
-                    //}
-                //}
-            } catch (AlertException e1) {
-                e1.printStackTrace();
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            } catch (TimeoutException e1) {
+            } catch (AlertException | InterruptedException | TimeoutException e1) {
                 e1.printStackTrace();
             }
-        //}
-
-        //long used = size - ring.remainingCapacity();
-//
-//        RingBuffer<TaskEvent> ring = this.ring;
-//        while (ring.remainingCapacity() < ring.getBufferSize()) {
-//            //while ((cap = ring.remainingCapacity()) < ring.getBufferSize()) {
-//
-//            //logger.info( "<-- seq=" + ring.getCursor() + " remain=" + cap);// + " last=" + last[0]);
-//
-//            //Thread.yield();
-//            //Util.pause(1);
-//            try {
-//                Thread.sleep(0);
-//            } catch (InterruptedException e) {
-//
-//            }
-//        }
-
 
     }
 
@@ -191,13 +145,13 @@ public class MultiThreadExecutioner extends Executioner {
     final static EventTranslatorOneArg<TaskEvent, Task[]> taskPublisher = (TaskEvent x, long seq, Task[] b) -> x.tasks = b;
 
     @Override
-    public void inputLater(@NotNull Task[] t) {
+    public final void inputLater(@NotNull Task[] t) {
         if (!ring.tryPublishEvent(taskPublisher, t)) {
             overflow(t);
         }
     }
 
-    public void overflow(@NotNull Task[] t) {
+    public final void overflow(@NotNull Task[] t) {
         //TODO use a bag to collect these
         logger.warn("dropped: {}", t);
     }
@@ -207,12 +161,12 @@ public class MultiThreadExecutioner extends Executioner {
     };
 
     @Override
-    public void execute(@NotNull Runnable r) {
+    public final void execute(@NotNull Runnable r) {
         disruptor.publishEvent(runPublisher, r);
     }
 
     @Override
-    public boolean executeMaybe(Runnable r) {
+    public final boolean executeMaybe(Runnable r) {
         return ring.tryPublishEvent(runPublisher, r);
     }
 

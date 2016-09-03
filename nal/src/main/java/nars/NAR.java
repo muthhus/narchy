@@ -5,7 +5,7 @@ import com.google.common.collect.Sets;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.concept.Activation;
+import nars.budget.Activation;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
@@ -15,8 +15,8 @@ import nars.nal.Level;
 import nars.time.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
-import nars.nar.Executioner;
-import nars.nar.SingleThreadExecutioner;
+import nars.nar.exe.Executioner;
+import nars.nar.exe.SingleThreadExecutioner;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -91,7 +91,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             //"eventSpeak"
     );
 
-    private final Executioner exe;
+    public final Executioner exe;
 
 
     /**

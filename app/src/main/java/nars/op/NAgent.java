@@ -4,7 +4,7 @@ import nars.*;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
-import nars.concept.Activation;
+import nars.budget.Activation;
 import nars.concept.Concept;
 import nars.task.GeneratedTask;
 import nars.term.Term;

@@ -3,6 +3,7 @@ package nars.concept;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.Task;
+import nars.budget.Activation;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import org.jetbrains.annotations.NotNull;

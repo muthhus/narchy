@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,12 +55,15 @@ import static nars.time.Tense.DTERNAL;
 
 
     @NotNull
-    private static Map newBagMap(int cap) {
-        //return new NonBlockingHashMap(cap);
-        return new ConcurrentHashMap(cap);
-        //return new HashMap(cap);
-        //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
-                        //ConcurrentHashMapUnsafe(cap);
+    private Map newBagMap(int cap) {
+        if (nar.exe.concurrent()) {
+            return new ConcurrentHashMap(cap);
+            //return new NonBlockingHashMap(cap);
+            //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
+            //ConcurrentHashMapUnsafe(cap);
+        } else {
+            return new HashMap(cap);
+        }
     }
 
     @NotNull
@@ -79,8 +83,8 @@ import static nars.time.Tense.DTERNAL;
     @Nullable
     final Concept newConcept(@NotNull Compound t){
 
-        if (t.op().temporal && t.dt()!=DTERNAL)
-            throw new RuntimeException("temporality in concept term: " + t);
+        assert(!(t.op().temporal && t.dt() != DTERNAL)); //throw new RuntimeException("temporality in concept term: " + t);
+
 
         Map map1 = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
         Map map2 =
@@ -119,10 +123,6 @@ import static nars.time.Tense.DTERNAL;
     }
 
 
-
-    //return (!(t instanceof Space)) ?
-    //new SpaceConcept((Space) t, taskLinks, termLinks);
-
     @NotNull
     public Bag<Task> taskbag(Map map) {
         return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
@@ -137,11 +137,8 @@ import static nars.time.Tense.DTERNAL;
 
     /** use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process */
     private final BudgetMerge mergeDefault = BudgetMerge
-            //.avgBlend;
             .plusBlend;
-
-
-
+            //.avgBlend;
 
 
     final static Logger logger = LoggerFactory.getLogger(DefaultConceptBuilder.class);

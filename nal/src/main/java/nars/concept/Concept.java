@@ -27,6 +27,7 @@ import nars.Symbols;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
+import nars.budget.Activation;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;

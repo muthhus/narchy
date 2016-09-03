@@ -6,6 +6,7 @@ import nars.index.TermIndex;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.nal8.AbstractOperator;
+import nars.nar.exe.Executioner;
 import nars.op.data.*;
 import nars.op.math.length;
 import nars.op.mental.doubt;

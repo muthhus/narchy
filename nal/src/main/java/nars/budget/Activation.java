@@ -1,10 +1,13 @@
-package nars.concept;
+package nars.budget;
 
 import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.Budgeted;
+import nars.concept.CompoundConcept;
+import nars.concept.Concept;
+import nars.concept.TruthDelta;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -264,7 +267,9 @@ public class Activation {
 
     public void activate(@NotNull NAR nar, float activation) {
         if (!concepts.isEmpty()) {
-            float total = 1 / (float) concepts.sum();
+            float total =
+                    //1 / (float) concepts.sum(); //normalized
+                    1f; //unnormalized
 
             nar.activate(concepts, in, activation / total, conceptOverflow);
         }

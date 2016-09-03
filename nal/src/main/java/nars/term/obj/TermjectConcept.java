@@ -7,7 +7,7 @@ import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.AbstractConcept;
-import nars.concept.Activation;
+import nars.budget.Activation;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.term.Compound;
