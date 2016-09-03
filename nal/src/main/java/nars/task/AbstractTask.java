@@ -402,7 +402,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (c != 0)
             return c;
 
-        if (!isInput()) {
+        if (evidence.length > 1) {
             Truth tr = this.truth;
 
             if (tr != null) {
@@ -505,7 +505,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (term && !this.term.equals(that.term()))
             return false;
 
-        if (!isInput()) {
+        if (evidence.length > 1) {
             if (occurrenceTime && (this.occurrence != that.occurrence()))
                 return false;
 

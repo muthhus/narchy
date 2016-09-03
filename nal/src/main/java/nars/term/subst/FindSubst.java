@@ -277,9 +277,31 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
     public final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
 
         Term y2 = yx.get(y);
-        return (y2 != null) ?
-                unify(x, y2) :
-                putYX(/*(Variable)*/ x, y);  // && putXY(y, /*(Variable)*/ x));
+        if (y2 == null) {
+            return putYX(x, y);
+        } else {
+
+            if (y.op() == y2.op()) {
+                if (y2.equals(y))
+                    return true;
+
+                int a = now();
+                //x needs to be assigned to both
+                if (putYX(x, y) && putYX(x, y2)) {
+                    return true;
+                } else {
+                    revert(a);
+                    return false;
+                }
+            } else {
+                return unify(x, y2);
+            }
+        }
+//        System.out.println(x + " " + y + " " + y2);
+//        return (y2 != null) ?
+//                //(y2.equals(y) || unify(x, y2)) :
+//                (unify(x, y2)) :
+//                putYX(/*(Variable)*/ x, y);  // && putXY(y, /*(Variable)*/ x));
 
         //return matcherYX.computeMatch(y, x);
 

@@ -374,14 +374,14 @@ public class Tetris extends NAgent {
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.7f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+        nar.goalConfidence(0.8f);
+        nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.04f);
-        nar.compoundVolumeMax.setValue(40);
+        nar.confMin.setValue(0.02f);
+        nar.compoundVolumeMax.setValue(60);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -416,7 +416,7 @@ public class Tetris extends NAgent {
         //new Abbreviation(nar,"aKa_");
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new VariableCompressor(nar);

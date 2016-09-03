@@ -95,7 +95,13 @@ abstract public class NAgent {
                 rewardNormalized,
                 (x) -> t(x, rewardConf)
         );
-        predictors.add(happy.desire($.t(1f, rewardGamma), nar.priorityDefault(Symbols.GOAL), nar.durabilityDefault(Symbols.GOAL)));
+
+        float happinssDurability =
+                nar.durabilityDefault(Symbols.GOAL);
+
+        predictors.add(happy.desire($.t(1f, rewardGamma),
+                nar.priorityDefault(Symbols.GOAL),
+                happinssDurability));
 
 
         joy = new SensorConcept("(joy)", nar,
