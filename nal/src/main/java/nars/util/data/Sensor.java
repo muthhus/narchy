@@ -2,6 +2,7 @@ package nars.util.data;
 
 import nars.NAR;
 import nars.Param;
+import nars.Symbols;
 import nars.Task;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -59,7 +60,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
-        this(n, t, value, truthFloatFunction, n.DEFAULT_BELIEF_PRIORITY, n.DEFAULT_BELIEF_DURABILITY);
+        this(n, t, value, truthFloatFunction, n.priorityDefault(Symbols.BELIEF), n.durabilityDefault(Symbols.BELIEF));
     }
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri, float dur) {

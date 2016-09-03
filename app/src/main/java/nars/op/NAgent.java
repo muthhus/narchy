@@ -27,6 +27,7 @@ import java.util.List;
 import static nars.$.t;
 import static nars.agent.NAgentOld.varPct;
 import static nars.nal.Tense.ETERNAL;
+import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.util.Texts.n2;
@@ -69,7 +70,7 @@ abstract public class NAgent {
     private long stopTime;
     private NARLoop loop;
     private Budget boostBudget, curiosityBudget;
-    private final float reinforcementAttention;
+
     //private float curiosityAttention;
     private float rewardSum = 0;
 
@@ -84,7 +85,6 @@ abstract public class NAgent {
                 //gamma
         ;
 
-        this.reinforcementAttention = or(nar.DEFAULT_BELIEF_PRIORITY, nar.DEFAULT_GOAL_PRIORITY);
 
 
         float rewardConf = alpha;
@@ -95,7 +95,7 @@ abstract public class NAgent {
                 rewardNormalized,
                 (x) -> t(x, rewardConf)
         );
-        predictors.add(happy.desire($.t(1f, rewardGamma), reinforcementAttention, 0.75f));
+        predictors.add(happy.desire($.t(1f, rewardGamma), nar.priorityDefault(Symbols.GOAL), nar.durabilityDefault(Symbols.GOAL)));
 
 
         joy = new SensorConcept("(joy)", nar,
@@ -189,10 +189,10 @@ abstract public class NAgent {
         /** set the sensor budget policy */
         int numSensors = sensors.size();
 
-        /** represents the approx equivalent number of sensors which can be fully budgeted at any time */
-        float activeSensors =
-                //(float) Math.sqrt(numSensors); //HEURISTIC
-                numSensors / 2f;
+//        /** represents the approx equivalent number of sensors which can be fully budgeted at any time */
+//        float activeSensors =
+//                //(float) Math.sqrt(numSensors); //HEURISTIC
+//                numSensors / 2f;
 
         for (SensorConcept sensor : sensors) {
             Term ts = sensor.term();
@@ -202,9 +202,9 @@ abstract public class NAgent {
 
                         float cp = nar.conceptPriority(ts);
 
-                        float p = gain/activeSensors - cp;
+                        float p = gain * (cp);
 
-                        return Math.max(gain/numSensors, Math.min(1f, p));
+                        return Math.min(1f, gain/numSensors + p);
                     }
             );
         }
@@ -303,10 +303,14 @@ abstract public class NAgent {
         long now = nar.time();
 
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
+
+        float reinforcementAttention =
+                and(alpha, gamma)/(actions.size()+sensors.size());
+
         if (reinforcementAttention > 0) {
 
-            boostBudget = UnitBudget.One.clone().multiplied(reinforcementAttention, 0.5f, 0.5f);
-            curiosityBudget = UnitBudget.One.clone().multiplied(0, 0f, 0f);
+            boostBudget = UnitBudget.One.clone().multiplied(reinforcementAttention, 0.25f, 0.9f);
+            curiosityBudget = UnitBudget.Zero;
 
             //boost(happy);
             //boost(happy); //boosted by the (happy)! task that is boosted below
@@ -317,7 +321,7 @@ abstract public class NAgent {
             for (MotorConcept c : actions) {
                 Truth d = c.desire(now);
                 if (d!=null)
-                    m += d.confWeight();
+                    m += d.conf();
             }
             motorDesireEvidence.addValue(m);
 
@@ -363,7 +367,7 @@ abstract public class NAgent {
     }
 
     public float desireConf() {
-        return Math.min(1f, w2c((float)motorDesireEvidence.getMean()));
+        return Math.min(1f, ((float)motorDesireEvidence.getMean()));
     }
 
     @Nullable
@@ -373,7 +377,7 @@ abstract public class NAgent {
 
             @Override
             public void activate(@NotNull NAR nar, float activation) {
-                linkTermLinks(c, alpha, nar);
+                linkTermLinks(c, activation, nar);
                 super.activate(nar, activation);
             }
         };
@@ -385,22 +389,21 @@ abstract public class NAgent {
 
 
     private void boost(@NotNull Task t) {
-        BudgetMerge.max.apply(t.budget(), boostBudget, 1);
-        if (t.isDeleted())
-            throw new RuntimeException();
 
-        float REINFORCEMENT_DURABILITY = 0.9f;
         if (t.occurrence() != ETERNAL) {
             nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(now, now)
                     .budget(boostBudget).log("Predictor"));
         } else {
+
+            if (t.isDeleted())
+                BudgetMerge.max.apply(t.budget(), boostBudget, 1); //resurrect
+
             //re-use existing eternal task
             Activation a = new Activation(t, nar, 1f) {
                 @Override
                 public void linkTerms(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
-                    super.linkTerms(src, tgt, scale, minScale, nar);
-
                     linkTermLinks(src, scale, nar);
+                    super.linkTerms(src, tgt, scale, minScale, nar);
                 }
             };
         }

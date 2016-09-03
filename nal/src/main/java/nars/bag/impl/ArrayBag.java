@@ -134,11 +134,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public V boost(Object key, float boost) {
         BLink<V> c = map.get(key);
         if (c!=null && !c.isDeleted()) {
-            float dur = c.dur();
+            //float dur = c.dur();
             float pBefore = c.priNext();
             c.priMult(boost);
             float delta = c.priNext() - pBefore;
-            pressure += delta * dur;
+            pressure += delta;// * dur;
             return c.get();
         }
         return null;
@@ -445,7 +445,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         BLink<V>[] l = items.array();
         int i = s - 1;
-        float weightedMass = 0;
+        float m = 0;
         @NotNull BLink<V> beneath = l[i]; //compares with self below to avoid a null check in subsequent iterations
         for (; i >= 0; ) {
             BLink<V> b = l[i];
@@ -459,7 +459,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
             float bCmp = cmp(b);
             if (bCmp > 0) {
-                weightedMass += bCmp * b.dur();
+                m += bCmp;// * b.dur();
             }
 
             if (lowestUnsorted == -1 && cmpGT(bCmp, beneath)) {
@@ -470,7 +470,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             i--;
         }
 
-        this.mass = weightedMass;
+        this.mass = m;
 
         return lowestUnsorted;
     }
@@ -777,19 +777,19 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 //existing.isDeleted() /* if deleted, we will merge replacing it as if it were zero:
 
-                float pBefore = existing.priNext() * existing.durNext();
+                float pBefore = existing.priNext();
                 float o = bag.mergeFunction.merge(existing, b, scale);
                 if (overflow != null)
                     overflow.add(o);
 
-                bag.mass += existing.priNext() * existing.durNext() - pBefore;
+                bag.mass += existing.priNext() - pBefore;
 
                 return existing;
             } else {
 
                 BLink r;
                 float bp = b.pri() * scale;
-                float incoming = bp * b.dur();
+                float incoming = bp;// * b.dur();
 
                 if (bag.minPriIfFull > bp) {
                     //reject due to insufficient budget

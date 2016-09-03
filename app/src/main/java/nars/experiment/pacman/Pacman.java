@@ -23,6 +23,7 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.gui.BeliefTableChart;
+import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
 import nars.nal.op.Derive;
 import nars.nar.Default;
@@ -384,6 +385,8 @@ public class Pacman extends NAgent {
 //
 //          //new BeliefTableChart(nar, charted).show(700, 900);
             BeliefTableChart.newBeliefChart(nar, charted, 500);
+            HistogramChart.newChart(nar, 50);
+
 ////
             //BagChart.show((Default) nar, 512);
 ////

@@ -8,6 +8,7 @@ import nars.NARLoop;
 import nars.data.AutoClassifier;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
+import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -44,9 +45,9 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAgent {
 
-    private static final int cyclesPerFrame = 2;
+    private static final int cyclesPerFrame = 1;
     public static final int runFrames = 50000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 64;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 128;
     public static final int INDEX_SIZE = 4 * 10000000;
     final Arkanoid noid;
     private SwingCamera cam;
@@ -166,6 +167,7 @@ public class Arkancide extends NAgent {
         //view.attention.add(nar.derivedActivation);
 
         newBeliefChartWindow(this, 400);
+        HistogramChart.newChart(nar, 50);
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
@@ -243,9 +245,9 @@ public class Arkancide extends NAgent {
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
         nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.6f);
+        nar.goalConfidence(0.8f);
 
-        float p = 1f;
+        float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.9f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f * p;

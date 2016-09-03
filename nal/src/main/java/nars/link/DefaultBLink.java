@@ -75,9 +75,12 @@ abstract public class DefaultBLink<X> extends BLink<X> {
         if (changed) {
             float p = PRI;
             if (p == p) /* not NaN */ {
+
                 PRI = clamp( p  + dPri);   dPri = 0;
                 DUR = clamp(DUR + dDur);   dDur = 0;
                 QUA = clamp(QUA + dQua);   dQua = 0;
+
+
             }
             changed = false;
         }
@@ -98,9 +101,13 @@ abstract public class DefaultBLink<X> extends BLink<X> {
         return Util.clamp(DUR + dDur);
     }
 
+    public float quaNext() {
+        return Util.clamp(QUA + dQua);
+    }
+
     @Override
     public final void _setPriority(float p) {
-        float delta = p - PRI;
+        float delta = p - priNext();
         if (delta >= Param.BUDGET_EPSILON || delta <= -Param.BUDGET_EPSILON) {
             dPri += delta;
             changed = true;
@@ -116,9 +123,10 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
     @Override
     public final void _setDurability(float d) {
-        float delta = d - DUR;
+        float delta = d - durNext();
         if (delta >= Param.BUDGET_EPSILON || delta <= -Param.BUDGET_EPSILON) {
             dDur += delta;
+
             changed = true;
         }
     }
@@ -130,7 +138,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
     @Override
     public final void _setQuality(float q) {
-        float delta = q - QUA;
+        float delta = q - quaNext();
         if (delta >= Param.BUDGET_EPSILON || delta <= -Param.BUDGET_EPSILON) {
             dQua += delta;
             changed = true;
