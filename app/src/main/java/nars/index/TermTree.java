@@ -9,10 +9,12 @@ import com.googlecode.concurrenttrees.radix.node.concrete.chararray.*;
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import nars.$;
-import nars.index.symbol.SymbolMap;
+import nars.Param;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.MyConcurrentRadixTree;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,51 +24,71 @@ import java.util.function.Function;
  * String interner that maps strings to integers and resolves them
  * bidirectionally with a globally shared Atomic concept
  */
-public class RadixTreeSymbolMap extends MyConcurrentRadixTree<Termed> implements SymbolMap {
+public class TermTree extends MyConcurrentRadixTree<Termed> {
 
 
-    public RadixTreeSymbolMap() {
-        super(new AtomNodeFactory());
+    public TermTree() {
+        //super(new AtomNodeFactory());
+        //super(new DefaultByteArrayNodeFactory());
+        super((NodeFactory) (edgeCharacters, value, childNodes, isRoot) -> {
+            if (edgeCharacters == null) {
+                throw new IllegalStateException("The edgeCharacters argument was null");
+            } else if (!isRoot && edgeCharacters.length() == 0) {
+                throw new IllegalStateException("Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters));
+            } else if (childNodes == null) {
+                throw new IllegalStateException("The childNodes argument was null");
+            } else {
+                //NodeUtil.ensureNoDuplicateEdges(childNodes);
+                return (Node) (childNodes.isEmpty() ? (value instanceof VoidValue ? new ByteArrayNodeLeafVoidValue(edgeCharacters) : (value != null ? new ByteArrayNodeLeafWithValue(edgeCharacters, value) : new ByteArrayNodeLeafNullValue(edgeCharacters))) : (value instanceof VoidValue ? new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes) : (value == null ? new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes) : new ByteArrayNodeDefault(edgeCharacters, value, childNodes))));
+            }
+        });
     }
 
-
-    @Override
-    public final Termed resolve(String id) {
+    public final Termed get(String id) {
         return getValueForExactKey(id);
     }
 
 
-
-    @Override
-    public final Termed resolveOrAdd(String s, Function<Term, ? extends Termed> conceptBuilder) {
-        return putIfAbsent(s, () -> conceptBuilder.apply($.the(s)) );
+    public final Termed computeIfAbsent(CharSequence s, Function<Term, ? extends Termed> conceptBuilder) {
+        return putIfAbsent(s, () -> conceptBuilder.apply($.the(s)));
     }
+
+
+//    public final Termed putIfAbsent(@NotNull TermKey a, Function<Term, ? extends Termed> conceptBuilder) {
+//        return putIfAbsent(
+//                a,
+//                () -> conceptBuilder.apply(a));
+//    }
+//
 
 
     /**
      * // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees...
      */
-    @Override public void print(Appendable out) {
+    public void print(Appendable out) {
         PrettyPrinter.prettyPrint(this, out);
     }
 
-    @Override
     public void forEach(Consumer<? super Termed> c) {
         throw new UnsupportedOperationException(); //TODO
+    }
+
+    public Termed get(TermKey term) {
+        return getValueForExactKey(term);
     }
 
 
     private static final class AtomNodeFactory implements NodeFactory {
 
-        public static final boolean DEBUG = false;
 
         @Override
         public Node createNode(CharSequence edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
-            if (DEBUG) {
+            if (Param.DEBUG) {
                 assert edgeCharacters != null : "The edgeCharacters argument was null";
                 assert !(!isRoot && edgeCharacters.length() == 0) : "Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters);
                 assert childNodes != null : "The childNodes argument was null";
-                NodeUtil.ensureNoDuplicateEdges(childNodes);
+                if (Param.DEBUG_EXTRA)
+                    NodeUtil.ensureNoDuplicateEdges(childNodes);
             }
 
             try {
@@ -75,10 +97,10 @@ public class RadixTreeSymbolMap extends MyConcurrentRadixTree<Termed> implements
                     // Leaf node...
                     if (value instanceof VoidValue) {
                         return new ByteArrayNodeLeafVoidValue(edgeCharacters);
-                    } else if (value != null) {
-                        return new ByteArrayNodeLeafWithValue(edgeCharacters, value);
-                    } else {
+                    } else if (value == null) {
                         return new ByteArrayNodeLeafNullValue(edgeCharacters);
+                    } else {
+                        return new ByteArrayNodeLeafWithValue(edgeCharacters, value);
                     }
                 } else {
                     // Non-leaf node...

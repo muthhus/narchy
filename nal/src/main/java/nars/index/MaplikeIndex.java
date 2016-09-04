@@ -89,18 +89,6 @@ public abstract class MaplikeIndex extends TermIndex {
 
 
     /** translaes a compound to one which can name a concept */
-    @NotNull public Compound conceptualize(@NotNull Compound x) {
-
-        if (!x.isNormalized())
-            throw new InvalidConceptException(x, "not normalized");
-
-        Term xx = $.unneg(Terms.atemporalize(x)).term();
-
-        if (xx.op().var)
-            throw new InvalidConceptException(x, "variables can not be conceptualized");
-
-        return (Compound)xx;
-    }
 
 
     @Override

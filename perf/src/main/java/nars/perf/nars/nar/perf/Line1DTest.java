@@ -6,6 +6,7 @@ import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
+import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -34,10 +35,11 @@ public class Line1DTest {
         //Default nar = new Default(1024, 4, 1, 3);
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int cyclesPerFrame = 16;
+        int cyclesPerFrame = 7;
         int conceptsPerCycle = cyclesPerFrame;
 
-        final Executioner exe = new MultiThreadExecutioner(2, 4096);
+        final Executioner exe = //new MultiThreadExecutioner(2, 4096);
+                new SingleThreadExecutioner();
 
         Default nar = new Default(1024,
                 conceptsPerCycle, 2, 2, rng,

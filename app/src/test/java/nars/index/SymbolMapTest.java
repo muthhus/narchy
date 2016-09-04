@@ -2,12 +2,15 @@ package nars.index;
 
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.nar.Terminal;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.junit.Test;
 
 import java.util.function.Function;
 
+import static nars.$.$;
 import static org.junit.Assert.*;
 
 /**
@@ -19,25 +22,23 @@ public class SymbolMapTest {
     @Test
     public void testAtomInsertion() {
 
-        RadixTreeSymbolMap tree = new RadixTreeSymbolMap();
-
-        //int start = SymbolMap.getLastSerial();
+        TermTree tree = new TermTree();
 
         Function<Term, Concept> cb = (t)->new AtomConcept((Atomic)t, null, null);
 
-        tree.resolveOrAdd("concept", cb);
-        tree.resolveOrAdd("term", cb);
-        tree.resolveOrAdd("termutator", cb);
+        tree.computeIfAbsent("concept", cb);
+        tree.computeIfAbsent("term", cb);
+        tree.computeIfAbsent("termutator", cb);
         tree.print(System.out);
 
-        assertNotNull(tree.resolve("term"));
-        assertNull(tree.resolve("xerm"));
-        assertNull(tree.resolve("te")); //partial
+        assertNotNull(tree.get("term"));
+        assertNull(tree.get("xerm"));
+        assertNull(tree.get("te")); //partial
 
-        assertNotNull(tree.resolveOrAdd("term", cb));
+        assertNotNull(tree.computeIfAbsent("term", cb));
         assertEquals(3, tree.size());
 
-        assertNotNull(tree.resolveOrAdd("termunator", cb));
+        assertNotNull(tree.computeIfAbsent("termunator", cb));
 
         tree.print(System.out);
 
@@ -50,4 +51,31 @@ public class SymbolMapTest {
     }
 
 
+    @Test
+    public void testCompoundInsertion() {
+
+        Terminal nar = new Terminal();
+        TreeIndex index = new TreeIndex(nar.index.conceptBuilder());
+
+
+        index.get($("x"), true);
+//        index.putIfAbsent($("(x)"), cb);
+//        index.putIfAbsent($("(xx)"), cb);
+//        index.putIfAbsent($("(xxx)"), cb);
+//        index.putIfAbsent($("(x,y)"), cb);
+//        index.putIfAbsent($("(x,z)"), cb);
+//        index.putIfAbsent($("(x-->z)"), cb);
+//        index.putIfAbsent($("(x<->z)"), cb);
+//        index.putIfAbsent($("(x && z)"), cb);
+//        index.putIfAbsent($("(/, x, _)"), cb);
+//        index.putIfAbsent($("(/, _, x)"), cb);
+
+        assertEquals(11, index.size());
+
+        index.print(System.out);
+
+//        String stringWithUnicode = "unicode\u00easomething";
+//        assertNull( tree.resolveOrAdd(stringWithUnicode)); //unicode not supported yet
+
+    }
 }

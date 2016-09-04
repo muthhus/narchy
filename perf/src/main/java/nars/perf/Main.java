@@ -47,12 +47,12 @@ public enum Main {
 
 				//.addProfiler(HotspotCompilationProfiler.class)
 				// .addProfiler(HotspotClassloadingProfiler.class)
-				//.addProfiler(LinuxPerfProfiler.class)
-				/*
+				.addProfiler(LinuxPerfProfiler.class)
 
-				 * .addProfiler(LinuxPerfAsmProfiler.class)
-				 * .addProfiler(LinuxPerfNormProfiler.class)
-				 */
+
+				  .addProfiler(LinuxPerfAsmProfiler.class)
+				  .addProfiler(LinuxPerfNormProfiler.class)
+
 				//.addProfiler(CompilerProfiler.class)
 				// .addProfiler(GCProfiler.class)
 

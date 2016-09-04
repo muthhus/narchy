@@ -7,6 +7,8 @@ import com.googlecode.concurrenttrees.radix.RadixTree;
 import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
+import nars.$;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.*;
@@ -132,7 +134,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
             Node existingNode = r.nodeFound;
             if (existingNode != null) {
                 Object existingValue = existingNode.getValue();
-                if (existingValue != null && key.equals(existingValue.toString())) {
+                if (existingValue != null /*&& key.equals(existingValue.toString())*/) {
                     return (O) existingValue;
                 }
             }
@@ -505,13 +507,10 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * @param overwrite If true, should replace any existing value, if false should not replace any existing value
      * @return The existing value for this key, if there was one, otherwise null
      */
-    O compute(CharSequence key, BiFunction<CharSequence, SearchResult, O> computeFunc) {
-        if (key == null) {
-            throw new IllegalArgumentException("The key argument was null");
-        }
-        if (key.length() == 0) {
-            throw new IllegalArgumentException("The key argument was zero-length");
-        }
+    O compute(@NotNull CharSequence key, BiFunction<CharSequence, SearchResult, O> computeFunc) {
+//        if (key.length() == 0) {
+//            throw new IllegalArgumentException("The key argument was zero-length");
+//        }
 
         acquireWriteLock();
         try {
@@ -576,7 +575,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     Node newChild = factory.createNode(keySuffix, newValue, Collections.emptyList(), false);
 
                     // Clone the current node adding the new child...
-                    List<Node> edges = new ArrayList<Node>(oedges.size() + 1);
+                    List<Node> edges = $.newArrayList(oedges.size() + 1);
                     edges.addAll(oedges);
                     edges.add(newChild);
                     cloneAndReattach(searchResult, factory, found, foundValue, edges);

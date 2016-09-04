@@ -89,7 +89,7 @@ public class IO {
         char p = t.punc();
         long[] evi = t.evidence();
         int evil;
-        evil = evi == null ? 0 : evi.length;
+        evil = evi.length;
 
         //TODO combine these into one byte
         out.writeByte(p);
@@ -169,6 +169,7 @@ public class IO {
         else
             return readCompound(in, o, t);
     }
+
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
 
         if (isSpecial(term)) {
@@ -189,12 +190,26 @@ public class IO {
         } else
             writeCompound(out, (Compound)term);
     }
+    public static void writeTermSeq(@NotNull DataOutput out, @NotNull Term term) throws IOException {
+
+
+        if (term instanceof Atomic) {
+            if (isSpecial(term)) {
+                out.writeByte(SPECIAL_OP);
+            }
+            //out.writeUTF(term.toString());
+            out.writeBytes(term.toString());
+            out.writeByte(term.op().ordinal()); //put operator last
+        } else {
+            writeCompoundSeq(out, (Compound) term);
+        }
+    }
 
     public static boolean isSpecial(@NotNull Term term) {
         return term instanceof GenericVariable;
     }
 
-    static void writeCompound(@NotNull DataOutput out, @NotNull Compound c) throws IOException {
+    public static void writeCompound(@NotNull DataOutput out, @NotNull Compound c) throws IOException {
 
         //how many subterms to follow
         writeTermContainer(out, c.subterms());
@@ -203,12 +218,33 @@ public class IO {
             out.writeInt(c.dt());
     }
 
+    public static void writeCompoundSeq(@NotNull DataOutput out, @NotNull Compound c) throws IOException {
+
+        writeTermContainerSeq(out, c.subterms());
+
+        @NotNull Op o = c.op();
+        out.writeByte(o.ordinal()); //put operator last
+        if (o.isImage() /* || o.temporal*/)
+            out.writeInt(c.dt());
+
+    }
+
     static void writeTermContainer(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
         int siz = c.size();
         out.writeByte(siz);
         for (int i = 0; i < siz; i++) {
             writeTerm(out, c.term(i));
         }
+    }
+    static void writeTermContainerSeq(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
+        int siz = c.size();
+
+        for (int i = 0; i < siz; i++) {
+            writeTermSeq(out, c.term(i));
+//            if (i < siz-1)
+//                out.writeByte(',');
+        }
+
     }
     @Nullable
     public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
@@ -337,24 +373,24 @@ public class IO {
 
         }
 
-        @Nullable
-        final FSTBasicObjectSerializer termContainers = new FSTBasicObjectSerializer() {
-
-            @Override
-            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
-            }
-
-            @Nullable
-            @Override
-            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
-                return readTermContainer(in, index);
-            }
-
-            @Override
-            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
-                writeTermContainer(out, (TermContainer) toWrite);
-            }
-        };
+//        @Nullable
+//        final FSTBasicObjectSerializer termContainers = new FSTBasicObjectSerializer() {
+//
+//            @Override
+//            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
+//            }
+//
+//            @Nullable
+//            @Override
+//            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
+//                return readTermContainer(in, index);
+//            }
+//
+//            @Override
+//            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+//                writeTermContainer(out, (TermContainer) toWrite);
+//            }
+//        };
 
         @Nullable
         final FSTBasicObjectSerializer terms = new FSTBasicObjectSerializer() {

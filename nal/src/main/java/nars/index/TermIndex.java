@@ -7,10 +7,7 @@ import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.op.TermTransform;
-import nars.term.Compound;
-import nars.term.InvalidTermException;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
@@ -64,6 +61,18 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public abstract Termed get(@NotNull Termed key, boolean createIfMissing);
 
+    @NotNull public Compound conceptualize(@NotNull Compound x) {
+
+        if (!x.isNormalized())
+            throw new InvalidConceptException(x, "not normalized");
+
+        Term xx = $.unneg(Terms.atemporalize(x)).term();
+
+        if (xx.op().var)
+            throw new InvalidConceptException(x, "variables can not be conceptualized");
+
+        return (Compound)xx;
+    }
 
     /**
      * set whether absent or not

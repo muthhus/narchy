@@ -24,6 +24,7 @@ import nars.NAR;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
+import nars.index.TreeIndex;
 import nars.nal.op.Derive;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -55,7 +56,7 @@ public class Pacman extends NAgent {
 
     final int visionRadius;
     final int itemTypes = 3;
-    final static int runCycles = 21500;
+    final static int runCycles = 10000;
 
 
     final int inputs;
@@ -89,9 +90,11 @@ public class Pacman extends NAgent {
         //Param.CONCURRENCY_DEFAULT = 2;
 
         //Multi nar = new Multi(3,512,
+        TreeIndex index = new TreeIndex(new DefaultConceptBuilder(rng));
         Default nar = new Default(1024,
-                128, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
+                32, 2, 2, rng,
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
+                index,
                 new FrameClock(), exe
 
         );
@@ -185,13 +188,17 @@ public class Pacman extends NAgent {
 //				runDelay);
 
 
-        //nar.index.print(System.out);
+
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
         //n.printActions();
         //nar.forEachActiveConcept(System.out::println);
 
-        Derive.printStats(nar);
+        //Derive.printStats(nar);
+
+        index.terms.print(System.out);
+
+
 
 //		nar.index.forEach(t -> {
 //			if (t instanceof Concept) {
