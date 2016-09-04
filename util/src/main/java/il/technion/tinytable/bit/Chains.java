@@ -1,6 +1,8 @@
 package il.technion.tinytable.bit;
 
 
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,11 +52,12 @@ public class Chains {
     }
 
     //
-    public static long[] storeValue(long[] chain, long fingerprint, int itemSize, long newCounter) {
+    public static LongArrayList set(long[] chain, long fingerprint, int itemSize, long newCounter) {
         int idx = findFingerprint(chain, fingerprint);
         if (idx < 0)
             throw new RuntimeException("cannot find fingerprint");
-        ArrayList<Long> newChain = new ArrayList<>(chain.length);
+
+        LongArrayList newChain = new LongArrayList(chain.length);
 
         // the first occurance is the fingerprint itself.
         // all items that are not
@@ -80,11 +83,11 @@ public class Chains {
         for (; i < chain.length; i++) {
             newChain.add(chain[i]);
         }
-        return toArray(newChain);
+        return newChain;
     }
 
-    private static ArrayList<Long> packNewCounterToChain(int itemSize,
-                                                         ArrayList<Long> newChain, long value) {
+    private static LongArrayList packNewCounterToChain(int itemSize,
+                                                         LongArrayList newChain, long value) {
         // pack back the value into the chain.
         int ctrBitSize = itemSize - 1;
 

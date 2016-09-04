@@ -4,6 +4,7 @@ import nars.$;
 import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
+import nars.budget.Forget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
@@ -12,8 +13,6 @@ import nars.link.StrongBLinkToBudgeted;
 import nars.util.Util;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -203,10 +202,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-    @Override
-    public @Nullable BLink<V> sample() {
-        throw new RuntimeException("unimpl");
-    }
+
 
     @NotNull
     @Override
@@ -215,20 +211,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-    @Override
-    public void put(@NotNull ObjectFloatHashMap<? extends V> values, @NotNull Budgeted in,/*, MutableFloat overflow*/float scale, MutableFloat overflow) {
 
-//        if (values.isEmpty())
-//            return;
-
-        ObjectFloatProcedure<V> p = (k, v) -> {
-            put(k, in, v * scale, overflow);
-        };
-
-        //synchronized(map) {
-        values.forEachKeyValue(p);
-        //}
-    }
 
 //    @Override
 //    public final void put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
@@ -307,14 +290,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //        return newLink(i, scale * b.pri(), b.dur(), b.qua());
 //    }
 
-    @NotNull
-    protected BLink<V> newLink(@NotNull V i, Budgeted b) {
-
-        if (i instanceof Budgeted)
-            return new StrongBLinkToBudgeted((Budgeted) i, b);
-        else
-            return new StrongBLink(i, b);
-    }
 
     @Nullable
     @Override
@@ -350,34 +325,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
         return this;
-    }
-
-
-    private static final class Forget implements Consumer<BLink> {
-        public final float r;
-
-        static final float maxEffectiveDurability = 1f;
-
-        public Forget(float r) {
-            this.r = r;
-        }
-
-        @Override
-        public void accept(@NotNull BLink bLink) {
-            float p = bLink.pri();
-            if (p == p) {
-                float d = bLink.dur();
-                //float d = or(bLink.dur(), bLink.qua());
-                //float d = Math.max(bLink.dur(), bLink.qua());
-                bLink.setPriority(p * (1f - (r * (1f - d * maxEffectiveDurability))));
-            }
-        }
-
-//        public Consumer<BLink> set(float r) {
-//            this.r = r;
-//            return this;
-//        }
-
     }
 
 
@@ -735,7 +682,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * Created by me on 8/15/16.
      */
-    static final class Insertion<V> implements BiFunction<V, BLink, BLink> {
+    final class Insertion<V> implements BiFunction<V, BLink, BLink> {
 
         private ArrayBag arrayBag;
         @Nullable
@@ -796,7 +743,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     r = null;
                 } else {
                     //accepted for insert
-                    BLink nvv = bag.newLink(key, b);
+                    BLink nvv = newLink(key, b);
                     nvv.priMult(scale);
 
                     bag.mass += incoming;

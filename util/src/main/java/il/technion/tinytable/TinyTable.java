@@ -22,14 +22,14 @@ public class TinyTable extends BitwiseArray {
     // anchor distance array.
     public short[] A;
     // used for debug - counts how many items in the table.
-    protected int nrItems;
-    //Hash function with an object pool... recycle!
+    //protected int nrItems;
+
     GreenHasher hash;
 
     public TinyTable(int itemsize, int bucketcapacity, int nrBuckets) {
         super(bucketcapacity * nrBuckets, itemsize, bucketcapacity);
         this.maxAdditionalSize = 0;
-        this.nrItems = 0;
+        //this.nrItems = 0;
         I0 = new long[nrBuckets];
         IStar = new long[nrBuckets];
         A = new short[nrBuckets];
@@ -37,36 +37,30 @@ public class TinyTable extends BitwiseArray {
         offsets = new byte[64];
         chain = new byte[64];
 
-        this.BucketCapacity = bucketcapacity;
     }
 
     public void add(long item) {
-
-        //FingerPrintAux fpaux = ;
         this.add(hash.hash(item));
     }
 
     public void add(String item) {
-
-        //FingerPrintAux fpaux = ;
         this.add(hash.hash(item));
     }
 
-    public void remove(long i) {
-        FingerPrint fpaux = hash.hash(i);
-        this.removeItem(fpaux);
+    public boolean remove(long i) {
+        return this.remove(hash.hash(i));
     }
 
-    public void remove(String i) {
-        remove(i.getBytes());
-    }
-    public <X> void remove(X x, Function<X,byte[]> toBytes) {
-        remove(toBytes.apply(x));
+    public boolean remove(String i) {
+        return remove(i.getBytes());
     }
 
-    public void remove(byte[] i) {
-        FingerPrint fpaux = hash.hash(i);
-        this.removeItem(fpaux);
+    public <X> boolean remove(X x, Function<X,byte[]> toBytes) {
+        return remove(toBytes.apply(x));
+    }
+
+    public boolean remove(byte[] i) {
+        return remove(hash.hash(i));
     }
 
     public boolean contains(String item) {
@@ -129,8 +123,11 @@ public class TinyTable extends BitwiseArray {
     }
 
 
-    protected void removeItem(FingerPrint fpaux) {
-        moveToEnd(fpaux);
+    protected boolean remove(FingerPrint fpaux) {
+        int m = moveToEnd(fpaux);
+        if (m < 0)
+            return false;
+
         this.removeAndShrink(fpaux.bucketId);
         removeItemFromIndex(fpaux);
 
@@ -148,7 +145,7 @@ public class TinyTable extends BitwiseArray {
             }
         }
 
-
+        return true;
     }
 
     private int find(FingerPrint fpaux) {
@@ -175,7 +172,8 @@ public class TinyTable extends BitwiseArray {
 
         int itemOffset = this.find(fpaux);
         if (itemOffset < 0)
-            throw new RuntimeException("Not found!");
+            return -1;
+            //throw new RuntimeException("Not found!");
 
         int removedOffset = itemOffset;
         int lastOffset = chain[chainoffset];
@@ -203,12 +201,18 @@ public class TinyTable extends BitwiseArray {
      * @return
      */
     private int findFreeBucket(int bucketId) {
-        bucketId = bucketId % this.A.length;
-        while (this.size(bucketId) + this.A[bucketId] >= this.BucketCapacity) {
+        int l = this.A.length;
+
+        int r = l;
+        bucketId = bucketId % l;
+
+        while (this.size(bucketId) + this.A[bucketId] >= this.bucketCapacity) {
 
             bucketId++;
-            bucketId = bucketId % this.A.length;
+            bucketId = bucketId % l;
 
+            if (r-- <= 0)
+                break;
         }
         return bucketId;
     }
@@ -274,7 +278,7 @@ public class TinyTable extends BitwiseArray {
      */
     protected void putAndPush(int bucketId, int idx, final long value) {
         this.replaceMany(bucketId, idx, value, this.start(bucketId));
-        this.nrItems++;
+        //this.nrItems++;
         return;
     }
 

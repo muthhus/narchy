@@ -1,6 +1,5 @@
 package nars.index;
 
-import com.github.benmanes.caffeine.cache.RemovalCause;
 import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
@@ -9,11 +8,10 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.util.data.map.nbhm.LimitedNonBlockingHashMap;
+import nars.util.data.map.nbhm.HijaCache;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
 /**
@@ -144,11 +142,11 @@ public class TreeIndex extends TermIndex {
     /** Tree-index with a front-end "L1" non-blocking hashmap cache */
     public static class L1TreeIndex extends TreeIndex {
 
-        private final LimitedNonBlockingHashMap<Term, Termed> L1;
+        private final HijaCache<Term, Termed> L1;
 
         public L1TreeIndex(Concept.ConceptBuilder conceptBuilder, int cacheSize, int reprobes) {
             super(conceptBuilder);
-            this.L1 = new LimitedNonBlockingHashMap<Term,Termed>(cacheSize, reprobes);
+            this.L1 = new HijaCache<Term,Termed>(cacheSize, reprobes);
         }
 
         @Override

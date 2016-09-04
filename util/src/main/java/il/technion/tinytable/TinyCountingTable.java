@@ -5,6 +5,8 @@ import il.technion.tinytable.bit.Chains;
 import il.technion.tinytable.hash.FingerPrint;
 import il.technion.tinytable.hash.RankIndexing;
 import org.eclipse.collections.api.list.primitive.IntList;
+import org.eclipse.collections.api.list.primitive.LongList;
+import org.eclipse.collections.impl.factory.primitive.LongLists;
 
 import java.util.function.Function;
 
@@ -89,8 +91,11 @@ public class TinyCountingTable extends TinyTable {
             this.add(fpaux);
         }
         long[] chain = this.getChain(fpaux.bucketId, fpaux.chainId);
-        chain = Chains.storeValue(chain, fpaux.fingerprint, this.itemSize, value);
-        this.storeChain(fpaux.bucketId, fpaux.chainId, chain);
+
+        this.storeChain(
+            fpaux.bucketId, fpaux.chainId,
+            Chains.set(chain, fpaux.fingerprint, this.itemSize, value)
+        );
     }
 
     /**
@@ -102,24 +107,26 @@ public class TinyCountingTable extends TinyTable {
      * @return
      */
     private IntList adjustChainToItems(int bucketId, int chainId,
-                                       long[] items) {
+                                       LongList items) {
         IntList chain = RankIndexing.getChain(chainId, I0[bucketId], IStar[bucketId]);
         FingerPrint fpaux = new FingerPrint(bucketId, chainId, 1L);
         // if the chain is shorter than needed we add dummy items.
-        if (chain.size() < items.length) {
-            int diff = items.length - chain.size();
+        int is = items.size();
+        int cs = chain.size();
+        if (cs < is) {
+            int diff = is - cs;
             while (diff > 0) {
                 this.add(fpaux);
                 diff--;
             }
         }
         // if the chain is longer than needed we remove items.
-        if (chain.size() > items.length) {
-            int diff = chain.size() - items.length;
+        else if (cs > is) {
+            int diff = cs - is;
             while (diff > 0) {
                 shrinkChain(bucketId, chainId);
                 diff--;
-                this.nrItems--;
+                //this.nrItems--;
 
             }
 
@@ -136,7 +143,7 @@ public class TinyCountingTable extends TinyTable {
      * @param items
      */
 
-    private void storeChain(int bucketId, int chainId, long[] items) {
+    private void storeChain(int bucketId, int chainId, LongList items) {
         // we change the chain in the table to be the same size as the new chain.
         IntList chainIndexes = adjustChainToItems(bucketId, chainId, items);
         // at this point we are sure that they are the same size.
@@ -144,13 +151,13 @@ public class TinyCountingTable extends TinyTable {
 //		Assert.assertTrue(chainIndexes.size() == items.length);
 
         //then we put the items in the appropriate indices.
-        for (int i = 0; i < items.length; i++) {
+        int is = items.size();
+        for (int i = 0; i < is; i++) {
             int itemOffset = chainIndexes.get(i);
             if (itemOffset < 0)
                 return;
-            this.set(bucketId, itemOffset, items[i]);
+            this.set(bucketId, itemOffset, items.get(i));
         }
-        return;
 
     }
 }

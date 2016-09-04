@@ -3,8 +3,11 @@ package nars.bag;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.link.BLink;
+import nars.link.StrongBLink;
+import nars.link.StrongBLinkToBudgeted;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +39,11 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
      * gets the next value without removing changing it or removing it from any index.  however
      * the bag is cycled so that subsequent elements are different.
      */
-    @Nullable BLink<V> sample();
+    @Nullable default BLink<V> sample() {
+        BLink<V>[] result = new BLink[1];
+        sample(1, (x) -> { result[0] = x; return true; } );
+        return result[0];
+    }
 
 
     /**
@@ -123,45 +130,12 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         return this;
     }
 
-    @NotNull
+    /**
+     * fills a collection with at-most N items, if an item passes the predicate.
+     * returns how many items added
+     */    @NotNull
     Bag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target);
-//    /**
-//     * fills a collection with at-most N items, if an item passes the predicate.
-//     * returns how many items added
-//     */
-//    public int sample(int n, Predicate<BagBudget<V>> each, Collection<BagBudget<V>> target) {
-//        int startSize = target.size();
-//        sample(n, x -> {
-//            if (each.test(x)) {
-//                target.add(x);
-//            }
-//            return true;
-//        });
-//        return target.size() - startSize;
-//    }
 
-
-
-//    /**
-//     * Get an Item by key
-//     *
-//     * @param key The key of the Item
-//     * @return The Item with the given key
-//     */
-//    @Override
-//    public abstract V get(K key);
-
-//    public abstract Set<K> keySet();
-
-
-//    /**
-//     * Choose an Item according to distribution policy and take it out of the Bag
-//     * TODO rename removeNext()
-//     *
-//     * @return The selected Item, or null if this bag is empty
-//     */
-//    @Nullable
-//    BLink<V> pop();
 
     /**
      * The number of items in the bag
@@ -558,8 +532,30 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
     };
 
+    @NotNull
+    default BLink newLink(@NotNull Object i, Budgeted b) {
 
-    void put(ObjectFloatHashMap<? extends V> values, Budgeted in, float scale, MutableFloat overflow);
+        if (i instanceof Budgeted)
+            return new StrongBLinkToBudgeted((Budgeted) i, b);
+        else
+            return new StrongBLink(i, b);
+    }
+
+
+    @Override
+    default void forEachKey(Consumer<? super V> each) {
+        forEach(b -> each.accept(b.get()));
+    }
+
+    default void put(@NotNull ObjectFloatHashMap<? extends V> values, @NotNull Budgeted in,/*, MutableFloat overflow*/float scale, MutableFloat overflow) {
+
+        ObjectFloatProcedure<V> p = (k, v) -> {
+            put(k, in, v * scale, overflow);
+        };
+
+        values.forEachKeyValue(p);
+    }
+
 
     /** gets the link if present, applies a scale factor boost, and returns the link */
     V boost(Object key, float boost);

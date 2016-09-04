@@ -310,8 +310,8 @@ public class STMClustered extends STM {
 
             @NotNull
             @Override
-            protected BLink<Task> newLink(Task i, Budgeted b) {
-                return new TLink(i, b);
+            public BLink newLink(Object i, Budgeted b) {
+                return new TLink((Task)i, b);
             }
 
 

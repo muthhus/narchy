@@ -134,14 +134,17 @@ public interface Budget extends Budgeted {
 //        return this;
 //    }
 //
-    default void priMult(float factor) {
+    default Budget priMult(float factor) {
         float pri = pri();
         if (pri==pri) //if not deleted
             setPriority(pri * factor);
+        return this;
     }
-    default void priLerp(float target, float speed) {
+
+    default Budget priLerp(float target, float speed) {
         float p = pri();
         setPriority(Util.lerp(target, p, speed));
+        return this;
     }
 
     /** returns the delta */

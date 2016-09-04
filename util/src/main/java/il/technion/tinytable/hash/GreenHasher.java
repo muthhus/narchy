@@ -12,11 +12,11 @@ public class GreenHasher {
     private final static long Seed64 = 0xe17a1465;
     private final static long m = 0xc6a4a7935bd1e995L;
     private final static int r = 47;
+    private static final long chainMask = 63L;
+
     private final int fpSize;
     private final long fpMask;
-    private static final long chainMask = 63L;
     private final int bucketRange;
-    public FingerPrint fpaux;
 
     public GreenHasher(int fingerprintsize, int bucketrange, int chainrange) {
         this.fpSize = fingerprintsize;
@@ -24,7 +24,7 @@ public class GreenHasher {
         assert (fpSize > 0);
         this.bucketRange = bucketrange;
         fpMask = (1L << fpSize) - 1;
-        fpaux = new FingerPrint(0, 0, 0);
+        //fpaux = new FingerPrint(0, 0, 0);
     }
 
 
@@ -41,19 +41,16 @@ public class GreenHasher {
 //		hash ^= (hash >>> 20) ^ (hash >>> 12);
 //		 hash ^= (hash >>> 7) ^ (hash >>> 4);
 
-
-        fpaux.fingerprint = hash & fpMask;
-        if (fpaux.fingerprint == 0L) {
-            fpaux.fingerprint++;
-        }
-
+        long fp = hash & fpMask;
+        if (fp == 0L)
+            fp = 1L;  //avoid 0
 
         hash >>>= fpSize;
-        fpaux.chainId = (int) (hash & chainMask);
+        int chainId = (int) (hash & chainMask);
         hash >>>= 6;
-        fpaux.bucketId = (int) ((hash & Long.MAX_VALUE) % bucketRange);
+        int bucketId = (int) ((hash & Long.MAX_VALUE) % bucketRange);
 
-        return fpaux;
+        return new FingerPrint(bucketId, chainId, fp);
     }
 
 
@@ -69,16 +66,14 @@ public class GreenHasher {
 
         long fp = (h & fpMask);
         if (fp == 0L)
-            fp = 1; //avoid 0
-        fpaux.fingerprint = fp;
-
+            fp = 1L; //avoid 0
 
         h >>>= fpSize;
-        fpaux.chainId = (int) (h & chainMask);
+        int chainId = (int) (h & chainMask);
         h >>>= 6;
-        fpaux.bucketId = (int) ((h & Long.MAX_VALUE) % bucketRange);
+        int bucketId = (int) ((h & Long.MAX_VALUE) % bucketRange);
 
-        return fpaux;
+        return new FingerPrint(bucketId, chainId, fp);
 
     }
 

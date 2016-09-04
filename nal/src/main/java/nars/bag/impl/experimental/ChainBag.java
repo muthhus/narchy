@@ -37,7 +37,6 @@ public class ChainBag<V> {
     private final transient Mean mean; //priority mean, continuously calculated
     private final Random rng;
 
-    private boolean ownsNodePool;
 
     private int capacity;
 
@@ -93,7 +92,6 @@ public class ChainBag<V> {
 
     public ChainBag(Random rng, int capacity) {
         this(rng, new DDNodePool(capacity + 1), capacity);
-        ownsNodePool = true;
     }
 
     public int capacity() {

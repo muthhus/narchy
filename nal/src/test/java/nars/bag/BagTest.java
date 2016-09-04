@@ -3,9 +3,11 @@ package nars.bag;
 import nars.Param;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
+import nars.bag.impl.experimental.HijackBag;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
+import nars.util.data.map.nbhm.HijaCache;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -24,10 +26,9 @@ import static nars.budget.merge.BudgetMerge.plusDQDominant;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author me
  */
-public class CurveBagTest  {
+public class BagTest {
 
     static final Random rng = new XorShift128PlusRandom(1);
 
@@ -35,20 +36,29 @@ public class CurveBagTest  {
         Param.DEBUG = true;
     }
 
+    @Test
+    public void testBasicInsertionRemovalArray() {
+        testBasicInsertionRemoval(new ArrayBag<>(1, plusDQDominant, new HashMap<>(1)));
+    }
 
-    @Test public void testBasicInsertionRemoval() {
-        int cap = 1;
+    @Test
+    public void testBasicInsertionRemovalCurve() {
+        testBasicInsertionRemoval(new CurveBag<>(1, defaultSampler, plusDQDominant, new HashMap(1)));
+    }
 
-        testBasicInsertionRemoval(new ArrayBag(cap, plusDQDominant, new HashMap<>(cap)));
-        testBasicInsertionRemoval(new CurveBag(cap, defaultSampler, plusDQDominant, new HashMap()));
+    @Test
+    public void testBasicInsertionRemovalHijack() {
+        testBasicInsertionRemoval(new HijackBag(1));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
 
 
         assertEquals(1, c.capacity());
-        assertEquals(0, c.size());
-        assertTrue(c.isEmpty());
+        if (!(c instanceof HijaCache)) {
+            assertEquals(0, c.size());
+            assertTrue(c.isEmpty());
+        }
 
         //insert an item with zero budget
         c.put("x");
@@ -59,11 +69,12 @@ public class CurveBagTest  {
 
         assertEquals(0, c.priMin(), 0.001f);
 
-        assertTrue(UnitBudget.Zero.equalsBudget( c.get("x"), 0.01f) );
+        assertTrue(UnitBudget.Zero.equalsBudget(c.get("x"), 0.01f));
 
     }
 
-    @Test public void testBudgetMerge() {
+    @Test
+    public void testBudgetMerge() {
         ArrayBag<String> a = new ArrayBag(4, plusDQDominant, new HashMap<>(4));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
@@ -78,7 +89,8 @@ public class CurveBagTest  {
 
     }
 
-    @Test public void testSort() {
+    @Test
+    public void testSort() {
         ArrayBag<String> a = new ArrayBag(4, plusDQDominant, new HashMap<>(4));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
@@ -93,7 +105,7 @@ public class CurveBagTest  {
 
         assertEquals("[y=$0.2000;0.5000;0.5000$, x=$0.1000;0.5000;0.5000$]", a.listCopy().toString());
 
-        a.put("x", new UnitBudget(0.2f,0.5f,0.5f));
+        a.put("x", new UnitBudget(0.2f, 0.5f, 0.5f));
         a.commit();
 
         //x should now be ahead
@@ -105,7 +117,8 @@ public class CurveBagTest  {
 
     }
 
-    @Test public void testCapacity() {
+    @Test
+    public void testCapacity() {
         ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
@@ -123,7 +136,8 @@ public class CurveBagTest  {
 
     }
 
-    @Test public void testRemoveByKey() {
+    @Test
+    public void testRemoveByKey() {
         ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
@@ -138,17 +152,28 @@ public class CurveBagTest  {
 
     }
 
-    @Test public void testScalePut() {
-        ArrayBag<String> a = new ArrayBag(2, plusBlend, new HashMap<>(2));
+    @Test
+    public void testScalePutArray() {
+        testScalePut(new ArrayBag<>(2, plusBlend, new HashMap<>(2)));
+        testScalePut2(new ArrayBag(2, plusBlend, new HashMap<>(2)));
 
+    }
+
+    @Test
+    public void testScalePutHija() {
+        testScalePut(new HijackBag<>(2));
+        testScalePut2(new HijackBag<>(2));
+    }
+
+    void testScalePut(Bag<String> a) {
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
         a.commit();
 
         assertEquals(0.15, a.get("x").pri(), 0.001f);
     }
-    @Test public void testScalePut2() {
-        ArrayBag<String> a = new ArrayBag(2, plusBlend, new HashMap<>(2));
+
+    void testScalePut2(Bag<String> a) {
 
         a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
@@ -191,10 +216,11 @@ public class CurveBagTest  {
 //
 //    }
     static void printDist(@NotNull EmpiricalDistribution f) {
-        System.out.println(f.getSampleStats().toString().replace("\n"," "));
+        System.out.println(f.getSampleStats().toString().replace("\n", " "));
         f.getBinStats().forEach(
                 s -> {
-                    /*if (s.getN() > 0)*/ System.out.println(
+                    /*if (s.getN() > 0)*/
+                    System.out.println(
                             s.getMin() + ".." + s.getMax() + ":\t" + s.getN());
                 }
         );
@@ -204,12 +230,13 @@ public class CurveBagTest  {
     private EmpiricalDistribution getSamplingDistribution(@NotNull CurveBag b, int n) {
         return getSamplingDistribution(b, n, 10);
     }
+
     @NotNull
     private EmpiricalDistribution getSamplingDistribution(@NotNull CurveBag b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
         for (int i = 0; i < n; i++)
-            f.add( b.sampleIndex() );
-        EmpiricalDistribution e =new EmpiricalDistribution(bins);
+            f.add(b.sampleIndex());
+        EmpiricalDistribution e = new EmpiricalDistribution(bins);
         e.load(f.toArray());
         return e;
     }
@@ -226,13 +253,14 @@ public class CurveBagTest  {
             for (int i = 0; i < n; i++)
                 f.add(b.sample().pri());
         }
-        EmpiricalDistribution e =new EmpiricalDistribution(bins);
+        EmpiricalDistribution e = new EmpiricalDistribution(bins);
         e.load(f.toArray());
         return e;
     }
 
 
-    @Test public void testNormalization() {
+    @Test
+    public void testNormalization() {
         int n = 64;
         int bins = 5;
         int samples = n * 32;
@@ -244,13 +272,13 @@ public class CurveBagTest  {
         float ratioUniform = maxMinRatio(unifDistr);
 
         //smaller dynamic range should be lesser probabailty difference from low to high
-        CurveBag smallDynamicRange = populated(n, () -> 0.1f*Math.random());
+        CurveBag smallDynamicRange = populated(n, () -> 0.1f * Math.random());
         EmpiricalDistribution flatDistr = getSamplingPriorityDistribution(smallDynamicRange, samples, bins);
         printDist(flatDistr);
 
         float ratioFlat = maxMinRatio(flatDistr);
 
-        System.out.println(ratioUniform + " "  + ratioFlat);
+        System.out.println(ratioUniform + " " + ratioFlat);
 
         assertTrue(ratioUniform > 7); //should be ideally ~10
         assertTrue(ratioFlat < 6.5); //should be ideally ~1
@@ -259,19 +287,19 @@ public class CurveBagTest  {
 
     private float maxMinRatio(@NotNull EmpiricalDistribution d) {
         List<SummaryStatistics> bins = d.getBinStats();
-        return  ((float)bins.get(bins.size()-1).getN() / ((float)bins.get(0).getN()));
+        return ((float) bins.get(bins.size() - 1).getN() / ((float) bins.get(0).getN()));
     }
 
     @NotNull
-    private CurveBag<String> populated(int n , @NotNull DoubleSupplier random) {
+    private CurveBag<String> populated(int n, @NotNull DoubleSupplier random) {
 
 
-        CurveBag<String> a = newNormalizedSamplingBag(n, plusDQDominant);
+        CurveBag<String> a = curveBag(n, plusDQDominant);
 
 
         //fill with uniform randomness
         for (int i = 0; i < n; i++) {
-            a.put("x" + i, new UnitBudget((float)random.getAsDouble(), 0.5f, 0.5f));
+            a.put("x" + i, new UnitBudget((float) random.getAsDouble(), 0.5f, 0.5f));
         }
 
         a.commit();
@@ -281,12 +309,33 @@ public class CurveBagTest  {
 
     }
 
-    @Test public void testFlatBagRemainsRandomInNormalizedSampler() {
-        int n = 8;
+    @Test
+    public void testFlatBagRemainsRandomInNormalizedSamplerCurve() {
+        @NotNull CurveBag<String> a = curveBag(8, plusDQDominant);
+
+        testSamplingFlat(a);
+
+
+        int n = a.capacity();
+        int rrr = 100;
+        EmpiricalDistribution d = getSamplingDistribution((CurveBag) a, n * rrr, n - 1);
+        //printDist(d);
+        for (int i = 0; i < n - 1; i++) {
+            long bi = d.getBinStats().get(i).getN();
+            assertTrue("bin " + i + " sampled x " + bi, bi > (rrr / 2)); //received enough samples
+        }
+
+    }
+
+    @Test
+    public void testFlatBagRemainsRandomInNormalizedSamplerHija() {
+        testSamplingFlat(new HijackBag<String>(8));
+    }
+
+    void testSamplingFlat(Bag<String> a) {
+        int n = a.capacity();
 
         float level = 0.04f;
-
-        CurveBag<String> a = newNormalizedSamplingBag(n, plusDQDominant);
 
         for (int i = 0; i < n; i++) {
             a.put("x" + i, new UnitBudget(level, 0.5f, 0.5f));
@@ -295,21 +344,14 @@ public class CurveBagTest  {
         a.commit(); //commit necessary to set sampler's dynamic range
 
         assertEquals(a.priMin(), level, 0.01f);
-        assertEquals(a.priMin(),a.priMax(),0.01f);
+        assertEquals(a.priMin(), a.priMax(), 0.01f);
 
-        int rrr = 100;
-        EmpiricalDistribution d = getSamplingDistribution(a, n * rrr, n-1);
-        //printDist(d);
-        for (int i = 0; i < n-1; i++) {
-            long bi = d.getBinStats().get(i).getN();
-            assertTrue("bin " + i + " sampled x " + bi, bi > (rrr/2)); //received enough samples
-        }
     }
 
-    static final CurveBag.CurveSampler defaultSampler = new CurveBag.NormalizedSampler(CurveBag.power6BagCurve,rng);
+    static final CurveBag.CurveSampler defaultSampler = new CurveBag.NormalizedSampler(CurveBag.power6BagCurve, rng);
 
     @NotNull
-    public CurveBag<String> newNormalizedSamplingBag(int n, BudgetMerge mergeFunction) {
+    public CurveBag<String> curveBag(int n, BudgetMerge mergeFunction) {
         return new CurveBag(n, defaultSampler, mergeFunction, new HashMap());
     }
 

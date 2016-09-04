@@ -3,7 +3,7 @@ package il.technion.tinytable.bit;
 
 public class BitwiseArray extends AuxilaryBitSet {
 
-    public int BucketCapacity;
+    public final int bucketCapacity;
     protected int itemSize;
     protected int bucketBitSize;
     protected int maxAdditionalSize = 15;
@@ -19,7 +19,7 @@ public class BitwiseArray extends AuxilaryBitSet {
     public BitwiseArray(final int capacity, final int itemSize, int bucketcapacity) {
         super((capacity * itemSize) / 64 + 1);
         this.itemSize = itemSize;
-        this.BucketCapacity = bucketcapacity;
+        this.bucketCapacity = bucketcapacity;
         this.bucketBitSize = bucketcapacity * itemSize;
     }
 

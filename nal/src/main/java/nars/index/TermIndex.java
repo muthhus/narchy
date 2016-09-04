@@ -19,7 +19,7 @@ import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
-import nars.util.data.map.nbhm.LimitedNonBlockingHashMap;
+import nars.util.data.map.nbhm.HijaCache;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
@@ -103,10 +103,10 @@ public abstract class TermIndex extends TermBuilder {
 
     public abstract int subtermsCount();
 
-    public final LimitedNonBlockingHashMap<TermContainer,TermContainer> normalizations =
-            new LimitedNonBlockingHashMap<>(Param.NORMALIZATION_CACHE_SIZE, 3 );
-    public final LimitedNonBlockingHashMap<ProtoCompound,Term> terms =
-            new LimitedNonBlockingHashMap<>(Param.TERM_CACHE_SIZE, 3 );
+    public final HijaCache<TermContainer,TermContainer> normalizations =
+            new HijaCache<>(Param.NORMALIZATION_CACHE_SIZE, 3 );
+    public final HijaCache<ProtoCompound,Term> terms =
+            new HijaCache<>(Param.TERM_CACHE_SIZE, 3 );
 
 //    final ThreadLocal<Map<Compound,Compound>> normalizations =
 //            ThreadLocal.withInitial( () ->

@@ -15,7 +15,6 @@ import java.util.function.Function;
 
 import com.lmax.disruptor.util.Util;
 import nars.util.Texts;
-import nars.util.data.random.JavaRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
@@ -30,7 +29,7 @@ import sun.misc.Unsafe;
  * with better scaling properties and generally lower costs to mutate the Map.
  * It provides identical correctness properties as ConcurrentHashMap.  All
  * operations are non-blocking and multi-thread safe, including all update
- * operations.  {@link LimitedNonBlockingHashMap} scales substatially better than
+ * operations.  {@link HijaCache} scales substatially better than
  * {@link java.util.concurrent.ConcurrentHashMap} for high update rates, even with a
  * large concurrency factor.  Scaling is linear up to 768 CPUs on a 768-CPU
  * Azul box, even with 100% updates or 100% reads or any fraction in-between.
@@ -82,7 +81,7 @@ import sun.misc.Unsafe;
  * @since 1.5
  */
 
-public class LimitedNonBlockingHashMap<TypeK, TypeV>
+public class HijaCache<TypeK, TypeV>
         extends AbstractMap<TypeK, TypeV>
         implements ConcurrentMap<TypeK, TypeV>, Cloneable, Serializable {
 
@@ -110,7 +109,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     static {                      // <clinit>
         Field f = null;
         try {
-            f = LimitedNonBlockingHashMap.class.getDeclaredField("_kvs");
+            f = HijaCache.class.getDeclaredField("_kvs");
         } catch (java.lang.NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -119,6 +118,10 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
     private final boolean CAS_kvs(final Object[] oldkvs, final Object[] newkvs) {
         return _unsafe.compareAndSwapObject(this, _kvs_offset, oldkvs, newkvs);
+    }
+
+    public final int capacity() {
+        return capacity;
     }
 
     // --- Adding a 'prime' bit onto Values via wrapping with a junk wrapper class
@@ -331,7 +334,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
      * elements will sacrifice space for a small amount of time gained.  The
      * initial size will be rounded up internally to the next larger power of 2.
      */
-    public LimitedNonBlockingHashMap(final int capacity, final int maxReprobes) {
+    public HijaCache(final int capacity, final int maxReprobes) {
         this.capacity = capacity;
         initialize(capacity);
         this.reprobes = maxReprobes;
@@ -517,7 +520,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
      */
     @Override
     public void clear() {         // Smack a new empty table down
-        Object[] newkvs = new LimitedNonBlockingHashMap(MIN_SIZE, reprobes)._kvs;
+        Object[] newkvs = new HijaCache(MIN_SIZE, reprobes)._kvs;
         while (!CAS_kvs(_kvs, newkvs)) // Spin until the clear works
             ;
     }
@@ -558,7 +561,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         try {
             // Must clone, to get the class right; NBHM might have been
             // extended so it would be wrong to just make a new NBHM.
-            LimitedNonBlockingHashMap<TypeK, TypeV> t = (LimitedNonBlockingHashMap<TypeK, TypeV>) super.clone();
+            HijaCache<TypeK, TypeV> t = (HijaCache<TypeK, TypeV>) super.clone();
             // But I don't have an atomic clone operation - the underlying _kvs
             // structure is undergoing rapid change.  If I just clone the _kvs
             // field, the CHM in _kvs[0] won't be in sync.
@@ -659,7 +662,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         return (TypeV) V;
     }
 
-    private static final Object get_impl(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, final int fullhash) {
+    private static final Object get_impl(final HijaCache topmap, final Object[] kvs, final Object key, final int fullhash) {
         final int len = len(kvs); // Count of key/value pairs, reads kvs.length
         final CHM chm = chm(kvs); // The CHM, for a volatile read below; reads slot 0 of kvs
         final int[] hashes = hashes(kvs); // The memoized hashes; reads slot 1 of kvs
@@ -714,7 +717,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     // assumed to work (although might have been immediately overwritten).  Only
     // the path through copy_slot passes in an expected value of null, and
     // putIfMatch only returns a null if passed in an expected null.
-    private static final Object putIfMatch(final LimitedNonBlockingHashMap topmap, final Object[] kvs, final Object key, Object putval, final Object expVal) {
+    private static final Object putIfMatch(final HijaCache topmap, final Object[] kvs, final Object key, Object putval, final Object expVal) {
         assert putval != null;
         assert !(putval instanceof Prime);
         assert !(expVal instanceof Prime);
@@ -747,7 +750,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                     //probe expired on a non-empty index, hijack a probed index at random,
                     // erasing the old value of another key
 
-                    idx = (startIdx + topmap.rng.nextInt(maxReprobes-1)) & (len - 1);
+                    idx = (startIdx + topmap.rng.nextInt(maxReprobes)) & (len - 1);
 
                     if (compute)
                         ticket = topmap.next(); //compute the ticket before the delicate operations:
@@ -1173,7 +1176,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         // Help along an existing resize operation.  We hope its the top-level
         // copy (it was when we started) but this CHM might have been promoted out
         // of the top position.
-        private final void help_copy_impl(LimitedNonBlockingHashMap topmap, Object[] oldkvs, boolean copy_all) {
+        private final void help_copy_impl(HijaCache topmap, Object[] oldkvs, boolean copy_all) {
             assert chm(oldkvs) == this;
             Object[] newkvs = _newkvs;
             assert newkvs != null;    // Already checked by caller
@@ -1237,7 +1240,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         // before any Prime appears.  So the caller needs to read the _newkvs
         // field to retry his operation in the new table, but probably has not
         // read it yet.
-        private final Object[] copy_slot_and_check(LimitedNonBlockingHashMap topmap, Object[] oldkvs, int idx, Object should_help) {
+        private final Object[] copy_slot_and_check(HijaCache topmap, Object[] oldkvs, int idx, Object should_help) {
             assert chm(oldkvs) == this;
             Object[] newkvs = _newkvs; // VOLATILE READ
             // We're only here because the caller saw a Prime, which implies a
@@ -1250,7 +1253,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         }
 
         // --- copy_check_and_promote --------------------------------------------
-        private final void copy_check_and_promote(LimitedNonBlockingHashMap topmap, Object[] oldkvs, int workdone) {
+        private final void copy_check_and_promote(HijaCache topmap, Object[] oldkvs, int workdone) {
             assert chm(oldkvs) == this;
             int oldlen = len(oldkvs);
             // We made a slot unusable and so did some of the needed copy work
@@ -1290,7 +1293,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         // not-null must have been from a copy_slot (or other old-table overwrite)
         // and not from a thread directly writing in the new table.  Thus we can
         // count null-to-not-null transitions in the new table.
-        private boolean copy_slot(LimitedNonBlockingHashMap topmap, int idx, Object[] oldkvs, Object[] newkvs) {
+        private boolean copy_slot(HijaCache topmap, int idx, Object[] oldkvs, Object[] newkvs) {
             // Blindly set the key slot from null to TOMBSTONE, to eagerly stop
             // fresh put's from inserting new values in the old table when the old
             // table is mid-resize.  We don't need to act on the results here,
@@ -1367,7 +1370,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
                 }
                 // Table copy in-progress - so we cannot get a clean iteration.  We
                 // must help finish the table copy before we can start iterating.
-                topchm.help_copy_impl(LimitedNonBlockingHashMap.this, topkvs, true);
+                topchm.help_copy_impl(HijaCache.this, topkvs, true);
             }
             // Warm-up the iterator
             next();
@@ -1378,7 +1381,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         }
 
         Object key(int idx) {
-            return LimitedNonBlockingHashMap.key(_sskvs, idx);
+            return HijaCache.key(_sskvs, idx);
         }
 
         private int _idx;              // Varies from 0-keys.length
@@ -1413,7 +1416,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
         public void remove() {
             if (_prevV == null) throw new IllegalStateException();
-            putIfMatch(LimitedNonBlockingHashMap.this, _sskvs, _prevK, TOMBSTONE, _prevV);
+            putIfMatch(HijaCache.this, _sskvs, _prevK, TOMBSTONE, _prevV);
             _prevV = null;
         }
 
@@ -1458,17 +1461,17 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         return new AbstractCollection<TypeV>() {
             @Override
             public void clear() {
-                LimitedNonBlockingHashMap.this.clear();
+                HijaCache.this.clear();
             }
 
             @Override
             public int size() {
-                return LimitedNonBlockingHashMap.this.size();
+                return HijaCache.this.size();
             }
 
             @Override
             public boolean contains(Object v) {
-                return LimitedNonBlockingHashMap.this.containsValue(v);
+                return HijaCache.this.containsValue(v);
             }
 
             @Override
@@ -1538,22 +1541,22 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         return new AbstractSet<TypeK>() {
             @Override
             public void clear() {
-                LimitedNonBlockingHashMap.this.clear();
+                HijaCache.this.clear();
             }
 
             @Override
             public int size() {
-                return LimitedNonBlockingHashMap.this.size();
+                return HijaCache.this.size();
             }
 
             @Override
             public boolean contains(Object k) {
-                return LimitedNonBlockingHashMap.this.containsKey(k);
+                return HijaCache.this.containsKey(k);
             }
 
             @Override
             public boolean remove(Object k) {
-                return LimitedNonBlockingHashMap.this.remove(k) != null;
+                return HijaCache.this.remove(k) != null;
             }
 
             @Override
@@ -1616,7 +1619,7 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
      * <p>
      * <p><strong>Warning:</strong> the iterator associated with this Set
      * requires the creation of {@link java.util.Map.Entry} objects with each
-     * iteration.  The {@link LimitedNonBlockingHashMap} does not normally create or
+     * iteration.  The {@link HijaCache} does not normally create or
      * using {@link java.util.Map.Entry} objects so they will be created soley
      * to support this iteration.  Iterating using {@link #keySet} or {@link
      * #values} will be more efficient.
@@ -1626,19 +1629,19 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
         return new AbstractSet<Map.Entry<TypeK, TypeV>>() {
             @Override
             public void clear() {
-                LimitedNonBlockingHashMap.this.clear();
+                HijaCache.this.clear();
             }
 
             @Override
             public int size() {
-                return LimitedNonBlockingHashMap.this.size();
+                return HijaCache.this.size();
             }
 
             @Override
             public boolean remove(final Object o) {
                 if (!(o instanceof Map.Entry)) return false;
                 final Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-                return LimitedNonBlockingHashMap.this.remove(e.getKey(), e.getValue());
+                return HijaCache.this.remove(e.getKey(), e.getValue());
             }
 
             @Override
