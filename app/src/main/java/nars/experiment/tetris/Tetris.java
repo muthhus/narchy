@@ -10,6 +10,7 @@ import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
+import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.time.Tense;
 import nars.nar.Default;
@@ -56,6 +57,8 @@ public class Tetris extends NAgent {
     public static final Executioner exe =
             //new MultiThreadExecutioner(2, 16384);
             new SingleThreadExecutioner();
+    public static final Executioner exe2 =
+            new MultiThreadExecutioner(2, 16384);
 
     public static final int runFrames = 55000;
     public static final int cyclesPerFrame = 6;

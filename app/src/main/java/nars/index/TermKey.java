@@ -1,31 +1,25 @@
 package nars.index;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.ByteArrayCharSequence;
 import nars.IO;
-import nars.term.Compound;
 import nars.term.Term;
+import nars.util.ByteBufferlet;
 
 import java.io.IOException;
 
 /**
  * TODO lazily compute
  */
-public class TermKey implements CharSequence {
-
-    private final byte[] key;
+public class TermKey extends ByteBufferlet implements CharSequence {
 
     public TermKey(Term a) {
-
-        ByteArrayDataOutput data = ByteStreams.newDataOutput(a.volume() * 8 /* ESTIMATE */);
+        super(a.volume() * 8 /* ESTIMATE */);
         try {
-            IO.writeTermSeq(data,a);
-            //data.writeByte(0); //null terminator, signifying end-of-term
+            IO.writeTermSeq(this, a);
+            this.writeByte(0); //null terminator, signifying end-of-term
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        key = data.toByteArray();
     }
 
     @Override
@@ -40,19 +34,23 @@ public class TermKey implements CharSequence {
 
 
     @Override
-    @Deprecated public int length() {
-        return key.length;
+    @Deprecated
+    public final int length() {
+        return position;
 //        return Integer.MAX_VALUE;
     }
 
     @Override
-    public char charAt(int index) {
-        return (char) Byte.toUnsignedInt(key[index]);
+    public final char charAt(int index) {
+        return (char) buffer[index];
+        //return (char) Byte.toUnsignedInt(key[index]);
     }
 
     @Override
     public CharSequence subSequence(int start, int end) {
         //return str.subSequence(start, Math.min(str.length(),end));
-        return new ByteArrayCharSequence(key,start,end);
+        return new ByteArrayCharSequence(buffer, start, end);
     }
+
+
 }

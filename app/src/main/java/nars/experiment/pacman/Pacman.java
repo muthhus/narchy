@@ -45,6 +45,7 @@ import java.util.Random;
 
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.experiment.tetris.Tetris.exe;
+import static nars.experiment.tetris.Tetris.exe2;
 
 /**
  * the java application class of pacman 
@@ -56,7 +57,7 @@ public class Pacman extends NAgent {
 
     final int visionRadius;
     final int itemTypes = 3;
-    final static int runCycles = 10000;
+    final static int runCycles = 50000;
 
 
     final int inputs;
@@ -92,10 +93,10 @@ public class Pacman extends NAgent {
         //Multi nar = new Multi(3,512,
 
         Default nar = new Default(1024,
-                64, 2, 2, rng,
+                256, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 8192, 3),
-                new FrameClock(), exe
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 3),
+                new FrameClock(), exe2
 
         );
         nar.preprocess(new VariableCompressor.Precompressor(nar));
@@ -106,16 +107,16 @@ public class Pacman extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
 
-        float pMult = 0.01f;
+        float pMult = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.4f * pMult;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f * pMult;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f * pMult;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.05f);
-        nar.compoundVolumeMax.set(60);
-        nar.truthResolution.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
+        nar.compoundVolumeMax.set(50);
+        //nar.truthResolution.setValue(0.01f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
         //nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
@@ -196,7 +197,7 @@ public class Pacman extends NAgent {
 
         //Derive.printStats(nar);
 
-        nar.index.print(System.out);
+        //nar.index.print(System.out);
 
 
 

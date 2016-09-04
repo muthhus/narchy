@@ -5,7 +5,7 @@ import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
-import nars.data.Range;
+import nars.util.data.Range;
 import nars.link.BLink;
 import nars.nal.Conclusion;
 import nars.nal.Deriver;

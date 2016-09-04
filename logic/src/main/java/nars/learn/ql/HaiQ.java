@@ -1,6 +1,6 @@
 package nars.learn.ql;
 
-import nars.data.Range;
+import nars.util.data.Range;
 import nars.learn.Agent;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;

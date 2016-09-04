@@ -16,7 +16,7 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
 import nars.NAR;
-import nars.data.Range;
+import nars.util.data.Range;
 import nars.guifx.NARfx;
 import nars.guifx.graph2.NodeVis;
 import nars.guifx.graph2.TermNode;

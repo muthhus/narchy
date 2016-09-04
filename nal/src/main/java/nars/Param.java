@@ -1,7 +1,7 @@
 package nars;
 
 import nars.budget.BudgetFunctions;
-import nars.data.Range;
+import nars.util.data.Range;
 import nars.nal.Level;
 import nars.task.MutableTask;
 import nars.term.atom.Atom;

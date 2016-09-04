@@ -20,7 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-import nars.data.Range;
+import nars.util.data.Range;
 import nars.guifx.annotation.Implementation;
 import nars.guifx.annotation.ImplementationProperty;
 import nars.guifx.annotation.Implementations;

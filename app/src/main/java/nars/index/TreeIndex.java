@@ -170,7 +170,7 @@ public class TreeIndex extends TermIndex {
 
         @Override
         public @NotNull String summary() {
-            return super.summary() + "\tl1:" + L1.summary();
+            return super.summary() + "\tL1:" + L1.summary();
         }
 
         @Override

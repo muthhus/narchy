@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.concept.Concept;
-import nars.data.Range;
+import nars.util.data.Range;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;

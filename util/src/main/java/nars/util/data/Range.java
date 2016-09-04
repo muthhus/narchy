@@ -1,4 +1,4 @@
-package nars.data;
+package nars.util.data;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
