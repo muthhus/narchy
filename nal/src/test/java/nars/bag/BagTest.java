@@ -1,5 +1,6 @@
 package nars.bag;
 
+import com.google.common.collect.Iterators;
 import nars.Param;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
@@ -7,12 +8,14 @@ import nars.bag.impl.experimental.HijackBag;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
+import nars.util.Texts;
 import nars.util.data.map.nbhm.HijaCache;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -23,6 +26,7 @@ import java.util.function.DoubleSupplier;
 
 import static nars.budget.merge.BudgetMerge.plusBlend;
 import static nars.budget.merge.BudgetMerge.plusDQDominant;
+import static nars.util.Texts.n4;
 import static org.junit.Assert.*;
 
 /**
@@ -48,7 +52,7 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalHijack() {
-        testBasicInsertionRemoval(new HijackBag(1));
+        testBasicInsertionRemoval(new HijackBag(1, 2));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
@@ -161,8 +165,10 @@ public class BagTest {
 
     @Test
     public void testScalePutHija() {
-        testScalePut(new HijackBag<>(2));
-        testScalePut2(new HijackBag<>(2));
+        testScalePut(new HijackBag<>(2, 1));
+            testScalePut(new HijackBag<>(2, 2));
+        testScalePut2(new HijackBag<>(2, 1));
+            testScalePut2(new HijackBag<>(2, 2));
     }
 
     void testScalePut(Bag<String> a) {
@@ -184,55 +190,24 @@ public class BagTest {
 
     }
 
-    //AutoBag does not apply to this test
-//    @Test public void testDistribution() {
-//        Default n = new Default(48, 4, 2, 4);
-//        n.perfection.setValue(1f);
-//        n.input("$1$ a:b.");
-//        n.input("$1$ b:c.");
-//        n.input("$1$ c:d.");
-//        n.run(4);
-//        Bag<Concept> bag = n.core.concepts;
-//
-//        bag.forEach(System.out::println);
-//        System.out.println(bag.size() + " " + bag.priMax() + ' ' + bag.priMin());
-//
-//        //TODO verify the histogram resulting from the above execution is relatively flat:
-//        //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
-//        //the tests below assume that it begins with a relatively flat distribution
-//        System.out.println(Arrays.toString(bag.priHistogram(4)));
-//        System.out.println(Arrays.toString(bag.priHistogram(8)));
-//
-//
-//
-//        System.out.print("Sampling: " );
-//        printDist(getSamplingDistribution((CurveBag) n.core.concepts, 1000));
-//        System.out.print("Priority: " );
-//        EmpiricalDistribution pri;
-//        printDist(pri = getSamplingPriorityDistribution(n.core.concepts, 1000));
-//
-//        List<SummaryStatistics> l = pri.getBinStats();
-//        assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());
-//
-//    }
     static void printDist(@NotNull EmpiricalDistribution f) {
         System.out.println(f.getSampleStats().toString().replace("\n", " "));
         f.getBinStats().forEach(
                 s -> {
                     /*if (s.getN() > 0)*/
                     System.out.println(
-                            s.getMin() + ".." + s.getMax() + ":\t" + s.getN());
+                            n4(s.getMin()) + ".." + n4(s.getMax()) + ":\t" + s.getN());
                 }
         );
     }
 
     @NotNull
     private EmpiricalDistribution getSamplingDistribution(@NotNull CurveBag b, int n) {
-        return getSamplingDistribution(b, n, 10);
+        return getSamplingIndexDistribution(b, n, 10);
     }
 
     @NotNull
-    private EmpiricalDistribution getSamplingDistribution(@NotNull CurveBag b, int n, int bins) {
+    private EmpiricalDistribution getSamplingIndexDistribution(@NotNull CurveBag b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
         for (int i = 0; i < n; i++)
             f.add(b.sampleIndex());
@@ -240,6 +215,7 @@ public class BagTest {
         e.load(f.toArray());
         return e;
     }
+
 
     @NotNull
     private EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag b, int n) {
@@ -250,8 +226,15 @@ public class BagTest {
     private EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
         if (!b.isEmpty()) {
-            for (int i = 0; i < n; i++)
-                f.add(b.sample().pri());
+            for (int i = 0; i < n; i++) {
+                @Nullable BLink sample = b.sample();
+                if (sample!=null) {
+                    float p = sample.pri();
+                    f.add(p);
+                } else {
+                    f.add(-1); //miss
+                }
+            }
         }
         EmpiricalDistribution e = new EmpiricalDistribution(bins);
         e.load(f.toArray());
@@ -313,12 +296,12 @@ public class BagTest {
     public void testFlatBagRemainsRandomInNormalizedSamplerCurve() {
         @NotNull CurveBag<String> a = curveBag(8, plusDQDominant);
 
-        testSamplingFlat(a);
+        testSamplingFlat(a, 0.04f);
 
 
         int n = a.capacity();
         int rrr = 100;
-        EmpiricalDistribution d = getSamplingDistribution((CurveBag) a, n * rrr, n - 1);
+        EmpiricalDistribution d = getSamplingIndexDistribution((CurveBag) a, n * rrr, n - 1);
         //printDist(d);
         for (int i = 0; i < n - 1; i++) {
             long bi = d.getBinStats().get(i).getN();
@@ -329,13 +312,30 @@ public class BagTest {
 
     @Test
     public void testFlatBagRemainsRandomInNormalizedSamplerHija() {
-        testSamplingFlat(new HijackBag<String>(8));
+
+        int n = 32;
+
+        testSamplingFlat(new HijackBag<>(n, 4), 0.018f);
+
+        HijackBag<String> a = new HijackBag<>((int)(n*2f), 2);
+        for (int i = 0; i < n; i++) {
+            a.put("x" + i, new UnitBudget(((float)(i+1))/(n), 0.5f, 0.5f));
+        }
+        int expectedSize = n - 1; /* not all fit */
+
+        assertEquals(expectedSize, a.values().size());
+        assertEquals(expectedSize, Iterators.toArray(a.iterator(), Object.class).length);
+
+        EmpiricalDistribution e = getSamplingPriorityDistribution(a, n * 1000, 20);
+
+        printDist(e);
+
+        //a.print();
     }
 
-    void testSamplingFlat(Bag<String> a) {
+    void testSamplingFlat(Bag<String> a, float level) {
         int n = a.capacity();
 
-        float level = 0.04f;
 
         for (int i = 0; i < n; i++) {
             a.put("x" + i, new UnitBudget(level, 0.5f, 0.5f));
@@ -343,7 +343,7 @@ public class BagTest {
 
         a.commit(); //commit necessary to set sampler's dynamic range
 
-        assertEquals(a.priMin(), level, 0.01f);
+        assertEquals(level, a.priMin(), 0.01f);
         assertEquals(a.priMin(), a.priMax(), 0.01f);
 
     }
@@ -354,6 +354,39 @@ public class BagTest {
     public CurveBag<String> curveBag(int n, BudgetMerge mergeFunction) {
         return new CurveBag(n, defaultSampler, mergeFunction, new HashMap());
     }
+
+    //AutoBag does not apply to this test
+//    @Test public void testDistribution() {
+//        Default n = new Default(48, 4, 2, 4);
+//        n.perfection.setValue(1f);
+//        n.input("$1$ a:b.");
+//        n.input("$1$ b:c.");
+//        n.input("$1$ c:d.");
+//        n.run(4);
+//        Bag<Concept> bag = n.core.concepts;
+//
+//        bag.forEach(System.out::println);
+//        System.out.println(bag.size() + " " + bag.priMax() + ' ' + bag.priMin());
+//
+//        //TODO verify the histogram resulting from the above execution is relatively flat:
+//        //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
+//        //the tests below assume that it begins with a relatively flat distribution
+//        System.out.println(Arrays.toString(bag.priHistogram(4)));
+//        System.out.println(Arrays.toString(bag.priHistogram(8)));
+//
+//
+//
+//        System.out.print("Sampling: " );
+//        printDist(getSamplingDistribution((CurveBag) n.core.concepts, 1000));
+//        System.out.print("Priority: " );
+//        EmpiricalDistribution pri;
+//        printDist(pri = getSamplingPriorityDistribution(n.core.concepts, 1000));
+//
+//        List<SummaryStatistics> l = pri.getBinStats();
+//        assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());
+//
+//    }
+
 
 //    /** maybe should be in ArrayBagTest */
 //    @Test public void inQueueTest() {

@@ -5,7 +5,6 @@
 
 package nars.util.data.map.nbhm;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -13,6 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.*;
 import java.util.function.Function;
 
+import com.google.common.collect.Iterators;
 import com.lmax.disruptor.util.Util;
 import nars.util.Texts;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -93,9 +93,9 @@ public class HijaCache<TypeK, TypeV>
     private static final int _Obase = _unsafe.arrayBaseOffset(Object[].class);
     private static final int _Oscale = _unsafe.arrayIndexScale(Object[].class);
 
-    private final Random rng = new XorShift128PlusRandom(1);
+    protected final Random rng = new XorShift128PlusRandom(1);
 
-    private final int capacity;
+    private int capacity;
     private long hit = 0, miss = 0;
 
     private static long rawIndex(/*final Object[] ary, */final int idx) {
@@ -105,6 +105,8 @@ public class HijaCache<TypeK, TypeV>
 
     // --- Setup to use Unsafe
     private static final long _kvs_offset;
+
+
 
     static {                      // <clinit>
         Field f = null;
@@ -162,7 +164,7 @@ public class HijaCache<TypeK, TypeV>
     // during standard 'get' operations.  I assume 'get' is much more frequent
     // than 'put'.  'get' can skip the extra indirection of skipping through the
     // CHM to reach the _kvs array.
-    private transient Object[] _kvs;
+    protected transient Object[] _kvs;
 
     private static final CHM chm(Object[] kvs) {
         return (CHM) kvs[0];
@@ -209,12 +211,16 @@ public class HijaCache<TypeK, TypeV>
     // field only once, and share that read across all key/val calls - lest the
     // _kvs field move out from under us and back-to-back key & val calls refer
     // to different _kvs arrays.
-    private static final Object key(Object[] kvs, int idx) {
+    protected static final Object key(Object[] kvs, int idx) {
         return kvs[(idx << 1) + 2];
     }
 
-    private static final Object val(Object[] kvs, int idx) {
+    protected static final Object val(Object[] kvs, int idx) {
         return kvs[(idx << 1) + 3];
+    }
+
+    protected final Object v(int idx) {
+        return val(_kvs, idx);
     }
 
     private static final boolean CAS_key(Object[] kvs, int idx, Object old, Object key) {
@@ -320,7 +326,7 @@ public class HijaCache<TypeK, TypeV>
 //        _reprobes = new ConcurrentAutoTable();
 //        return r;
 //    }
-    private int reprobes = 4; // Too many reprobes then force a table-resize
+    private int reprobes; // Too many reprobes then force a table-resize
 
 
     // --- LimitedNonBlockingHashMap --------------------------------------------------
@@ -335,26 +341,40 @@ public class HijaCache<TypeK, TypeV>
      * initial size will be rounded up internally to the next larger power of 2.
      */
     public HijaCache(final int capacity, final int maxReprobes) {
-        this.capacity = capacity;
-        initialize(capacity);
         this.reprobes = maxReprobes;
+
+        resize(capacity);
+
     }
 
-    private final void initialize(int initial_sz) {
-        if (initial_sz < 0) throw new IllegalArgumentException();
+    private void resize(int capacity) {
+
+        Set<Entry<TypeK, TypeV>> ii = isEmpty() ? null : entrySet();
+
+        if (capacity < 0) throw new IllegalArgumentException();
+
         int i;                      // Convert to next largest power-of-2
-        if (initial_sz > 1024 * 1024) initial_sz = 1024 * 1024;
-        for (i = MIN_SIZE_LOG; (1 << i) < (initial_sz << 2); i++) ;
+        for (i = MIN_SIZE_LOG; (1 << i) < (capacity ); i++) ;
+
+        this.capacity = (1 << i);
+
         // Double size for K,V pairs, add 1 for CHM and 1 for hashes
-        _kvs = new Object[((1 << i) << 1) + 2];
-        _kvs[0] = new CHM(reprobes); // CHM in slot 0
-        _kvs[1] = new int[1 << i];          // Matching hash entries
-        //_last_resize_milli = System.currentTimeMillis();
+        Object[] k = new Object[(capacity * 2) + 2];
+
+        k[0] = new CHM(reprobes); // CHM in slot 0
+        k[1] = new int[capacity];
+
+        _kvs = k;
+
+        if (ii!=null) {
+            //copy values from previous table
+            ii.forEach((e) -> put(e.getKey(), e.getValue()));
+        }
     }
 
-    // Version for subclassed readObject calls, to be called after the defaultReadObject
-    protected final void initialize() {
-        initialize(MIN_SIZE);
+    public boolean setCapacity(int c) {
+        resize(c);
+        return true;
     }
 
     // --- wrappers ------------------------------------------------------------
@@ -1466,7 +1486,7 @@ public class HijaCache<TypeK, TypeV>
 
             @Override
             public int size() {
-                return HijaCache.this.size();
+                return Iterators.size(iterator());
             }
 
             @Override
@@ -1659,30 +1679,30 @@ public class HijaCache<TypeK, TypeV>
         };
     }
 
-    // --- writeObject -------------------------------------------------------
-    // Write a NBHM to a stream
-    private void writeObject(java.io.ObjectOutputStream s) throws IOException {
-        s.defaultWriteObject();     // Nothing to write
-        for (Object K : keySet()) {
-            final Object V = get(K);  // Do an official 'get'
-            s.writeObject(K);         // Write the <TypeK,TypeV> pair
-            s.writeObject(V);
-        }
-        s.writeObject(null);        // Sentinel to indicate end-of-data
-        s.writeObject(null);
-    }
+//    // --- writeObject -------------------------------------------------------
+//    // Write a NBHM to a stream
+//    private void writeObject(java.io.ObjectOutputStream s) throws IOException {
+//        s.defaultWriteObject();     // Nothing to write
+//        for (Object K : keySet()) {
+//            final Object V = get(K);  // Do an official 'get'
+//            s.writeObject(K);         // Write the <TypeK,TypeV> pair
+//            s.writeObject(V);
+//        }
+//        s.writeObject(null);        // Sentinel to indicate end-of-data
+//        s.writeObject(null);
+//    }
 
-    // --- readObject --------------------------------------------------------
-    // Read a CHM from a stream
-    private void readObject(java.io.ObjectInputStream s) throws IOException, ClassNotFoundException {
-        s.defaultReadObject();      // Read nothing
-        initialize(MIN_SIZE);
-        for (; ; ) {
-            final TypeK K = (TypeK) s.readObject();
-            final TypeV V = (TypeV) s.readObject();
-            if (K == null) break;
-            put(K, V);                 // Insert with an offical put
-        }
-    }
+//    // --- readObject --------------------------------------------------------
+//    // Read a CHM from a stream
+//    private void readObject(java.io.ObjectInputStream s) throws IOException, ClassNotFoundException {
+//        s.defaultReadObject();      // Read nothing
+//        initialize(MIN_SIZE);
+//        for (; ; ) {
+//            final TypeK K = (TypeK) s.readObject();
+//            final TypeV V = (TypeV) s.readObject();
+//            if (K == null) break;
+//            put(K, V);                 // Insert with an offical put
+//        }
+//    }
 
 } // End LimitedNonBlockingHashMap class

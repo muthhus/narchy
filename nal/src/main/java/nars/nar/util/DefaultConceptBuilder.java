@@ -5,6 +5,7 @@ import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.bag.impl.experimental.HijackBag;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
@@ -131,7 +132,8 @@ import static nars.time.Tense.DTERNAL;
 
     @NotNull
     public Bag<Term> termbag(Map map) {
-        return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
+        return new HijackBag<Term>(1, 4);
+        //return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
     }
 
 
