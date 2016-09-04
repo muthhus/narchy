@@ -1,5 +1,6 @@
 package nars.index;
 
+import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
 import nars.term.Compound;
@@ -20,10 +21,19 @@ public class TreeIndex extends TermIndex {
     public final TermTree terms = new TermTree();
 
     private final Concept.ConceptBuilder conceptBuilder;
+    private NAR nar;
+    private static float SIZE_UPDATE_PROB = 0.05f;
+    private int lastSize = 0;
 
     public TreeIndex(Concept.ConceptBuilder conceptBuilder) {
         this.conceptBuilder = conceptBuilder;
     }
+
+    @Override
+    public void start(NAR nar) {
+        this.nar = nar;
+    }
+
 
     @Override
     public @Nullable Termed get(@NotNull Termed tt, boolean createIfMissing) {
@@ -32,11 +42,13 @@ public class TreeIndex extends TermIndex {
         if (t instanceof Compound)
             t = conceptualize((Compound)t);
 
+        TermKey k = new TermKey(t);
+
         if (createIfMissing) {
             Term finalT = t;
-            return terms.putIfAbsent(new TermKey(t), ()->conceptBuilder.apply(finalT));
+            return terms.putIfAbsent(k, ()->conceptBuilder.apply(finalT));
         } else {
-            return terms.get(new TermKey(t));
+            return terms.get(k);
         }
     }
 
@@ -81,7 +93,7 @@ public class TreeIndex extends TermIndex {
 
     @Override
     public @NotNull String summary() {
-        return size() + " terms";
+        return ((nar.random.nextFloat() < SIZE_UPDATE_PROB) ? (this.lastSize = size()) : ("~" + lastSize)) + " terms";
     }
 
     @Override

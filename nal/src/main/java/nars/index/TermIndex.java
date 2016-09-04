@@ -74,6 +74,7 @@ public abstract class TermIndex extends TermBuilder {
         return (Compound)xx;
     }
 
+
     /**
      * set whether absent or not
      */

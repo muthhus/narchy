@@ -90,11 +90,11 @@ public class Pacman extends NAgent {
         //Param.CONCURRENCY_DEFAULT = 2;
 
         //Multi nar = new Multi(3,512,
-        TreeIndex index = new TreeIndex(new DefaultConceptBuilder(rng));
+
         Default nar = new Default(1024,
                 32, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
-                index,
+                new TreeIndex(new DefaultConceptBuilder(rng)),
                 new FrameClock(), exe
 
         );
@@ -196,7 +196,7 @@ public class Pacman extends NAgent {
 
         //Derive.printStats(nar);
 
-        index.terms.print(System.out);
+        nar.index.print(System.out);
 
 
 

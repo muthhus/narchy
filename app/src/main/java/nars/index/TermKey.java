@@ -21,7 +21,7 @@ public class TermKey implements CharSequence {
         ByteArrayDataOutput data = ByteStreams.newDataOutput(a.volume() * 8 /* ESTIMATE */);
         try {
             IO.writeTermSeq(data,a);
-            data.writeByte(0); //null terminator, signifying end-of-term
+            //data.writeByte(0); //null terminator, signifying end-of-term
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -37,6 +37,7 @@ public class TermKey implements CharSequence {
     public int hashCode() {
         throw new UnsupportedOperationException();
     }
+
 
     @Override
     @Deprecated public int length() {

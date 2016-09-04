@@ -68,10 +68,11 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
     public void print(Appendable out) {
         PrettyPrinter.prettyPrint(this, out);
     }
-
-    public void forEach(Consumer<? super Termed> c) {
-        throw new UnsupportedOperationException(); //TODO
+    public void print() {
+        print(System.out);
     }
+
+
 
     public Termed get(TermKey term) {
         return getValueForExactKey(term);

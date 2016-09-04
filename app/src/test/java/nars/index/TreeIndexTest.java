@@ -1,14 +1,21 @@
 package nars.index;
 
+import com.google.common.collect.Sets;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import org.infinispan.util.stream.Streams;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static nars.$.$;
 import static org.junit.Assert.*;
@@ -16,7 +23,9 @@ import static org.junit.Assert.*;
 /**
  * Created by me on 2/25/16.
  */
-public class SymbolMapTest {
+public class TreeIndexTest {
+
+
 
 
     @Test
@@ -57,25 +66,33 @@ public class SymbolMapTest {
         Terminal nar = new Terminal();
         TreeIndex index = new TreeIndex(nar.index.conceptBuilder());
 
+        String[] terms = {
+            "x",
+            "(x)", "(xx)", "(xxx)",
+            "(x,y)", "(x,z)",
+            "(x --> z)", "(x <-> z)",
+            "(x&&z)","(/,x,_)","(/,_,x)"
+        };
+        HashSet<Term> input = new HashSet();
+        for (String s : terms) {
+            @NotNull Term ts = $(s);
+            input.add(ts);
+            index.get(ts, true);
+        }
 
-        index.get($("x"), true);
-//        index.putIfAbsent($("(x)"), cb);
-//        index.putIfAbsent($("(xx)"), cb);
-//        index.putIfAbsent($("(xxx)"), cb);
-//        index.putIfAbsent($("(x,y)"), cb);
-//        index.putIfAbsent($("(x,z)"), cb);
-//        index.putIfAbsent($("(x-->z)"), cb);
-//        index.putIfAbsent($("(x<->z)"), cb);
-//        index.putIfAbsent($("(x && z)"), cb);
-//        index.putIfAbsent($("(/, x, _)"), cb);
-//        index.putIfAbsent($("(/, _, x)"), cb);
+        assertEquals(terms.length, index.size());
 
-        assertEquals(11, index.size());
 
+        Set<Termed> stored = StreamSupport.stream(index.terms.spliterator(), false).collect(Collectors.toSet());
+
+        assertEquals(Sets.symmetricDifference(input, stored) + " = difference", input, stored);
+
+        index.terms.print();
         index.print(System.out);
 
 //        String stringWithUnicode = "unicode\u00easomething";
 //        assertNull( tree.resolveOrAdd(stringWithUnicode)); //unicode not supported yet
 
     }
+
 }

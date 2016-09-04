@@ -8,6 +8,7 @@ import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
 import nars.$;
+import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -16,6 +17,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -31,7 +33,7 @@ import java.util.function.Supplier;
  * @author Niall Gallagher
  * @modified by seth
  */
-public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, Serializable {
+public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, Serializable, Iterable<O> {
 
     private final NodeFactory nodeFactory;
 
@@ -131,11 +133,13 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
     public final O putIfAbsent(CharSequence key, Supplier<O> newValue) {
         return compute(key, (k, r) -> {
 
-            Node existingNode = r.nodeFound;
-            if (existingNode != null) {
-                Object existingValue = existingNode.getValue();
-                if (existingValue != null /*&& key.equals(existingValue.toString())*/) {
-                    return (O) existingValue;
+            if (r.charsMatched == k.length()) {
+                Node existingNode = r.nodeFound;
+                if (existingNode != null) {
+                    Object existingValue = existingNode.getValue();
+                    if (existingValue != null /*&& key.equals(existingValue.toString())*/) {
+                        return (O) existingValue;
+                    }
                 }
             }
 
@@ -476,7 +480,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      */
     @Override
     public int size() {
-        Deque<Node> stack = new ArrayDeque<Node>();
+        Deque<Node> stack = new ArrayDeque<Node>(64);
         stack.push(this.root);
         int count = 0;
         while (true) {
@@ -491,6 +495,22 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
         }
     }
 
+    @Override
+    public void forEach(Consumer<? super O> action) {
+        Deque<Node> stack = new ArrayDeque<Node>(64);
+        stack.push(this.root);
+        while (true) {
+            if (stack.isEmpty()) {
+                return;
+            }
+            Node current = stack.pop();
+            stack.addAll(current.getOutgoingEdges());
+            Object v = current.getValue();
+            if (v != null) {
+                action.accept((O)v);
+            }
+        }
+    }
 
     // ------------- Helper method for put() -------------
     Object putInternal(CharSequence key, Object value, boolean overwrite) {
@@ -1096,5 +1116,14 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
         }
 
 
+    }
+
+//    public void forEach(Consumer<? super O> c) {
+//        //TODO rewrite as pure forEach visitor
+//        this.forEach(c);
+//    }
+
+    public Iterator<O> iterator() {
+        return getValuesForKeysStartingWith("").iterator();
     }
 }
