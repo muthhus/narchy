@@ -92,9 +92,9 @@ public class Pacman extends NAgent {
         //Multi nar = new Multi(3,512,
 
         Default nar = new Default(1024,
-                32, 2, 2, rng,
+                64, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
-                new TreeIndex(new DefaultConceptBuilder(rng)),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 8192, 3),
                 new FrameClock(), exe
 
         );

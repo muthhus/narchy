@@ -26,8 +26,6 @@ import static org.junit.Assert.*;
 public class TreeIndexTest {
 
 
-
-
     @Test
     public void testAtomInsertion() {
 

@@ -15,6 +15,8 @@ import java.util.function.Function;
 
 import com.lmax.disruptor.util.Util;
 import nars.util.Texts;
+import nars.util.data.random.JavaRandom;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
@@ -91,6 +93,9 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     private static final Unsafe _unsafe = Util.getUnsafe();
     private static final int _Obase = _unsafe.arrayBaseOffset(Object[].class);
     private static final int _Oscale = _unsafe.arrayIndexScale(Object[].class);
+
+    private final Random rng = new XorShift128PlusRandom(1);
+
     private final int capacity;
     private long hit = 0, miss = 0;
 
@@ -291,13 +296,13 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     }
 
     public String summary() {
-        return hit + "/" + (hit + miss) + " hit rate (" +
+        return //hit + "/" + (hit + miss) + " (" +
                 Texts.n2(100.0 * ((double) hit) / ((double) hit + miss)) +
-                "%)";
+                "% hitrate";
     }
 
-    // Count of reprobes
-    private transient ConcurrentAutoTable _reprobes = new ConcurrentAutoTable();
+//    // Count of reprobes
+//    private transient ConcurrentAutoTable _reprobes = new ConcurrentAutoTable();
 
     //    /**
 //     * Get and clear the current count of reprobes.  Reprobes happen on key
@@ -413,8 +418,20 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
     }
 
 
-    @Override
-    public final TypeV computeIfAbsent(TypeK key, Function<? super TypeK, ? extends TypeV> mappingFunction) {
+    /**
+     *
+     * @param key
+     * @param mappingFunction
+     *      if the mapping function returns this map as the result, it is the signal
+     *      to not store anything and just return null.
+     *      otherwise, a returned null value will be stored / replace an existing value
+     *      for the index that was selected
+     * @return
+     */
+    @Override public final TypeV computeIfAbsent(TypeK key, Function<? super TypeK, ? extends TypeV> mappingFunction) {
+        return putIfMatch(key, mappingFunction, NO_MATCH_OLD);
+    }
+    public final TypeV computeIfAbsent2(TypeK key, Function<? super TypeK, Object> mappingFunction) {
         return putIfMatch(key, mappingFunction, NO_MATCH_OLD);
     }
 
@@ -727,9 +744,17 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
                 //URGENT HIJACK
                 if (reprobe++ >= maxReprobes) {
-                    //probe expired on a non-empty index, hijack this location erasing the old value of another key
+                    //probe expired on a non-empty index, hijack a probed index at random,
+                    // erasing the old value of another key
+
+                    idx = (startIdx + topmap.rng.nextInt(maxReprobes-1)) & (len - 1);
+
                     if (compute)
                         ticket = topmap.next(); //compute the ticket before the delicate operations:
+
+                    //save old values in case we want to revert
+                    V = val(kvs, idx);
+                    K = key(kvs, idx);
 
                     set_key(kvs, idx, key);
                     hashes[idx] = fullhash; // Memoize fullhash
@@ -858,13 +883,24 @@ public class LimitedNonBlockingHashMap<TypeK, TypeV>
 
                 if (ticket != null) {
 
-                    if (CAS_val(kvs, idx, ticket, V = (((Function) putval).apply(key)))) {
+                    Object W = (((Function) putval).apply(key));
+                    if (W == topmap) {
+                        //if the map itself is returned as a value to store,
+                        //this is the signal to not store anything.
+                        //remove the ticket
+                        boolean restored = CAS_key(kvs, idx, key, K);
+                        if (restored)
+                            CAS_val(kvs, idx, ticket, V);
+
+                        //topmap.miss++; //not exactly a miss
+                        return null;
+                    } else if (CAS_val(kvs, idx, ticket, W)) {
 
                         //if (emptyValue) //was inserted on an empty index, otherwise it was previously full so no need to increase size
                         //chm._size.add(1);
 
                         topmap.miss++;
-                        return V; //done, return the fresh new value
+                        return W; //done, return the fresh new value
 
                     } else {
                         //must retry, the function was too slow to capture this slot before another one

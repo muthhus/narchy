@@ -1,5 +1,6 @@
 package nars.index;
 
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
@@ -8,9 +9,11 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.util.data.map.nbhm.LimitedNonBlockingHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
 /**
@@ -45,11 +48,18 @@ public class TreeIndex extends TermIndex {
         TermKey k = new TermKey(t);
 
         if (createIfMissing) {
-            Term finalT = t;
-            return terms.putIfAbsent(k, ()->conceptBuilder.apply(finalT));
+            return _get(k, t);
         } else {
-            return terms.get(k);
+            return _get(k);
         }
+    }
+
+    protected Termed _get(TermKey k) {
+        return terms.get(k);
+    }
+
+    protected Termed _get(TermKey k, Term finalT) {
+        return terms.putIfAbsent(k, ()->conceptBuilder.apply(finalT));
     }
 
     public TermKey key(@NotNull Term t) {
@@ -98,7 +108,16 @@ public class TreeIndex extends TermIndex {
 
     @Override
     public void remove(@NotNull Termed entry) {
-        terms.remove(key(entry.term()));
+
+        TermKey k = key(entry.term());
+        Termed result = terms.get(k);
+        if (result!=null) {
+            if (!terms.remove(k))
+                return; //alredy removed since previous lookup or something
+
+            onRemoval(k, result);
+        }
+
     }
 
     @Override
@@ -106,8 +125,58 @@ public class TreeIndex extends TermIndex {
         return new GenericCompound(op, dt, subterms);
     }
 
+
+    protected void onRemoval(TermKey key, Termed value) {
+        if (value instanceof Concept) {
+            onRemoval((Concept) value);
+        }
+    }
+
+    protected void onRemoval(Concept value) {
+        value.delete(nar);
+    }
+
     @Override
     protected boolean transformImmediates() {
         return true;
+    }
+
+    /** Tree-index with a front-end "L1" non-blocking hashmap cache */
+    public static class L1TreeIndex extends TreeIndex {
+
+        private final LimitedNonBlockingHashMap<Term, Termed> L1;
+
+        public L1TreeIndex(Concept.ConceptBuilder conceptBuilder, int cacheSize, int reprobes) {
+            super(conceptBuilder);
+            this.L1 = new LimitedNonBlockingHashMap<Term,Termed>(cacheSize, reprobes);
+        }
+
+        @Override
+        public @Nullable Termed get(@NotNull Termed tt, boolean createIfMissing) {
+            Term t = tt.term();
+            t = tt instanceof Compound ? conceptualize(((Compound) t)) : t;
+            return L1.computeIfAbsent2(t,
+                    createIfMissing ?
+                            ttt -> super.get(ttt, true) :
+                            ttt -> {
+                                Termed v = super.get(ttt, false);
+                                if (v == null)
+                                    return L1; //this will result in null at the top level, but the null will not be stored in L1 itself
+                                return v;
+                            }
+            );
+
+        }
+
+        @Override
+        public @NotNull String summary() {
+            return super.summary() + "\tl1:" + L1.summary();
+        }
+
+        @Override
+        protected void onRemoval(Concept r) {
+            super.onRemoval(r);
+            L1.remove(r);
+        }
     }
 }
