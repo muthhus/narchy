@@ -98,6 +98,7 @@ public class Choose2 extends Termutator {
                         f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)))) {
 
                     next(f, chain, current);
+
                 }
 
             }

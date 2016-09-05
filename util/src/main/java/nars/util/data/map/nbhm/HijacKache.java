@@ -541,6 +541,7 @@ public class HijacKache<TypeK, TypeV>
         final Object res = putIfMatch(this, data, key, newVal, oldVal);
         assert !(res instanceof Prime);
         assert res != null;
+
         return res == TOMBSTONE ? null : (TypeV) res;
     }
 
@@ -869,8 +870,9 @@ public class HijacKache<TypeK, TypeV>
             // never put a null, so Value slots monotonically move from null to
             // not-null (deleted Values use Tombstone).  Thus if 'V' is null we
             // fail this fast cutout and fall into the check for table-full.
-            if (!(putval instanceof Function) && putval == V)
+            if (!(putval instanceof Function) && putval == V) {
                 return V; // Fast cutout for no-change
+            }
 
 //        // See if we want to move to a new table (to avoid high average re-probe
 //        // counts).  We only check on the initial set of a Value from null to
@@ -908,6 +910,7 @@ public class HijacKache<TypeK, TypeV>
 
             if (expVal != NO_MATCH_OLD && // Do we care about expected-Value at all?
                     V != expVal &&            // No instant match already?
+                    (!(V instanceof Integer)) &&
                     (expVal != MATCH_ANY || V == TOMBSTONE || V == null) &&
                     !(V == null && expVal == TOMBSTONE) &&    // Match on null/TOMBSTONE combo
                     (expVal == null || !expVal.equals(V))) // Expensive equals check at the last

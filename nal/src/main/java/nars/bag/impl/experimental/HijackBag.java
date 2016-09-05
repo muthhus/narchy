@@ -179,6 +179,22 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
         return this;
     }
 
+    @Override
+    public void forEach(Consumer<? super BLink<X>> action) {
+        Object[] data = this.data;
+        int c = (data.length - 2) / 2;
+
+        int j = 0;
+
+        while (j < c) {
+            Object v = data[((j++) & (c - 1)) * 2 + 3]; /* capacity may change during the loop so always get the latest value */
+
+            if (v instanceof BLink) {
+                action.accept((BLink<X>) v);
+            }
+        }
+    }
+
     /** yields the next threshold value to sample against */
     public float curve() {
         float c = rng.nextFloat();

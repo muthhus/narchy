@@ -25,11 +25,17 @@ public abstract class Termutator  {
     public abstract void run(FindSubst f, Termutator[] chain, int current);
 
     /** call this to invoke the next termutator in the chain */
-    protected static void next(FindSubst f, Termutator[] chain, int next) {
-        if (!f.isFull()) {
-            next++;
-            chain[next].run(f, chain, next);
-        }
+    protected static boolean next(FindSubst f, Termutator[] chain, int next) {
+
+        //increment the version counter by one and detect if the limit exceeded.
+        // this is to prevent infinite recursions in which no version incrementing
+        // occurrs that would otherwise trigger overflow to interrupt it.
+        if (f.versioning.next()==-1)
+            return false;
+
+        chain[++next].run(f, chain, next);
+
+        return true;
     }
 
     public abstract int getEstimatedPermutations();
