@@ -2,11 +2,11 @@ package nars.op;
 
 import nars.$;
 import nars.index.TermIndex;
-import nars.time.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,5 @@
 package nars.learn.gng;
 
-import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

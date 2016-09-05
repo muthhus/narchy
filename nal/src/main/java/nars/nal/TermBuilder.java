@@ -23,12 +23,12 @@ import java.util.TreeSet;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.XTERNAL;
 import static nars.term.Term.False;
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.compound.Statement.pred;
 import static nars.term.compound.Statement.subj;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * Created by me on 1/2/16.

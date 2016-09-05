@@ -1,8 +1,8 @@
 package il.technion.tinytable;
 
 
-import il.technion.tinytable.bit.Chains;
 import il.technion.tinytable.bit.BitwiseArray;
+import il.technion.tinytable.bit.Chains;
 import il.technion.tinytable.hash.FingerPrint;
 import il.technion.tinytable.hash.GreenHasher;
 import il.technion.tinytable.hash.RankIndexing;

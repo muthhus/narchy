@@ -1,13 +1,11 @@
 package nars.index;
 
-import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;

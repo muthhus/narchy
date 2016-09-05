@@ -17,8 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import static java.util.stream.StreamSupport.stream;
-import static nars.time.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.and;
+import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 
 /**

@@ -8,7 +8,6 @@ import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
 import nars.$;
-import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;

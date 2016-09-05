@@ -23,9 +23,7 @@ import nars.$;
 import nars.NAR;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
-import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
-import nars.nal.op.Derive;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.NAgent;
@@ -43,8 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
-import static nars.experiment.tetris.Tetris.exe;
 import static nars.experiment.tetris.Tetris.exe2;
 
 /**

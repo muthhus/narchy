@@ -8,7 +8,6 @@ import nars.NARLoop;
 import nars.data.AutoClassifier;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
-import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;

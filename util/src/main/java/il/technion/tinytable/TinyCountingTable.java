@@ -6,7 +6,6 @@ import il.technion.tinytable.hash.FingerPrint;
 import il.technion.tinytable.hash.RankIndexing;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.LongList;
-import org.eclipse.collections.impl.factory.primitive.LongLists;
 
 import java.util.function.Function;
 

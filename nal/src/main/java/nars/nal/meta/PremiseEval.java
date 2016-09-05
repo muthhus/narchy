@@ -25,8 +25,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;
-import static nars.time.Tense.DTERNAL;
 import static nars.nal.op.substituteIfUnifies.*;
+import static nars.time.Tense.DTERNAL;
 
 
 /**

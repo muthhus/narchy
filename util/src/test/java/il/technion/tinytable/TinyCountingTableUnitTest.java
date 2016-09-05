@@ -1,7 +1,6 @@
 package il.technion.tinytable;
 
 import junit.framework.Assert;
-
 import org.junit.Test;
 
 public class TinyCountingTableUnitTest {

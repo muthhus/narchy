@@ -11,9 +11,9 @@ import nars.inter.gnutella.Peer;
 import nars.inter.gnutella.PeerModel;
 import nars.inter.gnutella.message.Message;
 import nars.inter.gnutella.message.QueryMessage;
-import nars.time.Tense;
 import nars.op.mental.Inperience;
 import nars.term.Term;
+import nars.time.Tense;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

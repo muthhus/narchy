@@ -153,8 +153,11 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
 
         //TODO detect when the array is completely empty after 1 iteration through it in case the scan limit > 1.0
 
+        //randomly choose traversal direction
+        int di = rng.nextBoolean() ? +1 : -1;
+
         while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
-            Object v = data[ ((i++) % c)*2 + 3 ]; /* capacity may change during the loop so always get the latest value */;
+            Object v = data[ ((i+=di) & (c-1))*2 + 3 ]; /* capacity may change during the loop so always get the latest value */;
 
             if (v instanceof BLink) {
                 BLink<X> x = (BLink<X>) v;
@@ -175,12 +178,20 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
 
     /** yields the next threshold value to sample against */
     public float curve() {
-        return rng.nextFloat() - priMin;
+        float c = rng.nextFloat();
+        c*=c; //c^2 curve
+
+        //float min = this.priMin;
+        return (c ); // * (priMax - min);
     }
 
-    /** searchProgress in range 0..1.0 */
+    /**
+     * beam width (tolerance range)
+     * searchProgress in range 0..1.0 */
     private float tolerance(float searchProgress) {
-        return  (searchProgress*searchProgress) /* squared to sharpen the selection curve, growing more slowly at the beginning */;
+        /* raised polynomially to sharpen the selection curve, growing more slowly at the beginning */
+        float exp = 6;
+        return (float)Math.pow(searchProgress,exp);
     }
 
     @NotNull

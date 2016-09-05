@@ -1,10 +1,10 @@
 package nars.io;
 
 import nars.*;
-import nars.time.Tense;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

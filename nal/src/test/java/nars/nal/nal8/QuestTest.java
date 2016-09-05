@@ -2,8 +2,8 @@ package nars.nal.nal8;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.time.Tense;
 import nars.nar.Default;
+import nars.time.Tense;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;

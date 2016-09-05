@@ -9,8 +9,11 @@ import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.util.data.map.nbhm.HijacKache;
+import nars.util.data.random.MersenneTwisterFast;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
+import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.random.RandomAdaptor;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.jetbrains.annotations.NotNull;
@@ -316,18 +319,23 @@ public class BagTest {
 
         testSamplingFlat(new HijackBag<>(n, 4), 0.018f);
 
-        HijackBag<String> a = new HijackBag<>((int)(n*2f), 2);
+        HijackBag<String> a = new HijackBag<>((int)(n*2f), 2, new XorShift128PlusRandom(2));
         for (int i = 0; i < n; i++) {
-            a.put("x" + i, new UnitBudget(((float)(i+1))/(n), 0.5f, 0.5f));
+            a.put("x" + Integer.toString(Float.floatToIntBits(1f/i),5), new UnitBudget(((float)(i+1))/(n), 0.5f, 0.5f));
         }
         int expectedSize = n - 1; /* not all fit */
 
         assertEquals(expectedSize, a.values().size());
         assertEquals(expectedSize, Iterators.toArray(a.iterator(), Object.class).length);
 
-        EmpiricalDistribution e = getSamplingPriorityDistribution(a, n * 1000, 20);
+        int b = 20;
+        EmpiricalDistribution e = getSamplingPriorityDistribution(a, n * 5000, b);
 
         printDist(e);
+
+        //monotonically increasing:
+        assertTrue(e.getBinStats().get(0).getMean() < e.getBinStats().get(b/2).getMean());
+        assertTrue(e.getBinStats().get(b/2).getMean() < e.getBinStats().get(b-2).getMean());
 
         //a.print();
     }

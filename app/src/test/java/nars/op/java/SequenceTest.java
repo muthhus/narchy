@@ -4,7 +4,6 @@ import nars.$;
 import nars.Param;
 import nars.Task;
 import nars.index.TermIndex;
-import nars.time.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.op.in.Twenglish;
@@ -12,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.time.Tense;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 

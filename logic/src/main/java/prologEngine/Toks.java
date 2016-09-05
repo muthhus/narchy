@@ -1,7 +1,8 @@
 package prologEngine;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Reads chars from char streams using the current default encoding

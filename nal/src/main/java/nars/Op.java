@@ -1,11 +1,11 @@
 package nars;
 
 
-import nars.time.Tense;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.time.Tense;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.jetbrains.annotations.NotNull;
 

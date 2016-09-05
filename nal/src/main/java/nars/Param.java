@@ -1,13 +1,13 @@
 package nars;
 
 import nars.budget.BudgetFunctions;
-import nars.util.data.Range;
 import nars.nal.Level;
 import nars.task.MutableTask;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.MutableInteger;
+import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.jetbrains.annotations.NotNull;

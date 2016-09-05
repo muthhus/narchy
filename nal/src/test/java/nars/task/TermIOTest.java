@@ -19,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import static java.lang.System.out;
 import static nars.$.$;

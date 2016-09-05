@@ -22,8 +22,8 @@ package nars.truth;
 
 import nars.$;
 import nars.Param;
-import nars.time.Tense;
 import nars.nal.UtilityFunctions;
+import nars.time.Tense;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -20,7 +20,6 @@ package alice.tuprolog;
 import alice.util.OneWayList;
 import nars.util.data.list.FasterList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

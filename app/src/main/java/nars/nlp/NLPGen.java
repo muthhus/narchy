@@ -3,10 +3,10 @@ package nars.nlp;
 import nars.Narsese;
 import nars.Task;
 import nars.index.PatternIndex;
-import nars.time.Tense;
 import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.subst.FindSubst;
+import nars.time.Tense;
 
 import java.util.ArrayList;
 import java.util.List;

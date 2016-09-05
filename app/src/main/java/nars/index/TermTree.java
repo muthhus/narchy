@@ -10,14 +10,11 @@ import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import nars.$;
 import nars.Param;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.MyConcurrentRadixTree;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**

@@ -1,10 +1,10 @@
 package nars.op;
 
 import nars.*;
+import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.Activation;
 import nars.concept.Concept;
 import nars.task.GeneratedTask;
 import nars.term.Term;
@@ -26,9 +26,8 @@ import java.util.List;
 
 import static nars.$.t;
 import static nars.agent.NAgentOld.varPct;
-import static nars.time.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.and;
-import static nars.nal.UtilityFunctions.or;
+import static nars.time.Tense.ETERNAL;
 import static nars.util.Texts.n2;
 import static nars.util.Texts.n4;
 

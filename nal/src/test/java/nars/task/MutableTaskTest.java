@@ -1,8 +1,8 @@
 package nars.task;
 
 import nars.NAR;
-import nars.time.Tense;
 import nars.nar.Default;
+import nars.time.Tense;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

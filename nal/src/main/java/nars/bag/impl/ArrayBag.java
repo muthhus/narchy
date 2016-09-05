@@ -8,8 +8,6 @@ import nars.budget.Forget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
-import nars.link.StrongBLink;
-import nars.link.StrongBLinkToBudgeted;
 import nars.util.Util;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;

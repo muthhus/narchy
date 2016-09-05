@@ -1,15 +1,10 @@
 package nars.gui;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.google.common.collect.Lists;
-import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
-import nars.term.Termed;
 import nars.util.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import spacegraph.Facial;
@@ -19,14 +14,6 @@ import spacegraph.math.Color3f;
 import spacegraph.obj.GridSurface;
 import spacegraph.render.Draw;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import static java.util.stream.Collectors.toList;
-import static spacegraph.layout.TreeChart.WeightedString.w;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
 /**

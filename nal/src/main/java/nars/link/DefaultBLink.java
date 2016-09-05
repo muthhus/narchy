@@ -1,9 +1,6 @@
 package nars.link;
 
-import nars.Param;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.util.Util.clamp;

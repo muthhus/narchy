@@ -2,7 +2,6 @@ package nars.link;
 
 import com.google.common.base.Objects;
 import nars.budget.Budget;
-import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

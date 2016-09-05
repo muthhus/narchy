@@ -1,9 +1,8 @@
 package il.technion.tinytable;
 
+import il.technion.tinytable.hash.FingerPrint;
 import il.technion.tinytable.hash.RankIndexing;
 import junit.framework.Assert;
-import il.technion.tinytable.hash.FingerPrint;
-
 import org.junit.Test;
 
 public class RankIndexingTechnqiueUnitTest {

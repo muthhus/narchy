@@ -3,9 +3,7 @@ package il.technion.tinytable.bit;
 
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 
 public class Chains {

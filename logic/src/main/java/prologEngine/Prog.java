@@ -1,8 +1,9 @@
 package prologEngine;
 //import java.util.Arrays;
-import java.util.stream.Stream;
+
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class Prog extends Engine implements Spliterator<Object> {

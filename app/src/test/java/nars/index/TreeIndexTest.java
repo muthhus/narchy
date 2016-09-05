@@ -7,7 +7,6 @@ import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
-import org.infinispan.util.stream.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

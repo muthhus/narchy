@@ -5,19 +5,21 @@
 
 package nars.util.data.map.nbhm;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.*;
-import java.util.function.Function;
-
 import com.google.common.collect.Iterators;
 import com.lmax.disruptor.util.Util;
 import nars.util.Texts;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLongFieldUpdater;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+import java.util.function.Function;
 
 /**
  * THIS IS A LOSSY VERSION OF NonBlockingHashMap WHICH OPERATES WITHIN A
