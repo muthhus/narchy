@@ -383,16 +383,16 @@ public interface Concept extends Termed {
         tasklinks().commit();
         termlinks().commit();
 
-        if (Param.DEBUG) {
-            if ((((ArrayBag) termlinks()).map).size() > 1 + termlinks().capacity() + tasklinks().capacity()) {
-                //inconsistent item
-                System.err.println(
-                        term() + "\tmap=" +
-                                (((ArrayBag) termlinks()).map).size() + ":  " +
-                                termlinks().size() + "/" + termlinks().capacity() + "\t" +
-                                tasklinks().size() + "/" + tasklinks().capacity());
-            }
-        }
+//        if (Param.DEBUG) {
+//            if ((((ArrayBag) termlinks()).map).size() > 1 + termlinks().capacity() + tasklinks().capacity()) {
+//                //inconsistent item
+//                System.err.println(
+//                        term() + "\tmap=" +
+//                                (((ArrayBag) termlinks()).map).size() + ":  " +
+//                                termlinks().size() + "/" + termlinks().capacity() + "\t" +
+//                                tasklinks().size() + "/" + tasklinks().capacity());
+//            }
+//        }
 
 
     }

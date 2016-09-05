@@ -2,6 +2,7 @@ package nars.budget.merge;
 
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.link.BLink;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,6 +39,10 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     default Budget apply(@NotNull Budget target, @NotNull Budget incoming, float scale) {
         merge(target, incoming, scale);
         return target;
+    }
+
+    default float merge(BLink prev, BLink next) {
+        return merge(prev, next, 1f);
     }
 
     enum PriMerge {

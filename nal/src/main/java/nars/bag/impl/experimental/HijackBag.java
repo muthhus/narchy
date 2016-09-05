@@ -1,66 +1,105 @@
 package nars.bag.impl.experimental;
 
+import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.Forget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
-import nars.util.data.map.nbhm.HijaCache;
+import nars.util.data.map.nbhm.HijacKache;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import static nars.util.Util.clamp;
 
 /**
  * Created by me on 9/4/16.
  */
-public class HijackBag<X> extends HijaCache<X,BLink<X>> implements Bag<X> {
+public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
 
 
-    public static final float finalTolerance = 0.25f;
+
 
     /** max # of times allowed to scan through until either the next item is
-     *  accepted with final tolerance or gives up
+     *  accepted with final tolerance or gives up.
+     *  for safety, should be >= 1.0
      */
-    private static final float SCAN_ITERATIONS = 1.5f;
+    private static final float SCAN_ITERATIONS = 1.1f;
 
-    private float pending = 0;
+    private float pressure = 0;
+    float priMin, priMax;
 
+    /** the fraction of capacity which must contain entries to exceed in order to apply forgetting  */
+    private float FORGET_CAPACITY_THRESHOLD = 0.75f;
 
 
     public HijackBag(int capacity, int reprobes) {
-        super(capacity, reprobes);
+        this(capacity, reprobes, new XorShift128PlusRandom(1));
+    }
+
+    public HijackBag(int capacity, int reprobes, Random random) {
+        super(capacity, reprobes, random);
     }
 
 
     @Override
     public void put(X x, Budgeted b, float scale, MutableFloat overflowing) {
 
-        BLink next = (BLink) newLink(x, b).priMult(scale);
 
 
+        float dPending = 0;
 
         BLink prev = get(x);
         if (prev!=null) {
             float pBefore = prev.pri();
-            BudgetMerge.plusBlend.apply(prev, next);
-            pending += prev.pri() - pBefore;
+
+            float overflow = BudgetMerge.plusBlend.merge(prev, b, scale);
+            if (overflowing!=null)
+                overflowing.add(overflow);
+
+            float pAfter = prev.pri();
+            dPending = pAfter - pBefore;
+
+            range(pAfter);
+
         } else {
-            BLink displaced = put(x, next);
+            BLink next = (BLink) newLink(x, b).priMult(scale);
+
+            BLink<X> displaced = put(x, next);
+
+            float np = next.pri();
+
             if (displaced == null) {
-                pending += next.pri();
+                dPending = np;
             } else {
-                //System.out.println("displaced: " + displaced + " vs " + next);
-                //                float n = next.pri();
-//                float probNext = n / (n + prev.pri());
-//                if (rng.nextFloat() < probNext)
-//                    return next; //overwrite
-//                else
-//                    return prev; //keep old value
+
+                float dp = displaced.pri();
+                if (dp == dp) { //not deleted, compare the two
+                    float den = np + dp;
+                    float probNext = den > Param.BUDGET_EPSILON ? np / den : 0.5f;
+
+                    if (rng.nextFloat() < probNext) {
+                        dPending = np - dp; //keep the new value
+                        range(np);
+                    } else {
+                        remove(x);
+                        put(displaced.get(), displaced); //reinsert what was removed
+                        range(dp);
+                    }
+
+                } else {
+                    dPending = np;
+                }
             }
         }
+
+        pressure += dPending;
 
 //        BLink result = merge(i, l, (prev, next) -> {
 //            //warning due to lossy overwriting, the key of next may not be equal to the key of prev
@@ -79,6 +118,21 @@ public class HijackBag<X> extends HijaCache<X,BLink<X>> implements Bag<X> {
 //        });
     }
 
+    /** considers if this priority value stretches the current min/max range */
+    private final void range(float p) {
+        if (p > priMax) priMax = p;
+        if (p < priMin) priMin = p;
+    }
+
+    @Override
+    public float priMin() {
+        return priMin;
+    }
+
+    @Override
+    public float priMax() {
+        return priMax;
+    }
 
     @Override
     public void topWhile(Predicate<? super BLink<X>> each, int n) {
@@ -88,35 +142,45 @@ public class HijackBag<X> extends HijaCache<X,BLink<X>> implements Bag<X> {
     @NotNull
     @Override
     public Bag<X> sample(int n, Predicate<? super BLink<X>> target) {
-        Object[] data = _kvs;
+        Object[] data = this.data;
         int c = (data.length - 2)/2;
         int jLimit = (int)Math.ceil(c * SCAN_ITERATIONS);
-        float dBeam = 1f/c * finalTolerance; //(float)Math.sqrt(c);
-        float beam = 0;
 
         int start = rng.nextInt(c); //starting index
         int i = start, j = 0;
-        float r = rng.nextFloat(); //randomized threshold
+
+        float r = curve(); //randomized threshold
+
+        //TODO detect when the array is completely empty after 1 iteration through it in case the scan limit > 1.0
 
         while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
             Object v = data[ ((i++) % c)*2 + 3 ]; /* capacity may change during the loop so always get the latest value */;
 
-            if (v != null) {
+            if (v instanceof BLink) {
                 BLink<X> x = (BLink<X>) v;
                 float p = x.priIfFiniteElseNeg1();
                 if (p >= 0) {
-                    if (r < p + beam ) {
+                    if ((r < p) || (r < p + tolerance((((float)j) / jLimit)))) {
                         if (target.test(x)) {
                             n--;
-                            r = rng.nextFloat();
+                            r = curve();
                         }
                     }
                 }
-                beam += dBeam; //widen the search beam to make it more likely to accept something
             }
             j++;
         }
         return this;
+    }
+
+    /** yields the next threshold value to sample against */
+    public float curve() {
+        return rng.nextFloat() - priMin;
+    }
+
+    /** searchProgress in range 0..1.0 */
+    private float tolerance(float searchProgress) {
+        return  (searchProgress*searchProgress) /* squared to sharpen the selection curve, growing more slowly at the beginning */;
     }
 
     @NotNull
@@ -128,10 +192,14 @@ public class HijackBag<X> extends HijaCache<X,BLink<X>> implements Bag<X> {
     @NotNull
     @Override
     public Bag<X> commit() {
-        if (isEmpty())
-            return this;
+//        if (isEmpty())
+//            return this;
 
         float mass = 0;
+
+        int count = 0;
+        int cap = capacity();
+        float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
 
         Iterator<Entry<X, BLink<X>>> es = entrySet().iterator();
         while (es.hasNext()) {
@@ -148,29 +216,42 @@ public class HijackBag<X> extends HijaCache<X,BLink<X>> implements Bag<X> {
             if (delete) {
                 es.remove();
             } else {
-                mass += l.pri();
+                float p = l.pri();
+                if (p > max) max = p;
+                if (p < min) min = p;
+                mass += p;
+                count++;
             }
         }
 
-        float p = this.pending;
-        this.pending = 0;
+        this.priMin = min;
+        this.priMax = max;
 
-        float forgetRate = p / mass;
         Forget f;
-        if (forgetRate > 0) {
-            f = new Forget(forgetRate);
+        if (mass > 0 && (count >= cap * FORGET_CAPACITY_THRESHOLD)) {
+            float p = this.pressure;
+            this.pressure = 0;
+
+            float forgetRate = clamp(p / (p+mass));
+
+            if (forgetRate > Param.BUDGET_EPSILON) {
+                f = new Forget(forgetRate);
+            } else {
+                f = null;
+            }
         } else {
             f = null;
+            this.pressure = 0;
         }
 
         return commit(f);
     }
+
     @NotNull
     @Override
     public Bag<X> commit(Consumer<BLink> each) {
         if (each!=null && !isEmpty())
             forEach(each);
-
 
         return this;
     }
@@ -183,7 +264,7 @@ public class HijackBag<X> extends HijaCache<X,BLink<X>> implements Bag<X> {
             float before = b.pri();
             b.priMult(boost);
             float after = b.pri();
-            pending += (after - before);
+            pressure += (after - before);
             return b.get();
         }
         return null;

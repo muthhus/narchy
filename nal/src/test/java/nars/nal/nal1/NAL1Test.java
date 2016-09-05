@@ -15,7 +15,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL1Test extends AbstractNALTest {
 
-    final int withinCycles = 64;
+    final int withinCycles = 200;
 
     public NAL1Test(Supplier<NAR> b) {
         super(b);
@@ -55,7 +55,7 @@ public class NAL1Test extends AbstractNALTest {
 
 
     @Test
-    public void revision() throws Narsese.NarseseException {
+    public void revision()  {
 
         String belief = "<bird --> swimmer>";
 
@@ -69,7 +69,7 @@ public class NAL1Test extends AbstractNALTest {
 
 
     @Test
-    public void deduction() throws Narsese.NarseseException {
+    public void deduction()  {
 
         test().believe("<bird --> animal>")
                 /*.en("bird is a type of animal.")
@@ -81,7 +81,7 @@ public class NAL1Test extends AbstractNALTest {
     }
 
     @Test
-    public void abduction() throws Narsese.NarseseException {
+    public void abduction()  {
 
         int time = withinCycles;
 
@@ -102,7 +102,7 @@ public class NAL1Test extends AbstractNALTest {
     }
 
     @Test
-    public void abduction2() throws Narsese.NarseseException {
+    public void abduction2()  {
         
         /*
         <swan --> swimmer>. %0.9;0.9%
@@ -111,7 +111,6 @@ public class NAL1Test extends AbstractNALTest {
         //(A --> B), (A --> C), neq(B,C) |- (C --> B), (Belief:Abduction, Desire:Weak, Derive:AllowBackward)
 
         test()
-            .log()
             .believe("<swan --> swimmer>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
             .believe("<swan --> bird>") //.en("Swan is a type of bird.");
             .mustBelieve(withinCycles, "<bird --> swimmer>", 0.90f, 0.45f) //.en("I guess bird is a type of swimmer.");
@@ -136,7 +135,7 @@ public class NAL1Test extends AbstractNALTest {
 
 
     @Test
-    public void exemplification() throws Narsese.NarseseException {
+    public void exemplification()  {
 
         test()
             .log()
@@ -147,7 +146,7 @@ public class NAL1Test extends AbstractNALTest {
 
 
     @Test
-    public void conversion() throws Narsese.NarseseException {
+    public void conversion()  {
 
         TestNAR test = test();
         test.believe("<bird --> swimmer>")
@@ -159,7 +158,7 @@ public class NAL1Test extends AbstractNALTest {
 
 
     @Test
-    public void backwardInference() throws Narsese.NarseseException {
+    public void backwardInference()  {
         long time = withinCycles;
 
 

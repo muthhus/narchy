@@ -306,13 +306,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             Consumer<BLink> a;
             if (existing == 0) {
                 a = null; //nothing to forget
+                this.pressure = 0; //reset pending accumulator
             } else {
                 float pending = this.pressure;
                 this.pressure = 0; //reset pending accumulator
 
 
                 float r = Util.clamp(pending / (existing + pending));
-                //float r = Util.clamp(pending / existing);
 
                 //TODO some way to increase 'r' in proportion to minPriIfFull so that a higher floor will cause faster decay
 

@@ -8,8 +8,7 @@ import nars.bag.impl.experimental.HijackBag;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
-import nars.util.Texts;
-import nars.util.data.map.nbhm.HijaCache;
+import nars.util.data.map.nbhm.HijacKache;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -52,14 +51,14 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalHijack() {
-        testBasicInsertionRemoval(new HijackBag(1, 2));
+        testBasicInsertionRemoval(new HijackBag(1, 1));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
 
 
         assertEquals(1, c.capacity());
-        if (!(c instanceof HijaCache)) {
+        if (!(c instanceof HijacKache)) {
             assertEquals(0, c.size());
             assertTrue(c.isEmpty());
         }

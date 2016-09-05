@@ -8,7 +8,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.util.data.map.nbhm.HijaCache;
+import nars.util.data.map.nbhm.HijacKache;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -142,11 +142,11 @@ public class TreeIndex extends TermIndex {
     /** Tree-index with a front-end "L1" non-blocking hashmap cache */
     public static class L1TreeIndex extends TreeIndex {
 
-        private final HijaCache<Term, Termed> L1;
+        private final HijacKache<Term, Termed> L1;
 
         public L1TreeIndex(Concept.ConceptBuilder conceptBuilder, int cacheSize, int reprobes) {
             super(conceptBuilder);
-            this.L1 = new HijaCache<Term,Termed>(cacheSize, reprobes);
+            this.L1 = new HijacKache<Term,Termed>(cacheSize, reprobes);
         }
 
         @Override

@@ -37,35 +37,44 @@ import static nars.time.Tense.DTERNAL;
  */
  public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
-    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
-    private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 32;
+//    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
+//    private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 32;
+    public static final int HIJACK_REPROBES = 3;
 
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> {
-                Map map1 = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
-                Map map2 =
-                        map1; //shared
-                        //newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
+//                Map map1 = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
+//                Map map2 =
+//                        map1; //shared
+//                        //newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
 
                 switch (a.op()) {
                     default:
-                        return new AtomConcept(a, termbag(map1), taskbag(map2));
+                        return new AtomConcept(a, newBag(), newBag());
                 }
 
             };
 
-
-    @NotNull
-    private Map newBagMap(int cap) {
-        if (nar.exe.concurrent()) {
-            return new ConcurrentHashMap(cap);
-            //return new NonBlockingHashMap(cap);
-            //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
-            //ConcurrentHashMapUnsafe(cap);
-        } else {
-            return new HashMap(cap);
-        }
+    public <X> HijackBag<X> newBag() {
+        return newBag(1);
     }
+
+    private <X> HijackBag<X> newBag(int capacity) {
+        return new HijackBag<>(capacity, HIJACK_REPROBES, nar.random);
+    }
+
+
+//    @NotNull
+//    private Map newBagMap(int cap) {
+//        if (nar.exe.concurrent()) {
+//            return new ConcurrentHashMap(cap);
+//            //return new NonBlockingHashMap(cap);
+//            //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
+//            //ConcurrentHashMapUnsafe(cap);
+//        } else {
+//            return new HashMap(cap);
+//        }
+//    }
 
     @NotNull
     private final ConceptPolicy init;
@@ -87,13 +96,13 @@ import static nars.time.Tense.DTERNAL;
         assert(!(t.op().temporal && t.dt() != DTERNAL)); //throw new RuntimeException("temporality in concept term: " + t);
 
 
-        Map map1 = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
-        Map map2 =
-                map1; //shared
-                //newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
+//        Map map1 = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
+//        Map map2 =
+//                map1; //shared
+//                //newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
 
-        @NotNull Bag<Term> termbag = termbag(map1);
-        @NotNull Bag<Task> taskbag = taskbag(map2);
+        @NotNull Bag<Term> termbag = newBag();
+        @NotNull Bag<Task> taskbag = newBag();
 
         boolean dynamic = false;
 
@@ -124,17 +133,16 @@ import static nars.time.Tense.DTERNAL;
     }
 
 
-    @NotNull
-    public Bag<Task> taskbag(Map map) {
-        return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
-    }
-
-
-    @NotNull
-    public Bag<Term> termbag(Map map) {
-        return new HijackBag<Term>(1, 4);
-        //return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
-    }
+//    @NotNull
+//    public Bag<Task> taskbag(Map map) {
+//        return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
+//    }
+//
+//
+//    @NotNull
+//    public Bag<Term> termbag(Map map) {
+//        return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
+//    }
 
 
     /** use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process */
@@ -197,8 +205,8 @@ import static nars.time.Tense.DTERNAL;
 
             if (term instanceof Termject) {
                 //if (term.op() == INT || term.op() == INTRANGE) {
-                Map m = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
-                result = new TermjectConcept((Termject)term, termbag(m), taskbag(m));
+                //Map m = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
+                result = new TermjectConcept((Termject)term, newBag(), newBag());
             }
 
             if (term instanceof Variable) {

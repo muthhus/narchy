@@ -29,7 +29,7 @@ import sun.misc.Unsafe;
  * with better scaling properties and generally lower costs to mutate the Map.
  * It provides identical correctness properties as ConcurrentHashMap.  All
  * operations are non-blocking and multi-thread safe, including all update
- * operations.  {@link HijaCache} scales substatially better than
+ * operations.  {@link HijacKache} scales substatially better than
  * {@link java.util.concurrent.ConcurrentHashMap} for high update rates, even with a
  * large concurrency factor.  Scaling is linear up to 768 CPUs on a 768-CPU
  * Azul box, even with 100% updates or 100% reads or any fraction in-between.
@@ -77,11 +77,12 @@ import sun.misc.Unsafe;
  * @author Cliff Click
  * @author Prashant Deva - moved hash() function out of get_impl() so it is
  *         not calculated multiple times.
+ * @author SeH modified NonBlockingHashMap into HijacKache
  * @version 1.1.2
  * @since 1.5
  */
 
-public class HijaCache<TypeK, TypeV>
+public class HijacKache<TypeK, TypeV>
         extends AbstractMap<TypeK, TypeV>
         implements ConcurrentMap<TypeK, TypeV>, Cloneable, Serializable {
 
@@ -93,9 +94,8 @@ public class HijaCache<TypeK, TypeV>
     private static final int _Obase = _unsafe.arrayBaseOffset(Object[].class);
     private static final int _Oscale = _unsafe.arrayIndexScale(Object[].class);
 
-    protected final Random rng = new XorShift128PlusRandom(1);
+    protected Random rng;
 
-    private int capacity;
     private long hit = 0, miss = 0;
 
     private static long rawIndex(/*final Object[] ary, */final int idx) {
@@ -111,7 +111,7 @@ public class HijaCache<TypeK, TypeV>
     static {                      // <clinit>
         Field f = null;
         try {
-            f = HijaCache.class.getDeclaredField("_kvs");
+            f = HijacKache.class.getDeclaredField("data");
         } catch (java.lang.NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -123,7 +123,10 @@ public class HijaCache<TypeK, TypeV>
     }
 
     public final int capacity() {
-        return capacity;
+        Object[] d = this.data;
+        if (d == null)
+            return 0;
+        return hashes(d).length;
     }
 
     // --- Adding a 'prime' bit onto Values via wrapping with a junk wrapper class
@@ -164,7 +167,7 @@ public class HijaCache<TypeK, TypeV>
     // during standard 'get' operations.  I assume 'get' is much more frequent
     // than 'put'.  'get' can skip the extra indirection of skipping through the
     // CHM to reach the _kvs array.
-    protected transient Object[] _kvs;
+    protected transient Object[] data;
 
     private static final CHM chm(Object[] kvs) {
         return (CHM) kvs[0];
@@ -183,9 +186,7 @@ public class HijaCache<TypeK, TypeV>
     //private transient long _last_resize_milli;
 
     // --- Minimum table size ----------------
-    // Pick size 8 K/V pairs, which turns into (8*2+2)*4+12 = 84 bytes on a
-    // standard 32-bit HotSpot, and (8*2+2)*8+12 = 156 bytes on 64-bit Azul.
-    private static final int MIN_SIZE_LOG = 3;             //
+    private static final int MIN_SIZE_LOG = 0;
     private static final int MIN_SIZE = (1 << MIN_SIZE_LOG); // Must be power of 2
 
     // --- Sentinels -------------------------
@@ -220,7 +221,7 @@ public class HijaCache<TypeK, TypeV>
     }
 
     protected final Object v(int idx) {
-        return val(_kvs, idx);
+        return val(data, idx);
     }
 
     private static final boolean CAS_key(Object[] kvs, int idx, Object old, Object key) {
@@ -261,7 +262,7 @@ public class HijaCache<TypeK, TypeV>
      */
     public final void print() {
         System.out.println("=========");
-        print2(_kvs);
+        print2(data);
         System.out.println("=========");
     }
 
@@ -340,14 +341,20 @@ public class HijaCache<TypeK, TypeV>
      * elements will sacrifice space for a small amount of time gained.  The
      * initial size will be rounded up internally to the next larger power of 2.
      */
-    public HijaCache(final int capacity, final int maxReprobes) {
+    public HijacKache(final int capacity, final int maxReprobes, Random rng) {
+        this.rng = rng;
         this.reprobes = maxReprobes;
 
         resize(capacity);
 
     }
+    public HijacKache(final int capacity, final int maxReprobes) {
+        this(capacity, maxReprobes, new XorShift128PlusRandom(1));
+    }
 
     private void resize(int capacity) {
+
+        capacity = Math.max(capacity, reprobes);
 
         Set<Entry<TypeK, TypeV>> ii = isEmpty() ? null : entrySet();
 
@@ -356,7 +363,7 @@ public class HijaCache<TypeK, TypeV>
         int i;                      // Convert to next largest power-of-2
         for (i = MIN_SIZE_LOG; (1 << i) < (capacity ); i++) ;
 
-        this.capacity = (1 << i);
+        capacity = (1 << i);
 
         // Double size for K,V pairs, add 1 for CHM and 1 for hashes
         Object[] k = new Object[(capacity * 2) + 2];
@@ -364,16 +371,20 @@ public class HijaCache<TypeK, TypeV>
         k[0] = new CHM(reprobes); // CHM in slot 0
         k[1] = new int[capacity];
 
-        _kvs = k;
-
         if (ii!=null) {
             //copy values from previous table
-            ii.forEach((e) -> put(e.getKey(), e.getValue()));
+            ii.forEach((e) -> {
+                putIfMatch(this, k, e.getKey(), e.getValue(), NO_MATCH_OLD);
+            });
         }
+
+        reincarnate(k);
+
     }
 
     public boolean setCapacity(int c) {
-        resize(c);
+        if (capacity()!=c)
+            resize(c);
         return true;
     }
 
@@ -384,7 +395,7 @@ public class HijaCache<TypeK, TypeV>
      */
     @Override
     public int size() {
-        return capacity;
+        return capacity();
     }
 
     /**
@@ -515,8 +526,7 @@ public class HijaCache<TypeK, TypeV>
     }
 
     private final TypeV putIfMatch(@NotNull Object key, @NotNull Object newVal, @NotNull Object oldVal) {
-        if (oldVal == null || newVal == null) throw new NullPointerException();
-        final Object res = putIfMatch(this, _kvs, key, newVal, oldVal);
+        final Object res = putIfMatch(this, data, key, newVal, oldVal);
         assert !(res instanceof Prime);
         assert res != null;
         return res == TOMBSTONE ? null : (TypeV) res;
@@ -540,8 +550,12 @@ public class HijaCache<TypeK, TypeV>
      */
     @Override
     public void clear() {         // Smack a new empty table down
-        Object[] newkvs = new HijaCache(MIN_SIZE, reprobes)._kvs;
-        while (!CAS_kvs(_kvs, newkvs)) // Spin until the clear works
+        Object[] newkvs = new HijacKache(MIN_SIZE, reprobes).data;
+        reincarnate(newkvs);
+    }
+
+    private final void reincarnate(Object[] newkvs) {
+        while (!CAS_kvs(data, newkvs)) // Spin until the clear works
             ;
     }
 
@@ -581,7 +595,7 @@ public class HijaCache<TypeK, TypeV>
         try {
             // Must clone, to get the class right; NBHM might have been
             // extended so it would be wrong to just make a new NBHM.
-            HijaCache<TypeK, TypeV> t = (HijaCache<TypeK, TypeV>) super.clone();
+            HijacKache<TypeK, TypeV> t = (HijacKache<TypeK, TypeV>) super.clone();
             // But I don't have an atomic clone operation - the underlying _kvs
             // structure is undergoing rapid change.  If I just clone the _kvs
             // field, the CHM in _kvs[0] won't be in sync.
@@ -677,12 +691,12 @@ public class HijaCache<TypeK, TypeV>
     @Override
     public TypeV get(Object key) {
         final int fullhash = hash(key); // throws NullPointerException if key is null
-        final Object V = get_impl(this, _kvs, key, fullhash);
+        final Object V = get_impl(this, data, key, fullhash);
         assert !(V instanceof Prime); // Never return a Prime
         return (TypeV) V;
     }
 
-    private static final Object get_impl(final HijaCache topmap, final Object[] kvs, final Object key, final int fullhash) {
+    private static final Object get_impl(final HijacKache topmap, final Object[] kvs, final Object key, final int fullhash) {
         final int len = len(kvs); // Count of key/value pairs, reads kvs.length
         final CHM chm = chm(kvs); // The CHM, for a volatile read below; reads slot 0 of kvs
         final int[] hashes = hashes(kvs); // The memoized hashes; reads slot 1 of kvs
@@ -737,7 +751,7 @@ public class HijaCache<TypeK, TypeV>
     // assumed to work (although might have been immediately overwritten).  Only
     // the path through copy_slot passes in an expected value of null, and
     // putIfMatch only returns a null if passed in an expected null.
-    private static final Object putIfMatch(final HijaCache topmap, final Object[] kvs, final Object key, Object putval, final Object expVal) {
+    private static final Object putIfMatch(final HijacKache topmap, final Object[] kvs, final Object key, Object putval, final Object expVal) {
         assert putval != null;
         assert !(putval instanceof Prime);
         assert !(expVal instanceof Prime);
@@ -983,7 +997,7 @@ public class HijaCache<TypeK, TypeV>
         // Read the top-level KVS only once.  We'll try to help this copy along,
         // even if it gets promoted out from under us (i.e., the copy completes
         // and another KVS becomes the top-level copy).
-        Object[] topkvs = _kvs;
+        Object[] topkvs = data;
         CHM topchm = chm(topkvs);
         if (topchm._newkvs == null) return helper; // No copy in-progress
         topchm.help_copy_impl(this, topkvs, false);
@@ -1196,7 +1210,7 @@ public class HijaCache<TypeK, TypeV>
         // Help along an existing resize operation.  We hope its the top-level
         // copy (it was when we started) but this CHM might have been promoted out
         // of the top position.
-        private final void help_copy_impl(HijaCache topmap, Object[] oldkvs, boolean copy_all) {
+        private final void help_copy_impl(HijacKache topmap, Object[] oldkvs, boolean copy_all) {
             assert chm(oldkvs) == this;
             Object[] newkvs = _newkvs;
             assert newkvs != null;    // Already checked by caller
@@ -1260,7 +1274,7 @@ public class HijaCache<TypeK, TypeV>
         // before any Prime appears.  So the caller needs to read the _newkvs
         // field to retry his operation in the new table, but probably has not
         // read it yet.
-        private final Object[] copy_slot_and_check(HijaCache topmap, Object[] oldkvs, int idx, Object should_help) {
+        private final Object[] copy_slot_and_check(HijacKache topmap, Object[] oldkvs, int idx, Object should_help) {
             assert chm(oldkvs) == this;
             Object[] newkvs = _newkvs; // VOLATILE READ
             // We're only here because the caller saw a Prime, which implies a
@@ -1273,7 +1287,7 @@ public class HijaCache<TypeK, TypeV>
         }
 
         // --- copy_check_and_promote --------------------------------------------
-        private final void copy_check_and_promote(HijaCache topmap, Object[] oldkvs, int workdone) {
+        private final void copy_check_and_promote(HijacKache topmap, Object[] oldkvs, int workdone) {
             assert chm(oldkvs) == this;
             int oldlen = len(oldkvs);
             // We made a slot unusable and so did some of the needed copy work
@@ -1292,7 +1306,7 @@ public class HijaCache<TypeK, TypeV>
             // nested in-progress copies and manage to finish a nested copy before
             // finishing the top-level copy.  We only promote top-level copies.
             if (copyDone + workdone == oldlen && // Ready to promote this table?
-                    topmap._kvs == oldkvs && // Looking at the top-level table?
+                    topmap.data == oldkvs && // Looking at the top-level table?
                     // Attempt to promote
                     topmap.CAS_kvs(oldkvs, _newkvs)) {
                 //topmap._last_resize_milli = System.currentTimeMillis(); // Record resize time for next check
@@ -1313,7 +1327,7 @@ public class HijaCache<TypeK, TypeV>
         // not-null must have been from a copy_slot (or other old-table overwrite)
         // and not from a thread directly writing in the new table.  Thus we can
         // count null-to-not-null transitions in the new table.
-        private boolean copy_slot(HijaCache topmap, int idx, Object[] oldkvs, Object[] newkvs) {
+        private boolean copy_slot(HijacKache topmap, int idx, Object[] oldkvs, Object[] newkvs) {
             // Blindly set the key slot from null to TOMBSTONE, to eagerly stop
             // fresh put's from inserting new values in the old table when the old
             // table is mid-resize.  We don't need to act on the results here,
@@ -1379,7 +1393,7 @@ public class HijaCache<TypeK, TypeV>
 
         public SnapshotV() {
             while (true) {           // Verify no table-copy-in-progress
-                Object[] topkvs = _kvs;
+                Object[] topkvs = data;
                 CHM topchm = chm(topkvs);
                 if (topchm._newkvs == null) { // No table-copy-in-progress
                     // The "linearization point" for the iteration.  Every key in this
@@ -1390,7 +1404,7 @@ public class HijaCache<TypeK, TypeV>
                 }
                 // Table copy in-progress - so we cannot get a clean iteration.  We
                 // must help finish the table copy before we can start iterating.
-                topchm.help_copy_impl(HijaCache.this, topkvs, true);
+                topchm.help_copy_impl(HijacKache.this, topkvs, true);
             }
             // Warm-up the iterator
             next();
@@ -1401,7 +1415,7 @@ public class HijaCache<TypeK, TypeV>
         }
 
         Object key(int idx) {
-            return HijaCache.key(_sskvs, idx);
+            return HijacKache.key(_sskvs, idx);
         }
 
         private int _idx;              // Varies from 0-keys.length
@@ -1436,7 +1450,7 @@ public class HijaCache<TypeK, TypeV>
 
         public void remove() {
             if (_prevV == null) throw new IllegalStateException();
-            putIfMatch(HijaCache.this, _sskvs, _prevK, TOMBSTONE, _prevV);
+            putIfMatch(HijacKache.this, _sskvs, _prevK, TOMBSTONE, _prevV);
             _prevV = null;
         }
 
@@ -1481,7 +1495,7 @@ public class HijaCache<TypeK, TypeV>
         return new AbstractCollection<TypeV>() {
             @Override
             public void clear() {
-                HijaCache.this.clear();
+                HijacKache.this.clear();
             }
 
             @Override
@@ -1491,7 +1505,7 @@ public class HijaCache<TypeK, TypeV>
 
             @Override
             public boolean contains(Object v) {
-                return HijaCache.this.containsValue(v);
+                return HijacKache.this.containsValue(v);
             }
 
             @Override
@@ -1561,22 +1575,22 @@ public class HijaCache<TypeK, TypeV>
         return new AbstractSet<TypeK>() {
             @Override
             public void clear() {
-                HijaCache.this.clear();
+                HijacKache.this.clear();
             }
 
             @Override
             public int size() {
-                return HijaCache.this.size();
+                return HijacKache.this.size();
             }
 
             @Override
             public boolean contains(Object k) {
-                return HijaCache.this.containsKey(k);
+                return HijacKache.this.containsKey(k);
             }
 
             @Override
             public boolean remove(Object k) {
-                return HijaCache.this.remove(k) != null;
+                return HijacKache.this.remove(k) != null;
             }
 
             @Override
@@ -1639,7 +1653,7 @@ public class HijaCache<TypeK, TypeV>
      * <p>
      * <p><strong>Warning:</strong> the iterator associated with this Set
      * requires the creation of {@link java.util.Map.Entry} objects with each
-     * iteration.  The {@link HijaCache} does not normally create or
+     * iteration.  The {@link HijacKache} does not normally create or
      * using {@link java.util.Map.Entry} objects so they will be created soley
      * to support this iteration.  Iterating using {@link #keySet} or {@link
      * #values} will be more efficient.
@@ -1649,19 +1663,19 @@ public class HijaCache<TypeK, TypeV>
         return new AbstractSet<Map.Entry<TypeK, TypeV>>() {
             @Override
             public void clear() {
-                HijaCache.this.clear();
+                HijacKache.this.clear();
             }
 
             @Override
             public int size() {
-                return HijaCache.this.size();
+                return HijacKache.this.size();
             }
 
             @Override
             public boolean remove(final Object o) {
                 if (!(o instanceof Map.Entry)) return false;
                 final Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-                return HijaCache.this.remove(e.getKey(), e.getValue());
+                return HijacKache.this.remove(e.getKey(), e.getValue());
             }
 
             @Override

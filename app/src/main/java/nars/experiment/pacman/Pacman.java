@@ -96,7 +96,7 @@ public class Pacman extends NAgent {
                 256, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
                 new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 3),
-                new FrameClock(), exe2
+                new FrameClock(), exe
 
         );
         nar.preprocess(new VariableCompressor.Precompressor(nar));
