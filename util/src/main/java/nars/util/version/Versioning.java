@@ -33,18 +33,27 @@ abstract public class Versioning extends FasterList<Versioned> {
     }
 
 
-    /** start a new version with a commit, returns current version
+    /** increment the version count, returns the new current version
      *  @return -1 if capacity exceeded
      * */
-    public final int nextChange(Versioned v) {
+    public final int next() {
         int c = ++now;
         if (c == capacity) {
             now--; //return to original value
             return -1;
         } else {
-            add(v);
             return c;
         }
+    }
+
+    /** start a new version with a commit, returns the new  current version
+     *  @return -1 if capacity exceeded
+     * */
+    public final int nextChange(Versioned v) {
+        int c = next();
+        if (c!=-1)
+            add(v);
+        return c;
     }
 
     /** track change on current commit, returns current version */

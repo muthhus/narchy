@@ -187,6 +187,13 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
     public final void run(@NotNull FindSubst f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
         Termutator[] n = next();
         if (n != null) {
+
+            //increment the version counter by one and detect if the limit exceeded.
+            // this is to prevent infinite recursions in which no version incrementing
+            // occurrs that would otherwise trigger overflow to interrupt it.
+            if (versioning.next()==-1)
+                return;
+
             Termutator.next(f, n, -1); //combinatorial recurse starts here
         } else {
             f.onMatch(); //ends here when termutes exhausted

@@ -35,7 +35,10 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
     private float pressure = 0;
     float priMin, priMax;
 
-    /** the fraction of capacity which must contain entries to exceed in order to apply forgetting  */
+
+    /** the fraction of capacity which must contain entries to exceed in order to apply forgetting.
+     * this is somewhat analogous to hashmap load factor
+     * */
     private float FORGET_CAPACITY_THRESHOLD = 0.75f;
 
 
