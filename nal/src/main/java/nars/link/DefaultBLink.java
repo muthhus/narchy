@@ -1,6 +1,7 @@
 package nars.link;
 
 import nars.Param;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
 
     public DefaultBLink(@NotNull X id, float p, float d, float q) {
-        init(p, d, q);
+        budget(p, d, q);
     }
 
     public DefaultBLink(@NotNull X id, @NotNull Budgeted b) {
@@ -39,15 +40,9 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     }
 
     public DefaultBLink(@NotNull X id, @NotNull Budgeted b, float scale) {
-        init(b, scale);
+        budget(b.pri() * scale, b.dur(), b.qua());
     }
 
-
-    @Override public final void init(float p, float d, float q) {
-        _setPriority(p);
-        _setDurability(d);
-        _setQuality(q);
-    }
 
     @Override
     public final void _setPriority(float p) {
@@ -75,10 +70,20 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
 
     @Override
+    public final @NotNull BLink budget(float p, float d, float q) {
+        if (p!=p) //NaN check
+            throw new BudgetException();
+
+        PRI = clamp(p);
+        DUR = clamp(d);
+        QUA = clamp(q);
+        return this;
+    }
+
+    @Override
     public final float pri() {
         return PRI;
     }
-
 
 
 

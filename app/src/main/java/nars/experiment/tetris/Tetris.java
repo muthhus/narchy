@@ -10,6 +10,7 @@ import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
+import nars.index.TreeIndex;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.time.Tense;
@@ -61,7 +62,7 @@ public class Tetris extends NAgent {
             new MultiThreadExecutioner(2, 16384);
 
     public static final int runFrames = 55000;
-    public static final int cyclesPerFrame = 6;
+    public static final int cyclesPerFrame = 2;
     public static final int tetris_width = 6;
     public static final int tetris_height = 13;
     public static final int TIME_PER_FALL = 6;
@@ -367,8 +368,9 @@ public class Tetris extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                8, 2, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
+                64, 2, 3, rng,
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 16384, 3),
                 new FrameClock(), exe
 
         );
@@ -508,9 +510,10 @@ public class Tetris extends NAgent {
 
                 newControlWindow(view);
 
-                newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
+                //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
 
                 Arkancide.newBeliefChartWindow(this, 200);
+
                 HistogramChart.budgetChart(nar, 50);
 
                 //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
@@ -563,7 +566,7 @@ public class Tetris extends NAgent {
                 };
             }
         };
-
+        t.trace = true;
 
 //        Iterable<Termed> cheats = Iterables.concat(
 //                numericSensor(() -> t.currentX, nar, 0.3f,
@@ -722,8 +725,9 @@ public class Tetris extends NAgent {
         public NARController( NAR worker, NARLoop loop, NAgent env) {
 
             super( new Default(384, 4, 3, 2, new XORShiftRandom(2),
-                    new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 5*100000, false, exe),
-                    //new CaffeineIndex(new DefaultConceptBuilder(random)),
+                    //new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 5*100000, false, exe),
+                    new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 16384, 3),
+
                     new FrameClock()) {
                        @Override
                        protected void initHigherNAL() {

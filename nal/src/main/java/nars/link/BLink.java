@@ -15,11 +15,6 @@ public abstract class BLink<X> implements Budget, Link<X> {
 
     @Override abstract public X get();
 
-    protected void init(@NotNull Budgeted c, float scale) {
-        init(c.pri() * scale, c.dur(), c.qua());
-    }
-
-    abstract public void init(float p, float d, float q);
 
     @Override
     public boolean isDeleted() {
