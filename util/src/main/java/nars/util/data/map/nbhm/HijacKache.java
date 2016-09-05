@@ -356,35 +356,45 @@ public class HijacKache<TypeK, TypeV>
 
         capacity = Math.max(capacity, reprobes);
 
-        Set<Entry<TypeK, TypeV>> ii = isEmpty() ? null : entrySet();
-
-        if (capacity < 0) throw new IllegalArgumentException();
+        //if (capacity < 0) throw new IllegalArgumentException();
 
         int i;                      // Convert to next largest power-of-2
-        for (i = MIN_SIZE_LOG; (1 << i) < (capacity ); i++) ;
+        for (i = MIN_SIZE_LOG; (1 << i) < (capacity); i++) ;
 
         capacity = (1 << i);
 
-        // Double size for K,V pairs, add 1 for CHM and 1 for hashes
-        Object[] k = new Object[(capacity * 2) + 2];
+        synchronized (ticket) {
 
-        k[0] = new CHM(reprobes); // CHM in slot 0
-        k[1] = new int[capacity];
+            if (capacity() == capacity)
+                return;
 
-        if (ii!=null) {
-            //copy values from previous table
-            ii.forEach((e) -> {
-                putIfMatch(this, k, e.getKey(), e.getValue(), NO_MATCH_OLD);
-            });
+            // Double size for K,V pairs, add 1 for CHM and 1 for hashes
+            Object[] k = new Object[(capacity * 2) + 2];
+
+            k[0] = null; //new CHM(reprobes); // CHM in slot 0
+            k[1] = new int[capacity];
+
+            if (data != null) {
+
+                //warning: anything that has been added in between here and when the new table is set may be lost
+                //TODO add correct resizing behavior like the original NBHM
+
+                //copy values from previous table
+                SnapshotV v = new SnapshotV();
+                while (v.hasNext()) {
+                    v.next();
+                    putIfMatch(this, k, v._prevK, v._prevV, NO_MATCH_OLD);
+                }
+
+            }
+
+            reincarnate(k);
         }
-
-        reincarnate(k);
 
     }
 
     public boolean setCapacity(int c) {
-        if (capacity()!=c)
-            resize(c);
+        resize(c);
         return true;
     }
 
@@ -723,7 +733,7 @@ public class HijacKache<TypeK, TypeV>
             // and returning the Value (so the user might end up reading the stale
             // Value contents).  Same problem as with keys - and the one volatile
             // read covers both.
-            final Object[] newkvs = chm._newkvs; // VOLATILE READ before key compare
+            final Object[] newkvs = null; //chm._newkvs; // VOLATILE READ before key compare
 
             // Key-compare
             if (keyeq(K, key, hashes, idx, fullhash)) {
@@ -1388,25 +1398,26 @@ public class HijacKache<TypeK, TypeV>
     // --- Snapshot ------------------------------------------------------------
     // The main class for iterating over the NBHM.  It "snapshots" a clean
     // view of the K/V array.
-    private class SnapshotV implements Iterator<TypeV>, Enumeration<TypeV> {
+    private final class SnapshotV implements Iterator<TypeV>, Enumeration<TypeV> {
         final Object[] _sskvs;
 
         public SnapshotV() {
-            while (true) {           // Verify no table-copy-in-progress
-                Object[] topkvs = data;
-                CHM topchm = chm(topkvs);
-                if (topchm._newkvs == null) { // No table-copy-in-progress
-                    // The "linearization point" for the iteration.  Every key in this
-                    // table will be visited, but keys added later might be skipped or
-                    // even be added to a following table (also not iterated over).
-                    _sskvs = topkvs;
-                    break;
-                }
-                // Table copy in-progress - so we cannot get a clean iteration.  We
-                // must help finish the table copy before we can start iterating.
-                topchm.help_copy_impl(HijacKache.this, topkvs, true);
-            }
+//            while (true) {           // Verify no table-copy-in-progress
+//                Object[] topkvs = data;
+//                CHM topchm = chm(topkvs);
+//                if (topchm._newkvs == null) { // No table-copy-in-progress
+//                    // The "linearization point" for the iteration.  Every key in this
+//                    // table will be visited, but keys added later might be skipped or
+//                    // even be added to a following table (also not iterated over).
+//                    _sskvs = topkvs;
+//                    break;
+//                }
+//                // Table copy in-progress - so we cannot get a clean iteration.  We
+//                // must help finish the table copy before we can start iterating.
+//                topchm.help_copy_impl(HijacKache.this, topkvs, true);
+//            }
             // Warm-up the iterator
+            _sskvs = data;
             next();
         }
 
@@ -1615,7 +1626,8 @@ public class HijacKache<TypeK, TypeV>
         }
     }
 
-    private class SnapshotE implements Iterator<Map.Entry<TypeK, TypeV>> {
+
+    private final class SnapshotE implements Iterator<Map.Entry<TypeK, TypeV>> {
         final SnapshotV _ss;
 
         public SnapshotE() {
