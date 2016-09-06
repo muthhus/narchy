@@ -171,27 +171,34 @@ public class HijackBag<X> implements Bag<X> {
                 if (weakestIdx < 0)
                     throw new RuntimeException("no weakest found to take after probing");
 
-                Object V = val(kvs, idx);
-                float[] f = (float[])V;
-                float oldPri = f[0];
-                boolean hijack;
-                if (oldPri!=oldPri) {
-                    hijack = true; //yes take this pre-deleted slot
-                } else {
-                    boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
-                    boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
-                    if (newPriThresh && oldPriThresh) {
-                        hijack = (rng.nextFloat() > (newPri / (newPri + oldPri)));
-                    } else if (newPriThresh) {
-                        hijack = true;
-                    } else {
-                        hijack = false;
-                    }
-                }
+                boolean hijack = weakestPri <= newPri;
 
+                //SEMI-SOFTMAX TODO probability selection needs analyzed
+//                Object V = val(kvs, idx);
+//                float[] f = (float[])V;
+//                float oldPri = f[0];
+//                boolean hijack;
+//                if (oldPri!=oldPri) {
+//                    hijack = true; //yes take this pre-deleted slot
+//                } else {
+//                    boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
+//                    boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
+//                    if (newPriThresh && oldPriThresh) {
+//                        hijack = (rng.nextFloat() > (newPri / (newPri + oldPri)));
+//                    } else if (newPriThresh) {
+//                        hijack = true;
+//                    } else {
+//                        hijack = false;
+//                    }
+//                }
+
+                //GREEDY SELECTION
                 if (hijack) {
                     if (CAS_key(kvs, idx, K, key)) { // Got it!
                         hashes[idx] = fullhash; // Memoize fullhash
+
+                        Object V = val(kvs, idx);
+                        float[] f = (float[])V;
                         f[0] = Float.NaN;
                     }
                 } else {
