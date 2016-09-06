@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * Mutable, unit-scaled (1.0 max) budget value
  *
  */
-public class UnitBudget extends RawBudget {
+@Deprecated public class UnitBudget extends RawBudget {
 
     /**common instance for a 'Deleted budget'.*/
     public static final Budget Deleted = new ROBudget(Float.NaN, 0, 0);

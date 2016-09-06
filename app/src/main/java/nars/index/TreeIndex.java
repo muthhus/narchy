@@ -146,14 +146,14 @@ public class TreeIndex extends TermIndex {
 
         public L1TreeIndex(Concept.ConceptBuilder conceptBuilder, int cacheSize, int reprobes) {
             super(conceptBuilder);
-            this.L1 = new HijacKache<Term,Termed>(cacheSize, reprobes);
+            this.L1 = new HijacKache<>(cacheSize, reprobes);
         }
 
         @Override
         public @Nullable Termed get(@NotNull Termed tt, boolean createIfMissing) {
             Term t = tt.term();
             t = tt instanceof Compound ? conceptualize(((Compound) t)) : t;
-            return L1.computeIfAbsent2(t,
+            Object o = L1.computeIfAbsent2(t,
                     createIfMissing ?
                             ttt -> super.get(ttt, true) :
                             ttt -> {
@@ -163,7 +163,10 @@ public class TreeIndex extends TermIndex {
                                 return v;
                             }
             );
+            if (o instanceof Termed)
+                return ((Termed)o);
 
+            return null;
         }
 
         @Override

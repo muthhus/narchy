@@ -1,6 +1,9 @@
 package nars.budget;
 
+import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.util.Util.clamp;
 
 /**
  * Contains only the 3 p,d,q as floats.  For general purpose usage, you probably want to use UnitBudget
@@ -38,6 +41,17 @@ public class RawBudget implements Budget {
         setPriority(p);
         setDurability(d);
         setQuality(q);
+    }
+
+    @Override
+    public @NotNull Budget budget(float p, float d, float q) {
+        if (p!=p) //NaN check
+            throw new BudgetException();
+
+        priority = clamp(p);
+        durability = clamp(d);
+        quality = clamp(q);
+        return this;
     }
 
     @NotNull
@@ -121,7 +135,7 @@ public class RawBudget implements Budget {
     }
 
     @Override
-    public void _setPriority(float p) {
+    public final void _setPriority(float p) {
         this.priority = p;
     }
 
@@ -132,7 +146,7 @@ public class RawBudget implements Budget {
      * @param d The new durability
      */
     @Override
-    public void _setDurability(float d) {
+    public final void _setDurability(float d) {
         this.durability = d;
     }
 
@@ -143,7 +157,7 @@ public class RawBudget implements Budget {
      * @param q The new quality
      */
     @Override
-    public void _setQuality(float q) {
+    public final void _setQuality(float q) {
         this.quality = q;
     }
 

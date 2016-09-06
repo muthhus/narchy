@@ -85,6 +85,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 BLink<V> w = toRemove.get(i);
 
                 V k = w.get();
+                if (k == null)
+                    continue;
+
                 BLink<V> k2 = map.remove(k);
 
                 if (k2 != w && k2!=null) {

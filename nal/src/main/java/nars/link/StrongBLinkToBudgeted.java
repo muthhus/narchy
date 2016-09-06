@@ -16,14 +16,14 @@ public final class StrongBLinkToBudgeted<B extends Budgeted> extends StrongBLink
 
     }
 
-    @NotNull
-    @Override
-    public final B get() {
-        B x = id;
-        if (x.isDeleted()) {
-            delete();
-        }
-        return x;
-    }
+//    @NotNull
+//    @Override
+//    public final B get() {
+//        B x = id;
+//        if (x.isDeleted()) {
+//            delete();
+//        }
+//        return x;
+//    }
 
 }

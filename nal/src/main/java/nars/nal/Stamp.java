@@ -307,7 +307,8 @@ public interface Stamp {
 
     /** cyclic tasks are indicated with a final value of Long.MAX_VALUE */
     static boolean isCyclic(@NotNull long[] e) {
-        return (e[e.length-1] == Long.MAX_VALUE);
+        int length = e.length;
+        return (length > 1 && e[length -1] == Long.MAX_VALUE);
     }
 
     static long[] cyclic(@NotNull long[] x) {

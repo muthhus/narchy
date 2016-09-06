@@ -118,7 +118,7 @@ public class STMClustered extends STM {
             Task xx = x.get();
             //priSub(cycleCost(id));
 
-            if (!xx.isDeleted()) {
+            if (xx!=null && !xx.isDeleted()) {
 
                 if (x.node == this)
                     return;
@@ -226,9 +226,9 @@ public class STMClustered extends STM {
 
 
 
-        @NotNull public Task get() {
+        public Task get() {
             @Nullable Task id = this.id;
-            if (id.isDeleted()) {
+            if (id == null || id.isDeleted()) {
                 delete();
             }
             return id;

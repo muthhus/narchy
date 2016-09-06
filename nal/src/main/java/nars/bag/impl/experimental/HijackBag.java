@@ -4,6 +4,7 @@ import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.Forget;
+import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.util.data.map.nbhm.HijacKache;
@@ -21,14 +22,12 @@ import static nars.util.Util.clamp;
 /**
  * Created by me on 9/4/16.
  */
-public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
+public class HijackBag<X> extends HijacKache<X, BLink<X>> implements Bag<X> {
 
-
-
-
-    /** max # of times allowed to scan through until either the next item is
-     *  accepted with final tolerance or gives up.
-     *  for safety, should be >= 1.0
+    /**
+     * max # of times allowed to scan through until either the next item is
+     * accepted with final tolerance or gives up.
+     * for safety, should be >= 1.0
      */
     private static final float SCAN_ITERATIONS = 1.1f;
 
@@ -36,9 +35,10 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
     float priMin, priMax;
 
 
-    /** the fraction of capacity which must contain entries to exceed in order to apply forgetting.
+    /**
+     * the fraction of capacity which must contain entries to exceed in order to apply forgetting.
      * this is somewhat analogous to hashmap load factor
-     * */
+     */
     private float FORGET_CAPACITY_THRESHOLD = 0.75f;
 
 
@@ -54,16 +54,17 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
     @Override
     public void put(X x, Budgeted b, float scale, MutableFloat overflowing) {
 
-
-
         float dPending = 0;
 
-        BLink prev = get(x);
-        if (prev!=null) {
+        BLink prev = computeIfAbsent(x, (xx) -> newLink(xx, UnitBudget.Zero));
+
+        if (x.equals(prev.get())) {
+            //link exists, merge with it
+
             float pBefore = prev.pri();
 
             float overflow = BudgetMerge.plusBlend.merge(prev, b, scale);
-            if (overflowing!=null)
+            if (overflowing != null)
                 overflowing.add(overflow);
 
             float pAfter = prev.pri();
@@ -72,56 +73,44 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
             range(pAfter);
 
         } else {
-            BLink next = (BLink) newLink(x, b).priMult(scale);
+//            BLink next = (BLink) newLink(x, b).priMult(scale);
+//
+//            BLink<X> prev = put(x, next);
+//
+            float np = b.pri() * scale;
 
-            BLink<X> displaced = put(x, next);
 
-            float np = next.pri();
+            float dp = prev.pri();
+            if (dp == dp) { //not deleted, compare the two
+                float den = np + dp;
+                float probNext = den > Param.BUDGET_EPSILON ? np / den : 0.5f;
 
-            if (displaced == null) {
-                dPending = np;
-            } else {
-
-                float dp = displaced.pri();
-                if (dp == dp) { //not deleted, compare the two
-                    float den = np + dp;
-                    float probNext = den > Param.BUDGET_EPSILON ? np / den : 0.5f;
-
-                    if (rng.nextFloat() < probNext) {
-                        dPending = np - dp; //keep the new value
-                        range(np);
-                    } else {
-                        remove(x);
-                        put(displaced.get(), displaced); //reinsert what was removed
-                        range(dp);
-                    }
-
+                if (rng.nextFloat() > probNext) {
+                    //keep the old value
+                    dPending = 0;
                 } else {
-                    dPending = np;
+                    //use the new value
+                    float pBefore = prev.priIfFiniteElseZero();
+                    prev.set(x, b, scale);
+                    float pAfter = prev.pri();
+                    range(pAfter);
+                    dPending = pAfter - pBefore;
                 }
+
+            } else {
+                prev.set(x, b, scale);
+                dPending = np;
             }
+
         }
 
         pressure += dPending;
 
-//        BLink result = merge(i, l, (prev, next) -> {
-//            //warning due to lossy overwriting, the key of next may not be equal to the key of prev
-//            if (prev.get().equals(next.get())) {
-//                //float pBefore = prev.pri();
-//                BudgetMerge.plusBlend.apply(prev, next);
-//                return prev;
-//            } else {
-//                float n = next.pri();
-//                float probNext = n / (n + prev.pri());
-//                if (rng.nextFloat() < probNext)
-//                    return next; //overwrite
-//                else
-//                    return prev; //keep old value
-//            }
-//        });
     }
 
-    /** considers if this priority value stretches the current min/max range */
+    /**
+     * considers if this priority value stretches the current min/max range
+     */
     private final void range(float p) {
         if (p > priMax) priMax = p;
         if (p < priMin) priMin = p;
@@ -146,8 +135,8 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
     @Override
     public Bag<X> sample(int n, Predicate<? super BLink<X>> target) {
         Object[] data = this.data;
-        int c = (data.length - 2)/2;
-        int jLimit = (int)Math.ceil(c * SCAN_ITERATIONS);
+        int c = (data.length - 2) / 2;
+        int jLimit = (int) Math.ceil(c * SCAN_ITERATIONS);
 
         int start = rng.nextInt(c); //starting index
         int i = start, j = 0;
@@ -160,13 +149,13 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
         int di = rng.nextBoolean() ? +1 : -1;
 
         while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
-            Object v = data[ ((i+=di) & (c-1))*2 + 3 ]; /* capacity may change during the loop so always get the latest value */;
+            Object v = data[((i += di) & (c - 1)) * 2 + 3];
 
             if (v instanceof BLink) {
                 BLink<X> x = (BLink<X>) v;
                 float p = x.priIfFiniteElseNeg1();
                 if (p >= 0) {
-                    if ((r < p) || (r < p + tolerance((((float)j) / jLimit)))) {
+                    if ((r < p) || (r < p + tolerance((((float) j) / jLimit)))) {
                         if (target.test(x)) {
                             n--;
                             r = curve();
@@ -187,7 +176,7 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
         int j = 0;
 
         while (j < c) {
-            Object v = data[((j++) & (c - 1)) * 2 + 3]; /* capacity may change during the loop so always get the latest value */
+            Object v = data[((j++) & (c - 1)) * 2 + 3];
 
             if (v instanceof BLink) {
                 action.accept((BLink<X>) v);
@@ -195,22 +184,25 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
         }
     }
 
-    /** yields the next threshold value to sample against */
+    /**
+     * yields the next threshold value to sample against
+     */
     public float curve() {
         float c = rng.nextFloat();
-        c*=c; //c^2 curve
+        c *= c; //c^2 curve
 
         //float min = this.priMin;
-        return (c ); // * (priMax - min);
+        return (c); // * (priMax - min);
     }
 
     /**
      * beam width (tolerance range)
-     * searchProgress in range 0..1.0 */
+     * searchProgress in range 0..1.0
+     */
     private float tolerance(float searchProgress) {
         /* raised polynomially to sharpen the selection curve, growing more slowly at the beginning */
         float exp = 6;
-        return (float)Math.pow(searchProgress,exp);
+        return (float) Math.pow(searchProgress, exp);
     }
 
     @NotNull
@@ -234,7 +226,11 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
         Iterator<Entry<X, BLink<X>>> es = entrySet().iterator();
         while (es.hasNext()) {
             Entry<X, BLink<X>> e = es.next();
-            BLink<X> l = e.getValue();
+            Object ll = e.getValue();
+            if (!(ll instanceof BLink))
+                continue; //may be an Integer 'ticket' being computed, skip
+
+            BLink<X> l = (BLink<X>)ll;
 
             boolean delete = false;
             if (l.isDeleted())
@@ -262,7 +258,7 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
             float p = this.pressure;
             this.pressure = 0;
 
-            float forgetRate = clamp(p / (p+mass));
+            float forgetRate = clamp(p / (p + mass));
 
             if (forgetRate > Param.BUDGET_EPSILON) {
                 f = new Forget(forgetRate);
@@ -280,7 +276,7 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
     @NotNull
     @Override
     public Bag<X> commit(Consumer<BLink> each) {
-        if (each!=null && !isEmpty())
+        if (each != null && !isEmpty())
             forEach(each);
 
         return this;
@@ -290,7 +286,7 @@ public class HijackBag<X> extends HijacKache<X,BLink<X>> implements Bag<X> {
     @Override
     public X boost(Object key, float boost) {
         BLink<X> b = get(key);
-        if (b!=null && !b.isDeleted()) {
+        if (b != null && !b.isDeleted()) {
             float before = b.pri();
             b.priMult(boost);
             float after = b.pri();
