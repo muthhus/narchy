@@ -10,6 +10,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.util.data.map.nbhm.HijacKache;
 import nars.util.data.random.MersenneTwisterFast;
+import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
@@ -54,14 +55,14 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalHijack() {
-        testBasicInsertionRemoval(new HijackBag(1, 1));
+        testBasicInsertionRemoval(new HijackBag(1, 1, new XorShift128PlusRandom(1)));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
 
 
         assertEquals(1, c.capacity());
-        if (!(c instanceof HijacKache)) {
+        if (!(c instanceof HijackBag)) {
             assertEquals(0, c.size());
             assertTrue(c.isEmpty());
         }
@@ -167,10 +168,10 @@ public class BagTest {
 
     @Test
     public void testScalePutHija() {
-        testScalePut(new HijackBag<>(2, 1));
-            testScalePut(new HijackBag<>(2, 2));
-        testScalePut2(new HijackBag<>(2, 1));
-            testScalePut2(new HijackBag<>(2, 2));
+        testScalePut(new HijackBag<>(2, 1, new XorShift128PlusRandom(1)));
+            testScalePut(new HijackBag<>(2, 2, new XorShift128PlusRandom(1)));
+        testScalePut2(new HijackBag<>(2, 1, new XorShift128PlusRandom(1)));
+            testScalePut2(new HijackBag<>(2, 2, new XorShift128PlusRandom(1)));
     }
 
     void testScalePut(Bag<String> a) {
@@ -317,7 +318,7 @@ public class BagTest {
 
         int n = 32;
 
-        testSamplingFlat(new HijackBag<>(n, 4), 0.018f);
+        testSamplingFlat(new HijackBag<>(n, 4, new XorShift128PlusRandom(1)), 0.018f);
 
         HijackBag<String> a = new HijackBag<>((int)(n*2f), 2, new XorShift128PlusRandom(2));
         for (int i = 0; i < n; i++) {

@@ -104,15 +104,15 @@ public class Pacman extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
 
-        float pMult = 0.05f;
+        float pMult = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.4f * pMult;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f * pMult;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f * pMult;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.02f);
-        nar.compoundVolumeMax.set(50);
+        nar.confMin.setValue(0.01f);
+        nar.compoundVolumeMax.set(60);
         //nar.truthResolution.setValue(0.01f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");

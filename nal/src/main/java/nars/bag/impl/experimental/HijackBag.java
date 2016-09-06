@@ -8,7 +8,6 @@ import nars.budget.merge.BudgetMerge;
 import nars.link.ArrayBLink;
 import nars.link.BLink;
 import nars.util.data.map.nbhm.HijacKache;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,6 +37,7 @@ public class HijackBag<X> implements Bag<X> {
 
     private float pressure;
     float priMin, priMax;
+    int count;
 
 
     /**
@@ -47,12 +47,21 @@ public class HijackBag<X> implements Bag<X> {
     private final float FORGET_CAPACITY_THRESHOLD = 0.75f;
 
 
-    public HijackBag(int capacity, int reprobes) {
-        this(capacity, reprobes, new XorShift128PlusRandom(1));
-    }
-
     public HijackBag(int capacity, int reprobes, Random random) {
-        map = new HijacKache<>(capacity, reprobes, random);
+        map = new HijacKache<>(capacity, reprobes, random) {
+            @Override
+            protected void reincarnateInto(Object[] k) {
+                HijackBag.this.forEach((x,v)->{
+                    float[] f = putBag(k, x, v[0], map.reprobes, map.rng);
+                    if (f!=null) {
+                        f[1] = v[1];
+                        f[2] = v[2];
+                    } else {
+                        //lost
+                    }
+                });
+            }
+        };
     }
 
 
@@ -73,7 +82,10 @@ public class HijackBag<X> implements Bag<X> {
      */
     @Nullable
     private static final float[] putBag(final HijacKache map, final Object key, float newPri) {
-        final Object[] kvs = map.data;
+        return putBag(map.data, key, newPri, map.reprobes, map.rng);
+    }
+
+    private static float[] putBag(Object[] kvs, Object key, float newPri, int reprobes, Random rng) {
         final int fullhash = HijacKache.hash(key); // throws NullPointerException if key null
         final int len = HijacKache.len(kvs); // Count of key/value pairs, reads kvs.length
         //final CHM chm = chm(kvs); // Reads kvs[0]
@@ -81,8 +93,7 @@ public class HijackBag<X> implements Bag<X> {
         int idx = fullhash & (len - 1);
         int startIdx = idx;
 
-        int maxReprobes = map.reprobes;
-        int retriesRemain = 0; //experimental
+        int maxReprobes = reprobes;
 
         // Key-Claim stanza: spin till we can claim a Key (or force a resizing).
         int reprobe = 0;
@@ -125,7 +136,7 @@ public class HijackBag<X> implements Bag<X> {
                 // attempt hijack of probed index at random,
                 // erasing the old value of another key
 
-                idx = (startIdx + map.rng.nextInt(maxReprobes)) & (len - 1);
+                idx = (startIdx + rng.nextInt(maxReprobes)) & (len - 1);
 
                 V = val(kvs, idx);
                 float[] f = (float[])V;
@@ -137,7 +148,7 @@ public class HijackBag<X> implements Bag<X> {
                     boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
                     boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
                     if (newPriThresh && oldPriThresh) {
-                        hijack = (map.rng.nextFloat() > (newPri / (newPri + oldPri)));
+                        hijack = (rng.nextFloat() > (newPri / (newPri + oldPri)));
                     } else if (newPriThresh) {
                         hijack = true;
                     } else {
@@ -174,7 +185,6 @@ public class HijackBag<X> implements Bag<X> {
         } else {
             return (float[]) V;
         }
-
     }
 
     @Override
@@ -302,9 +312,9 @@ public class HijackBag<X> implements Bag<X> {
         return this;
     }
 
-    @Override
-    public int size() {
-        return map.size();
+
+    @Override public int size() {
+        return count;
     }
 
     @Override
@@ -378,8 +388,7 @@ public class HijackBag<X> implements Bag<X> {
     @NotNull
     @Override
     public Iterator<BLink<X>> iterator() {
-        throw new UnsupportedOperationException();
-        //return map.values().iterator();
+        return map.entrySet().stream().map(x -> (BLink<X>)new ArrayBLink<X>(x.getKey(), x.getValue())).iterator();
     }
 
     @Override
@@ -413,6 +422,7 @@ public class HijackBag<X> implements Bag<X> {
 
         this.priMin = min[0];
         this.priMax = max[0];
+        this.count = count[0];
 
         Forget f;
         if (mass[0] > 0 && (count[0] >= cap * FORGET_CAPACITY_THRESHOLD)) {

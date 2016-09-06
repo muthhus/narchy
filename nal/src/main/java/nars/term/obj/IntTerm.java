@@ -12,17 +12,8 @@ import static nars.Op.INT;
  */
 public class IntTerm extends Termject.PrimTermject<Integer> {
 
-    private final String str;
-
     public IntTerm(@NotNull int val) {
-        super(val);
-        this.str = Integer.toString(val);
-    }
-
-    @NotNull
-    @Override
-    public final String toString() {
-        return str;
+        super(val, Integer.toString(val));
     }
     
     @Override

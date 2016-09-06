@@ -30,7 +30,8 @@ public class ArrayBLink<X> implements BLink<X> {
 
     @Override
     public void set(X x) {
-        this.id = x;
+        throw new UnsupportedOperationException();
+        //this.id = x;
     }
 
     @Override
@@ -49,12 +50,12 @@ public class ArrayBLink<X> implements BLink<X> {
     }
 
     @Override
-    public @NotNull Budget clone() {
-        return null;
+    public final @NotNull Budget clone() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public Budget budget(float p, float d, float q) {
+    public final Budget budget(float p, float d, float q) {
         if (p != p) //NaN check
             throw new BudgetException();
 
@@ -81,12 +82,12 @@ public class ArrayBLink<X> implements BLink<X> {
     }
 
     @Override
-    public float qua() {
+    public final float qua() {
         return f[1];
     }
 
     @Override
-    public float dur() {
+    public final float dur() {
         return f[2];
     }
 
@@ -94,6 +95,11 @@ public class ArrayBLink<X> implements BLink<X> {
         this.id = id;
         this.f = v;
         return this;
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return id + "=" + super.toString();
     }
 
     public static class ArrayBLinkToBudgeted<X extends Budgeted> extends ArrayBLink<X> {

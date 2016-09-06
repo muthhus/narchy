@@ -51,6 +51,10 @@ abstract public class DefaultBLink<X> extends RawBudget implements BLink<X> {
         return hash;
     }
 
+    @Override
+    public @NotNull String toString() {
+        return id + "=" + super.toString();
+    }
 
     @Override
     public boolean delete() {

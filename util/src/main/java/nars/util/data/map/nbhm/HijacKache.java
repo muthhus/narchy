@@ -381,18 +381,22 @@ public class HijacKache<TypeK, TypeV>
                 //warning: anything that has been added in between here and when the new table is set may be lost
                 //TODO add correct resizing behavior like the original NBHM
 
-                //copy values from previous table
-                SnapshotV v = new SnapshotV();
-                while (v.hasNext()) {
-                    v.next();
-                    putIfMatch(this, k, v._prevK, v._prevV, NO_MATCH_OLD);
-                }
+                reincarnateInto(k);
 
             }
 
             reincarnate(k);
         }
 
+    }
+
+    protected void reincarnateInto(Object[] k) {
+        //copy values from previous table
+        SnapshotV v = new SnapshotV();
+        while (v.hasNext()) {
+            v.next();
+            putIfMatch(this, k, v._prevK, v._prevV, NO_MATCH_OLD);
+        }
     }
 
     public boolean setCapacity(int c) {

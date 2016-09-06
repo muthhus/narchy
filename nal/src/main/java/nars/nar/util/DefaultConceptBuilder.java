@@ -36,7 +36,7 @@ import static nars.time.Tense.DTERNAL;
 
 //    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
 //    private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 32;
-    public static final int HIJACK_REPROBES = 3;
+    public static final int HIJACK_REPROBES = 4;
 
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> {

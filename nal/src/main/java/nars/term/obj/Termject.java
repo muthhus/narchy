@@ -62,41 +62,48 @@ public interface Termject<X> extends Term {
         @NotNull
         public final X val;
 
+        private final String str;
+
         public PrimTermject(@NotNull X val) {
+            this(val, '`' + val.toString() + '`'); //TODO escape any '`' which appear in the string
+        }
+
+        public PrimTermject(@NotNull X val, String str) {
             this.val = val;
+            this.str = str;
         }
 
         @NotNull
         @Override
-        public X val() {
+        public final X val() {
             return val;
         }
 
 
         @NotNull
         @Override
-        public String toString() {
-            return '`' + val.toString() + '`'; //TODO escape any '`' which appear in the string
+        public final String toString() {
+            return str;
         }
 
 
         @Override
-        public int varIndep() {
+        public final int varIndep() {
             return 0;
         }
 
         @Override
-        public int varDep() {
+        public final int varDep() {
             return 0;
         }
 
         @Override
-        public int varQuery() {
+        public final int varQuery() {
             return 0;
         }
 
         @Override
-        public int varPattern() {
+        public final int varPattern() {
             return 0;
         }
     }
@@ -146,7 +153,10 @@ public interface Termject<X> extends Term {
         public IntInterval(int a, int b) {
             super(Range.closed(
                     a, b
-            ).canonical(DiscreteDomain.integers()));
+                ).canonical(DiscreteDomain.integers()),
+                "`" + a + "<=?<=" + b + '`'
+            );
+
             //this(Range.closed(a,b).canonical( DiscreteDomain.integers() ));
             //super(INTRANGE, TermVector.the(new IntTerm(a), new IntTerm(b-a)));
 
@@ -202,13 +212,6 @@ public interface Termject<X> extends Term {
             p.append(toString());
         }
 
-        @NotNull
-        @Override
-        public String toString() {
-            int u = max();
-            int l = min();
-            return "`" + l + "<=?<=" + u + '`';
-        }
 
         public int min() {
             int l = val.lowerEndpoint();
@@ -231,15 +234,15 @@ public interface Termject<X> extends Term {
         public boolean unify(Term y, FindSubst f) {
 
             //if (y.op() == INT) {
-                if (y instanceof IntTerm) {
-                    int yi = ((IntTerm) y).val;
-                    if (val.contains(yi)) {
-                        //return f.matchVarX(this, y);
-                        return true;
-                    }
-                } else if (y instanceof IntInterval) {
-                    Range<Integer> yr = ((IntInterval) y).val;
-                    //if (val.isConnected(yr)) {
+            if (y instanceof IntTerm) {
+                int yi = ((IntTerm) y).val;
+                if (val.contains(yi)) {
+                    //return f.matchVarX(this, y);
+                    return true;
+                }
+            } else if (y instanceof IntInterval) {
+                Range<Integer> yr = ((IntInterval) y).val;
+                //if (val.isConnected(yr)) {
 //                    Range<Integer> combinedRange = val.span(yr);
 //                    IntInterval combined;
 //                    if (!combinedRange.equals(val)) {
@@ -248,10 +251,10 @@ public interface Termject<X> extends Term {
 //                        combined = this;
 //                    }
 //                    return f.putBidi(this, y, combined);
-                    return (val.encloses(yr) || yr.encloses(val));
-                    //}
+                return (val.encloses(yr) || yr.encloses(val));
+                //}
 
-                }
+            }
             //}
             return super.unify(y, f);
         }
