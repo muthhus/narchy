@@ -113,7 +113,9 @@ public class HijackBag<X> implements Bag<X> {
         final int len = HijacKache.len(kvs); // Count of key/value pairs, reads kvs.length
         final int[] hashes = HijacKache.hashes(kvs); // Reads kvs[1], read before kvs[0]
         int idx = fullhash & (len - 1);
-        int startIdx = idx;
+
+        int weakestIdx = -1;
+        float weakestPri = Float.MAX_VALUE;
 
         while (true) {             // Spin till we get a Key slot
 
@@ -123,15 +125,15 @@ public class HijackBag<X> implements Bag<X> {
                 // Found an empty Key slot - which means this Key has never been in
                 // this table.  No need to put a Tombstone - the Key is not here!
 
-            if (K == null) {
+            if (CAS_key(kvs, idx, null, key)) {
                 // Claim the null key-slot
-                if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
+                //if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
                     //chm._slots.add(1);      // Raise key-slots-used count
-                    hashes[idx] = fullhash; // Memoize fullhash
-                    break;                  // Got a null entry
-                } else {
-                    K = key(kvs, idx); //recalculte
-                }
+                hashes[idx] = fullhash; // Memoize fullhash
+                break;                  // Got a null entry
+                //} /*else {
+                    //K = key(kvs, idx); //recalculte
+                //}*/
             }
 
 
@@ -139,9 +141,25 @@ public class HijackBag<X> implements Bag<X> {
                 break;                  // Got its existing entry
             }
 
-            if (key == TOMBSTONE) { // found a TOMBSTONE key
-                break;
+            {
+                Object V = val(kvs, idx);
+                if (V != null) {
+                    float[] v = (float[]) V;
+                    float p = v[0];
+                    if (p!=p) /* deleted, take it */ {
+                        if (CAS_key(kvs, idx, K, key)) {
+                            hashes[idx] = fullhash;
+                            break;
+                        }
+                    } else {
+                        if (p < weakestPri) {
+                            weakestIdx = idx;
+                            weakestPri = p;
+                        }
+                    }
+                }
             }
+
 
             //URGENT HIJACK
             if (reprobe++ > maxReprobes) {
@@ -149,7 +167,9 @@ public class HijackBag<X> implements Bag<X> {
                 // attempt hijack of probed index at random,
                 // erasing the old value of another key
 
-                idx = (startIdx + rng.nextInt(maxReprobes)) & (len - 1);
+                idx = weakestIdx; //(startIdx + rng.nextInt(maxReprobes)) & (len - 1);
+                if (weakestIdx < 0)
+                    throw new RuntimeException("no weakest found to take after probing");
 
                 Object V = val(kvs, idx);
                 float[] f = (float[])V;
@@ -170,13 +190,10 @@ public class HijackBag<X> implements Bag<X> {
                 }
 
                 if (hijack) {
-                    set_key(kvs, idx, key); // Got it!
-                    hashes[idx] = fullhash; // Memoize fullhash
-                    f[0] = Float.NaN;
-//
-//                    } else {
-//                        return null; //the hijack got hijacked, just fail
-//                    }
+                    if (CAS_key(kvs, idx, K, key)) { // Got it!
+                        hashes[idx] = fullhash; // Memoize fullhash
+                        f[0] = Float.NaN;
+                    }
                 } else {
                     idx = -1;
                 }
