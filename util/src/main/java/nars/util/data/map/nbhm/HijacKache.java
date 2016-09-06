@@ -98,7 +98,8 @@ public class HijacKache<TypeK, TypeV>
 
     public Random rng;
 
-    private long hit = 0, miss = 0;
+    private long hit = 0;
+    public long miss = 0;
 
     private static long rawIndex(/*final Object[] ary, */final int idx) {
         //assert idx >= 0 && idx < ary.length;
@@ -478,10 +479,10 @@ public class HijacKache<TypeK, TypeV>
      *      for the index that was selected
      * @return
      */
-    @Override public final TypeV computeIfAbsent(TypeK key, Function<? super TypeK, ? extends TypeV> mappingFunction) {
+    @Override public final TypeV computeIfAbsent(@NotNull TypeK key, @NotNull Function<? super TypeK, ? extends TypeV> mappingFunction) {
         return putIfMatch(key, mappingFunction, NO_MATCH_OLD);
     }
-    public final TypeV computeIfAbsent2(TypeK key, Function<? super TypeK, Object> mappingFunction) {
+    public final TypeV computeIfAbsent2(@NotNull TypeK key, @NotNull Function<? super TypeK, Object> mappingFunction) {
         return putIfMatch(key, mappingFunction, NO_MATCH_OLD);
     }
 

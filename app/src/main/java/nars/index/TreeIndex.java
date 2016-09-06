@@ -19,11 +19,11 @@ import java.util.function.Consumer;
  */
 public class TreeIndex extends TermIndex {
 
-    public final TermTree terms = new TermTree();
+    public final TermTree concepts = new TermTree();
 
     private final Concept.ConceptBuilder conceptBuilder;
     private NAR nar;
-    private static float SIZE_UPDATE_PROB = 0.05f;
+    //private static float SIZE_UPDATE_PROB = 0.05f;
     private int lastSize = 0;
 
     public TreeIndex(Concept.ConceptBuilder conceptBuilder) {
@@ -52,15 +52,15 @@ public class TreeIndex extends TermIndex {
         }
     }
 
-    protected Termed _get(TermKey k) {
-        return terms.get(k);
+    protected @Nullable Termed _get(@NotNull TermKey k) {
+        return concepts.get(k);
     }
 
-    protected Termed _get(TermKey k, Term finalT) {
-        return terms.putIfAbsent(k, ()->conceptBuilder.apply(finalT));
+    protected @NotNull Termed _get(@NotNull TermKey k, @NotNull Term finalT) {
+        return concepts.putIfAbsent(k, ()->conceptBuilder.apply(finalT));
     }
 
-    public TermKey key(@NotNull Term t) {
+    @NotNull static public TermKey key(@NotNull Term t) {
 
         if (t instanceof Compound)
             t = conceptualize((Compound)t);
@@ -71,7 +71,7 @@ public class TreeIndex extends TermIndex {
 
     @Override
     public void set(@NotNull Termed src, Termed target) {
-        terms.put(key(src.term()), target);
+        concepts.put(key(src.term()), target);
     }
 
     @Override
@@ -81,12 +81,12 @@ public class TreeIndex extends TermIndex {
 
     @Override
     public void forEach(Consumer<? super Termed> c) {
-        terms.forEach(c);
+        concepts.forEach(c);
     }
 
     @Override
     public int size() {
-        return terms.size(); //WARNING may be slow
+        return concepts.size(); //WARNING may be slow
     }
 
     @Override
@@ -101,16 +101,17 @@ public class TreeIndex extends TermIndex {
 
     @Override
     public @NotNull String summary() {
-        return ((nar.random.nextFloat() < SIZE_UPDATE_PROB) ? (this.lastSize = size()) : ("~" + lastSize)) + " terms";
+        //return ((nar.random.nextFloat() < SIZE_UPDATE_PROB) ? (this.lastSize = size()) : ("~" + lastSize)) + " terms";
+        return concepts.sizeEst() + " concepts";
     }
 
     @Override
     public void remove(@NotNull Termed entry) {
 
         TermKey k = key(entry.term());
-        Termed result = terms.get(k);
+        Termed result = concepts.get(k);
         if (result!=null) {
-            if (!terms.remove(k))
+            if (!concepts.remove(k))
                 return; //alredy removed since previous lookup or something
 
             onRemoval(k, result);
@@ -165,6 +166,11 @@ public class TreeIndex extends TermIndex {
             );
             if (o instanceof Termed)
                 return ((Termed)o);
+
+            if (createIfMissing) { //HACK try again: this should be handled by computeIfAbsent2, not here
+                L1.miss++;
+                return super.get(t, true);
+            }
 
             return null;
         }

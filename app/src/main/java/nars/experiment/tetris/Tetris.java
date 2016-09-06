@@ -58,9 +58,9 @@ public class Tetris extends NAgent {
             //new MultiThreadExecutioner(2, 16384);
             new SingleThreadExecutioner();
     public static final Executioner exe2 =
-            new MultiThreadExecutioner(2, 16384);
-    public static final Executioner exe3 =
-            new MultiThreadExecutioner(3, 16384);
+            new MultiThreadExecutioner(2, 1024*8);
+    public static final Executioner exe4 =
+            new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 55000;
     public static final int cyclesPerFrame = 2;
@@ -369,10 +369,10 @@ public class Tetris extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                64, 2, 3, rng,
+                256, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
                 new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 16384, 3),
-                new FrameClock(), exe
+                new FrameClock(), exe4
 
         );
 

@@ -44,6 +44,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
     // If true, force reading threads to acquire read lock (they will block on writes).
     private final boolean restrictConcurrency;
 
+    int estSize = 0;
 
     /**
      * Creates a new {@link MyConcurrentRadixTree} which will use the given {@link NodeFactory} to create nodes.
@@ -117,6 +118,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
 //        return existingValue;
 
         return compute(key, (k, r) -> {
+            estSize++;
             return value;
         });
     }
@@ -142,6 +144,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                 }
             }
 
+            estSize++;
             return newValue.get();
         });
     }
@@ -339,6 +342,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                             searchResult.parentNodesParent.updateOutgoingEdge(newParent);
                         }
                     }
+                    estSize--;
                     return true;
                 default:
                     return false;
@@ -484,7 +488,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
         int count = 0;
         while (true) {
             if (stack.isEmpty()) {
-                return count;
+                return this.estSize = count; //update size estimate
             }
             Node current = stack.pop();
             stack.addAll(current.getOutgoingEdges());
@@ -492,6 +496,11 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                 count++;
             }
         }
+    }
+
+    /** estimated size */
+    public int sizeEst() {
+        return estSize;
     }
 
     @Override

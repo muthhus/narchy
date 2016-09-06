@@ -61,7 +61,7 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public abstract Termed get(@NotNull Termed key, boolean createIfMissing);
 
-    @NotNull public Compound conceptualize(@NotNull Compound x) {
+    @NotNull public static Compound conceptualize(@NotNull Compound x) {
 
         if (!x.isNormalized())
             throw new InvalidConceptException(x, "not normalized");

@@ -80,11 +80,11 @@ public class TreeIndexTest {
         assertEquals(terms.length, index.size());
 
 
-        Set<Termed> stored = StreamSupport.stream(index.terms.spliterator(), false).collect(Collectors.toSet());
+        Set<Termed> stored = StreamSupport.stream(index.concepts.spliterator(), false).collect(Collectors.toSet());
 
         assertEquals(Sets.symmetricDifference(input, stored) + " = difference", input, stored);
 
-        index.terms.print();
+        index.concepts.print();
         index.print(System.out);
 
 //        String stringWithUnicode = "unicode\u00easomething";

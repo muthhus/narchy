@@ -4,6 +4,7 @@ import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.ByteArrayCha
 import nars.IO;
 import nars.term.Term;
 import nars.util.ByteBufferlet;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -12,7 +13,7 @@ import java.io.IOException;
  */
 public class TermKey extends ByteBufferlet implements CharSequence {
 
-    public TermKey(Term a) {
+    public TermKey(@NotNull Term a) {
         super(a.volume() * 8 /* ESTIMATE */);
         try {
             IO.writeTermSeq(this, a);

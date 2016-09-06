@@ -52,7 +52,7 @@ public class HijackBag<X> implements Bag<X> {
             @Override
             protected void reincarnateInto(Object[] k) {
                 HijackBag.this.forEach((x,v)->{
-                    int idx = putIdx(k, x, v[0], map.reprobes, map.rng);
+                    int idx = putIdx(k, x, v[0], map.reprobes);
                     if (idx>=0) {
                         CAS_val(k, idx, null, v);
                     } else {
@@ -80,13 +80,13 @@ public class HijackBag<X> implements Bag<X> {
      * returns the target array if insertion was successful, null otherwise
      */
     @Nullable
-    private static final float[] putBag(final HijacKache map, final Object key, float newPri) {
-        return putBag(map.data, key, newPri, map.reprobes, map.rng);
+    private final float[] putBag(final HijacKache map, final Object key, float newPri) {
+        return putBag(map.data, key, newPri, map.reprobes);
     }
 
-    private static float[] putBag(Object[] kvs, Object key, float newPri, int reprobes, Random rng) {
+    private float[] putBag(Object[] kvs, Object key, float newPri, int reprobes) {
 
-        int idx = putIdx(kvs, key, newPri, reprobes, rng);
+        int idx = putIdx(kvs, key, newPri, reprobes);
 
         if (idx == -1)
             return null;
@@ -105,7 +105,7 @@ public class HijackBag<X> implements Bag<X> {
         }
     }
 
-    private static int putIdx(Object[] kvs, Object key, float newPri, int reprobes, Random rng) {
+    private int putIdx(Object[] kvs, Object key, float newPri, int reprobes) {
         int maxReprobes = reprobes;
 
         int reprobe = 0;
@@ -171,28 +171,11 @@ public class HijackBag<X> implements Bag<X> {
                 if (weakestIdx < 0)
                     throw new RuntimeException("no weakest found to take after probing");
 
-                boolean hijack = weakestPri <= newPri;
 
-                //SEMI-SOFTMAX TODO probability selection needs analyzed
-//                Object V = val(kvs, idx);
-//                float[] f = (float[])V;
-//                float oldPri = f[0];
-//                boolean hijack;
-//                if (oldPri!=oldPri) {
-//                    hijack = true; //yes take this pre-deleted slot
-//                } else {
-//                    boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
-//                    boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
-//                    if (newPriThresh && oldPriThresh) {
-//                        hijack = (rng.nextFloat() > (newPri / (newPri + oldPri)));
-//                    } else if (newPriThresh) {
-//                        hijack = true;
-//                    } else {
-//                        hijack = false;
-//                    }
-//                }
+                boolean hijack =
+                        //hijackGreedy(newPri, weakestPri);
+                        hijackSoftmax(newPri, weakestPri);
 
-                //GREEDY SELECTION
                 if (hijack) {
                     if (CAS_key(kvs, idx, K, key)) { // Got it!
                         hashes[idx] = fullhash; // Memoize fullhash
@@ -211,6 +194,25 @@ public class HijackBag<X> implements Bag<X> {
         }
         // End of spinning till we get a Key slot
         return idx;
+    }
+
+    private boolean hijackSoftmax(float newPri, float oldPri) {
+        if (newPri >= oldPri) return true;
+        else {
+            boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
+            boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
+            if (newPriThresh && oldPriThresh) {
+                return (map.rng.nextFloat() > (newPri / (newPri + oldPri)));
+            } else if (newPriThresh) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private boolean hijackGreedy(float newPri, float weakestPri) {
+        return weakestPri <= newPri;
     }
 
     @Override
@@ -236,7 +238,7 @@ public class HijackBag<X> implements Bag<X> {
                 f[0] = range(nP);
                 f[1] = b.dur();
                 f[2] = b.qua();
-                pressure += nP;
+                pressure += range(nP);
             }
 
         }
@@ -245,6 +247,8 @@ public class HijackBag<X> implements Bag<X> {
 
     /**
      * considers if this priority value stretches the current min/max range
+     * this value will be updated for certain during a commit, so this value
+     * only improves accuracy between commits.
      */
     private final float range(float p) {
         if (p > priMax) priMax = p;
@@ -301,6 +305,8 @@ public class HijackBag<X> implements Bag<X> {
         int start = map.rng.nextInt(c); //starting index
         int i = start, j = 0;
 
+        int batchSize = n;
+
         float r = curve(); //randomized threshold
 
         //TODO detect when the array is completely empty after 1 iteration through it in case the scan limit > 1.0
@@ -323,14 +329,19 @@ public class HijackBag<X> implements Bag<X> {
 
 
                 float p = f[0];
-                if (p==p && p >= 0) {
+                if (p == p) {
+                    if (p >= 0) {
 
-                    if ((r < p) || (r < p + tolerance((((float) j) / jLimit)))) {
-                        if (target.test(a.set((X)k, f))) {
-                            n--;
-                            r = curve();
+                        if ((r < p) || (r < p + tolerance(j, jLimit, n, batchSize, c))) {
+                            if (target.test(a.set((X) k, f))) {
+                                n--;
+                                r = curve();
+                            }
                         }
                     }
+                } else {
+                    //early deletion nullify
+                    data[m] = null;
                 }
             }
             j++;
@@ -405,10 +416,14 @@ public class HijackBag<X> implements Bag<X> {
      * beam width (tolerance range)
      * searchProgress in range 0..1.0
      */
-    private float tolerance(float searchProgress) {
+    private float tolerance(int j, int jLimit, int b, int batchSize, int cap) {
+
+        float searchProgress = ((float)j)/jLimit;
+        //float selectionRate =  ((float)batchSize)/cap;
+
         /* raised polynomially to sharpen the selection curve, growing more slowly at the beginning */
         float exp = 6;
-        return (float) Math.pow(searchProgress, exp);
+        return (float) Math.pow(searchProgress, exp);// + selectionRate;
     }
 
     @NotNull
@@ -486,7 +501,7 @@ public class HijackBag<X> implements Bag<X> {
         if (b != null && !b.isDeleted()) {
             float before = b.pri();
             b.priMult(boost);
-            float after = b.pri();
+            float after = range(b.pri());
             pressure += (after - before);
             return b.get();
         }
