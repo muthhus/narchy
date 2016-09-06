@@ -325,7 +325,7 @@ public class BagTest {
         }
         int expectedSize = n - 1; /* not all fit */
 
-        assertEquals(expectedSize, a.values().size());
+        assertEquals(expectedSize, a.map.values().size());
         assertEquals(expectedSize, Iterators.toArray(a.iterator(), Object.class).length);
 
         int b = 20;

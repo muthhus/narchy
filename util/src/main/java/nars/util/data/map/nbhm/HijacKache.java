@@ -96,7 +96,7 @@ public class HijacKache<TypeK, TypeV>
     private static final int _Obase = _unsafe.arrayBaseOffset(Object[].class);
     private static final int _Oscale = _unsafe.arrayIndexScale(Object[].class);
 
-    protected Random rng;
+    public Random rng;
 
     private long hit = 0, miss = 0;
 
@@ -169,7 +169,7 @@ public class HijacKache<TypeK, TypeV>
     // during standard 'get' operations.  I assume 'get' is much more frequent
     // than 'put'.  'get' can skip the extra indirection of skipping through the
     // CHM to reach the _kvs array.
-    protected transient Object[] data;
+    public transient Object[] data;
 
     private static final CHM chm(Object[] kvs) {
         return (CHM) kvs[0];
