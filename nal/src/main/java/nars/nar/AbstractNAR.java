@@ -3,8 +3,6 @@ package nars.nar;
 import nars.NAR;
 import nars.Param;
 import nars.index.TermIndex;
-import nars.nal.Deriver;
-import nars.nal.meta.PremiseEval;
 import nars.nal.nal8.AbstractOperator;
 import nars.nar.exe.Executioner;
 import nars.op.data.*;
@@ -60,11 +58,6 @@ public abstract class AbstractNAR extends NAR {
     }
 
 
-    @NotNull
-    @Deprecated protected PremiseEval newMatcher() {
-        return new PremiseEval(random, newDeriver());
-    }
-
     /** NAL7 plugins */
     public void initNAL7() {
 
@@ -108,12 +101,6 @@ public abstract class AbstractNAR extends NAR {
 ////                    on(Counting.class);
 ////                }
 //    }
-
-
-    protected @NotNull Deriver newDeriver() {
-        return Deriver.getDefaultDeriver();
-    }
-
 
 
 //    public static final AbstractOperator[] exampleOperators = {

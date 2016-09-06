@@ -5,6 +5,7 @@ import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
+import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.VariableNormalization;
@@ -111,7 +112,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
     }
 
     int matches;
-    final PremiseEval p = new PremiseEval($.terms, new XorShift128PlusRandom(1), Deriver.getDefaultDeriver()) {
+    final PremiseEval p = new PremiseEval(new Terminal(), Deriver.getDefaultDeriver()) {
 
         @Override
         public boolean onMatch() {

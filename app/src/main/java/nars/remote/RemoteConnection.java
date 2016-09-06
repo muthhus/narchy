@@ -140,77 +140,80 @@ public class RemoteConnection implements RenderProtocol, ImageProcess {
     }
 
 
+    //TODO update this to how the new version of the library works
     protected void render(ImageRect rect) {
 
-        if (image == null) {
-            logger.error("canvas image has not been initialized");
-            return;
-        }
-
-        PixelReader ir = image.getPixelReader();
-        try {
-            switch (rect.getEncoding()) {
-                case DESKTOP_SIZE:
-                    logger.debug("resize image: {}", rect);
-                    resize(rect.getWidth(), rect.getHeight());
-                    //vncView.setImage(vncImage);
-                    break;
-                case RAW:
-                case ZLIB:
-                    RawImageRect rawRect = (RawImageRect) rect;
-                    image.getPixelWriter().setPixels(rawRect.getX(), rawRect.getY(), rawRect.getWidth(),
-                            rawRect.getHeight(), PixelFormat.getIntArgbInstance(), rawRect.getPixels(), 0,
-                            rawRect.getWidth());
-
-                    break;
-                case COPY_RECT:
-                    CopyImageRect copyImageRect = (CopyImageRect) rect;
-
-                    PixelReader reader = ir;
-                    WritableImage copyRect = new WritableImage(copyImageRect.getWidth(), copyImageRect.getHeight());
-                    copyRect.getPixelWriter().setPixels(0, 0, copyImageRect.getWidth(), copyImageRect.getHeight(), reader,
-                            copyImageRect.getSrcX(), copyImageRect.getSrcY());
-                    image.getPixelWriter().setPixels(copyImageRect.getX(), copyImageRect.getY(),
-                            copyImageRect.getWidth(), copyImageRect.getHeight(), copyRect.getPixelReader(), 0, 0);
-                    break;
-                case CURSOR:
-//                        if (!prop.clientCursorProperty().get()) {
-//                            logger.warn("ignore cursor encoding");
-//                            return;
-//                        }
-                    final CursorImageRect cRect = (CursorImageRect) rect;
-
-                    if (cRect.getHeight() < 2 && cRect.getWidth() < 2) {
-                        //vncView.setCursor(Cursor.NONE);
-                        return;
-                    }
-
-                    if (cRect.getBitmask() != null && cRect.getBitmask().length > 0) {
-                        // remove transparent pixels
-                        int maskBytesPerRow = Math.floorDiv((cRect.getWidth() + 7), 8);
-                        IntStream.range(0, cRect.getHeight())
-                                .forEach(
-                                        y -> IntStream.range(0, cRect.getWidth())
-                                                .filter(x -> (cRect.getBitmask()[(y * maskBytesPerRow)
-                                                        + Math.floorDiv(x, 8)] & (1 << 7 - Math.floorMod(x, 8))) < 1)
-                                                .forEach(x -> cRect.getPixels()[y * cRect.getWidth() + x] = 0));
-                    }
-
-                    Dimension2D dim = ImageCursor.getBestSize(cRect.getWidth(), cRect.getHeight());
-                    WritableImage cImage = new WritableImage((int) dim.getWidth(), (int) dim.getHeight());
-                    cImage.getPixelWriter().setPixels(0, 0, (int) Math.min(dim.getWidth(), cRect.getWidth()),
-                            (int) Math.min(dim.getHeight(), cRect.getHeight()), PixelFormat.getIntArgbInstance(),
-                            cRect.getPixels(), 0, cRect.getWidth());
-                    //remoteCursor = new ImageCursor(cImage, cRect.getHotspotX(), cRect.getHotspotY());
-                    //vncView.setCursor(remoteCursor);
-                    break;
-                default:
-                    logger.error("not supported encoding rect: {}", rect);
-                    break;
-            }
-        } catch (Exception e) {
-            logger.error("rect: " + String.valueOf(rect), e);
-        }
+//        if (image == null) {
+//            logger.error("canvas image has not been initialized");
+//            return;
+//        }
+//
+//        PixelReader ir = image.getPixelReader();
+//        try {
+//            switch (rect.getEncoding()) {
+//                case DESKTOP_SIZE:
+//                    logger.debug("resize image: {}", rect);
+//                    resize(rect.getWidth(), rect.getHeight());
+//                    //vncView.setImage(vncImage);
+//                    break;
+//                case RAW:
+//                case ZLIB:
+//                    RawImageRect rawRect = (RawImageRect) rect;
+//                    image.getPixelWriter().setPixels(rawRect.getX(), rawRect.getY(), rawRect.getWidth(),
+//                            rawRect.getHeight(), PixelFormat.getIntArgbInstance(),
+//                            //rawRect.getPixels(), 0, rawRect.getWidth());
+//                            rawRect.getPixels(), rawRect.getWidth());
+//
+//                    break;
+//                case COPY_RECT:
+//                    CopyImageRect copyImageRect = (CopyImageRect) rect;
+//
+//                    PixelReader reader = ir;
+//                    WritableImage copyRect = new WritableImage(copyImageRect.getWidth(), copyImageRect.getHeight());
+//                    copyRect.getPixelWriter().setPixels(0, 0, copyImageRect.getWidth(), copyImageRect.getHeight(), reader,
+//                            copyImageRect.getSrcX(), copyImageRect.getSrcY());
+//                    image.getPixelWriter().setPixels(copyImageRect.getX(), copyImageRect.getY(),
+//                            copyImageRect.getWidth(), copyImageRect.getHeight(), copyRect.getPixelReader(), 0, 0);
+//                    break;
+//                case CURSOR:
+////                        if (!prop.clientCursorProperty().get()) {
+////                            logger.warn("ignore cursor encoding");
+////                            return;
+////                        }
+//                    final CursorImageRect cRect = (CursorImageRect) rect;
+//
+//                    if (cRect.getHeight() < 2 && cRect.getWidth() < 2) {
+//                        //vncView.setCursor(Cursor.NONE);
+//                        return;
+//                    }
+//
+//
+//                    if (cRect.getBitmask() != null && cRect.getBitmask().length > 0) {
+//                        // remove transparent pixels
+//                        int maskBytesPerRow = Math.floorDiv((cRect.getWidth() + 7), 8);
+//                        IntStream.range(0, cRect.getHeight())
+//                                .forEach(
+//                                        y -> IntStream.range(0, cRect.getWidth())
+//                                                .filter(x -> (cRect.getBitmask()[(y * maskBytesPerRow)
+//                                                        + Math.floorDiv(x, 8)] & (1 << 7 - Math.floorMod(x, 8))) < 1)
+//                                                .forEach(x -> cRect.getPixels()[y * cRect.getWidth() + x] = 0));
+//                    }
+//
+//                    Dimension2D dim = ImageCursor.getBestSize(cRect.getWidth(), cRect.getHeight());
+//                    WritableImage cImage = new WritableImage((int) dim.getWidth(), (int) dim.getHeight());
+//                    cImage.getPixelWriter().setPixels(0, 0, (int) Math.min(dim.getWidth(), cRect.getWidth()),
+//                            (int) Math.min(dim.getHeight(), cRect.getHeight()), PixelFormat.getIntArgbInstance(),
+//                            cRect.getPixels(), 0, cRect.getWidth());
+//                    //remoteCursor = new ImageCursor(cImage, cRect.getHotspotX(), cRect.getHotspotY());
+//                    //vncView.setCursor(remoteCursor);
+//                    break;
+//                default:
+//                    logger.error("not supported encoding rect: {}", rect);
+//                    break;
+//            }
+//        } catch (Exception e) {
+//            logger.error("rect: " + String.valueOf(rect), e);
+//        }
 
 
 

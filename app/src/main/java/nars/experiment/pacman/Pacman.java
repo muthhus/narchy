@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static nars.experiment.tetris.Tetris.exe;
 import static nars.experiment.tetris.Tetris.exe4;
 
 /**
@@ -92,7 +93,7 @@ public class Pacman extends NAgent {
                 512, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
                 new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 2),
-                new FrameClock(), exe4
+                new FrameClock(), exe
 
         );
         nar.preprocess(new VariableCompressor.Precompressor(nar));
@@ -101,7 +102,7 @@ public class Pacman extends NAgent {
         //new MemoryManager(nar);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.goalConfidence(0.8f);
 
         float pMult = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.4f * pMult;

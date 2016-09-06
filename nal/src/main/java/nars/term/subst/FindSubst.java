@@ -15,6 +15,7 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
 import nars.util.data.list.FasterList;
+import nars.util.data.list.LimitedFasterList;
 import nars.util.version.HeapVersioning;
 import nars.util.version.VersionMap;
 import nars.util.version.Versioned;
@@ -48,6 +49,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
 
     public final Random random;
     public Op type; //TODO make final again
+    private final List<Termutator> termutes;
 
     @NotNull
     public final Versioning versioning;
@@ -107,7 +109,9 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
     }
 
     protected FindSubst(TermIndex index, Op type, Random random, @NotNull Versioning versioning) {
-        super(Param.UnificationTermutesMax);
+        super();
+
+        this.termutes = new LimitedFasterList(Param.UnificationTermutesMax);
 
         this.index = index;
 

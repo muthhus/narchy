@@ -12,14 +12,12 @@ import java.util.List;
  **/
 abstract public class Termunator extends Termutator {
 
-    protected final List<Termutator> termutes;
 
     @NotNull
     final Termutator[] onlyThis;
 
-    public Termunator(int stackSize) {
+    public Termunator() {
         super(".");
-        this.termutes = new LimitedFasterList(stackSize);
         this.onlyThis = new Termutator[] { this };
     }
 

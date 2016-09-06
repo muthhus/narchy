@@ -3,7 +3,6 @@ package nars.nal.meta;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
-import nars.index.TermIndex;
 import nars.nal.Conclusion;
 import nars.nal.Deriver;
 import nars.nal.Premise;
@@ -21,8 +20,6 @@ import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;
 import static nars.nal.op.substituteIfUnifies.*;
@@ -44,7 +41,7 @@ public class PremiseEval extends FindSubst {
      */
     @Nullable
     public transient Premise premise;
-    private float truthResolution;
+    private final float truthResolution;
 
     public boolean setPunct(@Nullable Truth t, char p, long[] evidence) {
 
@@ -61,7 +58,7 @@ public class PremiseEval extends FindSubst {
         return res == Param.TRUTH_EPSILON ? t : DefaultTruth.ditherOrNull(t, res);
     }
 
-    public static class TruthPuncEvidence {
+    public static final class TruthPuncEvidence {
         public final Truth truth;
         public final char punc;
         public final long[] evidence;
@@ -89,7 +86,7 @@ public class PremiseEval extends FindSubst {
     /**
      * run parameters
      */
-    int termutes;
+    int termutesRemain;
     private int termutesMax;
 
 
@@ -114,7 +111,7 @@ public class PremiseEval extends FindSubst {
 
     public Compound taskTerm;
     public Term beliefTerm;
-    public NAR nar;
+    public final NAR nar;
 
     public Task task;
     @Nullable
@@ -133,16 +130,12 @@ public class PremiseEval extends FindSubst {
     private boolean cyclic;
 
 
-    /**
-     * initializes with the default static term index/builder
-     */
-    public PremiseEval(Random r, @NotNull Deriver deriver) {
-        this($.terms, r, deriver);
-    }
+    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver) {
+        super(nar.index, VAR_PATTERN, nar.random);
 
-    public PremiseEval(TermIndex index, Random r, @NotNull Deriver deriver) {
-        super(index, VAR_PATTERN, r);
-
+        this.nar = nar;
+        this.truthResolution = nar.truthResolution.floatValue();
+        this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
 
         this.deriver = deriver;
         //occDelta = new Versioned(this);
@@ -151,7 +144,7 @@ public class PremiseEval extends FindSubst {
 
         put(new substitute(this));
 
-        OneMatchFindSubst subMatcher = new OneMatchFindSubst(index, r);
+        OneMatchFindSubst subMatcher = new OneMatchFindSubst(index, nar.random);
         put(new substituteIfUnifiesDep(this, subMatcher));
         put(new substituteOnlyIfUnifiesDep(this, subMatcher));
         put(new substituteIfUnifiesIndep(this, subMatcher));
@@ -162,7 +155,7 @@ public class PremiseEval extends FindSubst {
 
     }
 
-    protected void put(@NotNull Term t) {
+    protected final void put(@NotNull Term t) {
         putXY(t, t);
     }
 
@@ -185,10 +178,10 @@ public class PremiseEval extends FindSubst {
             //set the # of matches according to the # of conclusions in this branch
             //each matched termutation will be used to derive F=matchFactor conclusions,
             //so divide the premiseMatches value by it to equalize the derivation quantity
-            this.termutes = Math.max(1, termutesMax / matchFactor);
+            this.termutesRemain = Math.max(1, termutesMax / matchFactor);
             finish = true;
         } else {
-            this.termutes = -1; //will not apply unless eachMatch!=null (final step)
+            this.termutesRemain = -1; //will not apply unless eachMatch!=null (final step)
             finish = false;
         }
 
@@ -210,27 +203,19 @@ public class PremiseEval extends FindSubst {
 
     @Override
     public boolean onMatch() {
-        if (termutes-- < 0) {
+        if (termutesRemain-- < 0) {
             return false;
         }
         try {
             forEachMatch.accept(this, now());
             return true;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (Param.DEBUG_DERIVER)
                 Derive.logger.warn("{}\n\tderiving {}", e, ((Derive)forEachMatch).rule.source);
             return false;
         }
     }
 
-
-
-
-    public void init(@NotNull NAR nar) {
-        this.nar = nar;
-        this.truthResolution = nar.truthResolution.floatValue();
-        this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
-    }
 
     /**
      * execute the next premise, be sure to call init() before a batch of run()'s

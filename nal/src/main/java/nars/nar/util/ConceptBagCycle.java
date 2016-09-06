@@ -8,8 +8,8 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.Conclusion;
 import nars.nal.Deriver;
-import nars.nal.Premise;
 import nars.nal.PremiseBuilder;
+import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import nars.util.data.MutableInteger;
@@ -61,9 +61,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
     public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
 
-    private static final ThreadLocal<@NotNull PremiseEval> matcher = ThreadLocal.withInitial(
-            () -> new PremiseEval(new XorShift128PlusRandom((int) Thread.currentThread().getId()), Deriver.getDefaultDeriver())
-    );
     private final MutableInteger cyclesPerFrame;
     private final Concept.ConceptBuilder conceptBuilder;
 
@@ -165,7 +162,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     /**
      * shared combined conclusion
      */
-    public static class FireConcept extends Conclusion implements Runnable, Consumer<Premise> {
+    public static class FireConcept extends Conclusion implements Runnable {
 
         private static final Logger logger = LoggerFactory.getLogger(FireConcept.class);
 
@@ -173,13 +170,14 @@ public class ConceptBagCycle implements Consumer<NAR> {
         private final NAR nar;
         private final short tasklinks;
         private final short termlinks;
-        private PremiseEval mm;
+        private final TrieDeriver deriver;
         private int count;
 
         public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks, Collection<Task> batch) {
             super(batch);
             this.c = c;
             this.nar = nar;
+            this.deriver = Deriver.getDefaultDeriver();
             this.tasklinks = tasklinks;
             this.termlinks = termlinks;
         }
@@ -224,25 +222,27 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
             count = 0;
 
-            if (!termsBuffer.isEmpty()) {
+            @NotNull PremiseEval mm = new PremiseEval(nar, deriver);
 
+            if (!termsBuffer.isEmpty()) {
 
                 FasterList<BLink<Task>> tasksBuffer = $.newArrayList(tasklinks);
                 c.tasklinks().sample(tasklinks, tasksBuffer::addIfNotNull);
 
                 if (!tasksBuffer.isEmpty()) {
 
-                    mm = matcher.get();
-                    mm.init(nar);
-
                     for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
+
                         PremiseBuilder.run(
                                 c,
                                 nar,
                                 termsBuffer,
                                 tasksBuffer.get(i),
                                 mm,
-                                this
+                                (p) -> {
+                                    mm.run(p, this);
+                                    count++;
+                                }
                         );
 
                     }
@@ -257,12 +257,12 @@ public class ConceptBagCycle implements Consumer<NAR> {
             return count;
         }
 
-
-        @Override
-        public void accept(Premise p) {
-            mm.run(p, this);
-            count++;
-        }
+//
+//        @Override
+//        public void accept(Premise p) {
+//            mm.run(p, this);
+//            count++;
+//        }
     }
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */
