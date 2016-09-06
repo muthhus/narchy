@@ -52,10 +52,9 @@ public class HijackBag<X> implements Bag<X> {
             @Override
             protected void reincarnateInto(Object[] k) {
                 HijackBag.this.forEach((x,v)->{
-                    float[] f = putBag(k, x, v[0], map.reprobes, map.rng);
-                    if (f!=null) {
-                        f[1] = v[1];
-                        f[2] = v[2];
+                    int idx = putIdx(k, x, v[0], map.reprobes, map.rng);
+                    if (idx>=0) {
+                        CAS_val(k, idx, null, v);
                     } else {
                         //lost
                     }
@@ -86,26 +85,40 @@ public class HijackBag<X> implements Bag<X> {
     }
 
     private static float[] putBag(Object[] kvs, Object key, float newPri, int reprobes, Random rng) {
+
+        int idx = putIdx(kvs, key, newPri, reprobes, rng);
+
+        if (idx == -1)
+            return null;
+
+        Object V = val(kvs, idx);         // Get old value (before volatile read below!)
+        if (V == null) {
+            float[] ff = new float[] { Float.NaN, 0, 0 };
+            if (CAS_val(kvs, idx, null, ff)) {
+                return ff;
+            } else {
+                //return (float[]) val(kvs, idx);
+                return null; //hijack got hijacked
+            }
+        } else {
+            return (float[]) V;
+        }
+    }
+
+    private static int putIdx(Object[] kvs, Object key, float newPri, int reprobes, Random rng) {
+        int maxReprobes = reprobes;
+
+        int reprobe = 0;
         final int fullhash = HijacKache.hash(key); // throws NullPointerException if key null
         final int len = HijacKache.len(kvs); // Count of key/value pairs, reads kvs.length
-        //final CHM chm = chm(kvs); // Reads kvs[0]
         final int[] hashes = HijacKache.hashes(kvs); // Reads kvs[1], read before kvs[0]
         int idx = fullhash & (len - 1);
         int startIdx = idx;
 
-        int maxReprobes = reprobes;
-
-        // Key-Claim stanza: spin till we can claim a Key (or force a resizing).
-        int reprobe = 0;
-        Object K = null;
-        Object V = null;
-
-
         while (true) {             // Spin till we get a Key slot
 
 
-            V = val(kvs, idx);         // Get old value (before volatile read below!)
-            K = key(kvs, idx);         // Get current key
+            Object K = key(kvs, idx);         // Get current key
 
                 // Found an empty Key slot - which means this Key has never been in
                 // this table.  No need to put a Tombstone - the Key is not here!
@@ -138,7 +151,7 @@ public class HijackBag<X> implements Bag<X> {
 
                 idx = (startIdx + rng.nextInt(maxReprobes)) & (len - 1);
 
-                V = val(kvs, idx);
+                Object V = val(kvs, idx);
                 float[] f = (float[])V;
                 float oldPri = f[0];
                 boolean hijack;
@@ -165,7 +178,7 @@ public class HijackBag<X> implements Bag<X> {
 //                        return null; //the hijack got hijacked, just fail
 //                    }
                 } else {
-                    return null;
+                    idx = -1;
                 }
                 break;
             }
@@ -173,18 +186,7 @@ public class HijackBag<X> implements Bag<X> {
             idx = (idx + 1) & (len - 1); // Reprobe!
         }
         // End of spinning till we get a Key slot
-
-
-        if (V == null) {
-            float[] ff = new float[] { Float.NaN, 0, 0 };
-            if (CAS_val(kvs, idx, null, ff)) {
-                return ff;
-            } else {
-                return (float[]) val(kvs, idx);
-            }
-        } else {
-            return (float[]) V;
-        }
+        return idx;
     }
 
     @Override

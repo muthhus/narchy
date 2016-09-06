@@ -106,11 +106,7 @@ public class PatrickTests extends AbstractNALTest {
 
         TestNAR tt = test();
 
-        //tt.log();
 
-        tt.mustOutput(0, 4500, "lighter({SELF}, toothbrush)", '!', 1f, 1f,
-                0.3f, 1f, //at least some confidence
-                /*@*/ +0L);  //is this correct time? might be off by +/-10 , will check
 
         tt.input("made_of:(toothbrush,plastic).",
                 "( ( made_of:($1, plastic) &&+10 lighter({SELF}, $1) ) ==>+10 <$1 --> [heated]>).",
@@ -125,6 +121,9 @@ public class PatrickTests extends AbstractNALTest {
 
                 );
 
+        tt.mustOutput(0, 4500, "lighter({SELF}, toothbrush)", '!', 1f, 1f,
+                0.3f, 1f, //at least some confidence
+                /*@*/ +0L);  //is this correct time? might be off by +/-10 , will check
 
 
     }
