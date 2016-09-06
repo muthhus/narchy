@@ -146,7 +146,7 @@ public class HijacKache<TypeK, TypeV>
 
     // --- hash ----------------------------------------------------------------
     // Helper function to spread lousy hashCodes
-    private static final int hash(final Object key) {
+    public static final int hash(final Object key) {
         int h = key.hashCode();     // The real hashCode call
         // Spread bits to regularize both segment and index locations,
         // using variant of single-word Wang/Jenkins hash.
@@ -175,12 +175,12 @@ public class HijacKache<TypeK, TypeV>
         return (CHM) kvs[0];
     }
 
-    private static final int[] hashes(Object[] kvs) {
+    public static final int[] hashes(Object[] kvs) {
         return (int[]) kvs[1];
     }
 
     // Number of K,V pairs in the table
-    private static final int len(Object[] kvs) {
+    public static final int len(Object[] kvs) {
         return (kvs.length - 2) >> 1;
     }
 
@@ -200,7 +200,7 @@ public class HijacKache<TypeK, TypeV>
     private static final Object MATCH_ANY = new Object(); // Sentinel
     // This K/V pair has been deleted (but the Key slot is forever claimed).
     // The same Key can be reinserted with a new value later.
-    private static final Object TOMBSTONE = new Object();
+    public static final Object TOMBSTONE = new Object();
     // Prime'd or box'd version of TOMBSTONE.  This K/V pair was deleted, then a
     // table resize started.  The K/V pair has been marked so that no new
     // updates can happen to the old table (and since the K/V pair was deleted
@@ -214,11 +214,11 @@ public class HijacKache<TypeK, TypeV>
     // field only once, and share that read across all key/val calls - lest the
     // _kvs field move out from under us and back-to-back key & val calls refer
     // to different _kvs arrays.
-    protected static final Object key(Object[] kvs, int idx) {
+    public static final Object key(Object[] kvs, int idx) {
         return kvs[(idx << 1) + 2];
     }
 
-    protected static final Object val(Object[] kvs, int idx) {
+    public static final Object val(Object[] kvs, int idx) {
         return kvs[(idx << 1) + 3];
     }
 
@@ -226,7 +226,7 @@ public class HijacKache<TypeK, TypeV>
         return val(data, idx);
     }
 
-    private static final boolean CAS_key(Object[] kvs, int idx, Object old, Object key) {
+    public static final boolean CAS_key(Object[] kvs, int idx, Object old, Object key) {
         //return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), old, key);
 
         if (_unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), old, key)) {
@@ -236,7 +236,7 @@ public class HijacKache<TypeK, TypeV>
         return false;
     }
 
-    private static final boolean CAS_val(Object[] kvs, int idx, Object old, Object val) {
+    public static final boolean CAS_val(Object[] kvs, int idx, Object old, Object val) {
         //return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), old, val);
 
         if (_unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), old, val)) {
@@ -246,7 +246,7 @@ public class HijacKache<TypeK, TypeV>
         return false;
     }
 
-    private static final void set_key(Object[] kvs, int idx, Object key) {
+    public static final void set_key(Object[] kvs, int idx, Object key) {
         _unsafe.putOrderedObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), key);
         //System.out.println("key " + idx + " to " + key);
     }
@@ -329,7 +329,7 @@ public class HijacKache<TypeK, TypeV>
 //        _reprobes = new ConcurrentAutoTable();
 //        return r;
 //    }
-    private int reprobes; // Too many reprobes then force a table-resize
+    public int reprobes; // Too many reprobes then force a table-resize
 
 
     // --- LimitedNonBlockingHashMap --------------------------------------------------
@@ -664,7 +664,7 @@ public class HijacKache<TypeK, TypeV>
     // Check for key equality.  Try direct pointer compare first, then see if
     // the hashes are unequal (fast negative test) and finally do the full-on
     // 'equals' v-call.
-    private static boolean keyeq(Object K, Object key, int[] hashes, int hash, int fullhash) {
+    public static boolean keyeq(Object K, Object key, int[] hashes, int hash, int fullhash) {
 
         if (K == key)
             return true;
@@ -792,27 +792,6 @@ public class HijacKache<TypeK, TypeV>
 
             while (true) {             // Spin till we get a Key slot
 
-                //URGENT HIJACK
-                if (reprobe++ >= maxReprobes) {
-                    //probe expired on a non-empty index, hijack a probed index at random,
-                    // erasing the old value of another key
-
-                    idx = (startIdx + topmap.rng.nextInt(maxReprobes)) & (len - 1);
-
-                    if (compute)
-                        ticket = topmap.next(); //compute the ticket before the delicate operations:
-
-                    //save old values in case we want to revert
-                    V = val(kvs, idx);
-                    K = key(kvs, idx);
-
-                    set_key(kvs, idx, key);
-                    hashes[idx] = fullhash; // Memoize fullhash
-                    if (compute)
-                        set_val(kvs, idx, ticket);
-                    break;                  // Got it!
-
-                }
 
                 V = val(kvs, idx);         // Get old value (before volatile read below!)
                 K = key(kvs, idx);         // Get current key
@@ -859,6 +838,27 @@ public class HijacKache<TypeK, TypeV>
                     break;
                 }
 
+                //URGENT HIJACK
+                if (reprobe++ > maxReprobes) {
+                    //probe expired on a non-empty index, hijack a probed index at random,
+                    // erasing the old value of another key
+
+                    idx = (startIdx + topmap.rng.nextInt(maxReprobes)) & (len - 1);
+
+                    if (compute)
+                        ticket = topmap.next(); //compute the ticket before the delicate operations:
+
+                    //save old values in case we want to revert
+                    V = val(kvs, idx);
+                    K = key(kvs, idx);
+
+                    set_key(kvs, idx, key);
+                    hashes[idx] = fullhash; // Memoize fullhash
+                    if (compute)
+                        set_val(kvs, idx, ticket);
+                    break;                  // Got it!
+
+                }
 
                 idx = (idx + 1) & (len - 1); // Reprobe!
             }

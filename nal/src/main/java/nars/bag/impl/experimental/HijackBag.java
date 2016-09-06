@@ -4,8 +4,8 @@ import nars.Param;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.Forget;
-import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
+import nars.link.ArrayBLink;
 import nars.link.BLink;
 import nars.util.data.map.nbhm.HijacKache;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -14,19 +14,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static nars.util.Util.clamp;
+import static nars.util.data.map.nbhm.HijacKache.*;
 
 /**
  * Created by me on 9/4/16.
  */
 public class HijackBag<X> implements Bag<X> {
 
-    public final HijacKache<X, BLink<X>> map;
+    public final HijacKache<X, float[]> map;
 
     /**
      * max # of times allowed to scan through until either the next item is
@@ -35,7 +36,7 @@ public class HijackBag<X> implements Bag<X> {
      */
     private static final float SCAN_ITERATIONS = 1.1f;
 
-    private float pressure = 0;
+    private float pressure;
     float priMin, priMax;
 
 
@@ -43,7 +44,7 @@ public class HijackBag<X> implements Bag<X> {
      * the fraction of capacity which must contain entries to exceed in order to apply forgetting.
      * this is somewhat analogous to hashmap load factor
      */
-    private float FORGET_CAPACITY_THRESHOLD = 0.75f;
+    private final float FORGET_CAPACITY_THRESHOLD = 0.75f;
 
 
     public HijackBag(int capacity, int reprobes) {
@@ -63,72 +64,156 @@ public class HijackBag<X> implements Bag<X> {
     @Nullable
     @Override
     public BLink<X> remove(X x) {
-        return map.remove(x);
+        throw new UnsupportedOperationException();
+        //return map.remove(x);
+    }
+
+    /**
+     * returns the target array if insertion was successful, null otherwise
+     */
+    @Nullable
+    private static final float[] putBag(final HijacKache map, final Object key, float newPri) {
+        final Object[] kvs = map.data;
+        final int fullhash = HijacKache.hash(key); // throws NullPointerException if key null
+        final int len = HijacKache.len(kvs); // Count of key/value pairs, reads kvs.length
+        //final CHM chm = chm(kvs); // Reads kvs[0]
+        final int[] hashes = HijacKache.hashes(kvs); // Reads kvs[1], read before kvs[0]
+        int idx = fullhash & (len - 1);
+        int startIdx = idx;
+
+        int maxReprobes = map.reprobes;
+        int retriesRemain = 0; //experimental
+
+        // Key-Claim stanza: spin till we can claim a Key (or force a resizing).
+        int reprobe = 0;
+        Object K = null;
+        Object V = null;
+
+
+        while (true) {             // Spin till we get a Key slot
+
+
+            V = val(kvs, idx);         // Get old value (before volatile read below!)
+            K = key(kvs, idx);         // Get current key
+
+                // Found an empty Key slot - which means this Key has never been in
+                // this table.  No need to put a Tombstone - the Key is not here!
+
+            if (K == null) {
+                // Claim the null key-slot
+                if (CAS_key(kvs, idx, null, key)) { // Claim slot for Key
+                    //chm._slots.add(1);      // Raise key-slots-used count
+                    hashes[idx] = fullhash; // Memoize fullhash
+                    break;                  // Got a null entry
+                } else {
+                    K = key(kvs, idx); //recalculte
+                }
+            }
+
+
+            if (keyeq(K, key, hashes, idx, fullhash)) {
+                break;                  // Got its existing entry
+            }
+
+            if (key == TOMBSTONE) { // found a TOMBSTONE key
+                break;
+            }
+
+            //URGENT HIJACK
+            if (reprobe++ > maxReprobes) {
+                //probe expired on a non-empty index,
+                // attempt hijack of probed index at random,
+                // erasing the old value of another key
+
+                idx = (startIdx + map.rng.nextInt(maxReprobes)) & (len - 1);
+
+                V = val(kvs, idx);
+                float[] f = (float[])V;
+                float oldPri = f[0];
+                boolean hijack;
+                if (oldPri!=oldPri) {
+                    hijack = true; //yes take this pre-deleted slot
+                } else {
+                    boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
+                    boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
+                    if (newPriThresh && oldPriThresh) {
+                        hijack = (map.rng.nextFloat() > (newPri / (newPri + oldPri)));
+                    } else if (newPriThresh) {
+                        hijack = true;
+                    } else {
+                        hijack = false;
+                    }
+                }
+
+                if (hijack) {
+                    set_key(kvs, idx, key); // Got it!
+                    hashes[idx] = fullhash; // Memoize fullhash
+                    f[0] = Float.NaN;
+//
+//                    } else {
+//                        return null; //the hijack got hijacked, just fail
+//                    }
+                } else {
+                    return null;
+                }
+                break;
+            }
+
+            idx = (idx + 1) & (len - 1); // Reprobe!
+        }
+        // End of spinning till we get a Key slot
+
+
+        if (V == null) {
+            float[] ff = new float[] { Float.NaN, 0, 0 };
+            if (CAS_val(kvs, idx, null, ff)) {
+                return ff;
+            } else {
+                return (float[]) val(kvs, idx);
+            }
+        } else {
+            return (float[]) V;
+        }
+
     }
 
     @Override
     public void put(X x, Budgeted b, float scale, MutableFloat overflowing) {
 
-        float dPending = 0;
-
-        BLink prev = map.computeIfAbsent(x, (xx) -> newLink(xx, UnitBudget.Zero));
-
-        if (x.equals(prev.get())) {
-            //link exists, merge with it
-
-            float pBefore = prev.pri();
-
-            float overflow = BudgetMerge.plusBlend.merge(prev, b, scale);
-            if (overflowing != null)
-                overflowing.add(overflow);
-
-            float pAfter = prev.pri();
-            dPending = pAfter - pBefore;
-
-            range(pAfter);
-
+        float nP = b.pri() * scale;
+        float[] f = putBag(map, x, nP);
+        if (f == null) {
+            //rejected insert
+            pressure += range(nP);
         } else {
-//            BLink next = (BLink) newLink(x, b).priMult(scale);
-//
-//            BLink<X> prev = put(x, next);
-//
-            float np = b.pri() * scale;
 
+            float pBefore = f[0];
+            if (pBefore == pBefore) {
+                //existing to merge with
+                float overflow = BudgetMerge.plusBlend.merge(new ArrayBLink(x, f), b, scale);
+                if (overflowing != null)
+                    overflowing.add(overflow);
 
-            float dp = prev.pri();
-            if (dp == dp) { //not deleted, compare the two
-                float den = np + dp;
-                float probNext = den > Param.BUDGET_EPSILON ? np / den : 0.5f;
-
-                if (map.rng.nextFloat() > probNext) {
-                    //keep the old value
-                    dPending = 0;
-                } else {
-                    //use the new value
-                    float pBefore = prev.priIfFiniteElseZero();
-                    prev.set(x, b, scale);
-                    float pAfter = prev.pri();
-                    range(pAfter);
-                    dPending = pAfter - pBefore;
-                }
-
+                pressure += range(f[0]) - pBefore;
             } else {
-                prev.set(x, b, scale);
-                dPending = np;
+                //hijacked an empty entry
+                f[0] = range(nP);
+                f[1] = b.dur();
+                f[2] = b.qua();
+                pressure += nP;
             }
 
         }
-
-        pressure += dPending;
 
     }
 
     /**
      * considers if this priority value stretches the current min/max range
      */
-    private final void range(float p) {
+    private final float range(float p) {
         if (p > priMax) priMax = p;
         if (p < priMin) priMin = p;
+        return p;
     }
 
     @Override
@@ -148,7 +233,16 @@ public class HijackBag<X> implements Bag<X> {
 
     @Override
     public @Nullable BLink<X> get(Object key) {
-        return map.get(key);
+        float[] f = map.get(key);
+        return f == null ? null : link((X) key, f);
+    }
+
+    private BLink<X> link(X key, float[] f) {
+        if (key instanceof Budgeted) {
+            return new ArrayBLink.ArrayBLinkToBudgeted((Budgeted)key, f);
+        } else {
+            return new ArrayBLink<>(key, f);
+        }
     }
 
     @Override
@@ -178,15 +272,25 @@ public class HijackBag<X> implements Bag<X> {
         //randomly choose traversal direction
         int di = map.rng.nextBoolean() ? +1 : -1;
 
-        while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
-            Object v = data[((i += di) & (c - 1)) * 2 + 3];
+        ArrayBLink<X> a = new ArrayBLink<>();
 
-            if (v instanceof BLink) {
-                BLink<X> x = (BLink<X>) v;
-                float p = x.priIfFiniteElseNeg1();
-                if (p >= 0) {
+        while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
+            int m = ((i += di) & (c - 1)) * 2 + 2;
+
+            //slight chance these values may be inconsistently paired. TODO use CAS double-checked access
+            Object k = data[m];
+            Object v = data[m + 1];
+
+            if (k != null && v != null) {
+
+                float[] f = (float[]) v;
+
+
+                float p = f[0];
+                if (p==p && p >= 0) {
+
                     if ((r < p) || (r < p + tolerance((((float) j) / jLimit)))) {
-                        if (target.test(x)) {
+                        if (target.test(a.set((X)k, f))) {
                             n--;
                             r = curve();
                         }
@@ -209,13 +313,44 @@ public class HijackBag<X> implements Bag<X> {
         int c = (data.length - 2) / 2;
 
         int j = 0;
+        ArrayBLink<X> a = new ArrayBLink();
 
         while (j < c) {
-            Object v = data[((j++) & (c - 1)) * 2 + 3];
+            int m = ((j++) & (c - 1)) * 2 + 2;
 
-            if (v instanceof BLink) {
-                action.accept((BLink<X>) v);
+            //slight chance these values may be inconsistently paired. TODO use CAS double-checked access
+            Object k = data[m];
+            Object v = data[m + 1];
+
+            if (k != null && v != null) {
+                action.accept(a.set((X) k, (float[]) v));
             }
+        }
+    }
+
+    public void forEach(BiConsumer<X, float[]> e) {
+        Object[] data = map.data;
+        int c = (data.length - 2) / 2;
+
+        int j = 0;
+
+        while (j < c) {
+            int m = ((j++) & (c - 1)) * 2 + 2;
+
+            //slight chance these values may be inconsistently paired. TODO use CAS double-checked access
+            Object k = data[m];
+            Object v = data[m + 1];
+
+            if (k != null && v != null) {
+                float[] f = (float[]) v;
+                float p = f[0];
+                if (p == p) /* NaN? */ {
+                    e.accept((X) k, f);
+                } else {
+                    data[m] = null; //nullify
+                }
+            }
+
         }
     }
 
@@ -243,7 +378,8 @@ public class HijackBag<X> implements Bag<X> {
     @NotNull
     @Override
     public Iterator<BLink<X>> iterator() {
-        return map.values().iterator();
+        throw new UnsupportedOperationException();
+        //return map.values().iterator();
     }
 
     @Override
@@ -259,51 +395,31 @@ public class HijackBag<X> implements Bag<X> {
     @NotNull
     @Override
     public Bag<X> commit() {
-//        if (isEmpty())
-//            return this;
 
-        float mass = 0;
+        final float[] mass = {0};
 
-        int count = 0;
+        final int[] count = {0};
         int cap = capacity();
-        float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
+        final float[] min = {Float.MAX_VALUE};
+        final float[] max = {Float.MIN_VALUE};
 
-        Iterator<Map.Entry<X, BLink<X>>> es = map.entrySet().iterator();
-        while (es.hasNext()) {
-            Map.Entry<X, BLink<X>> e = es.next();
-            Object ll = e.getValue();
-            if (!(ll instanceof BLink))
-                continue; //may be an Integer 'ticket' being computed, skip
+        forEach((X x, float[] f) -> {
+            float p = f[0];
+            if (p > max[0]) max[0] = p;
+            if (p < min[0]) min[0] = p;
+            mass[0] += p;
+            count[0]++;
+        });
 
-            BLink<X> l = (BLink<X>)ll;
-
-            boolean delete = false;
-            if (l.isDeleted())
-                delete = true;
-            X x = l.get();
-            if (x == null)
-                delete = true;
-
-            if (delete) {
-                es.remove();
-            } else {
-                float p = l.pri();
-                if (p > max) max = p;
-                if (p < min) min = p;
-                mass += p;
-                count++;
-            }
-        }
-
-        this.priMin = min;
-        this.priMax = max;
+        this.priMin = min[0];
+        this.priMax = max[0];
 
         Forget f;
-        if (mass > 0 && (count >= cap * FORGET_CAPACITY_THRESHOLD)) {
+        if (mass[0] > 0 && (count[0] >= cap * FORGET_CAPACITY_THRESHOLD)) {
             float p = this.pressure;
             this.pressure = 0;
 
-            float forgetRate = clamp(p / (p + mass));
+            float forgetRate = clamp(p / (p + mass[0]));
 
             if (forgetRate > Param.BUDGET_EPSILON) {
                 f = new Forget(forgetRate);

@@ -1,7 +1,10 @@
 package nars.link;
 
 import nars.budget.Budgeted;
+import nars.budget.RawBudget;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static nars.util.Util.clamp;
 
@@ -12,7 +15,11 @@ import static nars.util.Util.clamp;
  * Acts as a "budget vector" containing an accumulating delta
  * that can be commit()'d on the next udpate
  */
-abstract public class DefaultBLink<X> extends BLink<X> {
+abstract public class DefaultBLink<X> extends RawBudget implements BLink<X> {
+
+    final static AtomicInteger serial = new AtomicInteger();
+
+    final int hash = serial.incrementAndGet();
 
     ///** the referred item */
     public X id;
@@ -33,6 +40,17 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     public boolean isDeleted() {
         return id == null || super.isDeleted();
     }
+
+    @Override
+    public final boolean equals(Object that) {
+        return this == that;
+    }
+
+    @Override
+    public final int hashCode() {
+        return hash;
+    }
+
 
     @Override
     public boolean delete() {

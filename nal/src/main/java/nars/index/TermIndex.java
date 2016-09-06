@@ -690,11 +690,11 @@ public abstract class TermIndex extends TermBuilder {
             this.reason = reason;
         }
 
-        @NotNull
         @Override
-        public String toString() {
+        public String getMessage() {
             return "InvalidConceptTerm: " + term + " (" + term.getClass() + "): " + reason;
         }
+
     }
 
 
