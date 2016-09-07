@@ -35,7 +35,9 @@ public class HijackBag<X> implements Bag<X> {
      */
     private static final float SCAN_ITERATIONS = 1.1f;
 
+    /** pressure from outside trying to enter */
     private float pressure;
+
     float priMin, priMax;
     int count;
 
@@ -44,7 +46,7 @@ public class HijackBag<X> implements Bag<X> {
      * the fraction of capacity which must contain entries to exceed in order to apply forgetting.
      * this is somewhat analogous to hashmap load factor
      */
-    private final float FORGET_CAPACITY_THRESHOLD = 0.75f;
+    private static final float FORGET_CAPACITY_THRESHOLD = 0.75f;
 
 
     public HijackBag(int capacity, int reprobes, Random random) {
@@ -52,7 +54,7 @@ public class HijackBag<X> implements Bag<X> {
             @Override
             protected void reincarnateInto(Object[] k) {
                 HijackBag.this.forEach((x,v)->{
-                    int idx = putIdx(k, x, v[0], map.reprobes);
+                    int idx = putIdx(k, x, v[0]);
                     if (idx>=0) {
                         CAS_val(k, idx, null, v);
                     } else {
@@ -72,21 +74,19 @@ public class HijackBag<X> implements Bag<X> {
     @Nullable
     @Override
     public BLink<X> remove(X x) {
-        throw new UnsupportedOperationException();
-        //return map.remove(x);
+        throw new UnsupportedOperationException("yet");
+        //return map.remove(x); //<- probably works
     }
 
     /**
      * returns the target array if insertion was successful, null otherwise
      */
     @Nullable
-    private final float[] putBag(final HijacKache map, final Object key, float newPri) {
-        return putBag(map.data, key, newPri, map.reprobes);
-    }
+    private final float[] putBag(final Object key, float newPri) {
 
-    private float[] putBag(Object[] kvs, Object key, float newPri, int reprobes) {
+        Object[] kvs = map.data;
 
-        int idx = putIdx(kvs, key, newPri, reprobes);
+        int idx = putIdx(kvs, key, newPri);
 
         if (idx == -1)
             return null;
@@ -105,8 +105,8 @@ public class HijackBag<X> implements Bag<X> {
         }
     }
 
-    private int putIdx(Object[] kvs, Object key, float newPri, int reprobes) {
-        int maxReprobes = reprobes;
+    private int putIdx(Object[] kvs, Object key, float newPri) {
+        int maxReprobes = map.reprobes;
 
         int reprobe = 0;
         final int fullhash = HijacKache.hash(key); // throws NullPointerException if key null
@@ -219,7 +219,7 @@ public class HijackBag<X> implements Bag<X> {
     public void put(X x, Budgeted b, float scale, MutableFloat overflowing) {
 
         float nP = b.pri() * scale;
-        float[] f = putBag(map, x, nP);
+        float[] f = putBag(x, nP);
         if (f == null) {
             //rejected insert
             pressure += range(nP);
@@ -333,7 +333,11 @@ public class HijackBag<X> implements Bag<X> {
                     if (p >= 0) {
 
                         if ((r < p) || (r < p + tolerance(j, jLimit, n, batchSize, c))) {
-                            if (target.test(a.set((X) k, f))) {
+                            if (target.test(
+                                    newLink((X) k,
+                                        a.set(null, f) //wraps the re-usable arraybag
+                                    )) //creates a fresh copy from it
+                                ) {
                                 n--;
                                 r = curve();
                             }

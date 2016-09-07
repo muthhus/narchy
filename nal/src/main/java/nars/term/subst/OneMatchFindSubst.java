@@ -29,6 +29,10 @@ public final class OneMatchFindSubst extends FindSubst {
         super(index, null, r);
     }
 
+    public OneMatchFindSubst(FindSubst parent) {
+        this(parent.index, parent.random);
+    }
+
     @Override
     public Versioned<Term> get() {
         return target.get();
@@ -62,7 +66,7 @@ public final class OneMatchFindSubst extends FindSubst {
         this.xterm = xterm;
         this.target = target;
         this.result = null;
-        unify(x, y, false, true);
+        unify(x, y, true, true);
         return result;
     }
 

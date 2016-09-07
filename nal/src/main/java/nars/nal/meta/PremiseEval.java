@@ -142,13 +142,11 @@ public class PremiseEval extends FindSubst {
         this.punct = new Versioned(versioning);
 
         put(new substitute(this));
-
-        OneMatchFindSubst subMatcher = new OneMatchFindSubst(index, nar.random);
-        put(new substituteIfUnifiesDep(this, subMatcher));
-        put(new substituteOnlyIfUnifiesDep(this, subMatcher));
-        put(new substituteIfUnifiesIndep(this, subMatcher));
-        put(new substituteIfUnifiesIndepForward(this, subMatcher));
-        put(new substituteOnlyIfUnifiesIndep(this, subMatcher));
+        put(new substituteIfUnifiesDep(this));
+        put(new substituteOnlyIfUnifiesDep(this));
+        put(new substituteIfUnifiesIndep(this));
+        put(new substituteIfUnifiesIndepForward(this));
+        put(new substituteOnlyIfUnifiesIndep(this));
 
         this.start = now();
     }

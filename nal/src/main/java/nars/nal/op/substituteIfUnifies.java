@@ -17,13 +17,13 @@ import static nars.time.Tense.DTERNAL;
  */
 abstract public class substituteIfUnifies extends TermTransformOperator  {
 
-    private final OneMatchFindSubst subMatcher;
+    //private final OneMatchFindSubst subMatcher;
     protected final PremiseEval parent; //parent matcher context
 
-    protected substituteIfUnifies(String id, PremiseEval parent, OneMatchFindSubst sub) {
+    protected substituteIfUnifies(String id, PremiseEval parent) {
         super(id);
         this.parent = parent;
-        this.subMatcher = sub;
+        //this.subMatcher = sub;
     }
 
 //    public substituteIfUnifies(PremiseEval parent, OneMatchFindSubst sub) {
@@ -92,11 +92,11 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             }
         }
 
-
         if (!equals && hasAnyOp) {
-            OneMatchFindSubst m = this.subMatcher;
-            m.clear();
+            OneMatchFindSubst m = new OneMatchFindSubst(parent);
+
             Term newTerm = m.tryMatch(op, parent, term, x, y);
+
             return (newTerm!=null) ? newTerm : term;
         } else {
             return equals ? term : False;
@@ -106,8 +106,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public static final class substituteIfUnifiesDep extends substituteIfUnifies {
 
 
-        public substituteIfUnifiesDep(PremiseEval parent, OneMatchFindSubst sub) {
-            super("substituteIfUnifiesDep", parent, sub);
+        public substituteIfUnifiesDep(PremiseEval parent) {
+            super("substituteIfUnifiesDep", parent);
         }
 
         @NotNull
@@ -119,8 +119,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 
     public static final class substituteOnlyIfUnifiesDep extends substituteIfUnifies {
 
-        public substituteOnlyIfUnifiesDep(PremiseEval parent, OneMatchFindSubst sub) {
-            super("substituteOnlyIfUnifiesDep", parent, sub);
+        public substituteOnlyIfUnifiesDep(PremiseEval parent) {
+            super("substituteOnlyIfUnifiesDep", parent);
         }
 
         @Override
@@ -137,8 +137,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 
     public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
 
-        public substituteIfUnifiesIndep(PremiseEval parent, OneMatchFindSubst sub) {
-            super("substituteIfUnifiesIndep",parent, sub);
+        public substituteIfUnifiesIndep(PremiseEval parent) {
+            super("substituteIfUnifiesIndep",parent);
         }
 
         @NotNull
@@ -158,8 +158,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
      */
     public static final class substituteIfUnifiesIndepForward extends substituteIfUnifies {
 
-        public substituteIfUnifiesIndepForward(PremiseEval parent, OneMatchFindSubst sub) {
-            super("substituteIfUnifiesIndepForward",parent, sub);
+        public substituteIfUnifiesIndepForward(PremiseEval parent) {
+            super("substituteIfUnifiesIndepForward",parent);
         }
 
         @Override
@@ -194,9 +194,9 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 
     public static final class substituteOnlyIfUnifiesIndep extends substituteIfUnifies {
 
-        public substituteOnlyIfUnifiesIndep(PremiseEval parent, OneMatchFindSubst sub) {
+        public substituteOnlyIfUnifiesIndep(PremiseEval parent) {
 
-            super("substituteOnlyIfUnifiesIndep", parent, sub);
+            super("substituteOnlyIfUnifiesIndep", parent);
         }
 
         @Override

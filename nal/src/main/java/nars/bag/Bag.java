@@ -533,7 +533,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     };
 
     @NotNull
-    default BLink newLink(@NotNull Object i, Budgeted b) {
+    default <Y> BLink<Y> newLink(@NotNull Y i, Budgeted b) {
 
         if (i instanceof Budgeted)
             return new StrongBLinkToBudgeted((Budgeted) i, b);
