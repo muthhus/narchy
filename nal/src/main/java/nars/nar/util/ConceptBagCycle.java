@@ -268,8 +268,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
                                 Premise p = PremiseBuilder.newPremise(nar, c, now, task, term, pBudget);
 
-                                PremiseEval mm = new PremiseEval(nar, deriver);
-                                mm.run(p, this);
+                                new PremiseEval(nar, deriver, p, this);
                                 count++;
                             }
                         }

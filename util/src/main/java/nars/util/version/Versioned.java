@@ -82,7 +82,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
         return current;
     }
 
-    private final X getUncached() {
+    private X getUncached() {
         int s = size();
         return s == 0 ? null : value.get(s - 1);
     }
@@ -128,7 +128,6 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      * make sure to call commit on the returned context after
      * all concurrent set() are finished
      */
-    @NotNull
     final void set(int now, X nextValue) {
         add(now);
         value.add(nextValue);

@@ -56,12 +56,12 @@ abstract public class Versioning extends FasterList<Versioned> {
         return c;
     }
 
-    /** track change on current commit, returns current version */
-    public final int continueChange(Versioned v) {
-        if (!addIfCapacity(v))
-            throw new RuntimeException();
-        return now;
-    }
+//    /** track change on current commit, returns current version */
+//    public final int continueChange(Versioned v) {
+//        if (!addIfCapacity(v))
+//            throw new RuntimeException();
+//        return now;
+//    }
 
 
     /** reverts to previous state */
@@ -76,7 +76,7 @@ abstract public class Versioning extends FasterList<Versioned> {
             doRevert(when);
     }
 
-    private final void doRevert(int when) {
+    private void doRevert(int when) {
         //if (was < when)
             //throw new RuntimeException("reverting to future time");
         now = when;
@@ -88,7 +88,7 @@ abstract public class Versioning extends FasterList<Versioned> {
         doRevertPop(when, s);
     }
 
-    private final void doRevertPop(int when, final int start) {
+    private void doRevertPop(int when, final int start) {
         int s = start;
 
         Versioned[] ii = this.items;
@@ -102,7 +102,7 @@ abstract public class Versioning extends FasterList<Versioned> {
         }
     }
 
-    private final void doRevertClean(int s, Versioned[] ii, int popped) {
+    private void doRevertClean(int s, Versioned[] ii, int popped) {
 
         if (popped > 1) {
             Arrays.fill(ii, s, s + popped, null);

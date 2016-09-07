@@ -4,10 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -92,9 +89,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     @Override public Set<Entry<X, Y>> entrySet() {
 //        throw new UnsupportedOperationException("inefficient");
         ArrayUnenforcedSet<Entry<X,Y>> e = new ArrayUnenforcedSet<>(size());
-        map.forEach( (k, v) -> {
-            e.add(new AbstractMap.SimpleEntry<>(k, v.get()));
-        });
+        map.forEach( (k, v) -> e.add(new SimpleEntry<>(k, v.get())));
         return e;
     }
 
@@ -133,12 +128,12 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     @NotNull
     public final Versioned<Y> newEntry(X k) {
-        //return new Versioned(context);
+        return new Versioned(context);
         //return cache(k) ? new Versioned(context) :
-        return new RemovingVersionedEntry(k);
+        //return new RemovingVersionedEntry(k);
     }
 
-    public final boolean computeAssignable(X x, @NotNull Reassigner<X,Y> r) {
+    public final boolean computeAssignable(X x, @NotNull BiFunction r) {
         return map.compute(x, r)!=null;
     }
 
@@ -147,32 +142,32 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
 
-    /** this implementation removes itself from the map when it is reverted to
-     *  times prior to its appearance in the map */
-    final class RemovingVersionedEntry extends Versioned<Y> {
-
-        private final X key;
-
-        public RemovingVersionedEntry(X key) {
-            super(context);
-            this.key = key;
-        }
-
-        @Override
-        boolean revertNext(int before) {
-            boolean v = super.revertNext(before);
-            if (size == 0)
-                removeFromMap();
-            return v;
-        }
-
-
-        private void removeFromMap() {
-            VersionMap.this.remove(key);
-        }
-
-      
-    }
+//    /** this implementation removes itself from the map when it is reverted to
+//     *  times prior to its appearance in the map */
+//    final class RemovingVersionedEntry extends Versioned<Y> {
+//
+//        private final X key;
+//
+//        public RemovingVersionedEntry(X key) {
+//            super(context);
+//            this.key = key;
+//        }
+//
+//        @Override
+//        boolean revertNext(int before) {
+//            boolean v = super.revertNext(before);
+//            if (size == 0)
+//                removeFromMap();
+//            return v;
+//        }
+//
+//
+//        private void removeFromMap() {
+//            VersionMap.this.remove(key);
+//        }
+//
+//
+//    }
 
 
 
@@ -224,7 +219,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
                 if (yy == null) {
                     if (!a.test(x, y) || (vy.set(y)==null))
                         return null;
-                } else if (!yy.equals(y)) {
+                } else if (!Objects.equals(yy, y)) {
                     return null; //conflict
                 }
                 return vy;

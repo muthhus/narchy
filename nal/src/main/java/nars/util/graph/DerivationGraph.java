@@ -111,26 +111,27 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
             return x;
     }
 
-    int matches;
-    final PremiseEval p = new PremiseEval(new Terminal(), Deriver.getDefaultDeriver()) {
 
-        @Override
-        public boolean onMatch() {
-            matches++;
-            return false; //only need the first one
-        }
-    };
 
     private boolean unifies(@NotNull Term a, @NotNull Term b) {
         //HACK
-        matches = 0;
+        final int[] matches = {0};
+
+        PremiseEval p = new PremiseEval(new Terminal(), Deriver.getDefaultDeriver()) {
+
+            @Override
+            public boolean onMatch() {
+                matches[0]++;
+                return false; //only need the first one
+            }
+        };
 
         p.unifyAll(a, b);
         p.clear();
 
 
         //System.out.println(a + " " + b + " " + (matches > 0));
-        boolean match = matches > 0;
+        boolean match = matches[0] > 0;
         if (match && !a.equals(b))
             System.out.println(a + " " + b + ' ' + (match));
         return match;

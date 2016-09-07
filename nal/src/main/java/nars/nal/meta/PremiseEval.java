@@ -129,7 +129,6 @@ public class PremiseEval extends FindSubst {
     public Conclusion conclusion;
     private boolean cyclic;
 
-
     public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver) {
         super(nar.index, VAR_PATTERN, nar.random);
 
@@ -152,6 +151,67 @@ public class PremiseEval extends FindSubst {
         put(new substituteOnlyIfUnifiesIndep(this, subMatcher));
 
         this.start = now();
+    }
+
+    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, Premise p, Conclusion c) {
+        this(nar, deriver);
+
+        this.premise = p;
+
+        Task task;
+        this.task = task = p.task();
+        Compound tt = task.term();
+        Term taskTerm = this.taskTerm = tt;
+
+        Task belief;
+        this.belief = belief = p.belief();
+        Term beliefTerm = this.beliefTerm = p.beliefTerm().term();
+
+
+        this.taskTruth = task.truth();
+        this.taskPunct = task.punc();
+        this.beliefTruth = belief != null ? belief.truth() : null;
+        this.termutesMax = matchesMax(task.summary());
+
+//        //normalize to positive truth
+//        if (taskTruth != null && Global.INVERT_NEGATIVE_PREMISE_TASK && taskTruth.isNegative()) {
+//            this.taskInverted = true;
+//            this.taskTruth = this.taskTruth.negated();
+//        } else {
+//            this.taskInverted = false;
+//        }
+//
+//        //normalize to positive truth
+//        if (beliefTruth!=null && Global.INVERT_NEGATIVE_PREMISE_TASK && beliefTruth.isNegative()) {
+//            this.beliefInverted = true;
+//            this.beliefTruth = this.beliefTruth.negated();
+//        } else {
+//            this.beliefInverted = false;
+//        }
+
+        //this.cyclic = task.cyclic();
+        this.cyclic = task.cyclic() || (belief != null && belief.cyclic());
+
+        this.overlap = belief != null && Stamp.overlapping(task, belief);
+
+        this.termSub0Struct = taskTerm.structure();
+        this.termSub0op = taskTerm.op().ordinal();
+        this.termSub0opBit = taskTerm.op().bit;
+        this.termSub1Struct = beliefTerm.structure();
+        this.termSub1op = beliefTerm.op().ordinal();
+        this.termSub1opBit = beliefTerm.op().bit;
+
+        this.temporal = temporal(task, belief);
+
+
+        this.conclusion = c;
+
+        revert(start); //do this before starting in case the last execution was interrupted
+        deriver.run(this);
+
+        this.premise = null;
+        this.conclusion = null; //forget a reference to the local field copy but return this instance
+        this.evidenceDouble = this.evidenceSingle = null;
 
     }
 
@@ -217,72 +277,7 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    /**
-     * execute the next premise, be sure to call init() before a batch of run()'s
-     */
-    @NotNull
-    public final Conclusion run(@NotNull Premise p, @NotNull Conclusion c) {
 
-
-        this.premise = p;
-
-        Task task;
-        this.task = task = p.task();
-        Compound tt = task.term();
-        Term taskTerm = this.taskTerm = tt;
-
-        Task belief;
-        this.belief = belief = p.belief();
-        Term beliefTerm = this.beliefTerm = p.beliefTerm().term();
-
-
-        this.taskTruth = task.truth();
-        this.taskPunct = task.punc();
-        this.beliefTruth = belief != null ? belief.truth() : null;
-        this.termutesMax = matchesMax(task.summary());
-
-//        //normalize to positive truth
-//        if (taskTruth != null && Global.INVERT_NEGATIVE_PREMISE_TASK && taskTruth.isNegative()) {
-//            this.taskInverted = true;
-//            this.taskTruth = this.taskTruth.negated();
-//        } else {
-//            this.taskInverted = false;
-//        }
-//
-//        //normalize to positive truth
-//        if (beliefTruth!=null && Global.INVERT_NEGATIVE_PREMISE_TASK && beliefTruth.isNegative()) {
-//            this.beliefInverted = true;
-//            this.beliefTruth = this.beliefTruth.negated();
-//        } else {
-//            this.beliefInverted = false;
-//        }
-
-        //this.cyclic = task.cyclic();
-        this.cyclic = task.cyclic() || (belief != null && belief.cyclic());
-
-        this.overlap = belief != null && Stamp.overlapping(task, belief);
-
-        this.termSub0Struct = taskTerm.structure();
-        this.termSub0op = taskTerm.op().ordinal();
-        this.termSub0opBit = taskTerm.op().bit;
-        this.termSub1Struct = beliefTerm.structure();
-        this.termSub1op = beliefTerm.op().ordinal();
-        this.termSub1opBit = beliefTerm.op().bit;
-
-        this.temporal = temporal(task, belief);
-
-
-        this.conclusion = c;
-
-        revert(start); //do this before starting in case the last execution was interrupted
-        deriver.run(this);
-
-        this.premise = null;
-        this.conclusion = null; //forget a reference to the local field copy but return this instance
-        this.evidenceDouble = this.evidenceSingle = null;
-
-        return c;
-    }
 
     private static boolean temporal(@NotNull Task task, @Nullable Task belief) {
         if (!task.isEternal() || task.dt() != DTERNAL)
