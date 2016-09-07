@@ -5,6 +5,7 @@ import nars.nal.meta.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -33,7 +34,7 @@ public class Choose1 extends Termutator {
     }
 
     public Choose1(Ellipsis xEllipsis, Term x, @NotNull Set<Term> yFree) {
-        super(xEllipsis);
+        super(Util.tuple(xEllipsis, x, yFree));
 
 
 

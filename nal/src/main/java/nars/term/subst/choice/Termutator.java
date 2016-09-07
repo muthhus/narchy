@@ -10,16 +10,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class Termutator  {
 
-    public final Termlike key;
-    private String asStringCached;
+    /** should have equals consistency */
+    public final Object key;
 
-    public Termutator(@NotNull String key) {
-        this($.the(key));
-    }
-
-    public Termutator(Termlike key) {
+    public Termutator(@NotNull Object key) {
         this.key = key;
     }
+
 
     /** match all termutations recursing to the next after each successful one */
     public abstract void run(FindSubst f, Termutator[] chain, int current);
@@ -52,11 +49,11 @@ public abstract class Termutator  {
         return key.hashCode();
     }
 
-    public final String toStringCached() {
-        String s = this.asStringCached;
-        if (s == null)
-            s = this.asStringCached = toString();
-        return s;
-    }
+//    public final String toStringCached() {
+//        String s = this.asStringCached;
+//        if (s == null)
+//            s = this.asStringCached = toString();
+//        return s;
+//    }
 
 }

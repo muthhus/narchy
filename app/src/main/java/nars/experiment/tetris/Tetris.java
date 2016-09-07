@@ -52,7 +52,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris extends NAgent {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 5 * 10000000;
+    public static final int DEFAULT_INDEX_WEIGHT = 40 * 100000;
 
     public static final Executioner exe =
             new SingleThreadExecutioner();

@@ -27,6 +27,7 @@ import java.util.List;
 import static nars.$.t;
 import static nars.agent.NAgentOld.varPct;
 import static nars.nal.UtilityFunctions.and;
+import static nars.nal.UtilityFunctions.w2c;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.Texts.n2;
 import static nars.util.Texts.n4;
@@ -325,9 +326,9 @@ abstract public class NAgent {
             for (MotorConcept c : actions) {
                 Truth d = c.desire(now);
                 if (d!=null)
-                    m += d.conf();
+                    m += d.confWeight();
             }
-            motorDesireEvidence.addValue(m);
+            motorDesireEvidence.addValue(w2c(m));
 
 
 

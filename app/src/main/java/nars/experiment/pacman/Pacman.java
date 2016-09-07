@@ -23,6 +23,7 @@ import nars.$;
 import nars.NAR;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
+import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -41,8 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static nars.experiment.tetris.Tetris.exe;
-import static nars.experiment.tetris.Tetris.exe4;
+import static nars.experiment.tetris.Tetris.*;
 
 /**
  * the java application class of pacman 
@@ -91,9 +91,9 @@ public class Pacman extends NAgent {
 
         Default nar = new Default(1024,
                 512, 2, 2, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 2),
-                new FrameClock(), exe
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
+                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 2),
+                new FrameClock(), exe2
 
         );
         nar.preprocess(new VariableCompressor.Precompressor(nar));

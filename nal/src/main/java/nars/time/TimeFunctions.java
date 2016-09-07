@@ -545,11 +545,11 @@ public interface TimeFunctions {
 
             if (belief != null && task.isBeliefOrGoal() && belief.isBeliefOrGoal()) {
                 //blend task and belief's DT's weighted by their relative confidence
-                float taskConf = task.conf();
+                float taskConf = task.confWeight();
                 eventDelta = Math.round(Util.lerp(
                         taskDT,
                         beliefDT,
-                        taskConf / (taskConf + belief.conf())
+                        taskConf / (taskConf + belief.confWeight())
                 ));
 //
 //                //reduce confidence by the total change proportion
@@ -584,8 +584,8 @@ public interface TimeFunctions {
             occReturn[0] = taskOcc;
         } else {
             //merge in proportion to their conf
-            double tConf = p.task.conf();
-            double bConf = p.belief.conf();
+            double tConf = p.task.confWeight();
+            double bConf = p.belief.confWeight();
             double newOcc = Util.lerp(taskOcc, beliefOcc, tConf / (bConf + tConf));
             occReturn[0] = (long)newOcc;
         }
@@ -625,9 +625,10 @@ public interface TimeFunctions {
             if (t!= Tense.ETERNAL && b!= Tense.ETERNAL) {
 
                 //randomize choice by confidence
-                float tc = task.conf() + belief.conf();
+                float tcw = task.confWeight();
+                float tc = tcw + belief.confWeight();
 
-                if ( p.random.nextFloat() * tc < task.conf() ) {
+                if ( p.random.nextFloat() * tc < tcw) {
                     return t;
                 } else {
                     return b;

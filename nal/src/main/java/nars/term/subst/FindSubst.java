@@ -422,33 +422,27 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
     public boolean addTermutator(@NotNull Termutator x) {
 
         //resolve termutator interferences that the addition may cause
-        Termlike xKey = x.key;
-        Class xKeyClass = xKey.getClass();
+        Object xKey = x.key;
 
         List<Termutator> t = this.termutes;
         int s = t.size();
 
         for (int i = 0; i < s; i++) {
             Termutator y = t.get(i);
-            Termlike yKey = y.key;
+            Object yKey = y.key;
             if (xKey.equals(yKey)) {
                 //TODO maybe bifurcate a termutator tree with an OR branch?
-
-                //if exact same conditions, dont add duplicate
-                if (xKeyClass == yKey.getClass() &&
-                        y.toStringCached().equals(x.toStringCached()))
-                    return true;
-                else
-                    continue;
-            }
-            if (xKey.containsTerm((Termlike) yKey)) {
-                //insert b before a since it is more specific
-                t.add(i, x);
                 return true;
-            } /*else if (b.containsTerm((Term) a)) {
-                //a contained by b; append to end (after a)
-                continue;
-            } */
+            }
+
+//            if (xKey.containsTerm((Termlike) yKey)) {
+//                //insert b before a since it is more specific
+//                t.add(i, x);
+//                return true;
+//            } /*else if (b.containsTerm((Term) a)) {
+//                //a contained by b; append to end (after a)
+//                continue;
+//            } */
 
         }
 

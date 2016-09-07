@@ -6,6 +6,7 @@ import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
+import nars.util.Util;
 import nars.util.data.array.IntArrays;
 import nars.util.math.Combinations;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +45,7 @@ public class Choose2 extends Termutator {
     }
 
     public Choose2(@NotNull FindSubst f, @NotNull Ellipsis xEllipsis, @NotNull Collection<Term> x, @NotNull Collection<Term> yFreeSet) {
-        super(xEllipsis);
+        super(Util.tuple(Choose2.class,xEllipsis, x, yFreeSet));
         this.f = f;
         this.xEllipsis = xEllipsis;
         this.x = x.toArray(new Term[x.size()]);

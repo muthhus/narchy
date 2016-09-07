@@ -40,17 +40,13 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 //    private final Cache<TermContainer, TermContainer> subs;
 
 
-    private static final Weigher<Termlike, Termlike> complexityAndConfidenceWeigher = (k, v) -> {
+    private static final Weigher<Termlike, Termlike> weigher = (k, v) -> {
 
         if (v instanceof WiredConcept) {
             return 0; //special concept implementation: dont allow removal
         }
 
-        return weigh(v);
-    };
-
-    private static int weigh(Termlike v) {
-//        float beliefCost = (v instanceof CompoundConcept) ?
+        //        float beliefCost = (v instanceof CompoundConcept) ?
 //                    (1f - maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
 //                    0;
         int c = v.complexity();
@@ -58,13 +54,13 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         return c;
         //return Math.round( 1f + 100 * c * beliefCost);
         //return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
-    }
+    };
 
-    private static float maxConfidence(@NotNull CompoundConcept v) {
-        //return Math.max(v.beliefs().confMax(), v.goals().confMax());
-        //return ((v.beliefs().confMax()) + (v.goals().confMax()));
-        return or((v.beliefs().confMax()), (v.goals().confMax()));
-    }
+//    private static float maxConfidence(@NotNull CompoundConcept v) {
+//        //return Math.max(v.beliefs().confMax(), v.goals().confMax());
+//        //return ((v.beliefs().confMax()) + (v.goals().confMax()));
+//        return or((v.beliefs().confMax()), (v.goals().confMax()));
+//    }
 
 
     public CaffeineIndex(Concept.ConceptBuilder builder, long maxWeight) {
@@ -84,7 +80,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
         Caffeine<Termlike, Termlike> builder = prepare(Caffeine.newBuilder(), soft);
         builder
-               .weigher(complexityAndConfidenceWeigher)
+               .weigher(weigher)
                .maximumWeight(maxWeight)
                .removalListener(this)
                .executor(executor)

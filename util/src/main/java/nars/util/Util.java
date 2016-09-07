@@ -20,7 +20,9 @@ import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -1199,4 +1201,10 @@ public enum Util {
         return result;
     }
 
+    public static Pair tuple(Object a, Object b, Object c) {
+        return Tuples.pair(Tuples.pair(a, b), c);
+    }
+    public static Pair tuple(Object a, Object b, Object c, Object d) {
+        return Tuples.pair(tuple(a, b, c), d);
+    }
 }

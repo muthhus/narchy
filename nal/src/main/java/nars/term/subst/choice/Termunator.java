@@ -17,7 +17,7 @@ abstract public class Termunator extends Termutator {
     final Termutator[] onlyThis;
 
     public Termunator() {
-        super(".");
+        super(Termunator.class);
         this.onlyThis = new Termutator[] { this };
     }
 

@@ -3,6 +3,8 @@ package nars.term.subst.choice;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
+import nars.util.Util;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,9 +26,9 @@ public final class CommutivePermutations extends Termutator {
                     '}';
     }
 
-    public CommutivePermutations(@NotNull FindSubst f, @NotNull TermContainer x, @NotNull TermContainer Y) {
-        super(x);
-        this.y = Y;
+    public CommutivePermutations(@NotNull FindSubst f, @NotNull TermContainer x, @NotNull TermContainer y) {
+        super(Util.tuple(CommutivePermutations.class, x, y));
+        this.y = y;
         this.perm = new ShuffledSubterms(f.random,  x);
     }
 
