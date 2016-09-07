@@ -3,20 +3,23 @@ package nars.nar.util;
 import nars.*;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.Conclusion;
 import nars.nal.Deriver;
+import nars.nal.Premise;
 import nars.nal.PremiseBuilder;
 import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.PremiseEval;
+import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import nars.util.data.list.FasterList;
 import nars.util.data.map.nbhm.NonBlockingHashMap;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -217,14 +220,16 @@ public class ConceptBagCycle implements Consumer<NAR> {
          */
         public final int firePremiseSquared(@NotNull Concept c, int tasklinks, int termlinks) {
 
-            FasterList<BLink<Term>> termsBuffer = $.newArrayList(termlinks);
-            c.termlinks().sample(termlinks, termsBuffer::addIfNotNull);
+            FasterList<BLink<Term>> termLinks = $.newArrayList(termlinks);
+            c.termlinks().sample(termlinks, termLinks::addIfNotNull);
 
             count = 0;
 
-            @NotNull PremiseEval mm = new PremiseEval(nar, deriver);
+            long now = nar.time();
 
-            if (!termsBuffer.isEmpty()) {
+            float minDur = nar.durMin.floatValue();
+
+            if (!termLinks.isEmpty()) {
 
                 FasterList<BLink<Task>> tasksBuffer = $.newArrayList(tasklinks);
                 c.tasklinks().sample(tasklinks, tasksBuffer::addIfNotNull);
@@ -233,17 +238,41 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
                     for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
 
-                        PremiseBuilder.run(
-                                c,
-                                nar,
-                                termsBuffer,
-                                tasksBuffer.get(i),
-                                mm,
-                                (p) -> {
-                                    mm.run(p, this);
-                                    count++;
-                                }
-                        );
+
+                        BLink<Task> taskLink = tasksBuffer.get(i);
+
+                        Task task = taskLink.get();
+                        if (task == null)
+                            continue;
+
+                        Compound taskTerm = task.term();
+
+                        RawBudget pBudget = new RawBudget(); //recycled temporary budget for calculating premise budget
+
+
+                        for (int j = 0, termsArraySize = termLinks.size(); j < termsArraySize; j++) {
+
+                            if (taskLink.isDeleted() || task.isDeleted())
+                                break;
+
+                            BLink<Term> termLink = termLinks.get(j);
+                            Term term = termLink.get();
+
+                             /*if (term == null)
+                continue;*/
+
+                            if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
+                                continue;
+
+                            if (PremiseBuilder.budget(pBudget, taskLink, termLink, minDur)) {
+
+                                Premise p = PremiseBuilder.newPremise(nar, c, now, task, term, pBudget);
+
+                                PremiseEval mm = new PremiseEval(nar, deriver);
+                                mm.run(p, this);
+                                count++;
+                            }
+                        }
 
                     }
 

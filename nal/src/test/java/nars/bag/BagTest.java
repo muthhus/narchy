@@ -318,7 +318,7 @@ public class BagTest {
 
         int n = 32;
 
-        testSamplingFlat(new HijackBag<>(n, 4, new XorShift128PlusRandom(1)), 0.018f);
+        testSamplingFlat(new HijackBag<>(n, 4, new XorShift128PlusRandom(1)), 0.038f);
 
         HijackBag<String> a = new HijackBag<>((int)(n*2f), 2, new XorShift128PlusRandom(2));
         for (int i = 0; i < n; i++) {

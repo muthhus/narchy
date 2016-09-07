@@ -55,7 +55,6 @@ public class Tetris extends NAgent {
     public static final int DEFAULT_INDEX_WEIGHT = 5 * 10000000;
 
     public static final Executioner exe =
-            //new MultiThreadExecutioner(2, 16384);
             new SingleThreadExecutioner();
     public static final Executioner exe2 =
             new MultiThreadExecutioner(2, 1024*8);
@@ -369,25 +368,24 @@ public class Tetris extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                256, 2, 3, rng,
+                64, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 16384, 3),
-                new FrameClock(), exe4
-
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 32768, 3),
+                new FrameClock(), exe
         );
 
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-        nar.beliefConfidence(0.9f);
+        nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         nar.DEFAULT_QUEST_PRIORITY = 0.1f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
-        nar.compoundVolumeMax.setValue(60);
+        nar.confMin.setValue(0.05f);
+        nar.compoundVolumeMax.setValue(35);
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -422,8 +420,8 @@ public class Tetris extends NAgent {
         //new Abbreviation(nar,"aKa_");
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
         //new VariableCompressor(nar);
 

@@ -86,19 +86,19 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
 
 
 
-    @NotNull
-    @Override
-    public String toString() {
-        return "subst:{" +
-                "now:" + versioning.now() +
-                ", type:" + type +
-                //", term:" + term +
-                ", parent:" + parent +
-                //"random:" + random +
-                ", xy:" + xy +
-                ", yx:" + yx +
-                '}';
-    }
+//    @NotNull
+//    @Override
+//    public String toString() {
+//        return "subst:{" +
+//                "now:" + versioning.now() +
+//                ", type:" + type +
+//                //", term:" + term +
+//                ", parent:" + parent +
+//                //"random:" + random +
+//                ", xy:" + xy +
+//                ", yx:" + yx +
+//                '}';
+//    }
 
 
     protected FindSubst(TermIndex index, Op type, Random random) {
@@ -637,6 +637,11 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
 
     public final boolean isFull() {
         return versioning.isFull();
+    }
+
+    public final Term yxResolve(Term y) {
+        Term y1 = yx.get(y);
+        return (y1 == null) ? y : y1;
     }
 
 

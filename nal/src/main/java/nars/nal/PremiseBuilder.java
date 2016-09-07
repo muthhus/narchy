@@ -46,49 +46,9 @@ public enum PremiseBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(PremiseBuilder.class);
 
-    /**
-     * Main Entry point: begin matching the task half of a premise
-     */
-    @NotNull
-    public static void run(@NotNull Concept c, @NotNull NAR nar, @NotNull List<BLink<Term>> termLinks, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher, @NotNull Consumer<Premise> each) {
-
-        long now = nar.time();
-
-        float minDur = nar.durMin.floatValue();
-
-        Task task = taskLink.get();
-        if (task == null)
-            return;
-
-        Compound taskTerm = task.term();
-
-        RawBudget pBudget = new RawBudget(); //recycled temporary budget for calculating premise budget
-
-        for (int i = 0, termsArraySize = termLinks.size(); i < termsArraySize; i++) {
-
-            if (taskLink.isDeleted() || task.isDeleted())
-                break;
-
-            BLink<Term> termLink = termLinks.get(i);
-            Term term = termLink.get();
-            /*if (term == null)
-                continue;*/
-
-            if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
-                continue;
-
-            if (budget(pBudget, taskLink, termLink, minDur)) {
-
-                Premise p = newPremise(nar, c, now, task, term, pBudget);
-                each.accept(p);
 
 
-            }
-        }
-
-    }
-
-    private static boolean budget(@NotNull RawBudget pBudget, @NotNull BLink<Task>taskLink, @NotNull BLink<Term> termLink, float minDur) {
+    public static boolean budget(@NotNull RawBudget pBudget, @NotNull BLink<Task> taskLink, @NotNull BLink<Term> termLink, float minDur) {
         TaskBudgeting.premise(pBudget, taskLink, termLink);
         return pBudget.dur() >= minDur;
     }
@@ -106,7 +66,7 @@ public enum PremiseBuilder {
      patham9 especially try to understand the "temporal temporal" case
      patham9 its using the result of higher confidence
      */
-    static @NotNull Premise newPremise(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task, @NotNull Term termLinkTerm, Budget b) {
+    public static @NotNull Premise newPremise(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task, @NotNull Term termLinkTerm, Budget b) {
 
 
         Task belief = null;

@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.PremiseEval;
-import nars.nal.op.substitute;
 import nars.term.Term;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
@@ -44,9 +43,9 @@ public final class OneMatchFindSubst extends FindSubst {
         if (xterm != null) {
             if (target != null) {
                 target.replaceAllXY(this);
-                result = substitute.resolve(target, target, xterm);
+                result = target.resolve(xterm, target);
             } else {
-                result = substitute.resolve(this, this, xterm);
+                result = resolve(xterm, this);
             }
         }
         return false;
