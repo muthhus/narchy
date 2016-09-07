@@ -27,7 +27,7 @@ public abstract class Termutator  {
         //increment the version counter by one and detect if the limit exceeded.
         // this is to prevent infinite recursions in which no version incrementing
         // occurrs that would otherwise trigger overflow to interrupt it.
-        if (f.versioning.next()==-1)
+        if (f.versioning.nextChange(null)==-1)
             return false;
 
         chain[++next].run(f, chain, next);

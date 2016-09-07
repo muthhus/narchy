@@ -13,42 +13,39 @@ import static org.junit.Assert.*;
 public class VersioningTest {
 
     @NotNull
-    Versioning v = new HeapVersioning(10,10);
+    Versioning v = new Versioning(10);
     @NotNull
-    Versioned a = new Versioned(v);
+    Versioned a = new Versioned(v, 8);
     @NotNull
-    Versioned b = new Versioned(v);
+    Versioned b = new Versioned(v, 8);
 
     @Test
     public void test1() {
-        Versioning w = new HeapVersioning(10,10);
+        Versioning w = new Versioning(10);
         VersionMap m = new VersionMap(w,10);
-        m.put("x", "a");
+        m.tryPut("x", "a");
         assertEquals("{x=a}", m.toString());
         assertEquals(1, w.now());
-        m.put("x", "b");
+        m.tryPut("x", "b");
 
         assertEquals("{x=b}", m.toString());
 
         Versioned mvx = m.version("x");
 
-        assertEquals("(1:a, 2:b)", mvx.toStackString());
+        assertEquals("(a, b)", mvx.toStackString());
         assertEquals(2, w.now());
-        assertEquals(2, mvx.lastUpdatedAt());
         assertEquals(2, mvx.size());
 
         w.revert(2); //should have no effect:
         assertEquals(2, w.now());
-        assertEquals(2, mvx.lastUpdatedAt());
-        assertEquals("(1:a, 2:b)", mvx.toStackString());
+        assertEquals("(a, b)", mvx.toStackString());
         assertEquals(2, mvx.size());
         assertEquals(2, w.size());
 
         w.revert(1);
         assertEquals(1, w.now());
-        assertEquals(1, mvx.lastUpdatedAt());
         assertEquals("{x=a}", m.toString());
-        assertEquals("(1:a)", mvx.toStackString());
+        assertEquals("(a)", mvx.toStackString());
         assertEquals(1, mvx.size());
         assertEquals(1, w.size());
 
@@ -56,10 +53,8 @@ public class VersioningTest {
         assertEquals(0, w.size());
         assertEquals(0, w.now());
         assertEquals(0, mvx.size());
-        assertEquals(-1, mvx.lastUpdatedAt());
-        assertEquals("{}", m.toString());
+        assertEquals("{x=null}", m.toString());
 
-        assertEquals(true, m.isEmpty());
         assertNull(m.get("x")); //removed from map because it did not exist at version 0 which is effectively empty
 
 

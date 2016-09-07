@@ -27,7 +27,7 @@ public enum AbstractPatternOp  {
 
             this.subterm = subterm;
             this.opOrdinal = op.ordinal();
-            this.id = name(getClass(), subterm, "\"" + op + "\"");
+            this.id = name(getClass(), subterm, "\"" + op + '"');
 
         }
 

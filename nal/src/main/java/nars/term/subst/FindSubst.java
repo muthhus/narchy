@@ -6,7 +6,6 @@ import nars.index.TermIndex;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.subst.choice.CommutivePermutations;
 import nars.term.subst.choice.Termunator;
@@ -14,9 +13,7 @@ import nars.term.subst.choice.Termutator;
 import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
-import nars.util.data.list.FasterList;
 import nars.util.data.list.LimitedFasterList;
-import nars.util.version.HeapVersioning;
 import nars.util.version.VersionMap;
 import nars.util.version.Versioned;
 import nars.util.version.Versioning;
@@ -26,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -44,7 +40,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class FindSubst extends Termunator implements Subst, Supplier<Versioned<Term>> {
+public abstract class FindSubst extends Termunator implements Subst {
 
 
     public final Random random;
@@ -103,7 +99,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
 
     protected FindSubst(TermIndex index, Op type, Random random) {
         this(index, type, random,
-                new HeapVersioning(Param.UnificationStackMax, 4)
+                new Versioning(Param.UnificationStackMax)
                 //new PooledVersioning(Global.UnificationStackMax, 4)
         );
     }
@@ -123,20 +119,20 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
         yx = new VersionMap(versioning, 4);
         reassignerXY = new VersionMap.Reassigner<>(this::assignable, xy);
         reassignerYX = new VersionMap.Reassigner<>(this::assignable, yx);
-        parent = new Versioned(versioning);
+        parent = new Versioned(versioning, 4);
 
         int constraintsLimit = 4;
-        constraints = new Versioned(versioning, new int[constraintsLimit], new FasterList(0, new MatchConstraint[constraintsLimit]));
+        constraints = new Versioned(versioning, new MatchConstraint[constraintsLimit]);
 
         //matcherXY = new Matcher(this::assignable, xy);
         //matcherYX = new Matcher(this::assignable, yx);
 
     }
 
-    @Override
-    public Versioned<Term> get() {
-        return new Versioned(versioning);
-    }
+//    @Override
+//    public Versioned<Term> get() {
+//        return new Versioned(versioning);
+//    }
 
     /**
      * called each time all variables are satisfied in a unique way
@@ -602,7 +598,7 @@ public abstract class FindSubst extends Termunator implements Subst, Supplier<Ve
         Versioned<MatchConstraint> cc = this.constraints;
         int s = cc.size();
         if (s > 0) {
-            MatchConstraint[] ccc = cc.value.array();
+            MatchConstraint[] ccc = cc.array();
             for (; s > 0; ) {
                 if (ccc[--s].invalid(x, y, this))
                     return false;

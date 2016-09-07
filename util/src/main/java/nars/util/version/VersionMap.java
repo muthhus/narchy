@@ -14,6 +14,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     private final Versioning context;
     public final Map<X, Versioned<Y>> map;
+    final static int elementStackSize = 8;
 
     public VersionMap(Versioning context, int initialSize) {
         this(context,
@@ -128,7 +129,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     @NotNull
     public final Versioned<Y> newEntry(X k) {
-        return new Versioned(context);
+        return new Versioned(context, elementStackSize);
         //return cache(k) ? new Versioned(context) :
         //return new RemovingVersionedEntry(k);
     }

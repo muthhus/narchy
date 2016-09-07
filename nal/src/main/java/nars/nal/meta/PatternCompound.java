@@ -16,6 +16,7 @@ import nars.term.subst.choice.Choose2;
 import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Set;
 
 abstract public class PatternCompound extends GenericCompound {
@@ -334,7 +335,7 @@ abstract public class PatternCompound extends GenericCompound {
 
                 //boolean xVar = x.op() == type;
                 //ellipsis to be matched in stage 2
-                if (x == ellipsis)
+                if (Objects.equals(x, ellipsis))
                     continue;
 
                 Term v = subst.xy(x); //xVar ? getXY(x) : x;

@@ -1,40 +1,27 @@
 package nars.util.version;
 
-import nars.util.data.list.FasterIntArrayList;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Maintains a versioned snapshot history (stack) of a changing value
+ * Maintains a versioned snapshot history (stack) of a changing value.
+ * Managed by a Versioning context
  */
-public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
+public class Versioned<X> extends FasterList<X> {
 
-    public final FasterList<X> value;
     @NotNull
     private final Versioning context;
 
-    @Nullable X current;
 
-    /**
-     * id, unique within the context this has registered with
-     */
-    private final int id;
-
-    public Versioned(@NotNull Versioning context) {
-        this(context, context.newIntStack(), context.newValueStack());
-    }
-
-    public Versioned(@NotNull Versioning context, int[] buffer, FasterList<X> value) {
-        super(buffer);
+    public Versioned(@NotNull Versioning context, X[] array) {
+        super(0, array);
         this.context = context;
-        this.value = value;
-        id = context.track();
     }
 
-    /** called when this versioned is removed/Deleted from a context */
-    void delete() {
-        clear();
+    public Versioned(@NotNull Versioning context, int initialCapacity) {
+        super(initialCapacity);
+        this.context = context;
     }
 
     @Override
@@ -42,58 +29,28 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
         return this == otherVersioned;
     }
 
-    @Override
-    public final int hashCode() {
-        return id;
-    }
 
 
-    boolean revertNext(int before) {
-        int p = size - 1;
-        if (p >= 0) {
-            int[] a = items;
-            if (a[p--] > before) {
-                popTo(p);
-                value.popTo(p);
-                this.current = getUncached();
-                return true;
-            }
-        }
-        return false;
-    }
+
+//    boolean revertNext(int count) {
+//        int p = size - count;
+//        if (p >= 0) {
+//            popTo(p);
+//            return true;
+//        }
+//        return false;
+//    }
 
 
-    public int lastUpdatedAt() {
-        int s = size();
-        if (s == 0) return -1;
-        return get(s-1);
-    }
-
-    /*@Override
-    public int compareTo(Versioned o) {
-        return Integer.compare(o.now(), now());
-    }*/
 
     /**
      * gets the latest value
      */
     @Nullable
     public final X get() {
-        return current;
+        return getLast();
     }
 
-    private X getUncached() {
-        int s = size();
-        return s == 0 ? null : value.get(s - 1);
-    }
-
-//    /**
-//     * gets the latest value at a specific time, rolling back as necessary
-//     */
-//    public X revertThenGet(int now) {
-//        revert(now);
-//        return latest();
-//    }
 
     /**
      * sets thens commits
@@ -101,48 +58,15 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      */
     @Nullable
     public final Versioned<X> set(X nextValue) {
-        @Nullable X current = this.current;
-        if (current!=nextValue) {
+
         //if (current == null || !current.equals(nextValue)) {
-            int next = context.nextChange(this);
-            if (next == -1)
-                return null;
-            set(next, this.current = nextValue);
+        int next = context.nextChange(this);
+        if (next == -1) {
+            return null;
+        } else {
+            add(nextValue);
+            return this;
         }
-        return this;
-    }
-
-//    /**
-//     * set but does not commit;
-//     * a commit should precede this call otherwise it will have the version of a previous commit
-//     */
-//    @NotNull
-//    public void thenSet(X nextValue) {
-//        if (this.current!=nextValue) {
-//            set(context.continueChange(this), this.current = nextValue);
-//        }
-//    }
-
-    /**
-     * sets at a specific time but does not commit;
-     * make sure to call commit on the returned context after
-     * all concurrent set() are finished
-     */
-    final void set(int now, X nextValue) {
-        add(now);
-        value.add(nextValue);
-    }
-
-
-    @Override
-    public void clear() {
-        //super.clear();
-        super.clearFast();
-
-        //value.clearFast();
-        value.clear();
-
-        this.current = null;
     }
 
     @Override
@@ -158,7 +82,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
         int s = size();
         for (int i = 0; i < s; i++) {
             //sb.append('(');
-            sb.append(get(i)).append(':').append(value.get(i));
+            sb.append(get(i));
             //sb.append(')');
             if (i < s - 1)
                 sb.append(", ");
@@ -167,32 +91,5 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 
     }
 
-//    public int setInt(IntToIntFunction f) {
-//        Integer x = (Integer) get();
-//        Integer y = f.valueOf(x);
-//        set(y);
-//    }
-
-//    @Nullable
-//    public X getIfAbsent(X valueIfMissing) {
-//        X x = get();
-//        if (x == null) return valueIfMissing;
-//        return x;
-//    }
-//
-////    public long getIfAbsent(long valueIfMissing) {
-////        if (isEmpty()) return valueIfMissing;
-////        return ((Long) get());
-////    }
-//
-//    @Deprecated public int getIfAbsent(int valueIfMissing) {
-//        Integer i  = (Integer) get();
-//        return i == null ? valueIfMissing : i;
-//    }
-
-//    public char getIfAbsent(char valueIfMissing) {
-//        if (isEmpty()) return valueIfMissing;
-//        return ((Character) get());
-//    }
 
 }

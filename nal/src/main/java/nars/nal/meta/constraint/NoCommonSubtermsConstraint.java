@@ -20,7 +20,6 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
         this.b = b;
     }
 
-    final static ThreadLocal<HashSet<Term>> scratch = ThreadLocal.withInitial(HashSet::new);
 
     @Override
     public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull FindSubst f) {

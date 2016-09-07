@@ -10,7 +10,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.graph.DirectedPseudograph;
@@ -117,7 +116,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
         //HACK
         final int[] matches = {0};
 
-        PremiseEval p = new PremiseEval(new Terminal(), Deriver.getDefaultDeriver()) {
+        PremiseEval p = new PremiseEval(new Terminal()) {
 
             @Override
             public boolean onMatch() {

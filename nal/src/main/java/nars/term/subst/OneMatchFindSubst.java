@@ -33,10 +33,6 @@ public final class OneMatchFindSubst extends FindSubst {
         this(parent.index, parent.random);
     }
 
-    @Override
-    public Versioned<Term> get() {
-        return target.get();
-    }
 
     /**
      * terminates after the first match

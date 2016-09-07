@@ -14,7 +14,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.subst.FindSubst;
-import nars.term.subst.OneMatchFindSubst;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
@@ -31,16 +30,12 @@ import static nars.time.Tense.DTERNAL;
  */
 public class PremiseEval extends FindSubst {
 
-    @NotNull
-    private final Deriver deriver;
-    private final int start;
-
 
     /**
      * the current premise being evaluated in this context TODO make private again
      */
-    @Nullable
-    public transient Premise premise;
+    @NotNull
+    public final Premise premise;
     private final float truthResolution;
 
     public boolean setPunct(@Nullable Truth t, char p, long[] evidence) {
@@ -129,17 +124,20 @@ public class PremiseEval extends FindSubst {
     public Conclusion conclusion;
     private boolean cyclic;
 
-    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver) {
+    public PremiseEval(@NotNull NAR nar) {
+        this(nar, null);
+    }
+
+    public PremiseEval(@NotNull NAR nar, @Nullable Premise p) {
         super(nar.index, VAR_PATTERN, nar.random);
 
         this.nar = nar;
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
 
-        this.deriver = deriver;
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);
-        this.punct = new Versioned(versioning);
+        this.punct = new Versioned(versioning, 2);
 
         put(new substitute(this));
         put(new substituteIfUnifiesDep(this));
@@ -148,13 +146,11 @@ public class PremiseEval extends FindSubst {
         put(new substituteIfUnifiesIndepForward(this));
         put(new substituteOnlyIfUnifiesIndep(this));
 
-        this.start = now();
+        this.premise = p;
     }
 
-    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, Premise p, Conclusion c) {
-        this(nar, deriver);
-
-        this.premise = p;
+    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Premise p, @NotNull Conclusion c) {
+        this(nar, p);
 
         Task task;
         this.task = task = p.task();
@@ -204,12 +200,12 @@ public class PremiseEval extends FindSubst {
 
         this.conclusion = c;
 
-        revert(start); //do this before starting in case the last execution was interrupted
+        //revert(start); //do this before starting in case the last execution was interrupted
+
         deriver.run(this);
 
-        this.premise = null;
-        this.conclusion = null; //forget a reference to the local field copy but return this instance
-        this.evidenceDouble = this.evidenceSingle = null;
+        //this.conclusion = null; //forget a reference to the local field copy but return this instance
+        //this.evidenceDouble = this.evidenceSingle = null;
 
     }
 
