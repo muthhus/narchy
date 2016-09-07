@@ -180,7 +180,6 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_elimination5()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("<{Tweety} --> [withWings]>"); //en("Tweety has wings.");
         tester.believe("<(&&,<$x --> [chirping]>,<$x --> [withWings]>) ==> <$x --> bird>>"); //en("If something can chirp and has wings, then it is a bird.");
         tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.81f); //en("If Tweety can chirp, then it is a bird.");
@@ -201,7 +200,6 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void multiple_variable_elimination()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("<(&&,<$x --> key>,<$y --> lock>) ==> <$y --> (/,open,$x,_)>>"); //en("Every lock can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         tester.mustBelieve(cycles*2, "<<$1 --> key> ==> <{lock1} --> (/,open,$1,_)>>", 1.00f, 0.81f); //en("Lock-1 can be opened by every key.");
@@ -242,7 +240,6 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_introduction()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("<swan --> bird>"); //en("A swan is a bird.");
         tester.believe("<swan --> swimmer>", 0.80f, 0.9f); //en("A swan is usually a swimmer.");
         tester.mustBelieve(cycles, "<<$1 --> bird> ==> <$1 --> swimmer>>", 0.80f, 0.45f); //en("I guess a bird is usually a swimmer.");
@@ -276,7 +273,6 @@ public class NAL6Test extends AbstractNALTest {
     @Ignore
     public void variable_introduction3()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("<gull --> swimmer>", 1f, 0.9f); //en("A gull is a swimmer.");
         tester.believe("<swan --> swimmer>", 0f, 0.9f); //en("A swan is never a swimmer.");
         tester.mustBelieve(cycles, "(&&,<gull --> #1>,<swan --> #1>)", 0.0f, 0.81f); //en("Gull and swan have no commonality.");

@@ -214,7 +214,6 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void compound_decomposition_two_premises3(){
         TestNAR tester = test();
-        tester.log();
         tester.believe("(||,<robin --> [flying]>,<robin --> swimmer>)"); //.en("Robin can fly or swim.");
         tester.believe("<robin --> swimmer>",0.0f,0.9f); //.en("Robin cannot swim.");
         tester.mustBelieve(cycles,"<robin --> [flying]>",1.00f,0.81f); //.en("Robin can fly.");
@@ -225,7 +224,6 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void compound_composition_one_premises(){
         TestNAR tester = test();
-        tester.log();
         tester.believe("<robin --> [flying]>"); //.en("Robin can fly.");
         tester.ask("(||,<robin --> [flying]>,<robin --> swimmer>)"); //.en("Can robin fly or swim?");
         tester.mustBelieve(cycles*2," (||,<robin --> swimmer>,<robin --> [flying]>)",1.00f,0.81f); //.en("Robin can fly or swim.");
@@ -450,7 +448,6 @@ public class NAL5Test extends AbstractNALTest {
 
     @Test public void testNegPosImplicationSubj() {
         test()
-                .log()
                 .input("(x). %0.0;0.90%")
                 .input("((--,(x)) ==> (y)).")
                 .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
@@ -468,7 +465,6 @@ public class NAL5Test extends AbstractNALTest {
     }
     @Test public void testNegNegImplicationPred() {
         test()
-                .log()
                 .input("(--,(y)).")
                 .input("((--,(x)) ==> (--,(y))).")
                 .mustBelieve(cycles, "(x)", 0.0f, 0.45f)
@@ -478,7 +474,6 @@ public class NAL5Test extends AbstractNALTest {
 
     @Test public void testNegNegImplicationConc() {
         test()
-                .log()
                 .input("(x). %0.0;0.90%")
                 .input("((--,(x)) ==> (--,(y))).")
                 .mustBelieve(cycles, "(y)", 0.0f, 0.81f)
@@ -487,7 +482,6 @@ public class NAL5Test extends AbstractNALTest {
     }
     @Test public void testNegNegEquivPred() {
         test()
-                .log()
                 .input("(--,(y)).")
                 .input("((--,(x)) <=> (--,(y))).")
                 .mustBelieve(cycles, "(x)", 0.0f, 0.81f)
@@ -496,7 +490,6 @@ public class NAL5Test extends AbstractNALTest {
     }
     @Test public void testNegNegEquivPredInv() {
         test()
-                .log()
                 .input("(y).")
                 .input("((--,(x)) <=> (--,(y))).")
                 .mustBelieve(cycles, "(x)", 1.0f, 0.81f)

@@ -336,15 +336,13 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void induction_on_events3_simple_reversed() {
         //TESTS COMMUTIVITY
-        int c = 5;
-        TestNAR t = test()
-                .log()
+        test()
                 .inputAt(0, "<room --> enter>. :|:")
                 .inputAt(4, "<door --> open>. :|:")
-                .mustBelieve(c, "(open:door <=>-4 enter:room)",
+                .mustBelieve(cycles, "(open:door <=>-4 enter:room)",
                     1.00f, 0.45f,
                     0)
-                .mustBelieve(c, "(enter:room <=>+4 open:door)", //same as other condition
+                .mustBelieve(cycles, "(enter:room <=>+4 open:door)", //same as other condition
                     1.00f, 0.45f,
                     0)
 
