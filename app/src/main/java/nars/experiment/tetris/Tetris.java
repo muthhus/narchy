@@ -9,6 +9,7 @@ import nars.data.AutoClassifier;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
+import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -52,7 +53,7 @@ import static spacegraph.obj.GridSurface.VERTICAL;
  */
 public class Tetris extends NAgent {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 40 * 100000;
+    public static final int DEFAULT_INDEX_WEIGHT = 30 * 100000;
 
     public static final Executioner exe =
             new SingleThreadExecutioner();
@@ -65,7 +66,7 @@ public class Tetris extends NAgent {
     public static final int cyclesPerFrame = 6;
     public static final int tetris_width = 6;
     public static final int tetris_height = 13;
-    public static final int TIME_PER_FALL = 6;
+    public static final int TIME_PER_FALL = 3;
     static boolean easy;
 
     static int frameDelay;
@@ -369,23 +370,28 @@ public class Tetris extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 32, 2, 2, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 32768, 3),
-                new FrameClock(), exe2
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
+                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 32768, 3),
+                new FrameClock(), exe
         );
 
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-        nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.8f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.6f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.1f;
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
+
+        float p = 0.05f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.2f*p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f*p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.1f*p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.1f*p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
-        nar.compoundVolumeMax.setValue(35);
+
+        nar.confMin.setValue(0.03f);
+
+        nar.compoundVolumeMax.setValue(30);
+
         //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
