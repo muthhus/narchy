@@ -347,7 +347,9 @@ public interface Concept extends Termed {
             //out.print("TermLinkTemplates: ");
             //out.println(termlinkTemplates());
 
-            out.println("\n TermLinks: " + termlinks().size() + "/" + termlinks().capacity());
+            out.println("\n TermLinks: " + termlinks().size() + "/" + termlinks().capacity() +
+                    ((this instanceof CompoundConcept) ? "\tTemplates: " + ((CompoundConcept)this).templates : "")
+            );
             termlinks().forEach(b -> {
                 out.print(indent);
                 out.print(b.get() + " " + b.toBudgetString());

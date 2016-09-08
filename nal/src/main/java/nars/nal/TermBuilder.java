@@ -41,12 +41,12 @@ public abstract class TermBuilder {
     /**
      * implications, equivalences, and interval
      */
-    public static int InvalidEquivalenceTerm = or(IMPL, EQUI);
+    public static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
     /**
      * equivalences and intervals (not implications, they are allowed
      */
-    public static int InvalidImplicationSubject = or(EQUI, IMPL);
-    public static int InvalidImplicationPredicate = or(EQUI);
+    public static final int InvalidImplicationSubject = or(EQUI, IMPL);
+    public static final int InvalidImplicationPredicate = or(EQUI);
 
 
     @NotNull
@@ -171,7 +171,7 @@ public abstract class TermBuilder {
     }
 
     /** collection implementation of the conjunction true/false filter */
-    private TreeSet<Term> conjTrueFalseFilter(TreeSet<Term> terms) {
+    private static TreeSet<Term> conjTrueFalseFilter(TreeSet<Term> terms) {
         Iterator<Term> ii = terms.iterator();
         while (ii.hasNext()) {
             Term n = ii.next();
@@ -430,10 +430,8 @@ public abstract class TermBuilder {
         if (n == 1) {
             Term only = u[0];
 
-            if (only instanceof Ellipsislike) {
-                //preserve unitary ellipsis for patterns etc
-                return finish(CONJ, dt, only);
-            } else return only;
+            //preserve unitary ellipsis for patterns etc
+            return only instanceof Ellipsislike ? finish(CONJ, dt, only) : only;
 
         }
 
@@ -473,7 +471,7 @@ public abstract class TermBuilder {
 
     }
 
-    public boolean commutive(int dt) {
+    public static boolean commutive(int dt) {
         return (dt == DTERNAL) || (dt == 0);
     }
 

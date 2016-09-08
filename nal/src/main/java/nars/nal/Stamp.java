@@ -164,14 +164,13 @@ public interface Stamp {
             lastValue = v;
         }
 
-        int sLen = outputLen;
-        if ((uniques == sLen) && (sorted.length == sLen)) {
+        if ((uniques == outputLen) && (sorted.length == outputLen)) {
             //if no duplicates and it's the right size, just return it
             return sorted;
         }
 
         //3. de-duplicate
-        int outSize = Math.min(uniques, sLen);
+        int outSize = Math.min(uniques, outputLen);
         long[] dedupAndTrimmed = new long[outSize];
         int uniques2 = 0;
         long lastValue2 = -1;
@@ -290,7 +289,7 @@ public interface Stamp {
         final int extra = 1;
         int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
         LongHashSet l = new LongHashSet(maxLen);
-        s.forEach( (Task t) -> {
+        s.forEach( (Stamp t) -> {
             long[] e = t.evidence();
             int el = e.length;
             for (int i = Math.max(0, el - maxPer); i < el; i++) {

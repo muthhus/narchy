@@ -22,9 +22,7 @@ import java.util.Set;
 abstract public class PatternCompound extends GenericCompound {
 
     public final int sizeCached;
-    public final int volCached;
     public final int structureCached;
-    public final boolean imgCached;
 
     @NotNull
     public final Term[] termsCached;
@@ -40,9 +38,7 @@ abstract public class PatternCompound extends GenericCompound {
         structureCached =
                 //seed.structure() & ~(Op.VariableBits);
                 seed.structure() & ~(Op.VAR_PATTERN.bit);
-        this.volCached = seed.volume();
         this.termsCached = subterms.terms();
-        this.imgCached = op.isImage();
 
     }
 
@@ -415,13 +411,13 @@ abstract public class PatternCompound extends GenericCompound {
 
     public static final class PatternCompoundSimple extends PatternCompound {
 
-        private final int subStructureCached;
-        private final boolean commutative;
+//        private final int subStructureCached;
+//        private final boolean commutative;
 
         public PatternCompoundSimple(@NotNull Compound seed, @NotNull TermContainer subterms) {
             super(seed, subterms);
-            this.commutative = Compound.commutative(op(), size());
-            this.subStructureCached = subterms().structure();
+//            this.commutative = Compound.commutative(op(), size());
+//            this.subStructureCached = subterms().structure();
         }
 
 //        @Override

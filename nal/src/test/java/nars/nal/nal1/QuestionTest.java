@@ -3,6 +3,8 @@ package nars.nal.nal1;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Param;
+import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.Answerer;
@@ -109,4 +111,33 @@ public class QuestionTest {
 
 
     }
+
+    @Test public void testSaneBudgeting() {
+        Param.DEBUG = true;
+        String c = "((parent($X,$Y) && parent($Y,$Z)) ==> grandparent($X,$Z))";
+        new Default(1000, 8, 1, 3)
+            .logSummaryGT(System.out, 0.1f)
+            .eachFrame(nn->{
+                Concept cc = nn.concept(c);
+                if (cc!=null) {
+                    cc.print();
+                }
+            })
+            .input(c + ".", "")
+            .run(100);
+
+    }
+//    @Test public void testPrologLike1() {
+//        Param.DEBUG = true;
+//        new Default(1000, 8, 1, 3)
+//            .logSummaryGT(System.out, 0.1f)
+//            .input(
+//                "((parent($X,$Y) && parent($Y,$Z)) ==> grandparent($X,$Z)).",
+//                "parent(c, p).",
+//                "parent(p, g).",
+//                "grandparent(p, #g)?"
+//            )
+//            .run(800);
+//
+//    }
 }

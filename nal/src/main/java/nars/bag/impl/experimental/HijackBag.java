@@ -34,6 +34,7 @@ public class HijackBag<X> implements Bag<X> {
      * for safety, should be >= 1.0
      */
     private static final float SCAN_ITERATIONS = 1.1f;
+    private final BudgetMerge merge;
 
     /** pressure from outside trying to enter */
     private float pressure;
@@ -46,10 +47,15 @@ public class HijackBag<X> implements Bag<X> {
      * the fraction of capacity which must contain entries to exceed in order to apply forgetting.
      * this is somewhat analogous to hashmap load factor
      */
-    private static final float FORGET_CAPACITY_THRESHOLD = 0.75f;
+    private static final float FORGET_CAPACITY_THRESHOLD = 0.9f;
 
 
-    public HijackBag(int capacity, int reprobes, Random random) {
+    @Deprecated public HijackBag(int capacity, int reprobes, Random random) {
+        this(capacity, reprobes, BudgetMerge.plusBlend, random);
+    }
+
+    public HijackBag(int capacity, int reprobes, BudgetMerge merge, Random random) {
+        this.merge = merge;
         map = new HijacKache<>(capacity, reprobes, random) {
             @Override
             protected void reincarnateInto(Object[] k) {
@@ -228,7 +234,7 @@ public class HijackBag<X> implements Bag<X> {
             float pBefore = f[0];
             if (pBefore == pBefore) {
                 //existing to merge with
-                float overflow = BudgetMerge.plusBlend.merge(new ArrayBLink(x, f), b, scale);
+                float overflow = merge.merge(new ArrayBLink(x, f), b, scale);
                 if (overflowing != null)
                     overflowing.add(overflow);
 

@@ -146,8 +146,7 @@ public final class Conclude extends AtomicStringConstant implements ProcTerm {
             long[] occReturn = {ETERNAL};
             float[] confScale = {1f};
 
-            Compound temporalized;
-            temporalized = this.temporalizer.compute(content,
+            Compound temporalized = this.temporalizer.compute(content,
                     m, this, occReturn, confScale
             );
 
@@ -222,7 +221,7 @@ public final class Conclude extends AtomicStringConstant implements ProcTerm {
                     .log(Param.DEBUG ? rule : null);
 
             return dt;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (Param.DEBUG) {
                 logger.error("{}", e.toString());
             }

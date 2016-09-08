@@ -192,11 +192,16 @@ public class PremiseEval extends FindSubst {
         this.overlap = belief != null && Stamp.overlapping(task, belief);
 
         this.termSub0Struct = taskTerm.structure();
-        this.termSub0op = taskTerm.op().ordinal();
-        this.termSub0opBit = taskTerm.op().bit;
+
+        @NotNull Op tOp = taskTerm.op();
+        this.termSub0op = tOp.ordinal();
+        this.termSub0opBit = tOp.bit;
+
         this.termSub1Struct = beliefTerm.structure();
-        this.termSub1op = beliefTerm.op().ordinal();
-        this.termSub1opBit = beliefTerm.op().bit;
+
+        @NotNull Op bOp = beliefTerm.op();
+        this.termSub1op = bOp.ordinal();
+        this.termSub1opBit = bOp.bit;
 
         this.temporal = temporal(task, belief);
 

@@ -149,10 +149,10 @@ public class PremiseRuleSet {
         }
 
         for (String s : lines) {
-            boolean currentRuleEmpty = current_rule.length() == 0;
 
             s = s.trim(); //HACK write a better file loader
 
+            boolean currentRuleEmpty = current_rule.length() == 0;
             if (s.startsWith("//") || spacePattern.matcher(s).replaceAll(Matcher.quoteReplacement("")).isEmpty()) {
 
                 if (!currentRuleEmpty) {
@@ -241,11 +241,9 @@ public class PremiseRuleSet {
     }
 
     public static void permute(@NotNull PremiseRule preNormRule, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur) {
-        posNegPermute(preNormRule, src, ur, index, (PremiseRule r) -> {
-            permuteSwap(r, src, index, ur, (PremiseRule s) -> {
-                permuteBackward(src, index, ur, r);
-            });
-        });
+        posNegPermute(preNormRule, src, ur, index,
+                (PremiseRule r) -> permuteSwap(r, src, index, ur,
+                        (PremiseRule s) -> permuteBackward(src, index, ur, r)));
     }
 
     static void permuteBackward(String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, @NotNull PremiseRule r) {

@@ -3,6 +3,7 @@ package nars.gui;
 import com.jogamp.newt.opengl.GLWindow;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -15,6 +16,7 @@ import org.infinispan.util.function.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
+import spacegraph.layout.Flatten;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.shape.SphereShape;
 
@@ -33,7 +35,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 32, 3, 4 );
+        Default n = new Default(128, 1, 1, 2 );
         //n.nal(4);
 
 
@@ -41,17 +43,31 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 64, 0);
+        newConceptWindow(n, 128, 0);
 
         //n.run(20); //headstart
 
-        n.loop(25f);
 
         //n.log();
         //n.input("(a<->b).", "(b<->c).");
 
-        new DeductiveMeshTest(n, new int[]{6, 6}, 16384);
+        //new DeductiveMeshTest(n, new int[]{6, 6}, 16384);
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
+
+
+        Param.DEBUG = true;
+        n
+                .log()
+                //.logSummaryGT(System.out, 0.05f)
+                .input(
+                        "((parent($X,$Y) && parent($Y,$Z)) ==> grandparent($X,$Z))."
+//                        "parent(c, p).",
+//                        "parent(p, g).",
+//                        "grandparent(p, #g)?"
+                );
+                //.run(800);
+
+        n.loop(1.5f);
 
     }
 
@@ -141,7 +157,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                                });
 //                            }
 //                        }
-                        //new Flatten()
+                        new Flatten()
 //                        //new Spiral()
 //                        //new FastOrganicLayout()
                 )

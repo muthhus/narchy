@@ -88,28 +88,28 @@ public final class Premise extends RawBudget implements Tasked {
     }
 
 
-    /** true if both task and (non-null) belief are temporal events */
-    public final boolean isEvent() {
-        /* TODO This part is used commonly, extract into its own precondition */
-        Task b = belief();
-        return (b!=null) && (!task().isEternal()) && (!b.isEternal());
-    }
+//    /** true if both task and (non-null) belief are temporal events */
+//    public final boolean isEvent() {
+//        /* TODO This part is used commonly, extract into its own precondition */
+//        Task b = belief();
+//        return (b!=null) && (!task().isEternal()) && (!b.isEternal());
+//    }
 
 //    @Nullable public final Concept concept(NAR n) {
 //        return n.concept(conceptLink);
 //    }
 
-    @Nullable public final BLink<? extends Termed> termlink(NAR nar) {
-        return termlink(nar.concept(concept));
-    }
+//    @Nullable public final BLink<? extends Termed> termlink(NAR nar) {
+//        return termlink(nar.concept(concept));
+//    }
 
     @Nullable public final BLink<? extends Termed> termlink(Concept c) {
         return c.termlinks().get(term);
     }
 
-    @Nullable public final BLink<? extends Task> tasklink(NAR nar) {
-        return tasklink(nar.concept(concept));
-    }
+//    @Nullable public final BLink<? extends Task> tasklink(NAR nar) {
+//        return tasklink(nar.concept(concept));
+//    }
 
     @Nullable public final BLink<? extends Task> tasklink(Concept c) {
         return c.tasklinks().get(task);

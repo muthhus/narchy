@@ -160,7 +160,7 @@ public class Activation {
 
 
         Concept asrc = src;
-        if (asrc != null && asrc != this) {
+        if (asrc != null) {
             //link the src to this
             linkSub(src, asrc, scale, nar);
         } else {
@@ -215,21 +215,21 @@ public class Activation {
             //throw new RuntimeException("termlink to null concept: " + target);
         }
 
-//        if (tt.equals( source.term() ))
-//            throw new RuntimeException("termlink self-loop");
+        if (!target.term().equals( source.term() )) {
+            //            throw new RuntimeException("termlink self-loop");
 
 
-//        /* insert termlink target to source */
-        boolean alsoReverse = true;
-        if (targetConcept != null && alsoReverse) {
-            subScale /= 2; //divide among both directions
+            //        /* insert termlink target to source */
+            boolean alsoReverse = true;
+            if (targetConcept != null && alsoReverse) {
+                subScale /= 2; //divide among both directions
 
-            targetConcept.termlinks().put(source.term(), in, subScale, linkOverflow);
+                targetConcept.termlinks().put(source.term(), in, subScale, linkOverflow);
+            }
+
+        /* insert termlink source to target */
+            source.termlinks().put(targetTerm, in, subScale, linkOverflow);
         }
-
-    /* insert termlink source to target */
-        source.termlinks().put(targetTerm, in, subScale, linkOverflow);
-
 
         return targetConcept;
     }

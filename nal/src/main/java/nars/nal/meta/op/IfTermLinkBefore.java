@@ -59,8 +59,7 @@ public class IfTermLinkBefore extends events {
             return true;
         } else {
 
-            final int targetMatch;  //must match term
-            targetMatch = ttdt < 0 ? 1 : 0;
+            final int targetMatch = ttdt < 0 ? 1 : 0;  //must match term
             return tt.term(targetMatch).equals(m.beliefTerm);
         }
     }
