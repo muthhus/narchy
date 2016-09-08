@@ -17,7 +17,7 @@ import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.nal.meta.op.*;
 import nars.nal.meta.op.AbstractPatternOp.PatternOpNot;
-import nars.nal.op.Derive;
+import nars.nal.op.Conclude;
 import nars.nal.op.Solve;
 import nars.nal.op.SolvePuncFromTask;
 import nars.nal.op.SolvePuncOverride;
@@ -218,7 +218,7 @@ public class PremiseRule extends GenericCompound {
 
             addAll(l, match.procedure);
 
-            l.add(truth.derive); //will be linked to and invoked by match callbacks
+            l.add(truth.conclude); //will be linked to and invoked by match callbacks
         }
 
         return l;
@@ -383,7 +383,7 @@ public class PremiseRule extends GenericCompound {
             throw new RuntimeException("unknown DesireFunction: " + p.goalTruth);
         }
 
-        Derive der = new Derive(rule, p.pattern,
+        Conclude der = new Conclude(rule, p.pattern,
                 /*anticipate,*/
                 eternalize, temporalizer);
 

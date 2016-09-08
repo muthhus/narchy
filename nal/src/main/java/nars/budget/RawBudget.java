@@ -1,6 +1,5 @@
 package nars.budget;
 
-import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.util.Util.clamp;

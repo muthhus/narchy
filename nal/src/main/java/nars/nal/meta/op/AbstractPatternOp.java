@@ -16,7 +16,7 @@ public enum AbstractPatternOp  {
         return c.getSimpleName() + "(p" + Integer.toString(subterm) + ",\"" + param + "\")";
     }
 
-    public static class PatternOp extends AtomicBoolCondition {
+    public static final class PatternOp extends AtomicBoolCondition {
 
         public final int subterm;
         public final int opOrdinal;
@@ -27,7 +27,7 @@ public enum AbstractPatternOp  {
 
             this.subterm = subterm;
             this.opOrdinal = op.ordinal();
-            this.id = name(getClass(), subterm, "\"" + op + '"');
+            this.id = name(getClass(), subterm, op.str);
 
         }
 

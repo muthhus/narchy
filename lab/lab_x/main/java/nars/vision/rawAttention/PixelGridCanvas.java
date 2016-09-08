@@ -1,4 +1,4 @@
-package nars.vision.rawAttention;
+package nars.video.rawAttention;
 
 /**
  * Canvas which shows big pixels and the pixels which are "seen" by nars

@@ -15,8 +15,6 @@ import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.UtilityFunctions.or;
-
 
 abstract public class DerivedTask extends MutableTask {
 
@@ -108,8 +106,9 @@ abstract public class DerivedTask extends MutableTask {
 
                 /* HEURISTIC */
                 float boost =
-                        1f + or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
+                        //1f + or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
                         //1f + deltaConfidence * Math.abs(deltaSatisfaction);
+                        1f + Math.max(deltaConfidence, deltaSatisfaction);
 
                 if (!Util.equals(boost, 1f, Param.TRUTH_EPSILON)) {
                     feedback(boost, nar);

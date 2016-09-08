@@ -9,12 +9,10 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.index.TermIndex;
 import nars.link.BLink;
-import nars.nal.meta.PremiseEval;
 import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import static nars.budget.Activation.linkable;
 import static nars.time.Tense.ETERNAL;

@@ -21,13 +21,12 @@ package nars.experiment.pacman;
 
 import nars.$;
 import nars.NAR;
+import nars.agent.NAgent;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
-import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.NAgent;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Termed;

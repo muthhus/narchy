@@ -5,15 +5,12 @@ import nars.index.PatternIndex;
 import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.BoolCondition;
 import nars.nal.rule.PremiseRule;
-import nars.nar.Default;
 import org.apache.commons.math3.stat.Frequency;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.*;
 
 import static java.lang.System.out;
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 

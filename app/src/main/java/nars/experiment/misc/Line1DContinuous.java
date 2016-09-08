@@ -2,12 +2,12 @@ package nars.experiment.misc;
 
 import nars.$;
 import nars.NAR;
+import nars.agent.NAgent;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.NAgent;
 import nars.term.Term;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;

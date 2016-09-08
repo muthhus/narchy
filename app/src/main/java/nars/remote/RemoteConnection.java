@@ -11,26 +11,17 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import javafx.geometry.Dimension2D;
-import javafx.scene.ImageCursor;
-import javafx.scene.image.PixelFormat;
-import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
-import nars.vision.ImageProcess;
+import nars.video.ImageProcess;
 import org.jfxvnc.net.rfb.codec.ProtocolHandler;
 import org.jfxvnc.net.rfb.codec.ProtocolState;
 import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;
 import org.jfxvnc.net.rfb.codec.encoder.InputEventListener;
 import org.jfxvnc.net.rfb.codec.security.SecurityType;
 import org.jfxvnc.net.rfb.render.*;
-import org.jfxvnc.net.rfb.render.rect.CopyImageRect;
-import org.jfxvnc.net.rfb.render.rect.CursorImageRect;
 import org.jfxvnc.net.rfb.render.rect.ImageRect;
-import org.jfxvnc.net.rfb.render.rect.RawImageRect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.stream.IntStream;
 
 /**
  * VNC/RDP client to a server

@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
+import nars.agent.NAgent;
 import nars.data.AutoClassifier;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
@@ -16,7 +17,6 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.NAgent;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
@@ -368,11 +368,12 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
+        Executioner e = Tetris.exe2;
         Default nar = new Default(1024,
-                32, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT/2, false, exe),
+                64, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 32768, 3),
-                new FrameClock(), exe
+                new FrameClock(), e
         );
 
 

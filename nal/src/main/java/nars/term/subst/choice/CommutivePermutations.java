@@ -4,7 +4,6 @@ import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import nars.util.Util;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 
 /**

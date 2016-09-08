@@ -1,4 +1,4 @@
-package nars.vision;
+package nars.video;
 
 import automenta.vivisect.swing.NWindow;
 import com.jogamp.opengl.GLCapabilities;

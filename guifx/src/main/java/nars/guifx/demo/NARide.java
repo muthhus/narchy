@@ -32,7 +32,6 @@ import nars.guifx.graph2.impl.HalfHalfIsoTriangleCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.nars.*;
-import nars.guifx.remote.VncClientApp;
 import nars.guifx.util.*;
 import nars.index.TermIndex;
 import nars.nar.util.ConceptBagCycle;
@@ -200,7 +199,7 @@ public class NARide extends StackPane {
 
         //ni.addTool("Terminal (bash)", LocalTerminal::new);
         //ni.addTool("Status", () -> new StatusPane(nar, 320));
-        ni.addTool("VNC/RDP Remote", () -> (VncClientApp.newView()));
+        //ni.addTool("VNC/RDP Remote", () -> (VncClientApp.newView()));
         ni.addTool("Web Browser", WebBrowser::new);
 
         ni.addTool("HTTP Server", Pane::new);

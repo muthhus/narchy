@@ -1,9 +1,6 @@
 package nars.term.subst.choice;
 
-import nars.util.data.list.LimitedFasterList;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * appended to the end of termuator execution chains to invoke

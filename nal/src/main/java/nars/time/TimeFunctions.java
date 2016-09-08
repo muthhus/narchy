@@ -5,7 +5,7 @@ import nars.Op;
 import nars.Task;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
-import nars.nal.op.Derive;
+import nars.nal.op.Conclude;
 import nars.nal.rule.PremiseRule;
 import nars.term.*;
 import nars.util.Util;
@@ -27,7 +27,7 @@ public interface TimeFunctions {
      * @param confScale
      * @return
      */
-    @NotNull Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, @NotNull float[] confScale);
+    @NotNull Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale);
 
 
     static long earlyOrLate(long t, long b, boolean early) {
@@ -53,24 +53,24 @@ public interface TimeFunctions {
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, +1);
+    TimeFunctions dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, +1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, -1);
+    TimeFunctions dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, -1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, 0);
+    TimeFunctions dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, 0);
 
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtUnion = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
+    TimeFunctions dtUnion = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
         //TODO
         return dtDiff(derived, p, occReturn, 2);
     };
-    TimeFunctions dtUnionReverse = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
+    TimeFunctions dtUnionReverse = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
         //TODO
         return dtDiff(derived, p, occReturn, -2);
     };
@@ -204,16 +204,16 @@ public interface TimeFunctions {
     /**
      * copiesthe 'dt' and the occurence of the task term directly
      */
-    TimeFunctions dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, true);
-    TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, false);
+    TimeFunctions dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, true);
+    TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, false);
 
 
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
-    @NotNull TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) ->
+    @NotNull TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) ->
             decompose(derived, p, occReturn, true);
-    @NotNull TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) ->
+    @NotNull TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) ->
             decompose(derived, p, occReturn, false);
 
     @NotNull
@@ -451,18 +451,18 @@ public interface TimeFunctions {
     /**
      * dt is supplied by Task
      */
-    TimeFunctions dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, false);
 
-    TimeFunctions dtTaskEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtTaskEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, true);
 
     /**
      * dt is supplied by Belief
      */
-    TimeFunctions dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, false);
-    TimeFunctions dtBeliefEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtBeliefEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, true);
 
     @NotNull
@@ -528,7 +528,7 @@ public interface TimeFunctions {
     /**
      * combine any existant DT's in the premise (assumes both task and belief are present)
      */
-    @NotNull TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
+    @NotNull TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) -> {
 
         Task task = p.task;
         int taskDT = ((Compound)$.pos(p.taskTerm)).dt();

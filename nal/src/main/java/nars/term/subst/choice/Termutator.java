@@ -1,7 +1,5 @@
 package nars.term.subst.choice;
 
-import nars.$;
-import nars.term.Termlike;
 import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 

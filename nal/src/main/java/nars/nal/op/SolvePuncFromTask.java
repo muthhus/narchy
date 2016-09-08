@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class SolvePuncFromTask extends Solve {
 
-    public SolvePuncFromTask(String i, Derive der, TruthOperator belief, TruthOperator desire) {
+    public SolvePuncFromTask(String i, Conclude der, TruthOperator belief, TruthOperator desire) {
         super(i, der, belief, desire);
     }
 

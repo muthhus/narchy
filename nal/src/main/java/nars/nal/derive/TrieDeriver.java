@@ -7,7 +7,7 @@ import nars.nal.Deriver;
 import nars.nal.meta.*;
 import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.nal.meta.op.MatchTermPrototype;
-import nars.nal.op.Derive;
+import nars.nal.op.Conclude;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
 import nars.term.Term;
@@ -381,7 +381,7 @@ public class TrieDeriver extends Deriver {
                 }
                 return true;
             }
-            if (x instanceof Derive) {
+            if (x instanceof Conclude) {
                 //link this derivation action to the previous Match,
                 //allowing multiple derivations to fold within a Match's actions
                 MatchTermPrototype mt = matchParent.get();
@@ -390,7 +390,7 @@ public class TrieDeriver extends Deriver {
                     //System.err.println("detached Derive action: " + x + " in branch: " + t);
                 } else {
                     //HACK
-                    Derive dx = (Derive) x;
+                    Conclude dx = (Conclude) x;
                     mt.derive(dx);
                     //derivationLinks.put(mt, dx);
                 }

@@ -65,6 +65,11 @@ public interface TruthOperator {
         }
 
         @Override
+        public String toString() {
+            return o.toString() + "X";
+        }
+
+        @Override
         public boolean allowOverlap() {
             return o.allowOverlap();
         }
@@ -84,6 +89,11 @@ public interface TruthOperator {
         public NegatedTruth(@NotNull TruthOperator o) {
             this.o = o;
             overlapCached = o.allowOverlap();
+        }
+
+        @Override
+        public final String toString() {
+            return o.toString() + "N";
         }
 
         @Override

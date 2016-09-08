@@ -1,4 +1,4 @@
-package nars.vision;
+package nars.video;
 
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;

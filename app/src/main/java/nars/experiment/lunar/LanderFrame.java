@@ -2,9 +2,10 @@ package nars.experiment.lunar;
 
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
-import java.awt.*;
 import javax.swing.*;
-import java.awt.event.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 

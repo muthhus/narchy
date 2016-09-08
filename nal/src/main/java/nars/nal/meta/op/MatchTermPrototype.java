@@ -6,7 +6,7 @@ import nars.nal.meta.Fork;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.op.Derive;
+import nars.nal.op.Conclude;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.api.map.ImmutableMap;
@@ -42,7 +42,7 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
 
     /** derivation handlers; use the array form for fast iteration */
     //private final Set<Derive> derive = Global.newHashSet(1);
-    private final Set<Derive> derive = $.newHashSet(1);
+    private final Set<Conclude> conclude = $.newHashSet(1);
 
 
     int matchFactor;
@@ -87,8 +87,8 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
     }
 
     /** add a derivation handler to be applied after a rule match */
-    public void derive(Derive x) {
-        derive.add(x);
+    public void derive(Conclude x) {
+        conclude.add(x);
     }
 
     public final @NotNull ProcTerm build() {
@@ -97,19 +97,19 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
 
             ProcTerm om;
 
-            switch (derive.size()) {
+            switch (conclude.size()) {
                 case 0:
                     om = null;
                     break;
                 case 1:
-                    om = derive.iterator().next();
+                    om = conclude.iterator().next();
                     break;
                 default:
-                    om = Fork.compile(derive.toArray(new Derive[derive.size()]));
+                    om = Fork.compile(conclude.toArray(new Conclude[conclude.size()]));
                     break;
             }
 
-            matchFactor = derive.size();
+            matchFactor = conclude.size();
 
             this.id = $.the("MatchTerm(" + pid +
                     ((om!=null) ? ",  " + om  : "") + ')');

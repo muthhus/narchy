@@ -9,8 +9,7 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import nars.$;
 import nars.term.Term;
 import nars.truth.Truth;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.*;
+
 
 import java.io.*;
 import java.util.*;
@@ -411,68 +410,68 @@ public class FuzzyOntologyMiner {
         return taxonomy;
     }
 
-    /**
-     * Metodo che, a partire dal vettore dei concetti e dalle tassonomie, crea l'ontologia
-     *
-     * @throws OWLOntologyCreationException
-     * @throws OWLOntologyStorageException
-     * @throws FileNotFoundException
-     **/
-    public void saveOWL2FuzzyOntology(Taxonomy tax, String fileName) throws OWLOntologyCreationException, OWLOntologyStorageException, FileNotFoundException {
-        int i, j;
-        OWLClass s, c;
-        //iteratore dei concetti
-        ArrayList<String> concetti = tax.getConcepts();
-
-        //gestore dell'ontologia
-        OWLOntologyManager m = OWLManager.createOWLOntologyManager();
-        //iri di riferimento per l'ontologia
-        IRI ontIRI = IRI.create("http://www.semanticweb.org/ontologies/concetti");
-        //crea ontologia
-        OWLOntology ont = m.createOntology(ontIRI);
-        //gestore interfaccia per l'ontologia
-        OWLDataFactory factory = m.getOWLDataFactory();
-
-        //Per ogni concetto crea una classe nell'ontologia
-        Map<String, OWLClass> classi = new HashMap<String, OWLClass>();
-        for (String con : concetti) {
-
-            IRI iriClass = IRI.create(ontIRI + "#" + con);
-            OWLClass cl = factory.getOWLClass(iriClass);
-            classi.put(con, cl);
-        }
-
-        for (i = 0; i < concetti.size(); i++) {
-            for (j = 0; j < concetti.size(); j++) {
-                String sub = concetti.get(j);
-                String cls = concetti.get(i);
-                double spec = tax.getSpecificity(sub, cls);
-                if (spec > 0) {
-                    OWLAnnotation fuzzyAnnotation = createFuzzyAnnotation(factory, spec);
-
-                    Set<OWLAnnotation> annotazioni = new HashSet<OWLAnnotation>();
-                    annotazioni.add(fuzzyAnnotation);
-
-                    s = classi.get(sub);
-                    c = classi.get(cls);
-                    OWLAxiom axiom = factory.getOWLSubClassOfAxiom(s, c, annotazioni);
-
-                    AddAxiom add = new AddAxiom(ont, axiom);
-                    m.applyChange(add);
-                }
-            }
-        }
-
-        //salvo l'ontologia su file
-        m.saveOntology(ont, new FileOutputStream(fileName));
-
-    }
-
-    public static OWLAnnotation createFuzzyAnnotation(OWLDataFactory f, double value) {
-        OWLAnnotationProperty fuzzyTag = f.getOWLAnnotationProperty(IRI.create("#fuzzyLabel"));
-        String fuzzyowl2 = "<fuzzyOwl2 fuzzyType=\"axiom\">\n\t<Degree value=\"" + value + "\"/></fuzzyOwl2>";
-        OWLLiteral fuzzyLiteral = f.getOWLLiteral(fuzzyowl2);
-        return f.getOWLAnnotation(fuzzyTag, fuzzyLiteral);
-    }
+//    /**
+//     * Metodo che, a partire dal vettore dei concetti e dalle tassonomie, crea l'ontologia
+//     *
+//     * @throws OWLOntologyCreationException
+//     * @throws OWLOntologyStorageException
+//     * @throws FileNotFoundException
+//     **/
+//    public void saveOWL2FuzzyOntology(Taxonomy tax, String fileName) throws OWLOntologyCreationException, OWLOntologyStorageException, FileNotFoundException {
+//        int i, j;
+//        OWLClass s, c;
+//        //iteratore dei concetti
+//        ArrayList<String> concetti = tax.getConcepts();
+//
+//        //gestore dell'ontologia
+//        OWLOntologyManager m = OWLManager.createOWLOntologyManager();
+//        //iri di riferimento per l'ontologia
+//        IRI ontIRI = IRI.create("http://www.semanticweb.org/ontologies/concetti");
+//        //crea ontologia
+//        OWLOntology ont = m.createOntology(ontIRI);
+//        //gestore interfaccia per l'ontologia
+//        OWLDataFactory factory = m.getOWLDataFactory();
+//
+//        //Per ogni concetto crea una classe nell'ontologia
+//        Map<String, OWLClass> classi = new HashMap<String, OWLClass>();
+//        for (String con : concetti) {
+//
+//            IRI iriClass = IRI.create(ontIRI + "#" + con);
+//            OWLClass cl = factory.getOWLClass(iriClass);
+//            classi.put(con, cl);
+//        }
+//
+//        for (i = 0; i < concetti.size(); i++) {
+//            for (j = 0; j < concetti.size(); j++) {
+//                String sub = concetti.get(j);
+//                String cls = concetti.get(i);
+//                double spec = tax.getSpecificity(sub, cls);
+//                if (spec > 0) {
+//                    OWLAnnotation fuzzyAnnotation = createFuzzyAnnotation(factory, spec);
+//
+//                    Set<OWLAnnotation> annotazioni = new HashSet<OWLAnnotation>();
+//                    annotazioni.add(fuzzyAnnotation);
+//
+//                    s = classi.get(sub);
+//                    c = classi.get(cls);
+//                    OWLAxiom axiom = factory.getOWLSubClassOfAxiom(s, c, annotazioni);
+//
+//                    AddAxiom add = new AddAxiom(ont, axiom);
+//                    m.applyChange(add);
+//                }
+//            }
+//        }
+//
+//        //salvo l'ontologia su file
+//        m.saveOntology(ont, new FileOutputStream(fileName));
+//
+//    }
+//
+//    public static OWLAnnotation createFuzzyAnnotation(OWLDataFactory f, double value) {
+//        OWLAnnotationProperty fuzzyTag = f.getOWLAnnotationProperty(IRI.create("#fuzzyLabel"));
+//        String fuzzyowl2 = "<fuzzyOwl2 fuzzyType=\"axiom\">\n\t<Degree value=\"" + value + "\"/></fuzzyOwl2>";
+//        OWLLiteral fuzzyLiteral = f.getOWLLiteral(fuzzyowl2);
+//        return f.getOWLAnnotation(fuzzyTag, fuzzyLiteral);
+//    }
 
 }

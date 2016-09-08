@@ -2,7 +2,6 @@ package nars.index;
 
 import com.github.benmanes.caffeine.cache.*;
 import nars.NAR;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
@@ -19,8 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-
-import static nars.nal.UtilityFunctions.or;
 
 
 public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
@@ -49,9 +46,10 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         //        float beliefCost = (v instanceof CompoundConcept) ?
 //                    (1f - maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
 //                    0;
-        int c = v.complexity();
 
-        return c;
+        //return v.complexity();
+        return v.volume();
+
         //return Math.round( 1f + 100 * c * beliefCost);
         //return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
     };

@@ -9,8 +9,8 @@ import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import nars.util.FX;
-import nars.vision.ImageContext;
-import nars.vision.ImageCrop;
+import nars.video.ImageContext;
+import nars.video.ImageCrop;
 import org.jfxvnc.net.rfb.render.RenderCallback;
 import org.jfxvnc.net.rfb.render.rect.ImageRect;
 

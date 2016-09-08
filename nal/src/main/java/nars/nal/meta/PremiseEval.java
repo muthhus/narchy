@@ -1,6 +1,9 @@
 package nars.nal.meta;
 
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.nal.Conclusion;
@@ -8,7 +11,7 @@ import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.op.Derive;
+import nars.nal.op.Conclude;
 import nars.nal.op.substitute;
 import nars.term.Compound;
 import nars.term.Term;
@@ -265,7 +268,7 @@ public class PremiseEval extends FindSubst {
             return true;
         } catch (RuntimeException e) {
             if (Param.DEBUG_DERIVER)
-                Derive.logger.warn("{}\n\tderiving {}", e, ((Derive)forEachMatch).rule.source);
+                Conclude.logger.warn("{}\n\tderiving {}", e, ((Conclude)forEachMatch).rule.source);
             return false;
         }
     }

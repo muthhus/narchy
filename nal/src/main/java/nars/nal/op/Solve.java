@@ -15,15 +15,15 @@ abstract public class Solve extends AtomicBoolCondition {
 
     private final transient String id;
 
-    public final Derive derive;
+    public final Conclude conclude;
 
     public final TruthOperator belief;
     public final TruthOperator desire;
 
-    public Solve(String id, Derive derive, TruthOperator belief, TruthOperator desire) {
+    public Solve(String id, Conclude conclude, TruthOperator belief, TruthOperator desire) {
         super();
         this.id = id;
-        this.derive = derive;
+        this.conclude = conclude;
         this.belief = belief;
         this.desire = desire;
     }

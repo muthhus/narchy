@@ -1,4 +1,4 @@
-package nars.vision;
+package nars.video;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTrack;

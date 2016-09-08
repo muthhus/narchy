@@ -4,8 +4,6 @@ import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
 /** versioning context that holds versioned instances */
 public class Versioning extends FasterList<Versioned> {
 

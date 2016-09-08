@@ -1,16 +1,7 @@
 package nars.link;
 
-import com.google.common.base.Objects;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.RawBudget;
-import nars.budget.UnitBudget;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static nars.util.Util.clamp;
 
 /**
  * Created by me on 5/29/16.

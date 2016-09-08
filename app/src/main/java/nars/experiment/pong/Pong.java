@@ -25,8 +25,8 @@ import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.SensorConcept;
-import nars.vision.NARCamera;
-import nars.vision.SwingCamera;
+import nars.video.NARCamera;
+import nars.video.SwingCamera;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
 

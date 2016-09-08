@@ -6,8 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static nars.util.Util.clamp;
-
 /**
  * Buffered/Budgeted Link (an entry in a bag)
  * equalsTo/hashCode proxies to the wrapped element, X id
