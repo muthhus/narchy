@@ -18,7 +18,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static nars.util.Util.clamp;
 import static nars.util.data.map.nbhm.HijacKache.*;
 
 /**
@@ -47,7 +46,7 @@ public class HijackBag<X> implements Bag<X> {
      * the fraction of capacity which must contain entries to exceed in order to apply forgetting.
      * this is somewhat analogous to hashmap load factor
      */
-    private static final float FORGET_CAPACITY_THRESHOLD = 0.9f;
+    private static final float FORGET_CAPACITY_THRESHOLD = 1f;
 
 
     @Deprecated public HijackBag(int capacity, int reprobes, Random random) {
@@ -377,10 +376,15 @@ public class HijackBag<X> implements Bag<X> {
 
             //slight chance these values may be inconsistently paired. TODO use CAS double-checked access
             Object k = data[m];
-            Object v = data[m + 1];
-
-            if (k != null && v != null) {
-                action.accept(a.set((X) k, (float[]) v));
+            if (k!=null) {
+                Object v = data[m + 1];
+                if (v != null) {
+                    float[] b = (float[]) v;
+                    float p = b[0];
+                    if (p == p) /* NaN */ {
+                        action.accept(a.set((X) k, b));
+                    }
+                }
             }
         }
     }
@@ -471,22 +475,20 @@ public class HijackBag<X> implements Bag<X> {
             count[0]++;
         });
 
+
         this.priMin = min[0];
         this.priMax = max[0];
         this.count = count[0];
 
+        float existingMass = mass[0];
+
         Forget f;
-        if (mass[0] > 0 && (count[0] >= cap * FORGET_CAPACITY_THRESHOLD)) {
+        if (existingMass > 0 && pressure > 0 && (count[0] >= cap * FORGET_CAPACITY_THRESHOLD)) {
             float p = this.pressure;
             this.pressure = 0;
 
-            float forgetRate = clamp(p / (p + mass[0]));
+            f = Forget.forget(p, existingMass, cap, 0.5f);
 
-            if (forgetRate > Param.BUDGET_EPSILON) {
-                f = new Forget(forgetRate);
-            } else {
-                f = null;
-            }
         } else {
             f = null;
             this.pressure = 0;

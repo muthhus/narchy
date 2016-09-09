@@ -1,7 +1,10 @@
 package nars.budget;
 
+import nars.Param;
 import nars.link.BLink;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -9,12 +12,40 @@ import java.util.function.Consumer;
  * Created by me on 9/4/16.
  */
 public final class Forget implements Consumer<BLink> {
+
+    //TODO document and move to Param.java
+    public static final float BAG_THRESHOLD = 0.25f;
+
     public final float r;
 
     static final float maxEffectiveDurability = 1f;
 
     public Forget(float r) {
         this.r = r;
+    }
+
+    /**
+     existingMass - (existingMass * forgetRate) + pressure <= (capacity * avgMass)
+        avgMass = 0.5 (estimate)
+
+     forgetRate ~= -((capacity * avgMass) - pressure - existingMass) / existingMass
+     */
+    @Nullable
+    public static Forget forget(float pressure, float existingMass, int cap, float expectedAvgMass) {
+
+        float r = -((cap * expectedAvgMass) - pressure - existingMass) / existingMass;
+
+        Forget f;
+        if (r >= Param.BUDGET_EPSILON)
+            f = new Forget(Util.clamp(r));
+        else
+            f = null;
+        return f;
+    }
+
+    @Nullable
+    public static Forget forget(float pressure, float existingMass, int cap) {
+        return forget(pressure, existingMass, cap, BAG_THRESHOLD);
     }
 
     @Override

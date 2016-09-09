@@ -64,9 +64,9 @@ public class Tetris extends NAgent {
 
     public static final int runFrames = 55000;
     public static final int cyclesPerFrame = 6;
-    public static final int tetris_width = 6;
-    public static final int tetris_height = 13;
-    public static final int TIME_PER_FALL = 3;
+    public static final int tetris_width = 8;
+    public static final int tetris_height = 16;
+    public static final int TIME_PER_FALL = 6;
     static boolean easy;
 
     static int frameDelay;
@@ -227,6 +227,7 @@ public class Tetris extends NAgent {
                 t.freq(), t.conf() //HACK this parameters sux
         );
     }
+
     private void inputBlock(int x, int y, float v, boolean horizontal) {
 
         Truth t = $.t(v>0 ? 1f : 0f,
@@ -280,6 +281,8 @@ public class Tetris extends NAgent {
 
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
+        float actionThresholdHigher = 1f - actionMargin/1.5f;
+        float actionThresholdLower = actionMargin/1.5f;
 
 
         actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b,d)->{
@@ -306,12 +309,12 @@ public class Tetris extends NAgent {
             actions.add(motorRotate = new MotorConcept("(rotate)", nar, (b,d)->{
                 if (d!=null) {
                     float r = d.freq();
-                    if (r > actionThresholdHigh) {
+                    if (r > actionThresholdHigher) {
                         if (state.take_action(CW))
                             //return d; //legal move
                             //return d.withConf(gamma);
                             return $.t(1, gamma);
-                    } else if (r < actionThresholdLow) {
+                    } else if (r < actionThresholdLower) {
                         if (state.take_action(CCW))
                             //return d; //legal move
                             //return d.withConf(gamma);
@@ -368,9 +371,9 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        Executioner e = Tetris.exe2;
+        Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                64, 2, 2, rng,
+                64, 3, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 32768, 3),
                 new FrameClock(), e
@@ -382,16 +385,16 @@ public class Tetris extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-        float p = 0.05f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.2f*p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f*p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.1f*p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.1f*p;
+        float p = 0.1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.7f*p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.2f*p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f*p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.03f);
+        nar.confMin.setValue(0.04f);
 
-        nar.compoundVolumeMax.setValue(30);
+        nar.compoundVolumeMax.setValue(22);
 
         //nar.truthResolution.setValue(0.02f);
 

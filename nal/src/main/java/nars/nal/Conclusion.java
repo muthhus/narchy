@@ -3,6 +3,7 @@ package nars.nal;
 import nars.Task;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * Effectively a 'compiled Premise evaluation' which contains certain invariant characteristics
@@ -31,11 +32,11 @@ import java.util.Collection;
  */
 public class Conclusion {
 
-    public Conclusion(Collection<Task> target) {
+    public Conclusion(Consumer<Task> target) {
         this.derive = target;
     }
 
-    public final Collection<Task> derive;
+    public final Consumer<Task> derive;
 
 //    /** the termutators which can be evaluated to generate all possible permutations. */
 //    public List<Termutator> termutators = null;

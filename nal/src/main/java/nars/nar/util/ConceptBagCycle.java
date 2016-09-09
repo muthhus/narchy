@@ -138,7 +138,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
                 if (c != null) {
                     new FireConcept(c, nar,
                             taskLinks, termLinks,
-                            new LinkedHashSet<>( 2 * (taskLinks*termLinks) /* estimate */ ))
+                            nar::inputLater)
 
                         /*@Override
                         public void accept(Premise p) {
@@ -176,7 +176,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
         private final TrieDeriver deriver;
         private int count;
 
-        public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks, Collection<Task> batch) {
+        public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks, Consumer<Task> batch) {
             super(batch);
             this.c = c;
             this.nar = nar;
@@ -200,9 +200,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
                         tasklinks,
                         termlinks
                 );
-
-                if (!derive.isEmpty())
-                    nar.inputLater(derive);
 
             } catch (Exception e) {
 

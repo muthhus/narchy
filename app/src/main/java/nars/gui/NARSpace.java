@@ -45,7 +45,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 16, 32);
+        newConceptWindow(n, 64, 32);
 
         //n.run(20); //headstart
 
@@ -62,7 +62,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 .log()
                 //.logSummaryGT(System.out, 0.05f)
                 .input(
-                        "((parent($X,$Y) && parent($Y,$Z)) ==> grandparent($X,$Z)).",
+                        "((parent($X,$Y) && parent($Y,$Z)) <=> grandparent($X,$Z)).",
                         "parent(c, p).",
                         "parent(p, g).",
                         "grandparent(p, #g)?"

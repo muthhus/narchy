@@ -199,7 +199,7 @@ public final class Conclude extends AtomicStringConstant implements ProcTerm {
 
         DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
         if (d != null)
-            m.conclusion.derive.add(d);
+            m.conclusion.derive.accept(d);
 
     }
 
