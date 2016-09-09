@@ -30,10 +30,7 @@ import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.util.ImmModeSink;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
-import spacegraph.math.AxisAngle4f;
-import spacegraph.math.Matrix3f;
-import spacegraph.math.Matrix4f;
-import spacegraph.math.v3;
+import spacegraph.math.*;
 import spacegraph.phys.collision.broad.BroadphaseNativeType;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
@@ -512,21 +509,25 @@ public enum Draw {
         gl.glPopMatrix();
     }
 
-    static final float[] tmpV = new float[3];
+//    static final float[] tmpV = new float[3];
     static final v3 ww = new v3();
     static final v3 vv = new v3();
-    static final Quaternion tmpQ = new Quaternion();
-    static final Matrix4f tmpM4 = new Matrix4f();
-    static final Matrix3f tmpM3 = new Matrix3f();
+    static final Quat4f tmpQ = new Quat4f();
+//    static final Matrix4f tmpM4 = new Matrix4f();
+//    static final Matrix3f tmpM3 = new Matrix3f();
     static final AxisAngle4f tmpA = new AxisAngle4f();
 
     static public void renderHalfTriEdge(GL2 gl, SimpleSpatial src, EDraw e, float width) {
         SimpleSpatial tgt = e.target;
 
-        gl.glPushMatrix();
 
-        src.transform().toAngleAxis(tmpQ, tmpA, ww);
-        ww.normalize(); //used for the normal3f below
+        src.transform().getRotation(tmpQ);
+
+        ww.set(0,0,1);
+        tmpQ.rotateVector(ww, ww);
+
+        //ww.normalize();
+
         float sx = src.x();
         float tx = tgt.x();
         float dx = tx - sx;
@@ -537,19 +538,21 @@ public enum Draw {
         float tz = tgt.z();
         float dz = tz - sz;
 
+
         vv.set(dx,dy,dz);
-        vv.cross(ww, vv);
+
+        vv.cross(vv, ww);
         vv.normalize();
         vv.scale(width);
 
-
+        gl.glPushMatrix();
         gl.glBegin(GL2.GL_TRIANGLES);
 
-
+        gl.glNormal3f(ww.x, ww.y, ww.z);
         gl.glVertex3f(sx+ vv.x, sy+ vv.y, sz+ vv.z); //right base
         gl.glVertex3f( //right base
-                //sx+-vv.x, sy+-vv.y, sz+-vv.z
-                sx, sy, sz
+                sx+-vv.x, sy+-vv.y, sz+-vv.z //full triangle
+                //sx, sy, sz  //half triangle
         );
         gl.glVertex3f(tx, ty, tz); //right base
         gl.glEnd();

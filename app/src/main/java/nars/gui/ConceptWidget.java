@@ -3,6 +3,8 @@ package nars.gui;
 import com.jogamp.opengl.GL2;
 import nars.NAR;
 import nars.Task;
+import nars.bag.Bag;
+import nars.concept.Concept;
 import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
@@ -12,6 +14,8 @@ import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.phys.Dynamic;
 import spacegraph.render.Draw;
+
+import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
 
@@ -98,10 +102,8 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         Draw.hsb( (tt.op().ordinal()/16f), 0.75f, 0.75f  , 0.25f + 0.5f * p, shapeColor);
 
-//        Concept cc = nar.concept(tt);
-//        if (cc == null) {
-//            //remove? hide?
-//        }
+
+
 //            float lastConceptForget = instance.getLastForgetTime();
 //            if (lastConceptForget != lastConceptForget)
 //                lastConceptForget = now;
@@ -119,11 +121,20 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         //lag = now - lastConceptForget;
         //float act = 1f / (1f + (timeSinceLastUpdate/3f));
 
-//        clearEdges();
-//        int maxEdges = edges.length;
-//
-//        Predicate<BLink<? extends Termed>> linkAdder = l -> addLink(s, l);
-//        tasklinks.topWhile(linkAdder, maxEdges / 2);
+//        Concept cc = nar.concept(tt);
+//        if (cc != null) {
+//            //remove? hide?
+//    //        clearEdges();
+//            int maxEdges = edges.length;
+//    //
+//            Consumer<BLink<? extends Termed>> linkAdder = l -> {
+//                if (numEdges < maxEdges)
+//                    addLink(s, l);
+//            };
+//            @NotNull Bag<Task> tasklinks = cc.tasklinks();
+//            tasklinks.forEach(linkAdder);
+//        }
+        //tasklinks.topWhile(linkAdder, maxEdges - edgeCount()); //fill remaining edges
 //        termlinks.topWhile(linkAdder, maxEdges - edgeCount()); //fill remaining edges
 
     }
@@ -154,8 +165,8 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         float qua = l.qua();
 
         //width relative to the radius of the atom
-        float minLineWidth = 0.5f;
-        float maxLineWidth = 0.75f;
+        float minLineWidth = 0.15f;
+        float maxLineWidth = 0.5f;
         float width = minLineWidth + (maxLineWidth - minLineWidth) * pri;
 
         float r, g, b;

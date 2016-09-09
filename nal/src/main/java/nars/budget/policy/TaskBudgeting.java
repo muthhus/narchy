@@ -71,7 +71,7 @@ public class TaskBudgeting {
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 pp.pri()
-                    //* volRatioScale
+                    * volRatioScale //priority should be reduced as well as durability, because in the time between here and the next forgetting it should not have similar priority as parent in cases like Belief:Identity truth function derivations
                     * qual
         ;
         //if (priority * durability < Param.BUDGET_EPSILON)

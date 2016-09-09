@@ -286,6 +286,8 @@ public class AxisAngle4f implements java.io.Serializable, Cloneable {
 
             if (angle)
                 this.angle = 2.0f * (float) (Math.atan2(mag, q1.getW()));
+            else
+                this.angle = 0;
         } else {
             x = 0.0f;
             y = 1.0f;

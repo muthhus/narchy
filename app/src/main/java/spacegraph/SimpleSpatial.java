@@ -44,8 +44,12 @@ public class SimpleSpatial<X> extends Spatial<X> {
         shapeColor = new float[] { 0.5f, 0.5f, 0.5f, 0.9f };
         this.shape = newShape();
 
-        this.label = key!=null ? key.toString() : super.toString();
+        this.label = label(x);
 
+    }
+
+    protected String label(X x) {
+        return x!=null ? x.toString() : super.toString();
     }
 
     public Dynamic body;

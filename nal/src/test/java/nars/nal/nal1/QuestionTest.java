@@ -112,21 +112,22 @@ public class QuestionTest {
 
     }
 
-    @Test public void testSaneBudgeting() {
-        Param.DEBUG = true;
-        String c = "((parent($X,$Y) && parent($Y,$Z)) ==> grandparent($X,$Z))";
-        new Default(1000, 8, 1, 3)
-            .logSummaryGT(System.out, 0.1f)
-            .eachFrame(nn->{
-                Concept cc = nn.concept(c);
-                if (cc!=null) {
-                    cc.print();
-                }
-            })
-            .input(c + ".", "")
-            .run(100);
+//    @Test public void testSaneBudgeting() {
+//        Param.DEBUG = true;
+//        String c = "((parent($X,$Y) && parent($Y,$Z)) ==> grandparent($X,$Z))";
+//        new Default(1000, 8, 1, 3)
+//            .logSummaryGT(System.out, 0.1f)
+//            .eachFrame(nn->{
+//                Concept cc = nn.concept(c);
+//                if (cc!=null) {
+//                    cc.print(System.out, false, false, true, false);
+//                }
+//            })
+//            .input(c + ".", "")
+//            .run(100);
+//
+//    }
 
-    }
 //    @Test public void testPrologLike1() {
 //        Param.DEBUG = true;
 //        new Default(1000, 8, 1, 3)

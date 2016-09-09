@@ -29,6 +29,9 @@ import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
 
+import static spacegraph.phys.math.VectorUtil.coord;
+import static spacegraph.phys.math.VectorUtil.setCoord;
+
 /**
  * Utility functions for matrices.
  * 
@@ -209,12 +212,12 @@ public class MatrixUtil {
 
 		if (trace > 0f) {
 			float s = (float) Math.sqrt(trace + 1f);
-			setQuat(q, 3, s * 0.5f);
+			q.setW(s * 0.5f);
 			s = 0.5f / s;
 
-			setQuat(q, 0, ((mat.m21 - mat.m12) * s) );
-			setQuat(q, 1, ((mat.m02 - mat.m20) * s) );
-			setQuat(q, 2, ((mat.m10 - mat.m01) * s) );
+			q.setX(((mat.m21 - mat.m12) * s) );
+			q.setY(((mat.m02 - mat.m20) * s) );
+			q.setZ(((mat.m10 - mat.m01) * s) );
 		}
 		else {
 			int i = mat.m00 < mat.m11 ? (mat.m11 < mat.m22 ? 2 : 1) : (mat.m00 < mat.m22 ? 2 : 0);
@@ -341,10 +344,10 @@ public class MatrixUtil {
 			for (int i=0; i<3; i++) {
 				rot.getRow(i, row);
 
-				mrp = VectorUtil.coord(row, p);
-				mrq = VectorUtil.coord(row, q);
-				VectorUtil.setCoord(row, p, cos * mrp - sin * mrq);
-				VectorUtil.setCoord(row, q, cos * mrq + sin * mrp);
+				mrp = coord(row, p);
+				mrq = coord(row, q);
+				setCoord(row, p, cos * mrp - sin * mrq);
+				setCoord(row, q, cos * mrq + sin * mrp);
 				rot.setRow(i, row);
 			}
 		}

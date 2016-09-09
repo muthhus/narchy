@@ -32,7 +32,7 @@ public abstract class Param /*extends Container*/ implements Level {
      * Must be >=1.0, usually 1 .. 2
      */
     public static final float HORIZON = 1f;
-    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 12;
+    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
@@ -45,10 +45,10 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final boolean BACKWARD_QUESTION_RULES = true;
 
     /** factor applied to budgeting backward question derivations */
-    public static final float BACKWARD_DERIVATION_FACTOR = 0.1f;
+    public static final float BACKWARD_DERIVATION_FACTOR = 1f;
 
     /** used in linear interpolating link adjustments during feedback */
-    public final MutableFloat linkFeedbackRate = new MutableFloat(0.25f);
+    public final MutableFloat linkFeedbackRate = new MutableFloat(0.05f);
 
     /**
      * hard upper-bound limit on Compound term complexity;
@@ -62,11 +62,12 @@ public abstract class Param /*extends Container*/ implements Level {
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
     public final static int UnificationStackMax = 48;
+
     /**
      * max # of chained termutes which can be active
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationTermutesMax = 8;
+    public final static int UnificationTermutesMax = 4;
     /**
      * swap task and belief in eligible rules ("forward" permutation)
      */
@@ -86,7 +87,6 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     public static int DEFAULT_NAL_LEVEL = 8;
-    public static boolean EXIT_ON_EXCEPTION = true;
 
     /**
      * use this for advanced error checking, at the expense of lower performance.

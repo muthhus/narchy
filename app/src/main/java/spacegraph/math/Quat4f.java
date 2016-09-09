@@ -31,6 +31,9 @@
 
 package spacegraph.math;
 
+import com.jogamp.opengl.math.FloatUtil;
+import com.jogamp.opengl.math.VectorUtil;
+
 /**
  * A 4 element unit quaternion represented by single precision floating
  * point x,y,z,w coordinates.  The quaternion is always normalized.
@@ -693,6 +696,44 @@ public class Quat4f extends Tuple4f implements java.io.Serializable {
         q.setAngle(ax, ay, az, angle);
         return q;
     }
+
+    public final v3 rotateVector(final v3 vecIn, final v3 vecOut) {
+//        if ( VectorUtil.isVec3Zero(vecIn, vecInOffset, FloatUtil.EPSILON) ) {
+//            vecOut.set(0,0, 0);
+//        } else {
+            final float vecX = vecIn.x; //vecIn[0+vecInOffset];
+            final float vecY = vecIn.y; //vecIn[1+vecInOffset];
+            final float vecZ = vecIn.z; //vecIn[2+vecInOffset];
+            final float x_x = x*x;
+            final float y_y = y*y;
+            final float z_z = z*z;
+            final float w_w = w*w;
+
+            float ox =   w_w * vecX
+                    + x_x * vecX
+                    - z_z * vecX
+                    - y_y * vecX
+                    + 2f * ( y*w*vecZ - z*w*vecY + y*x*vecY + z*x*vecZ );
+            ;
+
+            float oy =  y_y * vecY
+                    - z_z * vecY
+                    + w_w * vecY
+                    - x_x * vecY
+                    + 2f * ( x*y*vecX + z*y*vecZ + w*z*vecX - x*w*vecZ );
+            ;
+
+            float oz =   z_z * vecZ
+                    - y_y * vecZ
+                    - x_x * vecZ
+                    + w_w * vecZ
+                    + 2f * ( x*z*vecX + y*z*vecY - w*y*vecX + w*x*vecY );
+            ;
+        vecOut.set(ox, oy, oz);
+        return vecOut;
+
+    }
+
 }
 
 

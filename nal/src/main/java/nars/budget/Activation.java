@@ -216,13 +216,11 @@ public class Activation {
         }
 
         if (!target.term().equals( source.term() )) {
-            //            throw new RuntimeException("termlink self-loop");
-
 
             //        /* insert termlink target to source */
             boolean alsoReverse = true;
             if (targetConcept != null && alsoReverse) {
-                subScale /= 2; //divide among both directions
+                //subScale /= 2; //divide among both directions?
 
                 targetConcept.termlinks().put(source.term(), in, subScale, linkOverflow);
             }

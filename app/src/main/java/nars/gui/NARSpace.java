@@ -6,27 +6,29 @@ import nars.NAR;
 import nars.Param;
 import nars.bag.Bag;
 import nars.concept.Concept;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
-import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
-import spacegraph.layout.Flatten;
-import spacegraph.phys.Dynamic;
-import spacegraph.phys.shape.SphereShape;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 
 /**
  * thread-safe visualization of capacity-bound NAR data buffers
  */
 public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
+
+    public static final @NotNull Atom L = $.the("_l");
 
     private final TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect;
     private On on;
@@ -35,7 +37,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(128, 1, 1, 2 );
+        Default n = new Default(256, 3, 5, 7 );
         //n.nal(4);
 
 
@@ -43,7 +45,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 128, 0);
+        newConceptWindow(n, 16, 32);
 
         //n.run(20); //headstart
 
@@ -60,14 +62,14 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 .log()
                 //.logSummaryGT(System.out, 0.05f)
                 .input(
-                        "((parent($X,$Y) && parent($Y,$Z)) ==> grandparent($X,$Z))."
-//                        "parent(c, p).",
-//                        "parent(p, g).",
-//                        "grandparent(p, #g)?"
+                        "((parent($X,$Y) && parent($Y,$Z)) ==> grandparent($X,$Z)).",
+                        "parent(c, p).",
+                        "parent(p, g).",
+                        "grandparent(p, #g)?"
                 );
                 //.run(800);
 
-        n.loop(1.5f);
+        n.loop(15f);
 
     }
 
@@ -84,58 +86,36 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 //Concept Core
                 Concept concept = b.get();
 
-                ConceptWidget core = space.update(concept.term(),
+                ConceptWidget root = space.update(concept.term(),
                         t -> new ConceptWidget(t, maxEdges, nar));
 
-                core.pri = b.priIfFiniteElseZero();
-                target.add(core);
+                float bPri = root.pri = b.priIfFiniteElseZero();
+                target.add(root);
 
+                Term tlSrc = concept.term();
+
+
+                Consumer<BLink<? extends Termed>> linkAdder = l -> {
+                    if (root.numEdges < maxEdges)
+                        root.addLink(space, l);
+                };
+                concept.tasklinks().forEach(linkAdder);
 
                 concept.termlinks().forEach(bt -> {
 
-                    Term tlSrc = concept.term();
                     final Term tlTarget = bt.get();
                     if (tlTarget.equals(tlSrc))
                         return; //no self loop
 
-                    SimpleSpatial targetSpatial = (SimpleSpatial) space.getIfActive(tlTarget);
-                    if (targetSpatial==null)
-                        return;
-
-                    @NotNull Compound vTerm = $.p($.the("termlink"), $.p(tlSrc, tlTarget));
-
-                    ConceptWidget termLink = space.update(vTerm,
-                            t -> new ConceptWidget(t, 2, nar) {
-
-                                @Override
-                                public Dynamic newBody(boolean collidesWithOthersLikeThis) {
-                                    shape = new SphereShape(.5f);
-                                    Dynamic bb = super.newBody(collidesWithOthersLikeThis);
-                                    return bb;
-                                }
-
-                                @Override
-                                public void update(SpaceGraph<Term> s) {
-                                    super.update(s);
-
-                                    clearEdges();
-
-
-                                        EDraw in = addEdge(bt, core, false);
-                                        in.attraction = 2f;
-
-                                        EDraw out = addEdge(bt, targetSpatial, false);
-                                        //out.attraction = 1f;
-
-
-                                    //nothing
-                                }
-                            });
-
-                    termLink.pri = bt.priIfFiniteElseZero();
-
-                    target.add(termLink);
+                    ConceptWidget termLink = newLinkWidget(nar, space, root, tlSrc, tlTarget, bt, false);
+                    if (termLink!=null) {
+                        termLink.pri = bt.pri() * bPri; //scale by its Concept's priority
+                        target.add(termLink);
+                    }
                 });
+
+
+
 
                 return true;
 
@@ -157,7 +137,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                                });
 //                            }
 //                        }
-                        new Flatten()
+//                        new Flatten()
 //                        //new Spiral()
 //                        //new FastOrganicLayout()
                 )
@@ -168,6 +148,56 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
 
         return s.show(1300, 900);
+    }
+
+    public static ConceptWidget newLinkWidget(final NAR nar, SpaceGraph<Term> space, final ConceptWidget core, Term tlSrc, Term tlTarget, BLink bt, boolean task) {
+
+
+
+        @NotNull Compound vTerm = $.p(L, tlSrc, tlTarget);
+        SimpleSpatial targetSpatial = (SimpleSpatial) space.getIfActive(tlTarget);
+        if (targetSpatial!=null) {
+            ConceptWidget termLink = space.update(vTerm,
+                    t -> new ConceptWidget(t, 2, nar) {
+
+                        //                                @Override
+//                                public Dynamic newBody(boolean collidesWithOthersLikeThis) {
+//                                    shape = new SphereShape(.5f);
+//                                    Dynamic bb = super.newBody(collidesWithOthersLikeThis);
+//                                    return bb;
+//                                }
+
+
+                        @Override
+                        protected String label(Term term) {
+                            return "";
+                        }
+
+                        @Override
+                        public void update(SpaceGraph<Term> s) {
+                            super.update(s);
+
+                            clearEdges();
+
+
+                            EDraw in = addEdge(bt, core, task);
+                            in.attraction = 2.5f;
+
+
+                            EDraw out = addEdge(bt, targetSpatial, task);
+                            out.attraction = 1f + (0.5f * bt.priIfFiniteElseZero());
+
+
+                        }
+                    });
+            if (termLink!=null) {
+                termLink.pri = bt.priIfFiniteElseZero();
+            }
+            return termLink;
+        }
+
+        return null;
+
     }
 
 

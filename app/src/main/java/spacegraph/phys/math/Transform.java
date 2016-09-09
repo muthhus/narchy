@@ -208,8 +208,7 @@ public final class Transform extends v3 {
 	}
 
 	public final AxisAngle4f toAngleAxis(Quaternion tmpQ, AxisAngle4f tmpA, v3 angle) {
-		getRotation(tmpQ);
-		tmpA.set(tmpQ, false);
+		tmpA.set(getRotation(tmpQ), false);
 		tmpA.get(angle);
 		return tmpA;
 	}
