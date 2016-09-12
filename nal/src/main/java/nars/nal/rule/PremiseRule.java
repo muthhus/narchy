@@ -281,7 +281,9 @@ public class PremiseRule extends GenericCompound {
 
         put(SubTermStructure.class, 12);
 
+        put(TermNotEquals.class, 11);
 
+        put(Solve.class, 10);
 
 
 
@@ -293,7 +295,6 @@ public class PremiseRule extends GenericCompound {
 //        put(BeliefPositive.class, 7);
 
 
-        put(Solve.class, 5);
 
 
 //        put(SubTermOp.class, 10);
@@ -314,6 +315,8 @@ public class PremiseRule extends GenericCompound {
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
         if (b == TaskPunctuation.NotQuestion) return TaskPunctuation.class;
         if (b == TaskPunctuation.Question) return TaskPunctuation.class;
+
+        if (b instanceof TermNotEquals) return TermNotEquals.class;
         //if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
         //if (b == TaskPunctuation.NotBelief) return TaskPunctuation.class;
 
