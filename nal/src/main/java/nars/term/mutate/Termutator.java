@@ -1,4 +1,4 @@
-package nars.term.subst.choice;
+package nars.term.mutate;
 
 import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;

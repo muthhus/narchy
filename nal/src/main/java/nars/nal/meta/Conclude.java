@@ -1,4 +1,4 @@
-package nars.nal.op;
+package nars.nal.meta;
 
 import com.google.common.base.Joiner;
 import nars.NAR;
@@ -8,8 +8,6 @@ import nars.Task;
 import nars.budget.Budget;
 import nars.concept.TruthDelta;
 import nars.nal.Premise;
-import nars.nal.meta.PremiseEval;
-import nars.nal.meta.ProcTerm;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
 import nars.term.Compound;

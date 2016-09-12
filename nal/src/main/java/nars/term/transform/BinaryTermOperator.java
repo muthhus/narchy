@@ -1,7 +1,8 @@
-package nars.nal.op;
+package nars.term.transform;
 
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.transform.TermTransform;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,7 +19,7 @@ public abstract class BinaryTermOperator implements TermTransform {
     @NotNull
     @Override public final Term function(@NotNull Compound x) {
         if (x.size()!=2)
-            return null;
+            throw new UnsupportedOperationException("# args must equal 2");
 
         return apply(x.term(0), x.term(1));
     }

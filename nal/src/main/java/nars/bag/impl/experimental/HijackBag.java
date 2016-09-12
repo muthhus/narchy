@@ -508,11 +508,11 @@ public class HijackBag<X> implements Bag<X> {
 
 
     @Override
-    public X boost(Object key, float boost) {
+    public X boost(Object key, float factor) {
         BLink<X> b = get(key);
         if (b != null && !b.isDeleted()) {
             float before = b.pri();
-            b.priMult(boost);
+            b.priMult(factor);
             float after = range(b.pri());
             pressure += (after - before);
             return b.get();

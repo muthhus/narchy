@@ -557,7 +557,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     }
 
 
-    /** gets the link if present, applies a scale factor boost, and returns the link */
-    V boost(Object key, float boost);
+    /** gets the link if present, applies a priority multiplier factor, and returns the link */
+    V boost(Object key, float factor);
 
 }

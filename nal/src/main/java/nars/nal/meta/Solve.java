@@ -1,9 +1,7 @@
-package nars.nal.op;
+package nars.nal.meta;
 
 import nars.Op;
 import nars.Symbols;
-import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.PremiseEval;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;

@@ -394,7 +394,7 @@ public class Tetris extends NAgent {
 
         nar.confMin.setValue(0.04f);
 
-        nar.compoundVolumeMax.setValue(22);
+        nar.compoundVolumeMax.setValue(32);
 
         //nar.truthResolution.setValue(0.02f);
 

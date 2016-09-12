@@ -6,7 +6,7 @@ import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
-import nars.nal.op.TermTransform;
+import nars.term.transform.TermTransform;
 import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.atom.Operator;

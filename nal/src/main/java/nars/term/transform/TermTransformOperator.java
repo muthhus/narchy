@@ -1,4 +1,4 @@
-package nars.nal.op;
+package nars.term.transform;
 
 import nars.Op;
 import nars.term.atom.AtomicStringConstant;

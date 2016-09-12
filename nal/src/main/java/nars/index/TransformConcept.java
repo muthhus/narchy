@@ -3,7 +3,7 @@ package nars.index;
 import nars.$;
 import nars.bag.Bag;
 import nars.concept.AtomConcept;
-import nars.nal.op.TermTransform;
+import nars.term.transform.TermTransform;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;

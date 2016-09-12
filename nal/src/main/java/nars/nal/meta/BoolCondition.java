@@ -11,7 +11,7 @@ import static nars.Op.ATOM;
 public interface BoolCondition extends /*, BooleanFunction<PremiseEval>*/ ProcTerm {
 
 
-    boolean booleanValueOf(PremiseEval var1);
+    boolean booleanValueOf(PremiseEval p);
 
     @NotNull
     @Override

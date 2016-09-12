@@ -6,7 +6,7 @@ import nars.nal.meta.Fork;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.op.Conclude;
+import nars.nal.meta.Conclude;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.api.map.ImmutableMap;

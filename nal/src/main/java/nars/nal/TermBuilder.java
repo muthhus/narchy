@@ -4,7 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.nal.meta.match.Ellipsislike;
-import nars.nal.op.TermTransform;
+import nars.term.transform.TermTransform;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;

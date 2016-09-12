@@ -59,13 +59,16 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         Param.DEBUG = true;
         n
-                .log()
+                //.log()
                 //.logSummaryGT(System.out, 0.05f)
                 .input(
-                        "((parent($X,$Y) && parent($Y,$Z)) <=> grandparent($X,$Z)).",
-                        "parent(c, p).",
-                        "parent(p, g).",
-                        "grandparent(p, #g)?"
+//                        "((parent($X,$Y) && parent($Y,$Z)) <=> grandparent($X,$Z)).",
+//                        "parent(c, p).",
+//                        "parent(p, g).",
+//                        "grandparent(p, #g)?"
+                        "a:b.",
+                        "b:c.",
+                        "c:d."
                 );
                 //.run(800);
 

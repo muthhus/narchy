@@ -1,4 +1,4 @@
-package nars.nal.op;
+package nars.term.transform;
 
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;

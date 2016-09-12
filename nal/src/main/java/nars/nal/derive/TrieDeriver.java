@@ -7,7 +7,7 @@ import nars.nal.Deriver;
 import nars.nal.meta.*;
 import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.nal.meta.op.MatchTermPrototype;
-import nars.nal.op.Conclude;
+import nars.nal.meta.Conclude;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
 import nars.term.Term;
@@ -83,7 +83,9 @@ public class TrieDeriver extends Deriver {
         @NotNull List<ProcTerm> bb = subtree(trie.trie.root);
         this.roots = bb.toArray(new ProcTerm[bb.size()]);
 
-        build();
+        for (int i = 0; i < roots.length; i++) {
+            roots[i] = build(roots[i]);
+        }
 
         /*
         for (ProcTerm<PremiseMatch> p : roots) {
@@ -196,15 +198,6 @@ public class TrieDeriver extends Deriver {
             print(p, out, 2);
 
         out.println("}");
-    }
-
-    /**
-     * late binding procedures to finalize the built trie deriver
-     */
-    protected void build() {
-        for (int i = 0; i < roots.length; i++) {
-            roots[i] = build(roots[i]);
-        }
     }
 
     /** final processing step before finalized usable form */

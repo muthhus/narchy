@@ -1,4 +1,4 @@
-package nars.term.subst.choice;
+package nars.term.mutate;
 
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;

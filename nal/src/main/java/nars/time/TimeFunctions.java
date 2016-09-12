@@ -5,11 +5,13 @@ import nars.Op;
 import nars.Task;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
-import nars.nal.op.Conclude;
+import nars.nal.meta.Conclude;
 import nars.nal.rule.PremiseRule;
 import nars.term.*;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.nal.meta.PremiseEval.chooseByConf;
 
 /**
  * Strategies for solving temporal components of a derivation
@@ -545,12 +547,13 @@ public interface TimeFunctions {
 
             if (belief != null && task.isBeliefOrGoal() && belief.isBeliefOrGoal()) {
                 //blend task and belief's DT's weighted by their relative confidence
-                float taskConf = task.confWeight();
+                /*float taskConf = task.confWeight();
                 eventDelta = Math.round(Util.lerp(
                         taskDT,
                         beliefDT,
                         taskConf / (taskConf + belief.confWeight())
-                ));
+                ));*/
+                eventDelta = chooseByConf(task, belief, p).dt();
 //
 //                //reduce confidence by the total change proportion
 //                confScale[0] = eventDelta / (Math.abs(eventDelta-taskDT) + Math.abs(eventDelta-beliefDT)
@@ -576,19 +579,21 @@ public interface TimeFunctions {
     };
 
     TimeFunctions occMerge= (derived, p, d, occReturn, confScale) -> {
-        long taskOcc = p.task.occurrence();
-        long beliefOcc = p.belief.occurrence();
-        if (taskOcc == Tense.ETERNAL) {
-            occReturn[0] = beliefOcc;
-        } else if (beliefOcc == Tense.ETERNAL) {
-            occReturn[0] = taskOcc;
-        } else {
-            //merge in proportion to their conf
-            double tConf = p.task.confWeight();
-            double bConf = p.belief.confWeight();
-            double newOcc = Util.lerp(taskOcc, beliefOcc, tConf / (bConf + tConf));
-            occReturn[0] = (long)newOcc;
-        }
+//        long taskOcc = p.task.occurrence();
+//        long beliefOcc = p.belief.occurrence();
+//        if (taskOcc == Tense.ETERNAL) {
+//            occReturn[0] = beliefOcc;
+//        } else if (beliefOcc == Tense.ETERNAL) {
+//            occReturn[0] = taskOcc;
+//        } else {
+//            //merge in proportion to their conf
+//            //double tConf = p.task.confWeight();
+//            //double bConf = p.belief.confWeight();
+//            //double newOcc = Util.lerp(taskOcc, beliefOcc, tConf / (bConf + tConf));
+//
+//            ;
+//        }
+        occReturn[0] = chooseByConf(p.task, p.belief, p).occurrence();
         return derived;
     };
 
@@ -602,6 +607,7 @@ public interface TimeFunctions {
 //
 //        return derived;
 //    };
+
 
     /**
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
@@ -619,25 +625,7 @@ public interface TimeFunctions {
         Task task = p.task;
         Task belief = p.belief;
 
-        long occ = p.occurrenceTarget((t, b) -> {
-
-
-            if (t!= Tense.ETERNAL && b!= Tense.ETERNAL) {
-
-                //randomize choice by confidence
-                float tcw = task.confWeight();
-                float tc = tcw + belief.confWeight();
-
-                if ( p.random.nextFloat() * tc < tcw) {
-                    return t;
-                } else {
-                    return b;
-                }
-
-            } else {
-                return b!= Tense.ETERNAL ? b : t;
-            }
-        }); //reset
+        long occ = chooseByConf(task, belief, p).occurrence(); //reset
 
         Compound tt = (Compound) $.pos(p.taskTerm);
         Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;

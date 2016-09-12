@@ -1,4 +1,4 @@
-package nars.term.subst.choice;
+package nars.term.mutate;
 
 import org.jetbrains.annotations.NotNull;
 

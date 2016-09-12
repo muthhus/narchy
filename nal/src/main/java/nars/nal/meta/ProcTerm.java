@@ -11,9 +11,5 @@ public interface ProcTerm extends Term {
 //        s.append("/* TODO: ").append(this).append(" */\n");
 //    }*/
 
-    default void accept(PremiseEval c) {
-        accept(c, c.now());
-    }
-
     void accept(PremiseEval c, int now);
 }

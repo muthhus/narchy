@@ -1,6 +1,6 @@
 package nars.term.subst;
 
-import nars.nal.op.TermTransform;
+import nars.term.transform.TermTransform;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;

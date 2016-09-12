@@ -1,4 +1,4 @@
-package nars.term.subst.choice;
+package nars.term.mutate;
 
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;

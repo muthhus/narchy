@@ -11,20 +11,22 @@ import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.op.Conclude;
-import nars.nal.op.substitute;
+import nars.term.transform.substitute;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.subst.FindSubst;
+import nars.time.Tense;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+
 import static nars.Op.VAR_PATTERN;
-import static nars.nal.op.substituteIfUnifies.*;
+import static nars.term.transform.substituteIfUnifies.*;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -301,6 +303,28 @@ public class PremiseEval extends FindSubst {
                 TaskBudgeting.derivationBackward(derived, this, minDur);
     }
 
+
+    @NotNull public final static Task chooseByConf(@NotNull Task t, @NotNull Task b, @NotNull PremiseEval p) {
+
+        long to = t.occurrence();
+        long bo = b.occurrence();
+
+        if (to != Tense.ETERNAL && bo != Tense.ETERNAL) {
+
+            //randomize choice by confidence
+            float tcw = t.confWeight();
+            float tc = tcw + b.confWeight();
+
+            if ( p.random.nextFloat() * tc < tcw) {
+                return t;
+            } else {
+                return b;
+            }
+
+        } else {
+            return bo != Tense.ETERNAL ? b : t;
+        }
+    };
 
     public final long occurrenceTarget(@NotNull OccurrenceSolver s) {
         long tOcc = task.occurrence();
