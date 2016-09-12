@@ -42,8 +42,8 @@ public class MatchTaskBelief extends AtomicBoolCondition {
     @NotNull
     public final Term[] preconditions;
 
-    @NotNull
-    public final Term term;
+//    @NotNull
+//    public final Term term;
 
 
     public MatchTaskBelief(@NotNull TaskBeliefPair pattern, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
@@ -51,7 +51,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         //this.pattern = pattern;
         //compiled = new TermPattern(pattern, constraints);
 
-        this.term = pattern;
+        //this.term = pattern;
         this.id = getClass().getSimpleName() + '[' + pattern.toString() + ']';
 
 

@@ -24,9 +24,7 @@ import static nars.util.data.LabeledSupplier.supply;
 public abstract class AbstractNALTest {
 
 
-    //final ThreadLocal<NAR> nars;
     private final Supplier<NAR> nar;
-    //private final NAR the;
     protected TestNAR tester;
 
     protected AbstractNALTest(NAR nar) {
@@ -67,25 +65,20 @@ public abstract class AbstractNALTest {
     }
 
     @NotNull
-    @Deprecated public static Iterable<Supplier<NAR>> nars(int level, boolean requireMultistep) {
-        return nars(level, !requireMultistep, true);
-    }
+    @Deprecated public static Iterable<Supplier<NAR>> nars(int level) {
 
-    @NotNull
-    public static Iterable<Supplier<NAR>> nars(int level, boolean single, boolean multi) {
 
         List<Supplier<NAR>> l = $.newArrayList(2);
 
-        if (multi) {
 
             for (int c : new int[] {  4/*, 2, 4 */}) { ///concepts fired per cycle
                 l.add(supply("Default[NAL<=" + level + ",c=" + c + ']', () -> {
-                            Default d =
-                                    new Default(768, c, 2, 3 );
-                                    //new DiagNAR(768, c, 2, 3 );
-                            d.nal(level);
-                            return d;
-                        }
+                        Default d =
+                            new Default(768, c, 2, 3 );
+                            //new DiagNAR(768, c, 2, 3 );
+                        d.nal(level);
+                        return d;
+                    }
                 ));
                 /*if (level < 8) {
                     l.add(supply("Default[NAL8, c=" + c + "]", () -> {
@@ -108,13 +101,13 @@ public abstract class AbstractNALTest {
 //                    return d;
 //                }
 //            ));
-        }
 
-        if (single) {
-            //throw new RuntimeException("depr");
-//            l.add( supply("SingleStep[NAL<=" + level + ']',
-//                    () -> new SingleStepNAR(512, 1, 2, 3).nal(finalLevel) ) );
-        }
+
+//        if (single) {
+//            //throw new RuntimeException("depr");
+////            l.add( supply("SingleStep[NAL<=" + level + ']',
+////                    () -> new SingleStepNAR(512, 1, 2, 3).nal(finalLevel) ) );
+//        }
 
         return l;
     }

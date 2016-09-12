@@ -203,6 +203,15 @@ public class v3 extends Tuple3f implements java.io.Serializable {
         return norm;
     }
 
+    public final v3 normalized()     {
+        return normalized(1);
+    }
+    public final v3 normalized(float scale)     {
+        normalize();
+        if (scale!=1)
+            scale(scale);
+        return this;
+    }
 
   /** 
     *   Returns the angle in radians between this vector and the vector

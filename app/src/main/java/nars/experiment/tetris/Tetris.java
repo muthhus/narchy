@@ -63,7 +63,7 @@ public class Tetris extends NAgent {
             new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 55000;
-    public static final int cyclesPerFrame = 6;
+    public static final int cyclesPerFrame = 4;
     public static final int tetris_width = 8;
     public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 6;
@@ -371,9 +371,9 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        Executioner e = Tetris.exe;
+        Executioner e = Tetris.exe2;
         Default nar = new Default(1024,
-                64, 3, 3, rng,
+                48, 3, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 32768, 3),
                 new FrameClock(), e
@@ -445,7 +445,7 @@ public class Tetris extends NAgent {
                 super.init(nar);
 
                 AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                        tetris_width/2, 5 /* states */,
+                        tetris_width/2, 7 /* states */,
                         0.05f);
                 view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 

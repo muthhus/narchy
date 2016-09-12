@@ -1,5 +1,6 @@
 package spacegraph.obj;
 
+import com.jogamp.opengl.GL2;
 import nars.$;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
@@ -25,14 +26,6 @@ public class Maze extends SimpleSpatial {
 
     private List<Collidable> bodies;
 
-    public static void main(String[] args) {
-        SpaceGraph s = new SpaceGraph(
-            new Maze("x", 20, 20)
-        );
-        s.setGravity(v(0,0,-5));
-        s.show(1000,1000);
-    }
-
 
 
     boolean[][] cells;
@@ -41,8 +34,6 @@ public class Maze extends SimpleSpatial {
         super(id);
         cells = new boolean[x][y];
         build(0,0,x-1,y-1);
-
-
     }
 
     @Override
@@ -76,6 +67,8 @@ public class Maze extends SimpleSpatial {
                             -1//collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
                     );
                     b.setCenterOfMassTransform(new Transform(x, y, 0));
+                    b.setRenderer(this);
+                    b.setUserPointer(this);
 
                     //b.setLinearFactor(1,1,0); //restricts movement to a 2D plane
 
@@ -97,6 +90,8 @@ public class Maze extends SimpleSpatial {
         CollisionShape groundShape = new BoxShape(v(20f, 20f, 10f));
         Dynamic ground = Dynamics.newBody(0f, groundShape, new Motion(), +1, -1);
         ground.setCenterOfMassTransform(new Transform(0, 0, -15f));
+        ground.setRenderer(this);
+        ground.setUserPointer(this);
         l.add(ground);
 
 
@@ -105,14 +100,16 @@ public class Maze extends SimpleSpatial {
         );*/
         //ConvexShape blobShape =new TetrahedronShapeEx(v(-10,0,0), v(10, 0, 10), v(10, -10, 10), v(-10, -10, 10));
         //CollisionShape blobShape = terrain(5, 0.25f, 1, v(5,5,5));
-        ConvexHullShape blobShape = hull();
-        Dynamic blob = Dynamics.newBody(4f, blobShape, new Motion(), +1, -1);
-        blob.setCenterOfMassTransform(new Transform(0, 0, 15f));
-        l.add(blob);
 
 
+//        ConvexHullShape blobShape = hull();
+//        Dynamic blob = Dynamics.newBody(4f, blobShape, new Motion(), +1, -1);
+//        blob.setCenterOfMassTransform(new Transform(0, 0, 15f));
+//        l.add(blob);
 
-        Collections.addAll( l,  new RagDoll().build(world, v(0,0,20), 3f) );
+
+//
+//        Collections.addAll( l,  new RagDoll().build(world, v(0,0,20), 3f) );
 
         return l;
     }
@@ -232,13 +229,10 @@ public class Maze extends SimpleSpatial {
         return bodies;
     }
 
+
     @Override
     public List<TypedConstraint> constraints() {
         return null;
     }
 
-    @Override
-    public void accept(Object o, Object o2) {
-
-    }
 }

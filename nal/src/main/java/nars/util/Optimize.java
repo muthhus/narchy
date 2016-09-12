@@ -11,7 +11,6 @@ import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.NelderMeadSimplex;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.SimplexOptimizer;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,6 +69,10 @@ public class Optimize<X> {
             }
         }));
         return this;
+    }
+
+    public interface FloatFunction<X> {
+        float floatValueOf(X x);
     }
 
     @NotNull

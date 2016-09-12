@@ -25,7 +25,7 @@ public class NAL8Test extends AbstractNALTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable configurations() {
-        return AbstractNALTest.nars(8, false);
+        return AbstractNALTest.nars(8);
     }
 
 

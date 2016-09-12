@@ -456,6 +456,12 @@ public enum Draw {
         gl.glVertex3f(x2, y2, 0);
         gl.glEnd();
     }
+    public static void line(GL2 gl, v3 a, v3 b) {
+        gl.glBegin(GL2.GL_LINES);
+        gl.glVertex3f(a.x, a.y, a.z);
+        gl.glVertex3f(b.x, b.y, b.z);
+        gl.glEnd();
+    }
 
     public static void rectStroke(GL2 gl, float x1, float y1, float w, float h) {
         line(gl, x1, y1, x1 + w, y1);

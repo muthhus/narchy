@@ -21,7 +21,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(6, true);
+        return AbstractNALTest.nars(6);
     }
 
     //this test only works because the confidence matches, but the related task has insufficient budget

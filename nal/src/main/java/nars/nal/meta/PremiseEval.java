@@ -23,8 +23,6 @@ import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.*;
 import static nars.time.Tense.DTERNAL;
@@ -303,7 +301,7 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    @NotNull public final static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull PremiseEval p) {
+    @NotNull public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull PremiseEval p) {
 
         if (b == null)
             return t;
@@ -317,11 +315,7 @@ public class PremiseEval extends FindSubst {
             float tcw = t.confWeight();
             float tc = tcw + b.confWeight();
 
-            if ( p.random.nextFloat() * tc < tcw) {
-                return t;
-            } else {
-                return b;
-            }
+            return p.random.nextFloat() * tc < tcw ? t : b;
 
         } else {
             return bo != Tense.ETERNAL ? b : t;

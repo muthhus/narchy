@@ -85,7 +85,7 @@ public class PostCondition implements Serializable, Level //since there can be m
      * @throws RuntimeException
      */
     @NotNull public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term pattern,
-                                     @NotNull Term... modifiers) throws RuntimeException, UnsupportedOperationException {
+                                     @NotNull Term... modifiers) throws RuntimeException {
 
 
         Term beliefTruth = null, goalTruth = null;
@@ -129,8 +129,8 @@ public class PostCondition implements Serializable, Level //since there can be m
                     }
                     break;
 
-                case "Truth":
-                    throw new UnsupportedOperationException("Use Belief:.. or Goal:..");
+//                case "Truth":
+//                    throw new UnsupportedOperationException("Use Belief:.. or Goal:..");
 
                 case "Belief":
                     beliefTruth = which;

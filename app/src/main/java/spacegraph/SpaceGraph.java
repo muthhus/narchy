@@ -135,12 +135,13 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
 
-    public void setGravity(v3 v) {
+    public SpaceGraph setGravity(v3 v) {
         dyn.setGravity(v);
         dyn.forEachCollidable((i,c)->{
             c.setGravity(v);
             c.setActivationState(1);
         });
+        return this;
     }
 
 

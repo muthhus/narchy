@@ -19,7 +19,7 @@ public class NAL2Test extends AbstractNALTest {
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(2, false);
+        return AbstractNALTest.nars(2);
     }
 
     @Test

@@ -19,7 +19,7 @@ public class NAL5Test extends AbstractNALTest {
 
     @Parameterized.Parameters(name= "{0}")
     public static Iterable configurations() {
-        return AbstractNALTest.nars(5, true, true);
+        return AbstractNALTest.nars(5);
     }
 
     final int cycles = 170;

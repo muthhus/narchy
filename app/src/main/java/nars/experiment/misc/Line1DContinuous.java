@@ -13,7 +13,6 @@ import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
-import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -27,6 +26,9 @@ import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
  */
 public class Line1DContinuous extends NAgent {
 
+    public interface IntToFloatFunction {
+        float valueOf(int i);
+    }
 
     private final IntToFloatFunction targetFunc;
     int size;

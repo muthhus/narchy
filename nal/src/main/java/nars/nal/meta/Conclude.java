@@ -41,7 +41,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     public final static Logger logger = LoggerFactory.getLogger(Conclude.class);
 
-    public final boolean eternalize;
+    @Deprecated public final boolean eternalize;
 
     @NotNull
     public final PremiseRule rule;

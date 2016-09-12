@@ -21,7 +21,7 @@ public class NAL3Test extends AbstractNALTest {
 
     @Parameterized.Parameters(name= "{index}:{0}")
     public static Iterable configurations() {
-        return AbstractNALTest.nars(3, true, true);
+        return AbstractNALTest.nars(3);
     }
 
 
