@@ -27,7 +27,7 @@ public enum Op {
 //            return Atom.the(i);
 //        }}
 //
-    VAR_INDEP(Symbols.VAR_INDEPENDENT, 6 /*NAL6 for Indep Vars */, OpType.Variable),
+    VAR_INDEP(Symbols.VAR_INDEPENDENT, Op.ANY /* 6*/ /*NAL6 for Indep Vars */, OpType.Variable),
     VAR_DEP(Symbols.VAR_DEPENDENT, Op.ANY, OpType.Variable),
     VAR_QUERY(Symbols.VAR_QUERY, Op.ANY, OpType.Variable),
 

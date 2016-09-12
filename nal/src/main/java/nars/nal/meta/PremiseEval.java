@@ -80,7 +80,7 @@ public class PremiseEval extends FindSubst {
      */
     @Nullable
     @Deprecated
-    public ProcTerm forEachMatch;
+    public BoolCondition forEachMatch;
 
 
     /**
@@ -232,7 +232,7 @@ public class PremiseEval extends FindSubst {
     /**
      * only one thread should be in here at a time
      */
-    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable ProcTerm eachMatch, @Nullable MatchConstraint constraints, int matchFactor) {
+    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolCondition eachMatch, @Nullable MatchConstraint constraints, int matchFactor) {
 
         int t = now();
 
@@ -271,8 +271,7 @@ public class PremiseEval extends FindSubst {
             return false;
         }
         try {
-            forEachMatch.accept(this, now());
-            return true;
+            return forEachMatch.booleanValueOf(this, now());
         } catch (RuntimeException e) {
             if (Param.DEBUG_DERIVER)
                 Conclude.logger.warn("{}\n\tderiving {}", e, ((Conclude)forEachMatch).rule.source);
@@ -304,7 +303,10 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    @NotNull public final static Task chooseByConf(@NotNull Task t, @NotNull Task b, @NotNull PremiseEval p) {
+    @NotNull public final static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull PremiseEval p) {
+
+        if (b == null)
+            return t;
 
         long to = t.occurrence();
         long bo = b.occurrence();

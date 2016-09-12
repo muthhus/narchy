@@ -9,13 +9,13 @@ import java.util.Map;
 /**
  * Created by me on 5/21/16.
  */
-public final class PatternOpSwitch extends Atom /* TODO represent as some GenericCompound */ implements ProcTerm {
+public final class PatternOpSwitch extends Atom /* TODO represent as some GenericCompound */ implements BoolCondition {
 
-    public final ProcTerm[] proc = new ProcTerm[32]; //should be large enough
+    public final BoolCondition[] proc = new BoolCondition[32]; //should be large enough
     public final int subterm;
 
 
-    public PatternOpSwitch(int subterm, @NotNull Map<PatternOp, ProcTerm> cases) {
+    public PatternOpSwitch(int subterm, @NotNull Map<PatternOp, BoolCondition> cases) {
         super('"' + cases.toString() + '"');
 
         this.subterm = subterm;
@@ -24,10 +24,11 @@ public final class PatternOpSwitch extends Atom /* TODO represent as some Generi
     }
 
     @Override
-    public void accept(@NotNull PremiseEval m, int now) {
-        ProcTerm p = proc[m.subOp(subterm)];
+    public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+        BoolCondition p = proc[m.subOp(subterm)];
         if (p!=null) {
-            p.accept(m, now);
+            p.booleanValueOf(m, now);
         }
+        return true;
     }
 }

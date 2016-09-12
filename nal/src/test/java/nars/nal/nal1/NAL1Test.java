@@ -76,7 +76,7 @@ public class NAL1Test extends AbstractNALTest {
                 .de("bird ist eine art des animal.");*/
                 .believe("<robin --> bird>")
                         //.en("robin is a type of bird.");
-                .mustBelieve(50, "<robin --> animal>", 0.81f);
+                .mustBelieve(150, "<robin --> animal>", 0.81f);
     }
 
     @Test

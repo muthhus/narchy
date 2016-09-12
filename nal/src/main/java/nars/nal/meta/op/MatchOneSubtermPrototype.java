@@ -2,7 +2,7 @@ package nars.nal.meta.op;
 
 import nars.$;
 import nars.Op;
-import nars.nal.meta.ProcTerm;
+import nars.nal.meta.BoolCondition;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
 import org.eclipse.collections.api.map.ImmutableMap;
@@ -34,7 +34,7 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
 
     @NotNull
     @Override
-    protected ProcTerm build(ProcTerm eachMatch) {
+    protected BoolCondition build(BoolCondition eachMatch) {
         return new MatchOneSubterm(id, subterm, pattern, constraints, finish ? eachMatch : null, matchFactor);
     }
 

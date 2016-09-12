@@ -11,13 +11,12 @@ import java.util.List;
 
 
 /** parallel branching */
-public final class Fork extends GenericCompound implements ProcTerm {
+public final class Fork extends GenericCompound implements BoolCondition {
+
     @NotNull
-    public final ProcTerm[] termCache;
+    public final BoolCondition[] termCache;
 
-
-
-    protected Fork(@NotNull ProcTerm[] actions) {
+    protected Fork(@NotNull BoolCondition[] actions) {
         super(Op.CONJ, TermSet.the((Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
@@ -25,20 +24,22 @@ public final class Fork extends GenericCompound implements ProcTerm {
     }
 
     @Override
-    public final void accept(@NotNull PremiseEval m, int now) {
+    public boolean booleanValueOf(PremiseEval m, int now) {
 
-        for (ProcTerm s : termCache) {
-            s.accept(m, now);
+        for (BoolCondition s : termCache) {
+            s.booleanValueOf(m, now);
             m.revert(now);
         }
+
+        return true;
     }
 
     @Nullable
-    public static ProcTerm compile(@NotNull List<ProcTerm> t) {
-        return compile(t.toArray(new ProcTerm[t.size()]));
+    public static BoolCondition compile(@NotNull List<BoolCondition> t) {
+        return compile(t.toArray(new BoolCondition[t.size()]));
     }
 
-    @Nullable public static ProcTerm compile(@NotNull ProcTerm[] n) {
+    @Nullable public static BoolCondition compile(@NotNull BoolCondition[] n) {
         switch (n.length) {
             case 0: return null;
             case 1: return n[0];

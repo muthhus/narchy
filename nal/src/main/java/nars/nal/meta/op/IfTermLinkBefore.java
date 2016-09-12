@@ -38,7 +38,7 @@ public class IfTermLinkBefore extends events {
     }
 
     @Override
-    public boolean booleanValueOf(@NotNull PremiseEval m) {
+    public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
 
         Task belief = m.belief;
         if (belief == null && requireBelief())

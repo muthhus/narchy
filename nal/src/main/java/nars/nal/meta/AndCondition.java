@@ -30,21 +30,26 @@ public final class AndCondition extends GenericCompound implements BoolCondition
     }
 
 
-    /** just attempts to evaluate the condition, causing any desired side effects as a result */
-    @Override public final void accept(@NotNull PremiseEval m, int now) {
-        //BoolCondition.run(this, m);
-        booleanValueOf(m);
-        m.revert(now);
-    }
+//    /** just attempts to evaluate the condition, causing any desired side effects as a result */
+//    @Override public final void accept(@NotNull PremiseEval m, int now) {
+//        booleanValueOf(m, now);
+////        m.revert(now);
+//    }
 
     @Override
-    public final boolean booleanValueOf(PremiseEval m) {
+    public final boolean booleanValueOf(PremiseEval m, int now) {
+        boolean result = true;
+        int start = now;
         for (BoolCondition x : termCache) {
-            if (!x.booleanValueOf(m)) {
-                return false;
+            if (!x.booleanValueOf(m, now)) {
+                result = false;
+                break;
             }
+            now = m.now();
         }
-        return true;
+
+        m.revert(start);
+        return result;
     }
 
     public static @Nullable BoolCondition the(@NotNull List<BoolCondition> cond) {

@@ -24,7 +24,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m) {
+        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
             return beliefBeforeOrDuringTask(m.task, m.belief);
         }
 
@@ -40,7 +40,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m) {
+        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
             @Nullable Task b = m.belief;
             return b != null && beliefBeforeOrDuringTask(b, m.task);
         }
@@ -54,7 +54,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m) {
+        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
             int dt = m.task.dt();
             return (dt != DTERNAL);
         }
@@ -113,7 +113,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m) {
+        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
 
             /* true if belief is present and both task and belief are eternal */
             Task b = m.belief;

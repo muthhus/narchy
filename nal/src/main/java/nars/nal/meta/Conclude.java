@@ -36,7 +36,7 @@ import static nars.time.Tense.*;
  *
  * Each rule corresponds to a unique instance of this
  */
-public final class Conclude extends AtomicStringConstant implements ProcTerm {
+public final class Conclude extends AtomicStringConstant implements BoolCondition {
 
 
     public final static Logger logger = LoggerFactory.getLogger(Conclude.class);
@@ -98,7 +98,7 @@ public final class Conclude extends AtomicStringConstant implements ProcTerm {
      * false to stop it
      */
     @Override
-    public final void accept(@NotNull PremiseEval m, int now) {
+    public final boolean booleanValueOf(@NotNull PremiseEval m, int now) {
 
         Term r = m.index.resolve(this.conclusionPattern, m);
 
@@ -107,6 +107,7 @@ public final class Conclude extends AtomicStringConstant implements ProcTerm {
             derive(m, (Compound) r, ct);
         }
 
+        return true;
     }
 
 
@@ -130,7 +131,7 @@ public final class Conclude extends AtomicStringConstant implements ProcTerm {
         NAR nar = m.nar;
 
 
-        if (!Task.taskContentPreTest(content, ct.punc, nar, !Param.DEBUG))
+        if (!Task.taskContentPreTest(content, ct.punc, nar, true /* !Param.DEBUG*/))
             return; //INVALID TERM FOR TASK
 
 

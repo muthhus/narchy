@@ -1,12 +1,8 @@
 package nars.nal.meta.op;
 
 import nars.$;
-import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.Fork;
-import nars.nal.meta.PremiseEval;
-import nars.nal.meta.ProcTerm;
+import nars.nal.meta.*;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.meta.Conclude;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.api.map.ImmutableMap;
@@ -26,7 +22,7 @@ import static nars.nal.meta.op.MatchTaskBelief.compile;
 abstract public class MatchTermPrototype extends AtomicBoolCondition {
 
     @Nullable
-    private ProcTerm eachMatch;
+    private BoolCondition eachMatch;
 
     @Nullable
     public final MatchConstraint constraints;
@@ -91,11 +87,11 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
         conclude.add(x);
     }
 
-    public final @NotNull ProcTerm build() {
+    public final @NotNull BoolCondition build() {
         if (this.eachMatch == null) {
 
 
-            ProcTerm om;
+            BoolCondition om;
 
             switch (conclude.size()) {
                 case 0:
@@ -122,10 +118,10 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
     }
 
     @NotNull
-    abstract protected ProcTerm build(ProcTerm eachMatch);
+    abstract protected BoolCondition build(BoolCondition eachMatch);
 
     @Override
-    public boolean booleanValueOf(PremiseEval premiseEval) {
+    public boolean booleanValueOf(PremiseEval premiseEval, int now) {
         throw new UnsupportedOperationException("Use the instance that this builds, not this. it should not result in the deriver");
     }
 

@@ -20,7 +20,7 @@ public class TaskPositive extends AtomicBoolCondition {
 //
 
     @Override
-    public boolean booleanValueOf(@NotNull PremiseEval m) {
+    public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
         Truth t = m.premise.task().truth();
         return (t!=null && t.freq() >= 0.5f);
     }

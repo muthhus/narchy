@@ -38,7 +38,7 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval ff) {
+        public boolean booleanValueOf(@NotNull PremiseEval ff, int now) {
             return (subterm == 0 ? ff.termSub0op : ff.termSub1op) == opOrdinal;
         }
 
@@ -65,7 +65,7 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval ff) {
+        public boolean booleanValueOf(@NotNull PremiseEval ff, int now) {
             //the bit must not be set in the structure
             return (opBits & (subterm == 0 ? ff.termSub0opBit : ff.termSub1opBit)) == 0;
         }
