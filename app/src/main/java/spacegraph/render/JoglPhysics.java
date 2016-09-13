@@ -780,7 +780,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     };
 
     public final void render(Spatial<?> s) {
-        s.bodies().forEach(this::render);
+        s.forEachBody(this::render);
     }
 
     public final void render(Collidable<?> c) {

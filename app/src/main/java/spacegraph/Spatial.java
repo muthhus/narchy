@@ -7,16 +7,19 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.constraint.TypedConstraint;
+import spacegraph.phys.shape.BoxShape;
+import spacegraph.phys.shape.CollisionShape;
+import spacegraph.render.Draw;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * volumetric subspace.
  * an atom (base unit) of spacegraph physics-simulated virtual matter
  */
 public abstract class Spatial<X> implements BiConsumer<GL2, Dynamic> {
-
 
     public final X key;
     public final int hash;
@@ -116,7 +119,9 @@ public abstract class Spatial<X> implements BiConsumer<GL2, Dynamic> {
         order = -1;
     }
 
-    abstract public List<Collidable<X>> bodies();
+    //abstract public Iterable<Collidable> bodies();
+    abstract public void forEachBody(Consumer<Collidable> c);
+
     abstract public List<TypedConstraint> constraints();
 
 }

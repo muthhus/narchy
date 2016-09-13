@@ -266,13 +266,12 @@ public abstract class Dynamics<X> extends Collisions<X> {
      * re-activates the spatial's components for this cycle
      */
     private void reactivate(Spatial<X> s) {
-
-        s.bodies().forEach(this::on);
+        s.forEachBody(this::on);
     }
 
     protected final void inactivate(Spatial<X> s) {
         s.constraints().forEach(b -> removeConstraint(b));
-        s.bodies().forEach(b -> removeBody(b));
+        s.forEachBody(this::removeBody);
         s.stop(this);
     }
 

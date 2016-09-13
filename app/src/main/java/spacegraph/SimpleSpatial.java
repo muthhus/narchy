@@ -17,11 +17,12 @@ import spacegraph.render.Draw;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
 
 /** simplified implementation which manages one body and N constraints. useful for simple objects */
-public class SimpleSpatial<X> extends Spatial<X> {
+public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
 
 
@@ -34,7 +35,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public boolean motionLock;
 
     public float radius;
-    private List<Collidable<X>> bodies = Collections.emptyList();
+    private List<Collidable> bodies = Collections.emptyList();
 
     public float[] shapeColor;
 
@@ -188,75 +189,15 @@ public class SimpleSpatial<X> extends Spatial<X> {
     }
 
 
-    protected void renderAbsolute(GL2 gl) {
-        //blank
-    }
 
-    @Override public final void accept(GL2 gl, Dynamic body) {
-
-        renderAbsolute(gl);
-
-        gl.glPushMatrix();
-
-        Draw.transform(gl, body.transform());
-
-        renderRelative(gl, body);
-
-        CollisionShape shape = body.shape();
-
-        if (shape instanceof BoxShape) {
-            //render surface on BoxShape face
-
-            BoxShape bshape = (BoxShape)shape;
-
-            gl.glPushMatrix();
-            float sx, sy;
-            sx = bshape.x(); //HACK
-            sy = bshape.y(); //HACK
-            float tx, ty;
-            //if (sx > sy) {
-            ty = sy;
-            tx = sy/sx;
-            //} else {
-            //  tx = sx;
-            //  ty = sx/sy;
-            //}
-
-            //gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
-
-            gl.glScalef(tx, ty, 1f);
-
-            renderRelativeAspect(gl);
-        }
-        gl.glPopMatrix();
-
-        gl.glPopMatrix();
-    }
-
-    protected void renderRelative(GL2 gl, Dynamic body) {
-
-        renderShape(gl, body);
-
-    }
-
-    protected void renderRelativeAspect(GL2 gl) {
-
+    @Override protected void colorshape(GL2 gl) {
+        gl.glColor4fv(shapeColor, 0);
     }
 
     protected void renderLabel(GL2 gl, float scale) {
         final float charAspect = 1.5f;
         Draw.text(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
     }
-
-    protected void renderShape(GL2 gl, Dynamic body) {
-        colorshape(gl);
-        Draw.draw(gl, body.shape());
-    }
-
-    protected void colorshape(GL2 gl) {
-        gl.glColor4fv(shapeColor, 0);
-    }
-
 
 //    @Override
 //    public void start(short order) {
@@ -290,7 +231,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     }
 
-    protected List<Collidable<X>> enter(Dynamics world) {
+    protected List<Collidable> enter(Dynamics world) {
         Dynamic b = body = newBody(collidable());
         b.setData(this);
         b.setRenderer(this);
@@ -307,16 +248,14 @@ public class SimpleSpatial<X> extends Spatial<X> {
         body = null;
     }
 
-
-    @Override
-    public List<Collidable<X>> bodies() {
-        return bodies;
-    }
-
     @Override
     public List<TypedConstraint> constraints() {
         return constraints;
     }
 
 
+    @Override
+    public void forEachBody(Consumer<Collidable> c) {
+        bodies.forEach(c);
+    }
 }

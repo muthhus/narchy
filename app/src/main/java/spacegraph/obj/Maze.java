@@ -19,10 +19,7 @@ import static spacegraph.math.v3.v;
 /**
  * TODO extend CompoundSpatial
  */
-public class Maze extends SimpleSpatial {
-
-    private List<Collidable> bodies;
-
+public class Maze extends CompoundSpatial {
 
 
     boolean[][] cells;
@@ -34,17 +31,7 @@ public class Maze extends SimpleSpatial {
     }
 
     @Override
-    public void update(Dynamics world) {
-        if (bodies == null) {
-            this.bodies = enter(world);
-        } else {
-            next(world);
-        }
-    }
-
-    @Override
-    protected List<Collidable> enter(Dynamics world) {
-        List<Collidable> l = $.newArrayList();
+    protected void create(Dynamics world) {
 
         float dx = 1, dy = 1;
         float y = 0;
@@ -73,7 +60,7 @@ public class Maze extends SimpleSpatial {
                     b.setDamping(0.9f, 0.5f);
                     b.setFriction(0.9f);
 
-                    l.add(b);
+                    add(b);
                 }
 
                 x+=dx;
@@ -89,7 +76,7 @@ public class Maze extends SimpleSpatial {
         ground.setCenterOfMassTransform(new Transform(0, 0, -15f));
         ground.setRenderer(this);
         ground.setData(this);
-        l.add(ground);
+        add(ground);
 
 
         /*ConvexShape blobShape = new BvhTriangleMeshShape(
@@ -107,8 +94,6 @@ public class Maze extends SimpleSpatial {
 
 //
 //        Collections.addAll( l,  new RagDoll().build(world, v(0,0,20), 3f) );
-
-        return l;
     }
 
 
@@ -221,15 +206,5 @@ public class Maze extends SimpleSpatial {
             }
         }
 
-    @Override
-    public List<Collidable> bodies() {
-        return bodies;
-    }
-
-
-    @Override
-    public List<TypedConstraint> constraints() {
-        return null;
-    }
 
 }
