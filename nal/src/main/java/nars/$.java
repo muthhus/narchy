@@ -975,6 +975,23 @@ public enum $ {
         return l;
     }
 
+    public static Compound pRadix(int x, int radix, int maxX) {
+        String xs = Integer.toString(x, radix);
+        String xx = Integer.toString(maxX, radix);
+        Term[] tt = new Term[xx.length()];
+        int ttl = tt.length;
+        for (int i = 0; i < ttl; i++) {
+            Term n;
+            if (xs.length() > i) {
+                n = $.the(xs.charAt(i) - '0');
+            } else {
+                n = $.the(0); //pad with zeros
+            }
+            tt[ttl - 1 - i] = n; //reverse order, least significant bit at RIGHT
+        }
+        return $.p(tt);
+    }
+
 
     public static final class StaticTermBuilder extends TermIndex {
 

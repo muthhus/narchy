@@ -30,7 +30,7 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
 
         renderRelative(gl, body);
 
-        gl.glPopMatrix();
+
 
         gl.glPopMatrix();
     }
@@ -79,6 +79,8 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
             gl.glScalef(tx, ty, 1f);
 
             renderRelativeAspect(gl);
+
+            gl.glPopMatrix();
         }
 
     }

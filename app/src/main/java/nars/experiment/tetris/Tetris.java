@@ -62,8 +62,8 @@ public class Tetris extends NAgent {
     public static final Executioner exe4 =
             new MultiThreadExecutioner(4, 1024*32);
 
-    public static final int runFrames = 55000;
-    public static final int cyclesPerFrame = 2;
+    public static final int runFrames = 50500;
+    public static final int cyclesPerFrame = 4;
     public static final int tetris_width = 6;
     public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 4;
@@ -254,7 +254,9 @@ public class Tetris extends NAgent {
             int yy = y;
             for (int x = 0; x < state.width; x++) {
                 int xx = x;
-                Compound squareTerm = $.p(new IntTerm(x), new IntTerm(y));
+                Compound squareTerm =
+                        $.p(new IntTerm(x), new IntTerm(y));
+                        //$.p($.pRadix(x, 2, state.width), $.pRadix(y, 2, state.height));
                 @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
                         () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
 
@@ -394,7 +396,7 @@ public class Tetris extends NAgent {
 
         nar.confMin.setValue(0.03f);
 
-        nar.compoundVolumeMax.setValue(24);
+        nar.compoundVolumeMax.setValue(32);
         nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);
@@ -445,10 +447,10 @@ public class Tetris extends NAgent {
             public void init(NAR nar) {
                 super.init(nar);
 
-                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                        tetris_width/2, 7 /* states */,
-                        0.05f);
-                view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
+//                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
+//                        tetris_width/2, 7 /* states */,
+//                        0.05f);
+//                view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 
 //                int totalSize = tetris_width*tetris_height;
 //                AutoClassifier bc = new AutoClassifier($.the("row4"), nar, sensors,

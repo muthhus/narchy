@@ -98,10 +98,7 @@ public abstract class FindSubst extends Termunator implements Subst {
 
 
     protected FindSubst(TermIndex index, Op type, Random random) {
-        this(index, type, random,
-                new Versioning(Param.UnificationStackMax)
-                //new PooledVersioning(Global.UnificationStackMax, 4)
-        );
+        this(index, type, random, new Versioning(Param.UnificationStackMax) );
     }
 
     protected FindSubst(TermIndex index, Op type, Random random, @NotNull Versioning versioning) {
@@ -115,13 +112,13 @@ public abstract class FindSubst extends Termunator implements Subst {
         this.type = type;
 
         this.versioning = versioning;
-        xy = new VersionMap(versioning, 12);
-        yx = new VersionMap(versioning, 4);
+        xy = new VersionMap(versioning, 16);
         reassignerXY = new VersionMap.Reassigner<>(this::assignable, xy);
+        yx = new VersionMap(versioning, 4);
         reassignerYX = new VersionMap.Reassigner<>(this::assignable, yx);
         parent = new Versioned(versioning, 4);
 
-        int constraintsLimit = 4;
+        int constraintsLimit = 6;
         constraints = new Versioned(versioning, new MatchConstraint[constraintsLimit]);
 
         //matcherXY = new Matcher(this::assignable, xy);
@@ -585,7 +582,6 @@ public abstract class FindSubst extends Termunator implements Subst {
     }
 
     public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
-        //assert (y != null);
         return xy.tryPut(x, y);
     }
 

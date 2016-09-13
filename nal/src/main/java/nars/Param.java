@@ -78,7 +78,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.0002f;
+    public static final float BUDGET_EPSILON = 0.0005f;
 
 
     public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;

@@ -1,5 +1,6 @@
 package nars.rdfowl;
 
+import nars.NAR;
 import nars.Param;
 import nars.experiment.tetris.Tetris;
 import nars.index.TreeIndex;
@@ -8,16 +9,29 @@ import nars.nar.exe.Executioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.Random;
+
+import static junit.framework.TestCase.assertTrue;
 
 /**
  * Created by me on 9/13/16.
  */
 public class NQuadsRDFTest {
 
+    @Test
+    public void test1() throws Exception {
+        NAR n = new Default();
+        //n.stdout();
+        NQuadsRDF.input(n, "<http://example.org/#spiderman> <http://xmlns.com/foaf/0.1/name> \"Человек-паук\"@ru .");
+        n.run(1);
+        assertTrue(n.index.size() > 2);
+    }
+
+    @Ignore
     @Test
     public void testSchema1() throws Exception {
         Random rng = new XorShift128PlusRandom(1);
@@ -49,7 +63,7 @@ public class NQuadsRDFTest {
 
         Param.DEBUG = true;
 
-        n.run(32);
+        n.run(128);
 
 //        n.index.forEach(c -> {
 //            System.out.println(c);
