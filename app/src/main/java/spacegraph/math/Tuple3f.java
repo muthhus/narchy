@@ -326,6 +326,10 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
         set(s * this.x + t1.x, s * this.y + t1.y, s * this.z + t1.z);
     }
 
+    public final void addScaled(Tuple3f t1, float s) {
+        set(this.x + s * t1.x, this.y + s * t1.y, this.z + s * t1.z);
+    }
+
 
     /**
      * Returns true if the Object t1 is of type Tuple3f and all of the

@@ -89,18 +89,25 @@ public class RoverMaze1 {
             shapeColor[2] = 0.5f;
             shapeColor[3] = 1f;
 
-            for (int i = 0; i < 32; i++) {
-                Retina r = new Retina();
+        }
 
-                r.localPosition = v();
+        public void addRetinaGrid(v3 fwd, v3 left, v3 up, int w, int h, float rangeMax) {
+            for (int x = 0; x < w; x++) {
+                for (int y = 0; y < h; y++) {
+                    Retina r = new Retina();
 
-                r.localDirection = v((float)Math.random()-0.5f, (float)Math.random()-0.5f, (float)Math.random()-0.5f)
-                        .normalized();
+                    r.localPosition = v();
 
-                r.rangeMax = 8;
+                    r.localDirection = v(fwd);
+                    r.localDirection.addScaled(left, 2f * (((float)x)/(w-1) - 0.5f));
+                    r.localDirection.addScaled(up, 2f * (((float)y)/(h-1) - 0.5f));
 
-                retinas.add(r);
+                    r.rangeMax = rangeMax;
+
+                    retinas.add(r);
+                }
             }
+
         }
 
         @Override
@@ -127,9 +134,12 @@ public class RoverMaze1 {
     }
 
     public static void main(String[] args) {
+        Rover r = new Rover(new Default());
+        r.addRetinaGrid(v(0,0,1), v(0.1f,0,0), v(0,0.1f,0), 6,6, 4f);
+
         new SpaceGraph<>(
                 new Maze("x", 20, 20),
-                new Rover(new Default())
+                r
         ).setGravity(v(0, 0, -5)).show(1000, 1000);
     }
 

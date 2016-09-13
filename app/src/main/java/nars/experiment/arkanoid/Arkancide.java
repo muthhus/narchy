@@ -47,7 +47,6 @@ public class Arkancide extends NAgent {
     private static final int cyclesPerFrame = 1;
     public static final int runFrames = 50000;
     public static final int CONCEPTS_FIRE_PER_CYCLE = 128;
-    public static final int INDEX_SIZE = 4 * 10000000;
     final Arkanoid noid;
     private SwingCamera cam;
 
