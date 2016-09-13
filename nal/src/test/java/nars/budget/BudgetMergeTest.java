@@ -13,9 +13,9 @@ public class BudgetMergeTest {
 
     final static float tol = 0.01f;
 
-    static final UnitBudget a = new UnitBudget(1, 0.7f, 0.3f);
-    static final UnitBudget b = new UnitBudget(0.5f, 0.4f, 0.2f);
-    static final UnitBudget c = new UnitBudget(0.25f, 0.2f, 0.1f);
+    static final RawBudget a = new RawBudget(1, 0.7f, 0.3f);
+    static final RawBudget b = new RawBudget(0.5f, 0.4f, 0.2f);
+    static final RawBudget c = new RawBudget(0.25f, 0.2f, 0.1f);
 
     @Test
     public void testPlusDQBlend() {
@@ -85,23 +85,23 @@ public class BudgetMergeTest {
     }
 
     @NotNull
-    private UnitBudget z() {
-        return new UnitBudget(0,0,0);
+    private RawBudget z() {
+        return new RawBudget(0,0,0);
     }
 
     @NotNull
-    private static UnitBudget testMerge(float scale, @NotNull BudgetMerge m,
+    private static RawBudget testMerge(float scale, @NotNull BudgetMerge m,
                                         float exPri, float exDur, float exQua, //start value
                                         float inPri, float inDur, float inQua, //incoming merge
                                         float ouPri, float ouDur, float ouQua  //expected result
     )    {
-        UnitBudget x = new UnitBudget(exPri, exDur, exQua);
+        RawBudget x = new RawBudget(exPri, exDur, exQua);
         testMerge(m, x, inPri, inDur, inQua, scale, ouPri, ouDur, ouQua);
         return x;
     }
 
     private static Budget testMerge(@NotNull BudgetMerge m, Budget x, float inPri, float inDur, float inQua, float scale, float ouPri, float ouDur, float ouQua) {
-        UnitBudget y = new UnitBudget(inPri, inDur, inQua);
+        RawBudget y = new RawBudget(inPri, inDur, inQua);
         return testMerge(m, x, y, scale, ouPri, ouDur, ouQua);
     }
     private static Budget testMerge(@NotNull BudgetMerge m, Budget x, Budget y, float scale, float ouPri, float ouDur, float ouQua) {

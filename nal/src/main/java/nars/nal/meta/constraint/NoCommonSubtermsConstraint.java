@@ -6,6 +6,9 @@ import nars.term.subst.FindSubst;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+
+import static nars.term.container.TermContainer.commonSubtermsRecurse;
 import static nars.term.container.TermContainer.subtermOfTheOther;
 
 /** variables excluded */
@@ -37,7 +40,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
 
             return bCompound ?
                     subtermOfTheOther((Compound)B, C, true)
-                    //commonSubtermsRecurse((Compound) B, C, true, scratch.get())
+                    //commonSubtermsRecurse((Compound) B, C, true, new HashSet())
                     //commonSubterms((Compound) B, C, true, scratch.get())
                     :
                     C.containsTerm(B);

@@ -7,7 +7,7 @@ import ch.qos.logback.classic.net.SyslogAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import nars.budget.Budget;
-import nars.budget.UnitBudget;
+import nars.budget.RawBudget;
 import nars.concept.ConceptBuilder;
 import nars.index.TermIndex;
 import nars.task.MutableTask;
@@ -789,7 +789,7 @@ public enum $ {
 
     @NotNull
     public static Budget b(float p, float d, float q) {
-        return new UnitBudget(p, d, q);
+        return new RawBudget(p, d, q);
     }
 
     /** negates each entry in the array */

@@ -1,7 +1,7 @@
 package nars.task;
 
 import nars.*;
-import nars.budget.UnitBudget;
+import nars.budget.RawBudget;
 import nars.concept.TruthDelta;
 import nars.concept.InvalidConceptException;
 import nars.term.Compound;
@@ -35,7 +35,7 @@ import static nars.time.Tense.ETERNAL;
 
      once input, input tasks will have unique serial numbers anyway
  */
-public abstract class AbstractTask extends UnitBudget implements Task, Temporal {
+public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
     /** content term of this task */
     private Compound term;
@@ -257,8 +257,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     }
 
-
-//    /** if validated and entered into the system. can be overridden in subclasses to handle this event
+    //    /** if validated and entered into the system. can be overridden in subclasses to handle this event
 //     *  isnt called for Command tasks currently; they will be executed right away anyway
 //     * */
 //    protected void onInput(@NotNull Memory m) {

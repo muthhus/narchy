@@ -74,30 +74,44 @@ public abstract class NQuadsRDF {
 //        }
     }
 
-    public static void input(@NotNull NAR nar, @NotNull Iterable<Node[]> nxp) {
-
-        input(nar, StreamSupport.stream(nxp.spliterator(), false));
+    @Deprecated public static void input(@NotNull NAR nar, @NotNull Iterable<Node[]> nxp) {
+        input(nar, stream(nxp));
     }
 
-    public static void input(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
+    public static Stream<Node[]> stream(@NotNull Iterable<Node[]> nxp) {
+        return StreamSupport.stream(nxp.spliterator(), false);
+    }
 
-        nar.input(
-            nxp.map( (Node[] nx) -> {
-                if (nx.length >= 3) {
-                    //return inputRaw(
-                    return inputNALlike(
-                            nar,
-                            resource(nx[0]),
-                            resource(nx[1]),
-                            resource(nx[2])
-                    );
-                }
-                return null;
-            } ).filter(x -> x!=null)
-        );
+    public static Stream<Node[]> stream(@NotNull InputStream input) {
+        //try {
+        NxParser p = new NxParser();
+        p.parse(input);
+        return stream(p);
+    }
+
+    @Deprecated public static void input(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
+        nar.input(  stream(nar, nxp) );
+    }
 
 
+    public static Stream<MutableTask> stream(@NotNull NAR n, File f) throws FileNotFoundException {
+        return NQuadsRDF.stream(n, NQuadsRDF.stream(f));
+    }
 
+    public static Stream<MutableTask> stream(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
+
+        return nxp.map( (Node[] nx) -> {
+            if (nx.length >= 3) {
+                //return inputRaw(
+                return inputNALlike(
+                        nar,
+                        resource(nx[0]),
+                        resource(nx[1]),
+                        resource(nx[2])
+                );
+            }
+            return null;
+        } ).filter(x -> x!=null);
     }
 
 //    public static void input(NAR nar, File input) throws Exception {
@@ -320,7 +334,7 @@ public abstract class NQuadsRDF {
          * relation is to be saved. Takes care of updating relation_types as well.
          *
          */
-    public static Task inputNALlike(@NotNull NAR nar,
+    public static MutableTask inputNALlike(@NotNull NAR nar,
                               @Nullable Atom subject,
                               @NotNull Atom predicate, @NotNull Term object) {
 
@@ -472,10 +486,15 @@ public abstract class NQuadsRDF {
 
     final static Logger logger = LoggerFactory.getLogger(NQuadsRDF.class);
 
-    public static void input(NAR n, File f) throws FileNotFoundException {
+    @Deprecated public static void input(NAR n, File f) throws FileNotFoundException {
         logger.info("loading {}", f);
         input(n, new BufferedInputStream(new FileInputStream(f)));
 
+    }
+
+    public static Stream<Node[]> stream(File f) throws FileNotFoundException {
+        logger.info("loading {}", f);
+        return stream(new BufferedInputStream(new FileInputStream(f)));
     }
 
 //    public static void main(String[] args) throws Exception {

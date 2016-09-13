@@ -2,7 +2,7 @@ package nars.agent;
 
 import com.google.common.base.Joiner;
 import nars.*;
-import nars.budget.UnitBudget;
+import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.learn.Agent;
@@ -507,7 +507,7 @@ public class NAgentOld implements Agent {
     }
 
     private void boost(@NotNull MutableTask t) {
-        BudgetMerge.max.apply(t.budget(), UnitBudget.One, reinforcementAttention);
+        BudgetMerge.max.apply(t.budget(), Budget.One, reinforcementAttention);
         if (t.isDeleted())
             throw new RuntimeException();
 

@@ -6,7 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
-import nars.budget.UnitBudget;
+import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.nal.Premise;
@@ -212,7 +212,7 @@ public class TaskBudgeting {
         } else {
             float taskPriority = question.pri();
 
-            budget = new UnitBudget(
+            budget = new RawBudget(
                     and(taskPriority, quality),
                     //UtilityFunctions.or(taskPriority, quality),
                     question.dur(), BudgetFunctions.truthToQuality(solution.truth()));

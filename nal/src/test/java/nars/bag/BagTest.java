@@ -5,7 +5,8 @@ import nars.Param;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
 import nars.bag.impl.experimental.HijackBag;
-import nars.budget.UnitBudget;
+import nars.budget.Budget;
+import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -71,7 +72,7 @@ public class BagTest {
 
         assertEquals(0, c.priMin(), 0.001f);
 
-        assertTrue(UnitBudget.Zero.equalsBudget(c.get("x"), 0.01f));
+        assertTrue(Budget.Zero.equalsBudget(c.get("x"), 0.01f));
 
     }
 
@@ -79,14 +80,14 @@ public class BagTest {
     public void testBudgetMerge() {
         ArrayBag<String> a = new ArrayBag(4, plusDQDominant, new HashMap<>(4));
 
-        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
-        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
+        a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
+        a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
         a.commit();
         assertEquals(1, a.size());
 
 
         BLink<String> agx = a.get("x");
-        assertTrue(new UnitBudget(0.2f, 0.5f, 0.5f).equalsBudget(
+        assertTrue(new RawBudget(0.2f, 0.5f, 0.5f).equalsBudget(
                 agx, 0.01f));
 
     }
@@ -95,8 +96,8 @@ public class BagTest {
     public void testSort() {
         ArrayBag<String> a = new ArrayBag(4, plusDQDominant, new HashMap<>(4));
 
-        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
-        a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
+        a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
+        a.put("y", new RawBudget(0.2f, 0.5f, 0.5f));
 
         a.commit();
 
@@ -107,7 +108,7 @@ public class BagTest {
 
         assertEquals("[y=$0.2000;0.5000;0.5000$, x=$0.1000;0.5000;0.5000$]", a.listCopy().toString());
 
-        a.put("x", new UnitBudget(0.2f, 0.5f, 0.5f));
+        a.put("x", new RawBudget(0.2f, 0.5f, 0.5f));
         a.commit();
 
         //x should now be ahead
@@ -123,9 +124,9 @@ public class BagTest {
     public void testCapacity() {
         ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
 
-        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
-        a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
-        a.put("z", new UnitBudget(0.05f, 0.5f, 0.5f));
+        a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
+        a.put("y", new RawBudget(0.2f, 0.5f, 0.5f));
+        a.put("z", new RawBudget(0.05f, 0.5f, 0.5f));
 
         a.commit();
 
@@ -142,7 +143,7 @@ public class BagTest {
     public void testRemoveByKey() {
         ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
 
-        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
+        a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
         a.commit();
         assertEquals(1, a.size());
 
@@ -170,8 +171,8 @@ public class BagTest {
     }
 
     void testScalePut(Bag<String> a) {
-        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
-        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
+        a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
+        a.put("x", new RawBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
         a.commit();
 
         assertEquals(0.15, a.get("x").pri(), 0.001f);
@@ -179,9 +180,9 @@ public class BagTest {
 
     void testScalePut2(Bag<String> a) {
 
-        a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f));
-        a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
-        a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.25f, null);
+        a.put("y", new RawBudget(0.1f, 0.5f, 0.5f));
+        a.put("y", new RawBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
+        a.put("y", new RawBudget(0.1f, 0.5f, 0.5f), 0.25f, null);
         a.commit();
 
         assertEquals(0.175, a.get("y").pri(), 0.001f);
@@ -280,7 +281,7 @@ public class BagTest {
 
         //fill with uniform randomness
         for (int i = 0; i < n; i++) {
-            a.put("x" + i, new UnitBudget((float) random.getAsDouble(), 0.5f, 0.5f));
+            a.put("x" + i, new RawBudget((float) random.getAsDouble(), 0.5f, 0.5f));
         }
 
         a.commit();
@@ -317,7 +318,7 @@ public class BagTest {
 
         HijackBag<String> a = new HijackBag<>((int)(n*2f), 2, new XorShift128PlusRandom(2));
         for (int i = 0; i < n; i++) {
-            a.put("x" + Integer.toString(Float.floatToIntBits(1f/i),5), new UnitBudget(((float)(i+1))/(n), 0.5f, 0.5f));
+            a.put("x" + Integer.toString(Float.floatToIntBits(1f/i),5), new RawBudget(((float)(i+1))/(n), 0.5f, 0.5f));
         }
         int expectedSize = n - 1; /* not all fit */
 
@@ -341,7 +342,7 @@ public class BagTest {
 
 
         for (int i = 0; i < n; i++) {
-            a.put("x" + i, new UnitBudget(level, 0.5f, 0.5f));
+            a.put("x" + i, new RawBudget(level, 0.5f, 0.5f));
         }
 
         a.commit(); //commit necessary to set sampler's dynamic range
@@ -397,11 +398,11 @@ public class BagTest {
 //        CurveBag<String> s = newBag(2);
 //
 //        //1. fill bag
-//        s.put("a0", new UnitBudget(0.25f, 0, 0));
-//        s.put("a1", new UnitBudget(0.25f, 0, 0));
+//        s.put("a0", new RawBudget(0.25f, 0, 0));
+//        s.put("a1", new RawBudget(0.25f, 0, 0));
 //
 //        //2. attempt to insert new under-budgeted item while bag is full
-//        s.put("b", new UnitBudget(0.2f, 0, 0));
+//        s.put("b", new RawBudget(0.2f, 0, 0));
 //        assertEquals(2, s.size());
 //
 //        assertEquals(1, s.sizeQueue()); //b should be in the queue
@@ -409,7 +410,7 @@ public class BagTest {
 //        s.commit(); //apply pending changes. try inserting items in the queue. if an item is not able to be inserted it remains buffering
 //
 //        //3. insert again, bringing "b" effective budget to 0.4
-//        s.put("b", new UnitBudget(0.2f, 0, 0));
+//        s.put("b", new RawBudget(0.2f, 0, 0));
 //        assertEquals(2, s.size()); //still not actually in the bag
 //        assertEquals("a0=$0.2500;0.0000;0.0000$,a1=$0.2500;0.0000;0.0000$", s.toStringDetailed());
 //

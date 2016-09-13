@@ -1,8 +1,7 @@
 package nars.rdfowl;
 
-import nars.NAR;
+import nars.Param;
 import nars.experiment.tetris.Tetris;
-import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -13,8 +12,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.Random;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by me on 9/13/16.
@@ -32,11 +29,27 @@ public class NQuadsRDFTest {
                 new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 32768, 3),
                 new FrameClock(), e
         );
-        NQuadsRDF.input(n, new File("/tmp/all-layers.nq"));
 
+        n.input(
+                NQuadsRDF.stream(n, new File("/tmp/all-layers.nq")).map(t -> {
+                    t.budget(0, 0.5f);
+                    return t;
+                } )
+        );
+
+//        n.forEachActiveConcept(c -> {
+//            c.print();
+//        });
+
+        n.run(1);
+        n.core.concepts.clear();
         n.log();
+        n.input("(Bacteria <-> Pharmacy)?");
 
-        n.run(5);
+
+        Param.DEBUG = true;
+
+        n.run(32);
 
 //        n.index.forEach(c -> {
 //            System.out.println(c);

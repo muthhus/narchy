@@ -20,6 +20,17 @@ import static nars.nal.UtilityFunctions.or;
 public interface Budget extends Budgeted {
 
 
+    /**common instance for a 'Deleted budget'.*/
+    Budget Deleted = new ROBudget(Float.NaN, 0, 0);
+
+    /** common instance for a 'full budget'.*/
+    Budget One = new ROBudget(1f,1f,1f);
+
+    /** common instance for a 'half budget'.*/
+    Budget Half = new ROBudget(0.5f, 0.5f, 0.5f);
+
+    /** common instance for a 'zero budget'.*/
+    Budget Zero = new ROBudget(0,0,0);
 
     //@Contract(pure = true)
     public static boolean aveGeoNotLessThan(float min, float a, float b, float c) {

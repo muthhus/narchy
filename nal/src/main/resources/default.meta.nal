@@ -80,14 +80,14 @@
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
-    (P --> M), (S --> M), neq(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
-    (M --> P), (M --> S), neq(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+    (P --> M), (S --> M), neq(S,P), no_common_subterm(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+    (M --> P), (M --> S), neq(S,P), no_common_subterm(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
-    (M --> P), (S <-> M), neq(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
-    (P --> M), (S <-> M), neq(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
-    (M <-> P), (S <-> M), neq(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (M --> P), (S <-> M), neq(S,P), no_common_subterm(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (P --> M), (S <-> M), neq(S,P), no_common_subterm(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (M <-> P), (S <-> M), neq(S,P), no_common_subterm(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
 
 //// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:

@@ -303,10 +303,12 @@ public abstract class Param /*extends Container*/ implements Level {
     public void budgetDefault(@NotNull MutableTask t) {
 
         char punc = t.punc();
-        t.setPriority(priorityDefault(punc));
-        t.setDurability(durabilityDefault(punc));
+
+        float defPri = priorityDefault(punc);
+        float defDur = durabilityDefault(punc);
 
         if (t.isBeliefOrGoal()) {
+            t.budget(defPri, defDur);
 
             /** if q was not specified, and truth is, then we can calculate q from truthToQuality */
             float q = t.qua();
@@ -314,9 +316,9 @@ public abstract class Param /*extends Container*/ implements Level {
                 t.setQuality(BudgetFunctions.truthToQuality(t.truth()));
             }
         } else if (t.isQuestion()) {
-            t.setQuality(DEFAULT_QUESTION_QUALITY);
+            t.budget(defPri, defDur, DEFAULT_QUESTION_QUALITY);
         } else if (t.isQuest()) {
-            t.setQuality(DEFAULT_QUEST_QUALITY);
+            t.budget(defPri, defDur, DEFAULT_QUEST_QUALITY);
         }
 
     }

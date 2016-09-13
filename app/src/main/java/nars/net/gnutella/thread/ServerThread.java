@@ -3,7 +3,6 @@ package nars.net.gnutella.thread;
 import com.google.common.io.ByteStreams;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budget;
-import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.net.gnutella.GnutellaConstants;
 import nars.net.gnutella.Peer;
@@ -180,7 +179,7 @@ public class ServerThread extends PeerThread {
      */
     public void send(Message m) {
         //logger.trace("send {}", m);
-        outgoing.put(m, UnitBudget.Zero);
+        outgoing.put(m, Budget.Zero);
     }
 
     @Override

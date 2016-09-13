@@ -1,12 +1,12 @@
 package nars.util.analyze.bag;
 
-import nars.budget.UnitBudget;
+import nars.budget.RawBudget;
 import nars.util.data.random.XorShift128PlusRandom;
 
 import java.util.Random;
 
 /** Empty Item implementation useful for testing */
-public class NullItem extends UnitBudget {
+public class NullItem extends RawBudget {
 
 	static final Random rng = new XorShift128PlusRandom(1);
 	static int ID = 1;

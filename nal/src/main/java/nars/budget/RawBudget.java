@@ -2,6 +2,7 @@ package nars.budget;
 
 import org.jetbrains.annotations.NotNull;
 
+import static nars.nal.UtilityFunctions.and;
 import static nars.util.Util.clamp;
 
 /**
@@ -35,11 +36,14 @@ public class RawBudget implements Budget {
     public RawBudget(@NotNull Budgeted b, float scale) {
         this(b.pri()*scale, b.dur(), b.qua());
     }
+    public RawBudget(@NotNull Budgeted b) {
+        this(b.pri(), b.dur(), b.qua());
+    }
 
     public RawBudget(float p, float d, float q) {
+        setQuality(q); //set quality first
         setPriority(p);
         setDurability(d);
-        setQuality(q);
     }
 
     @Override
@@ -158,6 +162,26 @@ public class RawBudget implements Budget {
     @Override
     public final void _setQuality(float q) {
         this.quality = q;
+    }
+        /**
+     * Increase quality value by a percentage of the remaining range
+     *
+     * @param v The increasing percent
+     */
+    public void orQuality(float v) {
+        quality = BudgetFunctions.or(quality, v);
+    }
+
+    /**
+     * Decrease quality value by a percentage of the remaining range
+     *
+     * @param v The decreasing percent
+     */
+    public void andQuality(float v) {
+        quality = and(quality, v);
+    }
+    public void mulDurability(float factor) {
+        setDurability(durability * factor);
     }
 
 }

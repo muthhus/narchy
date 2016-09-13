@@ -43,7 +43,7 @@ public final class ROBudget implements Budget {
     @NotNull
     @Override
     public Budget clone() {
-        return new UnitBudget(this);
+        return new RawBudget(this);
     }
 
     @Override

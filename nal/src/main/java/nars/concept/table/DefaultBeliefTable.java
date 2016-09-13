@@ -5,7 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.budget.UnitBudget;
+import nars.budget.Budget;
 import nars.concept.CompoundConcept;
 import nars.concept.TruthDelta;
 import nars.task.EternalizedTask;
@@ -205,7 +205,7 @@ public class DefaultBeliefTable implements BeliefTable {
                             )
                                 .time(nar.time(), ETERNAL)
                                 .evidence(d)
-                                .budget(UnitBudget.Zero)
+                                .budget(Budget.Zero)
                                 .log("Eternalized");
 
                         nar.inputLater(ee);

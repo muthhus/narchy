@@ -3,7 +3,6 @@ package nars.agent;
 import nars.*;
 import nars.budget.Activation;
 import nars.budget.Budget;
-import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.GeneratedTask;
@@ -314,8 +313,8 @@ abstract public class NAgent {
 
         if (reinforcementAttention > 0) {
 
-            boostBudget = UnitBudget.One.clone().multiplied(reinforcementAttention, 0.25f, 0.9f);
-            curiosityBudget = UnitBudget.Zero;
+            boostBudget = Budget.One.clone().multiplied(reinforcementAttention, 0.25f, 0.9f);
+            curiosityBudget = Budget.Zero;
 
             //boost(happy);
             //boost(happy); //boosted by the (happy)! task that is boosted below

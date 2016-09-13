@@ -1,7 +1,7 @@
 package nars.bag;
 
+import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.UnitBudget;
 import nars.link.BLink;
 import nars.link.StrongBLink;
 import nars.link.StrongBLinkToBudgeted;
@@ -86,7 +86,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     default Budgeted initialBudget(@NotNull V v) {
         if (v instanceof Budgeted)
             return ((Budgeted)v);
-        return UnitBudget.Zero;
+        return Budget.Zero;
 //
 //        return new BLink(v, 0,0,0);
     }

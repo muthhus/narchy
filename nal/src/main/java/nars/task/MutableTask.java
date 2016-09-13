@@ -127,8 +127,9 @@ public class MutableTask extends AbstractTask {
             if (t == null)
                 throw new RuntimeException("Truth needs to be defined prior to budget to calculate truthToQuality");
             q = BudgetFunctions.truthToQuality(t);
-        } else
+        } else {
             throw new RuntimeException("incorrect punctuation");
+        }
 
         budget(p, d, q);
         return this;

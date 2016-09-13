@@ -4,8 +4,8 @@ import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.Task;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.concept.TruthDelta;
 import nars.task.GeneratedTask;
@@ -49,7 +49,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
     @NotNull
     protected final NAR nar;
     private final String termPrefix;
-    private final nars.budget.Budgeted defaultAbbreviationBudget = UnitBudget.One.cloneMult(0.9f, 0.5f, 0.5f);
+    private final nars.budget.Budgeted defaultAbbreviationBudget = Budget.One.cloneMult(0.9f, 0.5f, 0.5f);
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix) {

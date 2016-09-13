@@ -1122,7 +1122,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    public void input(@NotNull Stream<Task> taskStream) {
+    public void input(@NotNull Stream<? extends Task> taskStream) {
         taskStream.forEach(this::input);
         //input(new TaskStream(taskStream));
     }
