@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package nars.op.in;
+package nars.nlp;
 
 import com.google.common.collect.Lists;
 import nars.$;

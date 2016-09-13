@@ -6,7 +6,7 @@ import nars.Task;
 import nars.index.TermIndex;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
-import nars.op.in.Twenglish;
+import nars.nlp.Twenglish;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

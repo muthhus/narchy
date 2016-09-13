@@ -7,7 +7,7 @@ import nars.budget.policy.TaskBudgeting;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
-import nars.index.TermIndex;
+import nars.concept.InvalidConceptException;
 import nars.link.BLink;
 import nars.task.AnswerTask;
 import nars.term.Compound;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static nars.budget.Activation.linkable;
+import static nars.index.TermIndex.linkable;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -89,7 +89,7 @@ public enum PremiseBuilder {
                             else
                                 belief = beliefConcept.beliefs().match(task, now); //in case of quest, proceed with matching belief
 
-                        } catch (TermIndex.InvalidConceptException e) {
+                        } catch (InvalidConceptException e) {
                             logger.warn("{}", e.getMessage());
                         }
 

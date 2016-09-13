@@ -2,7 +2,7 @@ package nars.guifx;
 
 import nars.NAR;
 import nars.guifx.util.CodeInput;
-import nars.op.in.Twenglish;
+import nars.nlp.Twenglish;
 
 /**
  * Created by me on 10/13/15.

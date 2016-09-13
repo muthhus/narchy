@@ -1,4 +1,4 @@
-package nars.op.in;
+package nars.rdfowl;
 
 import nars.$;
 import nars.NAR;
@@ -84,7 +84,8 @@ public abstract class NQuadsRDF {
         nar.input(
             nxp.map( (Node[] nx) -> {
                 if (nx.length >= 3) {
-                    return input(
+                    //return inputRaw(
+                    return inputNALlike(
                             nar,
                             resource(nx[0]),
                             resource(nx[1]),
@@ -262,6 +263,7 @@ public abstract class NQuadsRDF {
     static final Atom parentOf = the("parentOf");
     static final Atom type = the("type");
     static final Atom subClassOf = the("subClassOf");
+    static final Atom isPartOf = the("isPartOf");
     static final Atom subPropertyOf = the("subPropertyOf");
     static final Atom equivalentClass = the("equivalentClass");
     static final Atom equivalentProperty = the("equivalentProperty");
@@ -275,10 +277,10 @@ public abstract class NQuadsRDF {
 
 
     @Nullable
-    static Term subjObjInst(Term subject, char subjType, char objType, boolean reverse) {
+    static Term subjObjInh(Term subject, char subjType, char objType, boolean reverse) {
         String a = reverse ? "subj" : "obj";
         String b = reverse ? "obj" : "subj";
-        return inst(
+        return inh(
                 p(v(subjType, a), v(objType, b)),
                 subject);
     }
@@ -289,18 +291,18 @@ public abstract class NQuadsRDF {
         add(the("isDefinedBy"));
     }};
 
-    public static Task input(@NotNull NAR nar,
+    public static Task inputRaw(@NotNull NAR nar,
                              @Nullable Atom subject,
                              @NotNull Atom predicate, @NotNull Term object) {
 
-        if ((subject == null) || (predicate == null) || (object == null))
+        if (subject == null)
             return null;
 
         if (predicatesIgnored.contains(predicate))
             return null;
 
         try {
-            Term term = $.inst($.p(subject, object), predicate);
+            Term term = /*$.inst*/ $.inh($.p(subject, object), predicate);
             if (term == null)
                 throw new NullPointerException();
             Task t = new MutableTask(term, '.', 1f, nar);
@@ -318,7 +320,7 @@ public abstract class NQuadsRDF {
          * relation is to be saved. Takes care of updating relation_types as well.
          *
          */
-    public static Task input0(@NotNull NAR nar,
+    public static Task inputNALlike(@NotNull NAR nar,
                               @Nullable Atom subject,
                               @NotNull Atom predicate, @NotNull Term object) {
 
@@ -326,9 +328,12 @@ public abstract class NQuadsRDF {
 
         Term belief = null;
 
-        //noinspection IfStatementWithTooManyBranches
-        if (predicate.equals(type)
-                ||predicate.equals(subClassOf)||predicate.equals(subPropertyOf)) {
+
+
+        if (predicatesIgnored.contains(predicate))
+            return null;
+
+        if (predicate.equals(type) ||predicate.equals(subClassOf)||predicate.equals(subPropertyOf)) {
             if (object.equals(owlClass)) {
                 return null;
             }
@@ -347,11 +352,12 @@ public abstract class NQuadsRDF {
         else if (predicate.equals(equivalentClass)) {
 
             belief = equi(
-                inst(varIndep(1), subject),
-                inst(varIndep(1), object)
+                inh(varIndep(1), subject),
+                inh(varIndep(1), object)
             );
-        }
-        else if (predicate.equals(sameAs)) {
+        } else if (predicate.equals(isPartOf)) {
+            belief = $.instprop( subject, object );
+        } else if (predicate.equals(sameAs)) {
             belief = sim(subject, object);
         }
         else if (predicate.equals(differentFrom)) {
@@ -362,15 +368,15 @@ public abstract class NQuadsRDF {
             //<PROPERTY($subj, $obj) ==> <$subj -{- CLASS>>.
 
 
-            Term b = inst(varIndep("subj"), object);
-            belief = conj(subjObjInst(subject, '$', '#', false),b);
+            Term b = inh(varIndep("subj"), object);
+            belief = conj(subjObjInh(subject, '$', '#', false),b);
         }
         else if (predicate.equals(range)) {
             // PROPERTY range CLASS
             //<PROPERTY($subj, $obj) ==> <$obj -{- CLASS>>.
 
-            Term b = inst(varIndep("obj"), object);
-            belief = conj(subjObjInst(subject, '#', '$', false),b);
+            Term b = inh(varIndep("obj"), object);
+            belief = conj(subjObjInh(subject, '#', '$', false),b);
 
 //            belief = nar.term(
 //                    //"<" + subject + "($subj,$obj) ==> <$obj -{- " + object + ">>"
@@ -386,8 +392,8 @@ public abstract class NQuadsRDF {
 
             //PREDSUBJ(#subj, #obj) <=> PREDOBJ(#obj, #subj)
             belief = equi(
-                    subjObjInst(subject, '$', '$', false),
-                    subjObjInst(object, '$', '$', true));
+                    subjObjInh(subject, '$', '$', false),
+                    subjObjInh(object, '$', '$', true));
 
         }
         else if (predicate.equals(disjointWith)) {
@@ -396,11 +402,14 @@ public abstract class NQuadsRDF {
             //disjoint classes have no common instances:
             // (--, (&&, {#x} --> subject, {#x} --> object ) ).
             Term x = varDep(1);
-            belief = neg(conj(inst(x, subject), inst(x,object)));
+            belief = neg(conj(inh(x, subject), inh(x,object)));
         }
         else {
             if (subject!=null && object!=null && predicate!=null) {
-                belief = inst(
+                belief =
+                    //inst
+                    inh
+                        (
                         p(subject, object),
                         predicate
                 );

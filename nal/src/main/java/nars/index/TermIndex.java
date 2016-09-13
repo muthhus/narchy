@@ -3,6 +3,7 @@ package nars.index;
 import nars.*;
 import nars.concept.Concept;
 import nars.concept.ConceptBuilder;
+import nars.concept.InvalidConceptException;
 import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
@@ -50,6 +51,7 @@ public abstract class TermIndex extends TermBuilder {
 
     public static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
 
+
     /**
      * get if not absent
      */
@@ -62,6 +64,7 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public abstract Termed get(@NotNull Termed key, boolean createIfMissing);
 
+    /** terms should generally not be tried here unless they also have been determined linkable() [below] first */
     @NotNull public static Compound conceptualize(@NotNull Compound x) {
 
         if (!x.isNormalized())
@@ -69,12 +72,39 @@ public abstract class TermIndex extends TermBuilder {
 
         Term xx = $.unneg(Terms.atemporalize(x)).term();
 
-        if (xx.op().var)
+        if (xx.op().var) {
             throw new InvalidConceptException(x, "variables can not be conceptualized");
+        } else {
+            //prevent conceptualization of non-statement VarIndep containing terms
+            if (xx.hasVarIndep() && !xx.hasAny(Op.StatementBits)) {
+                throw new InvalidConceptException(x, "non-statement conceptualization containing VarIndep");
+            }
+        }
 
         return (Compound)xx;
     }
 
+    public static boolean linkable(@NotNull Term x) {
+//        return !(target instanceof Variable);
+        if (x instanceof Variable) {
+            return false;
+        }
+        if (x instanceof Compound) {
+
+            if (x.op() == Op.NEG) {
+                if (((Compound) x).term(0) instanceof Variable)
+                    return false;
+            }
+            if (!x.isNormalized())
+                return false;
+
+            //prevent conceptualization of non-statement VarIndep containing terms
+            if (x.hasVarIndep() && !x.hasAny(Op.StatementBits)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * set whether absent or not
@@ -677,25 +707,6 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public Term replace(@NotNull Term src, Term from, Term to) {
         return replace(src, Maps.mutable.of(from, to));
-    }
-
-    public static final class InvalidConceptException extends RuntimeException {
-
-        @NotNull
-        public final Termed term;
-        @NotNull
-        public final String reason;
-
-        public InvalidConceptException(@NotNull Termed term, @NotNull String reason) {
-            this.term = term;
-            this.reason = reason;
-        }
-
-        @Override
-        public String getMessage() {
-            return "InvalidConceptTerm: " + term + " (" + term.getClass() + "): " + reason;
-        }
-
     }
 
 

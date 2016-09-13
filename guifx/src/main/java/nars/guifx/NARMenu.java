@@ -9,7 +9,7 @@ import javafx.stage.FileChooser;
 import nars.NAR;
 import nars.guifx.chart.Plot2D;
 import nars.guifx.util.NSlider;
-import nars.op.in.NQuadsRDF;
+import nars.rdfowl.NQuadsRDF;
 import nars.time.RealtimeMSClock;
 import nars.util.Texts;
 import nars.util.event.Active;

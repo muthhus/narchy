@@ -105,6 +105,7 @@ public enum Op {
 
     /** Image index ("imdex") symbol */
     public static final Atom Imdex = $.the("_");
+    public static int StatementBits = Op.or(Op.INH,Op.SIM,Op.IMPL,Op.EQUI);
 
     /**
      * symbol representation of this getOperator

@@ -3,7 +3,7 @@ package nars.task;
 import nars.*;
 import nars.budget.UnitBudget;
 import nars.concept.TruthDelta;
-import nars.index.TermIndex;
+import nars.concept.InvalidConceptException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -142,7 +142,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
     @Override
-    public void normalize(@NotNull NAR nar) throws TermIndex.InvalidConceptException, NAR.InvalidTaskException  {
+    public void normalize(@NotNull NAR nar) throws InvalidConceptException, NAR.InvalidTaskException  {
 
         if (isDeleted())
             throw new NAR.InvalidTaskException(this, "Deleted");

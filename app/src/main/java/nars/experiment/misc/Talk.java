@@ -12,7 +12,7 @@ import nars.concept.OperationConcept;
 import nars.index.TermIndex;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.operator.TermFunction;
-import nars.op.in.Twenglish;
+import nars.nlp.Twenglish;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;

@@ -5,7 +5,7 @@ import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import nars.NAR;
 import nars.Task;
-import nars.op.in.Twenglish;
+import nars.nlp.Twenglish;
 import nars.truth.Truth;
 import nars.util.event.Active;
 import org.slf4j.Logger;

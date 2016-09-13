@@ -1,16 +1,14 @@
 package nars.budget;
 
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.TruthDelta;
-import nars.term.Compound;
+import nars.index.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.var.Variable;
 import nars.truth.Truth;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -191,7 +189,7 @@ public class Activation {
 
         Term targetTerm = target.term();
 
-        if (!linkable(targetTerm)) {
+        if (!TermIndex.linkable(targetTerm)) {
             targetConcept = null;
         } else {
             targetConcept = nar.concept(target, true);
@@ -231,23 +229,6 @@ public class Activation {
 
 
         return targetConcept;
-    }
-
-    public static boolean linkable(@NotNull Term x) {
-//        return !(target instanceof Variable);
-        if (x instanceof Variable) {
-            return false;
-        }
-        if (x instanceof Compound) {
-
-            if (x.op() == Op.NEG) {
-                if (((Compound) x).term(0) instanceof Variable)
-                    return false;
-            }
-            if (!x.isNormalized())
-                return false;
-        }
-        return true;
     }
 
     public void link(Concept src, Term target, float scale, int depth) {

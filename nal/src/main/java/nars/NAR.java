@@ -10,6 +10,7 @@ import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
+import nars.concept.InvalidConceptException;
 import nars.index.TermIndex;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
@@ -18,6 +19,7 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.task.MutableTask;
 import nars.term.Compound;
+import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -623,7 +625,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 }
 
 
-            } catch (Exception e) {
+            } catch (InvalidConceptException|InvalidTermException|InvalidTaskException e) {
 
                 input.feedback(null, Float.NaN, Float.NaN, this);
 
@@ -1058,7 +1060,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return concept(tt.term(), createIfMissing);
     }
 
-    public @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) throws TermIndex.InvalidConceptException {
+    public @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) throws InvalidConceptException {
         return index.concept(t, createIfMissing);
     }
 

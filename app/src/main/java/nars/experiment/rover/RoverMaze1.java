@@ -91,12 +91,12 @@ public class RoverMaze1 {
 
         }
 
-        public void addRetinaGrid(v3 fwd, v3 left, v3 up, int w, int h, float rangeMax) {
+        public void addRetinaGrid(v3 src, v3 fwd, v3 left, v3 up, int w, int h, float rangeMax) {
             for (int x = 0; x < w; x++) {
                 for (int y = 0; y < h; y++) {
                     Retina r = new Retina();
 
-                    r.localPosition = v();
+                    r.localPosition = src; ///v(src);
 
                     r.localDirection = v(fwd);
                     r.localDirection.addScaled(left, 2f * (((float)x)/(w-1) - 0.5f));
@@ -135,7 +135,7 @@ public class RoverMaze1 {
 
     public static void main(String[] args) {
         Rover r = new Rover(new Default());
-        r.addRetinaGrid(v(0,0,1), v(0.1f,0,0), v(0,0.1f,0), 6,6, 4f);
+        r.addRetinaGrid(v(), v(0,0,1), v(0.1f,0,0), v(0,0.1f,0), 6,6, 4f);
 
         new SpaceGraph<>(
                 new Maze("x", 20, 20),

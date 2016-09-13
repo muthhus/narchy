@@ -3,7 +3,7 @@ package nars;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.concept.TruthDelta;
-import nars.index.TermIndex;
+import nars.concept.InvalidConceptException;
 import nars.nal.Stamp;
 import nars.task.MutableTask;
 import nars.task.Revision;
@@ -558,7 +558,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * if unnormalized, returns a normalized version of the task,
      * null if not normalizable
      */
-    void normalize(@NotNull NAR memory) throws NAR.InvalidTaskException, TermIndex.InvalidConceptException;
+    void normalize(@NotNull NAR memory) throws NAR.InvalidTaskException, InvalidConceptException;
 
 
 //    default void ensureValidParentTaskRef() {

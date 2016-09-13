@@ -1,7 +1,7 @@
 package nars;
 
 import nars.nar.Default;
-import nars.op.in.NQuadsRDF;
+import nars.rdfowl.NQuadsRDF;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
