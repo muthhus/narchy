@@ -89,10 +89,10 @@ public class Pacman extends NAgent {
         //Multi nar = new Multi(3,512,
 
         Default nar = new Default(1024,
-                256, 3, 5, rng,
+                128, 3, 5, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe2),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 2),
-                new FrameClock(), exe2
+                new FrameClock(), exe
 
         );
         nar.preprocess(new VariableCompressor.Precompressor(nar));
@@ -101,7 +101,7 @@ public class Pacman extends NAgent {
         //new MemoryManager(nar);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.6f);
 
         float pMult = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.4f * pMult;

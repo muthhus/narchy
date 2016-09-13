@@ -54,27 +54,28 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         //n.log();
         //n.input("(a<->b).", "(b<->c).");
 
-        //new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
+        new DeductiveMeshTest(n, new int[]{3, 3}, 16384);
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
 
         Param.DEBUG = true;
-        n
+//        n
 //                //.log()
 //                //.logSummaryGT(System.out, 0.05f)
-                .input(
-//                        "((parent($X,$Y) && parent($Y,$Z)) <=> grandparent($X,$Z)).",
-//                        "parent(c, p).",
-//                        "parent(p, g).",
-//                        "grandparent(p, #g)?"
-                        "x:(a,b)."
-//                        "$0.9;0.9;0.9$ (a,(b,(c,(d,e))))."
-//
-                );
+//                .input(
+////                        "((parent($X,$Y) && parent($Y,$Z)) <=> grandparent($X,$Z)).",
+////                        "parent(c, p).",
+////                        "parent(p, g).",
+////                        "grandparent(p, #g)?"
+//                        "x:(a,(b,c))."
+////                        "$0.9;0.9;0.9$ (a,(b,(c,(d,e))))."
+////
+//                );
 //                //.run(800);
 //
-//        n.loop(15f);
-        n.run(1);
+        n.linkFeedbackRate.setValue(0.95f);
+        n.loop(15f);
+        //n.run(1);
 //        n.forEachConcept(c -> {
 //            c.print();
 //        });

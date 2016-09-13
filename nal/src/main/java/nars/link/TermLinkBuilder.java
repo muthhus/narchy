@@ -36,11 +36,23 @@ public enum TermLinkBuilder {
 //    final static int levelBoost = Op.or(Op.EQUIV, Op.CONJ, Op.IMPL);
 
     private static int levels(Compound host) {
-//        if (host.op().in(levelBoost)) {
-//            return 3;
-//        } else {
-            return 2;
-        //}
+        switch (host.op()) {
+            case SETe:
+            case SETi:
+            case IMGe:
+            case IMGi:
+            case PROD:
+            case SIM:
+            case DIFFe:
+            case DIFFi:
+            case SECTi:
+            case SECTe:
+            //case INH:
+                return 1;
+            default:
+                return 2;
+        }
+//            return 2;
     }
 
 
@@ -59,18 +71,20 @@ public enum TermLinkBuilder {
 
         } else {
 
+
             if (t instanceof Compound) {
                 t = nar.normalize((Compound) t);
+                if (t!=null && t.op() == NEG)
+                    throw new RuntimeException("should not be NEG");
             }
 
-            if (t.op() == NEG)
-                throw new RuntimeException("should not be NEG");
+
 
             //it seems that its possible that t can become null from normalizing a temporal compound,
             // if it collapses values to atemporal state
             //in this case, descend to components but dont add the null as a template
 
-            if (t == null || target.add(t)) { //do not descend on repeats
+            if (t != null && target.add(t)) { //do not descend on repeats
 
                 if (level > 0 && t instanceof Compound) {
                     Compound cct = (Compound) t;

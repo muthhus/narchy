@@ -63,7 +63,7 @@ public class Tetris extends NAgent {
             new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 55000;
-    public static final int cyclesPerFrame = 1;
+    public static final int cyclesPerFrame = 2;
     public static final int tetris_width = 6;
     public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 4;
@@ -383,7 +383,7 @@ public class Tetris extends NAgent {
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
         nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.5f);
 
         float p = 0.2f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;
@@ -394,7 +394,8 @@ public class Tetris extends NAgent {
 
         nar.confMin.setValue(0.03f);
 
-        nar.compoundVolumeMax.setValue(32);
+        nar.compoundVolumeMax.setValue(24);
+        nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);
 

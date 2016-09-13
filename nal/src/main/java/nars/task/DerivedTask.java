@@ -108,7 +108,8 @@ abstract public class DerivedTask extends MutableTask {
                 float boost =
                         //1f + or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
                         //1f + deltaConfidence * Math.abs(deltaSatisfaction);
-                        1f + Math.max(deltaConfidence, deltaSatisfaction);
+                        //1f + Math.max(deltaConfidence, deltaSatisfaction);
+                        1f + Math.max(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
 
                 if (!Util.equals(boost, 1f, Param.TRUTH_EPSILON)) {
                     feedback(boost, nar);

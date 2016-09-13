@@ -151,12 +151,12 @@ public interface Concept extends Termed {
         float halfScale = scale / 2f;
 
         Activation a = new Activation(otherTask, null, nar);
-        a.link(this, other.term(), halfScale);
-        a.commit(1f);
+        a.link(this, other.term(), halfScale, 0);
+        //a.commit(1f);
 
         Activation b = new Activation(thisInput, null, nar);
-        b.link(other, term(), halfScale);
-        b.commit(1f);
+        b.link(other, term(), halfScale, 0);
+        //b.commit(1f);
     }
 
 //    /** link to a specific peer */

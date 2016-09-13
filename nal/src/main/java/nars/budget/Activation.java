@@ -25,6 +25,8 @@ import static nars.Param.TRUTH_EPSILON;
  */
 public class Activation {
 
+    private static final int TASKLINK_DEPTH_LIMIT = 1;
+
     public final Budgeted in;
 
     public final Concept src;
@@ -149,32 +151,30 @@ public class Activation {
     }
 
     protected final void link(float scale) {
-        link(src, src.term(), scale);
+        link(src, src.term(), scale, 0);
 
         commit(scale); //values will already be scaled
     }
 
     public void linkTermLinks(Concept src, float scale) {
         src.termlinks().forEach(n -> {
-            link(src, n.get(), scale);
+            link(src, n.get(), scale, 0);
         });
     }
 
-    public void linkTerms(@NotNull Concept src, @NotNull Term[] tgt, float scale, float minScale) {
-
-
+    public void linkTerms(@NotNull Concept src, @NotNull Term[] tgt, float scale, float minScale, int depth) {
 
         int n = tgt.length;
         float tStrength = 1f / n;
         float subScale = scale * tStrength;
 
-        if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
+        if (subScale >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
 
             //then link this to terms
             for (int i = 0; i < n; i++) {
                 Term tt = tgt[i];
 
-                link(src, tt, subScale); //Link the peer termlink bidirectionally
+                link(src, tt, subScale, depth+1); //Link the peer termlink bidirectionally
             }
         }
 
@@ -184,8 +184,7 @@ public class Activation {
      * crosslinks termlinks
      */
     @Nullable
-    Concept linkSubterm(@NotNull Concept source, @NotNull Termed target,
-                        float subScale) {
+    Concept linkSubterm(@NotNull Concept source, @NotNull Termed target, float subScale, int depth) {
 
     /* activate concept */
         Concept targetConcept;
@@ -203,7 +202,7 @@ public class Activation {
             activateConcept(targetConcept, subScale);
 
             if (targetConcept instanceof CompoundConcept)
-                linkTemplates(targetConcept, subScale);
+                linkTemplates(targetConcept, subScale, depth);
 
 //            activate(targetConcept, subScale);
 //            targetConcept = nar.activate(target,
@@ -251,19 +250,22 @@ public class Activation {
         return true;
     }
 
-    public void link(Concept src, Term target, float scale) {
+    public void link(Concept src, Term target, float scale, int depth) {
 
-        Concept targetConcept = linkSubterm(src, target, scale);
+        Concept targetConcept = linkSubterm(src, target, scale, depth);
 
-        if (targetConcept != null && in instanceof Task) {
+
+        if (targetConcept != null && in instanceof Task && depth <= TASKLINK_DEPTH_LIMIT) {
+            //System.out.println(in + " <- " + targetConcept + " " + depth);
+
             linkTask(scale, targetConcept);
         }
 
 
     }
 
-    protected void linkTemplates(Concept src, float subScale) {
-        linkTerms(src, ((CompoundConcept)src).templates.terms(), subScale, Param.BUDGET_EPSILON);
+    protected void linkTemplates(Concept src, float subScale, int depth) {
+        linkTerms(src, ((CompoundConcept)src).templates.terms(), subScale, Param.BUDGET_EPSILON, depth);
     }
 
     public void linkTask(float subScale, Concept target) {
