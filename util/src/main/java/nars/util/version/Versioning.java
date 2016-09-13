@@ -116,9 +116,6 @@ public class Versioning extends FasterList<Versioned> {
         revert(0);
     }
 
-    public <Y> void delete(Versioned<Y> v) {
-        v.clear();
-    }
 
     public final boolean isFull() {
         return now+1 >= capacity;

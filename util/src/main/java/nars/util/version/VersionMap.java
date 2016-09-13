@@ -33,13 +33,15 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     @Override
     public final boolean containsKey(Object key) {
-        return map.containsKey(key);
+        throw new UnsupportedOperationException(); //requires filtering
+        //return map.containsKey(key);
     }
 
     @NotNull
     @Override
     public Set<X> keySet() {
-        return map.keySet();
+        throw new UnsupportedOperationException(); //requires filtering
+        //return map.keySet();
     }
 
     //    @Override
@@ -53,7 +55,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         Versioned<Y> x = map.remove(key);
         if (x != null) {
             Y value = x.get();
-            context.delete(x);
+            x.clear();
             return value;
         } else {
             return null;
@@ -72,12 +74,17 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     @Override
     public final int size() {
-        return map.size();
+        final int[] count = {0};
+        map.forEach((k,v)->{
+           if (v.get()!=null)
+               count[0]++;
+        });
+        return count[0];
     }
 
     @Override
     public final boolean isEmpty() {
-        return map.isEmpty();
+        return size()==0;
     }
 
 //    @Override
@@ -178,7 +185,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     @Override
     public final Y get(/*X*/Object key) {
-        Versioned<Y> v = version((X) key);
+        Versioned<Y> v = map.get(key);
         return v != null ? v.get() : null;
     }
 
