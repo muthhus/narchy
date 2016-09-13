@@ -381,9 +381,9 @@ abstract public class NAgent {
         new Activation(boostBudget, c, nar, 1) {
 
             @Override
-            public void commit(@NotNull NAR nar, float scale) {
-                linkTermLinks(c, scale, nar);
-                super.commit(nar, scale);
+            public void commit(float scale) {
+                linkTermLinks(c, scale);
+                super.commit(scale);
             }
         };
 
@@ -403,14 +403,14 @@ abstract public class NAgent {
             if (t.isDeleted())
                 BudgetMerge.max.apply(t.budget(), boostBudget, 1); //resurrect
 
-            //re-use existing eternal task
-            Activation a = new Activation(t, nar, 1f) {
-                @Override
-                public void linkTerms(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
-                    linkTermLinks(src, scale, nar);
-                    super.linkTerms(src, tgt, scale, minScale, nar);
-                }
-            };
+//            //re-use existing eternal task
+//            Activation a = new Activation(t, nar, 1f) {
+//                @Override
+//                public void linkTerms(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
+//                    linkTermLinks(src, scale, nar);
+//                    super.linkTerms(src, tgt, scale, minScale, nar);
+//                }
+//            };
         }
 
     }

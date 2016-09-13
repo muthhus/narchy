@@ -67,7 +67,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                        "parent(c, p).",
 //                        "parent(p, g).",
 //                        "grandparent(p, #g)?"
-                        "a:b."
+                        "x:(a,b)."
 //                        "$0.9;0.9;0.9$ (a,(b,(c,(d,e))))."
 //
                 );

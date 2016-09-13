@@ -32,10 +32,12 @@ public class Activation {
     public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
     public final MutableFloat linkOverflow = new MutableFloat(0);
     public final MutableFloat conceptOverflow = new MutableFloat(0);
+    private final NAR nar;
 
 
-    public Activation(Budgeted in, Concept src) {
+    public Activation(Budgeted in, Concept src, NAR nar) {
 
+        this.nar = nar;
         this.in = in;
         this.src = src;
 
@@ -45,16 +47,16 @@ public class Activation {
      * runs the task activation procedure
      */
     public Activation(Budgeted in, Concept c, NAR nar, float scale) {
-        this(in, c);
+        this(in, c, nar);
 
-        link(nar, scale);
+        link(scale);
 
     }
 
-    public Activation(@NotNull Task in, @NotNull NAR n, float scale) {
-        this(in, in.concept(n));
+    public Activation(@NotNull Task in, @NotNull NAR nar, float scale) {
+        this(in, in.concept(nar), nar);
         activateConcept(src, scale);
-        link(n, scale);
+        link(scale);
     }
 
     /**
@@ -69,7 +71,7 @@ public class Activation {
         this(input, concept, nar, scale);
 
         if (delta!=null) {
-            feedback(input, delta, concept, nar);
+            feedback(input, delta, concept);
         }
     }
 
@@ -77,7 +79,7 @@ public class Activation {
     /**
      * apply derivation feedback and update NAR emotion state
      */
-    protected void feedback(Task input, TruthDelta delta, CompoundConcept concept, NAR nar) {
+    protected void feedback(Task input, TruthDelta delta, CompoundConcept concept) {
 
 
         //update emotion happy/sad
@@ -146,19 +148,19 @@ public class Activation {
 
     }
 
-    protected final void link(NAR nar, float scale) {
-        linkTerm(src, src.term(), nar, scale);
+    protected final void link(float scale) {
+        link(src, src.term(), scale);
 
-        commit(nar, scale); //values will already be scaled
+        commit(scale); //values will already be scaled
     }
 
-    public void linkTermLinks(Concept src, float scale, NAR nar) {
+    public void linkTermLinks(Concept src, float scale) {
         src.termlinks().forEach(n -> {
-            linkTerm(src, n.get(), nar, scale);
+            link(src, n.get(), scale);
         });
     }
 
-    public void linkTerms(@NotNull Concept src, @NotNull Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
+    public void linkTerms(@NotNull Concept src, @NotNull Term[] tgt, float scale, float minScale) {
 
 
 
@@ -172,7 +174,7 @@ public class Activation {
             for (int i = 0; i < n; i++) {
                 Term tt = tgt[i];
 
-                linkTerm(src, tt, nar, subScale); //Link the peer termlink bidirectionally
+                link(src, tt, subScale); //Link the peer termlink bidirectionally
             }
         }
 
@@ -183,8 +185,7 @@ public class Activation {
      */
     @Nullable
     Concept linkSubterm(@NotNull Concept source, @NotNull Termed target,
-                        float subScale,
-                        @NotNull NAR nar) {
+                        float subScale) {
 
     /* activate concept */
         Concept targetConcept;
@@ -202,7 +203,7 @@ public class Activation {
             activateConcept(targetConcept, subScale);
 
             if (targetConcept instanceof CompoundConcept)
-                linkTemplates(targetConcept, nar, subScale);
+                linkTemplates(targetConcept, subScale);
 
 //            activate(targetConcept, subScale);
 //            targetConcept = nar.activate(target,
@@ -250,9 +251,9 @@ public class Activation {
         return true;
     }
 
-    public void linkTerm(Concept src, Term target, @NotNull NAR nar, float scale) {
+    public void link(Concept src, Term target, float scale) {
 
-        Concept targetConcept = linkSubterm(src, target, scale, nar);
+        Concept targetConcept = linkSubterm(src, target, scale);
 
         if (targetConcept != null && in instanceof Task) {
             linkTask(scale, targetConcept);
@@ -261,16 +262,17 @@ public class Activation {
 
     }
 
-    protected void linkTemplates(Concept src, @NotNull NAR nar, float subScale) {
-        linkTerms(src, ((CompoundConcept)src).templates.terms(), subScale, Param.BUDGET_EPSILON, nar);
+    protected void linkTemplates(Concept src, float subScale) {
+        linkTerms(src, ((CompoundConcept)src).templates.terms(), subScale, Param.BUDGET_EPSILON);
     }
 
     public void linkTask(float subScale, Concept target) {
+
         target.tasklinks().put((Task)in, in, subScale, null);
     }
 
 
-    public void commit(@NotNull NAR nar, float scale) {
+    public void commit(float scale) {
         if (!concepts.isEmpty()) {
             float total =
                     //1 / (float) concepts.sum(); //normalized

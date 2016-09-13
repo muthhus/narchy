@@ -373,7 +373,7 @@ public class Tetris extends NAgent {
         //Multi nar = new Multi(3,512,
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                48, 2, 2, rng,
+                72, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 32768, 3),
                 new FrameClock(), e

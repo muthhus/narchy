@@ -45,9 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
-
-import static nars.time.Tense.ETERNAL;
 
 public interface Concept extends Termed {
 
@@ -153,13 +150,13 @@ public interface Concept extends Termed {
     default void crossLink(Budgeted thisInput, Budgeted otherTask, float scale, @NotNull Concept other, @NotNull NAR nar) {
         float halfScale = scale / 2f;
 
-        Activation a = new Activation(otherTask, null);
-        a.linkTerm(this, other.term(), nar, halfScale);
-        a.commit(nar, 1f);
+        Activation a = new Activation(otherTask, null, nar);
+        a.link(this, other.term(), halfScale);
+        a.commit(1f);
 
-        Activation b = new Activation(thisInput, null);
-        b.linkTerm(other, term(), nar, halfScale);
-        b.commit(nar, 1f);
+        Activation b = new Activation(thisInput, null, nar);
+        b.link(other, term(), halfScale);
+        b.commit(1f);
     }
 
 //    /** link to a specific peer */

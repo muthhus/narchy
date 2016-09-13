@@ -13,9 +13,6 @@ import java.util.function.Consumer;
  */
 public final class Forget implements Consumer<BLink> {
 
-    //TODO document and move to Param.java
-    public static final float BAG_THRESHOLD = 0.25f;
-
     public final float r;
 
     static final float maxEffectiveDurability = 1f;
@@ -45,7 +42,7 @@ public final class Forget implements Consumer<BLink> {
 
     @Nullable
     public static Forget forget(float pressure, float existingMass, int cap) {
-        return forget(pressure, existingMass, cap, BAG_THRESHOLD);
+        return forget(pressure, existingMass, cap, Param.BAG_THRESHOLD);
     }
 
     @Override

@@ -47,6 +47,9 @@ public abstract class Param /*extends Container*/ implements Level {
     /** factor applied to budgeting backward question derivations */
     public static final float BACKWARD_DERIVATION_FACTOR = 1f;
 
+    /** average priority target for bag forgetting */
+    public static final float BAG_THRESHOLD = 0.5f;
+
     /** used in linear interpolating link adjustments during feedback */
     public final MutableFloat linkFeedbackRate = new MutableFloat(0.05f);
 
