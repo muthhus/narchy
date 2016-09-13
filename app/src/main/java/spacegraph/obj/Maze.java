@@ -1,9 +1,7 @@
 package spacegraph.obj;
 
-import com.jogamp.opengl.GL2;
 import nars.$;
 import spacegraph.SimpleSpatial;
-import spacegraph.SpaceGraph;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
@@ -14,7 +12,6 @@ import spacegraph.phys.shape.*;
 import spacegraph.phys.util.Motion;
 
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.List;
 
 import static spacegraph.math.v3.v;
@@ -68,7 +65,7 @@ public class Maze extends SimpleSpatial {
                     );
                     b.setCenterOfMassTransform(new Transform(x, y, 0));
                     b.setRenderer(this);
-                    b.setUserPointer(this);
+                    b.setData(this);
 
                     //b.setLinearFactor(1,1,0); //restricts movement to a 2D plane
 
@@ -91,7 +88,7 @@ public class Maze extends SimpleSpatial {
         Dynamic ground = Dynamics.newBody(0f, groundShape, new Motion(), +1, -1);
         ground.setCenterOfMassTransform(new Transform(0, 0, -15f));
         ground.setRenderer(this);
-        ground.setUserPointer(this);
+        ground.setData(this);
         l.add(ground);
 
 

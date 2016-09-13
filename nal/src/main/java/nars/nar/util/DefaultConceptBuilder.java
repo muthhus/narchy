@@ -32,7 +32,7 @@ import static nars.time.Tense.DTERNAL;
 /**
  * Created by me on 2/24/16.
  */
- public class DefaultConceptBuilder implements Concept.ConceptBuilder {
+ public class DefaultConceptBuilder implements ConceptBuilder {
 
 //    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
 //    private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 32;

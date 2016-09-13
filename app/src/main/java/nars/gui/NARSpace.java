@@ -14,6 +14,7 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
+import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,26 +54,30 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         //n.log();
         //n.input("(a<->b).", "(b<->c).");
 
-        //new DeductiveMeshTest(n, new int[]{6, 6}, 16384);
+        //new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
 
         Param.DEBUG = true;
         n
-                //.log()
-                //.logSummaryGT(System.out, 0.05f)
+//                //.log()
+//                //.logSummaryGT(System.out, 0.05f)
                 .input(
 //                        "((parent($X,$Y) && parent($Y,$Z)) <=> grandparent($X,$Z)).",
 //                        "parent(c, p).",
 //                        "parent(p, g).",
 //                        "grandparent(p, #g)?"
-                        "a:b.",
-                        "b:c.",
-                        "c:d."
+                        "a:b."
+//                        "$0.9;0.9;0.9$ (a,(b,(c,(d,e))))."
+//
                 );
-                //.run(800);
-
-        n.loop(15f);
+//                //.run(800);
+//
+//        n.loop(15f);
+        n.run(1);
+//        n.forEachConcept(c -> {
+//            c.print();
+//        });
 
     }
 
@@ -99,7 +104,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
 
                 Consumer<BLink<? extends Termed>> linkAdder = l -> {
-                    if (root.numEdges < maxEdges)
+                    if (!l.get().term().equals(root.key) && root.numEdges < maxEdges)
                         root.addLink(space, l);
                 };
                 concept.tasklinks().forEach(linkAdder);

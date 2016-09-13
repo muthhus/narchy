@@ -6,6 +6,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.link.BLink;
 import nars.nal.Conclusion;
 import nars.nal.Deriver;
@@ -25,8 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -65,7 +64,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
     private final MutableInteger cyclesPerFrame;
-    private final Concept.ConceptBuilder conceptBuilder;
+    private final ConceptBuilder conceptBuilder;
 
 //
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);

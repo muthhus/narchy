@@ -39,27 +39,27 @@ public interface AbstractConcept extends Concept {
     //public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
 
 
-    /**
-     * attempt insert a tasklink into this concept's tasklink bag
-     * return true if successfully inserted
-     *
-     * when a task is processed, a tasklink
-     * can be created at the concept of its term
-     *
-     * @return whether the link successfully was completed
-     */
-    static boolean link(Concept c, float scale, float minScale, @NotNull Activation activation) {
-
-        if (scale < minScale)
-            return false;
-
-        Budgeted b = activation.in;
-        if (b instanceof Task) {
-            c.linkTask((Task)b, scale);
-        }
-
-        return true;
-    }
+//    /**
+//     * attempt insert a tasklink into this concept's tasklink bag
+//     * return true if successfully inserted
+//     *
+//     * when a task is processed, a tasklink
+//     * can be created at the concept of its term
+//     *
+//     * @return whether the link successfully was completed
+//     */
+//    static boolean link(Concept c, float scale, float minScale, @NotNull Activation activation) {
+//
+//        if (scale < minScale)
+//            return false;
+//
+//        Budgeted b = activation.in;
+//        if (b instanceof Task) {
+//            c.linkTask((Task)b, scale);
+//        }
+//
+//        return true;
+//    }
 
 
     //    @Override @NotNull
@@ -181,10 +181,6 @@ public interface AbstractConcept extends Concept {
         tasklinks().clear();
     }
 
-    @Override
-    default void linkTask(@NotNull Task t, float scale) {
-       tasklinks().put(t, t, scale, null);
-    }
 
 
 

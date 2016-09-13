@@ -199,11 +199,6 @@ public class TermjectConcept<X> implements AbstractConcept, Termject<X> {
         return QuestionTable.EMPTY;
     }
 
-    @Override
-    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
-        return AbstractConcept.link(this, scale, minScale, activation);
-
-    }
 
     @Override
     public @Nullable ConceptPolicy policy() {

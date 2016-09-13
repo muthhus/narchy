@@ -8,7 +8,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
-import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.index.TermIndex;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -1038,7 +1038,7 @@ public enum $ {
 
         @Nullable
         @Override
-        public Concept.@Nullable ConceptBuilder conceptBuilder() {
+        public ConceptBuilder conceptBuilder() {
             return null;
         }
 

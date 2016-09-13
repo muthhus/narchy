@@ -2,6 +2,7 @@ package nars.index;
 
 import nars.*;
 import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
@@ -97,7 +98,7 @@ public abstract class TermIndex extends TermBuilder {
      */
     public abstract int size();
 
-    @Nullable abstract public Concept.ConceptBuilder conceptBuilder();
+    @Nullable abstract public ConceptBuilder conceptBuilder();
 
 
 

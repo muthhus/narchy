@@ -2,7 +2,7 @@ package nars.index;
 
 import nars.Op;
 import nars.Param;
-import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -21,9 +21,9 @@ public abstract class MaplikeIndex extends TermIndex {
 
 
 
-    private final Concept.ConceptBuilder conceptBuilder;
+    private final ConceptBuilder conceptBuilder;
 
-    public MaplikeIndex(Concept.ConceptBuilder conceptBuilder) {
+    public MaplikeIndex(ConceptBuilder conceptBuilder) {
         this.conceptBuilder = conceptBuilder;
     }
 
@@ -203,7 +203,7 @@ public abstract class MaplikeIndex extends TermIndex {
 //    }
 
     @Override
-    public final Concept.ConceptBuilder conceptBuilder() {
+    public final ConceptBuilder conceptBuilder() {
         return conceptBuilder;
     }
 

@@ -1,6 +1,6 @@
 package nars.index;
 
-import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,7 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
 
     protected final Map<Termed,Termed> concepts;
 
-    SimpleMapIndex(Concept.ConceptBuilder conceptBuilder, Map<Termed, Termed> compounds) {
+    SimpleMapIndex(ConceptBuilder conceptBuilder, Map<Termed, Termed> compounds) {
         super(conceptBuilder);
         this.concepts = compounds;
     }

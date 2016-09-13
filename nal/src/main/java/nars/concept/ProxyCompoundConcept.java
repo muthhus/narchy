@@ -100,16 +100,6 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound> {
     }
 
 
-//    @Override
-//    public boolean contains(@NotNull Task t) {
-//        return target.contains(t);
-//    }
-
-    @Override
-    public void linkTask(@NotNull Task t, float scale) {
-        target.linkTask(t, scale);
-    }
-
     /**
      * Pending Quests to be answered by new desire values
      */
@@ -118,11 +108,6 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound> {
     public final QuestionTable quests() {
         return (target.quests());
     }
-
-//    @Override
-//    public TruthDelta process(@NotNull Task task, @NotNull NAR nar) {
-//        return target.process(task, nar);
-//    }
 
     @NotNull
     @Override
@@ -177,10 +162,6 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound> {
         return (target.goals());
     }
 
-    @Override
-    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
-        return target.link(scale, src, minScale, nar, activation);
-    }
 
 
 

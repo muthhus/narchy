@@ -165,7 +165,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         float qua = l.qua();
 
         //width relative to the radius of the atom
-        float minLineWidth = 0.15f;
+        float minLineWidth = 0.1f;
         float maxLineWidth = 0.5f;
         float width = minLineWidth + (maxLineWidth - minLineWidth) * pri;
 

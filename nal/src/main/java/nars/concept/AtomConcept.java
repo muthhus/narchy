@@ -107,31 +107,6 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
     }
 
 
-    @Override
-    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
-        return AbstractConcept.link(this, scale, minScale, activation);
-    }
-
-    @Override
-    public void linkTask(@NotNull Task t, float scale) {
-
-        tasklinks().put(t, t, scale, null);
-
-        //experimental: activate links with the incoming budget
-//        @NotNull Bag<Term> tl = termlinks();
-//
-//        int s = tl.size();
-//        float subScale = scale / s;
-//
-//        if (subScale >= Param.BUDGET_EPSILON) {
-//            //if (subScale >= minScale) {
-//            Budget in = t.budget();
-//            final BudgetMerge merge = BudgetMerge.plusBlend;
-//            tl.forEach(x -> merge.apply(x, in, subScale));
-//            //}
-//            //TODO adjust the bag's pending mass with a Bag multi-item method that does this precisely and efficiently
-//        }
-    }
 
 
 

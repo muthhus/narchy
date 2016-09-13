@@ -57,7 +57,6 @@ public interface Concept extends Termed {
 
     @Nullable Map<Object, Object> meta();
 
-
     @Nullable
     Object put(@NotNull Object key, @Nullable Object value);
 
@@ -73,7 +72,6 @@ public interface Concept extends Termed {
     /** follows Map.compute() semantics */
     @NotNull
     <C> C meta(Object key, BiFunction value);
-
 
     @NotNull BeliefTable beliefs();
 
@@ -103,10 +101,6 @@ public interface Concept extends Termed {
         return hasGoals() ? goals().truth(now) : null;
     }
 
-
-//    boolean contains(Task t);
-
-
     default boolean hasGoals() {
         return !goals().isEmpty();
     }
@@ -121,7 +115,6 @@ public interface Concept extends Termed {
         return !quests().isEmpty();
     }
 
-
     @Nullable
     default TaskTable tableFor(char punc) {
         switch(punc) {
@@ -134,16 +127,6 @@ public interface Concept extends Termed {
         }
     }
 
-//    default BeliefTable tableAnswering(char punc) {
-//        switch (punc) {
-//            case Symbols.QUESTION: return beliefs();
-//            case Symbols.QUEST: return goals();
-//            default:
-//                throw new UnsupportedOperationException();
-//        }
-//    }
-
-
     default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull NAR nar) {
         long now = nar.time();
         Truth truth = ((BeliefTable) tableFor(y.punc())).truth(when, now);
@@ -154,52 +137,29 @@ public interface Concept extends Termed {
 
 
 
-    boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation);
-
-    void linkTask(@NotNull Task t, float scale);
-
-
-    default boolean link(float initialScale, @NotNull NAR nar, @NotNull Activation activation) {
-
-        float p = activation.in.priIfFiniteElseNeg1();
-        float minScale = nar.taskLinkThreshold.floatValue() / p;
-
-        if (p <= minScale)
-            return false;
-
-        return link(initialScale, activation.in,
-                minScale, //minScale
-                nar, activation);
-    }
-
     /**
      * @param src  task with a term equal to this concept's
      * @param tgt task with a term equal to another concept's
      * @return number of links created (0, 1, or 2)
      */
     default void crossLink(@NotNull Budgeted src, @NotNull Task tgt, float scale, @NotNull NAR nar) {
-
         Concept other = tgt.concept(nar);
         if (other == null || other.equals(this))
             return; //null or same concept
 
         crossLink(src, tgt, scale, other, nar);
-
     }
 
     default void crossLink(Budgeted thisInput, Budgeted otherTask, float scale, @NotNull Concept other, @NotNull NAR nar) {
         float halfScale = scale / 2f;
 
         Activation a = new Activation(otherTask, null);
-
-        this.link(halfScale, nar, a);
+        a.linkTerm(this, other.term(), nar, halfScale);
+        a.commit(nar, 1f);
 
         Activation b = new Activation(thisInput, null);
-
-        other.link(halfScale, nar, b);
-
-        a.run(nar);
-        b.run(nar);
+        b.linkTerm(other, term(), nar, halfScale);
+        b.commit(nar, 1f);
     }
 
 //    /** link to a specific peer */
@@ -382,19 +342,6 @@ public interface Concept extends Termed {
     default void commit() {
         tasklinks().commit();
         termlinks().commit();
-
-//        if (Param.DEBUG) {
-//            if ((((ArrayBag) termlinks()).map).size() > 1 + termlinks().capacity() + tasklinks().capacity()) {
-//                //inconsistent item
-//                System.err.println(
-//                        term() + "\tmap=" +
-//                                (((ArrayBag) termlinks()).map).size() + ":  " +
-//                                termlinks().size() + "/" + termlinks().capacity() + "\t" +
-//                                tasklinks().size() + "/" + tasklinks().capacity());
-//            }
-//        }
-
-
     }
 
 
@@ -428,23 +375,4 @@ public interface Concept extends Termed {
 //        return filter(termToConcept, Concept.class); //should remove null's (unless they never get included anyway), TODO Check that)
 //    }
 
-    /**
-     * Created by me on 3/23/16.
-     */
-    interface ConceptBuilder extends Function<Term, Termed> {
-
-//        @NotNull
-//        Bag<Task> taskbag();
-//        Bag<Term> termbag(Map<Term, Term> map);
-
-        @NotNull ConceptPolicy init();
-        @NotNull ConceptPolicy awake();
-        @NotNull ConceptPolicy sleep();
-
-        void start(NAR nar);
-
-        default void init(Concept c) {
-            c.policy(init(), ETERNAL, Task.EmptyTaskList);
-        }
-    }
 }

@@ -320,7 +320,7 @@ public class Collidable<X> {
 		return userObjectPointer;
 	}
 
-	public void setUserPointer(X userObjectPointer) {
+	public void setData(X userObjectPointer) {
 		this.userObjectPointer = userObjectPointer;
 	}
 

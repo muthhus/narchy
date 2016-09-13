@@ -349,15 +349,15 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
 
-    @Override
-    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
-        if (AbstractConcept.link(this, scale, minScale, activation)) {
-            activation.linkTerms(this, templates.terms(), scale, minScale, nar);
-            return true;
-        }
-
-        return false;
-    }
+//    @Override
+//    public boolean link(float scale, @Deprecated Budgeted src, float minScale, @NotNull NAR nar, @NotNull Activation activation) {
+//        if (AbstractConcept.link(this, scale, minScale, activation)) {
+//            activation.linkTerms(this, templates.terms(), scale, minScale, nar);
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority

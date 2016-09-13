@@ -664,14 +664,24 @@ public abstract class Collisions<X> {
 	public static final class LocalRayResult {
 		public final Collidable collidable;
 		public final LocalShapeInfo localShapeInfo;
-		public final v3 hitNormalLocal = new v3();
+		public final v3 hitNormal = new v3();
 		public final float hitFraction;
 
-		public LocalRayResult(Collidable collidable, LocalShapeInfo localShapeInfo, v3 hitNormalLocal, float hitFraction) {
+		public LocalRayResult(Collidable collidable, LocalShapeInfo localShapeInfo, v3 hitNormal, float hitFraction) {
 			this.collidable = collidable;
 			this.localShapeInfo = localShapeInfo;
-			this.hitNormalLocal.set(hitNormalLocal);
+			this.hitNormal.set(hitNormal);
 			this.hitFraction = hitFraction;
+		}
+
+		@Override
+		public String toString() {
+			return "LocalRayResult{" +
+					"collidable=" + collidable +
+					", localShapeInfo=" + localShapeInfo +
+					", hitNormalLocal=" + hitNormal +
+					", hitFraction=" + hitFraction +
+					'}';
 		}
 	}
 	

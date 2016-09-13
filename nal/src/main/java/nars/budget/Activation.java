@@ -24,19 +24,15 @@ import static nars.Param.TRUTH_EPSILON;
  * Created by me on 8/22/16.
  */
 public class Activation {
+
     public final Budgeted in;
 
-    public Concept src;
-    //final ObjectFloatHashMap<BLink<Task>> tasks = new ObjectFloatHashMap<>();
-    //public final ObjectFloatHashMap<BLink<Term>> termlinks = new ObjectFloatHashMap<>();
+    public final Concept src;
+
     public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
     public final MutableFloat linkOverflow = new MutableFloat(0);
     public final MutableFloat conceptOverflow = new MutableFloat(0);
 
-    public Activation(@NotNull Task in, @NotNull NAR n, float scale) {
-        this(in, in.concept(n));
-        link(n, scale);
-    }
 
     public Activation(Budgeted in, Concept src) {
 
@@ -53,6 +49,12 @@ public class Activation {
 
         link(nar, scale);
 
+    }
+
+    public Activation(@NotNull Task in, @NotNull NAR n, float scale) {
+        this(in, in.concept(n));
+        activateConcept(src, scale);
+        link(n, scale);
     }
 
     /**
@@ -145,27 +147,20 @@ public class Activation {
     }
 
     protected final void link(NAR nar, float scale) {
-        src.link(1f, null/* linkActivation */, Param.BUDGET_EPSILON, nar, this);
+        linkTerm(src, src.term(), nar, scale);
 
-        activate(nar, scale); //values will already be scaled
+        commit(nar, scale); //values will already be scaled
     }
 
     public void linkTermLinks(Concept src, float scale, NAR nar) {
         src.termlinks().forEach(n -> {
-            linkTerm(src, nar, scale, n.get());
+            linkTerm(src, n.get(), nar, scale);
         });
     }
 
-    public void linkTerms(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
+    public void linkTerms(@NotNull Concept src, @NotNull Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
 
 
-        Concept asrc = src;
-        if (asrc != null) {
-            //link the src to this
-            linkSub(src, asrc, scale, nar);
-        } else {
-            activate(src, scale); //activate self
-        }
 
         int n = tgt.length;
         float tStrength = 1f / n;
@@ -177,12 +172,9 @@ public class Activation {
             for (int i = 0; i < n; i++) {
                 Term tt = tgt[i];
 
-
-                //Link the peer termlink bidirectionally
-                linkTerm(src, nar, subScale, tt);
+                linkTerm(src, tt, nar, subScale); //Link the peer termlink bidirectionally
             }
         }
-
 
     }
 
@@ -190,9 +182,9 @@ public class Activation {
      * crosslinks termlinks
      */
     @Nullable
-    Concept linkSub(@NotNull Concept source, @NotNull Termed target,
-                    float subScale,
-                    @NotNull NAR nar) {
+    Concept linkSubterm(@NotNull Concept source, @NotNull Termed target,
+                        float subScale,
+                        @NotNull NAR nar) {
 
     /* activate concept */
         Concept targetConcept;
@@ -207,27 +199,36 @@ public class Activation {
                 throw new NullPointerException(target + " did not resolve to a concept");
             //if (targetConcept!=null)
 
+            activateConcept(targetConcept, subScale);
 
-            activate(targetConcept, subScale);
+            if (targetConcept instanceof CompoundConcept)
+                linkTemplates(targetConcept, nar, subScale);
+
+//            activate(targetConcept, subScale);
 //            targetConcept = nar.activate(target,
 //                    activation);
             //if (targetConcept == null)
             //throw new RuntimeException("termlink to null concept: " + target);
         }
 
-        if (!target.term().equals( source.term() )) {
+        Term sourceTerm = source.term();
+
+        if (!targetTerm.equals(sourceTerm)) {
 
             //        /* insert termlink target to source */
             boolean alsoReverse = true;
             if (targetConcept != null && alsoReverse) {
                 //subScale /= 2; //divide among both directions?
 
-                targetConcept.termlinks().put(source.term(), in, subScale, linkOverflow);
+                targetConcept.termlinks().put(sourceTerm, in, subScale, linkOverflow);
+
+
             }
 
         /* insert termlink source to target */
             source.termlinks().put(targetTerm, in, subScale, linkOverflow);
         }
+
 
         return targetConcept;
     }
@@ -249,30 +250,39 @@ public class Activation {
         return true;
     }
 
-    public void linkTerm(Concept src, @NotNull NAR nar, float subScale, Term tt) {
-        Concept target = linkSub(src, tt, subScale, nar);
+    public void linkTerm(Concept src, Term target, @NotNull NAR nar, float scale) {
 
-        if (target != null && in instanceof Task) {
-            //insert recursive tasklink
-            target.linkTask((Task) in, subScale);
+        Concept targetConcept = linkSubterm(src, target, scale, nar);
+
+        if (targetConcept != null && in instanceof Task) {
+            linkTask(scale, targetConcept);
         }
+
+
     }
 
-    public void run(@NotNull NAR nar) {
-        activate(nar, 1f);
+    protected void linkTemplates(Concept src, @NotNull NAR nar, float subScale) {
+        linkTerms(src, ((CompoundConcept)src).templates.terms(), subScale, Param.BUDGET_EPSILON, nar);
     }
 
-    public void activate(@NotNull NAR nar, float activation) {
+    public void linkTask(float subScale, Concept target) {
+        target.tasklinks().put((Task)in, in, subScale, null);
+    }
+
+
+    public void commit(@NotNull NAR nar, float scale) {
         if (!concepts.isEmpty()) {
             float total =
                     //1 / (float) concepts.sum(); //normalized
                     1f; //unnormalized
 
-            nar.activate(concepts, in, activation / total, conceptOverflow);
+            //System.out.println("commit: " + concepts);
+            nar.activate(concepts, in, scale / total, conceptOverflow);
         }
     }
 
-    public void activate(Concept targetConcept, float scale) {
+    public void activateConcept(Concept targetConcept, float scale) {
+        //System.out.println("+" + scale + " x " + targetConcept);
         concepts.addToValue(targetConcept, scale);
     }
 

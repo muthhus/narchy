@@ -41,10 +41,10 @@ public class ClosestRay extends Collisions.RayResultCallback {
         closestHitFraction = rayResult.hitFraction;
         collidable = rayResult.collidable;
         if (normalInWorldSpace) {
-            hitNormalWorld.set(rayResult.hitNormalLocal);
+            hitNormalWorld.set(rayResult.hitNormal);
         } else {
             // need to transform normal into worldspace
-            hitNormalWorld.set(rayResult.hitNormalLocal);
+            hitNormalWorld.set(rayResult.hitNormal);
             collidable.getWorldTransform(new Transform()).basis.transform(hitNormalWorld);
         }
 

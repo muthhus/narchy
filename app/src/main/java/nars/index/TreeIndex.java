@@ -3,6 +3,7 @@ package nars.index;
 import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -21,12 +22,12 @@ public class TreeIndex extends TermIndex {
 
     public final TermTree concepts = new TermTree();
 
-    private final Concept.ConceptBuilder conceptBuilder;
+    private final ConceptBuilder conceptBuilder;
     private NAR nar;
     //private static float SIZE_UPDATE_PROB = 0.05f;
     private int lastSize = 0;
 
-    public TreeIndex(Concept.ConceptBuilder conceptBuilder) {
+    public TreeIndex(ConceptBuilder conceptBuilder) {
         this.conceptBuilder = conceptBuilder;
     }
 
@@ -90,7 +91,7 @@ public class TreeIndex extends TermIndex {
     }
 
     @Override
-    public @Nullable Concept.ConceptBuilder conceptBuilder() {
+    public @Nullable ConceptBuilder conceptBuilder() {
         return conceptBuilder;
     }
 
@@ -145,7 +146,7 @@ public class TreeIndex extends TermIndex {
 
         private final HijacKache<Term, Termed> L1;
 
-        public L1TreeIndex(Concept.ConceptBuilder conceptBuilder, int cacheSize, int reprobes) {
+        public L1TreeIndex(ConceptBuilder conceptBuilder, int cacheSize, int reprobes) {
             super(conceptBuilder);
             this.L1 = new HijacKache<>(cacheSize, reprobes);
         }

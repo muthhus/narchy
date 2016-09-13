@@ -36,7 +36,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
     public float radius;
     private List<Collidable<X>> bodies = Collections.emptyList();
 
-    protected float[] shapeColor;
+    public float[] shapeColor;
 
     public SimpleSpatial(X x) {
         super(x);
@@ -292,7 +292,7 @@ public class SimpleSpatial<X> extends Spatial<X> {
 
     protected List<Collidable<X>> enter(Dynamics world) {
         Dynamic b = body = newBody(collidable());
-        b.setUserPointer(this);
+        b.setData(this);
         b.setRenderer(this);
         return Collections.singletonList(body);
     }

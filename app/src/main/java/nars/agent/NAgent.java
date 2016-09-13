@@ -381,9 +381,9 @@ abstract public class NAgent {
         new Activation(boostBudget, c, nar, 1) {
 
             @Override
-            public void activate(@NotNull NAR nar, float activation) {
-                linkTermLinks(c, activation, nar);
-                super.activate(nar, activation);
+            public void commit(@NotNull NAR nar, float scale) {
+                linkTermLinks(c, scale, nar);
+                super.commit(nar, scale);
             }
         };
 

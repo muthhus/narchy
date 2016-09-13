@@ -1,6 +1,6 @@
 package nars.index;
 
-import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,7 @@ public class MapIndex extends SimpleMapIndex {
 
     private final Map<TermContainer, TermContainer> subterms;
 
-    public MapIndex(Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds, Map<TermContainer,TermContainer> subterms) {
+    public MapIndex(ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds, Map<TermContainer,TermContainer> subterms) {
         super(conceptBuilder, compounds);
         this.subterms = subterms;
     }

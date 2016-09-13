@@ -3,6 +3,7 @@ package nars.index;
 import com.github.benmanes.caffeine.cache.*;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -61,7 +62,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 //    }
 
 
-    public CaffeineIndex(Concept.ConceptBuilder builder, long maxWeight) {
+    public CaffeineIndex(ConceptBuilder builder, long maxWeight) {
         this(builder, maxWeight, false,
                 //ForkJoinPool.commonPool()
                 //Executors.newFixedThreadPool(1)
@@ -71,7 +72,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor executor) {
+    public CaffeineIndex(ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor executor) {
         super(conceptBuilder);
 
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
