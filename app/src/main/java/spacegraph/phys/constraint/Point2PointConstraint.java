@@ -119,7 +119,7 @@ public class Point2PointConstraint extends TypedConstraint {
 	public void solveConstraint(float timeStep) {
 		v3 tmp = new v3();
 		v3 tmp2 = new v3();
-		v3 tmpVec = new v3();
+		//v3 tmpVec = new v3();
 
 		Transform centerOfMassA = rbA.getCenterOfMassTransform(new Transform());
 		Transform centerOfMassB = rbB.getCenterOfMassTransform(new Transform());

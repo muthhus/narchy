@@ -6,6 +6,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
+import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.DistanceConstraint;
 import spacegraph.phys.shape.BoxShape;
@@ -56,8 +57,8 @@ public class TestP2PNode extends RectWidget {
 
 
         @Override
-        protected List<Collidable> enter(Dynamics world) {
-            List l = super.enter(world);
+        protected Dynamic create(Dynamics world) {
+            Dynamic l = super.create(world);
 
             float w = ((BoxShape) body.shape()).x();
 

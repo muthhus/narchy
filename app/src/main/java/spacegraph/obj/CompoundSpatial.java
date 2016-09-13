@@ -18,6 +18,7 @@ public abstract class CompoundSpatial<X> extends AbstractSpatial<X> {
 
     private final List<Collidable> bodies = $.newArrayList();
     private final List<Spatial> spatials = $.newArrayList();
+    private final List<TypedConstraint> constraints = $.newArrayList();
 
     public CompoundSpatial(X x) {
         super(x);
@@ -25,18 +26,25 @@ public abstract class CompoundSpatial<X> extends AbstractSpatial<X> {
 
     @Override
     public final void update(Dynamics world) {
-        for (Spatial s : spatials)
-            s.update(world);
 
-        if (bodies.isEmpty()) { //HACK
+        if (bodies.isEmpty() && spatials.isEmpty()) { //HACK TODO use a boolean flag
             create(world);
         } else {
             next(world);
         }
+
+        for (Spatial s : spatials)
+            s.update(world);
+
     }
 
     protected void next(Dynamics world) {
 
+    }
+
+    public TypedConstraint add(TypedConstraint c) {
+        constraints.add(c);
+        return c;
     }
 
     public Spatial add(Spatial s) {
@@ -71,6 +79,6 @@ public abstract class CompoundSpatial<X> extends AbstractSpatial<X> {
 
     @Override
     public List<TypedConstraint> constraints() {
-        return null;
+        return constraints;
     }
 }

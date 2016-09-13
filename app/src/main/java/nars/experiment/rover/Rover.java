@@ -26,18 +26,8 @@ public class Rover extends CompoundSpatial {
         super(nar);
         this.nar = nar;
 
-        SimpleSpatial torso;
-        add(torso = new SimpleSpatial("cylinderTorso") {
-            @Override
-            protected CollisionShape newShape() {
-                //return new TetrahedronShapeEx(v(0,10,0), v(10,0,0), v(10,10,0), v(0,0,10));
-                return new CylinderShape(v(1, 1, 1));
-            }
-        });
-        torso.shapeColor[0] = 1f;
-        torso.shapeColor[1] = 0.1f;
-        torso.shapeColor[2] = 0.5f;
-        torso.shapeColor[3] = 1f;
+
+
 
     }
 

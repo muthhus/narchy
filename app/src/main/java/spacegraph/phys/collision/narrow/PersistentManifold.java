@@ -90,9 +90,11 @@ public class PersistentManifold {
 //#ifdef KEEP_DEEPEST_POINT
 		float maxPenetration = pt.getDistance();
 		for (int i = 0; i < 4; i++) {
-			if (pointCache[i].getDistance() < maxPenetration) {
+			ManifoldPoint pii = pointCache[i];
+			float pid = pii.getDistance();
+			if (pid < maxPenetration) {
 				maxPenetrationIndex = i;
-				maxPenetration = pointCache[i].getDistance();
+				maxPenetration = pid;
 			}
 		}
 //#endif //KEEP_DEEPEST_POINT

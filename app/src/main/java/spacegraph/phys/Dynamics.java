@@ -61,14 +61,11 @@ import static spacegraph.phys.Dynamic.ifDynamic;
  */
 public abstract class Dynamics<X> extends Collisions<X> {
 
-    private static final Comparator<TypedConstraint> sortConstraintOnIslandPredicate = new Comparator<TypedConstraint>() {
-        @Override
-        public int compare(TypedConstraint lhs, TypedConstraint rhs) {
-            int rIslandId0, lIslandId0;
-            rIslandId0 = getConstraintIslandId(rhs);
-            lIslandId0 = getConstraintIslandId(lhs);
-            return lIslandId0 < rIslandId0 ? -1 : +1;
-        }
+    private static final Comparator<TypedConstraint> sortConstraintOnIslandPredicate = (lhs, rhs) -> {
+        int rIslandId0, lIslandId0;
+        rIslandId0 = getConstraintIslandId(rhs);
+        lIslandId0 = getConstraintIslandId(lhs);
+        return lIslandId0 < rIslandId0 ? -1 : +1;
     };
     protected final Constrainer constrainer;
     protected final Islands islands;
@@ -91,7 +88,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected int profileTimings;
     protected InternalTickCallback preTickCallback;
     private float dt;
-    private int nextBodyID;
 
     public Dynamics(Intersecter intersecter, Broadphase broadphase) {
         this(intersecter, broadphase, null);
@@ -128,9 +124,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
         return body;
     }
 
-    public final int stepSimulation(float timeStep) {
-		return stepSimulation(timeStep, 0);
-	}
 
 	public final int stepSimulation(float dt, int maxSubSteps) {
 		curDT = dt;
@@ -211,7 +204,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 updateObjects();
 
                 // clamp the number of substeps, to prevent simulation grinding spiralling down to a halt
-                int clampedSimulationSteps = (numSimulationSubSteps > maxSubSteps) ? maxSubSteps : numSimulationSubSteps;
+                int clampedSimulationSteps = Math.min(numSimulationSubSteps,maxSubSteps);
 
                 for (int i = 0; i < clampedSimulationSteps; i++) {
                     internalSingleStepSimulation(fixedTimeStep);
@@ -232,12 +225,10 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
     protected final void updateObjects() {
-        //nextBodyID = 0;
         collidable.clear(); //populate in 'saveKinematicState'
         forEachIntSpatial((i, s) -> {
 
             if (s.active((short)i, this)) {
-                nextBodyID++;
                 reactivate(s);
                 return false; //dont remove
             } else {
@@ -267,10 +258,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
      */
     private void reactivate(Spatial<X> s) {
         s.forEachBody(this::on);
+        s.constraints().forEach(this::addConstraint);
     }
 
     protected final void inactivate(Spatial<X> s) {
-        s.constraints().forEach(b -> removeConstraint(b));
+        s.constraints().forEach(this::removeConstraint);
         s.forEachBody(this::removeBody);
         s.stop(this);
     }

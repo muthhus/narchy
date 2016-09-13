@@ -70,6 +70,8 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     private boolean simulating = true;
     private float lastFrameTime;
 
+    private int maxSubsteps = 4; //set to zero for variable timing
+
 
     public void camera(v3 target, float distance) {
         v3 fwd = v();
@@ -311,7 +313,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
             dyn.stepSimulation(
-                    Math.max(dt, 1000000f / 60f) / 1000000.f
+                    Math.max(dt, 1000000f / 60f) / 1000000.f, maxSubsteps
                     //clock.getTimeThenReset()
             );
         }

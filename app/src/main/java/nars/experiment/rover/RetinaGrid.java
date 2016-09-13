@@ -4,6 +4,8 @@ import com.jogamp.opengl.GL2;
 import spacegraph.SimpleSpatial;
 import spacegraph.math.v3;
 import spacegraph.phys.Dynamics;
+import spacegraph.phys.shape.CollisionShape;
+import spacegraph.phys.shape.SphereShape;
 
 import static spacegraph.math.v3.v;
 
@@ -34,6 +36,11 @@ public class RetinaGrid extends SimpleSpatial {
             }
         }
 
+    }
+
+    @Override
+    protected CollisionShape newShape() {
+        return new SphereShape(0.5f);
     }
 
     @Override

@@ -127,7 +127,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public void update(SpaceGraph<X> s) {
         super.update(s);
         if (body == null) {
-            enter(s);
+            next(s);
         } else {
             body.activate();
         }
@@ -173,7 +173,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {
         Dynamic b;
         b = Dynamics.newBody(
-                1f, //mass
+                mass(), //mass
                 shape, motion,
                 +1, //group
                 collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
@@ -188,6 +188,9 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         return b;
     }
 
+    public float mass() {
+        return 1f;
+    }
 
 
     @Override protected void colorshape(GL2 gl) {
@@ -220,8 +223,8 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     @Override
     public void update(Dynamics world) {
-        if (body == null) {
-            this.bodies = enter(world);
+        if (bodies.isEmpty()) {
+            this.bodies = Collections.singletonList( create(world) );
         } else {
             next(world);
         }
@@ -231,14 +234,14 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     }
 
-    protected List<Collidable> enter(Dynamics world) {
+    protected Dynamic create(Dynamics world) {
         Dynamic b = body = newBody(collidable());
         b.setData(this);
         b.setRenderer(this);
-        return Collections.singletonList(body);
+        return b;
     }
 
-    protected void enter(SpaceGraph<X> s) {
+    protected void next(SpaceGraph<X> s) {
 
     }
 
