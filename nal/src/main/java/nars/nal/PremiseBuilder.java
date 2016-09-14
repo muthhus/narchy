@@ -75,19 +75,21 @@ public enum PremiseBuilder {
             Concept beliefConcept = nar.concept(termLinkTermConceptTerm);
             if (beliefConcept != null) {
 
+                long when = task.occurrence();
+
                 if ( task.isQuestOrQuestion()) {
 
                     //TODO is this correct handling for quests? this means a belief task may be a goal which may contradict deriver semantics
                     BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
 
-                    Task solution = table.match(task, now);
+                    Task solution = table.match(task, when);
                     if (solution!=null) {
                         try {
                             Task answered = answer(nar, task, solution, beliefConcept);
                             if (task.isQuestion())
                                 belief = answered;
                             else
-                                belief = beliefConcept.beliefs().match(task, now); //in case of quest, proceed with matching belief
+                                belief = beliefConcept.beliefs().match(task, when); //in case of quest, proceed with matching belief
 
                         } catch (InvalidConceptException e) {
                             logger.warn("{}", e.getMessage());
@@ -98,7 +100,7 @@ public enum PremiseBuilder {
 
                 } else {
 
-                    belief = beliefConcept.beliefs().match(task, now);
+                    belief = beliefConcept.beliefs().match(task, when);
 
                 }
             }
@@ -111,29 +113,29 @@ public enum PremiseBuilder {
 
 
     @Nullable
-    private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept answerConcept) {
+    private static Task answer(@NotNull NAR nar, @NotNull Task question, @NotNull Task answer, @NotNull Concept answerConcept) {
 
-        long taskOcc = taskLink.occurrence();
+        long taskOcc = question.occurrence();
 
         //project the belief to the question's time
         if (taskOcc != ETERNAL) {
-            solution = answerConcept.merge(taskLink, solution, taskOcc, nar);
+            answer = answerConcept.merge(question, answer, taskOcc, nar);
         }
 
-        if (solution != null) { //may have become null as a result of projection
+        if (answer != null) { //may have become null as a result of projection
 
             //attempt to Unify any Query variables; answer if unifies
-            if (taskLink.term().hasVarQuery()) {
-                matchQueryQuestion(nar, taskLink, solution, answerConcept);
-            } else if (answerConcept instanceof Compound && Term.equalAtemporally(taskLink, answerConcept)) {
-                matchAnswer(nar, taskLink, solution, answerConcept);
+            if (question.term().hasVarQuery()) {
+                matchQueryQuestion(nar, question, answer, answerConcept);
+            } else if (answerConcept instanceof Compound && Term.equalAtemporally(question, answerConcept)) {
+                matchAnswer(nar, question, answer, answerConcept);
             }
 
 
 
         }
 
-        return solution;
+        return answer;
     }
 
 
@@ -163,27 +165,23 @@ public enum PremiseBuilder {
 //    }
 
     static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a, @NotNull Concept answerConcept) {
-        if (a instanceof AnswerTask)
-            return; //already an answer
-
         @Nullable Concept questionConcept = nar.concept(q);
         if (questionConcept != null) {
             List<Task> displ = $.newArrayList(0);
             ((QuestionTable)questionConcept.tableFor(q.punc())).answer(a, answerConcept, nar, displ );
+            nar.tasks.remove(displ);
         }
     }
 
     static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief, Concept answerConcept) {
-        List<Termed> result = $.newArrayList(1);
-        new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH).unifyAll(
+        List<Termed> result = $.newArrayList(Param.QUERY_ANSWERS_PER_MATCH);
+        new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH)
+            .unifyAll(
                 task.term(), belief.term()
-        );
+            );
+
         if (!result.isEmpty()) {
-            int taskComplexity = task.complexity();
-            for (Termed r : result) {
-                if (r.complexity() > taskComplexity)
-                    matchAnswer(nar, task, belief, answerConcept);
-            }
+            matchAnswer(nar, task, belief, answerConcept);
         }
     }
 

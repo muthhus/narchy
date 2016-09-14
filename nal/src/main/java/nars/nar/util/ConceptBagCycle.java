@@ -256,10 +256,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
                             BLink<Term> termLink = termLinks.get(j);
                             Term term = termLink.get();
 
-                             /*if (term == null)
-                continue;*/
-
-                            if (Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
+                            if (term == null || Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
                                 continue;
 
                             if (PremiseBuilder.budget(pBudget, taskLink, termLink, minDur)) {

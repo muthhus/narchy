@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
@@ -184,11 +185,13 @@ public class LinkageTest extends AbstractNALTest {
 
             //test 2nd level link
             if (!(w instanceof Variable)) {
-                Concept Wc = nar.concept(w);
-                if (Wc != null) {
-                    for (BLink<Term> entry2 : Wc.termlinks()) {
-                        if (entry2.get().equals(p2Term)) {
-                            return true;
+                if (TermIndex.linkable(w)) {
+                    Concept Wc = nar.concept(w);
+                    if (Wc != null) {
+                        for (BLink<Term> entry2 : Wc.termlinks()) {
+                            if (entry2.get().equals(p2Term)) {
+                                return true;
+                            }
                         }
                     }
                 }

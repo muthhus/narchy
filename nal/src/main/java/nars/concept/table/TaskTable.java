@@ -47,13 +47,14 @@ public interface TaskTable extends Iterable<Task> {
 //        return null;
 //    }
 
-    default void top(int maxPerConcept, @NotNull Consumer<Task> recip) {
+    default void top(int _maxPerConcept, @NotNull Consumer<Task> recip) {
         int s = size();
-        if (s < maxPerConcept) maxPerConcept = s;
-        for (Task t : this) {
-            recip.accept(t);
-            if (--maxPerConcept == 0) break;
-        }
+        final int[] maxPerConcept = {Math.min(s, _maxPerConcept)};
+        forEach(t -> {
+            if ((maxPerConcept[0]--) > 0)
+                recip.accept(t);
+            //if (--maxPerConcept == 0) break; //TODO use a forEachWhile w/ Predicate or something
+        });
     }
 
 

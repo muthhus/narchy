@@ -8,10 +8,9 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.meta.Conclude;
 import nars.nal.rule.PremiseRule;
 import nars.term.*;
-import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.nal.meta.PremiseEval.chooseByConf;
+import static nars.task.Revision.chooseByConf;
 
 /**
  * Strategies for solving temporal components of a derivation

@@ -6,6 +6,7 @@ import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.GeneratedTask;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.data.list.FasterList;
@@ -72,6 +73,8 @@ abstract public class NAgent {
 
     //private float curiosityAttention;
     private float rewardSum = 0;
+
+    private int predictionHorizon = 16;
 
     public NAgent(NAR nar) {
         this.nar = nar;
@@ -199,6 +202,7 @@ abstract public class NAgent {
 //                //(float) Math.sqrt(numSensors); //HEURISTIC
 //                numSensors / 2f;
 
+        /** active perception: active concept budgeting determines budgeting of new sensor input tasks */
         for (SensorConcept sensor : sensors) {
             Term ts = sensor.term();
             sensor.pri(() -> {
@@ -216,34 +220,45 @@ abstract public class NAgent {
 
         @NotNull Term what = $.$("?w"); //#w
 
-        predictors.add(
-                //what will soon imply reward R
-                nar.ask($.impl(what, dt, happy.term()), '?', ETERNAL)
-        );
+        @NotNull Compound happiness = happy.term();
 
-        //what co-occurs with reward R
-        predictors.add(
-                nar.ask($.seq(what, dt, happy.term()), '?', ETERNAL)
+        predictors.addAll(
+                //what will imply reward
+                nar.ask($.impl(what, happiness), '?', now),
+
+                //what will imply non-reward
+                nar.ask($.impl(what, $.neg(happiness)), '?', now),
+
+                //what co-occurs with reward
+                nar.ask($.conj(what, happiness), '?', now),
+
+                //what co-occurs with non-reward
+                nar.ask($.conj(what, $.neg(happiness)), '?', now)
+
         );
-        predictors.add(
-                nar.ask($.seq(what, dt, happy.term()), '?', now)
-        );
-        predictors.add( //+2 cycles ahead
-                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
-        );
+//        predictors.add(
+//                nar.ask($.seq(what, dt, happy.term()), '?', now)
+//        );
+//        predictors.add( //+2 cycles ahead
+//                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
+//        );
 
 
-        for (Concept x : actions) {
+        for (Concept a : actions) {
 
             //quest for each action
             //predictors.add(nar.ask(x, '@', now));
 
             //does action A co-occur with reward R?
-            for (int d : new int[] { dt, dt * 2, dt * 4 /* .. */ }) {
-                predictors.add(
-                        nar.ask($.seq(x.term(), d, happy.term()), '?', now)
-                );
-            }
+            Term action = a.term();
+
+
+            predictors.addAll(
+                    nar.ask($.conj(what, action), '?', now),
+                    nar.ask($.conj(happiness, action), '?', now),
+                    nar.ask($.impl(what, action), '?', now)
+            );
+
 
 
 
@@ -308,9 +323,9 @@ abstract public class NAgent {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
         float reinforcementAttention =
-                or(alpha, gamma);
+                or(alpha, gamma)
                         //
-                        // /predictors.size();
+                         /predictors.size();
                         // /(actions.size()+sensors.size());
 
         if (reinforcementAttention > 0) {
@@ -383,22 +398,24 @@ abstract public class NAgent {
 
             @Override
             public void commit(float scale) {
-                linkTermLinks(c, scale);
+                linkTermLinks(c, scale); //activate all termlinks of this concept
                 super.commit(scale);
             }
         };
 
         return c;
-        //return c;
-        //return nar.activate(c, null);
     }
 
 
     private void boost(@NotNull Task t) {
 
         if (t.occurrence() != ETERNAL) {
-            nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(now, now)
-                    .budget(boostBudget).log("Predictor"));
+            int lookAhead = nar.random.nextInt(predictionHorizon);
+
+            nar.inputLater(
+                new GeneratedTask(t.term(), t.punc(), t.truth())
+                    .time(now, now + lookAhead)
+                    .budget(boostBudget).log("Agent Predictor"));
         } else {
             //re-use existing eternal task; first recharge budget
 

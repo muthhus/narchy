@@ -22,7 +22,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static nars.time.Tense.DTERNAL;
@@ -44,34 +47,24 @@ import static nars.time.Tense.DTERNAL;
 //                Map map2 =
 //                        map1; //shared
 //                        //newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
+                Map sharedMap = newBagMap();
 
                 switch (a.op()) {
                     default:
-                        return new AtomConcept(a, newBag(), newBag());
+                        return new AtomConcept(a, newCurveBag(sharedMap), newCurveBag(sharedMap));
                 }
 
             };
 
-    public <X> HijackBag<X> newBag() {
-        return newBag(1);
+    public <X> Bag<X> newHijackBag() {
+        return new HijackBag<>(1, HIJACK_REPROBES, mergeDefault, nar.random);
     }
 
-    private <X> HijackBag<X> newBag(int capacity) {
-        return new HijackBag<>(capacity, HIJACK_REPROBES, mergeDefault, nar.random);
+    public <X> Bag<X> newCurveBag(Map sharedMap) {
+        return new CurveBag<>(defaultCurveSampler, BudgetMerge.plusBlend, sharedMap);
     }
 
 
-//    @NotNull
-//    private Map newBagMap(int cap) {
-//        if (nar.exe.concurrent()) {
-//            return new ConcurrentHashMap(cap);
-//            //return new NonBlockingHashMap(cap);
-//            //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
-//            //ConcurrentHashMapUnsafe(cap);
-//        } else {
-//            return new HashMap(cap);
-//        }
-//    }
 
     @NotNull
     private final ConceptPolicy init;
@@ -98,8 +91,9 @@ import static nars.time.Tense.DTERNAL;
 //                map1; //shared
 //                //newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
 
-        @NotNull Bag<Term> termbag = newBag();
-        @NotNull Bag<Task> taskbag = newBag();
+        Map sharedMap = newBagMap();
+        @NotNull Bag<Term> termbag = newCurveBag(sharedMap);
+        @NotNull Bag<Task> taskbag = newCurveBag(sharedMap);
 
         boolean dynamic = false;
 
@@ -173,7 +167,7 @@ import static nars.time.Tense.DTERNAL;
         this.sleep = new DefaultConceptPolicy(7, 8, 2, 16, 8);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy(12, 10, 4, 24, 12);
+        this.awake = new DefaultConceptPolicy(12, 10, 4, 32, 24);
     }
 
     @Override
@@ -203,7 +197,9 @@ import static nars.time.Tense.DTERNAL;
             if (term instanceof Termject) {
                 //if (term.op() == INT || term.op() == INTRANGE) {
                 //Map m = newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
-                result = new TermjectConcept((Termject)term, newBag(), newBag());
+
+                Map sharedMap = newBagMap();
+                result = new TermjectConcept((Termject)term, newCurveBag(sharedMap), newCurveBag(sharedMap));
             }
 
             if (term instanceof Variable) {
@@ -247,4 +243,14 @@ import static nars.time.Tense.DTERNAL;
         return sleep;
     }
 
+    public Map newBagMap() {
+        if (nar.exe.concurrent()) {
+            return new ConcurrentHashMap();
+            //return new NonBlockingHashMap(cap);
+            //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
+            //ConcurrentHashMapUnsafe(cap);
+        } else {
+            return new HashMap();
+        }
+    }
 }

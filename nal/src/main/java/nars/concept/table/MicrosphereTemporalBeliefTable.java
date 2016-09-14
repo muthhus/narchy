@@ -329,7 +329,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     @Nullable
     @Override
-    public final Task strongest(long when, long now, @Nullable Task against) {
+    public final Task match(long when, long now, @Nullable Task against) {
 
         //removeDeleted();
 
@@ -353,7 +353,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                 continue;
             }
 
-            float r = rank(x, when, now);
+            float r = rank(x, when, now) / (1f + Revision.dtDifference(against,x));
 
             if (r > bestRank) {
                 best = x;

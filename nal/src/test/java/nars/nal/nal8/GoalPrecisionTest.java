@@ -47,36 +47,36 @@ public class GoalPrecisionTest {
         Param.DEBUG = true;
         n.onExecution($.oper("x"), (OperationConcept c) -> {
 
-            for (Task a : c.goals()) {
+            c.goals().forEach((a)-> {
 
-                Term[] aa = Operator.argArray(a.term());
-                float pri = a.pri() * a.expectation();
+                    Term[] aa = Operator.argArray(a.term());
+                    float pri = a.pri() * a.expectation();
 
-                float[] d = plan.get(aa[0].toString());
-                if (d == null) {
-                    throw new RuntimeException("unknown action: " + a);
-                }
+                    float[] d = plan.get(aa[0].toString());
+                    if (d == null) {
+                        throw new RuntimeException("unknown action: " + a);
+                    }
 
 
-                if (d[1] == -1) {
-                    //first time
-                    d[1] = (int) n.time();
-                    d[2] = pri;
-                    System.out.println("OK " + a);
-                } else {
-                    d[3] += pri;
-                    d[4]++;
+                    if (d[1] == -1) {
+                        //first time
+                        d[1] = (int) n.time();
+                        d[2] = pri;
+                        System.out.println("OK " + a);
+                    } else {
+                        d[3] += pri;
+                        d[4]++;
 
-                    System.out.println();
-                    System.out.println(a);
-                    System.out.println(a.log());
-                    n.concept(a).print();
-                    System.out.println(a.proof());
-                }
+                        System.out.println();
+                        System.out.println(a);
+                        System.out.println(a.log());
+                        n.concept(a).print();
+                        System.out.println(a.proof());
+                    }
 
-                //a.task.mulPriority(0);
-            }
+                    //a.task.mulPriority(0);
 
+            });
         });
 
 //        n.onExec("x", (Term[] aa) {

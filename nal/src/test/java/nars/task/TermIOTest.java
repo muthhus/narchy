@@ -168,7 +168,8 @@ public class TermIOTest {
         Set<String> bbB = new HashSet();
         a.forEachConceptTask(t->abB.add(t.toString()), true,true,true,true);
         b.forEachConceptTask(t->bbB.add(t.toString()), true,true,true,true);
-        assertTrue(2 >= Sets.symmetricDifference(abB, bbB).size());
+        Sets.SetView<String> diff = Sets.symmetricDifference(abB, bbB);
+        assertTrue("diff: " + diff.toString() + "\n\t" + abB + "\n\t" + bbB, 2 >= diff.size());
     }
 
 }

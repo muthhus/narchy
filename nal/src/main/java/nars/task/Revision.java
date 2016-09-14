@@ -8,6 +8,7 @@ import nars.concept.Concept;
 import nars.concept.table.DefaultBeliefTable;
 import nars.nal.Stamp;
 import nars.nal.UtilityFunctions;
+import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -16,6 +17,7 @@ import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Util;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
@@ -23,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Random;
 
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
@@ -131,14 +135,17 @@ public class Revision {
     }
 
     public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, Concept concept) {
-        assert(a.punc() == b.punc());
+        assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question
         float bw = b.confWeight();
 
         float aMix = aw / (aw + bw);
 
-        FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term(), aMix);
+        //HACK create a temorary RNG because pulling one up through the method calls would be a mess
+        Random rng = new XorShift128PlusRandom(Util.hashCombine(a.hashCode(), b.hashCode()) << 32 + Util.hashCombine((int) when, (int) now) * 31 + newTruth.hashCode());
+
+        FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term(), aMix, rng);
 //        float adjustedDifference = c.getOne();
 
 //        float confScale;
@@ -162,7 +169,7 @@ public class Revision {
 
         //get a stamp collecting all evidence from the table, since it all contributes to the result
         //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
-        long[] evidence = Stamp.zip(  ((DefaultBeliefTable)concept.tableFor(a.punc())).temporal );
+        long[] evidence = Stamp.zip(((DefaultBeliefTable) concept.tableFor(a.punc())).temporal);
 
         RevisionTask t = new RevisionTask(c.getTwo(), a.punc(),
                 newTruth,
@@ -192,13 +199,13 @@ public class Revision {
      * <p>
      * TODO threshold to stop early
      */
-    public static FloatObjectPair<Compound> dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp) {
+    public static FloatObjectPair<Compound> dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp, Random rng) {
         if (a.equals(b)) {
             return PrimitiveTuples.pair(0f, a);
         }
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
-        Compound cc = dtMerge(a, b, aProp, accumulatedDifference, 1f);
+        Compound cc = dtMerge(a, b, aProp, accumulatedDifference, 1f, rng);
 
 
         //how far away from 0.5 the weight point is, reduces the difference value because less will have changed
@@ -236,8 +243,55 @@ public class Revision {
 //        return 1f;
     }
 
+
+    /**
+     * computes a value that indicates the amount of difference (>=0) in the internal 'dt' subterm structure of 2 temporal compounds
+     */
     @NotNull
-    private static Compound dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth) {
+    public static float dtDifference(@Nullable Termed<Compound> a, @NotNull Termed<Compound> b) {
+        if (a == null) return 0f;
+
+        MutableFloat f = new MutableFloat(0);
+        dtDifference(a.term(), b.term(), f, 1f);
+        return f.floatValue();
+    }
+
+    @NotNull
+    private static void dtDifference(@NotNull Term a, @NotNull Term b, @NotNull MutableFloat accumulatedDifference, float depth) {
+        if (a.op() == b.op()) {
+            if (a.size() == 2 && b.size() == 2) {
+
+                if (a.equals(b))
+                    return; //no difference
+
+                Compound aa = ((Compound)a);
+                Compound bb = ((Compound)b);
+
+                dtCompare(aa, bb, 0.5f, accumulatedDifference, depth, null);
+
+                Term a0 = aa.term(0);
+                if (a0.size() == 2) {
+                    Term b0 = bb.term(0);
+
+                    if (a0.op() == b0.op()) {
+
+                        Term a1 = aa.term(1);
+                        Term b1 = bb.term(1);
+
+                        if (a1.op() == b1.op()) {
+                            //recurse
+                            dtCompare((Compound) a0, (Compound) b0, 0.5f, accumulatedDifference, depth / 2f, null);
+                            dtCompare((Compound) a1, (Compound) b1, 0.5f, accumulatedDifference, depth / 2f, null);
+                        }
+                    }
+                }
+
+            }
+        } /* else: can not be compared anyway */
+    }
+
+    @NotNull
+    private static Compound dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {
         if (a.equals(b))
             return a;
 
@@ -247,36 +301,22 @@ public class Revision {
             return failStrongest(a, b, aProp);
         }
 
-        int newDT;
-        int adt = a.dt();
-        if (adt != b.dt()) {
-
-            int bdt = b.dt();
-            if (adt != DTERNAL && bdt != DTERNAL) {
-                newDT = Math.round(Util.lerp(adt, bdt, aProp));
-                accumulatedDifference.add(Math.abs(adt - bdt) * depth);
-            } else if (bdt != DTERNAL) {
-                newDT = bdt;
-            } else if (adt != DTERNAL) {
-                newDT = adt;
-            } else {
-                throw new RuntimeException();
-            }
-        } else {
-            newDT = adt;
-        }
+        int newDT = dtCompare(a, b, aProp, accumulatedDifference, depth, rng);
 
 
         Term a0 = a.term(0);
         Term a1 = a.term(1);
-        if (a0.op() != b.term(0).op() || (a1.op() != b.term(1).op())) {
+        Term b0 = b.term(0);
+        Term b1 = b.term(1);
+
+        if (a0.op() != b0.op() || (a1.op() != b1.op())) {
             //throw new RuntimeException();
             return failStrongest(a, b, aProp);
         }
 
         Term r = $.compound(a.op(), newDT,
-                (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) (b.term(0)), aProp, accumulatedDifference, depth / 2f) : a0,
-                (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) (b.term(1)), aProp, accumulatedDifference, depth / 2f) : a1
+                (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) b0, aProp, accumulatedDifference, depth / 2f, rng) : a0,
+                (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) b1, aProp, accumulatedDifference, depth / 2f, rng) : a1
         );
         if (r instanceof Compound)
             return (Compound) r;
@@ -289,6 +329,43 @@ public class Revision {
         //if (a.op().temporal) //when would it not be temporal? this happens though
         //d = d.dt(newDT);
         //return d;
+    }
+
+    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {
+        int newDT;
+        int adt = a.dt();
+        if (adt != b.dt()) {
+
+            int bdt = b.dt();
+            if (adt != DTERNAL && bdt != DTERNAL) {
+
+                accumulatedDifference.add(Math.abs(adt - bdt) * depth);
+
+                //newDT = Math.round(Util.lerp(adt, bdt, aProp));
+                if (rng != null)
+                    newDT = choose(adt, bdt, aProp, rng);
+                else
+                    newDT = aProp > 0.5f ? adt : bdt;
+
+
+            } else if (bdt != DTERNAL) {
+                newDT = bdt;
+                accumulatedDifference.add(bdt * depth);
+
+            } else if (adt != DTERNAL) {
+                newDT = adt;
+                accumulatedDifference.add(adt * depth);
+            } else {
+                throw new RuntimeException();
+            }
+        } else {
+            newDT = adt;
+        }
+        return newDT;
+    }
+
+    static int choose(int x, int y, float xProp, Random random) {
+        return random.nextFloat() < xProp ? x : y;
     }
 
     private static Compound failStrongest(Compound a, Compound b, float aProp) {
@@ -342,7 +419,8 @@ public class Revision {
         return !(r instanceof Compound) ? strongest(aterm, bterm, aProp) : (Compound) r;
     }
 
-    @Nullable public static ProjectedTruth project(@NotNull Truth t, long target, long now, long occ, boolean eternalizeIfWeaklyTemporal) {
+    @Nullable
+    public static ProjectedTruth project(@NotNull Truth t, long target, long now, long occ, boolean eternalizeIfWeaklyTemporal) {
 
         if (occ == target)
             return new ProjectedTruth(t, target);
@@ -373,21 +451,43 @@ public class Revision {
         return new ProjectedTruth(t.freq(), nextConf, target);
     }
 
-    /** get the task which occurrs nearest to the target time */
-    @NotNull public static Task closestTo(@NotNull Task[] t, long when) {
-        Task best = t[0];
-        long bestDiff = Math.abs(when - best.occurrence());
-        for (int i = 1; i < t.length; i++) {
-            Task x = t[i];
-            long o = x.occurrence();
-            long diff = Math.abs(when - o);
-            if (diff < bestDiff) {
-                best = x;
-                bestDiff = diff;
-            }
+    @NotNull
+    public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull PremiseEval p) {
+
+        if (b == null)
+            return t;
+
+        long to = t.occurrence();
+        long bo = b.occurrence();
+
+        if (to != ETERNAL && bo != ETERNAL) {
+
+            //randomize choice by confidence
+            float tcw = t.confWeight();
+            float tc = tcw + b.confWeight();
+
+            return p.random.nextFloat() * tc < tcw ? t : b;
+
+        } else {
+            return bo != ETERNAL ? b : t;
         }
-        return best;
     }
+
+//    /** get the task which occurrs nearest to the target time */
+//    @NotNull public static Task closestTo(@NotNull Task[] t, long when) {
+//        Task best = t[0];
+//        long bestDiff = Math.abs(when - best.occurrence());
+//        for (int i = 1; i < t.length; i++) {
+//            Task x = t[i];
+//            long o = x.occurrence();
+//            long diff = Math.abs(when - o);
+//            if (diff < bestDiff) {
+//                best = x;
+//                bestDiff = diff;
+//            }
+//        }
+//        return best;
+//    }
 
 }
 

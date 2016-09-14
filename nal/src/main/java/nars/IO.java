@@ -93,7 +93,7 @@ public class IO {
 
         //TODO combine these into one byte
         out.writeByte(p);
-        out.writeByte(evil); //out.writeByte((byte) evil);
+        out.writeByte(evil);
 
         if (hasTruth(p)) {
             writeTruth(out, t.freq(), t.conf());

@@ -89,30 +89,25 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
     @Override
     public void answer(@NotNull Task a, Concept answerConcept, @NotNull NAR nar, List<Task> displ) {
 
-        if (a instanceof AnswerTask)
-            return; //already an answer
-
-
         int size = list.size();
-        if (size > 0) {
 
-            //each question is only responsible for 1/N of the effect on the answer
-            //TODO calculate this based on fraction of each question's priority of the total
+        //each question is only responsible for 1/N of the effect on the answer
+        //TODO calculate this based on fraction of each question's priority of the total
+        //TODO weaken the match based on dt discrepencies between question and answer. this will discriminate according to unique dt patterns of questions vs answers
 
-
-            for (int i = 0; !a.isDeleted() && i < size; ) {
-                Task q = list.get(i);
-                if (!q.isDeleted()) {
-                    if (answer(q, a, 1f / size, answerConcept, nar)) {
-                        i++;
-                        continue;
-                    }
+        for (int i = 0; i < size && !a.isDeleted(); ) {
+            Task q = list.get(i);
+            if (!q.isDeleted()) {
+                if (answer(q, a, 1f / size, answerConcept, nar)) {
+                    i++;
+                    continue;
                 }
-
-                remove(i, null, displ);
-                size--;
             }
+
+            remove(i, null, displ);
+            size--;
         }
+
 
     }
 
@@ -146,37 +141,27 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
 
         if (!qEtern) {
             //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
-            qBudget.quaMult(factor);
+            qBudget.quaMult(1 - factor);
         }
 
         if (q.onAnswered(a)) {
 
 
             boolean sameConcept;
-            if (answerConcept != null) {
+            if (answerConcept!=null && answerConcept.crossLink(a, q, scale * aConf, nar)) {
                 //check if different concepts; ex: if there is a reduction in variables, etc
-                Concept qc = nar.concept(q);
-                if (!qc.equals(answerConcept)) {
-                    sameConcept = false;
-                    qc.crossLink(q, a, scale * aConf, nar);
-                } else {
-                    sameConcept = true;
-                }
+                sameConcept = false;
             } else {
                 sameConcept = true;
             }
 
-
-            if (a.pri() > Param.BUDGET_EPSILON)
-                new Activation(a, nar, 1f);
-
-            if (Param.DEBUG_ANSWERS) {
+            if (Param.DEBUG_ANSWERS && !sameConcept) {
                 //if (q.term().equals(a.term()))
-                if (!sameConcept) {
-                    nar.logger.debug("Q&A: {}\t{}", q, a);
-                } else {
-                    nar.logger.debug("Q&A: {}\t{}", q, a.truth());
-                }
+                //if (!sameConcept) {
+                nar.logger.debug("Q&A: {}\t{}", q, a);
+                //} else {
+                //  nar.logger.debug("Q&A: {}\t{}", q, a.truth());
+                //}
             }
 
             //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly
@@ -349,7 +334,7 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
     public final void forEach(@NotNull Consumer<? super Task> action) {
         for (int i = 0, listSize = list.size(); i < listSize; i++) {
             Task t = list.get(i);
-            if (t!=null && !t.isDeleted())
+            if (t != null && !t.isDeleted())
                 action.accept(t);
         }
     }

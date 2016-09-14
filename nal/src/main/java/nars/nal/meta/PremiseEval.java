@@ -304,26 +304,7 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    @NotNull public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull PremiseEval p) {
-
-        if (b == null)
-            return t;
-
-        long to = t.occurrence();
-        long bo = b.occurrence();
-
-        if (to != Tense.ETERNAL && bo != Tense.ETERNAL) {
-
-            //randomize choice by confidence
-            float tcw = t.confWeight();
-            float tc = tcw + b.confWeight();
-
-            return p.random.nextFloat() * tc < tcw ? t : b;
-
-        } else {
-            return bo != Tense.ETERNAL ? b : t;
-        }
-    };
+    ;
 
     public final long occurrenceTarget(@NotNull OccurrenceSolver s) {
         long tOcc = task.occurrence();

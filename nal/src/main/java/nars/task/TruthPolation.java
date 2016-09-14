@@ -7,6 +7,7 @@ import nars.Param;
 import nars.Task;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.impl.factory.Iterables;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
@@ -65,21 +66,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 //
 //        assert(n >= 2);
 
-//        long minT, maxT;
-//        minT = maxT = tasks.get(0).occurrence();
-//        for (int i = 1; i < n; i++) {
-//            long o = tasks.get(i).occurrence();
-//            if (minT > o) minT = o;
-//            if (maxT < o) maxT = o;
-//
-////            sum += t.confWeight();
-////            //sum += t.conf();
-//        }
-//        //clip the target time point to the range of values, so that the value latches at the last known point
-//        when = Math.min(when, maxT);
-//        when = Math.max(when, minT);
-
-//        System.out.println(tasks + " sum=" + sum);
+        long minT = Long.MAX_VALUE, maxT = Long.MIN_VALUE;
 
         int volume = -1;
         int i = 0;
@@ -119,24 +106,46 @@ public final class TruthPolation extends InterpolatingMicrosphere {
                 volume = t.volume(); //get volume from first task
             }
 
+            if (minT > o) minT = o;
+            if (maxT < o) maxT = o;
+
+
             i++;
         }
 
         if (i < 2)
             throw new RuntimeException("too few tasks for truthpolation: " + i);
 
+
+        //allow an out-of-range temporal margin, ie. beyond which confidence begins diminishing with distance
+        final int dtTolerance;
+        if (minT > when) {
+            dtTolerance = (int) (minT - when);
+        } else if (maxT < when) {
+            dtTolerance = (int) (when - maxT);
+        } else {
+            dtTolerance = 0;
+        }
+
         int finalVolume = volume;
+
+        FloatToFloatFunction lightCurve = (dt) -> {
+
+            if (dt > dtTolerance) dt -= dtTolerance;
+
+            float duration = Math.max(1, finalVolume - 1);
+
+            //return 1f / (1f + (dt*dt)/(duration*duration));
+            //return 1f / (1f + (dt/duration)*(dt/duration));
+            return 1f / (1f + (dt / duration));
+        };
+
         float[] v = this.value(
                 new float[] { when },
                 times,
                 freq, conf,
                 //Param.timeToLuminosity,
-                (dt) -> {
-                    float duration = Math.max(1, finalVolume -1);
-                    //return 1f / (1f + (dt*dt)/(duration*duration));
-                    //return 1f / (1f + (dt/duration)*(dt/duration));
-                    return 1f / (1f + (dt/duration));
-                },
+                lightCurve,
                 i);
         return $.t(v[0], w2c(v[1]));
     }

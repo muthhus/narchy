@@ -213,7 +213,7 @@ public abstract class FindSubst extends Termunator implements Subst {
                 ||
                 x.unify(y, this)
                 ||
-                (y instanceof AbstractVariable && (y.op() == type) && matchVarY(x, y));
+                (/*y instanceof AbstractVariable && */(y.op() == type) && matchVarY(x, y));
     }
 
 //        if (x.equals(y)) {

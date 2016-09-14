@@ -58,7 +58,7 @@ public class NQuadsRDFTest {
                         "/home/me/Downloads/nquad"
                 )).map(t -> {
                     pout.println(t.term().toString() + t.punc());
-                    t.budget(0, 0.5f);
+                    //t.budget(0, 0.5f);
                     return t;
                 } )
         );

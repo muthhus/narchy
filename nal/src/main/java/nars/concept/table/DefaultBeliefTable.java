@@ -80,6 +80,15 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
+    public float priSum() {
+        final float[] total = {0};
+        Consumer<Task> totaler = t -> total[0] += t.pri();
+        eternal.forEach(totaler);
+        temporal.forEach(totaler);
+        return total[0];
+    }
+
+    @Override
     public int size() {
         return eternal.size() + temporal.size();
     }
@@ -151,7 +160,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public final Task topTemporal(long when, long now, Task against) {
-        return temporal.strongest(when, now, against);
+        return temporal.match(when, now, against);
     }
 
 

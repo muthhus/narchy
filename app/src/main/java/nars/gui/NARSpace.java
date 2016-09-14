@@ -38,11 +38,11 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(256, 3, 5, 7 );
+        Default n = new Default(512, 16, 2, 2 );
         //n.nal(4);
 
 
-        //n.DEFAULT_BELIEF_PRIORITY = 1f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
 
         //new ArithmeticInduction(n);
 
@@ -54,7 +54,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         //n.log();
         //n.input("(a<->b).", "(b<->c).");
 
-        new DeductiveMeshTest(n, new int[]{3, 3}, 16384);
+        new DeductiveMeshTest(n, new int[]{5, 5}, 16384);
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
 
@@ -74,7 +74,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                //.run(800);
 //
         n.linkFeedbackRate.setValue(0.95f);
-        n.loop(15f);
+        n.loop(5f);
         //n.run(1);
 //        n.forEachConcept(c -> {
 //            c.print();

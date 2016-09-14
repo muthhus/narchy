@@ -372,16 +372,15 @@ public class Tetris extends NAgent {
 
     public static void main(String[] args) {
         Param.DEBUG = false;
-        Param.DEBUG_ANSWERS = false;
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
         Executioner e = Tetris.exe2;
         Default nar = new Default(1024,
-                72, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                256, 2, 3, rng,
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
-                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 32768, 3),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 32768, 3),
                 new FrameClock(), e
         );
 
@@ -390,6 +389,14 @@ public class Tetris extends NAgent {
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
+
+        Param.DEBUG_ANSWERS = true;
+
+        nar.onTask(t -> {
+            if (t.isBeliefOrGoal() && t.occurrence() > 1 + nar.time()) {
+                System.out.println("\tFUTURE: " + t);
+            }
+        });
 
         float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;

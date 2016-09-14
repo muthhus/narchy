@@ -16,7 +16,8 @@ import java.util.function.Predicate;
  */
 public interface TemporalBeliefTable extends TaskTable {
 
-    @Nullable Task strongest(long when, long now, @Nullable Task against);
+    /** finds the strongest match to the specified parameters. Task against is an optional argument which can be used to compare internal temporal dt structure for similarity */
+    @Nullable Task match(long when, long now, @Nullable Task against);
 
     @Nullable Truth truth(long when, long now, EternalTable eternal);
 

@@ -137,14 +137,15 @@ public interface Concept extends Termed {
     /**
      * @param src  task with a term equal to this concept's
      * @param tgt task with a term equal to another concept's
-     * @return number of links created (0, 1, or 2)
+     * @return true if the tgt task's concept is different from this Concept, in which case a crossLink has been applied. false otherwise
      */
-    default void crossLink(@NotNull Budgeted src, @NotNull Task tgt, float scale, @NotNull NAR nar) {
+    default boolean crossLink(@NotNull Budgeted src, @NotNull Task tgt, float scale, @NotNull NAR nar) {
         Concept other = tgt.concept(nar);
         if (other == null || other.equals(this))
-            return; //null or same concept
+            return false; //null or same concept
 
         crossLink(src, tgt, scale, other, nar);
+        return true;
     }
 
     default void crossLink(Budgeted thisInput, Budgeted otherTask, float scale, @NotNull Concept other, @NotNull NAR nar) {
@@ -152,11 +153,11 @@ public interface Concept extends Termed {
 
         Activation a = new Activation(otherTask, null, nar);
         a.link(this, other.term(), halfScale, 0);
-        //a.commit(1f);
+        a.commit(1f);
 
         Activation b = new Activation(thisInput, null, nar);
         b.link(other, term(), halfScale, 0);
-        //b.commit(1f);
+        b.commit(1f);
     }
 
 //    /** link to a specific peer */
