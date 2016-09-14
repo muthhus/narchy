@@ -302,8 +302,10 @@ public class STMClustered extends STM {
             public Bag<Task> commit(Consumer<BLink> each) {
                 super.commit(each);
                 forEach(t -> {
-                    TLink tt = (TLink) t;
-                    tt.nearest().transfer(tt);
+                    if (t!=null) {
+                        TLink tt = (TLink) t;
+                        tt.nearest().transfer(tt);
+                    }
                 });
                 return this;
             }

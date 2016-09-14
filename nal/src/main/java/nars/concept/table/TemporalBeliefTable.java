@@ -31,5 +31,5 @@ public interface TemporalBeliefTable extends TaskTable {
 
     boolean isFull();
 
-    void range(long[] t);
+    //void range(long[] t);
 }

@@ -11,10 +11,14 @@ import nars.task.TruthPolation;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.impl.list.mutable.MultiReaderFastList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.time.Tense.ETERNAL;
@@ -23,7 +27,7 @@ import static nars.truth.TruthFunctions.c2w;
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
-public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements TemporalBeliefTable {
+public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     static final int MAX_TRUTHPOLATION_SIZE = 32;
     static final ThreadLocal<TruthPolation> truthpolations = ThreadLocal.withInitial(() -> {
@@ -31,23 +35,50 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     });
 
     private int capacity;
+    final MultiReaderFastList<Task> list;
 
     public MicrosphereTemporalBeliefTable(int initialCapacity) {
         super();
+        this.list = MultiReaderFastList.newList(initialCapacity);
         this.capacity = initialCapacity;
     }
 
+    @Override
+    public Iterator<Task> iterator() {
+        throw new UnsupportedOperationException();
+        //return list.iterator();
+    }
+
+    @Override
+    public final void forEach(Consumer<? super Task> action) {
+        list.withReadLockAndDelegate(l -> {
+            for (int i = 0, listSize = l.size(); i < listSize; i++) {
+                action.accept(l.get(i));
+            }
+        });
+    }
 
     public void capacity(int newCapacity, long now, @NotNull List<Task> removed) {
         this.capacity = newCapacity;
 
-        synchronized (this) {
-            removeAlreadyDeleted(removed);
-            while (this.size() > newCapacity) {
-                remove(weakest(now), removed);
+        list.withWriteLockAndDelegate((l) -> {
+            removeAlreadyDeleted(l, removed);
+            while (l.size() > newCapacity) {
+                remove(l, weakest(now), removed);
             }
-        }
 
+        });
+
+    }
+
+    @Override
+    public final int size() {
+        return list.size();
+    }
+
+    @Override
+    public final boolean isEmpty() {
+        return size() == 0;
     }
 
     @Override
@@ -74,34 +105,57 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             return null;
 
         //the result of compression is processed separately
-        Task next;
+        final Task[] next = new Task[1];
         long now = nar.time();
 
 
         Truth before, after;
-        synchronized (this) {
 
-            before = truth(now, eternal);
+        before = truth(now, eternal);
 
-            next = compress(input, now, eternal, displ, concept);
+        list.withWriteLockAndDelegate(l -> {
 
-            if (next == null || isFull()) {
+            Task nn = compress(l, input, now, eternal, displ, concept);
+
+            if (nn == null || isFull()) {
                 //input too weak or some other capacity problem
-                return null;
+                nn = null;
+            } else {
+
+                l.add(input);
             }
 
-            add(input);
+            next[0] = nn;
+        });
 
-            after = truth(now, eternal);
-
+        if (next[0] == null) {
+            return null; //fail
         }
 
-        if (next != input)
-            nar.inputLater(next);
+        after = truth(now, eternal);
+
+        if (next[0] != input)
+            nar.inputLater(next[0]);
 
         return new TruthDelta(before, after);
     }
 
+
+    @Override
+    public boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> displ) {
+        final boolean[] modified = {false};
+        list.withWriteLockAndDelegate(l -> {
+            l.removeIf(((Predicate<Task>) t -> {
+                if (o.test(t)) {
+                    displ.add(t);
+                    modified[0] = true;
+                    return true;
+                }
+                return false;
+            }));
+        });
+        return modified[0];
+    }
 
 
     @Override
@@ -119,30 +173,29 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 //        this.max = maxT;
 //    }
 
+//
+//    @Override
+//    public final void range(long[] t) {
+//        for (Task x : this.items) {
+//            if (x != null) {
+//                long o = x.occurrence();
+//                if (o < t[0]) t[0] = o;
+//                if (o > t[1]) t[1] = o;
+//            }
+//        }
+//    }
 
-    @Override
-    public final void range(long[] t) {
-        for (Task x : this.items) {
-            if (x != null) {
-                long o = x.occurrence();
-                if (o < t[0]) t[0] = o;
-                if (o > t[1]) t[1] = o;
-            }
-        }
-    }
 
-
-    @Override
     public boolean remove(Object object) {
-        return super.remove(object);
+        return list.remove(object);
     }
 
-    private final boolean remove(@NotNull Task removed, @NotNull List<Task> displ) {
-        int i = indexOf(removed);
+    private final boolean remove(List<Task> l, @NotNull Task removed, @NotNull List<Task> displ) {
+        int i = l.indexOf(removed);
         if (i == -1)
             return false;
 
-        Task x = remove(i, displ);
+        Task x = remove(l, i, displ);
         if (x != removed) {
             throw new RuntimeException("equal but different instances: " + removed);
         }
@@ -161,8 +214,8 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
 
     @Nullable
-    private final Task remove(int index, @NotNull List<Task> displ) {
-        @Nullable Task t = this.remove(index);
+    private final Task remove(List<Task> l, int index, @NotNull List<Task> displ) {
+        @Nullable Task t = l.remove(index);
         if (t != null) {
             displ.add(t);
         }
@@ -183,11 +236,11 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
 
         long[] mergeEvidence = toMergeWith != null ? toMergeWith.evidence() : null;
-        long then = toMergeWith!=null ? toMergeWith.occurrence() : now;
+        long then = toMergeWith != null ? toMergeWith.occurrence() : now;
 
         for (int i = 0; i < n; i++) {
 
-            Task ii = get(i);
+            Task ii = list.get(i);
             if (toMergeWith != null &&
                     ((!Param.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE &&
                             (/*Stamp.isCyclic(iiev) || */Stamp.overlapping(mergeEvidence, ii.evidence()))
@@ -197,11 +250,11 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             //consider ii for being the weakest ranked task to remove
             float r = rank(ii, now, now);
 
-            if (toMergeWith!=null) {
+            if (toMergeWith != null) {
                 r *=
-                     (1 + Math.abs(ii.freq() - toMergeWith.freq())); //similar frequency makes them more likely to be paired
+                        (1 + Math.abs(ii.freq() - toMergeWith.freq())); //similar frequency makes them more likely to be paired
 
-                   //* (1 + Math.abs(ii.occurrence() - toMergeWith.occurrence()));
+                //* (1 + Math.abs(ii.occurrence() - toMergeWith.occurrence()));
 
 
             }
@@ -227,10 +280,10 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
     @Nullable
-    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull List<Task> displ, @Nullable Concept concept) {
+    protected Task compress(List<Task> l, @Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull List<Task> displ, @Nullable Concept concept) {
 
         int cap = capacity();
-        if (size() < cap || removeAlreadyDeleted(displ) < cap) {
+        if (size() < cap || removeAlreadyDeleted(l, displ) < cap) {
             return input; //no need for compression
         }
 
@@ -238,14 +291,14 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         float inputRank = input != null ? rank(input, now, now) : Float.POSITIVE_INFINITY;
 
         Task a = weakest(now, null, inputRank);
-        if (a == null || !remove(a, displ)) {
+        if (a == null || !remove(l, a, displ)) {
             //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
         }
 
         Task b = weakest(now, a, Float.POSITIVE_INFINITY);
 
-        if (b != null && remove(b, displ)) {
+        if (b != null && remove(l, b, displ)) {
             return merge(a, b, now, concept, eternal);
         } else {
             return input;
@@ -266,7 +319,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
         float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
 
-        Truth t = Revision.revision(a, b, 1f - (overlap/2f), Param.TRUTH_EPSILON /*nar.confMin*/);
+        Truth t = Revision.revision(a, b, 1f - (overlap / 2f), Param.TRUTH_EPSILON /*nar.confMin*/);
         if (t != null)
             return Revision.mergeInterpolate(a, b, mid, now, t, concept);
 
@@ -285,67 +338,67 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             return null;
 
         Task best;
-        synchronized (this) {
-            best = get(0);
-            if (ls == 1)
-                return best; //early optimization: the only task
 
-            float bestRank = rank(best, when, now); //the first one
+        best = list.get(0);
+        if (ls == 1)
+            return best; //early optimization: the only task
 
-            for (int i = 1; i < ls; ) {
-                Task x = get(i);
-                if (x != null) {
+        float bestRank = rank(best, when, now); //the first one
 
-                    if (x.isDeleted()) {
-                        remove(i);
-                        ls--;
-                        continue;
-                    }
-
-                    float r = rank(x, when, now);
-
-                    if (r > bestRank) {
-                        best = x;
-                        bestRank = r;
-                    }
-
-                }
-                i++;
+        for (int i = 1; i < ls; ) {
+            Task x = list.get(i);
+            if (x == null || x.isDeleted()) {
+                remove(i);
+                ls--;
+                continue;
             }
+
+            float r = rank(x, when, now);
+
+            if (r > bestRank) {
+                best = x;
+                bestRank = r;
+            }
+
+            i++;
         }
+
 
         return best;
 
     }
 
     @Nullable
-    public final Truth truth(long when, @Nullable EternalTable eternal) {
+    public final Truth truth(long when, @Deprecated @Nullable EternalTable eternal) {
         return truth(when, when, eternal);
     }
 
     @Nullable
     @Override
-    public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
+    public final Truth truth(long when, long now, @Deprecated @Nullable EternalTable eternal) {
 
 
-        Task topEternal = eternal.strongest();
+        //Task topEternal = eternal.strongest();
 
-        int s;
-        Task[] copy;
-        synchronized (this) {
-            //clone a copy so that truthpolation can freely operate asynchronously
-            s = size();
-            if (s == 0) return null;
-            if (topEternal!=null) s++;
-            copy = toArrayExact(new Task[s]);
-        }
+        int s = size();
+        if (s == 0)
+            return null;
 
-        if (topEternal!=null)
-            copy[s-1] = topEternal;
+//        Task[] copy;
+//        synchronized (this) {
+//            //clone a copy so that truthpolation can freely operate asynchronously
+//            s = size();
+//            if (s == 0) return null;
+//            if (topEternal != null) s++;
+//            copy = toArrayExact(new Task[s]);
+//        }
+
+//        if (topEternal != null)
+//            copy[s - 1] = topEternal;
 
         Truth res;
         if (s == 1) {
-            Task the = copy[0];
+            Task the = list.get(0);
             res = the.truth();
             long o = the.occurrence();
             if ((now == ETERNAL || when == now) && o == when) //optimization: if at the current time and when
@@ -353,18 +406,22 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             return res != null ? Revision.project(res, when, now, o, false) : null;
 
         } else {
-            return truthpolations.get().truth(when, now, copy);
+            final Truth[] tt = new Truth[1];
+            list.withReadLockAndDelegate(l ->
+                tt[0] = truthpolations.get().truth(when, now, l)
+            );
+            return tt[0];
         }
 
     }
 
 
-    private int removeAlreadyDeleted(@NotNull List<Task> displ) {
+    private int removeAlreadyDeleted(List<Task> l, @NotNull List<Task> displ) {
         int s = size();
         for (int i = 0; i < s; ) {
-            Task x = get(i);
+            Task x = l.get(i);
             if (x == null || x.isDeleted()) {
-                if (remove(i, displ)!=null)
+                if (remove(l, i, displ) != null)
                     s--;
                 else
                     break;

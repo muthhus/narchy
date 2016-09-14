@@ -113,11 +113,8 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
      * @param delta Row offset
      * @return New terminal position based off this one but with an applied offset
      */
-    public TerminalPosition withRelativeRow(int delta) {
-        if(delta == 0) {
-            return this;
-        }
-        return withRow(row + delta);
+    public final TerminalPosition withRelativeRow(int delta) {
+        return delta == 0 ? this : withRow(row + delta);
     }
 
     /**

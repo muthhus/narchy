@@ -1,17 +1,20 @@
 package nars.task;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import nars.$;
 import nars.Param;
 import nars.Task;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
+import org.eclipse.collections.impl.factory.Iterables;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static nars.nal.UtilityFunctions.w2c;
@@ -45,22 +48,22 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     @Nullable
     public Truth truth(long when, Task... tasks) {
-        return truth(when, when, tasks);
+        return truth(when, when, Lists.newArrayList(tasks));
     }
 
-    @Nullable
-    public Truth truth(long when, long now, @NotNull Collection<Task> tasks) {
-        return truth(when, now, tasks.toArray(new Task[tasks.size()]));
-    }
+//    @Nullable
+//    public Truth truth(long when, long now, @NotNull Collection<Task> tasks) {
+//        return truth(when, now, tasks.toArray(new Task[tasks.size()]));
+//    }
 
     @Nullable
-    public Truth truth(long when, long now, @NotNull Task... tasks) {
+    public Truth truth(long when, long now, @NotNull List<Task> tasks) {
 
 
-        int n = tasks.length;
-        assert(times.length <= n);
-
-        assert(n >= 2);
+//        int n = tasks.length;
+//        assert(times.length <= n);
+//
+//        assert(n >= 2);
 
 //        long minT, maxT;
 //        minT = maxT = tasks.get(0).occurrence();
@@ -78,15 +81,17 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
 //        System.out.println(tasks + " sum=" + sum);
 
+        int volume = -1;
         int i = 0;
-        for (Task t : tasks) {
+        for (int i1 = 0, tasksSize = tasks.size(); i1 < tasksSize; i1++) {
+            Task t = tasks.get(i1);
 
             if (t == null)
                 continue; //HACK
 
 
-                //n--;
-                //continue;
+            //n--;
+            //continue;
             //}
             //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
 
@@ -100,31 +105,39 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             //float window = 0.01f;
 
             long o = t.occurrence();
-            times[i][0] = (o!=ETERNAL) ? o : when;
+            times[i][0] = (o != ETERNAL) ? o : when;
             freq[i] = t.freq();
 
-            float c = Math.min(t.conf(), 1f-Param.TRUTH_EPSILON); //clip maximum confidence
+            float c = Math.min(t.conf(), 1f - Param.TRUTH_EPSILON); //clip maximum confidence
 
             conf[i] = c2w(c)
-                    //* ((now == ETERNAL || o == ETERNAL) ? 1f : projection(when, o, now));
-                    ;
+            //* ((now == ETERNAL || o == ETERNAL) ? 1f : projection(when, o, now));
+
+            ;
+
+            if (i == 0) {
+                volume = t.volume(); //get volume from first task
+            }
+
             i++;
         }
 
-        int volume = tasks[0].volume();
+        if (i < 2)
+            throw new RuntimeException("too few tasks for truthpolation: " + i);
 
+        int finalVolume = volume;
         float[] v = this.value(
                 new float[] { when },
                 times,
                 freq, conf,
                 //Param.timeToLuminosity,
                 (dt) -> {
-                    float duration = Math.max(1, volume-1);
+                    float duration = Math.max(1, finalVolume -1);
                     //return 1f / (1f + (dt*dt)/(duration*duration));
                     //return 1f / (1f + (dt/duration)*(dt/duration));
                     return 1f / (1f + (dt/duration));
                 },
-                n);
+                i);
         return $.t(v[0], w2c(v[1]));
     }
 

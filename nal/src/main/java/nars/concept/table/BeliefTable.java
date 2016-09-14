@@ -90,10 +90,10 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
-        @Override
-        public void range(long[] t) {
-
-        }
+//        @Override
+//        public void range(long[] t) {
+//
+//        }
 
 
     };
@@ -415,8 +415,8 @@ public interface BeliefTable extends TaskTable {
         return t != null ? t.freq() : 0.5f;
     }
 
-    /** 2-element array containing running min/max range accumulator */
-    void range(long[] t);
+//    /** 2-element array containing running min/max range accumulator */
+//    void range(long[] t);
 
 
     //void remove(Task belief, @NotNull NAR nar);

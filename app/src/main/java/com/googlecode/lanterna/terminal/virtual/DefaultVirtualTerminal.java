@@ -155,22 +155,24 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
     }
 
     @Override
-    public synchronized TerminalPosition cursor() {
-        if(getBufferLineCount() <= termSize.row) {
+    public TerminalPosition cursor() {
+        int lines = getBufferLineCount();
+        int r = termSize.row;
+        if(lines <= r) {
             return bufferPos();
         }
         else {
-            return cursorPosition.withRelativeRow(-(getBufferLineCount() - termSize.row));
+            return cursorPosition.withRelativeRow(-(lines - r));
         }
     }
 
     @Override
-    public synchronized TerminalPosition bufferPos() {
+    public TerminalPosition bufferPos() {
         return cursorPosition;
     }
 
     @Override
-    public synchronized void setCursorVisible(boolean visible) {
+    public void setCursorVisible(boolean visible) {
         this.cursorVisible = visible;
     }
 
