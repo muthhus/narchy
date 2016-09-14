@@ -340,7 +340,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
             list.withWriteLockAndDelegate(l -> {
 
-                float bestRank = Float.MIN_VALUE;
+                float bestRank = Float.NEGATIVE_INFINITY;
 
                 int s = l.size();
                 for (int i = 0; i < s; ) {

@@ -63,11 +63,9 @@ public enum PremiseBuilder {
      patham9 especially try to understand the "temporal temporal" case
      patham9 its using the result of higher confidence
      */
-    public static @NotNull Premise newPremise(@NotNull NAR nar, @NotNull Concept taskConcept, long now, @NotNull Task task, @NotNull Term termLinkTerm, Budget b) {
-
+    public static @NotNull Premise newPremise(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task, @NotNull Term termLinkTerm, Budget b) {
 
         Task belief = null;
-
 
         Term termLinkTermConceptTerm = $.unneg(termLinkTerm).term();
 
@@ -76,23 +74,20 @@ public enum PremiseBuilder {
             Concept beliefConcept = nar.concept(termLinkTermConceptTerm);
             if (beliefConcept != null) {
 
-                long when = task.occurrence();
-                if (when == ETERNAL)
-                    when = now;
 
                 if ( task.isQuestOrQuestion()) {
 
                     //TODO is this correct handling for quests? this means a belief task may be a goal which may contradict deriver semantics
                     BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
 
-                    Task solution = table.match(task, when);
-                    if (solution!=null) {
+                    belief = table.match(task, now);
+                    if (belief !=null) {
                         //try {
-                            Task answered = answer(nar, task, solution, beliefConcept);
+                            Task answered = answer(nar, task, belief, beliefConcept);
                             if (task.isQuestion())
                                 belief = answered;
                             else
-                                belief = beliefConcept.beliefs().match(task, when); //in case of quest, proceed with matching belief
+                                belief = beliefConcept.beliefs().match(task, now); //in case of quest, proceed with matching belief
 
 
                         /*} catch (InvalidConceptException e) {
@@ -104,13 +99,13 @@ public enum PremiseBuilder {
 
                 } else {
 
-                    belief = beliefConcept.beliefs().match(task, when);
+                    belief = beliefConcept.beliefs().match(task, now);
 
                 }
             }
         }
 
-        Premise p = new Premise(taskConcept.term(), task, termLinkTerm, belief);
+        Premise p = new Premise(c.term(), task, termLinkTerm, belief);
         p.budget(b);
         return p;
     }

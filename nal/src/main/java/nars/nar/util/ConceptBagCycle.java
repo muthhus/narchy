@@ -139,7 +139,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
                 if (c != null) {
                     new FireConcept(c, nar,
                             taskLinks, termLinks,
-                            nar::inputLater)
+                            nar::inputLater);
 
                         /*@Override
                         public void accept(Premise p) {
@@ -153,7 +153,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
                         }*/
 
-                        .run();
+
                 }
             }
 
@@ -166,7 +166,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     /**
      * shared combined conclusion
      */
-    public static class FireConcept extends Conclusion implements Runnable {
+    public static class FireConcept extends Conclusion {
 
         private static final Logger logger = LoggerFactory.getLogger(FireConcept.class);
 
@@ -184,12 +184,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
             this.deriver = Deriver.getDefaultDeriver();
             this.tasklinks = tasklinks;
             this.termlinks = termlinks;
-        }
-
-
-
-        @Override
-        public void run() {
 
             try {
 
@@ -245,7 +239,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
                         Compound taskTerm = task.term();
 
-                        RawBudget pBudget = new RawBudget(); //recycled temporary budget for calculating premise budget
 
 
                         for (int j = 0, termsArraySize = termLinks.size(); j < termsArraySize; j++) {
@@ -258,6 +251,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
                             if (term == null || Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
                                 continue;
+
+                            RawBudget pBudget = new RawBudget(); //recycled temporary budget for calculating premise budget
 
                             if (PremiseBuilder.budget(pBudget, taskLink, termLink, minDur)) {
 

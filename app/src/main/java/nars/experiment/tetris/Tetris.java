@@ -12,7 +12,6 @@ import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
-import nars.index.MapDBIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -66,9 +65,9 @@ public class Tetris extends NAgent {
             new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 55555;
-    public static final int cyclesPerFrame = 6;
+    public static final int cyclesPerFrame = 3;
     public static final int tetris_width = 6;
-    public static final int tetris_height = 8;
+    public static final int tetris_height = 14;
     public static final int TIME_PER_FALL = 4;
     static boolean easy;
 
@@ -372,13 +371,13 @@ public class Tetris extends NAgent {
 
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        Param.DEBUG = false;
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                256, 2, 2, rng,
+                64, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 32768, 3),
@@ -388,31 +387,31 @@ public class Tetris extends NAgent {
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
 
         Param.DEBUG_ANSWERS = Param.DEBUG;
 
-        nar.onTask(t -> {
-            long now = nar.time();
-            if (t.isBeliefOrGoal() && t.occurrence() > 1 + now) {
-                System.err.println("\tFUTURE: " + t + "\t vs. PRESENT: " +
-                        ((BeliefTable)(t.concept(nar).tableFor(t.punc()))).truth(now)
-                        //+ "\n" + t.proof() + "\n"
-                );
-            }
-        });
+//        nar.onTask(t -> {
+//            long now = nar.time();
+//            if (t.isBeliefOrGoal() && t.occurrence() > 1 + now) {
+//                System.err.println("\tFUTURE: " + t + "\t vs. PRESENT: " +
+//                        ((BeliefTable)(t.concept(nar).tableFor(t.punc()))).truth(now)
+//                        //+ "\n" + t.proof() + "\n"
+//                );
+//            }
+//        });
 
-        float p = 0.5f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f*p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f*p;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f*p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.01f);
+        nar.confMin.setValue(0.03f);
 
-        nar.compoundVolumeMax.setValue(45);
+        nar.compoundVolumeMax.setValue(35);
         //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);
@@ -540,7 +539,7 @@ public class Tetris extends NAgent {
 
                 //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
 
-                Arkancide.newBeliefChartWindow(this, 500);
+                Arkancide.newBeliefChartWindow(this, 60);
 
                 HistogramChart.budgetChart(nar, 20);
 

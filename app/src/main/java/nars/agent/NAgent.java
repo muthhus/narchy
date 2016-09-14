@@ -67,8 +67,8 @@ abstract public class NAgent {
 
     public float rewardValue;
 
-    float predictorProbability = 0.5f;
-    private int predictionHorizon = curiosityMonitorDuration;
+    float predictorProbability = 0.25f;
+    private int predictionHorizon = curiosityMonitorDuration/2;
     private final FasterList<Task> predictors = $.newArrayList();
 
     public boolean trace = false;
@@ -237,12 +237,12 @@ abstract public class NAgent {
 
         predictors.addAll(
                 //what will imply reward
-                //new MutableTask($.equi(what, dt, happiness), '?', null).time(now,now),
-                new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
+                new MutableTask($.equi(what, dt, happiness), '?', null).time(now,now),
+                //new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
 
                 //what will imply non-reward
-                //new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now,now),
-                new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
+                new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now,now),
+                //new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
 
                 //what co-occurs with reward
                 new MutableTask($.parallel(what, happiness), '?', null).time(now,now),

@@ -80,7 +80,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.0005f;
+    public static final float BUDGET_EPSILON = 0.0003f;
 
 
     public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
@@ -119,7 +119,7 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     public static float matchTermutationsMax = 3;
 
-    public static int QUERY_ANSWERS_PER_MATCH = 2;
+    public static int QUERY_ANSWERS_PER_MATCH = 1;
     //public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 
 

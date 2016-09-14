@@ -103,8 +103,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         Term r = m.index.resolve(this.conclusionPattern, m);
 
         if (r instanceof Compound) { //includes null test
-            PremiseEval.TruthPuncEvidence ct = m.punct.get();
-            derive(m, (Compound) r, ct);
+            derive(m, (Compound) r, m.punct.get());
         }
 
         return true;
@@ -137,11 +136,10 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
 
         long occ;
-        Premise premise = m.premise;
 
         if (m.temporal) {
             if (nar.nal() < 7)
-                throw new RuntimeException("invalid NAL level");
+                throw new NAR.InvalidTaskException(content, "invalid NAL level");
 
             long[] occReturn = {ETERNAL};
             float[] confScale = {1f};
@@ -152,7 +150,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
             if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
                 //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
-                throw new RuntimeException("temporalization resulted in suspicious occurrence time");
+                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
             }
 
             content = temporalized;
@@ -171,7 +169,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 if (cf != 1) {
                     truth = truth.confMultViaWeightMaxEternal(cf);
                     if (truth == null) {
-                        throw new RuntimeException("temporal leak: " + premise);
+                        throw new NAR.InvalidTaskException(content, "temporal leak");
                         //return;
                     }
                 }
@@ -221,7 +219,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     .log(Param.DEBUG ? rule : null);
 
             return dt;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             if (Param.DEBUG) {
                 logger.error("{}", e.toString());
             }

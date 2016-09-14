@@ -142,12 +142,12 @@ public class PremiseEval extends FindSubst {
         //tDelta = new Versioned(this);
         this.punct = new Versioned(versioning, 2);
 
-        replace(new substitute(this));
-        replace(new substituteIfUnifiesDep(this));
-        replace(new substituteOnlyIfUnifiesDep(this));
-        replace(new substituteIfUnifiesIndep(this));
-        replace(new substituteIfUnifiesIndepForward(this));
-        replace(new substituteOnlyIfUnifiesIndep(this));
+        put(new substitute(this));
+        put(new substituteIfUnifiesDep(this));
+        put(new substituteOnlyIfUnifiesDep(this));
+        put(new substituteIfUnifiesIndep(this));
+        put(new substituteIfUnifiesIndepForward(this));
+        put(new substituteOnlyIfUnifiesIndep(this));
 
         this.premise = p;
     }
@@ -220,9 +220,9 @@ public class PremiseEval extends FindSubst {
     protected final void put(@NotNull Term t) {
         putXY(t, t);
     }
-    protected final void replace(@NotNull Term t) {
-        replaceXY(t, t);
-    }
+    //protected final void replace(@NotNull Term t) {
+     //   replaceXY(t, t);
+    //}
 
     public static int matchesMax(float p) {
         final float min = Param.matchTermutationsMin, max = Param.matchTermutationsMax;
@@ -276,7 +276,7 @@ public class PremiseEval extends FindSubst {
         } catch (RuntimeException e) {
             if (Param.DEBUG_DERIVER)
                 Conclude.logger.warn("{}\n\tderiving {}", e, ((Conclude)forEachMatch).rule.source);
-            return false;
+            return true; //continue
         }
     }
 
