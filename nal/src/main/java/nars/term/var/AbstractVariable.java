@@ -63,14 +63,12 @@ public abstract class AbstractVariable implements Variable {
     }
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+    public final boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
 
         Op op = op();
-        Op yOp = y.op();
-        Op type = subst.type;
-        if (op == yOp) {
+        if (op == y.op()) {
             return subst.putCommon(this, y);
-        } else if (op == type) { //TODO is this necessary? probably to allow the matchVarY condition below
+        } else if (op == subst.type) { //TODO is this necessary? probably to allow the matchVarY condition below
             return subst.matchVarX(this, y);
         }
 

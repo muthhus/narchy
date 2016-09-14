@@ -5,7 +5,10 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.budget.Activation;
+import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.task.AnswerTask;
 import org.jetbrains.annotations.NotNull;
@@ -87,7 +90,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
 
     @Override
-    public void answer(@NotNull Task a, @NotNull NAR nar, List<Task> displ) {
+    public void answer(@NotNull Task a, Concept answerConcept, @NotNull NAR nar, List<Task> displ) {
 
         if (a instanceof AnswerTask)
             return; //already an answer
@@ -104,12 +107,14 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
                 for (int i = 0; !a.isDeleted() && i < size; ) {
                     Task q = list.get(i);
                     if (!q.isDeleted()) {
-                        answer(q, a, 1f/size, nar);
-                        i++;
-                    } else {
-                        remove(i, null, displ);
-                        size--;
+                        if (answer(q, a, 1f/size, answerConcept, nar)) {
+                            i++;
+                            continue;
+                        }
                     }
+
+                    remove(i, null, displ);
+                    size--;
                 }
             }
         }
@@ -118,7 +123,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     /**
      * returns false if the question should be removed after retuning
      */
-    private static void answer(@NotNull Task q, @NotNull Task a, float scale, @NotNull NAR nar) {
+    private static boolean answer(@NotNull Task q, @NotNull Task a, float scale, @Nullable Concept answerConcept, @NotNull NAR nar) {
 //        if (Stamp.overlapping(q.evidence(), a.evidence()))
 //            return;
 
@@ -128,44 +133,69 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         boolean aEtern = a.isEternal();
         boolean qEtern = q.isEternal();
         float factor = scale;
+        float aConf = a.conf();
         if (aEtern) {
             if (qEtern)
-                factor = scale * (1f - a.conf());
+                factor = scale * (1f - aConf);
         } else {
             if (!qEtern) {
                 //TODO BeliefTable.rankTemporalByConfidence()
-                factor = scale * (1f - a.conf());
+                factor = scale * (1f - aConf);
             }
         }
 
 
-        BudgetFunctions.transferPri(q.budget(), a.budget(), factor);
+        @NotNull Budget qBudget = q.budget();
+        BudgetFunctions.transferPri(qBudget, a.budget(), factor);
 
         if (!qEtern) {
             //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
-            q.budget().quaMult(factor);
+            qBudget.quaMult(factor);
         }
 
         if (q.onAnswered(a)) {
 
-            //if there is a reduction in variables, link the (distinct) concepts
-            if (a.term().vars() < q.term().vars()) {
-                float aConf = a.conf();
 
+            boolean sameConcept;
+            if (answerConcept!=null) {
+                //check if different concepts; ex: if there is a reduction in variables, etc
                 Concept qc = nar.concept(q);
-                if (qc != null) {
+                if (!qc.equals(answerConcept)) {
+                    sameConcept = false;
                     qc.crossLink(q, a, scale * aConf, nar);
+                } else {
+                    sameConcept = true;
+                }
+            } else {
+                sameConcept = true;
+            }
+
+
+            if (a.pri() > Param.BUDGET_EPSILON)
+                new Activation(a, nar, 1f);
+
+            if (Param.DEBUG_ANSWERS) {
+                //if (q.term().equals(a.term()))
+                if (!sameConcept) {
+                    nar.logger.debug("Q&A: {}\t{}", q, a);
+                } else {
+                    nar.logger.debug("Q&A: {}\t{}", q, a.truth());
                 }
             }
-            //nar.activate(a, qBudget);
-
 
             //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly
             //BudgetFunctions.transferPri(q.budget(), a.budget(), (1f - q.qua()) * aConf);
 
         } else {
-            //the qustion requested for it to be deleted
-            return;
+            //the qustion self-destructed
+        }
+
+        if (aEtern || a.occurrence()!=q.occurrence()) {
+            //eternal or different occurrence time; keep the question
+            return true;
+        } else {
+            //discard this fully redundant question; the answer will remain in the same concept
+            return false;
         }
 
 //        //generate a projected answer
@@ -203,7 +233,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
             if (a != null && !a.isDeleted()) {
 
-                answer(questioned, a, 1/size(), n);
+                answer(questioned, a, 1/size(), null,  n);
             }
         }
 

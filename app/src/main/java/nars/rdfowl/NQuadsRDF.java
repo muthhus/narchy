@@ -103,12 +103,14 @@ public abstract class NQuadsRDF {
         return nxp.map( (Node[] nx) -> {
             if (nx.length >= 3) {
                 //return inputRaw(
-                return inputNALlike(
-                        nar,
-                        resource(nx[0]),
-                        resource(nx[1]),
-                        resource(nx[2])
-                );
+
+                    return inputNALlike(
+                            nar,
+                            resource(nx[0]),
+                            resource(nx[1]),
+                            resource(nx[2])
+                    );
+
             }
             return null;
         } ).filter(x -> x!=null);
@@ -336,7 +338,7 @@ public abstract class NQuadsRDF {
          */
     public static MutableTask inputNALlike(@NotNull NAR nar,
                               @Nullable Atom subject,
-                              @NotNull Atom predicate, @NotNull Term object) {
+                              @Nullable Atom predicate, @Nullable Term object) {
 
         //http://www.w3.org/TR/owl-ref/
 

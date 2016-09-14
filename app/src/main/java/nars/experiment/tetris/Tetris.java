@@ -370,6 +370,7 @@ public class Tetris extends NAgent {
 
     public static void main(String[] args) {
         Param.DEBUG = false;
+        Param.DEBUG_ANSWERS = true;
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,

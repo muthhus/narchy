@@ -111,22 +111,22 @@ public enum PremiseBuilder {
 
 
     @Nullable
-    private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {
+    private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept answerConcept) {
 
         long taskOcc = taskLink.occurrence();
 
         //project the belief to the question's time
         if (taskOcc != ETERNAL) {
-            solution = beliefConcept.merge(taskLink, solution, taskOcc, nar);
+            solution = answerConcept.merge(taskLink, solution, taskOcc, nar);
         }
 
         if (solution != null) { //may have become null as a result of projection
 
             //attempt to Unify any Query variables; answer if unifies
             if (taskLink.term().hasVarQuery()) {
-                matchQueryQuestion(nar, taskLink, solution);
-            } else if (beliefConcept instanceof Compound && Term.equalAtemporally(taskLink, beliefConcept)) {
-                matchAnswer(nar, taskLink, solution);
+                matchQueryQuestion(nar, taskLink, solution, answerConcept);
+            } else if (answerConcept instanceof Compound && Term.equalAtemporally(taskLink, answerConcept)) {
+                matchAnswer(nar, taskLink, solution, answerConcept);
             }
 
 
@@ -162,24 +162,28 @@ public enum PremiseBuilder {
 //        }
 //    }
 
-    static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a) {
+    static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a, @NotNull Concept answerConcept) {
         if (a instanceof AnswerTask)
             return; //already an answer
 
-        @Nullable Concept c = nar.concept(q);
-        if (c != null) {
+        @Nullable Concept questionConcept = nar.concept(q);
+        if (questionConcept != null) {
             List<Task> displ = $.newArrayList(0);
-            ((QuestionTable)c.tableFor(q.punc())).answer(a, nar, displ );
+            ((QuestionTable)questionConcept.tableFor(q.punc())).answer(a, answerConcept, nar, displ );
         }
     }
 
-    static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief) {
+    static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief, Concept answerConcept) {
         List<Termed> result = $.newArrayList(1);
         new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH).unifyAll(
                 task.term(), belief.term()
         );
         if (!result.isEmpty()) {
-            matchAnswer(nar, task, belief);
+            int taskComplexity = task.complexity();
+            for (Termed r : result) {
+                if (r.complexity() > taskComplexity)
+                    matchAnswer(nar, task, belief, answerConcept);
+            }
         }
     }
 

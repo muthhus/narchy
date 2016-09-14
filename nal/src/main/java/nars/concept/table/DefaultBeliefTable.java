@@ -163,7 +163,7 @@ public class DefaultBeliefTable implements BeliefTable {
         }
 
         if (result!=null) {
-            questions.answer(input, nar, displaced);
+            questions.answer(input, concept, nar, displaced);
         }
 
         return result;

@@ -12,7 +12,10 @@ import nars.util.data.random.XorShift128PlusRandom;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.Random;
 
 import static junit.framework.TestCase.assertTrue;
@@ -34,6 +37,8 @@ public class NQuadsRDFTest {
     @Ignore
     @Test
     public void testSchema1() throws Exception {
+        Param.DEBUG_ANSWERS = true;
+
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
         Executioner e = Tetris.exe;
@@ -44,12 +49,21 @@ public class NQuadsRDFTest {
                 new FrameClock(), e
         );
 
+        File output = new File("/tmp/onto.nal");
+        PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512*1024));
+
         n.input(
-                NQuadsRDF.stream(n, new File("/tmp/all-layers.nq")).map(t -> {
+                NQuadsRDF.stream(n, new File(
+                        //"/tmp/all-layers.nq"
+                        "/home/me/Downloads/nquad"
+                )).map(t -> {
+                    pout.println(t.term().toString() + t.punc());
                     t.budget(0, 0.5f);
                     return t;
                 } )
         );
+
+        pout.close();
 
 //        n.forEachActiveConcept(c -> {
 //            c.print();
@@ -58,10 +72,10 @@ public class NQuadsRDFTest {
         n.run(1);
         n.core.concepts.clear();
         n.log();
-        n.input("(Bacteria <-> Pharmacy)?");
+        n.input("$0.9$ (Bacteria <-> Pharmacy)?");
 
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
         n.run(128);
 

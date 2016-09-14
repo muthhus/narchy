@@ -2,6 +2,8 @@ package nars.concept.table;
 
 import nars.NAR;
 import nars.Task;
+import nars.concept.CompoundConcept;
+import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +29,7 @@ public interface QuestionTable extends TaskTable {
 
 
     /** called when a new answer appears */
-    void answer(@NotNull Task result, @NotNull NAR nar, @NotNull List<Task> displ);
+    void answer(@NotNull Task result, Concept answerConcept, @NotNull NAR nar, @NotNull List<Task> displ);
 
 //    {
 //        for (Task a : this) {
@@ -73,7 +75,7 @@ public interface QuestionTable extends TaskTable {
 
 
         @Override
-        public void answer(Task result, NAR nar, List<Task> displ) {
+        public void answer(Task result, Concept answerConcept, NAR nar, List<Task> displ) {
 
         }
     };

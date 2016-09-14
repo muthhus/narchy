@@ -26,6 +26,7 @@ import java.util.List;
 import static nars.$.t;
 import static nars.agent.NAgentOld.varPct;
 import static nars.nal.UtilityFunctions.and;
+import static nars.nal.UtilityFunctions.or;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.Texts.n2;
@@ -235,16 +236,14 @@ abstract public class NAgent {
         for (Concept x : actions) {
 
             //quest for each action
-            predictors.add(nar.ask(x, '@', ETERNAL));
-            predictors.add(nar.ask(x, '@', now));
+            //predictors.add(nar.ask(x, '@', now));
 
             //does action A co-occur with reward R?
-            predictors.add(
-                    nar.ask($.seq(x.term(), dt, happy.term()), '?', ETERNAL)
-            );
-            predictors.add(
-                    nar.ask($.seq(x.term(), dt, happy.term()), '?', now)
-            );
+            for (int d : new int[] { dt, dt * 2, dt * 4 /* .. */ }) {
+                predictors.add(
+                        nar.ask($.seq(x.term(), d, happy.term()), '?', now)
+                );
+            }
 
 
 
@@ -309,11 +308,14 @@ abstract public class NAgent {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
         float reinforcementAttention =
-                and(alpha, gamma)/(actions.size()+sensors.size());
+                or(alpha, gamma);
+                        //
+                        // /predictors.size();
+                        // /(actions.size()+sensors.size());
 
         if (reinforcementAttention > 0) {
 
-            boostBudget = Budget.One.clone().multiplied(reinforcementAttention, 0.25f, 0.9f);
+            boostBudget = Budget.One.clone().multiplied(reinforcementAttention, 0.5f, 0.9f);
             curiosityBudget = Budget.Zero;
 
             //boost(happy);
@@ -398,18 +400,11 @@ abstract public class NAgent {
             nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(now, now)
                     .budget(boostBudget).log("Predictor"));
         } else {
+            //re-use existing eternal task; first recharge budget
 
-            if (t.isDeleted())
-                BudgetMerge.max.apply(t.budget(), boostBudget, 1); //resurrect
+            BudgetMerge.max.apply(t.budget(), boostBudget, 1); //resurrect
 
-            //re-use existing eternal task
-            Activation a = new Activation(t, nar, 1f);/* {
-                @Override
-                public void link(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
-                    linkTermLinks(src, scale, nar);
-                    super.linkTerms(src, tgt, scale, minScale, nar);
-                }
-            };*/
+            Activation a = new Activation(t, nar, 1f);
         }
 
     }

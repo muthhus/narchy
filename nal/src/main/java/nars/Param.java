@@ -50,6 +50,8 @@ public abstract class Param /*extends Container*/ implements Level {
     /** average priority target for bag forgetting */
     public static final float BAG_THRESHOLD = 0.5f;
 
+    public static boolean DEBUG_ANSWERS = false;
+
     /** used in linear interpolating link adjustments during feedback */
     public final MutableFloat linkFeedbackRate = new MutableFloat(0.05f);
 
@@ -111,10 +113,12 @@ public abstract class Param /*extends Container*/ implements Level {
      * lower limit for # of termutations derived, determined by premise's priority
      */
     public static float matchTermutationsMin = 1;
+
     /**
      * upper limit for # of termutations derived, determined by premise's priority
      */
-    public static float matchTermutationsMax = 2;
+    public static float matchTermutationsMax = 3;
+
     public static int QUERY_ANSWERS_PER_MATCH = 1;
     //public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 

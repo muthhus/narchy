@@ -83,11 +83,7 @@ public final class TaskIndex {
     }
 
     public final void remove(@NotNull List<Task> tt) {
-
         int s = tt.size();
-        if (s == 0)
-            return;
-
         for (int i = 0; i < s; i++) {
             this.remove(tt.get(i));
         }
