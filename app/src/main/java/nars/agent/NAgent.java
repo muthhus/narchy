@@ -1,14 +1,18 @@
 package nars.agent;
 
+import com.google.common.base.Joiner;
 import nars.*;
 import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
+import nars.nal.UtilityFunctions;
 import nars.task.GeneratedTask;
+import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.PolarRangeNormalizedFloat;
@@ -17,6 +21,7 @@ import nars.util.signal.Emotion;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.eclipse.collections.api.block.procedure.Procedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -50,18 +55,22 @@ abstract public class NAgent {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<MotorConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.1f;
+    public float alpha, gamma, epsilonProbability = 0.5f;
     @Deprecated public float gammaEpsilonFactor = 0.5f;
 
-    final int CURIOSITY_DURATION = 32; //frames
-    final DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(CURIOSITY_DURATION);
-    final DescriptiveStatistics rewardWindow = new DescriptiveStatistics(CURIOSITY_DURATION);
+    final int curiosityMonitorDuration = 32; //frames
+    final DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(curiosityMonitorDuration);
+    final DescriptiveStatistics rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
 
 
 
 
     public float rewardValue;
+
+    float predictorProbability = 0.5f;
+    private int predictionHorizon = curiosityMonitorDuration;
     private final FasterList<Task> predictors = $.newArrayList();
+
     public boolean trace = false;
 
     protected int ticksBeforeObserve;
@@ -74,7 +83,6 @@ abstract public class NAgent {
     //private float curiosityAttention;
     private float rewardSum = 0;
 
-    private int predictionHorizon = 16;
 
     public NAgent(NAR nar) {
         this.nar = nar;
@@ -213,29 +221,37 @@ abstract public class NAgent {
 
                         float p = gain * (cp);
 
-                        return Math.min(1f, gain/numSensors + p);
+                        float basePri =
+                                //0.1f;
+                                gain / numSensors;
+
+                        return Math.min(1f, basePri + p);
                     }
             );
         }
 
         @NotNull Term what = $.$("?w"); //#w
+        @NotNull Term sth = $.$("#s"); //#w
 
         @NotNull Compound happiness = happy.term();
 
-        predictors.addAll(
-                //what will imply reward
-                nar.ask($.impl(what, happiness), '?', now),
-
-                //what will imply non-reward
-                nar.ask($.impl(what, $.neg(happiness)), '?', now),
-
-                //what co-occurs with reward
-                nar.ask($.conj(what, happiness), '?', now),
-
-                //what co-occurs with non-reward
-                nar.ask($.conj(what, $.neg(happiness)), '?', now)
-
-        );
+//        predictors.addAll(
+//                //what will imply reward
+//                //new MutableTask($.equi(what, dt, happiness), '?', null).time(now,now),
+//                new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
+//
+//                //what will imply non-reward
+//                //new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now,now),
+//                new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
+//
+//                //what co-occurs with reward
+//                new MutableTask($.parallel(what, happiness), '?', null).time(now,now),
+//
+//                //what co-occurs with non-reward
+//                new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now,now)
+//
+//
+//        );
 //        predictors.add(
 //                nar.ask($.seq(what, dt, happy.term()), '?', now)
 //        );
@@ -254,9 +270,11 @@ abstract public class NAgent {
 
 
             predictors.addAll(
-                    nar.ask($.conj(what, action), '?', now),
-                    nar.ask($.conj(happiness, action), '?', now),
-                    nar.ask($.impl(what, action), '?', now)
+                    new MutableTask($.seq(what, dt, action), '?', null).present(now),
+                    new MutableTask($.seq($.parallel(what,action), dt, happiness), '?', null).present(now),
+                    new MutableTask($.impl(what, dt, action), '?', null).present(now),
+                    new MutableTask($.impl(what, dt, $.neg(action)), '?', null).present(now),
+                    new MutableTask(action, '@', null).present(now)
             );
 
 
@@ -264,7 +282,7 @@ abstract public class NAgent {
 
         }
 
-        //System.out.println(predictors);
+        System.out.println(Joiner.on('\n').join(predictors));
 
     }
 
@@ -323,10 +341,10 @@ abstract public class NAgent {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
         float reinforcementAttention =
-                or(alpha, gamma)
-                        //
-                         /predictors.size();
-                        // /(actions.size()+sensors.size());
+                UtilityFunctions.aveAri(alpha, gamma);
+//                        //
+//                         / (predictors.size()/predictorProbability) );
+//                        // /(actions.size()+sensors.size());
 
         if (reinforcementAttention > 0) {
 
@@ -371,15 +389,14 @@ abstract public class NAgent {
                             return false;
                         }
                     }*/.
-                            present(now).budget(curiosityBudget).log("Curiosity"));
+                            time(now, now).budget(curiosityBudget).log("Curiosity"));
 
                 }
 
                 boost(c);
             }
 
-            for (Task x : predictors)
-                boost(x);
+            predictors.forEach((Procedure<Task>) this::boost);
 
 
         }
@@ -409,6 +426,9 @@ abstract public class NAgent {
 
     private void boost(@NotNull Task t) {
 
+        if (nar.random.nextFloat() > predictorProbability)
+            return; //ignore this one
+
         if (t.occurrence() != ETERNAL) {
             int lookAhead = nar.random.nextInt(predictionHorizon);
 
@@ -416,6 +436,7 @@ abstract public class NAgent {
                 new GeneratedTask(t.term(), t.punc(), t.truth())
                     .time(now, now + lookAhead)
                     .budget(boostBudget).log("Agent Predictor"));
+
         } else {
             //re-use existing eternal task; first recharge budget
 

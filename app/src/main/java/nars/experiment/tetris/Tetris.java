@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
 import nars.agent.NAgent;
+import nars.concept.table.BeliefTable;
 import nars.data.AutoClassifier;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
@@ -64,8 +65,8 @@ public class Tetris extends NAgent {
     public static final Executioner exe4 =
             new MultiThreadExecutioner(4, 1024*32);
 
-    public static final int runFrames = 50500;
-    public static final int cyclesPerFrame = 2;
+    public static final int runFrames = 64;
+    public static final int cyclesPerFrame = 1;
     public static final int tetris_width = 6;
     public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 4;
@@ -258,7 +259,7 @@ public class Tetris extends NAgent {
                 int xx = x;
                 Compound squareTerm =
                         $.p(x, y);
-                        //$.p($.pRadix(x, 2, state.width), $.pRadix(y, 2, state.height));
+                        //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
                 @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
                         () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
 
@@ -371,16 +372,16 @@ public class Tetris extends NAgent {
 
 
     public static void main(String[] args) {
-        Param.DEBUG = false;
+        Param.DEBUG = true;
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        Executioner e = Tetris.exe2;
+        Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                256, 2, 3, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                256, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 32768, 3),
+                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 32768, 3),
                 new FrameClock(), e
         );
 
@@ -390,24 +391,28 @@ public class Tetris extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-        Param.DEBUG_ANSWERS = true;
+        Param.DEBUG_ANSWERS = Param.DEBUG;
 
         nar.onTask(t -> {
-            if (t.isBeliefOrGoal() && t.occurrence() > 1 + nar.time()) {
-                System.out.println("\tFUTURE: " + t);
+            long now = nar.time();
+            if (t.isBeliefOrGoal() && t.occurrence() > 1 + now) {
+                System.err.println("\tFUTURE: " + t + "\t vs. PRESENT: " +
+                        ((BeliefTable)(t.concept(nar).tableFor(t.punc()))).truth(now)
+                        //+ "\n" + t.proof() + "\n"
+                );
             }
         });
 
-        float p = 0.1f;
+        float p = 0.3f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f*p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.2f*p;
         nar.DEFAULT_QUEST_PRIORITY = 0.3f*p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.01f);
 
-        nar.compoundVolumeMax.setValue(40);
+        nar.compoundVolumeMax.setValue(25);
         //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);
@@ -445,7 +450,7 @@ public class Tetris extends NAgent {
         //new Abbreviation2(nar, "_");
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
+        //MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 4);
 
         //new VariableCompressor(nar);
 

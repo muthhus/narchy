@@ -8,6 +8,8 @@ import nars.task.DerivedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
+import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import nars.util.data.Sensor;
 import nars.util.math.FloatSupplier;
@@ -18,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.ProtectionDomain;
 import java.util.List;
 
 import static nars.time.Tense.ETERNAL;
@@ -64,6 +67,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
 
     }
+
+
 
     protected void input(Task t) {
         nar.inputLater(t);

@@ -387,8 +387,8 @@ public class Pacman extends NAgent {
 //        if (nar instanceof Default) {
 //
 //          //new BeliefTableChart(nar, charted).show(700, 900);
-            BeliefTableChart.newBeliefChart(nar, charted, 500);
-            HistogramChart.budgetChart(nar, 50);
+            BeliefTableChart.newBeliefChart(nar, charted, 50);
+            HistogramChart.budgetChart(nar, 20);
 
 ////
             //BagChart.show((Default) nar, 512);

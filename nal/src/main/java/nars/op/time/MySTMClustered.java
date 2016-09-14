@@ -46,7 +46,7 @@ public class MySTMClustered extends STMClustered {
 
 		//this.logger = LoggerFactory.getLogger(toString());
 
-		allowNonInput = true;
+		allowNonInput = false;
 
 		net.setAlpha(0.05f);
 		net.setBeta(0.05f);
@@ -118,7 +118,8 @@ public class MySTMClustered extends STMClustered {
 				}
 
 				float finalFreq = freq;
-				node.termSet(maxGroupSize,  nar.compoundVolumeMax.intValue()-1).forEach(tt -> {
+				int maxVol = nar.compoundVolumeMax.intValue();
+				node.termSet(maxGroupSize,  maxVol -1).forEach(tt -> {
 
 					Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
@@ -131,6 +132,8 @@ public class MySTMClustered extends STMClustered {
 					long[] evidence = Stamp.zip(Lists.newArrayList(uu), uu.length, Param.STAMP_CAPACITY);
 
 					@Nullable Term conj = group(negated, uu);
+					if (conj.volume() > maxVol)
+						throw new RuntimeException("exceeded max volume");
 
 					if (!(conj instanceof Compound))
 						return;

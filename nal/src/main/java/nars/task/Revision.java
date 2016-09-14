@@ -264,29 +264,31 @@ public class Revision {
                 if (a.equals(b))
                     return; //no difference
 
-                Compound aa = ((Compound)a);
-                Compound bb = ((Compound)b);
+                Compound aa = ((Compound) a);
+                Compound bb = ((Compound) b);
 
                 dtCompare(aa, bb, 0.5f, accumulatedDifference, depth, null);
-
-                Term a0 = aa.term(0);
-                if (a0.size() == 2) {
-                    Term b0 = bb.term(0);
-
-                    if (a0.op() == b0.op()) {
-
-                        Term a1 = aa.term(1);
-                        Term b1 = bb.term(1);
-
-                        if (a1.op() == b1.op()) {
-                            //recurse
-                            dtCompare((Compound) a0, (Compound) b0, 0.5f, accumulatedDifference, depth / 2f, null);
-                            dtCompare((Compound) a1, (Compound) b1, 0.5f, accumulatedDifference, depth / 2f, null);
-                        }
-                    }
-                }
-
             }
+//            if (a.size() == b.size())
+//
+//                Term a0 = aa.term(0);
+//                if (a.size() == 2 && b0) {
+//                    Term b0 = bb.term(0);
+//
+//                    if (a0.op() == b0.op()) {
+//                        dtCompare((Compound) a0, (Compound) b0, 0.5f, accumulatedDifference, depth / 2f, null);
+//                    }
+//
+//                    Term a1 = aa.term(1);
+//                    Term b1 = bb.term(1);
+//
+//                    if (a1.op() == b1.op()) {
+//                        dtCompare((Compound) a1, (Compound) b1, 0.5f, accumulatedDifference, depth / 2f, null);
+//                    }
+//
+//                }
+//
+//            }
         } /* else: can not be compared anyway */
     }
 

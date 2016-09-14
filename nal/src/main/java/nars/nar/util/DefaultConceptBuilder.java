@@ -164,10 +164,10 @@ import static nars.time.Tense.DTERNAL;
                         //CurveBag.power6BagCurve,
                         rng);
 
-        this.sleep = new DefaultConceptPolicy(7, 8, 2, 16, 8);
+        this.sleep = new DefaultConceptPolicy(6, 4, 2, 16, 8);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy(12, 10, 4, 32, 24);
+        this.awake = new DefaultConceptPolicy(8, 6, 4, 32, 24);
     }
 
     @Override

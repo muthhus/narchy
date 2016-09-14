@@ -333,38 +333,42 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
         //removeDeleted();
 
-        int ls = size();
-        if (ls == 0)
-            return null;
+//        final int[] ls = {size()};
+//        if (ls[0] > 0) {
 
-        Task best;
+            final Task[] best = new Task[1];
 
-        best = list.get(0);
-        if (ls == 1)
-            return best; //early optimization: the only task
+            list.withWriteLockAndDelegate(l -> {
 
-        float bestRank = rank(best, when, now); //the first one
+                float bestRank = Float.MIN_VALUE;
 
-        for (int i = 1; i < ls; ) {
-            Task x = list.get(i);
-            if (x == null || x.isDeleted()) {
-                remove(i);
-                ls--;
-                continue;
-            }
+                int s = l.size();
+                for (int i = 0; i < s; ) {
+                    Task x = l.get(i);
+                    if (x == null || x.isDeleted()) {
+                        remove(i);
+                        s--;
+                        continue;
+                    } else {
 
-            float r = rank(x, when, now) / (1f + Revision.dtDifference(against,x));
+                        float r = rank(x, when, now) / (1f + Revision.dtDifference(against, x));
 
-            if (r > bestRank) {
-                best = x;
-                bestRank = r;
-            }
+                        if (r > bestRank) {
+                            best[0] = x;
+                            bestRank = r;
+                        }
 
-            i++;
-        }
+                        i++;
+                    }
+                }
 
 
-        return best;
+            });
+
+            return best[0];
+        //}
+
+        //return null;
 
     }
 

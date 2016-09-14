@@ -164,15 +164,16 @@ public class STMClustered extends STM {
 
                         int v = x.volume();
 
-                        if ((subterms.intValue() == maxComponentsPerTerm) || (currentVolume.intValue() + v > maxVolume)) {
+                        if ((subterms.intValue() >= maxComponentsPerTerm) || (currentVolume.intValue() + v > maxVolume)) {
                             //next group
-                            subterms.set(0);
-                            currentVolume.set(0);
                             group.incrementAndGet();
-                        }
+                            subterms.set(1);
+                            currentVolume.set(v);
+                        } else {
 
-                        subterms.incrementAndGet();
-                        currentVolume.addAndGet(v);
+                            subterms.incrementAndGet();
+                            currentVolume.addAndGet(v);
+                        }
 
                         return group.intValue();
                     }))

@@ -116,28 +116,31 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         if (i < 2)
             throw new RuntimeException("too few tasks for truthpolation: " + i);
 
-
-        //allow an out-of-range temporal margin, ie. beyond which confidence begins diminishing with distance
-        final int dtTolerance;
+        //clip to out-of-range temporal margin, ie. beyond which confidence begins diminishing with distance
+        //final int dtTolerance;
         if (minT > when) {
-            dtTolerance = (int) (minT - when);
+            //dtTolerance = (int) (minT - when);
+            when = minT;
         } else if (maxT < when) {
-            dtTolerance = (int) (when - maxT);
+            //dtTolerance = (int) (when - maxT);
+            when = maxT;
         } else {
-            dtTolerance = 0;
+            //dtTolerance = 0;
         }
 
-        int finalVolume = volume;
+
+        float duration = 2 * Math.max(1, volume - 1);
 
         FloatToFloatFunction lightCurve = (dt) -> {
 
-            if (dt > dtTolerance) dt -= dtTolerance;
+            //if (dt > dtTolerance) dt -= dtTolerance;
 
-            float duration = Math.max(1, finalVolume - 1);
 
             //return 1f / (1f + (dt*dt)/(duration*duration));
             //return 1f / (1f + (dt/duration)*(dt/duration));
-            return 1f / (1f + (dt / duration));
+            //return 1f / (1f + (dt / duration));
+            //return 1f / (float)Math.log(dt/duration + Math.E);
+            return 1f / (dt*dt/duration + 1f);
         };
 
         float[] v = this.value(

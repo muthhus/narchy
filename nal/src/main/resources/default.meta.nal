@@ -5,9 +5,6 @@
 // Statement about Statement: (A --> B) ==> (X --> Y): If A is true, so is/will be B
 // --> is a relation in meaning of terms, while ==> is a relation of truth between statements.
 
-//Similarity to Inheritance
-
-    (S --> P), (S <-> P), task("?") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief)
 
 
 //desire spreading by similarity
@@ -37,15 +34,6 @@
     ([S] --> P),  P  |- ([S] <-> P), (Belief:Identity, Derive:AllowBackward)
 
 
-//Inheritance to Similarity
-
-    (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief, Derive:NoSwap)
-
-//If S can stand for P, P can to a certain low degree also represent the class S
-//If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
-
-    (P --> S), (S --> P),                  task("?") |- (P --> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
-    (P ==> S), (S ==> P), time(dtCombine), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
 //    ( (--,%S) ==> P),  P, neq(S,P), no_common_subterm(S,P), notEquivalence(P), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
@@ -287,6 +275,7 @@
      //structural decompose any component of a conjunction
      (&&,X,A..+), X, time(decomposeTaskIfTemporal) |- X, (Belief:StructuralDeduction,Goal:StructuralStrong)
      (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralStrong)
+     (&&,X,A..+), X, time(decomposeTask), task("?") |- (&&,A..+), ()
 
      (&&,X,A), B, time(decomposeTask) |- substituteIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
      (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
@@ -446,12 +435,31 @@
 //          C, B, task("?") |- T, [post]
 //          C, T, task("?") |- B, [post]
 
-//here now are the backward inference rules which should really only work on backward inference:
+//backward inference rules which should really only work on backward inference:
+
 
     (A --> S), (B --> S), neq(A,B), task("?") |- (A --> B), (Punctuation:Question),
                                                  (B --> A), (Punctuation:Question)
 
+    (A ==> S), (B ==> S), neq(A,B), task("?") |- (A ==> B), (Punctuation:Question),
+                                                 (B ==> A), (Punctuation:Question)
+
+//Inheritance to Similarity
+
+    (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief, Derive:NoSwap)
+
+//If S can stand for P, P can to a certain low degree also represent the class S
+//If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
+
+    (P --> S), (S --> P),                  task("?") |- (P --> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
+    (P ==> S), (S ==> P), time(dtCombine), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
+
 //and the backward inference driven forward inference:
+
+//Similarity to Inheritance
+
+    (S --> P), (S <-> P), task("?") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief)
+    (S ==> P), (S <=> P), task("?") |- (S ==> P), (Belief:StructuralIntersection, Punctuation:Belief)
 
 //NAL2:
 

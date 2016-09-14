@@ -314,7 +314,7 @@ public class PremiseRule extends GenericCompound {
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
         if (b == TaskPunctuation.NotQuestion) return TaskPunctuation.class;
-        if (b == TaskPunctuation.Question) return TaskPunctuation.class;
+        if (b == TaskPunctuation.QuestionOrQuest) return TaskPunctuation.class;
 
         if (b instanceof TermNotEquals) return TermNotEquals.class;
         //if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
@@ -846,9 +846,10 @@ public class PremiseRule extends GenericCompound {
                             pres.add( TaskPositive.the );
                             break;
                         case "\"?\"":
-                            pres.add( TaskPunctuation.Question );
+                            pres.add( TaskPunctuation.QuestionOrQuest);
                             taskPunc = '?';
                             break;
+
                         case "\".\"":
                             pres.add( TaskPunctuation.Belief );
                             taskPunc = '.';

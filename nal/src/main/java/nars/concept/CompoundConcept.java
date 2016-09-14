@@ -69,13 +69,17 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     public CompoundConcept(@NotNull T term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks, @NotNull NAR nar) {
         this.term = term;
 
-        TermSet tt = TermSet.the(TermLinkBuilder.components(term, nar));
-        TermContainer ts = term.subterms();
-        this.templates = tt.equals(ts) ? ts : tt; //re-use the term's own subterms as the termlink templates if they are equal
+        this.templates = buildTemplates(term, nar);
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
 
+    }
+
+    protected TermContainer buildTemplates(@NotNull T term, @NotNull NAR nar) {
+        TermSet tt = TermSet.the(TermLinkBuilder.components(term, nar));
+        TermContainer ts = term.subterms();
+        return tt.equals(ts) ? ts : tt; //re-use the term's own subterms as the termlink templates if they are equal
     }
 
     @NotNull
