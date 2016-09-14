@@ -377,7 +377,7 @@ public class Tetris extends NAgent {
         //Multi nar = new Multi(3,512,
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                64, 2, 2, rng,
+                256, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 32768, 3),
@@ -539,7 +539,7 @@ public class Tetris extends NAgent {
 
                 //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
 
-                Arkancide.newBeliefChartWindow(this, 60);
+                Arkancide.newBeliefChartWindow(this, 200);
 
                 HistogramChart.budgetChart(nar, 20);
 

@@ -218,16 +218,19 @@ public final class BudgetFunctions extends UtilityFunctions {
 
     /** from a to b, LERP of priority according to strength 's' [0 <= s <= 1] */
     public static void transferPri(@Nullable Budget from, @Nullable Budget to, float s) {
-        float priToSend = from.pri() * s;
-        float afterReceived = to.pri() + priToSend;
-        float overflow = afterReceived - 1f;
 
-        //cap at 1, and only transfer what is necessary to reach it
-        if (overflow > 0)
-            priToSend -= overflow;
+        float priToSend = from.priIfFiniteElseZero() * s;
+        if (priToSend > 0) {
+            float afterReceived = to.pri() + priToSend;
+            float overflow = afterReceived - 1f;
 
-        to.priAdd(priToSend);
-        from.priSub(priToSend);
+            //cap at 1, and only transfer what is necessary to reach it
+            if (overflow > 0)
+                priToSend -= overflow;
+
+            to.priAdd(priToSend);
+            from.priSub(priToSend);
+        }
     }
 
     /** TODO guarantee balanced input and output */

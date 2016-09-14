@@ -22,10 +22,13 @@ package nars.experiment.pacman;
 import nars.$;
 import nars.NAR;
 import nars.agent.NAgent;
+import nars.experiment.tetris.Tetris;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
+import nars.index.TreeIndex;
 import nars.nar.Default;
+import nars.nar.exe.Executioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
@@ -42,6 +45,7 @@ import java.util.List;
 import java.util.Random;
 
 import static nars.experiment.tetris.Tetris.*;
+import static nars.experiment.tetris.Tetris.exe;
 
 /**
  * the java application class of pacman 
@@ -88,11 +92,12 @@ public class Pacman extends NAgent {
 
         //Multi nar = new Multi(3,512,
 
+        Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                128, 3, 5, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe2),
-                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 2),
-                new FrameClock(), exe
+                384, 2, 2, rng,
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 2),
+                new FrameClock(), e
 
         );
         nar.preprocess(new VariableCompressor.Precompressor(nar));
@@ -100,19 +105,19 @@ public class Pacman extends NAgent {
 
         //new MemoryManager(nar);
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.6f);
+        nar.beliefConfidence(0.95f);
+        nar.goalConfidence(0.8f);
 
-        float pMult = 0.1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.4f * pMult;
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f * pMult;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.1f * pMult;
-        nar.DEFAULT_QUEST_PRIORITY = 0.1f * pMult;
+        float pMult = 0.005f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * pMult;
+        nar.DEFAULT_GOAL_PRIORITY = 0.65f * pMult;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * pMult;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.01f);
-        nar.compoundVolumeMax.set(60);
-        //nar.truthResolution.setValue(0.01f);
+        nar.confMin.setValue(0.02f);
+        nar.compoundVolumeMax.set(36);
+        nar.truthResolution.setValue(0.02f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
         //nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
@@ -137,8 +142,8 @@ public class Pacman extends NAgent {
         //Param.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 2);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
 
         Pacman pacman = new Pacman(nar, 2 /* ghosts  */, 4 /* visionRadius */);

@@ -67,7 +67,7 @@ abstract public class NAgent {
 
     public float rewardValue;
 
-    float predictorProbability = 0.25f;
+    float predictorProbability = 0.75f;
     private int predictionHorizon = curiosityMonitorDuration/2;
     private final FasterList<Task> predictors = $.newArrayList();
 
@@ -230,8 +230,8 @@ abstract public class NAgent {
             );
         }
 
-        @NotNull Term what = $.$("?w"); //#w
-        @NotNull Term sth = $.$("#s"); //#w
+        //@NotNull Term what = $.$("?w"); //#w
+        @NotNull Term what = $.$("#s"); //#w
 
         @NotNull Compound happiness = happy.term();
 
@@ -274,6 +274,10 @@ abstract public class NAgent {
                     new MutableTask($.seq(action, dt, $.neg(happiness)), '?', null).present(now),
                     new MutableTask($.seq(action, dt*2, happiness), '?', null).present(now),
                     new MutableTask($.seq(action, dt*2, $.neg(happiness)), '?', null).present(now),
+                    new MutableTask($.seq(action, dt*4, happiness), '?', null).present(now),
+                    new MutableTask($.seq(action, dt*4, $.neg(happiness)), '?', null).present(now),
+                    new MutableTask($.seq(action, dt*8, happiness), '?', null).present(now),
+                    new MutableTask($.seq(action, dt*8, $.neg(happiness)), '?', null).present(now),
                     new MutableTask(action, '@', null).present(now)
                     //new MutableTask($.seq(what, dt, action), '?', null).present(now),
                     //new MutableTask($.impl(what, dt, action), '?', null).present(now),
@@ -344,9 +348,9 @@ abstract public class NAgent {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
         float reinforcementAttention =
-                UtilityFunctions.aveAri(alpha, gamma);
+                UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
 //                        //
-//                         / (predictors.size()/predictorProbability) );
+                         / (predictors.size());
 //                        // /(actions.size()+sensors.size());
 
         if (reinforcementAttention > 0) {
@@ -376,7 +380,7 @@ abstract public class NAgent {
                         new GeneratedTask(c, Symbols.GOAL,
                             $.t(nar.random.nextFloat()
                             //Math.random() > 0.5f ? 1f : 0f
-                            , gamma * gammaEpsilonFactor))
+                            , Math.max(nar.truthResolution.floatValue(), nar.random.nextFloat()*gamma * gammaEpsilonFactor)))
 
                     //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
                     /* {

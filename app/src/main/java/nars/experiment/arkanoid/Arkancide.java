@@ -46,7 +46,7 @@ public class Arkancide extends NAgent {
 
     private static final int cyclesPerFrame = 1;
     public static final int runFrames = 50000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 128;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 256;
     final Arkanoid noid;
     private SwingCamera cam;
 
@@ -241,7 +241,7 @@ public class Arkancide extends NAgent {
         Default nar = new Default(1024,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), INDEX_SIZE, false, exe)
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 8192, 3)
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 3)
 
                 , new FrameClock(), exe);
 
@@ -250,15 +250,15 @@ public class Arkancide extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.9f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.1f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.1f * p;
+        float p = 0.2f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.6f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.confMin.setValue(0.03f);
-        nar.compoundVolumeMax.setValue(50);
+        nar.compoundVolumeMax.setValue(40);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
