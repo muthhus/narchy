@@ -81,7 +81,10 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         int i = 0;
         for (Task t : tasks) {
 
-            assert(t != null);// {
+            if (t == null)
+                continue; //HACK
+
+
                 //n--;
                 //continue;
             //}

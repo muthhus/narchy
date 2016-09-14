@@ -35,12 +35,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * inbound pressure sum since last commit
      */
-    public float pressure = 0;
+    private volatile float pressure = 0;
 
     /**
      * mass as calculated in previous commit
      */
-    private float mass = 0;
+    private volatile float mass = 0;
     private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
 
     public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
@@ -252,7 +252,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
 
-        Insertion ii = new Insertion(this, b, scale, overflow);
+        Insertion ii = new Insertion(this, bp, b.dur(), b.qua(), scale, overflow);
         BLink<V> v = map.compute(key, ii);
 
         int r = ii.result;
@@ -679,25 +679,24 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * Created by me on 8/15/16.
      */
-    final class Insertion<V> implements BiFunction<V, BLink, BLink> {
+    final class Insertion<V> extends RawBudget implements BiFunction<V, BLink, BLink> {
 
         private ArrayBag arrayBag;
         @Nullable
         private final MutableFloat overflow;
-        private final Budgeted b;
 
-        /**
-         * TODO this field can be re-used for 'activated' return value
-         * -1 = deactivated, +1 = activated, 0 = no change
-         */
+//        /**
+//         * TODO this field can be re-used for 'activated' return value
+//         * -1 = deactivated, +1 = activated, 0 = no change
+//         */
         private final float scale;
 
         int result = 0;
 
-        public Insertion(ArrayBag arrayBag, Budgeted b, float scale, @Nullable MutableFloat overflow) {
-            this.arrayBag = arrayBag;
-            this.b = b;
+        public Insertion(ArrayBag arrayBag, float p, float d, float q, float scale, @Nullable MutableFloat overflow) {
+            super(p, d, q);
             this.scale = scale;
+            this.arrayBag = arrayBag;
             this.overflow = overflow;
         }
 
@@ -706,21 +705,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         @Override
         public BLink apply(@NotNull Object key, @Nullable BLink existing) {
 
-            float scale = this.scale;
-            Budgeted b = this.b;
             ArrayBag bag = this.arrayBag;
 
 
             if (existing != null) {
 
-                if (existing == b) {
-                    throw new RuntimeException("budget self merge");
-                }
 
                 //existing.isDeleted() /* if deleted, we will merge replacing it as if it were zero:
 
                 float pBefore = existing.pri();
-                float o = bag.mergeFunction.merge(existing, b, scale);
+                float o = bag.mergeFunction.merge(existing, this, scale);
                 if (overflow != null)
                     overflow.add(o);
 
@@ -730,20 +724,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             } else {
 
                 BLink r;
-                float bp = b.pri() * scale;
-                float incoming = bp;// * b.dur();
+                priMult(scale);
+                float bp = pri();
 
                 if (bag.minPriIfFull > bp) {
                     //reject due to insufficient budget
-                    bag.pressure += incoming;
+                    bag.pressure += bp;
                     this.result = -1;
                     r = null;
                 } else {
                     //accepted for insert
-                    BLink nvv = newLink(key, b);
+                    BLink nvv = newLink(key, this);
                     nvv.priMult(scale);
 
-                    bag.mass += incoming;
+                    bag.mass += bp;
 
                     this.result = +1;
                     r = nvv;

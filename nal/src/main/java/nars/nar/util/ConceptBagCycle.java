@@ -21,11 +21,13 @@ import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import nars.util.data.list.FasterList;
 import nars.util.data.map.nbhm.NonBlockingHashMap;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -297,7 +299,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
         public MonitoredCurveBag(NAR nar, int capacity, @NotNull CurveSampler sampler) {
             super(capacity, sampler, BudgetMerge.plusBlend,
                     //new ConcurrentHashMap<>(capacity)
-                    new NonBlockingHashMap<>(capacity*2)
+                    nar.exe.concurrent() ?  new ConcurrentHashMapUnsafe<>(capacity) : new HashMap(capacity)
+                    //new NonBlockingHashMap<>(capacity)
             );
             this.nar = nar;
         }
@@ -309,12 +312,12 @@ public class ConceptBagCycle implements Consumer<NAR> {
         }
 
         @Override
-        protected void onActive(@NotNull Concept c) {
+        protected final void onActive(@NotNull Concept c) {
             awake(c);
         }
 
         @Override
-        protected void onRemoved(@NotNull Concept c, BLink<Concept> value) {
+        protected final void onRemoved(@NotNull Concept c, @Nullable BLink<Concept> value) {
             if (value!=null)
                 sleep(c);
         }

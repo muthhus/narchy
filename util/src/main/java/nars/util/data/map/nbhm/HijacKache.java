@@ -479,8 +479,12 @@ public class HijacKache<TypeK, TypeV>
      *      for the index that was selected
      * @return
      */
-    @Override public final TypeV computeIfAbsent(@NotNull TypeK key, @NotNull Function<? super TypeK, ? extends TypeV> mappingFunction) {
-        return putIfMatch(key, mappingFunction, NO_MATCH_OLD);
+    @NotNull @Override public final TypeV computeIfAbsent(@NotNull TypeK key, @NotNull Function<? super TypeK, ? extends TypeV> mappingFunction) {
+        Object x = putIfMatch(key, mappingFunction, NO_MATCH_OLD);
+        if (x instanceof Integer) {
+            throw new RuntimeException("ticket leak");
+        }
+        return (TypeV) x;
     }
     public final TypeV computeIfAbsent2(@NotNull TypeK key, @NotNull Function<? super TypeK, Object> mappingFunction) {
         return putIfMatch(key, mappingFunction, NO_MATCH_OLD);
@@ -543,11 +547,12 @@ public class HijacKache<TypeK, TypeV>
     }
 
     private final TypeV putIfMatch(@NotNull Object key, @NotNull Object newVal, @NotNull Object oldVal) {
-        final Object res = putIfMatch(this, data, key, newVal, oldVal);
-        assert !(res instanceof Prime);
-        assert res != null;
-
-        return res == TOMBSTONE ? null : (TypeV) res;
+//        final Object res = putIfMatch(this, data, key, newVal, oldVal);
+//        assert !(res instanceof Prime);
+//        assert res != null;
+//
+//        return res == TOMBSTONE ? null : (TypeV) res;
+        return (TypeV) putIfMatch(this, data, key, newVal, oldVal);
     }
 
 
@@ -875,7 +880,7 @@ public class HijacKache<TypeK, TypeV>
             // never put a null, so Value slots monotonically move from null to
             // not-null (deleted Values use Tombstone).  Thus if 'V' is null we
             // fail this fast cutout and fall into the check for table-full.
-            if (!(putval instanceof Function) && putval == V) {
+            if (!compute && putval == V) {
                 return V; // Fast cutout for no-change
             }
 
@@ -965,7 +970,7 @@ public class HijacKache<TypeK, TypeV>
                     }
 
 
-                } else {
+                } else if (V!=null && !(V instanceof Integer)) {
                     assert (!(V instanceof Function));
                     topmap.hit++;
                     return V;
@@ -974,7 +979,7 @@ public class HijacKache<TypeK, TypeV>
 
             if (retriesRemain-- <= 0) {
                 topmap.miss++;
-                return compute ? V : putval;
+                return compute ? (((Function) putval).apply(key)) : putval;
             } else {
                 if (compute) {
                     putval = V;

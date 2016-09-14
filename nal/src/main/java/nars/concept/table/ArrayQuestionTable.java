@@ -11,6 +11,9 @@ import nars.budget.BudgetFunctions;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.task.AnswerTask;
+import nars.util.data.list.FasterList;
+import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.list.mutable.MultiReaderFastList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 /**
@@ -27,24 +31,25 @@ import java.util.function.Consumer;
  * <p>
  * TODO use a ring-buffer deque slightly faster than basic ArrayList modification
  */
-public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
+public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements QuestionTable, Comparator<Task> {
 
     protected int capacity;
 
     @NotNull
-    private final List<Task> list;
+    private final MultiReaderFastList<Task> list;
 
     public ArrayQuestionTable(int capacity) {
         super();
 
-        this.list = $.newArrayList(capacity);
+        this.list = //$.newArrayList(capacity);
+                MultiReaderFastList.newList(capacity);
 
         this.capacity = capacity;
         //setCapacity(capacity);
     }
 
     @Override
-    public int capacity() {
+    public final int capacity() {
         return capacity;
     }
 
@@ -56,21 +61,21 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         this.capacity = newCapacity;
 
-        @NotNull List<Task> list;
-
-        synchronized (list = this.list) {
-            int s = size();
-
-            int toRemove = s - newCapacity;
-            while (toRemove > 0) {
-                displ.add(list.remove(--s)); //last element
-                toRemove--;
-            }
+        if (size() > newCapacity) {
+            list.withWriteLockAndDelegate(ll -> {
+                int s = ll.size();
+                int toRemove = s - capacity;
+                while (toRemove > 0) {
+                    displ.add(ll.remove(--s)); //last element
+                    toRemove--;
+                }
+            });
         }
     }
 
+
     @Override
-    public int size() {
+    public final int size() {
         return list.size();
     }
 
@@ -80,14 +85,6 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         return list.isEmpty();
     }
 
-    @Deprecated
-    public final void remove(@NotNull Task belief, @NotNull List<Task> displ) {
-        //this list removal is slow; indexed or iterator is better
-        if (list.remove(belief)) {
-            TaskTable.removeTask(belief, null, displ);
-        }
-    }
-
 
     @Override
     public void answer(@NotNull Task a, Concept answerConcept, @NotNull NAR nar, List<Task> displ) {
@@ -95,29 +92,28 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         if (a instanceof AnswerTask)
             return; //already an answer
 
-        synchronized (list) {
 
-            int size = list.size();
-            if (size > 0) {
+        int size = list.size();
+        if (size > 0) {
 
-                //each question is only responsible for 1/N of the effect on the answer
-                //TODO calculate this based on fraction of each question's priority of the total
+            //each question is only responsible for 1/N of the effect on the answer
+            //TODO calculate this based on fraction of each question's priority of the total
 
 
-                for (int i = 0; !a.isDeleted() && i < size; ) {
-                    Task q = list.get(i);
-                    if (!q.isDeleted()) {
-                        if (answer(q, a, 1f/size, answerConcept, nar)) {
-                            i++;
-                            continue;
-                        }
+            for (int i = 0; !a.isDeleted() && i < size; ) {
+                Task q = list.get(i);
+                if (!q.isDeleted()) {
+                    if (answer(q, a, 1f / size, answerConcept, nar)) {
+                        i++;
+                        continue;
                     }
-
-                    remove(i, null, displ);
-                    size--;
                 }
+
+                remove(i, null, displ);
+                size--;
             }
         }
+
     }
 
     /**
@@ -157,7 +153,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
 
             boolean sameConcept;
-            if (answerConcept!=null) {
+            if (answerConcept != null) {
                 //check if different concepts; ex: if there is a reduction in variables, etc
                 Concept qc = nar.concept(q);
                 if (!qc.equals(answerConcept)) {
@@ -185,18 +181,13 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
             //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly
             //BudgetFunctions.transferPri(q.budget(), a.budget(), (1f - q.qua()) * aConf);
+            return true;
 
         } else {
             //the qustion self-destructed
-        }
-
-        if (aEtern || a.occurrence()!=q.occurrence()) {
-            //eternal or different occurrence time; keep the question
-            return true;
-        } else {
-            //discard this fully redundant question; the answer will remain in the same concept
             return false;
         }
+
 
 //        //generate a projected answer
         //WARNING this creates a huge amount of useless answers
@@ -233,7 +224,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
             if (a != null && !a.isDeleted()) {
 
-                answer(questioned, a, 1/size(), null,  n);
+                answer(questioned, a, 1 / size(), null, n);
             }
         }
 
@@ -255,8 +246,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         if (siz == capacity()) {
 
-
-            Collections.sort(list, this);
+            list.sortThis(this);
 
             if (last().qua() > tp) {
                 t.delete("Insufficient Priority");
@@ -356,8 +346,12 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     }
 
     @Override
-    public void forEach(@NotNull Consumer<? super Task> action) {
-        list.forEach(action);
+    public final void forEach(@NotNull Consumer<? super Task> action) {
+        for (int i = 0, listSize = list.size(); i < listSize; i++) {
+            Task t = list.get(i);
+            if (t!=null && !t.isDeleted())
+                action.accept(t);
+        }
     }
 
     @Override

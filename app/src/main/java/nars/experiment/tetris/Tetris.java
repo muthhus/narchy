@@ -11,6 +11,7 @@ import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
+import nars.index.MapDBIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -43,6 +44,7 @@ import spacegraph.obj.Plot2D;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.Executors;
 
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
@@ -255,8 +257,8 @@ public class Tetris extends NAgent {
             for (int x = 0; x < state.width; x++) {
                 int xx = x;
                 Compound squareTerm =
-                        //$.p(new IntTerm(x), new IntTerm(y));
-                        $.p($.pRadix(x, 2, state.width), $.pRadix(y, 2, state.height));
+                        $.p(x, y);
+                        //$.p($.pRadix(x, 2, state.width), $.pRadix(y, 2, state.height));
                 @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
                         () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
 
@@ -370,15 +372,16 @@ public class Tetris extends NAgent {
 
     public static void main(String[] args) {
         Param.DEBUG = false;
-        Param.DEBUG_ANSWERS = true;
+        Param.DEBUG_ANSWERS = false;
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        Executioner e = Tetris.exe;
+        Executioner e = Tetris.exe4;
         Default nar = new Default(1024,
                 72, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 32768, 3),
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 32768, 3),
                 new FrameClock(), e
         );
 

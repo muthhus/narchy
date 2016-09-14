@@ -125,7 +125,6 @@ public class HijackBag<X> implements Bag<X> {
         while (true) {             // Spin till we get a Key slot
 
 
-            Object K = key(kvs, idx);         // Get current key
 
                 // Found an empty Key slot - which means this Key has never been in
                 // this table.  No need to put a Tombstone - the Key is not here!
@@ -141,8 +140,9 @@ public class HijackBag<X> implements Bag<X> {
                 //}*/
             }
 
+            Object K = key(kvs, idx);         // Get current key
 
-            if (keyeq(K, key, hashes, idx, fullhash)) {
+            if (K!=null && keyeq(K, key, hashes, idx, fullhash)) {
                 break;                  // Got its existing entry
             }
 
