@@ -63,7 +63,7 @@ public class Tetris extends NAgent {
             new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 50500;
-    public static final int cyclesPerFrame = 4;
+    public static final int cyclesPerFrame = 2;
     public static final int tetris_width = 6;
     public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 4;
@@ -255,8 +255,8 @@ public class Tetris extends NAgent {
             for (int x = 0; x < state.width; x++) {
                 int xx = x;
                 Compound squareTerm =
-                        $.p(new IntTerm(x), new IntTerm(y));
-                        //$.p($.pRadix(x, 2, state.width), $.pRadix(y, 2, state.height));
+                        //$.p(new IntTerm(x), new IntTerm(y));
+                        $.p($.pRadix(x, 2, state.width), $.pRadix(y, 2, state.height));
                 @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
                         () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
 
@@ -384,20 +384,20 @@ public class Tetris extends NAgent {
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-        nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
-        float p = 0.2f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f*p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.2f*p;
         nar.DEFAULT_QUEST_PRIORITY = 0.3f*p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.03f);
+        nar.confMin.setValue(0.02f);
 
-        nar.compoundVolumeMax.setValue(32);
-        nar.linkFeedbackRate.setValue(0.95f);
+        nar.compoundVolumeMax.setValue(40);
+        //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);
 

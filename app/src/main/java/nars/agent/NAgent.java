@@ -402,14 +402,14 @@ abstract public class NAgent {
             if (t.isDeleted())
                 BudgetMerge.max.apply(t.budget(), boostBudget, 1); //resurrect
 
-//            //re-use existing eternal task
-//            Activation a = new Activation(t, nar, 1f) {
-//                @Override
-//                public void linkTerms(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
-//                    linkTermLinks(src, scale, nar);
-//                    super.linkTerms(src, tgt, scale, minScale, nar);
-//                }
-//            };
+            //re-use existing eternal task
+            Activation a = new Activation(t, nar, 1f);/* {
+                @Override
+                public void link(Concept src, Term[] tgt, float scale, float minScale, @NotNull NAR nar) {
+                    linkTermLinks(src, scale, nar);
+                    super.linkTerms(src, tgt, scale, minScale, nar);
+                }
+            };*/
         }
 
     }

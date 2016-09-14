@@ -97,7 +97,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             //float window = 0.01f;
 
             long o = t.occurrence();
-            times[i][0] = (o!=ETERNAL) ? o : when;// + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
+            times[i][0] = (o!=ETERNAL) ? o : when;
             freq[i] = t.freq();
 
             float c = Math.min(t.conf(), 1f-Param.TRUTH_EPSILON); //clip maximum confidence
@@ -108,11 +108,19 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             i++;
         }
 
+        int volume = tasks[0].volume();
+
         float[] v = this.value(
                 new float[] { when },
                 times,
                 freq, conf,
-                Param.timeToLuminosity,
+                //Param.timeToLuminosity,
+                (dt) -> {
+                    float duration = Math.max(1, volume-1);
+                    //return 1f / (1f + (dt*dt)/(duration*duration));
+                    //return 1f / (1f + (dt/duration)*(dt/duration));
+                    return 1f / (1f + (dt/duration));
+                },
                 n);
         return $.t(v[0], w2c(v[1]));
     }
