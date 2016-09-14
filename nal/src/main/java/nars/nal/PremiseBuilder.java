@@ -63,19 +63,22 @@ public enum PremiseBuilder {
      patham9 especially try to understand the "temporal temporal" case
      patham9 its using the result of higher confidence
      */
-    public static @NotNull Premise newPremise(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task, @NotNull Term termLinkTerm, Budget b) {
+    public static @NotNull Premise newPremise(@NotNull NAR nar, @NotNull Concept taskConcept, long now, @NotNull Task task, @NotNull Term termLinkTerm, Budget b) {
 
 
         Task belief = null;
 
 
         Term termLinkTermConceptTerm = $.unneg(termLinkTerm).term();
+
         if (termLinkTerm instanceof Compound && linkable(termLinkTermConceptTerm)) { //atomic concepts will have no beliefs to match
 
             Concept beliefConcept = nar.concept(termLinkTermConceptTerm);
             if (beliefConcept != null) {
 
                 long when = task.occurrence();
+                if (when == ETERNAL)
+                    when = now;
 
                 if ( task.isQuestOrQuestion()) {
 
@@ -84,16 +87,17 @@ public enum PremiseBuilder {
 
                     Task solution = table.match(task, when);
                     if (solution!=null) {
-                        try {
+                        //try {
                             Task answered = answer(nar, task, solution, beliefConcept);
                             if (task.isQuestion())
                                 belief = answered;
                             else
                                 belief = beliefConcept.beliefs().match(task, when); //in case of quest, proceed with matching belief
 
-                        } catch (InvalidConceptException e) {
+
+                        /*} catch (InvalidConceptException e) {
                             logger.warn("{}", e.getMessage());
-                        }
+                        }*/
 
                     }
 
@@ -106,7 +110,7 @@ public enum PremiseBuilder {
             }
         }
 
-        Premise p = new Premise(c.term(), task, termLinkTerm, belief);
+        Premise p = new Premise(taskConcept.term(), task, termLinkTerm, belief);
         p.budget(b);
         return p;
     }

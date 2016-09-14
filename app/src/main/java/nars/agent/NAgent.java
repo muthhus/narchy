@@ -235,23 +235,23 @@ abstract public class NAgent {
 
         @NotNull Compound happiness = happy.term();
 
-//        predictors.addAll(
-//                //what will imply reward
-//                //new MutableTask($.equi(what, dt, happiness), '?', null).time(now,now),
-//                new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
-//
-//                //what will imply non-reward
-//                //new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now,now),
-//                new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
-//
-//                //what co-occurs with reward
-//                new MutableTask($.parallel(what, happiness), '?', null).time(now,now),
-//
-//                //what co-occurs with non-reward
-//                new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now,now)
-//
-//
-//        );
+        predictors.addAll(
+                //what will imply reward
+                //new MutableTask($.equi(what, dt, happiness), '?', null).time(now,now),
+                new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
+
+                //what will imply non-reward
+                //new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now,now),
+                new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
+
+                //what co-occurs with reward
+                new MutableTask($.parallel(what, happiness), '?', null).time(now,now),
+
+                //what co-occurs with non-reward
+                new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now,now)
+
+
+        );
 //        predictors.add(
 //                nar.ask($.seq(what, dt, happy.term()), '?', now)
 //        );
@@ -270,11 +270,14 @@ abstract public class NAgent {
 
 
             predictors.addAll(
-                    new MutableTask($.seq(what, dt, action), '?', null).present(now),
-                    new MutableTask($.seq($.parallel(what,action), dt, happiness), '?', null).present(now),
-                    new MutableTask($.impl(what, dt, action), '?', null).present(now),
-                    new MutableTask($.impl(what, dt, $.neg(action)), '?', null).present(now),
+                    new MutableTask($.seq(action, dt, happiness), '?', null).present(now),
+                    new MutableTask($.seq(action, dt, $.neg(happiness)), '?', null).present(now),
+                    new MutableTask($.seq(action, dt*2, happiness), '?', null).present(now),
+                    new MutableTask($.seq(action, dt*2, $.neg(happiness)), '?', null).present(now),
                     new MutableTask(action, '@', null).present(now)
+                    //new MutableTask($.seq(what, dt, action), '?', null).present(now),
+                    //new MutableTask($.impl(what, dt, action), '?', null).present(now),
+                    //new MutableTask($.impl(what, dt, $.neg(action)), '?', null).present(now),
             );
 
 

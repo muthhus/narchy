@@ -65,10 +65,10 @@ public class Tetris extends NAgent {
     public static final Executioner exe4 =
             new MultiThreadExecutioner(4, 1024*32);
 
-    public static final int runFrames = 64;
-    public static final int cyclesPerFrame = 1;
+    public static final int runFrames = 55555;
+    public static final int cyclesPerFrame = 6;
     public static final int tetris_width = 6;
-    public static final int tetris_height = 16;
+    public static final int tetris_height = 8;
     public static final int TIME_PER_FALL = 4;
     static boolean easy;
 
@@ -403,16 +403,16 @@ public class Tetris extends NAgent {
             }
         });
 
-        float p = 0.3f;
+        float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f*p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.2f*p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.3f*p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.4f*p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.4f*p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
         nar.confMin.setValue(0.01f);
 
-        nar.compoundVolumeMax.setValue(25);
+        nar.compoundVolumeMax.setValue(45);
         //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);
@@ -540,9 +540,9 @@ public class Tetris extends NAgent {
 
                 //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
 
-                Arkancide.newBeliefChartWindow(this, 200);
+                Arkancide.newBeliefChartWindow(this, 500);
 
-                HistogramChart.budgetChart(nar, 50);
+                HistogramChart.budgetChart(nar, 20);
 
                 //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
 

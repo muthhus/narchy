@@ -60,8 +60,8 @@ import static nars.time.Tense.DTERNAL;
         return new HijackBag<>(1, HIJACK_REPROBES, mergeDefault, nar.random);
     }
 
-    public <X> Bag<X> newCurveBag(Map sharedMap) {
-        return new CurveBag<>(defaultCurveSampler, BudgetMerge.plusBlend, sharedMap);
+    public <X> Bag<X> newCurveBag(Map m) {
+        return new CurveBag<>(defaultCurveSampler, BudgetMerge.plusBlend, m);
     }
 
 
@@ -164,10 +164,10 @@ import static nars.time.Tense.DTERNAL;
                         //CurveBag.power6BagCurve,
                         rng);
 
-        this.sleep = new DefaultConceptPolicy(6, 4, 2, 16, 8);
+        this.sleep = new DefaultConceptPolicy(7, 8, 2, 16, 8);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy(8, 6, 4, 32, 24);
+        this.awake = new DefaultConceptPolicy(12, 10, 4, 32, 24);
     }
 
     @Override

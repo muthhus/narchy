@@ -147,7 +147,7 @@ public class BeliefTableChart extends Surface {
                         float tlx = o == ETERNAL ? nowX : xTime(minT, maxT, o);
                         float tly = x.freq();
                         float ii = 0.3f + 0.7f * x.conf();
-                        gl.glColor4f(ii / 2f, 0, ii, 0.25f + tl.pri() * 0.75f);
+                        gl.glColor4f(ii / 2f, 0, ii, 0.5f + tl.pri() * 0.5f);
                         float w = 0.05f;
                         float h = 0.05f;
                         Draw.rectStroke(gl, tlx - w / 2, tly - h / 2, w, h);
@@ -239,11 +239,11 @@ public class BeliefTableChart extends Surface {
 //            new Color(0.2f + 0.4f * c, 1f, 0.2f, 0.39f + 0.6f * c)
 //    );
 
-    static final float dz = 0.05f;
+    static final float dz = 0.0f;
 
     //horizontal block
     final static TaskRenderer beliefRenderer = (ge, q, c, w, h, x, y) -> {
-        ge.glColor4f(0.3f + 0.7f * c, 0.1f, 0.1f, 0.5f + 0.25f * q);
+        ge.glColor4f(0.3f + 0.7f * c, 0.1f, 0.1f, 0.75f + 0.2f * q);
         Draw.rect(ge, x - w / 2, y - h / 4, w, h / 2, dz);
     };
     final static TaskRenderer beliefProjRenderer = (ge, q, c, w, h, x, y) -> {
@@ -253,7 +253,7 @@ public class BeliefTableChart extends Surface {
     };
     //vertical block
     final static TaskRenderer goalRenderer = (ge, q, c, w, h, x, y) -> {
-        ge.glColor4f(0.1f, 0.3f + 0.7f * c, 0.1f, 0.5f + 0.25f * q);
+        ge.glColor4f(0.1f, 0.3f + 0.7f * c, 0.1f, 0.7f + 0.2f * q);
         Draw.rect(ge, x - w / 4, y - h / 2, w / 2, h, dz);
     };
     final static TaskRenderer goalProjRenderer = (ge, q, c, w, h, x, y) -> {
@@ -399,7 +399,7 @@ public class BeliefTableChart extends Surface {
 
 
     private static float xTime(float minT, float maxT, float o) {
-        float p = minT == maxT ? 0.5f : (o - minT) / (maxT - minT);
+        float p = (minT == maxT) ? 0.5f : (o - minT) / (maxT - minT);
         return p ;
     }
 

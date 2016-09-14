@@ -116,17 +116,17 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         if (i < 2)
             throw new RuntimeException("too few tasks for truthpolation: " + i);
 
-        //clip to out-of-range temporal margin, ie. beyond which confidence begins diminishing with distance
-        //final int dtTolerance;
-        if (minT > when) {
-            //dtTolerance = (int) (minT - when);
-            when = minT;
-        } else if (maxT < when) {
-            //dtTolerance = (int) (when - maxT);
-            when = maxT;
-        } else {
-            //dtTolerance = 0;
-        }
+//        //clip to out-of-range temporal margin, ie. beyond which confidence begins diminishing with distance
+//        //final int dtTolerance;
+//        if (minT > when) {
+//            //dtTolerance = (int) (minT - when);
+//            when = minT;
+//        } else if (maxT < when) {
+//            //dtTolerance = (int) (when - maxT);
+//            when = maxT;
+//        } else {
+//            //dtTolerance = 0;
+//        }
 
 
         float duration = 2 * Math.max(1, volume - 1);

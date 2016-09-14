@@ -243,10 +243,9 @@ public class ConceptBagCycle implements Consumer<NAR> {
                         if (task == null)
                             continue;
 
-
-
                         Compound taskTerm = task.term();
 
+                        RawBudget pBudget = new RawBudget(); //recycled temporary budget for calculating premise budget
 
 
                         for (int j = 0, termsArraySize = termLinks.size(); j < termsArraySize; j++) {
@@ -259,8 +258,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
                             if (term == null || Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
                                 continue;
-
-                            RawBudget pBudget = new RawBudget(); //recycled temporary budget for calculating premise budget
 
                             if (PremiseBuilder.budget(pBudget, taskLink, termLink, minDur)) {
 

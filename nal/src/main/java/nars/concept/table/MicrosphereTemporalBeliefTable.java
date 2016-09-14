@@ -346,8 +346,6 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                 for (int i = 0; i < s; ) {
                     Task x = l.get(i);
                     if (x == null || x.isDeleted()) {
-                        remove(i);
-                        s--;
                         continue;
                     } else {
 

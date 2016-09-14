@@ -124,6 +124,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 truth = truth.negated();
         }
 
+
         Budget budget = m.budget(truth, content);
         if (budget == null)
             return; //INSUFFICIENT BUDGET

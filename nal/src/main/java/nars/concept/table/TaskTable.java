@@ -51,7 +51,7 @@ public interface TaskTable extends Iterable<Task> {
         int s = size();
         final int[] maxPerConcept = {Math.min(s, _maxPerConcept)};
         forEach(t -> {
-            if ((maxPerConcept[0]--) > 0)
+            if ((maxPerConcept[0]--) >= 0)
                 recip.accept(t);
             //if (--maxPerConcept == 0) break; //TODO use a forEachWhile w/ Predicate or something
         });

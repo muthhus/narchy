@@ -314,7 +314,7 @@ public class BagTest {
 
         int n = 32;
 
-        testSamplingFlat(new HijackBag<>(n, 4, new XorShift128PlusRandom(1)), 0.038f);
+        testSamplingFlat(new HijackBag<>(n, 4, new XorShift128PlusRandom(1)), 0.076f);
 
         HijackBag<String> a = new HijackBag<>((int)(n*2f), 2, new XorShift128PlusRandom(2));
         for (int i = 0; i < n; i++) {
@@ -348,7 +348,7 @@ public class BagTest {
         a.commit(); //commit necessary to set sampler's dynamic range
 
         assertEquals(level, a.priMin(), 0.01f);
-        assertEquals(a.priMin(), a.priMax(), 0.01f);
+        assertEquals(a.priMin(), a.priMax(), 0.08f);
 
     }
 

@@ -119,7 +119,7 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     public static float matchTermutationsMax = 3;
 
-    public static int QUERY_ANSWERS_PER_MATCH = 1;
+    public static int QUERY_ANSWERS_PER_MATCH = 2;
     //public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 
 
@@ -140,27 +140,27 @@ public abstract class Param /*extends Container*/ implements Level {
 //     */
 //    public static final float TEMPORAL_DURATION = 0.9f;
 
-    /**
-     * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
-     * see: the microsphere interpolation paper for analysis on this parameter
-     */
-    public static FloatToFloatFunction timeToLuminosity = (dt) -> {
-        //luminosity curve function
-        // see: https://en.wikipedia.org/wiki/Inverse-square_law
-        //      https://en.wikipedia.org/wiki/Distance_decay
-        //      https://en.wikipedia.org/wiki/Proportionality_(mathematics)#Inverse_proportionality
-        //float timeRate = 1f;
-        //return InterpolatingMicrosphere.pow(Math.max(0.5f, diffNorm)*timeRate, -exponent);
-
-        float duration = 1f;
-        return 1f / (1 + (dt*dt)/(duration*duration));
-
-        //return 1f / (1f + dt);
-        //return 1f / (1f + dt*dt);
-        //return 1f / ( 1f + (float)Math.sqrt(dt));
-        //return 1f / ( (float)Math.pow(1+dt, 1.5f));
-
-    };
+//    /**
+//     * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
+//     * see: the microsphere interpolation paper for analysis on this parameter
+//     */
+//    public static FloatToFloatFunction timeToLuminosity = (dt) -> {
+//        //luminosity curve function
+//        // see: https://en.wikipedia.org/wiki/Inverse-square_law
+//        //      https://en.wikipedia.org/wiki/Distance_decay
+//        //      https://en.wikipedia.org/wiki/Proportionality_(mathematics)#Inverse_proportionality
+//        //float timeRate = 1f;
+//        //return InterpolatingMicrosphere.pow(Math.max(0.5f, diffNorm)*timeRate, -exponent);
+//
+//        float duration = 1f;
+//        return 1f / (1 + (dt*dt)/(duration*duration));
+//
+//        //return 1f / (1f + dt);
+//        //return 1f / (1f + dt*dt);
+//        //return 1f / ( 1f + (float)Math.sqrt(dt));
+//        //return 1f / ( (float)Math.pow(1+dt, 1.5f));
+//
+//    };
 
 
 
@@ -178,7 +178,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     /** if false, then revection will be budgeted with parent's budget mix, otherwise it will have dur/qua mixed but priority set to zero to not trigger linking */
-    public static boolean REVECTION_PRIORITY_ZERO = true;
+    public static boolean REVECTION_PRIORITY_ZERO = false;
 
     /** additional output for when deriver fails before deriving something */
     public static boolean DEBUG_DERIVER;

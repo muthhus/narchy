@@ -71,15 +71,16 @@ public class TruthWave {
         this.size = size[0];
 
         //compute time range
-        float start = Float.POSITIVE_INFINITY;
-        float end = Float.NEGATIVE_INFINITY;
+        long start = Long.MAX_VALUE;
+        long end = Long.MIN_VALUE;
         for (int i = 0; i < size[0]; i++) {
             float o = t[i*4 + 2];
-            if (o > end) end = o;
-            if (o < start) start = o;
+            long oo = (long) o;
+            if (oo > end) end = oo;
+            if (oo < start) start = oo;
         }
-        this.start = (long)start;
-        this.end = (long)end;
+        this.start = start;
+        this.end = end;
 
         this.current = b.truth(now);
     }

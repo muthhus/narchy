@@ -51,14 +51,14 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
         this.nar = n;
     }
 
-    @Override
-    protected TermContainer buildTemplates(Compound term, NAR nar) {
-        if (term.volume()==2 && term.op() == Op.PROD) {
-            //special case. these are atom-like products of 1 term
-            return Terms.ZeroSubterms;
-        }
-        return super.buildTemplates(term, nar);
-    }
+//    @Override
+//    protected TermContainer buildTemplates(Compound term, NAR nar) {
+//        if (term.volume()==2 && term.op() == Op.PROD) {
+//            //special case. these are atom-like products of 1 term
+//            return Terms.ZeroSubterms;
+//        }
+//        return super.buildTemplates(term, nar);
+//    }
 
     @Nullable protected Task filter(@NotNull Task t, @NotNull BeliefTable table, @NotNull BiPredicate<Task,NAR> valid, @NotNull NAR nar, @NotNull List<Task> displaced) {
 

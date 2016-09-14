@@ -352,11 +352,11 @@ public class Revision {
 
             } else if (bdt != DTERNAL) {
                 newDT = bdt;
-                accumulatedDifference.add(bdt * depth);
+                //accumulatedDifference.add(bdt * depth);
 
             } else if (adt != DTERNAL) {
                 newDT = adt;
-                accumulatedDifference.add(adt * depth);
+                //accumulatedDifference.add(adt * depth);
             } else {
                 throw new RuntimeException();
             }
@@ -465,10 +465,10 @@ public class Revision {
         if (to != ETERNAL && bo != ETERNAL) {
 
             //randomize choice by confidence
-            float tcw = t.confWeight();
-            float tc = tcw + b.confWeight();
+            float tc = t.confWeight();
+            float tbc = tc + b.confWeight();
 
-            return p.random.nextFloat() * tc < tcw ? t : b;
+            return p.random.nextFloat() < tc/tbc ? t : b;
 
         } else {
             return bo != ETERNAL ? b : t;

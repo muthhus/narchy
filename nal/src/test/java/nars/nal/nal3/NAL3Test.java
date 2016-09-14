@@ -57,7 +57,7 @@ public class NAL3Test extends AbstractNALTest {
     @Test //works, just control related issue (DecomposeNegativeNegativeNegative)
     public void compound_decomposition_two_premises2()  {
         TestNAR tester = test();
-        tester.log();
+        
         tester.believe("<robin --> swimmer>",0.0f,0.9f); //.en("Robin is not a type of swimmer.");
         tester.believe("<robin --> (-,mammal,swimmer)>", 0.0f, 0.9f); //.en("Robin is not a nonswimming mammal.");
         tester.mustBelieve(cycles*3, "<robin --> mammal>", 0.0f ,0.81f); //.en("Robin is not a type of mammal.");
@@ -122,7 +122,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<planetX --> [marsy,earthly,venusy]>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> [earthly,saturny]>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles*2, "<planetX --> [marsy,venusy]>", 0.90f , 0.81f); //.en("PlanetX is either Mars or Venus.");
+        tester.mustBelieve(cycles*8, "<planetX --> [marsy,venusy]>", 0.90f , 0.81f); //.en("PlanetX is either Mars or Venus.");
     }
 
     @Test
@@ -204,7 +204,7 @@ public class NAL3Test extends AbstractNALTest {
     @Test
     public void compound_composition_one_premise3()  {
         TestNAR tester = test();
-        tester.log();
+        
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
         tester.askAt(cycles/2,"<swan --> (-,swimmer,bird)>"); //.en("Is swan a type of nonbird swimmer?");
         tester.mustBelieve(cycles, "<swan --> (-,swimmer,bird)>", 0.10f ,0.73f); //.en("A swan is not a type of nonbird swimmer.");
@@ -255,7 +255,7 @@ public class NAL3Test extends AbstractNALTest {
     @Test public void testArity1_Decomposition_IntersectExt() {
         //(M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
         test()
-                .log()
+                //.log()
                 .believe("(a-->b)")
                 .believe("(a-->(&,b,c))", 0f, 0.9f)
                 .mustBelieve(cycles, "(a-->c)", 0f, 0.81f, ETERNAL);
@@ -264,7 +264,7 @@ public class NAL3Test extends AbstractNALTest {
     @Test public void testArity1_Decomposition_IntersectExt2() {
         //(M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
         test()
-                //.log()
+                ////.log()
                 .believe("(a-->b)")
                 .believe("(a-->(&,b,c))")
                 .mustBelieve(cycles, "(a-->c)", 1f, 0.81f, ETERNAL);
@@ -275,7 +275,7 @@ public class NAL3Test extends AbstractNALTest {
         //(M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
 
         test()
-                .log()
+                //.log()
                 .believe("(a-->b)", 0.25f, 0.9f)
                 .believe("(a-->(|,b,c))", 0.25f, 0.9f)
                 .mustBelieve(cycles, "(a-->c)", 0.19f, 0.15f, ETERNAL);
@@ -286,7 +286,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR x = test();
 
         x
-            //.log()
+            ////.log()
             .believe("<{x,y}-->c>")
             .believe("<{x,z}-->c>")
             .mustBelieve(cycles, "<{x,y,z}-->c>", 1f, 0.81f) //union

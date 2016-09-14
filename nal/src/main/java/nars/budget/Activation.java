@@ -23,7 +23,7 @@ import static nars.Param.TRUTH_EPSILON;
  */
 public class Activation {
 
-    private static final int TASKLINK_DEPTH_LIMIT = 2;
+    private static final int TASKLINK_DEPTH_LIMIT = 1;
 
     public final Budgeted in;
 
@@ -258,8 +258,8 @@ public class Activation {
     public void commit(float scale) {
         if (!concepts.isEmpty()) {
             float total =
-                    1 / (float) concepts.sum(); //normalized
-                    //1f; //unnormalized
+                    //1 / (float) concepts.sum(); //normalized
+                    1f; //unnormalized
 
             //System.out.println("commit: " + concepts);
             nar.activate(concepts, in, scale / total, conceptOverflow);

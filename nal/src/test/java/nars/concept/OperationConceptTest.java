@@ -12,6 +12,7 @@ import java.util.List;
 
 import static nars.util.Texts.n2;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Created by me on 3/22/16.
@@ -21,20 +22,20 @@ public class OperationConceptTest {
     @Test
     public void testMotivationBalanceEternal() {
 
-        List<String> history = $.newArrayList();
+//        List<String> history = $.newArrayList();
 
         NAR n = new Default();
 
         Termed op = new OperationConcept("f(x)", n) {
-            @Override public void accept(@NotNull NAR nar) {
-                history.add(nar.time() + ":(" + n2(belief(nar.time()).expectation()) + "," + n2(desire(nar.time()).expectation()) + ")");
-            }
+//            @Override public void accept(@NotNull NAR nar) {
+//                history.add(nar.time() + ":(" + n2(belief(nar.time()).expectation()) + "," + n2(desire(nar.time()).expectation()) + ")");
+//            }
         };
 
 
         n.goal(op, 1f, 0.9f);
         n.next().next();
-        assertMotive(n, op, 0.5f, 0.95f);
+        assertMotive(n, op, Float.NaN, 0.95f);
 
         n.believe(op, 0f, 0.5f).next();
         assertMotive(n, op, 0.25f, 0.95f);
@@ -44,14 +45,21 @@ public class OperationConceptTest {
 
         //n.concept(op).print();
 
-        System.out.println(Joiner.on('\n').join(history));
-
-        //number of execution state changes invoked
-        assertEquals(4, history.size());
+//        System.out.println(Joiner.on('\n').join(history));
+//
+//        //number of execution state changes invoked
+//        assertEquals(4, history.size());
     }
 
     public static void assertMotive(@NotNull NAR n, @NotNull Termed operation, float b, float g) {
-        assertEquals(b, n.concept(operation).belief(n.time()).expectation(), 0.01f);
-        assertEquals(g, n.concept(operation).desire(n.time()).expectation(), 0.01f);
+        Concept c = n.concept(operation);
+        assertEquals(g, c.desire(n.time()).expectation(), 0.01f);
+        if (b != b /* NaN */)
+            assertEquals(false, c.hasBeliefs());
+        else
+            assertEquals(b, c.belief(n.time()).expectation(), 0.01f);
+
+        //assertEquals(b, n.concept(operation).belief(n.time()).expectation(), 0.01f);
+
     }
 }
