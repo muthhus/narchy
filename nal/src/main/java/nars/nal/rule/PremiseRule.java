@@ -880,6 +880,7 @@ public class PremiseRule extends GenericCompound {
 
         this.match = new MatchTaskBelief(
                 new TaskBeliefPair(getTask(), getBelief()), //HACK
+                index,
                 constraints);
 
 

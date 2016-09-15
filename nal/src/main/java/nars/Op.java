@@ -105,7 +105,8 @@ public enum Op {
 
     /** Image index ("imdex") symbol */
     public static final Atom Imdex = $.the("_");
-    public static int StatementBits = Op.or(Op.INH,Op.SIM,Op.IMPL,Op.EQUI);
+    public static final int StatementBits = Op.or(Op.INH,Op.SIM,Op.IMPL,Op.EQUI);
+    public static final int IMGbits = Op.or(Op.IMGe, Op.IMGi);
 
     /**
      * symbol representation of this getOperator
@@ -137,6 +138,10 @@ public enum Op {
     public final boolean var;
     public final boolean atomic;
     public final boolean statement;
+    public final boolean image;
+
+    /** whether this involves an additional numeric component: 'dt' (for temporals) or 'relation' (for images) */
+    public final boolean hasNumeric;
 
 
 //    Op(char c, int minLevel) {
@@ -184,6 +189,10 @@ public enum Op {
         this.statement = str.equals("-->") || str.equals("==>") || str.equals("<=>") || str.equals("<->");
         this.temporal = str.equals("&&") || str.equals("==>") || str.equals("<=>");
             //in(or(CONJUNCTION, IMPLICATION, EQUIV));
+
+        this.image = str.equals("/") || str.equals("\\");
+
+        this.hasNumeric = image || temporal;
 
         //negation does not contribute to structure vector
         this.bit = (1 << ordinal());
@@ -299,8 +308,7 @@ public enum Op {
 //    }
 
     public final boolean isImage() {
-        return this == Op.IMGe || this == Op.IMGi;
-        //return in(ImageBits);
+        return image;
     }
 
 

@@ -490,10 +490,12 @@ public abstract class TermIndex extends TermBuilder {
 
         if (tgt != InvalidSubterms) {
             Compound c = compoundOrNull(the(t, tgt));
+            if (c == null)
+                return null;
+            c = compoundOrNull( $.unneg((Compound) c) );
             if (c!=null) {
                 ((GenericCompound)c).setNormalized();
-
-                Term ic = compoundOrNull( $.unneg((Compound) c) );
+                return c;
             }
         }
 
@@ -714,6 +716,11 @@ public abstract class TermIndex extends TermBuilder {
         for (TransformConcept t : TransformConcept.BuiltIn) {
             set(t);
         }
+    }
+
+    /** implementations can override this to update the index when a concept's state changes, ex: to re-evaluate it's features */
+    public void onPolicyChanged(Concept c) {
+        /* nothing */
     }
 
 

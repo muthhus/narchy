@@ -519,16 +519,18 @@
 
 ////composition on both sides of a statement:
 
-    ((B,P) <-> Z) ,(B <-> A), task("?") |- ((B,P) <-> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
-    ((P,B) <-> Z) ,(B <-> A), task("?") |- ((P,B) <-> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+
+//    ((B,P) <-> Z) ,(B <-> A), task("?") |- ((B,P) <-> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+//    ((P,B) <-> Z) ,(B <-> A), task("?") |- ((P,B) <-> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
 
     ((B,P) --> Z) ,(B --> A), task("?") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
     ((P,B) --> Z) ,(B --> A), task("?") |- ((P,B) --> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
 
 
 
-    ((/,N,_,A) --> Z), (B --> A), task("?") |- ((/,N,_,A) --> (/,N,_,B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
-    ((\,N,A,_) --> Z), (N --> R), task("?") |- ((\,N,A,_) --> (\,R,A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+//use variables here to force the image/product normalization to not apply
+    ((/,%N,_,%A) --> %Z), (%B --> %A), task("?") |- ((/,%N,_,%A) --> (/,%N,_,%B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    ((\,%N,%A,_) --> %Z), (%N --> %R), task("?") |- ((\,%N,%A,_) --> (\,%R,%A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
 
 
 

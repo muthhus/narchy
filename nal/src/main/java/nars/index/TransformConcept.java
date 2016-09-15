@@ -3,6 +3,7 @@ package nars.index;
 import nars.$;
 import nars.bag.Bag;
 import nars.concept.AtomConcept;
+import nars.concept.PermanentConcept;
 import nars.term.transform.TermTransform;
 import nars.op.data.differ;
 import nars.op.data.intersect;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * static-level instant term transform operations
  */
-public final class TransformConcept extends AtomConcept implements TermTransform {
+public final class TransformConcept extends AtomConcept implements PermanentConcept, TermTransform {
 
     public static final TransformConcept[] BuiltIn = {
             new TransformConcept(new intersect()),

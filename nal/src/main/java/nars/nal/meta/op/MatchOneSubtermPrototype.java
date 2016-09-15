@@ -2,6 +2,7 @@ package nars.nal.meta.op;
 
 import nars.$;
 import nars.Op;
+import nars.index.PatternIndex;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
@@ -21,11 +22,11 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
 
     private final boolean finish;
 
-    public MatchOneSubtermPrototype(@NotNull Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish) {
+    public MatchOneSubtermPrototype(@NotNull Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish, @NotNull PatternIndex index) {
         super(
                 (subterm == 0 ?
-                        $.p(id(x, constraints), Op.Imdex) :
-                        $.p(Op.Imdex, id(x, constraints))),
+                        index.the(Op.PROD, id(index, x, constraints), Op.Imdex) :
+                        index.the(Op.PROD, Op.Imdex, id(index, x, constraints))),
                 x
                 , constraints);
         this.subterm = subterm;

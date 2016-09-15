@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import static nars.$.$;
 
 
-public class MotorConcept extends WiredConcept  {
+public class MotorConcept extends WiredCompoundConcept {
 
 
     /** relative temporal delta time for desire/belief prediction */

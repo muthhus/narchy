@@ -1,6 +1,8 @@
 package nars.nal.meta.op;
 
 import nars.$;
+import nars.Op;
+import nars.index.PatternIndex;
 import nars.nal.meta.*;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Compound;
@@ -53,12 +55,12 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
 
 
     @Nullable
-    public static Term id(@NotNull Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+    public static Term id(@NotNull PatternIndex index, @NotNull Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         return (constraints == null) ?
                 //no constraints
                 pattern :
                 //constraints stored in atomic string
-                (Compound) ($.secte(pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
+                (Compound) (index.the(Op.SECTe, pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
     }
 
 

@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
 import nars.concept.ConceptBuilder;
+import nars.concept.PermanentConcept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -12,7 +13,7 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.util.MyConcurrentRadixTree;
 import nars.util.data.map.nbhm.HijacKache;
-import nars.util.signal.WiredConcept;
+import nars.util.signal.WiredCompoundConcept;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -146,7 +147,7 @@ public class TreeIndex extends TermIndex {
     }
 
     private boolean removeable(Concept c) {
-        return !(c instanceof WiredConcept);
+        return !(c instanceof PermanentConcept);
     }
 
 

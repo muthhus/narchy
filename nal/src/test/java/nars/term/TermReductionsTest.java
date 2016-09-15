@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
+import nars.nal.TermBuilder;
 import nars.op.data.differ;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import static nars.$.*;
 import static nars.Op.CONJ;
 import static nars.io.NarseseTest.assertInvalid;
+import static nars.nal.TermBuilder.imageUnwrap;
 import static nars.term.Term.False;
 import static nars.term.Term.True;
 import static nars.term.TermTest.assertValid;
@@ -626,4 +628,48 @@ public class TermReductionsTest {
 
 
     }
+
+    @Test public void testImageUnwrap0() {
+        assertEquals("(a,b)",
+           $.p(imageUnwrap($("(\\,n,_,b)"), $("a"))).toString());
+    }
+    @Test public void testImageUnwrap1() {
+        assertEquals("(a,b)",
+            $.p(imageUnwrap($("(\\,n,a,_)"), $("b"))).toString());
+    }
+    @Test public void testImageUnwrap2() {
+        assertEquals("(a,b)",
+            $.p(imageUnwrap($("(/,n,_,b)"), $("a"))).toString());
+    }
+    @Test public void testImageUnwrap3() {
+        assertEquals(     "(a,b)",
+           $.p(imageUnwrap($("(/,n,a,_)"), $("b"))).toString());
+    }
+
+    @Test public void testImageInSubtermsProductNormalFormIntensional() {
+
+        //<neutralization --> (acid,base)>" //en("Neutralization is a relation between an acid and a base. ");
+        //  <(\,neutralization,acid,_) --> base> //en("Something that can be neutralized by an acid is a base.");
+        //  <(\,neutralization,_,base) --> acid> //en("Something that can neutralize a base is an acid.");
+        assertEquals(
+                "((x)==>(n-->(a,b)))",
+                $("((x)==>((\\,n,a,_)-->b))").toString());
+        assertEquals(
+                "((x)==>(n-->(a,b)))",
+                $("((x)==>((\\,n,_,b)-->a))").toString());
+    }
+
+    @Test public void testImageInSubtermsProductNormalFormExtensional() {
+        //<(acid,base) --> reaction> //en("An acid and a base can have a reaction.");
+        //  <base --> (/,reaction,acid,_)> //en("A base is something that has a reaction with an acid.");
+        //  <acid --> (/,reaction,_,base)> //en("Acid can react with base.");
+        assertEquals(
+                  "{((a,b)-->r)}",
+                $("{(b-->(/,r,a,_))}").toString());
+        assertEquals(
+                  "(--,((a,b)-->r))",
+                $("(--,(a-->(/,r,_,b)))").toString());
+
+    }
+
 }

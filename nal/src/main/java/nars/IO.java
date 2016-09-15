@@ -120,9 +120,9 @@ public class IO {
 
     @Nullable
     public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
-        int x = in.readByte();
-        return $.v(o, x);
+        return $.v(o, in.readByte());
     }
+
     public static void writeVariable(@NotNull DataOutput out, @NotNull AbstractVariable v) throws IOException {
         out.writeByte(v.id);
     }
@@ -152,14 +152,8 @@ public class IO {
     public static Term readTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
         byte ob = in.readByte();
-
-        if (ob == SPECIAL_OP) {
-            String toParse = in.readUTF();
-            Term x = t.parseRaw(toParse);
-            if (x == null)
-                throw new IOException("Undecoded term: " + toParse);
-            return x;
-        }
+        if (ob == SPECIAL_OP)
+            return readSpecialTerm(in, t);
 
         Op o = Op.values()[ob];
         if (o.var)
@@ -168,6 +162,16 @@ public class IO {
             return readAtomic(in, o, t);
         else
             return readCompound(in, o, t);
+    }
+
+    public
+    @Nullable
+    static Term readSpecialTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+        String toParse = in.readUTF();
+        Term x = t.parseRaw(toParse);
+        if (x == null)
+            throw new IOException("Undecoded term: " + toParse);
+        return x;
     }
 
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
@@ -268,7 +272,7 @@ public class IO {
         Term[] v = readTermContainer(in, t);
 
         int dt = Tense.DTERNAL;
-        if (o.isImage() || o.temporal) //TODO o.hasNumeric
+        if (o.hasNumeric) //TODO o.hasNumeric
             dt = in.readInt();
 
         return (Compound) t.the(o, dt, v);

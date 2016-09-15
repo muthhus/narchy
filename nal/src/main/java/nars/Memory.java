@@ -122,8 +122,7 @@ public class Memory extends Param {
             tasks.remove(removed);
 
 
-            index.set(c); //update in the cache (weight, etc.)
-
+            index.onPolicyChanged(c);
         }
 
 

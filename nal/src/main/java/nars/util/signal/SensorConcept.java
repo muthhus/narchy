@@ -2,14 +2,13 @@ package nars.util.signal;
 
 import nars.*;
 import nars.budget.policy.ConceptPolicy;
+import nars.concept.PermanentConcept;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.task.DerivedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
-import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import nars.util.data.Sensor;
 import nars.util.math.FloatSupplier;
@@ -28,7 +27,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier {
+public class SensorConcept extends WiredCompoundConcept implements FloatFunction<Term>, FloatSupplier, PermanentConcept {
 
     @NotNull
     public final Sensor sensor;

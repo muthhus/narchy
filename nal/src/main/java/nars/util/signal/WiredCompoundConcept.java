@@ -36,7 +36,7 @@ import java.util.function.BiPredicate;
  * to make them directly reflect the sensor concept as the authority.
  *
  * */
-public abstract class WiredConcept extends CompoundConcept<Compound> implements Runnable {
+public abstract class WiredCompoundConcept extends CompoundConcept<Compound> implements Runnable {
 
     @NotNull
     protected final NAR nar;
@@ -45,7 +45,7 @@ public abstract class WiredConcept extends CompoundConcept<Compound> implements 
 
     @NotNull final private AtomicBoolean pendingRun = new AtomicBoolean(false);
 
-    public WiredConcept(@NotNull Compound term, @NotNull NAR n) {
+    public WiredCompoundConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
         n.on(this);
         this.nar = n;

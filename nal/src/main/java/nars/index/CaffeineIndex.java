@@ -4,13 +4,14 @@ import com.github.benmanes.caffeine.cache.*;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.ConceptBuilder;
+import nars.concept.PermanentConcept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.util.signal.WiredConcept;
+import nars.util.signal.WiredCompoundConcept;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -40,7 +41,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     private static final Weigher<Termlike, Termlike> weigher = (k, v) -> {
 
-        if (v instanceof WiredConcept) {
+        if (v instanceof PermanentConcept) {
             return 0; //special concept implementation: dont allow removal
         }
 
