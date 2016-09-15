@@ -35,6 +35,7 @@ import nars.op.time.MySTMClustered;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.truth.Truth;
+import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -92,11 +93,11 @@ public class Pacman extends NAgent {
 
         //Multi nar = new Multi(3,512,
 
-        Executioner e = Tetris.exe2;
+        Executioner e = Tetris.exe4;
         Default nar = new Default(1024,
                 384, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 16384, 2),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 50000, 16384, 4),
                 new FrameClock(), e
 
         );

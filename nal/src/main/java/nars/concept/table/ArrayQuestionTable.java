@@ -137,15 +137,14 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
 
 
         @NotNull Budget qBudget = q.budget();
-        BudgetFunctions.transferPri(qBudget, a.budget(), factor);
+        @NotNull Budget aBudget = a.budget();
+        if (!qBudget.isDeleted() && !aBudget.isDeleted() && q.onAnswered(a)) {
 
-        if (!qEtern) {
-            //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
-            qBudget.quaMult(1 - factor);
-        }
-
-        if (q.onAnswered(a)) {
-
+            BudgetFunctions.transferPri(qBudget, aBudget, factor);
+            if (!qEtern) {
+                //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
+                qBudget.quaMult(1 - factor);
+            }
 
             boolean sameConcept;
             if (answerConcept!=null && answerConcept.crossLink(a, q, scale * aConf, nar)) {

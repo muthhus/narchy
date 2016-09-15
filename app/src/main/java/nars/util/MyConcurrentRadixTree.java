@@ -289,7 +289,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /** allows subclasses to override this to handle removal events. return true if removal is accepted, false to reject the removal and reinsert */
     protected boolean onRemove(X removed) {
 
-        return false;
+        return true;
     }
 
     public boolean removeHavingAcquiredWriteLock(SearchResult searchResult, boolean recurse) {

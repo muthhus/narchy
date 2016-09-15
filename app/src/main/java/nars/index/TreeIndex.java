@@ -31,9 +31,9 @@ public class TreeIndex extends TermIndex {
 
     long updatePeriodMS = 1000;
 
-    int sizeLimit = 100000;
+    int sizeLimit;
 
-    public TreeIndex(ConceptBuilder conceptBuilder) {
+    public TreeIndex(ConceptBuilder conceptBuilder, int sizeLimit) {
 
         this.conceptBuilder = conceptBuilder;
         this.concepts = new TermTree() {
@@ -52,6 +52,7 @@ public class TreeIndex extends TermIndex {
                 return false;
             }
         };
+        this.sizeLimit = sizeLimit;
 
         Thread t = new Thread(this::forget, this.toString() + "_Forget");
         t.setPriority(Thread.MAX_PRIORITY - 1);
@@ -93,26 +94,33 @@ public class TreeIndex extends TermIndex {
                 float cap;
                 MyConcurrentRadixTree.SearchResult s = null;
 
-                while ((cap = capacitance()) > 0) {
+                try {
+                    concepts.acquireWriteLock();
 
-                    s = concepts.random(s, descentRate, rng);
-                    Node f = s.found;
+                    while ((cap = capacitance()) > 0) {
 
-                    if (f != null && f != concepts.root) {
-                        int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);
+                        s = concepts.random(s, descentRate, rng);
+                        Node f = s.found;
 
-                        if (subTreeSize == 0) {
-                            s = null; //restart
-                        } else if (subTreeSize > 0) {
-                            //long preBatch = sizeEst();
-                            concepts.remove(s, true);
-                            //logger.info("  Forgot Batch {}", preBatch - sizeEst());
-                            s = null;
-                        } /*else {
+                        if (f != null && f != concepts.root) {
+                            int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);
+
+                            if (subTreeSize == 0) {
+                                s = null; //restart
+                            } else if (subTreeSize > 0) {
+                                //long preBatch = sizeEst();
+                                concepts.removeHavingAcquiredWriteLock(s, true);
+                                //logger.info("  Forgot Batch {}", preBatch - sizeEst());
+                                s = null;
+                            } /*else {
                             logger.info("avoided removing {} elements, continuing..", concepts.size(f));
                             //continue descent
                         }*/
+                        }
                     }
+
+                } finally {
+                    concepts.releaseWriteLock();
                 }
 
 
@@ -245,8 +253,8 @@ public class TreeIndex extends TermIndex {
 
         private final HijacKache<Term, Termed> L1;
 
-        public L1TreeIndex(ConceptBuilder conceptBuilder, int cacheSize, int reprobes) {
-            super(conceptBuilder);
+        public L1TreeIndex(ConceptBuilder conceptBuilder, int sizeLimit, int cacheSize, int reprobes) {
+            super(conceptBuilder, sizeLimit);
             this.L1 = new HijacKache<>(cacheSize, reprobes);
         }
 

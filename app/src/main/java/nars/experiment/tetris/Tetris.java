@@ -375,12 +375,12 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        Executioner e = Tetris.exe;
+        Executioner e = Tetris.exe2;
         Default nar = new Default(1024,
                 256, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
-                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 32768, 3),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 32768, 4),
                 new FrameClock(), e
         );
 
@@ -753,7 +753,7 @@ public class Tetris extends NAgent {
 
             super( new Default(384, 4, 3, 2, new XORShiftRandom(2),
                     //new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 5*100000, false, exe),
-                    new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 16384, 3),
+                    new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 16384, 4),
 
                     new FrameClock()) {
                        @Override
