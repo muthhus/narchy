@@ -15,6 +15,7 @@ import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
+import nars.term.compound.GenericCompound;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.util.Texts;
@@ -134,6 +135,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         if (!Task.taskContentPreTest(content, ct.punc, nar, true /* !Param.DEBUG*/))
             return; //INVALID TERM FOR TASK
 
+        content = nar.normalize(content); //why isnt this sometimes normalized by here
 
         long occ;
 
@@ -153,7 +155,10 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
             }
 
-            content = temporalized;
+            if (temporalized!=content) {
+                content = temporalized;
+                ((GenericCompound)content).setNormalized();
+            }
 
             if (content.dt() == XTERNAL || content.dt() == -XTERNAL) {
                 throw new InvalidTermException(content.op(), content.dt(), content.terms(), "XTERNAL leak");
@@ -188,19 +193,20 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     //throw new InvalidTermException(o, content.dt(), content.terms(), "untemporalization failed");
                     return;
                 }
-                content = (Compound) ete;
+                content = nar.normalize((Compound)ete);
             }
 
             occ = ETERNAL;
         }
 
-        if (!content.isNormalized()) {
-            content = nar.normalize(content); //why isnt this sometimes normalized by here
-        }
+        if (!content.isNormalized())
+            throw new RuntimeException("content not normalized");
 
-        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
-        if (d != null)
-            m.conclusion.derive.accept(d);
+        if (content!=null) {
+            DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
+            if (d != null)
+                m.conclusion.derive.accept(d);
+        }
 
     }
 

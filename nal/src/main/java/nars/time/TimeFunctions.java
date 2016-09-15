@@ -194,12 +194,16 @@ public interface TimeFunctions {
             Term d0 = derived.term(0);
 
             //if (Terms.equalOrNegationOf(d0, bt) /*|| (derived.size() > 0 && derived.term(1).equals(prem.task().term()))*/ ||
-            if (productNormalize(unneg(d0)).equalsIgnoringVariables(productNormalize(unneg(bt))))
+            if (derivationMatch(bt, d0))
                 eventDelta *= -1;
         }
 
 
         return deriveDT(derived, polarity, p, eventDelta, occReturn);
+    }
+
+    public static boolean derivationMatch(Term a, Term b) {
+        return productNormalize(unneg(b)).equalsIgnoringVariables(productNormalize(unneg(a)));
     }
 
 
@@ -255,10 +259,10 @@ public interface TimeFunctions {
                 long shift = Tense.ETERNAL;
 
                 Term d0 = p.resolve(decomposedTerm.term(0));
-                boolean derivedIsDecomposedZero = Terms.equalOrNegationOf(d0, derived);
+                boolean derivedIsDecomposedZero = derivationMatch(d0, derived);
 
 
-                if (Terms.equalOrNegationOf(otherTerm, decomposedTerm)) {
+                if (derivationMatch(otherTerm, decomposedTerm)) {
                     //beginning, assume its relative to the occurrenc
 
                     shift = derivedIsDecomposedZero ?
@@ -268,13 +272,13 @@ public interface TimeFunctions {
                 } else {
                     Term d1 = p.resolve(decomposedTerm.term(1));
 
-                    if (derivedIsDecomposedZero && Terms.equalOrNegationOf(d1, otherTerm)) {
+                    if (derivedIsDecomposedZero && derivationMatch(d1, otherTerm)) {
                         shift = -edtDecomposed; //shift negative
 
                     } else {
-                        boolean derivedIsDecomposedOne = Terms.equalOrNegationOf(d1, derived);
+                        boolean derivedIsDecomposedOne = derivationMatch(d1, derived);
 
-                        if (derivedIsDecomposedOne && Terms.equalOrNegationOf(d0, otherTerm)) {
+                        if (derivedIsDecomposedOne && derivationMatch(d0, otherTerm)) {
                             shift = edtDecomposed; //shift positive
 
                         } else if (derivedIsDecomposedZero || derivedIsDecomposedOne) {
