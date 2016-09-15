@@ -1,5 +1,6 @@
 package nars.index;
 
+import com.googlecode.concurrenttrees.radix.node.Node;
 import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
@@ -9,10 +10,13 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.util.MyConcurrentRadixTree;
 import nars.util.data.map.nbhm.HijacKache;
+import nars.util.signal.WiredConcept;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
 import java.util.function.Consumer;
 
 /**
@@ -20,20 +24,121 @@ import java.util.function.Consumer;
  */
 public class TreeIndex extends TermIndex {
 
-    public final TermTree concepts = new TermTree();
+    public final TermTree concepts;
 
     private final ConceptBuilder conceptBuilder;
     private NAR nar;
-    //private static float SIZE_UPDATE_PROB = 0.05f;
-    private int lastSize = 0;
+
+    long updatePeriodMS = 1000;
+
+    int sizeLimit = 100000;
 
     public TreeIndex(ConceptBuilder conceptBuilder) {
+
         this.conceptBuilder = conceptBuilder;
+        this.concepts = new TermTree() {
+
+            @Override
+            public boolean onRemove(Termed r) {
+                if (r instanceof Concept) {
+                    Concept c = (Concept) r;
+                    if (removeable(c)) {
+                        onRemoval((Concept) r);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                return false;
+            }
+        };
+
+        Thread t = new Thread(this::forget, this.toString() + "_Forget");
+        t.setPriority(Thread.MAX_PRIORITY - 1);
+        t.setUncaughtExceptionHandler((whichThread, e) -> {
+            logger.error("Forget: {}", e);
+            e.printStackTrace();
+            System.exit(1);
+        });
+        t.start();
+
     }
 
     @Override
     public void start(NAR nar) {
         this.nar = nar;
+    }
+
+    //1. decide how many items to remove, if any
+    //2. search for items to meet this quota and remove them
+    protected void forget() {
+
+        while (true) {
+
+            try {
+                Thread.sleep(updatePeriodMS);
+            } catch (InterruptedException e) {
+            }
+
+            if (capacitance() > 0) {
+
+                Random rng = nar.random;
+
+                int sizeBefore = sizeEst();
+
+                float maxFractionThatCanBeRemovedAtATime = 0.005f;
+                int maxConceptsThatCanBeRemovedAtATime = (int) Math.max(1, sizeBefore * maxFractionThatCanBeRemovedAtATime);
+                float descentRate = 0.95f;
+
+                float cap;
+                MyConcurrentRadixTree.SearchResult s = null;
+
+                while ((cap = capacitance()) > 0) {
+
+                    s = concepts.random(s, descentRate, rng);
+                    Node f = s.found;
+
+                    if (f != null && f != concepts.root) {
+                        int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);
+
+                        if (subTreeSize == 0) {
+                            s = null; //restart
+                        } else if (subTreeSize > 0) {
+                            //long preBatch = sizeEst();
+                            concepts.remove(s, true);
+                            //logger.info("  Forgot Batch {}", preBatch - sizeEst());
+                            s = null;
+                        } /*else {
+                            logger.info("avoided removing {} elements, continuing..", concepts.size(f));
+                            //continue descent
+                        }*/
+                    }
+                }
+
+
+                int sizeAfter = sizeEst();
+
+                logger.info("Forgot {} Concepts", sizeBefore - sizeAfter);
+            }
+        }
+
+    }
+
+    private int sizeEst() {
+        return concepts.sizeEst();
+    }
+
+    /** relative capacitance; >0 = over-capacity, <0 = under-capacity */
+    private float capacitance() {
+        int s = sizeEst();
+        //if (s > sizeLimit) {
+        return s - sizeLimit;
+        //}
+        //return 0;
+    }
+
+    private boolean removeable(Concept c) {
+        return !(c instanceof WiredConcept);
     }
 
 
@@ -42,9 +147,9 @@ public class TreeIndex extends TermIndex {
         Term t = tt.term();
 
         if (t instanceof Compound)
-            t = conceptualize((Compound)t);
+            t = conceptualize((Compound) t);
 
-        TermKey k = new TermKey(t);
+        TermKey k = concepts.key(t);
 
         if (createIfMissing) {
             return _get(k, t);
@@ -58,15 +163,16 @@ public class TreeIndex extends TermIndex {
     }
 
     protected @NotNull Termed _get(@NotNull TermKey k, @NotNull Term finalT) {
-        return concepts.putIfAbsent(k, ()->conceptBuilder.apply(finalT));
+        return concepts.putIfAbsent(k, () -> conceptBuilder.apply(finalT));
     }
 
-    @NotNull static public TermKey key(@NotNull Term t) {
+    @NotNull
+    public TermKey key(@NotNull Term t) {
 
         if (t instanceof Compound)
-            t = conceptualize((Compound)t);
+            t = conceptualize((Compound) t);
 
-        return new TermKey(t);
+        return concepts.key(t);
     }
 
 
@@ -106,18 +212,14 @@ public class TreeIndex extends TermIndex {
         return concepts.sizeEst() + " concepts";
     }
 
+
     @Override
     public void remove(@NotNull Termed entry) {
-
         TermKey k = key(entry.term());
         Termed result = concepts.get(k);
-        if (result!=null) {
-            if (!concepts.remove(k))
-                return; //alredy removed since previous lookup or something
-
-            onRemoval(k, result);
+        if (result != null) {
+            concepts.remove(k);
         }
-
     }
 
     @Override
@@ -126,13 +228,8 @@ public class TreeIndex extends TermIndex {
     }
 
 
-    protected void onRemoval(TermKey key, Termed value) {
-        if (value instanceof Concept) {
-            onRemoval((Concept) value);
-        }
-    }
-
-    protected void onRemoval(Concept value) {
+    protected void onRemoval(@NotNull Concept value) {
+        //System.out.println("removing: "  + value);
         value.delete(nar);
     }
 
@@ -141,7 +238,9 @@ public class TreeIndex extends TermIndex {
         return true;
     }
 
-    /** Tree-index with a front-end "L1" non-blocking hashmap cache */
+    /**
+     * Tree-index with a front-end "L1" non-blocking hashmap cache
+     */
     public static class L1TreeIndex extends TreeIndex {
 
         private final HijacKache<Term, Termed> L1;
@@ -166,7 +265,7 @@ public class TreeIndex extends TermIndex {
                             }
             );
             if (o instanceof Termed)
-                return ((Termed)o);
+                return ((Termed) o);
 
             if (createIfMissing) { //HACK try again: this should be handled by computeIfAbsent2, not here
                 L1.miss++;

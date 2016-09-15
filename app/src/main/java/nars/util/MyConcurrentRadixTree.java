@@ -6,16 +6,20 @@ import com.googlecode.concurrenttrees.common.LazyIterator;
 import com.googlecode.concurrenttrees.radix.RadixTree;
 import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
+import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
 import nars.$;
+import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -32,19 +36,20 @@ import java.util.function.Supplier;
  * @author Niall Gallagher
  * @modified by seth
  */
-public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, Serializable, Iterable<O> {
+public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, Serializable, Iterable<X> {
 
     private final NodeFactory nodeFactory;
 
-    protected volatile Node root;
+    public volatile Node root;
 
     // Write operations acquire write lock.
     // Read operations are lock-free by default, but can be forced to acquire read locks via constructor flag...
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    // If true, force reading threads to acquire read lock (they will block on writes).
-    private final boolean restrictConcurrency;
+    // If non-null true, force reading threads to acquire read lock (they will block on writes).
+    @Nullable private final Lock readLock;
+    @NotNull private final Lock writeLock;
 
-    int estSize = 0;
+
+    final AtomicInteger estSize = new AtomicInteger(0);
 
     /**
      * Creates a new {@link MyConcurrentRadixTree} which will use the given {@link NodeFactory} to create nodes.
@@ -68,58 +73,60 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      */
     public MyConcurrentRadixTree(NodeFactory nodeFactory, boolean restrictConcurrency) {
         this.nodeFactory = nodeFactory;
-        this.restrictConcurrency = restrictConcurrency;
-        @SuppressWarnings({"NullableProblems", "UnnecessaryLocalVariable"})
-        Node rootNode = nodeFactory.createNode("", null, Collections.emptyList(), true);
-        this.root = rootNode;
+
+        ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+        this.writeLock = readWriteLock.writeLock();
+        if (restrictConcurrency) {
+            this.readLock = readWriteLock.readLock();
+        } else {
+            this.readLock = null;
+        }
+        this.root = nodeFactory.createNode("", null, Collections.emptyList(), true);
     }
 
     // ------------- Helper methods for serializing writes -------------
 
-    protected final void acquireWriteLock() {
-        readWriteLock.writeLock().lock();
+    public final void acquireWriteLock() {
+        writeLock.lock();
     }
 
-    protected final void releaseWriteLock() {
-        readWriteLock.writeLock().unlock();
+    public final void releaseWriteLock() {
+        writeLock.unlock();
     }
 
-    // Temporary helper methods for read locks, read locks will be removed in future...
 
     protected final void acquireReadLockIfNecessary() {
-        readLockIfNecessary(true, restrictConcurrency);
+        if (readLock!=null)
+            readLock.lock();
     }
 
     protected final void releaseReadLockIfNecessary() {
-        readLockIfNecessary(false, restrictConcurrency);
+        if (readLock!=null)
+            readLock.unlock();
     }
 
 
-    protected final void readLockIfNecessary(boolean acqOrRel, boolean restrictConcurrency) {
-        if (restrictConcurrency) { // restrictConcurrency is final
-            Lock l = readWriteLock.readLock();
-            if (acqOrRel)
-                l.lock();
-            else
-                l.unlock();
-        }
+    public final X put(Pair<CharSequence,X> value) {
+        return put(value.getOne(), value.getTwo());
     }
 
-    // ------------- Public API methods -------------
 
+    public X put(X value) {
+        throw new UnsupportedOperationException("subclasses can implement this by creating their own key and calling put(k,v)");
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final O put(CharSequence key, O value) {
+    public final X put(CharSequence key, X value) {
 //        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
 //        O existingValue = (O) putInternal(key, value, true);  // putInternal acquires write lock
 //        return existingValue;
 
-        return compute(key, (k, r) -> {
-            estSize++;
-            return value;
+        return compute(key, value, (k, r, v) -> {
+            estSize.incrementAndGet();
+            return v;
         });
     }
 
@@ -127,25 +134,25 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * {@inheritDoc}
      */
     @Override
-    public final O putIfAbsent(CharSequence key, O value) {
+    public final X putIfAbsent(CharSequence key, X value) {
         throw new UnsupportedOperationException();
     }
 
-    public final O putIfAbsent(CharSequence key, Supplier<O> newValue) {
-        return compute(key, (k, r) -> {
+    public final X putIfAbsent(CharSequence key, Supplier<X> newValue) {
+        return compute(key, newValue, (k, r, v) -> {
 
             if (r.charsMatched == k.length()) {
-                Node existingNode = r.nodeFound;
+                Node existingNode = r.found;
                 if (existingNode != null) {
                     Object existingValue = existingNode.getValue();
                     if (existingValue != null /*&& key.equals(existingValue.toString())*/) {
-                        return (O) existingValue;
+                        return (X) existingValue;
                     }
                 }
             }
 
-            estSize++;
-            return newValue.get();
+            estSize.incrementAndGet();
+            return v.get();
         });
     }
 
@@ -153,13 +160,13 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * {@inheritDoc}
      */
     @Override
-    public O getValueForExactKey(CharSequence key) {
+    public X getValueForExactKey(CharSequence key) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(key);
             if (searchResult.classification.equals(SearchResult.Classification.EXACT_MATCH)) {
                 @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-                O value = (O) searchResult.nodeFound.getValue();
+                X value = (X) searchResult.found.getValue();
                 return value;
             }
             return null;
@@ -176,7 +183,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(prefix);
-            Node nodeFound = searchResult.nodeFound;
+            Node nodeFound = searchResult.found;
             switch (searchResult.classification) {
                 case EXACT_MATCH:
                     return getDescendantKeys(prefix, nodeFound);
@@ -200,11 +207,11 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * {@inheritDoc}
      */
     @Override
-    public Iterable<O> getValuesForKeysStartingWith(CharSequence prefix) {
+    public Iterable<X> getValuesForKeysStartingWith(CharSequence prefix) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(prefix);
-            Node Found = searchResult.nodeFound;
+            Node Found = searchResult.found;
             switch (searchResult.classification) {
                 case EXACT_MATCH:
                     return getDescendantValues(prefix, Found);
@@ -232,21 +239,21 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * {@inheritDoc}
      */
     @Override
-    public Iterable<KeyValuePair<O>> getKeyValuePairsForKeysStartingWith(CharSequence prefix) {
+    public Iterable<KeyValuePair<X>> getKeyValuePairsForKeysStartingWith(CharSequence prefix) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(prefix);
             SearchResult.Classification classification = searchResult.classification;
             switch (classification) {
                 case EXACT_MATCH:
-                    return getDescendantKeyValuePairs(prefix, searchResult.nodeFound);
+                    return getDescendantKeyValuePairs(prefix, searchResult.found);
                 case KEY_ENDS_MID_EDGE:
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.nodeFound.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
                     prefix = CharSequences.concatenate(prefix, edgeSuffix);
-                    return getDescendantKeyValuePairs(prefix, searchResult.nodeFound);
+                    return getDescendantKeyValuePairs(prefix, searchResult.found);
                 default:
                     // Incomplete match means key is not a prefix of any node...
                     return Collections.emptySet();
@@ -260,96 +267,164 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * {@inheritDoc}
      */
     @Override
-    public boolean remove(CharSequence key) {
-        if (key == null) {
-            throw new IllegalArgumentException("The key argument was null");
-        }
+    public boolean remove(@NotNull CharSequence key) {
         acquireWriteLock();
         try {
             SearchResult searchResult = searchTree(key);
-            SearchResult.Classification classification = searchResult.classification;
-            switch (classification) {
-                case EXACT_MATCH:
-                    if (searchResult.nodeFound.getValue() == null) {
-                        // This node was created automatically as a split between two branches (implicit node).
-                        // No need to remove it...
-                        return false;
-                    }
-
-                    // Proceed with deleting the node...
-                    List<Node> childEdges = searchResult.nodeFound.getOutgoingEdges();
-                    if (childEdges.size() > 1) {
-                        // This node has more than one child, so if we delete the value from this node, we still need
-                        // to leave a similar node in place to act as the split between the child edges.
-                        // Just delete the value associated with this node.
-                        // -> Clone this node without its value, preserving its child nodes...
-                        @SuppressWarnings({"NullableProblems"})
-                        Node cloned = nodeFactory.createNode(searchResult.nodeFound.getIncomingEdge(), null, searchResult.nodeFound.getOutgoingEdges(), false);
-                        // Re-add the replacement node to the parent...
-                        searchResult.parentNode.updateOutgoingEdge(cloned);
-                    } else if (childEdges.size() == 1) {
-                        // Node has one child edge.
-                        // Create a new node which is the concatenation of the edges from this node and its child,
-                        // and which has the outgoing edges of the child and the value from the child.
-                        Node child = childEdges.get(0);
-                        CharSequence concatenatedEdges = CharSequences.concatenate(searchResult.nodeFound.getIncomingEdge(), child.getIncomingEdge());
-                        Node mergedNode = nodeFactory.createNode(concatenatedEdges, child.getValue(), child.getOutgoingEdges(), false);
-                        // Re-add the merged node to the parent...
-                        searchResult.parentNode.updateOutgoingEdge(mergedNode);
-                    } else {
-                        // Node has no children. Delete this node from its parent,
-                        // which involves re-creating the parent rather than simply updating its child edge
-                        // (this is why we need parentNodesParent).
-                        // However if this would leave the parent with only one remaining child edge,
-                        // and the parent itself has no value (is a split node), and the parent is not the root node
-                        // (a special case which we never merge), then we also need to merge the parent with its
-                        // remaining child.
-
-                        List<Node> currentEdgesFromParent = searchResult.parentNode.getOutgoingEdges();
-                        // Create a list of the outgoing edges of the parent which will remain
-                        // if we remove this child...
-                        // Use a non-resizable list, as a sanity check to force ArrayIndexOutOfBounds...
-                        List<Node> newEdgesOfParent = Arrays.asList(new Node[searchResult.parentNode.getOutgoingEdges().size() - 1]);
-                        for (int i = 0, added = 0, numParentEdges = currentEdgesFromParent.size(); i < numParentEdges; i++) {
-                            Node node = currentEdgesFromParent.get(i);
-                            if (node != searchResult.nodeFound) {
-                                newEdgesOfParent.set(added++, node);
-                            }
-                        }
-
-                        // Note the parent might actually be the root node (which we should never merge)...
-                        boolean parentIsRoot = (searchResult.parentNode == root);
-                        Node newParent;
-                        if (newEdgesOfParent.size() == 1 && searchResult.parentNode.getValue() == null && !parentIsRoot) {
-                            // Parent is a non-root split node with only one remaining child, which can now be merged.
-                            Node parentsRemainingChild = newEdgesOfParent.get(0);
-                            // Merge the parent with its only remaining child...
-                            CharSequence concatenatedEdges = CharSequences.concatenate(searchResult.parentNode.getIncomingEdge(), parentsRemainingChild.getIncomingEdge());
-                            newParent = nodeFactory.createNode(concatenatedEdges, parentsRemainingChild.getValue(), parentsRemainingChild.getOutgoingEdges(), parentIsRoot);
-                        } else {
-                            // Parent is a node which either has a value of its own, has more than one remaining
-                            // child, or is actually the root node (we never merge the root node).
-                            // Create new parent node which is the same as is currently just without the edge to the
-                            // node being deleted...
-                            newParent = nodeFactory.createNode(searchResult.parentNode.getIncomingEdge(), searchResult.parentNode.getValue(), newEdgesOfParent, parentIsRoot);
-                        }
-                        // Re-add the parent node to its parent...
-                        if (parentIsRoot) {
-                            // Replace the root node...
-                            this.root = newParent;
-                        } else {
-                            // Re-add the parent node to its parent...
-                            searchResult.parentNodesParent.updateOutgoingEdge(newParent);
-                        }
-                    }
-                    estSize--;
-                    return true;
-                default:
-                    return false;
-            }
+            return removeHavingAcquiredWriteLock(searchResult, false);
         } finally {
             releaseWriteLock();
         }
+    }
+
+    public boolean remove(@NotNull SearchResult searchResult, boolean recurse) {
+        acquireWriteLock();
+        try {
+            return removeHavingAcquiredWriteLock(searchResult, recurse);
+        } finally {
+            releaseWriteLock();
+        }
+    }
+
+    /** allows subclasses to override this to handle removal events. return true if removal is accepted, false to reject the removal and reinsert */
+    protected boolean onRemove(X removed) {
+
+        return false;
+    }
+
+    public boolean removeHavingAcquiredWriteLock(SearchResult searchResult, boolean recurse) {
+        SearchResult.Classification classification = searchResult.classification;
+        switch (classification) {
+            case EXACT_MATCH:
+                Node found = searchResult.found;
+                Node parent = searchResult.parentNode;
+
+                Object v = found.getValue();
+                if (!recurse && ((v == null)||(v == VoidValue.SINGLETON))) {
+                    // This node was created automatically as a split between two branches (implicit node).
+                    // No need to remove it...
+                    return false;
+                }
+
+                List<X> reinsertions = $.newArrayList(0);
+
+                if (v!=null && v != VoidValue.SINGLETON) {
+                    X xv = (X) v;
+                    boolean removed = tryRemove(xv);
+                    if (!recurse) {
+                        if (!removed)
+                            return false; //remove was disabled for this entry
+                    } else {
+                        if (!removed) {
+                            reinsertions.add(xv); //continue removing below then reinsert afterward
+                        }
+                    }
+                }
+
+
+                // Proceed with deleting the node...
+                List<Node> childEdges = found.getOutgoingEdges();
+                int numChildren = childEdges.size();
+                if (numChildren > 0) {
+                    if (!recurse) {
+                        if (numChildren > 1) {
+                            // This node has more than one child, so if we delete the value from this node, we still need
+                            // to leave a similar node in place to act as the split between the child edges.
+                            // Just delete the value associated with this node.
+                            // -> Clone this node without its value, preserving its child nodes...
+                            @SuppressWarnings({"NullableProblems"})
+                            Node cloned = nodeFactory.createNode(found.getIncomingEdge(), null, found.getOutgoingEdges(), false);
+                            // Re-add the replacement node to the parent...
+                            parent.updateOutgoingEdge(cloned);
+                        } else if (numChildren == 1) {
+                            // Node has one child edge.
+                            // Create a new node which is the concatenation of the edges from this node and its child,
+                            // and which has the outgoing edges of the child and the value from the child.
+                            Node child = childEdges.get(0);
+                            CharSequence concatenatedEdges = CharSequences.concatenate(found.getIncomingEdge(), child.getIncomingEdge());
+                            Node mergedNode = nodeFactory.createNode(concatenatedEdges, child.getValue(), child.getOutgoingEdges(), false);
+                            // Re-add the merged node to the parent...
+                            parent.updateOutgoingEdge(mergedNode);
+                        }
+                    } else {
+                        //collect all values from the subtree, call onRemove for them. then proceed below with removal of this node and its value
+                        forEach(found, (k,f) -> {
+                            boolean removed = tryRemove(f);
+                            if (!removed) {
+                                reinsertions.add(f);
+                            }
+                        });
+                        numChildren = 0;
+                    }
+                }
+
+                if (numChildren == 0) {
+
+                    if (reinsertions.size() == 1) {
+                        //this was a leaf node that was prevented from being removed.
+                        //in this case make no further changes
+                        return false;
+                    }
+
+                    // Node has no children. Delete this node from its parent,
+                    // which involves re-creating the parent rather than simply updating its child edge
+                    // (this is why we need parentNodesParent).
+                    // However if this would leave the parent with only one remaining child edge,
+                    // and the parent itself has no value (is a split node), and the parent is not the root node
+                    // (a special case which we never merge), then we also need to merge the parent with its
+                    // remaining child.
+
+                    List<Node> currentEdgesFromParent = parent.getOutgoingEdges();
+                    // Create a list of the outgoing edges of the parent which will remain
+                    // if we remove this child...
+                    // Use a non-resizable list, as a sanity check to force ArrayIndexOutOfBounds...
+                    List<Node> newEdgesOfParent = $.newArrayList(parent.getOutgoingEdges().size());
+                    for (int i = 0, numParentEdges = currentEdgesFromParent.size(); i < numParentEdges; i++) {
+                        Node node = currentEdgesFromParent.get(i);
+                        if (node != found) {
+                            newEdgesOfParent.add(node);
+                        }
+                    }
+
+                    // Note the parent might actually be the root node (which we should never merge)...
+                    boolean parentIsRoot = (parent == root);
+                    Node newParent;
+                    if (newEdgesOfParent.size() == 1 && parent.getValue() == null && !parentIsRoot) {
+                        // Parent is a non-root split node with only one remaining child, which can now be merged.
+                        Node parentsRemainingChild = newEdgesOfParent.get(0);
+                        // Merge the parent with its only remaining child...
+                        CharSequence concatenatedEdges = CharSequences.concatenate(parent.getIncomingEdge(), parentsRemainingChild.getIncomingEdge());
+                        newParent = nodeFactory.createNode(concatenatedEdges, parentsRemainingChild.getValue(), parentsRemainingChild.getOutgoingEdges(), parentIsRoot);
+                    } else {
+                        // Parent is a node which either has a value of its own, has more than one remaining
+                        // child, or is actually the root node (we never merge the root node).
+                        // Create new parent node which is the same as is currently just without the edge to the
+                        // node being deleted...
+                        newParent = nodeFactory.createNode(parent.getIncomingEdge(), parent.getValue(), newEdgesOfParent, parentIsRoot);
+                    }
+                    // Re-add the parent node to its parent...
+                    if (parentIsRoot) {
+                        // Replace the root node...
+                        this.root = newParent;
+                    } else {
+                        // Re-add the parent node to its parent...
+                        searchResult.parentNodesParent.updateOutgoingEdge(newParent);
+                    }
+                }
+
+
+                reinsertions.forEach(this::put);
+
+                return true;
+            default:
+                return false;
+        }
+    }
+
+
+    private final boolean tryRemove(X v) {
+        estSize.decrementAndGet();
+        return onRemove(v);
     }
 
     /**
@@ -363,20 +438,20 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
             SearchResult.Classification classification = searchResult.classification;
             switch (classification) {
                 case EXACT_MATCH:
-                    return getDescendantKeys(candidate, searchResult.nodeFound);
+                    return getDescendantKeys(candidate, searchResult.found);
                 case KEY_ENDS_MID_EDGE:
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.nodeFound.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
                     candidate = CharSequences.concatenate(candidate, edgeSuffix);
-                    return getDescendantKeys(candidate, searchResult.nodeFound);
+                    return getDescendantKeys(candidate, searchResult.found);
                 case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE: {
                     // Example: if we searched for CX, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
                     CharSequence keyOfParentNode = CharSequences.getPrefix(candidate, searchResult.charsMatched - searchResult.charsMatchedInNodeFound);
-                    CharSequence keyOfNodeFound = CharSequences.concatenate(keyOfParentNode, searchResult.nodeFound.getIncomingEdge());
-                    return getDescendantKeys(keyOfNodeFound, searchResult.nodeFound);
+                    CharSequence keyOfNodeFound = CharSequences.concatenate(keyOfParentNode, searchResult.found.getIncomingEdge());
+                    return getDescendantKeys(keyOfNodeFound, searchResult.found);
                 }
                 case INCOMPLETE_MATCH_TO_END_OF_EDGE:
                     if (searchResult.charsMatched == 0) {
@@ -386,7 +461,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     // Example: if we searched for COFFEE, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
                     CharSequence keyOfNodeFound = CharSequences.getPrefix(candidate, searchResult.charsMatched);
-                    return getDescendantKeys(keyOfNodeFound, searchResult.nodeFound);
+                    return getDescendantKeys(keyOfNodeFound, searchResult.found);
             }
             return Collections.emptySet();
         } finally {
@@ -398,27 +473,27 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * {@inheritDoc}
      */
     @Override
-    public Iterable<O> getValuesForClosestKeys(CharSequence candidate) {
+    public Iterable<X> getValuesForClosestKeys(CharSequence candidate) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(candidate);
             SearchResult.Classification classification = searchResult.classification;
             switch (classification) {
                 case EXACT_MATCH:
-                    return getDescendantValues(candidate, searchResult.nodeFound);
+                    return getDescendantValues(candidate, searchResult.found);
                 case KEY_ENDS_MID_EDGE:
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.nodeFound.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
                     candidate = CharSequences.concatenate(candidate, edgeSuffix);
-                    return getDescendantValues(candidate, searchResult.nodeFound);
+                    return getDescendantValues(candidate, searchResult.found);
                 case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE: {
                     // Example: if we searched for CX, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
                     CharSequence keyOfParentNode = CharSequences.getPrefix(candidate, searchResult.charsMatched - searchResult.charsMatchedInNodeFound);
-                    CharSequence keyOfNodeFound = CharSequences.concatenate(keyOfParentNode, searchResult.nodeFound.getIncomingEdge());
-                    return getDescendantValues(keyOfNodeFound, searchResult.nodeFound);
+                    CharSequence keyOfNodeFound = CharSequences.concatenate(keyOfParentNode, searchResult.found.getIncomingEdge());
+                    return getDescendantValues(keyOfNodeFound, searchResult.found);
                 }
                 case INCOMPLETE_MATCH_TO_END_OF_EDGE:
                     if (searchResult.charsMatched == 0) {
@@ -428,7 +503,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     // Example: if we searched for COFFEE, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
                     CharSequence keyOfNodeFound = CharSequences.getPrefix(candidate, searchResult.charsMatched);
-                    return getDescendantValues(keyOfNodeFound, searchResult.nodeFound);
+                    return getDescendantValues(keyOfNodeFound, searchResult.found);
             }
             return Collections.emptySet();
         } finally {
@@ -440,27 +515,27 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * {@inheritDoc}
      */
     @Override
-    public Iterable<KeyValuePair<O>> getKeyValuePairsForClosestKeys(CharSequence candidate) {
+    public Iterable<KeyValuePair<X>> getKeyValuePairsForClosestKeys(CharSequence candidate) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(candidate);
             SearchResult.Classification classification = searchResult.classification;
             switch (classification) {
                 case EXACT_MATCH:
-                    return getDescendantKeyValuePairs(candidate, searchResult.nodeFound);
+                    return getDescendantKeyValuePairs(candidate, searchResult.found);
                 case KEY_ENDS_MID_EDGE:
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.nodeFound.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
                     candidate = CharSequences.concatenate(candidate, edgeSuffix);
-                    return getDescendantKeyValuePairs(candidate, searchResult.nodeFound);
+                    return getDescendantKeyValuePairs(candidate, searchResult.found);
                 case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE: {
                     // Example: if we searched for CX, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
                     CharSequence keyOfParentNode = CharSequences.getPrefix(candidate, searchResult.charsMatched - searchResult.charsMatchedInNodeFound);
-                    CharSequence keyOfNodeFound = CharSequences.concatenate(keyOfParentNode, searchResult.nodeFound.getIncomingEdge());
-                    return getDescendantKeyValuePairs(keyOfNodeFound, searchResult.nodeFound);
+                    CharSequence keyOfNodeFound = CharSequences.concatenate(keyOfParentNode, searchResult.found.getIncomingEdge());
+                    return getDescendantKeyValuePairs(keyOfNodeFound, searchResult.found);
                 }
                 case INCOMPLETE_MATCH_TO_END_OF_EDGE:
                     if (searchResult.charsMatched == 0) {
@@ -470,7 +545,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     // Example: if we searched for COFFEE, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
                     CharSequence keyOfNodeFound = CharSequences.getPrefix(candidate, searchResult.charsMatched);
-                    return getDescendantKeyValuePairs(keyOfNodeFound, searchResult.nodeFound);
+                    return getDescendantKeyValuePairs(keyOfNodeFound, searchResult.found);
             }
             return Collections.emptySet();
         } finally {
@@ -483,46 +558,144 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      */
     @Override
     public int size() {
-        Deque<Node> stack = new ArrayDeque<Node>(64);
-        stack.push(this.root);
-        int count = 0;
-        while (true) {
-            if (stack.isEmpty()) {
-                return this.estSize = count; //update size estimate
-            }
-            Node current = stack.pop();
-            stack.addAll(current.getOutgoingEdges());
-            if (current.getValue() != null) {
-                count++;
-            }
+        return size(this.root);
+    }
+
+    public int size(Node n) {
+        acquireReadLockIfNecessary();
+        try {
+            return _size(n);
+        } finally {
+            releaseReadLockIfNecessary();
         }
+    }
+
+    public int sizeIfLessThan(Node n, int limit) {
+        acquireReadLockIfNecessary();
+        try {
+            return _sizeIfLessThan(n, limit);
+        } finally {
+            releaseReadLockIfNecessary();
+        }
+    }
+
+    private static int _size(Node n) {
+        int sum = 0;
+        Object v = n.getValue();
+        if (aValue(v))
+            sum++;
+
+        List<Node> l = n.getOutgoingEdges();
+        for (Node child : l)
+            sum += _size(child);
+
+        return sum;
+    }
+
+    /** as soon as the limit is exceeded, it returns -1 to cancel the recursion iteration */
+    private static int _sizeIfLessThan(Node n, int limit) {
+        int sum = 0;
+        Object v = n.getValue();
+        if (aValue(v))
+            sum++;
+
+        List<Node> l = n.getOutgoingEdges();
+        for (Node child : l) {
+            int s = _size(child);
+            if (s < 0)
+                return -1; //cascade
+            sum += s;
+            if (sum > limit)
+                return -1;
+        }
+
+        return sum;
     }
 
     /** estimated size */
     public int sizeEst() {
-        return estSize;
+        return estSize.get();
     }
 
     @Override
-    public void forEach(Consumer<? super O> action) {
-        Deque<Node> stack = new ArrayDeque<Node>(64);
-        stack.push(this.root);
-        while (true) {
-            if (stack.isEmpty()) {
-                return;
-            }
-            Node current = stack.pop();
-            stack.addAll(current.getOutgoingEdges());
-            Object v = current.getValue();
-            if (v != null) {
-                action.accept((O)v);
-            }
+    public void forEach(Consumer<? super X> action) {
+        forEach(this.root, action);
+    }
+
+    public final void forEach(Node start, Consumer<? super X> action) {
+        Object v = start.getValue();
+        if (aValue(v))
+            action.accept((X)v);
+
+        List<Node> l = start.getOutgoingEdges();
+        for (Node child : l)
+            forEach(child, action);
+    }
+
+    public final void forEach(Node start, BiConsumer<CharSequence, ? super X> action) {
+        Object v = start.getValue();
+        if (aValue(v))
+            action.accept(start.getIncomingEdge(), (X)v);
+
+        List<Node> l = start.getOutgoingEdges();
+        for (Node child : l) {
+            forEach(child, action);
         }
+    }
+
+    public static boolean aValue(Object v) {
+        return (v != null) && v!= VoidValue.SINGLETON;
     }
 
     // ------------- Helper method for put() -------------
     Object putInternal(CharSequence key, Object value, boolean overwrite) {
         throw new UnsupportedOperationException();
+    }
+
+    @NotNull public SearchResult random(float descendProb, Random rng) {
+        return random(null, descendProb, rng);
+    }
+
+    @NotNull public SearchResult random(@Nullable SearchResult at, float descendProb, Random rng) {
+        Node current, parent, parentParent;
+        if (at!=null && at.found!=null) {
+            current = at.found;
+            parent = at.parentNode;
+            parentParent = at.parentNodesParent;
+        } else {
+            current = root;
+            parent = parentParent = null;
+        }
+
+        acquireReadLockIfNecessary();
+        try {
+            while (true) {
+                List<Node> c = current.getOutgoingEdges();
+                if (c.isEmpty()) {
+                    break; //select it
+                } else {
+                    if (rng.nextFloat() < descendProb) {
+                        int which = rng.nextInt(c.size());
+                        Node next = c.get(which);
+
+                        parentParent = parent;
+                        parent = current;
+                        current = next;
+                    } else {
+                        break; //select it
+                    }
+                }
+            }
+        } finally {
+            releaseReadLockIfNecessary();
+        }
+
+        return new SearchResult(current, parent, parentParent);
+    }
+
+
+    public interface TriFunction<A, B, C, R> {
+        R apply(A a, B b, C c);
     }
 
     /**
@@ -535,7 +708,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * @param overwrite If true, should replace any existing value, if false should not replace any existing value
      * @return The existing value for this key, if there was one, otherwise null
      */
-    O compute(@NotNull CharSequence key, BiFunction<CharSequence, SearchResult, O> computeFunc) {
+    <V> X compute(@NotNull CharSequence key, V value, TriFunction<CharSequence, SearchResult, V, X> computeFunc) {
 //        if (key.length() == 0) {
 //            throw new IllegalArgumentException("The key argument was zero-length");
 //        }
@@ -548,10 +721,10 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
 
 
             NodeFactory factory = this.nodeFactory;
-            Node found = searchResult.nodeFound;
+            Node found = searchResult.found;
             int matched = searchResult.charsMatched;
             Object foundValue = found != null ? found.getValue() : null;
-            O newValue = computeFunc.apply(key, searchResult);
+            X newValue = computeFunc.apply(key, searchResult, value);
 
 
             List<Node> oedges = found.getOutgoingEdges();
@@ -609,7 +782,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     cloneAndReattach(searchResult, factory, found, foundValue, edges);
 
                     // Return null for the existing value...
-                    return newValue;
+                    return (X) newValue;
                 case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE:
                     // Search found a difference in characters between the key and the characters in the middle of the
                     // edge in the current node, and the key still has trailing unmatched characters.
@@ -637,7 +810,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     searchResult.parentNode.updateOutgoingEdge(n3);
 
                     // Return null for the existing value...
-                    return newValue;
+                    return (X) newValue;
                 default:
                     // This is a safeguard against a new enum constant being added in future.
                     throw new IllegalStateException("Unexpected classification for search result: " + searchResult);
@@ -1015,14 +1188,14 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * Also classifies the search result so that algorithms in methods which use this SearchResult, when adding nodes
      * and removing nodes from the tree, can select appropriate strategies based on the classification.
      */
-    static class SearchResult {
-        final CharSequence key;
-        final Node nodeFound;
-        final int charsMatched;
-        final int charsMatchedInNodeFound;
-        final Node parentNode;
-        final Node parentNodesParent;
-        final Classification classification;
+    public static class SearchResult {
+        public final CharSequence key;
+        public final Node found;
+        public final int charsMatched;
+        public final int charsMatchedInNodeFound;
+        public final Node parentNode;
+        public final Node parentNodesParent;
+        public final Classification classification;
 
         enum Classification {
             EXACT_MATCH,
@@ -1032,19 +1205,27 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
             INVALID // INVALID is never used, except in unit testing
         }
 
-        SearchResult(CharSequence key, Node nodeFound, int charsMatched, int charsMatchedInNodeFound, Node parentNode, Node parentNodesParent) {
+        SearchResult(Node found, Node parentNode, Node parentParentNode) {
+            this(null, found, -1, -1, parentNode, parentParentNode, found!=null ? Classification.EXACT_MATCH : Classification.INVALID);
+        }
+
+        SearchResult(CharSequence key, Node found, int charsMatched, int charsMatchedInNodeFound, Node parentNode, Node parentNodesParent) {
+            this(key, found, charsMatched, charsMatchedInNodeFound, parentNode, parentNodesParent, classify(key, found, charsMatched, charsMatchedInNodeFound));
+        }
+
+        SearchResult(CharSequence key, Node found, int charsMatched, int charsMatchedInNodeFound, Node parentNode, Node parentNodesParent, Classification c) {
             this.key = key;
-            this.nodeFound = nodeFound;
+            this.found = found;
             this.charsMatched = charsMatched;
             this.charsMatchedInNodeFound = charsMatchedInNodeFound;
             this.parentNode = parentNode;
             this.parentNodesParent = parentNodesParent;
 
             // Classify this search result...
-            this.classification = classify(key, nodeFound, charsMatched, charsMatchedInNodeFound);
+            this.classification = c;
         }
 
-        protected SearchResult.Classification classify(CharSequence key, Node nodeFound, int charsMatched, int charsMatchedInNodeFound) {
+        protected static SearchResult.Classification classify(CharSequence key, Node nodeFound, int charsMatched, int charsMatchedInNodeFound) {
             int len = nodeFound.getIncomingEdge().length();
             int keyLen = key.length();
             if (charsMatched == keyLen) {
@@ -1060,14 +1241,14 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     return SearchResult.Classification.INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE;
                 }
             }
-            throw new IllegalStateException("Unexpected failure to classify SearchResult: " + this);
+            throw new IllegalStateException("Unexpected failure to classify SearchResult");
         }
 
         @Override
         public String toString() {
             return "SearchResult{" +
                     "key=" + key +
-                    ", nodeFound=" + nodeFound +
+                    ", nodeFound=" + found +
                     ", charsMatched=" + charsMatched +
                     ", charsMatchedInNodeFound=" + charsMatchedInNodeFound +
                     ", parentNode=" + parentNode +
@@ -1131,7 +1312,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
 //        this.forEach(c);
 //    }
 
-    public Iterator<O> iterator() {
+    public Iterator<X> iterator() {
         return getValuesForKeysStartingWith("").iterator();
     }
 }

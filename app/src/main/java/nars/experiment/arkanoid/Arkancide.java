@@ -52,7 +52,7 @@ public class Arkancide extends NAgent {
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 30;
+    final int visW = 28;
     final int visH = 14;
     SensorConcept[][] ss;
 
@@ -100,10 +100,10 @@ public class Arkancide extends NAgent {
 
 
 
-        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-                4, 8 /* states */,
-                0.05f);
-        view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
+//        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
+//                4, 8 /* states */,
+//                0.05f);
+//        view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
 
         MatrixView.ViewFunc camViewView = (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
@@ -164,7 +164,7 @@ public class Arkancide extends NAgent {
         //view.attention.add(nar.inputActivation);
         //view.attention.add(nar.derivedActivation);
 
-        newBeliefChartWindow(this, 400);
+        newBeliefChartWindow(this, 200);
         HistogramChart.budgetChart(nar, 50);
 
         ControlSurface.newControlWindow(
@@ -248,17 +248,17 @@ public class Arkancide extends NAgent {
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.7f);
 
-        float p = 0.2f;
+        float p = 0.04f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.4f * p;
 
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.03f);
-        nar.compoundVolumeMax.setValue(40);
+        nar.confMin.setValue(0.05f);
+        nar.compoundVolumeMax.setValue(36);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -293,7 +293,7 @@ public class Arkancide extends NAgent {
 
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
         MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
 
         //new ArithmeticInduction(nar);

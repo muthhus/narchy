@@ -471,7 +471,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         float min = -1;
         if (s >= cap) {
             BLink<V>[] a = items.array();
-            if (a.length >= cap - 1) {
+            if (a.length > cap - 1) {
                 BLink<V> last = a[cap - 1];
                 if (last != null) {
                     min = last.priIfFiniteElseNeg1();

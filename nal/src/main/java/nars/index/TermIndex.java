@@ -493,7 +493,7 @@ public abstract class TermIndex extends TermBuilder {
             if (c!=null) {
                 ((GenericCompound)c).setNormalized();
 
-                return (Compound) $.unneg((Compound)c).term(); //some cases it may normalize to neg
+                Term ic = compoundOrNull( $.unneg((Compound) c) );
             }
         }
 

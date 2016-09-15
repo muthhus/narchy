@@ -15,6 +15,7 @@ import nars.term.Termed;
 import nars.util.MyConcurrentRadixTree;
 
 import java.util.List;
+import java.util.Random;
 import java.util.function.Function;
 
 /**
@@ -24,21 +25,33 @@ import java.util.function.Function;
 public class TermTree extends MyConcurrentRadixTree<Termed> {
 
 
+    static final NodeFactory factory = (NodeFactory) (edgeCharacters, value, childNodes, isRoot) -> {
+        if (edgeCharacters == null) {
+            throw new IllegalStateException("The edgeCharacters argument was null");
+        } else if (!isRoot && edgeCharacters.length() == 0) {
+            throw new IllegalStateException("Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters));
+        } else if (childNodes == null) {
+            throw new IllegalStateException("The childNodes argument was null");
+        } else {
+            //NodeUtil.ensureNoDuplicateEdges(childNodes);
+            return (Node) (childNodes.isEmpty() ?
+                    ((value instanceof VoidValue) ?
+                            new ByteArrayNodeLeafVoidValue(edgeCharacters) :
+                            ((value != null) ?
+                                    new ByteArrayNodeLeafWithValue(edgeCharacters, value) :
+                                    new ByteArrayNodeLeafNullValue(edgeCharacters))) :
+                    ((value instanceof VoidValue) ?
+                            new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes) :
+                            ((value == null) ?
+                                    new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes) :
+                                    new ByteArrayNodeDefault(edgeCharacters, value, childNodes))));
+        }
+    };
+
     public TermTree() {
         //super(new AtomNodeFactory());
         //super(new DefaultByteArrayNodeFactory());
-        super((NodeFactory) (edgeCharacters, value, childNodes, isRoot) -> {
-            if (edgeCharacters == null) {
-                throw new IllegalStateException("The edgeCharacters argument was null");
-            } else if (!isRoot && edgeCharacters.length() == 0) {
-                throw new IllegalStateException("Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters));
-            } else if (childNodes == null) {
-                throw new IllegalStateException("The childNodes argument was null");
-            } else {
-                //NodeUtil.ensureNoDuplicateEdges(childNodes);
-                return (Node) (childNodes.isEmpty() ? (value instanceof VoidValue ? new ByteArrayNodeLeafVoidValue(edgeCharacters) : (value != null ? new ByteArrayNodeLeafWithValue(edgeCharacters, value) : new ByteArrayNodeLeafNullValue(edgeCharacters))) : (value instanceof VoidValue ? new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes) : (value == null ? new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes) : new ByteArrayNodeDefault(edgeCharacters, value, childNodes))));
-            }
-        });
+        super(factory);
     }
 
     public final Termed get(String id) {
@@ -50,8 +63,16 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
         return putIfAbsent(s, () -> conceptBuilder.apply($.the(s)));
     }
 
+    @Override
+    public Termed put(Termed value) {
+        return put(key(value), value);
+    }
 
-//    public final Termed putIfAbsent(@NotNull TermKey a, Function<Term, ? extends Termed> conceptBuilder) {
+    public TermKey key(Termed value) {
+        return new TermKey(value.term());
+    }
+
+    //    public final Termed putIfAbsent(@NotNull TermKey a, Function<Term, ? extends Termed> conceptBuilder) {
 //        return putIfAbsent(
 //                a,
 //                () -> conceptBuilder.apply(a));
@@ -65,10 +86,10 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
     public void print(Appendable out) {
         PrettyPrinter.prettyPrint(this, out);
     }
+
     public void print() {
         print(System.out);
     }
-
 
 
     public Termed get(TermKey term) {
@@ -76,64 +97,64 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
     }
 
 
-    private static final class AtomNodeFactory implements NodeFactory {
-
-
-        @Override
-        public Node createNode(CharSequence edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
-            if (Param.DEBUG) {
-                assert edgeCharacters != null : "The edgeCharacters argument was null";
-                assert !(!isRoot && edgeCharacters.length() == 0) : "Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters);
-                assert childNodes != null : "The childNodes argument was null";
-                if (Param.DEBUG_EXTRA)
-                    NodeUtil.ensureNoDuplicateEdges(childNodes);
-            }
-
-            try {
-
-                if (childNodes.isEmpty()) {
-                    // Leaf node...
-                    if (value instanceof VoidValue) {
-                        return new ByteArrayNodeLeafVoidValue(edgeCharacters);
-                    } else if (value == null) {
-                        return new ByteArrayNodeLeafNullValue(edgeCharacters);
-                    } else {
-                        return new ByteArrayNodeLeafWithValue(edgeCharacters, value);
-                    }
-                } else {
-                    // Non-leaf node...
-                    if (value instanceof VoidValue) {
-                        return new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
-                    } else if (value == null) {
-                        return new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
-                    } else {
-                        return new ByteArrayNodeDefault(edgeCharacters, value, childNodes);
-                    }
-                }
-            } catch (ByteArrayCharSequence.IncompatibleCharacterException e) {
-
-                if (childNodes.isEmpty()) {
-                    // Leaf node...
-                    if (value instanceof VoidValue) {
-                        return new CharArrayNodeLeafVoidValue(edgeCharacters);
-                    } else if (value != null) {
-                        return new CharArrayNodeLeafWithValue(edgeCharacters, value);
-                    } else {
-                        return new CharArrayNodeLeafNullValue(edgeCharacters);
-                    }
-                } else {
-                    // Non-leaf node...
-                    if (value instanceof VoidValue) {
-                        return new CharArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
-                    } else if (value == null) {
-                        return new CharArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
-                    } else {
-                        return new CharArrayNodeDefault(edgeCharacters, value, childNodes);
-                    }
-                }
-            }
-        }
-    }
+//    private static final class AtomNodeFactory implements NodeFactory {
+//
+//
+//        @Override
+//        public Node createNode(CharSequence edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
+//            if (Param.DEBUG) {
+//                assert edgeCharacters != null : "The edgeCharacters argument was null";
+//                assert !(!isRoot && edgeCharacters.length() == 0) : "Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters);
+//                assert childNodes != null : "The childNodes argument was null";
+//                if (Param.DEBUG_EXTRA)
+//                    NodeUtil.ensureNoDuplicateEdges(childNodes);
+//            }
+//
+//            try {
+//
+//                if (childNodes.isEmpty()) {
+//                    // Leaf node...
+//                    if (value instanceof VoidValue) {
+//                        return new ByteArrayNodeLeafVoidValue(edgeCharacters);
+//                    } else if (value == null) {
+//                        return new ByteArrayNodeLeafNullValue(edgeCharacters);
+//                    } else {
+//                        return new ByteArrayNodeLeafWithValue(edgeCharacters, value);
+//                    }
+//                } else {
+//                    // Non-leaf node...
+//                    if (value instanceof VoidValue) {
+//                        return new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
+//                    } else if (value == null) {
+//                        return new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
+//                    } else {
+//                        return new ByteArrayNodeDefault(edgeCharacters, value, childNodes);
+//                    }
+//                }
+//            } catch (ByteArrayCharSequence.IncompatibleCharacterException e) {
+//
+//                if (childNodes.isEmpty()) {
+//                    // Leaf node...
+//                    if (value instanceof VoidValue) {
+//                        return new CharArrayNodeLeafVoidValue(edgeCharacters);
+//                    } else if (value != null) {
+//                        return new CharArrayNodeLeafWithValue(edgeCharacters, value);
+//                    } else {
+//                        return new CharArrayNodeLeafNullValue(edgeCharacters);
+//                    }
+//                } else {
+//                    // Non-leaf node...
+//                    if (value instanceof VoidValue) {
+//                        return new CharArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
+//                    } else if (value == null) {
+//                        return new CharArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
+//                    } else {
+//                        return new CharArrayNodeDefault(edgeCharacters, value, childNodes);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 }
 

@@ -556,7 +556,7 @@ public class Terms   {
 
     @Nullable
     public static Compound compoundOrNull(@Nullable Termed t) {
-        return compoundOrNull(t.term());
+        return t instanceof Compound ? ((Compound)t) : compoundOrNull(t.term());
     }
 
     /** detects a negated conjunction of negated subterms:
