@@ -194,6 +194,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             occ = ETERNAL;
         }
 
+        if (!content.isNormalized()) {
+            content = nar.normalize(content); //why isnt this sometimes normalized by here
+        }
 
         DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
         if (d != null)

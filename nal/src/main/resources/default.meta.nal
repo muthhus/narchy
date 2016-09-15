@@ -499,11 +499,11 @@
 
     (B --> (/, M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity, Derive:NoSwap)
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Derive:NoSwap)
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Goal:Identity, Derive:NoSwap)
 
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Derive:NoSwap)
+    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Goal:Identity, Derive:NoSwap)
 
-    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Derive:NoSwap)
+    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity, Derive:NoSwap)
 
 //Recursion Force - TODO use varargs
 
@@ -520,8 +520,8 @@
 ////composition on both sides of a statement:
 
 
-//    ((B,P) <-> Z) ,(B <-> A), task("?") |- ((B,P) <-> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
-//    ((P,B) <-> Z) ,(B <-> A), task("?") |- ((P,B) <-> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    ((B,P) <-> Z) ,(B <-> A), task("?") |- ((B,P) <-> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    ((P,B) <-> Z) ,(B <-> A), task("?") |- ((P,B) <-> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
 
     ((B,P) --> Z) ,(B --> A), task("?") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
     ((P,B) --> Z) ,(B --> A), task("?") |- ((P,B) --> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)

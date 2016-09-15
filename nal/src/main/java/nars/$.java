@@ -968,7 +968,6 @@ public enum $ {
         Term t = term.term();
         if (t.op() == NEG)
             t = ((Compound)t).term(0);
-        t = TermBuilder.productNormalize(t);
         return t;
     }
 

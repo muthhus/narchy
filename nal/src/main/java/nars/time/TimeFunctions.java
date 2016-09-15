@@ -3,6 +3,7 @@ package nars.time;
 import nars.$;
 import nars.Op;
 import nars.Task;
+import nars.nal.TermBuilder;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.Conclude;
@@ -10,6 +11,8 @@ import nars.nal.rule.PremiseRule;
 import nars.term.*;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.$.unneg;
+import static nars.nal.TermBuilder.productNormalize;
 import static nars.task.Revision.chooseByConf;
 
 /**
@@ -191,7 +194,7 @@ public interface TimeFunctions {
             Term d0 = derived.term(0);
 
             //if (Terms.equalOrNegationOf(d0, bt) /*|| (derived.size() > 0 && derived.term(1).equals(prem.task().term()))*/ ||
-            if ($.unneg(d0).term().equalsIgnoringVariables($.unneg(bt).term()))
+            if (productNormalize(unneg(d0)).equalsIgnoringVariables(productNormalize(unneg(bt))))
                 eventDelta *= -1;
         }
 
