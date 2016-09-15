@@ -12,7 +12,6 @@ import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,7 +96,7 @@ public abstract class TermBuilder {
     @NotNull public Term the(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
 
         if (transformImmediates())
-            productNormalize(u);
+            productNormalizeSubterms(u);
 
         switch (op) {
 //            case INT:
@@ -174,28 +173,32 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    private void productNormalize(Term[] u) {
+    public static void productNormalizeSubterms(Term[] u) {
         for (int i = 0, uLength = u.length; i < uLength; i++) {
-            Term t = u[i];
-            if (t instanceof Compound && (t.op() == INH) && (t.varPattern()==0) && t.hasAny(Op.IMGbits))  {
-                Term s = (((Compound) t).term(0));
-                Term p = (((Compound) t).term(1));
-                Op so = s.op();
-                Op po = p.op();
-                if (so == Op.IMGi && !po.isImage()) {
-                    Compound ii  = (Compound)s;
-                    u[i] = the(Op.INH, ii.term(0), imageUnwrapToProd(p, ii));
-                } else if (po == Op.IMGe && !so.isImage()) {
-                    Compound ii  = (Compound)p;
-                    u[i] = the(Op.INH, imageUnwrapToProd(s, ii), ii.term(0));
-                }
-            }
+            u[i] = productNormalize(u[i]);
         }
     }
 
+    public static Term productNormalize(Term t) {
+        if (t instanceof Compound && (t.op() == INH) && (t.varPattern()==0) && t.hasAny(Op.IMGbits))  {
+            Term s = (((Compound) t).term(0));
+            Term p = (((Compound) t).term(1));
+            Op so = s.op();
+            Op po = p.op();
+            if (so == Op.IMGi && !po.isImage()) {
+                Compound ii  = (Compound)s;
+                t = $.inh(ii.term(0), imageUnwrapToProd(p, ii));
+            } else if (po == Op.IMGe && !so.isImage()) {
+                Compound ii  = (Compound)p;
+                t = $.inh(imageUnwrapToProd(s, ii), ii.term(0));
+            }
+        }
+        return t;
+    }
+
     @NotNull
-    private final Term imageUnwrapToProd(Term p, Compound ii) {
-        return the(Op.PROD, imageUnwrap(ii, p));
+    public static final Term imageUnwrapToProd(Term p, Compound ii) {
+        return $.p(imageUnwrap(ii, p));
     }
 
     public static Term[] imageUnwrap(Compound image, Term other) {

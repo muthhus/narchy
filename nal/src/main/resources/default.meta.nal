@@ -327,7 +327,7 @@
         (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,(S --> $X)) ==>+- (P --> $X)), (Belief:InductionN)
     (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) <=>+- (S --> $X)), (Belief:Comparison)
         (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) <=>+- (--,(S --> $X))), (Belief:ComparisonN)
-    (S --> M), (P --> M), neq(S,P), time(dtAfterOrEternal) |- (&&, (S --> #Y), (P --> #Y)), (Belief:Intersection)
+    (S --> M), (P --> M), neq(S,P), time(dtAfterOrEternal) |- ((S --> #Y) &&+- (P --> #Y)), (Belief:Intersection)
         //^ intersection should be ok for both positive and negative cases
             //(S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternal) |- (&&, (--,(S --> #Y)), (P --> #Y)), (Belief:IntersectionN)
 
@@ -337,7 +337,7 @@
         (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- (($X --> P) ==>+- (--,($X --> S))), (Belief:AbductionN)
     (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternal) |- (($X --> S) <=>+- ($X --> P)), (Belief:Comparison)
         (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,($X --> S)) <=>+- ($X --> P)), (Belief:ComparisonN)
-    (M --> S), (M --> P), neq(S,P), time(dtAfterOrEternal) |- (&&, (#Y --> P), (#Y --> S)), (Belief:Intersection)
+    (M --> S), (M --> P), neq(S,P), time(dtAfterOrEternal) |- ((#Y --> S) &&+- (#Y --> P)), (Belief:Intersection)
         //^ intersection should be ok for both positive and negative cases
             //(M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- (&&, (#Y --> P), (--,(#Y --> S))), (Belief:IntersectionN)
 

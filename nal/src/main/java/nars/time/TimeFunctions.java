@@ -190,10 +190,8 @@ public interface TimeFunctions {
             Term bt = p.beliefTerm;
             Term d0 = derived.term(0);
 
-            if (Terms.equalOrNegationOf(d0, bt) /*|| (derived.size() > 0 && derived.term(1).equals(prem.task().term()))*/ ||
-                    (d0.equalsIgnoringVariables(bt))
-
-                    ) //last chance: try by ignoring variables to handle variable introduction cases
+            //if (Terms.equalOrNegationOf(d0, bt) /*|| (derived.size() > 0 && derived.term(1).equals(prem.task().term()))*/ ||
+            if ($.unneg(d0).term().equalsIgnoringVariables($.unneg(bt).term()))
                 eventDelta *= -1;
         }
 

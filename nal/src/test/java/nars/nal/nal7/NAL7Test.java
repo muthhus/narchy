@@ -86,7 +86,7 @@ public class NAL7Test extends AbstractNALTest {
 
     void testTemporalRevision(int delay, float freq, float conf, @NotNull String belief) {
         TestNAR tester = test();
-        //tester.nar.log();
+        
         tester.input(belief + ". :|: %1.00;0.65%");
         tester.inputAt(delay, belief + ". :|: %0.5;0.70%");
         tester.inputAt(delay + 1, belief + "? :|:");
@@ -499,9 +499,12 @@ public class NAL7Test extends AbstractNALTest {
         tester.input("<{t003} --> (/,at,SELF,_)>. :|:");
         tester.inputAt(10, "<{t003} --> (/,on,{t002},_)>. :|:");
 
-        tester.mustBelieve(cycles, "(<#1 --> (/,at,SELF,_)> &&+10 <#1 --> (/,on,{t002},_)>)",
+        tester.mustBelieve(cycles,
+                //"(<#1 --> (/,at,SELF,_)> &&+10 <#1 --> (/,on,{t002},_)>)",
+                "(((SELF,{t003})-->at) &&+10 (({t002},{t003})-->on))",
                 1.0f, 0.81f,
                 0);
+        tester.mustNotOutput(cycles, "(((SELF,#1)-->at) &&-10 (({t002},#1)-->on))", '.', 0, ETERNAL);
 
     }
 

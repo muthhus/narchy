@@ -10,6 +10,7 @@ import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.concept.ConceptBuilder;
 import nars.index.TermIndex;
+import nars.nal.TermBuilder;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -963,10 +964,12 @@ public enum $ {
     }
 
     /** unwraps any negation superterm */
-    @NotNull public static Termed unneg(@NotNull Termed term) {
-        if (term.op() == NEG)
-            term = ((Compound)term.term()).term(0);
-        return term;
+    @NotNull public static Term unneg(@NotNull Termed term) {
+        Term t = term.term();
+        if (t.op() == NEG)
+            t = ((Compound)t).term(0);
+        t = TermBuilder.productNormalize(t);
+        return t;
     }
 
     public static <X> List<X> newArrayList(X... x) {
