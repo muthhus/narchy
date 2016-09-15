@@ -26,7 +26,7 @@ public class TermTemplateTest {
         Concept c = t.concept(n);
 
         TermContainer templates = ((CompoundConcept)c).templates;
-        assertEquals(8, templates.size());
+        assertEquals(6, templates.size());
 
         String s = Joiner.on('\n').join(templates);
         System.out.println(s);

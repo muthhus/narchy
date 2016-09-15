@@ -203,8 +203,8 @@ public abstract class TermBuilder {
         Term[] t = new Term[l];
         int r = image.dt();
         @NotNull Term[] imageTerms = image.terms();
-        for (int i = 1 /* skip the first element of the image */, j = 0; j < l; ) {
-            t[j++] = ((j + 1) == r) ? other : imageTerms[i++];
+        for (int i = 0 /* skip the first element of the image */, j = 0; j < l; ) {
+            t[j++] = ((j) == r) ? other : imageTerms[++i];
         }
         return t;
     }
