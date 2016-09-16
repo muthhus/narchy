@@ -670,5 +670,11 @@ public class TermReductionsTest {
                 $("(--,(a-->(/,r,_,b)))").toString());
 
     }
+    @Test public void testNegatedImageInSubtermsProductNormalForm() {
+        assertEquals(
+                  "{(--,((a,b)-->r)),(z-->(x,y))}",
+                $("{ (--,(b-->(/,r,a,_))), ((\\,z,x,_)-->y) }").toString());
+
+    }
 
 }
