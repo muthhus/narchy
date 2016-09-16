@@ -19,8 +19,6 @@ import nars.truth.Truthed;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -146,7 +144,7 @@ public class Revision {
         Random rng = new XorShift128PlusRandom(Util.hashCombine(a.hashCode(), b.hashCode()) << 32 + Util.hashCombine((int) when, (int) now) * 31 + newTruth.hashCode());
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
-        Term cc = dtMerge(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng);
+        Term cc = intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng);
         if (!(cc instanceof Compound))
             return null;
 
@@ -276,7 +274,7 @@ public class Revision {
 //    }
 //
     @NotNull
-    public static Term dtMerge(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {
+    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {
         if (a.equals(b)) {
             return a;
         } else if (a instanceof Compound) {
@@ -306,28 +304,25 @@ public class Revision {
     @NotNull
     private static Term dtMergeTemporal(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {
 
-        Term b0, b1;
-        boolean bswap;
-        if (Math.signum(b.dt()) * Math.signum(a.dt()) < 0 /* opposite signs */) {
-            b0 = b.term(1); b1 = b.term(0);
-            bswap = true;
+        Term a0, a1, b0, b1;
+        int adt = a.dt();
+        if ((adt >= 0) || (adt == DTERNAL)) {
+            a0 = a.term(0); a1 = a.term(1);
         } else {
+            a0 = a.term(1); a1 = a.term(0); adt = -adt;
+        }
+        int bdt = b.dt();
+        if ((bdt >= 0) || (bdt == DTERNAL)) {
             b0 = b.term(0); b1 = b.term(1);
-            bswap = false;
-        }
-
-        Compound dtFrom = (Compound) choose(a, b, aProp, rng);
-        int dt;
-        if (dtFrom == b) {
-            dt = b.dt() * (bswap ? -1 : +1);
         } else {
-            dt = a.dt();
+            b0 = b.term(1); b1 = b.term(0); bdt = -bdt;
         }
 
-        return $.compound(a.op(), dt,
+        depth/=2f;
+        return $.compound(a.op(), (choose(a, b, aProp, rng) == a) ? adt : bdt,
                 new Term[]{
-                        dtMerge(a.term(0), b0, aProp, accumulatedDifference, depth / 2f, rng),
-                        dtMerge(a.term(1), b1, aProp, accumulatedDifference, depth / 2f, rng)
+                        intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng),
+                        intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng)
                 }
         );
 
@@ -491,8 +486,8 @@ public class Revision {
         }
     }
 
-    public static Term dtMerge(Term a, Term b, float aProp, Random rng) {
-        return dtMerge(a, b, aProp, new MutableFloat(),1,rng);
+    public static Term intermpolate(Term a, Term b, float aProp, Random rng) {
+        return intermpolate(a, b, aProp, new MutableFloat(),1,rng);
     }
 
 //    /** get the task which occurrs nearest to the target time */

@@ -13,12 +13,9 @@ import nars.term.Term;
 import nars.time.Tense;
 import nars.util.analyze.BeliefAnalysis;
 import nars.util.data.random.XorShift128PlusRandom;
-import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -329,7 +326,7 @@ public class RevisionTest {
         Set<Term> ss = new TreeSet();
         Random rng = new XorShift128PlusRandom(1);
         for (int i = 0; i < 8 * (a.volume() + b.volume()); i++) {
-            ss.add(Revision.dtMerge(a, b, 0.5f, rng));
+            ss.add(Revision.intermpolate(a, b, 0.5f, rng));
         }
         System.out.println(ss);
         return ss;

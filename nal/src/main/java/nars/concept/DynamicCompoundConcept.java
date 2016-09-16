@@ -123,7 +123,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
             final List<Task> e = evidence ? $.newArrayList(n) : null;
             Budget b = evidence ? new RawBudget() : null;
 
-            DynTruth d = new DynTruth(template.op(), nar.confMin.floatValue(), t, e, b);
+            DynTruth d = new DynTruth(op(), nar.confMin.floatValue(), t, e, b);
             Term[] subs = template.terms();
             for (Term s : subs) {
                 if (!(s instanceof Compound))
