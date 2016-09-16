@@ -45,15 +45,18 @@ public class Versioning extends FasterList<Versioned> {
         }
     }
 
-    /** start a new version with a commit, returns the new current version
-     *  a null value can be inserted as a placeholder. it will have no effect on reverting
-     *  @return -1 if capacity exceeded
+    /** start a new version with a commit, returns true if add was successful or false if unsuccessful (capacity exceeded)
+     *  @return null if capacity exceeded
      * */
-    public final int nextChange(@Nullable Versioned v) {
+    public final boolean nextChange(@Nullable Versioned v, @Nullable Object x) {
         int c = next();
-        if (c!=-1)
+        if (c!=-1) {
+            if (v!=null)
+                v.add(x);
             add(v);
-        return c;
+            return true;
+        }
+        return false;
     }
 
 //    /** track change on current commit, returns current version */

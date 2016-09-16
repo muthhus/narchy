@@ -146,6 +146,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             return; //INVALID TERM FOR TASK
 
         content = nar.normalize(content); //why isnt this sometimes normalized by here
+        if (!(content instanceof Compound))
+            return; //somehow became null
 
         long occ;
 

@@ -47,10 +47,10 @@ import static nars.time.Tense.DTERNAL;
 //                Map map2 =
 //                        map1; //shared
 //                        //newBagMap(DEFAULT_ATOM_LINK_MAP_CAPACITY);
-                Map sharedMap = newBagMap();
 
                 switch (a.op()) {
                     default:
+                        Map sharedMap = newBagMap();
                         return new AtomConcept(a, newCurveBag(sharedMap), newCurveBag(sharedMap));
                 }
 

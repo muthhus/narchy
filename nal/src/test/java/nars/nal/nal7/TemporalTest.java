@@ -406,9 +406,8 @@ public class TemporalTest {
     @Test public void testNonCommutivityImplConcept() {
         NAR n = new Default();
 
-        n.input("(x ==>+5 y).");
-        n.input("(y ==>-5 x).");
-        n.next().next();
+        n.input("(x ==>+5 y).", "(y ==>-5 x).");
+        n.next().next().next();
 
         StringBuilder cc = new StringBuilder();
         TreeSet d = new TreeSet((x,y)-> x.toString().compareTo(y.toString()));

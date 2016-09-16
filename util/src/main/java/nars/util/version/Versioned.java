@@ -48,7 +48,9 @@ public class Versioned<X> extends FasterList<X> {
      */
     @Nullable
     public final X get() {
-        return getLast();
+        //return getLast();
+        int s = this.size();
+        return s > 0 ? this.items[s - 1] : null;
     }
 
 
@@ -60,13 +62,10 @@ public class Versioned<X> extends FasterList<X> {
     public final Versioned<X> set(X nextValue) {
 
         //if (current == null || !current.equals(nextValue)) {
-        int next = context.nextChange(this);
-        if (next == -1) {
-            return null;
-        } else {
-            add(nextValue);
+        if (context.nextChange(this, nextValue))
             return this;
-        }
+        else
+            return null;
     }
 
     @Override

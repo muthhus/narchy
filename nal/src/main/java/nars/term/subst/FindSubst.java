@@ -72,11 +72,6 @@ public abstract class FindSubst extends Termunator implements Subst {
 //    @NotNull
 //    public final Versioned<Term> term;
 
-    /**
-     * parent, if in subterms
-     */
-    @NotNull
-    public final Versioned<Compound> parent;
 
 
 
@@ -111,11 +106,10 @@ public abstract class FindSubst extends Termunator implements Subst {
         this.type = type;
 
         this.versioning = versioning;
-        xy = new VersionMap(versioning, 16);
+        xy = new VersionMap(versioning, 64);
         reassignerXY = new VersionMap.Reassigner<>(this::assignable, xy);
-        yx = new VersionMap(versioning, 4);
+        yx = new VersionMap(versioning, 32);
         reassignerYX = new VersionMap.Reassigner<>(this::assignable, yx);
-        parent = new Versioned(versioning, 4);
 
         int constraintsLimit = 6;
         constraints = new Versioned(versioning, new MatchConstraint[constraintsLimit]);

@@ -20,6 +20,7 @@ import static nars.nal.TermBuilder.productNormalize;
 import static nars.task.Revision.chooseByConf;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * Strategies for solving temporal components of a derivation
@@ -176,7 +177,8 @@ public interface TimeFunctions {
             long earliest = p.occurrenceTarget(earliestOccurrence);
 
             //TODO check valid int/long conversion
-            eventDelta = (int) (p.belief.occurrence() -
+            eventDelta = (int) (
+                    p.belief.occurrence() -
                     p.task.occurrence());
 
 
@@ -250,11 +252,16 @@ public interface TimeFunctions {
 
 
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
-            //no temporal basis that can apply. only derive an eternal result if there is no actual temporal relation in the decomposition
-            //else
-            //return noTemporalBasis(derived);
+            //no temporal basis that can apply. only derive an eternal result
+            // if there is no actual temporal relation in the decomposition
 
-            return derived; //no shift necessary
+            int ddt = decomposedTerm.dt();
+            if ((ddt == 0 || ddt == DTERNAL || ddt == XTERNAL)) {
+                return derived; //allow eternal decompose since no temporal information is inside the decomposed term
+            } else {
+                return noTemporalBasis(derived);
+            }
+
         } else {
 
             long occ;
@@ -304,10 +311,7 @@ public interface TimeFunctions {
                 }
 
                 if (occ == ETERNAL) {
-                    if (Param.DEBUG)
-                        return noTemporalBasis(derived);
-                    else
-                        return null;
+                    return noTemporalBasis(derived);
                 }
 
             }
@@ -325,11 +329,13 @@ public interface TimeFunctions {
         return p.resolve(productNormalize(unneg(t)));
     }
 
-    @NotNull
+    @Nullable
     static Compound noTemporalBasis(@NotNull Compound derived) {
-        throw new InvalidTermException(derived.op(), derived.dt(), derived.terms(),
-                "no basis for relating other occurrence to derived");
-        //return derived;
+        if (Param.DEBUG_EXTRA)
+            throw new InvalidTermException(derived.op(), derived.dt(), derived.terms(),
+                    "no basis for relating other occurrence to derived");
+        else
+            return null;
     }
 
 
