@@ -25,12 +25,12 @@ abstract public class events extends AtomicBoolCondition {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
-            return beliefBeforeOrDuringTask(m.task, m.belief);
+            int d = deltaOcc(m.task, m.belief);
+            return d<=0 && d!=DTERNAL; /* && d!=DTERNAL which is negative */
         }
 
     };
-
-    /** true if belief is before or during task */
+    /** true if both are non-eternal and task is after belief  */
     @Nullable
     public static final events before = new events() {
 
@@ -41,11 +41,28 @@ abstract public class events extends AtomicBoolCondition {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
-            @Nullable Task b = m.belief;
-            return b != null && beliefBeforeOrDuringTask(b, m.task);
+            int d = deltaOcc(m.task, m.belief);
+            return d>=0 /* && d!=DTERNAL which is negative */;
         }
 
     };
+
+    /** order doesnt matter, just that they are both temporal */
+    @Nullable public static final events bothTemporal = new events() {
+
+        @Override
+        public String toString() {
+            return "bothTemporal";
+        }
+
+        @Override
+        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+            int d = deltaOcc(m.task, m.belief);
+            return d!=DTERNAL;
+        }
+
+    };
+
     public static final BoolCondition taskNotDTernal = new events() {
 
         @Override
@@ -85,20 +102,20 @@ abstract public class events extends AtomicBoolCondition {
 //        }
 //    };
 
-    public static boolean beliefBeforeOrDuringTask(@NotNull Task a, @Nullable Task b) {
+    public static int deltaOcc(@NotNull Task a, @Nullable Task b) {
 
         if (b == null)
-            return false;
+            return DTERNAL;
 
         long tOcc = a.occurrence();
         if (tOcc == ETERNAL)
-            return false;
+            return DTERNAL;
 
         long bOcc = b.occurrence();
         if (bOcc == ETERNAL)
-            return false;
+            return DTERNAL;
 
-        return ((bOcc - tOcc) >= 0);
+        return (int)(tOcc - bOcc);
     }
 
 

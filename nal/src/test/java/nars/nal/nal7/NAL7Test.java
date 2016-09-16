@@ -224,7 +224,6 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void inference_on_tense() {
         test()
-            
             .input("((($x, key) --> hold) ==>+3 (($x, room) --> enter)).")
             .input("<(John, key) --> hold>. :|:")
             .mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 3);

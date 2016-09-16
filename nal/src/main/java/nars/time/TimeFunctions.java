@@ -3,17 +3,19 @@ package nars.time;
 import nars.$;
 import nars.Op;
 import nars.Task;
-import nars.nal.TermBuilder;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.Conclude;
 import nars.nal.rule.PremiseRule;
 import nars.term.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.$.unneg;
 import static nars.nal.TermBuilder.productNormalize;
 import static nars.task.Revision.chooseByConf;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Strategies for solving temporal components of a derivation
@@ -35,8 +37,8 @@ public interface TimeFunctions {
 
 
     static long earlyOrLate(long t, long b, boolean early) {
-        boolean tEternal = t == Tense.ETERNAL;
-        boolean bEternal = b == Tense.ETERNAL;
+        boolean tEternal = t == ETERNAL;
+        boolean bEternal = b == ETERNAL;
         if (!tEternal && !bEternal) {
             if (early)
                 return t <= b ? t : b;
@@ -47,7 +49,7 @@ public interface TimeFunctions {
         } else if (!tEternal && bEternal) {
             return t;
         }
-        return Tense.ETERNAL;
+        return ETERNAL;
     }
 
     //nars.Premise.OccurrenceSolver latestOccurrence = (t, b) -> earlyOrLate(t, b, false);
@@ -82,13 +84,13 @@ public interface TimeFunctions {
     @NotNull
     static Compound dtDiff(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
 
-        Compound taskTerm = (Compound) $.pos(p.taskTerm);
+        Compound taskTerm = (Compound) $.unneg(p.taskTerm);
         Termed<Compound> beliefTerm = p.beliefTerm;
 
         int dt;
         int ttd = taskTerm.dt();
         int btd = beliefTerm.term().dt();
-        if (ttd != Tense.DTERNAL && btd != Tense.DTERNAL) {
+        if (ttd != DTERNAL && btd != DTERNAL) {
             switch (polarity) {
                 case 0:
                     dt = (ttd + btd) / 2; //intersect: 0
@@ -106,12 +108,12 @@ public interface TimeFunctions {
                 default:
                     throw new UnsupportedOperationException();
             }
-        } else if (ttd != Tense.DTERNAL) {
+        } else if (ttd != DTERNAL) {
             dt = ttd;
-        } else if (btd != Tense.DTERNAL) {
+        } else if (btd != DTERNAL) {
             dt = btd;
         } else {
-            dt = Tense.DTERNAL;
+            dt = DTERNAL;
         }
 
         if ((polarity == 0) || (polarity == 2) || (polarity == -2)) {
@@ -166,7 +168,7 @@ public interface TimeFunctions {
 
         long beliefO = p.belief.occurrence();
         long taskO = p.task.occurrence();
-        if (beliefO!= Tense.ETERNAL && taskO!= Tense.ETERNAL) {
+        if (beliefO!= ETERNAL && taskO!= ETERNAL) {
             long earliest = p.occurrenceTarget(earliestOccurrence);
 
             //TODO check valid int/long conversion
@@ -175,20 +177,20 @@ public interface TimeFunctions {
 
 
             occReturn[0] = earliest;
-        } else if (beliefO!= Tense.ETERNAL) {
+        } else if (beliefO!= ETERNAL) {
             occReturn[0] = beliefO;
-            eventDelta = Tense.DTERNAL;
-        } else if (taskO!= Tense.ETERNAL) {
+            eventDelta = DTERNAL;
+        } else if (taskO!= ETERNAL) {
             occReturn[0] = taskO;
-            eventDelta = Tense.DTERNAL;
+            eventDelta = DTERNAL;
         } else {
-            eventDelta = Tense.DTERNAL;
+            eventDelta = DTERNAL;
         }
 
 
 
         //HACK to handle commutive switching so that the dt is relative to the effective subject
-        if (eventDelta!=0 && eventDelta!= Tense.DTERNAL && derived.op().commutative) {
+        if (eventDelta!=0 && eventDelta!= DTERNAL && derived.op().commutative) {
 
             Term bt = p.beliefTerm;
             Term d0 = derived.term(0);
@@ -228,96 +230,69 @@ public interface TimeFunctions {
         //if (premBelief == null)
             //premBelief = p.task; //it is the task itself being decomposed
 
-        Compound decomposedTerm = (Compound) (decomposeTask ? $.pos(p.taskTerm) : p.beliefTerm).term();
+        Compound decomposedTerm = (Compound) (decomposeTask ? $.unneg(p.taskTerm) : p.beliefTerm);
         int dtDecomposed = decomposedTerm.dt();
-        long occDecomposed = decomposeTask ? p.task.occurrence() : (premBelief != null ? premBelief.occurrence() : Tense.ETERNAL);
+        long occDecomposed = decomposeTask ? p.task.occurrence() : (premBelief != null ? premBelief.occurrence() : ETERNAL);
 
         //the non-decomposed counterpart of the premise
         Task otherTask = decomposeTask ? premBelief : p.task;
-        Term otherTerm = decomposeTask ? p.beliefTerm.term() : $.pos(p.taskTerm);
-        long occOther = (otherTask != null && !otherTask.isEternal()) ? otherTask.occurrence() : Tense.ETERNAL;
 
 
-        if ((occDecomposed == Tense.ETERNAL) && (occOther == Tense.ETERNAL)) {
+        long occOther = (otherTask != null) ? otherTask.occurrence() : occDecomposed;
+
+
+        if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
             //no temporal basis that can apply. only derive an eternal result if there is no actual temporal relation in the decomposition
             //else
-            return noTemporalBasis(derived);
+            //return noTemporalBasis(derived);
 
-            //return derived; //no shift necessary
+            return derived; //no shift necessary
         } else {
 
             long occ;
 
-            int edtDecomposed = dtDecomposed != Tense.DTERNAL ? dtDecomposed : 0; //effective dt decomposed
+            //int edtDecomposed = dtDecomposed != DTERNAL ? dtDecomposed : 0; //effective dt decomposed
 
             if (decomposedTerm.size() != 2) {
                 //probably a (&&+0, ...)
-                occ = occDecomposed != Tense.ETERNAL ? occDecomposed : occOther;
-            } else if (occOther != Tense.ETERNAL) {
+                occ = occDecomposed != ETERNAL ? occDecomposed : occOther;
+            } else  {
 
-                long shift = Tense.ETERNAL;
+                occ = ETERNAL;
 
-                Term d0 = p.resolve(decomposedTerm.term(0));
-                boolean derivedIsDecomposedZero = derivationMatch(d0, derived);
+                if (occDecomposed!=ETERNAL) {
 
+                    occ = occDecomposed + p.resolve(decomposedTerm).subtermTime(derived);
+                }
+                if (occ == ETERNAL && occOther!=ETERNAL) {
 
-                if (derivationMatch(otherTerm, decomposedTerm)) {
-                    //beginning, assume its relative to the occurrenc
+                    @Nullable Term rOtherTerm = productNormalize(p.resolve(decomposeTask ? p.beliefTerm.term() : p.taskTerm));
 
-                    shift = derivedIsDecomposedZero ?
-                                0 :
-                            edtDecomposed;
-
-                } else {
-                    Term d1 = p.resolve(decomposedTerm.term(1));
-
-                    if (derivedIsDecomposedZero && derivationMatch(d1, otherTerm)) {
-                        shift = -edtDecomposed; //shift negative
-
+                    if (derivationMatch(rOtherTerm, derived)) {
+                        occ = occOther;
                     } else {
-                        boolean derivedIsDecomposedOne = derivationMatch(d1, derived);
-
-                        if (derivedIsDecomposedOne && derivationMatch(d0, otherTerm)) {
-                            shift = edtDecomposed; //shift positive
-
-                        } else if (derivedIsDecomposedZero || derivedIsDecomposedOne) {
-                            shift = 0; //shift zero
+                        @Nullable Term rd = p.resolve(decomposedTerm);
+                        int otherInDecomposed = rd.subtermTime(rOtherTerm);
+                        if (otherInDecomposed!=DTERNAL) {
+                            int derivedInDecomposed = rd.subtermTime(derived);
+                            if (derivedInDecomposed!=DTERNAL) {
+                                //now compute the dt between derived and otherTerm, as a shift added to occOther
+                                occ = occOther + (derivedInDecomposed-otherInDecomposed);
+                            }
                         }
+
+
                     }
 
                 }
 
-                if (shift == Tense.ETERNAL) {
+                if (occ == ETERNAL)
                     return noTemporalBasis(derived);
-                }
 
-                occ = occOther + shift;
-
-            } else {//if (occ == ETERNAL && occDecomposed != ETERNAL) {
-
-                long shift = Tense.ETERNAL;
-
-                Term d0 = p.resolve(decomposedTerm.term(0));
-                Term d1 = p.resolve(decomposedTerm.term(1));
-
-                if (derivationMatch(d0, derived)) {
-                    shift = 0; //beginning
-                } else if (derivationMatch(d1, derived)) {
-                    shift = edtDecomposed; //
-                }
-
-                if (shift == Tense.ETERNAL) {
-                    return noTemporalBasis(derived);
-                }
-
-                occ = occDecomposed + shift;
             }
 
+            occReturn[0] = occ;
 
-            if (occ != Tense.ETERNAL) {
-
-                occReturn[0] = occ;
-            }
             return derived;
 
         }
@@ -416,7 +391,8 @@ public interface TimeFunctions {
 
     @NotNull
     static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull PremiseEval p, boolean taskOrBelief) {
-        Term dtTerm = taskOrBelief ? $.pos(p.taskTerm) : p.beliefTerm;
+
+        Term dtTerm = taskOrBelief ? $.unneg(p.taskTerm) : p.beliefTerm;
 
         Task t = p.task;
         Task b = p.belief;
@@ -424,16 +400,16 @@ public interface TimeFunctions {
         if (!taskOrBelief && b != null) {
             //if (b.occurrence()!=ETERNAL) {
             int derivedInT = dtTerm.subtermTime(derived);
-            if (derivedInT == Tense.DTERNAL && derived.op() == Op.IMPL) {
+            if (derivedInT == DTERNAL && derived.op() == Op.IMPL) {
                 //try to find the subtermTime of the implication's subject
                 derivedInT = dtTerm.subtermTime(derived.term(0));
             }
 
-            if (derivedInT == Tense.DTERNAL) {
+            if (derivedInT == DTERNAL) {
                 derivedInT = 0;
             }
 
-            if (tOcc!= Tense.ETERNAL)
+            if (tOcc!= ETERNAL)
                 occReturn[0] = tOcc + derivedInT;
 
 //            } else if (t.occurrence()!=ETERNAL) {
@@ -489,11 +465,12 @@ public interface TimeFunctions {
 //                }
 //            }
 //        }
-        if (o != Tense.ETERNAL) {
+        if (o != ETERNAL) {
             if (taskOrBelief && end) {
                 //long taskDT = (taskOrBelief ? premise.task() : premise.belief()).term().dt();
-                long ddt = ((Compound)$.pos(p.taskTerm)).dt();
-                if (ddt != Tense.DTERNAL)
+
+                long ddt = ((Compound) $.unneg(p.taskTerm)).dt();
+                if (ddt != DTERNAL)
                     o += ddt;
             } else if (taskOrBelief && !end) {
                 //NOTHING NECESSARY
@@ -506,7 +483,7 @@ public interface TimeFunctions {
                 Compound beliefTerm = (Compound) p.beliefTerm;
                 //if (belief != null) {
                 long ddt = beliefTerm.dt();
-                if (ddt != Tense.DTERNAL) {
+                if (ddt != DTERNAL) {
                     if (!taskOrBelief && !end) {
                         o -= ddt;
                     } else if (!taskOrBelief && end) {
@@ -525,7 +502,7 @@ public interface TimeFunctions {
 
     @NotNull static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull PremiseEval p, int eventDelta, @NotNull long[] occReturn) {
         int dt;
-        dt = eventDelta == Tense.DTERNAL ? Tense.DTERNAL : eventDelta * polarity;
+        dt = eventDelta == DTERNAL ? DTERNAL : eventDelta * polarity;
 
         return dt(derived, dt, p, occReturn);
     }
@@ -536,15 +513,16 @@ public interface TimeFunctions {
     @NotNull TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, long[] occReturn, float[] confScale) -> {
 
         Task task = p.task;
-        int taskDT = ((Compound)$.pos(p.taskTerm)).dt();
+
+        int taskDT = ((Compound) $.unneg(p.taskTerm)).dt();
         Term bt = p.beliefTerm;
 
-        int beliefDT = (bt instanceof Compound) ? ((Compound) bt).dt() : Tense.DTERNAL;
+        int beliefDT = (bt instanceof Compound) ? ((Compound) bt).dt() : DTERNAL;
 
         int eventDelta;
-        if (taskDT == Tense.DTERNAL && beliefDT == Tense.DTERNAL) {
-            eventDelta = Tense.DTERNAL;
-        } else if (taskDT != Tense.DTERNAL && beliefDT != Tense.DTERNAL) {
+        if (taskDT == DTERNAL && beliefDT == DTERNAL) {
+            eventDelta = DTERNAL;
+        } else if (taskDT != DTERNAL && beliefDT != DTERNAL) {
 
             Task belief = p.belief;
 
@@ -570,7 +548,7 @@ public interface TimeFunctions {
                 eventDelta = taskDT;
             }
 
-        } else if (taskDT == Tense.DTERNAL) {
+        } else if (taskDT == DTERNAL) {
             eventDelta = beliefDT;
         } else /*if (beliefDT == DTERNAL)*/ {
             eventDelta = taskDT;
@@ -630,13 +608,13 @@ public interface TimeFunctions {
 
         long occ = chooseByConf(task, belief, p).occurrence(); //reset
 
-        Compound tt = (Compound) $.pos(p.taskTerm);
+        Compound tt = (Compound) $.unneg(p.taskTerm);
         Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;
 
         int td = tt.dt();
-        int bd = bb instanceof Compound ? ((Compound) bb).dt() : Tense.DTERNAL;
+        int bd = bb instanceof Compound ? ((Compound) bb).dt() : DTERNAL;
 
-        int t = Tense.DTERNAL;
+        int t = DTERNAL;
 
         Term cp = d.conclusionPattern; //TODO this may be a wrapped immediatefunction?
 
@@ -664,7 +642,7 @@ public interface TimeFunctions {
                 Term cb = ccc.term(1);
 
                 //chained relations
-                if (td != Tense.DTERNAL && bd != Tense.DTERNAL && (tp.size() == 2) && (bp.size() == 2)) {
+                if (td != DTERNAL && bd != DTERNAL && (tp.size() == 2) && (bp.size() == 2)) {
                     Compound tpp = (Compound) tp;
                     Compound bpp = (Compound) bp;
 
@@ -692,16 +670,16 @@ public interface TimeFunctions {
                 }
 
                 long to = task.occurrence();
-                long bo = belief != null ? belief.occurrence() : Tense.ETERNAL;
+                long bo = belief != null ? belief.occurrence() : ETERNAL;
 
-                int occDiff = (to != Tense.ETERNAL && bo != Tense.ETERNAL) ? (int) (bo - to) : 0;
+                int occDiff = (to != ETERNAL && bo != ETERNAL) ? (int) (bo - to) : 0;
 
-                if (td == Tense.DTERNAL && bd == Tense.DTERNAL) {
+                if (td == DTERNAL && bd == DTERNAL) {
 
-                    int aTask = tp.subtermTime(ca, Tense.DTERNAL);
-                    int aBelief = bp.subtermTime(ca, Tense.DTERNAL);
-                    int bTask = tp.subtermTime(cb, Tense.DTERNAL);
-                    int bBelief = bp.subtermTime(cb, Tense.DTERNAL);
+                    int aTask = tp.subtermTime(ca, DTERNAL);
+                    int aBelief = bp.subtermTime(ca, DTERNAL);
+                    int bTask = tp.subtermTime(cb, DTERNAL);
+                    int bBelief = bp.subtermTime(cb, DTERNAL);
 
                     if (belief != null) {
 
@@ -717,16 +695,16 @@ public interface TimeFunctions {
                         }
 
 
-                        if (aTask != Tense.DTERNAL && aBelief == Tense.DTERNAL &&
-                                bBelief != Tense.DTERNAL && bTask == Tense.DTERNAL) {
+                        if (aTask != DTERNAL && aBelief == DTERNAL &&
+                                bBelief != DTERNAL && bTask == DTERNAL) {
                             //forward: task -> belief
                             //t = (int) (task.occurrence() - belief().occurrence());
                             t = occDiff;
                             if (reversed) occ -= t;
                             else occ += t;
 
-                        } else if (aTask == Tense.DTERNAL && aBelief != Tense.DTERNAL &&
-                                bBelief == Tense.DTERNAL && bTask != Tense.DTERNAL) {
+                        } else if (aTask == DTERNAL && aBelief != DTERNAL &&
+                                bBelief == DTERNAL && bTask != DTERNAL) {
                             //reverse: belief -> task
                             t = -occDiff;
                             //t = (int) (belief().occurrence() - task.occurrence());
@@ -743,7 +721,7 @@ public interface TimeFunctions {
 
                             //both ITERNAL
 
-                            if ((to != Tense.ETERNAL) && (bo != Tense.ETERNAL)) {
+                            if ((to != ETERNAL) && (bo != ETERNAL)) {
                                 t = occDiff;
                                 if (reversed) occ -= t;
                                 else occ += t;
@@ -752,11 +730,11 @@ public interface TimeFunctions {
                         }
                     }
 
-                } else if (td == Tense.DTERNAL && bd != Tense.DTERNAL) {
+                } else if (td == DTERNAL && bd != DTERNAL) {
                     //belief has dt
                     t = bd;// + occDiff;
                     //TODO align
-                } else if (td != Tense.DTERNAL && bd == Tense.DTERNAL) {
+                } else if (td != DTERNAL && bd == DTERNAL) {
                     //task has dt
                     t = td + occDiff;
                     //occ += t; //TODO check this alignment
@@ -799,21 +777,21 @@ public interface TimeFunctions {
                     //the occ (=belief time's)
                     long timeOfBeliefInTask = T.subtermTime(B, td);
                     long timeOfDerivedInTask = T.subtermTime(C, td);
-                    if (timeOfDerivedInTask != Tense.DTERNAL && timeOfBeliefInTask != Tense.DTERNAL)
+                    if (timeOfDerivedInTask != DTERNAL && timeOfBeliefInTask != DTERNAL)
                         occ += (timeOfDerivedInTask - timeOfBeliefInTask);
-                    else if (timeOfDerivedInTask != Tense.DTERNAL)
+                    else if (timeOfDerivedInTask != DTERNAL)
                         occ += timeOfDerivedInTask;
                 } else if (!task.isEternal() && belief.isEternal()) {
                     long timeOfTaskInBelief = B.subtermTime(T, bd);
                     long timeOfDerivedInBelief = B.subtermTime(C, bd);
 
-                    if (timeOfTaskInBelief != Tense.DTERNAL && timeOfDerivedInBelief != Tense.DTERNAL)
+                    if (timeOfTaskInBelief != DTERNAL && timeOfDerivedInBelief != DTERNAL)
                         occ += (timeOfDerivedInBelief - timeOfTaskInBelief);
-                    else if (timeOfDerivedInBelief != Tense.DTERNAL)
+                    else if (timeOfDerivedInBelief != DTERNAL)
                         occ += timeOfDerivedInBelief;
                     else {
                         long timeOfDerivedInTask = T.subtermTime(C, td);
-                        if (timeOfDerivedInTask != Tense.DTERNAL) {
+                        if (timeOfDerivedInTask != DTERNAL) {
                             occ += timeOfDerivedInTask;
                         } else {
                             //??
@@ -831,14 +809,14 @@ public interface TimeFunctions {
 
                 if (!task.isEternal()) {
                     long timeOfDerivedInTask = T.subtermTime(C, td);
-                    if (timeOfDerivedInTask != Tense.DTERNAL)
+                    if (timeOfDerivedInTask != DTERNAL)
                         occ += timeOfDerivedInTask;
                 } else {
 
                     int ot = tp.subtermTime(cp, td);
                     int ob = bp.subtermTime(cp, bd);
 
-                    if (ot != Tense.DTERNAL) {
+                    if (ot != DTERNAL) {
                         if (tp instanceof Compound) {
                             Compound ctp = (Compound) tp;
                             if (derivationMatch(ctp.term(0), cp)) {
@@ -846,7 +824,7 @@ public interface TimeFunctions {
                             }
                         }
                         occ += ot; //occ + ot;
-                    } else if (ob != Tense.DTERNAL) {
+                    } else if (ob != DTERNAL) {
 
                         if (belief.occurrence() != task.occurrence()) { //why?
                             if (bp instanceof Compound) {
@@ -871,7 +849,7 @@ public interface TimeFunctions {
         //}
         //}
 
-        if ((t != Tense.DTERNAL) && (t != derived.dt())) {
+        if ((t != DTERNAL) && (t != derived.dt())) {
         /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
                 t, derived.subterms());*/
 
@@ -899,12 +877,12 @@ public interface TimeFunctions {
     @NotNull static Compound dt(@NotNull Compound derived, int dt, @NotNull PremiseEval p, long[] occReturn) {
         Op o = derived.op();
         if (!o.temporal) {
-            dt = Tense.DTERNAL;
+            dt = DTERNAL;
         }
-        if (!o.temporal && dt!= Tense.DTERNAL && dt!=0 && occReturn[0]!= Tense.ETERNAL) {
+        if (!o.temporal && dt!= DTERNAL && dt!=0 && occReturn[0]!= ETERNAL) {
             //something got reduced to a non-temporal, so shift it to the midpoint of what the actual term would have been:
             occReturn[0] += dt/2;
-            dt = Tense.DTERNAL;
+            dt = DTERNAL;
         }
         if (derived.dt() != dt) {
             Term[] derivedSubterms = derived.subterms().terms();

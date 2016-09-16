@@ -481,11 +481,7 @@ public class HijacKache<TypeK, TypeV>
      * @return
      */
     @NotNull @Override public final TypeV computeIfAbsent(@NotNull TypeK key, @NotNull Function<? super TypeK, ? extends TypeV> mappingFunction) {
-        Object x = putIfMatch(key, mappingFunction, NO_MATCH_OLD);
-        if (x instanceof Integer) {
-            throw new RuntimeException("ticket leak");
-        }
-        return (TypeV) x;
+        return (TypeV) putIfMatch(key, mappingFunction, NO_MATCH_OLD);
     }
 
     @Nullable public final Object computeIfAbsent2(@NotNull TypeK key, @NotNull Function<? super TypeK, Object> mappingFunction) {

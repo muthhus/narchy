@@ -866,17 +866,6 @@ public enum $ {
     }
 
 
-    /** positivize: unwraps a negation term if negated */
-    @Nullable
-    public static Term pos(@NotNull Term possiblyNegative) {
-        if (possiblyNegative.op() == NEG) {
-            // (--,(--,P)) = P
-            return ((TermContainer) possiblyNegative).term(0);
-        } else {
-            return possiblyNegative;
-        }
-    }
-
     @NotNull
     public static <K,V> Map<K, V> newHashMap() {
         return newHashMap(0);

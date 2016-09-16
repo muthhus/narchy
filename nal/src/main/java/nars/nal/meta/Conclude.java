@@ -101,10 +101,20 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     @Override
     public final boolean booleanValueOf(@NotNull PremiseEval m, int now) {
 
-        Term r = m.index.resolve(this.conclusionPattern, m);
+        Term r;
+        try {
+            r = m.index.resolve(this.conclusionPattern, m);
+        } catch (InvalidTermException e) {
+            logger.error("Term: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);
+            return true;
+        }
 
-        if (r instanceof Compound) { //includes null test
-            derive(m, (Compound) r, m.punct.get());
+        try {
+            if (r instanceof Compound) { //includes null test
+                derive(m, (Compound) r, m.punct.get());
+            }
+        } catch (RuntimeException e) {
+            logger.error("Task: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);
         }
 
         return true;

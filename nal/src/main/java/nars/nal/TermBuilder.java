@@ -736,14 +736,14 @@ public abstract class TermBuilder {
                 return Term.True;
             }
 
-            if (sop.statement && pop.statement) {
-                Compound csroot = (Compound) sRoot;
-                Compound cproot = (Compound) pRoot;
-                if ((csroot.term(0).equals(cproot.term(1))) ||
-                        (csroot.term(1).equals(cproot.term(0))))
-                    throw new InvalidTermException(op, new Term[]{subject, predicate}, "inner subject cross-linked with predicate");
-
-            }
+//            if (sop.statement && pop.statement) {
+//                Compound csroot = (Compound) sRoot;
+//                Compound cproot = (Compound) pRoot;
+//                if ((csroot.term(0).equals(cproot.term(1))) ||
+//                        (csroot.term(1).equals(cproot.term(0))))
+//                    throw new InvalidTermException(op, new Term[]{subject, predicate}, "inner subject cross-linked with predicate");
+//
+//            }
 
 
             if (op.commutative) {

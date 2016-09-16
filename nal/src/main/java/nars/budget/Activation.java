@@ -257,7 +257,10 @@ public class Activation {
 
     public void commit(float scale) {
         if (!concepts.isEmpty()) {
-            nar.activate(concepts, in, scale / (float)concepts.sum(), conceptOverflow);
+            concepts.compact();
+            nar.activate(concepts, in,
+                    scale * (float)concepts.sum(),
+                    conceptOverflow);
         }
     }
 

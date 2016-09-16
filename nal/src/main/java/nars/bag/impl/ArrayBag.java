@@ -246,6 +246,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public final void put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
+        if (scale < Param.BUDGET_EPSILON)
+            return; //too weak
+
         float bp = b.pri();
         if (bp != bp) { //already deleted
             return;
@@ -732,7 +735,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 } else {
                     //accepted for insert
                     BLink nvv = newLink(key, this);
-                    nvv.priMult(scale);
 
                     bag.mass += bp;
 

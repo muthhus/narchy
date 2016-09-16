@@ -407,7 +407,6 @@ public class NAL8Test extends AbstractNALTest {
     public void subbelief_2medium()  {
         //requires StructuralDeduction to AllowOverlap
         test()
-                
                 .input("(a:b &&+5 (c:d &&+5 x:y)). :|:")
                 .mustBelieve(cycles, "a:b", 1.0f, 0.81f, 0)
                 .mustBelieve(cycles, "c:d", 1.0f, 0.73f, 5)

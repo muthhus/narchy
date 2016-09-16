@@ -149,16 +149,16 @@ public abstract class TermIndex extends TermBuilder {
 
     final Function<? super ProtoCompound, ? extends Term> termizer = pc -> {
 
-        try {
+        //try {
             return super.the(pc.op(), pc.dt(), pc.terms());
-        } catch (InvalidTermException x) {
-            //if (Param.DEBUG_EXTRA)
-                logger.info("the {} {}", pc, x);
-            return False; //place a False placeholder so that a repeat call will not have to discover this manually
-        } catch (Throwable e) {
-            logger.error("the {} {}", pc ,e);
-            return False;
-        }
+//        } catch (InvalidTermException x) {
+//            //if (Param.DEBUG_EXTRA)
+//            logger.info("Termizer: {} {}", pc, x);
+//            return False; //place a False placeholder so that a repeat call will not have to discover this manually
+//        } catch (Throwable e) {
+//            logger.error("Termizer: {} {}", pc ,e);
+//            return False;
+//        }
     };
 
     @NotNull public final Term cached(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
