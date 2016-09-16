@@ -396,7 +396,7 @@ abstract public class NAgent {
                             return false;
                         }
                     }*/.
-                                    time(now, now).setBudget(curiosityBudget).log("Curiosity"));
+                                    time(now, now).budget(curiosityBudget).log("Curiosity"));
 
                 }
 
@@ -442,7 +442,7 @@ abstract public class NAgent {
             nar.inputLater(
                     new GeneratedTask(t.term(), t.punc(), t.truth())
                             .time(now, now + lookAhead)
-                            .setBudget(boostBudget).log("Agent Predictor"));
+                            .budget(boostBudget).log("Agent Predictor"));
 
         } else {
             //re-use existing eternal task; first recharge budget
@@ -453,7 +453,7 @@ abstract public class NAgent {
             nar.inputLater(
                     new GeneratedTask(t.term(), t.punc(), t.truth())
                             .time(now, ETERNAL)
-                            .setBudget(boostBudget).log("Agent Predictor"));
+                            .budget(boostBudget).log("Agent Predictor"));
         }
 
     }

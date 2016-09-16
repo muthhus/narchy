@@ -492,8 +492,8 @@ public class NAgentOld implements Agent {
             if (dontBeSad!=null)
                 boost(dontBeSad);
 
-            for (MotorConcept c : actions)
-                boost(c);
+//            for (MotorConcept c : actions)
+//                boost(c);
 
             for (MutableTask x : predictors)
                 boost(x);
@@ -513,7 +513,7 @@ public class NAgentOld implements Agent {
 
         if (t.occurrence()!=ETERNAL) {
             nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(nar.time(), nar.time())
-                    .setBudget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
+                    .budget($.b(reinforcementAttention, 0.5f, 0.5f)).log("Predictor Clone"));
         } else {
             //just reactivate the existing eternal
             //nar.activate(t);
@@ -522,11 +522,11 @@ public class NAgentOld implements Agent {
     }
 
 
-    public @Nullable Concept boost(Concept c) {
-
-        return c;
-        //return nar.activate(c, null);
-    }
+//    public @Nullable Concept boost(Concept c) {
+//
+//        return c;
+//        //return nar.activate(c, null);
+//    }
 
     final Set<Task> pendingInputTasks = new HashSet();
 
