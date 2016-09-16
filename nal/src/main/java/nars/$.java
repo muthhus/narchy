@@ -476,61 +476,59 @@ public enum $ {
     //}
 
     @NotNull
-    public static Logger logRoot;
+    public static final Logger logRoot;
 
     /** NALogging non-axiomatic logging encoder. log events expressed in NAL terms */
     @NotNull
-    public static PatternLayoutEncoder logEncoder;
+    public static final PatternLayoutEncoder logEncoder;
 
     static {
         Thread.currentThread().setName("$");
 
         //http://logback.qos.ch/manual/layouts.html
 
-        try {
-            initLogger();
-        } catch (Throwable t) {
-            System.err.println("Logging Disabled: " + t);
-        }
-    }
-
-    static void initLogger() {
         logRoot = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-
-        LoggerContext loggerContext = logRoot.getLoggerContext();
-        // we are not interested in auto-configuration
-        loggerContext.reset();
-
         logEncoder = new PatternLayoutEncoder();
-        logEncoder.setContext(loggerContext);
-        //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
-        logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
-        logEncoder.start();
+
+        try {
+
+            LoggerContext loggerContext = logRoot.getLoggerContext();
+            // we are not interested in auto-configuration
+            loggerContext.reset();
+
+            logEncoder.setContext(loggerContext);
+            //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
+            logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
+            logEncoder.start();
 
 
-        ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<>();
-        appender.setContext(loggerContext);
-        appender.setEncoder(logEncoder);
-        appender.start();
-        logRoot.addAppender(appender);
+            ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<>();
+            appender.setContext(loggerContext);
+            appender.setEncoder(logEncoder);
+            appender.start();
+            logRoot.addAppender(appender);
 
 
-        //---TEMPORARY---
-        SyslogAppender syslog = new SyslogAppender();
-        syslog.setPort(10010);
-        syslog.setFacility("LOCAL6");
-        syslog.setContext(loggerContext);
-        syslog.setCharset(Charset.forName("UTF8"));
-        syslog.start();
+            //---TEMPORARY---
+            SyslogAppender syslog = new SyslogAppender();
+            syslog.setPort(10010);
+            syslog.setFacility("LOCAL6");
+            syslog.setContext(loggerContext);
+            syslog.setCharset(Charset.forName("UTF8"));
+            syslog.start();
 
-        logRoot.addAppender(syslog);
+            logRoot.addAppender(syslog);
 
 //        logRoot.debug("Message 1");
 //        logRoot.info("Message 1");
 //        logRoot.warn("Message 2");
 //        logRoot.error("Message 2");
 
+        } catch (Throwable t) {
+            System.err.println("Logging Disabled: " + t);
+        }
     }
+
 
     @Nullable
     public static Term equi(Term subject, Term pred) {

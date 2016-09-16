@@ -31,7 +31,6 @@ public class RawBudget implements Budget {
     protected float quality;
 
     public RawBudget() {
-
     }
 
     public RawBudget(@NotNull Budgeted b, float scale) {
@@ -42,27 +41,16 @@ public class RawBudget implements Budget {
     }
 
     public RawBudget(float p, float d, float q) {
-        setQuality(q); //set quality first
+        this.quality = Budget.validBudgetValueOrNaN(q);
+        this.durability = Budget.validBudgetValueOrNaN(d);
         setPriority(p);
-        setDurability(d);
-    }
-
-    @Override
-    public @NotNull Budget budget(float p, float d, float q) {
-        if (p!=p) //NaN check
-            throw new BudgetException();
-
-        priority = clamp(p);
-        durability = clamp(d);
-        quality = clamp(q);
-        return this;
     }
 
 
     @NotNull
     @Override
     public Budget clone() {
-        return new RawBudget(pri(), dur(), qua());
+        return new RawBudget(this);
     }
 
     /**
@@ -75,10 +63,12 @@ public class RawBudget implements Budget {
         return priority;
     }
 
+    @Override
     public final float priIfFiniteElseZero() {
         float p = pri(); return /*Float.isFinite(p)*/ (p==p) ? p : 0;
     }
 
+    @Override
     public final float priIfFiniteElseNeg1() {
         float p = pri(); return /*Float.isFinite(p)*/ (p==p) ? p : -1;
     }
@@ -161,7 +151,7 @@ public class RawBudget implements Budget {
      */
     @Override
     public final void setDurability(float d) {
-        this.durability = validBudgetValue(d);
+        this.durability = Budget.validBudgetValue(d);
     }
 
 
@@ -173,7 +163,7 @@ public class RawBudget implements Budget {
      */
     @Override
     public final void setQuality(float q) {
-        this.quality = Budget.validBudgetValueOrNaN(q);
+        this.quality = Budget.validBudgetValue(q);
     }
 
 

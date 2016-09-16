@@ -1311,8 +1311,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         logger.info("Saved {}/{} tasks ({} bytes)", filtered, total, oo.size());
 
-        oo.flush();
-        os.flush();
+        oo.close();
 
         return this;
     }
@@ -1341,6 +1340,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
         logger.info("Loaded {} tasks from {}", count, tasks);
+
+        ii.close();
 
         return this;
     }

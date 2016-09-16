@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static nars.$.t;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
@@ -72,8 +73,6 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
 
 
-    @Nullable
-    private List log;
 
 
 //    public AbstractTask(Compound term, char punctuation, Truth truth, Budget bv, Task parentTask, Task parentBelief, Task solution) {
@@ -224,36 +223,27 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         //finally, assign a unique stamp if none specified (input)
         if (evidence.length == 0) {
-
             setEvidence(nar.clock.nextStamp());
 
-            //this actually means it arrived from unknown origin.
-            //we'll clarify what null evidence means later.
-            //if data arrives via a hardware device, can a virtual
-            //task be used as the parent when it generates it?
-            //doesnt everything originate from something else?
-            if (Param.DEBUG && (log == null))
-                log("Input");
-
-        }
-
-
-        float confLimit = 1f - Param.TRUTH_EPSILON;
-        if (!isInput() && conf() > confLimit) {
-            //clip maximum confidence in case a derivation of an axiomatic belief reaches conf=~1.0 also
-            setTruth($.t(freq(), confLimit));
-        }
-
-        //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
-        if (log!=null && log().get(0).equals(Narsese.NARSESE_TASK_TAG)) {
-            long exOcc = occurrence();
-            if (exOcc != ETERNAL) {
-                int termDur = ntt.dt();
-                if (termDur != DTERNAL && termDur < 0) {
-                    setOccurrence(exOcc - termDur);
-                }
+            //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
+//        if (isInput()) {
+//            long exOcc = occurrence();
+//            if (exOcc != ETERNAL) {
+//                int termDur = ntt.dt();
+//                if (termDur != DTERNAL && termDur < 0) {
+//                    setOccurrence(exOcc - termDur);
+//                }
+//            }
+//        }
+        } else {
+            float confLimit = 1f - Param.TRUTH_EPSILON;
+            if (conf() > confLimit) {
+                //clip maximum confidence in case a derivation of an axiomatic belief reaches conf=~1.0 also
+                setTruth(t(freq(), confLimit));
             }
         }
+
+
 
     }
 
@@ -443,16 +433,6 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
 
 
-    @Override
-    public boolean delete() {
-        if (super.delete()) {
-            if (!Param.DEBUG)
-                this.log = null; //.clear();
-            return true;
-        }
-        return false;
-    }
-
     protected final void invalidate() {
         hash = 0;
     }
@@ -520,53 +500,6 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
 
 
-    @NotNull
-    @Override
-    public Task log(@Nullable List historyToCopy) {
-        if (!Param.DEBUG_TASK_LOG)
-            return this;
-
-        if ((historyToCopy != null) && (!historyToCopy.isEmpty())) {
-            getOrCreateLog().addAll(historyToCopy);
-        }
-        return this;
-    }
-
-    /**
-     * append an entry to this task's log history
-     * useful for debugging but can also be applied to meta-analysis
-     * ex: an entry might be a String describing a change in the story/history
-     * of the Task and the reason for it.
-     */
-    @NotNull
-    @Override
-    public final AbstractTask log(@Nullable Object entry) {
-        if (!(entry == null || !Param.DEBUG_TASK_LOG))
-            getOrCreateLog().add(entry);
-        return this;
-    }
-
-    /** retrieve the log element at the specified index, or null if it doesnt exist */
-    public final Object log(int index) {
-        @Nullable List l = this.log;
-        return l != null ? (l.size() > index ? l.get(index) : null) : null;
-    }
-
-    @Nullable
-    @Override
-    public final List log() {
-        return (log);
-    }
-
-
-    @NotNull
-    final List getOrCreateLog() {
-        List exist = log();
-        if (exist == null) {
-            this.log = (exist = $.newArrayList(1));
-        }
-        return exist;
-    }
 
 
     /*

@@ -71,7 +71,7 @@ public class IO {
 
         MutableTask mm = new MutableTask(term, punc, truth).time(cre, occ);
         mm.evidence(evi);
-        mm.budget(pri, dur, qua);
+        mm.setBudget(pri, dur, qua);
         return mm;
     }
 

@@ -118,10 +118,11 @@ public class Revision {
 
         Task solution = new AnswerTask(b.term() /* question term in case it has different temporality */,
                 b, a, newTruth, now, when, 0.5f)
+                .log("Projected Answer")
                 .budget(bb)
                 //.state(state())
                 //.setEvidence(evidence())
-                .log("Projected Answer")
+
                 //.log("Projected from " + this)
                 ;
 

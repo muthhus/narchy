@@ -36,9 +36,6 @@ import static nars.truth.TruthFunctions.eternalize;
  */
 public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked {
 
-
-    List<Task> EmptyTaskList = Collections.emptyList();
-
     static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
 

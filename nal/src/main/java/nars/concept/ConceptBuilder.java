@@ -7,6 +7,8 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 import static nars.time.Tense.ETERNAL;
@@ -23,7 +25,9 @@ public interface ConceptBuilder extends Function<Term, Termed> {
 
     void start(NAR nar);
 
+    List<Task> EmptyTaskList = Collections.emptyList();
+
     default void init(Concept c) {
-        c.policy(init(), ETERNAL, Task.EmptyTaskList);
+        c.policy(init(), ETERNAL, EmptyTaskList);
     }
 }

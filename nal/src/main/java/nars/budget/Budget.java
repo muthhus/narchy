@@ -82,7 +82,7 @@ public interface Budget extends Budgeted {
      */
     @Nullable
     default Budget zero() {
-        return budget(0, 0, 0);
+        return setBudget(0, 0, 0);
     }
 
 
@@ -280,11 +280,11 @@ public interface Budget extends Budgeted {
      * copies a budget into this; if source is null, it deletes the budget
      */
     @NotNull
-    default Budget budget(@Nullable Budgeted srcCopy) {
+    default Budget setBudget(@Nullable Budgeted srcCopy) {
         if (srcCopy == null) {
             zero();
         } else {
-            budget(srcCopy.pri(), srcCopy.dur(), srcCopy.qua());
+            setBudget(srcCopy.pri(), srcCopy.dur(), srcCopy.qua());
         }
 
         return this;
@@ -294,7 +294,7 @@ public interface Budget extends Budgeted {
      * returns this budget, after being modified
      */
     @NotNull
-    default Budget budget(float p, float d, float q) {
+    default Budget setBudget(float p, float d, float q) {
         setPriority(p);
         setDurability(d);
         setQuality(q);
@@ -327,7 +327,7 @@ public interface Budget extends Budgeted {
     }
 
     default void set(@NotNull Budgeted b) {
-        budget(b.pri(), b.dur(), b.qua());
+        setBudget(b.pri(), b.dur(), b.qua());
     }
 
     @NotNull

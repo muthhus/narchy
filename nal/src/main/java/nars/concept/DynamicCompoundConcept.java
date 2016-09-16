@@ -280,7 +280,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
                         RevisionTask xx = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
                                 y, nar.time(), then, dt.evidence());
-                        xx.budget(dt.b);
+                        xx.setBudget(dt.b);
                         xx.log("Dynamic");
 
                         nar.inputLater(xx);

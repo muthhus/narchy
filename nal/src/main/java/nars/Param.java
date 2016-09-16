@@ -9,7 +9,6 @@ import nars.truth.Truth;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -358,9 +357,9 @@ public abstract class Param /*extends Container*/ implements Level {
                 t.setQuality(BudgetFunctions.truthToQuality(t.truth()));
             }
         } else if (t.isQuestion()) {
-            t.budget(defPri, defDur, DEFAULT_QUESTION_QUALITY);
+            t.setBudget(defPri, defDur, DEFAULT_QUESTION_QUALITY);
         } else if (t.isQuest()) {
-            t.budget(defPri, defDur, DEFAULT_QUEST_QUALITY);
+            t.setBudget(defPri, defDur, DEFAULT_QUEST_QUALITY);
         }
 
     }

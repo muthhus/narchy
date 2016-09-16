@@ -28,7 +28,7 @@ public class TaskBudgeting {
         try {
             if (taskLink.isDeleted())
                 return;
-            p.budget(taskLink);
+            p.setBudget(taskLink);
             if (termLink.isDeleted())
                 return;
             BudgetMerge.

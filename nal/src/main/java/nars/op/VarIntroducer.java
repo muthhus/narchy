@@ -3,8 +3,6 @@ package nars.op;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.budget.Activation;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
@@ -113,7 +111,7 @@ public class VarIntroducer implements Consumer<Task> {
             Concept dc = nar.input(derived);
             if (dc!=null) {
                 //input successful
-                dc.crossLink(derived, original, derived.conf(), nar);
+                dc.crossLink(derived, original, derived.isBeliefOrGoal() ? derived.conf() : derived.qua(), nar);
                 return derived;
             }
 

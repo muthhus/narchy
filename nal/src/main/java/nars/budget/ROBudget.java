@@ -10,9 +10,9 @@ public final class ROBudget implements Budget {
     private final float pri, dur, qua;
 
     public ROBudget(float pri, float dur, float qua) {
-        this.pri = Budget.validBudgetValue(pri);
-        this.dur = Budget.validBudgetValue(dur);
-        this.qua = Budget.validBudgetValue(qua);
+        this.pri = pri;
+        this.dur = dur;
+        this.qua = qua;
     }
 
     @Override

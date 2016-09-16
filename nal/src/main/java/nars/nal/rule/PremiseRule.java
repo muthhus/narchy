@@ -36,8 +36,9 @@ import nars.truth.func.BeliefFunction;
 import nars.truth.func.DesireFunction;
 import nars.truth.func.TruthOperator;
 import nars.util.data.list.FasterList;
-import nars.util.data.map.UnifriedMap;
+
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1201,7 +1202,7 @@ public class PremiseRule extends GenericCompound {
         int offset;
 
         public PremiseRuleVariableNormalization() {
-            super(new UnifriedMap<>(8));
+            super(new UnifiedMap<>(8));
         }
 
         public static AbstractVariable varPattern(int i) {

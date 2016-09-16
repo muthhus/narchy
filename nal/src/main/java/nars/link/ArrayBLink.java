@@ -63,13 +63,7 @@ public class ArrayBLink<X> implements BLink<X> {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public final Budget budget(float p, float d, float q) {
-        f[0] = validBudgetValue(p);
-        f[1] = validBudgetValue(d);
-        f[2] = validBudgetValue(q);
-        return this;
-    }
+
 
 
     @Override

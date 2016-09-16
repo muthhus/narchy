@@ -169,7 +169,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
                 }
             };
             t.time(nar.time(), ETERNAL);
-            t.budget(b);
+            t.setBudget(b);
             t.log("Abbreviation Link");
 
             nar.inputLater( t );

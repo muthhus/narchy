@@ -513,7 +513,7 @@ public class NAgentOld implements Agent {
 
         if (t.occurrence()!=ETERNAL) {
             nar.inputLater(new GeneratedTask(t.term(), t.punc(), t.truth()).time(nar.time(), nar.time())
-                    .budget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
+                    .setBudget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
         } else {
             //just reactivate the existing eternal
             //nar.activate(t);

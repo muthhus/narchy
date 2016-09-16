@@ -5,8 +5,6 @@ import nars.budget.RawBudget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * Buffered/Budgeted Link (an entry in a bag)
  * equalsTo/hashCode proxies to the wrapped element, X id
@@ -21,7 +19,7 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
     protected X id;
 
     public DefaultBLink(@NotNull X id, float p, float d, float q) {
-        budget(p, d, q);
+        setBudget(p, d, q);
         this.id = id;
     }
 

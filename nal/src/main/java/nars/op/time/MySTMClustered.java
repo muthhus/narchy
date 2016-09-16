@@ -1,9 +1,7 @@
 package nars.op.time;
 
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.nal.Stamp;
@@ -24,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * Created by me on 5/22/16.

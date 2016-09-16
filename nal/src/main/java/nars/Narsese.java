@@ -111,7 +111,7 @@ public class Narsese extends BaseParser<Object> {
                 break;
             case 1:
                 if ((p == Symbols.QUEST || p == Symbols.QUESTION)) {
-                    ttt.budget(b[0],
+                    ttt.setBudget(b[0],
                             memory.durabilityDefault(p),
                             memory.qualityDefault(p));
 
@@ -124,7 +124,7 @@ public class Narsese extends BaseParser<Object> {
                 ttt.budget(b[1], b[0]);
                 break;
             default:
-                ttt.budget(b[2], b[1], b[0]);
+                ttt.setBudget(b[2], b[1], b[0]);
                 break;
         }
 

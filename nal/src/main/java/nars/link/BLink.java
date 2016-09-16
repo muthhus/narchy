@@ -45,12 +45,9 @@ public interface BLink<X> extends Budget, Link<X> {
 
 
 
-    @Override
-    Budget budget(float p, float d, float q);
-
     default void set(X nx, Budgeted b, float scale) {
         set(nx);
-        budget(b.pri()*scale, b.dur(), b.qua());
+        setBudget(b.pri()*scale, b.dur(), b.qua());
     }
 
 }

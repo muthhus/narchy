@@ -13,6 +13,7 @@ import java.util.function.BiFunction;
 import static nars.Param.BUDGET_EPSILON;
 import static nars.budget.merge.BudgetMerge.PriMerge.*;
 import static nars.nal.UtilityFunctions.or;
+import static nars.util.Util.lerp;
 
 /**
  * Budget merge function, with input scale factor
@@ -55,34 +56,45 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 
     /** srcScale only affects the amount of priority adjusted; for the other components, the 'score'
      * calculations are used to interpolate */
-    static float blend(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, @NotNull PriMerge priMerge) {
+    static float blend(@NotNull Budget tgt, @NotNull Budgeted src, float sScale, @NotNull PriMerge priMerge) {
 
-        float sPri = src.priIfFiniteElseZero() * srcScale;
+        float sPri = src.priIfFiniteElseZero();
 
         float tPri = tgt.priIfFiniteElseZero();
 
 
-        float targetProp;
-        if (tPri > BUDGET_EPSILON && sPri > BUDGET_EPSILON) {
-            targetProp = tPri / (tPri + sPri);
-        } else if (tPri < BUDGET_EPSILON) {
-            targetProp = 0f;
-        } else if (sPri < BUDGET_EPSILON) {
-            targetProp = 1f;
+        float targetInfluence;
+
+        boolean hasTP = tPri >= BUDGET_EPSILON;
+        boolean hasSP = sPri >= BUDGET_EPSILON && sScale >= BUDGET_EPSILON;
+
+        if (!hasSP) {
+            if (hasTP) {
+                return 0; //nothing to do; zero incoming doesnt budge the target budget
+            } else {
+                targetInfluence = 0.5f; //to zeros share equal 50% responsibility
+            }
         } else {
-            targetProp = 0.5f;
+            if (!hasTP) {
+                tgt.set(src); //target has no influence, it becomes set entirely by incoming
+                tgt.priMult(sScale);
+                return 0;
+            } else {
+                targetInfluence = tPri / (tPri + sPri * sScale);
+            }
         }
 
         float newPri;
         switch (priMerge) {
-            case PLUS:    newPri = tPri + sPri; break;
-            case AND:     newPri = (tPri * sPri); break;
-            case OR:      newPri = UtilityFunctions.or(tPri,sPri);  break;
+            case PLUS:    newPri = tPri + sPri;       break;
+            case AND:     newPri = tPri * sPri;       break;
+            case OR:      newPri = or(tPri,sPri);     break;
             case AVERAGE: newPri = (tPri + sPri)/2f;  break;
             default:
                 throw new UnsupportedOperationException();
         }
-        return dqBlend(tgt, src, newPri, targetProp);
+
+        return dqBlend(tgt, src, lerp(newPri, tPri, sScale), targetInfluence);
     }
 
 //    static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
@@ -114,7 +126,9 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 //                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
 //    }
 
+    /** applies LERP (linear interpolation) to blend the values during merge */
     static float dqBlend(@NotNull Budget tgt, @NotNull Budgeted src, float nextPri, float targetProp) {
+
 
         float overflow;
         if (nextPri > 1f) {
@@ -123,10 +137,12 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
         } else {
             overflow = 0;
         }
+        //TODO negative case?
 
         float srcprop = 1f - targetProp; // inverse proportion
 
-        tgt.budget(nextPri,
+        tgt.setBudget(
+                nextPri,
                 (targetProp * tgt.dur()) + (srcprop * src.dur()),
                 (targetProp * tgt.qua()) + (srcprop * src.qua()));
 
@@ -214,7 +230,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
      *  WARNING untested
      * */
     BudgetMerge max = (tgt, src, srcScaleIgnored) -> {
-        tgt.budget(
+        tgt.setBudget(
             Util.max(src.priIfFiniteElseZero(), tgt.priIfFiniteElseZero()),
             Util.max(src.dur(), tgt.dur()),
             Util.max(src.qua(), tgt.qua()));

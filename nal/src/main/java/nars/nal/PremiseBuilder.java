@@ -7,9 +7,7 @@ import nars.budget.policy.TaskBudgeting;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
-import nars.concept.InvalidConceptException;
 import nars.link.BLink;
-import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -112,7 +110,7 @@ public enum PremiseBuilder {
         }
 
         Premise p = new Premise(c.term(), task, termLinkTerm, belief);
-        p.budget(b);
+        p.setBudget(b);
         return p;
     }
 

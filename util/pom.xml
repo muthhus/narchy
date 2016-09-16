@@ -91,7 +91,7 @@
     <dependency>
       <groupId>org.codehaus.janino</groupId>
       <artifactId>janino</artifactId>
-      <version>3.0.1</version>
+      <version>3.0.5</version>
       <scope>compile</scope>
     </dependency>
 
@@ -124,7 +124,7 @@
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
-      <version>1.4.22</version>
+      <version>1.4.24</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

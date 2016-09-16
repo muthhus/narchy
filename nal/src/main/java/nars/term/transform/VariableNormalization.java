@@ -5,7 +5,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
-import nars.util.data.map.UnifriedMap;
+
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +25,7 @@ import java.util.function.Function;
 public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
 
     @NotNull
-    private final UnifriedMap<Variable, Variable /*Variable*/> rename;
+    private final UnifiedMap<Variable, Variable /*Variable*/> rename;
 
     //private boolean renamed;
 
@@ -35,10 +36,10 @@ public class VariableNormalization extends VariableTransform implements Function
 
 
     public VariableNormalization(int size /* estimate */) {
-        this(new UnifriedMap<>(size));
+        this(new UnifiedMap<>(size));
     }
 
-    public VariableNormalization(@NotNull UnifriedMap<Variable, Variable> r) {
+    public VariableNormalization(@NotNull UnifiedMap<Variable, Variable> r) {
         rename = r;
 
         //NOTE:
