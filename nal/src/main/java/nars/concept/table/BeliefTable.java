@@ -1,6 +1,7 @@
 package nars.concept.table;
 
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.budget.Budgeted;
 import nars.concept.CompoundConcept;
@@ -59,12 +60,10 @@ public interface BeliefTable extends TaskTable {
         }
 
 
-
         @Override
         public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
             return null;
         }
-
 
 
         @Override
@@ -113,6 +112,7 @@ public interface BeliefTable extends TaskTable {
     static float rankEternalByConfAndOriginality(@NotNull Task b) {
         return rankEternalByConfAndOriginality(b.conf(), b.originality());
     }
+
     static float rankEternalByConfAndOriginality(float conf, float originality) {
         return and(conf, originality);
     }
@@ -147,13 +147,7 @@ public interface BeliefTable extends TaskTable {
 //        return relevance(Math.abs(from - to), ageFactor);
 //    }
 
-    /** returns a value <= 1.0 */
-    static float temporalIrrelevance(long delta /* positive only */, float duration /* <1, divides usually */) {
-        //return (1f + (float)Math.log(1+delta/duration));
-        return (1f+delta/duration);
-    }
-
-//    @NotNull
+    //    @NotNull
 //    static Task stronger(@NotNull Task a, @NotNull Task b) {
 //        return a.conf() > b.conf() ? a : b;
 //    }
@@ -162,40 +156,16 @@ public interface BeliefTable extends TaskTable {
 //        return rankTemporalByConfidence(t, when, now, bestSoFar) * t.originality();
 //    }
 
-    /**
-     *
-     * @param t
-     * @param when target time that is being evaluated (may be 'now' or some other time projected to)
-     * @return
-     */
-    static float rankTemporalByConfidence(@NotNull Task t, long when, long now, float bestSoFar) {
-        float c = t.conf();
-        //float c = t.confWeight(); //<- doesnt seem to work, produces values too high
-
-        if (c < bestSoFar)
-            return -1; //give up early since anything multiplied by relevance (<=1f) wont exceed the current best
-        else {
-            long tOcc = t.occurrence();
-            long dWhenNow = Math.abs(when - now);
-            //long dtCre = Math.abs(tOcc - t.creation());
-            long dtOcc = Math.abs(tOcc - now);
-
-            float rank = c2w(c) / (1 + temporalIrrelevance(dtOcc+dWhenNow, 1f)); // + temporalIrrelevance(dtCre, 1f));
-            //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);
-            return rank;
-        }
-
-    }
-
-//    static float rankTemporalByOriginality(@NotNull Task b, long when) {
+    //    static float rankTemporalByOriginality(@NotNull Task b, long when) {
 //        return BeliefTable.rankEternalByOriginality(b) *
 //                BeliefTable.relevance(b, when, 1);
 //    }
 
-    /** attempt to insert a task; returns what was input or null if nothing changed (rejected)
-     *
-     *  return null if wasn't added
-     * */
+    /**
+     * attempt to insert a task; returns what was input or null if nothing changed (rejected)
+     * <p>
+     * return null if wasn't added
+     */
     @Nullable TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar);
 
 
@@ -214,7 +184,9 @@ public interface BeliefTable extends TaskTable {
         return top(when, now, null);
     }
 
-    /** get the most relevant belief/goal with respect to a specific time. */
+    /**
+     * get the most relevant belief/goal with respect to a specific time.
+     */
     @Nullable
     default Task top(long when, long now, @Nullable Task against) {
 
@@ -242,10 +214,14 @@ public interface BeliefTable extends TaskTable {
 
     }
 
-    /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
+    /**
+     * get the top-ranking eternal belief/goal; null if no eternal beliefs known
+     */
     @Nullable Task eternalTop();
 
-    /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
+    /**
+     * finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known
+     */
     @Nullable Task topTemporal(long when, long now, @Nullable Task against);
 
 
@@ -282,12 +258,11 @@ public interface BeliefTable extends TaskTable {
 //
 //    }
 
-    @Nullable default Truth topEternalTruth(@Nullable Truth ifNone) {
+    @Nullable
+    default Truth topEternalTruth(@Nullable Truth ifNone) {
         Task t = eternalTop();
         return t == null ? ifNone : t.truth();
     }
-
-
 
 
 //    static float projectionQuality(float freq, float conf, @NotNull Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
@@ -314,6 +289,7 @@ public interface BeliefTable extends TaskTable {
     default void print(@NotNull PrintStream out) {
         this.forEach(t -> out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log()));
     }
+
     default void print() {
         print(System.out);
     }
@@ -359,21 +335,25 @@ public interface BeliefTable extends TaskTable {
     float confMax(float minFreq, float maxFreq);
 
 
-    /** estimates the current truth value from the top task, projected to the specified 'when' time;
-     * returns null if no evidence is available */
+    /**
+     * estimates the current truth value from the top task, projected to the specified 'when' time;
+     * returns null if no evidence is available
+     */
     @Nullable Truth truth(long when, long now);
 
 
-
-    @Nullable default Truth truth(long when) {
+    @Nullable
+    default Truth truth(long when) {
         return truth(when, when);
     }
 
-    /** finds the strongest matching belief for the given term (and its possible 'dt' value) and the given occurrence time.
-     *
-     *  TODO consider similarity of any of term's recursive 'dt' temporality in ranking
-     * */
-    @Nullable default Task match(@NotNull Task target, long now) {
+    /**
+     * finds the strongest matching belief for the given term (and its possible 'dt' value) and the given occurrence time.
+     * <p>
+     * TODO consider similarity of any of term's recursive 'dt' temporality in ranking
+     */
+    @Nullable
+    default Task match(@NotNull Task target, long now) {
 
         int size = size();
         if (size == 0)
@@ -409,7 +389,9 @@ public interface BeliefTable extends TaskTable {
         return t != null ? t.motivation() : 0;
     }
 
-    /** returns 0.5 if no truth can be determined */
+    /**
+     * returns 0.5 if no truth can be determined
+     */
     default float freq(long when) {
         Truth t = truth(when);
         return t != null ? t.freq() : 0.5f;
@@ -428,7 +410,6 @@ public interface BeliefTable extends TaskTable {
         //TODO
         return Float.NaN;
     }*/
-
 
 
 //    @FunctionalInterface
@@ -579,8 +560,6 @@ public interface BeliefTable extends TaskTable {
 //    default public Task top(boolean eternal, boolean nonEternal) {
 //
 //    }
-
-
 
 
 //    /** temporary until goal is separated into goalEternal, goalTemporal */

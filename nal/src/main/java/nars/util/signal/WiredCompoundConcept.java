@@ -60,22 +60,24 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
 //        return super.buildTemplates(term, nar);
 //    }
 
-    @Nullable protected Task filter(@NotNull Task t, @NotNull BeliefTable table, @NotNull BiPredicate<Task,NAR> valid, @NotNull NAR nar, @NotNull List<Task> displaced) {
+    @Nullable protected Task filter(@NotNull Task t, @NotNull BeliefTable table, @Nullable BiPredicate<Task,NAR> valid, @NotNull NAR nar, @NotNull List<Task> displaced) {
 
-        if (!table.isEmpty() /*&& ((DefaultBeliefTable)beliefs()).temporal.isFull()*/) {
-            //try to remove at least one past belief which did not originate from this sensor
-            //this should clear space for future predictions
-            TemporalBeliefTable tb = ((DefaultBeliefTable) table).temporal;
-            tb.removeIf(x -> !valid.test(x, nar), displaced);
-        }
+        if (valid!=null) {
+            if (!table.isEmpty() /*&& ((DefaultBeliefTable)beliefs()).temporal.isFull()*/) {
+                //try to remove at least one past belief which did not originate from this sensor
+                //this should clear space for future predictions
+                TemporalBeliefTable tb = ((DefaultBeliefTable) table).temporal;
+                tb.removeIf(x -> !valid.test(x, nar), displaced);
+            }
 
-        if (!valid.test(t, nar)) {
+            if (!valid.test(t, nar)) {
 
-            //TODO delete its non-input parent tasks?
-            onConflict(t);
+                //TODO delete its non-input parent tasks?
+                onConflict(t);
 
-            //TaskTable.removeTask(t, "Ignored Speculation", displaced); //will be displaced normally by returning null
-            return null;
+                //TaskTable.removeTask(t, "Ignored Speculation", displaced); //will be displaced normally by returning null
+                return null;
+            }
         }
 
         return t;
@@ -109,13 +111,13 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
 
     /** NOTE: if validBelief always returns true, then this can be bypassed by overriding with blank method */
     public @Nullable Task filterBeliefs(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
-        t = filter(t, beliefs(), this::validBelief, nar, displaced);
+        t = filter(t, beliefs(), null, nar, displaced);
         return t;
     }
 
     /** NOTE: if validGoal always returns true, then this can be bypassed by overriding with blank method */
     public @Nullable Task filterGoals(@NotNull Task t, @NotNull NAR nar, @NotNull List<Task> displaced) {
-        t = filter(t, goals(), this::validGoal, nar, displaced);
+        t = filter(t, goals(), null, nar, displaced);
         return t;
     }
 
@@ -146,8 +148,8 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
     }
 
 
-    public abstract boolean validBelief(@NotNull Task belief, @NotNull NAR nar);
-    public abstract boolean validGoal(@NotNull Task goal, @NotNull NAR nar);
+//    public abstract boolean validBelief(@NotNull Task belief, @NotNull NAR nar);
+//    public abstract boolean validGoal(@NotNull Task goal, @NotNull NAR nar);
 
 
 

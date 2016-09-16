@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import nars.*;
 import nars.budget.Activation;
 import nars.budget.Budget;
-import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.nal.UtilityFunctions;
 import nars.task.GeneratedTask;
@@ -12,7 +11,6 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.PolarRangeNormalizedFloat;
@@ -55,14 +53,13 @@ abstract public class NAgent {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<MotorConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.5f;
-    @Deprecated public float gammaEpsilonFactor = 0.5f;
+    public float alpha, gamma, epsilonProbability = 0.25f;
+    @Deprecated
+    public float gammaEpsilonFactor = 0.5f;
 
     final int curiosityMonitorDuration = 32; //frames
     final DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(curiosityMonitorDuration);
     final DescriptiveStatistics rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
-
-
 
 
     public float rewardValue;
@@ -70,6 +67,7 @@ abstract public class NAgent {
     float predictorProbability = 0.75f;
     private int predictionHorizon = curiosityMonitorDuration/2;
     private final FasterList<Task> predictors = $.newArrayList();
+    private float predictorPriFactor = 2f;
 
     public boolean trace = false;
 
@@ -84,17 +82,11 @@ abstract public class NAgent {
     private float rewardSum = 0;
 
 
+
     public NAgent(NAR nar) {
         this.nar = nar;
         alpha = this.nar.confidenceDefault(Symbols.BELIEF);
         gamma = this.nar.confidenceDefault(Symbols.GOAL);
-
-        float rewardGamma =
-                1.0f - Param.TRUTH_EPSILON
-                //1.0f
-                //gamma
-        ;
-
 
 
         float rewardConf = alpha;
@@ -106,19 +98,12 @@ abstract public class NAgent {
                 (x) -> t(x, rewardConf)
         );
 
-        float happinssDurability =
-                nar.durabilityDefault(Symbols.GOAL);
-
-        predictors.add(happy.desire($.t(1f, rewardGamma),
-                nar.priorityDefault(Symbols.GOAL),
-                happinssDurability));
-
 
         joy = new SensorConcept("(joy)", nar,
                 new PolarRangeNormalizedFloat(
-                    new FirstOrderDifferenceFloat(
-                        ()->nar.time(), () -> rewardValue
-                    )
+                        new FirstOrderDifferenceFloat(
+                                () -> nar.time(), () -> rewardValue
+                        )
                 ),
                 (x) -> t(x, rewardConf)
         );
@@ -147,7 +132,6 @@ abstract public class NAgent {
             nar.clock.tick();
 
 
-
         now = nar.time();
 
         float r = rewardValue = act();
@@ -159,7 +143,7 @@ abstract public class NAgent {
 
 
         if (stopTime > 0 && now >= stopTime) {
-            if (loop!=null) {
+            if (loop != null) {
                 loop.stop();
                 this.loop = null;
             }
@@ -179,15 +163,15 @@ abstract public class NAgent {
 //                             + "," +
 //                     n4( happy.beliefs().truth(now).motivation() )
 //                 + "] "
-                  "rwrd=" + n2(rewardValue) + "\t"
-                + "motv=" + n4(desireConf()) + " "
-                + "hapy=" + n4(emotion.happy()-emotion.sad()) + " "
-                + "busy=" + n4(emotion.busy.getSum()) + " "
-                + "lern=" + n4(emotion.learning()) + " "
-                + "strs=" + n4(emotion.stress.getSum()) + " "
-                + "alrt=" + n4(emotion.alert.getSum()) + " "
-                + " var=" + n4( varPct(nar) ) + " "
-                   + "\t" + nar.index.summary()
+                "rwrd=" + n2(rewardValue) + "\t"
+                        + "motv=" + n4(desireConf()) + " "
+                        + "hapy=" + n4(emotion.happy() - emotion.sad()) + " "
+                        + "busy=" + n4(emotion.busy.getSum()) + " "
+                        + "lern=" + n4(emotion.learning()) + " "
+                        + "strs=" + n4(emotion.stress.getSum()) + " "
+                        + "alrt=" + n4(emotion.alert.getSum()) + " "
+                        + " var=" + n4(varPct(nar)) + " "
+                        + "\t" + nar.index.summary()
 
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());
@@ -235,20 +219,37 @@ abstract public class NAgent {
 
         @NotNull Compound happiness = happy.term();
 
+        {
+            float rewardGamma =
+                    1.0f - Param.TRUTH_EPSILON
+                    //1.0f
+                    //gamma
+                    ;
+
+
+            float happinssDurability =
+                    nar.durabilityDefault(Symbols.GOAL);
+
+            predictors.add(
+                    happy.desire($.t(1f, rewardGamma),
+                            nar.priorityDefault(Symbols.GOAL),
+                            happinssDurability));
+        }
+
         predictors.addAll(
                 //what will imply reward
-                new MutableTask($.equi(what, dt, happiness), '?', null).time(now,now),
+                new MutableTask($.equi(what, dt, happiness), '?', null).time(now, now),
                 //new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
 
                 //what will imply non-reward
-                new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now,now),
+                new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
                 //new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
 
                 //what co-occurs with reward
-                new MutableTask($.parallel(what, happiness), '?', null).time(now,now),
+                new MutableTask($.parallel(what, happiness), '?', null).time(now, now),
 
                 //what co-occurs with non-reward
-                new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now,now)
+                new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
 
 
         );
@@ -272,19 +273,19 @@ abstract public class NAgent {
             predictors.addAll(
                     new MutableTask($.seq(action, dt, happiness), '?', null).present(now),
                     new MutableTask($.seq(action, dt, $.neg(happiness)), '?', null).present(now),
-                    new MutableTask($.seq(action, dt*2, happiness), '?', null).present(now),
-                    new MutableTask($.seq(action, dt*2, $.neg(happiness)), '?', null).present(now),
-                    new MutableTask($.seq(action, dt*4, happiness), '?', null).present(now),
-                    new MutableTask($.seq(action, dt*4, $.neg(happiness)), '?', null).present(now),
-                    new MutableTask($.seq(action, dt*8, happiness), '?', null).present(now),
-                    new MutableTask($.seq(action, dt*8, $.neg(happiness)), '?', null).present(now),
+                    new MutableTask($.impl(action, dt, happiness), '?', null).present(now),
+                    new MutableTask($.impl(action, dt, $.neg(happiness)), '?', null).present(now),
+//                    new MutableTask($.seq(action, dt * 2, happiness), '?', null).present(now),
+//                    new MutableTask($.seq(action, dt * 2, $.neg(happiness)), '?', null).present(now),
+//                    new MutableTask($.seq(action, dt * 4, happiness), '?', null).present(now),
+//                    new MutableTask($.seq(action, dt * 4, $.neg(happiness)), '?', null).present(now),
+//                    new MutableTask($.seq(action, dt * 8, happiness), '?', null).present(now),
+//                    new MutableTask($.seq(action, dt * 8, $.neg(happiness)), '?', null).present(now),
                     new MutableTask(action, '@', null).present(now)
                     //new MutableTask($.seq(what, dt, action), '?', null).present(now),
                     //new MutableTask($.impl(what, dt, action), '?', null).present(now),
                     //new MutableTask($.impl(what, dt, $.neg(action)), '?', null).present(now),
             );
-
-
 
 
         }
@@ -327,13 +328,13 @@ abstract public class NAgent {
     }
 
     private void start() {
-        if (this.loop!=null)
+        if (this.loop != null)
             throw new UnsupportedOperationException();
 
         ticksBeforeDecide = 0;
         ticksBeforeObserve = 0;
 
-        nar.runLater(()->{
+        nar.runLater(() -> {
             init(nar);
 
             mission();
@@ -350,7 +351,7 @@ abstract public class NAgent {
         float reinforcementAttention =
                 UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
 //                        //
-                         / (predictors.size());
+                        / (predictors.size()/predictorProbability * predictorPriFactor);
 //                        // /(actions.size()+sensors.size());
 
         if (reinforcementAttention > 0) {
@@ -366,23 +367,22 @@ abstract public class NAgent {
             int a = actions.size();
             for (MotorConcept c : actions) {
                 Truth d = c.desire(now);
-                if (d!=null)
+                if (d != null)
                     m += d.confWeight();
             }
             motorDesireEvidence.addValue(w2c(m));
 
 
-
-            float motorEpsilonProbability = epsilonProbability/a * (1f - (desireConf()/gamma));
+            float motorEpsilonProbability = epsilonProbability / a * (1f - (desireConf() / gamma));
             for (MotorConcept c : actions) {
                 if (nar.random.nextFloat() < motorEpsilonProbability) {
                     nar.inputLater(
-                        new GeneratedTask(c, Symbols.GOAL,
-                            $.t(nar.random.nextFloat()
-                            //Math.random() > 0.5f ? 1f : 0f
-                            , Math.max(nar.truthResolution.floatValue(), nar.random.nextFloat()*gamma * gammaEpsilonFactor)))
+                            new GeneratedTask(c, Symbols.GOAL,
+                                    $.t(nar.random.nextFloat()
+                                            //Math.random() > 0.5f ? 1f : 0f
+                                            , Math.max(nar.truthResolution.floatValue(), nar.random.nextFloat() * gamma * gammaEpsilonFactor)))
 
-                    //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
+                                    //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
                     /* {
                         @Override
                         public boolean onConcept(@NotNull Concept c) {
@@ -396,7 +396,7 @@ abstract public class NAgent {
                             return false;
                         }
                     }*/.
-                            time(now, now).budget(curiosityBudget).log("Curiosity"));
+                                    time(now, now).budget(curiosityBudget).log("Curiosity"));
 
                 }
 
@@ -412,7 +412,7 @@ abstract public class NAgent {
     }
 
     public float desireConf() {
-        return Math.min(1f, ((float)motorDesireEvidence.getMean()));
+        return Math.min(1f, ((float) motorDesireEvidence.getMean()));
     }
 
     @Nullable
@@ -440,16 +440,20 @@ abstract public class NAgent {
             int lookAhead = nar.random.nextInt(predictionHorizon);
 
             nar.inputLater(
-                new GeneratedTask(t.term(), t.punc(), t.truth())
-                    .time(now, now + lookAhead)
-                    .budget(boostBudget).log("Agent Predictor"));
+                    new GeneratedTask(t.term(), t.punc(), t.truth())
+                            .time(now, now + lookAhead)
+                            .budget(boostBudget).log("Agent Predictor"));
 
         } else {
             //re-use existing eternal task; first recharge budget
+//            BudgetMerge.max.apply(t.budget(), boostBudget, 1); //resurrect
+//            Activation a = new Activation(t, nar, 1f);
 
-            BudgetMerge.max.apply(t.budget(), boostBudget, 1); //resurrect
 
-            Activation a = new Activation(t, nar, 1f);
+            nar.inputLater(
+                    new GeneratedTask(t.term(), t.punc(), t.truth())
+                            .time(now, ETERNAL)
+                            .budget(boostBudget).log("Agent Predictor"));
         }
 
     }

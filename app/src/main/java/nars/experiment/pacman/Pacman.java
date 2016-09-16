@@ -64,9 +64,9 @@ public class Pacman extends NAgent {
     final int inputs;
 
     private final int pacmanCyclesPerFrame = 1;
-    int pacMovesPerCycle = 3;
+    int pacMovesPerCycle = 1;
 
-    float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
+    //float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
     public float scoretoReward = 1f;
 
     public Pacman(NAR nar, int ghosts, int visionRadius) {
@@ -93,11 +93,11 @@ public class Pacman extends NAgent {
 
         //Multi nar = new Multi(3,512,
 
-        Executioner e = Tetris.exe4;
+        Executioner e = Tetris.exe2;
         Default nar = new Default(1024,
                 384, 2, 2, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 50000, 16384, 4),
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 50000, 16384, 4),
                 new FrameClock(), e
 
         );
@@ -112,13 +112,13 @@ public class Pacman extends NAgent {
         float pMult = 0.005f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * pMult;
         nar.DEFAULT_GOAL_PRIORITY = 0.65f * pMult;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * pMult;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.4f * pMult;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
         nar.confMin.setValue(0.02f);
-        nar.compoundVolumeMax.set(36);
-        nar.truthResolution.setValue(0.02f);
+        nar.compoundVolumeMax.set(40);
+        //nar.truthResolution.setValue(0.02f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
         //nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
@@ -499,6 +499,8 @@ public class Pacman extends NAgent {
     @Override
     protected float act() {
 
+        pacman.cycle(pacmanCyclesPerFrame);
+
         //delta score from pacman game
         float ds = (pacman.score - lastScore) * scoretoReward;
         this.lastScore = pacman.score;
@@ -506,21 +508,20 @@ public class Pacman extends NAgent {
 
         //ds/=2f;
 
-        ds += bias;
+        //ds += bias;
 
         ds += deathPain;
         deathPain *= 0.95f;
 
-        if (ds > 1f) ds = 1f;
-        if (ds < -1f) ds = -1f;
+//        if (ds > 1f) ds = 1f;
+//        if (ds < -1f) ds = -1f;
 
+//
+//        if (deathPain < bias * 2f) {
+//            //too much pain
+//            pacman.pacKeyDir = -1;
+//        }
 
-        if (deathPain < bias * 2f) {
-            //too much pain
-            pacman.pacKeyDir = -1;
-        }
-
-        pacman.cycle(pacmanCyclesPerFrame);
 
         return ds;
 

@@ -22,7 +22,7 @@ public class MotorConcept extends WiredCompoundConcept {
     final int decisionDT = 0;
 
     /** relative temporal delta time for feedback occurrence */
-    final int feedbackDT = 1;
+    final int feedbackDT = 0;
 
 
 
@@ -84,17 +84,21 @@ public class MotorConcept extends WiredCompoundConcept {
         });
     }
 
-    @Override
-    public boolean validBelief(@NotNull Task belief, @NotNull NAR nar) {
-        //TODO only allow motor feedback?
-        //return futureDerivationsOnly(belief, nar);
-        return true;
-    }
-
-    @Override
-    public boolean validGoal(@NotNull Task goal, @NotNull NAR nar) {
-        return true;
-    }
+//    @Override
+//    public boolean validBelief(@NotNull Task t, @NotNull NAR nar) {
+//        if (!t.isEternal() && t.occurrence() > nar.time() + 1) {
+//            System.err.println("prediction detected: " + (t.occurrence() - nar.time()));
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean validGoal(@NotNull Task t, @NotNull NAR nar) {
+//        if (!t.isEternal() && t.occurrence() > nar.time() + 1) {
+//            System.err.println("prediction detected: " + (t.occurrence() - nar.time()));
+//        }
+//        return true;
+//    }
 
 //    @Override
 //    public @NotNull Task filterGoals(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {

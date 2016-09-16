@@ -745,34 +745,61 @@ public abstract class TermBuilder {
 
             if (op.commutative) {
 
+                boolean crossesTime = dt != DTERNAL && dt != XTERNAL && dt != 0;
+
+                //System.out.println("\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
 
                 //normalize co-negation
                 boolean sn = subject.op() == NEG;
                 boolean pn = predicate.op() == NEG;
-                if (sn && pn) {
-                    //unnegate both
-                    subject = $.unneg(subject).term();
-                    predicate = $.unneg(predicate).term();
-                } else if (sn && !pn) {
-                    //swap negation so that subject is un-negated
-                    subject = $.unneg(subject).term();
-                    predicate = $.neg(predicate);
+
+                if (sn ^ pn) {
+                    Term ss, pp;
+                    if (sn) {
+                        //subject negated;
+                        ss = $.unneg(subject);
+                        pp = predicate;
+                    } else {
+                        //predicate negated, which is the normal form
+                        ss = subject;
+                        pp = $.unneg(predicate);
+                    }
+                    //TODO re-use the original terms rather than re-neg the un-neg
+                    if (ss.compareTo(pp) > 0) {
+                        subject = pp;
+                        predicate = $.neg(ss);
+                        if (crossesTime)
+                            dt = -dt;
+                    } else {
+                        subject = ss;
+                        predicate = $.neg(pp);
+                    }
+                } else {
+                    if (sn && pn) {
+                        //both negative: unnegate both but use the original sort ordering in case negation causes it to change, this will keep it stable
+                        subject = $.unneg(subject);
+                        predicate = $.unneg(predicate);
+                    } else {
+                        //both postiive
+                    }
+
+                    if (subject.compareTo(predicate) > 0) {
+                        Term x = predicate;
+                        predicate = subject;
+                        subject = x;
+                        if (crossesTime)
+                            dt = -dt;
+                    }
                 }
 
-                boolean reversed = subject.compareTo(predicate) > 0;
-                if (reversed) {
-                    Term x = predicate;
-                    predicate = subject;
-                    subject = x;
-                }
+                //System.out.println( "\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
 
-                if (reversed && (dt != DTERNAL && dt != XTERNAL && dt != 0)) {
-                    dt = -dt;
-                }
+
 
 
             }
-            return finish(op, dt, subject, predicate);
+
+            return finish(op, dt, TermVector.the(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
 
         }
     }

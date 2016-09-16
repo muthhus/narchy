@@ -298,13 +298,15 @@ public class Revision {
             return a;
 
         if (a.size() != 2) {
-            if (b.size() != a.size())
-                logger.warn("{} and {} can not be intermpolated", a, b);
-            return failStrongest(a, b, aProp);
+            return strongest(a, b, aProp);
+        }
+
+        if (b.size() != a.size()) {
+            logger.warn("{} and {} can not be intermpolated due to different size", a, b);
+            return strongest(a, b, aProp);
         }
 
         int newDT = dtCompare(a, b, aProp, accumulatedDifference, depth, rng);
-
 
         Term a0 = a.term(0);
         Term a1 = a.term(1);
@@ -313,7 +315,8 @@ public class Revision {
 
         if (a0.op() != b0.op() || (a1.op() != b1.op())) {
             //throw new RuntimeException();
-            return failStrongest(a, b, aProp);
+            logger.warn("{} and {} have different subterm types that can not be compared further", a, b);
+            return strongest(a, b, aProp);
         }
 
         Term r = $.compound(a.op(), newDT,
@@ -322,15 +325,15 @@ public class Revision {
         );
         if (r instanceof Compound)
             return (Compound) r;
+        else {
 
-        //HACK TODO investigate why
+            //HACK TODO investigate why
 
+            logger.warn("{} and {} merged to useless non-compound {}", a, b, r);
 
-        return failStrongest(a, b, aProp);
+            return strongest(a, b, aProp);
+        }
 
-        //if (a.op().temporal) //when would it not be temporal? this happens though
-        //d = d.dt(newDT);
-        //return d;
     }
 
     private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {
@@ -370,10 +373,10 @@ public class Revision {
         return random.nextFloat() < xProp ? x : y;
     }
 
-    private static Compound failStrongest(Compound a, Compound b, float aProp) {
-        //logger.warn("interpolation failure: {} and {}", a, b);
-        return strongest(a, b, aProp);
-    }
+//    private static Compound failStrongest(Compound a, Compound b, float aProp) {
+//        //logger.warn("interpolation failure: {} and {}", a, b);
+//        return strongest(a, b, aProp);
+//    }
 
     private static Compound strongest(Compound a, Compound b, float balance) {
         return (balance >= 0.5f) ? a : b;

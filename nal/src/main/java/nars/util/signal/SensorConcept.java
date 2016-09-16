@@ -74,17 +74,17 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
 
 
-    /** originating from this sensor, or a future prediction */
-    @Override
-    public boolean validBelief(@NotNull Task t, @NotNull NAR nar) {
-        //return onlyDerivationsIfFuture(t, nar);
-        return true;
-    }
-    @Override
-    public boolean validGoal(@NotNull Task goal, @NotNull NAR nar) {
-        //return onlyDerivationsIfFuture(t, nar);
-        return true;
-    }
+//    /** originating from this sensor, or a future prediction */
+//    @Override
+//    public boolean validBelief(@NotNull Task t, @NotNull NAR nar) {
+//        //return onlyDerivationsIfFuture(t, nar);
+//        return true;
+//    }
+//    @Override
+//    public boolean validGoal(@NotNull Task goal, @NotNull NAR nar) {
+//        //return onlyDerivationsIfFuture(t, nar);
+//        return true;
+//    }
 
 
     public static boolean onlyDerivationsIfFuture(@NotNull Task belief, @NotNull NAR nar) {

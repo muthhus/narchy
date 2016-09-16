@@ -12,6 +12,7 @@ import nars.term.Termed;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.util.MyConcurrentRadixTree;
+import nars.util.Util;
 import nars.util.data.map.nbhm.HijacKache;
 import nars.util.signal.WiredCompoundConcept;
 import org.jetbrains.annotations.NotNull;
@@ -75,16 +76,19 @@ public class TreeIndex extends TermIndex {
     //2. search for items to meet this quota and remove them
     protected void forget() {
 
+
         while (true) {
 
-            try {
-                Thread.sleep(updatePeriodMS);
-            } catch (InterruptedException e) {
-            }
+            //Util.pause(updatePeriodMS);
+            try { Thread.sleep(updatePeriodMS); } catch (InterruptedException e) { }
+
+            if (nar == null)
+                continue;
+
+            Random rng = nar.random;
 
             if (capacitance() > 0) {
 
-                Random rng = nar.random;
 
                 int sizeBefore = sizeEst();
 
@@ -95,8 +99,8 @@ public class TreeIndex extends TermIndex {
                 float cap;
                 MyConcurrentRadixTree.SearchResult s = null;
 
+                concepts.acquireWriteLock();
                 try {
-                    concepts.acquireWriteLock();
 
                     while ((cap = capacitance()) > 0) {
 

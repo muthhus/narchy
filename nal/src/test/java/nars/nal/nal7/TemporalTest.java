@@ -161,6 +161,13 @@ public class TemporalTest {
         testParse("(goto(#1) &&-5 ((SELF,#1)-->at))", "(goto(#1) &&-5 ((SELF,#1)-->at))");
     }
 
+    @Test public void testCommutiveEquivAgain1() {
+        assertEquals( $("((--,(0,0)) <=>+48 (happy))"), $("((happy) <=>-48 (--,(0,0)))"));
+    }
+    @Test public void testCommutiveEquivAgain2() {
+        assertEquals( $("((--,(0,0)) <=>+48 (happy))"), $("((--,(happy)) <=>-48 (0,0))"));
+    }
+
     void testParse(String s) {
         testParse(s, null);
     }

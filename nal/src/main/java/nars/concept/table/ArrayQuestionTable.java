@@ -1,6 +1,8 @@
 package nars.concept.table;
 
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -12,6 +14,7 @@ import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.task.AnswerTask;
 import nars.util.data.list.FasterList;
+import org.apache.commons.collections4.ListUtils;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.list.mutable.MultiReaderFastList;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +34,7 @@ import java.util.function.Consumer;
  * <p>
  * TODO use a ring-buffer deque slightly faster than basic ArrayList modification
  */
-public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements QuestionTable, Comparator<Task> {
+public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
     protected int capacity;
 
@@ -56,18 +59,18 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
     @Override
     public final void capacity(int newCapacity, @NotNull List<Task> displ) {
 
-        if (this.capacity == newCapacity)
-            return;
+        if (this.capacity != newCapacity) {
 
-        this.capacity = newCapacity;
+            this.capacity = newCapacity;
 
-        if (size() > newCapacity) {
             list.withWriteLockAndDelegate(ll -> {
-                int s = ll.size();
-                int toRemove = s - capacity;
-                while (toRemove > 0) {
-                    displ.add(ll.remove(--s)); //last element
-                    toRemove--;
+                if (size() > newCapacity) {
+                    int s = ll.size();
+                    int toRemove = s - capacity;
+                    while (toRemove > 0) {
+                        displ.add(list.remove(--s)); //last element
+                        toRemove--;
+                    }
                 }
             });
         }
@@ -89,24 +92,26 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
     @Override
     public void answer(@NotNull Task a, Concept answerConcept, @NotNull NAR nar, List<Task> displ) {
 
-        int size = list.size();
+        list.withReadLockAndDelegate(l -> {
+            int size = l.size();
 
-        //each question is only responsible for 1/N of the effect on the answer
-        //TODO calculate this based on fraction of each question's priority of the total
-        //TODO weaken the match based on dt discrepencies between question and answer. this will discriminate according to unique dt patterns of questions vs answers
+            //each question is only responsible for 1/N of the effect on the answer
+            //TODO calculate this based on fraction of each question's priority of the total
+            //TODO weaken the match based on dt discrepencies between question and answer. this will discriminate according to unique dt patterns of questions vs answers
 
-        for (int i = 0; i < size && !a.isDeleted(); ) {
-            Task q = list.get(i);
-            if (!q.isDeleted()) {
-                if (answer(q, a, 1f / size, answerConcept, nar)) {
-                    i++;
-                    continue;
+            for (int i = 0; i < size && !a.isDeleted(); ) {
+                Task q = l.get(i);
+                if (!q.isDeleted()) {
+                    if (answer(q, a, 1f / size, answerConcept, nar)) {
+                        i++;
+                        continue;
+                    }
                 }
-            }
 
-            remove(i, null, displ);
-            size--;
-        }
+                remove(q, null, displ);
+                size--;
+            }
+        });
 
 
     }
@@ -147,7 +152,7 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
             }
 
             boolean sameConcept;
-            if (answerConcept!=null && answerConcept.crossLink(a, q, scale * aConf, nar)) {
+            if (answerConcept != null && answerConcept.crossLink(a, q, scale * aConf, nar)) {
                 //check if different concepts; ex: if there is a reduction in variables, etc
                 sameConcept = false;
             } else {
@@ -196,11 +201,7 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
     @Override
     public final Task add(@NotNull Task question, @NotNull BeliefTable answers, List<Task> displ, @NotNull NAR n) {
 
-        Task questioned;
-
-        synchronized (list) {
-            questioned = insert(question, displ);
-        }
+        Task questioned = insert(question, displ);
 
         //inserted if questioned!=null
         if (questioned != null && !answers.isEmpty()) {
@@ -208,7 +209,7 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
 
             if (a != null && !a.isDeleted()) {
 
-                answer(questioned, a, 1 / size(), null, n);
+                answer(questioned, a, 1f / size(), null, n);
             }
         }
 
@@ -216,60 +217,73 @@ public class ArrayQuestionTable extends CopyOnWriteArrayList<Task> implements Qu
         return questioned;
     }
 
-    public Task last() {
-        return list.get(list.size() - 1);
-    }
 
     @Nullable
     private Task insert(@NotNull Task t, @NotNull List<Task> displaced) {
 
-        int siz = size();
 
         float tp = t.pri();
 
 
-        if (siz == capacity()) {
+        final Task[] result = new Task[1];
 
-            list.sortThis(this);
+        list.withWriteLockAndDelegate(l -> {
 
-            if (last().qua() > tp) {
-                t.delete("Insufficient Priority");
-                return null;
-            } else {
-                // FIFO, remove oldest question (last)
-                float removedPri = remove(siz - 1, "Table Pop", displaced);
-                if (removedPri == removedPri) //not deleted
-                    t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
+
+            int sizeStart = l.size();
+            if (sizeStart > 0) {
+
+                list.sortThis(this);
+
+                if (sizeStart >= capacity()) {
+                    if (list.get(sizeStart - 1).qua() > tp) {
+                        t.log("Insufficient Priority");
+                        result[0] = null;
+                        return;
+                    } else {
+                        // FIFO, remove oldest question (last)
+                        float removedPri = remove(list, sizeStart - 1, "Table Pop", displaced);
+                        if (removedPri == removedPri) //not deleted
+                            t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
+                    }
+                }
             }
-        }
 
-        //insert in sorted order by qua
-        List<Task> list = this.list;
+            //insert in sorted order by qua
+            int i = 0;
+            int sizeInsert = list.size();
+            for (; i < sizeInsert - 1; i++) {
+                if (list.get(i).qua() < tp)
+                    break;
+            }
+            list.add(i, t);
 
-        int i = 0;
-        for (; i < siz - 1; i++) {
-            if (list.get(i).qua() < tp)
-                break;
-        }
-        list.add(i, t);
+            result[0] = t;
+        });
+
 
         return t;
     }
 
-    private float remove(int n, Object reason, @NotNull List<Task> displaced) {
+    private float remove(Task q, Object reason, @NotNull List<Task> displaced) {
 
-        Task removed = list.remove(n);
+        if (list.remove(q)) {
+            if (Param.DEBUG)
+                q.log(reason);
+            displaced.add(q);
+        }
+        return q.pri();
+
+
+    }
+
+    private float remove(List<Task> l, int n, Object reason, @NotNull List<Task> displaced) {
+
+        Task removed = l.remove(n);
         if (Param.DEBUG)
             removed.log(reason);
         displaced.add(removed);
         return removed.pri();
-
-        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
-            task.log(Premise.getStack());*/
-
-        //eventTaskRemoved.emit(task);
-
-        /* else: a more destructive cleanup of the discarded task? */
 
     }
 

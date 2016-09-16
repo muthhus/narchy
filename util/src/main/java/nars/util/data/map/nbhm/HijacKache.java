@@ -147,7 +147,7 @@ public class HijacKache<TypeK, TypeV>
 
     // --- hash ----------------------------------------------------------------
     // Helper function to spread lousy hashCodes
-    public static final int hash(final Object key) {
+    public static final int hash(@NotNull final Object key) {
         int h = key.hashCode();     // The real hashCode call
         // Spread bits to regularize both segment and index locations,
         // using variant of single-word Wang/Jenkins hash.
@@ -774,7 +774,7 @@ public class HijacKache<TypeK, TypeV>
     // assumed to work (although might have been immediately overwritten).  Only
     // the path through copy_slot passes in an expected value of null, and
     // putIfMatch only returns a null if passed in an expected null.
-    private static final Object putIfMatch(final HijacKache topmap, final Object[] kvs, final Object key, Object putval, final Object expVal) {
+    private static final Object putIfMatch(@NotNull final HijacKache topmap, @NotNull final Object[] kvs, @NotNull final Object key, @NotNull Object putval, final Object expVal) {
         assert putval != null;
         assert !(putval instanceof Prime);
         assert !(expVal instanceof Prime);
