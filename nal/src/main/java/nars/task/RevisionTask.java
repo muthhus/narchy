@@ -36,14 +36,14 @@ public class RevisionTask extends AnswerTask  {
         super(term, punc, conclusion, creationTime, occTime, evidence);
     }
 
-    public RevisionTask(@NotNull Compound c, @NotNull Task a, @NotNull Task b, long now, long newOcc, float aMix, Truth newTruth, Concept target) {
-        super(c, a, b, newTruth, now, newOcc, aMix);
-
-        if (!a.isBeliefOrGoal() || !b.isBeliefOrGoal() )
-            throw new UnsupportedOperationException("invalid punctuation");
-
-        this.concept = target;
-    }
+//    public RevisionTask(@NotNull Compound c, @NotNull Task a, @NotNull Task b, long now, long newOcc, float aMix, Truth newTruth, Concept target) {
+//        super(c, a, b, newTruth, now, newOcc, aMix);
+//
+//        if (!a.isBeliefOrGoal() || !b.isBeliefOrGoal() )
+//            throw new UnsupportedOperationException("invalid punctuation");
+//
+//        this.concept = target;
+//    }
 
     @Override
     public @Nullable Concept concept(@NotNull NAR n) {

@@ -9,14 +9,19 @@ import nars.budget.policy.DefaultConceptPolicy;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.time.Tense;
 import nars.util.analyze.BeliefAnalysis;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.FloatObjectPair;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -269,50 +274,65 @@ public class RevisionTest {
         b.tasklinks().print();
     }
 
-    @Test public void testTermRelevance() {
+    @Test public void testIntermpolation1() {
         Compound a = $.$("(a &&+3 (b &&+3 c))");
         Compound b = $.$("(a &&+0 (b &&+3 c))");
         Compound c = $.$("(a &&+3 (b &&+0 c))");
         Compound e = $.$("(a && (b &&+3 c))");
 
 
+
+
+//        Term cc = Revision.dtMerge(c, c, 0.5f, rng);
+//        //assertEquals(0f, cc.getOne(), 0.01f);
+//
+//
+//        Term aa = Revision.dtMerge(a, a, 0.5f, rng);
+//        //assertEquals(0f, aa.getOne(), 0.01f);
+
+
+        assertEquals("[(a &&+0 (b &&+3 c)), (a &&+3 (b &&+3 c))]", permutations(a, b).toString());
+        assertEquals("[(a &&+3 (b &&+0 c)), (a &&+3 (b &&+3 c))]", permutations(a, c).toString());
+    }
+
+    @Test public void testIntermpolation2() {
         Compound f = $.$("(a &&+1 (b &&+1 c))");
         Compound g = $.$("(a &&+10 (b &&-10 c))");
 
-        Random rng = new XorShift128PlusRandom(1);
+        assertEquals("[(a &&+1 b), (a &&+1 c), (a &&+1 (b &&-10 c)), (a &&+1 (b &&-1 c)), (a &&+1 (b &&+1 c)), (a &&+1 (b &&+10 c))]",
+                     permutations(f, g).toString());
 
-        FloatObjectPair<Compound> cc = Revision.dtMerge(c, c, 0.5f, rng);
-        assertEquals(0f, cc.getOne(), 0.01f);
-
-
-        FloatObjectPair<Compound> aa = Revision.dtMerge(a, a, 0.5f, rng);
-        assertEquals(0f, aa.getOne(), 0.01f);
-
-
-        FloatObjectPair<Compound> ab = Revision.dtMerge(a, b, 0.5f, rng);
-        assertEquals("(a &&+2 (b &&+3 c))", ab.getTwo().toString());
-        assertEquals(3.0f, ab.getOne(), 0.01f);
-
-        FloatObjectPair<Compound> ac = Revision.dtMerge(a, c, 0.5f, rng);
-        assertEquals("(a &&+3 (b &&+2 c))", ac.getTwo().toString());
-        assertEquals(1.5f, ac.getOne(), 0.01f);
-
-        //TEST ETERNAL
-        FloatObjectPair<Compound> ae = Revision.dtMerge(a, e, 0.5f, rng);
-        assertEquals("(a &&+3 (b &&+3 c))", ae.getTwo().toString());
-        assertEquals(0f, ae.getOne(), 0.01f);
-
-        //TEST VARIOUS WEIGHTING
-        FloatObjectPair<Compound> fg = Revision.dtMerge(f, g, 0.5f, rng);
-        assertEquals("(a &&+6 (b &&-4 c))", fg.getTwo().toString());
-        assertEquals(14.5, fg.getOne(), 0.01f);
-
-        FloatObjectPair<Compound> Fg = Revision.dtMerge(f, g, 0.1f, rng);
-        assertEquals("(a &&+9 (b &&-9 c))", Fg.getTwo().toString());
-        assertEquals(2.899, Fg.getOne(), 0.01f);
-
-        FloatObjectPair<Compound> fG = Revision.dtMerge(f, g, 0.9f, rng);
-        assertEquals("(a &&+2 (b &&+0 c))", fG.getTwo().toString());
-        assertEquals(2.899, fG.getOne(), 0.01f);
+//        Term ac = Revision.dtMerge(a, c, 0.5f, rng);
+//        assertEquals("(a &&+3 (b &&+2 c))", ac.toString());
+//        //assertEquals(1.5f, ac.getOne(), 0.01f);
+//
+//        //TEST ETERNAL
+//        Term ae = Revision.dtMerge(a, e, 0.5f, rng);
+//        assertEquals("(a &&+3 (b &&+3 c))", ae.toString());
+//        //assertEquals(0f, ae.getOne(), 0.01f);
+//
+//        //TEST VARIOUS WEIGHTING
+//        Term fg = Revision.dtMerge(f, g, 0.5f, rng);
+//        assertEquals("(a &&+6 (b &&-4 c))", fg.toString());
+//        //assertEquals(14.5, fg.getOne(), 0.01f);
+//
+//        Term Fg = Revision.dtMerge(f, g, 0.1f, rng);
+//        assertEquals("(a &&+9 (b &&-9 c))", Fg.toString());
+//        //assertEquals(2.899, Fg.getOne(), 0.01f);
+//
+//        Term fG = Revision.dtMerge(f, g, 0.9f, rng);
+//        assertEquals("(a &&+2 (b &&+0 c))", fG.toString());
+//        //assertEquals(2.899, fG.getOne(), 0.01f);
     }
+
+    private Set<Term> permutations(Term a, Term b) {
+        Set<Term> ss = new TreeSet();
+        Random rng = new XorShift128PlusRandom(1);
+        for (int i = 0; i < 8 * (a.volume() + b.volume()); i++) {
+            ss.add(Revision.dtMerge(a, b, 0.5f, rng));
+        }
+        System.out.println(ss);
+        return ss;
+    }
+
 }
