@@ -193,7 +193,6 @@ public interface TimeFunctions {
             Term bt = p.beliefTerm;
             Term d0 = derived.term(0);
 
-            //if (Terms.equalOrNegationOf(d0, bt) /*|| (derived.size() > 0 && derived.term(1).equals(prem.task().term()))*/ ||
             if (derivationMatch(bt, d0))
                 eventDelta *= -1;
         }
@@ -202,8 +201,8 @@ public interface TimeFunctions {
         return deriveDT(derived, polarity, p, eventDelta, occReturn);
     }
 
-    public static boolean derivationMatch(Term a, Term b) {
-        return productNormalize(unneg(b)).equalsIgnoringVariables(productNormalize(unneg(a)));
+    static boolean derivationMatch(Term a, Term b) {
+        return productNormalize(unneg(a)).equalsIgnoringVariables(productNormalize(unneg(b)));
     }
 
 
@@ -301,9 +300,9 @@ public interface TimeFunctions {
                 Term d0 = p.resolve(decomposedTerm.term(0));
                 Term d1 = p.resolve(decomposedTerm.term(1));
 
-                if (Terms.equalOrNegationOf(d0, derived)) {
+                if (derivationMatch(d0, derived)) {
                     shift = 0; //beginning
-                } else if (Terms.equalOrNegationOf(d1, derived)) {
+                } else if (derivationMatch(d1, derived)) {
                     shift = edtDecomposed; //
                 }
 
@@ -669,20 +668,20 @@ public interface TimeFunctions {
                     Compound tpp = (Compound) tp;
                     Compound bpp = (Compound) bp;
 
-                    if (Terms.equalOrNegationOf(tpp.term(1), bpp.term(0))) {
+                    if (derivationMatch(tpp.term(1), bpp.term(0))) {
                         t = td + bd;
 
                         //chained inner
-                        if (!Terms.equalOrNegationOf(cb, bpp.term(1))) {
+                        if (!derivationMatch(cb, bpp.term(1))) {
                             t = -t; //invert direction
                         }
-                    } else if (Terms.equalOrNegationOf(tpp.term(0), bpp.term(1))) {
+                    } else if (derivationMatch(tpp.term(0), bpp.term(1))) {
                         //chain outer
                         t = td + bd; //?? CHECK
-                    } else if (Terms.equalOrNegationOf(tpp.term(0), bpp.term(0))) {
+                    } else if (derivationMatch(tpp.term(0), bpp.term(0))) {
                         //common left
                         t = td - bd;
-                    } else if (Terms.equalOrNegationOf(tpp.term(1), bpp.term(1))) {
+                    } else if (derivationMatch(tpp.term(1), bpp.term(1))) {
                         //common right
                         t = bd - td;
                     } else {
@@ -709,7 +708,7 @@ public interface TimeFunctions {
                         boolean reversed = false;
                     /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
                         if (derived.op().commutative) {
-                            if (!Terms.equalOrNegationOf(
+                            if (!derivationMatch(
                                     p.resolve(((Compound) cp).term(0)),
                                     derived.term(0))) {
                                 occDiff = -occDiff;
@@ -842,7 +841,7 @@ public interface TimeFunctions {
                     if (ot != Tense.DTERNAL) {
                         if (tp instanceof Compound) {
                             Compound ctp = (Compound) tp;
-                            if (Terms.equalOrNegationOf(ctp.term(0), cp)) {
+                            if (derivationMatch(ctp.term(0), cp)) {
                                 ot -= td;
                             }
                         }
@@ -852,7 +851,7 @@ public interface TimeFunctions {
                         if (belief.occurrence() != task.occurrence()) { //why?
                             if (bp instanceof Compound) {
                                 Compound cbp = (Compound) bp;
-                                if (!Terms.equalOrNegationOf(cbp.term(1), cp)) {
+                                if (!derivationMatch(cbp.term(1), cp)) {
                                     ob -= bd;
                                 }
                             }

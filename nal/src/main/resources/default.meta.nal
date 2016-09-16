@@ -325,8 +325,8 @@
         (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) ==>+- (--,(S --> $X))), (Belief:AbductionN)
     (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternal) |- ((S --> $X) ==>+- (P --> $X)), (Belief:Induction)
         (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,(S --> $X)) ==>+- (P --> $X)), (Belief:InductionN)
-    (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) <=>+- (S --> $X)), (Belief:Comparison)
-        (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) <=>+- (--,(S --> $X))), (Belief:ComparisonN)
+    (S --> M), (P --> M), task(positive), neq(S,P), time(dtForward) |- ((S --> $X) <=>+- (P --> $X)), (Belief:Comparison)
+        (S --> M), (P --> M), task(negative), neq(S,P), time(dtForward) |- ((--,(S --> $X)) <=>+- (P --> $X)), (Belief:ComparisonN)
     (S --> M), (P --> M), neq(S,P), time(dtAfterOrEternal) |- ((S --> #Y) &&+- (P --> #Y)), (Belief:Intersection)
         //^ intersection should be ok for both positive and negative cases
             //(S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternal) |- (&&, (--,(S --> #Y)), (P --> #Y)), (Belief:IntersectionN)
@@ -335,8 +335,8 @@
         (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,($X --> S)) ==>+- ($X --> P)), (Belief:InductionN)
     (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- (($X --> P) ==>+- ($X --> S)), (Belief:Abduction)
         (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- (($X --> P) ==>+- (--,($X --> S))), (Belief:AbductionN)
-    (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternal) |- (($X --> S) <=>+- ($X --> P)), (Belief:Comparison)
-        (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,($X --> S)) <=>+- ($X --> P)), (Belief:ComparisonN)
+    (M --> S), (M --> P), task(positive), neq(S,P), time(dtForward) |- (($X --> S) <=>+- ($X --> P)), (Belief:Comparison)
+        (M --> S), (M --> P), task(negative), neq(S,P), time(dtForward) |- ((--,($X --> S)) <=>+- ($X --> P)), (Belief:ComparisonN)
     (M --> S), (M --> P), neq(S,P), time(dtAfterOrEternal) |- ((#Y --> S) &&+- (#Y --> P)), (Belief:Intersection)
         //^ intersection should be ok for both positive and negative cases
             //(M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- (&&, (#Y --> P), (--,(#Y --> S))), (Belief:IntersectionN)
@@ -347,9 +347,8 @@
     A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==>+- B), (Belief:Induction)
         A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
 
-    A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
-        A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- (--,%B)), (Belief:ComparisonN)
-            //the B is negated rather than A to follow the normalized commutive statement normal form and lexical ordering
+    A, B, task(positive), task("."), time(dtForward), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
+        A, B, task(negative), task("."), time(dtForward), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) <=>+- B), (Belief:ComparisonN)
 
     A, B, task(positive), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
         A, B, task(negative), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)

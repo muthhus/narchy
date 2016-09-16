@@ -504,7 +504,36 @@ public class NAL7Test extends AbstractNALTest {
                 "(((SELF,{t003})-->at) &&+10 (({t002},{t003})-->on))",
                 1.0f, 0.81f,
                 0);
-        tester.mustNotOutput(cycles, "(((SELF,#1)-->at) &&-10 (({t002},#1)-->on))", '.', 0, ETERNAL);
+        tester.mustBelieve(cycles,
+                "(((SELF,#1)-->at) &&-10 (({t002},#1)-->on))",
+                1.0f, 0.81f,
+                0);
+        tester.mustNotOutput(cycles, "(((SELF,#1)-->at) &&-10 (({t002},#1)-->on))", '.', ETERNAL);
+
+    }
+
+    @Test
+    public void variable_introduction_on_events_with_negation() {
+        test()
+
+        .input("(--,a:x). :|: %0.9;0.8% ")
+        .inputAt(10, "b:x. :|: %0.8;0.9% ")
+
+        .mustBelieve(cycles,
+                "((--,a:x) ==>+10 b:x)",
+                0.8f, 0.39f,
+                0)
+        .mustBelieve(cycles,
+                "(a:x <=>+10 b:x)", 0.1f, 0.37f, //notice the subtle discrepency between here
+                0)
+        .mustBelieve(cycles,
+                "(a:x <=>+10 (--,b:x))", 0.73f, 0.41f, // and here, as a result of the comparison truth function's asymmetry
+                0)
+        .mustBelieve(cycles,
+                "(($1 --> a) <=>+10 (--,($1 -->b)))",
+                0.73f, 0.41f,
+                0)
+        ;
 
     }
 
@@ -517,7 +546,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.input("(on:({t002},#1) &&+0 at:(SELF,#1)). :|:");
         tester.inputAt(10, "((on:($1,#2) &&+0 at:(SELF,#2)) ==>+0 reachable:(SELF,$1)).");
 
-        tester.mustBelieve(cycles*6, "reachable:(SELF,{t002})",
+        tester.mustBelieve(cycles*4, "reachable:(SELF,{t002})",
                 1.0f, 0.81f, 0);
 
     }
@@ -593,11 +622,10 @@ public class NAL7Test extends AbstractNALTest {
             $1.0;.13;.24$ (c-->a). 3-1 %1.0;.45% {3-1: 1;2} (((%1-->%2),(%3-->%1),neq(%2,%3)),((%2-->%3),((Exemplification-->Belief),(Weak-->Desire),(AllowBackward-->Derive))))
         */
         test()
-                
                 .inputAt(2,"a:x. :|: %1.0;0.45%")
                 .inputAt(5, "b:x. :|: %1.0;0.90%")
-                .mustBelieve(cycles*8, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2)
-                .mustNotOutput(cycles*8, "(a:#1 &&-3 b:#1)", '.', 0f, 1, 0f, 1, 2);
+                .mustBelieve(cycles*4, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2)
+                .mustNotOutput(cycles*4, "(a:#1 &&-3 b:#1)", '.', 0f, 1, 0f, 1, 2);
 
     }
 

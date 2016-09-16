@@ -721,6 +721,11 @@ public class PremiseRule extends GenericCompound {
                         case "dtCombine":
                             timeFunction = TimeFunctions.dtCombine;
                             break;
+
+                        case "dtForward":
+                            timeFunction = TimeFunctions.occForward;
+                            break;
+
                         case "dtReverse":
                             timeFunction = TimeFunctions.occReverse;
                             break;
