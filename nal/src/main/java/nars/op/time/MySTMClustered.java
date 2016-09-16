@@ -49,7 +49,7 @@ public class MySTMClustered extends STMClustered {
 
 		//this.logger = LoggerFactory.getLogger(toString());
 
-		allowNonInput = false;
+		allowNonInput = true;
 
 		net.setAlpha(0.05f);
 		net.setBeta(0.05f);
@@ -151,7 +151,7 @@ public class MySTMClustered extends STMClustered {
 
 					@Nullable Term conj = group(negated, uu);
 					if (conj.volume() > maxVol)
-						throw new RuntimeException("exceeded max volume");
+						return; //throw new RuntimeException("exceeded max volume");
 
 					if (!(conj instanceof Compound))
 						return;

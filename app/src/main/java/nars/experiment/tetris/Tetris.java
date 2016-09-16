@@ -385,7 +385,6 @@ public class Tetris extends NAgent {
         );
 
 
-        nar.preprocess(new VariableCompressor.Precompressor(nar));
 
         nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.8f);
@@ -402,7 +401,7 @@ public class Tetris extends NAgent {
 //            }
 //        });
 
-        float p = 0.02f;
+        float p = 0.005f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f*p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f*p;
@@ -411,7 +410,7 @@ public class Tetris extends NAgent {
 
         nar.confMin.setValue(0.02f);
 
-        nar.compoundVolumeMax.setValue(27);
+        nar.compoundVolumeMax.setValue(35);
         //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);

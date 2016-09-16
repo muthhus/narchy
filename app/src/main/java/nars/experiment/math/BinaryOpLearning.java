@@ -344,9 +344,6 @@ public class BinaryOpLearning extends NAgent {
 
         );
 
-        nar.preprocess(new VariableCompressor.Precompressor(nar));
-
-
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.6f);

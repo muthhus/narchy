@@ -10,6 +10,7 @@ import nars.link.BLink;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.ConceptBagCycle;
+import nars.op.VariableCompressor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
@@ -67,13 +68,18 @@ public class Default extends AbstractNAR {
                 termLinksPerConcept, taskLinksPerConcept
         );
 
-        if (nal() >= 7) {
-            initNAL7();
-            if (nal() >= 8) {
-                initNAL8();
-//                if (nal() >= 9) {
-//                    initNAL9();
-//                }
+        if (nal() >= 5) {
+
+            preprocess(new VariableCompressor(this));
+
+            if (nal() >= 7) {
+                initNAL7();
+                if (nal() >= 8) {
+                    initNAL8();
+                    //                if (nal() >= 9) {
+                    //                    initNAL9();
+                    //                }
+                }
             }
         }
 

@@ -246,7 +246,7 @@ public class Arkancide extends NAgent {
 
                 , new FrameClock(), exe);
 
-        nar.preprocess(new VariableCompressor.Precompressor(nar));
+        nar.preprocess(new VariableCompressor(nar));
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.7f);

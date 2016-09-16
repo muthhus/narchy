@@ -102,8 +102,6 @@ public class Pacman extends NAgent {
                 new FrameClock(), e
 
         );
-        nar.preprocess(new VariableCompressor.Precompressor(nar));
-
 
         //new MemoryManager(nar);
 

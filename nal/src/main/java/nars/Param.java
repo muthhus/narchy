@@ -282,7 +282,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * returns a value <= 1.0
      */
-    public static float temporalIrrelevance(long delta /* positive only */, float duration /* <1, divides usually */) {
+    public static float temporalIrrelevance(float delta /* positive only */, float duration /* <1, divides usually */) {
         //return (1f + (float)Math.log(1+delta/duration));
         return (delta / duration);
     }
@@ -298,7 +298,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
         long tOcc = t.occurrence();
-        long dWhenNow = Math.abs(when - now);
+        //long dWhenNow = Math.abs(when - now);
         //long dtCre = Math.abs(tOcc - t.creation());
         long dtOcc = Math.abs(tOcc - now);
 
@@ -306,7 +306,10 @@ public abstract class Param /*extends Container*/ implements Level {
         float futureDuration = 2f;
 
         float rank = c2w(c) / (1f +
-                temporalIrrelevance(dtOcc, tOcc <= now ? pastAndPresentDuration : futureDuration)
+                temporalIrrelevance(
+                        //(dtOcc+dWhenNow),
+                        dtOcc,
+                        tOcc <= now ? pastAndPresentDuration : futureDuration)
                 //+ temporalIrrelevance(dWhenNow, 1f)
         ); // + temporalIrrelevance(dtCre, 1f));
         //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);

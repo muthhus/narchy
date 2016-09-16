@@ -65,9 +65,9 @@ abstract public class NAgent {
     public float rewardValue;
 
     float predictorProbability = 0.75f;
-    private int predictionHorizon = curiosityMonitorDuration/2;
+    private int predictionHorizon = curiosityMonitorDuration/4;
     private final FasterList<Task> predictors = $.newArrayList();
-    private float predictorPriFactor = 2f;
+    private float predictorPriFactor = 10f;
 
     public boolean trace = false;
 
@@ -351,7 +351,7 @@ abstract public class NAgent {
         float reinforcementAttention =
                 UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
 //                        //
-                        / (predictors.size()/predictorProbability * predictorPriFactor);
+                        / (predictors.size()/predictorProbability) * predictorPriFactor;
 //                        // /(actions.size()+sensors.size());
 
         if (reinforcementAttention > 0) {
