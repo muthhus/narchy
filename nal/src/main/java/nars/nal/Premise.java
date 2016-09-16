@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 public final class Premise extends RawBudget implements Tasked {
 
 
-    @NotNull private final Term concept;
+    //@NotNull private final Term concept;
 
     @NotNull public final Task task;
 
@@ -45,7 +45,7 @@ public final class Premise extends RawBudget implements Tasked {
                    @NotNull Term termLink,
                    @Nullable Task belief) {
 
-        this.concept = concept;
+        //this.concept = concept;
 
         this.task = taskLink;
 

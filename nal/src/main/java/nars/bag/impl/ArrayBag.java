@@ -189,9 +189,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     /** gets the scalar float value used in a comparison of BLink's */
     static float cmp(@Nullable Budgeted b) {
-        if (b == null) return -1;
+        if (b == null) return -1f;
         float p = b.pri();
-        return p == p ? p : -1;
+        return p == p ? p : -1f;
         //return (b!=null) ? b.priIfFiniteElseNeg1() : -1f;
         //return b.priIfFiniteElseNeg1();
     }

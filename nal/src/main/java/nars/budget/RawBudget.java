@@ -73,6 +73,15 @@ public class RawBudget implements Budget {
         return priority;
     }
 
+    public final float priIfFiniteElseZero() {
+        float p = pri(); return /*Float.isFinite(p)*/ (p==p) ? p : 0;
+    }
+
+    public final float priIfFiniteElseNeg1() {
+        float p = pri(); return /*Float.isFinite(p)*/ (p==p) ? p : -1;
+    }
+
+
     @Override
     public boolean isDeleted() {
         float p = priority;

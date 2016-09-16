@@ -1,9 +1,6 @@
 package nars.budget.policy;
 
-import nars.$;
-import nars.Memory;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
@@ -166,7 +163,7 @@ public class TaskBudgeting {
      */
     @Nullable
     public static Budget derivationBackward(@NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
-        return derivation(premise.premise.qua() * Param.BACKWARD_DERIVATION_FACTOR, content, premise, minDur);
+        return derivation(premise.nar.qualityDefault(Symbols.QUESTION) * premise.premise.qua(), content, premise, minDur);
     }
 
     /**

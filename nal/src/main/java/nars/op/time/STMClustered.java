@@ -9,9 +9,12 @@ import nars.budget.merge.BudgetMerge;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
-import nars.link.StrongBLink;
+import nars.link.DependentBLink;
+import nars.truth.Truth;
+import nars.truth.Truthed;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,7 +55,8 @@ public class STMClustered extends STM {
     public final class TasksNode extends Node {
 
         /** current members */
-        public final Map<Task,TLink> tasks = new ConcurrentHashMap();
+        public final Set<TLink> tasks = new LinkedHashSet();
+
 
 
         public TasksNode(int id, int dimensions) {
@@ -102,12 +106,7 @@ public class STMClustered extends STM {
 
         protected boolean remove(@NotNull TLink x) {
             x.node = null;
-            if (tasks.remove(x)!=null) {
-                return true;
-            }
-            //if (requireRemoval)
-                //throw new RuntimeException("task not in set");
-            return false;
+            return tasks.remove(x);
         }
 
         public int size() {
@@ -118,20 +117,19 @@ public class STMClustered extends STM {
             Task xx = x.get();
             //priSub(cycleCost(id));
 
-            if (xx!=null && !xx.isDeleted()) {
+            if (xx!=null) {
 
-                if (x.node == this)
-                    return;
+                if (x.node != this) {
+                    tasks.add(x);
+                    x.node = this;
+                }
 
-                tasks.put(xx, x);
-//                if (tasks.putIfAbsent(xx, x) != null) {
-//                    throw new RuntimeException(xx + " already in this node's task set");
-//                }
-
-                x.node = this;
             } else {
                 //task is deleted
-                x.node = null;
+                if (x.node == this) {
+                    tasks.remove(x);
+                    x.node = null;
+                }
             }
         }
 
@@ -143,43 +141,49 @@ public class STMClustered extends STM {
         @Nullable
         public double[] coherence(int dim) {
             if (size() == 0) return null;
-            double[] v = Util.avgvar(tasks.values().stream().mapToDouble(t -> t.coord[dim]).toArray()); //HACK slow
+            double[] v = Util.avgvar(tasks.stream().mapToDouble(t -> t.coord[dim]).toArray()); //HACK slow
             v[1] = 1f - v[1]; //convert variance to coherence
             return v;
         }
 
         //TODO cache this value
         public float priSum() {
-            return (float)tasks.values().stream().mapToDouble(TLink::pri).sum();
+            return (float)tasks.stream().mapToDouble(TLink::pri).sum();
         }
 
         /** produces a parallel conjunction term consisting of all the task's terms */
-        public Stream<Task[]> termSet(int maxComponentsPerTerm, int maxVolume) {
-            AtomicInteger group = new AtomicInteger();
-            AtomicInteger subterms = new AtomicInteger();
-            AtomicInteger currentVolume = new AtomicInteger();
-            return tasks.values().stream().map(TLink::get).
-                    filter(x -> x != null).
-                    collect(Collectors.groupingBy(x -> {
+        public Stream<List<TLink>> chunk(int maxComponentsPerTerm, int maxVolume) {
+            final int[] group = {0};
+            final int[] subterms = {0};
+            final int[] currentVolume = {0};
+            return tasks.stream().
+                    filter(x -> x.get() != null).
+                    collect(Collectors.groupingBy(tx -> {
+
+                        Task x = tx.get();
+                        if (x == null)
+                            return -1;
 
                         int v = x.volume();
 
-                        if ((subterms.intValue() >= maxComponentsPerTerm) || (currentVolume.intValue() + v > maxVolume)) {
+                        if ((subterms[0] >= maxComponentsPerTerm) || (currentVolume[0] + v > maxVolume)) {
                             //next group
-                            group.incrementAndGet();
-                            subterms.set(1);
-                            currentVolume.set(v);
+                            group[0]++;
+                            subterms[0] = 1;
+                            currentVolume[0] = v;
                         } else {
 
-                            subterms.incrementAndGet();
-                            currentVolume.addAndGet(v);
+                            subterms[0]++;
+                            currentVolume[0]+=v;
                         }
 
-                        return group.intValue();
+                        return group[0];
                     }))
-                    .values().stream()
-                    .filter(c -> c.size()> 1)
-                    .map(c -> c.toArray(new Task[c.size()]));
+                    .entrySet().stream()
+                    .filter(c -> c.getKey() >= 0)
+                    .map(c -> c.getValue())//ignore the -1 discard group
+                    .filter(c -> c.size() > 1); //only batches of >1
+
         }
 
 //        public float confMin() {
@@ -188,19 +192,14 @@ public class STMClustered extends STM {
 
 
 
-        protected void remove(@NotNull Task[] uu) {
-            for (Task x : uu) {
-                input.remove(x);
-                tasks.remove(x);
-            }
-        }
-
     }
+
+    final AtomicInteger tLinkSerial = new AtomicInteger();
 
     /**
      * temporal link, centroid
      */
-    public final class TLink extends StrongBLink<Task> implements Comparable<TLink> {
+    public final class TLink extends DependentBLink<Task> implements Truthed, Comparable<TLink> {
 
         /** feature vector representing the item as learned by clusterer */
         @NotNull
@@ -208,12 +207,27 @@ public class STMClustered extends STM {
 
         /** current centroid */
         @Nullable TasksNode node;
+        final int hash;
 
         public TLink(@NotNull Task t, Budgeted b) {
             super(t, b);
             this.coord = getCoord(t);
+            this.hash = tLinkSerial.incrementAndGet();
         }
 
+
+        @Override
+        public @Nullable Truth truth() {
+            Task x = get();
+            if (x == null)
+                return null;
+            return x.truth();
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
 
         @NotNull
         @Override
@@ -227,13 +241,7 @@ public class STMClustered extends STM {
 
 
 
-        public Task get() {
-            @Nullable Task id = this.id;
-            if (id == null || id.isDeleted()) {
-                delete();
-            }
-            return id;
-        }
+
 
         private TasksNode nearest() {
             return net.learn(coord);
@@ -361,7 +369,7 @@ public class STMClustered extends STM {
         int rr = removed.size();
         for (int i = 0; i < rr; i++) {
             TasksNode t = removed.pollFirst();
-            t.tasks.values().forEach(TLink::migrate);
+            t.tasks.forEach(TLink::migrate);
             t.delete();
         }
 

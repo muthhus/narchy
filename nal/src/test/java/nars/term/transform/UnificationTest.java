@@ -747,27 +747,27 @@ public class UnificationTest {
     @Test
     public void patternImage() {
         test(Op.VAR_PATTERN,
-                "<A --> (/, _, %X)>",
-                "<A --> (/, _, B)>", true);
+                "<A --> (/, n, _, %X)>",
+                "<A --> (/, n, _, B)>", true);
 
         test(Op.VAR_PATTERN,
-                "<A --> (/, %X, _)>",
-                "<A --> (/, B, _)>", true);
+                "<A --> (/, %X, _, n)>",
+                "<A --> (/, B, _, n)>", true);
 
         test(Op.VAR_PATTERN,
-                "<A --> (/, %X, _)>",
-                "<A --> (/, _, B)>", false);
+                "<A --> (/, x, %X, _)>",
+                "<A --> (/, x, _, B)>", false);
 
 
-        test(Op.VAR_PATTERN,
-                "(&&,<F --> A>,<%X --> (/,_,C)>)",
-                "(&&,<F --> A>,<E --> (/,_,C)>)", true);
-        test(Op.VAR_PATTERN,
-                "(&&,<F --> A>,<%X --> (/,C,D,_)>)",
-                "(&&,<F --> A>,<E --> (/,C,D,_)>)", true);
-        test(Op.VAR_PATTERN,
-                "(&&,<F --> A>,<D --> (/,C,%X, _)>)",
-                "(&&,<F --> A>,<D --> (/,C,E, _)>)", true);
+//        test(Op.VAR_PATTERN,
+//                "(&&,<F --> A>,<%X --> (/,E, _,C,D)>)",
+//                "(&&,<F --> A>,<E --> (/,E,_,C,D)>)", true);
+//        test(Op.VAR_PATTERN,
+//                "(&&,<F --> A>,<%X --> (/,C,D,_)>)",
+//                "(&&,<F --> A>,<E --> (/,C,D,_)>)", true);
+//        test(Op.VAR_PATTERN,
+//                "(&&,<F --> A>,<D --> (/,C,%X, _)>)",
+//                "(&&,<F --> A>,<D --> (/,C,E, _)>)", true);
 
     }
     @Test

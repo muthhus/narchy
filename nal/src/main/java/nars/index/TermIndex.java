@@ -152,7 +152,7 @@ public abstract class TermIndex extends TermBuilder {
         try {
             return super.the(pc.op(), pc.dt(), pc.terms());
         } catch (InvalidTermException x) {
-            if (Param.DEBUG_EXTRA)
+            //if (Param.DEBUG_EXTRA)
                 logger.info("the {} {}", pc, x);
             return False; //place a False placeholder so that a repeat call will not have to discover this manually
         } catch (Throwable e) {

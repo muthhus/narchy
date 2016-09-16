@@ -3,8 +3,8 @@ package nars.bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.link.BLink;
-import nars.link.StrongBLink;
-import nars.link.StrongBLinkToBudgeted;
+import nars.link.DefaultBLink;
+import nars.link.DependentBLink;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
@@ -536,9 +536,9 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     default <Y> BLink<Y> newLink(@NotNull Y i, Budgeted b) {
 
         if (i instanceof Budgeted)
-            return new StrongBLinkToBudgeted((Budgeted) i, b);
+            return new DependentBLink((Budgeted) i, b);
         else
-            return new StrongBLink(i, b);
+            return new DefaultBLink(i, b);
     }
 
 

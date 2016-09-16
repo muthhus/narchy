@@ -297,16 +297,14 @@ public class Revision {
         if (a.equals(b))
             return a;
 
-        if (a.size() != 2) {
-            return strongest(a, b, aProp);
+        if ((a.structure() != b.structure()) || (a.volume() != b.volume()) ||
+                (a.size() != 2) || (a.size() != b.size())) {
+            //throw new RuntimeException();
+            failIntermpolation(a, b);
+            //logger.warn
+            //return strongest(a, b, aProp);
         }
 
-        if (b.size() != a.size()) {
-            logger.warn("{} and {} can not be intermpolated due to different size", a, b);
-            return strongest(a, b, aProp);
-        }
-
-        int newDT = dtCompare(a, b, aProp, accumulatedDifference, depth, rng);
 
         Term a0 = a.term(0);
         Term a1 = a.term(1);
@@ -314,26 +312,25 @@ public class Revision {
         Term b1 = b.term(1);
 
         if (a0.op() != b0.op() || (a1.op() != b1.op())) {
-            //throw new RuntimeException();
-            logger.warn("{} and {} have different subterm types that can not be compared further", a, b);
-            return strongest(a, b, aProp);
+            failIntermpolation(a, b);
         }
+
+        int newDT = dtCompare(a, b, aProp, accumulatedDifference, depth, rng);
 
         Term r = $.compound(a.op(), newDT,
                 (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) b0, aProp, accumulatedDifference, depth / 2f, rng) : a0,
                 (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) b1, aProp, accumulatedDifference, depth / 2f, rng) : a1
         );
-        if (r instanceof Compound)
-            return (Compound) r;
-        else {
 
-            //HACK TODO investigate why
+        if (!(r instanceof Compound))
+            throw new RuntimeException("merged to useless non-compound " + r + "\n\t" + a + "\n\t" + b);
 
-            logger.warn("{} and {} merged to useless non-compound {}", a, b, r);
+        return (Compound) r;
 
-            return strongest(a, b, aProp);
-        }
+    }
 
+    private static void failIntermpolation(@NotNull Compound a, @NotNull Compound b) {
+        throw new RuntimeException("interpolation failure: different or invalid internal structure and can not be compared:\n\t" + a + "\n\t" + b);
     }
 
     private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {

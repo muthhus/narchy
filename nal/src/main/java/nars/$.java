@@ -432,6 +432,10 @@ public enum $ {
     public static Term parallel(Term... s) {
         return compound(CONJ, 0, s);
     }
+    @Nullable
+    public static Term parallel(Collection<Term> s) {
+        return compound(CONJ, 0, s);
+    }
 
     @Nullable
     public static Term disj(@NotNull Term... a) {

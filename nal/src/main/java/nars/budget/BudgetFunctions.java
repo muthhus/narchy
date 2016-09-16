@@ -235,7 +235,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
     /** TODO guarantee balanced input and output */
     @NotNull
-    public static Budget fund(@NotNull Task[] tt, float paymentProportion) {
+    public static Budget fund(@NotNull Iterable<Task> tt, float paymentProportion) {
         RawBudget u = new RawBudget();
         for (Task t : tt) {
             @NotNull Budget tbudget = t.budget();

@@ -3,6 +3,7 @@ package nars.link;
 import nars.budget.Budgeted;
 import nars.budget.RawBudget;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,17 +14,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Acts as a "budget vector" containing an accumulating delta
  * that can be commit()'d on the next udpate
  */
-abstract public class DefaultBLink<X> extends RawBudget implements BLink<X> {
+public class DefaultBLink<X> extends RawBudget implements BLink<X> {
 
-    final static AtomicInteger serial = new AtomicInteger();
-
-    final int hash = serial.incrementAndGet();
 
     ///** the referred item */
-    public X id;
+    protected X id;
 
     public DefaultBLink(@NotNull X id, float p, float d, float q) {
         budget(p, d, q);
+        this.id = id;
     }
 
     public DefaultBLink(@NotNull X id, @NotNull Budgeted b) {
@@ -31,7 +30,7 @@ abstract public class DefaultBLink<X> extends RawBudget implements BLink<X> {
     }
 
     public DefaultBLink(@NotNull X id, @NotNull Budgeted b, float scale) {
-        budget(b.pri() * scale, b.dur(), b.qua());
+        this(id, b.pri() * scale, b.dur(), b.qua());
     }
 
     @Override
@@ -40,13 +39,14 @@ abstract public class DefaultBLink<X> extends RawBudget implements BLink<X> {
     }
 
     @Override
-    public final boolean equals(Object that) {
+    public final boolean equals(@NotNull Object that) {
         return this == that;
     }
 
     @Override
-    public final int hashCode() {
-        return hash;
+    public int hashCode() {
+        throw new UnsupportedOperationException();
+        //return hash;
     }
 
     @Override
@@ -67,4 +67,13 @@ abstract public class DefaultBLink<X> extends RawBudget implements BLink<X> {
     }
 
 
+    @Nullable
+    @Override
+    public final X get() {
+        return id;
+    }
+
+    public final void set(@NotNull X id) {
+        this.id = id;
+    }
 }

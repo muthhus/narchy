@@ -98,6 +98,7 @@ public abstract class TermBuilder {
         if (transformImmediates())
             productNormalizeSubterms(u);
 
+        int arity = u.length;
         switch (op) {
 //            case INT:
 //            case INTRANGE:
@@ -105,7 +106,7 @@ public abstract class TermBuilder {
 //                break;
 
             case NEG:
-                if (u.length != 1)
+                if (arity != 1)
                     throw new InvalidTermException(op, dt, u, "negation requires 1 subterm");
 
                 return negation(u[0]);
@@ -115,13 +116,13 @@ public abstract class TermBuilder {
 //                break;
 
             case INSTANCE:
-                if (u.length != 2 || dt != DTERNAL) throw new InvalidTermException(INSTANCE, dt, u, "needs 2 arg");
+                if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(INSTANCE, dt, u, "needs 2 arg");
                 return inst(u[0], u[1]);
             case PROPERTY:
-                if (u.length != 2 || dt != DTERNAL) throw new InvalidTermException(PROPERTY, dt, u, "needs 2 arg");
+                if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(PROPERTY, dt, u, "needs 2 arg");
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
-                if (u.length != 2 || dt != DTERNAL)
+                if (arity != 2 || dt != DTERNAL)
                     throw new InvalidTermException(INSTANCE_PROPERTY, dt, u, "needs 2 arg");
                 return instprop(u[0], u[1]);
 
@@ -138,9 +139,11 @@ public abstract class TermBuilder {
                 //if no relation was specified and it's an Image,
                 //it must contain a _ placeholder
                 if (hasImdex(u)) {
+                    if (arity < 2)
+                        throw new InvalidTermException(op, dt, u, "image requires size=2 excluding _ imdex");
                     //TODO use result of hasImdex in image construction to avoid repeat iteration to find it
                     return image(op, u);
-                } else if ((dt < 0) || (dt > u.length)) {
+                } else if ((dt < 0) || (dt > arity) || (arity < 1)) {
                     throw new InvalidTermException(op, dt, u, "Invalid Image");
                 }
                 break;
@@ -158,13 +161,13 @@ public abstract class TermBuilder {
             case SIM:
             case EQUI:
             case IMPL:
-                if (u.length != 2) {
+                if (arity != 2) {
                     throw new InvalidTermException(op, dt, u, "Statement without exactly 2 arguments");
                 }
                 return statement(op, dt, u[0], u[1]);
 
             case PROD:
-                if (u.length == 0)
+                if (arity == 0)
                     return Terms.ZeroProduct;
                 break;
 

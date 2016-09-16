@@ -45,8 +45,6 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     public static final boolean BACKWARD_QUESTION_RULES = true;
 
-    /** factor applied to budgeting backward question derivations */
-    public static final float BACKWARD_DERIVATION_FACTOR = 1f;
 
     /** average priority target for bag forgetting */
     public static final float BAG_THRESHOLD = 0.5f;

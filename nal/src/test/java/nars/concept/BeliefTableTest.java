@@ -198,12 +198,12 @@ public class BeliefTableTest  {
         /** closer to 0.5 as uncertainty grows */
         @Nullable Truth endTruth = table.truth(spacing * (maxBeliefs - 1) + margin);
         assertEquals(0.79f, endTruth.freq(), 0.2f);
-        assertTrue(lastBeliefTruth.conf() > endTruth.conf());
+        assertTrue(lastBeliefTruth.conf() >= endTruth.conf());
 
         /** closer to 0.5 as uncertainty grows */
         @Nullable Truth startTruth = table.truth(0 - margin);
         assertEquals(0.2f, startTruth.freq(), 0.2f);
-        assertTrue(firstBeliefTruth.conf() > startTruth.conf());
+        assertTrue(firstBeliefTruth.conf() >= startTruth.conf());
     }
 
 

@@ -64,11 +64,8 @@ public interface Budgeted  {
 
     float pri();
     float priIfFiniteElseZero();
+    float priIfFiniteElseNeg1();
 
-    default float priIfFiniteElseNeg1() {
-        float p = pri();
-        return /*Float.isFinite(p)*/ (p==p) ? p : -1;
-    }
 
     boolean isDeleted();
 

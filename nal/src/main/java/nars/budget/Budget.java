@@ -48,11 +48,11 @@ public interface Budget extends Budgeted {
 //    }
 
 
-    @Override
-    default float priIfFiniteElseZero() {
-        float p = pri();
-        return /*Float.isFinite(p)*/ (p==p) ? p : 0;
-    }
+//    @Override
+//    default float priIfFiniteElseZero() {
+//        float p = pri();
+//        return /*Float.isFinite(p)*/ (p==p) ? p : 0;
+//    }
 
 
     public static String toString(@NotNull Budget b) {

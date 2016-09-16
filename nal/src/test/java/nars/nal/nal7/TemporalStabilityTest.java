@@ -19,7 +19,7 @@ abstract public class TemporalStabilityTest {
 
     public void test(int cycles, @NotNull NAR n) {
 
-        n.log();
+        //n.log();
         n.onFrame(f -> {
 
             TimeMap m = new TimeMap(n);

@@ -23,8 +23,16 @@ public class ArrayBLink<X> implements BLink<X> {
         this.f = f;
     }
 
+    public final float priIfFiniteElseZero() {
+        float p = f[0]; return /*Float.isFinite(p)*/ (p==p) ? p : 0;
+    }
+
+    public final float priIfFiniteElseNeg1() {
+        float p = f[0]; return /*Float.isFinite(p)*/ (p==p) ? p : -1;
+    }
+
     @Override
-    public X get() {
+    public final X get() {
         return id;
     }
 
@@ -35,17 +43,17 @@ public class ArrayBLink<X> implements BLink<X> {
     }
 
     @Override
-    public void _setPriority(float p) {
+    public final void _setPriority(float p) {
         f[0] = p;
     }
 
     @Override
-    public void _setDurability(float d) {
+    public final void _setDurability(float d) {
         f[1] = d;
     }
 
     @Override
-    public void _setQuality(float q) {
+    public final void _setQuality(float q) {
         f[2] = q;
     }
 
@@ -67,7 +75,7 @@ public class ArrayBLink<X> implements BLink<X> {
 
 
     @Override
-    public boolean delete() {
+    public final boolean delete() {
         float p = f[0];
         if (p != p) {
             f[0] = Float.NaN;

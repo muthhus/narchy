@@ -21,6 +21,9 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -119,17 +122,32 @@ public class MySTMClustered extends STMClustered {
 
 				float finalFreq = freq;
 				int maxVol = nar.compoundVolumeMax.intValue();
-				node.termSet(maxGroupSize,  maxVol -1).forEach(tt -> {
+				node.chunk(maxGroupSize,  maxVol -1).forEach(tt -> {
 
-					Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
+					//Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
+					//get only the maximum confidence task for each term
+					Map<Term,Task> vv = new HashMap(tt.size());
+					tt.forEach(_z -> {
+						Task z = _z.get();
+						if (z!=null) {
+							vv.merge(z.term(), z, (prevZ, newZ) -> {
+								if (prevZ == null || newZ.conf() > prevZ.conf())
+									return newZ;
+								else
+									return prevZ;
+							});
+						}
+					});
+
+					Collection<Task> uu = vv.values();
 
 					//float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
 					float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
 					if (conf < confMin)
 						return;
 
-					long[] evidence = Stamp.zip(Lists.newArrayList(uu), uu.length, Param.STAMP_CAPACITY);
+					long[] evidence = Stamp.zip(uu);
 
 					@Nullable Term conj = group(negated, uu);
 					if (conj.volume() > maxVol)
@@ -151,7 +169,7 @@ public class MySTMClustered extends STMClustered {
 								new DefaultTruth(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 								.time(now, t)
 								.evidence(evidence)
-								.budget(BudgetFunctions.fund(uu, 1f / uu.length))
+								.budget(BudgetFunctions.fund(uu, 1f / uu.size()))
 								.log("STMCluster CoOccurr");
 
 
@@ -161,8 +179,8 @@ public class MySTMClustered extends STMClustered {
 						//System.err.println(m + " " + Arrays.toString(m.evidence()));
 						nar.inputLater(m);
 
-						node.remove(uu);
-					
+						node.tasks.removeAll(tt);
+
 
 
 			});
@@ -172,15 +190,21 @@ public class MySTMClustered extends STMClustered {
 	}
 
 	@Nullable
-	private Term group(boolean negated, @NotNull Task[] uu) {
+	private Term group(boolean negated, @NotNull Collection<Task> uuu) {
 
-		if (uu.length == 2) {
+
+		if (uuu.size() == 2) {
 			//find the dt and construct a sequence
 			Task early, late;
-			if (uu[0].occurrence() <= uu[1].occurrence()) {
-				early = uu[0]; late = uu[1];
+
+			Task[] uu = uuu.toArray(new Task[2]);
+
+			Task u0 = uu[0];
+			Task u1 = uu[1];
+			if (u0.occurrence() <= u1.occurrence()) {
+				early = u0; late = u1;
 			} else {
-				early = uu[1]; late = uu[0];
+				early = u1; late = u0;
 			}
 			int dt = (int)(late.occurrence() - early.occurrence());
 
@@ -192,13 +216,14 @@ public class MySTMClustered extends STMClustered {
 			);
 
 		} else {
-			Term[] s = Stream.of(uu).map(Task::term).toArray(Term[]::new);
+
+			Term[] uu = uuu.stream().map(t -> t.term()).toArray(s -> new Term[s]);
 
 			if (negated)
-				$.neg(s);
+				$.neg(uu);
 
 			//just assume they occurr simultaneously
-			return $.parallel(s);
+			return $.parallel(uu);
 			//return $.secte(s);
 		}
 	}

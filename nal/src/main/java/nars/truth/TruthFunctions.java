@@ -592,7 +592,8 @@ public final class TruthFunctions extends UtilityFunctions {
         return Param.HORIZON * c / (1 - Math.min(c, 1.0f - Param.TRUTH_EPSILON));
     }
 
-    public static float confAnd(@NotNull Truthed... tt) {
+
+    public static float confAnd(@NotNull Iterable<? extends Truthed> tt) {
         float c = 1f;
         for (Truthed x : tt) {
             c *= x.conf();
