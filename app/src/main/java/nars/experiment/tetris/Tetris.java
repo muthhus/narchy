@@ -59,10 +59,10 @@ public class Tetris extends NAgent {
 
     public static final Executioner exe =
             new SingleThreadExecutioner();
-    public static final Executioner exe2 =
-            new MultiThreadExecutioner(2, 1024*8);
-    public static final Executioner exe4 =
-            new MultiThreadExecutioner(4, 1024*32);
+//    public static final Executioner exe2 =
+//            new MultiThreadExecutioner(2, 1024*8);
+//    public static final Executioner exe4 =
+//            new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 55555;
     public static final int cyclesPerFrame = 2;
@@ -375,19 +375,19 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        Executioner e = Tetris.exe2;
+        Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                256, 2, 2, rng,
+                128, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 32768, 4),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
                 new FrameClock(), e
         );
 
 
         nar.preprocess(new VariableCompressor.Precompressor(nar));
 
-        nar.beliefConfidence(0.8f);
+        nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.8f);
 
         Param.DEBUG_ANSWERS = Param.DEBUG;
@@ -402,16 +402,16 @@ public class Tetris extends NAgent {
 //            }
 //        });
 
-        float p = 0.05f;
+        float p = 0.02f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f*p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f*p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.4f*p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f*p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.03f);
+        nar.confMin.setValue(0.02f);
 
-        nar.compoundVolumeMax.setValue(35);
+        nar.compoundVolumeMax.setValue(27);
         //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);

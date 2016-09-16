@@ -10,6 +10,7 @@ import com.lmax.disruptor.util.Util;
 import nars.util.Texts;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import sun.misc.Unsafe;
 
 import java.io.Serializable;
@@ -486,7 +487,8 @@ public class HijacKache<TypeK, TypeV>
         }
         return (TypeV) x;
     }
-    public final TypeV computeIfAbsent2(@NotNull TypeK key, @NotNull Function<? super TypeK, Object> mappingFunction) {
+
+    @Nullable public final Object computeIfAbsent2(@NotNull TypeK key, @NotNull Function<? super TypeK, Object> mappingFunction) {
         return putIfMatch(key, mappingFunction, NO_MATCH_OLD);
     }
 
@@ -546,7 +548,7 @@ public class HijacKache<TypeK, TypeV>
         return putIfMatch(key, newValue, oldValue) == oldValue;
     }
 
-    private final TypeV putIfMatch(@NotNull Object key, @NotNull Object newVal, @NotNull Object oldVal) {
+    @Nullable private final TypeV putIfMatch(@NotNull Object key, @NotNull Object newVal, @NotNull Object oldVal) {
 //        final Object res = putIfMatch(this, data, key, newVal, oldVal);
 //        assert !(res instanceof Prime);
 //        assert res != null;
@@ -774,6 +776,7 @@ public class HijacKache<TypeK, TypeV>
     // assumed to work (although might have been immediately overwritten).  Only
     // the path through copy_slot passes in an expected value of null, and
     // putIfMatch only returns a null if passed in an expected null.
+    @Nullable
     private static final Object putIfMatch(@NotNull final HijacKache topmap, @NotNull final Object[] kvs, @NotNull final Object key, @NotNull Object putval, final Object expVal) {
         assert putval != null;
         assert !(putval instanceof Prime);

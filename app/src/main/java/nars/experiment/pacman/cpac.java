@@ -21,12 +21,15 @@ package nars.experiment.pacman;
 
 import java.awt.*;
 
+import static nars.experiment.pacman.cmaze.WALL;
+import static nars.util.Util.Util;
+
 public class cpac
 {
 	// frames to wait after eaten a dot
 	final int DOT_WAIT=4;
 
-	int iDotWait;
+	//int iDotWait;
 
 	// current position
 	public int iX, iY;
@@ -73,7 +76,6 @@ public class cpac
 		iX=10*16;
 		iY=10*16;
 		iDir=1;		// downward, illegal and won't move
-		iDotWait=0;
 	}
 
 	public void draw()
@@ -96,68 +98,78 @@ public class cpac
 
 	// return 1 if eat a dot
 	// return 2 if eat power dot
-	public int move(int iNextDir)
+	public synchronized int move(int iDir)
 	{
 		int eaten=0;
 
 		//      iNextDir=cAuto.GetNextDir();
 
-		if (iNextDir!=-1 && iNextDir!=iDir)	// not set or same
-			// change direction
-		{
-			if (iX%16!=0 || iY%16!=0)
-			{
-				// only check go back
-				if (iNextDir%2==iDir%2)
-					iDir=iNextDir;
-			}	
-			else    // need to see whether ahead block is OK
-			{
-				if ( mazeOK(iX/16+ ctables.iXDirection[iNextDir],
-						iY/16+ ctables.iYDirection[iNextDir]) )
-				{
-					iDir=iNextDir;
-					iNextDir=-1;
-				}
-			}
-		}
-		if (iX%16==0 && iY%16==0)
+//		if (iNextDir!=-1 && iNextDir!=iDir)	// not set or same
+//			// change direction
+//		{
+//			if (iX%16!=0 || iY%16!=0)
+//			{
+//				// only check go back
+//				if (iNextDir%2==iDir%2)
+//					iDir=iNextDir;
+//			}
+//			else    // need to see whether ahead block is OK
+//			{
+//				if ( mazeOK(iX/16+ ctables.iXDirection[iNextDir],
+//						iY/16+ ctables.iYDirection[iNextDir]) )
+//				{
+//					iDir=iNextDir;
+//					iNextDir=-1;
+//				}
+//			}
+//		}
+		int jy = Math.round((iY) / 16f);
+		int jx = Math.round((iX) / 16f);
+		//boolean center = iX % 16 == 0 && iY % 16 == 0;
+		//if (center)
 		{
 
 			// see whether has eaten something
-			switch (maze.iMaze[iY/16][iX/16])
+			switch (maze.iMaze[jy][jx])
 			{
 			case cmaze.DOT:
 				eaten=1;
-				maze.iMaze[iY/16][iX/16]=cmaze.BLANK;	// eat dot
+				maze.iMaze[jy][jx]=cmaze.BLANK;	// eat dot
 				maze.iTotalDotcount--;
-				iDotWait=DOT_WAIT;
+				//iDotWait=DOT_WAIT;
 				break;
 			case cmaze.POWER_DOT:
 				eaten=2;
-				powerDot.eat(iX/16, iY/16);
-				maze.iMaze[iY/16][iX/16]=cmaze.BLANK;
+				powerDot.eat(jx, jy);
+				maze.iMaze[jy][jx]=cmaze.BLANK;
 				break;
 			}
 
-			if (maze.iMaze[iY/16+ ctables.iYDirection[iDir]]
-			               [iX/16+ ctables.iXDirection[iDir]]==1)
-			{
-				return(eaten);	// not valid move
-			}
 		}
-		if (iDotWait==0)
-		{
-			iX+= ctables.iXDirection[iDir];
-			iY+= ctables.iYDirection[iDir];
+		int dy = ctables.iYDirection[iDir];
+		int dx = ctables.iXDirection[iDir];
+		int ny = Util.clamp(iY+dy, 0, maze.HEIGHT*16);
+		int nx = Util.clamp(iX+dx, 0, maze.WIDTH*16);
+
+		int ty = Math.round((ny) / 16f);
+		int tx = Math.round((nx) / 16f);
+		if ( maze.iMaze[ty][tx] != WALL) {
+			this.iDir = iDir;
+			iX = nx;
+			iY = ny;
+		} else {
+			//just clamp the current position
+			iY = Util.clamp(iY, 0, maze.HEIGHT*16);
+			iX = Util.clamp(iX, 0, maze.WIDTH*16);
 		}
-		else	iDotWait--;
+
+
 		return(eaten);
 	}	
 
 	boolean mazeOK(int iRow, int icol)
 	{
-		return (maze.iMaze[icol][iRow] & (cmaze.WALL | cmaze.DOOR)) == 0;
+		return (maze.iMaze[icol][iRow] & (WALL | cmaze.DOOR)) == 0;
 	}
 
 	/** returns if moved */
@@ -168,7 +180,8 @@ public class cpac
 		for ( ; s >= 0; s--) {
 			eaten += move(d);
 		}
-		c.eatDots(eaten);
+		if (eaten > 0)
+			c.eatDots(eaten);
 		return (px!=iX) || (py!=iY);
 	}
 }

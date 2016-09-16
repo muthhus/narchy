@@ -167,6 +167,9 @@ public class TemporalTest {
     @Test public void testCommutiveEquivAgain2() {
         assertEquals( $("((--,(0,0)) <=>+48 (happy))"), $("((--,(happy)) <=>-48 (0,0))"));
     }
+    @Test public void testCommutiveEquivAgain3() {
+        assertEquals( $("((--,(0,0)) <=>+48 (--,(happy)))"), $("((--,(happy)) <=>-48 (--,(0,0)))"));
+    }
 
     void testParse(String s) {
         testParse(s, null);

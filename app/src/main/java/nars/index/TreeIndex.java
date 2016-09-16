@@ -269,7 +269,9 @@ public class TreeIndex extends TermIndex {
             t = tt instanceof Compound ? conceptualize(((Compound) t)) : t;
             Object o = L1.computeIfAbsent2(t,
                     createIfMissing ?
-                            ttt -> super.get(ttt, true) :
+                            ttt -> {
+                                return super.get(ttt, true);
+                            } :
                             ttt -> {
                                 Termed v = super.get(ttt, false);
                                 if (v == null)
@@ -277,15 +279,15 @@ public class TreeIndex extends TermIndex {
                                 return v;
                             }
             );
-            if (o instanceof Termed)
-                return ((Termed) o);
 
-            if (createIfMissing) { //HACK try again: this should be handled by computeIfAbsent2, not here
+            if (o instanceof Termed)
+                return (Termed) o;
+            else if (createIfMissing) { //HACK try again: this should be handled by computeIfAbsent2, not here
                 L1.miss++;
                 return super.get(t, true);
+            } else {
+                return null;
             }
-
-            return null;
         }
 
         @Override

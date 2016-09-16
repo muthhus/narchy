@@ -1207,4 +1207,11 @@ public enum Util {
     public static Pair tuple(Object a, Object b, Object c, Object d) {
         return Tuples.pair(tuple(a, b, c), d);
     }
+
+    /** min is inclusive, max is exclusive: [min, max) */
+    public int clamp(int x, int min, int max) {
+        if (x < min) x = min;
+        else if (x > --max) x = max;
+        return x;
+    }
 }

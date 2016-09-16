@@ -40,6 +40,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +65,9 @@ public class Pacman extends NAgent {
     final int inputs;
 
     private final int pacmanCyclesPerFrame = 1;
-    int pacMovesPerCycle = 1;
+    int pacMovesPerCycle = 5;
 
-    //float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
+    float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
     public float scoretoReward = 1f;
 
     public Pacman(NAR nar, int ghosts, int visionRadius) {
@@ -93,7 +94,7 @@ public class Pacman extends NAgent {
 
         //Multi nar = new Multi(3,512,
 
-        Executioner e = Tetris.exe2;
+        Executioner e = Tetris.exe;
         Default nar = new Default(1024,
                 384, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
@@ -286,6 +287,7 @@ public class Pacman extends NAgent {
 //			}
 
 
+        @Nullable Truth zero = $.t(0.5f, alpha);
 
         actions.add(new MotorConcept("(leftright)",nar,(b,d)->{
             if (d!=null) {
@@ -296,10 +298,12 @@ public class Pacman extends NAgent {
                 int sc = Math.round(2f * (f -0.5f) * pacMovesPerCycle);
                 if (sc < 0) {
                     if (!pacman.pac.move(ctables.LEFT, -sc, pacman))
-                        return $.t(0.5f, alpha);
+                        return zero;
                 } else if (sc > 0) {
                     if (!pacman.pac.move(ctables.RIGHT, sc, pacman))
-                        return $.t(0.5f, alpha);
+                        return zero;
+                } else {
+                    return zero;
                 }
                 //return d;
                 return d.withConf(alpha);
@@ -315,10 +319,12 @@ public class Pacman extends NAgent {
                 int sc = Math.round(2f * (f-0.5f) * pacMovesPerCycle);
                 if (sc < 0) {
                     if (!pacman.pac.move(ctables.UP, -sc, pacman))
-                        return $.t(0.5f, alpha);
+                        return zero;
                 } else if (sc > 0) {
                     if (!pacman.pac.move(ctables.DOWN, sc, pacman))
-                        return $.t(0.5f, alpha);
+                        return zero;
+                } else {
+                    return zero;
                 }
                 //return d;
                 return d.withConf(alpha);
@@ -393,8 +399,8 @@ public class Pacman extends NAgent {
 //        if (nar instanceof Default) {
 //
 //          //new BeliefTableChart(nar, charted).show(700, 900);
-            BeliefTableChart.newBeliefChart(nar, charted, 50);
-            HistogramChart.budgetChart(nar, 20);
+            BeliefTableChart.newBeliefChart(nar, charted, 500);
+            HistogramChart.budgetChart(nar, 50);
 
 ////
             //BagChart.show((Default) nar, 512);
@@ -499,7 +505,9 @@ public class Pacman extends NAgent {
     @Override
     protected float act() {
 
-        pacman.cycle(pacmanCyclesPerFrame);
+        //update maze limits by not moving
+        pacman.pac.move(ctables.LEFT, 0, pacman);
+
 
         //delta score from pacman game
         float ds = (pacman.score - lastScore) * scoretoReward;
@@ -508,19 +516,20 @@ public class Pacman extends NAgent {
 
         //ds/=2f;
 
-        //ds += bias;
+        ds += bias;
 
         ds += deathPain;
         deathPain *= 0.95f;
 
-//        if (ds > 1f) ds = 1f;
-//        if (ds < -1f) ds = -1f;
+        if (ds > 1f) ds = 1f;
+        if (ds < -1f) ds = -1f;
 
 //
 //        if (deathPain < bias * 2f) {
 //            //too much pain
 //            pacman.pacKeyDir = -1;
 //        }
+        pacman.cycle(pacmanCyclesPerFrame);
 
 
         return ds;

@@ -242,7 +242,7 @@ public class Arkancide extends NAgent {
         Default nar = new Default(1024,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), INDEX_SIZE, false, exe)
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 16384, 4)
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 8192, 2)
 
                 , new FrameClock(), exe);
 

@@ -420,9 +420,9 @@ public class cpcman {
         for (int i = 0; i < ghosts.length; i++)
             ghosts[i].move(pac.iX, pac.iY, pac.iDir);
 
-        if (pacKeyDir != -1) {
-            k = pac.move(pacKeyDir);
-        }
+//        if (pacKeyDir != -1) {
+//            k = pac.move(pacKeyDir);
+//        }
 
         if (k == 1)    // eaten a dot
         {

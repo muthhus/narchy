@@ -84,9 +84,10 @@ public enum PremiseBuilder {
                     if (belief !=null) {
                         //try {
                             Task answered = answer(nar, task, belief, beliefConcept);
-                            if (answered!=null && !answered.equals(belief)) {
-                                nar.inputLater(answered);
-                            }
+
+//                            if (answered!=null && !answered.equals(belief)) {
+//                                nar.inputLater(answered);
+//                            }
 
                             if (answered!=null && task.isQuestion())
                                 belief = answered;

@@ -92,7 +92,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
     @Override
     public void answer(@NotNull Task a, Concept answerConcept, @NotNull NAR nar, List<Task> displ) {
 
-        list.withReadLockAndDelegate(l -> {
+        list.withWriteLockAndDelegate(l -> {
             int size = l.size();
 
             //each question is only responsible for 1/N of the effect on the answer
