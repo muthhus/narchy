@@ -3,6 +3,7 @@ package nars.budget.merge;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.link.BLink;
+import nars.nal.UtilityFunctions;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,73 +57,62 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
      * calculations are used to interpolate */
     static float blend(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, @NotNull PriMerge priMerge) {
 
-        float srcPri = src.priIfFiniteElseZero();
-        float srcScore =
-                or(src.dur(), src.qua());
+        float sPri = src.priIfFiniteElseZero() * srcScale;
 
-        float targetPri = tgt.priIfFiniteElseZero();
-        float targetScore =
-                or(tgt.dur(), tgt.qua());
+        float tPri = tgt.priIfFiniteElseZero();
 
 
         float targetProp;
-        if(targetScore > BUDGET_EPSILON && srcScore > BUDGET_EPSILON) {
-            targetProp = targetScore / (targetScore + srcScore);
-        } else if (targetScore < BUDGET_EPSILON) {
+        if (tPri > BUDGET_EPSILON && sPri > BUDGET_EPSILON) {
+            targetProp = tPri / (tPri + sPri);
+        } else if (tPri < BUDGET_EPSILON) {
             targetProp = 0f;
-        } else if (srcScore < BUDGET_EPSILON) {
+        } else if (sPri < BUDGET_EPSILON) {
             targetProp = 1f;
         } else {
             targetProp = 0.5f;
         }
 
-
-        float newPri = Float.NaN;
+        float newPri;
         switch (priMerge) {
-            case PLUS:
-                newPri = targetPri + srcPri * srcScale;
-                //newPri = Util.lerp(srcPri, Math.min(1f, srcPri + targetPri), srcScale);
-                break;
-            case AND:
-                newPri = Util.lerp(targetPri * srcPri, targetPri, srcScale);
-                break;
-            case OR:
-                newPri = Util.lerp(or(targetPri,srcPri), targetPri, srcScale);
-                break;
-            case AVERAGE:
-                newPri = Util.lerp((srcPri + targetPri)/2f, targetPri, srcScale);
-                break;
+            case PLUS:    newPri = tPri + sPri; break;
+            case AND:     newPri = (tPri * sPri); break;
+            case OR:      newPri = UtilityFunctions.or(tPri,sPri);  break;
+            case AVERAGE: newPri = (tPri + sPri)/2f;  break;
+            default:
+                throw new UnsupportedOperationException();
         }
         return dqBlend(tgt, src, newPri, targetProp);
     }
-    static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
-        float incomingPri = src.priIfFiniteElseZero() * srcScale;
 
-        float currentPri = tgt.priIfFiniteElseZero();
-
-        float sumPri = currentPri + incomingPri;
-
-        float cp = sumPri > 0 ? currentPri / sumPri : 0.5f; // current proportion
-
-        return dqBlend(tgt, src, addOrAvgPri ?
-                sumPri :
-                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
-    }
-    static float dqBlendBySummary(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
-        float incomingPri = src.pri() * srcScale;
-        float incomingSummary = src.summary() * srcScale;
-
-        float currentPri = tgt.priIfFiniteElseZero();
-        float currentSummary = tgt.summary();
-
-        float sumSummary = currentSummary + incomingSummary;
-
-        float cp = currentSummary / sumSummary; // current proportion
-
-        return dqBlend(tgt, src, addOrAvgPri ?
-                currentPri + incomingPri :
-                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
-    }
+//    static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
+//        float incomingPri = src.priIfFiniteElseZero() * srcScale;
+//
+//        float currentPri = tgt.priIfFiniteElseZero();
+//
+//        float sumPri = currentPri + incomingPri;
+//
+//        float cp = sumPri > 0 ? currentPri / sumPri : 0.5f; // current proportion
+//
+//        return dqBlend(tgt, src, addOrAvgPri ?
+//                sumPri :
+//                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
+//    }
+//    static float dqBlendBySummary(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
+//        float incomingPri = src.pri() * srcScale;
+//        float incomingSummary = src.summary() * srcScale;
+//
+//        float currentPri = tgt.priIfFiniteElseZero();
+//        float currentSummary = tgt.summary();
+//
+//        float sumSummary = currentSummary + incomingSummary;
+//
+//        float cp = currentSummary / sumSummary; // current proportion
+//
+//        return dqBlend(tgt, src, addOrAvgPri ?
+//                currentPri + incomingPri :
+//                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
+//    }
 
     static float dqBlend(@NotNull Budget tgt, @NotNull Budgeted src, float nextPri, float targetProp) {
 
@@ -166,28 +156,28 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     BudgetMerge andBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AND);
 
 
-    @Deprecated BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {
-        float nextPriority = src.priIfFiniteElseZero() * srcScale;
-
-        float currentPriority = tgt.priIfFiniteElseZero();
-
-        float sumPriority = currentPriority + nextPriority;
-        float overflow;
-        if (sumPriority > 1) {
-            overflow = sumPriority - 1f;
-            sumPriority = 1f;
-        } else {
-            overflow = 0;
-        }
-
-        boolean currentWins = currentPriority > nextPriority;
-
-        tgt.budget( sumPriority,
-                (currentWins ? tgt.dur() : src.dur()),
-                (currentWins ? tgt.qua() : src.qua()));
-
-        return overflow;
-    };
+//    @Deprecated BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {
+//        float nextPriority = src.priIfFiniteElseZero() * srcScale;
+//
+//        float currentPriority = tgt.priIfFiniteElseZero();
+//
+//        float sumPriority = currentPriority + nextPriority;
+//        float overflow;
+//        if (sumPriority > 1) {
+//            overflow = sumPriority - 1f;
+//            sumPriority = 1f;
+//        } else {
+//            overflow = 0;
+//        }
+//
+//        boolean currentWins = currentPriority > nextPriority;
+//
+//        tgt.budget( sumPriority,
+//                (currentWins ? tgt.dur() : src.dur()),
+//                (currentWins ? tgt.qua() : src.qua()));
+//
+//        return overflow;
+//    };
 
 //    /** add priority, interpolate durability and quality according to the relative change in priority
 //     *  WARNING untested

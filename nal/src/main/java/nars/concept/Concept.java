@@ -144,19 +144,19 @@ public interface Concept extends Termed {
         if (other == null || other.equals(this))
             return false; //null or same concept
 
-        crossLink(src, tgt, scale, other, nar);
+        crossLink(src, tgt, other, scale, nar);
         return true;
     }
 
-    default void crossLink(Budgeted thisInput, Budgeted otherTask, float scale, @NotNull Concept other, @NotNull NAR nar) {
+    default void crossLink(Budgeted mine, Budgeted theirs, @NotNull Concept them, float scale, @NotNull NAR nar) {
         float halfScale = scale / 2f;
 
-        Activation a = new Activation(otherTask, null, nar);
-        a.link(this, other.term(), halfScale, 0);
+        Activation a = new Activation(theirs, null, nar);
+        a.link(this, them.term(), halfScale, 0);
         a.commit(1f);
 
-        Activation b = new Activation(thisInput, null, nar);
-        b.link(other, term(), halfScale, 0);
+        Activation b = new Activation(mine, null, nar);
+        b.link(them, term(), halfScale, 0);
         b.commit(1f);
     }
 

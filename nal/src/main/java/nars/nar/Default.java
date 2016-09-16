@@ -10,7 +10,7 @@ import nars.link.BLink;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.ConceptBagCycle;
-import nars.op.VariableCompressor;
+import nars.op.VarIntroducer;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
@@ -70,7 +70,7 @@ public class Default extends AbstractNAR {
 
         if (nal() >= 5) {
 
-            preprocess(new VariableCompressor(this));
+            onTask(new VarIntroducer(this));
 
             if (nal() >= 7) {
                 initNAL7();

@@ -4,6 +4,7 @@ import nars.budget.Budget;
 import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.budget.Budget.validBudgetValue;
 import static nars.util.Util.clamp;
 
 /**
@@ -43,18 +44,18 @@ public class ArrayBLink<X> implements BLink<X> {
     }
 
     @Override
-    public final void _setPriority(float p) {
-        f[0] = p;
+    public final void setPriority(float p) {
+        f[0] = validBudgetValue(p);
     }
 
     @Override
-    public final void _setDurability(float d) {
-        f[1] = d;
+    public final void setDurability(float d) {
+        f[1] = validBudgetValue(d);
     }
 
     @Override
-    public final void _setQuality(float q) {
-        f[2] = q;
+    public final void setQuality(float q) {
+        f[2] = validBudgetValue(q);
     }
 
     @Override
@@ -64,12 +65,9 @@ public class ArrayBLink<X> implements BLink<X> {
 
     @Override
     public final Budget budget(float p, float d, float q) {
-        if (p != p) //NaN check
-            throw new BudgetException();
-
-        f[0] = clamp(p);
-        f[1] = clamp(d);
-        f[2] = clamp(q);
+        f[0] = validBudgetValue(p);
+        f[1] = validBudgetValue(d);
+        f[2] = validBudgetValue(q);
         return this;
     }
 

@@ -257,12 +257,7 @@ public class Activation {
 
     public void commit(float scale) {
         if (!concepts.isEmpty()) {
-            float total =
-                    1 / (float) concepts.sum(); //normalized
-                    //1f; //unnormalized
-
-            //System.out.println("commit: " + concepts);
-            nar.activate(concepts, in, scale / total, conceptOverflow);
+            nar.activate(concepts, in, scale / (float)concepts.sum(), conceptOverflow);
         }
     }
 

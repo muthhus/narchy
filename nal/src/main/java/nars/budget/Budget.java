@@ -126,15 +126,20 @@ public interface Budget extends Budgeted {
      * @param p The new priority
      * @return whether the operation had any effect
      */
-    default void setPriority(float p) {
+    void setPriority(float p);
+
+    public static float validBudgetValue(float p) {
         if (p!=p /* fast NaN test */)
             throw new BudgetException();
 
-        _setPriority(Util.clamp(p));
+        return Util.clamp(p);
     }
-
-    /** called from setPriority after validation */
-    void _setPriority(float p);
+    public static float validBudgetValueOrNaN(float p) {
+        if (p!=p /* fast NaN test */)
+            return Float.NaN;
+        else
+            return Util.clamp(p);
+    }
 
    
 
@@ -146,15 +151,12 @@ public interface Budget extends Budgeted {
 //    }
 //
     default Budget priMult(float factor) {
-        float pri = pri();
-        if (pri==pri) //if not deleted
-            setPriority(pri * factor);
+        setPriority(pri() * factor);
         return this;
     }
 
     default Budget priLerp(float target, float speed) {
-        float p = pri();
-        setPriority(Util.lerp(target, p, speed));
+        setPriority(Util.lerp(target, pri(), speed));
         return this;
     }
 
@@ -188,25 +190,11 @@ public interface Budget extends Budgeted {
 //    }
 
 
-    default void setDurability(float d) {
-        _setDurability(Util.clamp(d));
-    }
+    void setDurability(float d);
 
-    public abstract void _setDurability(float d);
+    void setQuality(float q);
 
 
-    default void setQuality(float q) {
-        _setQuality(Util.clamp(q));
-    }
-
-    public abstract void _setQuality(float q);
-
-    /**
-     * Increase priority value by a percentage of the remaining range.
-     * Uses the 'or' function so it is not linear
-     *
-     * @param v The increasing percent
-     */
     default void orPriority(float v) {
         setPriority(or(pri(), v));
     }
@@ -214,6 +202,9 @@ public interface Budget extends Budgeted {
         setPriority(or(pri(), x, y));
     }
 
+    default void orQuality(float v) {
+        setQuality(BudgetFunctions.or(qua(), v));
+    }
 
 
 

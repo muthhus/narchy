@@ -6,13 +6,12 @@ import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.agent.NAgent;
-import nars.data.AutoClassifier;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.VariableCompressor;
+import nars.op.VarIntroducer;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
@@ -38,7 +37,6 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.t;
-import static nars.experiment.tetris.Tetris.arrayRenderer;
 import static nars.experiment.tetris.Tetris.exe;
 import static nars.video.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;
@@ -246,7 +244,6 @@ public class Arkancide extends NAgent {
 
                 , new FrameClock(), exe);
 
-        nar.preprocess(new VariableCompressor(nar));
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.7f);

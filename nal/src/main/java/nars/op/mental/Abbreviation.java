@@ -162,7 +162,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
                     Concept aliasConcept = nar.concept(alias, true);
                     if (abbreviatedConcept!=null) {
                         abbreviatedConcept.put(Abbreviation.class, abbreviation);
-                        abbreviatedConcept.crossLink(b, this, 1f, aliasConcept, nar);
+                        abbreviatedConcept.crossLink(b, this, aliasConcept, 1f, nar);
                     } else {
                         logger.error("alias unconceptualized: {}", alias);
                     }

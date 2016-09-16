@@ -9,17 +9,17 @@ import nars.term.container.TermVector;
 import nars.util.Texts;
 import nars.util.data.sorted.SortedList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
@@ -627,5 +627,70 @@ public class Terms   {
         }
 
         return c;
+    }
+
+    /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
+    @Nullable
+    public static Term substMaximal(Compound c, org.eclipse.collections.api.block.predicate.Predicate<Term> include, int minCount, int minScore) {
+        HashBag<Term> uniques = subtermScore(c,
+            t -> include.test(t) ? t.complexity() : 0 //sum by complexity if passes include filter
+        );
+
+        int s = uniques.size();
+        if (s>0) {
+            MutableList<ObjectIntPair<Term>> u = uniques.topOccurrences(s);
+            for (ObjectIntPair<Term> p : u) {
+                int score = p.getTwo();
+                if (score >= minScore) {
+                    Term subterm = p.getOne();
+                    int count = score / subterm.complexity(); //should be a whole number according to the above scoring policy
+                    if (count >= minCount) {
+                        return subterm;
+                    }
+                }
+            }
+
+        }
+
+        return null;
+    }
+
+//    /** produces a Map<Object,Int> of 'scores' of how much complexity would be reduced by replacing all occurrences of that subterm with a variable */
+//    @NotNull public static ObjectIntMap<Term> substAnalysis(Compound c, org.eclipse.collections.api.block.predicate.Predicate<Term> include, int minCount) {
+//
+//        HashBag<Term> uniques = subtermRepeats(c, include, t -> t.complexity());
+//
+//        if (!uniques.isEmpty()) {
+//
+//            //ObjectIntHashMap<Term> h = new ObjectIntHashMap<>(uniques.size());
+//            uniques.forEachWithOccurrences((subterm, score) -> {
+//                if (count >= minCount) {
+//                    int xc = subterm.complexity();
+//                    int score = xc * count;
+//                    h.put(subterm, score);
+//                }
+//            });
+//
+//            if (!h.isEmpty()) {
+//                h.compact();
+//                return h;
+//            }
+//
+//        }
+//
+//        return ObjectIntMaps.immutable.empty();
+//    }
+
+    /** counts the repetition occurrence count of each subterm within a compound */
+    public static HashBag<Term> subtermScore(Compound c, ToIntFunction<Term> score) {
+        HashBag<Term> uniques = new HashBag<>(c.volume());
+
+        c.recurseTerms((Term subterm) -> {
+            int s = score.applyAsInt(subterm);
+            if (s > 0)
+                uniques.addOccurrences(subterm, s);
+        });
+
+        return uniques;
     }
 }

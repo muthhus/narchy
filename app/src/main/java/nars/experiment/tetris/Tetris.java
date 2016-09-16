@@ -6,19 +6,14 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
 import nars.agent.NAgent;
-import nars.concept.table.BeliefTable;
-import nars.data.AutoClassifier;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
-import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
-import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
@@ -44,7 +39,6 @@ import spacegraph.obj.Plot2D;
 
 import java.io.IOException;
 import java.util.Random;
-import java.util.concurrent.Executors;
 
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;

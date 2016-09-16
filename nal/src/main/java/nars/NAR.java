@@ -580,7 +580,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * if the task was a command, it will return false even if executed
      */
     @Nullable
-    protected final Concept input(@NotNull Task input) {
+    public final Concept input(@NotNull Task input) {
 
         //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {

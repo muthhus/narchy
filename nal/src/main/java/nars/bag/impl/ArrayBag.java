@@ -707,9 +707,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
             ArrayBag bag = this.arrayBag;
 
-
             if (existing != null) {
-
 
                 //existing.isDeleted() /* if deleted, we will merge replacing it as if it were zero:
 
@@ -723,7 +721,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 return existing;
             } else {
 
-                BLink r;
                 priMult(scale);
                 float bp = pri();
 
@@ -731,7 +728,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     //reject due to insufficient budget
                     bag.pressure += bp;
                     this.result = -1;
-                    r = null;
+                    return null;
                 } else {
                     //accepted for insert
                     BLink nvv = newLink(key, this);
@@ -740,9 +737,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     bag.mass += bp;
 
                     this.result = +1;
-                    r = nvv;
+                    return nvv;
                 }
-                return r;
             }
         }
     }

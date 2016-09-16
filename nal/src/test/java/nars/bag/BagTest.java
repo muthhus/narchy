@@ -24,7 +24,7 @@ import java.util.Random;
 import java.util.function.DoubleSupplier;
 
 import static nars.budget.merge.BudgetMerge.plusBlend;
-import static nars.budget.merge.BudgetMerge.plusDQDominant;
+import static nars.budget.merge.BudgetMerge.plusBlend;
 import static nars.util.Texts.n4;
 import static org.junit.Assert.*;
 
@@ -41,12 +41,12 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalArray() {
-        testBasicInsertionRemoval(new ArrayBag<>(1, plusDQDominant, new HashMap<>(1)));
+        testBasicInsertionRemoval(new ArrayBag<>(1, plusBlend, new HashMap<>(1)));
     }
 
     @Test
     public void testBasicInsertionRemovalCurve() {
-        testBasicInsertionRemoval(new CurveBag<>(1, defaultSampler, plusDQDominant, new HashMap(1)));
+        testBasicInsertionRemoval(new CurveBag<>(1, defaultSampler, plusBlend, new HashMap(1)));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class BagTest {
 
     @Test
     public void testBudgetMerge() {
-        ArrayBag<String> a = new ArrayBag(4, plusDQDominant, new HashMap<>(4));
+        ArrayBag<String> a = new ArrayBag(4, plusBlend, new HashMap<>(4));
 
         a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
@@ -94,7 +94,7 @@ public class BagTest {
 
     @Test
     public void testSort() {
-        ArrayBag<String> a = new ArrayBag(4, plusDQDominant, new HashMap<>(4));
+        ArrayBag<String> a = new ArrayBag(4, plusBlend, new HashMap<>(4));
 
         a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new RawBudget(0.2f, 0.5f, 0.5f));
@@ -122,7 +122,7 @@ public class BagTest {
 
     @Test
     public void testCapacity() {
-        ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
+        ArrayBag<String> a = new ArrayBag(2, plusBlend, new HashMap<>(2));
 
         a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new RawBudget(0.2f, 0.5f, 0.5f));
@@ -141,7 +141,7 @@ public class BagTest {
 
     @Test
     public void testRemoveByKey() {
-        ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
+        ArrayBag<String> a = new ArrayBag(2, plusBlend, new HashMap<>(2));
 
         a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
         a.commit();
@@ -276,7 +276,7 @@ public class BagTest {
     private CurveBag<String> populated(int n, @NotNull DoubleSupplier random) {
 
 
-        CurveBag<String> a = curveBag(n, plusDQDominant);
+        CurveBag<String> a = curveBag(n, plusBlend);
 
 
         //fill with uniform randomness
@@ -293,7 +293,7 @@ public class BagTest {
 
     @Test
     public void testFlatBagRemainsRandomInNormalizedSamplerCurve() {
-        @NotNull CurveBag<String> a = curveBag(8, plusDQDominant);
+        @NotNull CurveBag<String> a = curveBag(8, plusBlend);
 
         testSamplingFlat(a, 0.04f);
 

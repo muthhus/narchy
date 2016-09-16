@@ -505,7 +505,7 @@ public class NAL7Test extends AbstractNALTest {
                 1.0f, 0.81f,
                 0);
         tester.mustBelieve(cycles,
-                "(((SELF,#1)-->at) &&-10 (({t002},#1)-->on))",
+                "(((SELF,#1)-->at) &&+10 (({t002},#1)-->on))",
                 1.0f, 0.81f,
                 0);
         tester.mustNotOutput(cycles, "(((SELF,#1)-->at) &&-10 (({t002},#1)-->on))", '.', ETERNAL);

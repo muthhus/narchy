@@ -26,16 +26,13 @@ import nars.experiment.tetris.Tetris;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
-import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.VariableCompressor;
 import nars.op.time.MySTMClustered;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.truth.Truth;
-import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -47,7 +44,6 @@ import java.util.List;
 import java.util.Random;
 
 import static nars.experiment.tetris.Tetris.*;
-import static nars.experiment.tetris.Tetris.exe;
 
 /**
  * the java application class of pacman 

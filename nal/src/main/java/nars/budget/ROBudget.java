@@ -10,9 +10,9 @@ public final class ROBudget implements Budget {
     private final float pri, dur, qua;
 
     public ROBudget(float pri, float dur, float qua) {
-        this.pri = pri;
-        this.dur = dur;
-        this.qua = qua;
+        this.pri = Budget.validBudgetValue(pri);
+        this.dur = Budget.validBudgetValue(dur);
+        this.qua = Budget.validBudgetValue(qua);
     }
 
     @Override
@@ -26,17 +26,17 @@ public final class ROBudget implements Budget {
     }
 
     @Override
-    public void _setPriority(float p) {
+    public void setPriority(float p) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void _setDurability(float d) {
+    public void setDurability(float d) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void _setQuality(float q) {
+    public void setQuality(float q) {
         throw new UnsupportedOperationException();
     }
 
