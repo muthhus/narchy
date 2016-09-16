@@ -225,18 +225,25 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
      */
     default int subtermTime(@NotNull Term x, int dt) {
 
-        if (this.equals(x))
+        x = $.unneg(x); //ignore polarity
+
+        if ($.unneg(this).equalsIgnoringVariables(x))
             return 0;
 
-        if (!this.op().temporal || dt == DTERNAL)
+        if (!this.op().temporal)
             return DTERNAL;
 
         Compound c = ((Compound) this);
 
+        //TODO use structure to early exit
 
-        if (dt == 0) {
-            if (this.containsTerm(x))
-                return 0; //also handles &| multi-arg case
+        if (dt == 0 || dt == DTERNAL) {
+            //TODO search better, containsTerm wont work in all cases
+            for (Term y : ((Compound)this).terms()) {
+                int sdt = y.subtermTime(x);
+                if (sdt!=DTERNAL)
+                    return sdt;
+            }
         } else if (this.size() == 2) {
 
             int firstIndex, lastIndex;
@@ -259,17 +266,18 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
                 lastIndex = 1;
             }
 
-            Term first = c.term(firstIndex);
-            if (first.equals(x))
+            Term first = $.unneg(c.term(firstIndex));
+            if (first.equalsIgnoringVariables(x))
                 return 0;
 
-            Term last = c.term(lastIndex);
-            if (last.equals(x))
+            Term last = $.unneg(c.term(lastIndex));
+            if (last.equalsIgnoringVariables(x))
                 return dt;
 
             int withinSubj = first.subtermTime(x);
             if (withinSubj != DTERNAL)
                 return withinSubj;
+
             int withinPred = last.subtermTime(x);
             if (withinPred != DTERNAL)
                 return dt + withinPred;

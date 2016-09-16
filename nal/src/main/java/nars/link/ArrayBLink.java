@@ -5,7 +5,6 @@ import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.budget.Budget.validBudgetValue;
-import static nars.util.Util.clamp;
 
 /**
  * Created by me on 9/6/16.

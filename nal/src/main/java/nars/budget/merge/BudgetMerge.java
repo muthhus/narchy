@@ -3,7 +3,6 @@ package nars.budget.merge;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.link.BLink;
-import nars.nal.UtilityFunctions;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -10,7 +10,6 @@ import nars.term.container.TermContainer;
 import nars.term.mutate.CommutivePermutations;
 import nars.term.mutate.Termunator;
 import nars.term.mutate.Termutator;
-import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
 import nars.util.data.list.LimitedFasterList;

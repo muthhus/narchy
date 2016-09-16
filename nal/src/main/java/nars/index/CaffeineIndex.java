@@ -11,7 +11,6 @@ import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.util.signal.WiredCompoundConcept;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;

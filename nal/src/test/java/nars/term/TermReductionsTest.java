@@ -2,7 +2,6 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
-import nars.nal.TermBuilder;
 import nars.op.data.differ;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

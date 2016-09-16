@@ -4,12 +4,12 @@ import nars.$;
 import nars.bag.Bag;
 import nars.concept.AtomConcept;
 import nars.concept.PermanentConcept;
-import nars.term.transform.TermTransform;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.transform.TermTransform;
 import org.jetbrains.annotations.NotNull;
 
 /**

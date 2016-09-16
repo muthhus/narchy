@@ -1,6 +1,9 @@
 package nars.budget.policy;
 
-import nars.*;
+import nars.$;
+import nars.Memory;
+import nars.Symbols;
+import nars.Task;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;

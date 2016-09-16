@@ -1,6 +1,5 @@
 package nars.nal.meta.op;
 
-import nars.$;
 import nars.Op;
 import nars.index.PatternIndex;
 import nars.nal.meta.BoolCondition;

@@ -4,7 +4,6 @@
  */
 package nars.nal;
 
-import nars.NAR;
 import nars.Task;
 import nars.budget.RawBudget;
 import nars.concept.Concept;

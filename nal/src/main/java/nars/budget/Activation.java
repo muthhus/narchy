@@ -156,7 +156,9 @@ public class Activation {
 
     public void linkTermLinks(Concept src, float scale) {
         src.termlinks().forEach(n -> {
-            link(src, n.get(), scale, 0);
+            Term nn = n.get();
+            if (nn!=null)
+                link(src, nn, scale, 0);
         });
     }
 

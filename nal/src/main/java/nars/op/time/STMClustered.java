@@ -14,7 +14,6 @@ import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

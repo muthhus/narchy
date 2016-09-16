@@ -2,7 +2,6 @@ package nars.nal;
 
 import nars.Task;
 
-import java.util.Collection;
 import java.util.function.Consumer;
 
 /**

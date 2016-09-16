@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import static nars.budget.Budget.validBudgetValue;
 import static nars.nal.UtilityFunctions.and;
-import static nars.util.Util.clamp;
 
 /**
  * Contains only the 3 p,d,q as floats.  For general purpose usage, you probably want to use UnitBudget

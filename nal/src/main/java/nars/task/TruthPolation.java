@@ -8,15 +8,12 @@ import nars.Task;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
-import org.eclipse.collections.impl.factory.Iterables;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static nars.nal.UtilityFunctions.w2c;

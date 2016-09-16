@@ -2,8 +2,8 @@ package nars.task;
 
 import nars.*;
 import nars.budget.RawBudget;
-import nars.concept.TruthDelta;
 import nars.concept.InvalidConceptException;
+import nars.concept.TruthDelta;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -15,11 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 import static nars.$.t;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 /**

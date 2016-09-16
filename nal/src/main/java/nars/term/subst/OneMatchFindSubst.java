@@ -5,7 +5,6 @@ import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
-import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

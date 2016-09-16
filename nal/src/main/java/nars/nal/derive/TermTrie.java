@@ -1,7 +1,6 @@
 package nars.nal.derive;
 
 import com.google.common.base.Joiner;
-import it.unimi.dsi.fastutil.objects.Object2FloatFunction;
 import nars.term.Term;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;

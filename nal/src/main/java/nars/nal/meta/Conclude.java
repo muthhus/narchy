@@ -160,6 +160,19 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     m, this, occReturn, confScale
             );
 
+            //temporalization failure, could not determine temporal attributes
+            if (temporalized == null)
+                return;
+
+            if (temporalized.dt() == XTERNAL || temporalized.dt() == -XTERNAL) {
+                   // || Math.abs(occReturn[0] - DTERNAL) < 1000) { //tempoary
+//                this.temporalizer.compute(content,
+//                        m, this, occReturn, confScale
+//                );
+                throw new InvalidTermException(content.op(), content.dt(), content.terms(), "XTERNAL/DTERNAL leak");
+                //return;
+            }
+
             if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
                 //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
                 throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
@@ -170,10 +183,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 ((GenericCompound)content).setNormalized();
             }
 
-            if (content.dt() == XTERNAL || content.dt() == -XTERNAL) {
-                throw new InvalidTermException(content.op(), content.dt(), content.terms(), "XTERNAL leak");
-                //return;
-            }
+
 
             //apply the confidence scale
             if (truth != null) {

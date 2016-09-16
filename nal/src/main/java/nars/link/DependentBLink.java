@@ -1,9 +1,7 @@
 package nars.link;
 
-import nars.Task;
 import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A BLink that references and depends on another Budgeted item (ex: Task).

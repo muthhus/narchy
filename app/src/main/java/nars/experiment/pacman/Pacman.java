@@ -26,6 +26,7 @@ import nars.experiment.tetris.Tetris;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
+import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.util.DefaultConceptBuilder;
@@ -33,6 +34,7 @@ import nars.op.time.MySTMClustered;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.truth.Truth;
+import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -55,13 +57,13 @@ public class Pacman extends NAgent {
 
     final int visionRadius;
     final int itemTypes = 3;
-    final static int runCycles = 50000;
+    final static int runCycles = 5000;
 
 
     final int inputs;
 
     private final int pacmanCyclesPerFrame = 1;
-    int pacMovesPerCycle = 5;
+    int pacMovesPerCycle = 2;
 
     float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
     public float scoretoReward = 1f;
@@ -92,17 +94,17 @@ public class Pacman extends NAgent {
 
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                384, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 50000, 16384, 4),
+                256, 2, 2, rng,
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
                 new FrameClock(), e
 
         );
 
         //new MemoryManager(nar);
 
-        nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         float pMult = 0.005f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * pMult;
@@ -112,7 +114,7 @@ public class Pacman extends NAgent {
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
         nar.confMin.setValue(0.02f);
-        nar.compoundVolumeMax.set(40);
+        nar.compoundVolumeMax.set(20);
         //nar.truthResolution.setValue(0.02f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");

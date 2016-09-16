@@ -10,9 +10,9 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.subst.FindSubst;
 import nars.term.mutate.Choose1;
 import nars.term.mutate.Choose2;
+import nars.term.subst.FindSubst;
 import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 

@@ -4,7 +4,6 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.nal.meta.match.Ellipsislike;
-import nars.term.transform.TermTransform;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
@@ -12,6 +11,7 @@ import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
+import nars.term.transform.TermTransform;
 import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -183,6 +183,10 @@ public abstract class TermBuilder {
     }
 
     public static Term productNormalize(Term t) {
+        boolean neg = t.op() == NEG;
+        if (neg)
+            t = $.unneg(t);
+
         if (t instanceof Compound && (t.op() == INH) && (t.varPattern()==0) && t.hasAny(Op.IMGbits))  {
             Term s = (((Compound) t).term(0));
             Term p = (((Compound) t).term(1));
@@ -196,7 +200,8 @@ public abstract class TermBuilder {
                 t = $.inh(imageUnwrapToProd(s, ii), ii.term(0));
             }
         }
-        return t;
+
+        return !neg ? t : $.neg(t);
     }
 
     @NotNull

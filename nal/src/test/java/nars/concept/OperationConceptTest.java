@@ -1,18 +1,12 @@
 package nars.concept;
 
-import com.google.common.base.Joiner;
-import nars.$;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.List;
-
-import static nars.util.Texts.n2;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
  * Created by me on 3/22/16.

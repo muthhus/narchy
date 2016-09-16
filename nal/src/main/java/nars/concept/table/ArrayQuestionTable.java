@@ -1,30 +1,19 @@
 package nars.concept.table;
 
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.task.AnswerTask;
-import nars.util.data.list.FasterList;
-import org.apache.commons.collections4.ListUtils;
-import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.list.mutable.MultiReaderFastList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 /**

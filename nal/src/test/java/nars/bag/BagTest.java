@@ -24,7 +24,6 @@ import java.util.Random;
 import java.util.function.DoubleSupplier;
 
 import static nars.budget.merge.BudgetMerge.plusBlend;
-import static nars.budget.merge.BudgetMerge.plusBlend;
 import static nars.util.Texts.n4;
 import static org.junit.Assert.*;
 

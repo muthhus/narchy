@@ -20,7 +20,6 @@ import nars.term.Terms;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import nars.util.data.list.FasterList;
-import nars.util.data.map.nbhm.NonBlockingHashMap;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

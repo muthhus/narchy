@@ -1,7 +1,6 @@
 package nars.util.signal;
 
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.policy.ConceptPolicy;
@@ -11,8 +10,6 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.TemporalBeliefTable;
 import nars.term.Compound;
-import nars.term.Terms;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

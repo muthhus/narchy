@@ -1,11 +1,8 @@
 package nars.term.obj;
 
-import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
-import nars.budget.Activation;
-import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.AbstractConcept;
 import nars.concept.table.BeliefTable;

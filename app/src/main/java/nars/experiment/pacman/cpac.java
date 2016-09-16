@@ -90,9 +90,9 @@ public class cpac
 				iImageStep=3-iImageStep;
 			else
 				iImageStep-=4;
-			graphics.drawImage(imagePac[iDir][iImageStep], iX - 1, iY - 1, applet);
+			graphics.drawImage(imagePac[iDir][Math.abs(iImageStep%4)], iX - 1, iY - 1, applet);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			//grr
+			e.printStackTrace();
 		}
 	}	
 

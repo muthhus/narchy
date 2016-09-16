@@ -2,12 +2,16 @@ package nars.time;
 
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.Task;
+import nars.nal.meta.Conclude;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
-import nars.nal.meta.Conclude;
 import nars.nal.rule.PremiseRule;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.InvalidTermException;
+import nars.term.Term;
+import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +37,7 @@ public interface TimeFunctions {
      * @param confScale
      * @return
      */
-    @NotNull Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale);
+    @Nullable Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale);
 
 
     static long earlyOrLate(long t, long b, boolean early) {
@@ -203,8 +207,12 @@ public interface TimeFunctions {
         return deriveDT(derived, polarity, p, eventDelta, occReturn);
     }
 
-    static boolean derivationMatch(Term a, Term b) {
+    @Deprecated static boolean derivationMatch(Term a, Term b) {
         return productNormalize(unneg(a)).equalsIgnoringVariables(productNormalize(unneg(b)));
+    }
+
+    static boolean derivationMatch(Term a, Term b, PremiseEval p) {
+        return resolve(p, a).equalsIgnoringVariables(resolve(p, b));
     }
 
 
@@ -218,12 +226,12 @@ public interface TimeFunctions {
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
-    @NotNull TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) ->
+    @Nullable TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) ->
             decompose(derived, p, occReturn, true);
-    @NotNull TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) ->
+    @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) ->
             decompose(derived, p, occReturn, false);
 
-    @NotNull
+    @Nullable
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
 
         Task premBelief = p.belief;
@@ -231,7 +239,7 @@ public interface TimeFunctions {
             //premBelief = p.task; //it is the task itself being decomposed
 
         Compound decomposedTerm = (Compound) (decomposeTask ? $.unneg(p.taskTerm) : p.beliefTerm);
-        int dtDecomposed = decomposedTerm.dt();
+        //int dtDecomposed = decomposedTerm.dt();
         long occDecomposed = decomposeTask ? p.task.occurrence() : (premBelief != null ? premBelief.occurrence() : ETERNAL);
 
         //the non-decomposed counterpart of the premise
@@ -260,21 +268,30 @@ public interface TimeFunctions {
 
                 occ = ETERNAL;
 
+                Term rDerived = resolve(p, derived);
+                Term rDecomposed = resolve(p, decomposedTerm);
+
                 if (occDecomposed!=ETERNAL) {
 
-                    occ = occDecomposed + p.resolve(decomposedTerm).subtermTime(derived);
+                    int dt = rDecomposed.subtermTime(rDerived);
+                    if (dt!=DTERNAL)
+                        occ = occDecomposed + dt;
+//                    else {
+//                        //TEMPOARY
+//                        rDecomposed.subtermTime(rDerived);
+//                    }
                 }
+
                 if (occ == ETERNAL && occOther!=ETERNAL) {
 
-                    @Nullable Term rOtherTerm = productNormalize(p.resolve(decomposeTask ? p.beliefTerm.term() : p.taskTerm));
+                    @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm.term() : p.taskTerm);
 
-                    if (derivationMatch(rOtherTerm, derived)) {
+                    if (derivationMatch(rOtherTerm, derived, p)) {
                         occ = occOther;
                     } else {
-                        @Nullable Term rd = p.resolve(decomposedTerm);
-                        int otherInDecomposed = rd.subtermTime(rOtherTerm);
+                        int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
                         if (otherInDecomposed!=DTERNAL) {
-                            int derivedInDecomposed = rd.subtermTime(derived);
+                            int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
                             if (derivedInDecomposed!=DTERNAL) {
                                 //now compute the dt between derived and otherTerm, as a shift added to occOther
                                 occ = occOther + (derivedInDecomposed-otherInDecomposed);
@@ -286,8 +303,12 @@ public interface TimeFunctions {
 
                 }
 
-                if (occ == ETERNAL)
-                    return noTemporalBasis(derived);
+                if (occ == ETERNAL) {
+                    if (Param.DEBUG)
+                        return noTemporalBasis(derived);
+                    else
+                        return null;
+                }
 
             }
 
@@ -297,6 +318,11 @@ public interface TimeFunctions {
 
         }
 
+    }
+
+    @Nullable
+    static Term resolve(@NotNull PremiseEval p, Term t) {
+        return p.resolve(productNormalize(unneg(t)));
     }
 
     @NotNull
@@ -765,8 +791,8 @@ public interface TimeFunctions {
         //apply occurrence shift
         if (occ > Tense.TIMELESS) {
 
-            Term T = p.resolve(tt);
-            Term B = bb != null ? p.resolve(bb) : null;
+            Term T = resolve(p, tt);
+            Term B = bb != null ? resolve(p,bb) : null;
             Term C = derived;
 
             if (belief != null) {

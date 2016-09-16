@@ -8,7 +8,6 @@ import nars.budget.Forget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
-import nars.util.Util;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +64,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         boolean forceClean = toAdd == null; //force clean if this is a commit and not an addition update
 
-        int sizeThresh = forceClean ? 0 : c + ((toAdd!=null) ? 1 : 0);
+        int sizeThresh = forceClean ? 0 : c + ((toAdd != null) ? 1 : 0);
         boolean modified = false;
 
         SortedArray<BLink<V>> items = this.items;
@@ -90,7 +89,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 BLink<V> k2 = map.remove(k);
 
-                if (k2 != w && k2!=null) {
+                if (k2 != w && k2 != null) {
                     //throw new RuntimeException(
                     logger.error("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
                     //reinsert it because it must have been added in the mean-time:
@@ -133,7 +132,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public V boost(Object key, float boost) {
         BLink<V> c = map.get(key);
-        if (c!=null && !c.isDeleted()) {
+        if (c != null && !c.isDeleted()) {
             //float dur = c.dur();
             float pBefore = c.pri();
             c.priMult(boost);
@@ -158,13 +157,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-
     /**
      * true iff o1 > o2
      */
     static final boolean cmpGT(@Nullable BLink o1, @Nullable BLink o2) {
         return (cmp(o1) < cmp(o2));
     }
+
     static final boolean cmpGT(@Nullable BLink o1, float o2) {
         return (cmp(o1) < o2);
     }
@@ -183,11 +182,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     static final boolean cmpLT(@Nullable BLink o1, @Nullable BLink o2) {
         return (cmp(o1) > cmp(o2));
     }
+
     static final boolean cmpLT(@Nullable BLink o1, float o2) {
         return (cmp(o1) > o2);
     }
 
-    /** gets the scalar float value used in a comparison of BLink's */
+    /**
+     * gets the scalar float value used in a comparison of BLink's
+     */
     static float cmp(@Nullable Budgeted b) {
         if (b == null) return -1f;
         float p = b.pri();
@@ -203,15 +205,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-
-
     @NotNull
     @Override
     public Bag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
         throw new RuntimeException("unimpl");
     }
-
-
 
 
 //    @Override
@@ -397,7 +395,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         for (; i >= 0; ) {
             BLink<V> b = l[i];
 
-            if (b != null && b.get()!=null ) {
+            if (b != null && b.get() != null) {
                 if (eachNotNull)
                     each.accept(b);
             }
@@ -498,6 +496,17 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
     }
 
+    @Override
+    public void forEach(Consumer<? super BLink<V>> action) {
+        Object[] x = items.array();
+        for (Object a : x) {
+            if (a!=null) {
+                BLink<V> b = (BLink)a;
+                if (!b.isDeleted())
+                    action.accept(b);
+            }
+        }
+    }
 
     /**
      * http://kosbie.net/cmu/summer-08/15-100/handouts/IterativeQuickSort.java
@@ -524,7 +533,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 }
                 if (stack_pointer != -1) {
                     right = stack[stack_pointer--];
-                    left =  stack[stack_pointer--];
+                    left = stack[stack_pointer--];
                 } else {
                     break;
                 }
@@ -688,7 +697,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         @Nullable
         private final MutableFloat overflow;
 
-//        /**
+        //        /**
 //         * TODO this field can be re-used for 'activated' return value
 //         * -1 = deactivated, +1 = activated, 0 = no change
 //         */

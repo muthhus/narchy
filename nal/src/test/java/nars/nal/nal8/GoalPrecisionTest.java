@@ -3,7 +3,6 @@ package nars.nal.nal8;
 import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.Task;
 import nars.concept.OperationConcept;
 import nars.nar.Default;
 import nars.term.Term;

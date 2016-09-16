@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
-import static nars.term.Terms.compoundOrNull;
-
 
 /**
  * generalized variable introduction implemented as input preprocessor stage
