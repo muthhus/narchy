@@ -27,6 +27,18 @@ public enum Op {
 //            return Atom.the(i);
 //        }}
 //
+
+    /*
+    <sseehh__> is it true thatdepvar only introduces across conjuncion subterms
+    <sseehh__> whlie indepvar only introduces across statement subterms
+    <sseehh__> or is there any other cases or exceptions to this
+    <patham9> yes, thats true for all introduction rules
+    <patham9> the reason is that independent variables are meant to capture the forall semantics by making use of the extension: if something is an A, it also is a B" (analogical with intension), so depends on this ==> copula
+    <patham9> but also on the --> on both sides
+    <patham9> while a dependent variable captures the some semantics, "something is A and B", which is a conjunction where both parts share this something
+    <sseehh__> ok that makes it simple
+    <sseehh__> we could call them 'conjunction variables' and 'statement variables'
+     */
     VAR_INDEP(Symbols.VAR_INDEPENDENT, Op.ANY /* 6*/ /*NAL6 for Indep Vars */, OpType.Variable),
     VAR_DEP(Symbols.VAR_DEPENDENT, Op.ANY, OpType.Variable),
     VAR_QUERY(Symbols.VAR_QUERY, Op.ANY, OpType.Variable),

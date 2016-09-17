@@ -3,6 +3,7 @@ package nars.nar;
 import nars.$;
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.bag.impl.CurveBag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
@@ -26,6 +27,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;
@@ -85,14 +87,21 @@ public class Default extends AbstractNAR {
                 @Override protected Term next(Compound input, Term selection, int iteration) {
                     //1. decide if the selected term spans across any statement, this will cause $1 otherwies #1
                     //TODO
-                    return $.varDep("c" + iteration);
+                    return $.varDep("d" + iteration);
                 }
             }.each(this);
 
             this.queryIntroducer = new MutaTaskBag(
                     new VarIntroduction(2 /* max iterations */) {
                         @Override protected Term next(Compound input, Term selection, int iteration) {
-                            return $.varQuery("c" + iteration);
+                            return $.varQuery("q" + iteration);
+                        }
+
+                        @Override
+                        protected Task clone(@NotNull Task original, Compound c) {
+                            Task t = super.clone(original, c);
+                            t.budget().mul(1f/original.term().volume(), 1f, 1f); //decrease in proportion to the input term's volume
+                            return t;
                         }
                     }, 0.5f, /* amount percent of capacity processed per frame, 0 <= x <= 1 */
                     new CurveBag<>(

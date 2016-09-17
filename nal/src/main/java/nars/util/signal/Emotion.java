@@ -186,7 +186,7 @@ public final class Emotion implements Serializable {
         alert.accept( percentFocusChange );
     }
 
-    public void errr() {
+    public void eror() {
         errr.accept(1);
     }
 

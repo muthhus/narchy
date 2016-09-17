@@ -229,8 +229,15 @@ public class MutableTask extends AbstractTask {
         return false;
     }
 
-    public MutableTask budget(@NotNull Budget bb) {
+    public final MutableTask budget(@NotNull Budget bb) {
         setBudget(bb);
+        return this;
+    }
+
+    /** sets the budget even if 'b' has been deleted; priority will be zero in that case */
+    public final MutableTask budgetSafe(Budget b) {
+        float p = b.priIfFiniteElseZero();
+        setBudget(p, b.dur(), b.qua());
         return this;
     }
 

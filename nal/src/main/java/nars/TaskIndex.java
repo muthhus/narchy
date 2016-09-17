@@ -20,12 +20,13 @@ public final class TaskIndex {
 
     @NotNull
     protected final Map<Task, Task> tasks;
+    private NAR nar;
     //private final ConcurrentMap<Task, Task> tasksMap;
 
 
     public TaskIndex() {
         this.tasks =
-                new ConcurrentHashMap(128 * 1024 /* estimate TODO */);
+                new ConcurrentHashMap(16 * 1024 /* estimate TODO */);
                 //new ConcurrentHashMapUnsafe(128 * 1024 /* estimate TODO */);
 
         //Caffeine.newBuilder()
@@ -42,6 +43,7 @@ public final class TaskIndex {
     }
 
     public void start(@NotNull NAR nar) {
+        this.nar = nar;
 //        if (Param.DEBUG) {
 //            int sweepInterval = 32;
 //            nar.onFrame(nn -> {
@@ -68,7 +70,16 @@ public final class TaskIndex {
 
         Task existing = tasks.putIfAbsent(x,x);
         if (existing!=null) {
-            DuplicateMerge.merge(existing.budget(), x, 1f);
+
+            if (existing!=x) {
+                //different instance
+                DuplicateMerge.merge(existing.budget(), x, 1f);
+                x.feedback(null, Float.NaN, Float.NaN, nar);
+                x.delete();
+            } else {
+                System.err.println("duplicate");
+            }
+
             return false;
         } else {
             return true;

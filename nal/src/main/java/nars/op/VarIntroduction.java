@@ -18,7 +18,9 @@ import java.util.function.BiConsumer;
  * a generalized variable introduction model that can transform tasks
  */
 public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
-    final static String tag = MutaTaskBag.class.getSimpleName();
+
+    @Deprecated final static String tag = MutaTaskBag.class.getSimpleName();
+
     final int introductionThreshold = 0;
     final int maxIterations;
 
@@ -44,7 +46,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
 
         if (a != c) {
             //introduction changed something
-            Task newTask = inputCloned(nar, task, c);
+            Task newTask = input(nar, task, c);
 
 //            System.out.println(a + " ====> " + c);
 //            System.out.println("\t" + task + " ====> " + newTask);
@@ -81,18 +83,15 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
     }
 
     @Nullable
-    protected Task inputCloned(NAR nar, @NotNull Task original, @NotNull Term newContent) {
+    protected Task input(NAR nar, @NotNull Task original, @NotNull Term newContent) {
 
         Compound c = nar.normalize((Compound) newContent);
         if (c != null && !c.equals(original.term())) {
 
-            Task derived = new VarIntroducedTask(c, original.punc(), original.truth())
-                    .time(original.creation(), original.occurrence())
-                    .evidence(original.evidence())
-                    .budget(original.budget())
-                    .log(tag);
+            Task derived = clone(original, c);
 
             Concept dc = nar.input(derived);
+
             if (dc != null) {
                 //input successful
                 dc.crossLink(derived, original, derived.isBeliefOrGoal() ? derived.conf() : derived.qua(), nar);
@@ -102,6 +101,14 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
         }
 
         return null;
+    }
+
+    protected Task clone(@NotNull Task original, Compound c) {
+        return new VarIntroducedTask(c, original.punc(), original.truth())
+                        .time(original.creation(), original.occurrence())
+                        .evidence(original.evidence())
+                        .budgetSafe(original.budget())
+                        .log(tag);
     }
 
     public VarIntroduction each(NAR nar) {

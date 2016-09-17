@@ -411,8 +411,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
             a = new Activation(input, this, nar, 1f, delta);
         } else {
             input.feedback(null, Float.NaN, Float.NaN, nar);
-            a = null;
             nar.tasks.remove(input); //which was added in the callee
+            a = null;
         }
 
         nar.tasks.remove(toRemove);

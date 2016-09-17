@@ -588,7 +588,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             input.normalize(this); //accept into input buffer for eventual processing
         } catch (Exception e) {
             emotion.frustration(input.priIfFiniteElseZero());
-            emotion.errr();
+            emotion.eror();
 
             input.delete();
 
@@ -627,23 +627,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             } catch (InvalidConceptException|InvalidTermException|InvalidTaskException e) {
 
-                input.feedback(null, Float.NaN, Float.NaN, this);
+                //input.feedback(null, Float.NaN, Float.NaN, this);
+                if (Param.DEBUG)
+                    logger.warn("task process: {} {}", e, input);
 
                 tasks.remove(input);
 
-                emotion.errr();
-
-                if (Param.DEBUG)
-                    logger.warn("process error: {}", e);
+                emotion.eror();
             }
-        } else {
-            input.feedback(null, Float.NaN, Float.NaN, this);
-
         }
 
-
         emotion.frustration(input.priIfFiniteElseZero());
-        //input.delete();
 
         return null;
     }

@@ -8,6 +8,7 @@ import nars.concept.TruthDelta;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
+import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -100,7 +101,7 @@ abstract public class DerivedTask extends MutableTask {
             if (delta == null) {
 
                 feedback(1f - priIfFiniteElseZero() /* HEURISTIC */, nar);
-                delete();
+                //delete(); //delete will happen soon after this
 
             } else {
 
@@ -111,9 +112,7 @@ abstract public class DerivedTask extends MutableTask {
                         //1f + Math.max(deltaConfidence, deltaSatisfaction);
                         1f + Math.max(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
 
-                if (!Util.equals(boost, 1f, Param.TRUTH_EPSILON)) {
-                    feedback(boost, nar);
-                }
+                feedback(boost, nar);
 
             }
 
@@ -127,19 +126,26 @@ abstract public class DerivedTask extends MutableTask {
             //reduce the score factor intensity by lerping it closer to 1.0
             score = Util.lerp(score, 1f, nar.linkFeedbackRate.floatValue());
 
-            @Nullable Premise premise = this.premise;
-            if (premise !=null) {
+            if (!Util.equals(score, 1f, Param.TRUTH_EPSILON)) {
 
-                Concept c = nar.concept(premise.term, score);
+                @Nullable Premise premise = this.premise;
+                if (premise != null) {
 
-                if (c != null) {
-                    c.termlinks().boost(premise.term, score);
-                    //c.tasklinks().boost(premise.task, score);
+                    Concept c = nar.concept(premise.term, score);
+
+                    if (c != null) {
+                        c.termlinks().boost(premise.term, score);
+                        //c.tasklinks().boost(premise.task, score);
+                    }
+
+                    ((Default)nar).core.concepts.boost(c.term(), score);
+
                 }
+
+                //budget().priMult(score);
 
             }
 
-            budget().priMult(score);
         }
 
     }

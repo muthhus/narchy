@@ -50,8 +50,8 @@ public abstract class Param /*extends Container*/ implements Level {
 
     public static boolean DEBUG_ANSWERS = false;
 
-    /** used in linear interpolating link adjustments during feedback */
-    public final MutableFloat linkFeedbackRate = new MutableFloat(0.05f);
+    /** used in linear interpolating link adjustments during feedback. set to zero to disable */
+    public final MutableFloat linkFeedbackRate = new MutableFloat(0.0f);
 
     /**
      * hard upper-bound limit on Compound term complexity;
