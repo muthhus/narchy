@@ -40,7 +40,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
         do {
             b = c;
             c = introduceNextVariable(c, i++);
-        } while (b != c);
+        } while ((i < maxIterations) && (b != c));
 
         if (a != c) {
             //introduction changed something
