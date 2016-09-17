@@ -60,19 +60,25 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
     private Compound introduceNextVariable(Compound input, int iteration) {
 
 
-        Term selection = Terms.substMaximal(input, this::canIntroduce, 2, 3);
-        if (selection != null) {
+        Term[] selections = nextSelection(input);
+        if (selections != null) {
 
-            Term d = next(input, selection, iteration);
-            if (d!=null) {
-                Term newContent = $.terms.replace(input, selection, d);
-                if ((newContent instanceof Compound) && !newContent.equals(input))
-                    return (Compound) newContent; //success
+            for (Term s : selections) {
+                Term d = next(input, s, iteration);
+                if (d != null) {
+                    Term newContent = $.terms.replace(input, s, d);
+                    if ((newContent instanceof Compound) && !newContent.equals(input))
+                        return (Compound) newContent; //success
+                }
             }
         }
 
         return input;
     }
+
+    @Nullable
+    abstract protected Term[] nextSelection(Compound input);
+
 
     /** provides the next term that will be substituted; return null to prevent introduction */
     @Nullable abstract protected Term next(Compound input, Term selection, int iteration);
@@ -81,9 +87,6 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
     }*/
 
 
-    private boolean canIntroduce(Term subterm) {
-        return !subterm.op().var;
-    }
 
     @Nullable
     protected void input(NAR nar, @NotNull Task original, @NotNull Term newContent) {

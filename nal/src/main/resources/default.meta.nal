@@ -263,7 +263,8 @@
 //or a temporal dependence which acts as special case of semantic dependence
 //These cases are handled by "Variable Introduction" and "Temporal Induction"
 
-    P, S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P) |- (S ==> P), (Belief:Induction)
+    P, S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P) |- (P ==> S), (Belief:Induction)
+    P, S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P) |- (S ==> P), (Belief:Abduction)
     P, S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P) |- (S <=> P), (Belief:Comparison)
     P, S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P) |- (P && S), (Belief:Intersection)
     %P, %S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P)  |- (%P || %S), (Belief:Union)

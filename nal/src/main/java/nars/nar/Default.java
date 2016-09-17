@@ -20,6 +20,7 @@ import nars.op.VarIntroduction;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
@@ -28,6 +29,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;
@@ -83,7 +85,7 @@ public class Default extends AbstractNAR {
 
         if (level >= 5) {
 
-            this.depIndepIntroducer = new DepIndepVarIntroduction().each(this);
+            this.depIndepIntroducer = new DepIndepVarIntroduction(random).each(this);
 
             this.queryIntroducer = new MutaTaskBag(
                     new VarIntroduction(2 /* max iterations */) {
@@ -91,8 +93,15 @@ public class Default extends AbstractNAR {
                             return $.varQuery("q" + iteration);
                         }
 
-                        @Override
-                        protected Task clone(@NotNull Task original, Compound c) {
+                        @Nullable @Override protected Term[] nextSelection(Compound input) {
+                            return Terms.substMaximal(input, this::canIntroduce, 2, 3);
+                        }
+
+                        protected boolean canIntroduce(Term subterm) {
+                            return !subterm.op().var;
+                        }
+
+                        @Override protected Task clone(@NotNull Task original, Compound c) {
                             Task t = super.clone(original, c);
                             //t.budget().mul(1f/original.term().volume(), 1f, 1f); //decrease in proportion to the input term's volume
                             return t;

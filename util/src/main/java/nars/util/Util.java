@@ -20,6 +20,7 @@ import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -1214,4 +1215,32 @@ public enum Util {
         else if (x > --max) x = max;
         return x;
     }
+
+    /**
+     * https://en.wikipedia.org/wiki/Fitness_proportionate_selection
+     * Returns the selected index based on the weights(probabilities)
+     */
+    public static int selectRoulette(int count, IntToFloatFunction weight, Random rng) {
+        // calculate the total weight
+        float weight_sum = 0;
+        for(int i=0; i<count; i++) {
+            weight_sum += weight.valueOf(i);
+        }
+        return selectRoulette(count, weight, weight_sum, rng);
+
+    }
+
+    /** faster if the sum is already known */
+    public static int selectRoulette(int count, IntToFloatFunction weight, float weight_sum, Random rng) {
+        // get a random value
+        float value = rng.nextFloat() * weight_sum;
+        // locate the random value based on the weights
+        for(int i=0; i<count; i++) {
+            value -= weight.valueOf(i);
+            if(value <= 0) return i;
+        }
+        // only when rounding errors occur
+        return count - 1;
+    }
+
 }

@@ -7,6 +7,7 @@ import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.Texts;
+import nars.util.Util;
 import nars.util.data.sorted.SortedList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.MutableList;
@@ -14,6 +15,7 @@ import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -631,9 +633,9 @@ public class Terms   {
 
     /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
     @Nullable
-    public static Term substMaximal(Compound c, org.eclipse.collections.api.block.predicate.Predicate<Term> include, int minCount, int minScore) {
+    public static Term[] substMaximal(Compound c, org.eclipse.collections.api.block.predicate.Predicate<Term> include, int minCount, int minScore) {
         HashBag<Term> uniques = subtermScore(c,
-            t -> include.test(t) ? t.complexity() : 0 //sum by complexity if passes include filter
+            t -> include.test(t) ? t.volume() : 0 //sum by complexity if passes include filter
         );
 
         int s = uniques.size();
@@ -645,7 +647,7 @@ public class Terms   {
                     Term subterm = p.getOne();
                     int count = score / subterm.complexity(); //should be a whole number according to the above scoring policy
                     if (count >= minCount) {
-                        return subterm;
+                        return new Term[] { subterm };
                     }
                 }
             }
@@ -654,6 +656,39 @@ public class Terms   {
 
         return null;
     }
+
+    /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
+    @Nullable
+    public static Term[] substRoulette(Compound c, org.eclipse.collections.api.block.predicate.Predicate<Term> include, int minCount, Random rng) {
+        HashBag<Term> uniques = subtermScore(c,
+                t -> include.test(t) ? 1 : 0 //sum by complexity if passes include filter
+        );
+
+        int s = uniques.size();
+        if (s > 0) {
+            ObjectIntPair<Term>[] oi = new ObjectIntPair[s];
+            final int[] j = {0};
+            final int[] sum = {0};
+            uniques.forEachWithOccurrences((Term t, int count)->{
+                if (count >= minCount) {
+                    int score = count * t.volume();
+                    oi[j[0]++] = PrimitiveTuples.pair(t, score);
+                    sum[0] += score;
+                }
+            });
+
+            int available = j[0];
+            if (available == 1) {
+                return new Term[]{oi[0].getOne()};
+            } else if (available > 1) {
+                int selected = Util.selectRoulette(j[0], (i) -> oi[i].getTwo(), sum[0], rng);
+                return new Term[]{oi[selected].getOne()};
+            }
+        }
+
+        return null;
+    }
+
 
 //    /** produces a Map<Object,Int> of 'scores' of how much complexity would be reduced by replacing all occurrences of that subterm with a variable */
 //    @NotNull public static ObjectIntMap<Term> substAnalysis(Compound c, org.eclipse.collections.api.block.predicate.Predicate<Term> include, int minCount) {
