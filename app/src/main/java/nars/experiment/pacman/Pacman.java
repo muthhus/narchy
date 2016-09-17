@@ -29,6 +29,7 @@ import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
+import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Termed;
@@ -92,11 +93,14 @@ public class Pacman extends NAgent {
 
         //Multi nar = new Multi(3,512,
 
-        Executioner e = Tetris.exe;
+        Executioner e =
+                new MultiThreadExecutioner(2, 8192);
+                //new SingleThreadExecutioner();
+
         Default nar = new Default(1024,
-                192, 2, 2, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
+                384, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
                 new FrameClock(), e
 
         );

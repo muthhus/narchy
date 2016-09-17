@@ -508,6 +508,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
     }
 
+
+
     /**
      * http://kosbie.net/cmu/summer-08/15-100/handouts/IterativeQuickSort.java
      */

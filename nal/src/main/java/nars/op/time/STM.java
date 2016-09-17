@@ -2,45 +2,43 @@ package nars.op.time;
 
 import nars.NAR;
 import nars.Task;
+import nars.bag.Bag;
+import nars.bag.impl.CurveBag;
+import nars.bag.impl.experimental.HijackBag;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
 /**
- * Short-term Memory Temporal Structure Formation
+ * Created by me on 9/16/16.
  */
-public abstract class STM implements Consumer<Task> {
-    public final @NotNull NAR nar;
+abstract public class STM /*extends BagBuffer<Task>*/ implements Consumer<Task> {
 
+    public final NAR nar;
+    boolean allowNonInput;
     public final MutableInteger capacity;
-    protected boolean allowNonInput;
+
 
     public STM(@NotNull NAR nar, MutableInteger capacity) {
+        super();
         this.nar = nar;
         this.capacity = capacity;
-    }
-
-    /** call this in constructor */
-    protected void start() {
         nar.eventTaskProcess.on(t -> {
             if (temporallyInductable(t, allowNonInput))
                 accept(t);
-        } );
+        });
         nar.eventReset.on(n -> clear());
-    }
 
-    protected void stop() {
-        //TODO
     }
-
-    abstract public void clear();
 
     static public boolean temporallyInductable(@NotNull Task newEvent, boolean allowNonInput) {
         return ( (allowNonInput || newEvent.isInput()) && newEvent.isBeliefOrGoal() && !newEvent.isEternal());
     }
 
+    abstract public void clear();
 
     @Override
     public abstract void accept(@NotNull Task t);
+
 }

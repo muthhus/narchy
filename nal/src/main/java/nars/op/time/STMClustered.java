@@ -37,19 +37,19 @@ public class STMClustered extends STM {
 
     final short clusters;
 
+    long now;
 
-    @NotNull
-    public final ArrayBag<Task> input;
 
     @NotNull
     public final NeuralGasNet<TasksNode> net;
 
     //final Map<TLink,TasksNode> transfer = new ConcurrentHashMap();
 
-    protected long now;
 
 
     public final char punc;
+
+    final Deque<TasksNode> removed = new ArrayDeque<>();
 
     public final class TasksNode extends Node {
 
@@ -294,7 +294,7 @@ public class STMClustered extends STM {
         return c;
     }
 
-    final Deque<TasksNode> removed = new ArrayDeque<>();
+    public final Bag<Task> input;
 
     public STMClustered(@NotNull NAR nar, @NotNull MutableInteger capacity, char punc, int expectedTasksPerNode) {
         super(nar, capacity);
@@ -349,18 +349,12 @@ public class STMClustered extends STM {
 
         now = nar.time();
 
-        start();
-    }
-
-
-
-    @Override
-    protected void start() {
-        super.start();
         nar.onFrame((nn) -> {
             iterate();
         });
     }
+
+
 
     protected void iterate() {
         input.setCapacity(capacity.intValue());

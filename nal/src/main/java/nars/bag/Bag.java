@@ -560,4 +560,15 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     /** gets the link if present, applies a priority multiplier factor, and returns the link */
     V boost(Object key, float factor);
 
+    /** samples and removes the sampled item. returns null if sample did not return an item */
+    default V pop() {
+        BLink<V> x = sample();
+        if (x!=null) {
+            V v = x.get();
+            x.delete();
+            return v;
+        }
+        return null;
+    }
+
 }

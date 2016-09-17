@@ -83,6 +83,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 //    }
 
 
+
     /**
      * optimized batch fill, using consecutive array elements, also ensuring uniqueness
      * returns the instance for fluentcy

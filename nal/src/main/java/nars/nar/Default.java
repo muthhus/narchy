@@ -33,6 +33,7 @@ public class Default extends AbstractNAR {
 
     public final @NotNull ConceptBagCycle core;
     public final MutableInteger cyclesPerFrame = new MutableInteger(1); //this is specific to a Core implementation, not the entire NAR
+    private VarIntroducer varIntro;
 
     @Deprecated
     public Default() {
@@ -70,7 +71,7 @@ public class Default extends AbstractNAR {
 
         if (nal() >= 5) {
 
-            onTask(new VarIntroducer(this));
+            this.varIntro = new VarIntroducer(this, Math.max(1, activeConcepts/4), Math.max(1,activeConcepts/8));
 
             if (nal() >= 7) {
                 initNAL7();
