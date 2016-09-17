@@ -46,9 +46,9 @@ public abstract class AbstractNAR extends NAR {
     }
 
     protected void initHigherNAL() {
-        if (nal() >= 7) {
+        if (level() >= 7) {
             initNAL7();
-            if(nal() >=8) {
+            if(level() >=8) {
                 initNAL8();
 //                if (nal() >= 9) {
 //                    initNAL9();
@@ -269,7 +269,7 @@ public abstract class AbstractNAR extends NAR {
     @NotNull
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '[' + nal() + ']';
+        return getClass().getSimpleName() + '[' + level() + ']';
     }
 
 

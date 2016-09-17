@@ -11,7 +11,6 @@ import nars.gui.HistogramChart;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.VarIntroducer;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;

@@ -116,7 +116,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
         if (t.volume() > nar.compoundVolumeMax.intValue())
             return test(t, "Term exceeds maximum volume", safe);
-        if (!t.levelValid(nar.nal()))
+        if (!t.levelValid(nar.level()))
             return test(t, "Term exceeds maximum NAL level", safe);
 
         return true;

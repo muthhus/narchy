@@ -4,7 +4,6 @@ import nars.Op;
 import nars.Param;
 import nars.index.TermIndex;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.mutate.CommutivePermutations;
@@ -393,7 +392,7 @@ public abstract class FindSubst extends Termunator implements Subst {
 
     @Nullable
     public final Term resolve(@NotNull Term t, @NotNull Subst subst) {
-        return index.resolve(t, subst);
+        return index.transform(t, subst);
     }
 
 

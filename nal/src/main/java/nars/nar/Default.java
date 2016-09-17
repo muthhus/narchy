@@ -1,8 +1,11 @@
 package nars.nar;
 
+import nars.$;
 import nars.NAR;
 import nars.Param;
+import nars.bag.impl.CurveBag;
 import nars.budget.Budgeted;
+import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.index.Indexes;
 import nars.index.TermIndex;
@@ -10,7 +13,9 @@ import nars.link.BLink;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.ConceptBagCycle;
-import nars.op.VarIntroducer;
+import nars.op.MutaTaskBag;
+import nars.op.VarIntroduction;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
@@ -18,6 +23,7 @@ import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +39,9 @@ public class Default extends AbstractNAR {
 
     public final @NotNull ConceptBagCycle core;
     public final MutableInteger cyclesPerFrame = new MutableInteger(1); //this is specific to a Core implementation, not the entire NAR
-    private VarIntroducer varIntro;
+
+    private VarIntroduction depIndepIntroducer;
+    private MutaTaskBag queryIntroducer;
 
     @Deprecated
     public Default() {
@@ -69,13 +77,34 @@ public class Default extends AbstractNAR {
                 termLinksPerConcept, taskLinksPerConcept
         );
 
-        if (nal() >= 5) {
+        int level = level();
 
-            this.varIntro = new VarIntroducer(this, Math.max(1, activeConcepts/4), Math.max(1,activeConcepts/8));
+        if (level >= 5) {
 
-            if (nal() >= 7) {
+            this.depIndepIntroducer = new VarIntroduction(1) {
+                @Override protected Term next(Compound input, Term selection, int iteration) {
+                    //1. decide if the selected term spans across any statement, this will cause $1 otherwies #1
+                    //TODO
+                    return $.varDep("c" + iteration);
+                }
+            }.each(this);
+
+            this.queryIntroducer = new MutaTaskBag(
+                    new VarIntroduction(2 /* max iterations */) {
+                        @Override protected Term next(Compound input, Term selection, int iteration) {
+                            return $.varQuery("c" + iteration);
+                        }
+                    }, 0.5f, /* amount percent of capacity processed per frame, 0 <= x <= 1 */
+                    new CurveBag<>(
+                        Math.max(1, activeConcepts/4) /* capacity */,
+                        new CurveBag.DirectSampler(CurveBag.power2BagCurve, this.random),
+                        BudgetMerge.plusBlend,
+                        new ConcurrentHashMap<>() ),
+                    this);
+
+            if (level >= 7) {
                 initNAL7();
-                if (nal() >= 8) {
+                if (level >= 8) {
                     initNAL8();
                     //                if (nal() >= 9) {
                     //                    initNAL9();

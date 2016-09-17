@@ -146,7 +146,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         Compound t = term;
 
-        if (!t.levelValid( nar.nal() ))
+        if (!t.levelValid( nar.level() ))
             throw new NAR.InvalidTaskException(this, "Unsupported NAL level");
 
         char punc = punc();

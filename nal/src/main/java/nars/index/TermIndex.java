@@ -5,7 +5,6 @@ import nars.concept.Concept;
 import nars.concept.ConceptBuilder;
 import nars.concept.InvalidConceptException;
 import nars.nal.TermBuilder;
-import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.term.*;
@@ -195,7 +194,7 @@ public abstract class TermIndex extends TermBuilder {
      * returns the resolved term according to the substitution
      */
     @Nullable
-    public Term resolve(@NotNull Term src, @NotNull Subst f) {
+    public Term transform(@NotNull Term src, @NotNull Subst f) {
 
 
         Term y = f.xy(src);
@@ -228,7 +227,7 @@ public abstract class TermIndex extends TermBuilder {
         Term[] cct = crc.terms();
         for (int i = 0; i < len; i++) {
             Term t = cct[i];
-            Term u = resolve(t, f);
+            Term u = transform(t, f);
 
 
             if (u instanceof EllipsisMatch) {
@@ -298,141 +297,6 @@ public abstract class TermIndex extends TermBuilder {
         return true;
     }
 
-//    public Term immediates(@NotNull Subst f, Term result) {
-//        Atomic op = Operator.operator(result);
-//        if (op!=null) {
-//            ImmediateTermTransform tf = f.getTransform(op);
-//            if (tf != null) {
-//                result = transform(f, (Compound) result, tf);
-//            }
-//        }
-//        return result;
-//    }
-
-
-    @Nullable
-    public Term transform(Subst f, @NotNull Compound result, TermTransform tf) {
-
-        //Compound args = (Compound) Operator.opArgs((Compound) result).apply(f);
-        Compound args = Operator.opArgs(result);
-
-        return ((tf instanceof PremiseAware) && (f instanceof PremiseEval)) ?
-                ((PremiseAware) tf).function(args, (PremiseEval) f) :
-                tf.function(args);
-    }
-
-
-//    class ImmediateTermIndex implements TermIndex {
-//
-//        @Override
-//        public Termed get(Object key) {
-//            return (Termed)key;
-//        }
-//
-//        @Override
-//        public TermContainer getIfAbsentIntern(TermContainer s) {
-//            return s;
-//        }
-//
-//        @Override
-//        public Termed internAtomic(Term t) {
-//            return t;
-//        }
-//
-//        @Override
-//        public void forEach(Consumer<? super Termed> c) {
-//
-//        }
-//
-//        @Override
-//        public Termed getTermIfPresent(Termed t) {
-//            return t;
-//        }
-//
-//        @Override
-//        public Termed intern(Term tt) {
-//            return tt;
-//        }
-//
-//        @Override
-//        public int subtermsCount() {
-//            return 0;
-//        }
-//
-//
-//        @Override
-//        public void clear() {
-//
-//        }
-//
-//
-//        @Override
-//        public void putTerm(Termed termed) {
-//
-//        }
-//
-//        @Override
-//        public int size() {
-//            return 0;
-//        }
-//
-//
-//    }
-
-//    class GuavaIndex extends GuavaCacheBag<Term,Termed> implements TermIndex {
-//
-//
-//        public GuavaIndex(CacheBuilder<Term, Termed> data) {
-//            super(data);
-//        }
-//
-//        @Override
-//        public void forEachTerm(Consumer<Termed> c) {
-//            data.asMap().forEach((k,v) -> {
-//                c.accept(v);
-//            });
-//        }
-//
-//
-//
-//    }
-
-//    /** public memory-based (Guava) cache */
-//    @NotNull
-//    static TermIndex memory(int capacity) {
-////        CacheBuilder builder = CacheBuilder.newBuilder()
-////            .maximumSize(capacity);
-//        return new MapIndex2(
-//            new HashMap(capacity*2),
-//                //new UnifriedMap()
-//                new publicConceptBuilder());
-////        return new MapIndex2(
-////                new HashMap(capacity)
-////                //new UnifriedMap()
-////        );
-//    }
-//    /** public memory-based (Guava) cache */
-//    @NotNull
-//    static TermIndex softMemory(int capacity) {
-////        CacheBuilder builder = CacheBuilder.newBuilder()
-////            .maximumSize(capacity);
-//        return new MapIndex2(
-//                new SoftValueHashMap(capacity*2),
-//                //new WeakHashMap()
-//                conceptBuilder);
-////        return new MapIndex2(
-////                new HashMap(capacity)
-////                //new UnifriedMap()
-////        );
-//    }
-////    static GuavaIndex memoryGuava(Clock c, int expirationCycles) {
-////        return new GuavaIndex(c, expirationCycles);
-//////        return new MapIndex(
-//////
-//////                new WeakValueHashMap(capacity),
-//////                new WeakValueHashMap(capacity*2)
-//////        );
-////    }
 
     public void print(@NotNull PrintStream out) {
         forEach(out::println);
@@ -442,7 +306,6 @@ public abstract class TermIndex extends TermBuilder {
 
 
     final Function<? super TermContainer, ? extends TermContainer> normalizer = u -> {
-        //bmiss[0] = true;
 
         TermContainer result;
 
@@ -460,7 +323,7 @@ public abstract class TermIndex extends TermBuilder {
 
             result = tgt != src ? TermVector.the(tgt) : u;
 
-        } catch (Throwable e) {
+        } catch (InvalidTermException e) {
 
             if (Param.DEBUG_EXTRA)
                 logger.warn("normalize {} : {}", u, e);
@@ -702,7 +565,7 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable
     public Term replace(@NotNull Term src, Map<Term, Term> m) {
-        return termOrNull(resolve(src, new MapSubst(m)));
+        return termOrNull(transform(src, new MapSubst(m)));
     }
 
     @Nullable

@@ -93,7 +93,7 @@ public class UnifySubst extends FindSubst  {
     Term resolve(@NotNull Term t, @Nullable Map<Term,Term> subs) {
         return (subs == null) || (subs.isEmpty()) ?
                 t /* no change necessary */ :
-                memory.index.resolve(t, new MapSubst(subs));
+                memory.index.transform(t, new MapSubst(subs));
     }
 
 }

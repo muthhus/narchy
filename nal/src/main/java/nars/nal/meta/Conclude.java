@@ -103,7 +103,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         Term r;
         try {
-            r = m.index.resolve(this.conclusionPattern, m);
+            r = m.index.transform(this.conclusionPattern, m);
         } catch (InvalidTermException e) {
             logger.error("Term: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);
             return true;
@@ -152,7 +152,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         long occ;
 
         if (m.temporal) {
-            if (nar.nal() < 7)
+            if (nar.level() < 7)
                 throw new NAR.InvalidTaskException(content, "invalid NAL level");
 
             long[] occReturn = {ETERNAL};

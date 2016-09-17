@@ -18,8 +18,6 @@ public final class InvalidTermException extends RuntimeException {
     @NotNull private final Term[] args;
     @NotNull private final String reason;
 
-
-
     public InvalidTermException(@NotNull Op op, @NotNull Term[] args, @NotNull String reason) {
         this(op, DTERNAL, args, reason);
     }
@@ -32,7 +30,7 @@ public final class InvalidTermException extends RuntimeException {
     }
 
     @Override
-    public synchronized Throwable fillInStackTrace() {
+    public Throwable fillInStackTrace() {
         if (!Param.DEBUG)
             return this; //omit stacktrace if not in debug mode for efficiency
         return super.fillInStackTrace();

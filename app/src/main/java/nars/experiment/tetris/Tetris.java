@@ -58,7 +58,7 @@ public class Tetris extends NAgent {
 //    public static final Executioner exe4 =
 //            new MultiThreadExecutioner(4, 1024*32);
 
-    public static final int runFrames = 55555;
+    public static final int runFrames = 555;
     public static final int cyclesPerFrame = 2;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;

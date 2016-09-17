@@ -100,7 +100,7 @@ public class Memory extends Param {
 
 
     @Override
-    public final int nal() {
+    public final int level() {
         return level;
     }
 
@@ -170,7 +170,7 @@ public class Memory extends Param {
     @NotNull
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ':' + nal() + "[@" + time() +  ']';
+        return getClass().getSimpleName() + ':' + level() + "[@" + time() +  ']';
     }
 //    /** whether the NAR is currently accepting new inputs */
 //    public boolean isInputting() {

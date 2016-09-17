@@ -196,7 +196,7 @@ public class PostCondition implements Serializable, Level //since there can be m
     }
 
     @Override
-    public int nal() {
+    public int level() {
         return minNAL;
     }
 
