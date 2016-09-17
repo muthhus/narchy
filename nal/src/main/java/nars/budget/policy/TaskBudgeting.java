@@ -62,7 +62,7 @@ public class TaskBudgeting {
         //volRatioScale = (float) Math.pow(volRatioScale, 2);
 
 
-        final float durability = pp.dur() * volRatioScale;
+        final float durability = pp.dur() * qual;// * volRatioScale;
         if (durability < minDur)
             return null;
 
@@ -166,7 +166,7 @@ public class TaskBudgeting {
      */
     @Nullable
     public static Budget derivationBackward(@NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
-        return derivation(premise.nar.qualityDefault(Symbols.QUESTION) * premise.premise.qua(), content, premise, minDur);
+        return derivation(premise.nar.qualityDefault(Symbols.QUESTION), content, premise, minDur);
     }
 
     /**

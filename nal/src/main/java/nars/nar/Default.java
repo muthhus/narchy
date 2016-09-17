@@ -14,6 +14,7 @@ import nars.link.BLink;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.ConceptBagCycle;
+import nars.op.DepIndepVarIntroduction;
 import nars.op.MutaTaskBag;
 import nars.op.VarIntroduction;
 import nars.term.Compound;
@@ -27,7 +28,6 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;
@@ -83,13 +83,7 @@ public class Default extends AbstractNAR {
 
         if (level >= 5) {
 
-            this.depIndepIntroducer = new VarIntroduction(1) {
-                @Override protected Term next(Compound input, Term selection, int iteration) {
-                    //1. decide if the selected term spans across any statement, this will cause $1 otherwies #1
-                    //TODO
-                    return $.varDep("d" + iteration);
-                }
-            }.each(this);
+            this.depIndepIntroducer = new DepIndepVarIntroduction().each(this);
 
             this.queryIntroducer = new MutaTaskBag(
                     new VarIntroduction(2 /* max iterations */) {
@@ -100,7 +94,7 @@ public class Default extends AbstractNAR {
                         @Override
                         protected Task clone(@NotNull Task original, Compound c) {
                             Task t = super.clone(original, c);
-                            t.budget().mul(1f/original.term().volume(), 1f, 1f); //decrease in proportion to the input term's volume
+                            //t.budget().mul(1f/original.term().volume(), 1f, 1f); //decrease in proportion to the input term's volume
                             return t;
                         }
                     }, 0.5f, /* amount percent of capacity processed per frame, 0 <= x <= 1 */
@@ -180,7 +174,6 @@ public class Default extends AbstractNAR {
     public void clear() {
         core.concepts.clear();
     }
-
 
 
 //    /** possibly faster access from active concept bag than the index

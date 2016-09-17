@@ -46,7 +46,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
 
         if (a != c) {
             //introduction changed something
-            Task newTask = input(nar, task, c);
+            input(nar, task, c);
 
 //            System.out.println(a + " ====> " + c);
 //            System.out.println("\t" + task + " ====> " + newTask);
@@ -63,16 +63,19 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
         Term selection = Terms.substMaximal(input, this::canIntroduce, 2, 3);
         if (selection != null) {
 
-            Term newContent = $.terms.replace(input, selection, next(input, selection, iteration));
-            if ((newContent instanceof Compound) && !newContent.equals(input))
-                return (Compound) newContent; //success
+            Term d = next(input, selection, iteration);
+            if (d!=null) {
+                Term newContent = $.terms.replace(input, selection, d);
+                if ((newContent instanceof Compound) && !newContent.equals(input))
+                    return (Compound) newContent; //success
+            }
         }
 
         return input;
     }
 
-    /** provides the next term that will be substituted */
-    abstract protected Term next(Compound input, Term selection, int iteration);
+    /** provides the next term that will be substituted; return null to prevent introduction */
+    @Nullable abstract protected Term next(Compound input, Term selection, int iteration);
     /*{
         return $.varQuery("c" + iteration);
     }*/
@@ -83,24 +86,24 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
     }
 
     @Nullable
-    protected Task input(NAR nar, @NotNull Task original, @NotNull Term newContent) {
+    protected void input(NAR nar, @NotNull Task original, @NotNull Term newContent) {
 
         Compound c = nar.normalize((Compound) newContent);
         if (c != null && !c.equals(original.term())) {
 
             Task derived = clone(original, c);
 
-            Concept dc = nar.input(derived);
+            nar.runLater( ()-> {
+                Concept dc = nar.input(derived);
 
-            if (dc != null) {
-                //input successful
-                dc.crossLink(derived, original, derived.isBeliefOrGoal() ? derived.conf() : derived.qua(), nar);
-                return derived;
-            }
+                if (dc != null) {
+                    //input successful
+                    dc.crossLink(derived, original, derived.isBeliefOrGoal() ? derived.conf() : derived.qua(), nar);
+                }
+            });
 
         }
 
-        return null;
     }
 
     protected Task clone(@NotNull Task original, Compound c) {

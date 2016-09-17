@@ -604,7 +604,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             if (clock instanceof FrameClock) {
                 //HACK for unique serial number w/ frameclock
-                ((FrameClock) clock).ensureNextStampExceeds(input.evidence());
+                ((FrameClock) clock).validate(input.evidence());
             }
 
             try {

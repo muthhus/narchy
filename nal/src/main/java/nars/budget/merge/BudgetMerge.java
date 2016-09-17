@@ -1,5 +1,6 @@
 package nars.budget.merge;
 
+import nars.Param;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.link.BLink;
@@ -62,7 +63,6 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
         float tPri = tgt.priIfFiniteElseZero();
 
 
-        float targetInfluence;
 
         boolean hasTP = tPri >= BUDGET_EPSILON;
         boolean hasSP = sPri >= BUDGET_EPSILON && sScale >= BUDGET_EPSILON;
@@ -71,7 +71,6 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
             if (hasTP) {
                 return 0; //nothing to do; zero incoming doesnt budge the target budget
             } else {
-                targetInfluence = 0.5f; //to zeros share equal 50% responsibility
             }
         } else {
             if (!hasTP) {
@@ -79,7 +78,6 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 tgt.priMult(sScale);
                 return 0;
             } else {
-                targetInfluence = tPri / (tPri + sPri * sScale);
             }
         }
 
@@ -93,7 +91,13 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 throw new UnsupportedOperationException();
         }
 
-        return dqBlend(tgt, src, lerp(newPri, tPri, sScale), targetInfluence);
+        float originalInfluence;
+        if (tPri + newPri < Param.BUDGET_EPSILON)
+            originalInfluence = 0.5f;
+        else
+            originalInfluence = (tPri / (tPri + newPri));
+
+        return dqBlend(tgt, src, lerp(newPri, tPri, sScale), originalInfluence);
     }
 
 //    static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {

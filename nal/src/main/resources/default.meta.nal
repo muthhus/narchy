@@ -50,10 +50,10 @@
 //                (A --> C)
 //If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
 
-(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
-(A --> B), (A --> C), neq(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
-(A --> C), (B --> C), neq(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
-(A --> B), (B --> C), neq(C,A) |- (C --> A), (Belief:Exemplification, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+(A --> B), (B --> C), neq(A,C), no_common_subterm(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+(A --> B), (A --> C), neq(B,C), no_common_subterm(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+(A --> C), (B --> C), neq(A,B), no_common_subterm(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+(A --> B), (B --> C), neq(C,A), no_common_subterm(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
 
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
@@ -263,10 +263,10 @@
 //or a temporal dependence which acts as special case of semantic dependence
 //These cases are handled by "Variable Introduction" and "Temporal Induction"
 
-//   P, S, no_common_subterm(S,P) |- (S ==> P), (Belief:Induction)
-//   P, S, no_common_subterm(S,P) |- (S <=> P), (Belief:Comparison)
-//   P, S, no_common_subterm(S,P) |- (P && S), (Belief:Intersection)
-//   %P, %S, no_common_subterm(S,P) |- (%P || %S), (Belief:Union)
+    P, S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P) |- (S ==> P), (Belief:Induction)
+    P, S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P) |- (S <=> P), (Belief:Comparison)
+    P, S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P) |- (P && S), (Belief:Intersection)
+    %P, %S, time(eternal), no_common_subterm(S,P), neq(S,P), notImplicationOrEquivalence(S), notImplicationOrEquivalence(P)  |- (%P || %S), (Belief:Union)
 
 
 
@@ -321,52 +321,36 @@
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //Introduce variables by common subject or predicate
 
-    (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) ==>+- (S --> $X)), (Belief:Abduction)
-        (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) ==>+- (--,(S --> $X))), (Belief:AbductionN)
-    (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternal) |- ((S --> $X) ==>+- (P --> $X)), (Belief:Induction)
-        (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,(S --> $X)) ==>+- (P --> $X)), (Belief:InductionN)
-    (S --> M), (P --> M), task(positive), neq(S,P), time(dtForward) |- ((S --> $X) <=>+- (P --> $X)), (Belief:Comparison)
-        (S --> M), (P --> M), task(negative), neq(S,P), time(dtForward) |- ((--,(S --> $X)) <=>+- (P --> $X)), (Belief:ComparisonN)
-    (S --> M), (P --> M), neq(S,P), time(dtAfterOrEternal) |- ((S --> #Y) &&+- (P --> #Y)), (Belief:Intersection)
-
-    (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternal) |- (($X --> S) ==>+- ($X --> P)), (Belief:Induction)
-        (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,($X --> S)) ==>+- ($X --> P)), (Belief:InductionN)
-    (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- (($X --> P) ==>+- ($X --> S)), (Belief:Abduction)
-        (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- (($X --> P) ==>+- (--,($X --> S))), (Belief:AbductionN)
-    (M --> S), (M --> P), task(positive), neq(S,P), time(dtForward) |- (($X --> S) <=>+- ($X --> P)), (Belief:Comparison)
-        (M --> S), (M --> P), task(negative), neq(S,P), time(dtForward) |- ((--,($X --> S)) <=>+- ($X --> P)), (Belief:ComparisonN)
-    (M --> S), (M --> P), neq(S,P), time(dtAfterOrEternal) |- ((#Y --> S) &&+- (#Y --> P)), (Belief:Intersection)
-
-////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
-//When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
-
-    A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==>+- B), (Belief:Induction)
-        A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
-
-    A, B, task(positive), task("."), time(dtForward), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
-        A, B, task(negative), task("."), time(dtForward), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) <=>+- B), (Belief:ComparisonN)
-
-    A, B, task(positive), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
-        A, B, task(negative), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
-
-    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
-        //A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
-
+//    (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) ==>+- (S --> $X)), (Belief:Abduction)
+//        (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- ((P --> $X) ==>+- (--,(S --> $X))), (Belief:AbductionN)
+//    (S --> M), (P --> M), task(positive), neq(S,P), time(dtAfterOrEternal) |- ((S --> $X) ==>+- (P --> $X)), (Belief:Induction)
+//        (S --> M), (P --> M), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,(S --> $X)) ==>+- (P --> $X)), (Belief:InductionN)
+//    (S --> M), (P --> M), task(positive), neq(S,P), time(dtForward) |- ((S --> $X) <=>+- (P --> $X)), (Belief:Comparison)
+//        (S --> M), (P --> M), task(negative), neq(S,P), time(dtForward) |- ((--,(S --> $X)) <=>+- (P --> $X)), (Belief:ComparisonN)
+//    (S --> M), (P --> M), neq(S,P), time(dtAfterOrEternal) |- ((S --> #Y) &&+- (P --> #Y)), (Belief:Intersection)
+//
+//    (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternal) |- (($X --> S) ==>+- ($X --> P)), (Belief:Induction)
+//        (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternal) |- ((--,($X --> S)) ==>+- ($X --> P)), (Belief:InductionN)
+//    (M --> S), (M --> P), task(positive), neq(S,P), time(dtAfterOrEternalReverse) |- (($X --> P) ==>+- ($X --> S)), (Belief:Abduction)
+//        (M --> S), (M --> P), task(negative), neq(S,P), time(dtAfterOrEternalReverse) |- (($X --> P) ==>+- (--,($X --> S))), (Belief:AbductionN)
+//    (M --> S), (M --> P), task(positive), neq(S,P), time(dtForward) |- (($X --> S) <=>+- ($X --> P)), (Belief:Comparison)
+//        (M --> S), (M --> P), task(negative), neq(S,P), time(dtForward) |- ((--,($X --> S)) <=>+- ($X --> P)), (Belief:ComparisonN)
+//    (M --> S), (M --> P), neq(S,P), time(dtAfterOrEternal) |- ((#Y --> S) &&+- (#Y --> P)), (Belief:Intersection)
 
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //, not_equal(A, (M --> S))
-    (A ==> (M --> P)), (M --> S), neq(S,P), neq(A, (M --> S)), time(dtTaskExact) |- ((&&,A,($X --> S)) ==>+- ($X --> P)), (Belief:Induction)
-    (A ==> (M --> P)), (M --> S), neq(S,P), neq(A, (M --> S)), time(dtTaskExact) |- (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
-
-    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (($Y --> S) ==>+- (&&,($Y --> P), A..+)), (Belief:Induction)
-    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
-
-    (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==>+- (S --> $X)), (Belief:Abduction)
-    (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
-
-    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- ((S --> $Y) ==>+- (&&,(P --> $Y), A..+)), (Belief:Abduction)
-    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
+//    (A ==> (M --> P)), (M --> S), neq(S,P), neq(A, (M --> S)), time(dtTaskExact) |- ((&&,A,($X --> S)) ==>+- ($X --> P)), (Belief:Induction)
+//    (A ==> (M --> P)), (M --> S), neq(S,P), neq(A, (M --> S)), time(dtTaskExact) |- (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
+//
+//    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (($Y --> S) ==>+- (&&,($Y --> P), A..+)), (Belief:Induction)
+//    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
+//
+//    (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==>+- (S --> $X)), (Belief:Abduction)
+//    (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
+//
+//    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- ((S --> $Y) ==>+- (&&,(P --> $Y), A..+)), (Belief:Abduction)
+//    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
 
 
 //conditional abduction by dependent variable
@@ -405,6 +389,22 @@
 
 
 
+////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
+//When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
+
+    A, B, task(positive), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==>+- B), (Belief:Induction)
+        A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
+
+    A, B, task(positive), task("."), time(dtForward), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=>+- B), (Belief:Comparison)
+        A, B, task(negative), task("."), time(dtForward), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) <=>+- B), (Belief:ComparisonN)
+
+    A, B, task(positive), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- A), (Belief:Abduction)
+        A, B, task(negative), task("."), time(dtAfterReverse), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
+
+    A, B, task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A &&+- B), (Belief:Intersection)
+        //A, B, task(negative), task("."), time(dtAfter), no_common_subterm(A,B), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
+
+
 
 
 
@@ -433,11 +433,11 @@
 //backward inference rules which should really only work on backward inference:
 
 
-    (A --> S), (B --> S), neq(A,B), task("?") |- (A --> B), (Derive:NoSwap)
-    (A --> S), (B --> S), neq(A,B), task("?") |- (B --> A), (Derive:NoSwap)
+    (A --> S), (B --> S), neq(A,B), no_common_subterm(A,B), task("?") |- (A --> B), (Derive:NoSwap)
+    (A --> S), (B --> S), neq(A,B), no_common_subterm(A,B), task("?") |- (B --> A), (Derive:NoSwap)
 
-    (A ==> S), (B ==> S), neq(A,B), task("?") |- (A ==> B), (Derive:NoSwap)
-    (A ==> S), (B ==> S), neq(A,B), task("?") |- (B ==> A), (Derive:NoSwap)
+    (A ==> S), (B ==> S), neq(A,B), no_common_subterm(A,B), task("?") |- (A ==> B), (Derive:NoSwap)
+    (A ==> S), (B ==> S), neq(A,B), no_common_subterm(A,B), task("?") |- (B ==> A), (Derive:NoSwap)
 
 //Inheritance to Similarity
 
@@ -486,8 +486,8 @@
     (W --> (|,B,A..+)), (W --> B), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
     ((&,B,A..+) --> W), (B --> W), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
 
-    (W --> (-,S,B)), (W --> B), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
-    ((~,S,B) --> W), (B --> W), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
+    (W --> (-,S,B)), (W --> B), neq(W,S), no_common_subterm(W,S), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
+    ((~,S,B) --> W), (B --> W), neq(W,S), no_common_subterm(W,S), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
 
 ////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
 //Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate

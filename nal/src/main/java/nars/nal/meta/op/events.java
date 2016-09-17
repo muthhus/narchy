@@ -118,6 +118,22 @@ abstract public class events extends AtomicBoolCondition {
         return (int)(tOcc - bOcc);
     }
 
+    /** both task and belief must be non-null and eternal */
+    @Nullable
+    public static final events eternal = new events() {
+
+        @Override
+        public String toString() {
+            return "eternal";
+        }
+
+        @Override
+        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+            Task b = m.belief;
+            if (b == null) return false;
+            return m.task.occurrence() == ETERNAL && b.occurrence() == ETERNAL;
+        }
+    };
 
 
     /** task is before or simultaneous with belief which follows (T ... B) */

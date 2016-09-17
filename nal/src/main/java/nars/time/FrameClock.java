@@ -46,7 +46,7 @@ public class FrameClock implements Clock {
     }
 
     /** used to ensure that the next system stamp serial is beyond the range of any input */
-    protected final void ensureNextStampExceeds(long s) {
+    protected final void validate(long s) {
         if (s == Long.MAX_VALUE) //ignore cyclic indicator
             return;
         long nextStamp = this.nextStamp.longValue();
@@ -57,9 +57,9 @@ public class FrameClock implements Clock {
             this.nextStamp.set(s+1);
     }
 
-    public final void ensureNextStampExceeds(@NotNull long[] s) {
+    public final void validate(@NotNull long[] s) {
         //assume that the evidence is sorted, and that the max value is in the last position
-        ensureNextStampExceeds(s[s.length-1]);
+        validate(s[s.length-1]);
     }
 
 }

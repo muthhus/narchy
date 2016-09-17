@@ -658,6 +658,11 @@ public class PremiseRule extends GenericCompound {
                         case "after":
                             pres.add( events.after );
                             break;
+
+                        case "eternal":
+                            pres.add( events.eternal );
+                            break;
+
                         case "afterOrEternal":
                             pres.add( events.afterOrEternal );
                             break;

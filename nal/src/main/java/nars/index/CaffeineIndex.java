@@ -165,7 +165,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         if (tx instanceof Compound)
             compounds.put(tx, (Termlike)target);
         else
-            atomics.put(tx, target);
+            atomics.putIfAbsent(tx, target);
 
         //Termed exist = data.getIfPresent(src);
 

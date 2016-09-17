@@ -98,7 +98,7 @@ public class Pacman extends NAgent {
                 //new SingleThreadExecutioner();
 
         Default nar = new Default(1024,
-                384, 2, 2, rng,
+                200, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
                 new FrameClock(), e

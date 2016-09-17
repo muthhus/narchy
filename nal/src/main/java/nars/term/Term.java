@@ -39,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -346,6 +347,19 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
         appendTo.add((byte)op().ordinal());
         return appendTo;
+    }
+
+    default List<byte[]> pathsTo(Term subterm) {
+        List<byte[]> list = $.newArrayList();
+        pathsTo(
+            (x) -> x.equals(subterm) ? x : null,
+            (l,t) -> list.add(l.toArray())
+        );
+        return list;
+    }
+
+    default boolean pathsTo(Term subterm, @NotNull BiPredicate<ByteList,Term> receiver) {
+        return pathsTo((x)->subterm.equals(x) ? x : null, receiver);
     }
 
     default <X> boolean pathsTo(@NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList,X> receiver) {
