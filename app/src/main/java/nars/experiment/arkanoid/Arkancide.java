@@ -230,12 +230,9 @@ public class Arkancide extends NAgent {
         actionTables.add(new BeliefTableChart(nar, narenv.happy, btRange));
         actionTables.add(new BeliefTableChart(nar, narenv.joy, btRange));
 
-        for (int i = 0; i < 4; i++)
-            actionTables.add(new BeliefTableChart(nar, narenv.sensors.get(i), btRange));
-
-
         return new GridSurface(VERTICAL, actionTables);
     }
+
     public static GridSurface newBeliefChart(NAR nar, Collection<? extends Termed> narenv, long window) {
         long[] btRange = new long[2];
         nar.onFrame(nn -> {

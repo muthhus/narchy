@@ -400,7 +400,7 @@ abstract public class NAgent {
 
                 }
 
-                boost(c);
+                //boost(c);
             }
 
             predictors.forEach((Procedure<Task>) this::boost);
@@ -415,20 +415,20 @@ abstract public class NAgent {
         return Math.min(1f, ((float) motorDesireEvidence.getMean()));
     }
 
-    @Nullable
-    protected Concept boost(Concept c) {
-
-        new Activation(boostBudget, c, nar, 1) {
-
-            @Override
-            public void commit(float scale) {
-                linkTermLinks(c, scale); //activate all termlinks of this concept
-                super.commit(scale);
-            }
-        };
-
-        return c;
-    }
+//    @Nullable
+//    protected Concept boost(Concept c) {
+//
+//        new Activation(boostBudget, c, nar, 1) {
+//
+//            @Override
+//            public void commit(float scale) {
+//                linkTermLinks(c, scale); //activate all termlinks of this concept
+//                super.commit(scale);
+//            }
+//        };
+//
+//        return c;
+//    }
 
 
     private void boost(@NotNull Task t) {

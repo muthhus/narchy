@@ -19,6 +19,8 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
+import nars.truth.Truth;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+
+import static nars.Param.TRUTH_EPSILON;
 
 
 public class CompoundConcept<T extends Compound> implements AbstractConcept, Termlike {
@@ -410,7 +414,16 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         Activation a;
         if (accepted) {
-            a = new Activation(input, this, nar, 1f, delta);
+            a = new Activation(input, this, nar, 1f);
+
+            if (delta!=null) {
+                //beliefs/goals
+                feedback(input, delta, (CompoundConcept) a.src, nar);
+            } else {
+                //questions/quests
+                input.feedback(delta, 0, 0, nar);
+            }
+
             //check again if during feedback, the task decided deleted itself
             if (input.isDeleted()) {
                 a = null;
@@ -426,6 +439,78 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         }
 
         return a;
+    }
+
+    /**
+     * apply derivation feedback and update NAR emotion state
+     */
+    protected static void feedback(Task input, TruthDelta delta, CompoundConcept concept, NAR nar) {
+
+
+        //update emotion happy/sad
+        Truth before = delta.before;
+        Truth after = delta.after;
+
+        float deltaSatisfaction, deltaConf;
+
+        if (before !=null && after !=null) {
+
+            float deltaFreq = after.freq() - before.conf();
+            deltaConf = after.conf() - before.conf();
+
+            Truth other;
+            float polarity =  0;
+
+            if (input.isBelief() && concept.hasGoals()) {
+                //compare against the current goal state
+                other = concept.goals().truth(nar.time());
+                polarity = +1f;
+            } else if (input.isGoal() && concept.hasBeliefs()) {
+                //compare against the current belief state
+                other = concept.beliefs().truth(nar.time());
+                polarity = -1f;
+            } else {
+                other = null;
+            }
+
+
+            if (other!=null) {
+
+                float f = other.freq();
+
+                if (Util.equals(f, 0.5f, TRUTH_EPSILON)) {
+
+                    //ambivalence: no change
+                    deltaSatisfaction = 0;
+
+                } else if (f > 0.5f) {
+                    //measure how much the freq increased since goal is positive
+                    deltaSatisfaction = +polarity * deltaFreq / (2f * (other.freq() - 0.5f));
+                } else {
+                    //measure how much the freq decreased since goal is negative
+                    deltaSatisfaction = -polarity * deltaFreq / (2f * (0.5f - other.freq()));
+                }
+
+                nar.emotion.happy(deltaSatisfaction, input.term());
+
+            } else {
+                deltaSatisfaction = 0;
+            }
+
+        } else {
+            if (before == null && after!=null) {
+                deltaConf = after.conf();
+            } else {
+                deltaConf = 0;
+            }
+            deltaSatisfaction = 0;
+        }
+
+        if (!Util.equals(deltaConf, 0f, TRUTH_EPSILON))
+            nar.emotion.confident(deltaConf, input.term());
+
+        input.feedback(delta, deltaConf, deltaSatisfaction, nar);
+
     }
 
 //    private void checkConsistency() {

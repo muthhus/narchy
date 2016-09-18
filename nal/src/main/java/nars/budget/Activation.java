@@ -24,6 +24,7 @@ import static nars.Param.TRUTH_EPSILON;
 public class Activation {
 
     private static final int TASKLINK_DEPTH_LIMIT = 1;
+    private static final int TERMLINK_DEPTH_LIMIT = 3; //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
 
     public final Budgeted in;
 
@@ -33,130 +34,36 @@ public class Activation {
     public final MutableFloat linkOverflow = new MutableFloat(0);
     public final MutableFloat conceptOverflow = new MutableFloat(0);
     private final NAR nar;
+    private final float minScale; //cut-off limit for recursive spread
 
 
-    public Activation(Budgeted in, Concept src, NAR nar) {
-
+    protected Activation(Budgeted in, Concept src, NAR nar) {
         this.nar = nar;
         this.in = in;
         this.src = src;
+        this.minScale = Param.BUDGET_EPSILON / in.pri();
+    }
 
+    /**
+     * runs the task activation procedure
+     */
+    public Activation(Budgeted in, Concept src, Concept target, NAR nar, float scale) {
+        this(in, src, nar);
+
+        link(src, target, scale, 0);
+
+        commit(scale); //values will already be scaled
     }
 
     /**
      * runs the task activation procedure
      */
     public Activation(Budgeted in, Concept c, NAR nar, float scale) {
-        this(in, c, nar);
-
-        link(scale);
-
-    }
-
-    public Activation(@NotNull Task in, @NotNull NAR nar, float scale) {
-        this(in, in.concept(nar), nar);
-        activateConcept(src, scale);
-        link(scale);
-    }
-
-    /**
-     *
-     * @param input
-     * @param concept
-     * @param nar
-     * @param scale
-     * @param delta - null for questions/quests
-     */
-    public Activation(@NotNull Task input, CompoundConcept concept, NAR nar, float scale, @Nullable TruthDelta delta) {
-        this(input, concept, nar, scale);
-
-        if (delta!=null) {
-            //beliefs/goals
-            feedback(input, delta, concept);
-        } else {
-            //questions/quests
-            input.feedback(delta, 0, 0, nar);
-        }
+        this(in, c, c, nar, scale);
     }
 
 
-    /**
-     * apply derivation feedback and update NAR emotion state
-     */
-    protected void feedback(Task input, TruthDelta delta, CompoundConcept concept) {
 
-
-        //update emotion happy/sad
-        Truth before = delta.before;
-        Truth after = delta.after;
-
-        float deltaSatisfaction, deltaConf;
-
-        if (before !=null && after !=null) {
-
-            float deltaFreq = after.freq() - before.conf();
-            deltaConf = after.conf() - before.conf();
-
-            Truth other;
-            float polarity =  0;
-
-            if (input.isBelief() && concept.hasGoals()) {
-                //compare against the current goal state
-                other = concept.goals().truth(nar.time());
-                polarity = +1f;
-            } else if (input.isGoal() && concept.hasBeliefs()) {
-                //compare against the current belief state
-                other = concept.beliefs().truth(nar.time());
-                polarity = -1f;
-            } else {
-                other = null;
-            }
-
-
-            if (other!=null) {
-
-                float f = other.freq();
-
-                if (Util.equals(f, 0.5f, TRUTH_EPSILON)) {
-
-                    //ambivalence: no change
-                    deltaSatisfaction = 0;
-
-                } else if (f > 0.5f) {
-                    //measure how much the freq increased since goal is positive
-                    deltaSatisfaction = +polarity * deltaFreq / (2f * (other.freq() - 0.5f));
-                } else {
-                    //measure how much the freq decreased since goal is negative
-                    deltaSatisfaction = -polarity * deltaFreq / (2f * (0.5f - other.freq()));
-                }
-
-                nar.emotion.happy(deltaSatisfaction, input.term());
-
-            } else {
-                deltaSatisfaction = 0;
-            }
-
-        } else {
-            if (before == null && after!=null) {
-                deltaConf = after.conf();
-            } else {
-                deltaConf = 0;
-            }
-            deltaSatisfaction = 0;
-        }
-
-        if (!Util.equals(deltaConf, 0f, TRUTH_EPSILON))
-            nar.emotion.confident(deltaConf, input.term());
-
-        input.feedback(delta, deltaConf, deltaSatisfaction, nar);
-
-    }
-
-    protected final void link(float scale) {
-        link(src, src.term(), scale, 0);
-
-        commit(scale); //values will already be scaled
-    }
 
     public void linkTermLinks(Concept src, float scale) {
         src.termlinks().forEach(n -> {
@@ -166,22 +73,17 @@ public class Activation {
         });
     }
 
-    public void linkTerms(@NotNull Concept src, @NotNull Term[] tgt, float scale, float minScale, int depth) {
+    void linkTerms(@NotNull Concept src, @NotNull Term[] tgt, float scale, int depth) {
 
         int n = tgt.length;
-        float tStrength = 1f / n;
-        float subScale = scale * tStrength;
+        float subScale = scale / n;
 
         if (subScale >= minScale) { //TODO use a min bound to prevent the iteration ahead of time
 
             //then link this to terms
-            for (int i = 0; i < n; i++) {
-                Term tt = tgt[i];
-
-                link(src, tt, subScale, depth+1); //Link the peer termlink bidirectionally
-            }
+            for (int i = 0; i < n; i++)
+                link(src, tgt[i], subScale, depth); //Link the peer termlink bidirectionally
         }
-
     }
 
     /**
@@ -192,72 +94,69 @@ public class Activation {
 
     /* activate concept */
         Concept targetConcept;
+        Term targetTerm;
 
-        Term targetTerm = target.term();
-
-        if (!TermIndex.linkable(targetTerm)) {
-            targetConcept = null;
+        if (target instanceof Concept) {
+            targetConcept = (Concept)target;
+            targetTerm = targetConcept.term();
         } else {
-            targetConcept = nar.concept(target, true);
-            if (targetConcept == null)
-                throw new NullPointerException(target + " did not resolve to a concept");
-            //if (targetConcept!=null)
+            targetTerm = (Term)target;
 
+            if (!TermIndex.linkable(targetTerm)) {
+                targetConcept = null;
+            } else {
+                targetConcept = nar.concept(target, true);
+                if (targetConcept == null)
+                    throw new NullPointerException(target + " did not resolve to a concept");
+            }
+
+        }
+
+
+        if (targetConcept!=null) {
             activateConcept(targetConcept, subScale);
 
-            if (targetConcept instanceof CompoundConcept)
-                linkTemplates(targetConcept, subScale, depth);
-
-//            activate(targetConcept, subScale);
-//            targetConcept = nar.activate(target,
-//                    activation);
-            //if (targetConcept == null)
-            //throw new RuntimeException("termlink to null concept: " + target);
+            if (targetConcept instanceof CompoundConcept) {
+                linkTerms(targetConcept, ((CompoundConcept) targetConcept).templates.terms(), subScale, depth);
+            }
         }
 
         Term sourceTerm = source.term();
-
         if (!targetTerm.equals(sourceTerm)) {
 
-            //        /* insert termlink target to source */
-            boolean alsoReverse = true;
-            if (targetConcept != null && alsoReverse) {
-                //subScale /= 2; //divide among both directions?
-
+            /* insert termlink target to source */
+            //boolean alsoReverse = true;
+            if (targetConcept != null /*&& alsoReverse*/) {
                 targetConcept.termlinks().put(sourceTerm, in, subScale, linkOverflow);
-
-
             }
 
-        /* insert termlink source to target */
+            /* insert termlink source to target */
             source.termlinks().put(targetTerm, in, subScale, linkOverflow);
         }
-
 
         return targetConcept;
     }
 
-    public void link(Concept src, Term target, float scale, int depth) {
+    public void link(Concept src, Termed target, float scale, int depth) {
 
-        Concept targetConcept = linkSubterm(src, target, scale, depth);
+        if (scale < minScale)
+            return;
 
 
-        if (targetConcept != null && in instanceof Task && depth <= TASKLINK_DEPTH_LIMIT) {
-            //System.out.println(in + " <- " + targetConcept + " " + depth);
-
-            linkTask(scale, targetConcept);
+        Concept targetConcept = null;
+        if (depth <= TERMLINK_DEPTH_LIMIT)  {
+            targetConcept = linkSubterm(src, target, scale, depth+1);
+        } else {
+            return;
         }
 
 
-    }
+        if (depth <= TASKLINK_DEPTH_LIMIT) {
+            if (targetConcept != null && in instanceof Task) {
+                targetConcept.tasklinks().put((Task)in, in, scale, null);
+            }
+        }
 
-    protected void linkTemplates(Concept src, float subScale, int depth) {
-        linkTerms(src, ((CompoundConcept)src).templates.terms(), subScale, Param.BUDGET_EPSILON, depth);
-    }
-
-    public void linkTask(float subScale, Concept target) {
-
-        target.tasklinks().put((Task)in, in, subScale, null);
     }
 
 

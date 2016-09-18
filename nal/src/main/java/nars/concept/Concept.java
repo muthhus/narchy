@@ -149,15 +149,10 @@ public interface Concept extends Termed {
     }
 
     default void crossLink(Budgeted mine, Budgeted theirs, @NotNull Concept them, float scale, @NotNull NAR nar) {
-        float halfScale = scale / 2f;
 
-        Activation a = new Activation(theirs, null, nar);
-        a.link(this, them.term(), halfScale, 0);
-        a.commit(1f);
+        new Activation(theirs, this, them, nar, scale);
+        new Activation(mine, them, this, nar, scale);
 
-        Activation b = new Activation(mine, null, nar);
-        b.link(them, term(), halfScale, 0);
-        b.commit(1f);
     }
 
 //    /** link to a specific peer */

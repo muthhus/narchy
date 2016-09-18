@@ -13,7 +13,10 @@ public abstract class AtomicString implements Atomic {
 
         if (u instanceof Atomic) {
             Atomic tu = (Atomic) u;
-            return op() == tu.op() && toString().equals(tu.toString());
+            if (toString().equals(u.toString()) && op()!=tu.op())
+                throw new RuntimeException("inconsistent op");
+
+            return toString().equals(tu.toString()) && op() == tu.op();
         }
         return false;
     }
