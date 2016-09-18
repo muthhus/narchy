@@ -592,10 +592,6 @@ public class PremiseRule extends GenericCompound {
 
             switch (predicateNameStr) {
 
-//                //postcondition test
-//                case "not_equal":
-//                    next = NotEqual.make(arg1, arg2);
-//                    break;
 
                 case "neq":
                     neq(constraints, X, Y);
@@ -643,21 +639,13 @@ public class PremiseRule extends GenericCompound {
                     neq(constraints, X, Y);
                     break;
 
-                case "notConjunction":
-                    //constraints.put(arg1, new NotOpConstraint(Op.CONJ));
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.CONJ.bit);
-                    break;
 
-                case "notEquivalence":
+                case "notEqui":
                     notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.EQUI.bit);
                     break;
 
-                case "notImplicationOrEquivalence":
+                case "notImplEqui":
                     notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits);
-                    break;
-                
-                case "notImplicationEquivalenceOrConjunction":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits | Op.CONJ.bit);
                     break;
 
                 case "events":

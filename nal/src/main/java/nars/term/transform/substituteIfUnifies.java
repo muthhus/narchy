@@ -27,7 +27,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     }
 
 //    public substituteIfUnifies(PremiseEval parent, OneMatchFindSubst sub) {
-//        this("substituteIfUnifies", parent, sub);
+//        this("subIfUnifies", parent, sub);
 //    }
 
 
@@ -107,7 +107,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 
 
         public substituteIfUnifiesDep(PremiseEval parent) {
-            super("substituteIfUnifiesDep", parent);
+            super("subIfUnifiesDep", parent);
         }
 
         @NotNull
@@ -120,7 +120,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public static final class substituteOnlyIfUnifiesDep extends substituteIfUnifies {
 
         public substituteOnlyIfUnifiesDep(PremiseEval parent) {
-            super("substituteOnlyIfUnifiesDep", parent);
+            super("subOnlyIfUnifiesDep", parent);
         }
 
         @Override
@@ -138,7 +138,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
 
         public substituteIfUnifiesIndep(PremiseEval parent) {
-            super("substituteIfUnifiesIndep",parent);
+            super("subIfUnifiesIndep",parent);
         }
 
         @NotNull
@@ -159,7 +159,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public static final class substituteIfUnifiesIndepForward extends substituteIfUnifies {
 
         public substituteIfUnifiesIndepForward(PremiseEval parent) {
-            super("substituteIfUnifiesIndepForward",parent);
+            super("subIfUnifiesIndepForward",parent);
         }
 
         @Override
@@ -196,7 +196,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 
         public substituteOnlyIfUnifiesIndep(PremiseEval parent) {
 
-            super("substituteOnlyIfUnifiesIndep", parent);
+            super("subOnlyIfUnifiesIndep", parent);
         }
 
         @Override
