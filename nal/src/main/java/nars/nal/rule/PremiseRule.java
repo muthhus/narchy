@@ -15,6 +15,7 @@ import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.nal.meta.op.*;
 import nars.nal.meta.op.AbstractPatternOp.PatternOpNot;
+import nars.nal.meta.op.AbstractPatternOp.PatternOpNotContained;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -614,11 +615,11 @@ public class PremiseRule extends GenericCompound {
                     break;
 
                 case "notSet":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.SetsBits);
+                    opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.SetsBits);
                     break;
 
                 case "hasNoDepVar":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.VAR_DEP.bit);
+                    opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.VAR_DEP.bit);
                     break;
 
                 case "setext":
@@ -641,11 +642,11 @@ public class PremiseRule extends GenericCompound {
 
 
                 case "notEqui":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.EQUI.bit);
+                    opNotContained(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.EQUI.bit);
                     break;
 
                 case "notImplEqui":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits);
+                    opNotContained(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits);
                     break;
 
                 case "events":
@@ -933,20 +934,38 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    public static void notOp(Term task, Term belief, @NotNull Set<BoolCondition> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
+    public static void opNot(Term task, Term belief, @NotNull Set<BoolCondition> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
 
-        boolean constrained = false;
+        boolean prefiltered = false;
         if (t.equals(task)) {
             pres.add(new PatternOpNot(0, structure));
-            constrained = true;
-        }
-        if (t.equals(belief)) {
+            prefiltered = true;
+        } else if (t.equals(belief)) {
             pres.add(new PatternOpNot(1, structure));
-            constrained = true;
+            prefiltered = true;
         }
 
-        if (!constrained)
-            constraints.put(t, new NotOpConstraint(structure));
+        if (!prefiltered)
+            constraints.put(t, new OpNotConstraint(structure));
+    }
+
+
+    public static void opNotContained(Term task, Term belief, @NotNull Set<BoolCondition> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
+
+
+        boolean prefiltered = true;
+
+        if (t.equals(task)) {
+            pres.add(new PatternOpNotContained(0, structure));
+            prefiltered = true;
+        } else if (t.equals(belief)) {
+            pres.add(new PatternOpNotContained(1, structure));
+            prefiltered = true;
+        }
+
+        if (!prefiltered)
+            constraints.put(t, new OpNotContainedConstraint(structure));
+
     }
 
     public void neq(@NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {

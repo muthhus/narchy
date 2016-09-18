@@ -3,6 +3,7 @@ package nars.index;
 import nars.nar.util.DefaultConceptBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,17 +23,21 @@ public enum Indexes {
     //
     //        }
     //    }
-        public static class DefaultTermIndex extends MapIndex {
 
-            public DefaultTermIndex(int capacity, @NotNull Random random) {
-                super(
-                        new DefaultConceptBuilder(random),
-                        new ConcurrentHashMap<>(capacity),
-                        new ConcurrentHashMap<>(capacity)
+    /** suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution */
+    public static class DefaultTermIndex extends MapIndex {
+
+        public DefaultTermIndex(int capacity, @NotNull Random random) {
+            super(
+                    new DefaultConceptBuilder(random),
+                    new HashMap(capacity),
+                    new HashMap(capacity)
+                    //new ConcurrentHashMap<>(capacity),
+                    //new ConcurrentHashMap<>(capacity)
                         //new ConcurrentHashMapUnsafe(capacity)
-                );
-            }
+            );
         }
+    }
 
 //    public static class WeakTermIndex2 extends GroupedMapIndex {
 //

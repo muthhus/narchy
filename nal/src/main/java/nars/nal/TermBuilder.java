@@ -669,16 +669,6 @@ public abstract class TermBuilder {
                         //return negation(predicate); /??
                     }
 
-                    // (C ==> (A ==> B))   <<==>>  ((&&,A,C) ==> B)
-                    if (predicate.op() == IMPL) {
-                        Term oldCondition = subj(predicate);
-                        if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Implication circularity");
-                        else {
-                            if (commutive(dt) || dt==XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */)
-                                return impl2Conj(dt, subject, predicate, oldCondition);
-                        }
-                    }
 
 
                     //filter (factor out) any common subterms iff commutive
@@ -700,6 +690,18 @@ public abstract class TermBuilder {
                             }
                         }
                     }
+
+                    // (C ==> (A ==> B))   <<==>>  ((&&,A,C) ==> B)
+                    if (predicate.op() == IMPL) {
+                        Term oldCondition = subj(predicate);
+                        if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
+                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Implication circularity");
+                        else {
+                            if (commutive(dt) || dt==XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */)
+                                return impl2Conj(dt, subject, predicate, oldCondition);
+                        }
+                    }
+
 
                     if (subject.isAny(InvalidImplicationSubject))
                         throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");

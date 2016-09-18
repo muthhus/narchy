@@ -66,6 +66,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return False; //FAILED?
         }
 
+        Term input = term;
 
         boolean equals = x.equals(y);
         if (!equals) {

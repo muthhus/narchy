@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Random;
 
 import static nars.experiment.tetris.Tetris.*;
-import static nars.op.QueryVariableIntroduction.queryVariableIntroduction;
 
 /**
  * the java application class of pacman 
@@ -100,9 +99,9 @@ public class Pacman extends NAgent {
                 //new SingleThreadExecutioner();
 
         Default nar = new Default(1024,
-                128, 2, 3, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
+                64, 2, 3, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
                 new FrameClock(), e
 
         );

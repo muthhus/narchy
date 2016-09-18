@@ -55,7 +55,7 @@ abstract public class TemporalStabilityTest {
 
             n.run(cycles);
 
-            evaluate(n);
+            //evaluate(n);
         }
     }
 

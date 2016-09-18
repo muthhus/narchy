@@ -71,5 +71,31 @@ public enum AbstractPatternOp  {
         }
     }
 
+    /** tests op membership in a given vector */
+    public static final class PatternOpNotContained extends AtomicBoolCondition {
+
+        public final int subterm;
+        public final int opBits;
+
+        @NotNull private final transient String id;
+
+
+        public PatternOpNotContained(int subterm, int structure) {
+            this.subterm = subterm;
+            this.opBits = structure;
+            this.id = name(getClass(), subterm, Integer.toString(structure,2));
+        }
+
+        @Override
+        public @NotNull String toString() {
+            return id;
+        }
+
+        @Override
+        public boolean run(@NotNull PremiseEval ff, int now) {
+            //the bit must not be set in the structure
+            return (opBits & (subterm == 0 ? ff.termSub0Struct : ff.termSub1Struct)) == 0;
+        }
+    }
 
 }
