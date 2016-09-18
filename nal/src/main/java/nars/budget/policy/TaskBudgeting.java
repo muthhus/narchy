@@ -26,25 +26,26 @@ import static nars.nal.UtilityFunctions.and;
 public class TaskBudgeting {
 
 
-    /** combines the tasklinks and termlink budgets to arrive at a Premise budget, used in budgeting its derivations */
-    public static void premise(@NotNull Budget p, @NotNull BLink<Task> taskLink, @NotNull BLink<Term> termLink) {
-        try {
-            if (taskLink.isDeleted())
-                return;
-            p.setBudget(taskLink);
-            if (termLink.isDeleted())
-                return;
-            BudgetMerge.
-                    orBlend
-                    //plusBlend
-                    //avgBlend
-                    //andBlend
-                    .apply(p, termLink, 1f);
-        } catch (Budget.BudgetException e) {
-            //HACK - this isnt a full solution, but it should work temporarily
-            return;
-        }
-    }
+//    /** combines the tasklinks and termlink budgets to arrive at a Premise budget, used in budgeting its derivations */
+//    public static void premise(@NotNull Budget p, @NotNull BLink<Task> taskLink, @NotNull BLink<Term> termLink) {
+//        try {
+//            if (taskLink.isDeleted())
+//                return;
+//            p.setBudget(taskLink);
+//            if (termLink.isDeleted())
+//                return;
+//            BudgetMerge.
+//                    orBlend
+//                    //plusBlend
+//                    //avgBlend
+//                    //andBlend
+//                    .apply(p, termLink, 1f);
+//            p.setDurability( );
+//        } catch (Budget.BudgetException e) {
+//            //HACK - this isnt a full solution, but it should work temporarily
+//            return;
+//        }
+//    }
 
     public static @Nullable Budget derivation(float qual, @NotNull Termed derived, @NotNull PremiseEval p, float minDur) {
 
@@ -62,7 +63,7 @@ public class TaskBudgeting {
         //volRatioScale = (float) Math.pow(volRatioScale, 2);
 
 
-        final float durability = pp.dur() * qual;// * volRatioScale;
+        final float durability = pp.dur() * qual * volRatioScale;
         if (durability < minDur)
             return null;
 

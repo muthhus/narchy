@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 import static nars.util.Texts.n2;
 
@@ -17,7 +18,7 @@ import static nars.util.Texts.n2;
  */
 public class MutaTaskBag  {
 
-    private static final Logger logger = LoggerFactory.getLogger(MutaTaskBag.class);
+    //private static final Logger logger = LoggerFactory.getLogger(MutaTaskBag.class);
     private final NAR nar;
     private final float selectionRate;
     private final BiConsumer<Task,NAR> model;
@@ -25,15 +26,14 @@ public class MutaTaskBag  {
 
 
 
-    public MutaTaskBag(BiConsumer<Task, NAR> model, float selectionRate, CurveBag<Task> bag, NAR n) {
+    public MutaTaskBag(BiConsumer<Task, NAR> model, Predicate<Task> prefilter, float selectionRate, CurveBag<Task> bag, NAR n) {
         this.bag = bag;
         this.nar = n;
         this.selectionRate = selectionRate;
         this.model = model;
         n.onTask(task -> {
-            if (task instanceof VarIntroduction.VarIntroducedTask)
-                return; //HACK dont process its own feedback
-            bag.put(task);
+            if (!prefilter.test(task))
+                bag.put(task);
         });
         n.onFrame(this::next);
     }

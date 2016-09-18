@@ -99,7 +99,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * false to stop it
      */
     @Override
-    public final boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+    public final boolean run(@NotNull PremiseEval m, int now) {
 
         Term r;
         try {

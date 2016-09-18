@@ -123,7 +123,7 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
     abstract protected BoolCondition build(BoolCondition eachMatch);
 
     @Override
-    public boolean booleanValueOf(PremiseEval premiseEval, int now) {
+    public boolean run(PremiseEval premiseEval, int now) {
         throw new UnsupportedOperationException("Use the instance that this builds, not this. it should not result in the deriver");
     }
 

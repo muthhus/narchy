@@ -30,6 +30,7 @@ import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
+import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Termed;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Random;
 
 import static nars.experiment.tetris.Tetris.*;
+import static nars.op.QueryVariableIntroduction.queryVariableIntroduction;
 
 /**
  * the java application class of pacman 
@@ -54,7 +56,7 @@ import static nars.experiment.tetris.Tetris.*;
 public class Pacman extends NAgent {
 
     final cpcman pacman;
-    public static final int cyclesPerFrame = 1;
+    public static final int cyclesPerFrame = 4;
 
     final int visionRadius;
     final int itemTypes = 3;
@@ -94,16 +96,17 @@ public class Pacman extends NAgent {
         //Multi nar = new Multi(3,512,
 
         Executioner e =
-                new MultiThreadExecutioner(2, 8192);
-                //new SingleThreadExecutioner();
+                //new MultiThreadExecutioner(2, 8192);
+                new SingleThreadExecutioner();
 
         Default nar = new Default(1024,
-                200, 2, 2, rng,
+                20, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
                 new FrameClock(), e
 
         );
+        //Object queryIntroducer = queryVariableIntroduction(nar, 100, 0.1f, 0.25f);
 
         //new MemoryManager(nar);
 

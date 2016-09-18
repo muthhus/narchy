@@ -24,10 +24,10 @@ public final class Fork extends GenericCompound implements BoolCondition {
     }
 
     @Override
-    public boolean booleanValueOf(PremiseEval m, int now) {
+    public boolean run(PremiseEval m, int now) {
 
         for (BoolCondition s : termCache) {
-            s.booleanValueOf(m, now);
+            s.run(m, now);
             m.revert(now);
         }
 

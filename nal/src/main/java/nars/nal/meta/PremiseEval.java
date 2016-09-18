@@ -271,7 +271,7 @@ public class PremiseEval extends FindSubst {
             return false;
         }
         try {
-            return forEachMatch.booleanValueOf(this, now());
+            return forEachMatch.run(this, now());
         } catch (RuntimeException e) {
             if (Param.DEBUG_DERIVER)
                 Conclude.logger.warn("{}\n\tderiving {}", e, ((Conclude)forEachMatch).rule.source);

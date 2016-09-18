@@ -1,6 +1,7 @@
 package nars.budget;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.budget.Budget.validBudgetValue;
 import static nars.nal.UtilityFunctions.and;
@@ -46,10 +47,11 @@ public class RawBudget implements Budget {
     }
 
 
-    @NotNull
+    @Nullable
     @Override
     public Budget clone() {
-        return new RawBudget(this);
+        float p = priority;
+        return p != p /* deleted? */ ? null : new RawBudget(p, dur(), qua());
     }
 
     /**

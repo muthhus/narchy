@@ -43,7 +43,7 @@ public class SimpleDeriver extends Deriver {
                 if (p instanceof BoolCondition) {
 
                     try {
-                        if (!((BoolCondition) p).booleanValueOf(m, m.now()))
+                        if (!((BoolCondition) p).run(m, m.now()))
                             break;
 
                     } catch (Exception e) {

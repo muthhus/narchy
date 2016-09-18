@@ -633,7 +633,7 @@ public class Terms   {
 
     /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
     @Nullable
-    public static Term[] substMaximal(Compound c, org.eclipse.collections.api.block.predicate.Predicate<Term> include, int minCount, int minScore) {
+    public static Term[] substMaximal(Compound c, Predicate<Term> include, int minCount, int minScore) {
         HashBag<Term> uniques = subtermScore(c,
             t -> include.test(t) ? t.volume() : 0 //sum by complexity if passes include filter
         );
@@ -659,7 +659,7 @@ public class Terms   {
 
     /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
     @Nullable
-    public static Term[] substRoulette(Compound c, org.eclipse.collections.api.block.predicate.Predicate<Term> include, int minCount, Random rng) {
+    public static Term[] substRoulette(Compound c, Predicate<Term> include, int minCount, Random rng) {
         HashBag<Term> uniques = subtermScore(c,
                 t -> include.test(t) ? 1 : 0 //sum by complexity if passes include filter
         );
@@ -689,9 +689,29 @@ public class Terms   {
         return null;
     }
 
+    /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
+    @Nullable
+    public static Term[] substAllRepeats(Compound c, Predicate<Term> include, int minCount) {
+        HashBag<Term> uniques = subtermScore(c,
+                t -> include.test(t) ? 1 : 0 //sum by complexity if passes include filter
+        );
+
+        int s = uniques.size();
+        if (s > 0) {
+            List<Term> oi = $.newArrayList();
+            uniques.forEachWithOccurrences((Term t, int count) -> {
+                if (count >= minCount) {
+                    oi.add(t);
+                }
+            });
+            return oi.toArray(new Term[oi.size()]);
+        }
+        return null;
+    }
+
 
 //    /** produces a Map<Object,Int> of 'scores' of how much complexity would be reduced by replacing all occurrences of that subterm with a variable */
-//    @NotNull public static ObjectIntMap<Term> substAnalysis(Compound c, org.eclipse.collections.api.block.predicate.Predicate<Term> include, int minCount) {
+//    @NotNull public static ObjectIntMap<Term> substAnalysis(Compound c, Predicate<Term> include, int minCount) {
 //
 //        HashBag<Term> uniques = subtermRepeats(c, include, t -> t.complexity());
 //

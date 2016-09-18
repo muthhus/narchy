@@ -43,7 +43,7 @@ public final class TermNotEquals extends AtomicBoolCondition {
     }
 
     @Override
-    public boolean booleanValueOf(@NotNull PremiseEval ff, int now) {
+    public boolean run(@NotNull PremiseEval ff, int now) {
         Term ca = a == 0 ? ff.taskTerm : ff.beliefTerm;
         Term cb = b == 0 ? ff.taskTerm : ff.beliefTerm;
 

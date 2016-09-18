@@ -10,8 +10,8 @@ public final class TaskNegative extends TaskPositive {
 
 
     @Override
-    public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
-        return !super.booleanValueOf(m, now);
+    public boolean run(@NotNull PremiseEval m, int now) {
+        return !super.run(m, now);
     }
 
 

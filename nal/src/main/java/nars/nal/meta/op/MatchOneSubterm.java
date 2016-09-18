@@ -21,7 +21,7 @@ public final class MatchOneSubterm extends MatchTerm {
     }
 
     @Override
-    public final boolean booleanValueOf(@NotNull PremiseEval p, int now) {
+    public final boolean run(@NotNull PremiseEval p, int now) {
         p.matchAll(pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch, constraints, matchFactor);
         return true;
     }

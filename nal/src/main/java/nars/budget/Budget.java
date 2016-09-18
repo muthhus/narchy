@@ -209,8 +209,8 @@ public interface Budget extends Budgeted {
 
 
 
-    @NotNull
-    Budget clone();
+    /** returns null if already deleted */
+    @Nullable Budget clone();
 
     default boolean summaryLessThan(float s) {
         return !summaryNotLessThan(s);

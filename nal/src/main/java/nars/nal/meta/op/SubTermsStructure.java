@@ -35,7 +35,7 @@ public final class SubTermsStructure extends AtomicBoolCondition {
     }
 
     @Override
-    public boolean booleanValueOf(@NotNull PremiseEval ff, int now) {
+    public boolean run(@NotNull PremiseEval ff, int now) {
         /*Compound t = ff.term;
         return !t.term(subterm).impossibleStructureMatch(bits);*/
         return ff.subTermsMatch(bits);

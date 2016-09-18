@@ -102,7 +102,7 @@ public class TrieDeriver extends Deriver {
     public final void run(@NotNull PremiseEval m) {
         int now = m.now();
         for (BoolCondition r : roots) {
-            r.booleanValueOf(m, now);
+            r.run(m, now);
             m.revert(now);
         }
     }

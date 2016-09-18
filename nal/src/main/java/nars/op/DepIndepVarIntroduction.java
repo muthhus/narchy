@@ -1,7 +1,9 @@
 package nars.op;
 
 import nars.$;
+import nars.NAR;
 import nars.Op;
+import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -9,41 +11,64 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Random;
+import java.util.function.Predicate;
 
+import static nars.$.varDep;
+import static nars.$.varIndep;
 import static nars.Op.CONJ;
 
 /**
  * 1-iteration DepVar and IndepVar introduction that emulates and expands the original NAL6 Variable Introduction Rules
- *
+ * <p>
  * allows promoting query variables to dep/indep vars
  */
 public class DepIndepVarIntroduction extends VarIntroduction {
 
-    private final Random rng;
 
-    public DepIndepVarIntroduction(Random rng) {
+    public DepIndepVarIntroduction() {
         super(1);
-        this.rng = rng;
     }
 
+    @Override
+    public void accept(Task task, NAR nar) {
 
+        if (!task.term().hasAny(ConjOrStatementBits))
+            return; //early failure test
+
+        if (task.cyclic())
+            return; //avoids reprocessing the same
+
+        super.accept(task, nar);
+    }
+
+    final static int ConjOrStatementBits = Op.StatementBits | Op.CONJ.bit;
     final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
 
     @Nullable
     @Override
     protected Term[] nextSelection(Compound input) {
-        return Terms.substRoulette(input, subterm -> !subterm.isAny(DepOrIndepBits), 2, rng);
+        Predicate<Term> condition = subterm -> !subterm.isAny(DepOrIndepBits);
+        return Terms.substAllRepeats(input, condition, 2);
+        //return Terms.substRoulette(input, condition, 2, rng);
     }
 
     @Override
-    protected Term next(Compound input, Term selected, int iteration) {
+    protected Term[] next(Compound input, Term selected, int iteration) {
 
         List<byte[]> p = input.pathsTo(selected);
         if (p.isEmpty())
             return null;
 
+        //detect an invalid top-level indep var substitution
+        if (input.op().statement) {
+            for (byte[] path : p)
+                if (path.length < 2)
+                    return null; //substitution would replace something at the top level of a statement
+        }
+
+
         boolean[] withinConj = new boolean[p.size()];
+        ObjectByteHashMap<Term> conjCoverage = new ObjectByteHashMap<>(p.size());
 
         ObjectByteHashMap<Term> statementCoverage = new ObjectByteHashMap<>(p.size() /* estimate */);
         boolean[] withinStatement = new boolean[p.size()];
@@ -52,39 +77,41 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             byte[] path = p.get(occurrence);
             Term t = null; //root
             int pathLength = path.length;
-            for (int i = -1; i < pathLength; i++) {
+            for (int i = -1; i < pathLength-1 /* dont include the selected term itself */; i++) {
                 if (i == -1)
                     t = input;
                 else
-                    t = ((Compound)t).term(path[i]);
+                    t = ((Compound) t).term(path[i]);
                 Op o = t.op();
                 if (o.statement) {
-                    if (i < pathLength - 1) {
-                        withinStatement[occurrence] = true;
-                        byte inside = (byte) (1 << path[i + 1]);
-                        statementCoverage.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
-                    }
+                    withinStatement[occurrence] = true;
+                    byte inside = (byte) (1 << path[i + 1]);
+                    statementCoverage.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
                 } else if (o == CONJ) {
                     withinConj[occurrence] = true;
+                    conjCoverage.addToValue(t, (byte) 1);
                 }
             }
         }
 
-        boolean statementScope = true;
-        for (boolean x : withinStatement)
-            if (!x) { statementScope = false; break; }
-        if (statementScope) {
-            //at least one statement must be covered (both bits)
-            if (statementCoverage.anySatisfy(b->b==0b11))
-                return $.varIndep("i" + iteration);
+
+        //at least one statement must have both sides covered
+        Term I = (statementCoverage.anySatisfy(b -> b == 0b11)) ?
+                varIndep("i" + iteration) : null;
+
+        //at least one conjunction must contain >=2 path instances
+        Term D = conjCoverage.anySatisfy(b -> b >= 2) ?
+                varDep("i" + iteration) : null;
+
+        if (I!=null && D!=null) {
+            return new Term[] { I , D };
+        } else if (I!=null) {
+            return new Term[] { I };
+        } else if (D!=null) {
+            return new Term[] { D };
+        } else {
+            return null;
         }
 
-        boolean conjScope = true;
-        for (boolean x : withinConj)
-            if (!x) { conjScope = false; break; }
-        if (conjScope)
-            return $.varDep("d" + iteration);
-
-        return null;
     }
 }

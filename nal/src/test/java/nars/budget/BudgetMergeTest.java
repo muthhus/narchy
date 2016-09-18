@@ -80,7 +80,7 @@ public class BudgetMergeTest {
         testMerge(b, b, 0.5f, AVG, b.pri(), b.dur(), b.qua()); //scale of anything also should have no effect with itself in avg
         testMerge(b, b, 1.0f, AVG, b.pri(), b.dur(), b.qua()); //scale of one also should have no effect with itself
 
-        testMerge(b, c, 1, AVG, 0.375f, 0.33f, 0.16f); //test correct affect of components; values closer to b since it is dominant
+        testMerge(b, c, 1, AVG, 0.375f, 0.31f, 0.16f); //test correct affect of components; values closer to b since it is dominant
         testMerge(b, c, 0.5f, AVG, 0.4375f, 0.36f, 0.18f); //lesser affect (dur and qua closer to original values)
 
         testMerge(a, c, 1f, AVG, 0.625f, 0.6f, 0.26f); //priority decrease

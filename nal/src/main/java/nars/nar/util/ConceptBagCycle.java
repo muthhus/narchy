@@ -3,23 +3,12 @@ package nars.nar.util;
 import nars.*;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.concept.ConceptBuilder;
 import nars.link.BLink;
-import nars.nal.Conclusion;
-import nars.nal.Deriver;
-import nars.nal.Premise;
-import nars.nal.PremiseBuilder;
-import nars.nal.derive.TrieDeriver;
-import nars.nal.meta.PremiseEval;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Terms;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
-import nars.util.data.list.FasterList;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -122,8 +111,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         int cpf = conceptsFiredPerCycle.intValue();
 
-        short taskLinks = (short) tasklinksFiredPerFiredConcept.intValue();
-        short termLinks = (short) termlinksFiredPerFiredConcept.intValue();
+        int taskLinks = tasklinksFiredPerFiredConcept.intValue();
+        int termLinks = termlinksFiredPerFiredConcept.intValue();
 
         List<BLink<Concept>> toFire = $.newArrayList();
         for (int cycleNum = 0; cycleNum < cycles; cycleNum++) {
@@ -136,150 +125,15 @@ public class ConceptBagCycle implements Consumer<NAR> {
             for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
                 @Nullable Concept c = toFire.get(i).get();
                 if (c != null) {
-                    new FireConcept(c, nar,
+                    new FireConceptSquared(c, nar,
                             taskLinks, termLinks,
                             nar::inputLater);
 
-                        /*@Override
-                        public void accept(Premise p) {
-                            total++;
-                            if (recent.putIfAbsent(p,p)==null) {
-                                super.accept(p);
-                                novel++;
-                            } else {
-                                //System.err.println("duplicate (novel=" + Texts.n2(((float)novel/total)*100f) + "%)" );
-                            }
-
-                        }*/
-
-
                 }
             }
 
         }
 
-        //recent.clear();
-
-    }
-
-    /**
-     * shared combined conclusion
-     */
-    public static class FireConcept extends Conclusion {
-
-        private static final Logger logger = LoggerFactory.getLogger(FireConcept.class);
-
-        private final Concept c;
-        private final NAR nar;
-        private final short tasklinks;
-        private final short termlinks;
-        private final TrieDeriver deriver;
-        private int count;
-
-        public FireConcept(Concept c, NAR nar, short tasklinks, short termlinks, Consumer<Task> batch) {
-            super(batch);
-            this.c = c;
-            this.nar = nar;
-            this.deriver = Deriver.getDefaultDeriver();
-            this.tasklinks = tasklinks;
-            this.termlinks = termlinks;
-
-            try {
-
-                c.commit();
-
-
-                firePremiseSquared(
-                        c,
-                        tasklinks,
-                        termlinks
-                );
-
-            } catch (Exception e) {
-
-                if (Param.DEBUG)
-                    e.printStackTrace();
-
-                logger.error("run {}", e.toString());
-            }
-
-        }
-
-        /**
-         * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
-         * (recycles buffers, non-thread safe, one thread use this at a time)
-         */
-        public final int firePremiseSquared(@NotNull Concept c, int tasklinks, int termlinks) {
-
-            FasterList<BLink<Term>> termLinks = $.newArrayList(termlinks);
-            c.termlinks().sample(termlinks, termLinks::addIfNotNull);
-
-            count = 0;
-
-            long now = nar.time();
-
-            float minDur = nar.durMin.floatValue();
-
-            if (!termLinks.isEmpty()) {
-
-                FasterList<BLink<Task>> tasksBuffer = $.newArrayList(tasklinks);
-                c.tasklinks().sample(tasklinks, tasksBuffer::addIfNotNull);
-
-                if (!tasksBuffer.isEmpty()) {
-
-                    for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
-
-
-                        BLink<Task> taskLink = tasksBuffer.get(i);
-
-                        Task task = taskLink.get();
-                        if (task == null)
-                            continue;
-
-                        Compound taskTerm = task.term();
-
-
-
-                        for (int j = 0, termsArraySize = termLinks.size(); j < termsArraySize; j++) {
-
-                            if (taskLink.isDeleted() || task.isDeleted())
-                                break;
-
-                            BLink<Term> termLink = termLinks.get(j);
-                            Term term = termLink.get();
-
-                            if (term == null || Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, term))
-                                continue;
-
-                            RawBudget pBudget = new RawBudget(); //recycled temporary budget for calculating premise budget
-
-                            if (PremiseBuilder.budget(pBudget, taskLink, termLink, minDur)) {
-
-                                Premise p = PremiseBuilder.newPremise(nar, c, now, task, term, pBudget);
-
-                                new PremiseEval(nar, deriver, p, this);
-                                count++;
-                            }
-                        }
-
-                    }
-
-                    //tasksBuffer.clear();
-                }
-
-                //termsBuffer.clear();
-            }
-
-
-            return count;
-        }
-
-//
-//        @Override
-//        public void accept(Premise p) {
-//            mm.run(p, this);
-//            count++;
-//        }
     }
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */

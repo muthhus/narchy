@@ -45,7 +45,6 @@ public class Default extends AbstractNAR {
     public final MutableInteger cyclesPerFrame = new MutableInteger(1); //this is specific to a Core implementation, not the entire NAR
 
     private VarIntroduction depIndepIntroducer;
-    private MutaTaskBag queryIntroducer;
 
     @Deprecated
     public Default() {
@@ -85,34 +84,8 @@ public class Default extends AbstractNAR {
 
         if (level >= 5) {
 
-            this.depIndepIntroducer = new DepIndepVarIntroduction(random).each(this);
+            this.depIndepIntroducer = new DepIndepVarIntroduction().each(this);
 
-            this.queryIntroducer = new MutaTaskBag(
-                    new VarIntroduction(2 /* max iterations */) {
-                        @Override protected Term next(Compound input, Term selection, int iteration) {
-                            return $.varQuery("q" + iteration);
-                        }
-
-                        @Nullable @Override protected Term[] nextSelection(Compound input) {
-                            return Terms.substMaximal(input, this::canIntroduce, 2, 3);
-                        }
-
-                        protected boolean canIntroduce(Term subterm) {
-                            return !subterm.op().var;
-                        }
-
-                        @Override protected Task clone(@NotNull Task original, Compound c) {
-                            Task t = super.clone(original, c);
-                            //t.budget().mul(1f/original.term().volume(), 1f, 1f); //decrease in proportion to the input term's volume
-                            return t;
-                        }
-                    }, 0.5f, /* amount percent of capacity processed per frame, 0 <= x <= 1 */
-                    new CurveBag<>(
-                        Math.max(1, activeConcepts/4) /* capacity */,
-                        new CurveBag.DirectSampler(CurveBag.power2BagCurve, this.random),
-                        BudgetMerge.plusBlend,
-                        new ConcurrentHashMap<>() ),
-                    this);
 
             if (level >= 7) {
                 initNAL7();

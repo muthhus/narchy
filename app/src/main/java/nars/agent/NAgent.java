@@ -357,7 +357,7 @@ abstract public class NAgent {
         if (reinforcementAttention > 0) {
 
             boostBudget = Budget.One.clone().multiplied(reinforcementAttention, 0.5f, 0.9f);
-            curiosityBudget = Budget.Zero;
+            curiosityBudget = Budget.One.clone().multiplied(0, 0.5f, 0.9f);
 
             //boost(happy);
             //boost(happy); //boosted by the (happy)! task that is boosted below

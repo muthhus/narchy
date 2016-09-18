@@ -16,7 +16,7 @@ public final class SolvePuncOverride extends Solve {
     }
 
     @Override
-    public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+    public boolean run(@NotNull PremiseEval m, int now) {
         return measure(m, puncOverride);
     }
 }

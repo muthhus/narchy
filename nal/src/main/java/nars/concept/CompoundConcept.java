@@ -403,19 +403,27 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
                 throw new RuntimeException("Invalid sentence type: " + input);
         }
 
+        nar.tasks.remove(toRemove);
+
         if (delta!=null)
             accepted = true;
 
         Activation a;
         if (accepted) {
             a = new Activation(input, this, nar, 1f, delta);
+            //check again if during feedback, the task decided deleted itself
+            if (input.isDeleted()) {
+                a = null;
+            }
         } else {
             input.feedback(null, Float.NaN, Float.NaN, nar);
-            nar.tasks.remove(input); //which was added in the callee
             a = null;
         }
 
-        nar.tasks.remove(toRemove);
+        if (a == null) {
+            //available for both conditions above
+            nar.tasks.remove(input); //which was added in the callee
+        }
 
         return a;
     }

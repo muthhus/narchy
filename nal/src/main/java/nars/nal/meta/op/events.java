@@ -24,7 +24,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+        public boolean run(@NotNull PremiseEval m, int now) {
             int d = deltaOcc(m.task, m.belief);
             return d<=0 && d!=DTERNAL; /* && d!=DTERNAL which is negative */
         }
@@ -40,7 +40,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+        public boolean run(@NotNull PremiseEval m, int now) {
             int d = deltaOcc(m.task, m.belief);
             return d>=0 /* && d!=DTERNAL which is negative */;
         }
@@ -56,7 +56,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+        public boolean run(@NotNull PremiseEval m, int now) {
             int d = deltaOcc(m.task, m.belief);
             return d!=DTERNAL;
         }
@@ -71,7 +71,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+        public boolean run(@NotNull PremiseEval m, int now) {
             int dt = m.task.dt();
             return (dt != DTERNAL);
         }
@@ -128,7 +128,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+        public boolean run(@NotNull PremiseEval m, int now) {
             Task b = m.belief;
             if (b == null) return false;
             return m.task.occurrence() == ETERNAL && b.occurrence() == ETERNAL;
@@ -146,7 +146,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m, int now) {
+        public boolean run(@NotNull PremiseEval m, int now) {
 
             /* true if belief is present and both task and belief are eternal */
             Task b = m.belief;

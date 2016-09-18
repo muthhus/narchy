@@ -431,9 +431,11 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
         @Override
         protected void commit(@NotNull CurveBag bag) {
-            float max = bag.priMax();
-            float min = bag.priMin();
-            this.range = max - min;
+            synchronized (bag._items()) {
+                float max = bag.priMax();
+                float min = bag.priMin();
+                this.range = max - min;
+            }
         }
 
         @Override

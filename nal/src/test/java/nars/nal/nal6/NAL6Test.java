@@ -288,6 +288,7 @@ public class NAL6Test extends AbstractNALTest {
     public void variable_introduction_with_existing_vars2()  {
         //test that an introduced variable doesn't interfere with an existing variable of same name ($1)
         TestNAR tester = test();
+        tester.log();
         tester.believe("<#1 --> swimmer>"); //en("A gull is a swimmer.");
         tester.believe("<swan --> swimmer>", 0.80f, 0.9f); //en("Usually, a swan is a swimmer.");
         tester.mustBelieve(cycles, "<<#1 --> $2> ==> <swan --> $2>>", 0.80f, 0.45f); //en("I guess what can be said about gull usually can also be said about swan.");
@@ -377,6 +378,7 @@ public class NAL6Test extends AbstractNALTest {
     public void second_variable_introduction_induction()  {
 
         TestNAR tester = test();
+        tester.log();
         tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>"); //en("if something opens lock1, it is a key");
         tester.believe("<lock1 --> lock>"); //en("lock1 is a key");
         tester.mustBelieve(cycles, "<(&&,<#1 --> lock>,<#1 --> (/,open,$2,_)>) ==> <$2 --> key>>", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");

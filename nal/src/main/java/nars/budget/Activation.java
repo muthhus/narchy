@@ -71,7 +71,11 @@ public class Activation {
         this(input, concept, nar, scale);
 
         if (delta!=null) {
+            //beliefs/goals
             feedback(input, delta, concept);
+        } else {
+            //questions/quests
+            input.feedback(delta, 0, 0, nar);
         }
     }
 
