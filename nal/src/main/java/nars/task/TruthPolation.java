@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 
@@ -47,21 +48,17 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     @Nullable
     public Truth truth(long when, Task... tasks) {
-        return truth(when, when, Lists.newArrayList(tasks));
-    }
-
-//    @Nullable
-//    public Truth truth(long when, long now, @NotNull Collection<Task> tasks) {
-//        return truth(when, now, tasks.toArray(new Task[tasks.size()]));
-//    }
-
-    @Nullable
-    public Truth truth(long when, long now, @NotNull Iterable<Task> tasks) {
-        return truth(when, now, tasks.iterator());
+        return truth(when, when, tasks);
     }
 
     @Nullable
-    public Truth truth(long when, long now, @NotNull Iterator<Task> tasks) {
+    public Truth truth(long when, long now, @NotNull Collection<Task> tasks) {
+        return truth(when, now, tasks.toArray(new Task[tasks.size()]));
+    }
+
+
+    @Nullable
+    public Truth truth(long when, long now, @NotNull Task[] tasks) {
 
 
 //        int n = tasks.length;
@@ -73,8 +70,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
         int volume = -1;
         int i = 0;
-        while (tasks.hasNext()) {
-            Task t = tasks.next();
+        for (Task t : tasks) {
 
 //            if (t == null)
 //                continue; //HACK

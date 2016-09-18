@@ -115,8 +115,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             if (r instanceof Compound) { //includes null test
                 derive(m, (Compound) r, m.punct.get());
             }
-        } catch (RuntimeException e) {
-            logger.error("Task: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);
+        } catch (InvalidTermException e) {
+            if (Param.DEBUG_EXTRA)
+                logger.error("Task: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);
         }
 
         return true;

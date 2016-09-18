@@ -131,9 +131,6 @@ public abstract class Param /*extends Container*/ implements Level {
     //public static float PREMISE_MATCH_OVERLAP_MULTIPLIER = 1f; //0.1f;
 
 
-    /** the result of an overlap will reduce the confidence by a proportional amount of the evidential overlap */
-    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = true;
-
 //    /**
 //     * relates time and evidence (confidence); how past and future beliefs decay in rank
 //     * across time; width of the temporal focus relative to the min/max occurrence times

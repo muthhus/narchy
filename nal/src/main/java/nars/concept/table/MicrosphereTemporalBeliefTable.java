@@ -10,7 +10,7 @@ import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
 import nars.util.Util;
-import org.eclipse.collections.impl.list.mutable.MultiReaderFastList;
+import nars.util.data.list.MultiRWFasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +20,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static com.google.common.collect.Iterators.concat;
-import static com.google.common.collect.Iterators.singletonIterator;
 import static nars.Param.rankTemporalByConfidence;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
@@ -33,11 +32,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
 
     private volatile int capacity;
-    final MultiReaderFastList<Task> list;
+    final MultiRWFasterList<Task> list;
 
     public MicrosphereTemporalBeliefTable(int initialCapacity) {
         super();
-        this.list = MultiReaderFastList.newList(initialCapacity);
+        this.list = MultiRWFasterList.newList(initialCapacity);
         this.capacity = initialCapacity;
     }
 
@@ -49,9 +48,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     @Override
     public final void forEach(Consumer<? super Task> action) {
-        list.withReadLockAndDelegate(l -> {
-            l.forEach(action);
-        });
+        list.forEach(action);
     }
 
     public void capacity(int newCapacity, long now, @NotNull List<Task> removed) {
@@ -59,13 +56,13 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
             this.capacity = newCapacity;
 
+            clean(removed);
+
             if (size() > newCapacity) {
                 list.withWriteLockAndDelegate((l) -> {
 
-                    removeAlreadyDeleted(removed);
-
                     while (list.size() > newCapacity) {
-                        Task weakest = weakest(list, now, null, Float.NEGATIVE_INFINITY);
+                        Task weakest = weakest(now, null);
                         if (weakest == null)
                             throw new NullPointerException();
                         remove(weakest, removed);
@@ -96,7 +93,9 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     /**
      * according to a balance of temporal proximity and confidence
      */
-    public static float rank(@NotNull Task t, long when, long now) {
+    public static float rank(@Nullable Task t, long when, long now) {
+        if (t == null || t.isDeleted())
+            return -1;
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
         return rankTemporalByConfidence(t, when, now);
     }
@@ -121,7 +120,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             before = truth(now, eternal);
 
             Task next;
-            if ((next = compress(l, input, now, eternal, displ, concept)) != null) {
+            if ((next = compress(input, now, eternal, displ, concept)) != null) {
 
                 list.add(input);
 
@@ -140,18 +139,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     @Override
     public boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> displ) {
-        final boolean[] modified = {false};
-        list.withWriteLockAndDelegate(l -> {
-            list.removeIf(((Predicate<Task>) t -> {
-                if (o.test(t)) {
-                    displ.add(t);
-                    modified[0] = true;
-                    return true;
-                }
-                return false;
-            }));
-        });
-        return modified[0];
+        return list.removeIf(((Predicate<Task>) t -> {
+            if (o.test(t)) {
+                displ.add(t);
+            }
+            return false;
+        }));
     }
 
 
@@ -206,53 +199,20 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 //    }
 
 
-    @Nullable
-    private final Task remove(int index, @NotNull List<Task> displ) {
-        @Nullable Task t = list.remove(index);
-        if (t != null) {
-            displ.add(t);
+    public Task weakest(long now, @Nullable Task toMergeWith) {
+
+        if (toMergeWith == null) {
+            return list.minBy(x -> rank(x, now, now));
+        } else {
+            long occ = toMergeWith.occurrence();
+            long[] evidence = toMergeWith.evidence();
+            return list.minBy(x -> rank(x, evidence, occ, now));
         }
-        return t;
+
     }
 
-
-    public Task weakest(List<Task> l, long now, @Nullable Task toMergeWith, float minRank) {
-        Task weakest = null;
-        float weakestRank = minRank;
-        int n = size();
-
-
-        long[] mergeEvidence = toMergeWith != null ? toMergeWith.evidence() : null;
-        long then = toMergeWith != null ? toMergeWith.occurrence() : now;
-
-        for (int i = 0; i < n; i++) {
-
-            Task ii = l.get(i);
-            if (mergeEvidence != null &&
-                    ((!Param.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE &&
-                            (/*Stamp.isCyclic(iiev) || */Stamp.overlapping(mergeEvidence, ii.evidence()))
-                    )))
-                continue;
-
-            //consider ii for being the weakest ranked task to remove
-            float r = rank(ii, then, now);
-
-//                r *=
-//                        (1 + Math.abs(ii.freq() - toMergeWith.freq())); //similar frequency makes them more likely to be paired
-
-            //if (toMergeWith != null) {
-            //* (1 + Math.abs(ii.occurrence() - toMergeWith.occurrence()));
-            //}
-
-            //(toMergeWith!=null ? (1f / (1f + Math.abs(ii.freq()-toMergeWith.freq()))) : 1f); //prefer close freq match
-            if (weakest == null || r < weakestRank) {
-                weakestRank = r;
-                weakest = ii;
-            }
-
-        }
-
-        return weakest;
+    public static Float rank(Task x, long[] evidence, long occ, long now) {
+        return Stamp.overlapFraction(evidence, x.evidence()) * rank(x, occ, now);
     }
 
 
@@ -265,23 +225,24 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
     @Nullable
-    protected Task compress(List<Task> l, @Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull List<Task> displ, @Nullable Concept concept) {
+    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull List<Task> displ, @Nullable Concept concept) {
 
         int cap = capacity();
-        if (size() < cap || removeAlreadyDeleted(displ) < cap) {
+
+        if (size() < cap || clean(displ)) {
             return input; //no need for compression
         }
 
 
         float inputRank = input != null ? rank(input, now, now) : Float.POSITIVE_INFINITY;
 
-        Task a = weakest(l, now, null, inputRank);
+        Task a = weakest(now, null);
         if (a == null || !remove(a, displ)) {
             //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
         }
 
-        Task b = weakest(l, now, a, Float.POSITIVE_INFINITY);
+        Task b = weakest(now, a);
 
         if (b != null && remove(b, displ)) {
             return merge(a, b, now, concept, eternal);
@@ -316,37 +277,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Override
     public final Task match(long when, long now, @Nullable Task against) {
 
-        if (list.isEmpty())
-            return null;
-
-        final Task[] best = new Task[1];
-
-        list.withReadLockAndDelegate(l -> {
-
-            float bestRank = Float.NEGATIVE_INFINITY;
-
-            int s = l.size();
-            for (int i = 0; i < s; i++) {
-                Task x = l.get(i);
-                if (x != null && !x.isDeleted()) {
-
-                    float r = rank(x, when, now);// / (1f + Revision.dtDifference(against, x));
-
-                    if (r > bestRank) {
-                        best[0] = x;
-                        bestRank = r;
-                    }
-
-                }
-            }
-
-
-        });
-
-        return best[0];
-        //}
-
-        //return null;
+        return list.maxBy(x -> rank(x, when, now));
 
     }
 
@@ -389,36 +320,27 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             return res != null ? Revision.project(res, when, now, o, false) : topEternalTruth;
 
         } else {
-            final Truth[] tt = new Truth[1];
-            list.withReadLockAndDelegate(l ->
 
-                    tt[0] = new TruthPolation(l.size()).truth(when, now,
-                            topEternal != null ?
-                                    concat(l.iterator(), singletonIterator(topEternal)) :
-                                    l.iterator()
-                    )
-            );
-            return tt[0];
+            boolean includeEternal = topEternal != null;
+            Task[] tr = list.toArray((i) -> new Task[i], includeEternal ? 1 : 0);
+            if (includeEternal)
+                tr[tr.length-1] = topEternal;
+            return new TruthPolation(tr.length).truth(when, now, tr);
+
         }
 
     }
 
 
-    private int removeAlreadyDeleted(@NotNull List<Task> displ) {
-        List<Task> list = this.list;
-        int s = size();
-        for (int i = 0; i < s; ) {
-            Task x = list.get(i);
-            if (x == null || x.isDeleted()) {
-                if (remove(i, displ) != null)
-                    s--;
-                else
-                    break;
-            } else {
-                i++;
+    private boolean clean(@NotNull List<Task> displ) {
+        return list.removeIf(x -> {
+            if (x == null) return true;
+            if (x.isDeleted()) {
+                displ.add(x);
+                return true;
             }
-        }
-        return s;
+            return false;
+        });
     }
 
 
