@@ -7,11 +7,11 @@ import org.jetbrains.annotations.NotNull;
 import static nars.term.Terms.equalsAnonymous;
 
 
-public final class NotEqualsConstraint implements MatchConstraint {
+public final class NotEqualConstraint implements MatchConstraint {
 
     private final Term b;
 
-    public NotEqualsConstraint(Term b) {
+    public NotEqualConstraint(Term b) {
         this.b = b;
     }
 

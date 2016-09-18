@@ -116,6 +116,8 @@ public class PremiseRule extends GenericCompound {
 
     private @Nullable TimeFunctions timeFunction = TimeFunctions.Auto;
 
+
+
     @Nullable
     private static final CompoundTransform<Compound, Term> truthSwap = new PremiseTruthTransform(true, true) {
         @Override
@@ -575,13 +577,13 @@ public class PremiseRule extends GenericCompound {
             BoolCondition next = null;
 
             Term[] args;
-            Term arg1, arg2;
+            Term X, Y;
 
             //if (predicate.getSubject() instanceof SetExt) {
             //decode precondition predicate arguments
             args = ((Compound) (predicate.term(0))).terms();
-            arg1 = (args.length > 0) ? args[0] : null;
-            arg2 = (args.length > 1) ? args[1] : null;
+            X = (args.length > 0) ? args[0] : null;
+            Y = (args.length > 1) ? args[1] : null;
             /*} else {
                 throw new RuntimeException("invalid arguments");*/
                 /*args = null;
@@ -596,71 +598,74 @@ public class PremiseRule extends GenericCompound {
 //                    break;
 
                 case "neq":
-                    neq(pres, taskTermPattern, beliefTermPattern, constraints, arg1, arg2);
+                    neq(pres, taskTermPattern, beliefTermPattern, constraints, X, Y);
 
                     //next = NotEqual.make(arg1, arg2); //TODO decide if necesary
 
                     break;
 
-                case "no_common_subterm":
-                    constraints.put(arg1, new NoCommonSubtermsConstraint(arg2));
-                    constraints.put(arg2, new NoCommonSubtermsConstraint(arg1));
+                case "neqCom":
+                    constraints.put(X, new NoCommonSubtermConstraint(Y));
+                    constraints.put(Y, new NoCommonSubtermConstraint(X));
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
                     break;
 
 
                 case "notSet":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.SetsBits);
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.SetsBits);
                     break;
 
                 case "hasNoDepVar":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.VAR_DEP.bit);
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.VAR_DEP.bit);
                     break;
 
                 case "setext":
                     //assumes arity=2 but arity=1 support can be written
-                    constraints.put(arg1, new OpConstraint(Op.SETe));
-                    constraints.put(arg2, new OpConstraint(Op.SETe));
+                    constraints.put(X, new OpConstraint(Op.SETe));
+                    constraints.put(Y, new OpConstraint(Op.SETe));
                     pres.add( new SubTermsStructure(Op.SETe.bit) );
                     ////additionally prohibits the two terms being equal
-                    neq(pres, taskTermPattern, beliefTermPattern, constraints, arg1, arg2);
+                    neq(pres, taskTermPattern, beliefTermPattern, constraints, X, Y);
                     break;
+
                 case "setint":
                     //assumes arity=2 but arity=1 support can be written
-                    constraints.put(arg1, new OpConstraint(Op.SETi));
-                    constraints.put(arg2, new OpConstraint(Op.SETi));
+                    constraints.put(X, new OpConstraint(Op.SETi));
+                    constraints.put(Y, new OpConstraint(Op.SETi));
                     pres.add( new SubTermsStructure(Op.SETi.bit) );
                     //additionally prohibits the two terms being equal
-                    neq(pres, taskTermPattern, beliefTermPattern, constraints, arg1, arg2);
+                    neq(pres, taskTermPattern, beliefTermPattern, constraints, X, Y);
                     break;
 
                 case "notConjunction":
                     //constraints.put(arg1, new NotOpConstraint(Op.CONJ));
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.CONJ.bit);
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.CONJ.bit);
                     break;
 
                 case "notEquivalence":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.EQUI.bit);
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.EQUI.bit);
                     break;
 
                 case "notImplicationOrEquivalence":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.ImplicationOrEquivalenceBits);
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits);
                     break;
                 
                 case "notImplicationEquivalenceOrConjunction":
-                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, arg1, Op.ImplicationOrEquivalenceBits | Op.CONJ.bit);
+                    notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits | Op.CONJ.bit);
                     break;
 
                 case "events":
                     throw new RuntimeException("depr");
 
                 case "time":
-                    switch (arg1.toString()) {
+                    switch (X.toString()) {
                         case "after":
                             pres.add( events.after );
                             break;
 
                         case "eternal":
                             pres.add( events.eternal );
+                            timeFunction = TimeFunctions.dternal;
                             break;
 
                         case "afterOrEternal":
@@ -843,7 +848,7 @@ public class PremiseRule extends GenericCompound {
 //                    break;
 
                 case "task":
-                    switch (arg1.toString()) {
+                    switch (X.toString()) {
                         case "negative":
                             pres.add( TaskNegative.the );
                             break;
@@ -867,7 +872,7 @@ public class PremiseRule extends GenericCompound {
                             taskPunc = 0;
                             break;
                         default:
-                            throw new RuntimeException("Unknown task punctuation type: " + arg1.toString());
+                            throw new RuntimeException("Unknown task punctuation type: " + X.toString());
                     }
                     break;
 
@@ -950,39 +955,42 @@ public class PremiseRule extends GenericCompound {
             constraints.put(t, new NotOpConstraint(structure));
     }
 
-    public void neq(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term arg1, @NotNull Term arg2) {
+    public void neq(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
         //find if the two compared terms are recursively contained as subterms of either the task or belief
         //and if so, create a precondition constraint rather than a matcher constraint
+        if (neqPrefilter(pres, task, belief, x, y))
+            return; //should the constraints be ommited in this case?
 
+        constraints.put(x, new NotEqualConstraint(y));
+        constraints.put(y, new NotEqualConstraint(x));
 
-            //locate an occurrence of arg1
-            int t1 = 0;
-            byte[] p1 = nonCommutivePathTo(task, arg1);
-            if (p1 == null) {
-                t1 = 1;
-                p1 = nonCommutivePathTo(belief, arg1);
+    }
+
+    public boolean neqPrefilter(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2) {
+        //locate an occurrence of arg1
+        int t1 = 0;
+        byte[] p1 = nonCommutivePathTo(task, arg1);
+        if (p1 == null) {
+            t1 = 1;
+            p1 = nonCommutivePathTo(belief, arg1);
+        }
+        if (p1 != null) {
+
+            //locate an occurrence of arg2
+            int t2 = 0;
+            byte[] p2 = nonCommutivePathTo(task, arg2);
+            if (p2 == null) {
+                t2 = 1;
+                p2 = nonCommutivePathTo(belief, arg2);
             }
-            if (p1 != null) {
 
-                //locate an occurrence of arg2
-                int t2 = 0;
-                byte[] p2 = nonCommutivePathTo(task, arg2);
-                if (p2 == null) {
-                    t2 = 1;
-                    p2 = nonCommutivePathTo(belief, arg2);
-                }
-
-                if (p2 != null) {
-                    //cheaper to compute this in precondition
-                    pres.add(new TermNotEquals(t1, p1, t2, p2));
-                    return;
-                }
+            if (p2 != null) {
+                //cheaper to compute this in precondition
+                pres.add(new TermNotEquals(t1, p1, t2, p2));
+                return true;
             }
-
-
-        constraints.put(arg1, new NotEqualsConstraint(arg2));
-        constraints.put(arg2, new NotEqualsConstraint(arg1));
-
+        }
+        return false;
     }
 
     static @Nullable byte[] nonCommutivePathTo(@NotNull Term term, @NotNull Term arg1) {

@@ -86,6 +86,9 @@ public interface TimeFunctions {
         return dtDiff(derived, p, occReturn, -2);
     };
 
+    /** does nothing but set DTternal; the input tasks will be considered to be eternal */
+    @Nullable TimeFunctions dternal = (derived, p, d, occReturn, confScale) -> dt(derived, DTERNAL, p, occReturn);
+
     @NotNull
     static Compound dtDiff(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
 
