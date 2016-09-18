@@ -292,40 +292,29 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
 
         Task topEternal = eternal.strongest();
-        Truth topEternalTruth = topEternal != null ? topEternal.truth() : null;
+        boolean includeEternal = topEternal != null;
 
-        int s = size();
-        if (s == 0)
-            return topEternalTruth;
+        Task[] tr = list.toArray((i) -> new Task[i], includeEternal ? 1 : 0);
+        int s = tr.length;
+        if (includeEternal)
+            tr[s -1] = topEternal;
 
-//        Task[] copy;
-//        synchronized (this) {
-//            //clone a copy so that truthpolation can freely operate asynchronously
-//            s = size();
-//            if (s == 0) return null;
-//            if (topEternal != null) s++;
-//            copy = toArrayExact(new Task[s]);
-//        }
+        switch (s) {
 
-//        if (topEternal != null)
-//            copy[s - 1] = topEternal;
+            case 0:
+                return null;
 
-        Truth res;
-        if (s == 1) {
-            Task the = list.get(0);
-            res = the.truth();
-            long o = the.occurrence();
-            if ((now == ETERNAL || when == now) && o == when) //optimization: if at the current time and when
-                return res;
-            return res != null ? Revision.project(res, when, now, o, false) : topEternalTruth;
+            case 1:
+                Task the = tr[0];
+                Truth res = the.truth();
+                long o = the.occurrence();
+                if ((now == ETERNAL || when == now) && o == when) //optimization: if at the current time and when
+                    return res;
+                else
+                    return Revision.project(res, when, now, o, false);
 
-        } else {
-
-            boolean includeEternal = topEternal != null;
-            Task[] tr = list.toArray((i) -> new Task[i], includeEternal ? 1 : 0);
-            if (includeEternal)
-                tr[tr.length-1] = topEternal;
-            return new TruthPolation(tr.length).truth(when, now, tr);
+            default:
+                return new TruthPolation(s).truth(when, now, tr);
 
         }
 
