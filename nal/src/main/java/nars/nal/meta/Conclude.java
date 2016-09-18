@@ -7,6 +7,7 @@ import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.concept.TruthDelta;
+import nars.index.TermIndex;
 import nars.nal.Premise;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
@@ -141,13 +142,13 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         NAR nar = m.nar;
 
+        content = nar.normalize(content); //why isnt this sometimes normalized by here
+        if (content == null)
+            return; //somehow became null
 
         if (!Task.taskContentPreTest(content, ct.punc, nar, true /* !Param.DEBUG*/))
             return; //INVALID TERM FOR TASK
 
-        content = nar.normalize(content); //why isnt this sometimes normalized by here
-        if (!(content instanceof Compound))
-            return; //somehow became null
 
         long occ;
 
@@ -221,10 +222,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             occ = ETERNAL;
         }
 
-        if (!content.isNormalized())
-            throw new RuntimeException("content not normalized");
 
         if (content!=null) {
+            //TermIndex.preConceptualize(content)
             DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
             if (d != null)
                 m.conclusion.derive.accept(d);

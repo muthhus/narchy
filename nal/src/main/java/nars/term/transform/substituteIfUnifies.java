@@ -66,12 +66,13 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return False; //FAILED?
         }
 
+
         boolean equals = x.equals(y);
         if (!equals) {
             boolean xn = (x.op()==NEG);
             boolean yn = (y.op()==NEG);
-            Term px = (xn) ? $.unneg(x).term() : x; //positive X
-            Term py = (yn) ? $.unneg(y).term() : y; //positive Y
+            Term px = (xn) ? $.unneg(x) : x; //positive X
+            Term py = (yn) ? $.unneg(y) : y; //positive Y
             if (Term.equalAtemporally(px, py)) {
                 equals = true;
                 if (xn ^ yn) {
@@ -97,7 +98,14 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 
             Term newTerm = m.tryMatch(op, parent, term, x, y);
 
-            return (newTerm!=null) ? newTerm : term;
+//            if (mustSubstitute()) {
+//                if (newTerm == null || newTerm.equals(term))
+//                    return False;
+//                return newTerm;
+//            } else {
+//                return (newTerm != null) ? newTerm : term;
+//            }
+            return newTerm != null ? newTerm : False;
         } else {
             return equals ? term : False;
         }

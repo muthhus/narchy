@@ -63,19 +63,19 @@ public abstract class TermIndex extends TermBuilder {
     public abstract Termed get(@NotNull Termed key, boolean createIfMissing);
 
     /** terms should generally not be tried here unless they also have been determined linkable() [below] first */
-    @NotNull public static Compound conceptualize(@NotNull Compound x) {
+    @NotNull public static Compound preConceptualize(@NotNull Compound x) {
 
         if (!x.isNormalized())
             throw new InvalidConceptException(x, "not normalized");
 
-        Term xx = $.unneg(Terms.atemporalize(x)).term();
+        Term xx = $.unneg(Terms.atemporalize(x));
 
         if (xx.op().var) {
             throw new InvalidConceptException(x, "variables can not be conceptualized");
         } else {
             //prevent conceptualization of non-statement VarIndep containing terms
             if (xx.hasVarIndep() && !xx.hasAny(Op.StatementBits)) {
-                throw new InvalidConceptException(x, "non-statement conceptualization containing VarIndep");
+                throw new InvalidConceptException(x, "conceptualization: contains no statements yet has VarIndep");
             }
         }
 

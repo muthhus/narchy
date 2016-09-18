@@ -12,9 +12,7 @@ import nars.term.Termed;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.util.MyConcurrentRadixTree;
-import nars.util.Util;
 import nars.util.data.map.nbhm.HijacKache;
-import nars.util.signal.WiredCompoundConcept;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -160,7 +158,7 @@ public class TreeIndex extends TermIndex {
         Term t = tt.term();
 
         if (t instanceof Compound)
-            t = conceptualize((Compound) t);
+            t = preConceptualize((Compound) t);
 
         TermKey k = concepts.key(t);
 
@@ -183,7 +181,7 @@ public class TreeIndex extends TermIndex {
     public TermKey key(@NotNull Term t) {
 
         if (t instanceof Compound)
-            t = conceptualize((Compound) t);
+            t = preConceptualize((Compound) t);
 
         return concepts.key(t);
     }
@@ -266,7 +264,7 @@ public class TreeIndex extends TermIndex {
         @Override
         public @Nullable Termed get(@NotNull Termed tt, boolean createIfMissing) {
             Term t = tt.term();
-            t = tt instanceof Compound ? conceptualize(((Compound) t)) : t;
+            t = tt instanceof Compound ? preConceptualize(((Compound) t)) : t;
             Object o = L1.computeIfAbsent2(t,
                     createIfMissing ?
                             ttt -> {

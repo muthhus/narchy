@@ -15,7 +15,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL3Test extends AbstractNALTest {
 
-    public static final int cycles = 150;
+    public static final int cycles = 550;
 
     public NAL3Test(Supplier<NAR> b) { super(b); }
 

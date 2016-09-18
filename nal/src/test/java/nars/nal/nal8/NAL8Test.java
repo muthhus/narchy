@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 150; //150 worked for most of the initial NAL8 tests converted
+    final int cycles = 550; //150 worked for most of the initial NAL8 tests converted
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -524,12 +524,20 @@ public class NAL8Test extends AbstractNALTest {
         ;
     }
 
+    @Test
+    public void detaching_condition0()  {
+        TestNAR tester = test();
 
+        tester.input("( ( hold:t2 &&+5 (at:t1 &&+5 open:t1)) ==>+5 opened:t1).");
+        tester.inputAt(10, "hold:t2. :|:");
+
+        tester.mustBelieve(cycles, "((at:t1 &&+5 open:t1) ==>+5 opened:t1)", 1.0f, 0.81f, 15);
+
+    }
     @Test
     public void detaching_condition()  {
         TestNAR tester = test();
 
-        //tester.log();
         tester.input("( ( hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001}))) ==>+5 [opened]:{t001}).");
         tester.inputAt(10, "hold:(SELF,{t002}). :|:");
 

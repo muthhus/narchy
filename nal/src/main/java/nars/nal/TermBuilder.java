@@ -645,12 +645,12 @@ public abstract class TermBuilder {
 
 
                 case EQUI:
-                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
-                        if (!validEquivalenceTerm(subject))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence subject");
-                        if (!validEquivalenceTerm(predicate))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
-                    }
+
+                    if (!validEquivalenceTerm(subject))
+                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence subject");
+                    if (!validEquivalenceTerm(predicate))
+                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
+
                     break;
 //                case SIM:
 //                    if (isTrueOrFalse(subject) && isTrueOrFalse(predicate)) {
@@ -659,12 +659,6 @@ public abstract class TermBuilder {
 //                    break;
 
                 case IMPL:
-                    if (!Param.ALLOW_RECURSIVE_IMPLICATIONS) {
-                        if (subject.isAny(InvalidImplicationSubject))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
-                        if (predicate.isAny(InvalidImplicationPredicate))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
-                    }
 
 
                     if (isTrue(subject)) {
@@ -678,7 +672,7 @@ public abstract class TermBuilder {
                     // (C ==> (A ==> B))   <<==>>  ((&&,A,C) ==> B)
                     if (predicate.op() == IMPL) {
                         Term oldCondition = subj(predicate);
-                        if (!Param.ALLOW_RECURSIVE_IMPLICATIONS && (oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
+                        if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Implication circularity");
                         else {
                             if (commutive(dt) || dt==XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */)
@@ -706,6 +700,12 @@ public abstract class TermBuilder {
                             }
                         }
                     }
+
+                    if (subject.isAny(InvalidImplicationSubject))
+                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
+                    if (predicate.isAny(InvalidImplicationPredicate))
+                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
+
 
                     break;
 

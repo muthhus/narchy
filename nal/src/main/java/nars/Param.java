@@ -196,9 +196,6 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
 
 
-    public static final boolean ALLOW_RECURSIVE_IMPLICATIONS = false;
-    //public static final boolean ALLOW_RECURSIVE_STATEMENTS = false;
-
 
     ///** extra debugging checks */
     //public static final boolean DEBUG_PARANOID = false;

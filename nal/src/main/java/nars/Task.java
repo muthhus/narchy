@@ -90,13 +90,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Nullable
     static boolean taskContentPreTest(@NotNull Term t, char punc, @NotNull NAR nar, boolean safe) {
 
-        if (!(t instanceof Compound))
-            return test(t, "Task Term is null or not a Compound", safe);
 
-        //t = memory.index.normalize(t, !safe);
-
-        //if (!(t instanceof Compound))
-        //return test(t, "Task Term Does Not Normalize to Compound", safe);
+        if (!(t instanceof Compound) && !t.isNormalized())
+            return test(t, "Task Term is null or not a normalized Compound", safe);
+        if (t.volume() > nar.compoundVolumeMax.intValue())
+            return test(t, "Term exceeds maximum volume", safe);
+        if (!t.levelValid(nar.level()))
+            return test(t, "Term exceeds maximum NAL level", safe);
 
         Compound ct = (Compound) t;
 
@@ -106,18 +106,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         if (op.isStatement() && subjectOrPredicateIsIndependentVar(ct))
             return test(t, "Statement Task's subject or predicate is VAR_INDEP", safe);
 
-//        if (hasCoNegatedAtemporalConjunction(ct)) {
-//            throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
-//        }
+        //prevent conceptualization of non-statement VarIndep containing terms
+        if (t.hasVarIndep() && !t.hasAny(Op.StatementBits))
+            return test(t, "conceptualization: contains no statements yet has VarIndep", safe);
 
         if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op == Op.IMPL || op == Op.EQUI))
             return test(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
-
-
-        if (t.volume() > nar.compoundVolumeMax.intValue())
-            return test(t, "Term exceeds maximum volume", safe);
-        if (!t.levelValid(nar.level()))
-            return test(t, "Term exceeds maximum NAL level", safe);
 
         return true;
     }

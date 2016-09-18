@@ -264,11 +264,11 @@
 //These cases are handled by "Variable Introduction" and "Temporal Induction"
 
     //implications may be constructed with implications for preds but not subjs
-    S, P, time(eternal), neqCom(P,S), notImplEqui(S), notEqui(P) |- (S ==> P), (Belief:Induction)
-    S, P, time(eternal), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction)
-    S, P, time(eternal), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- (P <=> S), (Belief:Comparison)
-    S, P, time(eternal), neqCom(P,S) |- (S && P), (Belief:Intersection)
-    %S, %P, time(eternal), neqCom(P,S) |- (%S || %P), (Belief:Union)
+    S, P, time(eternal), neq(P,S), notImplEqui(S), notEqui(P) |- (S ==> P), (Belief:Induction)
+    S, P, time(eternal), neq(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction)
+    S, P, time(eternal), neq(P,S), notImplEqui(S), notImplEqui(P) |- (P <=> S), (Belief:Comparison)
+    S, P, time(eternal), neq(P,S) |- (S && P), (Belief:Intersection)
+    //%S, %P, time(eternal), neqCom(P,S) |- (%S || %P), (Belief:Union)
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
@@ -318,7 +318,7 @@
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subOnlyIfUnifiesIndep(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
+    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesIndep(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
 
 //conditional abduction
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction)
@@ -437,28 +437,28 @@
 //backward inference rules which should really only work on backward inference:
 
 
-    (A --> S), (B --> S), neq(A,B), neqRec(A,B), task("?") |- (A --> B), (Derive:NoSwap)
-    (A --> S), (B --> S), neq(A,B), neqRec(A,B), task("?") |- (B --> A), (Derive:NoSwap)
+    (A --> S), (B --> S), neqCom(A,B), task("?") |- (A --> B), (Derive:NoSwap)
+    (A --> S), (B --> S), neqCom(A,B), task("?") |- (B --> A), (Derive:NoSwap)
 
-    (A ==> S), (B ==> S), neq(A,B), neqRec(A,B), task("?") |- (A ==> B), (Derive:NoSwap)
-    (A ==> S), (B ==> S), neq(A,B), neqRec(A,B), task("?") |- (B ==> A), (Derive:NoSwap)
+    (A ==> S), (B ==> S), neqCom(A,B), task("?") |- (A ==> B), (Derive:NoSwap)
+    (A ==> S), (B ==> S), neqCom(A,B), task("?") |- (B ==> A), (Derive:NoSwap)
 
 //Inheritance to Similarity
 
-    (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief, Derive:NoSwap)
+    (S <-> P), (S --> P), neqCom(S,P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief, Derive:NoSwap)
 
 //If S can stand for P, P can to a certain low degree also represent the class S
 //If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
 
-    (P --> S), (S --> P),                  task("?") |- (P --> S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
-    (P ==> S), (S ==> P), time(dtCombine), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
+    (P --> S), (S --> P), neqCom(S,P),                  task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
+    (P ==> S), (S ==> P), neqCom(S,P), time(dtCombine), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
 
 //and the backward inference driven forward inference:
 
 //Similarity to Inheritance
 
-    (S --> P), (S <-> P), task("?") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief, Derive:NoSwap)
-    (S ==> P), (S <=> P), task("?") |- (S ==> P), (Belief:StructuralIntersection, Punctuation:Belief, Derive:NoSwap)
+    (S --> P), (S <-> P), neqCom(S,P), task("?") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief, Derive:NoSwap)
+    (S ==> P), (S <=> P), neqCom(S,P), task("?") |- (S ==> P), (Belief:StructuralIntersection, Punctuation:Belief, Derive:NoSwap)
 
 //NAL2:
 
@@ -490,8 +490,8 @@
     (W --> (|,B,A..+)), (W --> B), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
     ((&,B,A..+) --> W), (B --> W), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
 
-    (W --> (-,S,B)), (W --> B), neq(W,S), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
-    ((~,S,B) --> W), (B --> W), neq(W,S), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
+    (W --> (-,S,B)), (W --> B), neqCom(W,S), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
+    ((~,S,B) --> W), (B --> W), neqCom(W,S), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
 
 ////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
 //Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate

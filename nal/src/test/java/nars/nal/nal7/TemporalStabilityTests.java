@@ -94,7 +94,7 @@ public class TemporalStabilityTests {
     static final IntToObjectFunction<String> linkedTempConj = (j) -> {
         char c = (char) ('a' + j);
         char d = (char) ('a' + (j+1)); //next
-        return "(" + c + " &&+5" + ")";
+        return "(" + c + " &&+5 " + d + ")";
     };
 
     @Test public void testTemporalStabilityInh3() {

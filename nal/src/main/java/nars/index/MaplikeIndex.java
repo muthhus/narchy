@@ -41,7 +41,7 @@ public abstract class MaplikeIndex extends TermIndex {
 
     @Nullable Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
 
-        x = conceptualize(x);
+        x = preConceptualize(x);
 
         return createIfMissing ?
                 getConceptCompound(x) :
