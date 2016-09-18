@@ -60,13 +60,13 @@ public class Pacman extends NAgent {
 
     final int visionRadius;
     final int itemTypes = 3;
-    final static int runCycles = 500000;
+    final static int runCycles = 50000;
 
 
     final int inputs;
 
     private final int pacmanCyclesPerFrame = 1;
-    int pacMovesPerCycle = 4;
+    int pacMovesPerCycle = 3;
 
     float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
     public float scoretoReward = 1f;
@@ -96,13 +96,13 @@ public class Pacman extends NAgent {
         //Multi nar = new Multi(3,512,
 
         Executioner e =
-                //new MultiThreadExecutioner(2, 8192);
-                new SingleThreadExecutioner();
+                new MultiThreadExecutioner(2, 8192);
+                //new SingleThreadExecutioner();
 
         Default nar = new Default(1024,
-                20, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
+                128, 2, 3, rng,
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
                 new FrameClock(), e
 
         );
@@ -114,14 +114,14 @@ public class Pacman extends NAgent {
         nar.goalConfidence(0.8f);
 
         float pMult = 0.005f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * pMult;
-        nar.DEFAULT_GOAL_PRIORITY = 0.65f * pMult;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.4f * pMult;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * pMult;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.25f * pMult;
+        nar.DEFAULT_GOAL_PRIORITY = 0.35f * pMult;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.15f * pMult;
+        nar.DEFAULT_QUEST_PRIORITY = 0.15f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
-        nar.confMin.setValue(0.03f);
-        nar.compoundVolumeMax.set(40);
+        nar.confMin.setValue(0.04f);
+        nar.compoundVolumeMax.set(24);
         //nar.truthResolution.setValue(0.02f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");

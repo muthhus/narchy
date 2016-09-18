@@ -102,11 +102,11 @@ public final class Premise extends RawBudget implements Tasked {
             return null;
 
         Budget taskBudget = task.budget().clone();
-        if (taskBudget.isDeleted())
+        if (taskBudget==null)
             return null;
 
         Budget termLinkBudget = termLink.clone();
-        if (termLinkBudget.isDeleted())
+        if (termLinkBudget==null)
             return null;
 
 
@@ -159,7 +159,7 @@ public final class Premise extends RawBudget implements Tasked {
         Budget beliefBudget;
         if (belief!=null) {
             beliefBudget = belief.budget().clone();
-            if (beliefBudget.isDeleted())
+            if (beliefBudget==null)
                 belief = null;
         } else {
             beliefBudget = null;

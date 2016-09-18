@@ -1,22 +1,17 @@
 package nars.op;
 
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.concept.Concept;
 import nars.concept.TruthDelta;
 import nars.nal.Stamp;
 import nars.task.GeneratedTask;
-import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
-import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.function.BiConsumer;
 
 /**
@@ -33,62 +28,44 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
         this.maxIterations = maxIterations;
     }
 
-    @Override public void accept(Task task, NAR nar) {
-        Compound c = task.term();
+    @Override public void accept(Task input, NAR nar) {
+        Compound c = input.term();
 
         //size limitations
         if ((c.volume()) < 2 || (c.volume() + introductionThreshold > nar.compoundVolumeMax.intValue()))
             return;
 
 
-        Compound a = c, b;
-
-        int i = 0;
-        do {
-            b = c;
-            c = introduceNextVariable(nar, c, i++);
-        } while ((i < maxIterations) && (b != c));
-
-        if (a != c) {
-            //introduction changed something
-            input(nar, task, c);
-
-//            System.out.println(a + " ====> " + c);
-//            System.out.println("\t" + task + " ====> " + newTask);
-//            System.out.println();
-        }
-
-
-    }
-
-
-    @NotNull private Compound introduceNextVariable(NAR nar, @NotNull Compound input, int iteration) {
-
-
-        Term[] selections = nextSelection(input);
-        if (selections != null) {
+        Term[] selections = nextSelection(c);
+        if (selections != null && selections.length > 0) {
 
             for (Term s : selections) {
-                Term[] dd = next(input, s, iteration);
-                if (dd != null) {
-                    for (Term d : dd) {
-                        Term newContent = nar.index.replace(input, s, d);
-                        if ((newContent instanceof Compound) && !newContent.equals(input))
-                            return (Compound) newContent; //success
-                    }
+
+                Term[] dd = next(c, s);
+
+                if (dd != null && dd.length > 0) {
+
+                    Term d = dd[nar.random.nextInt(dd.length)]; //choose one randomly
+                    //for (Term d : dd) {
+                        Term newContent = nar.index.replace(c, s, d);
+                        if ((newContent instanceof Compound) && !newContent.equals(c)) {
+                            input(nar, input, (Compound)newContent);
+                        }
+                    //}
                 }
             }
         }
 
-        return input;
+
     }
+
 
     @Nullable
     abstract protected Term[] nextSelection(Compound input);
 
 
     /** provides the next terms that will be substituted in separate permutations; return null to prevent introduction */
-    abstract protected Term[] next(Compound input, Term selection, int iteration);
+    abstract protected Term[] next(Compound input, Term selection);
     /*{
         return $.varQuery("c" + iteration);
     }*/
@@ -125,9 +102,9 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
     }
 
 
-    private static class VarIntroducedTask extends GeneratedTask {
+    private static final class VarIntroducedTask extends GeneratedTask {
 
-        @Nullable private Task original;
+        @Nullable private volatile transient Task original;
 
         public VarIntroducedTask(@NotNull Compound c, @NotNull Task original) {
             super(c, original.punc(), original.truth());
@@ -144,8 +121,8 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
                 return;
             }
 
-            if (orig !=null && deltaConfidence==deltaConfidence /* wasn't deleted, even for questions */) {
-                concept(nar).crossLink(this, this.original, isBeliefOrGoal() ? conf() : qua(), nar);
+            if (deltaConfidence==deltaConfidence /* wasn't deleted, even for questions */) {
+                concept(nar).crossLink(this, orig, isBeliefOrGoal() ? conf() : qua(), nar);
             }
 
             super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);

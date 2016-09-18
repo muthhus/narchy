@@ -15,7 +15,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL3Test extends AbstractNALTest {
 
-    public static final int cycles = 550;
+    public static final int cycles = 150;
 
     public NAL3Test(Supplier<NAR> b) { super(b); }
 
@@ -67,7 +67,6 @@ public class NAL3Test extends AbstractNALTest {
     @Test
     public void set_operations()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("<planetX --> {Mars,Pluto,Venus}>",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> {Pluto,Saturn}>", 0.7f,0.9f); //.en("PlanetX is probably Pluto or Saturn.");
         tester.mustBelieve(cycles, "<planetX --> {Mars,Pluto,Saturn,Venus}>", 0.97f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
@@ -287,17 +286,17 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR x = test();
 
         x
-            ////.log()
+            .log()
             .believe("<{x,y}-->c>")
             .believe("<{x,z}-->c>")
             .mustBelieve(cycles, "<{x,y,z}-->c>", 1f, 0.81f) //union
             .mustBelieve(cycles, "<{x}-->c>", 1f, 0.81f) //intersect
-            .mustBelieve(cycles, "<{y}-->c>", 0f, 0.81f) //difference
-            .mustBelieve(cycles, "<{z}-->c>", 0f, 0.81f) //difference
+            .mustBelieve(cycles, "<{y}-->c>", 1f, 0.81f) //difference
+            .mustBelieve(cycles, "<{z}-->c>", 1f, 0.81f) //difference
         //these are probably ok:
-            //.mustNotOutput(cycles,"<{x}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
-            //.mustNotOutput(cycles,"<{x,y}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
-            //.mustNotOutput(cycles,"<{x,z}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
+            .mustNotOutput(cycles,"<{x}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
+            .mustNotOutput(cycles,"<{y}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
+            .mustNotOutput(cycles,"<{z}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5
         ;
 
     }

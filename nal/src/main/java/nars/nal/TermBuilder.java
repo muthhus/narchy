@@ -38,13 +38,10 @@ public abstract class TermBuilder {
 
     private static final Term[] TrueArray = {Term.True};
     public static final TermContainer InvalidSubterms = TermVector.the(False);
-    /**
-     * implications, equivalences, and interval
-     */
+
+
     public static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
-    /**
-     * equivalences and intervals (not implications, they are allowed
-     */
+
     public static final int InvalidImplicationSubject = or(EQUI, IMPL);
     public static final int InvalidImplicationPredicate = or(EQUI);
 
@@ -63,16 +60,17 @@ public abstract class TermBuilder {
     @NotNull
     public Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
 
+        if (a.equals(b))
+            return False; //empty set
+
         //quick test: intersect the mask: if nothing in common, then it's entirely the first term
         if ((a.structure() & b.structure()) == 0) {
             return a;
         }
 
-        Term[] aa = a.terms();
-
-        List<Term> terms = $.newArrayList(aa.length);
-
         int retained = 0, size = a.size();
+        List<Term> terms = $.newArrayList(size);
+
         for (int i = 0; i < size; i++) {
             Term x = a.term(i);
             if (!b.containsTerm(x)) {
@@ -718,10 +716,12 @@ public abstract class TermBuilder {
                 return subject.equals(predicate) ? Term.True : False;
             }
 
+
+
             //compare unneg'd if it's not temporal or eternal/parallel
             boolean preventInverse = !op.temporal || (commutive(dt) || dt == XTERNAL);
-            Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject).term() : subject;
-            Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate).term() : predicate;
+            Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject) : subject;
+            Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate) : predicate;
             if (Terms.equalsAnonymous(sRoot, pRoot))
                 return subject.op() == predicate.op() ? Term.True : False; //True if same, False if negated
 
@@ -733,7 +733,6 @@ public abstract class TermBuilder {
                 //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
                 return Term.True;
             }
-
 
             @NotNull Op pop = pRoot.op();
             if (pop == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {

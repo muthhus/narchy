@@ -692,18 +692,37 @@ public class Terms   {
     /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
     @Nullable
     public static Term[] substAllRepeats(Compound c, Predicate<Term> include, int minCount) {
-        HashBag<Term> uniques = subtermScore(c,
-                t -> include.test(t) ? 1 : 0 //sum by complexity if passes include filter
+        HashBag<Term> uniques = Terms.subtermScore(c,
+                (sub) -> {
+                    return include.test(sub) ? 1 : 0; //sum by complexity if passes include filter
+                }
         );
 
         int s = uniques.size();
         if (s > 0) {
-            List<Term> oi = $.newArrayList();
+
+            MutableList<Term> oi = $.newArrayList();
+
             uniques.forEachWithOccurrences((Term t, int count) -> {
                 if (count >= minCount) {
                     oi.add(t);
                 }
             });
+
+            //remove terms which are contained by other terms in the list
+
+            oi.sort((a,b)->Integer.compare(a.volume(),b.volume())); //sorted by volume
+            Iterator<Term> ii = oi.iterator();
+            while (ii.hasNext()) {
+                Term b = ii.next();
+                if (oi.anySatisfy((a) ->
+                        a!=b && a instanceof Compound && ((Compound)a).containsTermRecursively(b)
+                )) {
+                    ii.remove();
+                }
+            }
+
+
             return oi.toArray(new Term[oi.size()]);
         }
         return null;
@@ -742,6 +761,23 @@ public class Terms   {
 
         c.recurseTerms((Term subterm) -> {
             int s = score.applyAsInt(subterm);
+            if (s > 0)
+                uniques.addOccurrences(subterm, s);
+        });
+
+        return uniques;
+    }
+
+    interface SubtermScorer {
+        public int score(Compound superterm, Term subterm);
+    }
+
+    /** counts the repetition occurrence count of each subterm within a compound */
+    public static HashBag<Term> subtermScore(Compound c, SubtermScorer score) {
+        HashBag<Term> uniques = new HashBag<>(c.volume());
+
+        c.recurseTerms((Term subterm, Compound superterm) -> {
+            int s = score.score(superterm, subterm);
             if (s > 0)
                 uniques.addOccurrences(subterm, s);
         });

@@ -114,26 +114,40 @@ public class ConceptBagCycle implements Consumer<NAR> {
         int taskLinks = tasklinksFiredPerFiredConcept.intValue();
         int termLinks = termlinksFiredPerFiredConcept.intValue();
 
+        for (int cycleNum = 0; cycleNum < cycles; cycleNum++)
+            cycle(cpf, taskLinks, termLinks);
+
+
+    }
+
+    void cycle(int cpf, int taskLinks, int termLinks) {
+
+        concepts.commit();
+
         List<BLink<Concept>> toFire = $.newArrayList();
-        for (int cycleNum = 0; cycleNum < cycles; cycleNum++) {
 
-            concepts.commit();
+        //gather the concepts into a list before firing. if firing while sampling, the bag can block itself
+        int cpfSampled = (int)Math.ceil(cpf * Param.BAG_OVERSAMPLING);
+        concepts.sample(cpfSampled, toFire::add);
 
-            //gather the concepts into a list before firing. if firing while sampling, the bag can block itself
-            concepts.sample(cpf, toFire::add);
+        int conceptsFired = 0;
+        int premisesFired = 0;
 
-            for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
-                @Nullable Concept c = toFire.get(i).get();
-                if (c != null) {
-                    new FireConceptSquared(c, nar,
-                            taskLinks, termLinks,
-                            nar::inputLater);
+        for (int i = 0, toFireSize = toFire.size(); i < toFireSize && conceptsFired < cpf; i++) {
+            @Nullable Concept c = toFire.get(i).get();
+            if (c != null) {
+                FireConceptSquared f = new FireConceptSquared(c, nar,
+                        taskLinks, termLinks,
+                        nar::inputLater);
 
+                int p = f.premisesFired;
+                if (p > 0) {
+                    premisesFired += p;
+                    conceptsFired++;
                 }
+
             }
-
         }
-
     }
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */

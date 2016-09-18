@@ -51,7 +51,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static boolean DEBUG_ANSWERS = false;
 
     /** how many times the desired selection size that bags should sample in case some of the selections are unused */
-    public static float OVERSAMPLE_BAGS = 2.0f;
+    public static float BAG_OVERSAMPLING = 2.0f;
 
     /** used in linear interpolating link adjustments during feedback. set to zero to disable */
     public final MutableFloat linkFeedbackRate = new MutableFloat(0.0f);

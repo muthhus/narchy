@@ -10,11 +10,9 @@ import nars.link.BLink;
 import nars.nal.Conclusion;
 import nars.nal.Deriver;
 import nars.nal.Premise;
-import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import nars.util.data.list.FasterList;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,54 +26,61 @@ public class FireConceptSquared extends Conclusion {
     private static final Logger logger = LoggerFactory.getLogger(FireConceptSquared.class);
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
-
+    public final int premisesFired;
 
 
     public FireConceptSquared(Concept c, NAR nar, int tasklinks, int termlinks, Consumer<Task> batch) {
         super(batch);
 
+        int count = 0;
+
         try {
 
             c.commit();
 
-            int count = 0;
-
-
-            int tasklinksSampled = (int)Math.ceil(tasklinks * Param.OVERSAMPLE_BAGS);
+            int tasklinksSampled = (int)Math.ceil(tasklinks * Param.BAG_OVERSAMPLING);
 
             FasterList<BLink<Task>> tasksBuffer = $.newArrayList(tasklinksSampled);
             c.tasklinks().sample(tasklinksSampled, tasksBuffer::addIfNotNull);
 
-            if (!tasksBuffer.isEmpty()) {
+            int tasksBufferSize = tasksBuffer.size();
+            if (tasksBufferSize > 0) {
 
-                int termlinksSampled = (int)Math.ceil(termlinks * Param.OVERSAMPLE_BAGS);
+                int termlinksSampled = (int)Math.ceil(termlinks * Param.BAG_OVERSAMPLING);
 
-                FasterList<BLink<Term>> termLinks = $.newArrayList(termlinksSampled);
-                c.termlinks().sample(termlinksSampled, termLinks::addIfNotNull);
+                FasterList<BLink<Term>> termsBuffer = $.newArrayList(termlinksSampled);
+                c.termlinks().sample(termlinksSampled, termsBuffer::addIfNotNull);
 
-                if (!termLinks.isEmpty()) {
+                int termsBufferSize = termsBuffer.size();
+                if (termsBufferSize > 0) {
+
+                    //current termlink counter, as it cycles through what has been sampled, give it a random starting position
+                    int jl = nar.random.nextInt(termsBufferSize);
+
+                    //random starting position
+                    int il = nar.random.nextInt(tasksBufferSize);
 
                     int countPerTasklink = 0;
 
-                    for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize && countPerTasklink < tasklinks; i++) {
+                    for (int i = 0; i < tasksBufferSize && countPerTasklink < tasklinks; i++, il++) {
 
-                        BLink<Task> taskLink = tasksBuffer.get(i);
+                        BLink<Task> taskLink = tasksBuffer.get( il % tasksBufferSize );
 
                         Task task = taskLink.get();
                         if (task == null || task.isDeleted())
                             continue;
 
                         Budget taskLinkBudget = taskLink.clone(); //save a copy because in multithread, the original may be deleted in-between the sample result and now
-                        if (taskLinkBudget.isDeleted())
+                        if (taskLinkBudget == null)
                             continue;
 
                         long now = nar.time();
 
                         int countPerTermlink = 0;
 
-                        for (int j = 0, termsArraySize = termLinks.size(); j < termsArraySize && countPerTermlink < termlinks; j++) {
+                        for (int j = 0; j < termsBufferSize && countPerTermlink < termlinks; j++, jl++) {
 
-                            Premise p = Premise.build(nar, c, now, task, taskLinkBudget, termLinks.get(j));
+                            Premise p = Premise.build(nar, c, now, task, taskLinkBudget, termsBuffer.get( jl % termsBufferSize ));
                             if (p != null) {
 
                                 new PremiseEval(nar, deriver, p, this);
@@ -84,18 +89,20 @@ public class FireConceptSquared extends Conclusion {
 
                         }
 
-                        countPerTasklink+= countPerTermlink;
+                        countPerTasklink+= countPerTermlink > 0 ? 1 : 0;
 
                     }
 
                     count+=countPerTasklink;
 
                 } else {
-                    logger.warn(c + " has zero termlinks");
+                    if (Param.DEBUG_EXTRA)
+                        logger.warn(c + " has zero termlinks");
                 }
 
             } else {
-                logger.warn(c + " has zero tasklinks");
+                if (Param.DEBUG_EXTRA)
+                    logger.warn(c + " has zero tasklinks");
             }
 
 
@@ -107,5 +114,6 @@ public class FireConceptSquared extends Conclusion {
             logger.error("run {}", e.toString());
         }
 
+        this.premisesFired = count;
     }
 }

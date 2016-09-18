@@ -21,7 +21,7 @@ abstract public class DerivedTask extends MutableTask {
 
 
     @Nullable
-    public transient Premise premise;
+    public volatile transient Premise premise;
 
     //TODO should this also affect the Belief task?
 

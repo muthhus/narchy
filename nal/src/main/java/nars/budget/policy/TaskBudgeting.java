@@ -63,7 +63,7 @@ public class TaskBudgeting {
         //volRatioScale = (float) Math.pow(volRatioScale, 2);
 
 
-        final float durability = pp.dur() * qual * volRatioScale;
+        final float durability = pp.dur() * volRatioScale;
         if (durability < minDur)
             return null;
 
@@ -78,7 +78,7 @@ public class TaskBudgeting {
         //if (priority * durability < Param.BUDGET_EPSILON)
             //return null;
 
-        final float quality = qual * volRatioScale;
+        final float quality = qual;// * volRatioScale;
 
 
         return $.b(priority, durability, quality);

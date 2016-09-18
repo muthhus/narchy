@@ -53,7 +53,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
     }
 
     @Override
-    protected Term[] next(Compound input, Term selected, int iteration) {
+    protected Term[] next(Compound input, Term selected) {
 
         List<byte[]> p = input.pathsTo(selected);
         if (p.isEmpty())
@@ -94,6 +94,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             }
         }
 
+        int iteration = 0;
 
         //at least one statement must have both sides covered
         Term I = (statementCoverage.anySatisfy(b -> b == 0b11)) ?
