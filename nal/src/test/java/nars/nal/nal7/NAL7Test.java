@@ -594,15 +594,20 @@ public class NAL7Test extends AbstractNALTest {
             .mustBelieve(cycles, "(b)", 1f, 0.81f, 1 /* occ */);
     }
 
-    @Test public void testImplicationDecompositionIsntEternalSwap() {
-        //same as the other impl decomp test, except the predicate is matched
+    /** because the two temporal events create a contradiction when evaluating the
+     * derivation's result time, this tests decomposition's
+     * ability to randomly choose (by confidence weighting) the result
+     * determined by either the task or the belief.
+     */
+    @Test public void testImplicationDecompositionContradictionFairness() {
+
         test()
                 
                 .inputAt(0, "(b). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
                 .mustNotOutput(cycles, "(a)", '.', ETERNAL)
-                .mustNotOutput(cycles, "(a)", '.', 0)
-                .mustBelieve(cycles, "(a)", 1f, 0.45f, -1 /* occ */);
+                .mustBelieve(cycles, "(a)", 1f, 0.45f, -1 /* occ */)
+                .mustBelieve(cycles, "(a)", 1f, 0.45f, 0 /* occ */);
     }
 
     @Test

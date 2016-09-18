@@ -49,7 +49,7 @@ public class PostCondition implements Serializable, Level //since there can be m
         add(the("Stamp"));
         add(the("Goal"));
         add(the("Order"));
-        add(the("Derive"));
+        add(the("Permute"));
         add(the("Info"));
         add(the("Event"));
         add(the("Punctuation"));
@@ -65,7 +65,7 @@ public class PostCondition implements Serializable, Level //since there can be m
             contraposition = the("Contraposition"),
             identity = the("Identity"),*/
             noSwap = the("NoSwap"),
-            allowBackward = the("AllowBackward"),
+            backward = the("Backward"),
 //            fromTask = the("FromTask"),
 //            fromBelief = the("FromBelief"),
             anticipate = the("Anticipate"),
@@ -101,10 +101,6 @@ public class PostCondition implements Serializable, Level //since there can be m
             Compound i = (Compound) m;
 
             Term type = i.term(1);
-            if (type == null) {
-                throw new RuntimeException("Unknown postcondition format (predicate must be atom): " + m);
-            }
-
             Term which = i.term(0);
 
 
@@ -140,8 +136,8 @@ public class PostCondition implements Serializable, Level //since there can be m
                     goalTruth = which;
                     break;
 
-                case "Derive":
-                    if (which.equals(PostCondition.allowBackward))
+                case "Permute":
+                    if (which.equals(PostCondition.backward))
                         rule.setAllowBackward();
                     if (which.equals(PostCondition.noSwap))
                         rule.allowForward = false;

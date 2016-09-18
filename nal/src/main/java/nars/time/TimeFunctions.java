@@ -239,19 +239,24 @@ public interface TimeFunctions {
     @Nullable
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
 
-        Task premBelief = p.belief;
+
+        Task task = p.task;
+        Task belief = p.belief;
         //if (premBelief == null)
             //premBelief = p.task; //it is the task itself being decomposed
 
-        Compound decomposedTerm = (Compound) (decomposeTask ? $.unneg(p.taskTerm) : p.beliefTerm);
+        Task decomposingTask = (decomposeTask) ? task : belief;
+        Task otherTask = (decomposeTask) ? belief : task;
+
+        Compound decomposedTerm = (Compound) (decomposeTask ? p.taskTerm : p.beliefTerm);
         //int dtDecomposed = decomposedTerm.dt();
-        long occDecomposed = decomposeTask ? p.task.occurrence() : (premBelief != null ? premBelief.occurrence() : ETERNAL);
+
+        long occDecomposed = decomposeTask ? task.occurrence() : (belief != null ? belief.occurrence() : ETERNAL);
 
         //the non-decomposed counterpart of the premise
-        Task otherTask = decomposeTask ? premBelief : p.task;
 
 
-        long occOther = (otherTask != null) ? otherTask.occurrence() : occDecomposed;
+        long occOther = (otherTask != null) ? otherTask.occurrence() : ETERNAL;
 
 
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
@@ -281,36 +286,48 @@ public interface TimeFunctions {
                 Term rDerived = resolve(p, derived);
                 Term rDecomposed = resolve(p, decomposedTerm);
 
+                long relOccDecomposed = ETERNAL, relOccOther = ETERNAL;
+
                 if (occDecomposed!=ETERNAL) {
 
                     int dt = rDecomposed.subtermTime(rDerived);
                     if (dt!=DTERNAL)
-                        occ = occDecomposed + dt;
-//                    else {
-//                        //TEMPOARY
-//                        rDecomposed.subtermTime(rDerived);
-//                    }
+                        relOccDecomposed = occDecomposed + dt;
+
                 }
 
-                if (occ == ETERNAL && occOther!=ETERNAL) {
+                if (occOther!=ETERNAL) {
 
                     @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm.term() : p.taskTerm);
 
                     if (derivationMatch(rOtherTerm, derived, p)) {
-                        occ = occOther;
+                        relOccOther = occOther;
                     } else {
                         int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
                         if (otherInDecomposed!=DTERNAL) {
                             int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
                             if (derivedInDecomposed!=DTERNAL) {
                                 //now compute the dt between derived and otherTerm, as a shift added to occOther
-                                occ = occOther + (derivedInDecomposed-otherInDecomposed);
+                                relOccOther = occOther + (derivedInDecomposed-otherInDecomposed);
                             }
                         }
 
-
                     }
 
+                }
+
+                if (relOccDecomposed!=ETERNAL && relOccOther!=ETERNAL) {
+                    //if both provide a possible timing for the result,
+                    // choose by random wighted confidence which one
+                    Task t = chooseByConf(task,belief,p);
+                    if (t == decomposingTask)
+                        occ = relOccDecomposed;
+                    else
+                        occ = relOccOther;
+                } else if (relOccDecomposed!=ETERNAL) {
+                    occ = relOccDecomposed;
+                } else if (relOccOther!=ETERNAL) {
+                    occ = relOccOther;
                 }
 
                 if (occ == ETERNAL) {

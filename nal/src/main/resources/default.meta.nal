@@ -14,30 +14,30 @@
 
 //Set Definition Similarity to Inheritance
 
-    ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Derive:AllowBackward)
+    ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Permute:Backward)
+    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Permute:Backward)
 
 
 //Set Definition Unwrap
 
-    ({S} <-> {P}), {S} |- (S <-> P), (Belief:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [S] |- (S <-> P), (Belief:Identity, Derive:AllowBackward)
+    ({S} <-> {P}), {S} |- (S <-> P), (Belief:Identity, Permute:Backward)
+    ([S] <-> [P]), [S] |- (S <-> P), (Belief:Identity, Permute:Backward)
 
 //Nothing is more specific than a instance, so its similar
 
-    (S --> {P}),  S  |- (S <-> {P}), (Belief:Identity, Derive:AllowBackward)
-    (S --> {P}), {P} |- (S <-> {P}), (Belief:Identity, Derive:AllowBackward)
+    (S --> {P}),  S  |- (S <-> {P}), (Belief:Identity, Permute:Backward)
+    (S --> {P}), {P} |- (S <-> {P}), (Belief:Identity, Permute:Backward)
 
 //nothing is more general than a property, so its similar
 
-    ([S] --> P), [S] |- ([S] <-> P), (Belief:Identity, Derive:AllowBackward)
-    ([S] --> P),  P  |- ([S] <-> P), (Belief:Identity, Derive:AllowBackward)
+    ([S] --> P), [S] |- ([S] <-> P), (Belief:Identity, Permute:Backward)
+    ([S] --> P),  P  |- ([S] <-> P), (Belief:Identity, Permute:Backward)
 
 
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
-//    ( (--,%S) ==> P),  P, neqRec(S,P), notEqui(P), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
-//    ( (--,%S) ==> P),  S, neq(S,P), neq((--,%S),P), neqRec(S,P), notEqui(S), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Derive:AllowBackward, Derive:NoSwap)
+//    ( (--,%S) ==> P),  P, neqRec(S,P), notEqui(P), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Permute:Backward, Permute:NoSwap)
+//    ( (--,%S) ==> P),  S, neq(S,P), neq((--,%S),P), neqRec(S,P), notEqui(S), time(dtTaskExact) |- ( (--,%P) ==>+- S), (Belief:Contraposition, Permute:Backward, Permute:NoSwap)
 
 
 
@@ -50,32 +50,32 @@
 //                (A --> C)
 //If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
 
-(A --> B), (B --> C), neqRec(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
-(A --> B), (A --> C), neqRec(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
-(A --> C), (B --> C), neqRec(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
-(A --> B), (B --> C), neqRec(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+(A --> B), (B --> C), neqRec(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:NoSwap)
+(A --> B), (A --> C), neqRec(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Backward, Permute:NoSwap)
+(A --> C), (B --> C), neqRec(A,B) |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Backward, Permute:NoSwap)
+(A --> B), (B --> C), neqRec(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Backward, Permute:NoSwap)
 
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
 
-    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong, Permute:Backward, Permute:NoSwap)
 
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
-    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong, Permute:Backward, Permute:NoSwap)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
-    (P --> M), (S --> M), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
-    (M --> P), (M --> S), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Derive:AllowBackward, Derive:NoSwap)
+    (P --> M), (S --> M), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Permute:Backward, Permute:NoSwap)
+    (M --> P), (M --> S), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Permute:Backward, Permute:NoSwap)
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
-    (M --> P), (S <-> M), neqCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
-    (P --> M), (S <-> M), neqCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
-    (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong, Derive:AllowBackward, Derive:NoSwap)
+    (M --> P), (S <-> M), neqCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Permute:Backward, Permute:NoSwap)
+    (P --> M), (S <-> M), neqCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Permute:Backward, Permute:NoSwap)
+    (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong, Permute:Backward, Permute:NoSwap)
 
 //// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:
@@ -84,18 +84,18 @@
 //  corresponds to extensional union, and extensional intersection corresponds
 //  to intensional union.
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((S | P) --> M), (Belief:Intersection, Derive:NoSwap)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((S & P) --> M), (Belief:Union, Derive:NoSwap)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((P ~ S) --> M), (Belief:Difference, Derive:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((S | P) --> M), (Belief:Intersection, Permute:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((S & P) --> M), (Belief:Union, Permute:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((P ~ S) --> M), (Belief:Difference, Permute:NoSwap)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P & S)), (Belief:Intersection, Derive:NoSwap)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P | S)), (Belief:Union, Derive:NoSwap)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P - S)), (Belief:Difference, Derive:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P & S)), (Belief:Intersection, Permute:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P | S)), (Belief:Union, Permute:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P - S)), (Belief:Difference, Permute:NoSwap)
 
 //raw product composition
-//    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection, Derive:NoSwap)
-//    (A..+), (B..+) |- ((A..+) & (B..+)), (Belief:Union, Derive:NoSwap)
-//    (A..+), (B..+) |- ((A..+) ~ (B..+)), (Belief:Difference, Derive:NoSwap)
+//    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection, Permute:NoSwap)
+//    (A..+), (B..+) |- ((A..+) & (B..+)), (Belief:Union, Permute:NoSwap)
+//    (A..+), (B..+) |- ((A..+) ~ (B..+)), (Belief:Difference, Permute:NoSwap)
 //raw product decomposition ?
 
 //// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
@@ -123,27 +123,27 @@
 
 //(C --> A), (C --> B), set_ext(A), union(A,B,R) |- (C --> R), (Truth:Union)
 //(C --> A), (C --> B), set_ext(A), intersection(A,B,R) |- (C --> R), (Truth:Intersection)
-    (C --> A), (C --> B), setext(A,B) |- (C --> union(A,B)), (Belief:Union, Derive:NoSwap)
-    (C --> A), (C --> B), setext(A,B) |- (C --> intersect(A,B)), (Belief:Intersection, Derive:NoSwap)
-    (C --> A), (C --> B), setext(A,B) |- (C --> differ(A,B)), (Belief:Difference, Derive:NoSwap)
+    (C --> A), (C --> B), setext(A,B) |- (C --> union(A,B)), (Belief:Union, Permute:NoSwap)
+    (C --> A), (C --> B), setext(A,B) |- (C --> intersect(A,B)), (Belief:Intersection, Permute:NoSwap)
+    (C --> A), (C --> B), setext(A,B) |- (C --> differ(A,B)), (Belief:Difference, Permute:NoSwap)
 
 //(C --> A), (C --> B), set_int(A), union(A,B,R) |- (C --> R), (Truth:Intersection)
 //(C --> A), (C --> B), set_int(A), intersection(A,B,R) |- (C --> R), (Truth:Union)
-    (C --> A), (C --> B), setint(A,B) |- (C --> union(A,B)), (Belief:Intersection, Derive:NoSwap)
-    (C --> A), (C --> B), setint(A,B) |- (C --> intersect(A,B)), (Belief:Union, Derive:NoSwap)
-    (C --> A), (C --> B), setint(A,B) |- (C --> differ(A,B)), (Belief:Difference, Derive:NoSwap)
+    (C --> A), (C --> B), setint(A,B) |- (C --> union(A,B)), (Belief:Intersection, Permute:NoSwap)
+    (C --> A), (C --> B), setint(A,B) |- (C --> intersect(A,B)), (Belief:Union, Permute:NoSwap)
+    (C --> A), (C --> B), setint(A,B) |- (C --> differ(A,B)), (Belief:Difference, Permute:NoSwap)
 
 //(A --> C), (B --> C), set_ext(A), union(A,B,R) |- (R --> C), (Truth:Intersection)
 //(A --> C), (B --> C), set_ext(A), intersection(A,B,R) |- (R --> C), (Truth:Union)
-    (A --> C), (B --> C), setext(A,B) |- (intersect(A,B) --> C), (Belief:Union, Derive:NoSwap)
-    (A --> C), (B --> C), setext(A,B) |- (union(A,B) --> C), (Belief:Intersection, Derive:NoSwap)
-    (A --> C), (B --> C), setext(A,B) |- (differ(A,B) --> C), (Belief:Difference, Derive:NoSwap)
+    (A --> C), (B --> C), setext(A,B) |- (intersect(A,B) --> C), (Belief:Union, Permute:NoSwap)
+    (A --> C), (B --> C), setext(A,B) |- (union(A,B) --> C), (Belief:Intersection, Permute:NoSwap)
+    (A --> C), (B --> C), setext(A,B) |- (differ(A,B) --> C), (Belief:Difference, Permute:NoSwap)
 
 //(A --> C), (B --> C), set_int(A), union(A,B,R) |- (R --> C), (Truth:Union)
 //(A --> C), (B --> C), set_int(A), intersection(A,B,R) |- (R --> C), (Truth:Intersection)
-    (A --> C), (B --> C), setint(A,B) |- (union(A,B) --> C), (Belief:Union, Derive:NoSwap)
-    (A --> C), (B --> C), setint(A,B) |- (intersect(A,B) --> C), (Belief:Intersection, Derive:NoSwap)
-    (A --> C), (B --> C), setint(A,B) |- (differ(A,B) --> C), (Belief:Difference, Derive:NoSwap)
+    (A --> C), (B --> C), setint(A,B) |- (union(A,B) --> C), (Belief:Union, Permute:NoSwap)
+    (A --> C), (B --> C), setint(A,B) |- (intersect(A,B) --> C), (Belief:Intersection, Permute:NoSwap)
+    (A --> C), (B --> C), setint(A,B) |- (differ(A,B) --> C), (Belief:Difference, Permute:NoSwap)
 
 //Set element takeout:
 
@@ -177,31 +177,31 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (M ==> P), (S ==> M), neqCom(S,P), time(dtUnionReverse), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction, Derive:AllowBackward)
+    (M ==> P), (S ==> M), neqCom(S,P), time(dtUnionReverse), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
 
-    (P ==> M), (S ==> M), neqCom(S,P), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction, Derive:AllowBackward)
+    (P ==> M), (S ==> M), neqCom(S,P), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction)
 
-    (M ==> P), (M ==> S), neqCom(S,P), time(dtTminB), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction, Derive:AllowBackward)
+    (M ==> P), (M ==> S), neqCom(S,P), time(dtTminB), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction)
 
-    (P ==> M), (M ==> S), neqCom(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification, Derive:AllowBackward)
+    (P ==> M), (M ==> S), neqCom(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
 
-    (S ==> P), (P ==> S), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Intersection, Derive:AllowBackward)
+    (S ==> P), (P ==> S), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Intersection)
 
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison, Derive:AllowBackward)
+    (P ==> M), (S ==> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
 
-    (M ==> P), (M ==> S), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison, Derive:AllowBackward)
+    (M ==> P), (M ==> S), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
 
-    (M <=> P), (S <=> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance, Derive:AllowBackward)
+    (M <=> P), (S <=> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance)
 
-    (M ==> P), (S <=> M), neqCom(S,P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy, Derive:AllowBackward)
+    (M ==> P), (S <=> M), neqCom(S,P), notImplEqui(S), notEqui(P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy)
 
-    (P ==> M), (S <=> M), neqCom(S,P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy, Derive:AllowBackward)
+    (P ==> M), (S <=> M), neqCom(S,P), notImplEqui(S), notEqui(P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy)
 
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
@@ -264,10 +264,13 @@
 //These cases are handled by "Variable Introduction" and "Temporal Induction"
 
     //implications may be constructed with implications for preds but not subjs
-    S, P, time(eternal), neq(P,S), notImplEqui(S), notEqui(P) |- (S ==> P), (Belief:Induction)
-    S, P, time(eternal), neq(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction)
-    S, P, time(eternal), neq(P,S), notImplEqui(S), notImplEqui(P) |- (P <=> S), (Belief:Comparison)
-    S, P, time(eternal), neq(P,S) |- (S && P), (Belief:Intersection)
+    S, P, time(eternal), task(positive), task("."), neq(P,S), notImplEqui(S), notEqui(P) |- (S ==> P), (Belief:Induction)
+        S, P, time(eternal), task(negative), task("."), neq(P,S), notImplEqui(S), notEqui(P) |- ((--,%S) ==> P), (Belief:InductionN)
+    S, P, time(eternal), task(positive), task("."), neq(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction)
+        S, P, time(eternal), task(negative), task("."), neq(P,S), notEqui(S), notImplEqui(P) |- (P ==> (--,%S)), (Belief:AbductionN)
+    S, P, time(eternal), task(positive), task("."), neq(P,S), notImplEqui(S), notImplEqui(P) |- (S <=> P), (Belief:Comparison)
+        S, P, time(eternal), task(negative), task("."), neq(P,S), notImplEqui(S), notImplEqui(P) |- ((--,%S) <=> P), (Belief:ComparisonN)
+    S, P, time(eternal), task(positive), task("."), neq(P,S) |- (S && P), (Belief:Intersection)
     //%S, %P, time(eternal), neqCom(P,S) |- (%S || %P), (Belief:Union)
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
@@ -294,7 +297,7 @@
      //structural decompose any component of a conjunction
      (&&,X,A..+), X, time(decomposeTaskIfTemporal) |- X, (Belief:StructuralDeduction,Goal:StructuralStrong)
      (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralStrong)
-     (&&,X,A..+), X, time(decomposeTask), task("?") |- (&&,A..+), (Derive:NoSwap)
+     (&&,X,A..+), X, time(decomposeTask), task("?") |- (&&,A..+), (Permute:NoSwap)
 
      (&&,X,A), B, time(decomposeTask) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
      (&&,X,A..+), B, time(decomposeTask) |- subOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
@@ -333,9 +336,9 @@
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
     //((&&,A..+) ==> C), M, time(dtTask), neqRec(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion), neqCom(C,M), notImplEqui(M)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
-    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neqCom(C,M), notImplEqui(M)  |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
-    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT) |- (B ==>+- M), (Belief:Induction)
+    ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion), neqCom(C,M), notImplEqui(M), notEqui(C)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
+    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neqCom(C,M), notImplEqui(M), notEqui(C)  |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
+    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neqCom(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
 
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //Introduce variables by common subject or predicate
@@ -437,36 +440,36 @@
 //backward inference rules which should really only work on backward inference:
 
 
-    (A --> S), (B --> S), neqCom(A,B), task("?") |- (A --> B), (Derive:NoSwap)
-    (A --> S), (B --> S), neqCom(A,B), task("?") |- (B --> A), (Derive:NoSwap)
+    (A --> S), (B --> S), neqCom(A,B), task("?") |- (A --> B), (Permute:NoSwap)
+    (A --> S), (B --> S), neqCom(A,B), task("?") |- (B --> A), (Permute:NoSwap)
 
-    (A ==> S), (B ==> S), neqCom(A,B), task("?") |- (A ==> B), (Derive:NoSwap)
-    (A ==> S), (B ==> S), neqCom(A,B), task("?") |- (B ==> A), (Derive:NoSwap)
+    (A ==> S), (B ==> S), neqCom(A,B), task("?") |- (A ==> B), (Permute:NoSwap)
+    (A ==> S), (B ==> S), neqCom(A,B), task("?") |- (B ==> A), (Permute:NoSwap)
 
 //Inheritance to Similarity
 
-    (S <-> P), (S --> P), neqCom(S,P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief, Derive:NoSwap)
+    (S <-> P), (S --> P), neqCom(S,P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief, Permute:NoSwap)
 
 //If S can stand for P, P can to a certain low degree also represent the class S
 //If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
 
-    (P --> S), (S --> P), neqCom(S,P),                  task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
-    (P ==> S), (S ==> P), neqCom(S,P), time(dtCombine), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief, Derive:NoSwap)
+    (P --> S), (S --> P), neqCom(S,P),                  task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief, Permute:NoSwap)
+    (P ==> S), (S ==> P), neqCom(S,P), time(dtCombine), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief, Permute:NoSwap)
 
 //and the backward inference driven forward inference:
 
 //Similarity to Inheritance
 
-    (S --> P), (S <-> P), neqCom(S,P), task("?") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief, Derive:NoSwap)
-    (S ==> P), (S <=> P), neqCom(S,P), task("?") |- (S ==> P), (Belief:StructuralIntersection, Punctuation:Belief, Derive:NoSwap)
+    (S --> P), (S <-> P), neqCom(S,P), task("?") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief, Permute:NoSwap)
+    (S ==> P), (S <=> P), neqCom(S,P), task("?") |- (S ==> P), (Belief:StructuralIntersection, Punctuation:Belief, Permute:NoSwap)
 
 //NAL2:
 
-    ([A] <-> [B]), (A <-> B), task("?") |- ([A] <-> [B]), (Belief:BeliefIdentity, Punctuation:Belief, Derive:NoSwap)
-    ({A} <-> {B}), (A <-> B), task("?") |- ({A} <-> {B}), (Belief:BeliefIdentity, Punctuation:Belief, Derive:NoSwap)
+    ([A] <-> [B]), (A <-> B), task("?") |- ([A] <-> [B]), (Belief:BeliefIdentity, Punctuation:Belief, Permute:NoSwap)
+    ({A} <-> {B}), (A <-> B), task("?") |- ({A} <-> {B}), (Belief:BeliefIdentity, Punctuation:Belief, Permute:NoSwap)
 
-    ([A] --> [B]), (A <-> B), task("?") |- ([A] --> [B]), (Belief:BeliefIdentity, Punctuation:Belief, Derive:NoSwap)
-    ({A} --> {B}), (A <-> B), task("?") |- ({A} --> {B}), (Belief:BeliefIdentity, Punctuation:Belief, Derive:NoSwap)
+    ([A] --> [B]), (A <-> B), task("?") |- ([A] --> [B]), (Belief:BeliefIdentity, Punctuation:Belief, Permute:NoSwap)
+    ({A} --> {B}), (A <-> B), task("?") |- ({A} --> {B}), (Belief:BeliefIdentity, Punctuation:Belief, Permute:NoSwap)
 
 //experimental:
 //    ([A] <-> {B}), (A <-> B), task("?") |- ([A] <-> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
@@ -479,30 +482,30 @@
 
 ////composition on both sides of a statement:
 
-    ((&,B,A..+) --> (&,X,A..+)), (B --> X), task("?") |- ((&,B,A..+) --> (&,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
-    ((|,B,A..+) --> (|,X,A..+)), (B --> X), task("?") |- ((|,B,A..+) --> (|,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    ((&,B,A..+) --> (&,X,A..+)), (B --> X), task("?") |- ((&,B,A..+) --> (&,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
+    ((|,B,A..+) --> (|,X,A..+)), (B --> X), task("?") |- ((|,B,A..+) --> (|,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
 
-    ((-,S,A) --> (-,S,B)), (B --> A), task("?") |- ((-,S,A) --> (-,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
-    ((~,S,A) --> (~,S,B)), (B --> A), task("?") |- ((~,S,A) --> (~,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    ((-,S,A) --> (-,S,B)), (B --> A), task("?") |- ((-,S,A) --> (-,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
+    ((~,S,A) --> (~,S,B)), (B --> A), task("?") |- ((~,S,A) --> (~,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
 
 ////composition on one side of a statement:
 
-    (W --> (|,B,A..+)), (W --> B), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
-    ((&,B,A..+) --> W), (B --> W), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    (W --> (|,B,A..+)), (W --> B), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
+    ((&,B,A..+) --> W), (B --> W), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
 
-    (W --> (-,S,B)), (W --> B), neqCom(W,S), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
-    ((~,S,B) --> W), (B --> W), neqCom(W,S), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief, Derive:NoSwap)
+    (W --> (-,S,B)), (W --> B), neqCom(W,S), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief, Permute:NoSwap)
+    ((~,S,B) --> W), (B --> W), neqCom(W,S), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief, Permute:NoSwap)
 
 ////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
 //Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate
 
-    (B --> (/, M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity, Derive:NoSwap)
+    (B --> (/, M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity, Permute:NoSwap)
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Goal:Identity, Derive:NoSwap)
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Goal:Identity, Permute:NoSwap)
 
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Goal:Identity, Derive:NoSwap)
+    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Goal:Identity, Permute:NoSwap)
 
-    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity, Derive:NoSwap)
+    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity, Permute:NoSwap)
 
 //Recursion Force - TODO use varargs
 
@@ -519,17 +522,17 @@
 ////composition on both sides of a statement:
 
 
-    ((B,P) <-> Z) ,(B <-> A), task("?") |- ((B,P) <-> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
-    ((P,B) <-> Z) ,(B <-> A), task("?") |- ((P,B) <-> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    ((B,P) <-> Z) ,(B <-> A), task("?") |- ((B,P) <-> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
+    ((P,B) <-> Z) ,(B <-> A), task("?") |- ((P,B) <-> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
 
-    ((B,P) --> Z) ,(B --> A), task("?") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
-    ((P,B) --> Z) ,(B --> A), task("?") |- ((P,B) --> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    ((B,P) --> Z) ,(B --> A), task("?") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
+    ((P,B) --> Z) ,(B --> A), task("?") |- ((P,B) --> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
 
 
 
 //use variables here to force the image/product normalization to not apply
-    ((/,%N,_,%A) --> %Z), (%B --> %A), task("?") |- ((/,%N,_,%A) --> (/,%N,_,%B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
-    ((\,%N,%A,_) --> %Z), (%N --> %R), task("?") |- ((\,%N,%A,_) --> (\,%R,%A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    ((/,%N,_,%A) --> %Z), (%B --> %A), task("?") |- ((/,%N,_,%A) --> (/,%N,_,%B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
+    ((\,%N,%A,_) --> %Z), (%N --> %R), task("?") |- ((\,%N,%A,_) --> (\,%R,%A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
 
 
 
@@ -551,7 +554,7 @@
 
 //compound composition one premise
 
-    (||,%B,A..+), B, task("?") |- (||,%B,A..+), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Derive:NoSwap)
+    (||,%B,A..+), B, task("?") |- (||,%B,A..+), (Belief:BeliefStructuralDeduction, Punctuation:Belief, Permute:NoSwap)
 
 
 //TODO for desire

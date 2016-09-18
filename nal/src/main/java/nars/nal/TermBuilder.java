@@ -24,6 +24,7 @@ import java.util.TreeSet;
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.term.Term.False;
+import static nars.term.Term.True;
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.compound.Statement.pred;
 import static nars.term.compound.Statement.subj;
@@ -36,7 +37,7 @@ import static nars.time.Tense.XTERNAL;
 public abstract class TermBuilder {
 
 
-    private static final Term[] TrueArray = {Term.True};
+    private static final Term[] TrueArray = {True};
     public static final TermContainer InvalidSubterms = TermVector.the(False);
 
 
@@ -235,7 +236,7 @@ public abstract class TermBuilder {
     @NotNull private static Term[] conjTrueFalseFilter(@NotNull Term[] u) {
         int trues = 0; //# of True subterms that can be eliminated
         for (Term x : u) {
-            if (x.equals(Term.True)) {
+            if (x.equals(True)) {
                 trues++;
             } else if (x.equals(False)) {
 
@@ -257,7 +258,7 @@ public abstract class TermBuilder {
         int j = 0;
         for (int i = 0; j < y.length; i++) {
             Term uu = u[i];
-            if (!uu.equals(Term.True)) // && (!uu.equals(False)))
+            if (!uu.equals(True)) // && (!uu.equals(False)))
                 y[j++] = uu;
         }
 
@@ -340,7 +341,7 @@ public abstract class TermBuilder {
     }
 
     public static boolean isTrue(@NotNull Term x) {
-        return x.equals(Term.True);
+        return x.equals(True);
     }
 
     public static boolean isFalse(@NotNull Term x) {
@@ -427,14 +428,14 @@ public abstract class TermBuilder {
         //HACK testing for equality like this is not a complete solution. for that we need a new special term type
 
         if (isTrue(t)) return False;
-        if (isFalse(t)) return Term.True;
+        if (isFalse(t)) return True;
 
         if (t.op() == NEG) {
             // (--,(--,P)) = P
             t = ((TermContainer) t).term(0);
 
             if (isTrue(t)) return False;
-            if (isFalse(t)) return Term.True;
+            if (isFalse(t)) return True;
 
             return t;
 
@@ -694,10 +695,11 @@ public abstract class TermBuilder {
                     // (C ==> (A ==> B))   <<==>>  ((&&,A,C) ==> B)
                     if (predicate.op() == IMPL) {
                         Term oldCondition = subj(predicate);
-                        if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
-                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Implication circularity");
-                        else {
-                            if (commutive(dt) || dt==XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */)
+                        if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject))) {
+                            //throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Implication circularity");
+                            return True; //infinite loop
+                        } else {
+                            if (commutive(dt)  /* if XTERNAL somehow happens here, just consider it as commutive */)
                                 return impl2Conj(dt, subject, predicate, oldCondition);
                         }
                     }
@@ -715,7 +717,7 @@ public abstract class TermBuilder {
 
             //if either the subject or pred are True/False by this point, fail
             if (isTrueOrFalse(subject) || isTrueOrFalse(predicate)) {
-                return subject.equals(predicate) ? Term.True : False;
+                return subject.equals(predicate) ? True : False;
             }
 
 
@@ -725,7 +727,7 @@ public abstract class TermBuilder {
             Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject) : subject;
             Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate) : predicate;
             if (Terms.equalsAnonymous(sRoot, pRoot))
-                return subject.op() == predicate.op() ? Term.True : False; //True if same, False if negated
+                return subject.op() == predicate.op() ? True : False; //True if same, False if negated
 
 
             //TODO its possible to disqualify invalid statement if there is no structural overlap here??
@@ -733,13 +735,13 @@ public abstract class TermBuilder {
             @NotNull Op sop = sRoot.op();
             if (sop == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
                 //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
-                return Term.True;
+                return True;
             }
 
             @NotNull Op pop = pRoot.op();
             if (pop == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
                 //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
-                return Term.True;
+                return True;
             }
 
 //            if (sop.statement && pop.statement) {

@@ -314,6 +314,10 @@ public class PremiseRule extends GenericCompound {
         if (b == TaskPunctuation.Question) return TaskPunctuation.class;
 
         if (b instanceof TermNotEquals) return TermNotEquals.class;
+
+        if (b instanceof PatternOpNot) return PatternOpNot.class;
+        if (b instanceof PatternOpNotContained) return PatternOpNot.class;
+
         //if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
         //if (b == TaskPunctuation.NotBelief) return TaskPunctuation.class;
 
@@ -595,20 +599,24 @@ public class PremiseRule extends GenericCompound {
 
 
                 case "neq":
-                    neq(constraints, X, Y);
 
-                    //next = NotEqual.make(arg1, arg2); //TODO decide if necesary
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+
+                    neq(constraints, X, Y); //should the constraints be ommited in this case?
 
                     break;
 
                 case "neqCom":
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+
                     constraints.put(X, new NoCommonSubtermConstraint(Y));
                     constraints.put(Y, new NoCommonSubtermConstraint(X));
-                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
                     break;
 
 
                 case "neqRec":
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+
                     constraints.put(X, new NoCommonRecursiveSubtermConstraint(Y));
                     constraints.put(Y, new NoCommonRecursiveSubtermConstraint(X));
                     //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
@@ -971,8 +979,7 @@ public class PremiseRule extends GenericCompound {
     public void neq(@NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
         //find if the two compared terms are recursively contained as subterms of either the task or belief
         //and if so, create a precondition constraint rather than a matcher constraint
-        //if (neqPrefilter(pres, task, belief, x, y))
-            //return; //should the constraints be ommited in this case?
+
 
         constraints.put(x, new NotEqualConstraint(y));
         constraints.put(y, new NotEqualConstraint(x));
