@@ -18,6 +18,10 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
     ///** the referred item */
     protected X id;
 
+    public DefaultBLink(@NotNull X id) {
+        this.id = id;
+    }
+
     public DefaultBLink(@NotNull X id, float p, float d, float q) {
         setBudget(p, d, q);
         this.id = id;

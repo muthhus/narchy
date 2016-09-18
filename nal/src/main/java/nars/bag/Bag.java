@@ -541,6 +541,14 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
             return new DefaultBLink(i, b);
     }
 
+    @NotNull
+    default <Y> BLink<Y> newLink(@NotNull Y i) {
+
+        if (i instanceof Budgeted)
+            return new DependentBLink((Budgeted) i);
+        else
+            return new DefaultBLink(i);
+    }
 
     @Override
     default void forEachKey(Consumer<? super V> each) {

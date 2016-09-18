@@ -12,12 +12,10 @@ public abstract class AtomicString implements Atomic {
         if (this == u) return true;
 
         if (u instanceof Atomic) {
-            Atomic tu = (Atomic) u;
-            if (toString().equals(u.toString()) && op()!=tu.op())
-                throw new RuntimeException("inconsistent op");
-
-            return toString().equals(tu.toString()) && op() == tu.op();
+            boolean strEqual = toString().equals(u.toString());
+            return u instanceof AtomicString ? strEqual : strEqual && op() == ((Atomic) u).op();
         }
+
         return false;
     }
 

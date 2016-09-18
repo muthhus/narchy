@@ -10,10 +10,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DependentBLink<B extends Budgeted> extends DefaultBLink<B> {
 
+    public DependentBLink(@NotNull B id) {
+        super(id);
+    }
 
     public DependentBLink(@NotNull B id, Budgeted b) {
         super(id, b);
-
     }
 
 

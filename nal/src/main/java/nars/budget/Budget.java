@@ -131,9 +131,13 @@ public interface Budget extends Budgeted {
     public static float validBudgetValue(float p) {
         if (p!=p /* fast NaN test */)
             throw new BudgetException();
-
-        return Util.clamp(p);
+        if (p > 1.0f)
+            p = 1.0f;
+        else if (p < 0.0f)
+            p = 0.0f;
+        return p;
     }
+
     public static float validBudgetValueOrNaN(float p) {
         if (p!=p /* fast NaN test */)
             return Float.NaN;
@@ -290,16 +294,18 @@ public interface Budget extends Budgeted {
         return this;
     }
 
-    /**
-     * returns this budget, after being modified
-     */
-    @NotNull
-    default Budget setBudget(float p, float d, float q) {
-        setPriority(p);
-        setDurability(d);
-        setQuality(q);
-        return this;
-    }
+    Budget setBudget(float p, float d, float q);
+
+//    /**
+//     * returns this budget, after being modified
+//     */
+//    @NotNull
+//    default Budget setBudget(float p, float d, float q) {
+//        setPriority(p);
+//        setDurability(d);
+//        setQuality(q);
+//        return this;
+//    }
 
     /**
      * Briefly display the BudgetValue

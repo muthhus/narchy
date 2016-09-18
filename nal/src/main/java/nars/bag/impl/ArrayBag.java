@@ -253,19 +253,31 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
 
-        Insertion ii = new Insertion(this, bp, b.dur(), b.qua(), scale, overflow);
+        Insertion ii = new Insertion(bp);
         BLink<V> v = map.compute(key, ii);
 
         int r = ii.result;
         switch (r) {
             case 0:
+                float pBefore = v.pri();
+
+                float o = mergeFunction.merge(v, b, scale);
+                if (overflow != null)
+                    overflow.add(o);
+
+                mass += v.pri() - pBefore;
+
                 updateRange(); //in case the merged item determined the min priority
                 break;
             case +1:
+                v.setBudget(bp, b.dur(), b.qua());
+                mass += bp;
                 update(v);
                 onActive(key);
                 break;
             case -1:
+                //reject due to insufficient budget
+                pressure += bp;
                 onRemoved(key, null);
                 break;
         }
@@ -499,11 +511,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public void forEach(Consumer<? super BLink<V>> action) {
         Object[] x = items.array();
-        for (Object a : x) {
-            if (a!=null) {
-                BLink<V> b = (BLink)a;
-                if (!b.isDeleted())
-                    action.accept(b);
+        if (x.length > 0) {
+            for (BLink a : ((BLink[])x)) {
+                if (a != null) {
+                    BLink<V> b = a;
+                    if (!b.isDeleted())
+                        action.accept(b);
+                }
             }
         }
     }
@@ -693,25 +707,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * Created by me on 8/15/16.
      */
-    final class Insertion<V> extends RawBudget implements BiFunction<V, BLink, BLink> {
+    final class Insertion<V> implements BiFunction<V, BLink, BLink> {
 
-        private ArrayBag arrayBag;
-        @Nullable
-        private final MutableFloat overflow;
 
-        //        /**
-//         * TODO this field can be re-used for 'activated' return value
-//         * -1 = deactivated, +1 = activated, 0 = no change
-//         */
-        private final float scale;
 
+        private final float pri;
+
+         /**
+          * TODO this field can be re-used for 'activated' return value
+          * -1 = deactivated, +1 = activated, 0 = no change
+          */
         int result = 0;
 
-        public Insertion(ArrayBag arrayBag, float p, float d, float q, float scale, @Nullable MutableFloat overflow) {
-            super(p, d, q);
-            this.scale = scale;
-            this.arrayBag = arrayBag;
-            this.overflow = overflow;
+        public Insertion(float pri) {
+            this.pri = pri;
         }
 
 
@@ -719,38 +728,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         @Override
         public BLink apply(@NotNull Object key, @Nullable BLink existing) {
 
-            ArrayBag bag = this.arrayBag;
 
             if (existing != null) {
-
-                //existing.isDeleted() /* if deleted, we will merge replacing it as if it were zero:
-
-                float pBefore = existing.pri();
-                float o = bag.mergeFunction.merge(existing, this, scale);
-                if (overflow != null)
-                    overflow.add(o);
-
-                bag.mass += existing.pri() - pBefore;
-
+                //result=0
                 return existing;
             } else {
-
-                priMult(scale);
-                float bp = pri();
-
-                if (bag.minPriIfFull > bp) {
-                    //reject due to insufficient budget
-                    bag.pressure += bp;
+                if (minPriIfFull > pri) {
                     this.result = -1;
                     return null;
                 } else {
                     //accepted for insert
-                    BLink nvv = newLink(key, this);
-
-                    bag.mass += bp;
-
                     this.result = +1;
-                    return nvv;
+                    return newLink(key);
                 }
             }
         }

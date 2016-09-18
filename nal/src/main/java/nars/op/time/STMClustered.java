@@ -208,8 +208,8 @@ public class STMClustered extends STM {
         @Nullable TasksNode node;
         final int hash;
 
-        public TLink(@NotNull Task t, Budgeted b) {
-            super(t, b);
+        public TLink(@NotNull Task t) {
+            super(t);
             this.coord = getCoord(t);
             this.hash = tLinkSerial.incrementAndGet();
         }
@@ -320,8 +320,8 @@ public class STMClustered extends STM {
 
             @NotNull
             @Override
-            public BLink newLink(Object i, Budgeted b) {
-                return new TLink((Task)i, b);
+            public BLink newLink(Object i) {
+                return new TLink((Task)i);
             }
 
 

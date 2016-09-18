@@ -43,6 +43,14 @@ public class ArrayBLink<X> implements BLink<X> {
     }
 
     @Override
+    public Budget setBudget(float p, float d, float q) {
+        f[0] = validBudgetValue(p);
+        f[1] = validBudgetValue(d);
+        f[2] = validBudgetValue(q);
+        return this;
+    }
+
+    @Override
     public final void setPriority(float p) {
         f[0] = validBudgetValue(p);
     }

@@ -64,7 +64,7 @@ public class Tetris extends NAgent {
     public static final int runFrames = 5550;
     public static final int cyclesPerFrame = 12;
     public static final int tetris_width = 6;
-    public static final int tetris_height = 12;
+    public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 5;
     static boolean easy;
 
@@ -399,7 +399,7 @@ public class Tetris extends NAgent {
 //            }
 //        });
 
-        float p = 0.1f;
+        float p = 0.02f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
@@ -547,7 +547,7 @@ public class Tetris extends NAgent {
 
             Arkancide.newBeliefChartWindow(t, 200);
 
-            HistogramChart.budgetChart(nar, 20);
+            HistogramChart.budgetChart(nar, 30);
 
             //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
 

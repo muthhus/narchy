@@ -47,6 +47,11 @@ public final class ROBudget implements Budget {
     }
 
     @Override
+    public Budget setBudget(float p, float d, float q) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public float pri() {
         return pri;
     }

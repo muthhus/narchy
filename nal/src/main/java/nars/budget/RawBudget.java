@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.budget.Budget.validBudgetValue;
+import static nars.budget.Budget.validBudgetValueOrNaN;
 import static nars.nal.UtilityFunctions.and;
 
 /**
@@ -41,9 +42,9 @@ public class RawBudget implements Budget {
     }
 
     public RawBudget(float p, float d, float q) {
-        this.quality = Budget.validBudgetValueOrNaN(q);
-        this.durability = Budget.validBudgetValueOrNaN(d);
-        setPriority(p);
+        this.priority = validBudgetValue(p);
+        this.durability = validBudgetValueOrNaN(d);
+        this.quality = validBudgetValueOrNaN(q);
     }
 
 
@@ -139,6 +140,15 @@ public class RawBudget implements Budget {
         return getBudgetString();
     }
 
+
+    @Override
+    public final Budget setBudget(float p, float d, float q) {
+        this.priority = validBudgetValue(p);
+        this.durability = validBudgetValue(d);
+        this.quality = validBudgetValue(q);
+        return this;
+    }
+
     @Override
     public final void setPriority(float p) {
         this.priority = validBudgetValue(p);
@@ -152,7 +162,7 @@ public class RawBudget implements Budget {
      */
     @Override
     public final void setDurability(float d) {
-        this.durability = Budget.validBudgetValue(d);
+        this.durability = validBudgetValue(d);
     }
 
 
@@ -164,7 +174,7 @@ public class RawBudget implements Budget {
      */
     @Override
     public final void setQuality(float q) {
-        this.quality = Budget.validBudgetValue(q);
+        this.quality = validBudgetValue(q);
     }
 
 
