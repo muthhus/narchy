@@ -598,7 +598,7 @@ public class PremiseRule extends GenericCompound {
 //                    break;
 
                 case "neq":
-                    neq(pres, taskTermPattern, beliefTermPattern, constraints, X, Y);
+                    neq(constraints, X, Y);
 
                     //next = NotEqual.make(arg1, arg2); //TODO decide if necesary
 
@@ -607,9 +607,15 @@ public class PremiseRule extends GenericCompound {
                 case "neqCom":
                     constraints.put(X, new NoCommonSubtermConstraint(Y));
                     constraints.put(Y, new NoCommonSubtermConstraint(X));
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
                     break;
 
+
+                case "neqRec":
+                    constraints.put(X, new NoCommonRecursiveSubtermConstraint(Y));
+                    constraints.put(Y, new NoCommonRecursiveSubtermConstraint(X));
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+                    break;
 
                 case "notSet":
                     notOp(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.SetsBits);
@@ -625,7 +631,7 @@ public class PremiseRule extends GenericCompound {
                     constraints.put(Y, new OpConstraint(Op.SETe));
                     pres.add( new SubTermsStructure(Op.SETe.bit) );
                     ////additionally prohibits the two terms being equal
-                    neq(pres, taskTermPattern, beliefTermPattern, constraints, X, Y);
+                    neq(constraints, X, Y);
                     break;
 
                 case "setint":
@@ -634,7 +640,7 @@ public class PremiseRule extends GenericCompound {
                     constraints.put(Y, new OpConstraint(Op.SETi));
                     pres.add( new SubTermsStructure(Op.SETi.bit) );
                     //additionally prohibits the two terms being equal
-                    neq(pres, taskTermPattern, beliefTermPattern, constraints, X, Y);
+                    neq(constraints, X, Y);
                     break;
 
                 case "notConjunction":
@@ -955,11 +961,11 @@ public class PremiseRule extends GenericCompound {
             constraints.put(t, new NotOpConstraint(structure));
     }
 
-    public void neq(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
+    public void neq(@NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
         //find if the two compared terms are recursively contained as subterms of either the task or belief
         //and if so, create a precondition constraint rather than a matcher constraint
-        if (neqPrefilter(pres, task, belief, x, y))
-            return; //should the constraints be ommited in this case?
+        //if (neqPrefilter(pres, task, belief, x, y))
+            //return; //should the constraints be ommited in this case?
 
         constraints.put(x, new NotEqualConstraint(y));
         constraints.put(y, new NotEqualConstraint(x));

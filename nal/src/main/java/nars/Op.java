@@ -108,9 +108,10 @@ public enum Op {
     @Deprecated INSTANCE("-{-", 2, OpType.Relation),
     @Deprecated PROPERTY("-]-", 2, OpType.Relation),
     @Deprecated INSTANCE_PROPERTY("{-]", 2, OpType.Relation),
-    @Deprecated DISJ("||", true, 5, Args.GTETwo)
+    @Deprecated DISJ("||", true, 5, Args.GTETwo),
 
-    ;
+    /** for ellipsis, when seen as a term */
+    SUBTERMS("...", 1, OpType.Other );
 
     //-----------------------------------------------------
 
