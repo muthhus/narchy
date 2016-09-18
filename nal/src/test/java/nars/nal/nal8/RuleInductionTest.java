@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.nar.Default;
-import nars.util.signal.FuzzyConceptSet;
+import nars.util.signal.FuzzySensorSet;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.junit.Test;
 
@@ -31,12 +31,12 @@ public class RuleInductionTest {
 
         MutableFloat m = new MutableFloat(0);
 
-        FuzzyConceptSet f = new FuzzyConceptSet(m, d,
+        FuzzySensorSet f = new FuzzySensorSet(m, d,
                 //"f:lo", "f:hi"
                 "(f_lo)", "(f_hi)"
         );
 
-        FuzzyConceptSet g = new FuzzyConceptSet(()->1f-m.floatValue(), d,
+        FuzzySensorSet g = new FuzzySensorSet(()->1f-m.floatValue(), d,
                 //"g:lo", "g:hi"
                 "(g_lo)", "(g_hi)"
         );

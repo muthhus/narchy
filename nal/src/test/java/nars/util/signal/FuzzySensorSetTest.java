@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by me on 7/2/16.
  */
-public class FuzzyConceptSetTest {
+public class FuzzySensorSetTest {
 
     //HACK TODO make sure this is smaller
     final static float tolerance = 0.2f;
@@ -30,7 +30,7 @@ public class FuzzyConceptSetTest {
         MutableFloat m = new MutableFloat(0f);
 
         testSteadyFreqCondition(m,
-            new FuzzyConceptSet(
+            new FuzzySensorSet(
                 new RangeNormalizedFloat(() -> m.floatValue()).updateRange(-1).updateRange(1),
                 d, "(x)"),
                 (f) -> Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)
@@ -44,7 +44,7 @@ public class FuzzyConceptSetTest {
 
         PolarRangeNormalizedFloat range = new PolarRangeNormalizedFloat(() -> m.floatValue());
         range.radius(1f);
-        FuzzyConceptSet f = new FuzzyConceptSet(range, d,
+        FuzzySensorSet f = new FuzzySensorSet(range, d,
                 "(low)", "(mid)", "(hih)");
 
 
@@ -74,7 +74,7 @@ public class FuzzyConceptSetTest {
         testSteadyFreqCondition(m, f, (freqSum) -> Util.equals(freqSum, 1f, tolerance));
     }
 
-    public void testSteadyFreqCondition(MutableFloat m, FuzzyConceptSet f, FloatPredicate withFreqSum) {
+    public void testSteadyFreqCondition(MutableFloat m, FuzzySensorSet f, FloatPredicate withFreqSum) {
         NAR d = f.nar;
         for (int i = 0; i < 32; i++) {
             m.setValue(Math.sin(i/2f));

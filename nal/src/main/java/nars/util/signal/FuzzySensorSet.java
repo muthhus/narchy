@@ -15,7 +15,7 @@ import java.util.List;
 import static nars.$.t;
 
 /** accepts a numeric signal which has been normalized to 0..1.0 range */
-public class FuzzyConceptSet implements Iterable<SensorConcept> {
+public class FuzzySensorSet implements Iterable<SensorConcept> {
 
 
     private final FloatSupplier input;
@@ -44,11 +44,11 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
         return nearness[index] /= s;
     }
 
-    public FuzzyConceptSet(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull String... states) {
+    public FuzzySensorSet(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull String... states) {
         this(input::floatValue, nar, states);
     }
 
-    public FuzzyConceptSet(FloatSupplier input, @NotNull NAR nar, @NotNull String... states) {
+    public FuzzySensorSet(FloatSupplier input, @NotNull NAR nar, @NotNull String... states) {
 
 
         this.conf = nar.confidenceDefault(Symbols.BELIEF);
@@ -111,7 +111,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
 //		}
 
     @NotNull
-    public FuzzyConceptSet pri(float p) {
+    public FuzzySensorSet pri(float p) {
         for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
             sensors.get(i).pri(p);
         }
@@ -119,7 +119,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
     }
 
     @NotNull
-    public FuzzyConceptSet resolution(float r) {
+    public FuzzySensorSet resolution(float r) {
         for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
             sensors.get(i).resolution(r);
         }
@@ -127,7 +127,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
     }
 
     @NotNull
-    public FuzzyConceptSet conf(float c) {
+    public FuzzySensorSet conf(float c) {
         this.conf = c;
         return this;
     }

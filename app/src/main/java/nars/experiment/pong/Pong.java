@@ -23,7 +23,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
-import nars.util.signal.FuzzyConceptSet;
+import nars.util.signal.FuzzySensorSet;
 import nars.util.signal.SensorConcept;
 import nars.video.NARCamera;
 import nars.video.SwingCamera;
@@ -197,30 +197,30 @@ public class Pong extends Player implements DiscreteEnvironment {
 
     }
 
-    public static FuzzyConceptSet bipolarNumericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+    public static FuzzySensorSet bipolarNumericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
         PolarRangeNormalizedFloat p = new PolarRangeNormalizedFloat(input);
         return rawNumericSensor(term, p, n, pri, low, mid, high);
     }
 
-    public static FuzzyConceptSet rawNumericSensor(FloatSupplier p, NAR n, float pri, String... states) {
-        return new FuzzyConceptSet(p, n, states).pri(pri).resolution(0.1f);
+    public static FuzzySensorSet rawNumericSensor(FloatSupplier p, NAR n, float pri, String... states) {
+        return new FuzzySensorSet(p, n, states).pri(pri).resolution(0.1f);
 //				"(" + term + " , " + low + ")",
 //				"(" + term + " , " + mid + ")",
 //				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
 
     }
 
-    public static FuzzyConceptSet numericSensor(FloatSupplier input, NAR n, float pri, String... states) {
+    public static FuzzySensorSet numericSensor(FloatSupplier input, NAR n, float pri, String... states) {
         RangeNormalizedFloat p = new RangeNormalizedFloat(input);
-        return new FuzzyConceptSet(p, n, states).pri(pri).resolution(0.1f);
+        return new FuzzySensorSet(p, n, states).pri(pri).resolution(0.1f);
 //				"(" + term + " , " + low + ")",
 //				"(" + term + " , " + mid + ")",
 //				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
 
     }
 
-    public static FuzzyConceptSet rawNumericSensor(String term, FloatSupplier p, NAR n, float pri, String low, String mid, String high) {
-        return new FuzzyConceptSet(p, n,
+    public static FuzzySensorSet rawNumericSensor(String term, FloatSupplier p, NAR n, float pri, String low, String mid, String high) {
+        return new FuzzySensorSet(p, n,
                 "(" + term + " --> " + low + ")",
                 "(" + term + " --> " + mid + ")",
                 "(" + term + " --> " + high + ")").pri(pri).resolution(0.1f);
@@ -230,18 +230,18 @@ public class Pong extends Player implements DiscreteEnvironment {
 
     }
 
-    public static FuzzyConceptSet rawNumericSensor(String term, String low, String high, NAR n, float pri, FloatSupplier p) {
-        return new FuzzyConceptSet(p, n,
+    public static FuzzySensorSet rawNumericSensor(String term, String low, String high, NAR n, float pri, FloatSupplier p) {
+        return new FuzzySensorSet(p, n,
                 "(" + term + " --> " + low + ")",
                 "(" + term + " --> " + high + ")").pri(pri).resolution(0.05f);
     }
 
-    public static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+    public static FuzzySensorSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
         RangeNormalizedFloat p = new RangeNormalizedFloat(input);
         return rawNumericSensor(term, p, n, pri, low, mid, high);
     }
 
-    public static FuzzyConceptSet numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri) {
+    public static FuzzySensorSet numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri) {
         RangeNormalizedFloat p = new RangeNormalizedFloat(input);
         return rawNumericSensor(term, low, high, n, pri, p);
     }

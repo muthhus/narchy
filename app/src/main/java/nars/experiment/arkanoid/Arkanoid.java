@@ -42,8 +42,8 @@ public class Arkanoid extends JFrame implements KeyListener {
 	private boolean running;
 
 	public final Paddle paddle = new Paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - PADDLE_HEIGHT);
-	private final Ball ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-	private final Collection<Brick> bricks = new ConcurrentSkipListSet<Brick>();
+	public final Ball ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	public final Collection<Brick> bricks = new ConcurrentSkipListSet<Brick>();
 
 	//private double lastFt;
 	//private double currentSlice;

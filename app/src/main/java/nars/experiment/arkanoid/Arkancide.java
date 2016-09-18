@@ -20,8 +20,11 @@ import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.Util;
+import nars.util.data.list.FasterList;
 import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.math.RangeNormalizedFloat;
+import nars.util.signal.FuzzySensorSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import nars.video.SwingCamera;
@@ -33,11 +36,13 @@ import spacegraph.obj.GridSurface;
 import spacegraph.obj.MatrixView;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.t;
+import static nars.experiment.pong.Pong.numericSensor;
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.experiment.tetris.Tetris.exe;
 import static nars.video.PixelCamera.decodeRed;
@@ -46,15 +51,15 @@ import static spacegraph.obj.GridSurface.VERTICAL;
 public class Arkancide extends NAgent {
 
     private static final int cyclesPerFrame = 3;
-    public static final int runFrames = 500;
+    public static final int runFrames = 5000;
     public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
     final Arkanoid noid;
     private SwingCamera cam;
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 14;
-    final int visH = 7;
+    final int visW = 32;
+    final int visH = 16;
     SensorConcept[][] ss;
 
     //private final int visionSyncPeriod = 16;
@@ -62,6 +67,7 @@ public class Arkancide extends NAgent {
 
     float paddleSpeed = 20f;
     private float prevScore;
+    private FasterList<SensorConcept> numberSensors;
 
     public class View {
         //public Surface camView;
@@ -99,7 +105,26 @@ public class Arkancide extends NAgent {
             }
         }
 
+        numberSensors = $.newArrayList();
 
+        numberSensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.paddle.x), n,
+                "(pad:x,0)",
+                "(pad:x,1)",
+                "(pad:x,2)"
+        ).resolution(0.05f).sensors );
+
+        numberSensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.ball.x), n,
+                "(ball:x,0)",
+                "(ball:x,1)",
+                "(ball:x,2)"
+        ).resolution(0.05f).sensors );
+
+        numberSensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.ball.y), n,
+                "(ball:y)"
+        ).resolution(0.05f).sensors );
+
+
+        sensors.addAll(numberSensors);
 
 //        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
 //                4, 8 /* states */,
@@ -166,6 +191,7 @@ public class Arkancide extends NAgent {
         //view.attention.add(nar.derivedActivation);
 
         newBeliefChartWindow(this, 200);
+        newBeliefChartWindow(nar, 200, numberSensors);
         HistogramChart.budgetChart(nar, 50);
 
         ControlSurface.newControlWindow(
@@ -187,6 +213,10 @@ public class Arkancide extends NAgent {
         GridSurface chart = newBeliefChart(nar, Lists.newArrayList(t), window);
         new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
     }
+    public static void newBeliefChartWindow(NAR nar, long window, List<? extends Termed> t) {
+        GridSurface chart = newBeliefChart(nar, t, window);
+        new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
+    }
 
     public static GridSurface newBeliefChart(NAgent narenv, long window) {
         NAR nar = narenv.nar;
@@ -206,7 +236,7 @@ public class Arkancide extends NAgent {
 
         return new GridSurface(VERTICAL, actionTables);
     }
-    public static GridSurface newBeliefChart(NAR nar, Collection<Termed> narenv, long window) {
+    public static GridSurface newBeliefChart(NAR nar, Collection<? extends Termed> narenv, long window) {
         long[] btRange = new long[2];
         nar.onFrame(nn -> {
             long now = nn.time();
