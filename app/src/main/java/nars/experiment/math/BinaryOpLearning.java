@@ -51,7 +51,6 @@ public class BinaryOpLearning extends NAgent {
 
         c = new CharMotor($.the("c"), this, W, vocab);
 
-        ticksBeforeObserve = timeSpacing;
     }
 
     public static class CharSensor {

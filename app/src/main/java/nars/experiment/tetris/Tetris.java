@@ -1,16 +1,17 @@
 package nars.experiment.tetris;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
 import nars.agent.NAgent;
+import nars.concept.Concept;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
-import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
@@ -18,18 +19,17 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.obj.IntTerm;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.time.Tense;
 import nars.truth.Truth;
-import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
-import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
-import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
@@ -39,10 +39,12 @@ import spacegraph.obj.MatrixView;
 import spacegraph.obj.Plot2D;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
+import static spacegraph.obj.GridSurface.HORIZONTAL;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
 /**
@@ -78,7 +80,7 @@ public class Tetris extends NAgent {
         public Surface plot1;
         public ConsoleSurface term = new ConsoleSurface(40, 8);
 
-        public Surface autoenc;
+        public Surface plot2;
         //public Plot2D lstm;
     }
 
@@ -397,7 +399,7 @@ public class Tetris extends NAgent {
 //            }
 //        });
 
-        float p = 0.005f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
@@ -474,8 +476,22 @@ public class Tetris extends NAgent {
 
             //STMView.show(stm, 800, 600);
 
-            view.plot1 = newCPanel(nar, 256, () -> t.rewardValue);
+            view.plot1 =
+                    newCPanel(nar, 256, () -> t.rewardValue);
 
+
+            view.plot2 = agentBudgetPlot(t, 256);
+            /*view.plot2 = new GridSurface(HORIZONTAL,
+                //conceptLinePlot(nar, Lists.newArrayList( t.happy, t.joy ), (c) -> nar.conceptPriority(c), 256),
+
+                conceptLinePlot(nar, t.actions, (c) -> {
+                    try {
+                        return nar.concept(c).goals().truth(nar.time()).freq();
+                    } catch (NullPointerException npe) {
+                        return 0.5f;
+                    }
+                }, 256)
+            );*/
 
 //                {
 //                    List<FloatSupplier> li = new ArrayList();
@@ -628,6 +644,12 @@ public class Tetris extends NAgent {
 //        });
     }
 
+    public static GridSurface agentBudgetPlot(NAgent t, int history) {
+        Default nar = (Default) t.nar;
+        return conceptLinePlot(t.nar,
+                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), nar::conceptPriority, history);
+    }
+
     public MatrixView.ViewFunc sensorMatrixView(NAR nar, long whenRelative) {
         return (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
@@ -708,6 +730,25 @@ public class Tetris extends NAgent {
         });
 
         return new GridSurface(VERTICAL, plot, plot1, plot2, plot3, plot4);
+    }
+
+    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, FloatFunction<Termed> value, int plotHistory) {
+
+        GridSurface grid = new GridSurface();
+        List<Plot2D> plots = $.newArrayList();
+        for (Termed t : concepts) {
+            Plot2D p = new Plot2D(plotHistory, Plot2D.Line);
+            p.add(t.toString(), ()->value.floatValueOf(t), 0f, 1f );
+            grid.children.add(p);
+            plots.add(p);
+        }
+        grid.layout();
+
+        nar.onFrame(f -> {
+            plots.forEach(Plot2D::update);
+        });
+
+        return grid;
     }
 
 //    public static class NARController extends NAgent {

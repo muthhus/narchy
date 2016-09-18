@@ -52,9 +52,9 @@ public class HistogramChart extends Surface {
 
     }
 
-    public static void budgetChart(NAR nar, int bins) {
-        new SpaceGraph().add(new Facial(
-                new GridSurface(VERTICAL,
+    public static GridSurface budgetChart(NAR nar, int bins) {
+        //new SpaceGraph().add(new Facial(
+                return new GridSurface(VERTICAL,
                     new HistogramChart(nar, c -> {
                         if (c!=null)
                             return c.pri();
@@ -65,8 +65,8 @@ public class HistogramChart extends Surface {
                             return c.dur();
                         return 0;
                     }, bins, new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f))
-                )
-            ).maximize()).show(800,600);
+                );
+          //  ).maximize()).show(800,600);
     }
 
     @Override

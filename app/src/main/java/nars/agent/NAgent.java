@@ -3,7 +3,6 @@ package nars.agent;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import nars.*;
-import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.nal.UtilityFunctions;
@@ -12,7 +11,6 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.PolarRangeNormalizedFloat;
@@ -22,14 +20,13 @@ import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.eclipse.collections.api.block.procedure.Procedure;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
 import static nars.agent.NAgentOld.varPct;
 import static nars.nal.UtilityFunctions.and;
@@ -61,7 +58,7 @@ abstract public class NAgent {
     public float gammaEpsilonFactor = 0.5f;
 
     final int curiosityMonitorDuration = 32; //frames
-    final DescriptiveStatistics motorDesireEvidence = new DescriptiveStatistics(curiosityMonitorDuration);
+    final DescriptiveStatistics actionDesireEvidence = new DescriptiveStatistics(curiosityMonitorDuration);
     final DescriptiveStatistics rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
 
 
@@ -74,24 +71,32 @@ abstract public class NAgent {
 
     public boolean trace = false;
 
-    protected int ticksBeforeObserve;
-    int ticksBeforeDecide;
+
+    /** >=0 : additional NAR frames that are computed between each Agent frame */
+    final int decisionFrames;
+
     protected long now;
     private long stopTime;
     private NARLoop loop;
-    private Budget boostBudget, curiosityBudget;
+
 
     //private float curiosityAttention;
     private float rewardSum = 0;
     private MutableFloat sensorPriority;
     private MutableFloat rewardPriority;
-
+    private MutableFloat minSensorPriority;
+    private MutableFloat minRewardPriority;
 
     public NAgent(NAR nar) {
+        this(nar, 0);
+    }
+
+    public NAgent(NAR nar, int decisionFrames) {
+
         this.nar = nar;
         alpha = this.nar.confidenceDefault(Symbols.BELIEF);
         gamma = this.nar.confidenceDefault(Symbols.GOAL);
-
+        this.decisionFrames = decisionFrames;
 
         float rewardConf = alpha;
 
@@ -121,18 +126,17 @@ abstract public class NAgent {
      */
     protected abstract float act();
 
-    protected void next() {
+    protected void frame() {
 
-        for (int i = 0; i < ticksBeforeObserve; i++)
-            nar.clock.tick();
+        updateActionDesire();
 
-        reinforce();
+        curiosity();
 
-        for (int i = 0; i < ticksBeforeDecide; i++)
-            nar.clock.tick();
+        //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
+        predict();
 
-        now = nar.time();
+        tick(decisionFrames);
 
         float r = rewardValue = act();
         rewardSum += r;
@@ -148,6 +152,12 @@ abstract public class NAgent {
                 this.loop = null;
             }
         }
+    }
+
+    private void tick(int narFrames) {
+        for (int i = 0; i < narFrames; i++)
+            nar.clock.tick();
+        now = nar.time();
     }
 
     public String summary() {
@@ -180,9 +190,9 @@ abstract public class NAgent {
     }
 
 
-    protected void mission() {
+    protected void init() {
 
-        int dt = 1 + ticksBeforeObserve + ticksBeforeDecide;
+        int dt = 1 + decisionFrames;
         //this.curiosityAttention = reinforcementAttention / actions.size();
 
 
@@ -204,9 +214,12 @@ abstract public class NAgent {
         /** attention per each reward */
         rewardPriority = new MutableFloat(nar.priorityDefault(Symbols.BELIEF));
 
-        SensorConcept.attentionGroup(sensors, sensorPriority, nar);
-        //SensorConcept.attentionGroup(actions, actionPriority, nar);
-        SensorConcept.attentionGroup(Lists.newArrayList(happy, joy), rewardPriority, nar);
+        minRewardPriority = new MutableFloat(nar.priorityDefault(Symbols.BELIEF) * 0.5f /* estimate */);
+        minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 4 /* to be safe */);
+
+        SensorConcept.attentionGroup(sensors, minSensorPriority, sensorPriority, nar);
+        SensorConcept.attentionGroup(newArrayList(happy, joy), minRewardPriority, rewardPriority, nar);
+        //SensorConcept.attentionGroup(actions, minSensorPriority, actionPriority, nar);
 
 
         //@NotNull Term what = $.$("?w"); //#w
@@ -267,7 +280,7 @@ abstract public class NAgent {
 
             predictors.addAll(
                     new MutableTask($.seq(action, dt, happiness), '?', null).present(now),
-                    new MutableTask($.seq(action, dt, $.neg(happiness)), '?', null).present(now),
+                    //new MutableTask($.seq(action, dt, $.neg(happiness)), '?', null).present(now),
                     new MutableTask($.impl(action, dt, happiness), '?', null).present(now),
                     new MutableTask($.impl(action, dt, $.neg(happiness)), '?', null).present(now),
 //                    new MutableTask($.seq(action, dt * 2, happiness), '?', null).present(now),
@@ -326,87 +339,74 @@ abstract public class NAgent {
         if (this.loop != null)
             throw new UnsupportedOperationException();
 
-        ticksBeforeDecide = 0;
-        ticksBeforeObserve = 0;
-
         nar.runLater(() -> {
 
-            mission();
+            init();
 
-            nar.onFrame(nn -> next());
+            nar.onFrame(nn -> frame());
         });
     }
 
-    protected void reinforce() {
-        long now = nar.time();
 
-        //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
+    private void curiosity() {
+        Budget curiosityBudget = Budget.One.clone().multiplied(minSensorPriority.floatValue(), 0.5f, 0.9f);
 
-        float reinforcementAttention =
-                UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
-//                        //
-                        / (predictors.size()/predictorProbability) * predictorPriFactor;
-//                        // /(actions.size()+sensors.size());
+        float motorEpsilonProbability = epsilonProbability / actions.size() * (1f - (desireConf() / gamma));
+        for (MotorConcept c : actions) {
+            if (nar.random.nextFloat() < motorEpsilonProbability) {
+                nar.inputLater(
+                    new GeneratedTask(c, Symbols.GOAL,
+                            $.t(nar.random.nextFloat()
+                                //Math.random() > 0.5f ? 1f : 0f
+                                , Math.max(nar.truthResolution.floatValue(), nar.random.nextFloat() * gamma * gammaEpsilonFactor)))
+                                .time(now, now).budget(curiosityBudget).log("Curiosity"));
 
-        if (reinforcementAttention > 0) {
-
-            boostBudget = Budget.One.clone().multiplied(reinforcementAttention, 0.5f, 0.9f);
-            curiosityBudget = Budget.One.clone().multiplied(0, 0.5f, 0.9f);
-
-            //boost(happy);
-            //boost(happy); //boosted by the (happy)! task that is boosted below
-            //boost(sad);
-
-            float m = 0;
-            int a = actions.size();
-            for (MotorConcept c : actions) {
-                Truth d = c.desire(now);
-                if (d != null)
-                    m += d.confWeight();
-            }
-            motorDesireEvidence.addValue(w2c(m));
-
-
-            float motorEpsilonProbability = epsilonProbability / a * (1f - (desireConf() / gamma));
-            for (MotorConcept c : actions) {
-                if (nar.random.nextFloat() < motorEpsilonProbability) {
-                    nar.inputLater(
-                            new GeneratedTask(c, Symbols.GOAL,
-                                    $.t(nar.random.nextFloat()
-                                            //Math.random() > 0.5f ? 1f : 0f
-                                            , Math.max(nar.truthResolution.floatValue(), nar.random.nextFloat() * gamma * gammaEpsilonFactor)))
-
-                                    //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
-                    /* {
-                        @Override
-                        public boolean onConcept(@NotNull Concept c) {
-                            if (super.onConcept(c)) {
-                                //self-destruct later
-                                nar.runLater(()->{
-                                    delete();
-                                });
-                                return true;
-                            }
-                            return false;
+                                //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
+                /* {
+                    @Override
+                    public boolean onConcept(@NotNull Concept c) {
+                        if (super.onConcept(c)) {
+                            //self-destruct later
+                            nar.runLater(()->{
+                                delete();
+                            });
+                            return true;
                         }
-                    }*/.
-                                    time(now, now).budget(curiosityBudget).log("Curiosity"));
+                        return false;
+                    }
+                }*/
 
-                }
-
-                //boost(c);
             }
 
-            predictors.forEach((Procedure<Task>) this::boost);
-
-
+            //boost(c);
         }
+    }
 
+    private void updateActionDesire() {
+        float m = 0;
+        int a = actions.size();
+        for (MotorConcept c : actions) {
+            Truth d = c.desire(now);
+            if (d != null)
+                m += d.confWeight();
+        }
+        actionDesireEvidence.addValue(w2c(m));
+    }
 
+    protected void predict() {
+
+        float pri =
+                UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
+                        / (predictors.size()/predictorProbability) * predictorPriFactor;
+
+        Budget boostBudget = Budget.One.clone().multiplied(pri, 0.5f, 0.9f);
+        predictors.forEach(t -> {
+            boost(t, boostBudget);
+        });
     }
 
     public float desireConf() {
-        return Math.min(1f, ((float) motorDesireEvidence.getMean()));
+        return Math.min(1f, ((float) actionDesireEvidence.getMean()));
     }
 
 //    @Nullable
@@ -425,7 +425,7 @@ abstract public class NAgent {
 //    }
 
 
-    private void boost(@NotNull Task t) {
+    private void boost(@NotNull Task t, Budget budget) {
 
         if (nar.random.nextFloat() > predictorProbability)
             return; //ignore this one
@@ -436,7 +436,7 @@ abstract public class NAgent {
             nar.inputLater(
                     new GeneratedTask(t.term(), t.punc(), t.truth())
                             .time(now, now + lookAhead)
-                            .budget(boostBudget).log("Agent Predictor"));
+                            .budget(budget).log("Agent Predictor"));
 
         } else {
             //re-use existing eternal task; first recharge budget
@@ -447,7 +447,7 @@ abstract public class NAgent {
             nar.inputLater(
                     new GeneratedTask(t.term(), t.punc(), t.truth())
                             .time(now, ETERNAL)
-                            .budget(boostBudget).log("Agent Predictor"));
+                            .budget(budget).log("Agent Predictor"));
         }
 
     }

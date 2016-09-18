@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.agent.NAgent;
 import nars.experiment.tetris.Tetris;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
@@ -76,15 +77,20 @@ public class Arkancide extends NAgent {
     }
     private final View view = new View();
 
+    public static int DECISION_FRAMES = 1;
+
     public Arkancide(NAR nar) {
-        super(nar);
+        super(nar, DECISION_FRAMES);
+
         noid = new Arkanoid();
-        ss = new SensorConcept[visW][visH];
+
 
 
         cam = new SwingCamera(noid, visW, visH);
         cam.update();
 
+        //TODO extract this section and associated variables to a CameraSensorMatrix class or something
+        ss = new SensorConcept[visW][visH];
         for (int x = 0; x < visW; x++) {
             int xx = x;
             for (int y = 0; y < visH; y++) {
@@ -153,7 +159,7 @@ public class Arkancide extends NAgent {
             float maxConceptPriority = ((Default)nar).core.concepts.priMax(); //TODO cache this
             float p = nar.conceptPriority(s);
             p /= maxConceptPriority;
-            g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
+            g.glColor4f(dr, dg, bf, 0.75f + 0.25f * p);
 
             return ((b!=null ? b.conf() : 0) + (d!=null ? d.conf() : 0))/4f;
 
@@ -185,6 +191,7 @@ public class Arkancide extends NAgent {
 
         newBeliefChartWindow(this, 200);
         HistogramChart.budgetChart(nar, 50);
+        BagChart.show((Default) nar);
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),

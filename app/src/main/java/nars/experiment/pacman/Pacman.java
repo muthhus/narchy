@@ -42,6 +42,8 @@ import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.Facial;
+import spacegraph.SpaceGraph;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -266,7 +268,10 @@ public class Pacman extends NAgent {
 //
 //          //new BeliefTableChart(nar, charted).show(700, 900);
         BeliefTableChart.newBeliefChart(nar, charted, 500);
-        HistogramChart.budgetChart(nar, 50);
+        SpaceGraph.window(HistogramChart.budgetChart(nar, 50), 200, 600);
+        SpaceGraph.window(agentBudgetPlot(this, 256) , 500, 400);
+
+
 
 ////
         //BagChart.show((Default) nar, 512);
@@ -309,14 +314,14 @@ public class Pacman extends NAgent {
         nar.goalConfidence(0.7f);
 
         float pMult = 0.01f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.25f * pMult;
-        nar.DEFAULT_GOAL_PRIORITY = 0.35f * pMult;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.15f * pMult;
-        nar.DEFAULT_QUEST_PRIORITY = 0.15f * pMult;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * pMult;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * pMult;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * pMult;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
         nar.confMin.setValue(0.04f);
-        nar.compoundVolumeMax.set(16);
+        nar.compoundVolumeMax.set(24);
         //nar.truthResolution.setValue(0.02f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");

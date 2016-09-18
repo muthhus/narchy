@@ -41,7 +41,7 @@ public class GridSurface extends LayoutSurface {
 
 
     @Override
-    protected void layout() {
+    public void layout() {
 
         int n = children.size();
         if (n == 0)

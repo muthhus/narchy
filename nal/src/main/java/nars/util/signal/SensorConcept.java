@@ -208,8 +208,8 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     }
 
 
-    public static void attentionGroup(List<SensorConcept> sensors, MutableFloat limit, NAR nar) {
-        attentionGroup(sensors, (cp) -> Util.clamp( Param.BUDGET_EPSILON + limit.floatValue() * cp), nar);
+    public static void attentionGroup(List<SensorConcept> sensors, MutableFloat min, MutableFloat limit, NAR nar) {
+        attentionGroup(sensors, (cp) -> Util.clamp( min.floatValue() + limit.floatValue() * cp), nar);
     }
 
     /** adaptively sets the priority of a group of sensors via a function  */
