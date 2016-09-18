@@ -8,6 +8,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -39,6 +40,15 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             return; //avoids reprocessing the same
 
         super.accept(task, nar);
+    }
+
+    @Override
+    protected Task clone(@NotNull Task original, Compound c) {
+        Task t = super.clone(original, c);
+        if (t!=null) {
+            t.budget().setPriority(t.pri()*t.pri()); //shrink
+        }
+        return t;
     }
 
     final static int ConjOrStatementBits = Op.StatementBits | Op.CONJ.bit;

@@ -9,6 +9,7 @@ import nars.agent.NAgent;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
+import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -58,11 +59,11 @@ public class Tetris extends NAgent {
 //    public static final Executioner exe4 =
 //            new MultiThreadExecutioner(4, 1024*32);
 
-    public static final int runFrames = 555;
-    public static final int cyclesPerFrame = 2;
+    public static final int runFrames = 5550;
+    public static final int cyclesPerFrame = 12;
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 3;
+    public static final int TIME_PER_FALL = 5;
     static boolean easy;
 
     static int frameDelay;
@@ -371,10 +372,10 @@ public class Tetris extends NAgent {
         //Multi nar = new Multi(3,512,
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                128, 2, 2, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                32, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
+                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
                 new FrameClock(), e
         );
 
@@ -404,7 +405,7 @@ public class Tetris extends NAgent {
 
         nar.confMin.setValue(0.02f);
 
-        nar.compoundVolumeMax.setValue(35);
+        nar.compoundVolumeMax.setValue(16);
         //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);

@@ -55,17 +55,17 @@ import static nars.experiment.tetris.Tetris.*;
 public class Pacman extends NAgent {
 
     final cpcman pacman;
-    public static final int cyclesPerFrame = 4;
+    public static final int cyclesPerFrame = 8;
 
     final int visionRadius;
     final int itemTypes = 3;
-    final static int runCycles = 50000;
+    final static int runCycles = 5000;
 
 
     final int inputs;
 
     private final int pacmanCyclesPerFrame = 1;
-    int pacMovesPerCycle = 3;
+    int pacMovesPerCycle = 6;
 
     float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
     public float scoretoReward = 1f;
@@ -99,7 +99,7 @@ public class Pacman extends NAgent {
                 //new SingleThreadExecutioner();
 
         Default nar = new Default(1024,
-                64, 2, 3, rng,
+                16, 2, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
                 new FrameClock(), e
@@ -110,9 +110,9 @@ public class Pacman extends NAgent {
         //new MemoryManager(nar);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.7f);
 
-        float pMult = 0.005f;
+        float pMult = 0.01f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.25f * pMult;
         nar.DEFAULT_GOAL_PRIORITY = 0.35f * pMult;
         nar.DEFAULT_QUESTION_PRIORITY = 0.15f * pMult;
@@ -120,7 +120,7 @@ public class Pacman extends NAgent {
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
         nar.confMin.setValue(0.04f);
-        nar.compoundVolumeMax.set(24);
+        nar.compoundVolumeMax.set(16);
         //nar.truthResolution.setValue(0.02f);
 
         //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -150,7 +150,7 @@ public class Pacman extends NAgent {
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
 
-        Pacman pacman = new Pacman(nar, 2 /* ghosts  */, 4 /* visionRadius */);
+        Pacman pacman = new Pacman(nar, 7 /* ghosts  */, 6 /* visionRadius */);
         pacman.trace = true;
 
 

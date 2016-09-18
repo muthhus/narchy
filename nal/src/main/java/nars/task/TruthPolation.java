@@ -143,7 +143,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             //return 1f / (1f + (dt/duration)*(dt/duration));
             //return 1f / (1f + (dt / duration));
             //return 1f / (float)Math.log(dt/duration + Math.E);
-            return 1f / (dt*dt/duration + 1f);
+            return 1f / (dt/duration + 1f);
         };
 
         float[] v = this.value(

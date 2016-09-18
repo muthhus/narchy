@@ -6,8 +6,10 @@ import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.agent.NAgent;
+import nars.experiment.tetris.Tetris;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
+import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -36,22 +38,23 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.t;
+import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.experiment.tetris.Tetris.exe;
 import static nars.video.PixelCamera.decodeRed;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
 public class Arkancide extends NAgent {
 
-    private static final int cyclesPerFrame = 1;
-    public static final int runFrames = 50000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 256;
+    private static final int cyclesPerFrame = 3;
+    public static final int runFrames = 500;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
     final Arkanoid noid;
     private SwingCamera cam;
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 28;
-    final int visH = 14;
+    final int visW = 14;
+    final int visH = 7;
     SensorConcept[][] ss;
 
     //private final int visionSyncPeriod = 16;
@@ -238,8 +241,8 @@ public class Arkancide extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), INDEX_SIZE, false, exe)
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 8192, 2)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
+                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 8192, 2)
 
                 , new FrameClock(), exe);
 
@@ -247,7 +250,7 @@ public class Arkancide extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.7f);
 
-        float p = 0.04f;
+        float p = 0.25f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
@@ -255,7 +258,7 @@ public class Arkancide extends NAgent {
 
         nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.confMin.setValue(0.05f);
-        nar.compoundVolumeMax.setValue(36);
+        nar.compoundVolumeMax.setValue(30);
         //nar.truthResolution.setValue(0.04f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {

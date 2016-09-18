@@ -30,10 +30,7 @@ import static nars.truth.TruthFunctions.c2w;
  */
 public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
-    static final int MAX_TRUTHPOLATION_SIZE = 32;
-    static final ThreadLocal<TruthPolation> truthpolations = ThreadLocal.withInitial(() -> {
-        return new TruthPolation(MAX_TRUTHPOLATION_SIZE);
-    });
+
 
     private volatile int capacity;
     final MultiReaderFastList<Task> list;
@@ -394,7 +391,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         } else {
             final Truth[] tt = new Truth[1];
             list.withReadLockAndDelegate(l ->
-                    tt[0] = truthpolations.get().truth(when, now,
+
+                    tt[0] = new TruthPolation(l.size()).truth(when, now,
                             topEternal != null ?
                                     concat(l.iterator(), singletonIterator(topEternal)) :
                                     l.iterator()

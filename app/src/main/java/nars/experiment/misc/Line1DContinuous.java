@@ -189,8 +189,8 @@ public class Line1DContinuous extends NAgent {
     public static void main(String[] args) {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-        int cyclesPerFrame = 1;
-        int conceptsPerCycle = 120;
+        int cyclesPerFrame = 8;
+        int conceptsPerCycle = 16;
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
@@ -204,24 +204,25 @@ public class Line1DContinuous extends NAgent {
 
         nar.cyclesPerFrame.setValue(cyclesPerFrame);
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.95f);
+        nar.goalConfidence(0.7f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.02f;
         nar.DEFAULT_GOAL_PRIORITY = 0.02f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.01f;
         nar.DEFAULT_QUEST_PRIORITY = 0.01f;
 
-        nar.compoundVolumeMax.set(25);
+        nar.compoundVolumeMax.set(16);
 
-        Line1DContinuous l = new Line1DContinuous(nar, 16,
-                sine(160)
+        Line1DContinuous l = new Line1DContinuous(nar, 6,
+                sine(55)
                 //random(120)
         );
         l.print = true;
-        l.runSync(15000);
+        l.runSync(1500);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
+        System.out.println("AVG SCORE=" + l.rewardSum()/ nar.time());
     }
 
 }

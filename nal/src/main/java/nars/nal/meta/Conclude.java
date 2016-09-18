@@ -106,7 +106,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         try {
             r = m.index.transform(this.conclusionPattern, m);
         } catch (InvalidTermException e) {
-            logger.error("Term: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);
+            if (Param.DEBUG_EXTRA)
+                logger.error("Term: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);
             return true;
         }
 
