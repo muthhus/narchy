@@ -45,6 +45,13 @@ public class BinaryOpLearning extends NAgent {
 
     public BinaryOpLearning(NAR nar) {
         super(nar);
+
+        a = new CharSensor($.the("a"), this, W, vocab);
+        b = new CharSensor($.the("b"), this, W, vocab);
+
+        c = new CharMotor($.the("c"), this, W, vocab);
+
+        ticksBeforeObserve = timeSpacing;
     }
 
     public static class CharSensor {
@@ -225,15 +232,6 @@ public class BinaryOpLearning extends NAgent {
 
     final DescriptiveStatistics rMean = new DescriptiveStatistics((period+1)*5); //reward mean
 
-    @Override
-    protected void init(NAR n) {
-        a = new CharSensor($.the("a"), this, W, vocab);
-        b = new CharSensor($.the("b"), this, W, vocab);
-
-        c = new CharMotor($.the("c"), this, W, vocab);
-
-        ticksBeforeObserve = timeSpacing;
-    }
 
 
 

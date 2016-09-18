@@ -10,9 +10,12 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.data.Sensor;
 import nars.util.math.FloatSupplier;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -202,6 +205,18 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     @Override
     protected BeliefTable newBeliefTable(int eCap, int tCap) {
         return new SensorBeliefTable(tCap);
+    }
+
+
+    public static void attentionGroup(List<SensorConcept> sensors, MutableFloat limit, NAR nar) {
+        attentionGroup(sensors, (cp) -> Util.clamp( Param.BUDGET_EPSILON + limit.floatValue() * cp), nar);
+    }
+
+    /** adaptively sets the priority of a group of sensors via a function  */
+    public static void attentionGroup(List<SensorConcept> sensors, FloatToFloatFunction conceptPriToTaskPri, NAR nar) {
+        sensors.forEach( s -> s.pri(() -> {
+            return conceptPriToTaskPri.valueOf(nar.conceptPriority(s));
+        } ) );
     }
 
     private final class SensorBeliefTable extends DefaultBeliefTable {

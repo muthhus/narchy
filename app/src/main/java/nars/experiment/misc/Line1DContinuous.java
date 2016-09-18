@@ -38,16 +38,11 @@ public class Line1DContinuous extends NAgent {
     float speed = 1f;
     final float[] ins;
 
-    public Line1DContinuous(NAR nar, int size, IntToFloatFunction target) {
-        super(nar);
+    public Line1DContinuous(NAR n, int size, IntToFloatFunction target) {
+        super(n);
         this.size = size;
         ins = new float[size*2];
         this.targetFunc = target;
-    }
-
-    @Override
-    protected void init(NAR n) {
-
 
         yEst = size/2; //NAR estimate of Y
         yHidden = size/2; //actual best Y used by loss function

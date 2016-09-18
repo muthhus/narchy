@@ -84,6 +84,202 @@ public class Pacman extends NAgent {
         };
         this.visionRadius = visionRadius;
         this.inputs = (int) Math.pow(visionRadius * 2 + 1, 2) * itemTypes;
+
+        FloatToObjectFunction<Truth> truther = (f) -> $.t(f, alpha);
+
+//			int pix = pac.iX / 16;
+//			int piy = pac.iY / 16;
+        for (int ii = -visionRadius; ii <= +visionRadius; ii++) {
+            for (int jj = -visionRadius; jj <= +visionRadius; jj++) {
+
+
+
+                int i = ii;
+                int j = jj;
+
+                sensors.add(new SensorConcept( $.inh($.p(i, j), $.the("wall")), nar,
+                        () -> {
+                            return at(i, j)==cmaze.WALL ? 1f : 0;
+                        },
+                        truther));
+                sensors.add(new SensorConcept( $.inh($.p(i, j), $.the("dot")), nar,
+                        () -> {
+                            int v = at(i, j);
+                            float dotness = 0;
+                            switch (v) {
+                                case cmaze.DOT:
+                                    dotness = 0.85f;
+                                    break;
+                                case cmaze.POWER_DOT:
+                                    dotness = 1f;
+                                    break;
+                            }
+                            return dotness;
+                        },
+                        truther));
+                sensors.add(new SensorConcept( $.inh($.p(i, j), $.the("ghost")), nar,
+                        () -> {
+                            int pix = Math.round(pacman.pac.iX / 16f);
+                            int piy = Math.round(pacman.pac.iY / 16f);
+                            int px = i+pix;
+                            int py = j+piy;
+
+                            for (int i1 = 0, ghostsLength = pacman.ghosts.length; i1 < ghostsLength; i1++) {
+                                cghost g = pacman.ghosts[i1];
+//							int ix = g.iX / 16;
+//							int iy = g.iY / 16;
+                                int ix = Math.round(g.iX / 16f);
+                                int iy = Math.round(g.iY / 16f);
+                                if (ix == px && iy == py) {
+                                    return 1;
+                                }
+                            }
+                            return 0;
+                        },
+                        truther));
+
+            }
+
+
+        }
+        //System.out.println(Arrays.toString(ins));
+
+//			//noise
+//			if (Math.random() < 0.1) {
+//				float noiselevel = 0.1f;
+//				for (int i = 0; i < ins.length; i++) {
+//					ins[i] = Util.clamp(ins[i] + (float) ((Math.random() - 0.5) * 2) * noiselevel);
+//				}
+//			}
+
+
+        @Nullable Truth zero = $.t(0.5f, alpha);
+
+        actions.add(new MotorConcept("(leftright)",nar,(b,d)->{
+            if (d!=null) {
+
+                float f =
+                        //d.expectation();
+                        d.freq();
+                int sc = Math.round(2f * (f -0.5f) * pacMovesPerCycle);
+                if (sc < 0) {
+                    if (!pacman.pac.move(ctables.LEFT, -sc, pacman))
+                        return zero;
+                } else if (sc > 0) {
+                    if (!pacman.pac.move(ctables.RIGHT, sc, pacman))
+                        return zero;
+                } else {
+                    return zero;
+                }
+                //return d;
+                return d.withConf(alpha);
+            }
+            return null;
+        }));
+        actions.add(new MotorConcept("(updown)",nar,(b,d)->{
+            if (d!=null) {
+                float f =
+                        //d.expectation();
+                        d.freq();
+
+                int sc = Math.round(2f * (f-0.5f) * pacMovesPerCycle);
+                if (sc < 0) {
+                    if (!pacman.pac.move(ctables.UP, -sc, pacman))
+                        return zero;
+                } else if (sc > 0) {
+                    if (!pacman.pac.move(ctables.DOWN, sc, pacman))
+                        return zero;
+                } else {
+                    return zero;
+                }
+                //return d;
+                return d.withConf(alpha);
+            }
+            return null;
+        }));
+
+
+        List<Termed> charted = new ArrayList(super.actions);
+
+        charted.add(happy);
+
+//				charted.add(nar.activate($.$("[pill]"), UnitBudget.Zero));
+//				charted.add(nar.activate($.$("[ghost]"), UnitBudget.Zero));
+
+        //PAC GPS global positioining
+//        Iterable<Termed> cheats = Iterables.concat(
+//                numericSensor(() -> pacman.pac.iX, nar, 0.3f,
+//                        "(pacX)").resolution(0.1f),
+//                numericSensor(() -> pacman.pac.iY, nar, 0.3f,
+//                        "(pacY)").resolution(0.1f)
+//        );
+        //Iterables.addAll(charted, cheats);
+
+        //charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
+        //charted.add(nar.ask($.$("((I-->be_happy) <=> (I-->happy))")).term());
+
+//				charted.add(nar.ask($.$("((a0) &&+2 (happy))")).term());
+//				charted.add(nar.ask($.$("((a1) &&+2 (happy))")).term());
+//				charted.add(nar.ask($.$("((a2) &&+2 (happy))")).term());
+//				charted.add(nar.ask($.$("((a3) &&+2 (happy))")).term());
+//				charted.add(nar.ask($.$("((a0) &&+2 (sad))")).term());
+//				charted.add(nar.ask($.$("((a1) &&+2 (sad))")).term());
+//				charted.add(nar.ask($.$("((a2) &&+2 (sad))")).term());
+//				charted.add(nar.ask($.$("((a3) &&+2 (sad))")).term());
+
+
+        //NAL9 emotion feedback loop
+//				Iterables.addAll(charted,
+//					bipolarNumericSensor(nar.self.toString(),
+//						"be_sad", "be_neutral", "be_happy", nar, ()->(float)(Util.sigmoid(nar.emotion.happy())-0.5f)*2f, 0.5f).resolution(0.1f));
+
+//				Iterables.addAll(charted,
+//						numericSensor(nar.self.toString(),
+//								"unmotivationed", "motivated", nar, ()->(float)nar.emotion.motivation.getSum(), 0.5f).resolution(0.1f));
+
+////				{
+//					List<FloatSupplier> li = new ArrayList();
+//					for (int i = 0; i < this.inputs.size(); i++) {
+//						li.add( this.inputs.get(i).getInput() );
+//					}
+////					for (int i = 0; i < cheats.size(); i++) {
+////						FloatSupplier ci = cheats.get(i).getInput();
+////						//li.add( new DelayedFloat(ci, 2) );
+////						//li.add( new DelayedFloat(new RangeNormalizedFloat(()->reward), 1) );
+////						li.add( ci );
+////					}
+//					List<FloatSupplier> lo = new ArrayList();
+//					RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> reward);
+//					lo.add(normReward);
+////
+////
+//					LSTMPredictor lp = new LSTMPredictor(li, lo, 1);
+////
+//					nar.onFrame(nn->{
+//						double[] p = lp.next();
+//						System.out.println(Texts.n4(p) + " , " + normReward.asFloat() );
+//					});
+////				}
+
+
+//        if (nar instanceof Default) {
+//
+//          //new BeliefTableChart(nar, charted).show(700, 900);
+        BeliefTableChart.newBeliefChart(nar, charted, 500);
+        HistogramChart.budgetChart(nar, 50);
+
+////
+        //BagChart.show((Default) nar, 512);
+////
+//            //STMView.show(stm, 500, 500);
+//
+//            //TimeSpace.newTimeWindow((Default)nar, 128);
+//            //NARSpace.newConceptWindow((Default) nar, 128, 6);
+//
+//
+//        }
+
+
     }
 
 
@@ -216,207 +412,6 @@ public class Pacman extends NAgent {
 //		});
     }
 
-    @Override
-    protected void init(NAR n) {
-
-
-        FloatToObjectFunction<Truth> truther = (f) -> $.t(f, alpha);
-
-//			int pix = pac.iX / 16;
-//			int piy = pac.iY / 16;
-            for (int ii = -visionRadius; ii <= +visionRadius; ii++) {
-                for (int jj = -visionRadius; jj <= +visionRadius; jj++) {
-
-
-
-                    int i = ii;
-                    int j = jj;
-
-                    sensors.add(new SensorConcept( $.inh($.p(i, j), $.the("wall")), nar,
-                            () -> {
-                                return at(i, j)==cmaze.WALL ? 1f : 0;
-                            },
-                            truther));
-                    sensors.add(new SensorConcept( $.inh($.p(i, j), $.the("dot")), nar,
-                            () -> {
-                                int v = at(i, j);
-                                float dotness = 0;
-                                switch (v) {
-                                    case cmaze.DOT:
-                                        dotness = 0.85f;
-                                        break;
-                                    case cmaze.POWER_DOT:
-                                        dotness = 1f;
-                                        break;
-                                }
-                                return dotness;
-                            },
-                            truther));
-                    sensors.add(new SensorConcept( $.inh($.p(i, j), $.the("ghost")), nar,
-                            () -> {
-                                int pix = Math.round(pacman.pac.iX / 16f);
-                                int piy = Math.round(pacman.pac.iY / 16f);
-                                int px = i+pix;
-                                int py = j+piy;
-
-                                cghost[] ghosts = pacman.ghosts;
-                                for (int i1 = 0, ghostsLength = ghosts.length; i1 < ghostsLength; i1++) {
-                                    cghost g = ghosts[i1];
-//							int ix = g.iX / 16;
-//							int iy = g.iY / 16;
-                                    int ix = Math.round(g.iX / 16f);
-                                    int iy = Math.round(g.iY / 16f);
-                                    if (ix == px && iy == py) {
-                                        return 1;
-                                    }
-                                }
-                                return 0;
-                            },
-                            truther));
-
-                }
-
-
-            }
-            //System.out.println(Arrays.toString(ins));
-
-//			//noise
-//			if (Math.random() < 0.1) {
-//				float noiselevel = 0.1f;
-//				for (int i = 0; i < ins.length; i++) {
-//					ins[i] = Util.clamp(ins[i] + (float) ((Math.random() - 0.5) * 2) * noiselevel);
-//				}
-//			}
-
-
-        @Nullable Truth zero = $.t(0.5f, alpha);
-
-        actions.add(new MotorConcept("(leftright)",nar,(b,d)->{
-            if (d!=null) {
-
-                float f =
-                        //d.expectation();
-                        d.freq();
-                int sc = Math.round(2f * (f -0.5f) * pacMovesPerCycle);
-                if (sc < 0) {
-                    if (!pacman.pac.move(ctables.LEFT, -sc, pacman))
-                        return zero;
-                } else if (sc > 0) {
-                    if (!pacman.pac.move(ctables.RIGHT, sc, pacman))
-                        return zero;
-                } else {
-                    return zero;
-                }
-                //return d;
-                return d.withConf(alpha);
-            }
-            return null;
-        }));
-        actions.add(new MotorConcept("(updown)",nar,(b,d)->{
-            if (d!=null) {
-                float f =
-                        //d.expectation();
-                        d.freq();
-
-                int sc = Math.round(2f * (f-0.5f) * pacMovesPerCycle);
-                if (sc < 0) {
-                    if (!pacman.pac.move(ctables.UP, -sc, pacman))
-                        return zero;
-                } else if (sc > 0) {
-                    if (!pacman.pac.move(ctables.DOWN, sc, pacman))
-                        return zero;
-                } else {
-                    return zero;
-                }
-                //return d;
-                return d.withConf(alpha);
-            }
-            return null;
-        }));
-
-
-        List<Termed> charted = new ArrayList(super.actions);
-
-        charted.add(happy);
-
-//				charted.add(nar.activate($.$("[pill]"), UnitBudget.Zero));
-//				charted.add(nar.activate($.$("[ghost]"), UnitBudget.Zero));
-
-        //PAC GPS global positioining
-//        Iterable<Termed> cheats = Iterables.concat(
-//                numericSensor(() -> pacman.pac.iX, nar, 0.3f,
-//                        "(pacX)").resolution(0.1f),
-//                numericSensor(() -> pacman.pac.iY, nar, 0.3f,
-//                        "(pacY)").resolution(0.1f)
-//        );
-        //Iterables.addAll(charted, cheats);
-
-        //charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
-        //charted.add(nar.ask($.$("((I-->be_happy) <=> (I-->happy))")).term());
-
-//				charted.add(nar.ask($.$("((a0) &&+2 (happy))")).term());
-//				charted.add(nar.ask($.$("((a1) &&+2 (happy))")).term());
-//				charted.add(nar.ask($.$("((a2) &&+2 (happy))")).term());
-//				charted.add(nar.ask($.$("((a3) &&+2 (happy))")).term());
-//				charted.add(nar.ask($.$("((a0) &&+2 (sad))")).term());
-//				charted.add(nar.ask($.$("((a1) &&+2 (sad))")).term());
-//				charted.add(nar.ask($.$("((a2) &&+2 (sad))")).term());
-//				charted.add(nar.ask($.$("((a3) &&+2 (sad))")).term());
-
-
-        //NAL9 emotion feedback loop
-//				Iterables.addAll(charted,
-//					bipolarNumericSensor(nar.self.toString(),
-//						"be_sad", "be_neutral", "be_happy", nar, ()->(float)(Util.sigmoid(nar.emotion.happy())-0.5f)*2f, 0.5f).resolution(0.1f));
-
-//				Iterables.addAll(charted,
-//						numericSensor(nar.self.toString(),
-//								"unmotivationed", "motivated", nar, ()->(float)nar.emotion.motivation.getSum(), 0.5f).resolution(0.1f));
-
-////				{
-//					List<FloatSupplier> li = new ArrayList();
-//					for (int i = 0; i < this.inputs.size(); i++) {
-//						li.add( this.inputs.get(i).getInput() );
-//					}
-////					for (int i = 0; i < cheats.size(); i++) {
-////						FloatSupplier ci = cheats.get(i).getInput();
-////						//li.add( new DelayedFloat(ci, 2) );
-////						//li.add( new DelayedFloat(new RangeNormalizedFloat(()->reward), 1) );
-////						li.add( ci );
-////					}
-//					List<FloatSupplier> lo = new ArrayList();
-//					RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> reward);
-//					lo.add(normReward);
-////
-////
-//					LSTMPredictor lp = new LSTMPredictor(li, lo, 1);
-////
-//					nar.onFrame(nn->{
-//						double[] p = lp.next();
-//						System.out.println(Texts.n4(p) + " , " + normReward.asFloat() );
-//					});
-////				}
-
-
-//        if (nar instanceof Default) {
-//
-//          //new BeliefTableChart(nar, charted).show(700, 900);
-            BeliefTableChart.newBeliefChart(nar, charted, 500);
-            HistogramChart.budgetChart(nar, 50);
-
-////
-            //BagChart.show((Default) nar, 512);
-////
-//            //STMView.show(stm, 500, 500);
-//
-//            //TimeSpace.newTimeWindow((Default)nar, 128);
-//            //NARSpace.newConceptWindow((Default) nar, 128, 6);
-//
-//
-//        }
-
-
-    }
 
     protected int at(int i, int j) {
         int pix = Math.round(pacman.pac.iX / 16f);

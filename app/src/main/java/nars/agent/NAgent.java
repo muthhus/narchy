@@ -1,6 +1,7 @@
 package nars.agent;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import nars.*;
 import nars.budget.Activation;
 import nars.budget.Budget;
@@ -11,6 +12,7 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.PolarRangeNormalizedFloat;
@@ -18,6 +20,7 @@ import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.eclipse.collections.api.block.procedure.Procedure;
 import org.jetbrains.annotations.NotNull;
@@ -80,7 +83,8 @@ abstract public class NAgent {
 
     //private float curiosityAttention;
     private float rewardSum = 0;
-
+    private MutableFloat sensorPriority;
+    private MutableFloat rewardPriority;
 
 
     public NAgent(NAR nar) {
@@ -110,10 +114,6 @@ abstract public class NAgent {
 
     }
 
-    /**
-     * install motors and sensors in the NAR
-     */
-    abstract protected void init(NAR n);
 
 
     /**
@@ -194,25 +194,20 @@ abstract public class NAgent {
 //                //(float) Math.sqrt(numSensors); //HEURISTIC
 //                numSensors / 2f;
 
-        /** active perception: active concept budgeting determines budgeting of new sensor input tasks */
-        for (SensorConcept sensor : sensors) {
-            Term ts = sensor.term();
-            sensor.pri(() -> {
 
-                        final float gain = nar.priorityDefault(Symbols.BELIEF); //1f;
+        /** attention per each sensor */
+        sensorPriority = new MutableFloat(nar.priorityDefault(Symbols.BELIEF) / numSensors);
 
-                        float cp = nar.conceptPriority(ts);
+        /** attention per each action TODO needs MotorConcept to extend SensorConcept */
+        //MutableFloat actionPriority = new MutableFloat(nar.priorityDefault(Symbols.BELIEF) / actions.size());
 
-                        float p = gain * (cp);
+        /** attention per each reward */
+        rewardPriority = new MutableFloat(nar.priorityDefault(Symbols.BELIEF));
 
-                        float basePri =
-                                //0.1f;
-                                gain / numSensors;
+        SensorConcept.attentionGroup(sensors, sensorPriority, nar);
+        //SensorConcept.attentionGroup(actions, actionPriority, nar);
+        SensorConcept.attentionGroup(Lists.newArrayList(happy, joy), rewardPriority, nar);
 
-                        return Math.min(1f, basePri + p);
-                    }
-            );
-        }
 
         //@NotNull Term what = $.$("?w"); //#w
         @NotNull Term what = $.$("#s"); //#w
@@ -335,7 +330,6 @@ abstract public class NAgent {
         ticksBeforeObserve = 0;
 
         nar.runLater(() -> {
-            init(nar);
 
             mission();
 

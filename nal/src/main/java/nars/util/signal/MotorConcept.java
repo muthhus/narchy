@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import static nars.$.$;
 
 
+/** TODO make extend SensorConcept and utilize that for feedback control */
 public class MotorConcept extends WiredCompoundConcept {
 
 

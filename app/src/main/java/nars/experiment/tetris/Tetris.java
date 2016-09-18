@@ -69,11 +69,10 @@ public class Tetris extends NAgent {
     static int frameDelay;
 
 
-
     private final TetrisState state;
     //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
-    public class View {
+    public static class View {
 
         public TetrisVisualizer vis;
         public Surface plot1;
@@ -83,7 +82,7 @@ public class Tetris extends NAgent {
         //public Plot2D lstm;
     }
 
-    final View view = new View();
+    static final View view = new View();
 
 
     private MotorConcept motorRotate;
@@ -118,17 +117,109 @@ public class Tetris extends NAgent {
             public boolean onKey(Vector2f hitPoint, char charCode, boolean pressed) {
 
                 switch (charCode) {
-                    case 'a': nar.goal(motorRotate, Tense.Present, pressed ? 0f: 0.5f, gamma); break;
-                    case 's': nar.goal(motorRotate, Tense.Present, pressed ? 1f: 0.5f, gamma); break;
-                    case 'z': nar.goal(motorLeftRight, Tense.Present, pressed ? 0f: 0.5f, gamma); break;
-                    case 'x': nar.goal(motorLeftRight, Tense.Present, pressed ? 1f: 0.5f, gamma); break;
+                    case 'a':
+                        nar.goal(motorRotate, Tense.Present, pressed ? 0f : 0.5f, gamma);
+                        break;
+                    case 's':
+                        nar.goal(motorRotate, Tense.Present, pressed ? 1f : 0.5f, gamma);
+                        break;
+                    case 'z':
+                        nar.goal(motorLeftRight, Tense.Present, pressed ? 0f : 0.5f, gamma);
+                        break;
+                    case 'x':
+                        nar.goal(motorLeftRight, Tense.Present, pressed ? 1f : 0.5f, gamma);
+                        break;
                 }
 
                 return true;
             }
         };
 
-        //restart();
+        state.seen = new float[state.width * state.height];
+
+        for (int y = 0; y < state.height; y++) {
+            int yy = y;
+            for (int x = 0; x < state.width; x++) {
+                int xx = x;
+                Compound squareTerm =
+                        $.p(x, y);
+                //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
+                @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
+                        () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
+
+                        //null //disable input
+
+                        (v) -> $.t(v, alpha)
+
+                )
+                        //timing(0, visionSyncPeriod)
+                        ;
+
+//                FloatSupplier defaultPri = s.sensor.pri;
+//                s.pri( () -> defaultPri.asFloat() * 0.25f );
+
+                sensors.add(s);
+
+            }
+        }
+
+
+        float actionMargin =
+                //0.33f; //divide the range into 3 sections: left/nothing/right
+                0.33f;
+
+        float actionThresholdHigh = 1f - actionMargin;
+        float actionThresholdLow = actionMargin;
+        float actionThresholdHigher = 1f - actionMargin / 1.5f;
+        float actionThresholdLower = actionMargin / 1.5f;
+
+
+        actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b, d) -> {
+            if (d != null) {
+                float x = d.freq();
+                //System.out.println(d + " " + x);
+                if (x > actionThresholdHigh) {
+                    if (state.take_action(RIGHT))
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(1, gamma);
+                } else if (x < actionThresholdLow) {
+                    if (state.take_action(LEFT))
+                        //return d; //legal move
+                        //return d.withConf(gamma);
+                        return $.t(0, gamma);
+                }
+            }
+            //return null;
+            return $.t(0.5f, gamma); //no action taken or move ineffective
+        }));
+
+        if (rotate) {
+            actions.add(motorRotate = new MotorConcept("(rotate)", nar, (b, d) -> {
+                if (d != null) {
+                    float r = d.freq();
+                    if (r > actionThresholdHigher) {
+                        if (state.take_action(CW))
+                            //return d; //legal move
+                            //return d.withConf(gamma);
+                            return $.t(1, gamma);
+                    } else if (r < actionThresholdLower) {
+                        if (state.take_action(CCW))
+                            //return d; //legal move
+                            //return d.withConf(gamma);
+                            return $.t(0, gamma);
+                    }
+                }
+                //return null;
+                return $.t(0.5f, gamma); //no action taken or move ineffective
+            }));
+        }
+        //actions.add(motorDown = new MotorConcept("(down)", nar));
+//        if (downMotivation > actionThresholdHigh) {
+//            state.take_action(FALL);
+//        }
+
+        reset();
     }
 
     //TODO
@@ -137,10 +228,11 @@ public class Tetris extends NAgent {
         public int height;/*how tall our board is*/
 
 
-
     }
 
-    /** RLE/scanline input method: groups similar pixels (monochrome) into a runline using a integer range */
+    /**
+     * RLE/scanline input method: groups similar pixels (monochrome) into a runline using a integer range
+     */
     protected void input() {
 
 //        float thresh = 0.5f;
@@ -189,10 +281,10 @@ public class Tetris extends NAgent {
                 }
 
                 //if it switched or reach the end of the line
-                if (end!=x || (x >= ww-1)) {
+                if (end != x || (x >= ww - 1)) {
                     //end of span
-                    if (end-start == 1) {
-                        inputBlock(start, start+1, sign, horizontal);
+                    if (end - start == 1) {
+                        inputBlock(start, start + 1, sign, horizontal);
                     } else {
                         inputSpan(start, end, y, sign, horizontal);
                     }
@@ -207,9 +299,9 @@ public class Tetris extends NAgent {
 
     private void inputSpan(int start, int end, int axis, int sign, boolean horizontal) {
 
-        Truth t = $.t(sign>0 ? 1f : 0f,
-            //(float)Math.pow(alpha, end-start)
-            alpha
+        Truth t = $.t(sign > 0 ? 1f : 0f,
+                //(float)Math.pow(alpha, end-start)
+                alpha
         );
         if (t == null)
             return; //too low confidence
@@ -227,7 +319,7 @@ public class Tetris extends NAgent {
 
     private void inputBlock(int x, int y, float v, boolean horizontal) {
 
-        Truth t = $.t(v>0 ? 1f : 0f,
+        Truth t = $.t(v > 0 ? 1f : 0f,
                 //(float)Math.pow(alpha, end-start)
                 alpha
         );
@@ -242,99 +334,9 @@ public class Tetris extends NAgent {
         );
     }
 
-    @Override
-    protected void init(NAR nar) {
-
-        state.seen = new float[state.width * state.height];
-
-        for (int y = 0; y < state.height; y++) {
-            int yy = y;
-            for (int x = 0; x < state.width; x++) {
-                int xx = x;
-                Compound squareTerm =
-                        $.p(x, y);
-                        //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
-                @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
-                        () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
-
-                        //null //disable input
-
-                        (v) -> $.t(v, alpha )
-
-                )
-                        //timing(0, visionSyncPeriod)
-                ;
-
-//                FloatSupplier defaultPri = s.sensor.pri;
-//                s.pri( () -> defaultPri.asFloat() * 0.25f );
-
-                sensors.add(s);
-
-            }
-        }
-
-
-        float actionMargin =
-                //0.33f; //divide the range into 3 sections: left/nothing/right
-                0.33f;
-
-        float actionThresholdHigh = 1f - actionMargin;
-        float actionThresholdLow = actionMargin;
-        float actionThresholdHigher = 1f - actionMargin/1.5f;
-        float actionThresholdLower = actionMargin/1.5f;
-
-
-        actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b,d)->{
-            if (d!=null) {
-                float x = d.freq();
-                //System.out.println(d + " " + x);
-                if (x > actionThresholdHigh) {
-                    if (state.take_action(RIGHT))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(1, gamma);
-                } else if (x < actionThresholdLow) {
-                    if (state.take_action(LEFT))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(0, gamma);
-                }
-            }
-            //return null;
-            return $.t(0.5f, gamma); //no action taken or move ineffective
-        }));
-
-        if (rotate) {
-            actions.add(motorRotate = new MotorConcept("(rotate)", nar, (b,d)->{
-                if (d!=null) {
-                    float r = d.freq();
-                    if (r > actionThresholdHigher) {
-                        if (state.take_action(CW))
-                            //return d; //legal move
-                            //return d.withConf(gamma);
-                            return $.t(1, gamma);
-                    } else if (r < actionThresholdLower) {
-                        if (state.take_action(CCW))
-                            //return d; //legal move
-                            //return d.withConf(gamma);
-                            return $.t(0, gamma);
-                    }
-                }
-                //return null;
-                return $.t(0.5f, gamma); //no action taken or move ineffective
-            }));
-        }
-        //actions.add(motorDown = new MotorConcept("(down)", nar));
-//        if (downMotivation > actionThresholdHigh) {
-//            state.take_action(FALL);
-//        }
-
-        reset();
-    }
 
     @Override
     public float act() {
-
 
 
         if (state.running) {
@@ -380,7 +382,6 @@ public class Tetris extends NAgent {
         );
 
 
-
         nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.8f);
 
@@ -397,10 +398,10 @@ public class Tetris extends NAgent {
 //        });
 
         float p = 0.005f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f*p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.7f*p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.4f*p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f*p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 0.7f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
         nar.confMin.setValue(0.02f);
@@ -448,13 +449,9 @@ public class Tetris extends NAgent {
         //new VariableCompressor(nar);
 
 
+        Tetris t = new Tetris(nar, tetris_width, tetris_height, TIME_PER_FALL);
+        {
 
-
-        Tetris t = new Tetris(nar, tetris_width, tetris_height, TIME_PER_FALL) {
-
-            @Override
-            public void init(NAR nar) {
-                super.init(nar);
 
 //                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
 //                        tetris_width/2, 7 /* states */,
@@ -473,12 +470,11 @@ public class Tetris extends NAgent {
 //                );
 
 
-                //BagChart.show((Default) nar, 512);
+            //BagChart.show((Default) nar, 512);
 
-                //STMView.show(stm, 800, 600);
+            //STMView.show(stm, 800, 600);
 
-                view.plot1 = newCPanel(nar, 256, () -> rewardValue);
-
+            view.plot1 = newCPanel(nar, 256, () -> t.rewardValue);
 
 
 //                {
@@ -510,13 +506,13 @@ public class Tetris extends NAgent {
 //                }
 
 
-                nar.onFrame(f -> {
-                    //view.lstm.update();
-                    try {
-                        view.term.term.putLinePre(summary());
-                    } catch (IOException e) {
-                    }
-                });
+            nar.onFrame(f -> {
+                //view.lstm.update();
+                try {
+                    view.term.term.putLinePre(t.summary());
+                } catch (IOException e1) {
+                }
+            });
 
 
 //                int window = 32;
@@ -529,15 +525,15 @@ public class Tetris extends NAgent {
 //                );
 //                newControlWindow(12f,4f, new Object[] { camHistory } );
 
-                newControlWindow(view);
+            newControlWindow(view);
 
-                //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
+            //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
 
-                Arkancide.newBeliefChartWindow(this, 200);
+            Arkancide.newBeliefChartWindow(t, 200);
 
-                HistogramChart.budgetChart(nar, 20);
+            HistogramChart.budgetChart(nar, 20);
 
-                //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
+            //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
 
 //                BeliefTableChart.newBeliefChart(nar, Lists.newArrayList(
 //                        sensors.get(0),
@@ -548,45 +544,10 @@ public class Tetris extends NAgent {
 //                        sensors.get(5)
 //                ), 200);
 
-                //NARSpace.newConceptWindow((Default) nar, 32, 8);
-            }
+            //NARSpace.newConceptWindow((Default) nar, 32, 8);
+        }
 
 
-            public MatrixView.ViewFunc sensorMatrixView(NAR nar, long whenRelative) {
-                return (x, y, g) -> {
-//            int rgb = cam.out.getRGB(x,y);
-//            float r = decodeRed(rgb);
-//            if (r > 0)
-//                System.out.println(x + " "+ y + " " + r);
-//            g.glColor3f(r,0,0);
-
-                    SensorConcept s = sensors.get(y * tetris_width + x);
-
-                    Truth b =  s.hasBeliefs() ? s.beliefs().truth(now + whenRelative) : null;
-                    float bf = b!=null ? b.freq() : 0.5f;
-                    Truth dt = s.hasGoals() ? s.goals().truth(now + whenRelative) : null;
-                    float dr, dg;
-                    if (dt == null) {
-                        dr = dg = 0;
-                    } else {
-                        float f = dt.freq();
-                        float c = dt.conf();
-                        if (f > 0.5f) {
-                            dr = 0;
-                            dg = (f - 0.5f) * 2f;// * c;
-                        } else {
-                            dg = 0;
-                            dr = (0.5f - f) * 2f;// * c;
-                        }
-                    }
-
-                    float p = nar.conceptPriority(s);
-                    g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
-
-                    return b!=null ? b.conf() : 0;
-                };
-            }
-        };
         t.trace = true;
 
 //        Iterable<Termed> cheats = Iterables.concat(
@@ -652,7 +613,6 @@ public class Tetris extends NAgent {
         loop.join();
 
 
-
         //nar.stop();
 
         //nar.index.print(System.out);
@@ -668,14 +628,50 @@ public class Tetris extends NAgent {
 //        });
     }
 
+    public MatrixView.ViewFunc sensorMatrixView(NAR nar, long whenRelative) {
+        return (x, y, g) -> {
+//            int rgb = cam.out.getRGB(x,y);
+//            float r = decodeRed(rgb);
+//            if (r > 0)
+//                System.out.println(x + " "+ y + " " + r);
+//            g.glColor3f(r,0,0);
+
+            SensorConcept s = sensors.get(y * tetris_width + x);
+
+            Truth b = s.hasBeliefs() ? s.beliefs().truth(now + whenRelative) : null;
+            float bf = b != null ? b.freq() : 0.5f;
+            Truth dt = s.hasGoals() ? s.goals().truth(now + whenRelative) : null;
+            float dr, dg;
+            if (dt == null) {
+                dr = dg = 0;
+            } else {
+                float f = dt.freq();
+                float c = dt.conf();
+                if (f > 0.5f) {
+                    dr = 0;
+                    dg = (f - 0.5f) * 2f;// * c;
+                } else {
+                    dg = 0;
+                    dr = (0.5f - f) * 2f;// * c;
+                }
+            }
+
+            float p = nar.conceptPriority(s);
+            g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
+
+            return b != null ? b.conf() : 0;
+        };
+    }
+
+
     public static MatrixView.ViewFunc arrayRenderer(float[][] ww) {
         return (x, y, g) -> {
             float v = ww[x][y];
             if (v < 0) {
                 v = -v;
-                g.glColor3f(v/2, 0, v);
+                g.glColor3f(v / 2, 0, v);
             } else {
-                g.glColor3f(v,v/2,0);
+                g.glColor3f(v, v / 2, 0);
             }
             return 0;
         };
@@ -714,198 +710,198 @@ public class Tetris extends NAgent {
         return new GridSurface(VERTICAL, plot, plot1, plot2, plot3, plot4);
     }
 
-    public static class NARController extends NAgent {
-
-        private final NARLoop loop;
-        private final NAR worker;
-        private final NAgent env;
-        private final FloatSupplier learn;
-        private final RangeNormalizedFloat busy;
-        public float score;
-
-
-        @Override
-        protected float act() {
-            //float avgFramePeriodMS = (float) loop.frameTime.getMean();
-
-            //float mUsage = memory();
-            //float targetMemUsage = 0.75f;
-
-            return this.score = (
-                    (1f + learn.asFloat()) *       //learn
-//                    (1f + (1f- busy.asFloat())) *  //avoid busywork
-                    (1f + happysad.asFloat())      //boost for motivation change
-
-                    //env.rewardNormalized.asFloat() +
-
-//                    1 / (1f + Math.abs(targetMemUsage - mUsage) / (targetMemUsage)) //maintain % memory utilization TODO cache 'memory()' result
-            );
-        }
-
-
-        public NARController( NAR worker, NARLoop loop, NAgent env) {
-
-            super( new Default(384, 4, 3, 2, new XORShiftRandom(2),
-                    //new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 5*100000, false, exe),
-                    new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 16384, 4),
-
-                    new FrameClock()) {
-                       @Override
-                       protected void initHigherNAL() {
-                           super.initHigherNAL();
-                           cyclesPerFrame.setValue(16);
-                           //ctl.confMin.setValue(0.01f);
-                           //ctl.truthResolution.setValue(0.01f);
-                           beliefConfidence(0.5f);
-                           goalConfidence(0.5f);
-                       }
-                   });
-
-            this.worker = worker;
-            this.loop = loop;
-            this.env = env;
-
-            busy = new RangeNormalizedFloat(()->(float)worker.emotion.busy.getSum());
-            happysad = new RangeNormalizedFloat(()->(float)worker.emotion.happysad());
-            learn = ()->(float)worker.emotion.learning();
-
-            //nar.log();
-            worker.onFrame(nn -> next());
-
-            init(nar);
-            mission();
-        }
-
-        @Override public void next() {
-            super.next();
-            nar.next();
-        }
-
-
-
-        @Override
-        protected void init(NAR n) {
-
-            float sensorResolution = 0.05f;
-
-            float sensorConf = alpha;
-
-            FloatToObjectFunction<Truth> truther = (v) -> $.t(v, sensorConf);
-
-            sensors.addAll(Lists.newArrayList(
-                    new SensorConcept("(motive)", n,
-                            happysad,
-                            truther
-                    ).resolution(sensorResolution),
-                    new SensorConcept("(busy)", n,
-                            new RangeNormalizedFloat(() -> (float) worker.emotion.busy.getSum()),
-                            truther
-                    ).resolution(sensorResolution),
-                    new SensorConcept("(learn)", n,
-                            learn,
-                            truther
-                    ).resolution(sensorResolution),
-                    new SensorConcept("(memory)", n,
-                            () -> memory(),
-                            truther
-                    ).resolution(sensorResolution)
-            ));
-
-            //final int BASE_PERIOD_MS = 100;
-            final int MAX_CONCEPTS_FIRE_PER_CYCLE = 32;
-            final int MAX_LINKS_PER_CONCEPT = 24;
-
-            actions.addAll(Lists.newArrayList(
-                    //cpu throttle
-                    /*new MotorConcept("(cpu)", nar, (b, d) -> {
-                        int newPeriod = Math.round(((1f - (d.expectation())) * BASE_PERIOD_MS));
-                        loop.setPeriodMS(newPeriod);
-                        //System.err.println("  loop period ms: " + newPeriod);
-                        return d;
-                    }),*/
-
-                    //memory throttle
-//                    new MotorConcept("(memoryWeight)", nar, (b, d) -> {
-//                        ((CaffeineIndex) worker.index).compounds.policy().eviction().ifPresent(e -> {
-//                            float sweep = 0.1f; //% sweep , 0<sweep
-//                            e.setMaximum((long) (DEFAULT_INDEX_WEIGHT * (1f + sweep * 2f * (d.freq() - 0.5f))));
-//                        });
+//    public static class NARController extends NAgent {
+//
+//        private final NARLoop loop;
+//        private final NAR worker;
+//        private final NAgent env;
+//        private final FloatSupplier learn;
+//        private final RangeNormalizedFloat busy;
+//        public float score;
+//
+//
+//        @Override
+//        protected float act() {
+//            //float avgFramePeriodMS = (float) loop.frameTime.getMean();
+//
+//            //float mUsage = memory();
+//            //float targetMemUsage = 0.75f;
+//
+//            return this.score = (
+//                    (1f + learn.asFloat()) *       //learn
+////                    (1f + (1f- busy.asFloat())) *  //avoid busywork
+//                    (1f + happysad.asFloat())      //boost for motivation change
+//
+//                    //env.rewardNormalized.asFloat() +
+//
+////                    1 / (1f + Math.abs(targetMemUsage - mUsage) / (targetMemUsage)) //maintain % memory utilization TODO cache 'memory()' result
+//            );
+//        }
+//
+//
+//        public NARController( NAR worker, NARLoop loop, NAgent env) {
+//
+//            super( new Default(384, 4, 3, 2, new XORShiftRandom(2),
+//                    //new CaffeineIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 5*100000, false, exe),
+//                    new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 16384, 4),
+//
+//                    new FrameClock()) {
+//                       @Override
+//                       protected void initHigherNAL() {
+//                           super.initHigherNAL();
+//                           cyclesPerFrame.setValue(16);
+//                           //ctl.confMin.setValue(0.01f);
+//                           //ctl.truthResolution.setValue(0.01f);
+//                           beliefConfidence(0.5f);
+//                           goalConfidence(0.5f);
+//                       }
+//                   });
+//
+//            this.worker = worker;
+//            this.loop = loop;
+//            this.env = env;
+//
+//            busy = new RangeNormalizedFloat(()->(float)worker.emotion.busy.getSum());
+//            happysad = new RangeNormalizedFloat(()->(float)worker.emotion.happysad());
+//            learn = ()->(float)worker.emotion.learning();
+//
+//            //nar.log();
+//            worker.onFrame(nn -> next());
+//
+//            init(nar);
+//            mission();
+//        }
+//
+//        @Override public void next() {
+//            super.next();
+//            nar.next();
+//        }
+//
+//
+//
+//        @Override
+//        protected void init(NAR n) {
+//
+//            float sensorResolution = 0.05f;
+//
+//            float sensorConf = alpha;
+//
+//            FloatToObjectFunction<Truth> truther = (v) -> $.t(v, sensorConf);
+//
+//            sensors.addAll(Lists.newArrayList(
+//                    new SensorConcept("(motive)", n,
+//                            happysad,
+//                            truther
+//                    ).resolution(sensorResolution),
+//                    new SensorConcept("(busy)", n,
+//                            new RangeNormalizedFloat(() -> (float) worker.emotion.busy.getSum()),
+//                            truther
+//                    ).resolution(sensorResolution),
+//                    new SensorConcept("(learn)", n,
+//                            learn,
+//                            truther
+//                    ).resolution(sensorResolution),
+//                    new SensorConcept("(memory)", n,
+//                            () -> memory(),
+//                            truther
+//                    ).resolution(sensorResolution)
+//            ));
+//
+//            //final int BASE_PERIOD_MS = 100;
+//            final int MAX_CONCEPTS_FIRE_PER_CYCLE = 32;
+//            final int MAX_LINKS_PER_CONCEPT = 24;
+//
+//            actions.addAll(Lists.newArrayList(
+//                    //cpu throttle
+//                    /*new MotorConcept("(cpu)", nar, (b, d) -> {
+//                        int newPeriod = Math.round(((1f - (d.expectation())) * BASE_PERIOD_MS));
+//                        loop.setPeriodMS(newPeriod);
 //                        //System.err.println("  loop period ms: " + newPeriod);
 //                        return d;
-//                    }),
-
-                    new MotorConcept("(confMin)", nar, (b, d) -> {
-                        float MAX_CONFMIN = 0.1f;
-                        float newConfMin = Math.max(Param.TRUTH_EPSILON, MAX_CONFMIN * d.freq());
-                        worker.confMin.setValue(newConfMin);
-                        return d;
-                    }),
+//                    }),*/
 //
-//                    new MotorConcept("(inputActivation)", nar, (b, d) -> {
-//                        worker.inputActivation.setValue(d.freq());
+//                    //memory throttle
+////                    new MotorConcept("(memoryWeight)", nar, (b, d) -> {
+////                        ((CaffeineIndex) worker.index).compounds.policy().eviction().ifPresent(e -> {
+////                            float sweep = 0.1f; //% sweep , 0<sweep
+////                            e.setMaximum((long) (DEFAULT_INDEX_WEIGHT * (1f + sweep * 2f * (d.freq() - 0.5f))));
+////                        });
+////                        //System.err.println("  loop period ms: " + newPeriod);
+////                        return d;
+////                    }),
+//
+//                    new MotorConcept("(confMin)", nar, (b, d) -> {
+//                        float MAX_CONFMIN = 0.1f;
+//                        float newConfMin = Math.max(Param.TRUTH_EPSILON, MAX_CONFMIN * d.freq());
+//                        worker.confMin.setValue(newConfMin);
+//                        return d;
+//                    }),
+////
+////                    new MotorConcept("(inputActivation)", nar, (b, d) -> {
+////                        worker.inputActivation.setValue(d.freq());
+////                        return d;
+////                    }),
+////
+////                    new MotorConcept("(derivedActivation)", nar, (b, d) -> {
+////                        worker.derivedActivation.setValue(d.freq());
+////                        return d;
+////                    }),
+//
+//                    new MotorConcept("(conceptsPerFrame)", nar, (b, d) -> {
+//                        ((Default) worker).core.conceptsFiredPerCycle.setValue((int) (d.freq() * MAX_CONCEPTS_FIRE_PER_CYCLE));
 //                        return d;
 //                    }),
 //
-//                    new MotorConcept("(derivedActivation)", nar, (b, d) -> {
-//                        worker.derivedActivation.setValue(d.freq());
+//                    new MotorConcept("(linksPerConcept)", nar, (b, d) -> {
+//                        float l = d.freq() * MAX_LINKS_PER_CONCEPT;
+//                        l = Math.max(l, 1f);
+//                        int vv = (int) Math.floor((float)Math.sqrt(l));
+//
+//                        ((Default) worker).core.tasklinksFiredPerFiredConcept.setValue(vv);
+//                        ((Default) worker).core.termlinksFiredPerFiredConcept.setValue((int)Math.ceil(l / vv));
 //                        return d;
 //                    }),
-
-                    new MotorConcept("(conceptsPerFrame)", nar, (b, d) -> {
-                        ((Default) worker).core.conceptsFiredPerCycle.setValue((int) (d.freq() * MAX_CONCEPTS_FIRE_PER_CYCLE));
-                        return d;
-                    }),
-
-                    new MotorConcept("(linksPerConcept)", nar, (b, d) -> {
-                        float l = d.freq() * MAX_LINKS_PER_CONCEPT;
-                        l = Math.max(l, 1f);
-                        int vv = (int) Math.floor((float)Math.sqrt(l));
-
-                        ((Default) worker).core.tasklinksFiredPerFiredConcept.setValue(vv);
-                        ((Default) worker).core.termlinksFiredPerFiredConcept.setValue((int)Math.ceil(l / vv));
-                        return d;
-                    }),
-
-                    new MotorConcept("(envCuriosity)", nar, (b, d) -> {
-                        float exp = d.freq();
-                        env.epsilonProbability = exp;
-                        env.gammaEpsilonFactor = exp*exp;
-                        return d;
-                    })
-            ));
-        }
-
-        public final float memory() {
-            Runtime runtime = Runtime.getRuntime();
-            long total = runtime.totalMemory(); // current heap allocated to the VM process
-            long free = runtime.freeMemory(); // out of the current heap, how much is free
-            long max = runtime.maxMemory(); // Max heap VM can use e.g. Xmx setting
-            long usedMemory = total - free; // how much of the current heap the VM is using
-            long availableMemory = max - usedMemory; // available memory i.e. Maximum heap size minus the current amount used
-            float ratio = 1f - ((float)availableMemory) / max;
-            //logger.warn("max={}k, used={}k {}%, free={}k", max/1024, total/1024, Texts.n2(100f * ratio), free/1024);
-            return ratio;
-        }
-
-        final RangeNormalizedFloat happysad;
-
-    }
-
-
-    //    static void addCamera(Tetris t, NAR n, int w, int h) {
-//        //n.framesBeforeDecision = GAME_DIVISOR;
-//        SwingCamera s = new SwingCamera(t.vis);
 //
-//        NARCamera nc = new NARCamera("t", n, s, (x, y) -> $.p($.the(x), $.the(y)));
+//                    new MotorConcept("(envCuriosity)", nar, (b, d) -> {
+//                        float exp = d.freq();
+//                        env.epsilonProbability = exp;
+//                        env.gammaEpsilonFactor = exp*exp;
+//                        return d;
+//                    })
+//            ));
+//        }
 //
-//        NARCamera.newWindow(s);
+//        public final float memory() {
+//            Runtime runtime = Runtime.getRuntime();
+//            long total = runtime.totalMemory(); // current heap allocated to the VM process
+//            long free = runtime.freeMemory(); // out of the current heap, how much is free
+//            long max = runtime.maxMemory(); // Max heap VM can use e.g. Xmx setting
+//            long usedMemory = total - free; // how much of the current heap the VM is using
+//            long availableMemory = max - usedMemory; // available memory i.e. Maximum heap size minus the current amount used
+//            float ratio = 1f - ((float)availableMemory) / max;
+//            //logger.warn("max={}k, used={}k {}%, free={}k", max/1024, total/1024, Texts.n2(100f * ratio), free/1024);
+//            return ratio;
+//        }
 //
-//        s.input(0, 0, t.vis.getWidth(),t.vis.getHeight());
-//        s.output(w, h);
+//        final RangeNormalizedFloat happysad;
 //
-//        n.onFrame(nn -> {
-//            s.update();
-//        });
 //    }
+//
+//
+//    //    static void addCamera(Tetris t, NAR n, int w, int h) {
+////        //n.framesBeforeDecision = GAME_DIVISOR;
+////        SwingCamera s = new SwingCamera(t.vis);
+////
+////        NARCamera nc = new NARCamera("t", n, s, (x, y) -> $.p($.the(x), $.the(y)));
+////
+////        NARCamera.newWindow(s);
+////
+////        s.input(0, 0, t.vis.getWidth(),t.vis.getHeight());
+////        s.output(w, h);
+////
+////        n.onFrame(nn -> {
+////            s.update();
+////        });
+////    }
 
 }

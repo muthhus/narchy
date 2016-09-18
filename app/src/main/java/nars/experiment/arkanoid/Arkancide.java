@@ -67,7 +67,7 @@ public class Arkancide extends NAgent {
 
     float paddleSpeed = 20f;
     private float prevScore;
-    private FasterList<SensorConcept> numberSensors;
+
 
     public class View {
         //public Surface camView;
@@ -80,10 +80,6 @@ public class Arkancide extends NAgent {
         super(nar);
         noid = new Arkanoid();
         ss = new SensorConcept[visW][visH];
-    }
-
-    @Override
-    protected void init(NAR n) {
 
 
         cam = new SwingCamera(noid, visW, visH);
@@ -105,26 +101,23 @@ public class Arkancide extends NAgent {
             }
         }
 
-        numberSensors = $.newArrayList();
-
-        numberSensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.paddle.x), n,
+        sensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.paddle.x), nar,
                 "(pad:x,0)",
                 "(pad:x,1)",
                 "(pad:x,2)"
         ).resolution(0.05f).sensors );
 
-        numberSensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.ball.x), n,
+        sensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.ball.x), nar,
                 "(ball:x,0)",
                 "(ball:x,1)",
                 "(ball:x,2)"
         ).resolution(0.05f).sensors );
 
-        numberSensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.ball.y), n,
+        sensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.ball.y), nar,
                 "(ball:y)"
         ).resolution(0.05f).sensors );
 
 
-        sensors.addAll(numberSensors);
 
 //        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
 //                4, 8 /* states */,
@@ -182,7 +175,7 @@ public class Arkancide extends NAgent {
 
             //@Nullable Truth tNow = motorLeftRight.goals().truth(now);
             //if (tNow!=null)
-                //noid.paddle.set(tNow.freq());
+            //noid.paddle.set(tNow.freq());
 
             //return $.t(noid.paddle.moveTo(d.freq(), paddleSpeed), 0.9f);
         }));
@@ -191,7 +184,6 @@ public class Arkancide extends NAgent {
         //view.attention.add(nar.derivedActivation);
 
         newBeliefChartWindow(this, 200);
-        newBeliefChartWindow(nar, 200, numberSensors);
         HistogramChart.budgetChart(nar, 50);
 
         ControlSurface.newControlWindow(
@@ -204,6 +196,7 @@ public class Arkancide extends NAgent {
 
 
     }
+
 
     public static void newBeliefChartWindow(NAgent narenv, long window) {
         GridSurface chart = newBeliefChart(narenv, window);
