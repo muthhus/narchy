@@ -732,10 +732,11 @@ public class Tetris extends NAgent {
 
     public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, FloatFunction<Termed> value, int plotHistory) {
 
+        //TODO make a lambda Grid constructor
         GridSurface grid = new GridSurface();
         List<Plot2D> plots = $.newArrayList();
         for (Termed t : concepts) {
-            Plot2D p = new Plot2D(plotHistory, Plot2D.Line);
+            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
             p.add(t.toString(), ()->value.floatValueOf(t), 0f, 1f );
             grid.children.add(p);
             plots.add(p);

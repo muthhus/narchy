@@ -46,7 +46,7 @@ public class CommandTest {
         assertTrue(invoked.get());
 
         //no concepts created because this command bypassed inference
-        n.index.forEach(c -> assertFalse(c instanceof Concept));
+        n.concepts.forEach(c -> assertFalse(c instanceof Concept));
 
     }
 }

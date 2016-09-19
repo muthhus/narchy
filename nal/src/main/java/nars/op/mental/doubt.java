@@ -21,8 +21,8 @@ import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
-import nars.table.BeliefTable;
 import nars.nal.nal8.AbstractOperator;
+import nars.table.BeliefTable;
 import org.jetbrains.annotations.NotNull;
 
 /**

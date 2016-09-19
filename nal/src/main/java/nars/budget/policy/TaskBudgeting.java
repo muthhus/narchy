@@ -1,7 +1,7 @@
 package nars.budget.policy;
 
 import nars.$;
-import nars.Memory;
+import nars.NAR;
 import nars.Symbols;
 import nars.Task;
 import nars.budget.Budget;
@@ -189,7 +189,7 @@ public class TaskBudgeting {
      * @return The budget for the new task which is the belief activated, if
      * necessary
      */
-    public static Budget solutionBudget(@NotNull Task question, @NotNull Task solution, @NotNull Truth projectedTruth, @NotNull Memory m) {
+    public static Budget solutionBudget(@NotNull Task question, @NotNull Task solution, @NotNull Truth projectedTruth, NAR m) {
         //boolean feedbackToLinks = false;
         /*if (task == null) {
             task = nal.getCurrentTask();

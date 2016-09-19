@@ -11,9 +11,9 @@ import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
 import nars.term.Term;
 import nars.util.Util;
+import nars.util.trie.TrieNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import nars.util.trie.TrieNode;
 
 import java.io.PrintStream;
 import java.util.Collection;

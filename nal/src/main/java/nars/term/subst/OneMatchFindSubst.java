@@ -21,7 +21,7 @@ public final class OneMatchFindSubst extends FindSubst {
     @Nullable private Term result;
 
     public OneMatchFindSubst(@NotNull NAR nar) {
-        this(nar.index, nar.random);
+        this(nar.concepts, nar.random);
     }
 
     public OneMatchFindSubst(TermIndex index, Random r) {

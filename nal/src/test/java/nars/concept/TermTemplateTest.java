@@ -21,7 +21,7 @@ public class TermTemplateTest {
         Task t = n.inputTask("((($3-->(/,REPR,_,$4))&&($1-->(/,REPR,_,$2)))==>({($1,$2),($3,$4)}-->REPR)).");
         n.next();
 
-        n.index.print(System.out);
+        n.concepts.print(System.out);
 
         Concept c = t.concept(n);
 

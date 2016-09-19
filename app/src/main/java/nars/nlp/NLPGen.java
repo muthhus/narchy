@@ -64,7 +64,7 @@ public class NLPGen {
 
                         final String[] result = {null};
 
-                        FindSubst u = new FindSubst(terminal.index, VAR_PATTERN, terminal.random) {
+                        FindSubst u = new FindSubst(terminal.concepts, VAR_PATTERN, terminal.random) {
 
                             @Override
                             public boolean onMatch() {

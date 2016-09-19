@@ -61,7 +61,7 @@ public class TreeIndexTest {
     public void testCompoundInsertion() {
 
         Terminal nar = new Terminal();
-        TreeIndex index = new TreeIndex(nar.index.conceptBuilder(), 1000);
+        TreeIndex index = new TreeIndex(nar.concepts.conceptBuilder(), 1000);
 
         String[] terms = {
             "x",

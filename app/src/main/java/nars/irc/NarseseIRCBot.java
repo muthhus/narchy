@@ -288,7 +288,7 @@ public class NarseseIRCBot extends Talk {
             @Nullable @Override public Object function(Compound arguments) {
 
                 @NotNull Bag<Concept> cbag = ((Default) nar).core.concepts;
-                return nar.index.summary();
+                return nar.concepts.summary();
                         //" | core pri: " + cbag.priMin() + "<" + Texts.n4(cbag.priHistogram(5)) + ">" + cbag.priMax();
 
             }

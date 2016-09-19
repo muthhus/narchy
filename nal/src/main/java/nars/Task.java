@@ -3,7 +3,6 @@ package nars;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.concept.util.InvalidConceptException;
-import nars.truth.TruthDelta;
 import nars.nal.Stamp;
 import nars.task.MutableTask;
 import nars.task.Revision;
@@ -14,6 +13,7 @@ import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
+import nars.truth.TruthDelta;
 import nars.truth.Truthed;
 import nars.util.data.LongString;
 import org.jetbrains.annotations.NotNull;
@@ -264,7 +264,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @Nullable
-    default CharSequence toString(Memory memory, boolean showStamp) {
+    default CharSequence toString(NAR memory, boolean showStamp) {
         return appendTo(new StringBuilder(), memory, showStamp);
     }
 
@@ -365,12 +365,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    }
 
     @NotNull
-    default StringBuilder toString(/**@Nullable*/Memory memory) {
+    default StringBuilder toString(/**@Nullable*/NAR memory) {
         return appendTo(null, memory);
     }
 
     @NotNull
-    default StringBuilder appendTo(@Nullable StringBuilder sb, /**@Nullable*/Memory memory) {
+    default StringBuilder appendTo(@Nullable StringBuilder sb, /**@Nullable*/NAR memory) {
         if (sb == null) sb = new StringBuilder();
         return appendTo(sb, memory, false);
     }
@@ -383,7 +383,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @NotNull
     @Deprecated
-    default String toStringWithoutBudget(Memory memory) {
+    default String toStringWithoutBudget(NAR memory) {
         StringBuilder b = new StringBuilder();
         appendTo(b, memory, true, false,
                 false, //budget
@@ -394,7 +394,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @Nullable
     @Deprecated
-    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/Memory memory, boolean showStamp) {
+    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/NAR memory, boolean showStamp) {
         boolean notCommand = punc() != Symbols.COMMAND;
         return appendTo(buffer, memory, true, showStamp && notCommand,
                 notCommand, //budget
@@ -403,7 +403,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @Nullable
-    default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/@Nullable Memory memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
+    default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
 
 
         Compound t = term();

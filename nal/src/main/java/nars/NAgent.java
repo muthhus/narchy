@@ -5,6 +5,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.budget.Budget;
 import nars.concept.Concept;
+import nars.concept.MotorConcept;
+import nars.concept.SensorConcept;
 import nars.nal.UtilityFunctions;
 import nars.nar.Default;
 import nars.task.GeneratedTask;
@@ -16,8 +18,6 @@ import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.FloatNormalized;
 import nars.util.math.FloatPolarNormalized;
-import nars.concept.MotorConcept;
-import nars.concept.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -203,7 +203,7 @@ abstract public class NAgent {
                         + "strs=" + n4(emotion.stress.getSum()) + " "
                         + "alrt=" + n4(emotion.alert.getSum()) + " "
                         + " var=" + n4(varPct(nar)) + " "
-                        + "\t" + nar.index.summary()
+                        + "\t" + nar.concepts.summary()
 
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());

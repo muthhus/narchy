@@ -37,8 +37,8 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound> {
         //this.target = (CompoundConcept) n.index.remove(target);
         this.target = target;
 
-        n.index.set(alias, this);
-        n.index.set(target, this);
+        n.concepts.set(alias, this);
+        n.concepts.set(target, this);
 
     }
 

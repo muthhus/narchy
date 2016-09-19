@@ -2,8 +2,8 @@ package nars.nal.nal4;
 
 import nars.NAR;
 import nars.nal.AbstractNALTest;
-import nars.util.signal.RuleTest;
 import nars.test.TestNAR;
+import nars.util.signal.RuleTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

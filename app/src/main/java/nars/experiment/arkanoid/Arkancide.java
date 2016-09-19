@@ -46,15 +46,15 @@ import static spacegraph.obj.GridSurface.grid;
 
 public class Arkancide extends NAgent {
 
-    private static final int cyclesPerFrame = 3;
-    public static final int runFrames = 5000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
+    private static final int cyclesPerFrame = 4;
+    public static final int runFrames = 50000;
+    public static final int CONCEPTS_FIRE_PER_CYCLE = 32;
 
 
 
 
-    final int visW = 48;
-    final int visH = 24;
+    final int visW = 32;
+    final int visH = 18;
 
 
     float paddleSpeed = 20f;
@@ -70,7 +70,7 @@ public class Arkancide extends NAgent {
 
 
     public Arkancide(NAR nar) {
-        super(nar, 1 /* additional decision frames */);
+        super(nar, 10 /* additional decision frames */);
 
         new NObj("noid", noid = new Arkanoid(), nar)
                 .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
@@ -190,31 +190,32 @@ public class Arkancide extends NAgent {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.85f);
+        nar.goalConfidence(0.7f);
 
-        float p = 0.25f;
+        float p = 0.15f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
-        nar.compoundVolumeMax.setValue(30);
+        nar.confMin.setValue(0.02f);
+        nar.compoundVolumeMax.setValue(32);
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!',2);
 
         Arkancide t = new Arkancide(nar);
         t.trace = true;
 
 
+        int history = 2000;
         window(
             grid(
                 new CameraSensorView(t.pixels, nar),
-                BeliefTableChart.agentActions(t, 200),
-                BagChart.concepts(nar, 16),
+                BeliefTableChart.agentActions(t, history),
+                BagChart.concepts(nar, 64),
                 col(
                     HistogramChart.budgetChart(nar, 50),
                     conceptLinePlot(nar, t.actions, nar::conceptPriority, 200)

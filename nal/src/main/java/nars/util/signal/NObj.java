@@ -8,7 +8,6 @@ import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.util.math.FloatNormalized;
 import ognl.*;
-import org.codehaus.janino.Java;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

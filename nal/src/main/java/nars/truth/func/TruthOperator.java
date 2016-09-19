@@ -1,7 +1,7 @@
 package nars.truth.func;
 
 import nars.$;
-import nars.Memory;
+import nars.NAR;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.Truth;
@@ -33,7 +33,7 @@ public interface TruthOperator {
      *                if confidence is equal to or greater, then it is valid
      * @return
      */
-    @Nullable Truth apply(@Nullable Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf);
+    @Nullable Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf);
 
 
     boolean allowOverlap();
@@ -60,7 +60,7 @@ public interface TruthOperator {
         @Override
         public
         @Nullable
-        Truth apply(@Nullable Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf) {
+        Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf) {
             return o.apply(belief, task, m, minConf);
         }
 
@@ -99,7 +99,7 @@ public interface TruthOperator {
         @Override
         public
         @Nullable
-        Truth apply(@Nullable Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf) {
+        Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf) {
             return task == null ? null : o.apply(task.negated(), belief, m, minConf);
         }
 

@@ -10,8 +10,8 @@ import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.time.Tense;
 import nars.test.analyze.BeliefAnalysis;
+import nars.time.Tense;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class RevisionTest {
         */
 
         //}
-        ((DefaultConceptPolicy)d.index.conceptBuilder().awake()).beliefsMaxEte.set(maxBeliefs);
+        ((DefaultConceptPolicy)d.concepts.conceptBuilder().awake()).beliefsMaxEte.set(maxBeliefs);
         return d;
     }
 

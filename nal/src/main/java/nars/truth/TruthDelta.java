@@ -1,7 +1,5 @@
 package nars.truth;
 
-import nars.truth.Truth;
-
 /**
  * Records a change in truth state from before and after a task is inserteed into a belief table.
  * Used for accurate feedback measurements.

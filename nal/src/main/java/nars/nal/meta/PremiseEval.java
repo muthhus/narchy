@@ -131,7 +131,7 @@ public class PremiseEval extends FindSubst {
     }
 
     public PremiseEval(@NotNull NAR nar, @Nullable Premise p) {
-        super(nar.index, VAR_PATTERN, nar.random);
+        super(nar.concepts, VAR_PATTERN, nar.random);
 
         this.nar = nar;
         this.truthResolution = nar.truthResolution.floatValue();

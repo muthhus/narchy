@@ -1,6 +1,6 @@
 package nars.term.subst;
 
-import nars.Memory;
+import nars.NAR;
 import nars.Op;
 import nars.term.InvalidTermException;
 import nars.term.Term;
@@ -18,8 +18,7 @@ public class UnifySubst extends FindSubst  {
 
     static final Logger logger = LoggerFactory.getLogger(UnifySubst.class);
 
-    @NotNull
-    public final Memory memory;
+    public final NAR memory;
 
 
     final Collection<Termed> target;
@@ -28,8 +27,8 @@ public class UnifySubst extends FindSubst  {
 
     int matches;
 
-    public UnifySubst(Op varType, @NotNull Memory memory, Collection<Termed> target, int maxMatches) {
-        super(memory.index, varType, memory.random);
+    public UnifySubst(Op varType, NAR memory, Collection<Termed> target, int maxMatches) {
+        super(memory.concepts, varType, memory.random);
 
         this.memory = memory;
         this.maxMatches = maxMatches;
@@ -66,7 +65,7 @@ public class UnifySubst extends FindSubst  {
 
         }
         catch (InvalidTermException e) {
-            logger.warn("{}",e.toString());
+            logger.warn("{}",e);
         }
 
 //        if ((aa == null) ||
@@ -93,7 +92,7 @@ public class UnifySubst extends FindSubst  {
     Term resolve(@NotNull Term t, @Nullable Map<Term,Term> subs) {
         return (subs == null) || (subs.isEmpty()) ?
                 t /* no change necessary */ :
-                memory.index.transform(t, new MapSubst(subs));
+                memory.concepts.transform(t, new MapSubst(subs));
     }
 
 }

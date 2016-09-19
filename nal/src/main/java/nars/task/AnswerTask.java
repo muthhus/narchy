@@ -3,11 +3,11 @@ package nars.task;
 import nars.NAR;
 import nars.Task;
 import nars.budget.merge.BudgetMerge;
-import nars.truth.TruthDelta;
 import nars.nal.Stamp;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
+import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

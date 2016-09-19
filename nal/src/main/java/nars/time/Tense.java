@@ -1,6 +1,6 @@
 package nars.time;
 
-import nars.Memory;
+import nars.NAR;
 import nars.Task;
 import nars.table.BeliefTable;
 import nars.truth.Truth;
@@ -113,7 +113,7 @@ public enum Tense  {
         return t <= TIMELESS; /* includes ETERNAL */
     }
 
-    public static long getRelativeOccurrence(@NotNull Tense tense, @NotNull Memory m) {
+    public static long getRelativeOccurrence(@NotNull Tense tense, NAR m) {
         return getRelativeOccurrence(m.time(), tense, 1 /*m.duration()*/);
     }
 

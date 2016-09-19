@@ -76,7 +76,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @NotNull
-    public static Task makeTask(Memory memory, @Nullable float[] b, Termed content, char p, @Nullable Truth t, Tense tense) {
+    public static Task makeTask(NAR memory, @Nullable float[] b, Termed content, char p, @Nullable Truth t, Tense tense) {
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");

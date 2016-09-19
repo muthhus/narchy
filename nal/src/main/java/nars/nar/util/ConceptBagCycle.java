@@ -1,7 +1,6 @@
 package nars.nar.util;
 
 import nars.$;
-import nars.Memory;
 import nars.NAR;
 import nars.Param;
 import nars.bag.Bag;
@@ -71,7 +70,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.cyclesPerFrame = cyclesPerFrame;
-        this.conceptBuilder = nar.index.conceptBuilder();
+        this.conceptBuilder = nar.concepts.conceptBuilder();
 
         this.concepts = new MonitoredCurveBag(nar, initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
 
@@ -101,7 +100,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     }
 
 
-    public void reset(Memory m) {
+    public void reset(NAR m) {
         concepts.clear();
     }
 

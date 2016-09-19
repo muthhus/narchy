@@ -4,8 +4,8 @@ import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.nar.Default;
 import nars.concept.FuzzyScalarConcepts;
+import nars.nar.Default;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.junit.Test;
 

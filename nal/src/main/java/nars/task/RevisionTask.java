@@ -5,10 +5,10 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
-import nars.truth.TruthDelta;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
+import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

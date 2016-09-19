@@ -3,11 +3,11 @@ package nars.op;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.truth.TruthDelta;
 import nars.nal.Stamp;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +46,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
 
                     Term d = dd[nar.random.nextInt(dd.length)]; //choose one randomly
                     //for (Term d : dd) {
-                        Term newContent = nar.index.replace(c, s, d);
+                        Term newContent = nar.concepts.replace(c, s, d);
                         if ((newContent instanceof Compound) && !newContent.equals(c)) {
                             input(nar, input, (Compound)newContent);
                         }

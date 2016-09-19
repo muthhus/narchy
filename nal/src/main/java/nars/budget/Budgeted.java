@@ -1,6 +1,6 @@
 package nars.budget;
 
-import nars.Memory;
+import nars.NAR;
 import nars.Param;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,7 @@ public interface Budgeted  {
     /**
      * randomly selects an item from a collection, weighted by priority
      */
-    static <E extends Budgeted> E selectRandomByPriority(@NotNull Memory memory, @NotNull Iterable<E> c) {
+    static <E extends Budgeted> E selectRandomByPriority(NAR memory, @NotNull Iterable<E> c) {
         float totalPriority = getPrioritySum(c);
 
         if (totalPriority == 0) return null;

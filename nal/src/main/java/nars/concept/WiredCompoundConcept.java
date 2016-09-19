@@ -4,13 +4,11 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.budget.policy.ConceptPolicy;
-import nars.concept.CompoundConcept;
-import nars.concept.PermanentConcept;
-import nars.truth.TruthDelta;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
+import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -6,17 +6,17 @@ import nars.Narsese.NarseseException;
 import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.concept.util.InvalidConceptException;
 import nars.concept.OperationConcept;
-import nars.table.BeliefTable;
+import nars.concept.util.InvalidConceptException;
 import nars.index.TermIndex;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.nar.exe.Executioner;
-import nars.nar.exe.SingleThreadExecutioner;
+import nars.table.BeliefTable;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
@@ -66,46 +66,48 @@ import static org.fusesource.jansi.Ansi.ansi;
  * memory operations.  It executes a series sof cycles in two possible modes:
  * * step mode - controlled by an outside system, such as during debugging or testing
  * * thread mode - runs in a pausable closed-loop at a specific maximum framerate.
+ *  * Memory consists of the run-time state of a NAR, including: * term and concept
+ * memory * clock * reasoner state * etc.
+ * <p>
+ * Excluding input/output channels which are managed by a NAR.
+ * <p>
+ * A memory is controlled by zero or one NAR's at a given time.
+ * <p>
+ * Memory is serializable so it can be persisted and transported.
  */
-public abstract class NAR extends Memory implements Level, Consumer<Task> {
-
-
-    /**
-     * The information about the version and date of the project.
-     */
-    public static final String VERSION = "Open-NARS v1.7.0";
-    /**
-     * The project web sites.
-     */
-    public static final String WEBSITE =
-            " Open-NARS website:  http://code.google.com/p/open-nars/ \n" +
-                    "      NARS website:  http://sites.google.com/site/narswang/ \n" +
-                    "    Github website:  http://github.com/opennars/ \n" +
-                    "               IRC:  http://webchat.freenode.net/?channels=nars \n";
+public abstract class NAR extends Param implements Level, Consumer<Task> {
 
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
 
-
-    static final Set<String> logEvents = Sets.newHashSet(
-            "eventTaskProcess", "eventAnswer",
-            "eventExecute" //"eventRevision", /* eventDerive */ "eventError",
-            //"eventSpeak"
-    );
+    static final Set<String> logEvents = Sets.newHashSet( "eventTaskProcess", "eventAnswer", "eventExecute" );
+    public static final String VERSION = "NARchy v?.?";
 
     public final Executioner exe;
-
+    @NotNull public final Random random;
+    public final transient Topic<NAR> eventReset = new DefaultTopic<>();
+    public final transient DefaultTopic<NAR> eventFrameStart = new DefaultTopic<>();
+    public final transient Topic<Task> eventTaskProcess = new DefaultTopic<>();
+    @NotNull public final transient Emotion emotion;
+    @NotNull public final Clock clock;
+    /** holds known Term's and Concept's */
+    @NotNull public final TermIndex concepts;
+    @NotNull public final TaskIndex tasks;
 
     /**
      * The id/name of the reasoner
      * TODO
      */
     @NotNull
-    public Atom self;
+    public final Atom self;
+
     /**
      * Flag for running continuously
      */
     public volatile boolean running = false;
+
+    /** maximum NAL level currently supported by this memory, for restricting it to activity below NAL8 */
+    int level;
 
 
     private NARLoop loop;
@@ -115,10 +117,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     private Function<Task, Task> preprocessor = (t) -> t; //by default, pass-through
 
 
-
-    public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
-        this(clock, index, rng, self, new SingleThreadExecutioner());
-    }
 
     public void printConceptStatistics() {
         //Frequency complexity = new Frequency();
@@ -163,11 +161,29 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //            logger.info("term cache: {}", index.terms.summary());
 //        }
 
-        return index.normalize(t);
+        return concepts.normalize(t);
     }
 
-    public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
-        super(clock, rng, index);
+    public NAR(@NotNull Clock clock, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
+
+        random = rng;
+
+        level = 8;
+
+        this.clock = clock;
+        clock.clear();
+
+        this.concepts = concepts;
+
+        this.tasks = new TaskIndex();
+
+
+        self = Param.DEFAULT_SELF; //default value
+
+
+        emotion = new Emotion();
+
+
         this.self = self;
 
         (this.exe = exe).start(this);
@@ -192,10 +208,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
 
-        index.conceptBuilder().start(this);
+        concepts.conceptBuilder().start(this);
 
-        index.loadBuiltins();
-        index.start(this);
+        concepts.loadBuiltins();
+        concepts.start(this);
 
         tasks.start(this);
 
@@ -235,19 +251,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         bt.forEach(e);
     }
 
-    /**
-     * change the identity of this NAR
-     */
-    @NotNull
-    public NAR setSelf(@NotNull Atom nextSelf) {
-        this.self = nextSelf;
-        return this;
-    }
-
-    @NotNull
-    public NAR setSelf(@NotNull String nextSelf) {
-        return setSelf((Atom) $.$(nextSelf));
-    }
 
     /**
      * Reset the system with an empty memory and reset clock.  Event handlers
@@ -259,7 +262,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         exe.synchronize();
 
-        super.reset();
+
+        eventReset.emit(this);
+
+        clock.clear();
+
+        concepts.clear();
+
+        tasks.clear();
 
     }
 
@@ -313,7 +323,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @NotNull
     public <T extends Term> Termed<T> term(@NotNull String t) throws NarseseException {
-        Termed x = index.parse(t);
+        Termed x = concepts.parse(t);
         if (x == null) {
             //if a NarseseException was not already thrown, this indicates that it parsed but the index failed to provide its output
             throw new NarseseException("Unindexed: " + t);
@@ -1055,7 +1065,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     public @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) throws InvalidConceptException {
-        return index.concept(t, createIfMissing);
+        return concepts.concept(t, createIfMissing);
     }
 
     @Nullable
@@ -1063,7 +1073,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @NotNull
     public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
-        index.forEach(x -> {
+        concepts.forEach(x -> {
             if (x instanceof Concept)
                 recip.accept((Concept) x);
         });
@@ -1175,7 +1185,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * implementations should apply active concept capacity policy
      */
     public final void on(@NotNull Concept c) {
-        index.set(c);
+        concepts.set(c);
         on.add(c);
     }
 
@@ -1216,6 +1226,38 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     /** if the concept is active, returns the Concept while applying the boost factor to its budget */
     abstract public Concept concept(Term term, float boost);
+
+    @Override
+    public final int level() {
+        return level;
+    }
+
+    /**
+     * sets current maximum allowed NAL level (1..8)
+     */
+    public final void nal(int newLevel) {
+        level = newLevel;
+    }
+
+    public final void policy(@NotNull Concept c, @NotNull ConceptPolicy p, long now) {
+
+        @Nullable ConceptPolicy prev = c.policy();
+        if (prev != p) {
+
+            List<Task> removed = $.newArrayList();
+            c.policy(p, now, removed);
+            tasks.remove(removed);
+
+
+            concepts.onPolicyChanged(c);
+        }
+
+
+    }
+
+    public final long time() {
+        return clock.time();
+    }
 
 
 //    @Nullable
@@ -1328,7 +1370,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         int count = 0;
 
         while ((tasks.available() > 0) || (i.available() > 0) || (ii.available() > 0)) {
-            Task t = IO.readTask(ii, index);
+            Task t = IO.readTask(ii, concepts);
             input(t);
             count++;
         }

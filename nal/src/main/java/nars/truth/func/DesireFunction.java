@@ -1,14 +1,13 @@
 package nars.truth.func;
 
 import nars.$;
-import nars.Memory;
+import nars.NAR;
 import nars.Symbols;
 import nars.nal.meta.AllowOverlap;
 import nars.nal.meta.SinglePremise;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -18,28 +17,28 @@ public enum DesireFunction implements TruthOperator {
 
     @SinglePremise
     Negation() {
-        @Override public @Nullable Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public @Nullable Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return TruthFunctions.negation(T, minConf);
         }
     },
 
     Strong() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return (T == null || B == null) ? null : TruthFunctions.desireStrong(T, B, minConf);
         }
     },
 
     Weak() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return (T == null || B == null) ? null : TruthFunctions.desireWeak(T, B, minConf);
         }
     },
 
     Induction() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return B == null ? null : TruthFunctions.desireInd(T, B, minConf);
         }
     },
@@ -47,7 +46,7 @@ public enum DesireFunction implements TruthOperator {
     //@AllowOverlap
     Deduction() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return (T == null || B == null) ? null : TruthFunctions.desireDed(T, B, minConf);
         }
     },
@@ -65,7 +64,7 @@ public enum DesireFunction implements TruthOperator {
     @SinglePremise
     Identity() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return TruthOperator.identity(T, minConf);
         }
     },
@@ -73,7 +72,7 @@ public enum DesireFunction implements TruthOperator {
     @AllowOverlap @SinglePremise
     StructuralStrong() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return TruthFunctions.desireStrong(T, defaultTruth(m), minConf);
         }
     },
@@ -82,7 +81,7 @@ public enum DesireFunction implements TruthOperator {
     @AllowOverlap
     StructuralDeduction() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, final Truth B, NAR m, float minConf) {
             return T != null ? TruthFunctions.deduction1(T, defaultTruth(m).conf(), minConf) : null;
         }
     },
@@ -98,7 +97,7 @@ public enum DesireFunction implements TruthOperator {
 
     Union() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.union(T, B, minConf);
         }
     },
@@ -106,14 +105,14 @@ public enum DesireFunction implements TruthOperator {
 
     Intersection() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.intersection(T, B, minConf);
         }
     },
 
     Difference() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.difference(T, B, minConf);
         }
     },
@@ -122,7 +121,7 @@ public enum DesireFunction implements TruthOperator {
     ;
 
     @Nullable
-    private static Truth defaultTruth(@NotNull Memory m) {
+    private static Truth defaultTruth(NAR m) {
         return m.truthDefault(Symbols.GOAL /* goal? */);
     }
 

@@ -624,7 +624,7 @@ public class NARide extends StackPane {
             nar.onFrame(c -> {
 
                 int activeConcepts = l.concepts.size();
-                TermIndex index = nar.index;
+                TermIndex index = nar.concepts;
                 int totalConcepts = index.size();
                 int uniqueSubterms = index.subtermsCount();
 

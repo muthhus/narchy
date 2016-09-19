@@ -76,7 +76,7 @@ public class InterNAR extends Peer implements PeerModel {
         if (super.onQuery(q)) {
 
             try {
-                Task t = IO.taskFromBytes(q.query, nar.index);
+                Task t = IO.taskFromBytes(q.query, nar.concepts);
                 logger.info("recv: {} \t {}", t, q);
                 consider(q, t);
             } catch (Exception e) {

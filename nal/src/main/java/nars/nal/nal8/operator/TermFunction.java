@@ -6,10 +6,10 @@ import nars.Op;
 import nars.Task;
 import nars.budget.Budgeted;
 import nars.concept.OperationConcept;
-import nars.table.BeliefTable;
 import nars.index.TermIndex;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
+import nars.table.BeliefTable;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -161,7 +161,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
         //}
 
         if (args!=null) {
-            O y = function(args, nar.index);
+            O y = function(args, nar.concepts);
             if (y != null) {
 
                 //if (!tt.isCommand()) {

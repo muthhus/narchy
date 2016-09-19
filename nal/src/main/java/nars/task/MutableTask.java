@@ -84,13 +84,13 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    public MutableTask time(@NotNull Tense t, @NotNull Memory memory) {
+    public MutableTask time(@NotNull Tense t, NAR memory) {
         occurr(Tense.getRelativeOccurrence(t, memory));
         return this;
     }
 
     @NotNull
-    public final MutableTask present(@NotNull Memory memory) {
+    public final MutableTask present(NAR memory) {
         return present(memory.time());
     }
 

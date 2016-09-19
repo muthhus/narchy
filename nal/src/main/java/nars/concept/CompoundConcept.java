@@ -8,12 +8,12 @@ import nars.bag.Bag;
 import nars.budget.Activation;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
+import nars.link.TermLinkBuilder;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.table.ArrayQuestionTable;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
 import nars.table.QuestionTable;
-import nars.link.TermLinkBuilder;
-import nars.nar.util.DefaultConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -126,7 +126,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public CompoundConcept(@NotNull T term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.index.conceptBuilder(), n, ((DefaultConceptBuilder)n.index.conceptBuilder()).newBagMap());
+        this(term, (DefaultConceptBuilder) n.concepts.conceptBuilder(), n, ((DefaultConceptBuilder)n.concepts.conceptBuilder()).newBagMap());
     }
 
     /**

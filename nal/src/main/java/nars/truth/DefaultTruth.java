@@ -1,6 +1,6 @@
 package nars.truth;
 
-import nars.Memory;
+import nars.NAR;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ public class DefaultTruth implements Truth  {
         //this.hash = Truth.hash(f, c, discreteness);
     }
 
-    public DefaultTruth(char punctuation, @NotNull Memory m) {
+    public DefaultTruth(char punctuation, NAR m) {
         this(1.0f, m.confidenceDefault(punctuation));
     }
 

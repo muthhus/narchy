@@ -290,9 +290,9 @@ public class TemporalTest {
 
         d.next();
 
-        int indexSize = d.index.size();
+        int indexSize = d.concepts.size();
 
-        d.index.print(System.out);
+        d.concepts.print(System.out);
 
 
         assertEquals(3 , d.concept("(x==>y)").beliefs().size() );
@@ -304,10 +304,10 @@ public class TemporalTest {
 
         assertEquals(4, d.concept("(x==>y)").beliefs().size() );
 
-        d.index.print(System.out);
-        assertEquals(indexSize, d.index.size() ); //remains same amount
+        d.concepts.print(System.out);
+        assertEquals(indexSize, d.concepts.size() ); //remains same amount
 
-        d.index.print(out);
+        d.concepts.print(out);
         d.concept("(x==>y)").print();
     }
 

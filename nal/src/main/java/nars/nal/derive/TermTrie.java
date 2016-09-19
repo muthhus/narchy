@@ -2,13 +2,13 @@ package nars.nal.derive;
 
 import com.google.common.base.Joiner;
 import nars.term.Term;
+import nars.util.trie.Trie;
+import nars.util.trie.TrieNode;
+import nars.util.trie.TrieSequencer;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import nars.util.trie.Trie;
-import nars.util.trie.TrieNode;
-import nars.util.trie.TrieSequencer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
