@@ -19,9 +19,12 @@
 
 package nars.experiment.pacman;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
@@ -30,22 +33,22 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
-import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.concept.MotorConcept;
 import nars.concept.SensorConcept;
+import nars.util.signal.NObj;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.SpaceGraph;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
-import static nars.experiment.tetris.Tetris.agentBudgetPlot;
+import static nars.experiment.tetris.Tetris.conceptLinePlot;
+import static spacegraph.SpaceGraph.window;
+import static spacegraph.obj.GridSurface.col;
+import static spacegraph.obj.GridSurface.grid;
 
 /**
  * the java application class of pacman 
@@ -57,7 +60,7 @@ public class Pacman extends NAgent {
 
     final int visionRadius;
     final int itemTypes = 3;
-    final static int runCycles = 5000;
+    final static int runCycles = 500;
 
 
     final int inputs;
@@ -85,14 +88,9 @@ public class Pacman extends NAgent {
 
         FloatToObjectFunction<Truth> truther = (f) -> $.t(f, alpha);
 
-//			int pix = pac.iX / 16;
-//			int piy = pac.iY / 16;
         for (int ii = -visionRadius; ii <= +visionRadius; ii++) {
+            int i = ii;
             for (int jj = -visionRadius; jj <= +visionRadius; jj++) {
-
-
-
-                int i = ii;
                 int j = jj;
 
                 sensors.add(new SensorConcept( $.inh($.p(i, j), $.the("wall")), nar,
@@ -100,6 +98,7 @@ public class Pacman extends NAgent {
                             return at(i, j)==cmaze.WALL ? 1f : 0;
                         },
                         truther));
+
                 sensors.add(new SensorConcept( $.inh($.p(i, j), $.the("dot")), nar,
                         () -> {
                             int v = at(i, j);
@@ -115,6 +114,7 @@ public class Pacman extends NAgent {
                             return dotness;
                         },
                         truther));
+
                 sensors.add(new SensorConcept( $.inh($.p(i, j), $.the("ghost")), nar,
                         () -> {
                             int pix = Math.round(pacman.pac.iX / 16f);
@@ -140,16 +140,6 @@ public class Pacman extends NAgent {
 
 
         }
-        //System.out.println(Arrays.toString(ins));
-
-//			//noise
-//			if (Math.random() < 0.1) {
-//				float noiselevel = 0.1f;
-//				for (int i = 0; i < ins.length; i++) {
-//					ins[i] = Util.clamp(ins[i] + (float) ((Math.random() - 0.5) * 2) * noiselevel);
-//				}
-//			}
-
 
         @Nullable Truth zero = $.t(0.5f, alpha);
 
@@ -174,6 +164,7 @@ public class Pacman extends NAgent {
             }
             return null;
         }));
+
         actions.add(new MotorConcept("(updown)",nar,(b,d)->{
             if (d!=null) {
                 float f =
@@ -197,9 +188,79 @@ public class Pacman extends NAgent {
         }));
 
 
-        List<Termed> charted = new ArrayList(super.actions);
+        //PAC-GPS
+        new NObj("pcpman", pacman, nar).read("pac.iX", "pac.iY").into(this);
+    }
 
-        charted.add(happy);
+
+    public static void main(String[] args) {
+        Random rng = new XorShift128PlusRandom(1);
+
+        //Param.CONCURRENCY_DEFAULT = 2;
+
+        //Multi nar = new Multi(3,512,
+
+        Executioner e =
+                new MultiThreadExecutioner(2, 8192);
+                //new SingleThreadExecutioner();
+
+        Default nar = new Default(1024,
+                16, 2, 3, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
+                new FrameClock(), e
+
+        );
+        //Object queryIntroducer = queryVariableIntroduction(nar, 100, 0.1f, 0.25f);
+
+        //new MemoryManager(nar);
+
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.7f);
+
+        float pMult = 0.01f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * pMult;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * pMult;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * pMult;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * pMult;
+        nar.cyclesPerFrame.set(cyclesPerFrame);
+
+        nar.confMin.setValue(0.04f);
+        nar.compoundVolumeMax.set(24);
+
+        //nar.truthResolution.setValue(0.02f);
+
+        //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
+        //nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
+
+        //nar.inputAt(20,"$1.0;0.8;1.0$ rightOf:((0,#x),(1,#x)). %1.0;1.0%");
+        //nar.inputAt(20,"$1.0;0.8;1.0$ rightOf:((1,#x),(2,#x)). %1.0;1.0%");
+        //nar.inputAt(20,"$1.0;0.8;1.0$ ( ( (($x,$y)-->$a) && (($x,$y)-->$b) ) ==> samePlace:(($x,$y),$a,$b) ). %1.0;1.0%");
+        //nar.inputAt(100,"$1.0;0.8;1.0$ samePlace:(#x,#y,#a,#b)?");
+
+        //nar.log();
+        //nar.logSummaryGT(System.out, 0.1f);
+
+//		nar.log(System.err, v -> {
+//			if (v instanceof Task) {
+//				Task t = (Task)v;
+//				if (t instanceof DerivedTask && t.punc() == '!')
+//					return true;
+//			}
+//			return false;
+//		});
+
+        //Param.DEBUG = true;
+
+        //new Abbreviation2(nar, "_");
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
+
+
+        Pacman p = new Pacman(nar, 7 /* ghosts  */, 6 /* visionRadius */);
+        p.trace = true;
+
+
 
 //				charted.add(nar.activate($.$("[pill]"), UnitBudget.Zero));
 //				charted.add(nar.activate($.$("[ghost]"), UnitBudget.Zero));
@@ -263,11 +324,21 @@ public class Pacman extends NAgent {
 //        if (nar instanceof Default) {
 //
 //          //new BeliefTableChart(nar, charted).show(700, 900);
-        BeliefTableChart.newBeliefChart(nar, charted, 500);
-        SpaceGraph.window(HistogramChart.budgetChart(nar, 50), 200, 600);
-        SpaceGraph.window(agentBudgetPlot(this, 256) , 500, 400);
 
 
+        int history = 2000;
+        window(
+            grid(
+                    //new CameraSensorView(pacman.pixels, nar),
+                    BeliefTableChart.agentActions(p, history),
+                    BagChart.concepts(nar, 64),
+                    col(
+                            HistogramChart.budgetChart(nar, 50),
+                            conceptLinePlot(nar,
+                                    Iterables.concat(p.actions, Lists.newArrayList(p.happy, p.joy)),
+                                    nar::conceptPriority, 200)
+                    )
+            ), 500, 500);
 
 ////
         //BagChart.show((Default) nar, 512);
@@ -281,77 +352,6 @@ public class Pacman extends NAgent {
 //        }
 
 
-    }
-
-
-    public static void main(String[] args) {
-        Random rng = new XorShift128PlusRandom(1);
-
-        //Param.CONCURRENCY_DEFAULT = 2;
-
-        //Multi nar = new Multi(3,512,
-
-        Executioner e =
-                new MultiThreadExecutioner(2, 8192);
-                //new SingleThreadExecutioner();
-
-        Default nar = new Default(1024,
-                16, 2, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 150000, 8192, 2),
-                new FrameClock(), e
-
-        );
-        //Object queryIntroducer = queryVariableIntroduction(nar, 100, 0.1f, 0.25f);
-
-        //new MemoryManager(nar);
-
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.7f);
-
-        float pMult = 0.01f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * pMult;
-        nar.DEFAULT_GOAL_PRIORITY = 1f * pMult;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * pMult;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * pMult;
-        nar.cyclesPerFrame.set(cyclesPerFrame);
-
-        nar.confMin.setValue(0.04f);
-        nar.compoundVolumeMax.set(24);
-        //nar.truthResolution.setValue(0.02f);
-
-        //nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
-        //nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
-
-        //nar.inputAt(20,"$1.0;0.8;1.0$ rightOf:((0,#x),(1,#x)). %1.0;1.0%");
-        //nar.inputAt(20,"$1.0;0.8;1.0$ rightOf:((1,#x),(2,#x)). %1.0;1.0%");
-        //nar.inputAt(20,"$1.0;0.8;1.0$ ( ( (($x,$y)-->$a) && (($x,$y)-->$b) ) ==> samePlace:(($x,$y),$a,$b) ). %1.0;1.0%");
-        //nar.inputAt(100,"$1.0;0.8;1.0$ samePlace:(#x,#y,#a,#b)?");
-
-        //nar.log();
-        //nar.logSummaryGT(System.out, 0.1f);
-
-//		nar.log(System.err, v -> {
-//			if (v instanceof Task) {
-//				Task t = (Task)v;
-//				if (t instanceof DerivedTask && t.punc() == '!')
-//					return true;
-//			}
-//			return false;
-//		});
-
-        //Param.DEBUG = true;
-
-        //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
-
-
-        Pacman pacman = new Pacman(nar, 7 /* ghosts  */, 6 /* visionRadius */);
-        pacman.trace = true;
-
-
-
 //		SwingCamera swingCam = new SwingCamera(pacman);
 //		NARCamera camera = new NARCamera("pacmap", nar, swingCam, (x, y) -> {
 //			return $.p($.the(x), $.the(y));
@@ -362,16 +362,16 @@ public class Pacman extends NAgent {
 //
 //		NARCamera.newWindow(camera);
 
-        nar.onFrame(nn -> {
-
-            //camera.center(pacman.pac.iX, pacman.pac.iY); //center on nars
-
-
-//			camera.updateMono((x,y,t,w) -> {
-//				//nar.believe(t, w, 0.9f);
-//			});
-
-        });
+//        nar.onFrame(nn -> {
+//
+//            //camera.center(pacman.pac.iX, pacman.pac.iY); //center on nars
+//
+//
+////			camera.updateMono((x,y,t,w) -> {
+////				//nar.believe(t, w, 0.9f);
+////			});
+//
+//        });
 
 
 //        Param.DEBUG = true;
@@ -380,7 +380,7 @@ public class Pacman extends NAgent {
 //               System.out.println(t);
 //           }
 //        });
-        pacman.runSync(runCycles);
+        p.runSync(runCycles);
 
 //		pacman.run(
 //				//new DQN(),
@@ -389,8 +389,6 @@ public class Pacman extends NAgent {
 //				n,
 //				runCycles,
 //				runDelay);
-
-
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);

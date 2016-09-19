@@ -60,7 +60,7 @@ public class Tetris extends NAgent {
 //            new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 5550;
-    public static final int cyclesPerFrame = 32;
+    public static final int cyclesPerFrame = 4;
     public static final int tetris_width = 6;
     public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 5;
@@ -96,7 +96,7 @@ public class Tetris extends NAgent {
      * @param timePerFall larger is slower gravity
      */
     public Tetris(NAR nar, int width, int height, int timePerFall) {
-        super(nar);
+        super(nar, 4);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override

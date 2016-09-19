@@ -42,15 +42,18 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
 
                 Term[] dd = next(c, s);
 
-                if (dd != null && dd.length > 0) {
+                if (dd!=null) {
+                    int replacements = dd.length;
+                    if (replacements > 0) {
 
-                    Term d = dd[nar.random.nextInt(dd.length)]; //choose one randomly
-                    //for (Term d : dd) {
+                        Term d = dd[nar.random.nextInt(replacements)]; //choose one randomly
+                        //for (Term d : dd) {
                         Term newContent = nar.concepts.replace(c, s, d);
                         if ((newContent instanceof Compound) && !newContent.equals(c)) {
                             input(nar, input, newContent);
                         }
-                    //}
+                        //}
+                    }
                 }
             }
         }

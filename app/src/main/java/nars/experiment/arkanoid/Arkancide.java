@@ -16,12 +16,9 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.math.FloatNormalized;
-import nars.concept.FuzzyScalarConcepts;
 import nars.concept.MotorConcept;
 import nars.util.signal.NObj;
 import nars.video.CameraSensorView;
@@ -75,7 +72,7 @@ public class Arkancide extends NAgent {
 
         new NObj("noid", noid = new Arkanoid(), nar)
                 .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
-                .in(this);
+                .into(this);
 
         pixels = new CameraSensor($.oper("noid"),
             new SwingCamera(noid, visW, visH), this, (v) -> t(v, alpha));

@@ -151,7 +151,7 @@ public class NObj<X> {
         return sb./*.append(')').*/toString();
     }
 
-    public void in(NAgent agent) {
+    public void into(NAgent agent) {
         agent.sensors.addAll(sensors);
         NAgent.logger.info("{} added {}", this, sensors);
     }
