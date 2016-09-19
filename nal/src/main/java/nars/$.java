@@ -972,14 +972,17 @@ public enum $ {
         String xx = Integer.toString(maxX, radix);
         Term[] tt = new Term[xx.length()];
         int ttl = tt.length;
+        int xsl = xs.length();
+        int p = ttl - xsl;
+        int j = 0;
         for (int i = 0; i < ttl; i++) {
             Term n;
-            if (xs.length() > i) {
-                n = $.the(xs.charAt(i) - '0');
-            } else {
+            if (p-- > 0) {
                 n = $.the(0); //pad with zeros
+            } else {
+                n = $.the(xs.charAt(j++) - '0');
             }
-            tt[ttl - 1 - i] = n; //reverse order, least significant bit at RIGHT
+            tt[i] = n;
         }
         return $.p(tt);
     }

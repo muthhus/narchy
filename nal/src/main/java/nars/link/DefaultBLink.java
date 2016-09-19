@@ -5,6 +5,8 @@ import nars.budget.RawBudget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * Buffered/Budgeted Link (an entry in a bag)
  * equalsTo/hashCode proxies to the wrapped element, X id
@@ -42,13 +44,12 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
 
     @Override
     public final boolean equals(@NotNull Object that) {
-        return this == that;
+        return Objects.equals(id, that);
     }
 
     @Override
     public int hashCode() {
-        throw new UnsupportedOperationException();
-        //return hash;
+        return id!=null ? id.hashCode() : 0;
     }
 
     @Override

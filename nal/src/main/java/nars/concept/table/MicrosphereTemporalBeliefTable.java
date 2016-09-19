@@ -237,13 +237,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         float inputRank = input != null ? rank(input, now, now) : Float.POSITIVE_INFINITY;
 
         Task a = weakest(now, null);
-        if (a == null || !remove(a, displ)) {
+        if (a == null || inputRank < rank(a, now, now) || !remove(a, displ)) {
             //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
         }
 
         Task b = weakest(now, a);
-
         if (b != null && remove(b, displ)) {
             return merge(a, b, now, concept, eternal);
         } else {

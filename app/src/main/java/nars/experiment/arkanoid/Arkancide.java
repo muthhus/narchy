@@ -18,6 +18,7 @@ import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.Util;
@@ -29,6 +30,7 @@ import nars.util.signal.FuzzySensorSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import nars.video.SwingCamera;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -59,8 +61,8 @@ public class Arkancide extends NAgent {
 
     private MotorConcept motorLeftRight;
 
-    final int visW = 32;
-    final int visH = 16;
+    final int visW = 48;
+    final int visH = 24;
     SensorConcept[][] ss;
 
     //private final int visionSyncPeriod = 16;
@@ -91,13 +93,21 @@ public class Arkancide extends NAgent {
 
         //TODO extract this section and associated variables to a CameraSensorMatrix class or something
         ss = new SensorConcept[visW][visH];
+
+        Atom xy = $.the("xy");
         for (int x = 0; x < visW; x++) {
             int xx = x;
             for (int y = 0; y < visH; y++) {
-                Compound squareTerm = $.p(x, y);
+                @NotNull Compound coord =
+                        $.p( $.pRadix(x, 4, visW), $.pRadix(y, 4, visH) );
+                        //$.p(x, y);
+
+                System.out.println(x + " " + y + "\t" + coord);
+
+                Compound cell = $.inh( coord, xy);
                 int yy = y;
                 SensorConcept sss;
-                sensors.add(sss = new SensorConcept(squareTerm, nar,
+                sensors.add(sss = new SensorConcept(cell, nar,
                         () -> noise(decodeRed(cam.out.getRGB(xx, yy))) ,// > 0.5f ? 1 : 0,
                         (v) -> t(v, alpha)
                 ));
@@ -108,19 +118,19 @@ public class Arkancide extends NAgent {
         }
 
         sensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.paddle.x), nar,
-                "(pad:x,0)",
-                "(pad:x,1)",
-                "(pad:x,2)"
+                "pad(x,0)",
+                "pad(x,1)",
+                "pad(x,2)"
         ).resolution(0.05f).sensors );
 
         sensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.ball.x), nar,
-                "(ball:x,0)",
-                "(ball:x,1)",
-                "(ball:x,2)"
+                "ball(x,0)",
+                "ball(x,1)",
+                "ball(x,2)"
         ).resolution(0.05f).sensors );
 
         sensors.addAll( new FuzzySensorSet(new RangeNormalizedFloat(() -> (float)noid.ball.y), nar,
-                "(ball:y)"
+                "ball(y)"
         ).resolution(0.05f).sensors );
 
 
@@ -191,7 +201,7 @@ public class Arkancide extends NAgent {
 
         newBeliefChartWindow(this, 200);
         HistogramChart.budgetChart(nar, 50);
-        BagChart.show((Default) nar);
+        //BagChart.show((Default) nar);
 
         ControlSurface.newControlWindow(
                 //new GridSurface(VERTICAL, actionTables),
