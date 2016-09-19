@@ -33,7 +33,7 @@ package nars.perf.nars.nar.perf;
 
 import nars.nar.Default;
 import nars.term.Compound;
-import nars.util.experiment.DeductiveMeshTest;
+import nars.test.DeductiveMeshTest;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 

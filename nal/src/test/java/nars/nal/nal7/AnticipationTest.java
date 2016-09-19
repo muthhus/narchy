@@ -3,7 +3,7 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.nar.Default;
 import nars.op.mental.Anticipate;
-import nars.util.signal.TestNAR;
+import nars.test.TestNAR;
 import org.junit.Ignore;
 import org.junit.Test;
 

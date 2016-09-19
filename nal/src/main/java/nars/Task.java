@@ -2,8 +2,8 @@ package nars;
 
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.concept.InvalidConceptException;
-import nars.concept.TruthDelta;
+import nars.concept.util.InvalidConceptException;
+import nars.truth.TruthDelta;
 import nars.nal.Stamp;
 import nars.task.MutableTask;
 import nars.task.Revision;

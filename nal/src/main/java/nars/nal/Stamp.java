@@ -22,7 +22,7 @@ package nars.nal;
 
 import nars.Param;
 import nars.Task;
-import nars.concept.table.TemporalBeliefTable;
+import nars.table.TemporalBeliefTable;
 import nars.truth.TruthFunctions;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;

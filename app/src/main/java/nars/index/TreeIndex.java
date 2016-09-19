@@ -4,7 +4,7 @@ import com.googlecode.concurrenttrees.radix.node.Node;
 import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
-import nars.concept.ConceptBuilder;
+import nars.concept.util.ConceptBuilder;
 import nars.concept.PermanentConcept;
 import nars.term.Compound;
 import nars.term.Term;

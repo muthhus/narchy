@@ -5,7 +5,7 @@ import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.concept.Concept;
-import nars.concept.table.DefaultBeliefTable;
+import nars.table.DefaultBeliefTable;
 import nars.nal.Stamp;
 import nars.nal.UtilityFunctions;
 import nars.nal.meta.PremiseEval;

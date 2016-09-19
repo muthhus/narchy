@@ -11,7 +11,7 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.bag.Bag;
 import nars.concept.Concept;
-import nars.concept.table.BeliefTable;
+import nars.table.BeliefTable;
 import nars.index.CaffeineIndex;
 import nars.link.BLink;
 import nars.nar.Default;

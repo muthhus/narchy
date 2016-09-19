@@ -7,7 +7,7 @@ import nars.Task;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.concept.TruthDelta;
+import nars.truth.TruthDelta;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;

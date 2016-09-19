@@ -7,7 +7,7 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.event.FrameReaction;
+import nars.guifx.util.FrameReaction;
 
 import static javafx.application.Platform.runLater;
 

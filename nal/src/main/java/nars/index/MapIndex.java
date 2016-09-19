@@ -1,6 +1,6 @@
 package nars.index;
 
-import nars.concept.ConceptBuilder;
+import nars.concept.util.ConceptBuilder;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;

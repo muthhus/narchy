@@ -6,7 +6,7 @@ import nars.Op;
 import nars.Task;
 import nars.budget.Budgeted;
 import nars.concept.OperationConcept;
-import nars.concept.table.BeliefTable;
+import nars.table.BeliefTable;
 import nars.index.TermIndex;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;

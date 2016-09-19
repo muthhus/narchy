@@ -2,7 +2,7 @@ package nars.time;
 
 import nars.Memory;
 import nars.Task;
-import nars.concept.table.BeliefTable;
+import nars.table.BeliefTable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 

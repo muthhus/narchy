@@ -3,7 +3,7 @@ package nars.op;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.concept.TruthDelta;
+import nars.truth.TruthDelta;
 import nars.nal.Stamp;
 import nars.task.GeneratedTask;
 import nars.term.Compound;

@@ -1,12 +1,12 @@
 package nars.video;
 
 import nars.$;
-import nars.agent.NAgent;
+import nars.NAgent;
 import nars.term.Compound;
 import nars.term.atom.Atom;
 import nars.truth.Truth;
 import nars.util.math.FloatSupplier;
-import nars.util.signal.SensorConcept;
+import nars.concept.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 

@@ -6,7 +6,7 @@
 //import nars.NAR;
 //import nars.Narsese;
 //import nars.concept.OperationConcept;
-//import nars.concept.table.BeliefTable;
+//import BeliefTable;
 //import nars.nal.Tense;
 //import nars.nar.Default;
 //import nars.task.Task;

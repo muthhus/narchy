@@ -8,7 +8,7 @@ import nars.audio.sample.SonarSample;
 import nars.budget.Budgeted;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.util.event.FrameReaction;
+import nars.guifx.util.FrameReaction;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.io.IOException;

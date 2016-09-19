@@ -11,7 +11,7 @@ import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.time.Tense;
-import nars.util.analyze.BeliefAnalysis;
+import nars.test.analyze.BeliefAnalysis;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

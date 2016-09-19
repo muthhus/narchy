@@ -5,7 +5,7 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
-import nars.concept.TruthDelta;
+import nars.truth.TruthDelta;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;

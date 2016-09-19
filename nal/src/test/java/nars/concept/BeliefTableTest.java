@@ -2,10 +2,10 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Param;
-import nars.concept.table.BeliefTable;
+import nars.table.BeliefTable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.util.analyze.BeliefAnalysis;
+import nars.test.analyze.BeliefAnalysis;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;

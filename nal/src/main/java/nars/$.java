@@ -8,7 +8,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
-import nars.concept.ConceptBuilder;
+import nars.concept.util.ConceptBuilder;
 import nars.index.TermIndex;
 import nars.task.MutableTask;
 import nars.term.Compound;

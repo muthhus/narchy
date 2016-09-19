@@ -3,7 +3,7 @@ package nars.index;
 import com.github.benmanes.caffeine.cache.*;
 import nars.NAR;
 import nars.concept.Concept;
-import nars.concept.ConceptBuilder;
+import nars.concept.util.ConceptBuilder;
 import nars.concept.PermanentConcept;
 import nars.term.Compound;
 import nars.term.Term;

@@ -12,7 +12,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.FindSubst;
 import nars.util.signal.RuleTest;
-import nars.util.signal.TestNAR;
+import nars.test.TestNAR;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;

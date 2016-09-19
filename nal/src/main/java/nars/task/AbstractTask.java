@@ -2,8 +2,8 @@ package nars.task;
 
 import nars.*;
 import nars.budget.RawBudget;
-import nars.concept.InvalidConceptException;
-import nars.concept.TruthDelta;
+import nars.concept.util.InvalidConceptException;
+import nars.truth.TruthDelta;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

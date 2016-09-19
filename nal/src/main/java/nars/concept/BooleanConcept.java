@@ -4,7 +4,7 @@
 //import nars.NAR;
 //import nars.Param;
 //import nars.Task;
-//import nars.concept.table.BeliefTable;
+//import BeliefTable;
 //import nars.concept.table.DynamicBeliefTable;
 //import nars.nal.Stamp;
 //import nars.task.MutableTask;

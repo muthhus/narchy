@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.Param;
 import nars.nar.Default;
 import nars.nar.Terminal;
-import nars.util.signal.TestNAR;
+import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;

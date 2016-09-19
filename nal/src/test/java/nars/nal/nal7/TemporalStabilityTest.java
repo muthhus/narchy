@@ -3,7 +3,7 @@ package nars.nal.nal7;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.util.TimeMap;
+import nars.util.data.TimeMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;

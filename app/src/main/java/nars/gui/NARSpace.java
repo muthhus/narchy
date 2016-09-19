@@ -14,7 +14,7 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
-import nars.util.experiment.DeductiveMeshTest;
+import nars.test.DeductiveMeshTest;
 import org.infinispan.util.function.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

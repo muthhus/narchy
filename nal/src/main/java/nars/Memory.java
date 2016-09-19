@@ -28,7 +28,6 @@ import nars.term.atom.Atom;
 import nars.time.Clock;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
-import nars.util.signal.Emotion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

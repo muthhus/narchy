@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
-import nars.agent.NAgent;
+import nars.NAgent;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
@@ -19,8 +19,8 @@ import nars.time.FrameClock;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatNormalized;
-import nars.util.signal.FuzzyScalar;
-import nars.util.signal.MotorConcept;
+import nars.concept.FuzzyScalarConcepts;
+import nars.concept.MotorConcept;
 import nars.video.CameraSensorView;
 import nars.video.CameraSensor;
 import nars.video.SwingCamera;
@@ -54,7 +54,7 @@ public class Arkancide extends NAgent {
 
     final int visW = 48;
     final int visH = 24;
-    final FuzzyScalar padX;
+    final FuzzyScalarConcepts padX;
 
     float paddleSpeed = 20f;
 
@@ -75,19 +75,19 @@ public class Arkancide extends NAgent {
 
         pixels = new CameraSensor(new SwingCamera(noid, visW, visH), this, (v) -> t(v, alpha));
 
-        addSensor(this.padX = new FuzzyScalar(new FloatNormalized(() -> (float)noid.paddle.x), nar,
+        addSensor(this.padX = new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.paddle.x), nar,
                 "pad(x,0)",
                 "pad(x,1)",
                 "pad(x,2)"
         ).resolution(0.05f) );
 
-        addSensor( new FuzzyScalar(new FloatNormalized(() -> (float)noid.ball.x), nar,
+        addSensor( new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.ball.x), nar,
                 "ball(x,0)",
                 "ball(x,1)",
                 "ball(x,2)"
         ).resolution(0.05f) );
 
-        addSensor( new FuzzyScalar(new FloatNormalized(() -> (float)noid.ball.y), nar,
+        addSensor( new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.ball.y), nar,
                 "ball(y)"
         ).resolution(0.05f) );
 

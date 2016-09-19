@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import nars.NAR;
 import nars.nar.Default;
 import nars.truth.Truth;
-import nars.util.signal.SensorConcept;
+import nars.concept.SensorConcept;
 import spacegraph.obj.MatrixView;
 
 /**

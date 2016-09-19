@@ -6,7 +6,7 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
-import nars.concept.TruthDelta;
+import nars.truth.TruthDelta;
 import nars.nal.Premise;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;

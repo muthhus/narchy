@@ -8,7 +8,7 @@ import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
-import nars.concept.ConceptBuilder;
+import nars.concept.util.ConceptBuilder;
 import nars.link.BLink;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;

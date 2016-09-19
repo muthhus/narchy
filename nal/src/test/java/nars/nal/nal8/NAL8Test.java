@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.term.Term;
 import nars.time.Tense;
-import nars.util.signal.TestNAR;
+import nars.test.TestNAR;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

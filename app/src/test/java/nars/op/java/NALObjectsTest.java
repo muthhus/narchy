@@ -5,7 +5,7 @@
 //import nars.NAR;
 //import nars.nar.Default;
 //import nars.term.Term;
-//import nars.util.analyze.EventCount;
+//import EventCount;
 //import org.junit.Ignore;
 //import org.junit.Test;
 //

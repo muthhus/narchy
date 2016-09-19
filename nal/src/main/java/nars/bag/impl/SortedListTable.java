@@ -1,6 +1,6 @@
 package nars.bag.impl;
 
-import nars.concept.table.ArrayListTable;
+import nars.table.ArrayListTable;
 import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

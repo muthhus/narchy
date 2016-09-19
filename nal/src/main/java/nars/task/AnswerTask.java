@@ -3,7 +3,7 @@ package nars.task;
 import nars.NAR;
 import nars.Task;
 import nars.budget.merge.BudgetMerge;
-import nars.concept.TruthDelta;
+import nars.truth.TruthDelta;
 import nars.nal.Stamp;
 import nars.term.Compound;
 import nars.term.Termed;

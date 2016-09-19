@@ -6,15 +6,12 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.guifx.AutoLabel;
 import nars.guifx.util.NSlider;
-import nars.nal.nal8.operator.ImmediateOperator;
-import nars.op.out.echo;
 import nars.util.FX;
-import nars.util.event.FrameReaction;
+import nars.guifx.util.FrameReaction;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;

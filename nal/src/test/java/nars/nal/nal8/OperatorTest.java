@@ -6,7 +6,7 @@ import nars.Op;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
-import nars.util.signal.TestNAR;
+import nars.test.TestNAR;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertNotNull;

@@ -12,7 +12,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;
 import nars.util.graph.TermLinkGraph;
-import nars.util.signal.TestNAR;
+import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.alg.ConnectivityInspector;

@@ -2,8 +2,8 @@ package nars.index;
 
 import nars.*;
 import nars.concept.Concept;
-import nars.concept.ConceptBuilder;
-import nars.concept.InvalidConceptException;
+import nars.concept.util.ConceptBuilder;
+import nars.concept.util.InvalidConceptException;
 import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;

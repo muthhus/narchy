@@ -2,7 +2,7 @@ package nars.index;
 
 import nars.Op;
 import nars.Param;
-import nars.concept.ConceptBuilder;
+import nars.concept.util.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
