@@ -1,6 +1,7 @@
 package nars.experiment.arkanoid;
 
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
@@ -192,7 +193,7 @@ public class Arkancide extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.7f);
 
-        float p = 0.15f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
@@ -218,7 +219,9 @@ public class Arkancide extends NAgent {
                 BagChart.concepts(nar, 64),
                 col(
                     HistogramChart.budgetChart(nar, 50),
-                    conceptLinePlot(nar, t.actions, nar::conceptPriority, 200)
+                    conceptLinePlot(nar,
+                            Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
+                            nar::conceptPriority, 200)
                 )
         ), 500, 500);
 

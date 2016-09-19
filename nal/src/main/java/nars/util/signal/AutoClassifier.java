@@ -107,7 +107,7 @@ public class AutoClassifier extends Autoencoder implements Consumer<NAR> {
     }
 
     @NotNull
-    private Term state(int which) {
+    private static Term state(int which) {
         //even though the state can be identified by an integer,
         //it does not have the same meaning as integers used
         //elsewhere. however once the autoencoder stabilizes

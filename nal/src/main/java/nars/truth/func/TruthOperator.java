@@ -66,7 +66,7 @@ public interface TruthOperator {
 
         @Override
         public String toString() {
-            return o.toString() + "X";
+            return o.toString() + 'X';
         }
 
         @Override
@@ -93,7 +93,7 @@ public interface TruthOperator {
 
         @Override
         public final String toString() {
-            return o.toString() + "N";
+            return o.toString() + 'N';
         }
 
         @Override

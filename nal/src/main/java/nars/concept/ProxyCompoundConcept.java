@@ -171,7 +171,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound> {
 
     @NotNull
     public String toStringActual() {
-        return getClass().getSimpleName() + '(' + alias + " ===> " + target + ")";
+        return getClass().getSimpleName() + '(' + alias + " ===> " + target + ')';
     }
 
 }

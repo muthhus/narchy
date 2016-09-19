@@ -196,6 +196,7 @@ public class MutableTask extends AbstractTask {
     }
 
     /** retrieve the log element at the specified index, or null if it doesnt exist */
+    @Override
     public final Object log(int index) {
         @Nullable List l = this.log;
         return l != null ? (l.size() > index ? l.get(index) : null) : null;

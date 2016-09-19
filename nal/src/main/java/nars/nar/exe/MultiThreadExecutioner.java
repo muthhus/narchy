@@ -151,7 +151,7 @@ public class MultiThreadExecutioner extends Executioner {
         }
     }
 
-    public final void overflow(@NotNull Task[] t) {
+    public static void overflow(@NotNull Task[] t) {
         //TODO use a bag to collect these
         logger.warn("dropped: {}", t);
     }

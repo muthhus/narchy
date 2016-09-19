@@ -48,7 +48,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
                     //for (Term d : dd) {
                         Term newContent = nar.concepts.replace(c, s, d);
                         if ((newContent instanceof Compound) && !newContent.equals(c)) {
-                            input(nar, input, (Compound)newContent);
+                            input(nar, input, newContent);
                         }
                     //}
                 }

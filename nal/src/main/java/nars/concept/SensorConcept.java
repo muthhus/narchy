@@ -2,6 +2,7 @@ package nars.concept;
 
 import nars.*;
 import nars.budget.policy.ConceptPolicy;
+import nars.nal.UtilityFunctions;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
 import nars.task.DerivedTask;
@@ -59,7 +60,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
             }
         };
 
-        setInput(input);
+        this.input = input;
 
         pri(() -> {
             return nar.priorityDefault(Symbols.BELIEF);
@@ -208,8 +209,15 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
 
     public static void attentionGroup(List<SensorConcept> sensors, MutableFloat min, MutableFloat limit, NAR nar) {
-        attentionGroup(sensors, (cp) -> Util.lerp( limit.floatValue(), min.floatValue(), cp), nar);
+
+        attentionGroup(sensors,
+                //(cp) -> Util.lerp( limit.floatValue(), min.floatValue(), cp) //direct pri -> pri mapping
+                (cp) -> Util.lerp(limit.floatValue(), min.floatValue(),
+                            UtilityFunctions.sawtoothCurved(cp))
+                , nar);
     }
+
+
 
     /** adaptively sets the priority of a group of sensors via a function  */
     public static void attentionGroup(List<SensorConcept> sensors, FloatToFloatFunction conceptPriToTaskPri, NAR nar) {

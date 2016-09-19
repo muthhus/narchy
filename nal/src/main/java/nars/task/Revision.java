@@ -153,7 +153,7 @@ public class Revision {
         //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
         long[] evidence = Stamp.zip(((DefaultBeliefTable) concept.tableFor(a.punc())).temporal);
 
-        RevisionTask t = new RevisionTask((Compound)cc, a.punc(),
+        RevisionTask t = new RevisionTask(cc, a.punc(),
                 newTruth,
                 now, when,
                 evidence
@@ -321,11 +321,8 @@ public class Revision {
 
         depth/=2f;
         return $.compound(a.op(), (choose(a, b, aProp, rng) == a) ? adt : bdt,
-                new Term[]{
-                        intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng),
-                        intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng)
-                }
-        );
+                intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng),
+                intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng));
 
     }
 

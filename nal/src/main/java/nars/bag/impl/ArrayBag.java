@@ -252,8 +252,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             return;
         }
 
+        pressure += bp;
 
         Insertion ii = new Insertion(bp);
+
         BLink<V> v = map.compute(key, ii);
 
         int r = ii.result;
@@ -277,7 +279,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 break;
             case -1:
                 //reject due to insufficient budget
-                pressure += bp;
                 onRemoved(key, null);
                 break;
         }
@@ -739,7 +740,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 } else {
                     //accepted for insert
                     this.result = +1;
-                    return newLink(key);
+                    BLink<Object> b = newLink(key);
+                    return b;
                 }
             }
         }

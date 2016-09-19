@@ -106,7 +106,7 @@ public class NObj<X> {
                         e.printStackTrace();
                         return Float.NaN;
                     }
-                }), nar, id + "(" + term(expr) + ")"
+                }), nar, id + '(' + term(expr) + ')'
         ).resolution(0.05f);
         sensors.addAll(fs.sensors);
         return fs;
@@ -127,14 +127,14 @@ public class NObj<X> {
                     //+ "\"";
             key = key.replace("@", "X");
             //HACK remove the '@' from the key so it doesnt need quoted:
-            return key + "(" +
+            return key + '(' +
                     term(((ASTStaticMethod) expr).jjtGetChild(0))
-                    + ")";
+                    + ')';
         } else if (expr instanceof SimpleNode) {
             return term((SimpleNode) expr);
         } else {
             //safest for unknown type but semantics are lost
-            return "\"" + expr + "\"";
+            return "\"" + expr + '"';
         }
     }
 
@@ -153,7 +153,7 @@ public class NObj<X> {
 
     public void in(NAgent agent) {
         agent.sensors.addAll(sensors);
-        agent.logger.info("{} added {}", this, sensors);
+        NAgent.logger.info("{} added {}", this, sensors);
     }
 
     private static class Test1 {

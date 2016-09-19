@@ -303,8 +303,6 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    ;
-
     public final long occurrenceTarget(@NotNull OccurrenceSolver s) {
         long tOcc = task.occurrence();
         Task b = belief;

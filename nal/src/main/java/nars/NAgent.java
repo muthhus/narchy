@@ -14,6 +14,7 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.FloatNormalized;
@@ -66,10 +67,10 @@ abstract public class NAgent {
 
     public float rewardValue;
 
-    float predictorProbability = 0.75f;
+    float predictorProbability = 0.25f;
     private int predictionHorizon = curiosityMonitorDuration/4;
     private final FasterList<Task> predictors = $.newArrayList();
-    private float predictorPriFactor = 10f;
+    private float predictorPriFactor = 1f;
 
     public boolean trace = false;
 
@@ -84,8 +85,8 @@ abstract public class NAgent {
 
     //private float curiosityAttention;
     private float rewardSum = 0;
-    private MutableFloat sensorPriority;
-    private MutableFloat rewardPriority;
+    private MutableFloat maxSensorPriority;
+    private MutableFloat maxRewardPriority;
     private MutableFloat minSensorPriority;
     private MutableFloat minRewardPriority;
 
@@ -226,22 +227,13 @@ abstract public class NAgent {
 //                //(float) Math.sqrt(numSensors); //HEURISTIC
 //                numSensors / 2f;
 
+        minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 100 /* to be safe */);
+        maxSensorPriority = new MutableFloat(Util.clamp(nar.priorityDefault(Symbols.BELIEF) / numSensors + minSensorPriority.floatValue())); //measured per-each sensor
+        SensorConcept.attentionGroup(sensors, minSensorPriority, maxSensorPriority, nar);
 
-        /** attention per each sensor */
-        sensorPriority = new MutableFloat(nar.priorityDefault(Symbols.BELIEF) / numSensors);
-
-        /** attention per each action TODO needs MotorConcept to extend SensorConcept */
-        //MutableFloat actionPriority = new MutableFloat(nar.priorityDefault(Symbols.BELIEF) / actions.size());
-
-        /** attention per each reward */
-        rewardPriority = new MutableFloat(nar.priorityDefault(Symbols.BELIEF));
-
-        minRewardPriority = new MutableFloat(nar.priorityDefault(Symbols.BELIEF) * 0.5f /* estimate */);
-        minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 4 /* to be safe */);
-
-        SensorConcept.attentionGroup(sensors, minSensorPriority, sensorPriority, nar);
-        SensorConcept.attentionGroup(newArrayList(happy, joy), minRewardPriority, rewardPriority, nar);
-        //SensorConcept.attentionGroup(actions, minSensorPriority, actionPriority, nar);
+        minRewardPriority = new MutableFloat(Param.BUDGET_EPSILON * 200 /* estimate */);
+        maxRewardPriority = new MutableFloat(Util.clamp(nar.priorityDefault(Symbols.BELIEF) / numSensors + minRewardPriority.floatValue()));
+        SensorConcept.attentionGroup(newArrayList(happy, joy), minRewardPriority, maxRewardPriority, nar);
 
 
         //@NotNull Term what = $.$("?w"); //#w
@@ -421,7 +413,7 @@ abstract public class NAgent {
                 UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
                         / (predictors.size()/predictorProbability) * predictorPriFactor;
 
-        Budget boostBudget = Budget.One.clone().multiplied(pri, 0.5f, 0.9f);
+        Budget boostBudget = Budget.One.clone().multiplied(pri, 0.5f, 0.99f);
         predictors.forEach(t -> {
             boost(t, boostBudget);
         });

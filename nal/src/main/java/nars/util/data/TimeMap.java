@@ -28,7 +28,7 @@ public class TimeMap extends IntervalTree<Long, Task> implements Consumer<Task> 
     }
 
     public void print() {
-        out.println(nar.time() + ": " + "Total tasks: " + size() + "\t" + keySetSorted().toString());
+        out.println(nar.time() + ": " + "Total tasks: " + size() + '\t' + keySetSorted().toString());
     }
 
 

@@ -67,7 +67,7 @@ public interface Execution  {
         }
 
 
-        return (MutableTask) new MutableTask(inh, Symbols.BELIEF, 1f, nar)  //with default truth value
+        return new MutableTask(inh, Symbols.BELIEF, 1f, nar)  //with default truth value
                 .time(tense, nar)
                 //.budget(goal.budget())
                 //.budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)

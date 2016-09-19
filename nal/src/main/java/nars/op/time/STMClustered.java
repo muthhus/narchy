@@ -193,8 +193,6 @@ public class STMClustered extends STM {
 
     }
 
-    final AtomicInteger tLinkSerial = new AtomicInteger();
-
     /**
      * temporal link, centroid
      */
@@ -206,12 +204,10 @@ public class STMClustered extends STM {
 
         /** current centroid */
         @Nullable TasksNode node;
-        final int hash;
 
         public TLink(@NotNull Task t) {
             super(t);
             this.coord = getCoord(t);
-            this.hash = tLinkSerial.incrementAndGet();
         }
 
 
@@ -223,10 +219,6 @@ public class STMClustered extends STM {
             return x.truth();
         }
 
-        @Override
-        public int hashCode() {
-            return hash;
-        }
 
         @NotNull
         @Override

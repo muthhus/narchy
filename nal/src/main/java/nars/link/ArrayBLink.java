@@ -23,10 +23,12 @@ public class ArrayBLink<X> implements BLink<X> {
         this.f = f;
     }
 
+    @Override
     public final float priIfFiniteElseZero() {
         float p = f[0]; return /*Float.isFinite(p)*/ (p==p) ? p : 0;
     }
 
+    @Override
     public final float priIfFiniteElseNeg1() {
         float p = f[0]; return /*Float.isFinite(p)*/ (p==p) ? p : -1;
     }

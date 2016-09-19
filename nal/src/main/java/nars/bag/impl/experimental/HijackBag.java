@@ -98,7 +98,7 @@ public class HijackBag<X> implements Bag<X> {
 
         Object V = val(kvs, idx);         // Get old value (before volatile read below!)
         if (V == null) {
-            float[] ff = new float[] { Float.NaN, 0, 0 };
+            float[] ff = { Float.NaN, 0, 0 };
             if (CAS_val(kvs, idx, null, ff)) {
                 return ff;
             } else {
@@ -208,15 +208,11 @@ public class HijackBag<X> implements Bag<X> {
             boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
             if (newPriThresh && oldPriThresh) {
                 return (map.rng.nextFloat() > (newPri / (newPri + oldPri)));
-            } else if (newPriThresh) {
-                return true;
-            } else {
-                return false;
-            }
+            } else return newPriThresh;
         }
     }
 
-    private boolean hijackGreedy(float newPri, float weakestPri) {
+    private static boolean hijackGreedy(float newPri, float weakestPri) {
         return weakestPri <= newPri;
     }
 
@@ -430,7 +426,7 @@ public class HijackBag<X> implements Bag<X> {
      * beam width (tolerance range)
      * searchProgress in range 0..1.0
      */
-    private float tolerance(int j, int jLimit, int b, int batchSize, int cap) {
+    private static float tolerance(int j, int jLimit, int b, int batchSize, int cap) {
 
         float searchProgress = ((float)j)/jLimit;
         //float selectionRate =  ((float)batchSize)/cap;

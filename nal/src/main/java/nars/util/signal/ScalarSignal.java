@@ -132,7 +132,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
             Task t = newInputTask(f, now);
             if (t!=null) {
-                Task prev = this.next;;
+                Task prev = this.next;
                 input(prev, this.next = t);
                 this.lastInputTime = now;
                 this.prevF = f;

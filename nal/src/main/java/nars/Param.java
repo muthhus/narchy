@@ -48,7 +48,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /** average priority target for bag forgetting */
     public static final float BAG_THRESHOLD = 0.5f;
 
-    public static boolean DEBUG_ANSWERS = false;
+    public static boolean DEBUG_ANSWERS;
 
     /** how many times the desired selection size that bags should sample in case some of the selections are unused */
     public static float BAG_OVERSAMPLING = 2.0f;
@@ -176,7 +176,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     /** if false, then revection will be budgeted with parent's budget mix, otherwise it will have dur/qua mixed but priority set to zero to not trigger linking */
-    public static boolean REVECTION_PRIORITY_ZERO = false;
+    public static boolean REVECTION_PRIORITY_ZERO;
 
     /** additional output for when deriver fails before deriving something */
     public static boolean DEBUG_DERIVER;

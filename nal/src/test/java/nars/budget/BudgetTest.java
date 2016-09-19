@@ -1,6 +1,8 @@
 package nars.budget;
 
+import nars.nal.UtilityFunctions;
 import nars.util.Util;
+import nars.util.io.SparkLine;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -27,4 +29,12 @@ public class BudgetTest {
         assertEquals(9, Util.bin(1.0f, 9));
     }
 
+    @Test public void testCurveSawtooth() {
+        int N = 32;
+        Integer[] x = new Integer[N];
+        for (int i = 0; i < N; i++) {
+            x[i] = Math.round(UtilityFunctions.sawtoothCurved((float)i/(N-1)) * N);
+        }
+        System.out.println(SparkLine.render(x));
+    }
 }

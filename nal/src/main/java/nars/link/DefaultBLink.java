@@ -48,7 +48,7 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return id!=null ? id.hashCode() : 0;
     }
 
@@ -76,6 +76,7 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
         return id;
     }
 
+    @Override
     public final void set(@NotNull X id) {
         this.id = id;
     }

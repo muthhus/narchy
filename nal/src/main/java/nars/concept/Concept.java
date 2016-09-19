@@ -300,7 +300,7 @@ public interface Concept extends Termed {
             //out.print("TermLinkTemplates: ");
             //out.println(termlinkTemplates());
 
-            out.println("\n TermLinks: " + termlinks().size() + "/" + termlinks().capacity() +
+            out.println("\n TermLinks: " + termlinks().size() + '/' + termlinks().capacity() +
                     ((this instanceof CompoundConcept) ? "\tTemplates: " + ((CompoundConcept)this).templates : "")
             );
             termlinks().forEach(b -> {
@@ -311,7 +311,7 @@ public interface Concept extends Termed {
         }
 
         if (showtasklinks) {
-            out.println("\n TaskLinks: " + tasklinks().size() + "/" + tasklinks().capacity());
+            out.println("\n TaskLinks: " + tasklinks().size() + '/' + tasklinks().capacity());
             tasklinks().forEach(b -> {
                 out.print(indent);
                 out.print(b.get() + " " + b.toBudgetString());

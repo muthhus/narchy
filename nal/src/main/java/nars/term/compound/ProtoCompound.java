@@ -51,7 +51,7 @@ public interface ProtoCompound {
         public String toString() {
             return "RawProtoCompound:" +
                     op +
-                    "(" + dt +
+                    '(' + dt +
                     ", " + Arrays.toString(args) +
                     ')';
         }

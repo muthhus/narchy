@@ -187,7 +187,7 @@ public class MySTMClustered extends STMClustered {
 	}
 
 	@Nullable
-	private Term group(boolean negated, @NotNull Collection<Task> uuu) {
+	private static Term group(boolean negated, @NotNull Collection<Task> uuu) {
 
 
 		if (uuu.size() == 2) {

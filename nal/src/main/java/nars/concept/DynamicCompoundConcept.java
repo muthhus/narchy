@@ -226,7 +226,6 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 }
 
                 case 2: //2D
-                {
                     Iterator<Map.Entry<ByteList, Termject.IntInterval>> ee = intervals.entrySet().iterator();
                     Map.Entry<ByteList, Termject.IntInterval> e1 = ee.next();
                     Map.Entry<ByteList, Termject.IntInterval> e2 = ee.next();
@@ -249,7 +248,6 @@ public class DynamicCompoundConcept extends CompoundConcept {
                         }
                     }
                     return t.iterator();
-                }
 
                 default:
                     //either there is none, or too many -- just use the term directly

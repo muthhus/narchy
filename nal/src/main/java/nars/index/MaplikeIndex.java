@@ -33,7 +33,7 @@ public abstract class MaplikeIndex extends TermIndex {
         if (Param.DEBUG) {
             for (Term x : subterms) {
                 if (isTrueOrFalse(x))
-                    throw new RuntimeException(x + " in " + subterms + " making " + op + " " + dt);
+                    throw new RuntimeException(x + " in " + subterms + " making " + op + ' ' + dt);
             }
         }
         return new GenericCompound(op, dt, subterms);

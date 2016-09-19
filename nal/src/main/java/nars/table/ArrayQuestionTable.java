@@ -141,17 +141,12 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
             }
 
             boolean sameConcept;
-            if (answerConcept != null && answerConcept.crossLink(a, q, scale * aConf, nar)) {
-                //check if different concepts; ex: if there is a reduction in variables, etc
-                sameConcept = false;
-            } else {
-                sameConcept = true;
-            }
+            sameConcept = !(answerConcept != null && answerConcept.crossLink(a, q, scale * aConf, nar));
 
             if (Param.DEBUG_ANSWERS && !sameConcept) {
                 //if (q.term().equals(a.term()))
                 //if (!sameConcept) {
-                nar.logger.debug("Q&A: {}\t{}", q, a);
+                NAR.logger.debug("Q&A: {}\t{}", q, a);
                 //} else {
                 //  nar.logger.debug("Q&A: {}\t{}", q, a.truth());
                 //}
@@ -266,7 +261,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
     }
 
-    private float remove(List<Task> l, int n, Object reason, @NotNull List<Task> displaced) {
+    private static float remove(List<Task> l, int n, Object reason, @NotNull List<Task> displaced) {
 
         Task removed = l.remove(n);
         if (Param.DEBUG)
