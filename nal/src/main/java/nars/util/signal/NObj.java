@@ -172,8 +172,8 @@ public class NObj<X> {
         Test1 t1 = new Test1();
         NObj<Test1> x = new NObj<Test1>("x", t1, nar)
                 .readAllFields(true)
-                .read("inner.b")
-                .read("@Math@sin(f1)");
+                .read("inner.b",
+                      "@Math@sin(f1)");
 
         System.out.println(x.sensors);
     }

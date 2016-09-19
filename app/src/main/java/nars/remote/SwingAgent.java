@@ -3,8 +3,12 @@ package nars.remote;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.truth.Truth;
+import nars.video.ImageCamera;
 import nars.video.CameraSensor;
+import nars.video.PanZoom;
 import nars.video.SwingCamera;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 
 import java.awt.*;
 import java.util.LinkedHashMap;
@@ -17,16 +21,25 @@ import static nars.$.t;
  */
 abstract public class SwingAgent extends NAgent {
 
-    public final Map<String,CameraSensor> widgets = new LinkedHashMap<>();
+    public final Map<String,CameraSensor> cam = new LinkedHashMap<>();
 
     public SwingAgent(NAR nar, int frames) {
         super(nar, frames);
 
     }
 
-    protected CameraSensor<SwingCamera> addCamera(String id, Container w, int px, int pw) {
-        CameraSensor c = new CameraSensor<SwingCamera>($.the(id), new SwingCamera(w, px, pw), this, (v) -> t(v, alpha));
-        widgets.put(id, c);
+    /** pixelTruth defaults to linear monochrome brightness -> frequency */
+    protected CameraSensor<PanZoom> addCamera(String id, Container w, int pw, int ph) {
+        return addCamera(id, w, pw, ph, (v) -> t(v, alpha));
+    }
+
+    protected CameraSensor<PanZoom> addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+        return addCamera(id, new PanZoom(new SwingCamera(w), pw, ph), pixelTruth);
+    }
+
+    protected <C extends ImageCamera> CameraSensor<C> addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+        CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
+        cam.put(id, c);
         return c;
     }
 
@@ -34,7 +47,7 @@ abstract public class SwingAgent extends NAgent {
     @Override
     protected float act() {
 
-        widgets.values().forEach(CameraSensor::update);
+        cam.values().forEach(CameraSensor::update);
 
         //TODO update input
 

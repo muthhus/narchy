@@ -1,8 +1,11 @@
 package nars.experiment.asteroids;
 
+import com.jogamp.nativewindow.GraphicsConfigurationFactory;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.awt.image.VolatileImage;
 import java.util.ArrayList;
 import java.text.*;
 import javax.imageio.*;
@@ -11,8 +14,12 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 public class Asteroids extends JFrame implements KeyListener, ActionListener {
-    
-    Image offscreen;
+
+    public static final int WIDTH = 512;
+    public static final int HEIGHT = 512;
+
+    final BufferedImage offscreen;
+
     Graphics2D offg;
     Spacecraft ship; // Defines "ship" as a Spacecraft, giving it
     Rock rock;   // parameters such as ship.angle or ship.yspeed
@@ -25,7 +32,7 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
     int numAsteroids;
     int numDebris;
     int bulletDeathCounter;
-    final Boolean[][] starPositions = new Boolean[900][600];
+    //final Boolean[][] starPositions = new Boolean[WIDTH][HEIGHT];
     int starPositionSeed;
     boolean upKey, downKey, leftKey, rightKey, spaceKey, shiftKey, SKey, DKey, PKey, FKey, escKey, RKey;
     boolean isExplosionShip;
@@ -36,6 +43,11 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
     int gameState;
     DecimalFormat df = new DecimalFormat("#.##");
 
+    private Color clearColor =
+            //new Color(0,0,0,0.1f);
+            //new Color(0,0,0,0.9f);
+            Color.BLACK;
+
 
     public static void main(String[] args) {
         new Asteroids(true);
@@ -44,7 +56,16 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
     public Asteroids(boolean autostart) {
         super();
 
+
+        setBackground(Color.BLACK);
         setIgnoreRepaint(true);
+
+
+        offscreen =
+                //getGraphicsConfiguration().createCompatibleImage(WIDTH, HEIGHT);
+                new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        offg = (Graphics2D) offscreen.getGraphics();
+
         init();
 
         if (autostart) {
@@ -54,20 +75,20 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
     }
 
     public void init() {
-        initStarPositions();
-        
 
-        
-        this.setSize(900, 600);
+
+
+
+        this.setSize(WIDTH, HEIGHT);
+        setResizable(false);
+
         this.addKeyListener(this);
         
         ship = new Spacecraft();
         
         shopSelection = 0;
         
-        offscreen = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        offg = (Graphics2D) offscreen.getGraphics();
-        
+
         rockList = new ArrayList();
         bulletList = new ArrayList();
         explosionList = new ArrayList();
@@ -96,84 +117,6 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
     
     public void paint(Graphics g) //Method that draws everything
     {
-        if (gameState == 0) {
-//            try {
-//                drawMainMenu();
-//            } catch (Exception e) {
-//            }
-            gameState = 1;
-        } else if (gameState == 1) {
-            //Draw background black with stars in the background, randomly generated according to starPositions[][]
-            offg.setColor(Color.BLACK);
-            offg.fillRect(0, 0, 900, 600);
-            
-            offg.setColor(Color.GRAY);
-            
-            for (int i = 0; i < 900; i++) {
-                for (int n = 0; n < 600; n++) {
-                    if (starPositions[i][n] == true) {
-                        offg.drawLine(i, n, i, n); // Creates a star at the point in the bakground with a 1/1000 probability. (See init())
-                    }
-                }
-            }
-            
-            //Draw each asteroid white with white 3D inside lines
-            
-            offg.setColor(Color.WHITE);
-            
-            for (int i = 0; i < rockList.size(); i++) {
-                Rock rock = rockList.get(i);
-                for (int n = 0; n < 5; n++) {
-                    for (int j = 0; j < 5; j++) {
-                        offg.drawLine((int) Math.round((rock.shape.xpoints[n] * Math.cos(rock.angle) - rock.shape.ypoints[n] * Math.sin(rock.angle) + rock.xposition)),
-                                (int) Math.round((rock.shape.xpoints[n] * Math.sin(rock.angle) + rock.shape.ypoints[n] * Math.cos(rock.angle) + rock.yposition)),
-                                (int) Math.round((rock.shape.xpoints[j] * Math.cos(rock.angle) - rock.shape.ypoints[j] * Math.sin(rock.angle) + rock.xposition)),
-                                (int) Math.round((rock.shape.xpoints[j] * Math.sin(rock.angle) + rock.shape.ypoints[j] * Math.cos(rock.angle) + rock.yposition)));
-                    }
-                }
-                
-                if (rock.active == true) {
-                    rock.paint(offg, false);
-                }
-            }
-            
-            //Draw each bullet yellow
-            offg.setColor(Color.YELLOW);
-            for (int i = 0; i < bulletList.size(); i++) {
-                Bullet bullet = bulletList.get(i);
-                if (bullet.active == true) {
-                    bullet.paint(offg, false);
-                }
-            }
-            
-            drawExplosions();
-            try {
-                drawHUD();
-            } catch (Exception e) {
-            };
-            drawShip();
-            
-        } else if (gameState == 2) {
-
-            newLevel();
-            //drawShop();
-            gameState = 1;
-
-        } else if (gameState == 3) {
-
-            gameState = 1; //respawn
-
-        } else if (gameState == 4) {
-            offg.setColor(Color.GREEN);
-            offg.fillRect(390, 75, 105, 40);
-            
-            offg.setColor(Color.BLACK);
-            offg.fillRect(395, 80, 95, 30);
-            
-            offg.setColor(Color.GREEN);
-            offg.drawString("GAME PAUSED", 400, 100);
-        }
-        
         g.drawImage(offscreen, 0, 0, this);
     }
     
@@ -297,7 +240,6 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
     
     public void update(Graphics g) {
 
-        paint(g);
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -310,7 +252,7 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
             keyCheck();
         } else if (gameState == 1) {
 
-            ship.updatePosition();
+            ship.updatePosition(WIDTH, HEIGHT);
             ship.checkWeapon();
             ship.checkInvinc();
             respawnShip();
@@ -319,18 +261,18 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
             // Updates positions of VectorSprites and deletes them at end of range
 
             for (int i = 0; i < rockList.size(); i++) {
-                rockList.get(i).updatePosition();
+                rockList.get(i).updatePosition(WIDTH, HEIGHT);
             }
 
             for (int i = 0; i < bulletList.size(); i++) {
-                bulletList.get(i).updatePosition();
+                bulletList.get(i).updatePosition(WIDTH, HEIGHT);
                 if (bulletList.get(i).counter == bulletDeathCounter) {
                     bulletList.remove(i);
                 }
             }
 
             for (int i = 0; i < explosionList.size(); i++) {
-                explosionList.get(i).updatePosition();
+                explosionList.get(i).updatePosition(WIDTH, HEIGHT);
                 if (explosionList.get(i).counter == 25) {
                     explosionList.remove(i);
                 }
@@ -348,9 +290,93 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
             keyCheck();
         }
 
-        SwingUtilities.invokeLater(this::repaint);
+
+        render();
 
         return credits;
+    }
+
+    private void render() {
+        if (gameState == 0) {
+//            try {
+//                drawMainMenu();
+//            } catch (Exception e) {
+//            }
+            gameState = 1;
+        } else if (gameState == 1) {
+            //Draw background black with stars in the background, randomly generated according to starPositions[][]
+            offg.setColor(clearColor);
+            offg.fillRect(0, 0, WIDTH, HEIGHT);
+
+            offg.setColor(Color.WHITE);
+
+//            for (int i = 0; i < WIDTH; i++) {
+//                for (int n = 0; n < HEIGHT; n++) {
+//                    if (starPositions[i][n] == true) {
+//                        offg.drawLine(i, n, i, n); // Creates a star at the point in the bakground with a 1/1000 probability. (See init())
+//                    }
+//                }
+//            }
+
+            //Draw each asteroid white with white 3D inside lines
+
+            offg.setColor(Color.WHITE);
+
+            for (int i = 0; i < rockList.size(); i++) {
+                Rock rock = rockList.get(i);
+                for (int n = 0; n < 5; n++) {
+                    for (int j = 0; j < 5; j++) {
+                        offg.drawLine((int) Math.round((rock.shape.xpoints[n] * Math.cos(rock.angle) - rock.shape.ypoints[n] * Math.sin(rock.angle) + rock.xposition)),
+                                (int) Math.round((rock.shape.xpoints[n] * Math.sin(rock.angle) + rock.shape.ypoints[n] * Math.cos(rock.angle) + rock.yposition)),
+                                (int) Math.round((rock.shape.xpoints[j] * Math.cos(rock.angle) - rock.shape.ypoints[j] * Math.sin(rock.angle) + rock.xposition)),
+                                (int) Math.round((rock.shape.xpoints[j] * Math.sin(rock.angle) + rock.shape.ypoints[j] * Math.cos(rock.angle) + rock.yposition)));
+                    }
+                }
+
+                if (rock.active == true) {
+                    rock.paint(offg, false);
+                }
+            }
+
+            //Draw each bullet yellow
+            offg.setColor(Color.YELLOW);
+            for (int i = 0; i < bulletList.size(); i++) {
+                Bullet bullet = bulletList.get(i);
+                if (bullet.active == true) {
+                    bullet.paint(offg, false);
+                }
+            }
+
+            drawExplosions();
+            try {
+                drawHUD();
+            } catch (Exception e) {
+            };
+            drawShip();
+
+        } else if (gameState == 2) {
+
+            newLevel();
+            //drawShop();
+            gameState = 1;
+
+        } else if (gameState == 3) {
+
+            gameState = 1; //respawn
+
+        } else if (gameState == 4) {
+            offg.setColor(Color.GREEN);
+            offg.fillRect(390, 75, 105, 40);
+
+            offg.setColor(Color.BLACK);
+            offg.fillRect(395, 80, 95, 30);
+
+            offg.setColor(Color.GREEN);
+            offg.drawString("GAME PAUSED", 400, 100);
+        }
+
+        repaint();
+
     }
 
     public void start() {
@@ -723,7 +749,7 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
     public void drawShop() {
         
         offg.setColor(Color.BLACK);
-        offg.fillRect(0, 0, 900, 600);
+        offg.fillRect(0, 0, WIDTH, HEIGHT);
         
         try {
             drawHUD();
@@ -828,17 +854,17 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
         }
     }
     
-    public void initStarPositions() {
-        for (int i = 0; i < 900; i++) {
-            for (int n = 0; n < 600; n++) {
-                starPositionSeed = (int) (Math.random() * 2000);
-                
-                if (starPositionSeed > 1998) {
-                    starPositions[i][n] = true;
-                } else {
-                    starPositions[i][n] = false;
-                }
-            }
-        }
-    }
+//    public void initStarPositions() {
+//        for (int i = 0; i < WIDTH; i++) {
+//            for (int n = 0; n < HEIGHT; n++) {
+//                starPositionSeed = (int) (Math.random() * 2000);
+//
+//                if (starPositionSeed > 1998) {
+//                    starPositions[i][n] = true;
+//                } else {
+//                    starPositions[i][n] = false;
+//                }
+//            }
+//        }
+//    }
 }

@@ -104,7 +104,7 @@ public class ScreenImage
 			return null;
 
 		if (image==null || image.getWidth()!=region.width || image.getHeight()!=region.height) {
-			image = new BufferedImage(region.width, region.height, BufferedImage.TYPE_INT_RGB);
+			image = component.getGraphicsConfiguration().createCompatibleImage(region.width, region.height);
 		}
 
 		//Graphics2D g2d = image.createGraphics();
@@ -209,7 +209,7 @@ public class ScreenImage
 //
 	static void layoutComponent(Component component)
 	{
-		synchronized (component.getTreeLock())
+		//synchronized (component.getTreeLock())
 		{
 			component.doLayout();
 

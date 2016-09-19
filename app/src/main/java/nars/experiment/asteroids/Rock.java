@@ -71,9 +71,9 @@ public class Rock extends VectorSprite
     }
     
     @Override
-    public void updatePosition()
+    public void updatePosition(int w, int h)
     {
         angle += ROTATION;
-        super.updatePosition();
+        super.updatePosition(w, h);
     }
 }

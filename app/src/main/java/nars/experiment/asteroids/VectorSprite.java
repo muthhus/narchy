@@ -52,7 +52,7 @@ public class VectorSprite
             g.drawPolygon(drawShape);
     }
     
-    public void updatePosition()
+    public void updatePosition(int w, int h)
     {
         counter++;
 
@@ -74,7 +74,7 @@ public class VectorSprite
             drawShape.ypoints[i] = y;
         }
         
-        wraparound();
+        wraparound(w, h);
         
         x = (int)Math.round(xposition);
         y = (int)Math.round(yposition);
@@ -85,26 +85,26 @@ public class VectorSprite
                         
     }
     
-    private void wraparound ()
+    private void wraparound(int w, int h)
     {
-        if (xposition > 900)
+        if (xposition >= w)
         {
             xposition = 0;
         }
         
         if (xposition < 0)
         {
-            xposition = 900;
+            xposition = w-1;
         }
         
-        if (yposition > 600)
+        if (yposition >= h)
         {
             yposition = 0;
         }
         
         if (yposition < 0)
         {
-            yposition = 600;
+            yposition = h-1;
         }
     }
     

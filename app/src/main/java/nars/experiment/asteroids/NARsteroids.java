@@ -2,9 +2,10 @@ package nars.experiment.asteroids;
 
 import nars.$;
 import nars.NAR;
-import nars.concept.ActionConcept;
 import nars.remote.SwingAgent;
+import nars.util.Util;
 import nars.video.CameraSensor;
+import nars.video.PanZoom;
 import nars.video.SwingCamera;
 
 import static nars.$.t;
@@ -16,24 +17,29 @@ import static nars.experiment.arkanoid.Arkancide.playSwing;
 public class NARsteroids extends SwingAgent {
 
     private final Asteroids space;
-    private final CameraSensor<SwingCamera> pixels;
+    private final CameraSensor/*<SwingCamera>*/ pixels;
 
     public static void main(String[] args) {
         playSwing(NARsteroids::new);
     }
 
     public NARsteroids(NAR nar) {
-        super(nar, 4);
+        super(nar, 0);
 
         this.space = new Asteroids(false);
 
-        pixels = addCamera("ast", space, 64, 64);
-        pixels.cam.input(0f, 0f, 0.3f, 0.3f);
+        pixels = addCamera("ast",
+                //space, 32, 32,
+                new PanZoom(()->space.offscreen, 64, 64),
+                (v) -> $.t(v , alpha));
+                    //t( Util.clamp(v * 1f /* contrast */)
 
-        addToggleAction("ast:fire", () -> space.spaceKey = true, () -> space.spaceKey= false);
-        addToggleAction("ast:forward", () -> space.upKey = true, () -> space.upKey= false);
-        addToggleAction("ast:left", () -> space.leftKey = true, () -> space.leftKey= false);
-        addToggleAction("ast:right", () -> space.rightKey = true, () -> space.rightKey= false);
+        //pixels.cam.input(0f, 0f, 0.3f, 0.3f);
+
+        addToggleAction("ast:fire", (b) -> space.spaceKey = b);
+        addToggleAction("ast:forward", (b) -> space.upKey = b);
+        addToggleAction("ast:left", (b) -> space.leftKey = b);
+        addToggleAction("ast:right", (b) -> space.rightKey = b);
 
     }
 

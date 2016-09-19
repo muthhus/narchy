@@ -4,7 +4,6 @@ package nars.experiment.arkanoid;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.NAR;
-import nars.NARLoop;
 import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -105,7 +104,7 @@ public class Arkancide extends SwingAgent {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.7f);
+        nar.goalConfidence(0.8f);
 
         float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
@@ -125,14 +124,14 @@ public class Arkancide extends SwingAgent {
         a.trace = true;
 
 
-        int history = 2000;
+        int history = 200;
         window(
             grid(
-                grid( a.widgets.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new) ),
+                grid( a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new) ),
                 Vis.agentActions(a, history),
                 Vis.concepts(nar, 32),
                 col(
-                    Vis.budgetHistogram(nar, 25),
+                    Vis.budgetHistogram(nar, 10),
                     conceptLinePlot(nar,
                             Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                             nar::conceptPriority, 200)
@@ -140,8 +139,8 @@ public class Arkancide extends SwingAgent {
         ), 900, 900);
 
 
-        NARLoop loop = a.run(runFrames, 0);
-        loop.join();
+        a.run(runFrames).join();
+        //a.runSync(runFrames);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);

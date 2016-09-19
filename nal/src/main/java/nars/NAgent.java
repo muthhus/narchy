@@ -21,6 +21,7 @@ import nars.util.math.FloatNormalized;
 import nars.util.math.FloatPolarNormalized;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,21 +147,30 @@ abstract public class NAgent {
 
     /** latches to either one of 2 states until it shifts to the other one. suitable for representing
      * push-buttons like keyboard keys. by default with no desire the state is off.  the 'on' and 'off'
-     * procedures will be called only as necessary (when state changes). */
+     * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
+     * its initial state will remain indetermined until the first feedback is generated.
+     * */
     public ActionConcept addToggleAction(String s, Runnable on, Runnable off) {
-        final boolean[] state = {false};
+
+        final int[] state = { 0 }; // 0: unknown, -1: false, +1: true
+
         ActionConcept m = new ActionConcept(s, nar, (b, d) -> {
-            boolean now = state[0];
+            int now = state[0];
             boolean next = d!=null && d.freq() >= 0.5f;
-            if (now && !next) {
-                state[0] = false; off.run(); return $.t(0, alpha);
-            } else if (next && !now) {
-                state[0] = true; on.run(); return $.t(1f, alpha);
+            if (now>=0 && !next) {
+                state[0] = -1; off.run(); return $.t(0, alpha);
+            } else if (now<=0 && next) {
+                state[0] = +1; on.run(); return $.t(1f, alpha);
             }
             return null;
         });
+
         actions.add(m);
         return m;
+    }
+
+    public ActionConcept addToggleAction(String s, BooleanProcedure onChange) {
+        return addToggleAction(s, () -> onChange.value(true), () -> onChange.value(false) );
     }
 
     /**
@@ -170,6 +180,10 @@ abstract public class NAgent {
 
     protected void frame() {
 
+        now = nar.time();
+        if (now % (1+decisionFrames) != 0)
+            return;
+
         updateActionDesire();
 
         curiosity();
@@ -178,7 +192,7 @@ abstract public class NAgent {
 
         predict();
 
-        tick(decisionFrames);
+        now = nar.time();
 
         float r = rewardValue = act();
         rewardSum += r;
@@ -196,11 +210,6 @@ abstract public class NAgent {
         }
     }
 
-    private void tick(int narFrames) {
-        for (int i = 0; i < narFrames; i++)
-            nar.clock.tick();
-        now = nar.time();
-    }
 
     public String summary() {
 
@@ -375,6 +384,7 @@ abstract public class NAgent {
         nar.runLater(() -> {
 
             init();
+
 
             nar.onFrame(nn -> frame());
         });

@@ -25,6 +25,8 @@ public class CameraSensor<P extends PixelCamera> {
         width = cam.width();
         height = cam.height();
 
+        float freqResolution = 0.1f;
+
         //TODO extract this section and associated variables to a CameraSensorMatrix class or something
         ss = new SensorConcept[width][height];
 
@@ -33,8 +35,8 @@ public class CameraSensor<P extends PixelCamera> {
             for (int y = 0; y < height; y++) {
                 //TODO support multiple coordinate termizations
                 @NotNull Compound coord =
-                        //$.p($.pRadix(x, 4, width), $.pRadix(y, 4, height));
-                        $.p(x, y);
+                        $.p($.pRadix(x, 4, width), $.pRadix(y, 4, height));
+                        //$.p(x, y);
 
                 Compound cell = $.inh(coord, root);
                 int yy = y;
@@ -43,11 +45,10 @@ public class CameraSensor<P extends PixelCamera> {
                 //monochrome only for now
                 FloatSupplier brightness = () -> cam.brightness(xx, yy);
 
-
                 agent.sensors.add(sss = new SensorConcept(cell, agent.nar,
                         brightness,
                         brightnessToTruth
-                ));
+                ).resolution(freqResolution));
                 //sss.sensor.dur = 0.1f;
                 //sss.timing(0,visionSyncPeriod);
                 ss[x][y] = sss;
