@@ -6,7 +6,7 @@ import nars.NAgent;
 import nars.truth.Truth;
 import nars.video.ImageCamera;
 import nars.video.CameraSensor;
-import nars.video.PanZoom;
+import nars.video.Scale;
 import nars.video.SwingCamera;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 
@@ -29,12 +29,12 @@ abstract public class SwingAgent extends NAgent {
     }
 
     /** pixelTruth defaults to linear monochrome brightness -> frequency */
-    protected CameraSensor<PanZoom> addCamera(String id, Container w, int pw, int ph) {
+    protected CameraSensor<Scale> addCamera(String id, Container w, int pw, int ph) {
         return addCamera(id, w, pw, ph, (v) -> t(v, alpha));
     }
 
-    protected CameraSensor<PanZoom> addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
-        return addCamera(id, new PanZoom(new SwingCamera(w), pw, ph), pixelTruth);
+    protected CameraSensor<Scale> addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+        return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }
 
     protected <C extends ImageCamera> CameraSensor<C> addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {

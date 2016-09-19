@@ -57,6 +57,7 @@ public class Spacecraft extends VectorSprite
     {
         xspeed += Math.cos(angle - Math.PI/2) * THRUST;
         yspeed += Math.sin(angle - Math.PI/2) * THRUST;
+
     }
 
     public void rotateLeft()

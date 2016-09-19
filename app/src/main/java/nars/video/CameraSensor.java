@@ -38,7 +38,10 @@ public class CameraSensor<P extends PixelCamera> {
                         $.p($.pRadix(x, 4, width), $.pRadix(y, 4, height));
                         //$.p(x, y);
 
-                Compound cell = $.inh(coord, root);
+                Compound cell =
+                    //$.inh(coord, root);
+                    $.p(root, coord);
+
                 int yy = y;
                 SensorConcept sss;
 

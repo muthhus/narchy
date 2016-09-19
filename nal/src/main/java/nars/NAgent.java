@@ -21,6 +21,7 @@ import nars.util.math.FloatNormalized;
 import nars.util.math.FloatPolarNormalized;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ abstract public class NAgent {
     public float gammaEpsilonFactor = 0.5f;
 
     final int curiosityMonitorDuration = 32; //frames
-    final DescriptiveStatistics actionDesireEvidence = new DescriptiveStatistics(curiosityMonitorDuration);
+    final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
     final DescriptiveStatistics rewardWindow = new DescriptiveStatistics(curiosityMonitorDuration);
 
 
@@ -172,6 +173,32 @@ abstract public class NAgent {
     public ActionConcept addToggleAction(String s, BooleanProcedure onChange) {
         return addToggleAction(s, () -> onChange.value(true), () -> onChange.value(false) );
     }
+
+    /** the supplied value will be in the range -1..+1.0. if the predicate returns false, then
+     * it will not allow feedback through. this can be used for situations where the action
+     * hits a limit or boundary that it did not pass through.
+     *
+     * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
+     */
+    public ActionConcept addIncrementalRangeAction(String s, FloatPredicate update) {
+
+        ActionConcept m = new ActionConcept(s, nar, (b, d) -> {
+            if (d!=null) {
+                float f = d.freq();
+                float y = (f - 0.5f) * 2f;
+                if (update.accept(y)) {
+                    return $.t(f, alpha);
+                } else {
+                    return $.t(0.5f, alpha); //neutral on failure
+                }
+            }
+            return null;
+        });
+
+        actions.add(m);
+        return m;
+    }
+
 
     /**
      * interpret motor states into env actions
@@ -433,7 +460,8 @@ abstract public class NAgent {
             if (d != null)
                 m += d.confWeight();
         }
-        actionDesireEvidence.addValue(w2c(m));
+        m/=a;
+        avgActionDesire.addValue(w2c(m));
     }
 
     protected void predict() {
@@ -449,7 +477,7 @@ abstract public class NAgent {
     }
 
     public float desireConf() {
-        return Math.min(1f, ((float) actionDesireEvidence.getMean()));
+        return Math.min(1f, ((float) avgActionDesire.getMean()));
     }
 
 //    @Nullable
