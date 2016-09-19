@@ -1,6 +1,5 @@
 package nars.experiment.asteroids;
 
-import java.applet.Applet;
 import java.awt.*;
 
 public class VectorSprite
@@ -35,18 +34,22 @@ public class VectorSprite
     
     boolean active;
     
-    int[][] upgrades = new int [3][4]; // First slot tells which gun is being upgraded, second slot tells what is being upgraded
-    int [][] upgradeCost = new int [3][4];
-    private boolean eternal = true;
+    final int[][] upgrades = new int [3][4]; // First slot tells which gun is being upgraded, second slot tells what is being upgraded
+    final int [][] upgradeCost = new int [3][4];
+    private final boolean eternal = true;
 
     public VectorSprite()
     {
         active = true;
     }
             
-    public void paint(Graphics g)
+    public void paint(Graphics2D g, boolean fill)
     {
-        g.drawPolygon(drawShape);
+
+        if (fill)
+            g.fillPolygon(drawShape);
+        else
+            g.drawPolygon(drawShape);
     }
     
     public void updatePosition()

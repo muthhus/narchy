@@ -1,5 +1,6 @@
 package spacegraph.obj;
 
+import com.google.common.collect.Iterables;
 import nars.concept.Concept;
 import nars.gui.BagChart;
 import nars.video.CameraSensorView;
@@ -120,6 +121,10 @@ public class GridSurface extends LayoutSurface {
         }
     }
 
+
+    public static Surface grid(Iterable<Surface> content) {
+        return grid( Iterables.toArray(content, Surface.class ) );
+    }
 
     public static Surface grid(Surface... content) {
         return new GridSurface(content);

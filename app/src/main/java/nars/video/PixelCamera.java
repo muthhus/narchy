@@ -76,4 +76,14 @@ public interface PixelCamera {
         return ((p & 0x000000ff))/255f;
     }
 
+
+
+//    public static float noise(float v, float noiseLevel, Random rng) {
+//        if (noiseLevel > 0) {
+//            return Util.clamp(v + (rng.nextFloat() * noiseLevel));
+//        }
+//        return v;
+//    }
+
+
 }

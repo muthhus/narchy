@@ -1,6 +1,5 @@
 package nars.experiment.asteroids;
 
-import java.applet.Applet;
 import java.awt.*;
 
 public class Spacecraft extends VectorSprite
@@ -20,8 +19,8 @@ public class Spacecraft extends VectorSprite
         xposition = 450;
         yposition = 300;
         
-        ROTATION = 0.15;
-        THRUST = 0.25;
+        ROTATION = 0.25;
+        THRUST = 0.1;
         
         weaponType = 1;
         spreadModifier = 0.1;
@@ -109,7 +108,7 @@ public class Spacecraft extends VectorSprite
         
         if (weaponType == 1) //Spread-shot gun
         {
-            fireDelay = 42 - 4*upgrades[0][1];
+            fireDelay = Math.max(0, 4 - 4*upgrades[0][1]);
             damage = 3 + 3*upgrades[0][2];
         }
         

@@ -1,7 +1,6 @@
 package nars.experiment.asteroids;
 
 import java.awt.Polygon;
-import java.applet.Applet;
 
 public class Debris extends VectorSprite
 {

@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
 import nars.NAgent;
-import nars.experiment.arkanoid.Arkancide;
+import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -371,7 +371,7 @@ public class BinaryOpLearning extends NAgent {
 //        System.out.println(b.sensors);
 //        System.out.println(b.actions);
 
-        Arkancide.newBeliefChartWindow(b, 100);
+        Vis.newBeliefChartWindow(b, 100);
         //BagChart.show((Default) nar, 1024);
 
         bLoop.join();

@@ -7,9 +7,8 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
 import nars.NAgent;
-import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
-import nars.gui.HistogramChart;
+import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -543,9 +542,9 @@ public class Tetris extends NAgent {
 
             //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
 
-            Arkancide.newBeliefChartWindow(t, 200);
+            Vis.newBeliefChartWindow(t, 200);
 
-            HistogramChart.budgetChart(nar, 30);
+            Vis.budgetHistogram(nar, 30);
 
             //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
 

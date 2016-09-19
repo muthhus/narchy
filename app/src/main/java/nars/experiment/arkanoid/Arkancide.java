@@ -3,46 +3,35 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import nars.$;
 import nars.NAR;
 import nars.NARLoop;
-import nars.NAgent;
-import nars.gui.BagChart;
-import nars.gui.BeliefTableChart;
-import nars.gui.HistogramChart;
+import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.remote.SwingAgent;
 import nars.time.FrameClock;
-import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.concept.MotorConcept;
 import nars.util.signal.NObj;
 import nars.video.CameraSensorView;
 import nars.video.CameraSensor;
 import nars.video.SwingCamera;
-import spacegraph.Facial;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.GridSurface;
-import spacegraph.obj.MatrixView;
 
-import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 import static nars.$.t;
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.experiment.tetris.Tetris.conceptLinePlot;
 import static nars.experiment.tetris.Tetris.exe;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.GridSurface.VERTICAL;
 import static spacegraph.obj.GridSurface.col;
 import static spacegraph.obj.GridSurface.grid;
 
-public class Arkancide extends NAgent {
+public class Arkancide extends SwingAgent {
 
     private static final int cyclesPerFrame = 4;
     public static final int runFrames = 50000;
@@ -58,11 +47,7 @@ public class Arkancide extends NAgent {
     float paddleSpeed = 20f;
 
 
-
-
     final Arkanoid noid;
-
-    private final CameraSensor pixels;
 
     private float prevScore;
 
@@ -74,26 +59,7 @@ public class Arkancide extends NAgent {
                 .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
                 .into(this);
 
-        pixels = new CameraSensor($.oper("noid"),
-            new SwingCamera(noid, visW, visH), this, (v) -> t(v, alpha));
-
-
-
-//        addSensor(this.padX = new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.paddle.x), nar,
-//                "pad(x,0)",
-//                "pad(x,1)",
-//                "pad(x,2)"
-//        ).resolution(0.05f) );
-
-//        addSensor( new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.ball.x), nar,
-//                "ball(x,0)",
-//                "ball(x,1)",
-//                "ball(x,2)"
-//        ).resolution(0.05f) );
-//
-//        addSensor( new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.ball.y), nar,
-//                "ball(y)"
-//        ).resolution(0.05f) );
+        addView("noid", noid, visW, visH);
 
 
         addAction(new MotorConcept(
@@ -110,65 +76,14 @@ public class Arkancide extends NAgent {
             }
         }));
 
-
-
 //        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
 //                4, 8 /* states */,
 //                0.05f);
 
-
-    }
-
-
-    public class View {
-        //public Surface camView;
-        public List attention = $.newArrayList();
-        public MatrixView autoenc;
-    }
-
-
-
-
-
-    public static void newBeliefChartWindow(NAgent narenv, long window) {
-        GridSurface chart = BeliefTableChart.agentActions(narenv, window);
-        new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
-    }
-    public static void newBeliefChartWindow(NAR nar, long window, Term... t) {
-        GridSurface chart = agentActions(nar, Lists.newArrayList(t), window);
-        new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
-    }
-    public static void newBeliefChartWindow(NAR nar, long window, List<? extends Termed> t) {
-        GridSurface chart = agentActions(nar, t, window);
-        new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
-    }
-
-    public static GridSurface agentActions(NAR nar, Iterable<? extends Termed> cc, long window) {
-        long[] btRange = new long[2];
-        nar.onFrame(nn -> {
-            long now = nn.time();
-            btRange[0] = now - window;
-            btRange[1] = now + window;
-        });
-        List<Surface> actionTables = $.newArrayList();
-        for (Termed c : cc) {
-            actionTables.add( new BeliefTableChart(nar, c, btRange) );
-        }
-
-        return new GridSurface(VERTICAL, actionTables);
-    }
-
-    private static float noise(float v, float noiseLevel, Random rng) {
-        if (noiseLevel > 0) {
-            return Util.clamp(v + (rng.nextFloat() * noiseLevel));
-        }
-        return v;
     }
 
     @Override
-    protected float act() {
-        pixels.update();
-
+    protected float reward() {
         float nextScore = noid.next();
         float reward = nextScore - prevScore;
         this.prevScore = nextScore;
@@ -176,6 +91,10 @@ public class Arkancide extends NAgent {
     }
 
     public static void main(String[] args) {
+        playSwing(Arkancide::new);
+    }
+
+    public static void playSwing(Function<NAR, SwingAgent> init) {
         Random rng = new XorShift128PlusRandom(1);
 
         //Multi nar = new Multi(3,512,
@@ -204,38 +123,31 @@ public class Arkancide extends NAgent {
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!',2);
 
-        Arkancide t = new Arkancide(nar);
-        t.trace = true;
+        SwingAgent a = init.apply(nar);
+        a.trace = true;
 
 
         int history = 2000;
         window(
             grid(
-                new CameraSensorView(t.pixels, nar),
-                BeliefTableChart.agentActions(t, history),
-                BagChart.concepts(nar, 64),
+                grid( a.widgets.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new) ),
+                Vis.agentActions(a, history),
+                Vis.concepts(nar, 32),
                 col(
-                    HistogramChart.budgetChart(nar, 50),
+                    Vis.budgetHistogram(nar, 25),
                     conceptLinePlot(nar,
-                            Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
+                            Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                             nar::conceptPriority, 200)
                 )
-        ), 500, 500);
+        ), 900, 900);
 
 
-
-
-
-        NARLoop loop = t.run(runFrames, 0);
-
-
+        NARLoop loop = a.run(runFrames, 0);
         loop.join();
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
-
         nar.printConceptStatistics();
-
     }
 
 

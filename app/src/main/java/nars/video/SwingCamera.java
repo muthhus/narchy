@@ -75,4 +75,12 @@ public class SwingCamera extends BufferedImageCamera {
     }
 
 
+    /** x and y in 0..1.0, w and h in 0..1.0 */
+    public void input(float x, float y, float w, float h) {
+        int px = Math.round(inWidth() * x);
+        int py = Math.round(inHeight() * y);
+        int pw = Math.round(inWidth() * w);
+        int ph = Math.round(inWidth() * h);
+        input(px, py, pw, ph);
+    }
 }

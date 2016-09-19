@@ -24,9 +24,7 @@ import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.gui.BagChart;
-import nars.gui.BeliefTableChart;
-import nars.gui.HistogramChart;
+import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -330,10 +328,10 @@ public class Pacman extends NAgent {
         window(
             grid(
                     //new CameraSensorView(pacman.pixels, nar),
-                    BeliefTableChart.agentActions(p, history),
-                    BagChart.concepts(nar, 64),
+                    Vis.agentActions(p, history),
+                    Vis.concepts(nar, 64),
                     col(
-                            HistogramChart.budgetChart(nar, 50),
+                            Vis.budgetHistogram(nar, 50),
                             conceptLinePlot(nar,
                                     Iterables.concat(p.actions, Lists.newArrayList(p.happy, p.joy)),
                                     nar::conceptPriority, 200)

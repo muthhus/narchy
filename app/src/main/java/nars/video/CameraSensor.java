@@ -14,13 +14,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
  */
-public class CameraSensor {
+public class CameraSensor<P extends PixelCamera> {
 
     public final SensorConcept[][] ss;
     public final int width, height;
-    private final PixelCamera cam;
+    public final P cam;
 
-    public CameraSensor(Term root, PixelCamera cam, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
+    public CameraSensor(Term root, P cam, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         this.cam = cam;
         width = cam.width();
         height = cam.height();
@@ -33,8 +33,8 @@ public class CameraSensor {
             for (int y = 0; y < height; y++) {
                 //TODO support multiple coordinate termizations
                 @NotNull Compound coord =
-                        $.p($.pRadix(x, 4, width), $.pRadix(y, 4, height));
-                //$.p(x, y);
+                        //$.p($.pRadix(x, 4, width), $.pRadix(y, 4, height));
+                        $.p(x, y);
 
                 Compound cell = $.inh(coord, root);
                 int yy = y;

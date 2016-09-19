@@ -1,6 +1,5 @@
 package nars.experiment.asteroids;
 
-import java.applet.Applet;
 import java.awt.*;
 
 public class Rock extends VectorSprite
@@ -71,6 +70,7 @@ public class Rock extends VectorSprite
         ROTATION = (Math.random()-0.5)/5;
     }
     
+    @Override
     public void updatePosition()
     {
         angle += ROTATION;
