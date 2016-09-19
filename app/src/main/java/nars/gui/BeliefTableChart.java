@@ -161,12 +161,14 @@ public class BeliefTableChart extends Surface {
                     if ((x != null) && (x.isBeliefOrGoal())) {
                         long o = x.occurrence();
                         float tlx = o == ETERNAL ? nowX : xTime(minT, maxT, o);
-                        float tly = x.freq();
-                        float ii = 0.3f + 0.7f * x.conf();
-                        gl.glColor4f(ii / 2f, 0, ii, 0.5f + tl.pri() * 0.5f);
-                        float w = 0.05f;
-                        float h = 0.05f;
-                        Draw.rectStroke(gl, tlx - w / 2, tly - h / 2, w, h);
+                        if (tlx > 0 && tlx < 1) {
+                            float tly = x.freq();
+                            float ii = 0.3f + 0.7f * x.conf();
+                            gl.glColor4f(ii / 2f, 0, ii, 0.5f + tl.pri() * 0.5f);
+                            float w = 0.05f;
+                            float h = 0.05f;
+                            Draw.rectStroke(gl, tlx - w / 2, tly - h / 2, w, h);
+                        }
                     }
                 }
             });

@@ -13,7 +13,6 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -252,7 +251,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
     /** this will be called from within a worker task */
-    @Override public final void onRemoval(Object key, Object value, @Nonnull RemovalCause cause) {
+    @Override public final void onRemoval(Object key, Object value, @NotNull RemovalCause cause) {
         if (value instanceof Concept) {
             ((Concept) value).delete(nar);
         }

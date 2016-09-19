@@ -21,6 +21,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatNormalized;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.MotorConcept;
+import nars.util.signal.NObj;
 import nars.video.CameraSensorView;
 import nars.video.CameraSensor;
 import nars.video.SwingCamera;
@@ -48,13 +49,12 @@ public class Arkancide extends NAgent {
     public static final int runFrames = 5000;
     public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
 
-    /** decision frames */
-    public static int BaseBrainwaveRate = 1;
+
 
 
     final int visW = 48;
     final int visH = 24;
-    final FuzzyScalarConcepts padX;
+
 
     float paddleSpeed = 20f;
 
@@ -69,27 +69,31 @@ public class Arkancide extends NAgent {
 
 
     public Arkancide(NAR nar) {
-        super(nar, BaseBrainwaveRate);
+        super(nar, 1 /* additional decision frames */);
 
-        noid = new Arkanoid();
+        new NObj("noid", noid = new Arkanoid(), nar)
+                .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
+                .in(this);
 
         pixels = new CameraSensor(new SwingCamera(noid, visW, visH), this, (v) -> t(v, alpha));
 
-        addSensor(this.padX = new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.paddle.x), nar,
-                "pad(x,0)",
-                "pad(x,1)",
-                "pad(x,2)"
-        ).resolution(0.05f) );
 
-        addSensor( new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.ball.x), nar,
-                "ball(x,0)",
-                "ball(x,1)",
-                "ball(x,2)"
-        ).resolution(0.05f) );
 
-        addSensor( new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.ball.y), nar,
-                "ball(y)"
-        ).resolution(0.05f) );
+//        addSensor(this.padX = new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.paddle.x), nar,
+//                "pad(x,0)",
+//                "pad(x,1)",
+//                "pad(x,2)"
+//        ).resolution(0.05f) );
+
+//        addSensor( new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.ball.x), nar,
+//                "ball(x,0)",
+//                "ball(x,1)",
+//                "ball(x,2)"
+//        ).resolution(0.05f) );
+//
+//        addSensor( new FuzzyScalarConcepts(new FloatNormalized(() -> (float)noid.ball.y), nar,
+//                "ball(y)"
+//        ).resolution(0.05f) );
 
 
         addAction(new MotorConcept("(leftright)", nar, (b,d)->{

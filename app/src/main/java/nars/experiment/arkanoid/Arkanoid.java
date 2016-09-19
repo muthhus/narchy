@@ -60,9 +60,9 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	class Rectangle extends GameObject {
 
-		double x, y;
-		double sizeX;
-		double sizeY;
+		public double x, y;
+		public double sizeX;
+		public double sizeY;
 
 		@Override
 		double left() {
@@ -104,7 +104,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	class Paddle extends Rectangle {
 
-		double velocity;
+		public double velocity;
 
 		public Paddle(double x, double y) {
 			this.x = x;
@@ -199,14 +199,26 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	class Ball extends GameObject {
 
-		double x, y;
+		public double x, y;
 		double radius = BALL_RADIUS;
-		double velocityX = BALL_VELOCITY;
-		double velocityY = BALL_VELOCITY;
+
+		//45 degree angle initially
+		public double velocityX;
+		public double velocityY;
 
 		Ball(int x, int y) {
 			this.x = x;
 			this.y = y;
+			setVelocityRandom();
+		}
+
+		public void setVelocityRandom() {
+			this.setVelocity(BALL_VELOCITY, Math.random() * Math.PI/3 - Math.PI/2); //angled upward
+		}
+
+		public void setVelocity(double speed, double angle) {
+			this.velocityX = Math.cos(angle) * speed;
+			this.velocityY = Math.sin(angle) * speed;
 		}
 
 		void draw(Graphics g) {
@@ -335,6 +347,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 		score = 0;
 		ball.x = SCREEN_WIDTH / 2;
 		ball.y = SCREEN_HEIGHT / 2;
+		ball.setVelocityRandom();
 	}
 
 //	void run() {

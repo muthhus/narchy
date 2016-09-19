@@ -7,8 +7,8 @@ import nars.util.Texts;
 import nars.util.Util;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 
 import static java.lang.Math.pow;
 import static nars.nal.UtilityFunctions.and;

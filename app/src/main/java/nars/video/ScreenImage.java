@@ -1,6 +1,8 @@
 package nars.video;
 
-import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
