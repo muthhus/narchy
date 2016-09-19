@@ -15,6 +15,7 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -75,7 +76,8 @@ public class Arkancide extends NAgent {
                 .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
                 .in(this);
 
-        pixels = new CameraSensor(new SwingCamera(noid, visW, visH), this, (v) -> t(v, alpha));
+        pixels = new CameraSensor($.oper("noid"),
+            new SwingCamera(noid, visW, visH), this, (v) -> t(v, alpha));
 
 
 
@@ -96,7 +98,10 @@ public class Arkancide extends NAgent {
 //        ).resolution(0.05f) );
 
 
-        addAction(new MotorConcept("(leftright)", nar, (b,d)->{
+        addAction(new MotorConcept(
+                //"happy:noid(paddle,x)"
+                "(leftright)"
+                , nar, (b,d)->{
             if (d!=null) {
                 //TODO add limits for feedback, dont just return the value
                 //do this with a re-usable feedback interface because this kind of acton -> limitation detection will be common

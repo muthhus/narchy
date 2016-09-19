@@ -3,6 +3,7 @@ package nars.video;
 import nars.$;
 import nars.NAgent;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.Truth;
 import nars.util.math.FloatSupplier;
@@ -19,7 +20,7 @@ public class CameraSensor {
     public final int width, height;
     private final PixelCamera cam;
 
-    public CameraSensor(PixelCamera cam, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
+    public CameraSensor(Term root, PixelCamera cam, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         this.cam = cam;
         width = cam.width();
         height = cam.height();
@@ -27,7 +28,6 @@ public class CameraSensor {
         //TODO extract this section and associated variables to a CameraSensorMatrix class or something
         ss = new SensorConcept[width][height];
 
-        Atom xy = $.the("xy");
         for (int x = 0; x < width; x++) {
             int xx = x;
             for (int y = 0; y < height; y++) {
@@ -36,7 +36,7 @@ public class CameraSensor {
                         $.p($.pRadix(x, 4, width), $.pRadix(y, 4, height));
                 //$.p(x, y);
 
-                Compound cell = $.inh(coord, xy);
+                Compound cell = $.inh(coord, root);
                 int yy = y;
                 SensorConcept sss;
 

@@ -40,7 +40,7 @@ import static nars.util.Texts.n4;
 abstract public class NAgent {
 
 
-    static final Logger logger = LoggerFactory.getLogger(NAgent.class);
+    public static final Logger logger = LoggerFactory.getLogger(NAgent.class);
 
     /** general reward signal for this agent */
     public final SensorConcept happy;

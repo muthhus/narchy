@@ -81,9 +81,9 @@ public class NObj<X> {
                     default:
                         throw new RuntimeException("not handled: " + classString);
                 }
-                if (y != null) {
+                /*if (y != null) {
                     System.out.println("read: \t" + o + " " + exp + " " + x + " " + x.getClass() + " " + initialValue + " " + initialValue.getClass());
-                }
+                }*/
                 return y;
             } catch (Exception e1) {
                 //e1.printStackTrace();
@@ -154,6 +154,7 @@ public class NObj<X> {
 
     public void in(NAgent agent) {
         agent.sensors.addAll(sensors);
+        agent.logger.info("{} added {}", this, sensors);
     }
 
     private static class Test1 {
