@@ -3,6 +3,7 @@ package nars.gui;
 import com.jogamp.opengl.GL2;
 import nars.NAR;
 import nars.Task;
+import nars.agent.NAgent;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.term.Termed;
@@ -97,6 +98,21 @@ public class BeliefTableChart extends Surface {
 
 
         new SpaceGraph().add(new Facial(new GridSurface(VERTICAL, actionTables)).maximize()).show(800,600);
+    }
+
+    public static GridSurface agentActions(NAgent a, long window) {
+        NAR nar = a.nar;
+        long[] btRange = new long[2];
+        nar.onFrame(nn -> {
+            long now = nn.time();
+            btRange[0] = now - window;
+            btRange[1] = now + window;
+        });
+        List<Surface> s = a.actions.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
+        s.add(new BeliefTableChart(nar, a.happy, btRange));
+        s.add(new BeliefTableChart(nar, a.joy, btRange));
+
+        return new GridSurface(VERTICAL, s);
     }
 
     public void update() {

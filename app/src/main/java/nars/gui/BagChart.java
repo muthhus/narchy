@@ -43,7 +43,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
     }
 
     public static void show(Default d, int count) {
-        BagChart<Concept> tc = newBagChart(d, count);
+        BagChart<Concept> tc = concepts(d, count);
         SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
 
 
@@ -54,7 +54,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
         s.add(new Facial(new CrosshairSurface(s)));
     }
 
-    public static BagChart<Concept> newBagChart(final Default d, final int count) {
+    public static BagChart<Concept> concepts(final Default d, final int count) {
         BagChart<Concept> tc = new BagChart<Concept>(d.core.concepts, count) {
             @Override
             public void accept(BLink<Concept> x, ItemVis<BLink<Concept>> y) {

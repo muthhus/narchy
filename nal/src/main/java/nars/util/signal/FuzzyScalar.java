@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static nars.$.t;
 
@@ -23,25 +24,28 @@ public class FuzzyScalar implements Iterable<SensorConcept> {
     public final List<SensorConcept> sensors;
     @NotNull
     public final NAR nar;
+
     float conf;
 
 
-    @NotNull float[] centerPoints;
+    @NotNull final float[] centerPoints;
 
-    public float calculate(int index) {
+    public float value(int index) {
         float v = input.asFloat();
 
         int n = centerPoints.length;
-        float nearness[] = new float[n];
+        //float nearness[] = new float[n];
         float s = 0;
         float dr = 1f / (n-1);
+        float numerator = Float.NaN;
         for (int i = 0; i < n; i++) {
-            float nn;
             float dist = Math.abs(centerPoints[i] - v);
-            nearness[i] = nn = Math.max(0, dr-dist);
+            float nn = Math.max(0, dr-dist);
             s += nn;
+            if (i == index)
+                numerator = nn;
         }
-        return nearness[index] /= s;
+        return numerator /= s;
     }
 
     public FuzzyScalar(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull String... states) {
@@ -69,7 +73,7 @@ public class FuzzyScalar implements Iterable<SensorConcept> {
                 int ii = i;
 
                 sensors.add( new SensorConcept(s, nar, this.input,
-                        (x) -> t(calculate(ii), conf)
+                        (x) -> t(value(ii), conf)
                 ));
                 center += dr;
                 i++;
@@ -110,12 +114,18 @@ public class FuzzyScalar implements Iterable<SensorConcept> {
 //			return t(f, c * conf);
 //		}
 
-    @NotNull
-    public FuzzyScalar pri(float p) {
-        for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
-            sensors.get(i).pri(p);
-        }
-        return this;
+//    @NotNull
+//    public FuzzyScalar pri(float p) {
+//        for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
+//            sensors.get(i).pri(p);
+//        }
+//        return this;
+//    }
+
+
+    @Override
+    public void forEach(Consumer<? super SensorConcept> action) {
+        sensors.forEach(action);
     }
 
     @NotNull
@@ -155,3 +165,33 @@ public class FuzzyScalar implements Iterable<SensorConcept> {
         return sensors.iterator();
     }
 }
+///**
+// * SensorConcept which wraps a MutableFloat value
+// */
+//public class FloatConcept extends SensorConcept {
+//
+//
+//    @NotNull
+//    private final MutableFloat value;
+//
+//    public FloatConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
+//        this(compoundTermString, n, Float.NaN);
+//    }
+//
+//    public FloatConcept(@NotNull String compoundTermString, @NotNull NAR n, float initialValue) throws Narsese.NarseseException {
+//        this(compoundTermString, n, new MutableFloat(initialValue));
+//    }
+//
+//    public FloatConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MutableFloat v) throws Narsese.NarseseException {
+//        super(compoundTermString, n, v::floatValue,
+//                (vv) -> new DefaultTruth(vv, n.confidenceDefault(Symbols.BELIEF) )
+//        );
+//        this.value = v;
+//    }
+//
+//    public float set(float v) {
+//        value.setValue(v);
+//        return v;
+//    }
+//
+//}

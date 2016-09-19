@@ -317,7 +317,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 		this.setUndecorated(false);
 		this.setResizable(false);
 		this.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-		this.setVisible(true);
+		//this.setVisible(true);
 		this.addKeyListener(this);
 		this.setLocationRelativeTo(null);
 		setIgnoreRepaint(true);

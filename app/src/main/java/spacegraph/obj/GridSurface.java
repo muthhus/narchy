@@ -1,5 +1,8 @@
 package spacegraph.obj;
 
+import nars.concept.Concept;
+import nars.gui.BagChart;
+import nars.video.CameraSensorView;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Surface;
 
@@ -117,5 +120,15 @@ public class GridSurface extends LayoutSurface {
         }
     }
 
+
+    public static Surface grid(Surface... content) {
+        return new GridSurface(content);
+    }
+    public static Surface row(Surface... content) {
+        return new GridSurface(HORIZONTAL, content);
+    }
+    public static Surface col(Surface... content) {
+        return new GridSurface(VERTICAL, content);
+    }
 
 }

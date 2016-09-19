@@ -10,14 +10,14 @@ import spacegraph.obj.MatrixView;
 /**
  * displays a CameraSensor pixel data as perceived through its concepts (belief/goal state)
  */
-public class CamView extends MatrixView implements MatrixView.ViewFunc {
+public class CameraSensorView extends MatrixView implements MatrixView.ViewFunc {
 
     private final CameraSensor cam;
     private final NAR nar;
     private float maxConceptPriority;
     private long now;
 
-    public CamView(CameraSensor cam, NAR nar) {
+    public CameraSensorView(CameraSensor cam, NAR nar) {
         super(cam.width, cam.height);
         this.cam = cam;
         this.nar = nar;
