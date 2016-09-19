@@ -26,8 +26,6 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.lazy.ReverseIterable;
 import org.eclipse.collections.impl.lazy.parallel.list.ListIterableParallelIterable;
 import org.eclipse.collections.impl.lazy.parallel.list.MultiReaderParallelListIterable;
-import org.eclipse.collections.impl.list.mutable.FastList;
-
 import org.eclipse.collections.impl.list.mutable.SynchronizedMutableList;
 import org.eclipse.collections.impl.list.mutable.UnmodifiableMutableList;
 import org.eclipse.collections.impl.stack.mutable.ArrayStack;

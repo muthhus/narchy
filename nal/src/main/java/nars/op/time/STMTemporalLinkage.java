@@ -3,7 +3,6 @@ package nars.op.time;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.bag.impl.experimental.HijackBag;
 import nars.concept.Concept;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;

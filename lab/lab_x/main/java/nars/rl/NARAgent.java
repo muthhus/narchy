@@ -1,12 +1,12 @@
 package nars.rl;
 
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import jurls.reinforcementlearning.domains.RLEnvironment;
 import nars.NAR;
 import nars.nal.nal8.OpReaction;
 import nars.nal.nal8.Operator;
 import nars.term.Term;
 import nars.util.event.EventEmitter;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 
 /**
  * Generic interface for agent interface controllers

@@ -9,7 +9,6 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.term.*;
 import nars.term.atom.Atomic;
-import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.ProtoCompound;
 import nars.term.container.TermContainer;

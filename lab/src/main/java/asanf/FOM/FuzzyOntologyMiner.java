@@ -10,7 +10,6 @@ import nars.$;
 import nars.term.Term;
 import nars.truth.Truth;
 
-
 import java.io.*;
 import java.util.*;
 

@@ -79,13 +79,13 @@
     <dependency>
       <groupId>org.jgrapht</groupId>
       <artifactId>jgrapht-core</artifactId>
-      <version>0.9.2</version>
+      <version>1.0.0</version>
     </dependency>
     <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-ext -->
     <dependency>
       <groupId>org.jgrapht</groupId>
       <artifactId>jgrapht-ext</artifactId>
-      <version>0.9.2</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
@@ -133,11 +133,11 @@
       <version>3.6.1</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.21</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>slf4j-api</artifactId>-->
+      <!--<version>1.7.21</version>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -159,7 +159,14 @@
       <exclusions>
         <exclusion><artifactId>javassist</artifactId><groupId>org.javassist</groupId></exclusion>
         <exclusion><artifactId>objenesis</artifactId><groupId>org.objenesis</groupId></exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
       </exclusions>
+
+
+
     </dependency>
     <dependency>
       <groupId>ognl</groupId>
@@ -171,12 +178,12 @@
       </exclusions>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.addthis/stream-lib -->
-    <dependency>
-      <groupId>com.addthis</groupId>
-      <artifactId>stream-lib</artifactId>
-      <version>3.0.0</version>
-    </dependency>
+    <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.addthis/stream-lib &ndash;&gt;-->
+    <!--<dependency>-->
+      <!--<groupId>com.addthis</groupId>-->
+      <!--<artifactId>stream-lib</artifactId>-->
+      <!--<version>3.0.0</version>-->
+    <!--</dependency>-->
 
 
     <dependency>

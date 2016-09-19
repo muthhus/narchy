@@ -12,7 +12,6 @@ import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v3;
-import spacegraph.obj.GridSurface;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.ClosestRay;

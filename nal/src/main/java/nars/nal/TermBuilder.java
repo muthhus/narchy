@@ -2,7 +2,6 @@ package nars.nal;
 
 import nars.$;
 import nars.Op;
-import nars.Param;
 import nars.nal.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.InvalidTermException;

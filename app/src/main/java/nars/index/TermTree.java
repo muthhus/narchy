@@ -5,17 +5,12 @@ import com.googlecode.concurrenttrees.common.PrettyPrinter;
 import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
 import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.*;
-import com.googlecode.concurrenttrees.radix.node.concrete.chararray.*;
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
-import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import nars.$;
-import nars.Param;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.MyConcurrentRadixTree;
 
-import java.util.List;
-import java.util.Random;
 import java.util.function.Function;
 
 /**

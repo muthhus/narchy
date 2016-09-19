@@ -1,18 +1,13 @@
 package spacegraph.obj;
 
-import nars.$;
-import spacegraph.SimpleSpatial;
 import spacegraph.math.v3;
-import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
-import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.*;
 import spacegraph.phys.util.Motion;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 import static spacegraph.math.v3.v;
 

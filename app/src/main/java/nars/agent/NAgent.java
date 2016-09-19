@@ -1,11 +1,13 @@
 package nars.agent;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.*;
 import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.nal.UtilityFunctions;
+import nars.nar.Default;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -13,8 +15,8 @@ import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
-import nars.util.math.PolarRangeNormalizedFloat;
-import nars.util.math.RangeNormalizedFloat;
+import nars.util.math.FloatNormalized;
+import nars.util.math.FloatPolarNormalized;
 import nars.util.signal.Emotion;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -24,13 +26,11 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
-import static nars.agent.NAgentOld.varPct;
-import static nars.nal.UtilityFunctions.and;
-import static nars.nal.UtilityFunctions.or;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.Texts.n2;
@@ -44,10 +44,14 @@ abstract public class NAgent {
 
     static final Logger logger = LoggerFactory.getLogger(NAgent.class);
 
+    /** general reward signal for this agent */
     public final SensorConcept happy;
 
+    /** d(happy)/dt = change in happiness over time (ie. first-order difference of happiness signal) */
     public final SensorConcept joy;
-    public final RangeNormalizedFloat rewardNormalized;
+
+    public final FloatNormalized rewardNormalized;
+
     public NAR nar;
 
     public final List<SensorConcept> sensors = $.newArrayList();
@@ -100,7 +104,7 @@ abstract public class NAgent {
 
         float rewardConf = alpha;
 
-        rewardNormalized = new PolarRangeNormalizedFloat(() -> rewardValue);
+        rewardNormalized = new FloatPolarNormalized(() -> rewardValue);
 
         happy = new SensorConcept("(happy)", nar,
                 rewardNormalized,
@@ -109,7 +113,7 @@ abstract public class NAgent {
 
 
         joy = new SensorConcept("(joy)", nar,
-                new PolarRangeNormalizedFloat(
+                new FloatPolarNormalized(
                         new FirstOrderDifferenceFloat(
                                 () -> nar.time(), () -> rewardValue
                         )
@@ -120,6 +124,26 @@ abstract public class NAgent {
     }
 
 
+
+    /** should only be invoked before agent has started TODO check for this */
+    public void addSensor(SensorConcept... s) {
+        addSensor(Lists.newArrayList(s));
+    }
+
+    /** should only be invoked before agent has started TODO check for this */
+    public void addSensor(Iterable<SensorConcept> s) {
+        Iterables.addAll(sensors, s);
+    }
+
+    /** should only be invoked before agent has started TODO check for this */
+    public void addAction(MotorConcept... s) {
+        addAction(Lists.newArrayList(s));
+    }
+
+    /** should only be invoked before agent has started TODO check for this */
+    public void addAction(Iterable<MotorConcept> s) {
+        Iterables.addAll(actions, s);
+    }
 
     /**
      * interpret motor states into env actions
@@ -456,4 +480,22 @@ abstract public class NAgent {
         return rewardSum;
     }
 
+    public static float varPct(NAR nar) {
+        if (nar instanceof Default) {
+            DoubleSummaryStatistics is = new DoubleSummaryStatistics();
+            nar.forEachActiveConcept(xx -> {
+
+                if (xx != null) {
+                    Term tt = xx.term();
+                    float v = tt.volume();
+                    int c = tt.complexity();
+                    is.accept((v - c) / v);
+                }
+
+            });
+
+            return (float) is.getAverage();
+        }
+        return Float.NaN;
+    }
 }

@@ -1,18 +1,5 @@
 package nars.op;
 
-import nars.$;
-import nars.NAR;
-import nars.Task;
-import nars.bag.impl.CurveBag;
-import nars.budget.merge.BudgetMerge;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Terms;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-
 public class QueryVariableIntroduction {
 
     /**

@@ -1,6 +1,5 @@
 package nars.prolog;
 
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import nars.Events.OUT;
 import nars.NAR;
 import nars.io.out.TextOutput;
@@ -13,6 +12,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.util.data.random.XORShiftRandom;
 import nars.util.event.Reaction;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 
 import java.util.HashSet;
 import java.util.Set;

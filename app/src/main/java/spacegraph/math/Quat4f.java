@@ -31,9 +31,6 @@
 
 package spacegraph.math;
 
-import com.jogamp.opengl.math.FloatUtil;
-import com.jogamp.opengl.math.VectorUtil;
-
 /**
  * A 4 element unit quaternion represented by single precision floating
  * point x,y,z,w coordinates.  The quaternion is always normalized.

@@ -2,7 +2,6 @@ package nars.experiment.arkanoid;
 
 
 import com.google.common.collect.Lists;
-import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
@@ -16,14 +15,12 @@ import nars.op.time.MySTMClustered;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.FrameClock;
-import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.math.RangeNormalizedFloat;
+import nars.util.math.FloatNormalized;
 import nars.util.signal.FuzzyScalar;
 import nars.util.signal.MotorConcept;
-import nars.util.signal.SensorConcept;
-import nars.video.BufferedImageCamera;
+import nars.video.CamView;
 import nars.video.CameraSensor;
 import nars.video.SwingCamera;
 import spacegraph.Facial;
@@ -39,7 +36,6 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.t;
-import static nars.experiment.pong.Pong.numericSensor;
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.experiment.tetris.Tetris.exe;
 import static spacegraph.obj.GridSurface.VERTICAL;
@@ -49,20 +45,69 @@ public class Arkancide extends NAgent {
     private static final int cyclesPerFrame = 3;
     public static final int runFrames = 5000;
     public static final int CONCEPTS_FIRE_PER_CYCLE = 16;
-    final Arkanoid noid;
 
-    private SwingCamera cam;
-    private final CameraSensor pixels;
+    /** decision frames */
+    public static int BaseBrainwaveRate = 1;
 
-    private MotorConcept motorLeftRight;
 
     final int visW = 48;
     final int visH = 24;
 
-    //private final int visionSyncPeriod = 16;
-
     float paddleSpeed = 20f;
+
+
+
+
+    final Arkanoid noid;
+
+    private final CameraSensor pixels;
+
     private float prevScore;
+
+
+    public Arkancide(NAR nar) {
+        super(nar, BaseBrainwaveRate);
+
+        noid = new Arkanoid();
+
+        pixels = new CameraSensor(new SwingCamera(noid, visW, visH), this, (v) -> t(v, alpha));
+
+        addSensor( new FuzzyScalar(new FloatNormalized(() -> (float)noid.paddle.x), nar,
+                "pad(x,0)",
+                "pad(x,1)",
+                "pad(x,2)"
+        ).resolution(0.05f) );
+
+        addSensor( new FuzzyScalar(new FloatNormalized(() -> (float)noid.ball.x), nar,
+                "ball(x,0)",
+                "ball(x,1)",
+                "ball(x,2)"
+        ).resolution(0.05f) );
+
+        addSensor( new FuzzyScalar(new FloatNormalized(() -> (float)noid.ball.y), nar,
+                "ball(y)"
+        ).resolution(0.05f) );
+
+
+        addAction(new MotorConcept("(leftright)", nar, (b,d)->{
+            if (d!=null) {
+                //TODO add limits for feedback, dont just return the value
+                //do this with a re-usable feedback interface because this kind of acton -> limitation detection will be common
+                noid.paddle.move((d.freq() - 0.5f) * paddleSpeed);
+                return d.withConf(alpha);
+            } else {
+                return null;
+            }
+        }));
+
+
+
+//        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
+//                4, 8 /* states */,
+//                0.05f);
+
+
+    }
 
 
     public class View {
@@ -70,82 +115,9 @@ public class Arkancide extends NAgent {
         public List attention = $.newArrayList();
         public MatrixView autoenc;
     }
-    private final View view = new View();
-
-    public static int DECISION_FRAMES = 1;
-
-    public Arkancide(NAR nar) {
-        super(nar, DECISION_FRAMES);
-
-        noid = new Arkanoid();
 
 
 
-        cam = new SwingCamera(noid, visW, visH);
-        cam.update();
-
-
-        pixels = new CameraSensor(cam, this, (v) -> t(v, alpha));
-
-        sensors.addAll( new FuzzyScalar(new RangeNormalizedFloat(() -> (float)noid.paddle.x), nar,
-                "pad(x,0)",
-                "pad(x,1)",
-                "pad(x,2)"
-        ).resolution(0.05f).sensors );
-
-        sensors.addAll( new FuzzyScalar(new RangeNormalizedFloat(() -> (float)noid.ball.x), nar,
-                "ball(x,0)",
-                "ball(x,1)",
-                "ball(x,2)"
-        ).resolution(0.05f).sensors );
-
-        sensors.addAll( new FuzzyScalar(new RangeNormalizedFloat(() -> (float)noid.ball.y), nar,
-                "ball(y)"
-        ).resolution(0.05f).sensors );
-
-
-
-//        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-//                4, 8 /* states */,
-//                0.05f);
-//        view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
-
-
-
-        actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b,d)->{
-
-            if (d!=null) {
-                noid.paddle.move((d.freq() - 0.5f) * paddleSpeed);
-                return d.withConf(alpha);
-            }
-            return null;
-
-            //return $.t((float)(noid.paddle.x / noid.SCREEN_WIDTH), 0.9f);
-
-            //@Nullable Truth tNow = motorLeftRight.goals().truth(now);
-            //if (tNow!=null)
-            //noid.paddle.set(tNow.freq());
-
-            //return $.t(noid.paddle.moveTo(d.freq(), paddleSpeed), 0.9f);
-        }));
-
-        //view.attention.add(nar.inputActivation);
-        //view.attention.add(nar.derivedActivation);
-
-        newBeliefChartWindow(this, 200);
-        HistogramChart.budgetChart(nar, 50);
-        //BagChart.show((Default) nar);
-
-        ControlSurface.newControlWindow(
-                //new GridSurface(VERTICAL, actionTables),
-                //BagChart.newBagChart((Default)nar, 1024),
-                new CamView(pixels, nar)//, view
-        );
-
-        //newConceptWindow((Default) n, 64, 4);
-
-
-    }
 
 
     public static void newBeliefChartWindow(NAgent narenv, long window) {
@@ -197,8 +169,7 @@ public class Arkancide extends NAgent {
 
     @Override
     protected float act() {
-        cam.update();
-
+        pixels.update();
 
         float nextScore = noid.next();
         float reward = nextScore - prevScore;
@@ -276,6 +247,28 @@ public class Arkancide extends NAgent {
         t.trace = true;
 
 
+        //        view.autoenc = new MatrixView(ac.W.length, ac.W[0].length, arrayRenderer(ac.W));
+
+
+
+
+        //view.attention.add(nar.inputActivation);
+        //view.attention.add(nar.derivedActivation);
+
+        newBeliefChartWindow(t, 200);
+        HistogramChart.budgetChart(nar, 50);
+        //BagChart.show((Default) nar);
+
+        ControlSurface.newControlWindow(
+                //new GridSurface(VERTICAL, actionTables),
+                //BagChart.newBagChart((Default)nar, 1024),
+                new CamView(t.pixels, nar)//, view
+        );
+
+        //newConceptWindow((Default) n, 64, 4);
+
+
+
         NARLoop loop = t.run(runFrames, 0);
 
         //Tetris2.NARController meta = new Tetris2.NARController(nar, loop, t);
@@ -293,51 +286,4 @@ public class Arkancide extends NAgent {
     }
 
 
-    public static class CamView extends MatrixView implements MatrixView.ViewFunc {
-
-        private final CameraSensor cam;
-        private final NAR nar;
-        private float maxConceptPriority;
-        private long now;
-
-        public CamView(CameraSensor cam, NAR nar) {
-            super(cam.width, cam.height);
-            this.cam = cam;
-            this.nar = nar;
-            nar.onFrame(nn -> {
-                now = nn.time();
-                maxConceptPriority = ((Default)nar).core.concepts.priMax(); //TODO cache this
-            });
-        }
-
-        @Override
-        public float update(int x, int y, GL2 g) {
-
-            SensorConcept s = cam.ss[x][y];
-            Truth b =  s.hasBeliefs() ? s.beliefs().truth(now) : null;
-            float bf = b!=null ? b.freq() : 0.5f;
-            Truth d = s.hasGoals() ? s.goals().truth(now) : null;
-            float dr, dg;
-            if (d == null) {
-                dr = dg = 0;
-            } else {
-                float f = d.freq();
-                float c = d.conf();
-                if (f > 0.5f) {
-                    dr = 0;
-                    dg = (f - 0.5f) * 2f;// * c;
-                } else {
-                    dg = 0;
-                    dr = (0.5f - f) * 2f;// * c;
-                }
-            }
-
-            float p = nar.conceptPriority(s);
-            p /= maxConceptPriority;
-            g.glColor4f(dr, dg, bf, 0.75f + 0.25f * p);
-
-            return ((b!=null ? b.conf() : 0) + (d!=null ? d.conf() : 0))/4f;
-
-        }
-    }
 }

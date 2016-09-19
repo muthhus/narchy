@@ -18,9 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import static nars.$.unneg;
 import static nars.nal.TermBuilder.productNormalize;
 import static nars.task.Revision.chooseByConf;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
+import static nars.time.Tense.*;
 
 /**
  * Strategies for solving temporal components of a derivation

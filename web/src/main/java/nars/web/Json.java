@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.io.SerializedString;
 import nars.util.data.list.FasterList;
 
 import nars.util.meter.event.FloatGuage;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.nustaq.serialization.*;
 import org.nustaq.serialization.coders.FSTJsonDecoder;
 import org.nustaq.serialization.coders.Unknown;
@@ -39,7 +40,7 @@ public class Json {
                 ArrayList.class,
                 FasterList.class,
                 HashMap.class,
-                UnifriedMap.class,
+                UnifiedMap.class,
 
                 FloatGuage.class
 

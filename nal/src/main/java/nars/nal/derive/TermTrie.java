@@ -6,9 +6,9 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.magnos.trie.Trie;
-import org.magnos.trie.TrieNode;
-import org.magnos.trie.TrieSequencer;
+import nars.util.trie.Trie;
+import nars.util.trie.TrieNode;
+import nars.util.trie.TrieSequencer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

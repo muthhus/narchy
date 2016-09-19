@@ -6,8 +6,8 @@ import nars.nar.Default;
 import nars.truth.Truth;
 import nars.util.Texts;
 import nars.util.Util;
-import nars.util.math.PolarRangeNormalizedFloat;
-import nars.util.math.RangeNormalizedFloat;
+import nars.util.math.FloatNormalized;
+import nars.util.math.FloatPolarNormalized;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class FuzzyScalarTest {
 
         testSteadyFreqCondition(m,
             new FuzzyScalar(
-                new RangeNormalizedFloat(() -> m.floatValue()).updateRange(-1).updateRange(1),
+                new FloatNormalized(() -> m.floatValue()).updateRange(-1).updateRange(1),
                 d, "(x)"),
                 (f) -> Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)
         );
@@ -42,7 +42,7 @@ public class FuzzyScalarTest {
         NAR d = new Default();
         MutableFloat m = new MutableFloat(0f);
 
-        PolarRangeNormalizedFloat range = new PolarRangeNormalizedFloat(() -> m.floatValue());
+        FloatPolarNormalized range = new FloatPolarNormalized(() -> m.floatValue());
         range.radius(1f);
         FuzzyScalar f = new FuzzyScalar(range, d,
                 "(low)", "(mid)", "(hih)");

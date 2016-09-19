@@ -5,13 +5,10 @@ import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
 import spacegraph.math.v3;
-import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.DistanceConstraint;
 import spacegraph.phys.shape.BoxShape;
-
-import java.util.List;
 
 /**
  * Created by me on 7/23/16.

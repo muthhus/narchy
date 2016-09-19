@@ -1,12 +1,8 @@
 package nars.nar;
 
-import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.Task;
-import nars.bag.impl.CurveBag;
 import nars.budget.Budgeted;
-import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.index.Indexes;
 import nars.index.TermIndex;
@@ -15,21 +11,16 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.ConceptBagCycle;
 import nars.op.DepIndepVarIntroduction;
-import nars.op.MutaTaskBag;
 import nars.op.VarIntroduction;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;

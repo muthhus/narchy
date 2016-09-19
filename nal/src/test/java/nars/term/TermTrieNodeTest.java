@@ -3,9 +3,9 @@
 //import nars.NAR;
 //import nars.nar.Default;
 //import org.junit.Test;
-//import org.magnos.trie.Trie;
-//import org.magnos.trie.TrieMatch;
-//import org.magnos.trie.Tries;
+//import Trie;
+//import TrieMatch;
+//import Tries;
 //
 //import static org.junit.Assert.assertEquals;
 //

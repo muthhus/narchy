@@ -13,9 +13,7 @@ import spacegraph.math.v3;
 import java.awt.*;
 import java.util.Objects;
 
-import static ideal.vacuum.Environment.WALL1;
-import static ideal.vacuum.Environment.WALL2;
-import static ideal.vacuum.Environment.WALL3;
+import static ideal.vacuum.Environment.*;
 
 
 /**

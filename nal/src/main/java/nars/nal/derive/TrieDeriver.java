@@ -13,7 +13,7 @@ import nars.term.Term;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.magnos.trie.TrieNode;
+import nars.util.trie.TrieNode;
 
 import java.io.PrintStream;
 import java.util.Collection;

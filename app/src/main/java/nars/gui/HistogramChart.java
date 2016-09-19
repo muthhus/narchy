@@ -7,8 +7,6 @@ import nars.link.BLink;
 import nars.nar.Default;
 import nars.util.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import spacegraph.Facial;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;
 import spacegraph.obj.GridSurface;

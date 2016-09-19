@@ -22,34 +22,30 @@ package nars.experiment.pacman;
 import nars.$;
 import nars.NAR;
 import nars.agent.NAgent;
-import nars.experiment.tetris.Tetris;
 import nars.gui.BeliefTableChart;
 import nars.gui.HistogramChart;
 import nars.index.CaffeineIndex;
-import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
-import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.truth.Truth;
-import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static nars.experiment.tetris.Tetris.*;
+import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
+import static nars.experiment.tetris.Tetris.agentBudgetPlot;
 
 /**
  * the java application class of pacman 

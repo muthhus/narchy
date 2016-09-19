@@ -10,8 +10,6 @@ import nars.util.signal.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.video.PixelCamera.decodeRed;
-
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
  */
@@ -19,8 +17,10 @@ public class CameraSensor {
 
     public final SensorConcept[][] ss;
     public final int width, height;
+    private final PixelCamera cam;
 
     public CameraSensor(PixelCamera cam, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
+        this.cam = cam;
         width = cam.width();
         height = cam.height();
 
@@ -56,4 +56,7 @@ public class CameraSensor {
 
     }
 
+    public void update() {
+        cam.update();
+    }
 }

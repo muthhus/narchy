@@ -1,18 +1,14 @@
 package nars.experiment.math;
 
-import nars.agent.NAgentOld;
 import nars.experiment.misc.DiscreteEnvironment;
 import nars.learn.Agent;
-import nars.nar.Default;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 
-import static nars.experiment.pong.Pong.beliefChart;
 
 /**
  * http://arxiv.org/pdf/1511.07275v2.pdf
@@ -260,50 +256,50 @@ abstract public class Algorithmic implements DiscreteEnvironment {
         }
     }
 
-    public static void main(String[] args) {
-
-        //Global.DEBUG = true;
-
-        Default n = new Default(1024, 4, 2, 2);
-        n.beliefConfidence(0.8f);
-        n.goalConfidence(0.8f);
-        n.DEFAULT_BELIEF_PRIORITY = 0.3f;
-        n.DEFAULT_GOAL_PRIORITY = 0.7f;
-        n.DEFAULT_QUESTION_PRIORITY = 0.5f;
-        n.DEFAULT_QUEST_PRIORITY = 0.5f;
-        n.cyclesPerFrame.set(64);
-        //n.logSummaryGT(System.out, 0.2f);
-        //n.log();
-
-        final NAgentOld a = new NAgentOld(n) {
-            @Override
-            public void start(int inputs, int actions) {
-                super.start(inputs, actions);
-                beliefChart(this, Collections.emptyList());
-            }
-        };
-
-//        n.onTask(tt -> {
-//            if (tt.isGoal()) {
-//                if ((tt.term().equals(a.happy) && tt.freq() < 0.5f) ||
-//                        (tt.term().equals(a.sad) && tt.freq() > 0.5f))
-//                {
-//                    if (tt.conf() > 0.25f) {
-//                        System.err.println("WTF psychotic");
-//                        System.err.println(tt.explanation());
-//                    }
-//                }
+//    public static void main(String[] args) {
+//
+//        //Global.DEBUG = true;
+//
+//        Default n = new Default(1024, 4, 2, 2);
+//        n.beliefConfidence(0.8f);
+//        n.goalConfidence(0.8f);
+//        n.DEFAULT_BELIEF_PRIORITY = 0.3f;
+//        n.DEFAULT_GOAL_PRIORITY = 0.7f;
+//        n.DEFAULT_QUESTION_PRIORITY = 0.5f;
+//        n.DEFAULT_QUEST_PRIORITY = 0.5f;
+//        n.cyclesPerFrame.set(64);
+//        //n.logSummaryGT(System.out, 0.2f);
+//        //n.log();
+//
+//        final NAgentOld a = new NAgentOld(n) {
+//            @Override
+//            public void start(int inputs, int actions) {
+//                super.start(inputs, actions);
+//                beliefChart(this, Collections.emptyList());
 //            }
-//        });
-
-        new CopyTask(2, 2).run(
-                a,
-                //new DQN(),
-                //new HaiQAgent(),
-                47024);
-
-
-        a.printActions();
-
-    }
+//        };
+//
+////        n.onTask(tt -> {
+////            if (tt.isGoal()) {
+////                if ((tt.term().equals(a.happy) && tt.freq() < 0.5f) ||
+////                        (tt.term().equals(a.sad) && tt.freq() > 0.5f))
+////                {
+////                    if (tt.conf() > 0.25f) {
+////                        System.err.println("WTF psychotic");
+////                        System.err.println(tt.explanation());
+////                    }
+////                }
+////            }
+////        });
+//
+//        new CopyTask(2, 2).run(
+//                a,
+//                //new DQN(),
+//                //new HaiQAgent(),
+//                47024);
+//
+//
+//        a.printActions();
+//
+//    }
 }

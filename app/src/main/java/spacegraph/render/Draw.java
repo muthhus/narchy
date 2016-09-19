@@ -26,11 +26,12 @@ package spacegraph.render;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.math.Quaternion;
 import com.jogamp.opengl.util.ImmModeSink;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
-import spacegraph.math.*;
+import spacegraph.math.AxisAngle4f;
+import spacegraph.math.Quat4f;
+import spacegraph.math.v3;
 import spacegraph.phys.collision.broad.BroadphaseNativeType;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;

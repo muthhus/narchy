@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static com.google.common.collect.Iterators.concat;
 import static nars.Param.rankTemporalByConfidence;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;

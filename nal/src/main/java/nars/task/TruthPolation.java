@@ -1,7 +1,6 @@
 package nars.task;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.Param;
 import nars.Task;
@@ -14,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.stream.Collectors;
 
 import static nars.nal.UtilityFunctions.w2c;

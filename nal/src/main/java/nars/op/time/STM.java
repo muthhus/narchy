@@ -2,9 +2,6 @@ package nars.op.time;
 
 import nars.NAR;
 import nars.Task;
-import nars.bag.Bag;
-import nars.bag.impl.CurveBag;
-import nars.bag.impl.experimental.HijackBag;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 

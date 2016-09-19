@@ -4,16 +4,12 @@ import nars.nar.Default;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.obj.Maze;
-import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.HingeConstraint;
-import spacegraph.phys.constraint.Point2PointConstraint;
 import spacegraph.phys.shape.BoxShape;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.shape.CylinderShape;
-
-import java.util.List;
 
 import static spacegraph.math.v3.v;
 

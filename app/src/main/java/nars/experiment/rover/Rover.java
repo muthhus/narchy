@@ -1,18 +1,7 @@
 package nars.experiment.rover;
 
-import com.jogamp.opengl.GL2;
-import nars.$;
 import nars.NAR;
-import spacegraph.SimpleSpatial;
-import spacegraph.math.v3;
 import spacegraph.obj.CompoundSpatial;
-import spacegraph.phys.Dynamics;
-import spacegraph.phys.shape.CollisionShape;
-import spacegraph.phys.shape.CylinderShape;
-
-import java.util.List;
-
-import static spacegraph.math.v3.v;
 
 /**
  * Created by me on 9/13/16.

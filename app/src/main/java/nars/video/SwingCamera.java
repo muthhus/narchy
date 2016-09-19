@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-import static nars.video.PixelCamera.*;
-
 /**
  * Captures a awt/swing component to a bitmap and scales it down, returning an image pixel by pixel
  */
@@ -28,43 +26,33 @@ public class SwingCamera extends BufferedImageCamera {
         this.component = component;
         input(0, 0, component.getWidth(), component.getHeight());
         output(targetWidth, targetHeight);
+        update();
     }
 
-    @Override
-    public void update(PerPixelRGB p) {
+    public void update() {
 
-        if (!update())
-            return;
-
-        super.update(p);
-    }
+        synchronized (component) {
+            final int width = this.width;
+            final int height = this.height;
 
 
-    public synchronized boolean update() {
-        final int width = this.width;
-        if (width == 0)
-            return false;
-        final int height = this.height;
-        if (height == 0)
-            return false;
+            //logger.info("{} capturing {} scaled to {},{}", component.getClass().getSimpleName(), input, width, height);
+
+            in = ScreenImage.get(component, in, input);
+
+            if (out == null || out.getWidth() != width || out.getHeight() != height) {
+                out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                outgfx = out.createGraphics(); //create a graphics object to paint to
+                outgfx.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                outgfx.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+                outgfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            }
 
 
-        //logger.info("{} capturing {} scaled to {},{}", component.getClass().getSimpleName(), input, width, height);
-
-        in = ScreenImage.get(component, in, input);
-
-        if (out == null || out.getWidth() != width || out.getHeight() != height) {
-            out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            outgfx = out.createGraphics(); //create a graphics object to paint to
-            outgfx.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            outgfx.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-            outgfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            outgfx.fillRect(0, 0, width, height); //TODO add fade option
+            outgfx.drawImage(in, 0, 0, width, height, null); //draw the image scaled
         }
 
-
-        outgfx.fillRect(0, 0, width, height); //TODO add fade option
-        outgfx.drawImage(in, 0, 0, width, height, null); //draw the image scaled
-        return true;
     }
 
 

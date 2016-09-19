@@ -1,11 +1,8 @@
 package nars.video;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
-import static nars.video.PixelCamera.decodeBlue;
-import static nars.video.PixelCamera.decodeGreen;
-import static nars.video.PixelCamera.decodeRed;
+import static nars.video.PixelCamera.*;
 
 /**
  * exposes a buffered image as a camera video source
@@ -26,7 +23,7 @@ public abstract class BufferedImageCamera implements PixelCamera {
     }
 
 
-    public void update(PerPixelRGB p) {
+    public void see(EachPixelRGB p) {
         final BufferedImage b = this.out;
         if (b == null)
             return;
@@ -41,8 +38,8 @@ public abstract class BufferedImageCamera implements PixelCamera {
         return decodeRed(out.getRGB(xx, yy));
     }
 
-    public void updateBuffered(PerPixelRGBf m) {
-        update(
+    public void updateBuffered(EachPixelRGBf m) {
+        see(
                 (x, y, p) -> {
                     intToFloat(m, x, y, p);
                 }

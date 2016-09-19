@@ -2,8 +2,8 @@
 //
 //import nars.concept.Concept;
 //import nars.term.Term;
-//import org.magnos.trie.Trie;
-//import org.magnos.trie.TrieSequencer;
+//import Trie;
+//import TrieSequencer;
 //
 ///**
 // * Created by me on 7/8/15.

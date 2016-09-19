@@ -7,7 +7,6 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
 import nars.agent.NAgent;
-import nars.concept.Concept;
 import nars.experiment.arkanoid.Arkancide;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.HistogramChart;
@@ -44,7 +43,6 @@ import java.util.Random;
 
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
-import static spacegraph.obj.GridSurface.HORIZONTAL;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
 /**
@@ -62,7 +60,7 @@ public class Tetris extends NAgent {
 //            new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 5550;
-    public static final int cyclesPerFrame = 12;
+    public static final int cyclesPerFrame = 32;
     public static final int tetris_width = 6;
     public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 5;

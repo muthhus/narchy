@@ -5,18 +5,13 @@ import nars.Param;
 import nars.Task;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.concept.TruthDelta;
 import nars.index.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.Truth;
-import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static nars.Param.TRUTH_EPSILON;
 
 /**
  * Created by me on 8/22/16.
