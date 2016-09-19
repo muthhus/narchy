@@ -12,6 +12,9 @@ public interface PixelCamera {
     int width();
     int height();
 
+    /** returns a value 0..1.0 indicating the monochrome brightness (white level) at the specified pixel */
+    float brightness(int xx, int yy);
+
     @FunctionalInterface interface PerPixelRGB {
         void pixel(int x, int y, int aRGB);
     }

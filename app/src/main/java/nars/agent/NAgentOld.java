@@ -18,7 +18,7 @@ import nars.util.data.list.FasterList;
 import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.signal.Emotion;
-import nars.util.signal.FuzzySensorSet;
+import nars.util.signal.FuzzyScalar;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -102,7 +102,7 @@ public class NAgentOld implements Agent {
 
     public SensorConcept happy;
     public SensorConcept sad;
-    public FuzzySensorSet rewardConcepts;
+    public FuzzyScalar rewardConcepts;
     private MutableTask beHappy, dontBeSad;
     float eternalGoalSeekConf;
 
@@ -263,8 +263,8 @@ public class NAgentOld implements Agent {
 
     }
 
-    public static FuzzySensorSet rewardConcepts(FloatSupplier input, NAR nar) {
-        return new FuzzySensorSet(
+    public static FuzzyScalar rewardConcepts(FloatSupplier input, NAR nar) {
+        return new FuzzyScalar(
                 new PolarRangeNormalizedFloat(input),
                 //new RangeNormalizedFloat(input),
                 nar,

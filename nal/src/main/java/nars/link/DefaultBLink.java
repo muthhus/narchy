@@ -44,7 +44,7 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
 
     @Override
     public final boolean equals(@NotNull Object that) {
-        return Objects.equals(id, that);
+        return Objects.equals(id, ((BLink)that).get());
     }
 
     @Override

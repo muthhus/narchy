@@ -25,6 +25,12 @@ public class MatrixView extends Surface {
         float update(int x, int y, GL2 gl);
     }
 
+    protected MatrixView(int w, int h) {
+        this.w = w;
+        this.h = h;
+        this.view = (ViewFunc)this;
+    }
+
     public MatrixView(int w, int h, ViewFunc view) {
         this.w = w;
         this.h = h;

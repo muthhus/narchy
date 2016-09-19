@@ -23,8 +23,9 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
-import nars.util.signal.FuzzySensorSet;
+import nars.util.signal.FuzzyScalar;
 import nars.util.signal.SensorConcept;
+import nars.video.BufferedImageCamera;
 import nars.video.NARCamera;
 import nars.video.SwingCamera;
 import org.eclipse.collections.api.tuple.Twin;
@@ -58,7 +59,7 @@ public class Pong extends Player implements DiscreteEnvironment {
 
     float bias; //pain of boredom
     private NAgentOld nagent;
-    final SwingCamera swingCamera;
+    final BufferedImageCamera swingCamera;
 
 
     public static void main(String[] args) throws IOException {
@@ -197,30 +198,30 @@ public class Pong extends Player implements DiscreteEnvironment {
 
     }
 
-    public static FuzzySensorSet bipolarNumericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+    public static FuzzyScalar bipolarNumericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
         PolarRangeNormalizedFloat p = new PolarRangeNormalizedFloat(input);
         return rawNumericSensor(term, p, n, pri, low, mid, high);
     }
 
-    public static FuzzySensorSet rawNumericSensor(FloatSupplier p, NAR n, float pri, String... states) {
-        return new FuzzySensorSet(p, n, states).pri(pri).resolution(0.1f);
+    public static FuzzyScalar rawNumericSensor(FloatSupplier p, NAR n, float pri, String... states) {
+        return new FuzzyScalar(p, n, states).pri(pri).resolution(0.1f);
 //				"(" + term + " , " + low + ")",
 //				"(" + term + " , " + mid + ")",
 //				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
 
     }
 
-    public static FuzzySensorSet numericSensor(FloatSupplier input, NAR n, float pri, String... states) {
+    public static FuzzyScalar numericSensor(FloatSupplier input, NAR n, float pri, String... states) {
         RangeNormalizedFloat p = new RangeNormalizedFloat(input);
-        return new FuzzySensorSet(p, n, states).pri(pri).resolution(0.1f);
+        return new FuzzyScalar(p, n, states).pri(pri).resolution(0.1f);
 //				"(" + term + " , " + low + ")",
 //				"(" + term + " , " + mid + ")",
 //				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
 
     }
 
-    public static FuzzySensorSet rawNumericSensor(String term, FloatSupplier p, NAR n, float pri, String low, String mid, String high) {
-        return new FuzzySensorSet(p, n,
+    public static FuzzyScalar rawNumericSensor(String term, FloatSupplier p, NAR n, float pri, String low, String mid, String high) {
+        return new FuzzyScalar(p, n,
                 "(" + term + " --> " + low + ")",
                 "(" + term + " --> " + mid + ")",
                 "(" + term + " --> " + high + ")").pri(pri).resolution(0.1f);
@@ -230,18 +231,18 @@ public class Pong extends Player implements DiscreteEnvironment {
 
     }
 
-    public static FuzzySensorSet rawNumericSensor(String term, String low, String high, NAR n, float pri, FloatSupplier p) {
-        return new FuzzySensorSet(p, n,
+    public static FuzzyScalar rawNumericSensor(String term, String low, String high, NAR n, float pri, FloatSupplier p) {
+        return new FuzzyScalar(p, n,
                 "(" + term + " --> " + low + ")",
                 "(" + term + " --> " + high + ")").pri(pri).resolution(0.05f);
     }
 
-    public static FuzzySensorSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+    public static FuzzyScalar numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
         RangeNormalizedFloat p = new RangeNormalizedFloat(input);
         return rawNumericSensor(term, p, n, pri, low, mid, high);
     }
 
-    public static FuzzySensorSet numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri) {
+    public static FuzzyScalar numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri) {
         RangeNormalizedFloat p = new RangeNormalizedFloat(input);
         return rawNumericSensor(term, low, high, n, pri, p);
     }
