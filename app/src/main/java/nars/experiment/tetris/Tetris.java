@@ -25,7 +25,7 @@ import nars.time.Tense;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
-import nars.concept.MotorConcept;
+import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
@@ -84,9 +84,9 @@ public class Tetris extends NAgent {
     static final View view = new View();
 
 
-    private MotorConcept motorRotate;
+    private ActionConcept motorRotate;
     //private MotorConcept motorDown;
-    private MotorConcept motorLeftRight;
+    private ActionConcept motorLeftRight;
     private final boolean rotate = !easy;
 
     /**
@@ -173,7 +173,7 @@ public class Tetris extends NAgent {
         float actionThresholdLower = actionMargin / 1.5f;
 
 
-        actions.add(motorLeftRight = new MotorConcept("(leftright)", nar, (b, d) -> {
+        actions.add(motorLeftRight = new ActionConcept("(leftright)", nar, (b, d) -> {
             if (d != null) {
                 float x = d.freq();
                 //System.out.println(d + " " + x);
@@ -194,7 +194,7 @@ public class Tetris extends NAgent {
         }));
 
         if (rotate) {
-            actions.add(motorRotate = new MotorConcept("(rotate)", nar, (b, d) -> {
+            actions.add(motorRotate = new ActionConcept("(rotate)", nar, (b, d) -> {
                 if (d != null) {
                     float r = d.freq();
                     if (r > actionThresholdHigher) {

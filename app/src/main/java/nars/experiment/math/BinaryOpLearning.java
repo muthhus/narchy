@@ -19,7 +19,7 @@ import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.concept.MotorConcept;
+import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -117,7 +117,7 @@ public class BinaryOpLearning extends NAgent {
 
         final char[] buffer;
 
-        final MotorConcept[][] motor;
+        final ActionConcept[][] motor;
         final float[][] desire;
 
         private final char[] vocab;
@@ -130,7 +130,7 @@ public class BinaryOpLearning extends NAgent {
             this.buffer = new char[length];
             this.vocab = vocab;
 
-            this.motor = new MotorConcept[length][vocab.length];
+            this.motor = new ActionConcept[length][vocab.length];
             this.desire = new float[length][vocab.length];
 
 
@@ -141,8 +141,8 @@ public class BinaryOpLearning extends NAgent {
                     int ll = j, cc = i;
 
                     Compound t = charTerm(id, ll, vocab[cc]);
-                    MotorConcept m;
-                    env.actions.add(m = new MotorConcept(t, env.nar, (Truth b, Truth d)->{
+                    ActionConcept m;
+                    env.actions.add(m = new ActionConcept(t, env.nar, (Truth b, Truth d)->{
                         float e;
                         if (d!=null) {
                             e =

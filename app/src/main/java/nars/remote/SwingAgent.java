@@ -24,7 +24,7 @@ abstract public class SwingAgent extends NAgent {
 
     }
 
-    protected CameraSensor<SwingCamera> addView(String id, Container w, int px, int pw) {
+    protected CameraSensor<SwingCamera> addCamera(String id, Container w, int px, int pw) {
         CameraSensor c = new CameraSensor<SwingCamera>($.the(id), new SwingCamera(w, px, pw), this, (v) -> t(v, alpha));
         widgets.put(id, c);
         return c;

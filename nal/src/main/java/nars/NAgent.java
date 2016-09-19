@@ -5,7 +5,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.budget.Budget;
 import nars.concept.Concept;
-import nars.concept.MotorConcept;
+import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.nal.UtilityFunctions;
 import nars.nar.Default;
@@ -54,7 +54,7 @@ abstract public class NAgent {
     public NAR nar;
 
     public final List<SensorConcept> sensors = $.newArrayList();
-    public final List<MotorConcept> actions = $.newArrayList();
+    public final List<ActionConcept> actions = $.newArrayList();
 
     public float alpha, gamma, epsilonProbability = 0.25f;
     @Deprecated
@@ -135,13 +135,32 @@ abstract public class NAgent {
     }
 
     /** should only be invoked before agent has started TODO check for this */
-    public void addAction(MotorConcept... s) {
+    public void addAction(ActionConcept... s) {
         addAction(Lists.newArrayList(s));
     }
 
     /** should only be invoked before agent has started TODO check for this */
-    public void addAction(Iterable<MotorConcept> s) {
+    public void addAction(Iterable<ActionConcept> s) {
         Iterables.addAll(actions, s);
+    }
+
+    /** latches to either one of 2 states until it shifts to the other one. suitable for representing
+     * push-buttons like keyboard keys. by default with no desire the state is off.  the 'on' and 'off'
+     * procedures will be called only as necessary (when state changes). */
+    public ActionConcept addToggleAction(String s, Runnable on, Runnable off) {
+        final boolean[] state = {false};
+        ActionConcept m = new ActionConcept(s, nar, (b, d) -> {
+            boolean now = state[0];
+            boolean next = d!=null && d.freq() >= 0.5f;
+            if (now && !next) {
+                state[0] = false; off.run(); return $.t(0, alpha);
+            } else if (next && !now) {
+                state[0] = true; on.run(); return $.t(1f, alpha);
+            }
+            return null;
+        });
+        actions.add(m);
+        return m;
     }
 
     /**
@@ -366,7 +385,7 @@ abstract public class NAgent {
         Budget curiosityBudget = Budget.One.clone().multiplied(minSensorPriority.floatValue(), 0.5f, 0.9f);
 
         float motorEpsilonProbability = epsilonProbability / actions.size() * (1f - (desireConf() / gamma));
-        for (MotorConcept c : actions) {
+        for (ActionConcept c : actions) {
             if (nar.random.nextFloat() < motorEpsilonProbability) {
                 nar.inputLater(
                     new GeneratedTask(c, Symbols.GOAL,
@@ -399,7 +418,7 @@ abstract public class NAgent {
     private void updateActionDesire() {
         float m = 0;
         int a = actions.size();
-        for (MotorConcept c : actions) {
+        for (ActionConcept c : actions) {
             Truth d = c.desire(now);
             if (d != null)
                 m += d.confWeight();

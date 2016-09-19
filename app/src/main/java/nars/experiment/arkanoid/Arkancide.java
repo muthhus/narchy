@@ -13,11 +13,9 @@ import nars.op.time.MySTMClustered;
 import nars.remote.SwingAgent;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.concept.MotorConcept;
+import nars.concept.ActionConcept;
 import nars.util.signal.NObj;
 import nars.video.CameraSensorView;
-import nars.video.CameraSensor;
-import nars.video.SwingCamera;
 import spacegraph.Surface;
 
 import java.util.Random;
@@ -59,10 +57,10 @@ public class Arkancide extends SwingAgent {
                 .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
                 .into(this);
 
-        addView("noid", noid, visW, visH);
+        addCamera("noid", noid, visW, visH);
 
 
-        addAction(new MotorConcept(
+        addAction(new ActionConcept(
                 //"happy:noid(paddle,x)"
                 "(leftright)"
                 , nar, (b,d)->{

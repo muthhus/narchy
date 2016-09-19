@@ -305,7 +305,7 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
         
     }
 
-    public void frame() {
+    public float frame() {
         if (gameState == 0) {
             keyCheck();
         } else if (gameState == 1) {
@@ -349,6 +349,8 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
         }
 
         SwingUtilities.invokeLater(this::repaint);
+
+        return credits;
     }
 
     public void start() {

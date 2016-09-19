@@ -16,7 +16,7 @@ import static nars.$.$;
 
 
 /** TODO make extend SensorConcept and utilize that for feedback control */
-public class MotorConcept extends WiredCompoundConcept {
+public class ActionConcept extends WiredCompoundConcept {
 
 
     /** relative temporal delta time for desire/belief prediction */
@@ -63,15 +63,15 @@ public class MotorConcept extends WiredCompoundConcept {
     private MotorFunction motor;
 
 
-    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
+    public ActionConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
         this($(compoundTermString), n, MotorFunction.Direct);
     }
 
-    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
+    public ActionConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
         this($(compoundTermString), n, motor);
     }
 
-    public MotorConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
+    public ActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
         super(term, n);
 
         //assert (Op.isOperation(this));
@@ -197,7 +197,7 @@ public class MotorConcept extends WiredCompoundConcept {
         public Task match(@NotNull Task target, long now) {
             long when = target.occurrence();
 
-            Task f = MotorConcept.this.nextFeedback;
+            Task f = ActionConcept.this.nextFeedback;
             if (f !=null && when <= now && when >= f.occurrence()) {
                 return f;
             }

@@ -34,7 +34,7 @@ import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.concept.MotorConcept;
+import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.util.signal.NObj;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -141,7 +141,7 @@ public class Pacman extends NAgent {
 
         @Nullable Truth zero = $.t(0.5f, alpha);
 
-        actions.add(new MotorConcept("(leftright)",nar,(b,d)->{
+        actions.add(new ActionConcept("(leftright)",nar,(b, d)->{
             if (d!=null) {
 
                 float f =
@@ -163,7 +163,7 @@ public class Pacman extends NAgent {
             return null;
         }));
 
-        actions.add(new MotorConcept("(updown)",nar,(b,d)->{
+        actions.add(new ActionConcept("(updown)",nar,(b, d)->{
             if (d!=null) {
                 float f =
                         //d.expectation();

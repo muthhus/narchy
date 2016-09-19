@@ -2,7 +2,7 @@ package nars.experiment.asteroids;
 
 import nars.$;
 import nars.NAR;
-import nars.NAgent;
+import nars.concept.ActionConcept;
 import nars.remote.SwingAgent;
 import nars.video.CameraSensor;
 import nars.video.SwingCamera;
@@ -16,7 +16,7 @@ import static nars.experiment.arkanoid.Arkancide.playSwing;
 public class NARsteroids extends SwingAgent {
 
     private final Asteroids space;
-    private final CameraSensor pixels;
+    private final CameraSensor<SwingCamera> pixels;
 
     public static void main(String[] args) {
         playSwing(NARsteroids::new);
@@ -27,11 +27,17 @@ public class NARsteroids extends SwingAgent {
 
         this.space = new Asteroids(false);
 
-        SwingCamera cam = new SwingCamera(space, 64, 64);
-        float brightness = 2f;
-        pixels = new CameraSensor($.oper("ast"), cam, this, (v) -> t(Math.min(1f, v*brightness), alpha));
-        cam.input(0f, 0f, 0.3f, 0.3f);
+        pixels = addCamera("ast", space, 64, 64);
+        pixels.cam.input(0f, 0f, 0.3f, 0.3f);
+
+        addToggleAction("ast:fire", () -> space.spaceKey = true, () -> space.spaceKey= false);
+        addToggleAction("ast:forward", () -> space.upKey = true, () -> space.upKey= false);
+        addToggleAction("ast:left", () -> space.leftKey = true, () -> space.leftKey= false);
+        addToggleAction("ast:right", () -> space.rightKey = true, () -> space.rightKey= false);
+
     }
+
+
 
 //    @Override
 //    protected float act() {
@@ -47,9 +53,12 @@ public class NARsteroids extends SwingAgent {
 //        return 0;
 //    }
 
-    @Override
-    protected float reward() {
-        space.frame();
-        return 0;
+    float prevScore = 0;
+    @Override protected float reward() {
+        float nextScore = space.frame();
+        float ds = nextScore - prevScore;
+        this.prevScore = nextScore;
+        return ds;
     }
+
 }

@@ -11,7 +11,7 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.term.Term;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.concept.MotorConcept;
+import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,7 +63,7 @@ public class Line1DContinuous extends NAgent {
             }, (v) -> $.t(v, alpha)));
         }
 
-        actions.add(new MotorConcept("(leftright)", n, (b, d) -> {
+        actions.add(new ActionConcept("(leftright)", n, (b, d) -> {
             if (d!=null) {
                 float v =
                         //d.expectation();
