@@ -337,6 +337,20 @@ public interface Concept extends Termed {
         termlinks().commit();
     }
 
+    default float beliefFreq(long time) {
+        return freq(time, beliefs());
+    }
+    default float goalFreq(long time) {
+        return freq(time, goals());
+    }
+
+    static float freq(long time, BeliefTable table) {
+        Truth t = table.truth(time);
+        if (t!=null)
+            return t.freq();
+        return 0.5f;
+    }
+
 
 //    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {
 //        if (termLinks && taskLinks) {

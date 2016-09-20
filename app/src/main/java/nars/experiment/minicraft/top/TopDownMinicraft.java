@@ -183,9 +183,9 @@ public class TopDownMinicraft extends Canvas implements Runnable {
 
     public void tick() {
         tickCount++;
-        if (!hasFocus()) {
+        /*if (!hasFocus()) {
             input.releaseAll();
-        } else {
+        } else */{
             if (!player.removed && !hasWon) gameTime++;
 
             input.tick();
@@ -269,7 +269,7 @@ public class TopDownMinicraft extends Canvas implements Runnable {
 
         renderGui();
 
-        if (!hasFocus()) renderFocusNagger();
+        //if (!hasFocus()) renderFocusNagger();
 
         for (int y = 0; y < screen.h; y++) {
             for (int x = 0; x < screen.w; x++) {

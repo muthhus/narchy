@@ -9,7 +9,6 @@ import nars.video.SwingCamera;
 
 import static java.lang.Math.*;
 import static nars.$.t;
-import static nars.experiment.arkanoid.Arkancide.playSwing;
 
 /**
  * Created by me on 9/19/16.

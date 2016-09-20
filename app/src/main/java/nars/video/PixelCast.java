@@ -22,8 +22,8 @@ public class PixelCast implements PixelCamera {
 
     public float minX = 0f;
     public float maxX = 1f;
-    float minY = 0f;
-    float maxY = 1f;
+    public float minY = 0f;
+    public float maxY = 1f;
 
     final float[][] w;
 

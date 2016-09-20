@@ -644,7 +644,7 @@ public class Tetris extends NAgent {
     public static GridSurface agentBudgetPlot(NAgent t, int history) {
         Default nar = (Default) t.nar;
         return conceptLinePlot(t.nar,
-                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), nar::conceptPriority, history);
+                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history, nar::conceptPriority);
     }
 
     public MatrixView.ViewFunc sensorMatrixView(NAR nar, long whenRelative) {
@@ -729,7 +729,7 @@ public class Tetris extends NAgent {
         return new GridSurface(VERTICAL, plot, plot1, plot2, plot3, plot4);
     }
 
-    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, FloatFunction<Termed> value, int plotHistory) {
+    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory, FloatFunction<Termed> value) {
 
         //TODO make a lambda Grid constructor
         GridSurface grid = new GridSurface();
@@ -737,6 +737,28 @@ public class Tetris extends NAgent {
         for (Termed t : concepts) {
             Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
             p.add(t.toString(), ()->value.floatValueOf(t), 0f, 1f );
+            grid.children.add(p);
+            plots.add(p);
+        }
+        grid.layout();
+
+        nar.onFrame(f -> {
+            plots.forEach(Plot2D::update);
+        });
+
+        return grid;
+    }
+    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory) {
+
+        //TODO make a lambda Grid constructor
+        GridSurface grid = new GridSurface();
+        List<Plot2D> plots = $.newArrayList();
+        for (Termed t : concepts) {
+            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
+            p.setTitle(t.toString());
+            p.add("P", ()->nar.conceptPriority(t), 0f, 1f );
+            p.add("B", ()->nar.concept(t).beliefFreq(nar.time()), 0f, 1f );
+            p.add("G", ()->nar.concept(t).goalFreq(nar.time()), 0f, 1f );
             grid.children.add(p);
             plots.add(p);
         }

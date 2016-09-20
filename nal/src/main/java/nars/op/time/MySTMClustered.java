@@ -33,6 +33,7 @@ public class MySTMClustered extends STMClustered {
 	public final Topic<Task> generate = new DefaultTopic<>();
 
 	private final int maxGroupSize;
+	private final int maxInputVolume;
 
 	float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
 	float freqCoherenceThresh = 0.9f;
@@ -41,8 +42,13 @@ public class MySTMClustered extends STMClustered {
 	float confMin;
 
 	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize) {
+		this(nar, size, punc, maxGroupSize, Math.round(((float)nar.compoundVolumeMax.intValue()) / (size - 1)) /* estimate */);
+	}
+
+	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, int maxInputVolume) {
         super(nar, new MutableInteger(size), punc, maxGroupSize);
 		this.maxGroupSize = maxGroupSize;
+		this.maxInputVolume = maxInputVolume;
 
 		//this.logger = LoggerFactory.getLogger(toString());
 
@@ -52,6 +58,17 @@ public class MySTMClustered extends STMClustered {
 		net.setBeta(0.05f);
 		net.setWinnerUpdateRate(0.03f, 0.01f);
     }
+
+
+	@Override
+	public void accept(@NotNull Task t) {
+
+		if (t.punc() == punc && t.volume()<=maxInputVolume) {
+
+			input.put(t, t.budget());
+		}
+
+	}
 
     @Override
 	protected void iterate() {

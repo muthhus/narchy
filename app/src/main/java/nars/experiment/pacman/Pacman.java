@@ -334,7 +334,7 @@ public class Pacman extends NAgent {
                             Vis.budgetHistogram(nar, 50),
                             conceptLinePlot(nar,
                                     Iterables.concat(p.actions, Lists.newArrayList(p.happy, p.joy)),
-                                    nar::conceptPriority, 200)
+                                    200, nar::conceptPriority)
                     )
             ), 500, 500);
 

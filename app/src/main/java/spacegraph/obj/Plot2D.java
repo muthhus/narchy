@@ -13,6 +13,12 @@ import java.util.function.DoubleSupplier;
 
 public class Plot2D extends Surface {
     private final FasterList<Series> series;
+    private String title = null;
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
 
     //public static final ColorArray BlueRed = new ColorArray(128, Color.BLUE, Color.RED);
 
@@ -28,7 +34,7 @@ public class Plot2D extends Surface {
 
         protected transient float maxValue, minValue;
 
-        public float[] color = { 1, 1, 1, 1 };
+        public float[] color = { 1, 1, 1, 0.75f };
 
         @Override
         public float[] toArray() {
@@ -162,6 +168,16 @@ public class Plot2D extends Surface {
 
         plotVis.draw(series, gl, minValue, maxValue);
 
+        if (title!=null) {
+            gl.glEnable(GL2.GL_COLOR_LOGIC_OP);
+            gl.glLogicOp(GL2.GL_XOR);
+
+            //Draw.text(gl, 0.001f, 0.001f, title, 0.5f,0.5f,0);
+            gl.glColor3f(1f, 1f, 1f);
+
+            Draw.text(gl, title, 0.1f, 0.5f, 0.5f, 0);
+            gl.glDisable(GL2.GL_COLOR_LOGIC_OP);
+        }
 
     }
 
@@ -235,8 +251,6 @@ public class Plot2D extends Surface {
 
             Draw.text(gl, rangeFontScale, rangeFontScale, String.valueOf(maxValue), 0, H, labelDZ);
 
-
-
             for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
 
                 Series s = series.get(si);
@@ -260,12 +274,13 @@ public class Plot2D extends Surface {
 
                 float py = 0;
 
-                gl.glLineWidth(2);
-                gl.glColor4fv(s.color, 0);
+                gl.glLineWidth(4);
+                gl.glColor3fv(s.color, 0);
 
+                float ny = mid;
                 for (int i = 0; i < ss; i++) {
 
-                    float ny = ypos(minValue, maxValue, ssh[i]);
+                    ny = ypos(minValue, maxValue, ssh[i]);
 
 
                     if (i > 0)
@@ -275,7 +290,8 @@ public class Plot2D extends Surface {
                     py = ny;
                 }
 
-                Draw.text(gl, seriesFontScale, seriesFontScale, s.name, 0, mid, labelDZ, s.color);
+                gl.glLineWidth(1);
+                Draw.text(gl, s.name, 0.1f, 0, ny, 0);
 
             }
         }

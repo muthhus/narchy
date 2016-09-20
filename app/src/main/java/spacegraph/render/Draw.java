@@ -27,6 +27,10 @@ package spacegraph.render;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
+import nars.$;
+import nars.util.data.list.FasterList;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.math.AxisAngle4f;
@@ -37,8 +41,11 @@ import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.*;
 import spacegraph.phys.util.BulletStack;
-import spacegraph.phys.util.IntArrayList;
 import spacegraph.phys.util.OArrayList;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.List;
 
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.math.v3.v;
@@ -200,7 +207,7 @@ public enum Draw {
                             int tris = hull.numTriangles();
                             if (tris > 0) {
                                 int index = 0;
-                                IntArrayList idx = hull.getIndexPointer();
+                                spacegraph.phys.util.IntArrayList idx = hull.getIndexPointer();
                                 OArrayList<v3> vtx = hull.getVertexPointer();
 
                                 v3 normal = v();
@@ -494,21 +501,27 @@ public enum Draw {
     /** thickness of font to avoid z-fighting */
     final static float zStep = 0.05f;
 
-    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
+    @Deprecated static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
         text(gl, scaleX, scaleY, label, dx, dy, dz, null);
     }
-    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz, float[] color) {
+    @Deprecated static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz, float[] color) {
         gl.glPushMatrix();
         //gl.glNormal3f(0, 0, 1f);
         gl.glTranslatef(dx, dy, dz + zStep);
 
-        float fontThick = 1f;
-        gl.glLineWidth(fontThick);
-
-
         if (color!=null)
             gl.glColor3fv(color, 0);
 
+        float fontThick = 1f;
+        gl.glLineWidth(fontThick);
+
+        /*
+         GLUT_STROKE_ROMAN
+            A proportionally spaced Roman Simplex font for ASCII characters 32 through 127. The maximum top character in the font is 119.05 units; the bottom descends 33.33 units.
+
+        GLUT_STROKE_MONO_ROMAN
+            A mono-spaced spaced Roman Simplex font (same characters as GLUT_STROKE_ROMAN) for ASCII characters 32 through 127. The maximum top character in the font is 119.05 units; the bottom descends 33.33 units. Each character is 104.76 units wide.
+         */
         //float r = v.radius;
         renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, label,
                 scaleX, scaleY,
@@ -768,5 +781,211 @@ public enum Draw {
             vbo.glEnd(gl);
         }
     }
+
+    /*
+ * Hershey Fonts
+ * http://paulbourke.net/dataformats/hershey/
+ *
+ * Drawn in Processing.
+ *
+ */
+
+//    // a curly brace from the Hershey characters
+//    String exampleCurly = " 2226 40KYPBRCSDTFTHSJRKQMQOSQ R" +
+//            "RCSESGRIQJPLPNQPURQTPVPXQZR[S]S_Ra R" +
+//            "SSQUQWRYSZT\\T^S`RaPb";
+
+    static boolean isGlyphInteger(String str) {
+        return str.matches("-?\\d+");
+    }
+
+
+//    // Point wrapper -- no tuples in Processing
+//// (Bonus: can tell you the ascii character pair that
+//// corresponds to it in the original file)
+//    static class GlyphPoint {
+//        int x, y;
+//
+//        GlyphPoint(int ix, int iy) {
+//            x = ix;
+//            y = iy;
+//        }
+//
+//        String toString() {
+//            return "<Point: (" + x + "," + y + ") [" + repr() + "]>";
+//        }
+//
+//        String repr() {
+//            return "" + char(x + offsetR) + char(y + offsetR); // empty string necessary for append
+//        }
+//    }
+
+    public static final class HGlyph {
+        /*int idx, verts, */
+        int leftPos, rightPos;
+        //String spec;
+        int[][] segments;
+
+        // Hershey fonts use coordinates represented by characters'
+        // integer values relative to ascii 'R'
+        static final int offsetR = (int)('R');
+
+
+
+        HGlyph(String hspec) {
+            FasterList<int[]> segments = $.newArrayList();
+
+            //idx      = Integer.valueOf(hspec.substring(0, 5));
+            //verts    = Integer.valueOf(hspec.substring(5, 8));
+            String spec     = (hspec.substring(10));
+
+            // TODO: is this needed?
+            leftPos  = (int)(hspec.charAt(8)) - offsetR;
+            rightPos = (int)(hspec.charAt(9)) - offsetR;
+
+            int curX, curY;
+            boolean penUp = true;
+            IntArrayList currentSeg = new IntArrayList();
+
+            for (int i = 0; i < spec.length() - 1; i += 2) {
+                if (spec.charAt(i+1) == 'R' && spec.charAt(i) == ' ') {
+                    penUp = true;
+                    segments.add(currentSeg.toArray());
+                    currentSeg = new IntArrayList();
+                    continue;
+                }
+
+                curX = (int)(spec.charAt(i)) - offsetR;
+                curY = (int)(spec.charAt(i + 1)) - offsetR;
+                currentSeg.add(curX);
+                currentSeg.add(20 - curY);
+            }
+            if (currentSeg.size()>0)
+                segments.add(currentSeg.toArray());
+
+            this.segments = segments.toArray(new int[segments.size()][]);
+        }
+
+
+        public void draw(GL2 gl, float scale, float tx, float ty, float tz) {
+            //int pLastX = 0, pLastY = 0;
+            int px=0, py =0;
+
+            for (int[] seg : segments) {
+
+                gl.glBegin(GL2.GL_LINE_STRIP);
+
+
+                int ss = seg.length;
+                for (int j = 0; j < ss; ) {
+
+                    px= seg[j++];
+                    py= seg[j++];
+//
+//
+//                    if (j > 2) {
+//                        // annotate pLast
+//                        //ellipse(tx(pLastX, 20.0 + sin(frameCount)), ty(pLastY, 20.0+ sin(frameCount)), 10, 10);
+//                        //text(pLast.repr(), tx(pLastX, 20.0) + 20, ty(pLastY, 20.0) + 5);
+//                        //line(gl, tx(pLastX, 20.0f), tx(pLastY, 20.0f), tx(pLastX, 20.0f) + 20, ty(pLastY, 20.0f));
+//                        //line(gl, px+tx, py+ty, pLastX+tx, pLastY+ty, tz);
+//
+//                        //gl.glVertex3f(pLastX + tx, pLastY+ ty, tz);
+//
+//                        //p = seg.get(j);
+//                        // connect pLast to p
+//                        //line(tx(pLastX, 20.0 + sin(frameCount)), ty(pLasty, 20.0 + sin(frameCount)), tx(p.x, 20.0 + sin(frameCount)), ty(p.y, 20.0 + sin(frameCount)));
+//
+//                    }
+
+                    gl.glVertex3f(px*scale + tx, py*scale + ty, tz);
+//
+//                    pLastX = px;
+//                    pLastY = py;
+                }
+                gl.glEnd();
+
+//                // handle last point since we haven't annotated it with an ellipse
+//                px = seg.get(ss - 1);
+//                //ellipse(tx(p.x, 20.0 + sin(frameCount)), ty(p.y, 20.0 + sin(frameCount)), 10, 10);
+//                //text(p.repr(), tx(p.x, 20.0) + 20, ty(p.y, 20.0) + 5);
+//                line(gl, tx(px, 20.0F), ty(py, 20.0F), tx(px, 20.0F) + 20, ty(py, 20.0F));
+            }
+        }
+    }
+
+    public static void text(GL2 gl, String s, float scale, float x, float y, float z) {
+        int l = s.length();
+        int N = fontMono.length;
+
+        scale *= 1f/20f; //to normalize
+
+        float letterWidth = scale * 16;
+        float width = letterWidth * s.length();
+
+        //align center:
+        x -= width/2f;
+
+        for (int i = 0; i < l; i++) {
+            char c = s.charAt(i);
+            int ci = c - 32; //ASCII to index
+            if (ci < N) {
+                HGlyph g = fontMono[ci];
+                g.draw(gl, scale, x, y, z);
+            }
+            x += letterWidth;
+
+        }
+    }
+
+    public final static HGlyph[] fontMono;
+
+    static {
+
+        List<HGlyph> glyphs = $.newArrayList();
+        List<String> lines;
+        try {
+            String font =
+                    //"meteorology"
+                    "rowmans"
+                    ;
+            lines = IOUtils.readLines(Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf"), Charset.defaultCharset());
+
+            String scratch = "";
+            HGlyph nextGlyph;
+            for (int i = 0; i < lines.size(); i++) {
+                String c = lines.get(i);
+                if (c.endsWith("\n"))
+                    c = c.substring(0, c.length()-1);
+//                if (c.length() < 5) {
+//                    continue;
+//                }
+                //    if (lines[i].charAt(0) == ' ') {
+                if (Character.isDigit(c.charAt(4))) {
+                    nextGlyph = new HGlyph(c + scratch);
+                    //      println("Instantiated glyph " + nextGlyph.idx);
+                    glyphs.add(nextGlyph);
+                    scratch = "";
+                }
+                else {
+                    scratch += c;
+                }
+            }
+
+//
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        fontMono = glyphs.toArray(new HGlyph[glyphs.size()]);
+
+    }
+
+
+
+
+
+
 
 }

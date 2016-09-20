@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
+ * monochrome
  */
 public class CameraSensor<P extends PixelCamera> {
 
