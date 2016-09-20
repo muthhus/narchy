@@ -19,7 +19,7 @@ public class NARsteroids extends SwingAgent {
     private final CameraSensor/*<SwingCamera>*/ pixels;
 
     public static void main(String[] args) {
-        playSwing(NARsteroids::new);
+        playSwing(NARsteroids::new, 5000);
     }
 
     public NARsteroids(NAR nar) {

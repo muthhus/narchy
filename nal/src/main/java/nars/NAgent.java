@@ -282,11 +282,11 @@ abstract public class NAgent {
 //                //(float) Math.sqrt(numSensors); //HEURISTIC
 //                numSensors / 2f;
 
-        minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 100 /* to be safe */);
+        minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 10 /* to be safe */);
         maxSensorPriority = new MutableFloat(Util.clamp(nar.priorityDefault(Symbols.BELIEF) / numSensors + minSensorPriority.floatValue())); //measured per-each sensor
         SensorConcept.attentionGroup(sensors, minSensorPriority, maxSensorPriority, nar);
 
-        minRewardPriority = new MutableFloat(Param.BUDGET_EPSILON * 200 /* estimate */);
+        minRewardPriority = new MutableFloat(Param.BUDGET_EPSILON * 20 /* estimate */);
         maxRewardPriority = new MutableFloat(Util.clamp(nar.priorityDefault(Symbols.BELIEF) / numSensors + minRewardPriority.floatValue()));
         SensorConcept.attentionGroup(newArrayList(happy, joy), minRewardPriority, maxRewardPriority, nar);
 

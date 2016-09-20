@@ -20,7 +20,7 @@ public class NARcraft extends SwingAgent {
     private final CameraSensor<?> pixels;
 
     public static void main(String[] args) {
-        playSwing(NARcraft::new);
+        playSwing(NARcraft::new, 15000);
     }
 
     public NARcraft(NAR nar) {
@@ -32,32 +32,45 @@ public class NARcraft extends SwingAgent {
         //swingCam.input(W/4, H/4, W/2, H/2); //50%
 
 //        Scale cam = new Scale(swingCam, 48, 48);
-        PixelCast cam = new PixelCast(craft.image, 48, 48);
+        PixelCast cam = new PixelCast(craft.image, 72, 64);
 
         pixels = addCamera("cra", cam, (v) -> $.t( v, alpha));
 
 
-        float camXYSpeed = 0.1f;
+        addIncrementalRangeAction("cra:(cam,X)", (f)-> {
+            cam.setX(f);
+            return true;
+        });
+        addIncrementalRangeAction("cra:(cam,Y)", (f)-> {
+            cam.setY(f);
+            return true;
+        });
+        addIncrementalRangeAction("cra:(cam,Z)", (f)-> {
+            cam.setZ(f);
+            return true;
+        });
+
+//relative camera controls:
+//        float camXYSpeed = 0.1f;
 //        float camZoomRate = 0.1f;
 //        int minZoomX = 64;
 //        int minZoomY = 64;
-        float minWidth = 0.6f;
-        addIncrementalRangeAction("cra:(cam,L)", (f)-> {
-            cam.minX = Math.max(0, Math.min(cam.minX + f * camXYSpeed, cam.maxX - minWidth));
-            return true;
-        });
-        addIncrementalRangeAction("cra:(cam,R)", (f)-> {
-            cam.maxX = Math.max(cam.minX + minWidth, Math.min(cam.maxX + f * camXYSpeed, 1));
-            return true;
-        });
-        addIncrementalRangeAction("cra:(cam,U)", (f)-> {
-            cam.minY = Math.max(0, Math.min(cam.minY + f * camXYSpeed, cam.maxY - minWidth));
-            return true;
-        });
-        addIncrementalRangeAction("cra:(cam,D)", (f)-> {
-            cam.maxY = Math.max(cam.minY + minWidth, Math.min(cam.maxY + f * camXYSpeed, 1));
-            return true;
-        });
+//        addIncrementalRangeAction("cra:(cam,L)", (f)-> {
+//            cam.minX = Math.max(0, Math.min(cam.minX + f * camXYSpeed, cam.maxX - minWidth));
+//            return true;
+//        });
+//        addIncrementalRangeAction("cra:(cam,R)", (f)-> {
+//            cam.maxX = Math.max(cam.minX + minWidth, Math.min(cam.maxX + f * camXYSpeed, 1));
+//            return true;
+//        });
+//        addIncrementalRangeAction("cra:(cam,U)", (f)-> {
+//            cam.minY = Math.max(0, Math.min(cam.minY + f * camXYSpeed, cam.maxY - minWidth));
+//            return true;
+//        });
+//        addIncrementalRangeAction("cra:(cam,D)", (f)-> {
+//            cam.maxY = Math.max(cam.minY + minWidth, Math.min(cam.maxY + f * camXYSpeed, 1));
+//            return true;
+//        });
 
 //        addIncrementalRangeAction("cra:(cam,R)", (f)->
 //            swingCam.inputTranslate(round(+camXYSpeed * f), 0 ) );
@@ -70,7 +83,13 @@ public class NARcraft extends SwingAgent {
 //        addIncrementalRangeAction("cra:(cam,O)", (f)->
 //            swingCam.inputZoom( (1 + camZoomRate * f), minZoomX, minZoomY) );
 
-        new NObj("cra", craft, nar).read("player.health").into(this);
+        new NObj("cra", craft, nar)
+                .read(
+                    "player.health",
+                    "player.dir",
+                    "player.getTile().connectsToGrass",
+                    "player.getTile().connectsToWater"
+                ).into(this);
 
         InputHandler input = craft.input;
         addToggleAction("cra:fire", (b) -> input.attack.toggle(b) );

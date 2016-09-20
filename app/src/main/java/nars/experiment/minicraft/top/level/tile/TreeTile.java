@@ -16,6 +16,9 @@ import nars.experiment.minicraft.top.item.resource.Resource;
 import nars.experiment.minicraft.top.level.Level;
 
 public class TreeTile extends Tile {
+
+	static final int TREE_HP = 2;
+
 	public TreeTile(int id) {
 		super(id);
 		connectsToGrass = true;
@@ -98,7 +101,7 @@ public class TreeTile extends Tile {
 		int damage = level.getData(x, y) + dmg;
 		level.add(new SmashParticle(x * 16 + 8, y * 16 + 8));
 		level.add(new TextParticle(String.valueOf(dmg), x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
-		if (damage >= 20) {
+		if (damage >= TREE_HP) {
 			int count = random.nextInt(2) + 1;
 			for (int i = 0; i < count; i++) {
 				level.add(new ItemEntity(new ResourceItem(Resource.wood), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));

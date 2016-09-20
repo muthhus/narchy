@@ -85,8 +85,8 @@ public class NObj<X> {
                 }*/
                 return y;
             } catch (Exception e1) {
-                //e1.printStackTrace();
-                System.err.println("\t" + e1);
+                e1.printStackTrace();
+
                 return null;
             }
         });
@@ -101,7 +101,14 @@ public class NObj<X> {
 
                 new FloatNormalized(() -> {
                     try {
-                        return ((Number) Ognl.getValue(expr, o, Number.class)).floatValue();
+                        Object v = Ognl.getValue(expr, o, Object.class);
+                        if (v instanceof Boolean) {
+                            return ((Boolean)v).booleanValue() ? 1f  : 0f;
+                        } else if (v instanceof Number) {
+                            return ((Number) v).floatValue();
+                        } else {
+                            return Float.NaN; //unknown
+                        }
                     } catch (OgnlException e) {
                         e.printStackTrace();
                         return Float.NaN;
@@ -120,15 +127,16 @@ public class NObj<X> {
             return ae
                     .substring(1, ae.length()-1); //it's raw field name, wont need quoted
 
-        } else if (expr instanceof ASTStaticMethod) {
+        } else if ((expr instanceof ASTStaticMethod) || (expr instanceof ASTMethod)) {
             String ae = expr.toString();
             String key = //"\"" +
                     ae.substring(0, ae.indexOf('('));
                     //+ "\"";
             key = key.replace("@", "X");
             //HACK remove the '@' from the key so it doesnt need quoted:
+
             return key + '(' +
-                    term(((ASTStaticMethod) expr).jjtGetChild(0))
+                    term((SimpleNode) expr)
                     + ')';
         } else if (expr instanceof SimpleNode) {
             return term((SimpleNode) expr);

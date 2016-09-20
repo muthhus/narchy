@@ -290,7 +290,7 @@ public class LevelGen {
 				dist = dist * dist * dist * dist;
 				val = val + 1 - dist * 20;
 
-				if (val > -2 && wval < -2.0 + (depth) / 2 * 3) {
+				if (val > -2 && wval < -2.0 + (depth) / 2f * 3) {
 					if (depth > 2)
 						map[i] = Tile.lava.id;
 					else

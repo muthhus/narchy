@@ -33,7 +33,32 @@ public class TopDownMinicraft extends Canvas implements Runnable {
     private Screen lightScreen;
     public final InputHandler input = new InputHandler(this);
 
-    private final int[] colors = new int[256];
+    static final int[] colors = new int[256];
+    static {
+        int pp = 0;
+        for (int r = 0; r < 6; r++) {
+            for (int g = 0; g < 6; g++) {
+                for (int b = 0; b < 6; b++) {
+                    int rr = (r * 255 / 5);
+                    int gg = (g * 255 / 5);
+                    int bb = (b * 255 / 5);
+                    int mid = (rr * 30 + gg * 59 + bb * 11) / 100;
+
+                    int r1 = ((rr + mid * 1) / 2) * 230 / 255 + 10;
+                    int g1 = ((gg + mid * 1) / 2) * 230 / 255 + 10;
+                    int b1 = ((bb + mid * 1) / 2) * 230 / 255 + 10;
+                    colors[pp++] = r1 << 16 | g1 << 8 | b1;
+
+                }
+            }
+        }
+    }
+
+    public TopDownMinicraft() {
+        player = new Player(this, input ); //temporary so player is never null
+
+    }
+
     private int tickCount = 0;
     public int gameTime = 0;
 
@@ -48,6 +73,7 @@ public class TopDownMinicraft extends Canvas implements Runnable {
     private int wonTimer = 0;
     public boolean hasWon = false;
 
+
     public void setMenu(Menu menu) {
         this.menu = menu;
         if (menu != null) menu.init(this, input);
@@ -55,7 +81,22 @@ public class TopDownMinicraft extends Canvas implements Runnable {
 
     public void start() {
         running = true;
-        init();
+
+
+//		try {
+//			System.out.println(Game.class.getResource(".").toURI());
+//		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+//		}
+        try {
+            screen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
+            lightScreen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        resetGame();
+        //setMenu(new TitleMenu());
     }
 
     public void stop() {
@@ -86,41 +127,6 @@ public class TopDownMinicraft extends Canvas implements Runnable {
         for (int i = 0; i < 5; i++) {
             levels[i].trySpawn(5000);
         }
-    }
-
-    private void init() {
-        int pp = 0;
-        for (int r = 0; r < 6; r++) {
-            for (int g = 0; g < 6; g++) {
-                for (int b = 0; b < 6; b++) {
-                    int rr = (r * 255 / 5);
-                    int gg = (g * 255 / 5);
-                    int bb = (b * 255 / 5);
-                    int mid = (rr * 30 + gg * 59 + bb * 11) / 100;
-
-                    int r1 = ((rr + mid * 1) / 2) * 230 / 255 + 10;
-                    int g1 = ((gg + mid * 1) / 2) * 230 / 255 + 10;
-                    int b1 = ((bb + mid * 1) / 2) * 230 / 255 + 10;
-                    colors[pp++] = r1 << 16 | g1 << 8 | b1;
-
-                }
-            }
-        }
-
-//		try {
-//			System.out.println(Game.class.getResource(".").toURI());
-//		} catch (URISyntaxException e) {
-//			e.printStackTrace();
-//		}
-        try {
-            screen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
-            lightScreen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        resetGame();
-        //setMenu(new TitleMenu());
     }
 
     int frames = 0;
@@ -178,7 +184,8 @@ public class TopDownMinicraft extends Canvas implements Runnable {
         frames++;
         render();
 
-        return player.score;
+        //System.out.println("score=" + player.score + " health=" + player.health + " stamina=" + player.stamina );
+        return player.score + player.health*2 + player.stamina;
     }
 
     public void tick() {
@@ -376,9 +383,9 @@ public class TopDownMinicraft extends Canvas implements Runnable {
 
         game.start();
 
-        if (auto) {
-            new Thread(game).start();
-        }
+//        if (auto) {
+//            new Thread(game).start();
+//        }
 
     }
 

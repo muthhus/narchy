@@ -4,6 +4,7 @@ import nars.experiment.minicraft.top.gfx.Screen;
 import nars.experiment.minicraft.top.item.Item;
 import nars.experiment.minicraft.top.level.Level;
 import nars.experiment.minicraft.top.level.tile.Tile;
+import nars.util.data.random.XorShift128PlusRandom;
 
 import java.util.List;
 import java.util.Random;
@@ -42,6 +43,7 @@ public class Entity {
 	}
 
 	public void hurt(Tile tile, int x, int y, int dmg) {
+		level.player.score += dmg;
 	}
 
 	public boolean move(int xa, int ya) {
@@ -57,6 +59,18 @@ public class Entity {
 			return !stopped;
 		}
 		return true;
+	}
+
+	/** tile standing on */
+	public Tile getTile() {
+		int xt = x >> 4;
+		int yt = y >> 4;
+		if (level == null)
+			return Tile.none;
+		Tile t = level.getTile(xt, yt);
+		if (t == null)
+			return Tile.none;
+		return t;
 	}
 
 	protected boolean move2(int xa, int ya) {

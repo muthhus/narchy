@@ -39,12 +39,12 @@ abstract public class SwingAgent extends NAgent {
 
     public final Map<String, CameraSensor> cam = new LinkedHashMap<>();
 
-    public SwingAgent(NAR nar, int frames) {
-        super(nar, frames);
+    public SwingAgent(NAR nar, int reasonerFramesPerEnvironmentFrame) {
+        super(nar, reasonerFramesPerEnvironmentFrame);
 
     }
 
-    public static void playSwing(Function<NAR, SwingAgent> init) {
+    public static void playSwing(Function<NAR, SwingAgent> init,int framesToRun) {
         Random rng = new XorShift128PlusRandom(1);
 
         //Multi nar = new Multi(3,512,
@@ -92,7 +92,7 @@ abstract public class SwingAgent extends NAgent {
                 ), 1200, 900);
 
 
-        a.run(Arkancide.runFrames).join();
+        a.run(framesToRun).join();
         //a.runSync(runFrames);
 
         NAR.printTasks(nar, true);

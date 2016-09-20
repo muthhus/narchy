@@ -41,5 +41,6 @@ public class DeadMenu extends Menu {
 		Font.draw("Score:", screen, 2 * 8, 6 * 8, Color.get(-1, 555, 555, 555));
 		Font.draw(String.valueOf(game.player.score), screen, (2 + 6) * 8, 6 * 8, Color.get(-1, 550, 550, 550));
 		Font.draw("Press C to lose", screen, 2 * 8, 8 * 8, Color.get(-1, 333, 333, 333));
+
 	}
 }

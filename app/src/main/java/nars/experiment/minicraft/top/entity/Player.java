@@ -114,6 +114,7 @@ public class Player extends Mob {
 
 	}
 
+
 	private boolean use() {
 		int yo = -2;
 		if (dir == 0 && use(x - 8, y + 4 + yo, x + 8, y + 12 + yo)) return true;
@@ -227,7 +228,7 @@ public class Player extends Mob {
 	}
 
 	private int getAttackDamage(Entity e) {
-		int dmg = random.nextInt(3) + 1;
+		int dmg = random.nextInt(6) + 1;
 		if (attackItem != null) {
 			dmg += attackItem.getAttackDamageBonus(e);
 		}
@@ -332,7 +333,7 @@ public class Player extends Mob {
 
 	@Override
 	public boolean findStartPos(Level level) {
-		while (true) {
+        for (int i = 0; i < 1000; i++) {
 			int x = random.nextInt(level.w);
 			int y = random.nextInt(level.h);
 			if (level.getTile(x, y) == Tile.grass) {
@@ -341,6 +342,7 @@ public class Player extends Mob {
 				return true;
 			}
 		}
+		return true;
 	}
 
 	public boolean payStamina(int cost) {
