@@ -17,7 +17,7 @@ public class PixelCast implements PixelCamera {
     final BufferedImage source;
     private final int px;
     private final int py;
-    float sampleRate = 0.25f;
+    float sampleRate = 0.15f;
     final Random rng = new XorShift128PlusRandom(1);
 
     public float minX = 0f;
@@ -41,15 +41,19 @@ public class PixelCast implements PixelCamera {
         if (b == null)
             return;
 
-        System.out.println(maxX + " " + minX + ":" + maxY + " " + minY);
+        //System.out.println(maxX + " " + minX + ":" + maxY + " " + minY);
 
         int sw = b.getWidth();
         int sh = b.getHeight();
         float samples = px*py*sampleRate;
         for (int i = 0; i < samples; i++) {
             //choose a virtual retina pixel
-            float x = rng.nextFloat();
-            float y = rng.nextFloat();
+            float x =
+                    //rng.nextFloat();
+                    Util.clamp(((float)rng.nextGaussian()+1.0f)/2.0f); //resolves the center more clearly
+            float y =
+                    //rng.nextFloat();
+                    Util.clamp(((float)rng.nextGaussian()+1.0f)/2.0f);
 
             //project from the local retina plane
             int lx = round((px-1) * x);
