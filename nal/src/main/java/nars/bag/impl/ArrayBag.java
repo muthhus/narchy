@@ -272,6 +272,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 updateRange(); //in case the merged item determined the min priority
                 break;
             case +1:
+                bp *= scale;
                 v.setBudget(bp, b.dur(), b.qua());
                 mass += bp;
                 update(v);

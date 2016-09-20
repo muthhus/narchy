@@ -290,8 +290,8 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(4, "enter:(John,room). :|:")
                 .mustBelieve(cycles, "( (--,open:(John, door)) ==>+4 enter:(John, room) )",
                         1.00f, 0.45f, 0)
-                .mustBelieve(cycles, "( (--,open:(John, door)) &&+4 enter:(John, room) )",
-                        1.00f, 0.81f, 0)
+                .mustBelieve(cycles, "( open:(John, door) &&+4 enter:(John, room) )",
+                        0f, 0.81f, 0)
         ;
     }
 
@@ -519,18 +519,18 @@ public class NAL7Test extends AbstractNALTest {
         .inputAt(10, "b:x. :|: %0.8;0.9% ")
 
         .mustBelieve(cycles,
-                "((--,a:x) ==>+10 b:x)",
-                0.8f, 0.39f,
+                "(b:x ==>-10 a:x)",
+                0.1f, 0.37f,
                 0)
         .mustBelieve(cycles,
                 "(a:x <=>+10 b:x)", 0.1f, 0.37f, //notice the subtle discrepency between here
                 0)
         .mustBelieve(cycles,
-                "(a:x <=>+10 (--,b:x))", 0.73f, 0.41f, // and here, as a result of the comparison truth function's asymmetry
+                "(a:x <=>+10 b:x)", 0.27f, 0.41f, // and here, as a result of the comparison truth function's asymmetry
                 0)
         .mustBelieve(cycles,
-                "(($1 --> a) <=>+10 (--,($1 -->b)))",
-                0.73f, 0.41f,
+                "(($1 --> a) <=>+10 ($1 -->b))",
+                0.27f, 0.41f,
                 0)
         ;
 
@@ -643,7 +643,6 @@ public class NAL7Test extends AbstractNALTest {
             $.26;.39;.95$ (--,(p4)). 1+0 %1.0;.90% {1+0: j} Input
         */
         test()
-                
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
                 .mustNotOutput(cycles*2, "(x)", '.', 0f, 0.89f, 0f, 0.91f, 10)

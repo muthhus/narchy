@@ -55,29 +55,25 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     }
 
     /** srcScale only affects the amount of priority adjusted; for the other components, the 'score'
-     * calculations are used to interpolate */
+     * calculations are used to interpolate
+     //TODO will this work for a possible negative pri value case?
+     * */
     static float blend(@NotNull Budget tgt, @NotNull Budgeted src, float sScale, @NotNull PriMerge priMerge) {
 
-        float sPri = src.priIfFiniteElseZero();
-
         float tPri = tgt.priIfFiniteElseZero();
-
-
-
         boolean hasTP = tPri >= BUDGET_EPSILON;
+        float sPri = src.priIfFiniteElseZero();
         boolean hasSP = sPri >= BUDGET_EPSILON && sScale >= BUDGET_EPSILON;
 
         if (!hasSP) {
             if (hasTP) {
                 return 0; //nothing to do; zero incoming doesnt budge the target budget
-            } else {
             }
         } else {
             if (!hasTP) {
                 tgt.set(src); //target has no influence, it becomes set entirely by incoming
                 tgt.priMult(sScale);
                 return 0;
-            } else {
             }
         }
 
@@ -91,13 +87,29 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 throw new UnsupportedOperationException();
         }
 
-        float originalInfluence;
-        if (tPri + newPri < Param.BUDGET_EPSILON)
-            originalInfluence = 0.5f;
-        else
-            originalInfluence = (tPri / (tPri + newPri));
+        newPri = lerp(newPri, tPri, sScale);
 
-        return dqBlend(tgt, src, lerp(newPri, tPri, sScale), originalInfluence);
+
+        float overflow;
+        if (newPri > 1f) {
+            overflow = newPri - 1f;
+            newPri = 1f;
+        } else {
+            overflow = 0;
+        }
+
+        float tgtInfluence;
+        if (tPri + newPri < Param.BUDGET_EPSILON)
+            tgtInfluence = 0.5f;
+        else
+            tgtInfluence = (tPri / (tPri + newPri));
+
+        tgt.setBudget(
+                newPri,
+                (tgtInfluence * tgt.dur()) + ((1f-tgtInfluence) * src.dur()),
+                (tgtInfluence * tgt.qua()) + ((1f-tgtInfluence)  * src.qua()));
+
+        return overflow;
     }
 
 //    static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
@@ -128,29 +140,6 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 //                currentPri + incomingPri :
 //                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
 //    }
-
-    /** applies LERP (linear interpolation) to blend the values during merge */
-    static float dqBlend(@NotNull Budget tgt, @NotNull Budgeted src, float nextPri, float targetProp) {
-
-
-        float overflow;
-        if (nextPri > 1f) {
-            overflow = nextPri - 1f;
-            nextPri = 1f;
-        } else {
-            overflow = 0;
-        }
-        //TODO negative case?
-
-        float srcprop = 1f - targetProp; // inverse proportion
-
-        tgt.setBudget(
-                nextPri,
-                (targetProp * tgt.dur()) + (srcprop * src.dur()),
-                (targetProp * tgt.qua()) + (srcprop * src.qua()));
-
-        return overflow;
-    }
 
     BudgetMerge errorMerge = (x, y, z) -> {
         throw new UnsupportedOperationException();

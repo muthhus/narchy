@@ -28,17 +28,17 @@ public class BudgetMergeTest {
 
         testMerge(b, b, 0, m, b.pri(), b.dur(), b.qua()); //scale of zero should have no effect
 
-        testMerge(b, c, 1, m, (c.pri() + b.pri()), 0.33f, 0.16f); //test correct affect of components
-        testMerge(b, c, 0.5f, m, (c.pri() / 2f + b.pri()), 0.36f, 0.18f); //lesser affect (dur and qua closer to original values)
+        testMerge(b, c, 1, m, (c.pri() + b.pri()), 0.28f, 0.14f); //test correct affect of components
+        testMerge(b, c, 0.5f, m, (c.pri() / 2f + b.pri()), 0.29f, 0.14f); //lesser affect (dur and qua closer to original values)
     }
     @Test
     public void testPlusDQBlend2() {
         BudgetMerge m = BudgetMerge.plusBlend;
 
-        testMerge(m, a, c, 1f, 1, 0.6f, 0.26f, //priority saturation behavior
+        testMerge(m, a, c, 1f, 1, 0.45f, 0.2f, //priority saturation behavior
                 0.25f); //with overflow
 
-        testMerge(m, a, c, 0.5f, 1, 0.64f, 0.27f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
+        testMerge(m, a, c, 0.5f, 1, 0.45f, 0.2f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
                 0f);  //no overflow
 
         testMerge(a, a, 1f, m, a.pri(), a.dur(), a.qua()); //no change since saturated with the same incoming values
@@ -81,9 +81,9 @@ public class BudgetMergeTest {
         testMerge(b, b, 1.0f, AVG, b.pri(), b.dur(), b.qua()); //scale of one also should have no effect with itself
 
         testMerge(b, c, 1, AVG, 0.375f, 0.31f, 0.16f); //test correct affect of components; values closer to b since it is dominant
-        testMerge(b, c, 0.5f, AVG, 0.4375f, 0.36f, 0.18f); //lesser affect (dur and qua closer to original values)
+        testMerge(b, c, 0.5f, AVG, 0.4375f, 0.30f, 0.15f); //lesser affect (dur and qua closer to original values)
 
-        testMerge(a, c, 1f, AVG, 0.625f, 0.6f, 0.26f); //priority decrease
+        testMerge(a, c, 1f, AVG, 0.625f, 0.51f, 0.22f); //priority decrease
 
     }
 

@@ -956,8 +956,11 @@ public enum $ {
     /** unwraps any negation superterm */
     @NotNull public static Term unneg(@NotNull Termed term) {
         Term t = term.term();
-        if (t.op() == NEG)
-            t = ((Compound)t).term(0);
+        if (t.op() == NEG) {
+            t = ((Compound) t).term(0);
+            if (Param.DEBUG && t.op() == NEG)
+                throw new RuntimeException("double negation detected: " + term);
+        }
         return t;
     }
 
