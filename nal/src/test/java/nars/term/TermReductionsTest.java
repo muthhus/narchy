@@ -116,18 +116,32 @@ public class TermReductionsTest {
 
 
     @Test
-    public void testSimilarityAndEquivalenceNegatedSubtermsDoubleNeg() {
-        assertEquals($("((P)<->(Q))"), $("((--,(P))<->(--,(Q)))"));
-        assertEquals($("((P)<=>(Q))"), $("((--,(P))<=>(--,(Q)))"));
+    public void testEquivalenceNegatedSubtermsDoubleNeg() {
+        assertEquals(("((P)<=>(Q))"), $("((--,(P))<=>(--,(Q)))").toString());
+    }
+    @Test
+    public void testSimilarityNegatedSubtermsDoubleNeg() {
+        assertEquals(("((--,(P))<->(--,(Q)))"), $("((--,(P))<->(--,(Q)))").toString()); //SAME should not change
+        /*
+        <patham9> <-> is a relation in meaning not in truth
+        <patham9> so negation can't enforce any equivalence here
+        */
     }
 
     @Test
-    public void testSimilarityAndEquivalenceNegatedSubtermsOpposite() {
-        assertEquals($("((P)<->(--,(Q)))"), $("((P)<->(--,(Q)))"));
-        assertEquals($("((P)<->(--,(Q)))"), $("((--,(P))<->(Q))"));
-
-        assertEquals($("((P)<=>(--,(Q)))"), $("((P)<=>(--,(Q)))"));
-        assertEquals($("((P)<=>(--,(Q)))"), $("((--,(P))<=>(Q))"));
+    public void testSimilarityNegatedSubterms() {
+//        assertEquals(("((P)<->(--,(Q)))"), $("((P)<->(--,(Q)))").toString());
+//        assertEquals(("((P)<->(--,(Q)))"), $("((--,(P))<->(Q))").toString());
+        assertEquals("((P)<->(--,(Q)))", $("((P)<->(--,(Q)))").toString()); //NO change
+        assertEquals("((--,(P))<->(Q))", $("((--,(P))<->(Q))").toString()); //NO change
+    }
+    @Test public void testEquivalenceNegatedSubterms() {
+        assertEquals(("(--,((P)<=>(Q)))"), $("((P)<=>(--,(Q)))").toString());
+        assertEquals(("(--,((P)<=>(Q)))"), $("((--,(P))<=>(Q))").toString());
+    }
+    @Test public void testImplicationNegatedPredicate() {
+        assertEquals("(--,((P)==>(Q)))", $("((P)==>(--,(Q)))").toString());
+        assertEquals(("((--,(P))==>(Q))"), $("((--,(P))==>(Q))").toString()); //SAME should not change
     }
 
     @Test

@@ -651,12 +651,18 @@ public abstract class TermBuilder {
                     if (!validEquivalenceTerm(predicate))
                         throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
 
+                    boolean subjNeg = subject.op() == NEG;
+                    boolean predNeg = predicate.op() == NEG;
+                    if (subjNeg && predNeg) {
+                        return statement(op, dt, $.unneg(subject), $.unneg(predicate));
+                    } else if (!subjNeg && predNeg) {
+                        return $.neg( statement(op, dt, subject, $.unneg(predicate)));
+                    } else if (subjNeg && !predNeg) {
+                        return $.neg( statement(op, dt, $.unneg(subject), predicate));
+                    }
+
                     break;
-//                case SIM:
-//                    if (isTrueOrFalse(subject) && isTrueOrFalse(predicate)) {
-//                        return subject.equals(predicate) ? True : ;
-//                    }
-//                    break;
+
 
                 case IMPL:
 
@@ -699,7 +705,8 @@ public abstract class TermBuilder {
                             return True; //infinite loop
                         } else {
                             if (commutive(dt)  /* if XTERNAL somehow happens here, just consider it as commutive */)
-                                return impl2Conj(dt, subject, predicate, oldCondition);
+                                subject = conj(dt, subject, oldCondition);
+                                predicate = pred(predicate);
                         }
                     }
 
@@ -709,7 +716,15 @@ public abstract class TermBuilder {
                     if (predicate.isAny(InvalidImplicationPredicate))
                         throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
 
-
+                    if (predicate.op() == NEG) {
+                        Compound unNegatedPred = $.impl(subject, dt, $.unneg(predicate));
+                        if (unNegatedPred == null) //reduced to an invalid term
+                            return False;
+                        return //negation
+                               $.neg( //to be safe use the full negation but likely it can be the local negation pipeline
+                                       unNegatedPred
+                               );
+                    }
                     break;
 
             }
@@ -718,6 +733,7 @@ public abstract class TermBuilder {
             if (isTrueOrFalse(subject) || isTrueOrFalse(predicate)) {
                 return subject.equals(predicate) ? True : False;
             }
+
 
 
 
@@ -764,31 +780,32 @@ public abstract class TermBuilder {
                 boolean pn = predicate.op() == NEG;
 
                 if (sn ^ pn) {
-                    Term ss, pp;
-                    if (sn) {
-                        //subject negated;
-                        ss = $.unneg(subject);
-                        pp = predicate;
-                    } else {
-                        //predicate negated, which is the normal form
-                        ss = subject;
-                        pp = $.unneg(predicate);
-                    }
-                    //TODO re-use the original terms rather than re-neg the un-neg
-                    if (ss.compareTo(pp) > 0) {
-                        subject = pp;
-                        predicate = $.neg(ss);
-                        if (crossesTime)
-                            dt = -dt;
-                    } else {
-                        subject = ss;
-                        predicate = $.neg(pp);
-                    }
+                    //this block should only happen for similarity, since the either-negated case for equivalence is factored out above
+//                    Term ss, pp;
+//                    if (sn) {
+//                        //subject negated;
+//                        ss = $.unneg(subject);
+//                        pp = predicate;
+//                    } else {
+//                        //predicate negated, which is the normal form
+//                        ss = subject;
+//                        pp = $.unneg(predicate);
+//                    }
+//                    //TODO re-use the original terms rather than re-neg the un-neg
+//                    if (ss.compareTo(pp) > 0) {
+//                        subject = pp;
+//                        predicate = $.neg(ss);
+//                        if (crossesTime)
+//                            dt = -dt;
+//                    } else {
+//                        subject = ss;
+//                        predicate = $.neg(pp);
+//                    }
                 } else {
                     if (sn && pn) {
-                        //both negative: unnegate both but use the original sort ordering in case negation causes it to change, this will keep it stable
-                        subject = $.unneg(subject);
-                        predicate = $.unneg(predicate);
+//                        //both negative: unnegate both but use the original sort ordering in case negation causes it to change, this will keep it stable
+//                        subject = $.unneg(subject);
+//                        predicate = $.unneg(predicate);
                     } else {
                         //both postiive
                     }
@@ -824,11 +841,6 @@ public abstract class TermBuilder {
 //    public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
 //        return difference(setType, A, B);
 //    }
-
-    @NotNull
-    public Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
-        return the(IMPL, conj(t, subject, oldCondition), pred(predicate));
-    }
 
     @Nullable
     public Term newIntersectINT(@NotNull Term[] t) {
