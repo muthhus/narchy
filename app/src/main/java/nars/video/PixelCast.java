@@ -1,9 +1,13 @@
 package nars.video;
 
+import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
+
+import static java.lang.Math.floor;
+import static java.lang.Math.round;
 
 /**
  * 2D flat Raytracing Retina
@@ -13,10 +17,16 @@ public class PixelCast implements PixelCamera {
     final BufferedImage source;
     private final int px;
     private final int py;
-    float sampleRate = 0.5f;
+    float sampleRate = 0.25f;
     final Random rng = new XorShift128PlusRandom(1);
 
+    public float minX = 0f;
+    public float maxX = 1f;
+    float minY = 0f;
+    float maxY = 1f;
+
     final float[][] w;
+
 
     public PixelCast(BufferedImage b, int px, int py) {
         this.source = b;
@@ -31,6 +41,8 @@ public class PixelCast implements PixelCamera {
         if (b == null)
             return;
 
+        System.out.println(maxX + " " + minX + ":" + maxY + " " + minY);
+
         int sw = b.getWidth();
         int sh = b.getHeight();
         float samples = px*py*sampleRate;
@@ -40,15 +52,18 @@ public class PixelCast implements PixelCamera {
             float y = rng.nextFloat();
 
             //project from the local retina plane
-            int lx = Math.round((px-1) * x);
-            int ly = Math.round((py-1) * y);
+            int lx = round((px-1) * x);
+            int ly = round((py-1) * y);
 
             //project to the viewed image plane
-            int sx = Math.round((sw-1) * x);
-            int sy = Math.round((sh-1) * y);
+            int sx = (int) floor((sw-1) * Util.lerp(maxX, minX, x));
+            int sy = (int) floor((sh-1) * Util.lerp(maxY, minY, y));
 
-            float v = PixelCamera.decodeRed(b.getRGB(sx, sy));
-            w[lx][ly] = v;
+            int RGB = b.getRGB(sx, sy);
+            float R = PixelCamera.decodeRed(RGB);
+            float G = PixelCamera.decodeGreen(RGB);
+            float B = PixelCamera.decodeBlue(RGB);
+            w[lx][ly] = (R + G + B)/3f;
             //p.pixel(lx, ly, );
         }
     }

@@ -33,21 +33,28 @@ public class NARcraft extends SwingAgent {
         int W = craft.getWidth();
         int H = craft.getHeight();
 
-        PixelCast swingCam = new PixelCast(craft.image, 64, 64);
         //swingCam.input(W/4, H/4, W/2, H/2); //50%
 
 //        Scale cam = new Scale(swingCam, 48, 48);
-        pixels = addCamera("cra",
-                swingCam,
-                (v) -> $.t(v , alpha));
+        PixelCast cam = new PixelCast(craft.image, 64, 64);
+        pixels = addCamera("cra", cam, (v) -> $.t(v , alpha));
 
 
-//        int camXYSpeed = 30;
+        float camXYSpeed = 0.01f;
 //        float camZoomRate = 0.1f;
 //        int minZoomX = 64;
 //        int minZoomY = 64;
-//        addIncrementalRangeAction("cra:(cam,L)", (f)->
-//            swingCam.inputTranslate(round(-camXYSpeed * f), 0 ) );
+        float minWidth = 0.5f;
+        addIncrementalRangeAction("cra:(cam,L)", (f)-> {
+            cam.minX = Math.max(0, Math.min(cam.minX + f * camXYSpeed, cam.maxX - minWidth));
+            return true;
+        });
+        addIncrementalRangeAction("cra:(cam,R)", (f)-> {
+            cam.maxX = Math.max(cam.minX + minWidth, Math.min(cam.maxX + f * camXYSpeed, 1));
+            return true;
+        });
+
+
 //        addIncrementalRangeAction("cra:(cam,R)", (f)->
 //            swingCam.inputTranslate(round(+camXYSpeed * f), 0 ) );
 //        addIncrementalRangeAction("cra:(cam,U)", (f)->
@@ -73,7 +80,7 @@ public class NARcraft extends SwingAgent {
 
     float prevScore = 0;
     @Override protected float reward() {
-        float nextScore = craft.frame();
+        float nextScore = craft.frameImmediate();
         float ds = nextScore - prevScore;
         this.prevScore = nextScore;
         return ds;

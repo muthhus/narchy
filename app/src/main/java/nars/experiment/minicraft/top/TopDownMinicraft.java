@@ -19,361 +19,371 @@ import java.awt.image.DataBufferInt;
 import java.io.IOException;
 
 public class TopDownMinicraft extends Canvas implements Runnable {
-	private static final long serialVersionUID = 1L;
-	//private final Random random = new Random();
-	public static final String NAME = "Minicraft";
-	public static final int HEIGHT = 120;
-	public static final int WIDTH = 160;
-	private static final int SCALE = 6;
+    private static final long serialVersionUID = 1L;
+    //private final Random random = new Random();
+    public static final String NAME = "Minicraft";
+    public static final int HEIGHT = 120;
+    public static final int WIDTH = 160;
+    private static final int SCALE = 6;
 
-	public final BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-	private final int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-	private boolean running = false;
-	private Screen screen;
-	private Screen lightScreen;
-	public final InputHandler input = new InputHandler(this);
+    public final BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+    private final int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+    private boolean running = false;
+    private Screen screen;
+    private Screen lightScreen;
+    public final InputHandler input = new InputHandler(this);
 
-	private final int[] colors = new int[256];
-	private int tickCount = 0;
-	public int gameTime = 0;
+    private final int[] colors = new int[256];
+    private int tickCount = 0;
+    public int gameTime = 0;
 
-	private Level level;
-	private Level[] levels = new Level[5];
-	private int currentLevel = 3;
-	public Player player;
+    private Level level;
+    private Level[] levels = new Level[5];
+    private int currentLevel = 3;
+    public Player player;
 
-	public Menu menu;
-	private int playerDeadTime;
-	private int pendingLevelChange;
-	private int wonTimer = 0;
-	public boolean hasWon = false;
+    public Menu menu;
+    private int playerDeadTime;
+    private int pendingLevelChange;
+    private int wonTimer = 0;
+    public boolean hasWon = false;
 
-	public void setMenu(Menu menu) {
-		this.menu = menu;
-		if (menu != null) menu.init(this, input);
-	}
+    public void setMenu(Menu menu) {
+        this.menu = menu;
+        if (menu != null) menu.init(this, input);
+    }
 
-	public void start() {
-		running = true;
-		init();
-	}
+    public void start() {
+        running = true;
+        init();
+    }
 
-	public void stop() {
-		running = false;
-	}
+    public void stop() {
+        running = false;
+    }
 
-	public void resetGame() {
-		playerDeadTime = 0;
-		wonTimer = 0;
-		gameTime = 0;
-		hasWon = false;
+    public void resetGame() {
+        playerDeadTime = 0;
+        wonTimer = 0;
+        gameTime = 0;
+        hasWon = false;
 
-		levels = new Level[5];
-		currentLevel = 3;
+        levels = new Level[5];
+        currentLevel = 3;
 
-		levels[4] = new Level(128, 128, 1, null);
-		levels[3] = new Level(128, 128, 0, levels[4]);
-		levels[2] = new Level(128, 128, -1, levels[3]);
-		levels[1] = new Level(128, 128, -2, levels[2]);
-		levels[0] = new Level(128, 128, -3, levels[1]);
+        levels[4] = new Level(128, 128, 1, null);
+        levels[3] = new Level(128, 128, 0, levels[4]);
+        levels[2] = new Level(128, 128, -1, levels[3]);
+        levels[1] = new Level(128, 128, -2, levels[2]);
+        levels[0] = new Level(128, 128, -3, levels[1]);
 
-		level = levels[currentLevel];
-		player = new Player(this, input);
-		player.findStartPos(level);
+        level = levels[currentLevel];
+        player = new Player(this, input);
+        player.findStartPos(level);
 
-		level.add(player);
+        level.add(player);
 
-		for (int i = 0; i < 5; i++) {
-			levels[i].trySpawn(5000);
-		}
-	}
+        for (int i = 0; i < 5; i++) {
+            levels[i].trySpawn(5000);
+        }
+    }
 
-	private void init() {
-		int pp = 0;
-		for (int r = 0; r < 6; r++) {
-			for (int g = 0; g < 6; g++) {
-				for (int b = 0; b < 6; b++) {
-					int rr = (r * 255 / 5);
-					int gg = (g * 255 / 5);
-					int bb = (b * 255 / 5);
-					int mid = (rr * 30 + gg * 59 + bb * 11) / 100;
+    private void init() {
+        int pp = 0;
+        for (int r = 0; r < 6; r++) {
+            for (int g = 0; g < 6; g++) {
+                for (int b = 0; b < 6; b++) {
+                    int rr = (r * 255 / 5);
+                    int gg = (g * 255 / 5);
+                    int bb = (b * 255 / 5);
+                    int mid = (rr * 30 + gg * 59 + bb * 11) / 100;
 
-					int r1 = ((rr + mid * 1) / 2) * 230 / 255 + 10;
-					int g1 = ((gg + mid * 1) / 2) * 230 / 255 + 10;
-					int b1 = ((bb + mid * 1) / 2) * 230 / 255 + 10;
-					colors[pp++] = r1 << 16 | g1 << 8 | b1;
+                    int r1 = ((rr + mid * 1) / 2) * 230 / 255 + 10;
+                    int g1 = ((gg + mid * 1) / 2) * 230 / 255 + 10;
+                    int b1 = ((bb + mid * 1) / 2) * 230 / 255 + 10;
+                    colors[pp++] = r1 << 16 | g1 << 8 | b1;
 
-				}
-			}
-		}
+                }
+            }
+        }
 
 //		try {
 //			System.out.println(Game.class.getResource(".").toURI());
 //		} catch (URISyntaxException e) {
 //			e.printStackTrace();
 //		}
-		try {
-			screen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
-			lightScreen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        try {
+            screen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
+            lightScreen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		resetGame();
-		//setMenu(new TitleMenu());
-	}
-	int frames = 0;
-	int ticks = 0;
-	double unprocessed = 0;
+        resetGame();
+        //setMenu(new TitleMenu());
+    }
 
-	@Override
-	public void run() {
-		long lastTime = System.nanoTime();
-		double nsPerTick = 1000000000.0 / 60;
-		long lastTimer1 = System.currentTimeMillis();
+    int frames = 0;
+    int ticks = 0;
+    double unprocessed = 0;
+
+    @Override
+    public void run() {
+        long lastTime = System.nanoTime();
+        double nsPerTick = 1000000000.0 / 60;
+        long lastTimer1 = System.currentTimeMillis();
 
 
-		while (running) {
-			long now = System.nanoTime();
-			unprocessed += (now - lastTime) / nsPerTick;
-			lastTime = now;
-			frame();
+        while (running) {
+            long now = System.nanoTime();
+            unprocessed += (now - lastTime) / nsPerTick;
+            lastTime = now;
+            frame();
 
-			try {
-				Thread.sleep(2);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+            try {
+                Thread.sleep(2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-			int fpsIntervalMS = 10000;
-			if (System.currentTimeMillis() - lastTimer1 > fpsIntervalMS) {
-				lastTimer1 += fpsIntervalMS;
-				System.out.println(ticks + " ticks, " + frames + " fps");
-				frames = 0;
-				ticks = 0;
-			}
-		}
-	}
+            int fpsIntervalMS = 10000;
+            if (System.currentTimeMillis() - lastTimer1 > fpsIntervalMS) {
+                lastTimer1 += fpsIntervalMS;
+                System.out.println(ticks + " ticks, " + frames + " fps");
+                frames = 0;
+                ticks = 0;
+            }
+        }
+    }
 
-	public int frame() {
-		boolean shouldRender = true;
-		while (unprocessed >= 1) {
+    public void frame() {
+        boolean shouldRender = true;
+        while (unprocessed >= 1) {
             ticks++;
             tick();
             unprocessed -= 1;
             shouldRender = true;
         }
 
-		if (shouldRender) {
+        if (shouldRender) {
             frames++;
             render();
         }
-		return player.score;
-	}
+    }
 
-	public void tick() {
-		tickCount++;
-		if (!hasFocus()) {
-			input.releaseAll();
-		} else {
-			if (!player.removed && !hasWon) gameTime++;
+    public int frameImmediate() {
+        ticks++;
+        tick();
 
-			input.tick();
-			if (menu != null) {
-				menu.tick();
-			} else {
-				if (player.removed) {
-					playerDeadTime++;
-					if (playerDeadTime > 60) {
-						die();
+        frames++;
+        render();
 
-					}
-				} else {
-					if (pendingLevelChange != 0) {
-						setMenu(new LevelTransitionMenu(pendingLevelChange));
-						pendingLevelChange = 0;
-					}
-				}
-				if (wonTimer > 0) {
-					if (--wonTimer == 0) {
-						win();
-					}
-				}
-				level.tick();
-				Tile.tickCount++;
-			}
-		}
+        return player.score;
+    }
+
+    public void tick() {
+        tickCount++;
+        if (!hasFocus()) {
+            input.releaseAll();
+        } else {
+            if (!player.removed && !hasWon) gameTime++;
+
+            input.tick();
+            if (menu != null) {
+                menu.tick();
+            } else {
+                if (player.removed) {
+                    playerDeadTime++;
+                    if (playerDeadTime > 60) {
+                        die();
+
+                    }
+                } else {
+                    if (pendingLevelChange != 0) {
+                        setMenu(new LevelTransitionMenu(pendingLevelChange));
+                        pendingLevelChange = 0;
+                    }
+                }
+                if (wonTimer > 0) {
+                    if (--wonTimer == 0) {
+                        win();
+                    }
+                }
+                level.tick();
+                Tile.tickCount++;
+            }
+        }
 
 
-	}
+    }
 
-	public void win() {
-		setMenu(new WonMenu());
-	}
+    public void win() {
+        setMenu(new WonMenu());
+    }
 
-	public void die() {
-		//setMenu(new DeadMenu());
-		setMenu(new TitleMenu());
-	}
+    public void die() {
+        //setMenu(new DeadMenu());
+        setMenu(new TitleMenu());
+    }
 
-	public void changeLevel(int dir) {
-		level.remove(player);
-		currentLevel += dir;
-		level = levels[currentLevel];
-		player.x = (player.x >> 4) * 16 + 8;
-		player.y = (player.y >> 4) * 16 + 8;
-		level.add(player);
+    public void changeLevel(int dir) {
+        level.remove(player);
+        currentLevel += dir;
+        level = levels[currentLevel];
+        player.x = (player.x >> 4) * 16 + 8;
+        player.y = (player.y >> 4) * 16 + 8;
+        level.add(player);
 
-	}
+    }
 
-	public void render() {
-		BufferStrategy bs = getBufferStrategy();
-		if (bs == null) {
-			createBufferStrategy(3);
-			requestFocus();
-			return;
-		}
+    public void render() {
+        BufferStrategy bs = getBufferStrategy();
+        if (bs == null) {
+            createBufferStrategy(3);
+            requestFocus();
+            return;
+        }
 
-		int xScroll = player.x - screen.w / 2;
-		int yScroll = player.y - (screen.h - 8) / 2;
-		if (xScroll < 16) xScroll = 16;
-		if (yScroll < 16) yScroll = 16;
-		if (xScroll > level.w * 16 - screen.w - 16) xScroll = level.w * 16 - screen.w - 16;
-		if (yScroll > level.h * 16 - screen.h - 16) yScroll = level.h * 16 - screen.h - 16;
-		if (currentLevel > 3) {
-			int col = Color.get(20, 20, 121, 121);
-			for (int y = 0; y < 14; y++)
-				for (int x = 0; x < 24; x++) {
-					screen.render(x * 8 - ((xScroll / 4) & 7), y * 8 - ((yScroll / 4) & 7), 0, col, 0);
-				}
-		}
+        int xScroll = player.x - screen.w / 2;
+        int yScroll = player.y - (screen.h - 8) / 2;
+        if (xScroll < 16) xScroll = 16;
+        if (yScroll < 16) yScroll = 16;
+        if (xScroll > level.w * 16 - screen.w - 16) xScroll = level.w * 16 - screen.w - 16;
+        if (yScroll > level.h * 16 - screen.h - 16) yScroll = level.h * 16 - screen.h - 16;
+        if (currentLevel > 3) {
+            int col = Color.get(20, 20, 121, 121);
+            for (int y = 0; y < 14; y++)
+                for (int x = 0; x < 24; x++) {
+                    screen.render(x * 8 - ((xScroll / 4) & 7), y * 8 - ((yScroll / 4) & 7), 0, col, 0);
+                }
+        }
 
-		level.renderBackground(screen, xScroll, yScroll);
-		level.renderSprites(screen, xScroll, yScroll);
+        level.renderBackground(screen, xScroll, yScroll);
+        level.renderSprites(screen, xScroll, yScroll);
 
-		if (currentLevel < 3) {
-			lightScreen.clear(0);
-			level.renderLight(lightScreen, xScroll, yScroll);
-			screen.overlay(lightScreen, xScroll, yScroll);
-		}
+        if (currentLevel < 3) {
+            lightScreen.clear(0);
+            level.renderLight(lightScreen, xScroll, yScroll);
+            screen.overlay(lightScreen, xScroll, yScroll);
+        }
 
-		renderGui();
+        renderGui();
 
-		if (!hasFocus()) renderFocusNagger();
+        if (!hasFocus()) renderFocusNagger();
 
-		for (int y = 0; y < screen.h; y++) {
-			for (int x = 0; x < screen.w; x++) {
-				int cc = screen.pixels[x + y * screen.w];
-				if (cc < 255) pixels[x + y * WIDTH] = colors[cc];
-			}
-		}
+        for (int y = 0; y < screen.h; y++) {
+            for (int x = 0; x < screen.w; x++) {
+                int cc = screen.pixels[x + y * screen.w];
+                if (cc < 255) pixels[x + y * WIDTH] = colors[cc];
+            }
+        }
 
-		Graphics g = bs.getDrawGraphics();
-		g.fillRect(0, 0, getWidth(), getHeight());
+        Graphics g = bs.getDrawGraphics();
+        g.fillRect(0, 0, getWidth(), getHeight());
 
-		int ww = WIDTH * SCALE;
-		int hh = HEIGHT * SCALE;
-		int xo = (getWidth() - ww) / 2;
-		int yo = (getHeight() - hh) / 2;
-		g.drawImage(image, xo, yo, ww, hh, null);
-		g.dispose();
-		bs.show();
-	}
+        int ww = WIDTH * SCALE;
+        int hh = HEIGHT * SCALE;
+        int xo = (getWidth() - ww) / 2;
+        int yo = (getHeight() - hh) / 2;
+        g.drawImage(image, xo, yo, ww, hh, null);
+        g.dispose();
+        bs.show();
+    }
 
-	private void renderGui() {
-		for (int y = 0; y < 2; y++) {
-			for (int x = 0; x < 20; x++) {
-				screen.render(x * 8, screen.h - 16 + y * 8, 0 + 12 * 32, Color.get(000, 000, 000, 000), 0);
-			}
-		}
+    private void renderGui() {
+        for (int y = 0; y < 2; y++) {
+            for (int x = 0; x < 20; x++) {
+                screen.render(x * 8, screen.h - 16 + y * 8, 0 + 12 * 32, Color.get(000, 000, 000, 000), 0);
+            }
+        }
 
-		for (int i = 0; i < 10; i++) {
-			if (i < player.health)
-				screen.render(i * 8, screen.h - 16, 0 + 12 * 32, Color.get(000, 200, 500, 533), 0);
-			else
-				screen.render(i * 8, screen.h - 16, 0 + 12 * 32, Color.get(000, 100, 000, 000), 0);
+        for (int i = 0; i < 10; i++) {
+            if (i < player.health)
+                screen.render(i * 8, screen.h - 16, 0 + 12 * 32, Color.get(000, 200, 500, 533), 0);
+            else
+                screen.render(i * 8, screen.h - 16, 0 + 12 * 32, Color.get(000, 100, 000, 000), 0);
 
-			if (player.staminaRechargeDelay > 0) {
-				if (player.staminaRechargeDelay / 4 % 2 == 0)
-					screen.render(i * 8, screen.h - 8, 1 + 12 * 32, Color.get(000, 555, 000, 000), 0);
-				else
-					screen.render(i * 8, screen.h - 8, 1 + 12 * 32, Color.get(000, 110, 000, 000), 0);
-			} else {
-				if (i < player.stamina)
-					screen.render(i * 8, screen.h - 8, 1 + 12 * 32, Color.get(000, 220, 550, 553), 0);
-				else
-					screen.render(i * 8, screen.h - 8, 1 + 12 * 32, Color.get(000, 110, 000, 000), 0);
-			}
-		}
-		if (player.activeItem != null) {
-			player.activeItem.renderInventory(screen, 10 * 8, screen.h - 16);
-		}
+            if (player.staminaRechargeDelay > 0) {
+                if (player.staminaRechargeDelay / 4 % 2 == 0)
+                    screen.render(i * 8, screen.h - 8, 1 + 12 * 32, Color.get(000, 555, 000, 000), 0);
+                else
+                    screen.render(i * 8, screen.h - 8, 1 + 12 * 32, Color.get(000, 110, 000, 000), 0);
+            } else {
+                if (i < player.stamina)
+                    screen.render(i * 8, screen.h - 8, 1 + 12 * 32, Color.get(000, 220, 550, 553), 0);
+                else
+                    screen.render(i * 8, screen.h - 8, 1 + 12 * 32, Color.get(000, 110, 000, 000), 0);
+            }
+        }
+        if (player.activeItem != null) {
+            player.activeItem.renderInventory(screen, 10 * 8, screen.h - 16);
+        }
 
-		if (menu != null) {
-			menu.render(screen);
-		}
-	}
+        if (menu != null) {
+            menu.render(screen);
+        }
+    }
 
-	private void renderFocusNagger() {
-		String msg = "Click to focus!";
-		int xx = (WIDTH - msg.length() * 8) / 2;
-		int yy = (HEIGHT - 8) / 2;
-		int w = msg.length();
-		int h = 1;
+    private void renderFocusNagger() {
+        String msg = "Click to focus!";
+        int xx = (WIDTH - msg.length() * 8) / 2;
+        int yy = (HEIGHT - 8) / 2;
+        int w = msg.length();
+        int h = 1;
 
-		screen.render(xx - 8, yy - 8, 0 + 13 * 32, Color.get(-1, 1, 5, 445), 0);
-		screen.render(xx + w * 8, yy - 8, 0 + 13 * 32, Color.get(-1, 1, 5, 445), 1);
-		screen.render(xx - 8, yy + 8, 0 + 13 * 32, Color.get(-1, 1, 5, 445), 2);
-		screen.render(xx + w * 8, yy + 8, 0 + 13 * 32, Color.get(-1, 1, 5, 445), 3);
-		for (int x = 0; x < w; x++) {
-			screen.render(xx + x * 8, yy - 8, 1 + 13 * 32, Color.get(-1, 1, 5, 445), 0);
-			screen.render(xx + x * 8, yy + 8, 1 + 13 * 32, Color.get(-1, 1, 5, 445), 2);
-		}
-		for (int y = 0; y < h; y++) {
-			screen.render(xx - 8, yy + y * 8, 2 + 13 * 32, Color.get(-1, 1, 5, 445), 0);
-			screen.render(xx + w * 8, yy + y * 8, 2 + 13 * 32, Color.get(-1, 1, 5, 445), 1);
-		}
+        screen.render(xx - 8, yy - 8, 0 + 13 * 32, Color.get(-1, 1, 5, 445), 0);
+        screen.render(xx + w * 8, yy - 8, 0 + 13 * 32, Color.get(-1, 1, 5, 445), 1);
+        screen.render(xx - 8, yy + 8, 0 + 13 * 32, Color.get(-1, 1, 5, 445), 2);
+        screen.render(xx + w * 8, yy + 8, 0 + 13 * 32, Color.get(-1, 1, 5, 445), 3);
+        for (int x = 0; x < w; x++) {
+            screen.render(xx + x * 8, yy - 8, 1 + 13 * 32, Color.get(-1, 1, 5, 445), 0);
+            screen.render(xx + x * 8, yy + 8, 1 + 13 * 32, Color.get(-1, 1, 5, 445), 2);
+        }
+        for (int y = 0; y < h; y++) {
+            screen.render(xx - 8, yy + y * 8, 2 + 13 * 32, Color.get(-1, 1, 5, 445), 0);
+            screen.render(xx + w * 8, yy + y * 8, 2 + 13 * 32, Color.get(-1, 1, 5, 445), 1);
+        }
 
-		if ((tickCount / 20) % 2 == 0) {
-			Font.draw(msg, screen, xx, yy, Color.get(5, 333, 333, 333));
-		} else {
-			Font.draw(msg, screen, xx, yy, Color.get(5, 555, 555, 555));
-		}
-	}
+        if ((tickCount / 20) % 2 == 0) {
+            Font.draw(msg, screen, xx, yy, Color.get(5, 333, 333, 333));
+        } else {
+            Font.draw(msg, screen, xx, yy, Color.get(5, 555, 555, 555));
+        }
+    }
 
-	public void scheduleLevelChange(int dir) {
-		pendingLevelChange = dir;
-	}
+    public void scheduleLevelChange(int dir) {
+        pendingLevelChange = dir;
+    }
 
-	public static void main(String[] args) {
-		TopDownMinicraft game = new TopDownMinicraft();
-		start(game, true);
-	}
+    public static void main(String[] args) {
+        TopDownMinicraft game = new TopDownMinicraft();
+        start(game, true);
+    }
 
-	public static void start(TopDownMinicraft game, boolean auto) {
-		game.setMinimumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-		game.setMaximumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-		game.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
+    public static void start(TopDownMinicraft game, boolean auto) {
+        game.setMinimumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
+        game.setMaximumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
+        game.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
 
-		JFrame frame = new JFrame(TopDownMinicraft.NAME);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new BorderLayout());
-		frame.add(game, BorderLayout.CENTER);
-		frame.pack();
-		frame.setResizable(false);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
+        JFrame frame = new JFrame(TopDownMinicraft.NAME);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        frame.add(game, BorderLayout.CENTER);
+        frame.pack();
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
 
-		game.start();
+        game.start();
 
-		if (auto) {
-			new Thread(game).start();
-		}
+        if (auto) {
+            new Thread(game).start();
+        }
 
-	}
+    }
 
-	public void won() {
-		wonTimer = 60 * 3;
-		hasWon = true;
-	}
+    public void won() {
+        wonTimer = 60 * 3;
+        hasWon = true;
+    }
 }
