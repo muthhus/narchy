@@ -26,7 +26,7 @@ public class CameraSensor<P extends PixelCamera> {
         width = cam.width();
         height = cam.height();
 
-        float freqResolution = 0.1f;
+        float freqResolution = 0.04f;
 
         //TODO extract this section and associated variables to a CameraSensorMatrix class or something
         ss = new SensorConcept[width][height];
