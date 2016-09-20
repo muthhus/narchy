@@ -25,7 +25,7 @@ public abstract class Entity implements java.io.Serializable {
 	public float dy;
 	
 	protected Sprite sprite;
-	protected boolean gravityApplies;
+	protected final boolean gravityApplies;
 	protected int widthPX;
 	protected int heightPX;
 	
@@ -243,11 +243,22 @@ public abstract class Entity implements java.io.Serializable {
 
 	public boolean inBoundingBox(Int2 pos, int tileSize) {
 		int left = (int) this.getLeft(tileSize);
+		if (pos.x < left) {
+			return false;
+		}
 		int right = (int) this.getRight(tileSize);
+		if (pos.x > right) {
+			return false;
+		}
 		int top = (int) this.getTop(tileSize);
+		if (pos.y < top) {
+			return false;
+		}
 		int bottom = (int) this.getBottom(tileSize);
-		
-		return pos.x >= left && pos.x <= right && pos.y >= top && pos.y <= bottom;
+		if (pos.y > bottom) {
+			return false;
+		}
+		return true;
 	}
 	
 	public void draw(GraphicsHandler g, float cameraX, float cameraY, int screenWidth,

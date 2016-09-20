@@ -5,8 +5,8 @@ import nars.experiment.minicraft.top.item.ToolItem;
 import nars.experiment.minicraft.top.item.ToolType;
 
 public class ToolRecipe extends Recipe {
-	private ToolType type;
-	private int level;
+	private final ToolType type;
+	private final int level;
 
 	public ToolRecipe(ToolType type, int level) {
 		super(new ToolItem(type, level));
@@ -14,6 +14,7 @@ public class ToolRecipe extends Recipe {
 		this.level = level;
 	}
 
+	@Override
 	public void craft(Player player) {
 		player.inventory.add(0, new ToolItem(type, level));
 	}

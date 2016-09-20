@@ -28,9 +28,9 @@ public final class TileTemplate implements java.io.Serializable {
 							TileID.NONE },
 					{ TileID.NONE, TileID.LEAVES, TileID.LEAVES, TileID.NONE, TileID.NONE,
 							TileID.NONE } }, 5, 2);
-	public TileID[][] template;
-	public int spawnX;
-	public int spawnY;
+	public final TileID[][] template;
+	public final int spawnX;
+	public final int spawnY;
 	
 	private TileTemplate(TileID[][] tileIDs, int spawnX, int spawnY) {
 		this.template = tileIDs;

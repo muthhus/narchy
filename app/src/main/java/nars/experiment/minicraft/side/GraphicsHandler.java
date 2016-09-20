@@ -11,11 +11,11 @@ public abstract class GraphicsHandler {
 	
 	private static GraphicsHandler single;
 	
-	public int getScreenWidth() {
+	public static int getScreenWidth() {
 		return screenWidth;
 	}
 	
-	public int getScreenHeight() {
+	public static int getScreenHeight() {
 		return screenHeight;
 	}
 	

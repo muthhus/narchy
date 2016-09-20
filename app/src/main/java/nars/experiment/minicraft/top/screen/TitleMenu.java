@@ -13,26 +13,28 @@ public class TitleMenu extends Menu {
 	public TitleMenu() {
 	}
 
-	public void tick() {
-		if (input.up.clicked) selected--;
-		if (input.down.clicked) selected++;
-
-		int len = options.length;
-		if (selected < 0) selected += len;
-		if (selected >= len) selected -= len;
-
-		if (input.attack.clicked || input.menu.clicked) {
-			if (selected == 0) {
+	@Override
+    public void tick() {
+//		if (input.up.clicked) selected--;
+//		if (input.down.clicked) selected++;
+//
+//		int len = options.length;
+//		if (selected < 0) selected += len;
+//		if (selected >= len) selected -= len;
+//
+//		if (input.attack.clicked || input.menu.clicked) {
+//			if (selected == 0) {
 				Sound.test.play();
 				game.resetGame();
 				game.setMenu(null);
-			}
-			if (selected == 1) game.setMenu(new InstructionsMenu(this));
-			if (selected == 2) game.setMenu(new AboutMenu(this));
-		}
+//			}
+//			if (selected == 1) game.setMenu(new InstructionsMenu(this));
+//			if (selected == 2) game.setMenu(new AboutMenu(this));
+//		}
 	}
 
-	public void render(Screen screen) {
+	@Override
+    public void render(Screen screen) {
 		screen.clear(0);
 
 		int h = 2;

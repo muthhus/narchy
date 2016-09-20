@@ -16,8 +16,9 @@ public class LavaTile extends Tile {
 		connectsToLava = true;
 	}
 
-	private Random wRandom = new Random();
+	private final Random wRandom = new Random();
 
+	@Override
 	public void render(Screen screen, Level level, int x, int y) {
 		wRandom.setSeed((tickCount + (x / 2 - y) * 4311) / 10 * 54687121l + x * 3271612l + y * 3412987161l);
 		int col = Color.get(500, 500, 520, 550);
@@ -54,10 +55,12 @@ public class LavaTile extends Tile {
 			screen.render(x * 16 + 8, y * 16 + 8, (r ? 16 : 15) + (d ? 2 : 1) * 32, (sd || sr) ? transitionColor2 : transitionColor1, 0);
 	}
 
+	@Override
 	public boolean mayPass(Level level, int x, int y, Entity e) {
 		return e.canSwim();
 	}
 
+	@Override
 	public void tick(Level level, int xt, int yt) {
 		int xn = xt;
 		int yn = yt;
@@ -72,6 +75,7 @@ public class LavaTile extends Tile {
 		}
 	}
 
+	@Override
 	public int getLightRadius(Level level, int x, int y) {
 		return 6;
 	}

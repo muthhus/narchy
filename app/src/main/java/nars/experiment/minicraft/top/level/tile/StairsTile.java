@@ -5,13 +5,14 @@ import nars.experiment.minicraft.top.gfx.Screen;
 import nars.experiment.minicraft.top.level.Level;
 
 public class StairsTile extends Tile {
-	private boolean leadsUp;
+	private final boolean leadsUp;
 
 	public StairsTile(int id, boolean leadsUp) {
 		super(id);
 		this.leadsUp = leadsUp;
 	}
 
+	@Override
 	public void render(Screen screen, Level level, int x, int y) {
 		int color = Color.get(level.dirtColor, 000, 333, 444);
 		int xt = 0;

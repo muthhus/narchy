@@ -57,6 +57,7 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
         super();
 
 
+
         setBackground(Color.BLACK);
         setIgnoreRepaint(true);
 

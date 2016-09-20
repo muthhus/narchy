@@ -1,6 +1,6 @@
 package nars.experiment.minicraft.top.entity;
 
-import nars.experiment.minicraft.top.Game;
+import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.entity.particle.TextParticle;
 import nars.experiment.minicraft.top.gfx.Color;
@@ -16,10 +16,10 @@ import nars.experiment.minicraft.top.sound.Sound;
 import java.util.List;
 
 public class Player extends Mob {
-	private InputHandler input;
+	private final InputHandler input;
 	private int attackTime, attackDir;
 
-	public Game game;
+	public TopDownMinicraft game;
 	public Inventory inventory = new Inventory();
 	public Item attackItem;
 	public Item activeItem;
@@ -31,7 +31,7 @@ public class Player extends Mob {
 	private int onStairDelay;
 	public int invulnerableTime = 0;
 
-	public Player(Game game, InputHandler input) {
+	public Player(TopDownMinicraft game, InputHandler input) {
 		this.game = game;
 		this.input = input;
 		x = 24;
@@ -42,6 +42,7 @@ public class Player extends Mob {
 		inventory.add(new PowerGloveItem());
 	}
 
+	@Override
 	public void tick() {
 		super.tick();
 
@@ -129,7 +130,7 @@ public class Player extends Mob {
 		if (attackDir == 3) xt = (x + r) >> 4;
 
 		if (xt >= 0 && yt >= 0 && xt < level.w && yt < level.h) {
-			if (level.getTile(xt, yt).use(level, xt, yt, this, attackDir)) return true;
+			if (Tile.use(level, xt, yt, this, attackDir)) return true;
 		}
 
 		return false;
@@ -233,6 +234,7 @@ public class Player extends Mob {
 		return dmg;
 	}
 
+	@Override
 	public void render(Screen screen) {
 		int xt = 0;
 		int yt = 14;
@@ -317,15 +319,18 @@ public class Player extends Mob {
 		}
 	}
 
+	@Override
 	public void touchItem(ItemEntity itemEntity) {
 		itemEntity.take(this);
 		inventory.add(itemEntity.item);
 	}
 
+	@Override
 	public boolean canSwim() {
 		return true;
 	}
 
+	@Override
 	public boolean findStartPos(Level level) {
 		while (true) {
 			int x = random.nextInt(level.w);
@@ -348,6 +353,7 @@ public class Player extends Mob {
 		game.scheduleLevelChange(dir);
 	}
 
+	@Override
 	public int getLightRadius() {
 		int r = 2;
 		if (activeItem != null) {
@@ -359,22 +365,25 @@ public class Player extends Mob {
 		return r;
 	}
 
+	@Override
 	protected void die() {
 		super.die();
 		Sound.playerDeath.play();
 	}
 
+	@Override
 	protected void touchedBy(Entity entity) {
 		if (!(entity instanceof Player)) {
 			entity.touchedBy(this);
 		}
 	}
 
+	@Override
 	protected void doHurt(int damage, int attackDir) {
 		if (hurtTime > 0 || invulnerableTime > 0) return;
 
 		Sound.playerHurt.play();
-		level.add(new TextParticle("" + damage, x, y, Color.get(-1, 504, 504, 504)));
+		level.add(new TextParticle(String.valueOf(damage), x, y, Color.get(-1, 504, 504, 504)));
 		health -= damage;
 		if (attackDir == 0) yKnockback = +6;
 		if (attackDir == 1) yKnockback = -6;

@@ -15,7 +15,7 @@ public class Screen {
 	public final int w, h;
 	public int[] pixels;
 
-	private SpriteSheet sheet;
+	private final SpriteSheet sheet;
 
 	public Screen(int w, int h, SpriteSheet sheet) {
 		this.sheet = sheet;
@@ -48,27 +48,34 @@ public class Screen {
 	 * for (int i = 0; i < sprites.size(); i++) { Sprite s = sprites.get(i); render(s.x, s.y, s.img, s.col, s.bits); } sprites.clear(); }
 	 */
 
-	public void render(int xp, int yp, int tile, int colors, int bits) {
-		xp -= xOffset;
-		yp -= yOffset;
+	public void render(int _xp, int _yp, int tile, int colors, int bits) {
+		final int xp = _xp - xOffset;
+		final int yp = _yp - yOffset;
 		boolean mirrorX = (bits & BIT_MIRROR_X) > 0;
 		boolean mirrorY = (bits & BIT_MIRROR_Y) > 0;
 
 		int xTile = tile % 32;
 		int yTile = tile / 32;
-		int toffs = xTile * 8 + yTile * 8 * sheet.width;
+		int sw = sheet.width;
+		int toffs = xTile * 8 + yTile * 8 * sw;
+		int[] sp = sheet.pixels;
+		int[] pp = this.pixels;
 
 		for (int y = 0; y < 8; y++) {
 			int ys = y;
 			if (mirrorY) ys = 7 - y;
-			if (y + yp < 0 || y + yp >= h) continue;
+			int yyp = y + yp;
+			if (yyp < 0 || yyp >= h) continue;
 			for (int x = 0; x < 8; x++) {
-				if (x + xp < 0 || x + xp >= w) continue;
+				int xxp = x + xp;
+				if (xxp < 0 || xxp >= w) continue;
 
 				int xs = x;
 				if (mirrorX) xs = 7 - x;
-				int col = (colors >> (sheet.pixels[xs + ys * sheet.width + toffs] * 8)) & 255;
-				if (col < 255) pixels[(x + xp) + (y + yp) * w] = col;
+				int col = (colors >> (sp[xs + ys * sw + toffs] * 8)) & 255;
+				if (col < 255) {
+					pp[xxp + (yyp) * w] = col;
+				}
 			}
 		}
 	}
@@ -78,14 +85,15 @@ public class Screen {
 		this.yOffset = yOffset;
 	}
 
-	private int[] dither = new int[] { 0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5, };
+	private static final int[] dither = { 0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5, };
 
 	public void overlay(Screen screen2, int xa, int ya) {
 		int[] oPixels = screen2.pixels;
 		int i = 0;
 		for (int y = 0; y < h; y++) {
+			int yy = ((y + ya) & 3) * 4;
 			for (int x = 0; x < w; x++) {
-				if (oPixels[i] / 10 <= dither[((x + xa) & 3) + ((y + ya) & 3) * 4]) pixels[i] = 0;
+				if (oPixels[i] / 10 <= dither[((x + xa) & 3) + yy]) pixels[i] = 0;
 				i++;
 			}
 
@@ -114,7 +122,9 @@ public class Screen {
 				// System.out.println(dist);
 				if (dist <= r * r) {
 					int br = 255 - dist * 255 / (r * r);
-					if (pixels[xx + yy * w] < br) pixels[xx + yy * w] = br;
+					int pi = xx + yy * w;
+					if (pixels[pi] < br)
+						pixels[pi] = br;
 				}
 			}
 		}

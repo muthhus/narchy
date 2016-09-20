@@ -17,7 +17,8 @@ public class AirWizard extends Mob {
 		health = maxHealth = 2000;
 	}
 
-	public void tick() {
+	@Override
+    public void tick() {
 		super.tick();
 
 		if (attackDelay > 0) {
@@ -84,14 +85,16 @@ public class AirWizard extends Mob {
 		}
 	}
 
-	protected void doHurt(int damage, int attackDir) {
+	@Override
+    protected void doHurt(int damage, int attackDir) {
 		super.doHurt(damage, attackDir);
 		if (attackDelay == 0 && attackTime == 0) {
 			attackDelay = 60 * 2;
 		}
 	}
 
-	public void render(Screen screen) {
+	@Override
+    public void render(Screen screen) {
 		int xt = 8;
 		int yt = 14;
 
@@ -138,13 +141,15 @@ public class AirWizard extends Mob {
 		screen.render(xo + 8 - 8 * flip2, yo + 8, xt + 1 + (yt + 1) * 32, col2, flip2);
 	}
 
-	protected void touchedBy(Entity entity) {
+	@Override
+    protected void touchedBy(Entity entity) {
 		if (entity instanceof Player) {
 			entity.hurt(this, 3, dir);
 		}
 	}
 
-	protected void die() {
+	@Override
+    protected void die() {
 		super.die();
 		if (level.player != null) {
 			level.player.score += 1000;

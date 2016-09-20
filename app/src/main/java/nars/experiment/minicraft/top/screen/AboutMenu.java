@@ -5,18 +5,20 @@ import nars.experiment.minicraft.top.gfx.Font;
 import nars.experiment.minicraft.top.gfx.Screen;
 
 public class AboutMenu extends Menu {
-	private Menu parent;
+	private final Menu parent;
 
 	public AboutMenu(Menu parent) {
 		this.parent = parent;
 	}
 
+	@Override
 	public void tick() {
 		if (input.attack.clicked || input.menu.clicked) {
 			game.setMenu(parent);
 		}
 	}
 
+	@Override
 	public void render(Screen screen) {
 		screen.clear(0);
 

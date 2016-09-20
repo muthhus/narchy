@@ -15,8 +15,8 @@ package nars.experiment.minicraft.side;
 public class InventoryItem implements java.io.Serializable {
 	private static final long serialVersionUID = -2389571032163510795L;
 	
-	public final int maxCount = 64;
-	public int count = 0;
+	public static final int maxCount = 64;
+	public int count;
 	public Item item;
 	
 	public InventoryItem(Item item) {
@@ -87,7 +87,7 @@ public class InventoryItem implements java.io.Serializable {
 		this.getItem().sprite.draw(g, x, y, tileSize, tileSize);
 		if (this.getCount() > 1) {
 			g.setColor(Color.white);
-			g.drawString("" + this.getCount(), x, y + tileSize / 2);
+			g.drawString(String.valueOf(this.getCount()), x, y + tileSize / 2);
 		}
 		if (item.getClass() == Tool.class) {
 			Tool tool = (Tool) item;

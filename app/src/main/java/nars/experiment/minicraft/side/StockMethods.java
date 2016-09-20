@@ -12,13 +12,9 @@
 
 package nars.experiment.minicraft.side;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Scanner;
-
 public final class StockMethods {
 	public static Boolean onScreen = true;
-	public static Int2 pos = new Int2(0, 0);
+	public static final Int2 pos = new Int2(0, 0);
 	
 	public static Int2 computeDrawLocationInPlace(float cameraX, float cameraY, int width,
 			int height, int tileSize, float positionX, float positionY) {

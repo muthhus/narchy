@@ -17,16 +17,16 @@ public class Tool extends Item {
 	
 	public enum ToolType {
 		Shovel, Pick, Axe
-	};
-	
-	public enum ToolPower {
+	}
+
+    public enum ToolPower {
 		Wood, Stone, Metal, Diamond
-	};
-	
-	int totalUses;
+	}
+
+    final int totalUses;
 	int uses;
-	public ToolType toolType;
-	public ToolPower toolPower;
+	public final ToolType toolType;
+	public final ToolPower toolPower;
 	
 	public Tool(String ref, int size, int id, String name, int[][] template, int templateCount,
 			ToolType toolType, ToolPower toolPower) {

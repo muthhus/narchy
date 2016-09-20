@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class SpriteStore {
 	/** The single instance of this class */
@@ -51,7 +52,7 @@ public abstract class SpriteStore {
 
 				// use ImageIO to read the image in
 				sourceImage = ImageIO.read(url);
-			} catch (IOException e) {
+			} catch (IOException ignored) {
 				fail("Failed to load: " + ref);
 			}
 
@@ -65,7 +66,7 @@ public abstract class SpriteStore {
 			image.getGraphics().drawImage(sourceImage, 0, 0, null);
 
 			// create a sprite, add it the cache then return it
-			Sprite sprite = (Sprite) new AwtSprite(image, ref);
+			Sprite sprite = new AwtSprite(image, ref);
 			return sprite;
 		}
 
@@ -75,7 +76,7 @@ public abstract class SpriteStore {
 		 * @param message
 		 *            The message to display on failure
 		 */
-		private void fail(String message) {
+		private static void fail(String message) {
 			// we're pretty dramatic here, if a resource isn't available
 			// we dump the message and exit the game
 			System.err.println(message);
@@ -121,7 +122,8 @@ public abstract class SpriteStore {
 		 *
 		 * @return The width in pixels of this sprite
 		 */
-		public int getWidth() {
+		@Override
+        public int getWidth() {
 			return image.getWidth(null);
 		}
 
@@ -130,7 +132,8 @@ public abstract class SpriteStore {
 		 *
 		 * @return The height in pixels of this sprite
 		 */
-		public int getHeight() {
+		@Override
+        public int getHeight() {
 			return image.getHeight(null);
 		}
 
@@ -144,19 +147,23 @@ public abstract class SpriteStore {
 		 * @param y
 		 *            The y location at which to draw the sprite
 		 */
-		public void draw(GraphicsHandler g, int x, int y) {
+		@Override
+        public void draw(GraphicsHandler g, int x, int y) {
 			g.drawImage(this, x, y);
 		}
 
-		public void draw(GraphicsHandler g, int x, int y, Color tint) {
+		@Override
+        public void draw(GraphicsHandler g, int x, int y, Color tint) {
 			g.drawImage(this, x, y, tint);
 		}
 
-		public void draw(GraphicsHandler g, int x, int y, int width, int height) {
+		@Override
+        public void draw(GraphicsHandler g, int x, int y, int width, int height) {
 			g.drawImage(this, x, y, width, height);
 		}
 
-		public void draw(GraphicsHandler g, int x, int y, int width, int height, Color tint) {
+		@Override
+        public void draw(GraphicsHandler g, int x, int y, int width, int height, Color tint) {
 			g.drawImage(this, x, y, width, height, tint);
 		}
 
@@ -170,7 +177,7 @@ public abstract class SpriteStore {
 			// always perform the default de-serialization first
 			// aInputStream.defaultReadObject();
 			ref = (String) aInputStream.readObject();
-			this.image = ((AwtSprite) AwtSpriteStore.get().getSprite(ref)).image;
+			this.image = ((AwtSprite) SpriteStore.get().getSprite(ref)).image;
 		}
 
 		/**
@@ -186,7 +193,7 @@ public abstract class SpriteStore {
 	}
 	
 	/** The cached sprite map, from reference to sprite instance */
-	private HashMap<String, Sprite> sprites = new HashMap<String, Sprite>();
+	private final Map<String, Sprite> sprites = new HashMap<>();
 	
 	/**
 	 * Retrieve a sprite from the store

@@ -18,7 +18,8 @@ public class GrassTile extends Tile {
 		connectsToGrass = true;
 	}
 
-	public void render(Screen screen, Level level, int x, int y) {
+	@Override
+    public void render(Screen screen, Level level, int x, int y) {
 		int col = Color.get(level.grassColor, level.grassColor, level.grassColor + 111, level.grassColor + 111);
 		int transitionColor = Color.get(level.grassColor - 111, level.grassColor, level.grassColor + 111, level.dirtColor);
 
@@ -47,7 +48,8 @@ public class GrassTile extends Tile {
 			screen.render(x * 16 + 8, y * 16 + 8, (r ? 13 : 12) + (d ? 2 : 1) * 32, transitionColor, 0);
 	}
 
-	public void tick(Level level, int xt, int yt) {
+	@Override
+    public void tick(Level level, int xt, int yt) {
 		if (random.nextInt(40) != 0) return;
 
 		int xn = xt;
@@ -63,7 +65,8 @@ public class GrassTile extends Tile {
 		}
 	}
 
-	public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
+	@Override
+    public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
 		if (item instanceof ToolItem) {
 			ToolItem tool = (ToolItem) item;
 			if (tool.type == ToolType.shovel) {

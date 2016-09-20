@@ -13,6 +13,7 @@
 package nars.experiment.minicraft.side;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 
@@ -46,7 +47,7 @@ public class WorldGenerator {
 		int surface = median;// maxSurface-5;
 		int dirtDepth = 3;
 		
-		ArrayList<Int2> trees = new ArrayList<Int2>();
+		List<Int2> trees = new ArrayList<>();
 		
 		int surfaceSum = 0;
 		
@@ -142,7 +143,7 @@ public class WorldGenerator {
 		uniformlyAddMinerals(world, TileID.DIAMOND_ORE, .001f, (int) (height * .9), height,
 				new TileID[] { TileID.DIRT, TileID.SAND, TileID.WATER, TileID.NONE }, random);
 		
-		TileID[] caveIgnore = new TileID[] { TileID.DIRT, TileID.COAL_ORE, TileID.WATER,
+		TileID[] caveIgnore = { TileID.DIRT, TileID.COAL_ORE, TileID.WATER,
 				TileID.GRASS, TileID.SAND, TileID.NONE };
 		// caves
 		int caveCount = (int) (width / 16 + random.nextDouble() * 3);
@@ -208,7 +209,7 @@ public class WorldGenerator {
 	
 	private static void carve(TileID[][] world, int x, int y, double distance, TileID type,
 			TileID[] ignoreTypes, boolean left) {
-		for (int i = -(int) distance; (!left && i <= (int) distance) || (left && i <= 0); i++) {
+		for (int i = -(int) distance; i <= (left ? 0 : (int) distance); i++) {
 			int currentX = x + i;
 			if (currentX < 0 || currentX >= world.length) {
 				continue;

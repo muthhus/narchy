@@ -20,7 +20,8 @@ public class HardRockTile extends Tile {
 		super(id);
 	}
 
-	public void render(Screen screen, Level level, int x, int y) {
+	@Override
+    public void render(Screen screen, Level level, int x, int y) {
 		int col = Color.get(334, 334, 223, 223);
 		int transitionColor = Color.get(001, 334, 445, level.dirtColor);
 
@@ -66,15 +67,18 @@ public class HardRockTile extends Tile {
 			screen.render(x * 16 + 8, y * 16 + 8, (r ? 4 : 5) + (d ? 0 : 1) * 32, transitionColor, 3);
 	}
 
-	public boolean mayPass(Level level, int x, int y, Entity e) {
+	@Override
+    public boolean mayPass(Level level, int x, int y, Entity e) {
 		return false;
 	}
 
-	public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
+	@Override
+    public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
 		hurt(level, x, y, 0);
 	}
 
-	public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
+	@Override
+    public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
 		if (item instanceof ToolItem) {
 			ToolItem tool = (ToolItem) item;
 			if (tool.type == ToolType.pickaxe && tool.level == 4) {
@@ -90,7 +94,7 @@ public class HardRockTile extends Tile {
 	public void hurt(Level level, int x, int y, int dmg) {
 		int damage = level.getData(x, y) + dmg;
 		level.add(new SmashParticle(x * 16 + 8, y * 16 + 8));
-		level.add(new TextParticle("" + dmg, x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
+		level.add(new TextParticle(String.valueOf(dmg), x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
 		if (damage >= 200) {
 			int count = random.nextInt(4) + 1;
 			for (int i = 0; i < count; i++) {
@@ -106,7 +110,8 @@ public class HardRockTile extends Tile {
 		}
 	}
 
-	public void tick(Level level, int xt, int yt) {
+	@Override
+    public void tick(Level level, int xt, int yt) {
 		int damage = level.getData(xt, yt);
 		if (damage > 0) level.setData(xt, yt, damage - 1);
 	}

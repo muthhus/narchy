@@ -16,7 +16,7 @@ import nars.experiment.minicraft.top.item.resource.Resource;
 import nars.experiment.minicraft.top.level.Level;
 
 public class OreTile extends Tile {
-	private Resource toDrop;
+	private final Resource toDrop;
 	private int color;
 
 	public OreTile(int id, Resource toDrop) {
@@ -25,6 +25,7 @@ public class OreTile extends Tile {
 		this.color = toDrop.color & 0xffff00;
 	}
 
+	@Override
 	public void render(Screen screen, Level level, int x, int y) {
 		color = (toDrop.color & 0xffffff00) + Color.get(level.dirtColor);
 		screen.render(x * 16 + 0, y * 16 + 0, 17 + 1 * 32, color, 0);
@@ -33,14 +34,17 @@ public class OreTile extends Tile {
 		screen.render(x * 16 + 8, y * 16 + 8, 18 + 2 * 32, color, 0);
 	}
 
+	@Override
 	public boolean mayPass(Level level, int x, int y, Entity e) {
 		return false;
 	}
 
+	@Override
 	public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
 		hurt(level, x, y, 0);
 	}
 
+	@Override
 	public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
 		if (item instanceof ToolItem) {
 			ToolItem tool = (ToolItem) item;
@@ -57,7 +61,7 @@ public class OreTile extends Tile {
 	public void hurt(Level level, int x, int y, int dmg) {
 		int damage = level.getData(x, y) + 1;
 		level.add(new SmashParticle(x * 16 + 8, y * 16 + 8));
-		level.add(new TextParticle("" + dmg, x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
+		level.add(new TextParticle(String.valueOf(dmg), x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
 		if (dmg > 0) {
 			int count = random.nextInt(2);
 			if (damage >= random.nextInt(10) + 3) {
@@ -72,6 +76,7 @@ public class OreTile extends Tile {
 		}
 	}
 
+	@Override
 	public void bumpedInto(Level level, int x, int y, Entity entity) {
 		entity.hurt(this, x, y, 3);
 	}

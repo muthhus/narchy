@@ -15,21 +15,21 @@ package nars.experiment.minicraft.side;
 public class Inventory implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	public InventoryItem[][] inventoryItems;
+	public final InventoryItem[][] inventoryItems;
 	public int tableSizeAvailable = 2;
-	public int hotbarIdx = 0;
+	public int hotbarIdx;
 	
-	private int maxCount = 64;
-	private int playerRow;
-	private boolean visible = false;
-	private InventoryItem holding = new InventoryItem(null);
+	private static final int maxCount = 64;
+	private final int playerRow;
+	private boolean visible;
+	private final InventoryItem holding = new InventoryItem(null);
 	private int holdingX;
 	private int holdingY;
-	private Int2 clickPos = new Int2(0, 0);;
-	private int craftingHeight;
-	private char[][] tableTwo = new char[2][2];
-	private char[][] tableThree = new char[3][3];
-	private InventoryItem craftable = new InventoryItem(null);
+	private final Int2 clickPos = new Int2(0, 0);
+    private final int craftingHeight;
+	private final char[][] tableTwo = new char[2][2];
+	private final char[][] tableThree = new char[3][3];
+	private final InventoryItem craftable = new InventoryItem(null);
 	
 	public Inventory(int width, int height, int craftingHeight) {
 		inventoryItems = new InventoryItem[width][height + craftingHeight];
@@ -203,7 +203,7 @@ public class Inventory implements java.io.Serializable {
 							}
 						}
 						int count = entry.template.outCount;
-						holding.add((Item) entry.clone(), count);
+						holding.add(entry.clone(), count);
 					}
 					break;
 				}
@@ -333,7 +333,7 @@ public class Inventory implements java.io.Serializable {
 	}
 	
 	public void setVisible(boolean visible) {
-		if (visible == false) {
+		if (!visible) {
 			tableSizeAvailable = 2;
 		}
 		this.visible = visible;

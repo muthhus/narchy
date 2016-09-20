@@ -10,6 +10,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -20,7 +21,7 @@ public class AwtGraphicsHandler extends GraphicsHandler {
 	private Canvas canvas;
 	private BufferStrategy strategy;
 	private JFrame container;
-	private Cursor myCursor = null;
+	private Cursor myCursor;
 	private JPanel panel;
 	
 	@Override
@@ -34,7 +35,9 @@ public class AwtGraphicsHandler extends GraphicsHandler {
 			Image im = ii.getImage();
 			Toolkit tk = canvas.getToolkit();
 			myCursor = tk.createCustomCursor(im, new Point(0, 0), "MyCursor");
-		} catch (Exception e) {
+		} catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
 			System.out.println("myCursor creation failed " + e);
 		}
 		
@@ -69,13 +72,7 @@ public class AwtGraphicsHandler extends GraphicsHandler {
 		// add a listener to respond to the user closing the window. If they
 		// do we'd like to exit the game
 		// TODO: add this back in
-		container.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				game.goToMainMenu();  // this saves and cleans up appropriately
-				game.quit();
-			}
-		});
+		container.addWindowListener(new MyWindowAdapter(game));
 		new AwtEventsHandler(game, canvas);
 		
 		// request the focus so key events come to us
@@ -162,5 +159,19 @@ public class AwtGraphicsHandler extends GraphicsHandler {
 		this.setColor(tint);
 		this.fillRect(x, y, width, height);
 		g.setColor(old);
+	}
+
+	private static class MyWindowAdapter extends WindowAdapter {
+		private final Game game;
+
+		public MyWindowAdapter(Game game) {
+			this.game = game;
+		}
+
+		@Override
+        public void windowClosing(WindowEvent e) {
+            game.goToMainMenu();  // this saves and cleans up appropriately
+            Game.quit();
+        }
 	}
 }

@@ -1,12 +1,16 @@
 package nars.experiment.minicraft.side;
 
+import org.eclipse.collections.impl.map.mutable.primitive.CharObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Constants {
 
-	public static Map<TileID, Tile> tileTypes = new HashMap<TileID, Tile>();
-	public static Map<Integer, TileID> tileIDs = new HashMap<Integer, TileID>();
+	public static final Map<TileID, Tile> tileTypes = new EnumMap(TileID.class);
+	public static final IntObjectHashMap<TileID> tileIDs = new IntObjectHashMap<>();
 	
 	static {
 		tileTypes.put(TileID.DIRT, new Tile(new TileType("sprites/tiles/dirt.png", TileID.DIRT)));
@@ -47,9 +51,10 @@ public class Constants {
 		for (TileID tileID : TileID.values()) {
 			tileIDs.put(tileID.breaksInto, tileID);
 		}
+		tileIDs.compact();
 	}
 	
-	public static Map<Character, Item> itemTypes;
+	public static final CharObjectHashMap<Item> itemTypes;
 	static {
 		itemTypes = ItemLoader.loadItems(16);
 	}
@@ -57,7 +62,7 @@ public class Constants {
 	public static final int LIGHT_VALUE_TORCH = 13;
 	public static final int LIGHT_VALUE_SUN = 15;
 	// not final so that we can set it via command-line arg
-	public static boolean DEBUG = false;
+	public static boolean DEBUG;
 	public static final boolean DEBUG_VISIBILITY_ON = false;
 	public static final int LIGHT_VALUE_OPAQUE = 10000;
 }

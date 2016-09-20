@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Recipe implements ListItem {
-	public List<Item> costs = new ArrayList<Item>();
+	public List<Item> costs = new ArrayList<>();
 	public boolean canCraft = false;
 	public Item resultTemplate;
 
@@ -40,7 +40,8 @@ public abstract class Recipe implements ListItem {
 		canCraft = true;
 	}
 
-	public void renderInventory(Screen screen, int x, int y) {
+	@Override
+    public void renderInventory(Screen screen, int x, int y) {
 		screen.render(x, y, resultTemplate.getSprite(), resultTemplate.getColor(), 0);
 		int textColor = canCraft ? Color.get(-1, 555, 555, 555) : Color.get(-1, 222, 222, 222);
 		Font.draw(resultTemplate.getName(), screen, x + 8, y, textColor);

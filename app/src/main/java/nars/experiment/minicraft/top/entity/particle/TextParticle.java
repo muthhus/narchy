@@ -6,8 +6,8 @@ import nars.experiment.minicraft.top.gfx.Font;
 import nars.experiment.minicraft.top.gfx.Screen;
 
 public class TextParticle extends Entity {
-	private String msg;
-	private int col;
+	private final String msg;
+	private final int col;
 	private int time = 0;
 	public double xa, ya, za;
 	public double xx, yy, zz;
@@ -25,6 +25,7 @@ public class TextParticle extends Entity {
 		za = random.nextFloat() * 0.7 + 2;
 	}
 
+	@Override
 	public void tick() {
 		time++;
 		if (time > 60) {
@@ -44,6 +45,7 @@ public class TextParticle extends Entity {
 		y = (int) yy;
 	}
 
+	@Override
 	public void render(Screen screen) {
 //		Font.draw(msg, screen, x - msg.length() * 4, y, Color.get(-1, 0, 0, 0));
 		Font.draw(msg, screen, x - msg.length() * 4 + 1, y - (int) (zz) + 1, Color.get(-1, 0, 0, 0));

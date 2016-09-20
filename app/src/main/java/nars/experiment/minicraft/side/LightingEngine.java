@@ -1,11 +1,10 @@
 package nars.experiment.minicraft.side;
 
+import nars.$;
+import nars.util.data.list.FasterList;
+
 import java.io.Serializable;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class LightingEngine implements Serializable {
 	
@@ -13,13 +12,14 @@ public class LightingEngine implements Serializable {
 	
 	public enum Direction {
 		RIGHT, UP_RIGHT, UP, UP_LEFT, LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, SOURCE, WELL, UNKNOWN
-	};
+	}
+
+    public final Direction[][] lightFlow;
 	
-	public Direction[][] lightFlow;
-	
-	private int[][] lightValues;
-	private int width, height;
-	private Tile[][] tiles;
+	private final int[][] lightValues;
+	private final int width;
+    private final int height;
+	private final Tile[][] tiles;
 	
 	private final boolean isSun;
 	
@@ -40,23 +40,28 @@ public class LightingEngine implements Serializable {
 				lightFlow[x][y] = Direction.UNKNOWN;
 			}
 		}
-		LinkedList<LightingPoint> sources = new LinkedList<LightingPoint>();
 		if (isSun) {
+			List<LightingPoint> sources = $.newArrayList(width);
 			for (int x = 0; x < width; x++) {
-				sources.addAll(getSunSources(x));
+				getSunSources(x, sources);
 			}
+			spreadLightingDijkstra(sources);
 		} else {
 			for (int x = 0; x < width; x++) {
+				Tile[] tx = tiles[x];
+				Direction[] fx = lightFlow[x];
+				int[] lx = lightValues[x];
+
 				for (int y = 0; y < height; y++) {
-					if (tiles[x][y].type.lightEmitting > 0) {
-						lightFlow[x][y] = Direction.SOURCE;
-						lightValues[x][y] = tiles[x][y].type.lightEmitting;
+					if (tx[y].type.lightEmitting > 0) {
+						fx[y] = Direction.SOURCE;
+						lx[y] = tx[y].type.lightEmitting;
 					}
 					
 				}
 			}
 		}
-		spreadLightingDijkstra(sources);
+
 	}
 	
 	public int getLightValue(int x, int y) {
@@ -71,7 +76,7 @@ public class LightingEngine implements Serializable {
 		}
 		lightFlow[x][y] = Direction.UNKNOWN;
 		if (isSun) {
-			spreadLightingDijkstra(getSunSources(x));
+			spreadLightingDijkstra(getSunSources(x, $.newArrayList()));
 		}
 		spreadLightingDijkstra(new LightingPoint(x, y, Direction.UNKNOWN, lightValues[x][y])
 				.getNeighbors(true, width, height));
@@ -99,8 +104,8 @@ public class LightingEngine implements Serializable {
 		resetLighting(x, y);
 	}
 	
-	public List<LightingPoint> getSunSources(int column) {
-		LinkedList<LightingPoint> sources = new LinkedList<LightingPoint>();
+	public List<LightingPoint> getSunSources(int column, List<LightingPoint> sources) {
+		//LinkedList<LightingPoint> sources = new LinkedList<>();
 		for (int y = 0; y < height - 1; y++) {
 			if (tiles[column][y].type.lightBlocking != 0) {
 				break;
@@ -115,7 +120,7 @@ public class LightingEngine implements Serializable {
 		int right = Math.min(x + Constants.LIGHT_VALUE_SUN, width - 1);
 		int top = Math.max(y - Constants.LIGHT_VALUE_SUN, 0);
 		int bottom = Math.min(y + Constants.LIGHT_VALUE_SUN, height - 1);
-		List<LightingPoint> sources = new LinkedList<LightingPoint>();
+		List<LightingPoint> sources = new LinkedList<>();
 		
 		// safely circle around the target zeroed zone
 		boolean bufferLeft = (left > 0);
@@ -183,8 +188,10 @@ public class LightingEngine implements Serializable {
 	
 	public class LightingPoint {
 		
-		public int x, y, lightValue;
-		public Direction flow;
+		public final int x;
+        public final int y;
+        public final int lightValue;
+		public final Direction flow;
 		
 		// public LightingPoint(int x, int y, Direction flow, int lightValue) {
 		// this(x, y, flow, lightValue, true);
@@ -204,7 +211,7 @@ public class LightingEngine implements Serializable {
 		}
 		
 		public List<LightingPoint> getNeighbors(boolean sun, int width, int height) {
-			List<LightingPoint> neighbors = new LinkedList<LightingPoint>();
+			List<LightingPoint> neighbors = new LinkedList<>();
 			if (tiles[x][y].type.lightBlocking == Constants.LIGHT_VALUE_OPAQUE) {
 				return neighbors;
 			}
@@ -215,7 +222,7 @@ public class LightingEngine implements Serializable {
 		}
 		
 		public List<LightingPoint> getExactNeighbors(int width, int height, int lightingValue) {
-			LinkedList<LightingPoint> neighbors = new LinkedList<LightingPoint>();
+			LinkedList<LightingPoint> neighbors = new LinkedList<>();
 			
 			boolean bufferLeft = (x > 0);
 			boolean bufferRight = (x < width - 1);
@@ -260,23 +267,24 @@ public class LightingEngine implements Serializable {
 		}
 	}
 	
-	public class LightValueComparator implements Comparator<LightingPoint> {
+	public static class LightValueComparator implements Comparator<LightingPoint> {
 		@Override
 		public int compare(LightingPoint arg0, LightingPoint arg1) {
 			if (arg0.lightValue < arg1.lightValue) {
 				return 1;
-			} else if (arg0.lightValue > arg1.lightValue) {
+			}
+			if (arg0.lightValue > arg1.lightValue) {
 				return -1;
 			}
 			return 0;
 		}
 	}
 	
-	private void spreadLightingDijkstra(List<LightingPoint> sources) {
+	private void spreadLightingDijkstra(Collection<LightingPoint> sources) {
 		if (sources.isEmpty())
 			return;
-		HashSet<LightingPoint> out = new HashSet<LightingPoint>();
-		PriorityQueue<LightingPoint> in = new PriorityQueue<LightingPoint>(sources.size(),
+		Set<LightingPoint> out = new HashSet<>(sources.size());
+		PriorityQueue<LightingPoint> in = new PriorityQueue<>(sources.size(),
 				new LightValueComparator());
 		// consider that the input sources are done (this is not a good assumption if different
 		// light sources have different values......)
@@ -306,7 +314,7 @@ public class LightingEngine implements Serializable {
 		}
 	}
 	
-	public Direction oppositeDirection(Direction direction) {
+	public static Direction oppositeDirection(Direction direction) {
 		switch (direction) {
 		case RIGHT:
 			return Direction.LEFT;
@@ -329,7 +337,7 @@ public class LightingEngine implements Serializable {
 		}
 	}
 	
-	public Int2 followDirection(int x, int y, Direction direction) {
+	public static Int2 followDirection(int x, int y, Direction direction) {
 		switch (direction) {
 		case RIGHT:
 			return new Int2(x + 1, y);

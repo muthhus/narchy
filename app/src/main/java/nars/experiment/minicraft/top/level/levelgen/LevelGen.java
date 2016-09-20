@@ -10,7 +10,8 @@ import java.util.Random;
 public class LevelGen {
 	private static final Random random = new Random();
 	public double[] values;
-	private int w, h;
+	private final int w;
+    private final int h;
 
 	public LevelGen(int w, int h, int featureSize) {
 		this.w = w;

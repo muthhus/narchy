@@ -22,33 +22,36 @@ public class ResourceItem extends Item {
 		this.count = count;
 	}
 
+	@Override
 	public int getColor() {
 		return resource.color;
 	}
 
+	@Override
 	public int getSprite() {
 		return resource.sprite;
 	}
 
+	@Override
 	public void renderIcon(Screen screen, int x, int y) {
 		screen.render(x, y, resource.sprite, resource.color, 0);
 	}
 
+	@Override
 	public void renderInventory(Screen screen, int x, int y) {
 		screen.render(x, y, resource.sprite, resource.color, 0);
 		Font.draw(resource.name, screen, x + 32, y, Color.get(-1, 555, 555, 555));
 		int cc = count;
 		if (cc > 999) cc = 999;
-		Font.draw("" + cc, screen, x + 8, y, Color.get(-1, 444, 444, 444));
+		Font.draw(String.valueOf(cc), screen, x + 8, y, Color.get(-1, 444, 444, 444));
 	}
 
+	@Override
 	public String getName() {
 		return resource.name;
 	}
 
-	public void onTake(ItemEntity itemEntity) {
-	}
-
+    @Override
 	public boolean interactOn(Tile tile, Level level, int xt, int yt, Player player, int attackDir) {
 		if (resource.interactOn(tile, level, xt, yt, player, attackDir)) {
 			count--;
@@ -57,6 +60,7 @@ public class ResourceItem extends Item {
 		return false;
 	}
 
+	@Override
 	public boolean isDepleted() {
 		return count <= 0;
 	}

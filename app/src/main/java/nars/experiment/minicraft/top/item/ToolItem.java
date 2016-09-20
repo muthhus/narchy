@@ -9,7 +9,7 @@ import nars.experiment.minicraft.top.gfx.Screen;
 import java.util.Random;
 
 public class ToolItem extends Item {
-	private Random random = new Random();
+	private final Random random = new Random();
 
 	public static final int MAX_LEVEL = 5;
 	public static final String[] LEVEL_NAMES = { //
@@ -32,34 +32,38 @@ public class ToolItem extends Item {
 		this.level = level;
 	}
 
+	@Override
 	public int getColor() {
 		return LEVEL_COLORS[level];
 	}
 
+	@Override
 	public int getSprite() {
 		return type.sprite + 5 * 32;
 	}
 
+	@Override
 	public void renderIcon(Screen screen, int x, int y) {
 		screen.render(x, y, getSprite(), getColor(), 0);
 	}
 
+	@Override
 	public void renderInventory(Screen screen, int x, int y) {
 		screen.render(x, y, getSprite(), getColor(), 0);
 		Font.draw(getName(), screen, x + 8, y, Color.get(-1, 555, 555, 555));
 	}
 
+	@Override
 	public String getName() {
 		return LEVEL_NAMES[level] + " " + type.name;
 	}
 
-	public void onTake(ItemEntity itemEntity) {
-	}
-
+	@Override
 	public boolean canAttack() {
 		return true;
 	}
 
+	@Override
 	public int getAttackDamageBonus(Entity e) {
 		if (type == ToolType.axe) {
 			return (level + 1) * 2 + random.nextInt(4);
@@ -70,13 +74,13 @@ public class ToolItem extends Item {
 		return 1;
 	}
 
+	@Override
 	public boolean matches(Item item) {
 		if (item instanceof ToolItem) {
 			ToolItem other = (ToolItem) item;
 			if (other.type != type) return false;
-			if (other.level != level) return false;
-			return true;
-		}
+            return other.level == level;
+        }
 		return false;
 	}
 }

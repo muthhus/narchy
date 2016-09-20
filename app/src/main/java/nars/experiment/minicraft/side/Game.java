@@ -17,17 +17,16 @@ import java.util.Random;
 
 
 public class Game {
-	
+
+	int worldHeight = 256;
 	private int worldWidth = 512;
-	private int worldHeight = 256;
-	private boolean gameRunning = true;
-	public boolean leftClick = false;
-	public boolean rightClick = false;
+	public boolean leftClick;
+	public boolean rightClick;
 	public boolean paused = true;
 	
-	public ArrayList<Entity> entities = new ArrayList<Entity>();
+	public ArrayList<Entity> entities = new ArrayList<>();
 	
-	private int tileSize = 32;
+	private int tileSize = 96;
 	
 	private int breakingTicks;
 	private Int2 breakingPos;
@@ -37,17 +36,17 @@ public class Game {
 	private Sprite[] breakingSprites;
 	private Sprite fullHeart, halfHeart, emptyHeart, bubble, emptyBubble;
 	
-	public boolean viewFPS = false;
+	public boolean viewFPS;
 	private boolean inMenu = true;
-	private MainMenu menu;
+	private final MainMenu menu;
 	public long ticksRunning;
-	private Random random = new Random();
+	private final Random random = new Random();
 	
 	public Player player;
 	public World world;
 	
 //	public MusicPlayer musicPlayer = new MusicPlayer("sounds/music.ogg");
-	public Int2 screenMousePos = new Int2(0, 0);
+	public final Int2 screenMousePos = new Int2(0, 0);
 	
 	/**
 	 * Construct our game and set it running.
@@ -119,8 +118,8 @@ public class Game {
 		System.gc();
 	}
 	
-	public void drawCenteredX(GraphicsHandler g, Sprite s, int top, int width, int height) {
-		s.draw(g, g.getScreenWidth() / 2 - width / 2, top, width, height);
+	public static void drawCenteredX(GraphicsHandler g, Sprite s, int top, int width, int height) {
+		s.draw(g, GraphicsHandler.getScreenWidth() / 2 - width / 2, top, width, height);
 	}
 	
 	public void gameLoop() {
@@ -131,6 +130,7 @@ public class Game {
 		}
 		
 		// keep looping round till the game ends
+		boolean gameRunning = true;
 		while (gameRunning) {
 			ticksRunning++;
 			long delta = SystemTimer.getTime() - lastLoopTime;
@@ -147,8 +147,8 @@ public class Game {
 				SystemTimer.sleep(lastLoopTime + 16 - SystemTimer.getTime());
 				continue;
 			}
-			final int screenWidth = g.getScreenWidth();
-			final int screenHeight = g.getScreenHeight();
+			final int screenWidth = GraphicsHandler.getScreenWidth();
+			final int screenHeight = GraphicsHandler.getScreenHeight();
 			float cameraX = player.x - screenWidth / tileSize / 2;
 			float cameraY = player.y - screenHeight / tileSize / 2;
 			float worldMouseX = (cameraX * tileSize + screenMousePos.x) / tileSize;
@@ -204,7 +204,7 @@ public class Game {
 					Item newItem = Constants.itemTypes.get((char) name.breaksInto);
 					if (newItem != null) // couldn't find that item
 					{
-						newItem = (Item) newItem.clone();
+						newItem = newItem.clone();
 						newItem.x = player.handBreakPos.x + random.nextFloat()
 								* (1 - (float) newItem.widthPX / tileSize);
 						newItem.y = player.handBreakPos.y + random.nextFloat()
@@ -229,12 +229,14 @@ public class Game {
 					InventoryItem current = player.inventory.selectedItem();
 					if (!current.isEmpty()) {
 						TileID itemID = Constants.tileIDs.get(current.getItem().item_id);
-						boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
-						
-						if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
-							if (world.addTile(player.handBuildPos, itemID)) {
-								// placed successfully
-								player.inventory.decreaseSelected(1);
+						if (itemID!=null) {
+							boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
+
+							if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
+								if (world.addTile(player.handBuildPos, itemID)) {
+									// placed successfully
+									player.inventory.decreaseSelected(1);
+								}
 							}
 						}
 					}
@@ -258,7 +260,7 @@ public class Game {
 			}
 			
 			if (viewFPS) {
-				String fps = "Fps: " + 1 / ((float) delta / 1000) + "("
+				String fps = "Fps: " + 1 / ((float) delta / 1000) + '('
 						+ Runtime.getRuntime().freeMemory() / 1024 / 1024 + " / "
 						+ Runtime.getRuntime().totalMemory() / 1024 / 1024 + ") Free MB";
 				g.setColor(Color.white);
@@ -320,16 +322,16 @@ public class Game {
 		}
 	}
 	
-	public void drawMouse(GraphicsHandler g, Int2 pos) {
+	public static void drawMouse(GraphicsHandler g, Int2 pos) {
 		g.setColor(Color.white);
 		g.fillOval(pos.x - 4, pos.y - 4, 8, 8);
 		g.setColor(Color.black);
 		g.fillOval(pos.x - 3, pos.y - 3, 6, 6);
 	}
 	
-	public void drawTileBackground(GraphicsHandler g, Sprite sprite, int tileSize) {
-		for (int i = 0; i <= GraphicsHandler.get().getScreenWidth() / tileSize; i++) {
-			for (int j = 0; j <= GraphicsHandler.get().getScreenHeight() / tileSize; j++) {
+	public static void drawTileBackground(GraphicsHandler g, Sprite sprite, int tileSize) {
+		for (int i = 0; i <= GraphicsHandler.getScreenWidth() / tileSize; i++) {
+			for (int j = 0; j <= GraphicsHandler.getScreenHeight() / tileSize; j++) {
 				sprite.draw(g, i * tileSize, j * tileSize, tileSize, tileSize);
 			}
 		}
@@ -378,7 +380,7 @@ public class Game {
 		if (!inventoryItem.isEmpty()) {
 			Item newItem = inventoryItem.getItem();
 			if (!(newItem instanceof Tool)) {
-				newItem = (Item) newItem.clone();
+				newItem = newItem.clone();
 			}
 			inventoryItem.remove(1);
 			if (player.facingRight) {
@@ -399,7 +401,7 @@ public class Game {
 		inMenu = true; // go back to the main menu
 	}
 	
-	public void quit() {
+	public static void quit() {
 //		musicPlayer.close();
 		System.exit(0);
 	}
@@ -414,6 +416,7 @@ public class Game {
 	 */
 	public static void main(String argv[]) {
 		// really simple argument parsing
+		Constants.DEBUG = true;
 		for (String arg : argv) {
 			if (arg.equals("-d") || arg.equals("--debug")) {
 				Constants.DEBUG = true;

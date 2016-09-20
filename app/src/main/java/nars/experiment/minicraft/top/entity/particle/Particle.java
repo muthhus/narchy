@@ -6,6 +6,4 @@ public class Particle extends Entity {
 	public Particle() {
 	}
 
-	public void tick() {
-	}
 }

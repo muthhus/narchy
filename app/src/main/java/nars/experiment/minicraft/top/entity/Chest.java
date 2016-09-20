@@ -12,7 +12,8 @@ public class Chest extends Furniture {
 		sprite = 1;
 	}
 
-	public boolean use(Player player, int attackDir) {
+	@Override
+    public boolean use(Player player, int attackDir) {
 		player.game.setMenu(new ContainerMenu(player, "Chest", inventory));
 		return true;
 	}

@@ -13,7 +13,8 @@ public class HoleTile extends Tile {
 		connectsToLava= true;
 	}
 
-	public void render(Screen screen, Level level, int x, int y) {
+	@Override
+    public void render(Screen screen, Level level, int x, int y) {
 		int col = Color.get(111, 111, 110, 110);
 		int transitionColor1 = Color.get(3, 111, level.dirtColor - 111, level.dirtColor);
 		int transitionColor2 = Color.get(3, 111, level.sandColor - 110, level.sandColor);
@@ -48,7 +49,8 @@ public class HoleTile extends Tile {
 			screen.render(x * 16 + 8, y * 16 + 8, (r ? 16 : 15) + (d ? 2 : 1) * 32, (sd || sr) ? transitionColor2 : transitionColor1, 0);
 	}
 
-	public boolean mayPass(Level level, int x, int y, Entity e) {
+	@Override
+    public boolean mayPass(Level level, int x, int y, Entity e) {
 		return e.canSwim();
 	}
 

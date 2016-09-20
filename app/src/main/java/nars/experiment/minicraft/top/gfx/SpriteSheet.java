@@ -3,8 +3,8 @@ package nars.experiment.minicraft.top.gfx;
 import java.awt.image.BufferedImage;
 
 public class SpriteSheet {
-	public int width, height;
-	public int[] pixels;
+	public final int width, height;
+	public final int[] pixels;
 
 	public SpriteSheet(BufferedImage image) {
 		width = image.getWidth();

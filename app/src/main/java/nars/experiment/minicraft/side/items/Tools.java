@@ -1,6 +1,5 @@
 package nars.experiment.minicraft.side.items;
 
-import nars.experiment.minicraft.side.ItemDefinition;
 import nars.experiment.minicraft.side.ToolDefinition;
 
 /**
@@ -8,25 +7,20 @@ import nars.experiment.minicraft.side.ToolDefinition;
  */
 public class Tools {
 
-/*
-[
-{type:"Pick",  power:"Wood",   item_id:89, name:"wPick",spriteRef:"sprites/tools/wPic.png",   recipe:[[112,112,112],[0,107,0],[0,107,0]],yield:1},
-{type:"Pick",  power:"Stone",  item_id:63, name:"sPick",spriteRef:"sprites/tools/sPic.png",   recipe:[[98,98,98],[0,107,0],[0,107,0]],   yield:1},
-{type:"Pick",  power:"Metal",  item_id:239,name:"mPick",spriteRef:"sprites/tools/mPic.png",   recipe:[[105,105,105],[0,107,0],[0,107,0]],yield:1},
-{type:"Pick",  power:"Diamond",item_id:175,name:"dPick",spriteRef:"sprites/tools/dPic.png",   recipe:[[109,109,109],[0,107,0],[0,107,0]],yield:1},
-{type:"Axe",   power:"Wood",   item_id:95, name:"wAxe", spriteRef:"sprites/tools/wAxe.png",   recipe:[[112,112,0],[112,107,0],[0,107,0]],yield:1},
-{type:"Axe",   power:"Stone",  item_id:91, name:"sAxe", spriteRef:"sprites/tools/sAxe.png",   recipe:[[98,98,0],[98,107,0],[0,107,0]],   yield:1},
-{type:"Axe",   power:"Metal",  item_id:87, name:"mAxe", spriteRef:"sprites/tools/mAxe.png",   recipe:[[105,105,0],[105,107,0],[0,107,0]],yield:1},
-{type:"Axe",   power:"Diamond",item_id:140,name:"dAxe", spriteRef:"sprites/tools/dAxe.png",   recipe:[[109,109,0],[109,107,0],[0,107,0]],yield:1},
-{type:"Shovel",power:"Wood",   item_id:90, name:"wShov",spriteRef:"sprites/tools/wShovel.png",recipe:[[0,112,0],[0,107,0],[0,107,0]],    yield:1},
-{type:"Shovel",power:"Stone",  item_id:190,name:"sShov",spriteRef:"sprites/tools/sShovel.png",recipe:[[0,98,0],[0,107,0],[0,107,0]],     yield:1},
-{type:"Shovel",power:"Metal",  item_id:86, name:"mShov",spriteRef:"sprites/tools/mShovel.png",recipe:[[0,105,0],[0,107,0],[0,107,0]],    yield:1},
-{type:"Shovel",power:"Diamond",item_id:88, name:"dShov",spriteRef:"sprites/tools/dShovel.png",recipe:[[0,109,0],[0,107,0],[0,107,0]],    yield:1}
-]
 
- */
-
-    public static ToolDefinition[] tools = new ToolDefinition[] {
-
+    public static final ToolDefinition[] tools = {
+            //type, power, item_id, name, sprite,recipe,yield
+        new ToolDefinition("Pick",  "Wood",   89, "wPick","sprites/tools/wPic.png",   new int[][]{{112,112,112},{0,107,0},{0,107,0}},1),
+        new ToolDefinition("Pick",  "Stone",  63, "sPick","sprites/tools/sPic.png",   new int[][]{{98,98,98},{0,107,0},{0,107,0}}   ,1),
+        new ToolDefinition("Pick",  "Metal",  239,"mPick","sprites/tools/mPic.png",   new int[][]{{105,105,105},{0,107,0},{0,107,0}},1),
+        new ToolDefinition("Pick",  "Diamond",175,"dPick","sprites/tools/dPic.png",   new int[][]{{109,109,109},{0,107,0},{0,107,0}},1),
+        new ToolDefinition("Axe",   "Wood",   95, "wAxe", "sprites/tools/wAxe.png",   new int[][]{{112,112,0},{112,107,0},{0,107,0}},1),
+        new ToolDefinition("Axe",   "Stone",  91, "sAxe", "sprites/tools/sAxe.png",   new int[][]{{98,98,0},{98,107,0},{0,107,0}}   ,1),
+        new ToolDefinition("Axe",   "Metal",  87, "mAxe", "sprites/tools/mAxe.png",   new int[][]{{105,105,0},{105,107,0},{0,107,0}},1),
+        new ToolDefinition("Axe",   "Diamond",140,"dAxe", "sprites/tools/dAxe.png",   new int[][]{{109,109,0},{109,107,0},{0,107,0}},1),
+        new ToolDefinition("Shovel","Wood",   90, "wShov","sprites/tools/wShovel.png",new int[][]{{0,112,0},{0,107,0},{0,107,0}}    ,1),
+        new ToolDefinition("Shovel","Stone",  190,"sShov","sprites/tools/sShovel.png",new int[][]{{0,98,0},{0,107,0},{0,107,0}}     ,1),
+        new ToolDefinition("Shovel","Metal",  86, "mShov","sprites/tools/mShovel.png",new int[][]{{0,105,0},{0,107,0},{0,107,0}}    ,1),
+        new ToolDefinition("Shovel","Diamond",88, "dShov","sprites/tools/dShovel.png",new int[][]{{0,109,0},{0,107,0},{0,107,0}}    ,1)
     };
 }

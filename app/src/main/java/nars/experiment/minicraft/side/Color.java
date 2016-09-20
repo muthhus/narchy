@@ -15,7 +15,10 @@ public class Color implements java.io.Serializable {
 	public static final Color DARK_GRAY = darkGray;
 	public static final Color orange = new Color(255, 200, 0);
 	
-	public int R, G, B, A;
+	public final int R;
+    public final int G;
+    public final int B;
+    public final int A;
 	
 	public Color(int R, int G, int B) {
 		this.R = R;

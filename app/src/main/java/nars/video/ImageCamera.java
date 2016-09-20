@@ -18,11 +18,11 @@ public class ImageCamera implements PixelCamera, Supplier<BufferedImage> {
     public ImageCamera() {
 
     }
-
-    public ImageCamera(Supplier<BufferedImage> i) {
-        this.source = i;
-        update();
-    }
+//
+//    public ImageCamera(Supplier<BufferedImage> i) {
+//        this.source = i;
+//        update();
+//    }
 
     @Override
     public int width() {
@@ -59,13 +59,13 @@ public class ImageCamera implements PixelCamera, Supplier<BufferedImage> {
         return out!=null ? decodeRed(out.getRGB(xx, yy)) : Float.NaN;
     }
 
-    public void updateBuffered(EachPixelRGBf m) {
-        see(
-                (x, y, p) -> {
-                    intToFloat(m, x, y, p);
-                }
-        );
-    }
+//    public void updateBuffered(EachPixelRGBf m) {
+//        see(
+//                (x, y, p) -> {
+//                    intToFloat(m, x, y, p);
+//                }
+//        );
+//    }
 
     public float red(int x, int y) {
         return outsideBuffer(x, y) ? Float.NaN : decodeRed(out.getRGB(x, y));

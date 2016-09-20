@@ -7,7 +7,7 @@ import nars.experiment.minicraft.side.ItemDefinition;
  */
 public class Items {
 
-    public static ItemDefinition[] items = {
+    public static final ItemDefinition[] items = {
         new ItemDefinition(100, "dirt", "sprites/tiles/dirt.png", 0),
         new ItemDefinition(115, "stone", "sprites/tiles/stone.png", 0),
         new ItemDefinition(110, "sand", "sprites/tiles/sand.png", 0),

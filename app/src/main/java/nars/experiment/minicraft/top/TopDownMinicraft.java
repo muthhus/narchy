@@ -17,25 +17,23 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Random;
 
-public class Game extends Canvas implements Runnable {
+public class TopDownMinicraft extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
-	private Random random = new Random();
+	//private final Random random = new Random();
 	public static final String NAME = "Minicraft";
 	public static final int HEIGHT = 120;
 	public static final int WIDTH = 160;
-	private static final int SCALE = 3;
+	private static final int SCALE = 6;
 
-	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-	private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+	public final BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+	private final int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 	private boolean running = false;
 	private Screen screen;
 	private Screen lightScreen;
-	private InputHandler input = new InputHandler(this);
+	public final InputHandler input = new InputHandler(this);
 
-	private int[] colors = new int[256];
+	private final int[] colors = new int[256];
 	private int tickCount = 0;
 	public int gameTime = 0;
 
@@ -57,7 +55,7 @@ public class Game extends Canvas implements Runnable {
 
 	public void start() {
 		running = true;
-		new Thread(this).start();
+		init();
 	}
 
 	public void stop() {
@@ -115,37 +113,31 @@ public class Game extends Canvas implements Runnable {
 //			e.printStackTrace();
 //		}
 		try {
-			screen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(Game.class.getResource("icons.png"))));
-			lightScreen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(Game.class.getResource("icons.png"))));
+			screen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
+			lightScreen = new Screen(WIDTH, HEIGHT, new SpriteSheet(ImageIO.read(TopDownMinicraft.class.getResource("icons.png"))));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		resetGame();
-		setMenu(new TitleMenu());
+		//setMenu(new TitleMenu());
 	}
+	int frames = 0;
+	int ticks = 0;
+	double unprocessed = 0;
 
+	@Override
 	public void run() {
 		long lastTime = System.nanoTime();
-		double unprocessed = 0;
 		double nsPerTick = 1000000000.0 / 60;
-		int frames = 0;
-		int ticks = 0;
 		long lastTimer1 = System.currentTimeMillis();
 
-		init();
 
 		while (running) {
 			long now = System.nanoTime();
 			unprocessed += (now - lastTime) / nsPerTick;
 			lastTime = now;
-			boolean shouldRender = true;
-			while (unprocessed >= 1) {
-				ticks++;
-				tick();
-				unprocessed -= 1;
-				shouldRender = true;
-			}
+			frame();
 
 			try {
 				Thread.sleep(2);
@@ -153,18 +145,30 @@ public class Game extends Canvas implements Runnable {
 				e.printStackTrace();
 			}
 
-			if (shouldRender) {
-				frames++;
-				render();
-			}
-
-			if (System.currentTimeMillis() - lastTimer1 > 1000) {
-				lastTimer1 += 1000;
+			int fpsIntervalMS = 10000;
+			if (System.currentTimeMillis() - lastTimer1 > fpsIntervalMS) {
+				lastTimer1 += fpsIntervalMS;
 				System.out.println(ticks + " ticks, " + frames + " fps");
 				frames = 0;
 				ticks = 0;
 			}
 		}
+	}
+
+	public int frame() {
+		boolean shouldRender = true;
+		while (unprocessed >= 1) {
+            ticks++;
+            tick();
+            unprocessed -= 1;
+            shouldRender = true;
+        }
+
+		if (shouldRender) {
+            frames++;
+            render();
+        }
+		return player.score;
 	}
 
 	public void tick() {
@@ -181,7 +185,8 @@ public class Game extends Canvas implements Runnable {
 				if (player.removed) {
 					playerDeadTime++;
 					if (playerDeadTime > 60) {
-						setMenu(new DeadMenu());
+						die();
+
 					}
 				} else {
 					if (pendingLevelChange != 0) {
@@ -191,13 +196,24 @@ public class Game extends Canvas implements Runnable {
 				}
 				if (wonTimer > 0) {
 					if (--wonTimer == 0) {
-						setMenu(new WonMenu());
+						win();
 					}
 				}
 				level.tick();
 				Tile.tickCount++;
 			}
 		}
+
+
+	}
+
+	public void win() {
+		setMenu(new WonMenu());
+	}
+
+	public void die() {
+		//setMenu(new DeadMenu());
+		setMenu(new TitleMenu());
 	}
 
 	public void changeLevel(int dir) {
@@ -255,8 +271,8 @@ public class Game extends Canvas implements Runnable {
 		Graphics g = bs.getDrawGraphics();
 		g.fillRect(0, 0, getWidth(), getHeight());
 
-		int ww = WIDTH * 3;
-		int hh = HEIGHT * 3;
+		int ww = WIDTH * SCALE;
+		int hh = HEIGHT * SCALE;
 		int xo = (getWidth() - ww) / 2;
 		int yo = (getHeight() - hh) / 2;
 		g.drawImage(image, xo, yo, ww, hh, null);
@@ -330,12 +346,16 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		Game game = new Game();
+		TopDownMinicraft game = new TopDownMinicraft();
+		start(game, true);
+	}
+
+	public static void start(TopDownMinicraft game, boolean auto) {
 		game.setMinimumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
 		game.setMaximumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
 		game.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
 
-		JFrame frame = new JFrame(Game.NAME);
+		JFrame frame = new JFrame(TopDownMinicraft.NAME);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		frame.add(game, BorderLayout.CENTER);
@@ -345,6 +365,11 @@ public class Game extends Canvas implements Runnable {
 		frame.setVisible(true);
 
 		game.start();
+
+		if (auto) {
+			new Thread(game).start();
+		}
+
 	}
 
 	public void won() {

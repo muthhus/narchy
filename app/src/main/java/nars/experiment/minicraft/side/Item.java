@@ -15,9 +15,9 @@ package nars.experiment.minicraft.side;
 public class Item extends Entity implements Cloneable {
 	private static final long serialVersionUID = 1L;
 	
-	public int item_id;
-	public String name;
-	public Template template;
+	public final int item_id;
+	public final String name;
+	public final Template template;
 	
 	public Item(String ref, int size, int id, String name, int[][] template, int templateCount) {
 		super(ref, true, 0, 0, size, size);
@@ -30,7 +30,7 @@ public class Item extends Entity implements Cloneable {
 	public Item clone() {
 		try {
 			return (Item) super.clone();
-		} catch (CloneNotSupportedException e) {
+		} catch (CloneNotSupportedException ignored) {
 			return null; // should never happen
 		}
 	}

@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Crafting {
-	public static final List<Recipe> anvilRecipes = new ArrayList<Recipe>();
-	public static final List<Recipe> ovenRecipes = new ArrayList<Recipe>();
-	public static final List<Recipe> furnaceRecipes = new ArrayList<Recipe>();
-	public static final List<Recipe> workbenchRecipes = new ArrayList<Recipe>();
+	public static final List<Recipe> anvilRecipes = new ArrayList<>();
+	public static final List<Recipe> ovenRecipes = new ArrayList<>();
+	public static final List<Recipe> furnaceRecipes = new ArrayList<>();
+	public static final List<Recipe> workbenchRecipes = new ArrayList<>();
 
 	static {
 		try {
@@ -57,6 +57,8 @@ public class Crafting {
 			furnaceRecipes.add(new ResourceRecipe(Resource.glass).addCost(Resource.sand, 4).addCost(Resource.coal, 1));
 
 			ovenRecipes.add(new ResourceRecipe(Resource.bread).addCost(Resource.wheat, 4));
+		} catch (InstantiationException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

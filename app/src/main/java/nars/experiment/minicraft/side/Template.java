@@ -15,8 +15,8 @@ package nars.experiment.minicraft.side;
 public class Template implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	public int outCount;
-	public Int2 position = new Int2(0, 0);
+	public final int outCount;
+	public final Int2 position = new Int2(0, 0);
 	
 	private char[][] matrix;
 	

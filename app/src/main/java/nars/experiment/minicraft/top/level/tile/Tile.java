@@ -1,7 +1,6 @@
 package nars.experiment.minicraft.top.level.tile;
 
 
-import nars.experiment.minicraft.top.*;
 import nars.experiment.minicraft.top.entity.Entity;
 import nars.experiment.minicraft.top.entity.Mob;
 import nars.experiment.minicraft.top.entity.Player;
@@ -17,24 +16,24 @@ public class Tile {
 	protected Random random = new Random();
 
 	public static Tile[] tiles = new Tile[256];
-	public static Tile grass = new GrassTile(0);
+	public static final Tile grass = new GrassTile(0);
 	public static Tile rock = new RockTile(1);
-	public static Tile water = new WaterTile(2);
-	public static Tile flower = new FlowerTile(3);
-	public static Tile tree = new TreeTile(4);
-	public static Tile dirt = new DirtTile(5);
-	public static Tile sand = new SandTile(6);
-	public static Tile cactus = new CactusTile(7);
-	public static Tile hole = new HoleTile(8);
-	public static Tile treeSapling = new SaplingTile(9, grass, tree);
-	public static Tile cactusSapling = new SaplingTile(10, sand, cactus);
-	public static Tile farmland = new FarmTile(11);
-	public static Tile wheat = new WheatTile(12);
-	public static Tile lava = new LavaTile(13);
+	public static final Tile water = new WaterTile(2);
+	public static final Tile flower = new FlowerTile(3);
+	public static final Tile tree = new TreeTile(4);
+	public static final Tile dirt = new DirtTile(5);
+	public static final Tile sand = new SandTile(6);
+	public static final Tile cactus = new CactusTile(7);
+	public static final Tile hole = new HoleTile(8);
+	public static final Tile treeSapling = new SaplingTile(9, grass, tree);
+	public static final Tile cactusSapling = new SaplingTile(10, sand, cactus);
+	public static final Tile farmland = new FarmTile(11);
+	public static final Tile wheat = new WheatTile(12);
+	public static final Tile lava = new LavaTile(13);
 	public static Tile stairsDown = new StairsTile(14, false);
 	public static Tile stairsUp = new StairsTile(15, true);
-	public static Tile infiniteFall = new InfiniteFallTile(16);
-	public static Tile cloud = new CloudTile(17);
+	public static final Tile infiniteFall = new InfiniteFallTile(16);
+	public static final Tile cloud = new CloudTile(17);
 	public static Tile hardRock = new HardRockTile(18);
 	public static Tile ironOre = new OreTile(19, Resource.ironOre);
 	public static Tile goldOre = new OreTile(20, Resource.goldOre);
@@ -81,7 +80,7 @@ public class Tile {
 		return false;
 	}
 
-	public boolean use(Level level, int xt, int yt, Player player, int attackDir) {
+	public static boolean use(Level level, int xt, int yt, Player player, int attackDir) {
 		return false;
 	}
 

@@ -18,20 +18,20 @@ import java.util.Random;
 public class World implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	public Tile[][] tiles;
-	public int width;
-	public int height;
-	public Int2 spawnLocation;
+	public final Tile[][] tiles;
+	public final int width;
+	public final int height;
+	public final Int2 spawnLocation;
 	
 	private int chunkNeedsUpdate;
-	private int chunkCount;
-	private int chunkWidth = 16;
+	private final int chunkCount;
+	private static final int chunkWidth = 16;
 	private boolean chunkFillRight = true;
-	private Random random;
-	private long ticksAlive = 0;
-	private final int dayLength = 20000;
-	private LightingEngine lightingEngineSun;
-	private LightingEngine lightingEngineSourceBlocks;
+	private final Random random;
+	private long ticksAlive;
+	private static final int dayLength = 20000;
+	private final LightingEngine lightingEngineSun;
+	private final LightingEngine lightingEngineSourceBlocks;
 	
 	// private int[] columnHeights;
 	
@@ -178,10 +178,10 @@ public class World implements java.io.Serializable {
 		}
 	}
 	
-	private TileID[] breakWood = new TileID[] { TileID.WOOD, TileID.PLANK, TileID.CRAFTING_BENCH };
-	private TileID[] breakStone = new TileID[] { TileID.STONE, TileID.COBBLE, TileID.COAL_ORE };
-	private TileID[] breakMetal = new TileID[] { TileID.IRON_ORE };
-	private TileID[] breakDiamond = new TileID[] { TileID.DIAMOND_ORE };
+	private final TileID[] breakWood = { TileID.WOOD, TileID.PLANK, TileID.CRAFTING_BENCH };
+	private final TileID[] breakStone = { TileID.STONE, TileID.COBBLE, TileID.COAL_ORE };
+	private final TileID[] breakMetal = { TileID.IRON_ORE };
+	private final TileID[] breakDiamond = { TileID.DIAMOND_ORE };
 	
 	public int breakTicks(int x, int y, Item item) {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
@@ -227,7 +227,7 @@ public class World implements java.io.Serializable {
 		
 	}
 	
-	private double getSpeed(Tool tool) {
+	private static double getSpeed(Tool tool) {
 		// if(tool == null)
 		// return 5;
 		if (tool.toolPower == Tool.ToolPower.Wood) {
@@ -316,21 +316,24 @@ public class World implements java.io.Serializable {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return false;
 		}
-		return tiles[x][y].type == null || tiles[x][y].type.passable;
+		TileType tt = tiles[x][y].type;
+		return tt == null || tt.passable;
 	}
 	
 	public boolean isLiquid(int x, int y) {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return false;
 		}
-		return tiles[x][y].type != null && tiles[x][y].type.liquid;
+		TileType tt = tiles[x][y].type;
+		return tt != null && tt.liquid;
 	}
 	
 	public boolean isAir(int x, int y) {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return false;
 		}
-		return tiles[x][y].type != null && tiles[x][y].type.name == TileID.AIR;
+		TileType tt = tiles[x][y].type;
+		return tt != null && tt.name == TileID.AIR;
 	}
 	
 	public boolean isBreakable(int x, int y) {
@@ -341,16 +344,18 @@ public class World implements java.io.Serializable {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return false;
 		}
-		return tiles[x][y].type != null
-				&& (tiles[x][y].type.name == TileID.WOOD || tiles[x][y].type.name == TileID.PLANK
-						|| tiles[x][y].type.name == TileID.LADDER || tiles[x][y].type.liquid);
+		TileType tt = tiles[x][y].type;
+		return tt != null
+				&& (tt.name == TileID.WOOD || tt.name == TileID.PLANK
+						|| tt.name == TileID.LADDER || tt.liquid);
 	}
 	
 	public boolean isCraft(int x, int y) {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return false;
 		}
-		return tiles[x][y].type != null && (tiles[x][y].type.name == TileID.CRAFTING_BENCH);
+		TileType tt = tiles[x][y].type;
+		return tt != null && (tt.name == TileID.CRAFTING_BENCH);
 	}
 	
 	/**

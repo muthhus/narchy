@@ -11,14 +11,14 @@ public interface Sprite extends java.io.Serializable {
 	 * 
 	 * @return The width in pixels of this sprite
 	 */
-	public int getWidth();
+    int getWidth();
 	
 	/**
 	 * Get the height of the drawn sprite
 	 * 
 	 * @return The height in pixels of this sprite
 	 */
-	public int getHeight();
+    int getHeight();
 	
 	/**
 	 * Draw the sprite onto the graphics context provided
@@ -30,16 +30,16 @@ public interface Sprite extends java.io.Serializable {
 	 * @param y
 	 *            The y location at which to draw the sprite
 	 */
-	public void draw(GraphicsHandler g, int x, int y);
+    void draw(GraphicsHandler g, int x, int y);
 	
-	public void draw(GraphicsHandler g, int x, int y, Color tint);
+	void draw(GraphicsHandler g, int x, int y, Color tint);
 	
-	public void draw(GraphicsHandler g, int x, int y, int width, int height);
+	void draw(GraphicsHandler g, int x, int y, int width, int height);
 	
-	public void draw(GraphicsHandler g, int x, int y, int width, int height, Color tint);
+	void draw(GraphicsHandler g, int x, int y, int width, int height, Color tint);
 	
-	public void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException,
+	void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException,
 			IOException;
 	
-	public void writeObject(ObjectOutputStream aOutputStream) throws IOException;
-};
+	void writeObject(ObjectOutputStream aOutputStream) throws IOException;
+}

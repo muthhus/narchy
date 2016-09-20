@@ -17,12 +17,12 @@ public class TileType implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/** The sprite that represents this Type */
-	protected Sprite sprite;
-	protected TileID name;
-	protected boolean passable;
-	protected boolean liquid;
-	protected int lightBlocking;
-	protected int lightEmitting;
+	protected final Sprite sprite;
+	protected final TileID name;
+	protected final boolean passable;
+	protected final boolean liquid;
+	protected final int lightBlocking;
+	protected final int lightEmitting;
 	
 	public TileType(String ref, TileID name) {
 		this(ref, name, false, false, Constants.LIGHT_VALUE_OPAQUE);

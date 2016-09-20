@@ -13,12 +13,12 @@ import static java.lang.Math.min;
  */
 public class SwingCamera extends ImageCamera {
 
-    private final Container component;
+    private final Component component;
 
     public Rectangle selection;
 
 
-    public SwingCamera(Container component) {
+    public SwingCamera(Component component) {
         this.component = component;
         input(0, 0, component.getWidth(), component.getHeight());
         update();

@@ -1,6 +1,6 @@
 package nars.experiment.minicraft.top.screen;
 
-import nars.experiment.minicraft.top.Game;
+import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.gfx.Color;
 import nars.experiment.minicraft.top.gfx.Font;
@@ -9,10 +9,10 @@ import nars.experiment.minicraft.top.gfx.Screen;
 import java.util.List;
 
 public class Menu {
-	protected Game game;
+	protected TopDownMinicraft game;
 	protected InputHandler input;
 
-	public void init(Game game, InputHandler input) {
+	public void init(TopDownMinicraft game, InputHandler input) {
 		this.input = input;
 		this.game = game;
 	}
@@ -23,7 +23,7 @@ public class Menu {
 	public void render(Screen screen) {
 	}
 
-	public void renderItemList(Screen screen, int xo, int yo, int x1, int y1, List<? extends ListItem> listItems, int selected) {
+	public static void renderItemList(Screen screen, int xo, int yo, int x1, int y1, List<? extends ListItem> listItems, int selected) {
 		boolean renderCursor = true;
 		if (selected < 0) {
 			selected = -selected - 1;

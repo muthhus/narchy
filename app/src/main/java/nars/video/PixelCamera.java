@@ -41,7 +41,7 @@ public interface PixelCamera {
         float r = decodeRed(p);
         float g = decodeGreen(p);
         float b = decodeBlue(p);
-        m.pixel(x, y, r, g, b, a/255f);
+        m.pixel(x, y, r, g, b, a/256f);
     }
 
 
@@ -63,17 +63,17 @@ public interface PixelCamera {
     }
 
     static float rgbToMono(int r, int g, int b) {
-        return (r+g+b)/255f/3f;
+        return (r+g+b)/256f/3f;
     }
 
     static float decodeRed(int p) {
-        return ((p & 0x00ff0000) >> 16)/255f;
+        return ((p & 0x00ff0000) >> 16)/256f;
     }
     static float decodeGreen(int p) {
-        return ((p & 0x0000ff00) >> 8)/255f;
+        return ((p & 0x0000ff00) >> 8)/256f;
     }
     static float decodeBlue(int p) {
-        return ((p & 0x000000ff))/255f;
+        return ((p & 0x000000ff))/256f;
     }
 
 

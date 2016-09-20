@@ -10,7 +10,7 @@ import nars.experiment.minicraft.top.level.tile.Tile;
 import java.util.*;
 
 public class Level {
-	private Random random = new Random();
+	private final Random random = new Random();
 
 	public int w, h;
 
@@ -21,18 +21,15 @@ public class Level {
 	public int grassColor = 141;
 	public int dirtColor = 322;
 	public int sandColor = 550;
-	private int depth;
+	private final int depth;
 	public int monsterDensity = 8;
 
-	public List<Entity> entities = new ArrayList<Entity>();
-	private Comparator<Entity> spriteSorter = new Comparator<Entity>() {
-		public int compare(Entity e0, Entity e1) {
-			if (e1.y < e0.y) return +1;
-			if (e1.y > e0.y) return -1;
-			return 0;
-		}
-
-	};
+	public List<Entity> entities = new ArrayList<>();
+	private final Comparator<Entity> spriteSorter = (e0, e1) -> {
+        if (e1.y < e0.y) return +1;
+        if (e1.y > e0.y) return -1;
+        return 0;
+    };
 
 	@SuppressWarnings("unchecked")
 	public Level(int w, int h, int level, Level parentLevel) {
@@ -92,7 +89,7 @@ public class Level {
 
 		entitiesInTiles = new ArrayList[w * h];
 		for (int i = 0; i < w * h; i++) {
-			entitiesInTiles[i] = new ArrayList<Entity>();
+			entitiesInTiles[i] = new ArrayList<>();
 		}
 		
 		if (level==1) {
@@ -117,7 +114,7 @@ public class Level {
 		screen.setOffset(0, 0);
 	}
 
-	private List<Entity> rowSprites = new ArrayList<Entity>();
+	private final List<Entity> rowSprites = new ArrayList<>();
 
 	public Player player;
 
@@ -133,7 +130,7 @@ public class Level {
 				if (x < 0 || y < 0 || x >= this.w || y >= this.h) continue;
 				rowSprites.addAll(entitiesInTiles[x + y * this.w]);
 			}
-			if (rowSprites.size() > 0) {
+			if (!rowSprites.isEmpty()) {
 				sortAndRender(screen, rowSprites);
 			}
 			rowSprites.clear();
@@ -282,7 +279,7 @@ public class Level {
 	}
 
 	public List<Entity> getEntities(int x0, int y0, int x1, int y1) {
-		List<Entity> result = new ArrayList<Entity>();
+		List<Entity> result = new ArrayList<>();
 		int xt0 = (x0 >> 4) - 1;
 		int yt0 = (y0 >> 4) - 1;
 		int xt1 = (x1 >> 4) + 1;

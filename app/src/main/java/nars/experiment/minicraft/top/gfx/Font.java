@@ -1,7 +1,7 @@
 package nars.experiment.minicraft.top.gfx;
 
 public class Font {
-	private static String chars = "" + //
+	private static final String chars = "" + //
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ      " + //
 			"0123456789.,!?'\"-+=/\\%()<>:;     " + //
 			"";

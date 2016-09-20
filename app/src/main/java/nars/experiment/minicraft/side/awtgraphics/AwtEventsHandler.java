@@ -13,7 +13,7 @@ import java.awt.event.MouseWheelListener;
 
 
 public class AwtEventsHandler {
-	Game game;
+	final Game game;
 	
 	public AwtEventsHandler(Game game, Canvas canvas) {
 		this.game = game;

@@ -20,7 +20,8 @@ public class Item implements ListItem {
 	public void onTake(ItemEntity itemEntity) {
 	}
 
-	public void renderInventory(Screen screen, int x, int y) {
+	@Override
+    public void renderInventory(Screen screen, int x, int y) {
 	}
 
 	public boolean interact(Player player, Entity entity, int attackDir) {

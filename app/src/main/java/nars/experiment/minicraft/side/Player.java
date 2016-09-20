@@ -15,15 +15,15 @@ package nars.experiment.minicraft.side;
 public class Player extends LivingEntity {
 	private static final long serialVersionUID = 1L;
 	
-	public Int2 handBreakPos = new Int2(0, 0);
-	public Int2 handBuildPos = new Int2(0, 0);
+	public final Int2 handBreakPos = new Int2(0, 0);
+	public final Int2 handBuildPos = new Int2(0, 0);
 	public float handStartX;
 	public float handStartY;
 	public float handEndX;
 	public float handEndY;
 	
-	private Sprite leftWalkSprite;
-	private Sprite rightWalkSprite;
+	private final Sprite leftWalkSprite;
+	private final Sprite rightWalkSprite;
 	
 	public Player(boolean gravityApplies, float x, float y, int width, int height) {
 		super(gravityApplies, x, y, width, height);

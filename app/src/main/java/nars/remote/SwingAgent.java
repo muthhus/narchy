@@ -4,10 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.truth.Truth;
-import nars.video.ImageCamera;
-import nars.video.CameraSensor;
-import nars.video.Scale;
-import nars.video.SwingCamera;
+import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 
 import java.awt.*;
@@ -37,7 +34,7 @@ abstract public class SwingAgent extends NAgent {
         return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }
 
-    protected <C extends ImageCamera> CameraSensor<C> addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+    protected <C extends PixelCamera> CameraSensor<C> addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
         CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
         cam.put(id, c);
         return c;

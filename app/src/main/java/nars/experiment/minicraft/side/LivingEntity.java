@@ -17,17 +17,17 @@ public abstract class LivingEntity extends Entity {
 	protected static final int maxHP = 100;
 	
 	public int hitPoints;
-	public boolean climbing = false;
+	public boolean climbing;
 	public boolean facingRight = true;
-	public Inventory inventory;
+	public final Inventory inventory;
 	
-	protected final float walkSpeed = .1f;
-	protected final float swimSpeed = .04f;
-	protected float armLength = 4.5f;
-	protected float moveDirection = 0;
-	protected long ticksAlive = 0;
-	protected int ticksUnderwater = 0;
-	protected boolean jumping = false;
+	protected static final float walkSpeed = .1f;
+	protected static final float swimSpeed = .04f;
+	protected final float armLength = 4.5f;
+	protected float moveDirection;
+	protected long ticksAlive;
+	protected int ticksUnderwater;
+	protected boolean jumping;
 	
 	public LivingEntity(boolean gravityApplies, float x, float y, int width, int height) {
 		super(null, gravityApplies, x, y, width, height);
@@ -131,8 +131,8 @@ public abstract class LivingEntity extends Entity {
 		climbing = false;
 	}
 	
-	public float findIntersection(float rayOx, float rayOy, float m, float p1x, float p1y,
-			float p2x, float p2y) {
+	public static float findIntersection(float rayOx, float rayOy, float m, float p1x, float p1y,
+										 float p2x, float p2y) {
 		float freeVar = -1;
 		if (p1x == p2x)// segment is vertical
 		{

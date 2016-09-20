@@ -6,7 +6,7 @@ import nars.experiment.minicraft.top.gfx.Screen;
 import nars.experiment.minicraft.top.item.Item;
 
 public class InventoryMenu extends Menu {
-	private Player player;
+	private final Player player;
 	private int selected = 0;
 
 	public InventoryMenu(Player player) {
@@ -18,6 +18,7 @@ public class InventoryMenu extends Menu {
 		}
 	}
 
+	@Override
 	public void tick() {
 		if (input.menu.clicked) game.setMenu(null);
 
@@ -36,6 +37,7 @@ public class InventoryMenu extends Menu {
 		}
 	}
 
+	@Override
 	public void render(Screen screen) {
 		Font.renderFrame(screen, "inventory", 1, 1, 12, 11);
 		renderItemList(screen, 1, 1, 12, 11, player.inventory.items, selected);

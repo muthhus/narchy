@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InputHandler implements KeyListener {
-	public class Key {
+	public final class Key {
 		public int presses, absorbs;
 		public boolean down, clicked;
 
@@ -33,14 +33,14 @@ public class InputHandler implements KeyListener {
 		}
 	}
 
-	public List<Key> keys = new ArrayList<Key>();
+	public final List<Key> keys = new ArrayList<>();
 
-	public Key up = new Key();
-	public Key down = new Key();
-	public Key left = new Key();
-	public Key right = new Key();
-	public Key attack = new Key();
-	public Key menu = new Key();
+	public final Key up = new Key();
+	public final Key down = new Key();
+	public final Key left = new Key();
+	public final Key right = new Key();
+	public final Key attack = new Key();
+	public final Key menu = new Key();
 
 	public void releaseAll() {
 		for (int i = 0; i < keys.size(); i++) {
@@ -54,15 +54,17 @@ public class InputHandler implements KeyListener {
 		}
 	}
 
-	public InputHandler(Game game) {
+	public InputHandler(TopDownMinicraft game) {
 		game.addKeyListener(this);
 	}
 
-	public void keyPressed(KeyEvent ke) {
+	@Override
+    public void keyPressed(KeyEvent ke) {
 		toggle(ke, true);
 	}
 
-	public void keyReleased(KeyEvent ke) {
+	@Override
+    public void keyReleased(KeyEvent ke) {
 		toggle(ke, false);
 	}
 
@@ -93,6 +95,7 @@ public class InputHandler implements KeyListener {
 		if (ke.getKeyCode() == KeyEvent.VK_C) attack.toggle(pressed);
 	}
 
-	public void keyTyped(KeyEvent ke) {
+	@Override
+    public void keyTyped(KeyEvent ke) {
 	}
 }

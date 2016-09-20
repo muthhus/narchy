@@ -21,7 +21,8 @@ public class TreeTile extends Tile {
 		connectsToGrass = true;
 	}
 
-	public void render(Screen screen, Level level, int x, int y) {
+	@Override
+    public void render(Screen screen, Level level, int x, int y) {
 		int col = Color.get(10, 30, 151, level.grassColor);
 		int barkCol1 = Color.get(10, 30, 430, level.grassColor);
 		int barkCol2 = Color.get(10, 30, 320, level.grassColor);
@@ -57,20 +58,24 @@ public class TreeTile extends Tile {
 		}
 	}
 
-	public void tick(Level level, int xt, int yt) {
+	@Override
+    public void tick(Level level, int xt, int yt) {
 		int damage = level.getData(xt, yt);
 		if (damage > 0) level.setData(xt, yt, damage - 1);
 	}
 
-	public boolean mayPass(Level level, int x, int y, Entity e) {
+	@Override
+    public boolean mayPass(Level level, int x, int y, Entity e) {
 		return false;
 	}
 
-	public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
+	@Override
+    public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
 		hurt(level, x, y, dmg);
 	}
 
-	public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
+	@Override
+    public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
 		if (item instanceof ToolItem) {
 			ToolItem tool = (ToolItem) item;
 			if (tool.type == ToolType.axe) {
@@ -92,7 +97,7 @@ public class TreeTile extends Tile {
 		}
 		int damage = level.getData(x, y) + dmg;
 		level.add(new SmashParticle(x * 16 + 8, y * 16 + 8));
-		level.add(new TextParticle("" + dmg, x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
+		level.add(new TextParticle(String.valueOf(dmg), x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
 		if (damage >= 20) {
 			int count = random.nextInt(2) + 1;
 			for (int i = 0; i < count; i++) {

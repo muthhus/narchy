@@ -12,7 +12,7 @@
 
 package nars.experiment.minicraft.side;
 
-public class Int2 implements java.io.Serializable {
+final public class Int2 implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	public int x, y;
@@ -33,6 +33,6 @@ public class Int2 implements java.io.Serializable {
 	
 	@Override
 	public String toString() {
-		return "{" + x + ", " + y + "}";
+		return "{" + x + ", " + y + '}';
 	}
 }

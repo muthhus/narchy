@@ -14,14 +14,16 @@ package nars.experiment.minicraft.side;
 
 import nars.experiment.minicraft.side.items.Items;
 import nars.experiment.minicraft.side.items.Tools;
+import org.eclipse.collections.impl.map.mutable.primitive.CharObjectHashMap;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class ItemLoader {
 	//private static final FSTGson gson = new Gson();
 	
-	public static HashMap<Character, Item> loadItems(int size) {
+	public static CharObjectHashMap<Item> loadItems(int size) {
 		ItemDefinition[] items = Items.items;
 		ToolDefinition[] tools = Tools.tools;
 
@@ -39,13 +41,14 @@ public class ItemLoader {
 //			System.exit(5);
 //		}
 		
-		HashMap<Character, Item> itemTypes = new HashMap<Character, Item>();
+		CharObjectHashMap<Item> itemTypes = new CharObjectHashMap<>();
 		for (ToolDefinition td : tools) {
 			itemTypes.put((char) td.item_id, td.makeTool(size));
 		}
 		for (ItemDefinition id : items) {
 			itemTypes.put((char) id.item_id, id.makeItem(size));
 		}
+		itemTypes.compact();
 		return itemTypes;
 	}
 }

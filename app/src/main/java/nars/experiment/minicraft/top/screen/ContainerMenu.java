@@ -6,10 +6,10 @@ import nars.experiment.minicraft.top.gfx.Font;
 import nars.experiment.minicraft.top.gfx.Screen;
 
 public class ContainerMenu extends Menu {
-	private Player player;
-	private Inventory container;
+	private final Player player;
+	private final Inventory container;
 	private int selected = 0;
-	private String title;
+	private final String title;
 	private int oSelected;
 	private int window = 0;
 
@@ -19,6 +19,7 @@ public class ContainerMenu extends Menu {
 		this.container = container;
 	}
 
+	@Override
 	public void tick() {
 		if (input.menu.clicked) game.setMenu(null);
 
@@ -55,6 +56,7 @@ public class ContainerMenu extends Menu {
 		}
 	}
 
+	@Override
 	public void render(Screen screen) {
 		if (window == 1) screen.setOffset(6 * 8, 0);
 		Font.renderFrame(screen, title, 1, 1, 12, 11);

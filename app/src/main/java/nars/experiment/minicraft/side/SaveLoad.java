@@ -12,14 +12,7 @@
 
 package nars.experiment.minicraft.side;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 
 public class SaveLoad {
@@ -31,8 +24,8 @@ public class SaveLoad {
 				return;
 			}
 			
-			FileOutputStream fileOut = new FileOutputStream("MiniCraft.sav");
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			FileOutputStream fileOut = new FileOutputStream("/tmp/MiniCraft.sav");
+			ObjectOutput out = new ObjectOutputStream(fileOut);
 			
 			out.writeObject(game.world);
 			out.writeObject(game.entities);
@@ -40,8 +33,6 @@ public class SaveLoad {
 			out.close();
 			fileOut.close();
 			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -49,14 +40,14 @@ public class SaveLoad {
 	
 	@SuppressWarnings("unchecked")
 	public static boolean doLoad(Game game) {
-		File f = new File("MiniCraft.sav");
+		File f = new File("/tmp/MiniCraft.sav");
 		
 		ObjectInputStream in = null;
 		try {
 			in = new ObjectInputStream(new FileInputStream(f));
-		} catch (InvalidClassException e) {
+		} catch (InvalidClassException ignored) {
 			System.err.println("Save file has the wrong version.");
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException ignored) {
 			System.err.println("Save file does not exist.");
 		} catch (IOException e) {
 			e.printStackTrace();
