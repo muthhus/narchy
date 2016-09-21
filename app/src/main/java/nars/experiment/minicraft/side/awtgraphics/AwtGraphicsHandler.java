@@ -10,6 +10,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -18,15 +19,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class AwtGraphicsHandler extends GraphicsHandler {
-	private Canvas canvas;
-	private BufferStrategy strategy;
-	private JFrame container;
+	public final Canvas canvas = new Canvas();
+	//private BufferStrategy strategy;
+	public JFrame container;
 	private Cursor myCursor;
-	private JPanel panel;
-	
+	public JPanel panel;
+	public BufferedImage buffer;
+
 	@Override
-	public void init(final Game game) {
-		canvas = new Canvas();
+	public void init(final SideScrollMinicraft game) {
+		//canvas = new Canvas();
 		// create a frame to contain our game
 		container = new JFrame("Minicraft");
 		
@@ -73,15 +75,18 @@ public class AwtGraphicsHandler extends GraphicsHandler {
 		// do we'd like to exit the game
 		// TODO: add this back in
 		container.addWindowListener(new MyWindowAdapter(game));
-		new AwtEventsHandler(game, canvas);
+
 		
 		// request the focus so key events come to us
 		canvas.requestFocus();
 		
 		// create the buffering strategy which will allow AWT
 		// to manage our accelerated graphics
-		canvas.createBufferStrategy(2);
-		strategy = canvas.getBufferStrategy();
+		//canvas.createBufferStrategy(2);
+		//strategy = canvas.getBufferStrategy();
+
+		buffer = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_INT_RGB);
+		g = (Graphics2D) buffer.getGraphics();
 	}
 	
 	Graphics2D g;
@@ -90,7 +95,7 @@ public class AwtGraphicsHandler extends GraphicsHandler {
 	public void startDrawing() {
 		// Get hold of a graphics context for the accelerated
 		// surface and blank it out
-		g = (Graphics2D) strategy.getDrawGraphics();
+		g = (Graphics2D) buffer.getGraphics();
 		g.setColor(java.awt.Color.black);
 		g.fillRect(0, 0, screenWidth, screenHeight);
 		
@@ -99,7 +104,13 @@ public class AwtGraphicsHandler extends GraphicsHandler {
 	@Override
 	public void finishDrawing() {
 		g.dispose();
-		strategy.show();
+
+
+		Graphics cg = canvas.getGraphics();
+		cg.drawImage(buffer, 0, 0, null);
+		cg.dispose();;
+
+		//strategy.show();
 	}
 	
 	@Override
@@ -162,16 +173,16 @@ public class AwtGraphicsHandler extends GraphicsHandler {
 	}
 
 	private static class MyWindowAdapter extends WindowAdapter {
-		private final Game game;
+		private final SideScrollMinicraft game;
 
-		public MyWindowAdapter(Game game) {
+		public MyWindowAdapter(SideScrollMinicraft game) {
 			this.game = game;
 		}
 
 		@Override
         public void windowClosing(WindowEvent e) {
             game.goToMainMenu();  // this saves and cleans up appropriately
-            Game.quit();
+            SideScrollMinicraft.quit();
         }
 	}
 }

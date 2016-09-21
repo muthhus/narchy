@@ -1255,7 +1255,7 @@ public enum Util {
         return count - 1;
     }
 
-    public static int unitize(float v, int min, int max) {
+    public static int clamp(float v, int min, int max) {
         int i = Math.round(v);
         if (i < min) i = min;
         if (i > max) i = max;

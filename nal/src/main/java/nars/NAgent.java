@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
@@ -199,6 +201,10 @@ abstract public class NAgent {
         return m;
     }
 
+    public ActionConcept addIncrementalRangeAction(String s, IntSupplier in, int dx, int min, int max, IntConsumer out) {
+        //TODO
+        return null;
+    }
 
     /**
      * interpret motor states into env actions

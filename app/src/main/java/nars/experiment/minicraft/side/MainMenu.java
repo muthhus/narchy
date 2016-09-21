@@ -35,15 +35,15 @@ public class MainMenu {
 	private static final int menu_bigWidth = 1024;
 	
 	private boolean newGame;
-	private final Game game;
+	private final SideScrollMinicraft game;
 	
-	public MainMenu(Game g) {
+	public MainMenu(SideScrollMinicraft g) {
 		this.game = g;
 	}
 
 	public void draw(GraphicsHandler g) {
-		Game.drawTileBackground(g, menu_bgTile, 32);
-		Game.drawCenteredX(g, menu_logo, 70, 397, 50);
+		SideScrollMinicraft.drawTileBackground(g, menu_bgTile, 32);
+		SideScrollMinicraft.drawCenteredX(g, menu_logo, 70, 397, 50);
 		float tagScale = ((float) Math.abs((game.ticksRunning % 100) - 50)) / 50 + 1;
 		menu_tag.draw(g, 450, 70, (int) (60 * tagScale), (int) (37 * tagScale));
 
@@ -55,24 +55,24 @@ public class MainMenu {
 	}
 	
 	private void drawStartMenu(GraphicsHandler g) {
-		Game.drawCenteredX(g, menu_newUp, 150, 160, 64);
-		Game.drawCenteredX(g, menu_loadUp, 250, 160, 64);
-		Game.drawCenteredX(g, menu_quitUp, 350, 160, 64);
+		SideScrollMinicraft.drawCenteredX(g, menu_newUp, 150, 160, 64);
+		SideScrollMinicraft.drawCenteredX(g, menu_loadUp, 250, 160, 64);
+		SideScrollMinicraft.drawCenteredX(g, menu_quitUp, 350, 160, 64);
 		int mouseY = game.screenMousePos.y;
 		// TODO: use the mouse x-value as well
 		if (mouseY >= 350 && mouseY <= 414) {
-			Game.drawCenteredX(g, menu_quitDown, 350, 160, 64);
+			SideScrollMinicraft.drawCenteredX(g, menu_quitDown, 350, 160, 64);
 		} else if (mouseY >= 250 && mouseY <= 314) {
-			Game.drawCenteredX(g, menu_loadDown, 250, 160, 64);
+			SideScrollMinicraft.drawCenteredX(g, menu_loadDown, 250, 160, 64);
 		} else if (mouseY >= 150 && mouseY <= 214) {
-			Game.drawCenteredX(g, menu_newDown, 150, 160, 64);
+			SideScrollMinicraft.drawCenteredX(g, menu_newDown, 150, 160, 64);
 		}
 		if (!game.leftClick) {
 			return;
 		}
 		game.leftClick = false;
 		if (mouseY >= 350 && mouseY <= 414) {
-			Game.quit();  // "quit" button
+			SideScrollMinicraft.quit();  // "quit" button
 		} else if (mouseY >= 250 && mouseY <= 314) {
 			game.startGame(true, menu_mediumWidth);  // "load" button
 		} else if (mouseY >= 150 && mouseY <= 214) {
@@ -81,17 +81,17 @@ public class MainMenu {
 	}
 	
 	private void drawNewMenu(GraphicsHandler g) {
-		Game.drawCenteredX(g, menu_miniUp, 150, 160, 64);
-		Game.drawCenteredX(g, menu_mediumUp, 250, 160, 64);
-		Game.drawCenteredX(g, menu_bigUp, 350, 160, 64);
+		SideScrollMinicraft.drawCenteredX(g, menu_miniUp, 150, 160, 64);
+		SideScrollMinicraft.drawCenteredX(g, menu_mediumUp, 250, 160, 64);
+		SideScrollMinicraft.drawCenteredX(g, menu_bigUp, 350, 160, 64);
 		int mouseY = game.screenMousePos.y;
 		// TODO: use the mouse x-value as well
 		if (mouseY >= 350 && mouseY <= 414) {
-			Game.drawCenteredX(g, menu_bigDown, 350, 160, 64);
+			SideScrollMinicraft.drawCenteredX(g, menu_bigDown, 350, 160, 64);
 		} else if (mouseY >= 250 && mouseY <= 314) {
-			Game.drawCenteredX(g, menu_mediumDown, 250, 160, 64);
+			SideScrollMinicraft.drawCenteredX(g, menu_mediumDown, 250, 160, 64);
 		} else if (mouseY >= 150 && mouseY <= 214) {
-			Game.drawCenteredX(g, menu_miniDown, 150, 160, 64);
+			SideScrollMinicraft.drawCenteredX(g, menu_miniDown, 150, 160, 64);
 		}
 		if (!game.leftClick) {
 			return;

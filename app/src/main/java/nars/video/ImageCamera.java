@@ -12,7 +12,7 @@ import static nars.video.PixelCamera.*;
 public class ImageCamera implements PixelCamera, Supplier<BufferedImage> {
 
     Supplier<BufferedImage> source;
-    BufferedImage out;
+    public BufferedImage out;
 
 
     public ImageCamera() {

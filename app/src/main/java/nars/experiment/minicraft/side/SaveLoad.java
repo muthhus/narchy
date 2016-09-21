@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class SaveLoad {
 	
-	public static void doSave(Game game) {
+	public static void doSave(SideScrollMinicraft game) {
 		
 		try {
 			if (game.world == null) {
@@ -39,7 +39,7 @@ public class SaveLoad {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static boolean doLoad(Game game) {
+	public static boolean doLoad(SideScrollMinicraft game) {
 		File f = new File("/tmp/MiniCraft.sav");
 		
 		ObjectInputStream in = null;

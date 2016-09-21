@@ -1,6 +1,6 @@
 package nars.experiment.minicraft.side.awtgraphics;
 
-import nars.experiment.minicraft.side.Game;
+import nars.experiment.minicraft.side.SideScrollMinicraft;
 
 import java.awt.Canvas;
 import java.awt.event.KeyAdapter;
@@ -13,16 +13,16 @@ import java.awt.event.MouseWheelListener;
 
 
 public class AwtEventsHandler {
-	final Game game;
+	final SideScrollMinicraft game;
 	
-	public AwtEventsHandler(Game game, Canvas canvas) {
+	public AwtEventsHandler(SideScrollMinicraft game, Canvas canvas) {
 		this.game = game;
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
-		canvas.addKeyListener(new KeyInputHandler());
-		canvas.addMouseListener(new MouseInputHander());
-		canvas.addMouseWheelListener(new MouseWheelInputHander());
-		canvas.addMouseMotionListener(new MouseMoveInputHander());
+//		canvas.addKeyListener(new KeyInputHandler());
+//		canvas.addMouseListener(new MouseInputHander());
+//		canvas.addMouseWheelListener(new MouseWheelInputHander());
+//		canvas.addMouseMotionListener(new MouseMoveInputHander());
 		
 		// TODO: A lot of this should be calling a nicer function in Game to handle
 		// mouse+keyboard/touch input
@@ -119,7 +119,7 @@ public class AwtEventsHandler {
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_W:
 			case KeyEvent.VK_SPACE:
-				game.player.endClimb();
+				game.player.stopClimb();
 				break;
 			case KeyEvent.VK_A:
 				game.player.stopLeft();

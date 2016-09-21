@@ -14,16 +14,16 @@ import static java.lang.Math.round;
 /**
  * Created by me on 9/19/16.
  */
-public class NARcraft extends SwingAgent {
+public class TopCraft extends SwingAgent {
 
     private final TopDownMinicraft craft;
     private final CameraSensor<?> pixels;
 
     public static void main(String[] args) {
-        playSwing(NARcraft::new, 15000);
+        playSwing(TopCraft::new, 15000);
     }
 
-    public NARcraft(NAR nar) {
+    public TopCraft(NAR nar) {
         super(nar, 0);
 
         this.craft = new TopDownMinicraft();

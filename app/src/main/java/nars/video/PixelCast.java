@@ -1,5 +1,6 @@
 package nars.video;
 
+import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 
 import java.awt.image.BufferedImage;
@@ -64,9 +65,9 @@ public class PixelCast implements PixelCamera {
 
         float mw = sw - ew; //margin size
         float mh = sh - eh; //margin size
-        float minX = (X*mw/2f);
+        float minX = (X*mw);
         float maxX = minX + ew;
-        float minY = (Y*mh/2f);
+        float minY = (Y*mh);
         float maxY = minY + eh;
 
 //        System.out.println(X + "," + Y + "," + Z + ": [" + (minX+maxX)/2f + "@" + minX + "," + maxX + "::"
@@ -86,7 +87,7 @@ public class PixelCast implements PixelCamera {
         float minClarity = 0.05f, maxClarity = 0.66f;
 
         for (int ly = 0; ly < py; ly++) {
-            int sy = unitize(lerp(maxY, minY, ly/pyf), 0, sh-1);
+            int sy = Util.clamp(lerp(maxY, minY, ly/pyf), 0, sh-1);
 
             float dy = Math.abs(ly - cy);
             float yDistFromCenterSq = dy * dy;
@@ -111,7 +112,7 @@ public class PixelCast implements PixelCamera {
                     continue;
 
                 //project to the viewed image plane
-                int sx = unitize(lerp(maxX, minX, lx/pxf), 0, sw-1);
+                int sx = Util.clamp(lerp(maxX, minX, lx/pxf), 0, sw-1);
 
                 //pixel value
                 int RGB = b.getRGB(sx, sy);

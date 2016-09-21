@@ -127,7 +127,7 @@ public abstract class LivingEntity extends Entity {
 		climbing = true;
 	}
 	
-	public void endClimb() {
+	public void stopClimb() {
 		climbing = false;
 	}
 	
