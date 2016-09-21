@@ -6,10 +6,13 @@ import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.remote.SwingAgent;
 import nars.util.signal.NObj;
-import nars.video.CameraSensor;
-import nars.video.PixelCast;
+import nars.video.MatrixSensor;
+import nars.video.PixelBag;
+import spacegraph.SpaceGraph;
+import spacegraph.obj.MatrixView;
 
 import static java.lang.Math.round;
+import static nars.experiment.minicraft.SideCraft.arrayRenderer;
 
 /**
  * Created by me on 9/19/16.
@@ -17,7 +20,8 @@ import static java.lang.Math.round;
 public class TopCraft extends SwingAgent {
 
     private final TopDownMinicraft craft;
-    private final CameraSensor<?> pixels;
+    private final MatrixSensor pixels;
+    private final SideCraft.PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
         playSwing(TopCraft::new, 15000);
@@ -32,20 +36,23 @@ public class TopCraft extends SwingAgent {
         //swingCam.input(W/4, H/4, W/2, H/2); //50%
 
 //        Scale cam = new Scale(swingCam, 48, 48);
-        PixelCast cam = new PixelCast(craft.image, 72, 64);
+        PixelBag cam = new PixelBag(craft.image, 72, 64);
 
         pixels = addCamera("cra", cam, (v) -> $.t( v, alpha));
 
+        camAE = new SideCraft.PixelAutoClassifier("cra", cam.pixels, 16, 16, 16, 4, this);
+        SpaceGraph.window(new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)), 500, 500);
 
-        addIncrementalRangeAction("cra:(cam,X)", (f)-> {
+
+        actionRangeIncrement("cra:(cam,X)", (f)-> {
             cam.setX(f);
             return true;
         });
-        addIncrementalRangeAction("cra:(cam,Y)", (f)-> {
+        actionRangeIncrement("cra:(cam,Y)", (f)-> {
             cam.setY(f);
             return true;
         });
-        addIncrementalRangeAction("cra:(cam,Z)", (f)-> {
+        actionRangeIncrement("cra:(cam,Z)", (f)-> {
             cam.setZ(f);
             return true;
         });
@@ -92,11 +99,11 @@ public class TopCraft extends SwingAgent {
                 ).into(this);
 
         InputHandler input = craft.input;
-        addToggleAction("cra:fire", (b) -> input.attack.toggle(b) );
-        addToggleAction("cra:up", (b) -> input.up.toggle(b) );
-        addToggleAction("cra:down", (b) -> input.down.toggle(b) );
-        addToggleAction("cra:left", (b) -> input.left.toggle(b) );
-        addToggleAction("cra:right", (b) -> input.right.toggle(b) );
+        actionToggle("cra:fire", (b) -> input.attack.toggle(b) );
+        actionToggle("cra:up", (b) -> input.up.toggle(b) );
+        actionToggle("cra:down", (b) -> input.down.toggle(b) );
+        actionToggle("cra:left", (b) -> input.left.toggle(b) );
+        actionToggle("cra:right", (b) -> input.right.toggle(b) );
 
         TopDownMinicraft.start(craft, false);
     }
@@ -105,6 +112,9 @@ public class TopCraft extends SwingAgent {
 
     float prevScore = 0;
     @Override protected float reward() {
+
+        camAE.frame();
+
         float nextScore = craft.frameImmediate();
         float ds = nextScore - prevScore;
         this.prevScore = nextScore;

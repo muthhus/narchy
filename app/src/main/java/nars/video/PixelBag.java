@@ -1,5 +1,8 @@
 package nars.video;
 
+import nars.NAgent;
+import nars.experiment.minicraft.SideCraft;
+import nars.term.Term;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 
@@ -14,7 +17,7 @@ import static nars.util.Util.unitize;
 /**
  * 2D flat Raytracing Retina
  */
-public class PixelCast implements PixelCamera {
+public class PixelBag implements PixelCamera {
 
     final BufferedImage source;
     private final int px;
@@ -34,12 +37,12 @@ public class PixelCast implements PixelCamera {
 //    public float minY = 0f;
 //    public float maxY = 1f;
 
-    final float[][] pixels;
+    public final float[][] pixels;
 
     private int pixMin = 3;
 
 
-    public PixelCast(BufferedImage b, int px, int py) {
+    public PixelBag(BufferedImage b, int px, int py) {
         this.source = b;
         this.px = px;
         this.py = py;
@@ -161,4 +164,21 @@ public class PixelCast implements PixelCamera {
     public void setX(float f) {
         X = u(f);
     }
+
+    public PixelBag addActions(String termRoot, NAgent a) {
+        a.actionRangeIncrement(termRoot.toString() + ":(cam,X)", (f)-> {
+            setX(f);
+            return true;
+        });
+        a.actionRangeIncrement(termRoot.toString() + ":(cam,Y)", (f)-> {
+            setY(f);
+            return true;
+        });
+        a.actionRangeIncrement(termRoot.toString() + ":(cam,Z)", (f)-> {
+            setZ(f);
+            return true;
+        });
+        return this;
+    }
+
 }

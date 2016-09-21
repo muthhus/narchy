@@ -44,9 +44,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
     @Override
     protected Task clone(@NotNull Task original, Compound c) {
         Task t = super.clone(original, c);
-        if (t!=null) {
-            t.budget().setPriority(t.pri()*t.pri()); //shrink
-        }
+//        if (t!=null) {
+//            t.budget().setPriority(t.pri()*t.pri()); //shrink
+//        }
         return t;
     }
 

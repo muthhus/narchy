@@ -153,7 +153,7 @@ abstract public class NAgent {
      * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
      * its initial state will remain indetermined until the first feedback is generated.
      * */
-    public ActionConcept addToggleAction(String s, Runnable on, Runnable off) {
+    public ActionConcept actionToggle(String s, Runnable on, Runnable off) {
 
         final int[] state = { 0 }; // 0: unknown, -1: false, +1: true
 
@@ -172,8 +172,8 @@ abstract public class NAgent {
         return m;
     }
 
-    public ActionConcept addToggleAction(String s, BooleanProcedure onChange) {
-        return addToggleAction(s, () -> onChange.value(true), () -> onChange.value(false) );
+    public ActionConcept actionToggle(String s, BooleanProcedure onChange) {
+        return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false) );
     }
 
     /** the supplied value will be in the range -1..+1. if the predicate returns false, then
@@ -182,7 +182,7 @@ abstract public class NAgent {
      *
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
-    public ActionConcept addIncrementalRangeAction(String s, FloatPredicate update) {
+    public ActionConcept actionRangeIncrement(String s, FloatPredicate update) {
 
         ActionConcept m = new ActionConcept(s, nar, (b, d) -> {
             if (d!=null) {
@@ -201,7 +201,7 @@ abstract public class NAgent {
         return m;
     }
 
-    public ActionConcept addIncrementalRangeAction(String s, IntSupplier in, int dx, int min, int max, IntConsumer out) {
+    public ActionConcept actionRangeIncrement(String s, IntSupplier in, int dx, int min, int max, IntConsumer out) {
         //TODO
         return null;
     }

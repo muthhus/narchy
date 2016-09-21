@@ -95,7 +95,7 @@ public class Tetris extends NAgent {
      * @param timePerFall larger is slower gravity
      */
     public Tetris(NAR nar, int width, int height, int timePerFall) {
-        super(nar, 4);
+        super(nar, 2);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override
@@ -396,10 +396,10 @@ public class Tetris extends NAgent {
 //            }
 //        });
 
-        float p = 0.02f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.7f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
+        float p = 0.25f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
@@ -683,18 +683,6 @@ public class Tetris extends NAgent {
     }
 
 
-    public static MatrixView.ViewFunc arrayRenderer(float[][] ww) {
-        return (x, y, g) -> {
-            float v = ww[x][y];
-            if (v < 0) {
-                v = -v;
-                g.glColor3f(v / 2, 0, v);
-            } else {
-                g.glColor3f(v, v / 2, 0);
-            }
-            return 0;
-        };
-    }
 
     public static GridSurface newCPanel(NAR nar, int plotHistory, FloatSupplier reward) {
         Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);

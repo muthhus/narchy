@@ -29,7 +29,6 @@ import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.experiment.tetris.Tetris.conceptLinePlot;
 import static nars.experiment.tetris.Tetris.exe;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.GridSurface.col;
 import static spacegraph.obj.GridSurface.grid;
 
 /**
@@ -103,15 +102,20 @@ abstract public class SwingAgent extends NAgent {
     /**
      * pixelTruth defaults to linear monochrome brightness -> frequency
      */
-    protected CameraSensor<Scale> addCamera(String id, Container w, int pw, int ph) {
+    protected MatrixSensor addCamera(String id, Container w, int pw, int ph) {
         return addCamera(id, w, pw, ph, (v) -> t(v, alpha));
     }
 
-    protected CameraSensor<Scale> addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected MatrixSensor addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }
 
-    protected <C extends PixelCamera> CameraSensor<C> addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+    protected <C extends PixelCamera> MatrixSensor addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+        CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
+        cam.put(id, c);
+        return c;
+    }
+    protected <C extends PixelCamera> MatrixSensor addMatrixAutoEncoder(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
         CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
         cam.put(id, c);
         return c;

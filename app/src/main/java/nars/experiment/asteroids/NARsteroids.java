@@ -3,7 +3,7 @@ package nars.experiment.asteroids;
 import nars.$;
 import nars.NAR;
 import nars.remote.SwingAgent;
-import nars.video.CameraSensor;
+import nars.video.MatrixSensor;
 import nars.video.Scale;
 import nars.video.SwingCamera;
 
@@ -16,7 +16,7 @@ import static nars.$.t;
 public class NARsteroids extends SwingAgent {
 
     private final Asteroids space;
-    private final CameraSensor/*<SwingCamera>*/ pixels;
+    private final MatrixSensor/*<SwingCamera>*/ pixels;
 
     public static void main(String[] args) {
         playSwing(NARsteroids::new, 5000);
@@ -44,23 +44,23 @@ public class NARsteroids extends SwingAgent {
         float camZoomRate = 0.1f;
         int minZoomX = 64;
         int minZoomY = 64;
-        addIncrementalRangeAction("ast:(cam,L)", (f)->
+        actionRangeIncrement("ast:(cam,L)", (f)->
             swingCam.inputTranslate(round(-camXYSpeed * f), 0 ) );
-        addIncrementalRangeAction("ast:(cam,R)", (f)->
+        actionRangeIncrement("ast:(cam,R)", (f)->
             swingCam.inputTranslate(round(+camXYSpeed * f), 0 ) );
-        addIncrementalRangeAction("ast:(cam,U)", (f)->
+        actionRangeIncrement("ast:(cam,U)", (f)->
             swingCam.inputTranslate(0, round(-camXYSpeed * f)) );
-        addIncrementalRangeAction("ast:(cam,D)", (f)->
+        actionRangeIncrement("ast:(cam,D)", (f)->
             swingCam.inputTranslate(0, round(+camXYSpeed * f)) );
-        addIncrementalRangeAction("ast:(cam,I)", (f)->
+        actionRangeIncrement("ast:(cam,I)", (f)->
             swingCam.inputZoom( (1 - camZoomRate * f), minZoomX, minZoomY) );
-        addIncrementalRangeAction("ast:(cam,O)", (f)->
+        actionRangeIncrement("ast:(cam,O)", (f)->
             swingCam.inputZoom( (1 + camZoomRate * f), minZoomX, minZoomY) );
 
-        addToggleAction("ast:fire", (b) -> space.spaceKey = b);
-        addToggleAction("ast:forward", (b) -> space.upKey = b);
-        addToggleAction("ast:left", (b) -> space.leftKey = b);
-        addToggleAction("ast:right", (b) -> space.rightKey = b);
+        actionToggle("ast:fire", (b) -> space.spaceKey = b);
+        actionToggle("ast:forward", (b) -> space.upKey = b);
+        actionToggle("ast:left", (b) -> space.leftKey = b);
+        actionToggle("ast:right", (b) -> space.rightKey = b);
 
     }
 
