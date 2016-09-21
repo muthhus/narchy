@@ -33,9 +33,11 @@ public class Arkancide extends SwingAgent {
     public Arkancide(NAR nar) {
         super(nar, 10 /* additional decision frames */);
 
-        new NObj("noid", noid = new Arkanoid(), nar)
-                .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
-                .into(this);
+        noid = new Arkanoid();
+
+//        new NObj("noid", noid, nar)
+//                .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
+//                .into(this);
 
         addCamera("noid", noid, visW, visH);
 

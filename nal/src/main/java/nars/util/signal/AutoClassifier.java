@@ -14,9 +14,13 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
+
+import static nars.util.Texts.n2;
+import static nars.util.Texts.n4;
 
 /**
  * Autoencodes a vector of inputs and attempts to classify the current values to
@@ -30,26 +34,17 @@ public class AutoClassifier extends Autoencoder  {
     private static final Logger logger = LoggerFactory.getLogger(AutoClassifier.class);
 
 
-    private final float alpha;
-    private final float epsilon;
+
 
     //private final Compound aeBase;
 
     //private int metaInterval = 100;
 
-    public AutoClassifier(int input, int output, float alpha, Random rng) {
+    public AutoClassifier(int input, int output, Random rng) {
         super(input, output, rng);
-        this.alpha = alpha;
-        this.epsilon = 0.01f;
     }
 
-    public int learn(float[] x) {
-        float error = train(x, alpha, 0.01f, 0.01f, true);
-        int y = max();
-        return y;
-    }
-
-//    protected void input(int stride, Term which, float conf) {
+    //    protected void input(int stride, Term which, float conf) {
 //
 //        GeneratedTask t = new GeneratedTask(
 //                input(stride, which),

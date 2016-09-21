@@ -25,7 +25,7 @@ public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P, SensorC
 
     private final int radix = 3;
     private final NAR nar;
-    float freqResolution = 0.04f; //TODO less precision for peripheral pixels than center?
+    float freqResolution = 0.1f; //TODO less precision for peripheral pixels than center?
 
     public CameraSensor(Term root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         super(src, src.width(), src.height());
@@ -35,10 +35,11 @@ public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P, SensorC
         agent.sensors.addAll(
             encode((x,y)->
 
-                $.p((radix > 1 ?
-                        $.p($.pRadix(x, 4, width), $.pRadix(y, 4, height)) :
+                $.inh( $.p(
+                    (radix > 1 ?
+                        $.p( $.pRecurse($.radixArray(x, 4, width)), $.pRecurse($.radixArray(y, 4, height))) :
                         $.p(x, y)
-                    ), root)
+                    )), root)
 
             , brightnessToTruth));
 

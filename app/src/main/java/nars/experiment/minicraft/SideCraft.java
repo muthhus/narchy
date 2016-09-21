@@ -3,7 +3,6 @@ package nars.experiment.minicraft;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.experiment.minicraft.side.Player;
 import nars.experiment.minicraft.side.SideScrollMinicraft;
 import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
 import nars.remote.SwingAgent;
@@ -14,14 +13,15 @@ import nars.util.Util;
 import nars.util.signal.AutoClassifier;
 import nars.video.MatrixSensor;
 import nars.video.PixelBag;
-import org.apache.commons.math3.util.ArithmeticUtils;
-import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.obj.MatrixView;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+
+import static nars.util.Texts.n2;
+import static nars.util.Texts.n4;
 
 /**
  * Created by me on 9/19/16.
@@ -30,10 +30,10 @@ public class SideCraft extends SwingAgent {
 
     private final SideScrollMinicraft craft;
     private final MatrixSensor pixels;
-    private final PixelAutoClassifier camAE;
+    private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        playSwing(SideCraft::new, 15000);
+        playSwing(SideCraft::new, 500);
     }
 
     public SideCraft(NAR nar) {
@@ -54,8 +54,8 @@ public class SideCraft extends SwingAgent {
 
         PixelBag cam = new PixelBag(camBuffer, 64, 64).addActions("cra", this);
 
-        camAE = new PixelAutoClassifier("cra", cam.pixels, 16, 16, 16, 4, this);
-        SpaceGraph.window(new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)), 500, 500);
+        //camAE = new PixelAutoClassifier("cra", cam.pixels, 16, 16, 24, 4, this);
+        //SpaceGraph.window(new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)), 500, 500);
 
 
         pixels = addCamera("cra", cam, (v) -> $.t(v, alpha));
@@ -119,7 +119,8 @@ public class SideCraft extends SwingAgent {
     @Override
     protected float reward() {
 
-        camAE.frame();
+        if (camAE!=null)
+            camAE.frame();
 
         float nextScore = craft.frame();
         float ds = nextScore - prevScore;
@@ -134,19 +135,22 @@ public class SideCraft extends SwingAgent {
 
         private final float[][] pixIn;
         private final int[] pixOut;
+        public final float[][] pixRecon; //reconstructed input
         private final Term root;
-        private final float buffer[];
+        private final float in[];
         private final int sw, sh;
         private final int nw, nh;
         private final int pw, ph;
         private final int batchSize;
+        private boolean reconstruct = true;
+        public boolean learn = true;
 
 //        public PixelAutoClassifier(String root, float[][] pixIn, int sw, int sh, NAgent agent) {
 //            this(root, pixIn, sw, sh, sw * sh /* estimate */, 4, agent);
 //        }
 
         public PixelAutoClassifier(String root, float[][] pixIn, int sw, int sh, int states, int termBatchSize, NAgent agent) {
-            super(sw * sh, states, 0.1f, agent.nar.random);
+            super(sw * sh, states, agent.nar.random);
             this.nar = agent.nar;
             this.root = $.the(root);
             this.pixIn = pixIn;
@@ -156,20 +160,28 @@ public class SideCraft extends SwingAgent {
             pw = pixIn.length;
             this.nw = (int) Math.ceil(pw / ((float) sw)); //number strides wide
             this.nh = (int) Math.ceil(ph / ((float) sh)); //number strides high
-            this.buffer = new float[sw * sh];
+            this.in = new float[sw * sh];
+            this.pixRecon = new float[pw][ph];
             this.pixOut = new int[nw * nh];
             this.batchSize = termBatchSize;
-            assert(nw*nh % batchSize == 0); //evenly divides
+            assert (nw * nh % batchSize == 0); //evenly divides
         }
 
         public void frame() {
             int q = 0;
-            for (int i = 0; i < nw; i++) {
-                for (int j = 0; j < nh; j++) {
+
+            float alpha = 0.05f;
+
+            float sumErrSquared = 0;
+            //forget(alpha*alpha);
+
+
+            for (int i = 0; i < nw; ) {
+                for (int j = 0; j < nh; ) {
 
                     int p = 0;
-                    int oi = i * nw;
-                    int oj = j * nh;
+                    int oi = i * sw;
+                    int oj = j * sh;
                     for (int si = 0; si < sw; si++) {
                         int d = si + oi;
                         if (d >= pw)
@@ -180,35 +192,70 @@ public class SideCraft extends SwingAgent {
 
                             int c = sj + oj;
 
-                            buffer[p++] = c < ph ? col[c] : 0;
+                            in[p++] = c < ph ? col[c] : 0;
 
                         }
                     }
 
-                    pixOut[q++] = learn(buffer);
+                    boolean sigIn = true, sigOut = true;
+                    if (learn) {
+                        float regionError = train(in, alpha, 0f, 0.2f, sigIn, sigOut);
+                        sumErrSquared += regionError;
+                        //System.out.println(n2(y) + ", +-" + n4(regionError / y.length));
+                    } else {
+                        //System.out.println(n2(y));
+                        recode(in, sigIn, sigOut);
+                    }
+                    pixOut[q++] = max();
 
+                    if (reconstruct) {
+                        float z[] = this.z;
+                        p = 0;
+                        for (int si = 0; si < sw; si++) {
+                            int d = si + oi;
+                            if (d >= pw)
+                                break;
+
+                            float[] col = pixRecon[d];
+                            for (int sj = 0; sj < sh; sj++) {
+
+                                int c = sj + oj;
+
+                                if (c >= ph)
+                                    break;
+                                col[c] = z[p++];
+                            }
+                        }
+                    }
+
+                    j++;
                 }
+
+                i++;
             }
 
-            System.out.println(Arrays.toString(pixOut));
+            float meanErrSquaredPerPixel = sumErrSquared / (pw * ph);
+            System.out.println(Arrays.toString(pixOut) +", +-" + n4(meanErrSquaredPerPixel));
 
 
-                int qq = 0;
-                for (int i = 0; i < pixOut.length; i += batchSize) {
-                    Term[] t = new Term[batchSize + 1];
-                    int j = 0;
-                    for (; j < batchSize; )
-                        t[j++] = $.the(pixOut[qq++]);
-                    t[j] = TAG;
+            int qq = 0;
+            for (int i = 0; i < pixOut.length; i += batchSize) {
+                Term[] t = new Term[batchSize + 1];
+                int j = 0;
+                for (; j < batchSize; )
+                    t[j++] = $.the(pixOut[qq++]);
+                t[j] = TAG;
 
-                    //TODO use a new Term choice sensor type here
+                //TODO use a new Term choice sensor type here
 
-                    Term Y = $.inh($.p(t), root);
-                    //System.out.println(Y);
-                    nar.believe(Y, Tense.Present);
-                }
+                Term Y = $.inh($.p(t), root);
+                //System.out.println(Y);
+                nar.believe(Y, Tense.Present);
+            }
 
         }
+
+
     }
 
     public static MatrixView.ViewFunc arrayRenderer(float[][] ww) {

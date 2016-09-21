@@ -11,17 +11,23 @@ import java.util.Random;
  */
 public class Autoencoder {
 
-	public final int n_visible;
-	public final int n_hidden;
+	final static float NORMALIZATION_EPSILON = 0.0001f;
+
+
+	/** input vector after preprocessing (noise, corruption, etc..) */
+	final private float[] xx;
+
+	/** output vector */
+	final public float[] y;
+
 	public final float[][] W;
 	private final float[] hbias;
 	private final float[] vbias;
 	private final Random rng;
-	private float[] tilde_x;
-	public float[] y;
-	private float[] z;
-	private float[] L_vbias;
-	private float[] L_hbias;
+
+	public final float[] z;
+	final private float[] L_vbias;
+	final private float[] L_hbias;
 
 	private float uniform(float min, float max) {
 		return rng.nextFloat() * (max - min) + min;
@@ -39,110 +45,112 @@ public class Autoencoder {
 	 */
 
 
-	public Autoencoder(int n_visible, int n_hidden, Random r) {
-		this(n_visible, n_hidden, null, null, null, r);
+	public Autoencoder(int ins, int outs, Random r) {
+		this(ins, outs, null, null, null, r);
 	}
 
-	public Autoencoder(int n_visible, int n_hidden, float[][] W,
+	public Autoencoder(int ins, int outs, float[][] W,
 			float[] hbias, float[] vbias, Random rng) {
-		this.n_visible = n_visible;
-		this.n_hidden = n_hidden;
+
+		xx = new float[ins];
+		z = new float[ins];
+		L_vbias = new float[ins];
+		y = new float[outs];
+		L_hbias = new float[outs];
 
 		this.rng = rng;
 
-		if (W == null) {
-			this.W = new float[n_hidden][n_visible];
-			float a = 1.0f / this.n_visible;
+		this.W = new float[outs][ins];
+		float a = 1.0f / ins;
 
-			for (int i = 0; i < this.n_hidden; i++) {
-				for (int j = 0; j < this.n_visible; j++) {
-					this.W[i][j] = uniform(-a, a);
-				}
+		for (int i = 0; i < outs; i++) {
+			for (int j = 0; j < ins; j++) {
+				this.W[i][j] = uniform(-a, a);
 			}
-		} else {
-			this.W = W;
 		}
 
-		if (hbias == null) {
-			this.hbias = new float[n_hidden];
-			for (int i = 0; i < this.n_hidden; i++) {
-				this.hbias[i] = 0;
-			}
-		} else {
-			this.hbias = hbias;
+
+
+		this.hbias = new float[outs];
+		for (int i = 0; i < outs; i++) {
+			this.hbias[i] = 0;
 		}
 
-		if (vbias == null) {
-			this.vbias = new float[n_visible];
-			for (int i = 0; i < this.n_visible; i++) {
-				this.vbias[i] = 0;
-			}
-		} else {
-			this.vbias = vbias;
+
+		this.vbias = new float[ins];
+		for (int i = 0; i < ins; i++) {
+			this.vbias[i] = 0;
 		}
 	}
 
-	private void addNoise(float[] x, float[] tilde_x, float maxNoiseAmount,
-                          float corruptionRate) {
+	private float[] preprocess(float[] x, float noiseLevel,
+							   float corruptionRate) {
 
         Random r = this.rng;
+		int ins = x.length;
 
-		for (int i = 0; i < n_visible; i++) {
+		float[] xx = this.xx;
+		for (int i = 0; i < ins; i++) {
+			float v = x[i];
             if ((corruptionRate > 0) && (r.nextFloat() < corruptionRate)) {
-				tilde_x[i] = 0;
-			} else if (maxNoiseAmount > 0) {
-				float nx = x[i] + (r.nextFloat() - 0.5f) * maxNoiseAmount;
-				if (nx < 0)
-					nx = 0;
-				if (nx > 1)
-					nx = 1;
-				tilde_x[i] = nx;
+				v = 0;
 			}
+			if (noiseLevel > 0) {
+				v += x[i] + r.nextGaussian() * noiseLevel; // (r.nextFloat() - 0.5f) * maxNoiseAmount;
+//				if (nx < 0)
+//					nx = 0;
+//				if (nx > 1)
+//					nx = 1;
+			}
+			xx[i] = v;
 		}
+
+		return xx;
 	}
 
 	// Encode
-	public float[] encode(float[] x, float[] y, boolean sigmoid,
-			boolean normalize) {
+	public float[] encode(float[] x, float[] y, boolean sigmoid, boolean normalize) {
 
 		float[][] W = this.W;
 
-		if (y == null)
-			y = new float[n_hidden];
+		int ins = x.length;
+		int outs = y.length;
 
-		int nv = n_visible;
-		int nh = n_hidden;
+//		if (y == null)
+//			y = new float[outs];
+
 		float[] hbias = this.hbias;
 
-		float max = 0, min = 0;
-		for (int i = 0; i < nh; i++) {
+		float max = Float.NEGATIVE_INFINITY, min = Float.POSITIVE_INFINITY;
+		for (int i = 0; i < outs; i++) {
 			float yi = hbias[i];
 			float[] wi = W[i];
 
-			for (int j = 0; j < nv; j++) {
+			for (int j = 0; j < ins; j++) {
 				yi += wi[j] * x[j];
 			}
 
 			if (sigmoid)
 				yi = Util.sigmoid(yi);
 
-			if (i == 0)
-				max = min = yi;
-			else {
-				if (yi > max)
-					max = yi;
-				if (yi < min)
-					min = yi;
-			}
+			if (yi > max)
+				max = yi;
+			if (yi < min)
+				min = yi;
+
 			y[i] = yi;
 
 		}
 
-		if ((normalize) && (max != min)) {
-			float maxMin = max-min;
-			for (int i = 0; i < nh; i++) {
-				y[i] = (y[i]-min) / maxMin;
-			}
+
+
+		if ((normalize)) {
+			float maxMin = max - min;
+			if (!Util.equals(maxMin, 0, NORMALIZATION_EPSILON))
+
+				for (int i = 0; i < outs; i++) {
+					y[i] = (y[i] - min) / maxMin;
+				}
 
 //to check unit result:
 //			float len = cartesianLength(y);
@@ -156,7 +164,7 @@ public class Autoencoder {
 //			for (int i = 0; i < nh; i++) {
 //				y[i] = (y[i] - min) / (max-min);
 //			}
-		}
+			}
 
 
 
@@ -171,116 +179,137 @@ public class Autoencoder {
 		return (float)Math.sqrt(d);
 	}
 
-	// Decode
-    private void get_reconstructed_input(float[] y, float[] z) {
-		float[][] w = W;
-
-		float[] vbias = this.vbias;
-		int nv = n_visible;
-		int nh = n_hidden;
-
-		for (int i = 0; i < nv; i++) {
-			float zi = vbias[i];
-
-			for (int j = 0; j < nh; j++) {
-				zi += w[j][i] * y[j];
-			}
-
-			zi = Util.sigmoid(zi);
-
-			z[i] = zi;
+	/** TODO some or all of the bias vectors may need modified too here */
+	public void forget(float rate) {
+		float f = 1f - rate;
+		float[][] w = this.W;
+		int O = w.length;
+		int I = w[0].length;
+		for (int o = 0; o < O; o++) {
+			float[] ii = w[o];
+			for (int i = 0; i < I; i++)
+				ii[i] *= f;
 		}
 	}
 
-	public float[] getOutput() {
+	// Decode
+    private float[] decode(float[] y, boolean sigmoid) {
+		float[][] w = W;
+
+		float[] vbias = this.vbias;
+		int ins = vbias.length;
+		int outs = y.length;
+
+		for (int i = 0; i < ins; i++) {
+			float zi = vbias[i];
+
+			for (int j = 0; j < outs; j++) {
+				zi += w[j][i] * y[j];
+			}
+
+			if (sigmoid)
+				zi = Util.sigmoid(zi);
+
+			z[i] = zi;
+		}
+
+		return z;
+	}
+
+
+	public int outputs() {
+		return y.length;
+	}
+
+	public float[] output() {
 		return y;
+	}
+
+	public float train(float[] x, float learningRate,
+					   float noiseLevel, float corruptionRate,
+					   boolean sigmoid) {
+		return train(x, learningRate, noiseLevel, corruptionRate, sigmoid,sigmoid);
 	}
 
 	/** returns the total error (not avg_error = error sum divided by # items) */
 	public float train(float[] x, float learningRate,
 					   float noiseLevel, float corruptionRate,
-					   boolean sigmoid) {
-		if ((tilde_x == null) || (tilde_x.length != n_visible)) {
-			tilde_x = new float[n_visible];
-			z = new float[n_visible];
-			L_vbias = new float[n_visible];
-		}
-		if (y == null || y.length != n_hidden) {
-			y = new float[n_hidden];
-			L_hbias = new float[n_hidden];
-		}
+					   boolean sigmoidIn, boolean sigmoidOut) {
 
+		recode(preprocess(x, noiseLevel, corruptionRate), sigmoidIn, sigmoidOut);
+		return learn(x, y, learningRate);
+	}
+
+	public float learn(float[] x, float[] y, float learningRate) {
 		float[][] W = this.W;
 		float[] L_hbias = this.L_hbias;
 		float[] L_vbias = this.L_vbias;
 		float[] vbias = this.vbias;
 
-		if (noiseLevel > 0) {
-			addNoise(x, tilde_x, noiseLevel, corruptionRate);
-		} else {
-			tilde_x = x;
-		}
+		int ins = x.length;
 
-		float[] tilde_x = this.tilde_x;
-
-		encode(tilde_x, y, sigmoid, true);
-
-		get_reconstructed_input(y, z);
+		int outs = y.length;
 
 		float error = 0;
 
 		float[] zz = z;
-		// vbias
-		for (int i = 0; i < n_visible; i++) {
 
-			float lv = L_vbias[i] = x[i] - zz[i];
+		// vbias
+		for (int i = 0; i < ins; i++) {
+
+			float lv = x[i] - zz[i];
+
+			L_vbias[i] = lv;
 
 			error += lv * lv; // square of difference
 
 			vbias[i] += learningRate * lv;
 		}
 
-		//error /= n_visible;
+		//error /= ins;
 
-		int n = n_visible;
-		float[] y = this.y;
+
 		float[] hbias = this.hbias;
-		int nh = n_hidden;
+
 
 		// hbias
-		for (int i = 0; i < nh; i++) {
-			L_hbias[i] = 0;
+		for (int i = 0; i < outs; i++) {
+			L_hbias[i] = 0f;
 			float[] wi = W[i];
 
-			float lbi = 0;
-			for (int j = 0; j < n; j++) {
+			float lbi = 0f;
+			for (int j = 0; j < ins; j++) {
 				lbi += wi[j] * L_vbias[j];
 			}
 			L_hbias[i] += lbi;
 
 			float yi = y[i];
-			L_hbias[i] *= yi * (1 - yi);
+			L_hbias[i] *= yi * (1f - yi);
 			hbias[i] += learningRate * L_hbias[i];
 		}
 
 		// W
-		for (int i = 0; i < nh; i++) {
+		float[] xx = this.xx;
+		for (int i = 0; i < outs; i++) {
 			float yi = y[i];
 			float lhb = L_hbias[i];
 			float[] wi = W[i];
-			for (int j = 0; j < n; j++) {
-				wi[j] += learningRate * (lhb * tilde_x[j] + L_vbias[j] * yi);
+			for (int j = 0; j < ins; j++) {
+				wi[j] += learningRate * (lhb * xx[j] + L_vbias[j] * yi);
 			}
 		}
 
 		return error;
 	}
 
-	public float[] reconstruct(float[] x, float[] z) {
-		float[] y = new float[n_hidden];
+	public float[] recode(float[] x, boolean sigmoidIn, boolean sigmoidOut) {
+		return decode(encode(x, y, sigmoidIn, false /* normalize */), sigmoidOut);
+	}
 
-		encode(x, y, true, false);
-		get_reconstructed_input(y, z);
+	public float[] reconstruct(float[] x, float[] z) {
+		float[] y = new float[this.y.length];
+
+		decode(encode(x, y, true, true), false);
 
 		return z;
 	}
@@ -294,13 +323,16 @@ public class Autoencoder {
 		float m = Float.NEGATIVE_INFINITY;
 		int best = -1;
 		float[] y = this.y;
-		for (int i = 0; i < y.length; i++) {
-			float Y = y[i];
+		int outs = y.length;
+		int start = rng.nextInt(outs); //random starting point to give a fair chance to all if the value is similar
+		for (int i = 0; i < outs; i++) {
+			int ii = (i + start) % outs;
+			float Y = y[ii];
 			if (Y > m) {
 				m = Y;
-				best = i;
+				best = ii;
 			}
 		}
-		return best == -1 ? (int) (rng.nextFloat() * y.length) : best;
+		return best;
 	}
 }

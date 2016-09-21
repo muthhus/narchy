@@ -971,6 +971,13 @@ public enum $ {
     }
 
     public static Compound pRadix(int x, int radix, int maxX) {
+        Term[] tt = radixArray(x, radix, maxX);
+        return $.p(tt);
+    }
+
+
+    /** most significant digit first, least last. padded with zeros */
+    public static @NotNull Term[] radixArray(int x, int radix, int maxX) {
         String xs = Integer.toString(x, radix);
         String xx = Integer.toString(maxX, radix);
         Term[] tt = new Term[xx.length()];
@@ -987,7 +994,18 @@ public enum $ {
             }
             tt[i] = n;
         }
-        return $.p(tt);
+        return tt;
+    }
+
+    /** generates a recursive product for the given terms array. the terms should be ordered with the
+     * most significant digit first. */
+    public static @NotNull Compound pRecurse(@NotNull Term... t) {
+        int tl = t.length;
+        Compound nextInner = $.p(t[tl - 1]); //wrap innermost item in product too, for fairness
+        for (int i = tl - 2; i >= 0; i--) {
+            nextInner = $.p(t[i], nextInner);
+        }
+        return nextInner;
     }
 
 

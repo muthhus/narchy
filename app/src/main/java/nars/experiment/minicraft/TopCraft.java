@@ -13,6 +13,7 @@ import spacegraph.obj.MatrixView;
 
 import static java.lang.Math.round;
 import static nars.experiment.minicraft.SideCraft.arrayRenderer;
+import static spacegraph.obj.GridSurface.col;
 
 /**
  * Created by me on 9/19/16.
@@ -36,12 +37,18 @@ public class TopCraft extends SwingAgent {
         //swingCam.input(W/4, H/4, W/2, H/2); //50%
 
 //        Scale cam = new Scale(swingCam, 48, 48);
-        PixelBag cam = new PixelBag(craft.image, 72, 64);
+        PixelBag cam = new PixelBag(craft.image, 64, 64);
 
         pixels = addCamera("cra", cam, (v) -> $.t( v, alpha));
 
         camAE = new SideCraft.PixelAutoClassifier("cra", cam.pixels, 16, 16, 16, 4, this);
-        SpaceGraph.window(new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)), 500, 500);
+        SpaceGraph.window(
+                col(
+                    new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)),
+                    new MatrixView(camAE.pixRecon.length, camAE.pixRecon[0].length, arrayRenderer(camAE.pixRecon))
+                ),
+                500, 500
+        );
 
 
         actionRangeIncrement("cra:(cam,X)", (f)-> {
@@ -113,6 +120,7 @@ public class TopCraft extends SwingAgent {
     float prevScore = 0;
     @Override protected float reward() {
 
+        //camAE.learn = (nar.time() % 500 < 250);
         camAE.frame();
 
         float nextScore = craft.frameImmediate();
