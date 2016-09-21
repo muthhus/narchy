@@ -14,7 +14,7 @@ package nars.experiment.minicraft.side;
 
 public abstract class LivingEntity extends Entity {
 	private static final long serialVersionUID = 1L;
-	protected static final int maxHP = 100;
+	protected static final int maxHP = 20;
 	
 	public int hitPoints;
 	public boolean climbing;

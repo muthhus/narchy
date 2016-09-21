@@ -33,7 +33,7 @@ public class SideCraft extends SwingAgent {
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        playSwing(SideCraft::new, 500);
+        playSwing(SideCraft::new, 256*1024);
     }
 
     public SideCraft(NAR nar) {
@@ -52,13 +52,13 @@ public class SideCraft extends SwingAgent {
 
         BufferedImage camBuffer = ((AwtGraphicsHandler) craft.gfx).buffer;
 
-        PixelBag cam = new PixelBag(camBuffer, 64, 64).addActions("cra", this);
+        PixelBag cam = new PixelBag(camBuffer, 64, 64).addActions("cra:cam", this);
 
         //camAE = new PixelAutoClassifier("cra", cam.pixels, 16, 16, 24, 4, this);
         //SpaceGraph.window(new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)), 500, 500);
 
 
-        pixels = addCamera("cra", cam, (v) -> $.t(v, alpha));
+        pixels = addCamera("cra:cam", cam, (v) -> $.t(v, alpha));
 
 
 //        new NObj("cra", craft, nar)
@@ -70,21 +70,21 @@ public class SideCraft extends SwingAgent {
 //                ).into(this);
 
 //        InputHandler input = craft.input;
-        actionToggle("cra:left", (b) -> {
+        actionToggle("cra:(key,left)", (b) -> {
             if (b) craft.player.startLeft(false /* slow */);
             else craft.player.stopLeft();
         });
-        actionToggle("cra:right", (b) -> {
+        actionToggle("cra:(key,right)", (b) -> {
             if (b) craft.player.startRight(false /* slow */);
             else craft.player.stopRight();
         });
-        actionToggle("cra:up", (b) -> {
+        actionToggle("cra:(key,up)", (b) -> {
             if (b) craft.player.startClimb();
             else craft.player.stopClimb();
         });
-        actionToggle("cra:(mouse,L)", (b) -> craft.leftClick = b);
-        actionToggle("cra:(mouse,R)", (b) -> craft.rightClick = b);
-        float mSpeed = 4f;
+        actionToggle("cra:(key,mouseL)", (b) -> craft.leftClick = b);
+        actionToggle("cra:(key,mouseR)", (b) -> craft.rightClick = b);
+        float mSpeed = 25f;
         actionRangeIncrement("cra:(mouse,X)", (v) -> {
             int x = craft.screenMousePos.x;
             int xx = Util.clamp(x + v * mSpeed, 0, camBuffer.getWidth() - 1);

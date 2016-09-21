@@ -31,7 +31,7 @@ public class SideScrollMinicraft {
 	
 	public ArrayList<Entity> entities = new ArrayList<>();
 	
-	private int tileSize = 96;
+	private int tileSize = 64;
 	
 	private int breakingTicks;
 	private Int2 breakingPos;

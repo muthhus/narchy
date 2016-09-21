@@ -12,11 +12,6 @@ import static spacegraph.obj.GridSurface.grid;
 
 public class Arkancide extends SwingAgent {
 
-    public static final int runFrames = 50000;
-    public static final int CONCEPTS_FIRE_PER_CYCLE = 24;
-
-
-
 
     final int visW = 32;
     final int visH = 18;

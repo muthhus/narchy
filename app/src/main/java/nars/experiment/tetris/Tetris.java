@@ -8,6 +8,7 @@ import nars.NARLoop;
 import nars.Param;
 import nars.NAgent;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -29,6 +30,7 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
 import spacegraph.obj.ConsoleSurface;
@@ -41,6 +43,7 @@ import java.util.List;
 import java.util.Random;
 
 import static nars.experiment.tetris.TetrisState.*;
+import static spacegraph.SpaceGraph.*;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.VERTICAL;
 
@@ -60,9 +63,9 @@ public class Tetris extends NAgent {
 
     public static final int runFrames = 5550;
     public static final int cyclesPerFrame = 4;
-    public static final int tetris_width = 6;
+    public static final int tetris_width = 8;
     public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 5;
+    public static final int TIME_PER_FALL = 2;
     static boolean easy;
 
     static int frameDelay;
@@ -141,7 +144,9 @@ public class Tetris extends NAgent {
             for (int x = 0; x < state.width; x++) {
                 int xx = x;
                 Compound squareTerm =
-                        $.p(x, y);
+                        //$.p(x, y);
+                        $.p($.pRecurse($.radixArray(x, 2, state.width)), $.pRecurse($.radixArray(y, 2, state.height)));
+
                 //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
                 @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
                         () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
@@ -373,7 +378,7 @@ public class Tetris extends NAgent {
         //Multi nar = new Multi(3,512,
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                32, 2, 2, rng,
+                16, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
@@ -396,8 +401,8 @@ public class Tetris extends NAgent {
 //            }
 //        });
 
-        float p = 0.25f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        float p = 0.02f;
+        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
@@ -405,7 +410,7 @@ public class Tetris extends NAgent {
 
         nar.confMin.setValue(0.02f);
 
-        nar.compoundVolumeMax.setValue(16);
+        nar.compoundVolumeMax.setValue(24);
         //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);
@@ -469,7 +474,7 @@ public class Tetris extends NAgent {
 //                );
 
 
-            //BagChart.show((Default) nar, 512);
+            window(Vis.concepts((Default) nar, 1024), 500, 500);
 
             //STMView.show(stm, 800, 600);
 
@@ -542,9 +547,9 @@ public class Tetris extends NAgent {
 
             //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
 
-            Vis.newBeliefChartWindow(t, 200);
+            //Vis.newBeliefChartWindow(t, 200);
 
-            Vis.budgetHistogram(nar, 30);
+            window(Vis.budgetHistogram(nar, 30), 500, 300);
 
             //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
 
@@ -642,9 +647,8 @@ public class Tetris extends NAgent {
     }
 
     public static GridSurface agentBudgetPlot(NAgent t, int history) {
-        Default nar = (Default) t.nar;
         return conceptLinePlot(t.nar,
-                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history, nar::conceptPriority);
+                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history);
     }
 
     public MatrixView.ViewFunc sensorMatrixView(NAR nar, long whenRelative) {

@@ -61,7 +61,7 @@ public abstract class Param /*extends Container*/ implements Level {
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public final MutableInteger compoundVolumeMax = new MutableInteger(64);
+    public final MutableInteger compoundVolumeMax = new MutableInteger(32);
 
     /**
      * maximum changes logged in deriver's stack.

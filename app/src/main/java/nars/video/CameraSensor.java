@@ -37,7 +37,7 @@ public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P, SensorC
 
                 $.inh( $.p(
                     (radix > 1 ?
-                        $.p( $.pRecurse($.radixArray(x, 4, width)), $.pRecurse($.radixArray(y, 4, height))) :
+                        $.p( $.pRecurse($.radixArray(x, radix, width)), $.pRecurse($.radixArray(y, radix, height))) :
                         $.p(x, y)
                     )), root)
 

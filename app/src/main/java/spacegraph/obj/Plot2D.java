@@ -1,5 +1,6 @@
 package spacegraph.obj;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import javafx.scene.text.TextAlignment;
 import nars.$;
@@ -272,23 +273,28 @@ public class Plot2D extends Surface {
 
                 float x = 0;
 
-                float py = 0;
+                //float py = 0;
 
-                gl.glLineWidth(4);
+                gl.glLineWidth(2);
                 gl.glColor3fv(s.color, 0);
 
                 float ny = mid;
+                gl.glBegin(GL.GL_LINE_STRIP);
+                float range = maxValue - minValue;
                 for (int i = 0; i < ss; i++) {
 
-                    ny = ypos(minValue, maxValue, ssh[i]);
+                    ny = ypos(minValue, range, ssh[i]);
 
 
-                    if (i > 0)
-                        Draw.line(gl, x - dx, py, x, ny);
+                    //if (i > 0) {
+                        gl.glVertex3f(x, ny, 0);
+                        //Draw.line(gl, x - dx, py, x, ny);
+                    //}
 
                     x += dx;
-                    py = ny;
+                    //py = ny;
                 }
+                gl.glEnd();
 
                 gl.glLineWidth(1);
                 Draw.text(gl, s.name, 0.1f, W, ny, 0, Draw.TextAlignment.Right);
@@ -297,10 +303,16 @@ public class Plot2D extends Surface {
         }
     };
 
-    private static float ypos(float minValue, float maxValue, float v) {
-        float ny = (v - minValue) / (maxValue - minValue);
-        if (ny < 0) ny = 0;
-        else if (ny > 1.0) ny = 1.0f;
+//    private static float ypos(float minValue, float maxValue, float v) {
+//        float ny = (v - minValue) / (maxValue - minValue);
+//        //if (ny < 0) ny = 0;
+//        //else if (ny > 1.0) ny = 1.0f;
+//        return ny;
+//    }
+    private static float ypos(float minValue, float range, float v) {
+        float ny = (v - minValue) / range;
+        //if (ny < 0) ny = 0;
+        //else if (ny > 1.0) ny = 1.0f;
         return ny;
     }
 

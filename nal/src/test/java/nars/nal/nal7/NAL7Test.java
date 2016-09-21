@@ -18,7 +18,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 800;
+    final int cycles = 100;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -182,7 +182,7 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void intervalPreserve_and_shift_occurence() {
-        int time = cycles * 4;
+        int time = cycles;
         test()
             
             //.input("X:x.") //shouldnt be necessary
@@ -628,8 +628,8 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .inputAt(2,"a:x. :|: %1.0;0.45%")
                 .inputAt(5, "b:x. :|: %1.0;0.90%")
-                .mustBelieve(cycles*4, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2)
-                .mustNotOutput(cycles*4, "(a:#1 &&-3 b:#1)", '.', 0f, 1, 0f, 1, 2);
+                .mustBelieve(cycles, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2)
+                .mustNotOutput(cycles, "(a:#1 &&-3 b:#1)", '.', 0f, 1, 0f, 1, 2);
 
     }
 
@@ -645,8 +645,8 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
-                .mustNotOutput(cycles*2, "(x)", '.', 0f, 0.89f, 0f, 0.91f, 10)
-                .mustBelieve(cycles*2, "(x)", 0f, 0.6f /* some smaller conf since it is a prediction */, 4);
+                .mustNotOutput(cycles, "(x)", '.', 0f, 0.89f, 0f, 0.91f, 10)
+                .mustBelieve(cycles, "(x)", 0f, 0.6f /* some smaller conf since it is a prediction */, 4);
     }
 
     @Test public void testComparison1_Eternal() {

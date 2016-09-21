@@ -172,7 +172,7 @@ public class PremiseRuleTest {
     public void testBackwardPermutations() {
         if (Param.BACKWARD_QUESTION_RULES) {
             Set<PremiseRule> s = PremiseRuleSet.permute(
-                    rule("<(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Derive:Backward)>")
+                    rule("<(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)>")
             );
             assertNotNull(s);
             //System.out.println(Joiner.on('\n').join(s));

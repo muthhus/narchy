@@ -1,6 +1,7 @@
 package nars.index;
 
 import nars.concept.util.ConceptBuilder;
+import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,12 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
     protected Termed getNewAtom(@NotNull Atomic x) {
         return concepts.computeIfAbsent(x, this::buildConcept);
     }
+
+    @NotNull
+    protected Termed getConceptCompound(@NotNull Compound x) {
+        return concepts.computeIfAbsent(x, this::buildConcept);
+    }
+
 
     @Override
     public void remove(Termed entry) {

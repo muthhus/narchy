@@ -48,7 +48,7 @@ abstract public class SwingAgent extends NAgent {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                Arkancide.CONCEPTS_FIRE_PER_CYCLE, 2, 2, rng,
+                32, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, exe)
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 8192, 2)
 
@@ -58,18 +58,18 @@ abstract public class SwingAgent extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.4f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        float p = 0.05f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         //nar.cyclesPerFrame.set(Arkancide.cyclesPerFrame);
-        nar.confMin.setValue(0.02f);
-        nar.compoundVolumeMax.setValue(24);
+        nar.confMin.setValue(0.05f);
+        nar.compoundVolumeMax.setValue(32);
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 192, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         SwingAgent a = init.apply(nar);

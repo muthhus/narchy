@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public class Activation {
 
     private static final int TASKLINK_DEPTH_LIMIT = 1;
-    private static final int TERMLINK_DEPTH_LIMIT = 3; //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
+    private static final int TERMLINK_DEPTH_LIMIT = 1; //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
 
     public final Budgeted in;
 

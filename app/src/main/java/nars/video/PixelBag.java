@@ -166,15 +166,15 @@ public class PixelBag implements PixelCamera {
     }
 
     public PixelBag addActions(String termRoot, NAgent a) {
-        a.actionRangeIncrement(termRoot.toString() + ":(cam,X)", (f)-> {
+        a.actionRangeIncrement(termRoot.toString() + "(moveX)", (f)-> {
             setX(f);
             return true;
         });
-        a.actionRangeIncrement(termRoot.toString() + ":(cam,Y)", (f)-> {
+        a.actionRangeIncrement(termRoot.toString() + "(moveY)", (f)-> {
             setY(f);
             return true;
         });
-        a.actionRangeIncrement(termRoot.toString() + ":(cam,Z)", (f)-> {
+        a.actionRangeIncrement(termRoot.toString() + "(zoom)", (f)-> {
             setZ(f);
             return true;
         });
