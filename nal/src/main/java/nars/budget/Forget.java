@@ -34,7 +34,7 @@ public final class Forget implements Consumer<BLink> {
 
         Forget f;
         if (r >= Param.BUDGET_EPSILON)
-            f = new Forget(Util.clamp(r));
+            f = new Forget(Util.unitize(r));
         else
             f = null;
         return f;

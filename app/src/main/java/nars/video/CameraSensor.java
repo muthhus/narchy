@@ -20,13 +20,14 @@ public class CameraSensor<P extends PixelCamera> {
     public final SensorConcept[][] ss;
     public final int width, height;
     public final P cam;
+    private final int radix = 3;
 
     public CameraSensor(Term root, P cam, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         this.cam = cam;
         width = cam.width();
         height = cam.height();
 
-        float freqResolution = 0.04f;
+        float freqResolution = 0.04f; //TODO less precision for peripheral pixels than center?
 
         //TODO extract this section and associated variables to a CameraSensorMatrix class or something
         ss = new SensorConcept[width][height];
@@ -36,8 +37,8 @@ public class CameraSensor<P extends PixelCamera> {
             for (int y = 0; y < height; y++) {
                 //TODO support multiple coordinate termizations
                 @NotNull Compound coord =
-                        $.p($.pRadix(x, 4, width), $.pRadix(y, 4, height));
-                        //$.p(x, y);
+                        radix > 1 ? $.p($.pRadix(x, 4, width), $.pRadix(y, 4, height)) :
+                                    $.p(x, y);
 
                 Compound cell =
                     //$.inh(coord, root);

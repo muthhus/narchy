@@ -70,6 +70,6 @@ public class RetinaPixel extends Collisions.RayResultCallback {
 
     float distanceToAlpha(float dist) {
         //could also be exponential, etc
-        return Util.clamp(1f - (dist / rangeMax)) * 0.5f + 0.5f;
+        return Util.unitize(1f - (dist / rangeMax)) * 0.5f + 0.5f;
     }
 }

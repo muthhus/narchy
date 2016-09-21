@@ -42,7 +42,7 @@ public class MySTMClustered extends STMClustered {
 	float confMin;
 
 	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize) {
-		this(nar, size, punc, maxGroupSize, Math.round(((float)nar.compoundVolumeMax.intValue()) / (size - 1)) /* estimate */);
+		this(nar, size, punc, maxGroupSize, Math.round(((float)nar.compoundVolumeMax.intValue()) / (2)) /* estimate, based on 2-ary grouping as a minimum */);
 	}
 
 	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, int maxInputVolume) {

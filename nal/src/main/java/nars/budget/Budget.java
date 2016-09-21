@@ -141,7 +141,7 @@ public interface Budget extends Budgeted {
         if (p!=p /* fast NaN test */)
             return Float.NaN;
         else
-            return Util.clamp(p);
+            return Util.unitize(p);
     }
 
    
@@ -170,7 +170,7 @@ public interface Budget extends Budgeted {
             return 0; //no change
 
         float p = pri();
-        float target = Util.clamp(p * factor);
+        float target = Util.unitize(p * factor);
         float delta = target - p;
         setPriority(Util.lerp(target, p, speed));
         return delta;

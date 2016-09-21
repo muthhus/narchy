@@ -174,7 +174,7 @@ abstract public class NAgent {
         return addToggleAction(s, () -> onChange.value(true), () -> onChange.value(false) );
     }
 
-    /** the supplied value will be in the range -1..+1.0. if the predicate returns false, then
+    /** the supplied value will be in the range -1..+1. if the predicate returns false, then
      * it will not allow feedback through. this can be used for situations where the action
      * hits a limit or boundary that it did not pass through.
      *
@@ -283,11 +283,11 @@ abstract public class NAgent {
 //                numSensors / 2f;
 
         minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 10 /* to be safe */);
-        maxSensorPriority = new MutableFloat(Util.clamp(nar.priorityDefault(Symbols.BELIEF) / numSensors + minSensorPriority.floatValue())); //measured per-each sensor
+        maxSensorPriority = new MutableFloat(Util.unitize(nar.priorityDefault(Symbols.BELIEF) / numSensors + minSensorPriority.floatValue())); //measured per-each sensor
         SensorConcept.attentionGroup(sensors, minSensorPriority, maxSensorPriority, nar);
 
         minRewardPriority = new MutableFloat(Param.BUDGET_EPSILON * 20 /* estimate */);
-        maxRewardPriority = new MutableFloat(Util.clamp(nar.priorityDefault(Symbols.BELIEF) / numSensors + minRewardPriority.floatValue()));
+        maxRewardPriority = new MutableFloat(Util.unitize(nar.priorityDefault(Symbols.BELIEF) / numSensors + minRewardPriority.floatValue()));
         SensorConcept.attentionGroup(newArrayList(happy, joy), minRewardPriority, maxRewardPriority, nar);
 
 

@@ -914,7 +914,14 @@ public enum Draw {
         }
     }
 
+    public enum TextAlignment {
+        Left, Center, Right
+    }
     public static void text(GL2 gl, String s, float scale, float x, float y, float z) {
+        text(gl, s, scale, x, y, z, TextAlignment.Center );
+    }
+
+    public static void text(GL2 gl, String s, float scale, float x, float y, float z, TextAlignment a) {
         int l = s.length();
         int N = fontMono.length;
 
@@ -924,7 +931,18 @@ public enum Draw {
         float width = letterWidth * s.length();
 
         //align center:
-        x -= width/2f;
+        switch (a) {
+            case Left:
+                x = 0;
+                break;
+            case Right:
+                x -= width;
+                break;
+            case Center:
+                x -= width/2f;
+                break;
+        }
+
 
         for (int i = 0; i < l; i++) {
             char c = s.charAt(i);

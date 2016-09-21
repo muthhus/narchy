@@ -64,13 +64,13 @@ public class ColorArray {
 
 	public static int rgba(float red, float green, float blue, float opacity) {
 
-		int i = (int)(Util.clamp(opacity) * 255.0f);
+		int i = (int)(Util.unitize(opacity) * 255.0f);
 		i = i << 8;
-		i = i | (int)(Util.clamp(red) * 255.0f);
+		i = i | (int)(Util.unitize(red) * 255.0f);
 		i = i << 8;
-		i = i | (int)(Util.clamp(green) * 255.0f);
+		i = i | (int)(Util.unitize(green) * 255.0f);
 		i = i << 8;
-		i = i | (int)(Util.clamp(blue) * 255.0f);
+		i = i | (int)(Util.unitize(blue) * 255.0f);
 		return i;
 	}
 }

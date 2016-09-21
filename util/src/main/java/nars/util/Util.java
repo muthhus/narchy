@@ -536,10 +536,12 @@ public enum Util {
      * linear interpolate between target & current, factor is between 0 and 1.0
      */
     public static float lerp(float target, float current, float factor) {
+        factor = unitize(factor);
         return target * factor + current * (1.0f - factor);
         //return Math.fma(target, factor, current * (1.0f - factor));
     }
     public static double lerp(double target, double current, double factor) {
+        factor = unitize(factor);
         return target * factor + current * (1.0f - factor);
         //return Math.fma(target, factor, current * (1.0f - factor));
     }
@@ -628,14 +630,24 @@ public enum Util {
     /**
      * clamps a value to 0..1 range
      */
-    public static float clamp(float p) {
+    public static float unitize(float p) {
         if (p > 1.0f)
             p = 1.0f;
         else if (p < 0.0f)
             p = 0.0f;
         return p;
     }
-
+    /**
+     * clamps a value to 0..1 range
+     */
+    public static double unitize(double p) {
+        if (p > 1.0)
+            p = 1.0;
+        else if (p < 0.0)
+            p = 0.0;
+        return p;
+    }
+    
     /**
      * clamps a value to -1..1 range
      */
@@ -657,7 +669,7 @@ public enum Util {
     }
 
     public static float clampround(float value, float epsilon) {
-        return round(clamp(value), epsilon );
+        return round(unitize(value), epsilon );
     }
 
     public static int hash(float f, int discretness) {
@@ -1210,7 +1222,7 @@ public enum Util {
     }
 
     /** min is inclusive, max is exclusive: [min, max) */
-    public int clamp(int x, int min, int max) {
+    public int unitize(int x, int min, int max) {
         if (x < min) x = min;
         else if (x > --max) x = max;
         return x;
@@ -1243,7 +1255,7 @@ public enum Util {
         return count - 1;
     }
 
-    public static int clamp(float v, int min, int max) {
+    public static int unitize(float v, int min, int max) {
         int i = Math.round(v);
         if (i < min) i = min;
         if (i > max) i = max;

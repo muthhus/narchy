@@ -148,8 +148,8 @@ public class cpac
 		}
 		int dy = ctables.iYDirection[iDir];
 		int dx = ctables.iXDirection[iDir];
-		int ny = Util.clamp(iY+dy, 0, maze.HEIGHT*16);
-		int nx = Util.clamp(iX+dx, 0, maze.WIDTH*16);
+		int ny = Util.unitize(iY+dy, 0, maze.HEIGHT*16);
+		int nx = Util.unitize(iX+dx, 0, maze.WIDTH*16);
 
 		int ty = Math.round((ny) / 16f);
 		int tx = Math.round((nx) / 16f);
@@ -159,8 +159,8 @@ public class cpac
 			iY = ny;
 		} else {
 			//just clamp the current position
-			iY = Util.clamp(iY, 0, maze.HEIGHT*16);
-			iX = Util.clamp(iX, 0, maze.WIDTH*16);
+			iY = Util.unitize(iY, 0, maze.HEIGHT*16);
+			iX = Util.unitize(iX, 0, maze.WIDTH*16);
 		}
 
 

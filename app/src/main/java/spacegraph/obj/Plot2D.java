@@ -1,6 +1,7 @@
 package spacegraph.obj;
 
 import com.jogamp.opengl.GL2;
+import javafx.scene.text.TextAlignment;
 import nars.$;
 import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
@@ -228,7 +229,6 @@ public class Plot2D extends Surface {
 
         float labelDZ = 0.1f;
         float rangeFontScale = 0.0005f;
-        float seriesFontScale = 0.001f;
 
         //background
         gl.glColor4f(0,0,0,0.75f);
@@ -291,7 +291,7 @@ public class Plot2D extends Surface {
                 }
 
                 gl.glLineWidth(1);
-                Draw.text(gl, s.name, 0.1f, 0, ny, 0);
+                Draw.text(gl, s.name, 0.1f, W, ny, 0, Draw.TextAlignment.Right);
 
             }
         }
