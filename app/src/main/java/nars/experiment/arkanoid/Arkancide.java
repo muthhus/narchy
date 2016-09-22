@@ -4,7 +4,6 @@ package nars.experiment.arkanoid;
 import nars.NAR;
 import nars.remote.SwingAgent;
 import nars.concept.ActionConcept;
-import nars.util.signal.NObj;
 
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
@@ -65,7 +64,7 @@ public class Arkancide extends SwingAgent {
     }
 
     public static void main(String[] args) {
-        playSwing(Arkancide::new, 5000);
+        run(Arkancide::new, 5000);
     }
 
 

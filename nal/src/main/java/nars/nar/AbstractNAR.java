@@ -28,7 +28,7 @@ import java.util.Random;
  */
 public abstract class AbstractNAR extends NAR {
 
-    public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 4;
+    public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;
 
 
     public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, Executioner exe) {

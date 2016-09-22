@@ -25,7 +25,7 @@ public class TopCraft extends SwingAgent {
     private final SideCraft.PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        playSwing(TopCraft::new, 15000);
+        run(TopCraft::new, 15000);
     }
 
     public TopCraft(NAR nar) {
@@ -51,15 +51,15 @@ public class TopCraft extends SwingAgent {
         );
 
 
-        actionRangeIncrement("cra:(cam,X)", (f)-> {
+        actionBipolar("cra:(cam,X)", (f)-> {
             cam.setX(f);
             return true;
         });
-        actionRangeIncrement("cra:(cam,Y)", (f)-> {
+        actionBipolar("cra:(cam,Y)", (f)-> {
             cam.setY(f);
             return true;
         });
-        actionRangeIncrement("cra:(cam,Z)", (f)-> {
+        actionBipolar("cra:(cam,Z)", (f)-> {
             cam.setZ(f);
             return true;
         });

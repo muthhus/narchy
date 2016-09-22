@@ -19,7 +19,7 @@ public class NARsteroids extends SwingAgent {
     private final MatrixSensor/*<SwingCamera>*/ pixels;
 
     public static void main(String[] args) {
-        playSwing(NARsteroids::new, 5000);
+        run(NARsteroids::new, 5000);
     }
 
     public NARsteroids(NAR nar) {
@@ -44,17 +44,17 @@ public class NARsteroids extends SwingAgent {
         float camZoomRate = 0.1f;
         int minZoomX = 64;
         int minZoomY = 64;
-        actionRangeIncrement("ast:(cam,L)", (f)->
+        actionBipolar("ast:(cam,L)", (f)->
             swingCam.inputTranslate(round(-camXYSpeed * f), 0 ) );
-        actionRangeIncrement("ast:(cam,R)", (f)->
+        actionBipolar("ast:(cam,R)", (f)->
             swingCam.inputTranslate(round(+camXYSpeed * f), 0 ) );
-        actionRangeIncrement("ast:(cam,U)", (f)->
+        actionBipolar("ast:(cam,U)", (f)->
             swingCam.inputTranslate(0, round(-camXYSpeed * f)) );
-        actionRangeIncrement("ast:(cam,D)", (f)->
+        actionBipolar("ast:(cam,D)", (f)->
             swingCam.inputTranslate(0, round(+camXYSpeed * f)) );
-        actionRangeIncrement("ast:(cam,I)", (f)->
+        actionBipolar("ast:(cam,I)", (f)->
             swingCam.inputZoom( (1 - camZoomRate * f), minZoomX, minZoomY) );
-        actionRangeIncrement("ast:(cam,O)", (f)->
+        actionBipolar("ast:(cam,O)", (f)->
             swingCam.inputZoom( (1 + camZoomRate * f), minZoomX, minZoomY) );
 
         actionToggle("ast:fire", (b) -> space.spaceKey = b);

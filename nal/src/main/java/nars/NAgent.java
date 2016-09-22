@@ -182,7 +182,7 @@ abstract public class NAgent {
      *
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
-    public ActionConcept actionRangeIncrement(String s, FloatPredicate update) {
+    public ActionConcept actionBipolar(String s, FloatPredicate update) {
 
         ActionConcept m = new ActionConcept(s, nar, (b, d) -> {
             if (d!=null) {

@@ -19,10 +19,12 @@ import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunctio
 import spacegraph.Surface;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static nars.$.t;
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
@@ -43,7 +45,7 @@ abstract public class SwingAgent extends NAgent {
 
     }
 
-    public static void playSwing(Function<NAR, SwingAgent> init,int framesToRun) {
+    public static void run(Function<NAR, SwingAgent> init, int framesToRun) {
         Random rng = new XorShift128PlusRandom(1);
 
         //Multi nar = new Multi(3,512,
@@ -108,6 +110,10 @@ abstract public class SwingAgent extends NAgent {
 
     protected MatrixSensor addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
+    }
+
+    protected MatrixSensor addCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+        return addCamera(id, new PixelBag(w, pw, ph), pixelTruth);
     }
 
     protected <C extends PixelCamera> MatrixSensor addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {

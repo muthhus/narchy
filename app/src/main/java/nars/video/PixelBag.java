@@ -1,13 +1,12 @@
 package nars.video;
 
 import nars.NAgent;
-import nars.experiment.minicraft.SideCraft;
-import nars.term.Term;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import static java.lang.Math.max;
 import static java.lang.Math.round;
@@ -19,7 +18,7 @@ import static nars.util.Util.unitize;
  */
 public class PixelBag implements PixelCamera {
 
-    final BufferedImage source;
+    final Supplier<BufferedImage> source;
     private final int px;
     private final int py;
 
@@ -43,6 +42,10 @@ public class PixelBag implements PixelCamera {
 
 
     public PixelBag(BufferedImage b, int px, int py) {
+        this(()->b, px, py);
+    }
+
+    public PixelBag(Supplier<BufferedImage> b, int px, int py) {
         this.source = b;
         this.px = px;
         this.py = py;
@@ -56,7 +59,7 @@ public class PixelBag implements PixelCamera {
 
 
 
-        final BufferedImage b = this.source;
+        final BufferedImage b = this.source.get();
         if (b == null)
             return;
         
@@ -153,31 +156,25 @@ public class PixelBag implements PixelCamera {
         return f/2f+0.5f;
     }
 
-    public void setZ(float f) {
+    public boolean setZ(float f) {
         Z = u(f);
+        return true;
     }
 
-    public void setY(float f) {
+    public boolean setY(float f) {
         Y = u(f);
+        return true;
     }
 
-    public void setX(float f) {
+    public boolean setX(float f) {
         X = u(f);
+        return true;
     }
 
     public PixelBag addActions(String termRoot, NAgent a) {
-        a.actionRangeIncrement(termRoot.toString() + "(moveX)", (f)-> {
-            setX(f);
-            return true;
-        });
-        a.actionRangeIncrement(termRoot.toString() + "(moveY)", (f)-> {
-            setY(f);
-            return true;
-        });
-        a.actionRangeIncrement(termRoot.toString() + "(zoom)", (f)-> {
-            setZ(f);
-            return true;
-        });
+        a.actionBipolar(termRoot + "(moveX)", this::setX);
+        a.actionBipolar(termRoot + "(moveY)", this::setY);
+        a.actionBipolar(termRoot + "(zoom)", this::setZ);
         return this;
     }
 

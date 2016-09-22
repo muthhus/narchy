@@ -14,7 +14,6 @@ import nars.util.signal.AutoClassifier;
 import nars.video.MatrixSensor;
 import nars.video.PixelBag;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.SpaceGraph;
 import spacegraph.obj.MatrixView;
 
 import java.awt.image.BufferedImage;
@@ -33,7 +32,7 @@ public class SideCraft extends SwingAgent {
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        playSwing(SideCraft::new, 256*1024);
+        run(SideCraft::new, 256*1024);
     }
 
     public SideCraft(NAR nar) {
@@ -85,7 +84,7 @@ public class SideCraft extends SwingAgent {
         actionToggle("cra:(key,mouseL)", (b) -> craft.leftClick = b);
         actionToggle("cra:(key,mouseR)", (b) -> craft.rightClick = b);
         float mSpeed = 25f;
-        actionRangeIncrement("cra:(mouse,X)", (v) -> {
+        actionBipolar("cra:(mouse,X)", (v) -> {
             int x = craft.screenMousePos.x;
             int xx = Util.clamp(x + v * mSpeed, 0, camBuffer.getWidth() - 1);
             if (xx != x) {
@@ -94,7 +93,7 @@ public class SideCraft extends SwingAgent {
             }
             return false;
         });
-        actionRangeIncrement("cra:(mouse,Y)", (v) -> {
+        actionBipolar("cra:(mouse,Y)", (v) -> {
             int y = craft.screenMousePos.y;
             int yy = Util.clamp(y + v * mSpeed, 0, camBuffer.getHeight() - 1);
             if (yy != y) {
