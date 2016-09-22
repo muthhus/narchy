@@ -37,8 +37,8 @@ public class Terms   {
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull public static final Term[] empty = new Term[0];
-    @NotNull public static final TermVector ZeroSubterms = new TermVector((Term[])new Term[] { });
-    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PROD, DTERNAL, ZeroSubterms);
+    @NotNull public static final TermVector NoSubterms = new TermVector((Term[])new Term[] { });
+    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PROD, DTERNAL, NoSubterms);
     @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
     /**

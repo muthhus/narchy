@@ -3,6 +3,7 @@ package nars.concept;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.budget.policy.ConceptPolicy;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,46 +75,6 @@ public interface AbstractConcept extends Concept {
 //    }
 
 
-    /** should not be called directly */
-    void setMeta(@NotNull Map newMeta);
-
-
-    @NotNull
-    @Override default <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
-        @Nullable Map meta = meta();
-        if (meta == null) {
-            Object v;
-            put(key, v = value.apply(key, null));
-            return (C)v;
-        } else {
-            return (C) meta.compute(key, value);
-        }
-    }
-
-    /** like Map.put for storing data in meta map
-     *  @param value if null will perform a removal
-     * */
-    @Override
-    @Nullable
-    default Object put(@NotNull Object key, @Nullable Object value) {
-
-        Map currMeta = meta();
-
-        if (value != null) {
-
-            if (currMeta == null) {
-                setMeta(  currMeta =
-                        //new WeakIdentityHashMap();
-                        new SoftValueHashMap(1) );
-            }
-
-            return currMeta.put(key, value);
-        }
-        else {
-            return currMeta != null ? currMeta.remove(key) : null;
-        }
-
-    }
 
 //    @Override
 //    public final boolean equals(@NotNull Object obj) {
@@ -164,19 +125,6 @@ public interface AbstractConcept extends Concept {
 
 
 
-
-    default void linkCapacity(@NotNull ConceptPolicy p) {
-
-        termlinks().setCapacity( p.linkCap(this, true) );
-        tasklinks().setCapacity( p.linkCap(this, false) );
-    }
-
-
-    @Override
-    default void delete(NAR nar) {
-        termlinks().clear();
-        tasklinks().clear();
-    }
 
 
 

@@ -10,6 +10,8 @@ import nars.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
+import nars.term.Terms;
+import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
@@ -169,6 +171,12 @@ public class TermjectConcept<X> implements AbstractConcept, Termject<X> {
     @Override
     public @NotNull Bag<Term> termlinks() {
         return termLinks;
+    }
+
+    @NotNull
+    @Override
+    public final TermContainer templates() {
+        return Terms.NoSubterms;
     }
 
     @Override

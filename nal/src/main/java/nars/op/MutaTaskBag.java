@@ -4,35 +4,40 @@ import nars.NAR;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.budget.Budgeted;
+import nars.link.BLink;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 
 /**
  * a bag which collects tasks for per-frame processing of some of them
  */
-public class MutaTaskBag  {
+public abstract class MutaTaskBag<B extends BLink>  {
 
     //private static final Logger logger = LoggerFactory.getLogger(MutaTaskBag.class);
     private final NAR nar;
     private final float selectionRate;
-    private final BiConsumer<Task,NAR> model;
-    private final Bag<Task> bag;
+    public final Bag<B> bag;
 
-
-
-    public MutaTaskBag(BiConsumer<Task, NAR> model, Predicate<Task> prefilter, float selectionRate, CurveBag<Task> bag, NAR n) {
+    public MutaTaskBag(float selectionRate, Bag<B> bag, NAR n) {
         this.bag = bag;
         this.nar = n;
         this.selectionRate = selectionRate;
-        this.model = model;
         n.onTask(task -> {
-            if (!prefilter.test(task))
-                bag.put(task);
+            B b = filter(task);
+            if (b != null)
+                bag.put(b);
         });
         n.onFrame(this::next);
     }
+
+    @Nullable
+    abstract protected B filter(@NotNull Task task);
 
     /** next iteration, each frame */
     protected void next(NAR n) {
@@ -43,11 +48,11 @@ public class MutaTaskBag  {
         bag.commit(); //prepare items for sampling
 
         while (tRemain > 0) {
-            Task t = bag.pop();
+            B t = bag.pop();
             if (t == null)
                 break; //bag should be empty here
 
-            model.accept(t, nar);
+            accept(t);
             tRemain--;
         }
 
@@ -62,6 +67,7 @@ public class MutaTaskBag  {
         }
     }
 
+    abstract protected void accept(B b);
 
 
 }

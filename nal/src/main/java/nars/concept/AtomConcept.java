@@ -7,8 +7,10 @@ import nars.budget.policy.ConceptPolicy;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicStringConstant;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class AtomConcept extends AtomicStringConstant implements AbstractConcept {
+public class AtomConcept extends AtomicStringConstant implements Concept {
 
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
@@ -29,9 +31,13 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
     private Map meta;
 
     public AtomConcept(@NotNull Atomic atom, Bag<Term> termLinks, Bag<Task> taskLinks) {
-        super(atom.toString());
+        this(atom.toString(), atom.op(), termLinks, taskLinks);
+    }
 
-        this.op = atom.op();
+    protected AtomConcept(String term, Op op, Bag<Term> termLinks, Bag<Task> taskLinks) {
+        super(term);
+
+        this.op = op;
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
@@ -43,6 +49,10 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
         return op;
     }
 
+    /** typically atoms wont have termlink templates although some custom implementations might */
+    @Override public @Nullable TermContainer templates() {
+        return Terms.NoSubterms;
+    }
 
     @Override
     public ConceptPolicy policy() {

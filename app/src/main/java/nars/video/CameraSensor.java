@@ -7,6 +7,7 @@ import nars.op.math.IntIntTo;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.FloatSupplier;
 import nars.concept.SensorConcept;
@@ -25,7 +26,7 @@ public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P, SensorC
 
     private final int radix = 3;
     private final NAR nar;
-    float freqResolution = 0.1f; //TODO less precision for peripheral pixels than center?
+    float maxResolution = 0.02f, minResolution = 0.12f; //TODO less precision for peripheral pixels than center?
 
     public CameraSensor(Term root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         super(src, src.width(), src.height());
@@ -59,15 +60,29 @@ public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P, SensorC
                 //monochrome only for now
                 FloatSupplier brightness = () -> src.brightness(xx, yy);
 
+//                float dx = Math.abs(x - width/2f);
+//                float dy = Math.abs(y - height/2f);
+//                float cdist = (float) (Math.sqrt( dx*dx + dy*dy )-1) / (Math.max(width,height)/2f);
+
                 l.add(sss = new SensorConcept(cell, nar,
                         brightness,
                         brightnessToTruth
-                ).resolution(freqResolution));
+                ).resolution(
+                        //distToResolution(cdist)
+                        maxResolution
+                ));
                 matrix[x][y] = sss;
             }
         }
         return l;
     }
+
+//    private float distToResolution(float dist) {
+//
+//        float r = Util.lerp(minResolution, maxResolution, dist);
+//
+//        return r;
+//    }
 
     public void update() {
         src.update();

@@ -4,6 +4,7 @@ import nars.bag.Bag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +32,10 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     @NotNull
     final CurveSampler sampler;
 
+
+    public CurveBag(@NotNull BudgetMerge mergeFunction, Random rng) {
+        this(new CurveBag.NormalizedSampler(power2BagCurve, rng), mergeFunction, new ConcurrentHashMap<>());
+    }
 
     public CurveBag(@NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
         this(64 /* this should be updated soon, but this allows some room to start */, c, mergeFunction, map);

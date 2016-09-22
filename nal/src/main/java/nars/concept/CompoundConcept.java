@@ -45,7 +45,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      */
 
     @NotNull
-    public final TermContainer templates;
+    private final TermContainer templates;
+
     @NotNull
     private final T term;
 
@@ -62,6 +63,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     @Nullable
     private transient ConceptPolicy policy;
+
 
 
     /**
@@ -104,6 +106,9 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     public <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public final TermContainer templates() { return templates; }
 
     @Override
     public @Nullable Map<Object, Object> meta() {

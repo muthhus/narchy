@@ -1,7 +1,7 @@
 package nars.budget.policy;
 
-import nars.concept.AbstractConcept;
 import nars.concept.CompoundConcept;
+import nars.concept.Concept;
 
 /** interface for a management model responsible for concept resource allocation:
  *      --budget (time)
@@ -9,7 +9,7 @@ import nars.concept.CompoundConcept;
  */
 public interface ConceptPolicy {
 
-    int linkCap(AbstractConcept compoundConcept, boolean termOrTask);
+    int linkCap(Concept compoundConcept, boolean termOrTask);
 
     int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal);
 

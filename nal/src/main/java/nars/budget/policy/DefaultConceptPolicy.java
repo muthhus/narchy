@@ -1,7 +1,7 @@
 package nars.budget.policy;
 
-import nars.concept.AbstractConcept;
 import nars.concept.CompoundConcept;
+import nars.concept.Concept;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +63,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     }
 
     @Override
-    public int linkCap(@NotNull AbstractConcept c, boolean termOrTask) {
+    public int linkCap(@NotNull Concept c, boolean termOrTask) {
         if (termOrTask) {
 
             return lerp(c, this.termLinksCapacityMin, this.termLinksCapacityMax);
@@ -73,7 +73,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         }
     }
 
-    public static int lerp(@NotNull AbstractConcept c, @NotNull MutableInteger _min, @NotNull MutableInteger _max) {
+    public static int lerp(@NotNull Concept c, @NotNull MutableInteger _min, @NotNull MutableInteger _max) {
         int min = _min.intValue();
         int max = _max.intValue();
 
@@ -82,8 +82,8 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         complexityFactor = Math.min(complexityFactor, 1f); //clip at +1
 
         int l = Math.round(Util.lerp(min, max, complexityFactor));
-        if (c instanceof CompoundConcept)
-            l = Math.max(l, 1+((CompoundConcept)c).templates.size()); //at least enough for its templates
+
+        l = Math.max(l, 1+ c.templates().size()); //at least enough for its templates
 
         return l;
     }

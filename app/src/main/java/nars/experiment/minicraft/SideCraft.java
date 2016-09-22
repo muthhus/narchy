@@ -32,7 +32,7 @@ public class SideCraft extends SwingAgent {
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        run(SideCraft::new, 256*1024);
+        run(SideCraft::new, 512);
     }
 
     public SideCraft(NAR nar) {
@@ -51,13 +51,13 @@ public class SideCraft extends SwingAgent {
 
         BufferedImage camBuffer = ((AwtGraphicsHandler) craft.gfx).buffer;
 
-        PixelBag cam = new PixelBag(camBuffer, 64, 64).addActions("cra:cam", this);
+        PixelBag cam = new PixelBag(camBuffer, 64, 64).addActions("cra", this);
 
         //camAE = new PixelAutoClassifier("cra", cam.pixels, 16, 16, 24, 4, this);
         //SpaceGraph.window(new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)), 500, 500);
 
 
-        pixels = addCamera("cra:cam", cam, (v) -> $.t(v, alpha));
+        pixels = addCamera("cra", cam, (v) -> $.t(v, alpha));
 
 
 //        new NObj("cra", craft, nar)

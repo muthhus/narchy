@@ -21,6 +21,7 @@
 package nars.concept;
 
 import com.google.common.collect.Iterators;
+import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.Symbols;
 import nars.Task;
@@ -34,6 +35,7 @@ import nars.table.TaskTable;
 import nars.task.Revision;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,10 +54,26 @@ public interface Concept extends Termed {
 
     @NotNull Bag<Term> termlinks();
 
+    /** termlink templates; null if none exist */
+    @NotNull TermContainer templates();
+
     @Nullable Map<Object, Object> meta();
 
-    @Nullable
-    Object put(@NotNull Object key, @Nullable Object value);
+    /** should not be called directly */
+    void setMeta(@NotNull Map newMeta);
+
+    /** follows Map.compute() semantics */
+    @NotNull default <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
+        @Nullable Map meta = meta();
+        if (meta == null) {
+            Object v;
+            put(key, v = value.apply(key, null));
+            return (C)v;
+        } else {
+            return (C) meta.compute(key, value);
+        }
+    }
+
 
     /**
      * like Map.gett for getting data stored in meta map
@@ -66,9 +84,7 @@ public interface Concept extends Termed {
         return null == m ? null : (C) m.get(key);
     }
 
-    /** follows Map.compute() semantics */
-    @NotNull
-    <C> C meta(Object key, BiFunction value);
+
 
     @NotNull BeliefTable beliefs();
 
@@ -77,6 +93,44 @@ public interface Concept extends Termed {
     @NotNull QuestionTable questions();
 
     @Nullable QuestionTable quests();
+
+
+    /** like Map.put for storing data in meta map
+     *  @param value if null will perform a removal
+     * */
+    @Nullable
+    default Object put(@NotNull Object key, @Nullable Object value) {
+
+        synchronized (term()) {
+            Map currMeta = meta();
+
+            if (value != null) {
+
+                if (currMeta == null) {
+                    setMeta(currMeta =
+                            //new WeakIdentityHashMap();
+                            new SoftValueHashMap(1));
+                }
+
+                return currMeta.put(key, value);
+            } else {
+                return currMeta != null ? currMeta.remove(key) : null;
+            }
+        }
+
+    }
+
+
+    default void linkCapacity(@NotNull ConceptPolicy p) {
+
+        termlinks().setCapacity( p.linkCap(this, true) );
+        tasklinks().setCapacity( p.linkCap(this, false) );
+    }
+
+    default void delete(NAR nar) {
+        termlinks().clear();
+        tasklinks().clear();
+    }
 
     @Nullable
     default Truth belief(long when, long now) {
@@ -301,8 +355,8 @@ public interface Concept extends Termed {
             //out.println(termlinkTemplates());
 
             out.println("\n TermLinks: " + termlinks().size() + '/' + termlinks().capacity() +
-                    ((this instanceof CompoundConcept) ? "\tTemplates: " + ((CompoundConcept)this).templates : "")
-            );
+                    "\tTemplates: " + this.templates());
+
             termlinks().forEach(b -> {
                 out.print(indent);
                 out.print(b.get() + " " + b.toBudgetString());
@@ -322,7 +376,6 @@ public interface Concept extends Termed {
         out.println('\n');
     }
 
-    void delete(@NotNull NAR nar);
 
     @Nullable ConceptPolicy policy();
 

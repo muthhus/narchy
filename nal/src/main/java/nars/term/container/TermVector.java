@@ -309,7 +309,7 @@ public class TermVector implements TermContainer {
 
     @NotNull
     public static TermVector the(@NotNull Term... t) {
-        return t.length == 0 ? Terms.ZeroSubterms : new TermVector(t);
+        return t.length == 0 ? Terms.NoSubterms : new TermVector(t);
     }
     @NotNull
     public static TermVector the(@NotNull Term one) {

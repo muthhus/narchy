@@ -1,85 +1,137 @@
 package nars.op.mental;
 
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
+import nars.bag.Bag;
+import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
-import nars.budget.Budgeted;
+import nars.budget.merge.BudgetMerge;
+import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.link.BLink;
+import nars.link.DefaultBLink;
+import nars.op.MutaTaskBag;
 import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.truth.TruthDelta;
+import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
+import nars.term.subst.FindSubst;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
+import static nars.nal.UtilityFunctions.or;
 import static nars.time.Tense.ETERNAL;
+import static nars.util.Util.unitize;
 
 /**
- * 1-step abbreviation, which calls ^abbreviate directly and not through an added Task.
- * Experimental alternative to Abbreviation plugin.
+ * compound<->dynamic atom abbreviation.
+ *
  * @param S serial term type
  */
-public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
+public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound>> {
 
     static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 
-    private static final AtomicInteger currentTermSerial = new AtomicInteger(1);
-    //when a concept is important and exceeds a syntactic complexity, let NARS name it:
-    public final MutableInt abbreviationVolMin = new MutableInt(5);
-    public final MutableInt abbreviationVolMax = new MutableInt(1000);
-    public final MutableFloat abbreviationQualityMin = new MutableFloat(0.75f);
+    private static final AtomicInteger currentTermSerial = new AtomicInteger(0);
+
+    /** when a concept is important and exceeds a syntactic complexity above
+     * this value multiplied by the NAR's volume limit, then LET NARS NAME IT. */
+    public final MutableFloat abbreviationRelativeVolThreshold = new MutableFloat(0.5f);
+
+
+
+
 
     //TODO different parameters for priorities and budgets of both the abbreviation process and the resulting abbreviation judgment
     //public AtomicDouble priorityFactor = new AtomicDouble(1.0);
     /**
      * generated abbreviation belief's confidence
      */
-    public final MutableFloat abbreviationConfidence = new MutableFloat(0.95f);
-    public final MutableFloat abbreviationProbability = new MutableFloat(0.00001f);
+    public final MutableFloat abbreviationConfidence;
+
+    /** abbreviations per processed task */
+    public final MutableFloat abbreviationProbability = new MutableFloat(1f);
+
     @NotNull
     protected final NAR nar;
     private final String termPrefix;
-    private final nars.budget.Budgeted defaultAbbreviationBudget = Budget.One.cloneMult(0.9f, 0.5f, 0.5f);
+    private float volThresh;
+    private float threshFalloffRate;
 
 
-    public Abbreviation(@NotNull NAR n, String termPrefix) {
-
+    public Abbreviation(@NotNull NAR n, String termPrefix, float selectionRate, int capacity) {
+        super(selectionRate, new CurveBag<>(BudgetMerge.plusBlend, n.random), n);
         this.nar = n;
         this.termPrefix = termPrefix;
+        this.bag.setCapacity(capacity);
+        this.abbreviationConfidence = new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
+    }
 
-        n.eventTaskProcess.on(this);
+    @Nullable
+    @Override
+    protected BLink<Compound> filter(Task task) {
+        Term t = task.term();
+
+        float score;
+        if ((score = scoreIfExceeds(task,nar.random.nextFloat())) > 0) {
+            @NotNull Budget b = task.budget();
+            return new DefaultBLink(t,
+                    or(b.priIfFiniteElseZero(), score),
+                    b.dur(),
+                    b.qua());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    protected void next(NAR n) {
+        //calculate this once per frame. not every task process
+        volThresh = abbreviationRelativeVolThreshold.floatValue() * nar.compoundVolumeMax.intValue();
+
+        //how quickly to decrease probability for each degree of volume away from the thresh
+        //this is measured relative to the larger of either the distance to the max
+        //volume, or min volume (1)
+        threshFalloffRate = Math.min(
+                Math.abs(nar.compoundVolumeMax.floatValue() - volThresh),
+                nar.compoundVolumeMax.floatValue() - 1 );
+
+        super.next(n);
+    }
+
+    @Override
+    protected void accept(BLink<Compound> b) {
+
+        Term term = b.get();
+        Concept abbreviated = nar.concept(term);
+        if (abbreviated != null && abbreviated.get(Abbreviation.class) == null) {
+            abbreviate(abbreviated, b);
+        }
 
     }
 
     @Nullable
-    static Compound newAbbreviation(@NotNull Concept abbreviated, @NotNull Term id) {
+    static Compound abbreviate(@NotNull Concept abbreviated, @NotNull Term id) {
         return
-                //$.sim(abbreviated.term(), id);
+                (Compound) $.sim(abbreviated.term(), id);
                 //(Compound) $.equi(abbreviated.term(), id);
-                (Compound) $.secte(abbreviated.term(), id);
+                //(Compound) $.secte(abbreviated.term(), id);
 
-        /*
         //old 1.6 pattern:
-        Operation compound = Operation.make(
-            Product.make(termArray(termAbbreviating)), abbreviate);*/
+        //Operation compound = Operation.make(
+        //    Product.make(termArray(termAbbreviating)), abbreviate);*/
     }
 
     @NotNull
-    protected Term newSerialTerm() {
-        //TODO base64
-        //return Atom.the(Utf8.toUtf8(name));
+    protected String newSerialTerm() {
 
-        return $.the(termPrefix + Integer.toString(currentTermSerial.incrementAndGet(), 36));
+        return (termPrefix + "_" + Integer.toString(currentTermSerial.incrementAndGet(), 36));
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -98,48 +150,31 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
         //  }
     }
 
-    protected boolean canAbbreviate(@NotNull Task task) {
-        Term t = task.term();
+    private float scoreIfExceeds(Task task, float min) {
+        float s = task.priIfFiniteElseZero() * task.qua();
+        if (s >= min) {
+            s *= abbreviationProbability.floatValue();
+            if (s >= min) {
 
-        /*if (t instanceof Similarity) {
-            Similarity s = (Similarity)t;
-            if (Operation.isA(s.getSubject(), abbreviate)) return false;
-            if (Operation.isA(s.getPredicate(), abbreviate)) return false;
-        }*/
-        int v = t.volume();
-        return
-                //(!Op.isOperation(t)) &&
-                (v >= abbreviationVolMin.floatValue()) &&
-                        (v <= abbreviationVolMax.floatValue()) &&
-                        (task.qua() > abbreviationQualityMin.intValue());
-    }
+                //higher probability for terms nearer the thresh. smaller and larger get less chance
+                s *= 1f - unitize(
+                        Math.abs(task.volume() - volThresh) /
+                                (threshFalloffRate) );
 
-    /**
-     * To create a judgment with a given statement
-     *
-     * @return Immediate results as Tasks
-     */
-    @Override
-    public void accept(@NotNull Task task) {
-//
-//        //is it complex and also important? then give it a name:
-        if (canAbbreviate(task)) {
-            if (nar.random.nextFloat() <= abbreviationProbability.floatValue()) {
-
-                Concept abbreviated = task.concept(nar);
-                if (abbreviated != null && abbreviated.get(Abbreviation.class) == null) {
-
-                    Term id = newSerialTerm();
-
-                    abbreviate(abbreviated, id);
-                }
+                if (s >= min)
+                    return s;
             }
         }
+        return -1;
     }
 
-    protected void abbreviate(@NotNull Concept abbreviated, @NotNull Term alias) {
+    protected void abbreviate(@NotNull Concept abbreviated, Budget b) {
         //Concept abbreviation = nar.activate(, NewAbbreviationBudget);
-        Compound abbreviation = newAbbreviation(abbreviated, alias);
+
+        AtomicAbbreviation alias = new AtomicAbbreviation(newSerialTerm(), abbreviated);
+        nar.on(alias);
+
+        Compound abbreviation = abbreviate(abbreviated, alias);
         if (abbreviation != null) {
 
 
@@ -147,35 +182,52 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
 
             //logger.info("Abbreviation {}", abbreviation);
 
-            Budgeted b = defaultAbbreviationBudget;
-
 
             MutableTask t = new GeneratedTask(abbreviation, Symbols.BELIEF,
-                    $.t(1, abbreviationConfidence.floatValue())) {
-                //@Override
-                //TODO
+                    $.t(1, abbreviationConfidence.floatValue()))
 
-                @Override
-                public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
-                    Concept abbreviatedConcept = nar.concept(abbreviated, true);
 
-                    Concept aliasConcept = nar.concept(alias, true);
-                    if (abbreviatedConcept!=null) {
-                        abbreviatedConcept.put(Abbreviation.class, abbreviation);
-                        abbreviatedConcept.crossLink(b, this, aliasConcept, 1f, nar);
-                    } else {
-                        logger.error("alias unconceptualized: {}", alias);
-                    }
-                }
-            };
+//                @Override
+//                public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+//                    Concept abbreviatedConcept = nar.concept(abbreviated, true);
+//
+//                    //Concept aliasConcept = nar.concept(alias, true);
+//                    if (abbreviatedConcept!=null) {
+//                        abbreviatedConcept.put(Abbreviation.class, abbreviation);
+//                        //abbreviatedConcept.crossLink(b, this, aliasConcept, 1f, nar);
+//                    } else {
+//                        logger.error("alias unconceptualized: {}", alias);
+//                    }
+//                }
+            ;
             t.time(nar.time(), ETERNAL);
             t.setBudget(b);
-            t.log("Abbreviation Link");
+            t.log("Abbreviate");
 
             nar.inputLater( t );
 
             logger.info("new: {}", t);
 
+        }
+    }
+
+    static class AtomicAbbreviation extends AtomConcept {
+
+        private final Concept abbr;
+
+        public AtomicAbbreviation(String term, Concept abbreviated) {
+            super(term, Op.ATOM, abbreviated.termlinks(), abbreviated.tasklinks());
+            this.abbr = abbreviated;
+        }
+
+        @Override
+        public @Nullable TermContainer templates() {
+            return abbr.templates();
+        }
+
+        @Override
+        public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+            return super.unify(y, subst) || abbr.term().unify(y, subst);
         }
     }
 

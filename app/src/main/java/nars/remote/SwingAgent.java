@@ -10,6 +10,7 @@ import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -74,6 +75,8 @@ abstract public class SwingAgent extends NAgent {
         MySTMClustered stm = new MySTMClustered(nar, 192, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
+        Abbreviation abbr = new Abbreviation(nar, "the", 0.1f, 32);
+
         SwingAgent a = init.apply(nar);
         a.trace = true;
 
@@ -113,7 +116,9 @@ abstract public class SwingAgent extends NAgent {
     }
 
     protected MatrixSensor addCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
-        return addCamera(id, new PixelBag(w, pw, ph), pixelTruth);
+        PixelBag pb = new PixelBag(w, pw, ph);
+        pb.addActions(id, this);
+        return addCamera(id, pb, pixelTruth);
     }
 
     protected <C extends PixelCamera> MatrixSensor addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {

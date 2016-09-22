@@ -111,9 +111,11 @@ public class Activation {
         if (targetConcept!=null) {
             activateConcept(targetConcept, subScale);
 
-            if (targetConcept instanceof CompoundConcept) {
-                linkTerms(targetConcept, ((CompoundConcept) targetConcept).templates.terms(), subScale, depth);
-            }
+
+            @NotNull Term[] tmpl = targetConcept.templates().terms();
+            if (tmpl.length > 0)
+                linkTerms(targetConcept, tmpl, subScale, depth);
+
         }
 
         Term sourceTerm = source.term();
