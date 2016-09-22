@@ -1,20 +1,21 @@
 package nars.op.mental;
 
 import nars.*;
-import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.AtomConcept;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.op.MutaTaskBag;
+import nars.table.BeliefTable;
+import nars.table.QuestionTable;
 import nars.task.GeneratedTask;
-import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import nars.truth.TruthDelta;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static nars.nal.UtilityFunctions.or;
@@ -77,6 +79,10 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
     @Nullable
     @Override
     protected BLink<Compound> filter(Task task) {
+
+        if (task instanceof AbbreviationTask) //avoids feedback
+            return null;
+
         Term t = task.term();
 
         float score;
@@ -110,7 +116,7 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
     protected void accept(BLink<Compound> b) {
 
         Term term = b.get();
-        Concept abbreviated = nar.concept(term);
+        CompoundConcept abbreviated = (CompoundConcept) nar.concept(term);
         if (abbreviated != null && abbreviated.get(Abbreviation.class) == null) {
             abbreviate(abbreviated, b);
         }
@@ -169,10 +175,10 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
         return -1;
     }
 
-    protected void abbreviate(@NotNull Concept abbreviated, Budget b) {
+    protected void abbreviate(@NotNull CompoundConcept abbreviated, Budget b) {
         //Concept abbreviation = nar.activate(, NewAbbreviationBudget);
 
-        AtomicAbbreviation alias = new AtomicAbbreviation(newSerialTerm(), abbreviated);
+        AliasConcept alias = new AliasConcept(newSerialTerm(), abbreviated);
         nar.on(alias);
 
         Compound abbreviation = abbreviate(abbreviated, alias);
@@ -184,18 +190,7 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
             //logger.info("Abbreviation {}", abbreviation);
 
 
-            MutableTask t = new GeneratedTask(abbreviation, Symbols.BELIEF,
-                    $.t(1, abbreviationConfidence.floatValue())) {
-
-                @Override public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
-                    super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
-                    if (!isDeleted()) {
-                        //redirect concept resolution to the abbreviation alias
-                        nar.concepts.set(abbreviated.term(), alias);
-                    }
-                }
-
-            }
+            AbbreviationTask t = new AbbreviationTask(abbreviation, abbreviated.term(), alias, abbreviationConfidence.floatValue());
 //                @Override
 //                public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
 //                    Concept abbreviatedConcept = nar.concept(abbreviated, true);
@@ -208,7 +203,7 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
 //                        logger.error("alias unconceptualized: {}", alias);
 //                    }
 //                }
-            ;
+
             t.time(nar.time(), ETERNAL);
             t.setBudget(b);
             t.log("Abbreviate");
@@ -220,11 +215,11 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
         }
     }
 
-    static class AtomicAbbreviation extends AtomConcept {
+    static final class AliasConcept extends AtomConcept {
 
         private final Concept abbr;
 
-        public AtomicAbbreviation(String term, Concept abbreviated) {
+        public AliasConcept(String term, Concept abbreviated) {
             super(term, Op.ATOM, abbreviated.termlinks(), abbreviated.tasklinks());
             this.abbr = abbreviated;
         }
@@ -238,7 +233,44 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
         @Override public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
             return /*super.unify(y, subst) || */abbr.term().unify(y, subst);
         }
+
+        @Override
+        public final Activation process(@NotNull Task input, NAR nar) {
+            return abbr.process(input, nar);
+        }
+
+        @Override
+        public @Nullable Map<Object, Object> meta() {
+            return abbr.meta();
+        }
+
+        @NotNull @Override public BeliefTable beliefs() {  return abbr.beliefs();        }
+        @NotNull @Override public BeliefTable goals() { return abbr.goals();         }
+        @NotNull @Override public QuestionTable questions() { return abbr.questions();         }
+        @NotNull @Override public QuestionTable quests() { return abbr.quests(); }
     }
 
 
+    static class AbbreviationTask extends GeneratedTask {
+
+        private
+        @NotNull
+        final Compound abbreviated;
+        private final AliasConcept alias;
+
+        public AbbreviationTask(Compound abbreviation, @NotNull Compound abbreviated, AliasConcept alias, float conf) {
+            super(abbreviation, Symbols.BELIEF, $.t(1, conf));
+            this.abbreviated = abbreviated;
+            this.alias = alias;
+        }
+
+        @Override public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+            super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
+            if (!isDeleted()) {
+                //redirect concept resolution to the abbreviation alias
+                nar.concepts.set(abbreviated, alias);
+            }
+        }
+
+    }
 }

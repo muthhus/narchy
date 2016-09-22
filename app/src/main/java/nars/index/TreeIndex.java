@@ -155,10 +155,6 @@ public class TreeIndex extends TermIndex {
 
     @Override
     public @Nullable Termed get(@NotNull Term t, boolean createIfMissing) {
-
-        if (t instanceof Compound)
-            t = preConceptualize((Compound) t);
-
         TermKey k = concepts.key(t);
 
         if (createIfMissing) {
@@ -261,7 +257,7 @@ public class TreeIndex extends TermIndex {
 
         @Override
         public @Nullable Termed get(@NotNull Term t, boolean createIfMissing) {
-            t = t instanceof Compound ? preConceptualize(((Compound) t)) : t;
+
             Object o = L1.computeIfAbsent2(t,
                     createIfMissing ?
                             ttt -> {

@@ -1,8 +1,10 @@
 package nars.concept;
 
+import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
+import nars.budget.Activation;
 import nars.budget.policy.ConceptPolicy;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
@@ -58,6 +60,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     public ConceptPolicy policy() {
         return policy;
     }
+
     @Override
     public void policy(@NotNull  ConceptPolicy p, long now, List<Task> removed) {
         ConceptPolicy current = this.policy;
@@ -89,27 +92,32 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
         this.meta = newMeta;
     }
 
+    @Override
+    public Activation process(@NotNull Task input, NAR nar) {
+        throw new UnsupportedOperationException("Atom " + this + " can not process Tasks; " + input);
+    }
+
     @NotNull
     @Override
-    public final BeliefTable beliefs() {
+    public BeliefTable beliefs() {
         return BeliefTable.EMPTY;
     }
 
     @NotNull
     @Override
-    public final BeliefTable goals() {
+    public BeliefTable goals() {
         return BeliefTable.EMPTY;
     }
 
     @Override
     @NotNull
-    public final QuestionTable questions() {
+    public QuestionTable questions() {
         return QuestionTable.EMPTY;
     }
 
     @NotNull
     @Override
-    public final QuestionTable quests() {
+    public QuestionTable quests() {
         return QuestionTable.EMPTY;
     }
 

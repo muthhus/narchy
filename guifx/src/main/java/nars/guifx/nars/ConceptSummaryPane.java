@@ -71,13 +71,15 @@ public class ConceptSummaryPane extends Text {
         if (priority && truth && pendingUpdate.compareAndSet(false, true)) {
 
             Color color;
-            if (concept.hasBeliefs()) {
-                Truth tv = concept.beliefs().top(now).truth();
+
+            Task ttv = concept.beliefs().top(now);
+            if (ttv!=null) {
+                Truth tv = ttv.truth();
                 color = truthColors.get(tv.freq(), tv.conf());
-            }
-            else {
+            } else {
                 color = Color.GRAY;
             }
+
 
             runLater(() -> {
                 pendingUpdate.set(false);

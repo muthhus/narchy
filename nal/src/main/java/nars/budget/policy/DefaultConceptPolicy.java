@@ -1,15 +1,19 @@
 package nars.budget.policy;
 
+import nars.Op;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.term.atom.AtomicStringConstant;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.Op.ATOM;
+
 /**
  * Created by me on 5/11/16.
  */
-public final class DefaultConceptPolicy implements ConceptPolicy {
+public final class DefaultConceptPolicy extends AtomicStringConstant implements ConceptPolicy {
 
     public final MutableInteger beliefsMaxEte, goalsMaxEte;
     public final MutableInteger questionsMax;
@@ -18,8 +22,8 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     private final MutableInteger beliefsMaxTemp;
     private final MutableInteger goalsMaxTemp;
 
-    public DefaultConceptPolicy(int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
-        this(
+    public DefaultConceptPolicy(String id, int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
+        this(   id,
                 new MutableInteger(Math.max(1, beliefsCapTotal / 4)), //belief ete ~1/4
                 new MutableInteger(Math.max(1, goalsCapTotal / 4)),   //goal ete  ~1/4
                 new MutableInteger(Math.max(1, beliefsCapTotal * 3 / 4)), //belief temp ~3/4
@@ -30,9 +34,10 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         );
     }
 
-    DefaultConceptPolicy(MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte,
+    DefaultConceptPolicy(String id, MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte,
                          MutableInteger beliefsMaxTemp, MutableInteger goalsMaxTemp,
                          MutableInteger questionsMax, @NotNull MutableInteger termlinksCapacity, @NotNull MutableInteger taskLinksCapacity) {
+        super("___" + id);
         this.beliefsMaxEte = beliefsMaxEte;
         this.beliefsMaxTemp = beliefsMaxTemp;
         this.goalsMaxEte = goalsMaxEte;
@@ -46,6 +51,10 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
 
 
 
+    @Override
+    public @NotNull Op op() {
+        return ATOM;
+    }
 
     @Override
     public int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {

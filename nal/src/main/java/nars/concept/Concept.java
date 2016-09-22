@@ -92,7 +92,7 @@ public interface Concept extends Termed {
 
     @NotNull QuestionTable questions();
 
-    @Nullable QuestionTable quests();
+    @NotNull QuestionTable quests();
 
 
     /** like Map.put for storing data in meta map
@@ -134,37 +134,25 @@ public interface Concept extends Termed {
 
     @Nullable
     default Truth belief(long when, long now) {
-        return hasBeliefs() ? beliefs().truth(when, now) : null;
+        return beliefs().truth(when, now);
     }
 
     @Nullable
     default Truth desire(long when, long now) {
-        return hasGoals() ? goals().truth(when, now) : null;
+        return goals().truth(when, now);
     }
 
     @Nullable
     default Truth belief(long now) {
-        return hasBeliefs() ? beliefs().truth(now) : null;
+        return beliefs().truth(now);
     }
 
     @Nullable
     default Truth desire(long now) {
-        return hasGoals() ? goals().truth(now) : null;
+        return goals().truth(now);
     }
 
-    default boolean hasGoals() {
-        return !goals().isEmpty();
-    }
 
-    default boolean hasBeliefs() {
-        return !beliefs().isEmpty();
-    }
-
-    default boolean hasQuestions() { return !questions().isEmpty();    }
-
-    default boolean hasQuests() {
-        return !quests().isEmpty();
-    }
 
     @Nullable
     default TaskTable tableFor(char punc) {
@@ -403,6 +391,8 @@ public interface Concept extends Termed {
             return t.freq();
         return 0.5f;
     }
+
+    Activation process(@NotNull Task input, NAR nar);
 
 
 //    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {

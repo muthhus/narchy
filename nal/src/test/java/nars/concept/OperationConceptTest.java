@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 3/22/16.
@@ -49,7 +50,7 @@ public class OperationConceptTest {
         Concept c = n.concept(operation);
         assertEquals(g, c.desire(n.time()).expectation(), 0.01f);
         if (b != b /* NaN */)
-            assertEquals(false, c.hasBeliefs());
+            assertTrue(c.beliefs().isEmpty());
         else
             assertEquals(b, c.belief(n.time()).expectation(), 0.01f);
 

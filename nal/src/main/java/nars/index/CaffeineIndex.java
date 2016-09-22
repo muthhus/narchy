@@ -77,63 +77,26 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
-        Caffeine<Term, Termed> builder = prepare(Caffeine.newBuilder(), soft);
-        builder
-               .weigher(weigher)
-               .maximumWeight(maxWeight)
-               .removalListener(this)
-               .executor(executor)
-               //.recordStats()
-        ;
-        cache = builder.build();
-
-
-//        Caffeine<Termed, Termed> buildera = prepare(Caffeine.newBuilder(), false);
-//        buildera
-//                .removalListener(this)
-//                .executor(executor);
-//        atomics = buildera.build();
-//        atomics = new ConcurrentHashMap<>(256 /* estimate */); //TODO this should probably be a Caffeine again, with a limit and restriction on removing WiredConcept's
-
-
-//        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), false);
-
-//        subs = builderSubs
-//                //.weakValues() //.softValues()
-//                .weigher(complexityAndConfidenceWeigher)
-//                .maximumWeight(maxSubtermWeight)
-//                .executor(executor)
-//                .build();
-
-//        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), soft);
-//        subs = builderSubs
-//                .weigher(complexityWeigher)
-//                .maximumWeight(maxWeight)
-//                .build();
-
-
-    }
-
-
-    private static Caffeine prepare(Caffeine<Object, Object> builder, boolean soft) {
-
-        //builder = builder.initialCapacity(initialSize);
+        Caffeine<Term, Termed> builder = Caffeine.newBuilder()
+                .removalListener(this)
+                .executor(executor);
 
         if (soft) {
-            //builder = builder.softValues();
-            builder = builder.weakValues();
+            builder.softValues();
+//                //.weakValues() //.softValues()
+        } else {
+           builder.weigher(weigher)
+                .maximumWeight(maxWeight);
         }
 
-        //.softValues()
-        //.maximumSize(10_000)
-        //.expireAfterAccess(5, TimeUnit.MINUTES)
-        //.refreshAfterWrite(1, TimeUnit.MINUTES)
-        //.refreshAfterWrite(1, TimeUnit.NANOSECONDS)
-        //.maximumSize(32*1024)
-        //.build(key -> createExpensiveGraph(key));
+       //.recordStats()
 
-        return builder;
+        cache = builder.build();
+
     }
+
+
+
 
     @Override
     public void remove(@NotNull Term x) {
@@ -202,9 +165,10 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public @NotNull String summary() {
-        CacheStats s = cache.stats();
-        return cache.estimatedSize() + " concepts (" + n2(s.hitRate()) + " hitrate, " +
-                s.requestCount() + " reqs)";
+        //CacheStats s = cache.stats();
+        return cache.estimatedSize() + " concepts";
+        //(" + n2(s.hitRate()) + " hitrate, " +
+                //s.requestCount() + " reqs)";
 
     }
 

@@ -384,7 +384,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      *
      * @return null if not processed, or an Activation instance to continue with link activation and feedback
      */
-    public final Activation process(@NotNull Task input, @NotNull NAR nar) {
+    @Override public final Activation process(@NotNull Task input, @NotNull NAR nar) {
 
         List<Task> toRemove = $.newArrayList();
 
@@ -467,14 +467,17 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
             Truth other;
             float polarity =  0;
 
-            if (input.isBelief() && concept.hasGoals()) {
+            long now = nar.time();
+            if (input.isBelief()) {
                 //compare against the current goal state
-                other = concept.goals().truth(nar.time());
-                polarity = +1f;
-            } else if (input.isGoal() && concept.hasBeliefs()) {
+                other = concept.goals().truth(now);
+                if (other!=null)
+                    polarity = +1f;
+            } else if (input.isGoal()) {
                 //compare against the current belief state
-                other = concept.beliefs().truth(nar.time());
-                polarity = -1f;
+                other = concept.beliefs().truth(now);
+                if (other!=null)
+                    polarity = -1f;
             } else {
                 other = null;
             }

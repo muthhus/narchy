@@ -661,9 +661,9 @@ public class Tetris extends NAgent {
 
             SensorConcept s = sensors.get(y * tetris_width + x);
 
-            Truth b = s.hasBeliefs() ? s.beliefs().truth(now + whenRelative) : null;
+            Truth b = s.beliefs().truth(now + whenRelative);
             float bf = b != null ? b.freq() : 0.5f;
-            Truth dt = s.hasGoals() ? s.goals().truth(now + whenRelative) : null;
+            Truth dt = s.goals().truth(now + whenRelative);
             float dr, dg;
             if (dt == null) {
                 dr = dg = 0;

@@ -23,18 +23,18 @@ public class TuffySmokesTest {
             if (c == null) {
                 System.err.println(t + " unknown" + " ");
             } else {
-                if (!c.hasBeliefs()) {
-                    System.err.println(t + " no beliefs");
-
-
-                    //n.input(t + ". %0.5;0.1%");
-
-                } else {
-                    Task b = c.beliefs().top(ETERNAL);
-                    System.err.println(t + " = " + b);
-                    //System.err.println(b.getExplanation());
-                    continue;
-                }
+//                if (!c.hasBeliefs()) {
+//                    System.err.println(t + " no beliefs");
+//
+//
+//                    //n.input(t + ". %0.5;0.1%");
+//
+//                } else {
+//                    Task b = c.beliefs().top(ETERNAL);
+//                    System.err.println(t + " = " + b);
+//                    //System.err.println(b.getExplanation());
+//                    continue;
+//                }
             }
             //n.input(t + "?");
         }

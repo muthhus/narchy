@@ -28,6 +28,11 @@ public abstract class MaplikeIndex extends TermIndex {
     }
 
 
+    @NotNull
+    @Override protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
+        return super.newCompound(op, dt, internSubterms(subterms));
+    }
+
     abstract public @NotNull TermContainer internSubterms(@NotNull TermContainer s);
 
 

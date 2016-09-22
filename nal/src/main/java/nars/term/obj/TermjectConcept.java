@@ -1,8 +1,10 @@
 package nars.term.obj;
 
+import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.bag.Bag;
+import nars.budget.Activation;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.AbstractConcept;
 import nars.table.BeliefTable;
@@ -213,6 +215,11 @@ public class TermjectConcept<X> implements AbstractConcept, Termject<X> {
     @Override
     public void policy(@NotNull ConceptPolicy c, long now, @NotNull List<Task> removed) {
         this.policy = c;
+    }
+
+    @Override
+    public Activation process(@NotNull Task input, NAR nar) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

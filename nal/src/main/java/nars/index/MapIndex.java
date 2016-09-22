@@ -53,10 +53,7 @@ public class MapIndex extends SimpleMapIndex {
     @Override
     @NotNull public TermContainer internSubterms(@NotNull TermContainer x) {
         TermContainer prev = subterms.putIfAbsent(x, x);
-        if (prev == null)
-            return x; //which was inserted
-        else
-            return prev;
+        return (prev == null) ? x : prev;
     }
 }
 

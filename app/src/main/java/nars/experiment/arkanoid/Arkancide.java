@@ -64,7 +64,7 @@ public class Arkancide extends SwingAgent {
     }
 
     public static void main(String[] args) {
-        run(Arkancide::new, 5000);
+        run(Arkancide::new, 500);
     }
 
 

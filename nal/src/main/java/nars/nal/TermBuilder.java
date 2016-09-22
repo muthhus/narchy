@@ -291,7 +291,7 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    private Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
+    protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
         return new GenericCompound(op, dt, subterms);
     }
 
@@ -356,9 +356,6 @@ public abstract class TermBuilder {
      */
     @NotNull
     private Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
-
-
-
 
         //if (Param.DEBUG ) {
         //check for any imdex terms that may have not been removed

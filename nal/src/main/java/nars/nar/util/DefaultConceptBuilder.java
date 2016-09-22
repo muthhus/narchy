@@ -87,11 +87,6 @@ import static nars.time.Tense.DTERNAL;
     @Nullable
     final Concept newConcept(@NotNull Compound t){
 
-
-        t = preConceptualize(t);
-
-
-
 //        Map map1 = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
 //        Map map2 =
 //                map1; //shared
@@ -131,9 +126,6 @@ import static nars.time.Tense.DTERNAL;
 
     /** terms should generally not be tried here unless they also have been determined linkable() [below] first */
     @NotNull public static Compound preConceptualize(@NotNull Compound x) {
-
-        if (!(x.op().temporal && x.dt() != DTERNAL))
-            throw new RuntimeException("temporality in concept term: " + x);
 
         if (!x.isNormalized())
             throw new InvalidConceptException(x, "not normalized");
@@ -179,10 +171,10 @@ import static nars.time.Tense.DTERNAL;
                         //CurveBag.power6BagCurve,
                         rng);
 
-        this.sleep = new DefaultConceptPolicy(7, 8, 2, 16, 8);
+        this.sleep = new DefaultConceptPolicy("sleep", 7, 8, 2, 16, 8);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy(12, 10, 4, 32, 24);
+        this.awake = new DefaultConceptPolicy("awake", 12, 10, 4, 32, 24);
     }
 
     @Override

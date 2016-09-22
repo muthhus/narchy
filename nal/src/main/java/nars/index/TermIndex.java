@@ -36,6 +36,7 @@ import java.util.function.Function;
 
 import static nars.Op.INH;
 import static nars.Op.VAR_PATTERN;
+import static nars.nar.util.DefaultConceptBuilder.preConceptualize;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
@@ -464,6 +465,9 @@ public abstract class TermIndex extends TermBuilder {
      */
     @Nullable
     public final Concept concept(@NotNull Term term, boolean createIfMissing) throws InvalidConceptException {
+
+        if (term instanceof Compound)
+            term = preConceptualize((Compound)term);
 
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {

@@ -104,28 +104,26 @@ public class Vis {
                     r = g = b = ph * 0.5f;
                 } else {
                     float belief = 0;
-                    if (c.hasBeliefs()) {
-                        @Nullable Truth bt = c.beliefs().truth(now);
-                        if (bt!=null)
-                            belief = bt.conf();
-                    }
+
+                    @Nullable Truth bt = c.beliefs().truth(now);
+                    if (bt!=null)
+                        belief = bt.conf();
+
 
                     float goal = 0;
-                    if (c.hasGoals()) {
-                        @Nullable Truth gt = c.goals().truth(now);
-                        if (gt!=null)
-                            goal = gt.conf();
-                    }
+                    @Nullable Truth gt = c.goals().truth(now);
+                    if (gt!=null)
+                        goal = gt.conf();
 
                     if (belief > 0 || goal > 0) {
                         r = 0;
                         g = 0.25f + 0.75f * belief;
                         b = 0.25f + 0.75f * goal;
-                    } else if (c.hasQuestions() || c.hasQuests()) {
+                    } /*else if (c.hasQuestions() || c.hasQuests()) {
                         r = 1; //yellow
                         g = 1/2;
                         b = 0;
-                    } else {
+                    } else*/ {
                         r = g = b = 0;
                     }
                 }

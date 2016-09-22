@@ -64,10 +64,11 @@ public class MSG extends Globals {
     //ok.
     public static void WriteInt(sizebuf_t sb, int c) {
         int i = SZ.GetSpace(sb, 4);
-        sb.data[i++] = (byte) ((c & 0xff));
-        sb.data[i++] = (byte) ((c >>> 8) & 0xff);
-        sb.data[i++] = (byte) ((c >>> 16) & 0xff);
-        sb.data[i++] = (byte) ((c >>> 24) & 0xff);
+        byte[] d = sb.data;
+        d[i++] = (byte) ((c & 0xff));
+        d[i++] = (byte) ((c >>> 8) & 0xff);
+        d[i++] = (byte) ((c >>> 16) & 0xff);
+        d[i++] = (byte) ((c >>> 24) & 0xff);
     }
 
     //ok.

@@ -120,9 +120,16 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
     public void printConceptStatistics() {
         //Frequency complexity = new Frequency();
+        Frequency clazz = new Frequency();
+        Frequency policy = new Frequency();
         Frequency volume = new Frequency();
         Frequency rootOp = new Frequency();
         AtomicInteger i = new AtomicInteger(0);
+
+        LongSummaryStatistics beliefs = new LongSummaryStatistics();
+        LongSummaryStatistics goals = new LongSummaryStatistics();
+        LongSummaryStatistics questions = new LongSummaryStatistics();
+        LongSummaryStatistics quests = new LongSummaryStatistics();
 
         LongSummaryStatistics termlinksCap = new LongSummaryStatistics();
         LongSummaryStatistics termlinksUsed = new LongSummaryStatistics();
@@ -134,11 +141,22 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
             //complexity.addValue(c.complexity());
             volume.addValue(c.volume());
             rootOp.addValue(c.op());
+            clazz.addValue(c.getClass().toString());
+
+            @Nullable ConceptPolicy p = c.policy();
+            policy.addValue(p != null ? p.toString() : "null");
 
             termlinksCap.accept(c.termlinks().capacity());
             termlinksUsed.accept(c.termlinks().size());
             tasklinksCap.accept(c.tasklinks().capacity());
             tasklinksUsed.accept(c.tasklinks().size());
+
+            beliefs.accept(c.beliefs().size());
+            goals.accept(c.goals().size());
+            questions.accept(c.questions().size());
+            quests.accept(c.quests().size());
+
+
                     
         });
         System.out.println("Total Concepts:\n" + i.get());
@@ -147,8 +165,10 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         System.out.println("\ntaskLinksUsed:\n" + tasklinksUsed);
         System.out.println("\ntaskLinksCapacity:\n" + tasklinksCap);
         //System.out.println("\nComplexity:\n" + complexity);
+        System.out.println("\npolicy:\n" + policy);
         System.out.println("\nrootOp:\n" + rootOp);
         System.out.println("\nvolume:\n" + volume);
+        System.out.println("\nclass:\n" + clazz);
 
     }
 
@@ -623,7 +643,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
                 emotion.busy(input.pri());
 
-                Activation a = ((CompoundConcept)c).process(input, this);
+                Activation a = c.process(input, this);
                 if (a!=null) {
 
                     emotion.stress(a.linkOverflow);
@@ -1036,11 +1056,11 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
                                   boolean includeTaskLinks, int maxPerConcept,
                                   @NotNull Consumer<Task> recip) {
         forEachConcept(c -> {
-            if (includeConceptBeliefs && c.hasBeliefs()) c.beliefs().top(maxPerConcept, recip);
-            if (includeConceptQuestions && c.hasQuestions()) c.questions().top(maxPerConcept, recip);
-            if (includeConceptGoals && c.hasBeliefs()) c.goals().top(maxPerConcept, recip);
-            if (includeConceptQuests && c.hasQuests()) c.quests().top(maxPerConcept, recip);
-            if (includeTaskLinks && null != c.tasklinks())
+            if (includeConceptBeliefs) c.beliefs().top(maxPerConcept, recip);
+            if (includeConceptQuestions) c.questions().top(maxPerConcept, recip);
+            if (includeConceptGoals) c.goals().top(maxPerConcept, recip);
+            if (includeConceptQuests) c.quests().top(maxPerConcept, recip);
+            if (includeTaskLinks)
                 c.tasklinks().forEach(maxPerConcept, t -> recip.accept(t.get()));
         });
 
