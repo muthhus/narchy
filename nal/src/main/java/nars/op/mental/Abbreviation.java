@@ -225,9 +225,9 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
             return abbr.templates();
         }
 
-        @Override
-        public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
-            return super.unify(y, subst) || abbr.term().unify(y, subst);
+        /** equality will have already been tested here, and the parent super.unify() method is just return false. so skip it and just try the abbreviated */
+        @Override public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+            return /*super.unify(y, subst) || */abbr.term().unify(y, subst);
         }
     }
 

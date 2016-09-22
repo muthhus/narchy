@@ -15,7 +15,7 @@ public class Autoencoder {
 
 
 	/** input vector after preprocessing (noise, corruption, etc..) */
-	final private float[] xx;
+	protected final float[] xx;
 
 	/** output vector */
 	final public float[] y;
@@ -231,7 +231,7 @@ public class Autoencoder {
 		return train(x, learningRate, noiseLevel, corruptionRate, sigmoid,sigmoid);
 	}
 
-	/** returns the total error (not avg_error = error sum divided by # items) */
+	/** returns the total error (not sqr(error) and not avg_error = error sum divided by # items) */
 	public float train(float[] x, float learningRate,
 					   float noiseLevel, float corruptionRate,
 					   boolean sigmoidIn, boolean sigmoidOut) {
@@ -240,6 +240,7 @@ public class Autoencoder {
 		return learn(x, y, learningRate);
 	}
 
+	/** returns the total error (not sqr(error) and not avg_error = error sum divided by # items) */
 	public float learn(float[] x, float[] y, float learningRate) {
 		float[][] W = this.W;
 		float[] L_hbias = this.L_hbias;
@@ -250,7 +251,7 @@ public class Autoencoder {
 
 		int outs = y.length;
 
-		float error = 0;
+		float errorSq = 0, error = 0;
 
 		float[] zz = z;
 
@@ -259,9 +260,11 @@ public class Autoencoder {
 
 			float lv = x[i] - zz[i];
 
+			error += Math.abs(lv);
+
 			L_vbias[i] = lv;
 
-			error += lv * lv; // square of difference
+			errorSq += lv * lv; // square of difference
 
 			vbias[i] += learningRate * lv;
 		}

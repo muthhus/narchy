@@ -14,13 +14,17 @@ import nars.util.signal.AutoClassifier;
 import nars.video.MatrixSensor;
 import nars.video.PixelBag;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.SpaceGraph;
 import spacegraph.obj.MatrixView;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
+import static nars.nal.UtilityFunctions.w2c;
 import static nars.util.Texts.n2;
 import static nars.util.Texts.n4;
+import static spacegraph.obj.GridSurface.col;
 
 /**
  * Created by me on 9/19/16.
@@ -32,7 +36,7 @@ public class SideCraft extends SwingAgent {
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        run(SideCraft::new, 512);
+        run(SideCraft::new, 6512);
     }
 
     public SideCraft(NAR nar) {
@@ -53,9 +57,18 @@ public class SideCraft extends SwingAgent {
 
         PixelBag cam = new PixelBag(camBuffer, 64, 64).addActions("cra", this);
 
-        //camAE = new PixelAutoClassifier("cra", cam.pixels, 16, 16, 24, 4, this);
-        //SpaceGraph.window(new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)), 500, 500);
-
+        final int nx = 8;
+        camAE = new SideCraft.PixelAutoClassifier("cra", cam.pixels, nx, nx, (subX, subY)-> {
+            //context metadata: camera zoom, to give a sense of scale
+            return new float[] { subX/((float)(nx-1)), subY/((float)(nx-1)), cam.Z };
+        }, 16, 4, this);
+        SpaceGraph.window(
+                col(
+                        new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)),
+                        new MatrixView(camAE.pixRecon.length, camAE.pixRecon[0].length, arrayRenderer(camAE.pixRecon))
+                ),
+                500, 500
+        );
 
         pixels = addCamera("cra", cam, (v) -> $.t(v, alpha));
 
@@ -130,6 +143,7 @@ public class SideCraft extends SwingAgent {
     public static class PixelAutoClassifier extends AutoClassifier {
 
         private final NAR nar;
+        private final MetaBits metabits;
         @NotNull Atom TAG = $.the("ae");
 
         private final float[][] pixIn;
@@ -148,8 +162,14 @@ public class SideCraft extends SwingAgent {
 //            this(root, pixIn, sw, sh, sw * sh /* estimate */, 4, agent);
 //        }
 
-        public PixelAutoClassifier(String root, float[][] pixIn, int sw, int sh, int states, int termBatchSize, NAgent agent) {
-            super(sw * sh, states, agent.nar.random);
+        public interface MetaBits {
+            float[] get(int subX, int subY);
+        }
+
+        /** metabits must consistently return an array of the same size, since now the size of this autoencoder is locked to its dimension */
+        public PixelAutoClassifier(String root, float[][] pixIn, int sw, int sh, MetaBits metabits, int states, int termBatchSize, NAgent agent) {
+            super(sw * sh + metabits.get(0,0).length, states, agent.nar.random);
+            this.metabits = metabits;
             this.nar = agent.nar;
             this.root = $.the(root);
             this.pixIn = pixIn;
@@ -159,7 +179,7 @@ public class SideCraft extends SwingAgent {
             pw = pixIn.length;
             this.nw = (int) Math.ceil(pw / ((float) sw)); //number strides wide
             this.nh = (int) Math.ceil(ph / ((float) sh)); //number strides high
-            this.in = new float[sw * sh];
+            this.in = new float[xx.length];
             this.pixRecon = new float[pw][ph];
             this.pixOut = new int[nw * nh];
             this.batchSize = termBatchSize;
@@ -169,9 +189,9 @@ public class SideCraft extends SwingAgent {
         public void frame() {
             int q = 0;
 
-            float alpha = 0.05f;
+            float alpha = 0.04f;
 
-            float sumErrSquared = 0;
+            float sumErr = 0;
             //forget(alpha*alpha);
 
 
@@ -196,10 +216,15 @@ public class SideCraft extends SwingAgent {
                         }
                     }
 
+                    float[] metabits = this.metabits.get(i, j);
+                    for (float m : metabits) {
+                        in[p++] = m;
+                    }
+
                     boolean sigIn = true, sigOut = true;
                     if (learn) {
-                        float regionError = train(in, alpha, 0f, 0.2f, sigIn, sigOut);
-                        sumErrSquared += regionError;
+                        float regionError = train(in, alpha, 0f, 0.01f, sigIn, sigOut);
+                        sumErr += regionError;
                         //System.out.println(n2(y) + ", +-" + n4(regionError / y.length));
                     } else {
                         //System.out.println(n2(y));
@@ -233,25 +258,31 @@ public class SideCraft extends SwingAgent {
                 i++;
             }
 
-            float meanErrSquaredPerPixel = sumErrSquared / (pw * ph);
+            float meanErrSquaredPerPixel = sumErr / (pw * ph);
             System.out.println(Arrays.toString(pixOut) +", +-" + n4(meanErrSquaredPerPixel));
 
+            if (sumErr < 1f) {
 
-            int qq = 0;
-            for (int i = 0; i < pixOut.length; i += batchSize) {
-                Term[] t = new Term[batchSize + 1];
-                int j = 0;
-                for (; j < batchSize; )
-                    t[j++] = $.the(pixOut[qq++]);
-                t[j] = TAG;
+                float conf = w2c(1f-sumErr /* approx */);
+                if (conf >= nar.confMin.floatValue()) {
 
-                //TODO use a new Term choice sensor type here
+                    int qq = 0;
+                    for (int i = 0; i < pixOut.length; i += batchSize) {
+                        Term[] t = new Term[batchSize + 1];
+                        int j = 0;
+                        for (; j < batchSize; )
+                            t[j++] = $.the(pixOut[qq++]);
+                        t[j] = TAG;
 
-                Term Y = $.inh($.p(t), root);
-                //System.out.println(Y);
-                nar.believe(Y, Tense.Present);
+                        //TODO use a new Term choice sensor type here
+
+                        Term Y = $.inh($.p(t), root);
+                        //System.out.println(Y);
+                        nar.believe(Y, Tense.Present, 1f, conf);
+                    }
+
+                }
             }
-
         }
 
 

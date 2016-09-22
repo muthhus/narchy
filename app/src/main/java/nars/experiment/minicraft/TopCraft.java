@@ -41,7 +41,11 @@ public class TopCraft extends SwingAgent {
 
         pixels = addCamera("cra", cam, (v) -> $.t( v, alpha));
 
-        camAE = new SideCraft.PixelAutoClassifier("cra", cam.pixels, 16, 16, 16, 4, this);
+        final int nx = 8;
+        camAE = new SideCraft.PixelAutoClassifier("cra", cam.pixels, nx, nx, (subX, subY)-> {
+            //context metadata: camera zoom, to give a sense of scale
+            return new float[] { subX/((float)(nx-1)), subY/((float)(nx-1)), cam.Z };
+        }, 12, 4, this);
         SpaceGraph.window(
                 col(
                     new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)),

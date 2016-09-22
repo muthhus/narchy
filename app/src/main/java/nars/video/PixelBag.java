@@ -29,7 +29,9 @@ public class PixelBag implements PixelCamera {
      *   = 1: zoomed out all the way
      *
      */
-    float X = 0f, Y = 0f, Z;
+    float X = 0f;
+    float Y = 0f;
+    public float Z;
 
 //    public float minX = 0f;
 //    public float maxX = 1f;
