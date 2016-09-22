@@ -154,8 +154,7 @@ public class TreeIndex extends TermIndex {
 
 
     @Override
-    public @Nullable Termed get(@NotNull Termed tt, boolean createIfMissing) {
-        Term t = tt.term();
+    public @Nullable Termed get(@NotNull Term t, boolean createIfMissing) {
 
         if (t instanceof Compound)
             t = preConceptualize((Compound) t);
@@ -179,17 +178,24 @@ public class TreeIndex extends TermIndex {
 
     @NotNull
     public TermKey key(@NotNull Term t) {
-
-        if (t instanceof Compound)
-            t = preConceptualize((Compound) t);
-
         return concepts.key(t);
     }
 
 
     @Override
-    public void set(@NotNull Termed src, Termed target) {
-        concepts.put(key(src.term()), target);
+    public void set(@NotNull Term src, Termed target) {
+
+        concepts.acquireWriteLock();
+        try {
+            @NotNull TermKey k = key(src);
+            Termed existing = concepts.get(k);
+            if (!(existing instanceof PermanentConcept)) {
+                concepts.put(k, target);
+            }
+            concepts.releaseWriteLock();
+        } finally {
+            concepts.releaseWriteLock();
+        }
     }
 
     @Override
@@ -225,17 +231,12 @@ public class TreeIndex extends TermIndex {
 
 
     @Override
-    public void remove(@NotNull Termed entry) {
-        TermKey k = key(entry.term());
+    public void remove(@NotNull Term entry) {
+        TermKey k = key(entry);
         Termed result = concepts.get(k);
         if (result != null) {
             concepts.remove(k);
         }
-    }
-
-    @Override
-    public @NotNull Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
-        return new GenericCompound(op, dt, subterms);
     }
 
 
@@ -244,10 +245,7 @@ public class TreeIndex extends TermIndex {
         value.delete(nar);
     }
 
-    @Override
-    protected boolean transformImmediates() {
-        return true;
-    }
+
 
     /**
      * Tree-index with a front-end "L1" non-blocking hashmap cache
@@ -262,9 +260,8 @@ public class TreeIndex extends TermIndex {
         }
 
         @Override
-        public @Nullable Termed get(@NotNull Termed tt, boolean createIfMissing) {
-            Term t = tt.term();
-            t = tt instanceof Compound ? preConceptualize(((Compound) t)) : t;
+        public @Nullable Termed get(@NotNull Term t, boolean createIfMissing) {
+            t = t instanceof Compound ? preConceptualize(((Compound) t)) : t;
             Object o = L1.computeIfAbsent2(t,
                     createIfMissing ?
                             ttt -> {

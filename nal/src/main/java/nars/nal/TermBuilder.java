@@ -2,11 +2,13 @@ package nars.nal;
 
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.nal.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
@@ -40,10 +42,10 @@ public abstract class TermBuilder {
     public static final TermContainer InvalidSubterms = TermVector.the(False);
 
 
-    public static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
+    private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
 
-    public static final int InvalidImplicationSubject = or(EQUI, IMPL);
-    public static final int InvalidImplicationPredicate = or(EQUI);
+    private static final int InvalidImplicationSubject = or(EQUI, IMPL);
+    private static final int InvalidImplicationPredicate = or(EQUI);
 
 
     @NotNull
@@ -174,7 +176,7 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    public static void productNormalizeSubterms(Term[] u) {
+    private static void productNormalizeSubterms(Term[] u) {
         for (int i = 0, uLength = u.length; i < uLength; i++) {
             u[i] = productNormalize(u[i]);
         }
@@ -203,7 +205,7 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public static final Term imageUnwrapToProd(Term p, Compound ii) {
+    private static Term imageUnwrapToProd(Term p, Compound ii) {
         return $.p(imageUnwrap(ii, p));
     }
 
@@ -268,7 +270,7 @@ public abstract class TermBuilder {
     }
 
 
-    static boolean validEquivalenceTerm(@NotNull Term t) {
+    private static boolean validEquivalenceTerm(@NotNull Term t) {
         return !t.isAny(InvalidEquivalenceTerm);
 //        if ( instanceof Implication) || (subject instanceof Equivalence)
 //                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
@@ -277,7 +279,7 @@ public abstract class TermBuilder {
 //        }
     }
 
-    static boolean hasImdex(@NotNull Term[] r) {
+    private static boolean hasImdex(@NotNull Term[] r) {
         for (Term x : r) {
             //        if (t instanceof Compound) return false;
 //        byte[] n = t.bytes();
@@ -289,17 +291,18 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    public abstract Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms);
-
+    private Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
+        return new GenericCompound(op, dt, subterms);
+    }
 
     @NotNull
-    public Term the(@NotNull Op op, @NotNull Term... tt) {
+    private Term the(@NotNull Op op, @NotNull Term... tt) {
         return the(op, DTERNAL, tt);
     }
 
 
     @NotNull
-    public Term newDiff(@NotNull Op op, @NotNull Term[] t) {
+    private Term newDiff(@NotNull Op op, @NotNull Term[] t) {
 
         //corresponding set type for reduction:
         Op set = op == DIFFe ? SETe : SETi;
@@ -321,17 +324,17 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    public final Term finish(@NotNull Op op, @NotNull Term... args) {
+    private Term finish(@NotNull Op op, @NotNull Term... args) {
         return finish(op, DTERNAL, args);
     }
 
     @NotNull
-    public final Term finish(@NotNull Op op, @NotNull TermContainer args) {
+    private Term finish(@NotNull Op op, @NotNull TermContainer args) {
         return finish(op, DTERNAL, args);
     }
 
     @NotNull
-    public final Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
+    private Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
         return finish(op, dt, TermContainer.the(op, args));
     }
 
@@ -339,11 +342,11 @@ public abstract class TermBuilder {
         return isTrue(x) || isFalse(x);
     }
 
-    public static boolean isTrue(@NotNull Term x) {
+    private static boolean isTrue(@NotNull Term x) {
         return x.equals(True);
     }
 
-    public static boolean isFalse(@NotNull Term x) {
+    private static boolean isFalse(@NotNull Term x) {
         return x.equals(False);
     }
 
@@ -352,7 +355,7 @@ public abstract class TermBuilder {
      * final step in compound construction
      */
     @NotNull
-    protected final Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
+    private Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
 
 
 
@@ -412,7 +415,7 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    public final Term[] negation(@NotNull Term[] t) {
+    private Term[] negation(@NotNull Term[] t) {
         int l = t.length;
         Term[] u = new Term[l];
         for (int i = 0; i < l; i++) {
@@ -445,7 +448,7 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    final Term image(@NotNull Op o, @NotNull Term[] res) {
+    private Term image(@NotNull Op o, @NotNull Term[] res) {
 
         int index = DTERNAL, j = 0;
         for (Term x : res) {
@@ -467,7 +470,7 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public Term conj(int dt, final @NotNull Term... uu) {
+    private Term conj(int dt, final @NotNull Term... uu) {
 
         Term[] u = conjTrueFalseFilter(uu);
 
@@ -519,7 +522,7 @@ public abstract class TermBuilder {
 
     }
 
-    public static boolean commutive(int dt) {
+    private static boolean commutive(int dt) {
         return (dt == DTERNAL) || (dt == 0);
     }
 
@@ -530,7 +533,7 @@ public abstract class TermBuilder {
      * flattening junction builder, for (commutive) multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
      */
     @NotNull
-    public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
+    private Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
         if (u.length == 0)
             return False;
@@ -569,7 +572,7 @@ public abstract class TermBuilder {
      * measurements.
      */
     @Nullable
-    protected TreeSet<Term> junctionGroupNonDTSubterms(@NotNull TreeSet<Term> s, int innerDT) {
+    private TreeSet<Term> junctionGroupNonDTSubterms(@NotNull TreeSet<Term> s, int innerDT) {
         TreeSet<Term> outer = new TreeSet();
         Iterator<Term> ss = s.iterator();
         while (ss.hasNext()) {
@@ -607,7 +610,7 @@ public abstract class TermBuilder {
     /**
      * for commutive conjunction (0 or DTERNAL)
      */
-    static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
+    private static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
 
         for (Term x : u) {
 
@@ -629,7 +632,7 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    public Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
+    private Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
 
         while (true) {
@@ -832,9 +835,11 @@ public abstract class TermBuilder {
     }
 
     /**
-     * whether this builder applies immediate transforms
+     * whether to apply immediate transforms during compound building
      */
-    protected abstract boolean transformImmediates();
+    protected boolean transformImmediates() {
+        return true;
+    }
 
 
 //    @Nullable
@@ -843,7 +848,7 @@ public abstract class TermBuilder {
 //    }
 
     @Nullable
-    public Term newIntersectINT(@NotNull Term[] t) {
+    private Term newIntersectINT(@NotNull Term[] t) {
         return newIntersection(t,
                 SECTi,
                 SETi,
@@ -851,7 +856,7 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public Term newIntersectEXT(@NotNull Term[] t) {
+    private Term newIntersectEXT(@NotNull Term[] t) {
         return newIntersection(t,
                 SECTe,
                 SETe,
@@ -859,7 +864,7 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
+    private Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
         switch (t.length) {
 
             case 1:
@@ -884,7 +889,7 @@ public abstract class TermBuilder {
 
     @NotNull
     @Deprecated
-    public Term newIntersection2(@NotNull Term term1, @NotNull Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
+    private Term newIntersection2(@NotNull Term term1, @NotNull Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
 
         if (term1.equals(term2))
             return term1;

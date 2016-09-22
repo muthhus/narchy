@@ -17,6 +17,7 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
+import nars.truth.TruthDelta;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -184,9 +185,17 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
 
 
             MutableTask t = new GeneratedTask(abbreviation, Symbols.BELIEF,
-                    $.t(1, abbreviationConfidence.floatValue()))
+                    $.t(1, abbreviationConfidence.floatValue())) {
 
+                @Override public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+                    super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
+                    if (!isDeleted()) {
+                        //redirect concept resolution to the abbreviation alias
+                        nar.concepts.set(abbreviated.term(), alias);
+                    }
+                }
 
+            }
 //                @Override
 //                public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
 //                    Concept abbreviatedConcept = nar.concept(abbreviated, true);

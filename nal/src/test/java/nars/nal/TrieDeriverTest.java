@@ -1,6 +1,7 @@
 package nars.nal;
 
 import com.google.common.collect.Sets;
+import nars.concept.util.ConceptBuilder;
 import nars.index.PatternIndex;
 import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.BoolCondition;
@@ -13,6 +14,7 @@ import java.util.*;
 import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 12/12/15.
@@ -211,7 +213,7 @@ public class TrieDeriverTest {
 
     @Test public void testPatternIndexContainsNoConcepts() {
         PatternIndex p = d.rules.patterns;
-        assertNull(p.conceptBuilder());
+        assertTrue(ConceptBuilder.Null == p.conceptBuilder());
 //        //out.println(p.data);
 //        //out.println(p.atoms);
 //        p.forEach(t -> {

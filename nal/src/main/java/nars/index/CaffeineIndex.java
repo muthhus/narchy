@@ -1,6 +1,7 @@
 package nars.index;
 
 import com.github.benmanes.caffeine.cache.*;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -13,11 +14,11 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+
+import static nars.util.Texts.n2;
 
 
 public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
@@ -26,18 +27,18 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
 //    @NotNull
 //    public final Cache<Termed, Termed> atomics;
-    @NotNull
-    private final Map<Termed,Termed> atomics;
+//    @NotNull
+//    private final Map<Termed,Termed> atomics;
 
 
     /** holds compounds and subterm vectors */
-    @NotNull public final Cache<Termlike, Termlike> compounds;
+    @NotNull public final Cache<Term, Termed> cache;
 
 //    @NotNull
 //    private final Cache<TermContainer, TermContainer> subs;
 
 
-    private static final Weigher<Termlike, Termlike> weigher = (k, v) -> {
+    private static final Weigher<Term, Termed> weigher = (k, v) -> {
 
         if (v instanceof PermanentConcept) {
             return 0; //special concept implementation: dont allow removal
@@ -76,16 +77,15 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
-        Caffeine<Termlike, Termlike> builder = prepare(Caffeine.newBuilder(), soft);
+        Caffeine<Term, Termed> builder = prepare(Caffeine.newBuilder(), soft);
         builder
                .weigher(weigher)
                .maximumWeight(maxWeight)
                .removalListener(this)
                .executor(executor)
-
                //.recordStats()
         ;
-        compounds = builder.build();
+        cache = builder.build();
 
 
 //        Caffeine<Termed, Termed> buildera = prepare(Caffeine.newBuilder(), false);
@@ -93,7 +93,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 //                .removalListener(this)
 //                .executor(executor);
 //        atomics = buildera.build();
-        atomics = new ConcurrentHashMap<>(256 /* estimate */); //TODO this should probably be a Caffeine again, with a limit and restriction on removing WiredConcept's
+//        atomics = new ConcurrentHashMap<>(256 /* estimate */); //TODO this should probably be a Caffeine again, with a limit and restriction on removing WiredConcept's
 
 
 //        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), false);
@@ -136,100 +136,55 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
     @Override
-    public void remove(@NotNull Termed x) {
-        Term tx = x.term();
-        if (tx instanceof Compound)
-            compounds.invalidate(tx);
-        else
-            atomics.remove(tx);
+    public void remove(@NotNull Term x) {
+        cache.invalidate(x);
     }
 
-    @Override
-    public Termed get(@NotNull Termed x) {
-        Term tx = x.term();
-        if (tx instanceof Compound)
-            return (Termed) compounds.getIfPresent(tx);
-        else
-            return atomics.get(tx);
-    }
-
-//    @NotNull
-//    private final Cache<Termed,Termed> cacheFor(Term x) {
-//        return x instanceof Compound ? compounds : atomics;
-//    }
 
     @Override
-    public void set(@NotNull Termed src, @NotNull Termed target) {
-        Term tx = src.term();
-        if (tx instanceof Compound)
-            compounds.put(tx, (Termlike)target);
-        else
-            atomics.putIfAbsent(tx, target);
-
-        //Termed exist = data.getIfPresent(src);
-
-        //data.put(src, target);
-        //data.cleanUp();
-        //return target;
-
-//        Termed current = data.get(src, (s) -> target);
-//        return current;
+    public void set(@NotNull Term src, @NotNull Termed target) {
+        cache.asMap().merge(src, target, setIfNotAlreadyPermanent);
     }
 
 
     @Override
     public void clear() {
-        compounds.invalidateAll();
-        //atomics.invalidateAll();
+        cache.invalidateAll();
     }
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {
-        //BiConsumer<Termed, Termed> e = (k, v) -> c.accept(v);
-
-        atomics.values().forEach(c);
-        //atomics.asMap().forEach(e);
-
-        compounds.asMap().values().forEach(x -> {
-           if (x instanceof Termed)
-               c.accept((Termed)x);
+        cache.asMap().values().forEach(x -> {
+            c.accept(x);
         });
     }
 
     @Override
     public int size() {
-        return (int) (compounds.estimatedSize() + atomics.size());
+        return (int)cache.estimatedSize();
     }
 
     @Override
     public int subtermsCount() {
-        return -1; //not calculated when they share the same cache
-        //return (int) subs.estimatedSize();
+        return -1;
     }
 
 
     @NotNull @Override
     public TermContainer internSubterms(@NotNull TermContainer t) {
-        return (TermContainer) compounds.get(t, tt -> tt);
+        //return (TermContainer) cache.get(t, tt -> tt);
+        return t;
     }
 
-
-    /**
-     * default lowest common denominator impl, subclasses may reimpl for more efficiency
-     */
     @Override
-    @NotNull
-    protected Termed getConceptCompound(@NotNull Compound x) {
-        return (Termed) compounds.get(x, y -> (Termlike)buildConcept((Compound)y));
+    public Termed get(Term key, boolean createIfMissing) {
+        if (createIfMissing) {
+            return cache.get(key, conceptBuilder::apply);
+        } else {
+            return cache.getIfPresent(key);
+        }
     }
 
-
-
-    @NotNull
-    @Override
-    protected Termed getNewAtom(@NotNull Atomic x) {
-        return atomics.computeIfAbsent(x, this::buildConcept);
-    }
     //    protected Termed theCompoundCreated(@NotNull Compound x) {
 //
 //        if (x.hasTemporal()) {
@@ -247,7 +202,10 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public @NotNull String summary() {
-        return atomics.size() + " atoms " + compounds.estimatedSize() + " compounds";// / " + subtermsCount() + " subterms";
+        CacheStats s = cache.stats();
+        return cache.estimatedSize() + " concepts (" + n2(s.hitRate()) + " hitrate, " +
+                s.requestCount() + " reqs)";
+
     }
 
     /** this will be called from within a worker task */

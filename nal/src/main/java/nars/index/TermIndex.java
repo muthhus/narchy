@@ -52,68 +52,21 @@ public abstract class TermIndex extends TermBuilder {
     /**
      * get if not absent
      */
-    @Nullable
-    public Termed get(@NotNull Termed t) {
+    @Nullable public final Termed get(@NotNull Term t) {
         return get(t, false);
     }
 
-    //use concept(key, craeteIfMissing) instead
-    @Nullable
-    public abstract Termed get(@NotNull Termed key, boolean createIfMissing);
-
-    /** terms should generally not be tried here unless they also have been determined linkable() [below] first */
-    @NotNull public static Compound preConceptualize(@NotNull Compound x) {
-
-        if (!x.isNormalized())
-            throw new InvalidConceptException(x, "not normalized");
-
-        Term xx = $.unneg(Terms.atemporalize(x));
-
-        if (xx.op().var) {
-            throw new InvalidConceptException(x, "variables can not be conceptualized");
-        } else {
-            //prevent conceptualization of non-statement VarIndep containing terms
-            if (xx.hasVarIndep() && !xx.hasAny(Op.StatementBits)) {
-                throw new InvalidConceptException(x, "conceptualization: contains no statements yet has VarIndep");
-            }
-        }
-
-        return (Compound)xx;
-    }
-
-    public static boolean linkable(@NotNull Term x) {
-//        return !(target instanceof Variable);
-        if (x instanceof Variable) {
-            return false;
-        }
-        if (x instanceof Compound) {
-
-            if (x.op() == Op.NEG) {
-                if (((Compound) x).term(0) instanceof Variable)
-                    return false;
-            }
-            if (!x.isNormalized())
-                return false;
-
-            //prevent conceptualization of non-statement VarIndep containing terms
-            if (x.hasVarIndep() && !x.hasAny(Op.StatementBits)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    @Nullable public abstract Termed get(@NotNull Term key, boolean createIfMissing);
     /**
-     * set whether absent or not
+     * sets or replaces the existing value, unless the existing value is a PermanentConcept it must not
+     * be replaced with a non-Permanent concept
      */
-    public abstract void set(@NotNull Termed src, Termed target);
+    public abstract void set(@NotNull Term src, Termed target);
 
-    public void set(@NotNull Termed t) {
-        set(t, t);
-    }
+    public final void set(@NotNull Termed t) { set(t.term(), t);     }
 
 
-    public abstract void clear();
+    abstract public void clear();
 
     abstract public void forEach(Consumer<? super Termed> c);
 
@@ -127,9 +80,16 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable abstract public ConceptBuilder conceptBuilder();
 
-
-
     public abstract int subtermsCount();
+
+    /**
+     * a string containing statistics of the index's current state
+     */
+    @NotNull public abstract String summary();
+
+    public abstract void remove(@NotNull Term entry);
+
+
 
     public final HijacKache<TermContainer,TermContainer> normalizations =
             new HijacKache<>(Param.NORMALIZATION_CACHE_SIZE, 3 );
@@ -281,7 +241,7 @@ public abstract class TermIndex extends TermBuilder {
         return cached(op, dt, args);
     }
 
-    @Deprecated @Override public final @NotNull Term the(@NotNull Op op, @NotNull Term... tt) {
+    @Deprecated public final @NotNull Term the(@NotNull Op op, @NotNull Term... tt) {
         return the(op, DTERNAL, tt); //call this implementation's, not super class's
     }
 
@@ -301,8 +261,6 @@ public abstract class TermIndex extends TermBuilder {
         forEach(out::println);
         out.println();
     }
-
-
 
     final Function<? super TermContainer, ? extends TermContainer> normalizer = u -> {
 
@@ -505,38 +463,7 @@ public abstract class TermIndex extends TermBuilder {
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
     @Nullable
-    public Concept concept(@NotNull Termed term, boolean createIfMissing) throws InvalidConceptException {
-
-//        if (term instanceof Atomic) {
-//
-//            if (term instanceof Variable) {
-//                //if (createIfMissing)
-//                throw new InvalidConceptException(term, "Variables are not conceptualizable");
-//                //return null;
-//            }
-//
-//        } else {
-//
-//            term = unneg(term);
-//
-//            Compound prenormalized = (Compound) term.term();
-//
-//            Compound cterm;
-//            if ((cterm = normalize(prenormalized)) == null)
-//                throw new InvalidConceptException(prenormalized, "Failed normalization");
-//
-//            Compound aterm = Terms.atemporalize(cterm);
-//            if (!(aterm instanceof Compound))
-//                throw new InvalidConceptException(term, "Failed atemporalization");
-//
-//            term = unneg(aterm);
-////            term = aterm;
-//
-//            //if (aterm.op() == NEG)
-//            //throw new InvalidConceptException(term, "Negation re-appeared");
-//
-//        }
-
+    public final Concept concept(@NotNull Term term, boolean createIfMissing) throws InvalidConceptException {
 
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {
@@ -554,13 +481,6 @@ public abstract class TermIndex extends TermBuilder {
         return cc;
     }
 
-    /**
-     * a string containing statistics of the index's current state
-     */
-    @NotNull
-    public abstract String summary();
-
-    public abstract void remove(@NotNull Termed entry);
 
     @Nullable
     public Term replace(@NotNull Term src, Map<Term, Term> m) {
@@ -583,6 +503,31 @@ public abstract class TermIndex extends TermBuilder {
     public void onPolicyChanged(Concept c) {
         /* nothing */
     }
+
+
+
+    public static boolean linkable(@NotNull Term x) {
+//        return !(target instanceof Variable);
+        if (x instanceof Variable) {
+            return false;
+        }
+        if (x instanceof Compound) {
+
+            if (x.op() == Op.NEG) {
+                if (((Compound) x).term(0) instanceof Variable)
+                    return false;
+            }
+            if (!x.isNormalized())
+                return false;
+
+            //prevent conceptualization of non-statement VarIndep containing terms
+            if (x.hasVarIndep() && !x.hasAny(Op.StatementBits)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 
     //    static boolean possiblyTemporal(Termlike x) {

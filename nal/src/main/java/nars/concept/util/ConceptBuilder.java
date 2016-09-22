@@ -20,6 +20,8 @@ import static nars.time.Tense.ETERNAL;
 public interface ConceptBuilder extends Function<Term, Termed> {
 
 
+
+
     @NotNull ConceptPolicy init();
     @NotNull ConceptPolicy awake();
     @NotNull ConceptPolicy sleep();
@@ -30,5 +32,39 @@ public interface ConceptBuilder extends Function<Term, Termed> {
 
     default void init(Concept c) {
         c.policy(init(), ETERNAL, EmptyTaskList);
+    }
+
+
+    ConceptBuilder Null = new NullConceptBuilder();
+
+
+    /** passes through terms without creating any concept anything */
+    final class NullConceptBuilder implements ConceptBuilder {
+
+        @Override
+        public Termed apply(Term term) {
+            return term;
+        }
+
+        @Override
+        public @NotNull ConceptPolicy init() {
+            return null;
+        }
+
+        @Override
+        public @NotNull ConceptPolicy awake() {
+            return null;
+        }
+
+        @Override
+        public @NotNull ConceptPolicy sleep() {
+            return null;
+        }
+
+        @Override
+        public void start(NAR nar) {
+
+        }
+
     }
 }

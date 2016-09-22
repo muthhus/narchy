@@ -95,12 +95,12 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     }
 
 
-    protected final void acquireReadLockIfNecessary() {
+    public final void acquireReadLockIfNecessary() {
         if (readLock!=null)
             readLock.lock();
     }
 
-    protected final void releaseReadLockIfNecessary() {
+    public final void releaseReadLockIfNecessary() {
         if (readLock!=null)
             readLock.unlock();
     }

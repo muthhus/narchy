@@ -1,5 +1,6 @@
 package nars.nar.util;
 
+import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -11,9 +12,11 @@ import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.*;
 import nars.concept.util.ConceptBuilder;
+import nars.concept.util.InvalidConceptException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
@@ -84,7 +87,9 @@ import static nars.time.Tense.DTERNAL;
     @Nullable
     final Concept newConcept(@NotNull Compound t){
 
-        assert(!(t.op().temporal && t.dt() != DTERNAL)); //throw new RuntimeException("temporality in concept term: " + t);
+
+        t = preConceptualize(t);
+
 
 
 //        Map map1 = newBagMap(DEFAULT_CONCEPT_LINK_MAP_CAPACITY);
@@ -124,19 +129,28 @@ import static nars.time.Tense.DTERNAL;
 
     }
 
+    /** terms should generally not be tried here unless they also have been determined linkable() [below] first */
+    @NotNull public static Compound preConceptualize(@NotNull Compound x) {
 
-//    @NotNull
-//    public Bag<Task> taskbag(Map map) {
-//        return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
-//    }
-//
-//
-//    @NotNull
-//    public Bag<Term> termbag(Map map) {
-//        return new CurveBag<>( defaultCurveSampler, mergeDefault, map);
-//    }
+        if (!(x.op().temporal && x.dt() != DTERNAL))
+            throw new RuntimeException("temporality in concept term: " + x);
 
+        if (!x.isNormalized())
+            throw new InvalidConceptException(x, "not normalized");
 
+        Term xx = $.unneg(Terms.atemporalize(x));
+
+        if (xx.op().var) {
+            throw new InvalidConceptException(x, "variables can not be conceptualized");
+        } else {
+            //prevent conceptualization of non-statement VarIndep containing terms
+            if (xx.hasVarIndep() && !xx.hasAny(Op.StatementBits)) {
+                throw new InvalidConceptException(x, "conceptualization: contains no statements yet has VarIndep");
+            }
+        }
+
+        return (Compound)xx;
+    }
     /** use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process */
     private final BudgetMerge mergeDefault = BudgetMerge
             .plusBlend;

@@ -1,6 +1,7 @@
 package nars.index;
 
 import nars.concept.util.ConceptBuilder;
+import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,8 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class RawTermIndex extends MapIndex implements Serializable {
 
-    RawTermIndex(ConceptBuilder conceptBuilder, int capacity) {
-        super(conceptBuilder,
+    RawTermIndex(int capacity) {
+        super(ConceptBuilder.Null,
                 new ConcurrentHashMap<>(capacity),
                 new ConcurrentHashMap<>(capacity)
 //                new HashMap<>(capacity),
@@ -21,12 +22,5 @@ public abstract class RawTermIndex extends MapIndex implements Serializable {
         );
     }
 
-
-    /**
-     * doesnt conceptualize, pass-through raw term
-     */
-    @NotNull @Override protected Termed buildConcept(@NotNull Termed interned) {
-        return interned;
-    }
 
 }

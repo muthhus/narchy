@@ -1011,21 +1011,10 @@ public enum $ {
 
     public static final class StaticTermBuilder extends TermIndex {
 
-        @NotNull
-        @Override
-        public Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
-            return new GenericCompound(op, dt, subterms);
-        }
-
-        @Override
-        protected boolean transformImmediates() {
-            return true;
-        }
-
         @Override
         public
         @Nullable
-        Termed get(@NotNull Termed t, boolean createIfMissing) {
+        Termed get(@NotNull Term t, boolean createIfMissing) {
             return createIfMissing ? t : null;
         }
 
@@ -1046,7 +1035,7 @@ public enum $ {
         }
 
         @Override
-        public void remove(@NotNull Termed entry) {
+        public void remove(@NotNull Term entry) {
 
         }
 
@@ -1064,7 +1053,7 @@ public enum $ {
 
         @Nullable
         @Override
-        public void set(@NotNull Termed s, Termed t) {
+        public void set(@NotNull Term s, Termed t) {
             throw new UnsupportedOperationException();
         }
 

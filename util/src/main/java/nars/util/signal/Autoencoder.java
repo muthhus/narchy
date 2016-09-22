@@ -45,12 +45,7 @@ public class Autoencoder {
 	 */
 
 
-	public Autoencoder(int ins, int outs, Random r) {
-		this(ins, outs, null, null, null, r);
-	}
-
-	public Autoencoder(int ins, int outs, float[][] W,
-			float[] hbias, float[] vbias, Random rng) {
+	public Autoencoder(int ins, int outs, Random rng) {
 
 		xx = new float[ins];
 		z = new float[ins];

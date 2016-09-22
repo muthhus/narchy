@@ -8,12 +8,10 @@ import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.NEG;
 
@@ -28,14 +26,21 @@ public class PatternIndex extends RawTermIndex {
 //              new ConcurrentHashMapUnsafe(2048), Terms.terms, null);
 //    }
     public PatternIndex() {
-        super(null, 1024);
+        super(1024);
 
         loadBuiltins();
     }
 
     @Override
-    protected @Nullable
-    Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
+    public Termed get(Term x, boolean createIfMissing) {
+        if (x instanceof Compound) {
+            return compute((Compound)x);
+        }
+        return super.get(x, createIfMissing);
+    }
+
+
+    protected Termed compute(@NotNull Compound x) {
 
         //dont store the actual rules, they are guaranteed unique by other means
         if (x instanceof PremiseRule) {
@@ -58,10 +63,10 @@ public class PatternIndex extends RawTermIndex {
                 } else {
                     /*if (b != a && a.isNormalized())
                         ((GenericCompound) b).setNormalized();*/
-                    b = theCompound((Compound) a, true).term();
+                    b = get(a, true).term();
                 }
             } else {
-                b = theAtom((Atomic) a, true).term();
+                b = get(a, true).term();
             }
             if (a != b) {
                 changed = true;
