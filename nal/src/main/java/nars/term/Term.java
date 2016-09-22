@@ -25,6 +25,7 @@ import nars.$;
 import nars.Op;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import nars.term.var.AbstractVariable;
@@ -52,8 +53,8 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     /**
      * absolute/singular Boolean truths
      */
-    Atom True = $.the("†");
-    Atom False = $.the("Ø");
+    AtomicSingleton True = new AtomicSingleton("†");
+    AtomicSingleton False = new AtomicSingleton("Ø");
 
     static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed<Compound> b) {
 

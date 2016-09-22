@@ -123,7 +123,7 @@ public class Vis {
                         r = 1; //yellow
                         g = 1/2;
                         b = 0;
-                    } else*/ {
+                    } */ else {
                         r = g = b = 0;
                     }
                 }

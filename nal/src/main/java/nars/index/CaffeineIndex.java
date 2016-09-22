@@ -159,9 +159,11 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     /** this will be called from within a worker task */
     @Override public final void onRemoval(Object key, Object value, @NotNull RemovalCause cause) {
         if (value instanceof Concept) {
-            ((Concept) value).delete(nar);
+            delete(((Concept) value), nar);
         }
     }
+
+
 
     @Override
     public void start(NAR nar) {

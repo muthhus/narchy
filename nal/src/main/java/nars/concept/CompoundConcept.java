@@ -65,7 +65,6 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     private transient ConceptPolicy policy;
 
 
-
     /**
      * Constructor, called in Memory.getConcept only
      *
@@ -108,7 +107,9 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     }
 
     @Override
-    public final TermContainer templates() { return templates; }
+    public final TermContainer templates() {
+        return templates;
+    }
 
     @Override
     public @Nullable Map<Object, Object> meta() {
@@ -131,7 +132,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public CompoundConcept(@NotNull T term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.concepts.conceptBuilder(), n, ((DefaultConceptBuilder)n.concepts.conceptBuilder()).newBagMap());
+        this(term, (DefaultConceptBuilder) n.concepts.conceptBuilder(), n, ((DefaultConceptBuilder) n.concepts.conceptBuilder()).newBagMap());
     }
 
     /**
@@ -245,8 +246,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         return processQuestion(task, nar, displaced);
     }
 
+
     @Override
     public void delete(NAR nar) {
+
         policy = null;
 
         //remove all tasks from the index:
@@ -257,10 +260,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         termlinks().clear();
         tasklinks().clear();
 
-        beliefs = null;
-        goals = null;
-        questions = null;
-        quests = null;
+        beliefs = goals = null;
+        questions = quests = null;
     }
 
 
@@ -290,8 +291,6 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         return target.add(belief, questions, displaced, this, nar);
 
     }
-
-
 
 
     @Override
@@ -384,7 +383,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      *
      * @return null if not processed, or an Activation instance to continue with link activation and feedback
      */
-    @Override public final Activation process(@NotNull Task input, @NotNull NAR nar) {
+    @Override
+    public final Activation process(@NotNull Task input, @NotNull NAR nar) {
 
         List<Task> toRemove = $.newArrayList();
 
@@ -415,14 +415,14 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         nar.tasks.remove(toRemove);
 
-        if (delta!=null)
+        if (delta != null)
             accepted = true;
 
         Activation a;
         if (accepted) {
             a = new Activation(input, this, nar, 1f);
 
-            if (delta!=null) {
+            if (delta != null) {
                 //beliefs/goals
                 feedback(input, delta, (CompoundConcept) a.src, nar);
             } else {
@@ -459,31 +459,31 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         float deltaSatisfaction, deltaConf;
 
-        if (before !=null && after !=null) {
+        if (before != null && after != null) {
 
             float deltaFreq = after.freq() - before.conf();
             deltaConf = after.conf() - before.conf();
 
             Truth other;
-            float polarity =  0;
+            float polarity = 0;
 
             long now = nar.time();
             if (input.isBelief()) {
                 //compare against the current goal state
                 other = concept.goals().truth(now);
-                if (other!=null)
+                if (other != null)
                     polarity = +1f;
             } else if (input.isGoal()) {
                 //compare against the current belief state
                 other = concept.beliefs().truth(now);
-                if (other!=null)
+                if (other != null)
                     polarity = -1f;
             } else {
                 other = null;
             }
 
 
-            if (other!=null) {
+            if (other != null) {
 
                 float f = other.freq();
 
@@ -507,7 +507,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
             }
 
         } else {
-            if (before == null && after!=null) {
+            if (before == null && after != null) {
                 deltaConf = after.conf();
             } else {
                 deltaConf = 0;

@@ -2,8 +2,11 @@ package nars.budget;
 
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 import static nars.budget.Budget.aveGeo;
 
@@ -14,18 +17,28 @@ import static nars.budget.Budget.aveGeo;
  */
 public interface Budgeted  {
 
-    static float getPrioritySum(@NotNull Iterable<? extends Budgeted> c) {
+    static float priSum(@NotNull Iterable<? extends Budgeted> c) {
         float totalPriority = 0;
         for (Budgeted i : c)
-            totalPriority += i.pri();
+            totalPriority += i.priIfFiniteElseZero();
         return totalPriority;
+    }
+
+    public static void normalizePriSum(Iterable<? extends Budgeted> l, float total) {
+
+        float priSum = Budgeted.priSum(l);
+        float mult = total / priSum;
+        for (Budgeted b : l) {
+            b.budget().priMult(mult);
+        }
+
     }
 
     /**
      * randomly selects an item from a collection, weighted by priority
      */
     static <E extends Budgeted> E selectRandomByPriority(NAR memory, @NotNull Iterable<E> c) {
-        float totalPriority = getPrioritySum(c);
+        float totalPriority = priSum(c);
 
         if (totalPriority == 0) return null;
 
@@ -83,7 +96,6 @@ public interface Budgeted  {
     default boolean equalsBudget(@NotNull Budgeted b) {
         return equalsBudget(b, Param.BUDGET_EPSILON);
     }
-
 
 
 }

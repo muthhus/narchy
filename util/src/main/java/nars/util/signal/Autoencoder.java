@@ -80,8 +80,7 @@ public class Autoencoder {
 		}
 	}
 
-	private float[] preprocess(float[] x, float noiseLevel,
-							   float corruptionRate) {
+	private float[] preprocess(float[] x, float noiseLevel, float corruptionRate) {
 
         Random r = this.rng;
 		int ins = x.length;
@@ -225,15 +224,15 @@ public class Autoencoder {
 	public float train(float[] x, float learningRate,
 					   float noiseLevel, float corruptionRate,
 					   boolean sigmoid) {
-		return train(x, learningRate, noiseLevel, corruptionRate, sigmoid,sigmoid);
+		return train(x, learningRate, noiseLevel, corruptionRate, sigmoid, true, sigmoid);
 	}
 
 	/** returns the total error (not sqr(error) and not avg_error = error sum divided by # items) */
 	public float train(float[] x, float learningRate,
 					   float noiseLevel, float corruptionRate,
-					   boolean sigmoidIn, boolean sigmoidOut) {
+					   boolean sigmoidIn, boolean normalize, boolean sigmoidOut) {
 
-		recode(preprocess(x, noiseLevel, corruptionRate), sigmoidIn, sigmoidOut);
+		recode(preprocess(x, noiseLevel, corruptionRate), sigmoidIn, normalize, sigmoidOut);
 		return learn(x, y, learningRate);
 	}
 
@@ -302,8 +301,8 @@ public class Autoencoder {
 		return error;
 	}
 
-	public float[] recode(float[] x, boolean sigmoidIn, boolean sigmoidOut) {
-		return decode(encode(x, y, sigmoidIn, true /* normalize */), sigmoidOut);
+	public float[] recode(float[] x, boolean sigmoidIn, boolean normalize, boolean sigmoidOut) {
+		return decode(encode(x, y, sigmoidIn, normalize), sigmoidOut);
 	}
 
 	public float[] reconstruct(float[] x, float[] z) {

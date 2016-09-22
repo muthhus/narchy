@@ -21,7 +21,6 @@
 package nars.concept;
 
 import com.google.common.collect.Iterators;
-import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.Symbols;
 import nars.Task;
@@ -37,6 +36,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.truth.Truth;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -107,9 +107,9 @@ public interface Concept extends Termed {
             if (value != null) {
 
                 if (currMeta == null) {
-                    setMeta(currMeta =
+                    setMeta(currMeta = new UnifiedMap(1));
                             //new WeakIdentityHashMap();
-                            new SoftValueHashMap(1));
+                            //new SoftValueHashMap(1));
                 }
 
                 return currMeta.put(key, value);
@@ -127,10 +127,23 @@ public interface Concept extends Termed {
         tasklinks().setCapacity( p.linkCap(this, false) );
     }
 
+
     default void delete(NAR nar) {
         termlinks().clear();
         tasklinks().clear();
     }
+
+
+    /**
+     * the value (if present in the meta table for the class key),
+     * is a reference to an object preventing deletion and also
+     * manages and takes responsibility for the remainder of
+     * this concept's lifecycle.
+     */
+    interface Savior { }
+
+
+
 
     @Nullable
     default Truth belief(long when, long now) {

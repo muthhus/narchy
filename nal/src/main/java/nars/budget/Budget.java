@@ -9,6 +9,8 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 import static java.lang.Math.pow;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
@@ -154,7 +156,9 @@ public interface Budget extends Budgeted {
 //    }
 //
     default Budget priMult(float factor) {
-        setPriority(pri() * factor);
+        float p = pri();
+        if (p==p)
+            setPriority(p * factor);
         return this;
     }
 
@@ -368,5 +372,7 @@ public interface Budget extends Budgeted {
 //            super(reason);
 //        }
 //    }
+
+
 
 }

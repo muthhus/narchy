@@ -166,7 +166,8 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 return false;
 
             BeliefTable table = beliefOrGoal ? nextConcept.beliefs() : nextConcept.goals();
-            if (table.isEmpty()) {
+            boolean tableDynamic = table instanceof DynamicBeliefTable;
+            if (!tableDynamic && table.isEmpty()) {
                 return false;
             }
 
@@ -177,7 +178,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
 
             @Nullable Truth nt = null;
-            if (nextConcept instanceof DynamicCompoundConcept) {
+            if (tableDynamic) {
                 @Nullable DynamicCompoundConcept.DynTruth ndt = ((DynamicBeliefTable)table).truth(when + dt, now, (Compound) next, false);
                 if (ndt!=null) {
                     nt = ndt.truth();

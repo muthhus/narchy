@@ -2,7 +2,6 @@ package nars.nal;
 
 import nars.$;
 import nars.Op;
-import nars.Param;
 import nars.nal.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
@@ -39,6 +38,7 @@ public abstract class TermBuilder {
 
 
     private static final Term[] TrueArray = {True};
+    private static final Term[] FalseArray = {False};
     public static final TermContainer InvalidSubterms = TermVector.the(False);
 
 
@@ -233,18 +233,18 @@ public abstract class TermBuilder {
         return terms;
     }
 
+
     /** array implementation of the conjunction true/false filter */
     @NotNull private static Term[] conjTrueFalseFilter(@NotNull Term[] u) {
         int trues = 0; //# of True subterms that can be eliminated
         for (Term x : u) {
-            if (x.equals(True)) {
+            if (isTrue(x)) {
                 trues++;
-            } else if (x.equals(False)) {
+            } else if (isFalse(x)) {
 
                 //false subterm in conjunction makes the entire condition false
                 //this will eventually reduce diectly to false in this method's only callee HACK
-                return new Term[]{False};
-
+                return FalseArray;
             }
         }
 
@@ -259,12 +259,11 @@ public abstract class TermBuilder {
         int j = 0;
         for (int i = 0; j < y.length; i++) {
             Term uu = u[i];
-            if (!uu.equals(True)) // && (!uu.equals(False)))
+            if (!isTrue(uu)) // && (!uu.equals(False)))
                 y[j++] = uu;
         }
 
         assert(j == y.length);
-
 
         return y;
     }
@@ -342,12 +341,13 @@ public abstract class TermBuilder {
         return isTrue(x) || isFalse(x);
     }
 
+
     private static boolean isTrue(@NotNull Term x) {
-        return x.equals(True);
+        return x == True;
     }
 
     private static boolean isFalse(@NotNull Term x) {
-        return x.equals(False);
+        return x == False;
     }
 
 

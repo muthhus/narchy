@@ -12,7 +12,8 @@ import spacegraph.SpaceGraph;
 import spacegraph.obj.MatrixView;
 
 import static java.lang.Math.round;
-import static nars.experiment.minicraft.SideCraft.arrayRenderer;
+import static spacegraph.SpaceGraph.window;
+import static spacegraph.obj.MatrixView.arrayRenderer;
 import static spacegraph.obj.GridSurface.col;
 
 /**
@@ -22,7 +23,7 @@ public class TopCraft extends SwingAgent {
 
     private final TopDownMinicraft craft;
     private final MatrixSensor pixels;
-    private final SideCraft.PixelAutoClassifier camAE;
+    private final PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
         run(TopCraft::new, 500);
@@ -41,18 +42,8 @@ public class TopCraft extends SwingAgent {
 
         pixels = addCamera("cra", cam, (v) -> $.t( v, alpha));
 
-        final int nx = 16;
-        camAE = new SideCraft.PixelAutoClassifier("cra", cam.pixels, nx, nx, (subX, subY)-> {
-            //context metadata: camera zoom, to give a sense of scale
-            return new float[] { subX/((float)(nx-1)), subY/((float)(nx-1)), cam.Z };
-        }, 32, 4, this);
-        SpaceGraph.window(
-                col(
-                    new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)),
-                    new MatrixView(camAE.pixRecon.length, camAE.pixRecon[0].length, arrayRenderer(camAE.pixRecon))
-                ),
-                500, 500
-        );
+        camAE = new PixelAutoClassifier("cra", cam.pixels, 16, 16, 16, this);
+        window(camAE.newChart(), 500, 500);
 
 
         actionBipolar("cra(cam,X)", (f)-> {

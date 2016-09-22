@@ -47,13 +47,12 @@ import static java.util.Arrays.stream;
  *
  *
  */
-public enum Util {
-    Util;
-
+public enum Util { ;
 
     public static final int PRIME3 = 524287;
     public static final int PRIME2 = 92821;
     public static final int PRIME1 = 31;
+    public static final float[] EmptyFloatArray = new float[0];
 
     /**
      * It is basically the same as a lookup table with 2048 entries and linear interpolation between the entries, but all this with IEEE floating point tricks.
@@ -1222,7 +1221,7 @@ public enum Util {
     }
 
     /** min is inclusive, max is exclusive: [min, max) */
-    public int unitize(int x, int min, int max) {
+    public static int unitize(int x, int min, int max) {
         if (x < min) x = min;
         else if (x > --max) x = max;
         return x;

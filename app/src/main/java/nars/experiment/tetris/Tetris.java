@@ -15,6 +15,7 @@ import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
@@ -87,9 +88,9 @@ public class Tetris extends NAgent {
     static final View view = new View();
 
 
-    private ActionConcept motorRotate;
+    private final ActionConcept motorRotate;
     //private MotorConcept motorDown;
-    private ActionConcept motorLeftRight;
+    private final ActionConcept motorLeftRight;
     private final boolean rotate = !easy;
 
     /**
@@ -120,10 +121,12 @@ public class Tetris extends NAgent {
 
                 switch (charCode) {
                     case 'a':
-                        nar.goal(motorRotate, Tense.Present, pressed ? 0f : 0.5f, gamma);
+                        if (motorRotate!=null)
+                            nar.goal(motorRotate, Tense.Present, pressed ? 0f : 0.5f, gamma);
                         break;
                     case 's':
-                        nar.goal(motorRotate, Tense.Present, pressed ? 1f : 0.5f, gamma);
+                        if (motorRotate!=null)
+                            nar.goal(motorRotate, Tense.Present, pressed ? 1f : 0.5f, gamma);
                         break;
                     case 'z':
                         nar.goal(motorLeftRight, Tense.Present, pressed ? 0f : 0.5f, gamma);
@@ -217,6 +220,8 @@ public class Tetris extends NAgent {
                 //return null;
                 return $.t(0.5f, gamma); //no action taken or move ineffective
             }));
+        } else {
+            motorRotate = null;
         }
         //actions.add(motorDown = new MotorConcept("(down)", nar));
 //        if (downMotivation > actionThresholdHigh) {
@@ -410,7 +415,9 @@ public class Tetris extends NAgent {
 
         nar.confMin.setValue(0.02f);
 
-        nar.compoundVolumeMax.setValue(24);
+        Abbreviation abbr = new Abbreviation(nar, "the", 4, 0.5f, 32);
+
+        nar.compoundVolumeMax.setValue(32);
         //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);
@@ -454,7 +461,6 @@ public class Tetris extends NAgent {
 
 
         Tetris t = new Tetris(nar, tetris_width, tetris_height, TIME_PER_FALL);
-        {
 
 
 //                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
@@ -474,15 +480,15 @@ public class Tetris extends NAgent {
 //                );
 
 
-            window(Vis.concepts((Default) nar, 1024), 500, 500);
+        window(Vis.concepts(nar, 1024), 500, 500);
 
-            //STMView.show(stm, 800, 600);
+        //STMView.show(stm, 800, 600);
 
-            view.plot1 =
-                    newCPanel(nar, 256, () -> t.rewardValue);
+        view.plot1 =
+                newCPanel(nar, 256, () -> t.rewardValue);
 
 
-            view.plot2 = agentBudgetPlot(t, 256);
+        view.plot2 = agentBudgetPlot(t, 256);
             /*view.plot2 = new GridSurface(HORIZONTAL,
                 //conceptLinePlot(nar, Lists.newArrayList( t.happy, t.joy ), (c) -> nar.conceptPriority(c), 256),
 
@@ -524,13 +530,13 @@ public class Tetris extends NAgent {
 //                }
 
 
-            nar.onFrame(f -> {
-                //view.lstm.update();
-                try {
-                    view.term.term.putLinePre(t.summary());
-                } catch (IOException e1) {
-                }
-            });
+        nar.onFrame(f -> {
+            //view.lstm.update();
+            try {
+                view.term.term.putLinePre(t.summary());
+            } catch (IOException e1) {
+            }
+        });
 
 
 //                int window = 32;
@@ -543,15 +549,15 @@ public class Tetris extends NAgent {
 //                );
 //                newControlWindow(12f,4f, new Object[] { camHistory } );
 
-            newControlWindow(view);
+        newControlWindow(view);
 
-            //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
+        //newControlWindow(2f,4f, new Object[] { new MatrixView(tetris_width, tetris_height, sensorMatrixView(nar, 0)) } );
 
-            //Vis.newBeliefChartWindow(t, 200);
+        //Vis.newBeliefChartWindow(t, 200);
 
-            window(Vis.budgetHistogram(nar, 30), 500, 300);
+        window(Vis.budgetHistogram(nar, 30), 500, 300);
 
-            //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
+        //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
 
 //                BeliefTableChart.newBeliefChart(nar, Lists.newArrayList(
 //                        sensors.get(0),
@@ -562,8 +568,7 @@ public class Tetris extends NAgent {
 //                        sensors.get(5)
 //                ), 200);
 
-            //NARSpace.newConceptWindow((Default) nar, 32, 8);
-        }
+        //NARSpace.newConceptWindow((Default) nar, 32, 8);
 
 
         t.trace = true;

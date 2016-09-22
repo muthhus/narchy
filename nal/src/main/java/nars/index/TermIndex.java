@@ -498,5 +498,15 @@ public abstract class TermIndex extends TermBuilder {
     }
 
 
+    static boolean isDeletable(Concept c) {
+        return c.get(Concept.Savior.class)==null;
+    }
+
+    /** attempts to delete a concept */
+    protected void delete(@NotNull Concept value, @NotNull NAR nar) {
+        if (isDeletable(value))
+            value.delete(nar);
+    }
+
 
 }

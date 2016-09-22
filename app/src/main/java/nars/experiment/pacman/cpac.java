@@ -19,10 +19,11 @@
 
 package nars.experiment.pacman;
 
+import nars.util.Util;
+
 import java.awt.*;
 
 import static nars.experiment.pacman.cmaze.WALL;
-import static nars.util.Util.Util;
 
 public class cpac
 {

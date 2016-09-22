@@ -233,8 +233,7 @@ public class TreeIndex extends TermIndex {
 
 
     protected void onRemoval(@NotNull Concept value) {
-        //System.out.println("removing: "  + value);
-        value.delete(nar);
+        delete(value, nar);
     }
 
 

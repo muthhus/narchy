@@ -1,5 +1,6 @@
 package nars.op.mental;
 
+import com.sun.deploy.util.ArrayUtil;
 import nars.*;
 import nars.bag.impl.CurveBag;
 import nars.budget.Activation;
@@ -20,8 +21,10 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.subst.FindSubst;
 import nars.util.data.MutableInteger;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -114,9 +117,11 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
 
         Term term = b.get();
         Concept abbreviable = nar.concept(term);
-        if (abbreviable != null &&
-                !(abbreviable instanceof PermanentConcept) &&
-                !(abbreviable instanceof AliasConcept) /*&& abbreviated.get(Abbreviation.class) == null*/) {
+        if ((abbreviable != null) &&
+            !(abbreviable instanceof PermanentConcept) &&
+            !(abbreviable instanceof AliasConcept) &&
+            (abbreviable.get(Concept.Savior.class) == null)) {
+
             abbreviate((CompoundConcept)abbreviable, b);
         }
 
@@ -212,12 +217,18 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
     static final class AliasConcept extends AtomConcept {
 
         private final Concept abbr;
+        private TermContainer templates;
 
         public AliasConcept(@NotNull String term, @NotNull Concept abbreviated, @NotNull NAR nar) {
             super(term, Op.ATOM, abbreviated.termlinks(), abbreviated.tasklinks());
+
+            abbreviated.put(Concept.Savior.class, this);
+
             this.abbr = abbreviated;
+            this.templates = TermVector.the(ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term()));
             rewriteLinks(nar);
         }
+
 
         /** rewrite termlinks and tasklinks which contain the abbreviated term...
          *      (but are not equal to since tasks can not have atom content)
@@ -250,10 +261,15 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
         }
 
 
+        @Override
+        public void delete(NAR nar) {
+            abbr.delete(nar);
+            super.delete(nar);
+        }
 
         @Override
         public @Nullable TermContainer templates() {
-            return abbr.templates();
+            return templates;
         }
 
         @Override
@@ -269,6 +285,11 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
         /** equality will have already been tested here, and the parent super.unify() method is just return false. so skip it and just try the abbreviated */
         @Override public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
             return /*super.unify(y, subst) || */abbr.term().unify(y, subst);
+        }
+
+        @Override
+        public boolean equals(Object u) {
+            return super.equals(u);
         }
 
         @Override
