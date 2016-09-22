@@ -85,14 +85,14 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    public MutableTask time(@NotNull Tense t, NAR memory) {
-        occurr(Tense.getRelativeOccurrence(t, memory));
+    public MutableTask time(@NotNull Tense t, @NotNull NAR nar) {
+        occurr(Tense.getRelativeOccurrence(t, nar));
         return this;
     }
 
     @NotNull
-    public final MutableTask present(NAR memory) {
-        return present(memory.time());
+    public final MutableTask present(@NotNull NAR nar) {
+        return present(nar.time());
     }
 
     @NotNull public final MutableTask present(long when) {
@@ -130,7 +130,7 @@ public class MutableTask extends AbstractTask {
 
 
     @NotNull
-    public MutableTask because(Object reason) {
+    public MutableTask because(@NotNull Object reason) {
         log(reason);
         return this;
     }
@@ -237,13 +237,13 @@ public class MutableTask extends AbstractTask {
     }
 
     /** sets the budget even if 'b' has been deleted; priority will be zero in that case */
-    public final MutableTask budgetSafe(Budget b) {
+    public final MutableTask budgetSafe(@NotNull Budget b) {
         float p = b.priIfFiniteElseZero();
         setBudget(p, b.dur(), b.qua());
         return this;
     }
 
-    @Nullable public static Task clone(Task xt, Compound y, NAR nar) {
+    @Nullable public static Task clone(@NotNull Task xt, @NotNull Compound y, @NotNull NAR nar) {
         if (!y.isNormalized()) {
             y = nar.normalize(y);
             if (y == null)

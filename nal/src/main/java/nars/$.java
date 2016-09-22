@@ -75,7 +75,7 @@ public enum $ {
 
 
     @NotNull
-    public static <T extends Term> T $(@NotNull String term) {
+    public static <T extends Term> T $(@NotNull String term) throws Narsese.NarseseException {
         return (T)Narsese.the().term(term, terms, true);
     }
 
@@ -1023,11 +1023,6 @@ public enum $ {
             return 0;
         }
 
-
-        @Override
-        public int subtermsCount() {
-            return 0;
-        }
 
         @Override
         public @NotNull String summary() {

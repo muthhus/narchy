@@ -124,25 +124,6 @@ import static nars.time.Tense.DTERNAL;
 
     }
 
-    /** terms should generally not be tried here unless they also have been determined linkable() [below] first */
-    @NotNull public static Compound preConceptualize(@NotNull Compound x) {
-
-        if (!x.isNormalized())
-            throw new InvalidConceptException(x, "not normalized");
-
-        Term xx = $.unneg(Terms.atemporalize(x));
-
-        if (xx.op().var) {
-            throw new InvalidConceptException(x, "variables can not be conceptualized");
-        } else {
-            //prevent conceptualization of non-statement VarIndep containing terms
-            if (xx.hasVarIndep() && !xx.hasAny(Op.StatementBits)) {
-                throw new InvalidConceptException(x, "conceptualization: contains no statements yet has VarIndep");
-            }
-        }
-
-        return (Compound)xx;
-    }
     /** use average blend so that reactivations of adjusted task budgets can be applied repeatedly without inflating the link budgets they activate; see CompoundConcept.process */
     private final BudgetMerge mergeDefault = BudgetMerge
             .plusBlend;

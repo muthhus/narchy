@@ -22,7 +22,7 @@ public class NAL5Test extends AbstractNALTest {
         return AbstractNALTest.nars(5);
     }
 
-    final int cycles = 50;
+    final int cycles = 150;
 
     @Test public void revision(){
         test()
@@ -338,7 +338,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<robin --> [withWings]>,<robin --> [chirping]>) ==> <robin --> bird>>"); //.en("If robin is has wings and chirps, then robin is a bird");
         tester.believe("<(&&,<robin --> [flying]>,<robin --> [withWings]>,<robin --> [chirping]>) ==> <robin --> bird>>"); //.en("If robin can fly, has wings, and chirps, then robin is a bird");
-        tester.mustBelieve(cycles," <robin --> [flying]>",1.00f,0.45f); //.en("I guess that robin can fly.");
+        tester.mustBelieve(cycles, "<robin --> [flying]>",1.00f,0.45f); //.en("I guess that robin can fly.");
 
     }
 

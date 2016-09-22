@@ -138,12 +138,12 @@ public class TermIndexTest {
     private void testShared(@NotNull TermIndex i, @NotNull String s) {
 
         int t0 = i.size();
-        int s0 = i.subtermsCount();
+        //int s0 = i.subtermsCount();
 
         Term a = i.get(i.parse(s), true).term(); //create by parsing then manually intern it
 
         int t1 = i.size();
-        int s1 = i.subtermsCount();
+        //int s1 = i.subtermsCount();
 
         //some terms and subterms were added
         if (a instanceof Compound) {
@@ -154,7 +154,7 @@ public class TermIndexTest {
         testShared(a, a2);
 
         assertEquals(i.size(), t1 /* unchanged */);
-        assertEquals(i.subtermsCount(), s1 /* unchanged */);
+        //assertEquals(i.subtermsCount(), s1 /* unchanged */);
 
         //i.print(System.out); System.out.println();
 
@@ -166,7 +166,7 @@ public class TermIndexTest {
 
         //i.print(System.out); System.out.println();
 
-        assertEquals(i.subtermsCount(), s1 + 1 /* unchanged */);
+        //assertEquals(i.subtermsCount(), s1 + 1 /* unchanged */);
 
         //create by transformation (substitution)
         //testShared(a, n.term(..).substMap(..

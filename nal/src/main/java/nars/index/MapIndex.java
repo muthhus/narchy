@@ -3,33 +3,26 @@ package nars.index;
 import nars.concept.util.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /** additionally caches subterm vectors */
-public class MapIndex extends SimpleMapIndex {
+public class MapIndex extends MaplikeIndex {
 
-    private final Map<TermContainer, TermContainer> subterms;
+    protected final Map<Term,Termed> concepts;
 
-    public MapIndex(ConceptBuilder conceptBuilder, Map<Term,Termed> compounds, Map<TermContainer,TermContainer> subterms) {
-        super(conceptBuilder, compounds);
-        this.subterms = subterms;
-    }
-
-    @Override
-    public int subtermsCount() {
-        return subterms.size(); //unsupported
+    public MapIndex(ConceptBuilder conceptBuilder, Map<Term, Termed> map) {
+        super(conceptBuilder);
+        this.concepts = map;
     }
 
     @NotNull
     @Override
     public String summary() {
-        return
-                concepts.size() + " concepts, " +
-                subterms.size() + " subterms";
+        return concepts.size() + " concepts";
     }
 
     @Override
@@ -45,16 +38,50 @@ public class MapIndex extends SimpleMapIndex {
     }
 
     @Override
-    public void clear() {
-        super.clear();
-        subterms.clear();
+    public Termed get(Term x, boolean createIfMissing) {
+        if (createIfMissing) {
+            return concepts.computeIfAbsent(x, conceptBuilder::apply);
+        } else {
+            return concepts.get(x);
+        }
     }
 
     @Override
-    @NotNull public TermContainer internSubterms(@NotNull TermContainer x) {
-        TermContainer prev = subterms.putIfAbsent(x, x);
-        return (prev == null) ? x : prev;
+    public void remove(Term entry) {
+        concepts.remove(entry);
     }
+
+    @Override
+    public void set(@NotNull Term src, Termed target) {
+        concepts.merge(src, target, setOrReplaceNonPermanent);
+    }
+
+    @Override
+    public void clear() {
+        concepts.clear();
+    }
+
+    @Override
+    public void forEach(@NotNull Consumer<? super Termed> c) {
+        concepts.forEach((k, v)-> c.accept(v));
+    }
+
+    @Override
+    public int size() {
+        return concepts.size() /* + atoms.size? */;
+    }
+
+//    @Override
+//    public void clear() {
+//        super.clear();
+//        subterms.clear();
+//    }
+
+//    @Override
+//    @NotNull public TermContainer internSubterms(@NotNull TermContainer x) {
+//        TermContainer prev = subterms.putIfAbsent(x, x);
+//        return (prev == null) ? x : prev;
+//    }
 }
 
 //package nars.index;

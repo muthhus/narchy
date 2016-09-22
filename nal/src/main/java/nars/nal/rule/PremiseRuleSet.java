@@ -55,7 +55,7 @@ public class PremiseRuleSet {
     @NotNull
     public static PremiseRuleSet resource(String name) throws IOException, URISyntaxException {
 
-        PatternIndex p = new PatternIndex();
+        PatternIndex p = new PatternIndex(1024);
 
         Function<DataInput,Pair<Compound,String>> decoder = (i) -> {
             try {

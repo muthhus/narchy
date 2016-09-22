@@ -28,12 +28,13 @@ public abstract class MaplikeIndex extends TermIndex {
     }
 
 
-    @NotNull
-    @Override protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
-        return super.newCompound(op, dt, internSubterms(subterms));
-    }
-
-    abstract public @NotNull TermContainer internSubterms(@NotNull TermContainer s);
+//    @NotNull
+//    @Override protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
+//        return super.newCompound(op, dt, internSubterms(subterms));
+//    }
+//
+//    /** doesnt work, needs to be done recursively */
+//    abstract public @NotNull TermContainer internSubterms(@NotNull TermContainer s);
 
 
     @Nullable @Override abstract public Termed get(@NotNull Term key, boolean createIfMissing);
@@ -61,7 +62,7 @@ public abstract class MaplikeIndex extends TermIndex {
     @Override
     public abstract void forEach(@NotNull Consumer<? super Termed> c);
 
-    public static final BiFunction<? super Termed, ? super Termed, ? extends Termed> setIfNotAlreadyPermanent = (prev, next) -> {
+    public static final BiFunction<? super Termed, ? super Termed, ? extends Termed> setOrReplaceNonPermanent = (prev, next) -> {
         if (prev instanceof PermanentConcept)
             return prev;
         return next;

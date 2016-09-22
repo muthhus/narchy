@@ -29,7 +29,6 @@ public enum Indexes {
         public DefaultTermIndex(int capacity, @NotNull Random random) {
             super(
                     new DefaultConceptBuilder(random),
-                    new HashMap(capacity),
                     new HashMap(capacity)
                     //new ConcurrentHashMap<>(capacity),
                     //new ConcurrentHashMap<>(capacity)
@@ -53,7 +52,6 @@ public enum Indexes {
                 super(
                         new DefaultConceptBuilder(random),
                         //new SoftValueHashMap(capacity)
-                        new WeakHashMap<>(capacity),
                         new WeakHashMap<>(capacity)
                 );
 

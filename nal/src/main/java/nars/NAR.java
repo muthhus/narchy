@@ -1084,7 +1084,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         return concept(tt.term(), createIfMissing);
     }
 
-    public @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) throws InvalidConceptException {
+    public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing)  {
         return concepts.concept(t, createIfMissing);
     }
 

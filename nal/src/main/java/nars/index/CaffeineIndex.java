@@ -1,17 +1,12 @@
 package nars.index;
 
 import com.github.benmanes.caffeine.cache.*;
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Termlike;
-import nars.term.atom.Atomic;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
@@ -106,7 +101,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public void set(@NotNull Term src, @NotNull Termed target) {
-        cache.asMap().merge(src, target, setIfNotAlreadyPermanent);
+        cache.asMap().merge(src, target, setOrReplaceNonPermanent);
     }
 
 
@@ -127,17 +122,6 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         return (int)cache.estimatedSize();
     }
 
-    @Override
-    public int subtermsCount() {
-        return -1;
-    }
-
-
-    @NotNull @Override
-    public TermContainer internSubterms(@NotNull TermContainer t) {
-        //return (TermContainer) cache.get(t, tt -> tt);
-        return t;
-    }
 
     @Override
     public Termed get(Term key, boolean createIfMissing) {

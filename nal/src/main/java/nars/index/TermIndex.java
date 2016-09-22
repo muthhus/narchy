@@ -36,7 +36,6 @@ import java.util.function.Function;
 
 import static nars.Op.INH;
 import static nars.Op.VAR_PATTERN;
-import static nars.nar.util.DefaultConceptBuilder.preConceptualize;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
@@ -81,7 +80,6 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable abstract public ConceptBuilder conceptBuilder();
 
-    public abstract int subtermsCount();
 
     /**
      * a string containing statistics of the index's current state
@@ -464,10 +462,33 @@ public abstract class TermIndex extends TermBuilder {
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
     @Nullable
-    public final Concept concept(@NotNull Term term, boolean createIfMissing) throws InvalidConceptException {
+    public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
-        if (term instanceof Compound)
-            term = preConceptualize((Compound)term);
+        Term termPre;
+        do {
+            termPre = term;
+
+            switch (term.op()) {
+                case VAR_DEP:
+                case VAR_INDEP:
+                case VAR_QUERY:
+                case VAR_PATTERN:
+                    //throw new InvalidConceptException((Compound)term, "variables can not be conceptualized");
+                    return null;
+                case NEG:
+                    term = $.unneg(term);
+                    break;
+
+                default:
+                    if (term instanceof Compound)
+                        term = normalize((Compound)term);
+                    if (term instanceof Compound)
+                        term = Terms.atemporalize((Compound)term);
+                    break;
+
+            }
+        } while (termPre!=term);
+
 
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {

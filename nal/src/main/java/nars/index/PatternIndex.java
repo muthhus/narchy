@@ -1,6 +1,7 @@
 package nars.index;
 
 import nars.Op;
+import nars.concept.util.ConceptBuilder;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisTransform;
@@ -13,20 +14,22 @@ import nars.term.container.TermVector;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import static nars.Op.NEG;
 
 /**
  * Index which specifically holds the term components of a deriver ruleset.
  */
-public class PatternIndex extends RawTermIndex {
+public class PatternIndex extends MapIndex {
 
-//    public PatternIndex() {
-//        super(new HashSymbolMap(
-//              new ConcurrentHashMapUnsafe(512)),
-//              new ConcurrentHashMapUnsafe(2048), Terms.terms, null);
-//    }
-    public PatternIndex() {
-        super(1024);
+    @Deprecated public PatternIndex() {
+        this(1024);
+    }
+
+    public PatternIndex(int capacity) {
+        super(ConceptBuilder.Null,
+            new ConcurrentHashMap<>(capacity));
 
         loadBuiltins();
     }
@@ -74,7 +77,7 @@ public class PatternIndex extends RawTermIndex {
             bb[i] = b;
         }
 
-        TermContainer v = internSubterms(changed ? TermVector.the(bb) : s);
+        TermContainer v = (changed ? TermVector.the(bb) : s);
 
 
         Ellipsis e = Ellipsis.firstEllipsis(v);
