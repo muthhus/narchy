@@ -214,10 +214,6 @@ public class TreeIndex extends TermIndex {
         return conceptBuilder;
     }
 
-    @Override
-    public int subtermsCount() {
-        return -1;
-    }
 
     @Override
     public @NotNull String summary() {

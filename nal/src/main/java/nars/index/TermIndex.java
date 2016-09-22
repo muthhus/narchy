@@ -292,9 +292,6 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable public final Compound normalize(@NotNull Compound t) {
 
-//        if (t.op() == NEG)
-//            throw new RuntimeException("should not be neg");
-
         if (t.isNormalized())
             return t;
 
@@ -318,31 +315,6 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         return null;
-
-
-        //        if (v == null)
-        //            throw new InvalidTermException(t.op(), t.dt(), new Term[]{}, "unnormalizable");
-        //
-        //
-        ////        if (insert) {
-        ////            Compound s = (Compound) termOrNull(get(r, false));
-        ////            return s == null ? r : s; //if a concept does not exist, do not create one yet and just return the key
-        ////        } else {
-        ////        }
-        //
-        //
-        //
-        //
-        ////Compound v = normalizations.get(t, normalizer); //caffeine
-        //
-        //        /*if (Math.random() < 0.01)
-        //            System.err.println(normalizations.summary());*/
-        //
-        //        return v == InvalidSubterms ? null : v;
-        //
-        //    //return _normalize(t);
-        //
-
     }
 
     @Nullable public final TermContainer normalize(@NotNull TermContainer t) {
@@ -447,23 +419,33 @@ public abstract class TermIndex extends TermBuilder {
         return (T) /*the*/(Narsese.the().term(termToParse, this, true));
     }
 
-
-//    /** for long-running processes, this uses
-//     * a weak-value policy */
-//    static TermIndex memoryAdaptive(int capacity) {
-//        CacheBuilder builder = CacheBuilder.newBuilder()
-//            .maximumSize(capacity)
-//            .recordStats()
-//            .weakValues();
-//        return new GuavaIndex(builder);
-//    }
-
     /**
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
     @Nullable
     public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
+        term = conceptualizable(term);
+        if (term==null)
+            return null;
+
+        @Nullable Termed c = get(term, createIfMissing);
+        if (!(c instanceof Concept)) {
+            if (createIfMissing) {
+                throw new InvalidConceptException(term, "Failed to build concept");
+            }
+            return null;
+        }
+
+        Concept cc = (Concept)c;
+        if (cc.policy() == null) {
+            conceptBuilder().init(cc);
+        }
+
+        return cc;
+    }
+
+    public Term conceptualizable(@NotNull Term term) {
         Term termPre;
         do {
             termPre = term;
@@ -487,23 +469,9 @@ public abstract class TermIndex extends TermBuilder {
                     break;
 
             }
-        } while (termPre!=term);
+        } while (termPre!=term && term!=null);
 
-
-        @Nullable Termed c = get(term, createIfMissing);
-        if (!(c instanceof Concept)) {
-            if (createIfMissing) {
-                throw new InvalidConceptException(term, "Failed to build concept");
-            }
-            return null;
-        }
-
-        Concept cc = (Concept)c;
-        if (cc.policy() == null) {
-            conceptBuilder().init(cc);
-        }
-
-        return cc;
+        return term;
     }
 
 
@@ -531,98 +499,4 @@ public abstract class TermIndex extends TermBuilder {
 
 
 
-    public static boolean linkable(@NotNull Term x) {
-//        return !(target instanceof Variable);
-        if (x instanceof Variable) {
-            return false;
-        }
-        if (x instanceof Compound) {
-
-            if (x.op() == Op.NEG) {
-                if (((Compound) x).term(0) instanceof Variable)
-                    return false;
-            }
-            if (!x.isNormalized())
-                return false;
-
-            //prevent conceptualization of non-statement VarIndep containing terms
-            if (x.hasVarIndep() && !x.hasAny(Op.StatementBits)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-
-    //    static boolean possiblyTemporal(Termlike x) {
-//        return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
-//    }
-//
-//    @NotNull
-//    public Term atemporalize2(@NotNull Compound c) {
-//        if (!possiblyTemporal(c))
-//            return c;
-//        return new CompoundAtemporalizer(this, c).result;
-//    }
-//
-//
-//    final class CompoundAtemporalizer implements CompoundTransform<Compound, Term> {
-//
-//        private final TermIndex index;
-//        @NotNull
-//        private final Term result;
-//
-//        public CompoundAtemporalizer(@NotNull TermIndex index, @NotNull Compound c) {
-//            this.index = index;
-//            this.result = apply(null, c);
-//        }
-//
-//
-//        @Override
-//        public boolean test(Term subterm) {
-//            return possiblyTemporal(subterm);
-//        }
-//
-//        @Override
-//        public @Nullable Term apply(Compound parent, @NotNull Term subterm) {
-//
-//            Compound c = (Compound)subterm;
-//            TermIndex i = index;
-//
-//            Term x = c;
-//            int dt = c.dt();
-//            if (dt!=DTERNAL) {
-//                Op o = c.op();
-//                if (o.temporal) {
-//                    //int edt; //for non-commutative conjunctions, use XTERNAL as a placeholder to prevent flattening
-//                    //if (o == CONJ && dt != 0 && csubs.hasAny(CONJ.bit)) {
-//                    //edt = XTERNAL;
-//                    //} else {
-//                    //edt = DTERNAL;
-//                    //}
-//                    //Term xx = i.builder().build(o, edt, csubs.terms());
-//
-//                    GenericCompound xx = new GenericCompound(o, DTERNAL, c.subterms());
-//                    if (c.isNormalized())
-//                        xx.setNormalized();
-//
-//                    Termed exxist = i.get(xx, false); //early exit: atemporalized to a concept already, so return
-//                    if (exxist!=null)
-//                        return exxist.term();
-//
-//                    //x = i.the(xx).term();
-//                    x = xx;
-//                }
-//            }
-//
-//            //if (x instanceof Compound) {
-//                return i.transform((Compound) x, this);
-//            //}
-//            //else
-//                //return x;
-//
-//
-//        }
-//    }
 }

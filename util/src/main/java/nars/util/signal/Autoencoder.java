@@ -1,6 +1,8 @@
 package nars.util.signal;
 
 import nars.util.Util;
+import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
+import org.eclipse.collections.impl.set.mutable.primitive.ShortHashSet;
 
 import java.util.Random;
 
@@ -301,7 +303,7 @@ public class Autoencoder {
 	}
 
 	public float[] recode(float[] x, boolean sigmoidIn, boolean sigmoidOut) {
-		return decode(encode(x, y, sigmoidIn, false /* normalize */), sigmoidOut);
+		return decode(encode(x, y, sigmoidIn, true /* normalize */), sigmoidOut);
 	}
 
 	public float[] reconstruct(float[] x, float[] z) {
@@ -333,4 +335,22 @@ public class Autoencoder {
 		}
 		return best;
 	}
+
+	public short[] max(float thresh) {
+		float[] y = this.y;
+		ShortArrayList s = null;
+		int outs = y.length;
+		for (int i = 0; i < outs; i++) {
+			float Y = y[i];
+			if (Y >= thresh) {
+				if (s == null)
+					s = new ShortArrayList(3 /* est */);
+				s.add((short)i);
+			}
+		}
+		if (s == null)
+			return null;
+		return s.toArray();
+	}
+
 }

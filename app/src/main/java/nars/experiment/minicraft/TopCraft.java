@@ -25,7 +25,7 @@ public class TopCraft extends SwingAgent {
     private final SideCraft.PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 15000);
+        run(TopCraft::new, 500);
     }
 
     public TopCraft(NAR nar) {
@@ -41,11 +41,11 @@ public class TopCraft extends SwingAgent {
 
         pixels = addCamera("cra", cam, (v) -> $.t( v, alpha));
 
-        final int nx = 8;
+        final int nx = 16;
         camAE = new SideCraft.PixelAutoClassifier("cra", cam.pixels, nx, nx, (subX, subY)-> {
             //context metadata: camera zoom, to give a sense of scale
             return new float[] { subX/((float)(nx-1)), subY/((float)(nx-1)), cam.Z };
-        }, 12, 4, this);
+        }, 32, 4, this);
         SpaceGraph.window(
                 col(
                     new MatrixView(camAE.W.length, camAE.W[0].length, arrayRenderer(camAE.W)),
@@ -55,15 +55,15 @@ public class TopCraft extends SwingAgent {
         );
 
 
-        actionBipolar("cra:(cam,X)", (f)-> {
+        actionBipolar("cra(cam,X)", (f)-> {
             cam.setX(f);
             return true;
         });
-        actionBipolar("cra:(cam,Y)", (f)-> {
+        actionBipolar("cra(cam,Y)", (f)-> {
             cam.setY(f);
             return true;
         });
-        actionBipolar("cra:(cam,Z)", (f)-> {
+        actionBipolar("cra(cam,Z)", (f)-> {
             cam.setZ(f);
             return true;
         });
@@ -110,11 +110,11 @@ public class TopCraft extends SwingAgent {
                 ).into(this);
 
         InputHandler input = craft.input;
-        actionToggle("cra:fire", (b) -> input.attack.toggle(b) );
-        actionToggle("cra:up", (b) -> input.up.toggle(b) );
-        actionToggle("cra:down", (b) -> input.down.toggle(b) );
-        actionToggle("cra:left", (b) -> input.left.toggle(b) );
-        actionToggle("cra:right", (b) -> input.right.toggle(b) );
+        actionToggle("cra(fire)", (b) -> input.attack.toggle(b) );
+        actionToggle("cra(up)", (b) -> input.up.toggle(b) );
+        actionToggle("cra(down)", (b) -> input.down.toggle(b) );
+        actionToggle("cra(left)", (b) -> input.left.toggle(b) );
+        actionToggle("cra(right)", (b) -> input.right.toggle(b) );
 
         TopDownMinicraft.start(craft, false);
     }

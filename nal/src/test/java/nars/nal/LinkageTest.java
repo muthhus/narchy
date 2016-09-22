@@ -184,18 +184,15 @@ public class LinkageTest extends AbstractNALTest {
             }
 
             //test 2nd level link
-            if (!(w instanceof Variable)) {
-                if (TermIndex.linkable(w)) {
-                    Concept Wc = nar.concept(w);
-                    if (Wc != null) {
-                        for (BLink<Term> entry2 : Wc.termlinks()) {
-                            if (entry2.get().equals(p2Term)) {
-                                return true;
-                            }
-                        }
+            Concept Wc = nar.concept(w);
+            if (Wc != null) {
+                for (BLink<Term> entry2 : Wc.termlinks()) {
+                    if (entry2.get().equals(p2Term)) {
+                        return true;
                     }
                 }
             }
+
         }
         return false;
     }

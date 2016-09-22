@@ -88,34 +88,19 @@ public class Activation {
     Concept linkSubterm(@NotNull Concept source, @NotNull Termed target, float subScale, int depth) {
 
     /* activate concept */
-        Concept targetConcept;
+        Concept targetConcept = nar.concept(target, true);
         Term targetTerm;
-
-        if (target instanceof Concept) {
-            targetConcept = (Concept)target;
-            targetTerm = targetConcept.term();
-        } else {
-            targetTerm = (Term)target;
-
-            if (!TermIndex.linkable(targetTerm)) {
-                targetConcept = null;
-            } else {
-                targetConcept = nar.concept(target, true);
-                if (targetConcept == null)
-                    throw new NullPointerException(target + " did not resolve to a concept");
-            }
-
-        }
-
 
         if (targetConcept!=null) {
             activateConcept(targetConcept, subScale);
-
 
             @NotNull Term[] tmpl = targetConcept.templates().terms();
             if (tmpl.length > 0)
                 linkTerms(targetConcept, tmpl, subScale, depth);
 
+            targetTerm = targetConcept.term();
+        } else {
+            targetTerm = target.term();
         }
 
         Term sourceTerm = source.term();

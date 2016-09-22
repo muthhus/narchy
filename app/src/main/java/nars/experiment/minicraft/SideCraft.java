@@ -1,11 +1,10 @@
 package nars.experiment.minicraft;
 
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
+import nars.*;
 import nars.experiment.minicraft.side.SideScrollMinicraft;
 import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
 import nars.remote.SwingAgent;
+import nars.task.MutableTask;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.Tense;
@@ -13,15 +12,14 @@ import nars.util.Util;
 import nars.util.signal.Autoencoder;
 import nars.video.MatrixSensor;
 import nars.video.PixelBag;
+import org.eclipse.collections.impl.set.mutable.primitive.ShortHashSet;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
 import spacegraph.obj.MatrixView;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-import java.util.Random;
+import java.util.List;
 
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.util.Texts.n2;
@@ -59,10 +57,10 @@ public class SideCraft extends SwingAgent {
 
         PixelBag cam = new PixelBag(camBuffer, 64, 64).addActions("cra", this);
 
-        final int nx = 8;
-        camAE = new SideCraft.PixelAutoClassifier("cra", cam.pixels, nx, nx, (subX, subY)-> {
+        final int nx = 16;
+        camAE = new SideCraft.PixelAutoClassifier("cra", cam.pixels, nx, nx, (subX, subY) -> {
             //context metadata: camera zoom, to give a sense of scale
-            return new float[] { subX/((float)(nx-1)), subY/((float)(nx-1)), cam.Z };
+            return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), cam.Z};
         }, 16, 4, this);
         SpaceGraph.window(
                 col(
@@ -133,7 +131,7 @@ public class SideCraft extends SwingAgent {
     @Override
     protected float reward() {
 
-        if (camAE!=null)
+        if (camAE != null)
             camAE.frame();
 
         float nextScore = craft.frame();
@@ -146,10 +144,14 @@ public class SideCraft extends SwingAgent {
 
         private final NAR nar;
         private final MetaBits metabits;
-        @NotNull Atom TAG = $.the("ae");
+
+        @NotNull String TAG = ("ae");
 
         private final float[][] pixIn;
-        private final int[] pixOut;
+
+        private final short[][][] pixOut;
+        private final float[][] pixConf;
+
         public final float[][] pixRecon; //reconstructed input
         private final Term root;
         private final float in[];
@@ -159,6 +161,8 @@ public class SideCraft extends SwingAgent {
         private final int batchSize;
         private boolean reconstruct = true;
         public boolean learn = true;
+        private float minConf;
+        private float baseConf;
 
 //        public PixelAutoClassifier(String root, float[][] pixIn, int sw, int sh, NAgent agent) {
 //            this(root, pixIn, sw, sh, sw * sh /* estimate */, 4, agent);
@@ -168,9 +172,11 @@ public class SideCraft extends SwingAgent {
             float[] get(int subX, int subY);
         }
 
-        /** metabits must consistently return an array of the same size, since now the size of this autoencoder is locked to its dimension */
+        /**
+         * metabits must consistently return an array of the same size, since now the size of this autoencoder is locked to its dimension
+         */
         public PixelAutoClassifier(String root, float[][] pixIn, int sw, int sh, MetaBits metabits, int states, int termBatchSize, NAgent agent) {
-            super(sw * sh + metabits.get(0,0).length, states, agent.nar.random);
+            super(sw * sh + metabits.get(0, 0).length, states, agent.nar.random);
             this.metabits = metabits;
             this.nar = agent.nar;
             this.root = $.the(root);
@@ -183,19 +189,34 @@ public class SideCraft extends SwingAgent {
             this.nh = (int) Math.ceil(ph / ((float) sh)); //number strides high
             this.in = new float[xx.length];
             this.pixRecon = new float[pw][ph];
-            this.pixOut = new int[nw * nh];
+
+            this.pixOut = new short[nw][nh][];
+            this.pixConf = new float[nw][nh];
+
             this.batchSize = termBatchSize;
+
             assert (nw * nh % batchSize == 0); //evenly divides
         }
 
         public void frame() {
-            int q = 0;
+            //int q = 0;
 
-            float alpha = 0.04f;
+            minConf = nar.confMin.floatValue();
+            baseConf = nar.confidenceDefault(Symbols.BELIEF);
 
+            float alpha = 0.85f; //this represents the overall rate; the sub-block rate will be a fraction of this
+            float subAlpha = alpha / (nw * nh);
+            float corruption = 0.1f;
+            int regionPixels = sw * sh;
             float sumErr = 0;
+
+            int states = y.length;
+            float outputThresh = 1f - (1f/(states-1));
+            int maxStatesPerRegion = states/4; //limit before considered ambiguous
+
             //forget(alpha*alpha);
 
+            List<Task> tasks = $.newArrayList();
 
             for (int i = 0; i < nw; ) {
                 for (int j = 0; j < nh; ) {
@@ -224,17 +245,38 @@ public class SideCraft extends SwingAgent {
                     }
 
                     boolean sigIn = true, sigOut = true;
+                    short[] po = null;
                     if (learn) {
-                        float regionError = train(in, alpha, 0f, 0.01f, sigIn, sigOut);
+                        float regionError = train(in, subAlpha, 0f, corruption, sigIn, sigOut);
                         sumErr += regionError;
+
+                        // must have sufficient error, and
+                        // the indecision degree between selected features must not reduce the evidence
+                        // below that which would cross the provided min conf thresh
+                        float evi;
+                        if ((evi = 1f - (regionError/regionPixels)) > 0) {
+                            short[] features = max(outputThresh);
+                            if (features!=null) {
+                                if (features.length < maxStatesPerRegion) {
+                                    evi /= features.length;
+                                    if ((pixConf[i][j] = (baseConf * w2c(evi))) >= minConf) {
+                                        po = features;
+                                    }
+                                }
+                            }
+                        }
                         //System.out.println(n2(y) + ", +-" + n4(regionError / y.length));
                     } else {
                         //System.out.println(n2(y));
                         recode(in, sigIn, sigOut);
                     }
-                    pixOut[q++] = max();
+                    pixOut[i][j] = po;
+
 
                     if (reconstruct) {
+
+                        float mult = (pixOut[i][j]==null) ?  -1f  /* invert */ : +1f /* normal */;
+
                         float z[] = this.z;
                         p = 0;
                         for (int si = 0; si < sw; si++) {
@@ -249,7 +291,8 @@ public class SideCraft extends SwingAgent {
 
                                 if (c >= ph)
                                     break;
-                                col[c] = z[p++];
+
+                                col[c] = z[p++] * mult;
                             }
                         }
                     }
@@ -260,32 +303,45 @@ public class SideCraft extends SwingAgent {
                 i++;
             }
 
-            float meanErrSquaredPerPixel = sumErr / (pw * ph);
-            System.out.println(Arrays.toString(pixOut) +", +-" + n4(meanErrSquaredPerPixel));
+            if (learn) {
+                //float meanErrPerPixel = sumErr / (pw * ph);
+                //System.out.println(Arrays.toString(pixOut) + ", +-" + n4(meanErrPerPixel));
 
-            if (sumErr < 1f) {
 
-                float conf = w2c(1f-sumErr /* approx */);
-                if (conf >= nar.confMin.floatValue()) {
+                for (int i = 0; i < pixOut.length; i++) {
+                    short[][] po = pixOut[i];
+                    float[] pc = pixConf[i];
+                    for (int j = 0; j < po.length; j++) {
+                        short[] v = po[j];
+                        if (v == null)
+                            continue;
 
-                    int qq = 0;
-                    for (int i = 0; i < pixOut.length; i += batchSize) {
-                        Term[] t = new Term[batchSize + 1];
-                        int j = 0;
-                        for (; j < batchSize; )
-                            t[j++] = $.the(pixOut[qq++]);
-                        t[j] = TAG;
+                        float conf = pc[j];
 
-                        //TODO use a new Term choice sensor type here
+                        Term[] vt = new Term[v.length];
+                        int vtt = 0;
+                        for (short x : v) {
+                            vt[vtt++] = $.the(TAG.toString() + x);
+                        }
 
-                        Term Y = $.inh($.p(t), root);
-                        //System.out.println(Y);
-                        nar.believe(Y, Tense.Present, 1f, conf);
+                        Term Y = $.inh($.sete($.p(root, $.the(i), $.the(j))), $.seti(vt));
+                        tasks.add(new MutableTask(Y, Symbols.BELIEF, 1f, conf)
+                                    .present(nar)
+                                    .log(TAG));
+
                     }
-
                 }
+
+
+                if (!tasks.isEmpty()) {
+                    //TODO normalize priority of these
+                    nar.inputLater(tasks);
+                }
+
             }
         }
+
+
 
 //        /**
 //         * Autoencodes a vector of inputs and attempts to classify the current values to
@@ -376,9 +432,13 @@ public class SideCraft extends SwingAgent {
             float v = ww[x][y];
             float r, g, b;
             if (v < 0) {
-                r = -v/2f; g = 0f;    b = -v;
+                r = -v / 2f;
+                g = 0f;
+                b = -v;
             } else {
-                r = v;    g = v/2;  b = 0f;
+                r = v;
+                g = v / 2;
+                b = 0f;
             }
             gl.glColor3f(r, g, b);
             return 0;

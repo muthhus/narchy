@@ -1261,4 +1261,14 @@ public enum Util {
         if (i > max) i = max;
         return i;
     }
+
+    /** range [a, b) */
+    public static int[] intSequence(int a, int b) {
+        int ba = b - a;
+        int[] x = new int[ba];
+        for (int i = 0; i < ba; i++) {
+            x[i+a] = i;
+        }
+        return x;
+    }
 }

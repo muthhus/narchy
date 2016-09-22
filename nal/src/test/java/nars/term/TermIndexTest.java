@@ -204,30 +204,30 @@ public class TermIndexTest {
 
 
 
-    @Test public void testSubtermIntern() {
-        Default n = new Default();
-        MaplikeIndex i = (MaplikeIndex)(n.concepts);
-
-        Term at = $("a");
-        TermVector a = TermVector.the(at, $("b"), $("cd"));
-        TermContainer b = ((Compound)n.concept(p(a), true).term()).subterms();
-        assertEquals(a, b);
-
-        //i.print(System.out);
-
-        //System.out.println(a.term(0));
-        //System.out.println(a.term(0));
-        //System.out.println(i.data);
-        a.forEach(bb->System.out.println(bb + " " + bb.getClass()));
-
-        Term B = b.term(0);
-        assertTrue(B instanceof AtomConcept);
-        assertTrue(at!= B);
-        assertTrue(B.term() == B);
-        assertEquals(at.toString(), B.toString());
-
-
-    }
+//    @Test public void testSubtermIntern() {
+//        Default n = new Default();
+//        MaplikeIndex i = (MaplikeIndex)(n.concepts);
+//
+//        Term at = $("a");
+//        TermVector a = TermVector.the(at, $("b"), $("cd"));
+//        TermContainer b = ((Compound)n.concept(p(a), true).term()).subterms();
+//        assertEquals(a, b);
+//
+//        //i.print(System.out);
+//
+//        //System.out.println(a.term(0));
+//        //System.out.println(a.term(0));
+//        //System.out.println(i.data);
+//        a.forEach(bb->System.out.println(bb + " " + bb.getClass()));
+//
+//        Term B = b.term(0);
+//        assertTrue(B instanceof AtomConcept);
+//        assertTrue(at!= B);
+//        assertTrue(B.term() == B);
+//        assertEquals(at.toString(), B.toString());
+//
+//
+//    }
 
     @Test public void testCommonPrefix1() {
         testCommonPrefix(true);

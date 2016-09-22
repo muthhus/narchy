@@ -3,6 +3,7 @@ package nars.link;
 import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.index.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.Variable;
@@ -61,28 +62,16 @@ public enum TermLinkBuilder {
      */
     protected static void components(@NotNull Term t, int level, @NotNull Collection<Term> target, @NotNull NAR nar) {
 
-        t = $.unneg(t);
+        //t = $.unneg(t);
 
         if (t instanceof Variable) {
 
-            if (t.op()!=Op.VAR_QUERY) {
-                target.add(t);
-            }
+            //should these even be added?
+            target.add(t);
 
         } else {
 
-
-            if (t instanceof Compound) {
-                t = nar.normalize((Compound) t);
-                if (t!=null && t.op() == NEG)
-                    throw new RuntimeException("should not be NEG");
-            }
-
-
-
-            //it seems that its possible that t can become null from normalizing a temporal compound,
-            // if it collapses values to atemporal state
-            //in this case, descend to components but dont add the null as a template
+            t = nar.concepts.conceptualizable(t);
 
             if (t != null && target.add(t)) { //do not descend on repeats
 
