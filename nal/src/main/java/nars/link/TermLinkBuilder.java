@@ -61,7 +61,7 @@ public enum TermLinkBuilder {
      */
     protected static void components(@NotNull Term t, int level, @NotNull Collection<Term> target, @NotNull NAR nar) {
 
-        t = $.unneg(t).term();
+        t = $.unneg(t);
 
         if (t instanceof Variable) {
 

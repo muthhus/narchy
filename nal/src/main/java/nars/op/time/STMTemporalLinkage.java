@@ -83,7 +83,7 @@ public final class STMTemporalLinkage extends STM {
                     //                    continue;
                     //                }
 
-                    if ($.unneg(previousTask.term()).equals($.unneg(t.term())))
+                    if ($.unneg(previousTask).equals($.unneg(t)))
                         continue;
 
 

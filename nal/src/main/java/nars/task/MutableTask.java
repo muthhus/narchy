@@ -4,6 +4,7 @@ import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.DefaultTruth;
@@ -242,4 +243,17 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
+    @Nullable public static Task clone(Task xt, Compound y, NAR nar) {
+        if (!y.isNormalized()) {
+            y = nar.normalize(y);
+            if (y == null)
+                return null;
+        }
+
+        MutableTask yt = new MutableTask(y, xt.punc(), xt.truth());
+        yt.setBudget(xt);
+        yt.setEvidence(xt.evidence());
+        yt.time(xt.creation(), xt.occurrence());
+        return yt;
+    }
 }

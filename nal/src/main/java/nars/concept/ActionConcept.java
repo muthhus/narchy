@@ -139,16 +139,13 @@ public class ActionConcept extends WiredCompoundConcept {
     @Override
     protected final void update() {
 
-        if (!hasGoals())
-            return;
-
         long now = nar.time();
         @Nullable Truth d = this.desire(now + decisionDT);
         @Nullable Truth b = this.belief(now + decisionDT);
 
         Truth feedback = motor.motor(b, d);
         if (feedback != null) {
-            Task next = feedback(feedback, now);
+            Task next = feedback(feedback, now + feedbackDT);
             if (nextFeedback == null || !nextFeedback.equalsTruth(next, feedbackResolution)) { //if feedback is different from last
                 nextFeedback = next;
                 nar.inputLater(next);
@@ -159,7 +156,7 @@ public class ActionConcept extends WiredCompoundConcept {
 
     protected final Task feedback(Truth t, long when) {
         return new GeneratedTask(this, Symbols.BELIEF, t)
-                .time(when, when+ feedbackDT)
+                .time(when, when)
                 .budget(feedbackPriority, feedbackDurability)
                 .log("Motor Feedback");
     }

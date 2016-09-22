@@ -112,7 +112,7 @@ public final class Premise extends RawBudget implements Tasked {
 
         Task belief = null;
 
-        Term termLinkTermConceptTerm = $.unneg(term).term();
+        Term termLinkTermConceptTerm = $.unneg(term);
 
         if (term instanceof Compound && linkable(termLinkTermConceptTerm)) { //atomic concepts will have no beliefs to match
 

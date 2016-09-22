@@ -1,5 +1,6 @@
 package nars.bag;
 
+import nars.$;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.link.BLink;
@@ -16,7 +17,9 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 
@@ -63,6 +66,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     default void put(@NotNull V x) {
         put(x, initialBudget(x), null);
     }
+    default void putLink(@NotNull BLink<V> x) {
+        put(x.get(), x);
+    }
+
 //        @Nullable
 //        @Override public BLink<V> put(@NotNull V v) {
 //            //TODO combine with CurveBag.put(v)
@@ -579,4 +586,24 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         return null;
     }
 
+    /** apply a transformation to each value. if the function returns null, it indicates
+     * the link is to be removed.  if it returns the original value, no change for that link.
+     * changes are buffered until after list iteration completes.
+     */
+    default void compute(Function<BLink<V>,BLink<V>> o) {
+        List<BLink<V>[]> changed = $.newArrayList();
+        forEach(x -> {
+           BLink<V> y = o.apply(x);
+           if (y!=x) {
+               changed.add(new BLink[]{ x, y });
+           }
+        });
+        for (BLink<V>[] c : changed) {
+            remove(c[0].get());
+
+            BLink<V> toAdd = c[1];
+            if (toAdd!=null)
+                putLink(toAdd);
+        }
+    }
 }

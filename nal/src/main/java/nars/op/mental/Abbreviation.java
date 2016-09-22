@@ -5,6 +5,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -14,6 +15,7 @@ import nars.op.MutaTaskBag;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.task.GeneratedTask;
+import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
@@ -25,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,7 +48,7 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
 
     /** when a concept is important and exceeds a syntactic complexity above
      * this value multiplied by the NAR's volume limit, then LET NARS NAME IT. */
-    public final MutableFloat abbreviationRelativeVolThreshold = new MutableFloat(0.5f);
+    public final MutableFloat abbreviationRelativeVolThreshold = new MutableFloat(0.25f);
 
 
 
@@ -59,13 +62,12 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
     public final MutableFloat abbreviationConfidence;
 
     /** abbreviations per processed task */
-    public final MutableFloat abbreviationProbability = new MutableFloat(1f);
+    public final MutableFloat abbreviationProbability = new MutableFloat(2f);
 
     @NotNull
     protected final NAR nar;
     private final String termPrefix;
     private float volThresh;
-    private float threshFalloffRate;
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix, float selectionRate, int capacity) {
@@ -84,17 +86,19 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
             return null;
 
         Term t = task.term();
+        if (t.volume() >= volThresh) {
 
-        float score;
-        if ((score = scoreIfExceeds(task,nar.random.nextFloat())) > 0) {
-            @NotNull Budget b = task.budget();
-            return new DefaultBLink(t,
-                    or(b.priIfFiniteElseZero(), score),
-                    b.dur(),
-                    b.qua());
-        } else {
-            return null;
+            float score;
+            if ((score = scoreIfExceeds(task, nar.random.nextFloat())) > 0) {
+                @NotNull Budget b = task.budget();
+                return new DefaultBLink(t,
+                        or(b.priIfFiniteElseZero(), score),
+                        b.dur(),
+                        b.qua());
+            }
         }
+
+        return null;
     }
 
     @Override
@@ -102,12 +106,12 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
         //calculate this once per frame. not every task process
         volThresh = abbreviationRelativeVolThreshold.floatValue() * nar.compoundVolumeMax.intValue();
 
-        //how quickly to decrease probability for each degree of volume away from the thresh
-        //this is measured relative to the larger of either the distance to the max
-        //volume, or min volume (1)
-        threshFalloffRate = Math.min(
-                Math.abs(nar.compoundVolumeMax.floatValue() - volThresh),
-                nar.compoundVolumeMax.floatValue() - 1 );
+//        //how quickly to decrease probability for each degree of volume away from the thresh
+//        //this is measured relative to the larger of either the distance to the max
+//        //volume, or min volume (1)
+//        threshFalloffRate = Math.min(
+//                Math.abs(nar.compoundVolumeMax.floatValue() - volThresh),
+//                nar.compoundVolumeMax.floatValue() - 1 );
 
         super.next(n);
     }
@@ -164,9 +168,9 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
             if (s >= min) {
 
                 //higher probability for terms nearer the thresh. smaller and larger get less chance
-                s *= 1f - unitize(
-                        Math.abs(task.volume() - volThresh) /
-                                (threshFalloffRate) );
+//                s *= 1f - unitize(
+//                        Math.abs(task.volume() - volThresh) /
+//                                (threshFalloffRate) );
 
                 if (s >= min)
                     return s;
@@ -178,7 +182,7 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
     protected void abbreviate(@NotNull CompoundConcept abbreviated, Budget b) {
         //Concept abbreviation = nar.activate(, NewAbbreviationBudget);
 
-        AliasConcept alias = new AliasConcept(newSerialTerm(), abbreviated);
+        AliasConcept alias = new AliasConcept(newSerialTerm(), abbreviated, nar);
         nar.on(alias);
 
         Compound abbreviation = abbreviate(abbreviated, alias);
@@ -219,14 +223,56 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
 
         private final Concept abbr;
 
-        public AliasConcept(String term, Concept abbreviated) {
+        public AliasConcept(@NotNull String term, @NotNull Concept abbreviated, @NotNull NAR nar) {
             super(term, Op.ATOM, abbreviated.termlinks(), abbreviated.tasklinks());
             this.abbr = abbreviated;
+            rewriteLinks(nar);
+        }
+
+        /** rewrite termlinks and tasklinks which contain the abbreviated term...
+         *      (but are not equal to since tasks can not have atom content)
+         *  ...replacing it with this alias */
+        private void rewriteLinks(@NotNull NAR nar) {
+            Term thiz = term();
+            Term that = abbr.term();
+            termlinks().compute(existingLink -> {
+               Term x = existingLink.get();
+               Term y = nar.concepts.replace(x, that, thiz);
+               return (y!=null && y != x) ?
+                       termlinks().newLink(y, existingLink) :
+                       existingLink;
+            });
+            tasklinks().compute(existingLink -> {
+                Task xt = existingLink.get();
+                Term x = xt.term();
+
+                if (!x.equals(that) && !x.hasTemporal()) {
+                    Term y = $.terms.replace(x, that, thiz);
+                    if ( y != x && y instanceof Compound) {
+                        Task yt = MutableTask.clone(xt, (Compound) y, nar);
+                        if (yt!=null)
+                            return termlinks().newLink(yt, existingLink);
+                    }
+                }
+
+                return existingLink;
+
+            });
         }
 
         @Override
         public @Nullable TermContainer templates() {
             return abbr.templates();
+        }
+
+        @Override
+        public ConceptPolicy policy() {
+            return abbr.policy();
+        }
+
+        @Override
+        public void policy(@NotNull ConceptPolicy p, long now, List<Task> removed) {
+            abbr.policy(p, now, removed);
         }
 
         /** equality will have already been tested here, and the parent super.unify() method is just return false. so skip it and just try the abbreviated */

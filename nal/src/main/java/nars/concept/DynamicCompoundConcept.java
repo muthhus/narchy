@@ -126,10 +126,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
             DynTruth d = new DynTruth(op(), nar.confMin.floatValue(), t, e, b);
             Term[] subs = template.terms();
             for (Term s : subs) {
-                if (!(s instanceof Compound))
-                    continue; //unusual but could happen
-
-                if (!subTruth((Compound) s, template, when, now, d))
+                if (!subTruth(s, template, when, now, d))
                     return null;
             }
 
@@ -137,69 +134,83 @@ public class DynamicCompoundConcept extends CompoundConcept {
         }
 
         /** returns true if the subterm was evaluated successfully, false otherwise */
-        private boolean subTruth(Compound subterm, Compound superterm, long when, long now, DynTruth d) {
+        private boolean subTruth(Term subterm, Compound superterm, long when, long now, DynTruth d) {
 
-            Compound ss = subterm; //original pre-unnegated subterm for dt relative calculation
+            Term ss = subterm; //original pre-unnegated subterm for dt relative calculation
 
             boolean negated = subterm.op()==NEG;
             if (negated)
-                subterm = (Compound) ($.unneg(subterm).term());
+                subterm = $.unneg(subterm);
 
-            Iterator<Compound> unrolled = unroll(subterm);
-            while (unrolled.hasNext()) {
-                subterm = unrolled.next();
+            if (subterm instanceof Compound && subterm.hasAny(Op.INT)) {
 
-                Concept p = nar.concept(subterm);
-                if (p == null)
-                    return false;
-
-                BeliefTable table = beliefOrGoal ? p.beliefs() : p.goals();
-                if (table.isEmpty()) {
-                    return false;
-                }
-
-                int dt = superterm.subtermTime(ss);
-                if (dt == DTERNAL) dt = 0;
-
-                //System.out.println(ss + " "+ dt + " in " + template);
-
-
-                @Nullable Truth nt = null;
-                if (p instanceof DynamicCompoundConcept) {
-                    @Nullable DynamicCompoundConcept.DynTruth ndt = ((DynamicBeliefTable)table).truth(when + dt, now, subterm, false);
-                    if (ndt!=null) {
-                        nt = ndt.truth();
+                Iterator<Term> unrolled = unroll((Compound) subterm);
+                if (unrolled!=null) {
+                    while (unrolled.hasNext()) {
+                        if (!subTruth(unrolled.next(), superterm, when, now, d, ss, negated))
+                            return false;
                     }
-                } else {
-                    nt = table.truth(when + dt, now);
-                }
 
-                if (nt==null) {
-                    return false;
-                }
-                if (!d.add($.negIf(nt,negated)))
-                    return false;
-
-                if (d.e!=null) {
-                    @Nullable Task bt = table.top(when+dt, now);
-                    if (bt != null) {
-                        Budget btb = bt.budget();
-                        if (!btb.isDeleted())
-                            BudgetMerge.plusBlend.apply(d.b, btb, 1f);
-
-                        d.e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
-                    }
+                    return true;
                 }
 
             }
 
+            return subTruth(subterm, superterm, when, now, d, ss, negated);
+
+        }
+
+        private boolean subTruth(Term next, Compound superterm, long when, long now, DynTruth d, Term ss, boolean negated) {
+            Concept nextConcept = nar.concept(next);
+            if (nextConcept == null)
+                return false;
+
+            BeliefTable table = beliefOrGoal ? nextConcept.beliefs() : nextConcept.goals();
+            if (table.isEmpty()) {
+                return false;
+            }
+
+            int dt = superterm.subtermTime(ss);
+            if (dt == DTERNAL) dt = 0;
+
+            //System.out.println(ss + " "+ dt + " in " + template);
+
+
+            @Nullable Truth nt = null;
+            if (nextConcept instanceof DynamicCompoundConcept) {
+                @Nullable DynamicCompoundConcept.DynTruth ndt = ((DynamicBeliefTable)table).truth(when + dt, now, (Compound) next, false);
+                if (ndt!=null) {
+                    nt = ndt.truth();
+                }
+            } else {
+                nt = table.truth(when + dt, now);
+            }
+
+            if (nt==null) {
+                return false;
+            }
+            if (!d.add($.negIf(nt,negated)))
+                return false;
+
+            if (d.e!=null) {
+                @Nullable Task bt = table.top(when+dt, now);
+                if (bt != null) {
+                    Budget btb = bt.budget();
+                    if (!btb.isDeleted())
+                        BudgetMerge.plusBlend.apply(d.b, btb, 1f);
+
+                    d.e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
+                }
+            }
             return true;
         }
 
         /** unroll IntInterval's */
-        private Iterator<Compound> unroll(Compound c) {
+        private Iterator<Term> unroll(Compound c) {
             if (!c.hasAny(Op.INT))
                 return Iterators.singletonIterator(c); //no IntInterval's early exit
+
+            Compound cc = c;
 
             Map<ByteList, Termject.IntInterval> intervals = new HashMap();
             c.pathsTo(x -> x instanceof Termject.IntInterval ? ((Termject.IntInterval)x) : null, (ByteList p, Termject.IntInterval x) -> {
@@ -215,12 +226,11 @@ public class DynamicCompoundConcept extends CompoundConcept {
                     Termject.IntInterval i1 = e.getValue();
                     int max = i1.max();
                     int min = i1.min();
-                    List<Compound> t = $.newArrayList(1 + max - min);
+                    List<Term> t = $.newArrayList(1 + max - min);
                     for (int i = min; i <= max; i++) {
-                        @Nullable Term c1 = $.terms.transform(c, e.getKey(), $.the(i));
-                        if (!(c1 instanceof Compound))
-                            continue;
-                        t.add((Compound) c1);
+                        @Nullable Term c1 = $.terms.transform(cc, e.getKey(), $.the(i));
+                        if (c1!=null)
+                            t.add(c1);
                     }
                     return t.iterator();
                 }
@@ -232,26 +242,26 @@ public class DynamicCompoundConcept extends CompoundConcept {
                     Termject.IntInterval i1 = e1.getValue();
                     Termject.IntInterval i2 = e2.getValue();
                     int max1 = i1.max(), min1 = i1.min(), max2 = i2.max(), min2 = i2.min();
-                    List<Compound> t = $.newArrayList( (1 + max2 - min2) * (1 + max1 - min1) ) ;
+                    List<Term> t = $.newArrayList( (1 + max2 - min2) * (1 + max1 - min1) ) ;
 
                     for (int i = min1; i <= max1; i++) {
                         for (int j = min2; j <= max2; j++) {
-                            Term c1 = $.terms.transform(c, e1.getKey(), $.the(i));
-                            if (!(c1 instanceof Compound))
+                            Term c1 = $.terms.transform(cc, e1.getKey(), $.the(i));
+                            if (c1 == null)
                                 //throw new RuntimeException("how not transformed to compound");
                                 continue;
                             Term c2 = $.terms.transform((Compound)c1, e2.getKey(), $.the(j));
-                            if (!(c2 instanceof Compound))
+                            if (c2 == null)
                                 //throw new RuntimeException("how not transformed to compound");
                                 continue;
-                            t.add((Compound)c2);
+                            t.add(c2);
                         }
                     }
                     return t.iterator();
 
                 default:
                     //either there is none, or too many -- just use the term directly
-                    return Iterators.singletonIterator(c);
+                    return null;
 
             }
 

@@ -82,7 +82,7 @@ public class OperationConcept extends CompoundConcept<Compound> implements Consu
     }
 
     protected boolean runLater(@NotNull Task t, @NotNull NAR nar) {
-        return hasGoals() && operationExec(operationConcept(nar))!=null;
+        return !goals().isEmpty() && operationExec(operationConcept(nar))!=null;
     }
 
     /** called between frames if belief or goal state has changed */
