@@ -29,6 +29,8 @@ import jake2.render.opengl.GLDriver;
 import jake2.render.opengl.QGL;
 import jake2.render.opengl.QGLConst;
 
+import java.nio.ByteBuffer;
+
 /**
  * Base
  * 
@@ -166,7 +168,7 @@ public abstract class Base implements QGLConst, RenderAPI {
     /*
      * base members
      */
-    protected final static viddef_t vid = new viddef_t();
+    public final static viddef_t vid = new viddef_t();
 
     protected cvar_t vid_fullscreen;
     
@@ -182,5 +184,27 @@ public abstract class Base implements QGLConst, RenderAPI {
     public static synchronized void setVid(int width, int height) {
 	vid.setSize(width, height);
     }
-    
+
+    public ByteBuffer see(ByteBuffer rgb) {
+
+        int size = vid.getWidth() * vid.getHeight() * 3;
+
+        if (rgb == null || rgb.remaining()<size) {
+            rgb = ByteBuffer.allocate(size);
+        }
+
+        // change pixel alignment for reading
+        if (vid.getWidth() % 4 != 0) {
+            gl.glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        }
+
+        // read the RGB values into the image buffer
+        gl.glReadPixels(0, 0, vid.getWidth(), vid.getHeight(), GL_RGB, GL_UNSIGNED_BYTE, rgb);
+
+        // reset to default alignment
+        gl.glPixelStorei(GL_PACK_ALIGNMENT, 4);
+
+        return rgb;
+    }
+
 }

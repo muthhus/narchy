@@ -48,7 +48,7 @@ public class NEWTWin {
     volatile GLWindow window = null;
     volatile GameAnimatorControl animCtrl = null;
     /** Encapsulateed AWT dependency */
-    volatile Object canvasObj = null;
+    public volatile Object canvasObj = null;
     boolean forceReleaseCtx = false;
     volatile boolean shouldQuit = false;
     volatile boolean shouldPause = false;

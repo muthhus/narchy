@@ -87,7 +87,7 @@ public class IRCServer implements Runnable {
 	 */
 	public void sendMOTD(Client client) throws IOException {
 		client.connection.send(Reply.RPL_MOTDSTART, client, ":- " + Config.getProperty("hostname") + " Message of the day - ");
-		File motd = new File("motd.txt");
+//		File motd = new File("motd.txt");
 //		if (!motd.exists()) Utilities.makeFile("motd.txt");
 		for (String line : motd())
 			client.connection.send(Reply.RPL_MOTD, client, ":- " + line);
@@ -146,11 +146,11 @@ public class IRCServer implements Runnable {
 //			add(c);
 //	}
 
-	public void forEach(Consumer<Channel> each) {
+	public void forEachChannel(Consumer<Channel> each) {
 		channels.forEach((k,v)-> each.accept(v));
 	}
 
-	public void add(String line) throws IOException {
+	public void addChannel(String line) throws IOException {
 		if (line.startsWith("//")) return;
 		String[] lineArray = line.split(":");
 		if (lineArray.length < 5) return;
@@ -268,7 +268,7 @@ public class IRCServer implements Runnable {
 //	 *            Client to add.
 //	 * @throws Exception
 //	 */
-	public void add(Client client) {
+	public void addChannel(Client client) {
 		clients.put(client.getUsername(), client);
 		plugins.runOnClientLogin(client);
 	}

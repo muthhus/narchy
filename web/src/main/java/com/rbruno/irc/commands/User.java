@@ -36,7 +36,7 @@ public class User extends Command {
 			//request.connection.send(Reply.RPL_LUSERCHANNELS, client, server.getNonSecretChannels() + " :channels formed");
 			request.connection.send(Reply.RPL_LUSERME, client, ":I have " + server.getClientCount() + " clients and 1 servers");
 			server.sendMOTD(client);
-			server.add(client);
+			server.addChannel(client);
 			break;
 		case SERVER:
 			// TODO Server

@@ -20,7 +20,7 @@ public class List extends Command {
 		if (request.getArgs().length == 0) {
 
 			request.send(Reply.RPL_LISTSTART, client, "Channel :Users Name");
-			server.forEach(current -> {
+			server.forEachChannel(current -> {
 				try {
 					request.send(Reply.RPL_LIST, client, current.id + ' ' + current.getCurrentNumberOfUsers() + " :" + current.getTopic());
 				} catch (IOException e) {

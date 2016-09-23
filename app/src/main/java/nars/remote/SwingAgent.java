@@ -21,6 +21,7 @@ import spacegraph.Surface;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;

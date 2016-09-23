@@ -1,11 +1,17 @@
 package nars.web;
 
+import io.undertow.server.handlers.PathHandler;
 import io.undertow.util.FastConcurrentDirectDeque;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import nars.NAR;
 import nars.Task;
+import nars.bag.Bag;
+import nars.concept.Concept;
+import nars.link.BLink;
 import nars.nlp.Twenglish;
+import nars.table.BeliefTable;
+import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.event.Active;
 import org.slf4j.Logger;
@@ -15,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static nars.time.Tense.ETERNAL;
+import static nars.web.WebServer.socket;
 
 /**
  * Created by me on 4/21/16.
@@ -36,7 +43,6 @@ public class NarseseIOService extends WebsocketService {
 
     @Override
     public void onStart() {
-
 
         active = new Active(
                 nar.eventTaskProcess.on(this::queue),

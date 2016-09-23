@@ -195,6 +195,7 @@ final byte[][] dottexture =
 	    VID.Printf(Defines.PRINT_ALL, "Wrote " + file + '\n');
  	} 
 
+
 	/*
 	** GL_Strings_f
 	*/

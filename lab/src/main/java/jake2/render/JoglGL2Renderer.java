@@ -37,14 +37,14 @@ import jake2.sys.NEWTKBD;
  * 
  * @author dsanders/cwei
  */
-final class JoglGL2Renderer extends JoglGL2Driver implements refexport_t, Ref {
+public final class JoglGL2Renderer extends JoglGL2Driver implements refexport_t, Ref {
 
     public static final String DRIVER_NAME = "joglgl2";
 
     private final KBD kbd = new NEWTKBD();
 
     // is set from Renderer factory
-    private RenderAPI impl;
+    public RenderAPI impl;
 
     static {
         Renderer.register(new JoglGL2Renderer());

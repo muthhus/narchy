@@ -30,6 +30,7 @@ import jake2.qcommon.Cvar;
 import jake2.qcommon.Q2DataTool;
 import jake2.qcommon.Qcommon;
 import jake2.sys.Timer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -57,43 +58,47 @@ public final class Jake2 {
      * @param args
      */
     public static void main(String[] args) {
-    	
-    	boolean dedicated = false;
 
-    	// check if we are in dedicated mode to hide the java dialog.
-    	for (int n = 0; n <  args.length; n++)
-    	{
-    		if (args[n].equals("+set"))
-    		{
-    			if (n++ >= args.length)
-    				break;
-    			
-    			if (!args[n].equals("dedicated"))
-    				continue;
+        run(args, null);
+    }
 
-    			if (n++ >= args.length)
-    				break;
+    public static void run(String[] args, @Nullable Runnable onFrame) {
+        boolean dedicated = false;
 
-    			if (args[n].equals("1") || args[n].equals("\"1\""))
-    			{
-    				Com.Printf("Starting in dedicated mode.\n");
-    				dedicated = true;
-    			}
-    		}    		
-    	}
-    	
-    	// TODO: check if dedicated is set in config file
-    	
-		Globals.dedicated= Cvar.Get("dedicated", "0", Qcommon.CVAR_NOSET);
-    
-    	if (dedicated)
-    		Globals.dedicated.value = 1.0f;
-    	    	
-    	
-    	// open the q2dialog, if we are not in dedicated mode.
-    	if (Globals.dedicated.value != 1.0f) {
-    	    Jake2.initQ2DataTool();
-    	}
+        // check if we are in dedicated mode to hide the java dialog.
+        for (int n = 0; n <  args.length; n++)
+        {
+            if (args[n].equals("+set"))
+            {
+                if (n++ >= args.length)
+                    break;
+
+                if (!args[n].equals("dedicated"))
+                    continue;
+
+                if (n++ >= args.length)
+                    break;
+
+                if (args[n].equals("1") || args[n].equals("\"1\""))
+                {
+                    Com.Printf("Starting in dedicated mode.\n");
+                    dedicated = true;
+                }
+            }
+        }
+
+        // TODO: check if dedicated is set in config file
+
+        Globals.dedicated= Cvar.Get("dedicated", "0", Qcommon.CVAR_NOSET);
+
+        if (dedicated)
+            Globals.dedicated.value = 1.0f;
+
+
+        // open the q2dialog, if we are not in dedicated mode.
+        if (Globals.dedicated.value != 1.0f) {
+            Jake2.initQ2DataTool();
+        }
 
         // in C the first arg is the filename
         int argc = (args == null) ? 1 : args.length + 1;
@@ -106,6 +111,7 @@ public final class Jake2 {
 
         Globals.nostdout = Cvar.Get("nostdout", "0", 0);
 
+
         int oldtime = Timer.Milliseconds();
         int newtime;
         int time;
@@ -116,6 +122,10 @@ public final class Jake2 {
 
             if (time > 0)
                 Qcommon.Frame(time);
+
+            if (onFrame!=null)
+                onFrame.run();
+
             oldtime = newtime;
         }
     }

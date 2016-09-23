@@ -4,14 +4,14 @@ import nars.util.Util;
 import nars.util.data.MutableInteger;
 
 /**
- * Created by me on 4/24/16.
+ *
  */
-public abstract class SynchWebsocketService extends WebsocketService implements Runnable {
+public abstract class PeriodicWebsocketService extends WebsocketService implements Runnable {
 
     public final MutableInteger updatePeriodMS;
     private Thread thread;
 
-    public SynchWebsocketService(int updatePeriodMS) {
+    public PeriodicWebsocketService(int updatePeriodMS) {
         super();
 
         this.updatePeriodMS = new MutableInteger(updatePeriodMS);

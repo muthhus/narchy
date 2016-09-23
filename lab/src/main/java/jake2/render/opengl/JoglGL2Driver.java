@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 package jake2.render.opengl;
 
+import com.jogamp.nativewindow.NativeWindow;
 import com.jogamp.nativewindow.util.Dimension;
 import com.jogamp.newt.MonitorMode;
 import com.jogamp.opengl.GLException;
@@ -51,12 +52,14 @@ public abstract class JoglGL2Driver extends JoglGL2ES1 implements GLDriver {
             throw new GLException("GL2 is disabled");
         }
     }
-    
+
+
+
     protected JoglGL2Driver() {
         super();
     }
 
-    private NEWTWin newtWin = null;
+    public NEWTWin newtWin = null;
 
     public abstract String getName();
     
@@ -73,7 +76,9 @@ public abstract class JoglGL2Driver extends JoglGL2ES1 implements GLDriver {
         }
         int res = newtWin.setMode(glp, dim, mode, fullscreen, getName());
         if( Base.rserr_ok == res ) {
-            
+
+            //this.canvas = (NativeWindow) newtWin.canvasObj;
+
             setGL(newtWin.window.getGL().getGL2());
             init(0, 0);
             

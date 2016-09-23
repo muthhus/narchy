@@ -19,7 +19,7 @@ public class Names extends Command {
 	public void run(Request request) throws IOException {
 		IRCServer server = request.server();
 		if (request.getArgs().length == 0) {
-			server.forEach(current -> {
+			server.forEachChannel(current -> {
                 String message = current.id + " :";
 				ArrayList<Client> clients = current.getClients();
 				for (Client client : clients) {

@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by me on 4/24/16.
  */
-abstract public class TopConceptService<O> extends SynchWebsocketService {
+abstract public class TopConceptService<O> extends PeriodicWebsocketService {
 
     private final NAR nar;
     protected final MutableInteger maxConcepts;

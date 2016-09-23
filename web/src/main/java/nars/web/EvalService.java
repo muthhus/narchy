@@ -9,23 +9,33 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by me on 4/21/16.
  */
-public class EvalService<R,V> extends SynchWebsocketService  {
+public class EvalService<R,V> extends PeriodicWebsocketService {
 
     private final R root;
     private final Object expression;
 
     final static Logger logger = LoggerFactory.getLogger(EvalService.class);
 
-    public EvalService(R root, String expression, int updatePeriodMS) throws OgnlException {
+    public EvalService(R root, String expression, int updatePeriodMS)  {
         super(updatePeriodMS);
         this.root = root;
-        this.expression = Ognl.parseExpression( expression );
+
+        Object ee;
+        try {
+            ee = Ognl.parseExpression( expression );
+        } catch (OgnlException e) {
+            ee = null;
+        }
+        this.expression = ee;
     }
 
     @Nullable
     public final V get() {
         try {
-            return (V)Ognl.getValue(expression, root);
+            if (expression!=null)
+                return (V)Ognl.getValue(expression, root);
+            else
+                return null;
         } catch (OgnlException e) {
             logger.error("{}", e);
             return null;
