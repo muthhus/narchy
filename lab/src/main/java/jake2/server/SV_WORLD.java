@@ -213,8 +213,9 @@ public class SV_WORLD {
                     max = v;
             }
             for (int i = 0; i < 3; i++) {
-                ent.absmin[i] = ent.s.origin[i] - max;
-                ent.absmax[i] = ent.s.origin[i] + max;
+                float ei = ent.s.origin[i];
+                ent.absmin[i] = ei - max;
+                ent.absmax[i] = ei + max;
             }
         } else {
             // normal

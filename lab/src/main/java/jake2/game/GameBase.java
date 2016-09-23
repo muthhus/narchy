@@ -67,7 +67,7 @@ public class GameBase {
 
     public static cvar_t dmflags = new cvar_t();
 
-    public static cvar_t skill; // = new cvar_t();
+    public static cvar_t skill = new cvar_t();
 
     public static cvar_t fraglimit = new cvar_t();
 

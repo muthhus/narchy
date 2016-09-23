@@ -415,7 +415,7 @@ public class Tetris extends NAgent {
 
         nar.confMin.setValue(0.02f);
 
-        Abbreviation abbr = new Abbreviation(nar, "the", 4, 0.5f, 32);
+        //Abbreviation abbr = new Abbreviation(nar, "the", 4, 0.5f, 32);
 
         nar.compoundVolumeMax.setValue(32);
         //nar.linkFeedbackRate.setValue(0.95f);

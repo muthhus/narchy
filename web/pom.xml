@@ -33,6 +33,15 @@
       <scope>compile</scope>
     </dependency>
 
+
+    <!-- https://mvnrepository.com/artifact/com.hanhuy/sirc -->
+    <dependency>
+      <groupId>com.hanhuy</groupId>
+      <artifactId>sirc</artifactId>
+      <version>1.1.6-pfn.2</version>
+    </dependency>
+
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

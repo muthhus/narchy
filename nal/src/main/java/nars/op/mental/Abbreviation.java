@@ -185,8 +185,8 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
         String id = newSerialTerm();
 
 
-        Compound abbreviation = newRelation(abbreviated, id);
-        if (abbreviation != null) {
+        //Compound abbreviation = newRelation(abbreviated, id);
+        //if (abbreviation != null) {
 
             Compound abbreviatedTerm = abbreviated.term();
 
@@ -210,8 +210,7 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
 //            nar.inputLater( t );
 //            logger.info("new: {}", t);
 
-
-        }
+        //}
     }
 
     static final class AliasConcept extends AtomConcept {
@@ -272,15 +271,15 @@ public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound
             return templates;
         }
 
-        @Override
-        public ConceptPolicy policy() {
-            return abbr.policy();
-        }
-
-        @Override
-        public void policy(@NotNull ConceptPolicy p, long now, List<Task> removed) {
-            abbr.policy(p, now, removed);
-        }
+//        @Override
+//        public ConceptPolicy policy() {
+//            return abbr.policy();
+//        }
+//        @Override
+//        public void policy(@NotNull ConceptPolicy p, long now, List<Task> removed) {
+//
+//            //abbr.policy(p, now, removed);
+//        }
 
         /** equality will have already been tested here, and the parent super.unify() method is just return false. so skip it and just try the abbreviated */
         @Override public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {

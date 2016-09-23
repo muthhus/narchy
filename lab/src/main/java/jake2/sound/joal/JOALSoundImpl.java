@@ -250,7 +250,8 @@ public final class JOALSoundImpl implements Sound {
 	 */
 	public void StopAllSounds() {
 		// mute the listener (master)
-		al.alListenerf(AL.AL_GAIN, 0);
+		if (al!=null)
+			al.alListenerf(AL.AL_GAIN, 0);
 	    PlaySound.reset();
 	    Channel.reset();
 	}

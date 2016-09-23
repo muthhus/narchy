@@ -89,7 +89,7 @@ public class CL_parse {
         String name = DownloadFileName(Globals.cls.downloadtempname);
 
         RandomAccessFile fp = Lib.fopen(name, "r+b");
-        
+
         if (fp != null) { 
             
             // it exists
@@ -99,6 +99,7 @@ public class CL_parse {
                 len = fp.length();
             } 
             catch (IOException e) {
+                e.printStackTrace();
             }
             
 

@@ -626,14 +626,14 @@ public class NARide extends StackPane {
                 int activeConcepts = l.concepts.size();
                 TermIndex index = nar.concepts;
                 int totalConcepts = index.size();
-                int uniqueSubterms = index.subtermsCount();
+
 
                 runLater(() -> {
                     StringBuilder sb = new StringBuilder();
                     sb.append("Active Concepts: ").append(activeConcepts).append('\n');
                     sb.append("Total Concepts: ").append(totalConcepts).append('\n');
-                    if (uniqueSubterms!=-1)
-                        sb.append("Unique Subterms: ").append(uniqueSubterms).append('\n');
+//                    if (uniqueSubterms!=-1)
+//                        sb.append("Unique Subterms: ").append(uniqueSubterms).append('\n');
                     status.setText(sb.toString());
                     sb.setLength(0);
                 });
