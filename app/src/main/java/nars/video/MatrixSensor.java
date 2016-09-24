@@ -6,7 +6,7 @@ import nars.concept.SensorConcept;
 /**
  * Created by me on 9/21/16.
  */
-public class MatrixSensor<S, C extends Concept> {
+public class MatrixSensor<S> {
 
     public final Concept[][] matrix;
     public final int width, height;

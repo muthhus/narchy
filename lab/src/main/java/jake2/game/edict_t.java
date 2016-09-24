@@ -28,6 +28,7 @@ import jake2.util.Lib;
 import jake2.util.QuakeFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class edict_t {
 
@@ -774,4 +775,6 @@ public class edict_t {
         if (f.readInt() != 9876)
             System.err.println("ent load check failed for num " + index);
     }
+
+
 }

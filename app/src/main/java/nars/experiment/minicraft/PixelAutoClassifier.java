@@ -98,14 +98,14 @@ public class PixelAutoClassifier extends Autoencoder {
         float basePri = nar.priorityDefault(Symbols.BELIEF);
         float baseDur = nar.durabilityDefault(Symbols.BELIEF);
 
-        float alpha = 0.05f; //this represents the overall rate; the sub-block rate will be a fraction of this
-        float corruption = 0.1f;
+        float alpha = 0.1f; //this represents the overall rate; the sub-block rate will be a fraction of this
+        float corruption = 0.3f;
         int regionPixels = sw * sh;
         float sumErr = 0;
 
         int states = y.length;
         float outputThresh = 1f - (1f / (states - 1));
-        int maxStatesPerRegion = states / 4; //limit before considered ambiguous
+        int maxStatesPerRegion = 2; //states / 4; //limit before considered ambiguous
 
         //forget(alpha*alpha);
 

@@ -8,96 +8,99 @@ import com.jogamp.opengl.util.GLReadBufferUtil;
 
 import jake2.client.VID;
 import jake2.client.refexport_t;
+import jake2.game.PlayerView;
+import jake2.game.edict_t;
+import jake2.qcommon.Qcommon;
 import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.render.opengl.JoglGL2Driver;
 import jogamp.newt.WindowImpl;
 import nars.NAR;
+import nars.experiment.minicraft.PixelAutoClassifier;
 import nars.remote.SwingAgent;
+import nars.video.MatrixSensor;
+import nars.video.PixelBag;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.function.Supplier;
 
+import static jake2.game.PlayerView.current_player;
 import static jake2.render.Base.vid;
 import static nars.$.t;
+import static spacegraph.SpaceGraph.window;
 
 /**
  * Created by me on 9/22/16.
  */
 public class Jake2Agent extends SwingAgent implements Runnable {
 
+    private final PixelAutoClassifier camAE;
     ByteBuffer seen = null;
     int width, height;
     boolean see = true;
 
+    final int[] nBits = new int[]{8, 8, 8};
+    final int[] bOffs1 = new int[]{2, 1, 0};
+
+    final ColorSpace raster = ColorSpace.getInstance(1000);
+    final ComponentColorModel colorModel = new ComponentColorModel(raster, nBits, false, false, 1, 0);
+
+    final Supplier<BufferedImage> screenshotter = () -> {
+        byte[] bb = seen.array();
+
+        WritableRaster raster1 = Raster.createInterleavedRaster(
+                new DataBufferByte(bb, bb.length), width, height, width * 3, 3, bOffs1, new Point(0, 0));
+
+        BufferedImage b = new BufferedImage(colorModel, raster1, false, (Hashtable) null);
+        return b;
+    };
+
     public Jake2Agent(NAR nar) {
         super(nar, 1);
 
-        addCamera("q", ()->{
-            if (seen!=null) {
 
-            } else {
+        MatrixSensor<PixelBag> qcam = addCamera("q", screenshotter, 64, 64, (v) -> t(v, alpha));
+        qcam.src.vflip = true;
 
-            }
-            byte[] bb = seen.array();
+        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 16, this);
+        window(camAE.newChart(), 500, 500);
 
-//            return new BufferedImage(ColorModel.getRGBdefault(), new WritableRaster(
-//                    new BandedSampleModel(
-//                            DataBuffer.TYPE_BYTE,
-//                            width,
-//                            height,
-//                            3
-//                    ),
-//                    ,
-//                    new Point(0,0))
-//            ,false, null);
-
-            Object bOffs = null;
-            ComponentColorModel colorModel;
-            ColorSpace raster;
-            int[] nBits;
-            int[] bOffs1;
-            raster = ColorSpace.getInstance(1000);
-            nBits = new int[]{8, 8, 8};
-            bOffs1 = new int[]{2, 1, 0};
-            colorModel = new ComponentColorModel(raster, nBits, false, false, 1, 0);
-
-            WritableRaster raster1 = Raster.createInterleavedRaster(
-                    new DataBufferByte(bb, bb.length), width, height, width*3, 3, bOffs1, new Point(0, 0));
-            return new BufferedImage(colorModel, raster1, false, (Hashtable)null);
-
-        }, 128,128, (v) -> t(v, alpha));
 
         new Thread(this).start();
     }
 
-    @Override public void run() {
+    @Override
+    protected float reward() {
+
+        camAE.frame();
+
+        edict_t p = PlayerView.current_player;
+        if (p == null)
+            return 0;
+
+//        System.out.println(p.health + " " + p.speed + Arrays.toString(p.velocity) + " "
+//        + p.client.weaponstate + " "
+//        );
+        //p.health
+
+        return -(1f - ((float)p.health)/(p.max_health));
+    }
+
+    @Override
+    public void run() {
         //http://aq2maps.quadaver.org/
         //https://www.quaddicted.com/reviews/
         //http://tastyspleen.net/~quake2/baseq2/maps/
         Jake2.run(new String[]{
-                "+god mode +give all +map train"
+                "+god mode", "+give all", "+map train"
                 //"+connect .."
-        }, () -> {
-            refexport_t r = Globals.re;
-            JoglGL2Renderer renderer = (JoglGL2Renderer) r;
+        }, this::onDraw);
 
-            if (see) {
-                if (seen != null) {
-                    seen.rewind();
-                }
-
-                width = vid.getWidth();
-                height = vid.getHeight();
-                seen = ((Base) renderer.impl).see(seen);
-
-                System.out.println(seen);
-            }
-
-        });
 
         /*
         Outer Base		base1.bsp
@@ -149,13 +152,27 @@ public class Jake2Agent extends SwingAgent implements Runnable {
 
     }
 
-    @Override
-    protected float reward() {
-        return 0;
+    protected synchronized void onDraw() {
+
+        refexport_t r = Globals.re;
+        JoglGL2Renderer renderer = (JoglGL2Renderer) r;
+
+        if (see) {
+            if (seen != null) {
+                seen.rewind();
+            }
+
+            width = vid.getWidth();
+            height = vid.getHeight();
+            seen = ((Base) renderer.impl).see(seen);
+        }
+
     }
 
+
+
     public static void main(String[] args) {
-        SwingAgent.run(Jake2Agent::new, 500);
+        SwingAgent.run(Jake2Agent::new, 66500);
     }
 }
 

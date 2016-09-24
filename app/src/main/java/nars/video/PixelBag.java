@@ -41,6 +41,7 @@ public class PixelBag implements PixelCamera {
     public final float[][] pixels;
 
     private int pixMin = 3;
+    public boolean vflip = false;
 
 
     public PixelBag(BufferedImage b, int px, int py) {
@@ -95,7 +96,8 @@ public class PixelBag implements PixelCamera {
         float minClarity = 0.05f, maxClarity = 0.66f;
 
         for (int ly = 0; ly < py; ly++) {
-            int sy = Util.clamp(lerp(maxY, minY, ly/pyf), 0, sh-1);
+            float l = ly / pyf;
+            int sy = Util.clamp(lerp(maxY, minY, !vflip ? l : 1f-l), 0, sh-1);
 
             float dy = Math.abs(ly - cy);
             float yDistFromCenterSq = dy * dy;

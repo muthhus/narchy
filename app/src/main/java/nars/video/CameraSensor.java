@@ -3,17 +3,13 @@ package nars.video;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.op.math.IntIntTo;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.FloatSupplier;
 import nars.concept.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import org.eclipse.collections.api.block.function.primitive.IntToIntFunction;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -21,7 +17,7 @@ import java.util.List;
  * manages reading a camera to a pixel grid of SensorConcepts
  * monochrome
  */
-public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P, SensorConcept> {
+public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P> {
 
 
     private final int radix = 3;

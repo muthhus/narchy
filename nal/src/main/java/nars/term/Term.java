@@ -56,18 +56,6 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     AtomicSingleton True = new AtomicSingleton("†");
     AtomicSingleton False = new AtomicSingleton("Ø");
 
-    static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed<Compound> b) {
-
-        //Term t = $.unNeg(term.term());
-        //Term b = $.unNeg(beliefConcept.term());
-
-        if (a.op() == b.op()) {
-            if (a.structure() == b.structure() && a.volume() == b.volume()) {
-                return b.equals(Terms.atemporalize((Compound) a));
-            }
-        }
-        return false;
-    }
 
     @NotNull
     @Override
@@ -401,6 +389,14 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         }
 
         throw new RuntimeException("ordering exception: " + this + ", " + y);
+    }
+
+
+    static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed<Compound> b) {
+        return ((a.structure() == b.structure()) &&
+                (a.op() == b.op()) &&
+                (a.volume() == b.volume()) &&
+                b.equals(Terms.atemporalize((Compound) a)));
     }
 }
 

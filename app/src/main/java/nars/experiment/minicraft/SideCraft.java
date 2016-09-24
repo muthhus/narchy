@@ -49,7 +49,7 @@ public class SideCraft extends SwingAgent {
         PixelBag cam = new PixelBag(camBuffer, 64, 64).addActions("cra", this);
 
 
-        camAE = new PixelAutoClassifier("cra", cam.pixels, 16, 16, 16, this);
+        camAE = new PixelAutoClassifier("cra", cam.pixels, 8, 8, 32, this);
         window(camAE.newChart(), 500, 500);
 
 

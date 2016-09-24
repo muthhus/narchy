@@ -116,7 +116,7 @@ abstract public class SwingAgent extends NAgent {
         return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }
 
-    protected MatrixSensor addCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected MatrixSensor<PixelBag> addCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         PixelBag pb = new PixelBag(w, pw, ph);
         pb.addActions(id, this);
         return addCamera(id, pb, pixelTruth);

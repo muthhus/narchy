@@ -298,24 +298,27 @@ public class PlayerHud {
         //
         // health
         //
-        ent.client.ps.stats[Defines.STAT_HEALTH_ICON] = (short) GameBase.level.pic_health;
-        ent.client.ps.stats[Defines.STAT_HEALTH] = (short) ent.health;
+        gclient_t C = ent.client;
+        short[] S = C.ps.stats;
+
+        S[Defines.STAT_HEALTH_ICON] = (short) GameBase.level.pic_health;
+        S[Defines.STAT_HEALTH] = (short) ent.health;
 
         //
         // ammo
         //
-        if (0 == ent.client.ammo_index /*
+        if (0 == C.ammo_index /*
                                         * ||
                                         * !ent.client.pers.inventory[ent.client.ammo_index]
                                         */
         ) {
-            ent.client.ps.stats[Defines.STAT_AMMO_ICON] = 0;
-            ent.client.ps.stats[Defines.STAT_AMMO] = 0;
+            S[Defines.STAT_AMMO_ICON] = 0;
+            S[Defines.STAT_AMMO] = 0;
         } else {
-            item = GameItemList.itemlist[ent.client.ammo_index];
-            ent.client.ps.stats[Defines.STAT_AMMO_ICON] = (short) game_import_t
+            item = GameItemList.itemlist[C.ammo_index];
+            S[Defines.STAT_AMMO_ICON] = (short) game_import_t
                     .imageindex(item.icon);
-            ent.client.ps.stats[Defines.STAT_AMMO] = (short) ent.client.pers.inventory[ent.client.ammo_index];
+            S[Defines.STAT_AMMO] = (short) C.pers.inventory[C.ammo_index];
         }
 
         //
@@ -323,8 +326,7 @@ public class PlayerHud {
         //
         power_armor_type = GameItems.PowerArmorType(ent);
         if (power_armor_type != 0) {
-            cells = ent.client.pers.inventory[GameItems.ITEM_INDEX(GameItems
-                    .FindItem("cells"))];
+            cells = C.pers.inventory[GameItems.ITEM_INDEX(GameItems.FindItem("cells"))];
             if (cells == 0) { // ran out of cells for power armor
                 ent.flags &= ~Defines.FL_POWER_ARMOR;
                 game_import_t
@@ -345,102 +347,102 @@ public class PlayerHud {
                                                                          // other
                                                                          // armor
                                                                          // icon
-            ent.client.ps.stats[Defines.STAT_ARMOR_ICON] = (short) game_import_t
+            S[Defines.STAT_ARMOR_ICON] = (short) game_import_t
                     .imageindex("i_powershield");
-            ent.client.ps.stats[Defines.STAT_ARMOR] = (short) cells;
+            S[Defines.STAT_ARMOR] = (short) cells;
         } else if (index != 0) {
             item = GameItems.GetItemByIndex(index);
-            ent.client.ps.stats[Defines.STAT_ARMOR_ICON] = (short) game_import_t
+            S[Defines.STAT_ARMOR_ICON] = (short) game_import_t
                     .imageindex(item.icon);
-            ent.client.ps.stats[Defines.STAT_ARMOR] = (short) ent.client.pers.inventory[index];
+            S[Defines.STAT_ARMOR] = (short) C.pers.inventory[index];
         } else {
-            ent.client.ps.stats[Defines.STAT_ARMOR_ICON] = 0;
-            ent.client.ps.stats[Defines.STAT_ARMOR] = 0;
+            S[Defines.STAT_ARMOR_ICON] = 0;
+            S[Defines.STAT_ARMOR] = 0;
         }
 
         //
         // pickup message
         //
-        if (GameBase.level.time > ent.client.pickup_msg_time) {
-            ent.client.ps.stats[Defines.STAT_PICKUP_ICON] = 0;
-            ent.client.ps.stats[Defines.STAT_PICKUP_STRING] = 0;
+        if (GameBase.level.time > C.pickup_msg_time) {
+            S[Defines.STAT_PICKUP_ICON] = 0;
+            S[Defines.STAT_PICKUP_STRING] = 0;
         }
 
         //
         // timers
         //
-        if (ent.client.quad_framenum > GameBase.level.framenum) {
-            ent.client.ps.stats[Defines.STAT_TIMER_ICON] = (short) game_import_t
+        if (C.quad_framenum > GameBase.level.framenum) {
+            S[Defines.STAT_TIMER_ICON] = (short) game_import_t
                     .imageindex("p_quad");
-            ent.client.ps.stats[Defines.STAT_TIMER] = (short) ((ent.client.quad_framenum - GameBase.level.framenum) / 10);
-        } else if (ent.client.invincible_framenum > GameBase.level.framenum) {
-            ent.client.ps.stats[Defines.STAT_TIMER_ICON] = (short) game_import_t
+            S[Defines.STAT_TIMER] = (short) ((C.quad_framenum - GameBase.level.framenum) / 10);
+        } else if (C.invincible_framenum > GameBase.level.framenum) {
+            S[Defines.STAT_TIMER_ICON] = (short) game_import_t
                     .imageindex("p_invulnerability");
-            ent.client.ps.stats[Defines.STAT_TIMER] = (short) ((ent.client.invincible_framenum - GameBase.level.framenum) / 10);
-        } else if (ent.client.enviro_framenum > GameBase.level.framenum) {
-            ent.client.ps.stats[Defines.STAT_TIMER_ICON] = (short) game_import_t
+            S[Defines.STAT_TIMER] = (short) ((C.invincible_framenum - GameBase.level.framenum) / 10);
+        } else if (C.enviro_framenum > GameBase.level.framenum) {
+            S[Defines.STAT_TIMER_ICON] = (short) game_import_t
                     .imageindex("p_envirosuit");
-            ent.client.ps.stats[Defines.STAT_TIMER] = (short) ((ent.client.enviro_framenum - GameBase.level.framenum) / 10);
-        } else if (ent.client.breather_framenum > GameBase.level.framenum) {
-            ent.client.ps.stats[Defines.STAT_TIMER_ICON] = (short) game_import_t
+            S[Defines.STAT_TIMER] = (short) ((C.enviro_framenum - GameBase.level.framenum) / 10);
+        } else if (C.breather_framenum > GameBase.level.framenum) {
+            S[Defines.STAT_TIMER_ICON] = (short) game_import_t
                     .imageindex("p_rebreather");
-            ent.client.ps.stats[Defines.STAT_TIMER] = (short) ((ent.client.breather_framenum - GameBase.level.framenum) / 10);
+            S[Defines.STAT_TIMER] = (short) ((C.breather_framenum - GameBase.level.framenum) / 10);
         } else {
-            ent.client.ps.stats[Defines.STAT_TIMER_ICON] = 0;
-            ent.client.ps.stats[Defines.STAT_TIMER] = 0;
+            S[Defines.STAT_TIMER_ICON] = 0;
+            S[Defines.STAT_TIMER] = 0;
         }
 
         //
         // selected item
         //
         // bugfix rst
-        if (ent.client.pers.selected_item <= 0)
-            ent.client.ps.stats[Defines.STAT_SELECTED_ICON] = 0;
+        if (C.pers.selected_item <= 0)
+            S[Defines.STAT_SELECTED_ICON] = 0;
         else
-            ent.client.ps.stats[Defines.STAT_SELECTED_ICON] = (short) game_import_t
-                    .imageindex(GameItemList.itemlist[ent.client.pers.selected_item].icon);
+            S[Defines.STAT_SELECTED_ICON] = (short) game_import_t
+                    .imageindex(GameItemList.itemlist[C.pers.selected_item].icon);
 
-        ent.client.ps.stats[Defines.STAT_SELECTED_ITEM] = (short) ent.client.pers.selected_item;
+        S[Defines.STAT_SELECTED_ITEM] = (short) C.pers.selected_item;
 
         //
         // layouts
         //
-        ent.client.ps.stats[Defines.STAT_LAYOUTS] = 0;
+        S[Defines.STAT_LAYOUTS] = 0;
 
         if (GameBase.deathmatch.value != 0) {
-            if (ent.client.pers.health <= 0
+            if (C.pers.health <= 0
                     || GameBase.level.intermissiontime != 0
-                    || ent.client.showscores)
-                ent.client.ps.stats[Defines.STAT_LAYOUTS] |= 1;
-            if (ent.client.showinventory && ent.client.pers.health > 0)
-                ent.client.ps.stats[Defines.STAT_LAYOUTS] |= 2;
+                    || C.showscores)
+                S[Defines.STAT_LAYOUTS] |= 1;
+            if (C.showinventory && C.pers.health > 0)
+                S[Defines.STAT_LAYOUTS] |= 2;
         } else {
-            if (ent.client.showscores || ent.client.showhelp)
-                ent.client.ps.stats[Defines.STAT_LAYOUTS] |= 1;
-            if (ent.client.showinventory && ent.client.pers.health > 0)
-                ent.client.ps.stats[Defines.STAT_LAYOUTS] |= 2;
+            if (C.showscores || C.showhelp)
+                S[Defines.STAT_LAYOUTS] |= 1;
+            if (C.showinventory && C.pers.health > 0)
+                S[Defines.STAT_LAYOUTS] |= 2;
         }
 
         //
         // frags
         //
-        ent.client.ps.stats[Defines.STAT_FRAGS] = (short) ent.client.resp.score;
+        S[Defines.STAT_FRAGS] = (short) C.resp.score;
 
         //
         // help icon / current weapon if not shown
         //
-        if (ent.client.pers.helpchanged != 0
+        if (C.pers.helpchanged != 0
                 && (GameBase.level.framenum & 8) != 0)
-            ent.client.ps.stats[Defines.STAT_HELPICON] = (short) game_import_t
+            S[Defines.STAT_HELPICON] = (short) game_import_t
                     .imageindex("i_help");
-        else if ((ent.client.pers.hand == Defines.CENTER_HANDED || ent.client.ps.fov > 91)
-                && ent.client.pers.weapon != null)
-            ent.client.ps.stats[Defines.STAT_HELPICON] = (short) game_import_t
-                    .imageindex(ent.client.pers.weapon.icon);
+        else if ((C.pers.hand == Defines.CENTER_HANDED || C.ps.fov > 91)
+                && C.pers.weapon != null)
+            S[Defines.STAT_HELPICON] = (short) game_import_t
+                    .imageindex(C.pers.weapon.icon);
         else
-            ent.client.ps.stats[Defines.STAT_HELPICON] = 0;
+            S[Defines.STAT_HELPICON] = 0;
 
-        ent.client.ps.stats[Defines.STAT_SPECTATOR] = 0;
+        S[Defines.STAT_SPECTATOR] = 0;
     }
 
     /*
