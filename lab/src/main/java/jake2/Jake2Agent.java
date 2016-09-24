@@ -6,6 +6,7 @@ import com.jogamp.nativewindow.SurfaceUpdatedListener;
 import com.jogamp.opengl.util.GLPixelBuffer;
 import com.jogamp.opengl.util.GLReadBufferUtil;
 
+import jake2.client.CL_input;
 import jake2.client.VID;
 import jake2.client.refexport_t;
 import jake2.game.PlayerView;
@@ -18,6 +19,7 @@ import jogamp.newt.WindowImpl;
 import nars.NAR;
 import nars.experiment.minicraft.PixelAutoClassifier;
 import nars.remote.SwingAgent;
+import nars.util.signal.NObj;
 import nars.video.MatrixSensor;
 import nars.video.PixelBag;
 
@@ -29,6 +31,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.function.Supplier;
 
+import static jake2.Globals.*;
 import static jake2.game.PlayerView.current_player;
 import static jake2.render.Base.vid;
 import static nars.$.t;
@@ -60,6 +63,34 @@ public class Jake2Agent extends SwingAgent implements Runnable {
         return b;
     };
 
+    public static class PlayerData {
+        public float health;
+        public float velX;
+        public float velY;
+        public float velZ;
+        public float speed;
+        public int weaponState;
+        public short frags;
+
+        protected void update() {
+            edict_t p = PlayerView.current_player;
+            if (p==null) return;
+
+            health = p.health;
+            weaponState = p.client.weaponstate;
+
+            frags = p.client.ps.stats[STAT_FRAGS];
+
+            float[] v = p.velocity;
+            velX = v[0];
+            velY = v[1];
+            velZ = v[2];
+            speed = (float) Math.sqrt(velX*velX+velY*velY+velZ*velZ );
+
+        }
+    }
+    final PlayerData player = new PlayerData();
+
     public Jake2Agent(NAR nar) {
         super(nar, 1);
 
@@ -67,9 +98,32 @@ public class Jake2Agent extends SwingAgent implements Runnable {
         MatrixSensor<PixelBag> qcam = addCamera("q", screenshotter, 64, 64, (v) -> t(v, alpha));
         qcam.src.vflip = true;
 
-        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 16, this);
+        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);
         window(camAE.newChart(), 500, 500);
 
+        new NObj("p", player, nar).readAllFields(false).into(this);
+
+        actionToggle("(fore)", (x) -> CL_input.in_forward.state = x ? 1 : 0);
+        actionToggle("(back)", (x) -> CL_input.in_back.state = x ? 1 : 0);
+
+        //actionToggle("(left)", (x) -> CL_input.in_left.state = x ? 1 : 0);
+        //actionToggle("(right)", (x) -> CL_input.in_right.state = x ? 1 : 0);
+        actionToggle("(moveleft)", (x) -> CL_input.in_moveleft.state = x ? 1 : 0);
+        actionToggle("(moveright)", (x) -> CL_input.in_moveright.state = x ? 1 : 0);
+        actionBipolar("(lookyaw)", (x) -> {
+            float yawSpeed = 10;
+            cl.viewangles[Defines.YAW] += yawSpeed * x;
+            //return CL_input.in_lookup.state = x ? 1 : 0;
+            return true;
+        });
+        actionBipolar("(lookpitch)", (x) -> {
+            float pitchSpeed = 30; //absolute
+            cl.viewangles[Defines.PITCH] = pitchSpeed * x;
+            //return CL_input.in_lookup.state = x ? 1 : 0;
+            return true;
+        });
+        //actionToggle("(lookdown)", (x) -> CL_input.in_lookdown.state = x ? 1 : 0);
+        actionToggle("(attak)", (x) -> CL_input.in_attack.state = x ? 1 : 0);
 
         new Thread(this).start();
     }
@@ -79,16 +133,9 @@ public class Jake2Agent extends SwingAgent implements Runnable {
 
         camAE.frame();
 
-        edict_t p = PlayerView.current_player;
-        if (p == null)
-            return 0;
+        player.update();
 
-//        System.out.println(p.health + " " + p.speed + Arrays.toString(p.velocity) + " "
-//        + p.client.weaponstate + " "
-//        );
-        //p.health
-
-        return -(1f - ((float)p.health)/(p.max_health));
+        return player.health + player.speed;
     }
 
     @Override
@@ -96,8 +143,18 @@ public class Jake2Agent extends SwingAgent implements Runnable {
         //http://aq2maps.quadaver.org/
         //https://www.quaddicted.com/reviews/
         //http://tastyspleen.net/~quake2/baseq2/maps/
+        //https://www.eecis.udel.edu/~portnoi/quake/quakeiicom.html
         Jake2.run(new String[]{
-                "+god mode", "+give all", "+map train"
+                "+god",
+                //"+debuggraph",
+                //"+give all",
+                //"+use chaingun",
+                //"+mlook 0", //disable mouse
+                //"+in_initmouse 0",
+                "+in_mouse 0",
+                "+cl_gun 0", //hide gun
+                "+timescale 0.2",
+                "+map base3"
                 //"+connect .."
         }, this::onDraw);
 
@@ -154,7 +211,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
 
     protected synchronized void onDraw() {
 
-        refexport_t r = Globals.re;
+        refexport_t r = re;
         JoglGL2Renderer renderer = (JoglGL2Renderer) r;
 
         if (see) {
@@ -172,7 +229,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
 
 
     public static void main(String[] args) {
-        SwingAgent.run(Jake2Agent::new, 66500);
+        SwingAgent.run(Jake2Agent::new, 100000);
     }
 }
 

@@ -73,35 +73,35 @@ public class CL_input {
 	 * ===============================================================================
 	 */
 
-	static final kbutton_t in_klook = new kbutton_t();
+	public static final kbutton_t in_klook = new kbutton_t();
 
-	static final kbutton_t in_left = new kbutton_t();
+	public static final kbutton_t in_left = new kbutton_t();
 
-	static final kbutton_t in_right = new kbutton_t();
+	public static final kbutton_t in_right = new kbutton_t();
 
-	static final kbutton_t in_forward = new kbutton_t();
+	public static final kbutton_t in_forward = new kbutton_t();
 
-	static final kbutton_t in_back = new kbutton_t();
+	public static final kbutton_t in_back = new kbutton_t();
 
-	static final kbutton_t in_lookup = new kbutton_t();
+	public static final kbutton_t in_lookup = new kbutton_t();
 
-	static final kbutton_t in_lookdown = new kbutton_t();
+	public static final kbutton_t in_lookdown = new kbutton_t();
 
-	static final kbutton_t in_moveleft = new kbutton_t();
+	public static final kbutton_t in_moveleft = new kbutton_t();
 
-	static final kbutton_t in_moveright = new kbutton_t();
+	public static final kbutton_t in_moveright = new kbutton_t();
 
 	public static final kbutton_t in_strafe = new kbutton_t();
 
-	static final kbutton_t in_speed = new kbutton_t();
+	public static final kbutton_t in_speed = new kbutton_t();
 
-	static final kbutton_t in_use = new kbutton_t();
+	public static final kbutton_t in_use = new kbutton_t();
 
-	static final kbutton_t in_attack = new kbutton_t();
+	public static final kbutton_t in_attack = new kbutton_t();
 
-	static final kbutton_t in_up = new kbutton_t();
+	public static final kbutton_t in_up = new kbutton_t();
 
-	static final kbutton_t in_down = new kbutton_t();
+	public static final kbutton_t in_down = new kbutton_t();
 
 	static int in_impulse;
 
