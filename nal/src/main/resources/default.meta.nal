@@ -329,7 +329,7 @@
 
 //conditional abduction
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction)
-    ((&&,M,N) ==> C), (N ==> C) |- M, (Belief:Abduction)
+//    ((&&,M,N) ==> C), (N ==> C) |- M, (Belief:Abduction)
         //TODO modify ellipsis to allow these two rules to be expressed as one:
         // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
         //  which will match A..+ to a Conjunction

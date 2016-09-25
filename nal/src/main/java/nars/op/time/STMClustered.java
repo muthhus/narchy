@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-
+/** clusterjunctioning */
 public class STMClustered extends STM {
 
     static final int DIMENSIONS = 3;
