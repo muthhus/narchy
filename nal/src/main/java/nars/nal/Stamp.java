@@ -25,6 +25,8 @@ import nars.Task;
 import nars.table.TemporalBeliefTable;
 import nars.truth.TruthFunctions;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.set.primitive.LongSet;
+import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.jetbrains.annotations.NotNull;
@@ -231,13 +233,17 @@ public interface Stamp {
      * assumes the arrays are sorted and contain no duplicates
      */
     static float overlapFraction(@Nullable long[] a, @Nullable long[] b) {
-        LongHashSet l = new LongHashSet(a);
-        if (!l.retainAll(b)) {
-            return 0f;
+        LongSet l = LongSets.immutable.of(a);
+        int common = 0;
+        for (long x: b) {
+            if (l.contains(x))
+                common++;
         }
-        int common = l.size();
-        int unique = a.length + b.length - (common);
-        return (float)common / unique;
+        if (common == 0) {
+            return 0;
+        } else {
+            return (float) common / (a.length + b.length - (common));
+        }
     }
 
     long creation();
@@ -281,11 +287,11 @@ public interface Stamp {
         return zip(s, s.size(), Param.STAMP_CAPACITY);
     }
 
-    static long[] zip(@NotNull Collection<Task> s) {
+    static long[] zip(@NotNull Collection<? extends Stamp> s) {
         return zip(s, s.size(), Param.STAMP_CAPACITY);
     }
 
-    static long[] zip(@NotNull Iterable<Task> s, @Deprecated int num, int maxLen) {
+    static long[] zip(@NotNull Iterable<? extends Stamp> s, @Deprecated int num, int maxLen) {
         final int extra = 1;
         int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
         LongHashSet l = new LongHashSet(maxLen);

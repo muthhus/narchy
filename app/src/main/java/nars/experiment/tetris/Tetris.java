@@ -374,7 +374,7 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        int maxVol = 40;
+        int maxVol = 20;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
                 16, 2, 2, rng,
