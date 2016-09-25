@@ -1,4 +1,5 @@
 <html>
+
 <head>
 
     <title>NARchy</title>
@@ -24,11 +25,11 @@
     <script src="lib/cytoscape/dist/cytoscape.js"></script>
     <script src="lib/cytoscape-edgehandles/cytoscape-edgehandles.js"></script>
 
-    <link href="simone/simone.taskbar.css" rel="stylesheet">
+    <!--<link href="simone/simone.taskbar.css" rel="stylesheet">
     <link href="simone/simone.window.css" rel="stylesheet">
     <script src="simone/simone.taskbar.js"></script>
     <script src="simone/simone.window.js"></script>
-    <script src="simone/i18n-simone.min.custom.js"></script>
+    <script src="simone/i18n-simone.min.custom.js"></script>-->
 
     <script src="cytoscape-spread/cytoscape-spread.js"></script>
 
@@ -40,47 +41,38 @@
     <script src="frame.js"></script>
     <script src="lib/semantic/dist/semantic.min.js"></script>
     <script type="text/javascript" src="socketview.js"></script>
-    <link rel="stylesheet" href="lib/semantic/dist/semantic.min.css"/>
+    <link rel="stylesheet" href="lib/semantic/dist/semantic.min.css" />
 
-    <link rel="stylesheet" href="index.css"/>
+    <link rel="stylesheet" href="index.css" />
 
 
 
 </head>
+
 <body>
 
+    <div id="mainButtons">
 
-<div id="view" style="position: fixed; width: 100%; height: 100%; padding-top: 36px;"></div>
-
-
-<div class="taskbar">
-
-</div>
+    </div>
 
 
-<div id="mainButtons">
+    <!--<div id="menu" class="ui compact vertical menu" style="position: absolute">
 
-</div>
+        <div class="item" id="log">+ Log</div>
+        <div class="item" id="timeline">+ Timeline</div>
+        <div class="item">+ Status</div>
+        <hr/>
+        <div class="item">Load...</div>
+        <div class="item">Save...</div>
+        <hr/>
+        <div class="item">CPU Limit (slider)</div>
+        <div class="item">Memory Limit (slider)</div>
+        <hr/>
+        <div class="item">Reset</div>
+        <div class="item">Shutdown</div>
+    </div>-->
 
-
-<div id="narOutput">
-</div>
-
-<div id="menu" class="ui compact vertical menu" style="position: absolute">
-
-    <div class="item" id="log">+ Log</div>
-    <div class="item" id="timeline">+ Timeline</div>
-    <div class="item">+ Status</div>
-    <hr/>
-    <div class="item">Load...</div>
-    <div class="item">Save...</div>
-    <hr/>
-    <div class="item">CPU Limit (slider)</div>
-    <div class="item">Memory Limit (slider)</div>
-    <hr/>
-    <div class="item">Reset</div>
-    <div class="item">Shutdown</div>
-</div>
+    <div id="view" style="position: fixed; width: 100%; height: 100%; padding-top: 36px;"></div>
 
 </body>
 
@@ -90,7 +82,7 @@
 <script>
     "use strict";
 
-    var terminal, viewing = undefined;
+    var viewing = undefined;
 
     function addView(v) {
         /*
@@ -119,8 +111,8 @@
 
         //button
         var b = $('<div class="ui icon ' + v.color + ' button"/>').append(
-                '<i class="' + v.icon + ' icon"></i>',
-                dropDownIcon = $('<i class="dropdown icon"></i>')
+            '<i class="' + v.icon + ' icon"></i>',
+            dropDownIcon = $('<i class="dropdown icon"></i>')
         ).attr('title', v.id);
 
         var ddMenu = $('<div class="mainPopup item"/>');
@@ -131,7 +123,7 @@
             b.addClass('active');
         }
 
-        v.update = function () {
+        v.update = function() {
             if (viewing === v) {
                 b.addClass('active');
 
@@ -179,7 +171,7 @@
             ddMenu.toggle(0);
         }
 
-        b.click(function (e) {
+        b.click(function(e) {
             if (v.start) {
                 if (viewing !== v) {
                     enable();
@@ -190,7 +182,7 @@
                 toggle();
             }
         });
-        b.dblclick(function () {
+        b.dblclick(function() {
             if (enable())
                 toggle();
         });
@@ -199,68 +191,14 @@
 
         $('#mainButtons').append(b);
 
+        v.click = b.click;
 
         return v;
     }
 
-    function TaskBar(target, menu) {
 
 
-        // taskbar has to be created first
-        var tasks = target;
-
-        var o = {
-            windowsContainment: "viewport",
-            horizontalStick: "top right",
-            draggable: true,
-            buttons: {},
-            buttonsOrder: []
-//            buttons: {
-//                log: {
-//                    label: "Log",
-//                },
-//                timeline: {
-//                    Label: "Timeline"
-//                }
-//            },
-//
-//            buttonsOrder: [ "log", 'timeline' ]
-
-        };
-
-        tasks.taskbar(o);
-
-        /** creates a new taskbar-managed window */
-        tasks.newWindow = function (title, contentBuilder, onClose, onResized) {
-            return contentBuilder().window({
-                taskbar: this,
-                title: title,
-                close: onClose,
-                resizeStop: onResized
-            });
-        };
-
-
-        //setup main menus
-
-
-        _.each(menu, function (m, k) {
-            var menuitem = $('#' + k);
-            if (menuitem.length === 0)
-                console.error('menu item not found', k);
-
-            menuitem.click(function () {
-                m.onClick(tasks);
-            });
-        });
-
-
-        return tasks;
-
-    }
-
-
-    $(document).ready(function () {
+    $(document).ready(function() {
 
 
         //TaskDB(DB(), terminal);
@@ -269,10 +207,10 @@
             id: 'main',
             icon: 'warning',
             color: 'orange',
-            menu: function () {
+            menu: function() {
                 return $('#menu');
             },
-            start: function () {
+            start: function() {
                 this.terminal = NARTerminal();
                 $('#view').append(new NARConsole(this.terminal));
             },
@@ -280,19 +218,19 @@
                 this.terminal.close();
                 this.terminal = undefined;
             }
-        });
+        }).start( /* default  */ );
 
         addView({
             id: 'graph',
             icon: 'bomb',
             color: 'yellow',
-            start: function () {
+            start: function() {
                 $('#view').append(this.graph = SocketNARGraph("active"));
             },
-            menu: function () {
+            menu: function() {
                 return 'abc';
             },
-            stop: function () {
+            stop: function() {
                 this.graph.stop();
                 this.graph = undefined;
             }
@@ -301,13 +239,13 @@
             id: 'status',
             icon: 'options',
             color: 'green',
-            start: function () {
+            start: function() {
                 $('#view').append(SocketMetaWidget("emotion"));
             },
-            menu: function () {
+            menu: function() {
                 return 'abc';
             },
-            stop: function () {
+            stop: function() {
 
             }
         });
@@ -315,13 +253,13 @@
             id: 'top',
             icon: 'options',
             color: 'blue',
-            start: function () {
+            start: function() {
                 $('#view').append(TopTable("active"));
             },
-            menu: function () {
+            menu: function() {
                 return 'abc';
             },
-            stop: function () {
+            stop: function() {
 
             }
         });
@@ -338,46 +276,16 @@
          <option>Web Browser</option>
          */
 
-        var taskbar = TaskBar($(".taskbar"), {
-            'log': {
-                onClick: function (taskbar) {
-                    var terminal = this.terminal = NARTerminal();
-                    var c = NARConsole(terminal);
 
-                    taskbar.newWindow("Log",
-                            function () {  c; },
-                            function (event) {
-                              terminal.close();
-                            },
-                            function (event, ui) {
-                                c.editor.resize(true); //ace editor needs resized manually when its container has
-                            }
-                    );
-                }
-            },
-            'timeline': {
-                onClick: function (taskbar) {
-                    var g = SocketNARGraph("active");
-
-                    taskbar.newWindow("Timeline",
-                            function () {  g; },
-                            function (event) {  },
-                            function (event, ui) {
-                                g.editor.resize(true); //ace editor needs resized manually when its container has
-                            }
-                    );
-                }
-            }
-        });
 
 
         /** input line */
-        $("body").append(NARInputter(NARTerminal()).attr('id', 'nalInput'));
+        $("#mainButtons").append(NARInputter(NARTerminal()).attr('id', 'nalInput'));
 
 
 
 
     });
-
 </script>
+
 </html>

@@ -487,9 +487,12 @@ function NARInputter(terminal, initialValue) {
 
         e);
 
+    e.editor.renderer.setShowGutter(false);
+    
     d.editor = e.editor;
 
-    return d.addClass('ui fluid menu inverted');
+    return d;
+    //return d.addClass('ui fluid menu inverted');
 }
 
 function NARConsole(terminal) {
