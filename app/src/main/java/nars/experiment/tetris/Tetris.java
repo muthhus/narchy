@@ -63,7 +63,7 @@ public class Tetris extends NAgent {
 //            new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 5550;
-    public static final int cyclesPerFrame = 4;
+    public static final int cyclesPerFrame = 8;
     public static final int tetris_width = 8;
     public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 2;
@@ -381,7 +381,7 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        int maxVol = 32;
+        int maxVol = 40;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
                 16, 2, 2, rng,
@@ -456,7 +456,7 @@ public class Tetris extends NAgent {
         //new Abbreviation2(nar, "_");
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
-        //MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 4);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new VariableCompressor(nar);
 
@@ -481,7 +481,7 @@ public class Tetris extends NAgent {
 //                );
 
 
-        window(Vis.concepts(nar, 1024), 500, 500);
+        //window(Vis.concepts(nar, 1024), 500, 500);
 
         //STMView.show(stm, 800, 600);
 

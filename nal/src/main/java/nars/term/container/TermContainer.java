@@ -561,10 +561,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        if ((diff = Integer.compare(v, b.structure())) != 0)
 //            return diff;
 
-        int s = a.size();
-        if ((diff = Integer.compare(s, b.size())) != 0)
+        long h = a.sizeVolumeStructure();
+        if ((diff = Long.compare(h, b.sizeVolumeStructure())) != 0)
             return diff;
 
+        int s = a.size();
         TermContainer cc = (TermContainer) b;
         for (int i = 0; i < s; i++) {
             int d = a.term(i).compareTo(cc.term(i));

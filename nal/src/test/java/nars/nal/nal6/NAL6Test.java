@@ -16,7 +16,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 100;
+    final int cycles = 200;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
@@ -176,7 +176,7 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("(&&,<#x --> bird>,<#x --> swimmer>)"); //en("Some bird can swim.");
         tester.believe("<swan --> bird>", 0.90f, 0.9f); //en("Swan is a type of bird.");
-        tester.mustBelieve(cycles*2, "<swan --> swimmer>", 0.90f, 0.43f); //en("I guess swan can swim.");
+        tester.mustBelieve(cycles*4, "<swan --> swimmer>", 0.90f, 0.43f); //en("I guess swan can swim.");
 
     }
 

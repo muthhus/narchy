@@ -60,7 +60,7 @@ public class ArithmeticInduction {
         } else if (numUniqueSubstructures > 1) {
             //recurse with each sub-structure group and re-combine
 
-            Set<Term> ss = new TreeSet();
+            Set<Term> ss = new HashSet();
             for (Collection<Term> stg : subTermStructures.asMap().values()) {
                 int gs = stg.size();
 
@@ -88,7 +88,9 @@ public class ArithmeticInduction {
             return subs;
         } else if (ssa > 1) {
             //process each unique atom seq group:
-            Set<Term> ss = new TreeSet();
+            Set<Term> ss =
+                    //new TreeSet();
+                    new HashSet();
             for (Collection<Term> ssg : subAtomSeqs.asMap().values()) {
                 TermContainer gg = TermVector.the(ssg);
                 gg = compress(gg, depthRemain-1);
@@ -146,7 +148,7 @@ public class ArithmeticInduction {
             }*/
         }
 
-        TreeSet<Term> result = new TreeSet();
+        Set<Term> result = new HashSet();//new TreeSet();
         Set<Term> subsumed = new HashSet();
 
         for (Map.Entry<ByteList, Pair<ByteHashSet, List<Term>>> e : data.entrySet()) {
