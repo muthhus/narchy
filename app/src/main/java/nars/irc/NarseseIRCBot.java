@@ -44,6 +44,7 @@ public class NarseseIRCBot extends Talk {
 
     public static final Atom inner = $.the("inner");
     private static final Logger logger = LoggerFactory.getLogger(NarseseIRCBot.class);
+    private final IRCBot irc;
 
     class MarkovContext implements Runnable {
         final MarkovChain<Term> markov = new MarkovChain<Term>(2);
@@ -92,23 +93,21 @@ public class NarseseIRCBot extends Talk {
     float innerPri = 0.03f;
     float wikiPri = 0.05f;
 
-    public NarseseIRCBot(NAR nar) throws Exception {
+    public NarseseIRCBot(NAR nar, String server, String nick, String channel) throws Exception {
         super(nar);
 
 
-        inter = new InterNAR(nar);
-        inter.connect("localhost", 11001);
-        inter.broadcastPriorityThreshold = 0.45f;
+//        inter = new InterNAR(nar);
+//        inter.connect("localhost", 11001);
+//        inter.broadcastPriorityThreshold = 0.45f;
 
-//        irc = new IRCBot(
-//                "irc.freenode.net",
-//                //"localhost",
-//                "NARchy", "#netention") {
-//            @Override
-//            protected void onMessage(String channel, String nick, String msg) {
-//                NarseseIRCBot.this.onMessage(channel, nick, msg);
-//            }
-//        };
+        irc = new IRCBot(server, nick, channel) {
+            @Override
+            protected void onMessage(String channel, String nick, String msg) {
+                System.err.println("received: " + msg);
+                //NarseseIRCBot.this.onMessage(channel, nick, msg);
+            }
+        };
 
 
 
@@ -156,71 +155,71 @@ public class NarseseIRCBot extends Talk {
     }
 
 
-    public static void main(String[] args) throws Exception {
-        Param.DEBUG = false;
-
-        Random rng = new XorShift128PlusRandom(1);
-        Default nar = new Default(
-                1024, 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 2000000)
-                //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
-                //new Indexes.WeakTermIndex(256 * 1024, rng)
-                //new Indexes.SoftTermIndex(128 * 1024, rng)
-                //new Indexes.DefaultTermIndex(128 *1024, rng)
-                //,new FrameClock()
-                ,new RealtimeMSClock()
-        );
-
-        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.9f;
-
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
-
-
-        //nar.inputActivation.setValue(0.1f);
-        nar.cyclesPerFrame.set(16);
-
-        nar.logSummaryGT(System.out, 0.75f);
-
-        new MySTMClustered(nar, 32, '.', 2);
-
-        NarseseIRCBot bot = new NarseseIRCBot(nar);
-
-
-
-        //nar.inputNarsese(new File("/home/me/quietwars.nal"));
-
-
-        List<Task> goals = new ArrayList();
-            goals.add(nar.task("(hear(#x,#c) &&+100 think(#x,I))! %1.0;0.70%"));
-            goals.add(nar.task("((hear(#x,#c) &&+100 hear(#y,#c)) ==>+100 think((#x,#y),I)). %1.0;0.9%"));
-            //goals.add(nar.task("(hear(#x,#c) ==>+100 say(#x,#c)). %1.0;1.0%"));
-
-//            nar.task("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))! %1.0;1.0%");
-//            nar.task("((#x --> (/,hear,#c,_)) ==>+0 say(#x,#c)). %1.0;1.0%");
-//            nar.task("(#something-->(/,hear,I,_))! %1.0;1.0%");
-
-
-        for (Task t : goals) {
-            nar.input(t);
-        }
+//    public static void main(String[] args) throws Exception {
+//        Param.DEBUG = false;
 //
-//        new Thread(()->{
-//            while (true) {
-//                for (Task t : goals) {
-//                    nar.activate(t, 1f);
-//                }
-//                Util.pause(10000);
-//            }
-//        }).start();
-
-
-        nar.loop(20f);
-
-        //addInitialCorpus(bot);
-
-    }
+//        Random rng = new XorShift128PlusRandom(1);
+//        Default nar = new Default(
+//                1024, 4, 2, 2, rng,
+//                new CaffeineIndex(new DefaultConceptBuilder(rng), 2000000)
+//                //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
+//                //new Indexes.WeakTermIndex(256 * 1024, rng)
+//                //new Indexes.SoftTermIndex(128 * 1024, rng)
+//                //new Indexes.DefaultTermIndex(128 *1024, rng)
+//                //,new FrameClock()
+//                ,new RealtimeMSClock()
+//        );
+//
+//        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
+//        nar.DEFAULT_GOAL_PRIORITY = 0.9f;
+//
+//        nar.DEFAULT_QUEST_PRIORITY = 0.5f;
+//        nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
+//
+//
+//        //nar.inputActivation.setValue(0.1f);
+//        nar.cyclesPerFrame.set(16);
+//
+//        nar.logSummaryGT(System.out, 0.75f);
+//
+//        new MySTMClustered(nar, 32, '.', 2);
+//
+//        NarseseIRCBot bot = new NarseseIRCBot(nar);
+//
+//
+//
+//        //nar.inputNarsese(new File("/home/me/quietwars.nal"));
+//
+//
+//        List<Task> goals = new ArrayList();
+//            goals.add(nar.task("(hear(#x,#c) &&+100 think(#x,I))! %1.0;0.70%"));
+//            goals.add(nar.task("((hear(#x,#c) &&+100 hear(#y,#c)) ==>+100 think((#x,#y),I)). %1.0;0.9%"));
+//            //goals.add(nar.task("(hear(#x,#c) ==>+100 say(#x,#c)). %1.0;1.0%"));
+//
+////            nar.task("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))! %1.0;1.0%");
+////            nar.task("((#x --> (/,hear,#c,_)) ==>+0 say(#x,#c)). %1.0;1.0%");
+////            nar.task("(#something-->(/,hear,I,_))! %1.0;1.0%");
+//
+//
+//        for (Task t : goals) {
+//            nar.input(t);
+//        }
+////
+////        new Thread(()->{
+////            while (true) {
+////                for (Task t : goals) {
+////                    nar.activate(t, 1f);
+////                }
+////                Util.pause(10000);
+////            }
+////        }).start();
+//
+//
+//        nar.loop(20f);
+//
+//        //addInitialCorpus(bot);
+//
+//    }
 
     public String toString(Object t) {
         if (t instanceof Task) {
@@ -237,8 +236,7 @@ public class NarseseIRCBot extends Talk {
     }
 
     final NAR nar;
-    final InterNAR inter;
-
+    //final InterNAR inter;
 
 
 

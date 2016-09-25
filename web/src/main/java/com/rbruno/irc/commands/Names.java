@@ -18,7 +18,7 @@ public class Names extends Command {
 	@Override
 	public void run(Request request) throws IOException {
 		IRCServer server = request.server();
-		if (request.getArgs().length == 0) {
+        if (request.args.length == 0) {
 			server.forEachChannel(current -> {
                 String message = current.id + " :";
 				ArrayList<Client> clients = current.getClients();
@@ -26,13 +26,13 @@ public class Names extends Command {
 					message = message + (current.checkOP(client) || client.isServerOP() ? "@" : "+") + client.id + " ";
 				}
 				try {
-					request.connection.send(Reply.RPL_NAMREPLY, request.getClient(), message);
+					request.connection.send(Reply.RPL_NAMREPLY, request.client, message);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			});
 		} else {
-			String[] stringChannels = request.getArgs()[0].split(",");
+            String[] stringChannels = request.args[0].split(",");
 			for (String current : stringChannels) {
 				Channel channel = server.getChannel(current);
                 String message = channel.id + " :";
@@ -40,7 +40,7 @@ public class Names extends Command {
 				for (Client client : clients) {
 					message = message + (channel.checkOP(client) || client.isServerOP() ? "@" : "+") + client.id + " ";
 				}
-				request.connection.send(Reply.RPL_NAMREPLY, request.getClient(), message);
+				request.connection.send(Reply.RPL_NAMREPLY, request.client, message);
 			}
 		}
 	}

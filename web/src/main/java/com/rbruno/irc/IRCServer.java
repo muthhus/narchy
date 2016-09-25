@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import com.rbruno.irc.commands.Command;
-import com.rbruno.irc.plugin.PluginManager;
 import com.rbruno.irc.reply.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,26 +23,22 @@ public class IRCServer implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(IRCServer.class);
 
 	private static final String VERSION = "v1.0-RELEASE";
-
+	public final String hostname;
 	private final boolean running;
 	private final ServerSocket serverSocket;
-
 	private final Config config;
-
-	public final PluginManager plugins;
-	public final String hostname;
+	private final Map<String,Channel> channels = new ConcurrentHashMap();
+	private final Map<String,Client> clients = new ConcurrentHashMap<>();
 
 	/**
 	 * Server constructor. Starts all managers, opens the socket and starts the
 	 * running thread.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public IRCServer(String hostname, int port) throws Exception {
 
 		config = new Config();
-
-		plugins = new PluginManager();
 
 		Command.init();
 
@@ -58,7 +53,22 @@ public class IRCServer implements Runnable {
 		new Thread(this, "Running Thread").start();
 	}
 
-	//final ExecutorService exe = Executors.newCachedThreadPool();
+	public static String[] motd() {
+		return new String[] { "Connected" };
+	}
+
+	public static void main(String args[]) throws Exception {
+		new IRCServer("localhost", 6667);
+	}
+
+	/**
+	 * Returns current server version.
+	 *
+	 * @return Current server version.
+	 */
+	public static String getVersion() {
+		return VERSION;
+	}
 
 	/**
 	 * Main running thread. Waits for sockets then creates a new Connection
@@ -80,7 +90,7 @@ public class IRCServer implements Runnable {
 
 	/**
 	 * Sends MOTD to client. Reads from motd.txt. If not found will create one.
-	 * 
+	 *
 	 * @param client
 	 *            Client to send MOTD.
 	 * @throws IOException
@@ -93,38 +103,6 @@ public class IRCServer implements Runnable {
 			client.connection.send(Reply.RPL_MOTD, client, ":- " + line);
 		client.connection.send(Reply.RPL_ENDOFMOTD, client, ":End of /MOTD command");
 	}
-
-	public static String[] motd() {
-		return new String[] { "Connected" };
-	}
-
-	public static void main(String args[]) throws Exception {
-		new IRCServer("localhost", 6667);
-	}
-
-
-	/**
-	 * Gets Config object.
-	 * 
-	 * @return Config.
-	 */
-	public Config getConfig() {
-		return config;
-	}
-
-
-
-	/**
-	 * Returns current server version.
-	 * 
-	 * @return Current server version.
-	 */
-	public static String getVersion() {
-		return VERSION;
-	}
-
-
-	private final Map<String,Channel> channels = new ConcurrentHashMap();
 
 //	/**
 //	 * Creates a new ClientManager object. Reads and process channels.txt. If
@@ -146,9 +124,30 @@ public class IRCServer implements Runnable {
 //			add(c);
 //	}
 
+	/**
+	 * Gets Config object.
+	 *
+	 * @return Config.
+	 */
+	public Config getConfig() {
+		return config;
+	}
+
 	public void forEachChannel(Consumer<Channel> each) {
 		channels.forEach((k,v)-> each.accept(v));
 	}
+
+
+
+//	/**
+//	 * Adds a channel to the Array.
+//	 *
+//	 * @param channel
+//	 *            Channel to be added.
+//	 */
+//	public void addChannel(Channel channel) {
+//		channels.add(channel);
+//	}
 
 	public void addChannel(String line) throws IOException {
 		if (line.startsWith("//")) return;
@@ -182,18 +181,6 @@ public class IRCServer implements Runnable {
 		this.channels.put(channel.id, channel);
 	}
 
-
-
-//	/**
-//	 * Adds a channel to the Array.
-//	 *
-//	 * @param channel
-//	 *            Channel to be added.
-//	 */
-//	public void addChannel(Channel channel) {
-//		channels.add(channel);
-//	}
-
 	/**
 	 * Removes a channel from the Array.
 	 *
@@ -202,18 +189,6 @@ public class IRCServer implements Runnable {
 	 */
 	public void removeChannel(Channel channel) {
 		channels.remove(channel);
-	}
-
-	/**
-	 * Returns channel with the given name.
-	 *
-	 * @param name
-	 *            Name of channel that is returned.
-	 * @return Returns Channel with the given name or null if channel does not
-	 *         exist.
-	 */
-	public Channel getChannel(String name) {
-		return channels.computeIfAbsent(name, (n) -> new Channel(n, "", true, this));
 	}
 
 //	/**
@@ -228,8 +203,17 @@ public class IRCServer implements Runnable {
 //		return channels;
 //	}
 
-	private final Map<String,Client> clients = new ConcurrentHashMap<>();
-
+	/**
+	 * Returns channel with the given name.
+	 *
+	 * @param name
+	 *            Name of channel that is returned.
+	 * @return Returns Channel with the given name or null if channel does not
+	 *         exist.
+	 */
+	public Channel getChannel(String name) {
+		return channels.computeIfAbsent(name, (n) -> new Channel(n, "", true, this));
+	}
 
 	/**
 	 * Sends a message to all clients connected that are directly connected to
@@ -270,7 +254,6 @@ public class IRCServer implements Runnable {
 //	 */
 	public void addChannel(Client client) {
 		clients.put(client.getUsername(), client);
-		plugins.runOnClientLogin(client);
 	}
 
 	/**

@@ -41,11 +41,12 @@ public class UnifySubst extends FindSubst  {
         this.a = x;
         this.matches = 0;
 
-        if (x.hasAny(type) || y.hasAny(type)) { //no need to unify if there is actually no variable
+        if (matchPossible(x) || matchPossible(y)) { //no need to unify if there is actually no variable
             super.unify(x, y, start, finish);
         }
 
     }
+
 
     public int matches() {
         return matches;

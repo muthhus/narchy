@@ -10,7 +10,7 @@ public class Pass extends Command {
 
 	@Override
 	public void run(Request request) {
-		request.connection.setConnectionPassword(request.getArgs()[0]);
+        request.connection.setConnectionPassword(request.args[0]);
 	}
 
 }

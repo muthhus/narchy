@@ -13,11 +13,11 @@ public class Admin extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		if (request.getArgs().length == 0)  {
-			request.connection.send(Reply.RPL_ADMINME, request.getClient(), Config.getProperty("hostname") + " :Administrative info");
-			request.connection.send(Reply.RPL_ADMINLOC1, request.getClient(), Config.getProperty("hostname") + " :" + Config.getProperty("AdminName"));
-			request.connection.send(Reply.RPL_ADMINLOC2, request.getClient(), Config.getProperty("hostname") + " :" + Config.getProperty("AdminNick"));
-			request.connection.send(Reply.RPL_ADMINMAIL, request.getClient(), Config.getProperty("hostname") + " :" + Config.getProperty("AdminEmail"));
+        if (request.args.length == 0)  {
+			request.connection.send(Reply.RPL_ADMINME, request.client, Config.getProperty("hostname") + " :Administrative info");
+			request.connection.send(Reply.RPL_ADMINLOC1, request.client, Config.getProperty("hostname") + " :" + Config.getProperty("AdminName"));
+			request.connection.send(Reply.RPL_ADMINLOC2, request.client, Config.getProperty("hostname") + " :" + Config.getProperty("AdminNick"));
+			request.connection.send(Reply.RPL_ADMINMAIL, request.client, Config.getProperty("hostname") + " :" + Config.getProperty("AdminEmail"));
 		} else {
 			//TODO: Server
 		}

@@ -5,6 +5,7 @@ import nars.Param;
 import nars.index.TermIndex;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
+import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.mutate.CommutivePermutations;
 import nars.term.mutate.Termunator;
@@ -205,8 +206,30 @@ public abstract class FindSubst extends Termunator implements Subst {
                 ||
                 x.unify(y, this)
                 ||
-                (/*y instanceof AbstractVariable && */(y.op() == type) && matchVarY(x, y));
+                (/*y instanceof AbstractVariable && */matchType(y) && matchVarY(x, y))
+                ;
     }
+
+    public final boolean matchType(@NotNull Term y) {
+        return matchType(y.op());
+    }
+
+    public final boolean matchType(@NotNull Op oy) {
+        Op t = this.type;
+        return t == null ? oy.var : oy == t;
+    }
+
+    public final boolean matchPossible(@NotNull Termlike x) {
+        Op t = this.type;
+        if (t == null) {
+            return x.hasAny(Op.VariableBits);
+        } else if (t == Op.VAR_PATTERN) {
+            return x.varPattern() > 0;
+        } else {
+            return x.hasAny(t.bit);
+        }
+    }
+
 
 //        if (x.equals(y)) {
 //            return true;
@@ -256,36 +279,48 @@ public abstract class FindSubst extends Termunator implements Subst {
         Term x2 = xy(x);
         return (x2 != null) ?
                 unify(x2, y) :
-                putXY(/* (Variable) */ x, y);
+                putVarX(/* (Variable) */ x, y);
 
         //return matcherXY.computeMatch(x, y);
     }
+
+
     /**
      * x's and y's ops already determined inequal
      */
     public final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
 
         Term y2 = yx.get(y);
-        if (y2 == null) {
-            return putYX(x, y);
+        if (y2 != null) {
+            return unify(x, y2);
+//            if (y.op() == y2.op()) {
+//                if (y2.equals(y))
+//                    return true;
+//
+//                int a = now();
+//                //experimental: x needs to be assigned to both ?
+//                if (putYX(x, y) && putYX(x, y2)) {
+//                    return true;
+//                } else {
+//                    revert(a);
+//                    return false;
+//                }
+//            } else {
+//                return unify(x, y2);
+//            }
         } else {
 
-            if (y.op() == y2.op()) {
-                if (y2.equals(y))
-                    return true;
-
-                int a = now();
-                //experimental: x needs to be assigned to both ?
-                if (putYX(x, y) && putYX(x, y2)) {
-                    return true;
-                } else {
-                    revert(a);
-                    return false;
+            //return putYX(x, y);
+            if (putYX((Variable) y, x)) {
+                if (y instanceof CommonVariable) {
+                    if (!putXY((Variable) y, x)) {
+                        return false;
+                    }
                 }
-            } else {
-                return unify(x, y2);
+                return true;
             }
         }
+        return false;
 //        System.out.println(x + " " + y + " " + y2);
 //        return (y2 != null) ?
 //                //(y2.equals(y) || unify(x, y2)) :
@@ -436,7 +471,7 @@ public abstract class FindSubst extends Termunator implements Subst {
 
     public final boolean matchPermute(@NotNull TermContainer x, @NotNull TermContainer y) {
         //if there are no variables of the matching type, then it seems CommutivePermutations wouldnt match anyway
-        return x.hasAny(type) && addTermutator(new CommutivePermutations(this, x, y));
+        return matchPossible(x) && addTermutator(new CommutivePermutations(this, x, y));
     }
 
 
@@ -487,12 +522,18 @@ public abstract class FindSubst extends Termunator implements Subst {
 ////    /**
 ////     * elimination
 ////     */
-//    private boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
-//        //if (!(x instanceof GenericNormalizedVariable))
-//          //  throw new RuntimeException();
-//
-//        return putXY(x, y);// && (x.op() != type || putYX(x, y));
-//    }
+    public boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
+        if (putXY(x, y)) {
+            if (x instanceof CommonVariable) {
+                if (!putYX(x, y)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
 
 
     public boolean putCommon(@NotNull Term /* var */ x, @NotNull Term y) {
@@ -501,13 +542,9 @@ public abstract class FindSubst extends Termunator implements Subst {
     }
 
     public boolean putBidi(@NotNull Term x, @NotNull Term y, @NotNull Term common) {
-        int s = now();
         if (putXY(x, common)) {
             if (putYX(y, common)) {
                 return true;
-            } else {
-                //restore changed values if putYX fails but putXY succeeded
-                revert(s);
             }
         }
         return false;
@@ -525,7 +562,7 @@ public abstract class FindSubst extends Termunator implements Subst {
                 return matchSub(X, Y, 0);
             case 2:
                 //match the target variable first, if exists:
-                return matchLinear2(X, Y, X.isTerm(0, type) ? 0 : 1);
+                return matchLinear2(X, Y, matchType(X.term(0)) ? 0 : 1);
                 //return matchLinear2(X, Y, 0); //<- fails for certain image transformation rules
             default:
                 return matchLinearN(X, Y);
@@ -621,6 +658,8 @@ public abstract class FindSubst extends Termunator implements Subst {
         Term y1 = yx.get(y);
         return (y1 == null) ? y : y1;
     }
+
+
 
 
 //    public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {

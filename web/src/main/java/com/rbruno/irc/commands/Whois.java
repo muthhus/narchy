@@ -15,14 +15,14 @@ public class Whois extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		for (String current : request.getArgs()[1].split(",")) {
+        for (String current : request.args[1].split(",")) {
 			Client target = server.getClient(current);
-			request.connection.send(Reply.RPL_WHOISUSER, request.getClient(), target.id + ' ' + target.getUsername() + ' ' + Config.getProperty("hostname") + " * :" + target.getRealName());
+			request.connection.send(Reply.RPL_WHOISUSER, request.client, target.id + ' ' + target.getUsername() + ' ' + Config.getProperty("hostname") + " * :" + target.getRealName());
 			// TODO Whois server
-			if (target.isServerOP()) request.connection.send(Reply.RPL_WHOISOPERATOR, request.getClient(), target.id + " :is an IRC operator");
-			if (!target.getAwayMessage().isEmpty()) request.connection.send(Reply.RPL_AWAY, request.getClient(), target.id + " :" + target.getAwayMessage());
+			if (target.isServerOP()) request.connection.send(Reply.RPL_WHOISOPERATOR, request.client, target.id + " :is an IRC operator");
+			if (!target.getAwayMessage().isEmpty()) request.connection.send(Reply.RPL_AWAY, request.client, target.id + " :" + target.getAwayMessage());
 			//request.getConnection().send(Reply.RPL_WHOISIDLE, request.getClient(), target.getNickname() + " 0 :seconds idle");
-			request.connection.send(Reply.RPL_ENDOFWHOIS, request.getClient(), target.id + " :End of /WHOIS list");
+			request.connection.send(Reply.RPL_ENDOFWHOIS, request.client, target.id + " :End of /WHOIS list");
 			String channels = "";
 			for (Channel channel : target.getChannels()) {
 				if (channel.checkOP(target) || target.isServerOP()) {
@@ -33,7 +33,7 @@ public class Whois extends Command {
                     channels = channels + channel.id + ' ';
 				}
 			}
-			request.connection.send(Reply.RPL_WHOISCHANNELS, request.getClient(), target.id + " :" + channels);
+			request.connection.send(Reply.RPL_WHOISCHANNELS, request.client, target.id + " :" + channels);
 		}
 
 	}

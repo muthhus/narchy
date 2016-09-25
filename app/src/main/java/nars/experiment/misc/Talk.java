@@ -51,19 +51,19 @@ public class Talk {
 
 
         loopBack = true;
-        UnsynchronizedAppenderBase<ILoggingEvent> hearAppender = new UnsynchronizedAppenderBase<>() {
-            @Override
-            protected void append(ILoggingEvent e) {
-                if (loopBack) {
-                    String m = e.getFormattedMessage();
-                    nar.runLater(() -> {
-                        hear(m, nar.self, 0.5f);
-                    });
-                }
-            }
-        };
-        ((ch.qos.logback.classic.Logger) NAR.logger).addAppender(hearAppender);
-        hearAppender.start();
+//        UnsynchronizedAppenderBase<ILoggingEvent> hearAppender = new UnsynchronizedAppenderBase<>() {
+//            @Override
+//            protected void append(ILoggingEvent e) {
+//                if (loopBack) {
+//                    String m = e.getFormattedMessage();
+//                    nar.runLater(() -> {
+//                        hear(m, nar.self, 0.5f);
+//                    });
+//                }
+//            }
+//        };
+//        ((ch.qos.logback.classic.Logger) NAR.logger).addAppender(hearAppender);
+//        hearAppender.start();
 
 
         nar.onExec(new AbstractOperator("think") {

@@ -16,8 +16,8 @@ public class List extends Command {
 
 	@Override
 	public void run(Request request) throws IOException { IRCServer server = request.server();
-		Client client = request.getClient();
-		if (request.getArgs().length == 0) {
+		Client client = request.client;
+        if (request.args.length == 0) {
 
 			request.send(Reply.RPL_LISTSTART, client, "Channel :Users Name");
 			server.forEachChannel(current -> {
@@ -29,7 +29,7 @@ public class List extends Command {
 			});
 			request.send(Reply.RPL_LISTEND, client, ":End of /LIST");
 		} else {
-			String[] stringChannels = request.getArgs()[0].split(",");
+            String[] stringChannels = request.args[0].split(",");
 			request.send(Reply.RPL_LISTSTART, client, "Channel :Users  Name");
 			for (String current : stringChannels) {
 				Channel channel = server.getChannel(current);

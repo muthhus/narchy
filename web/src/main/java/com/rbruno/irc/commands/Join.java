@@ -16,7 +16,7 @@ public class Join extends Command {
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
 		// TODO: Check password
-		String[] channels = request.getArgs()[0].split(",");
+        String[] channels = request.args[0].split(",");
 		for (String channelName : channels) {
 			Channel channel = server.getChannel(channelName);
 //			if (channel == null) {
@@ -32,20 +32,20 @@ public class Join extends Command {
 //				server.get(channel);
 //			}
 			if (channel!=null) { // && channel.getUserLimit() == -1 || channel.getUserLimit() > channel.getCurrentNumberOfUsers() || request.getClient().isServerOP()) {
-				if (channel.checkPassword((request.getArgs().length >= 2) ? request.getArgs()[1] : "")) {
-					if (channel.getMode(ChannelMode.INVITE_ONLY) && !channel.isUserInvited(request.getClient()) && !request.getClient().isServerOP()) {
-						request.connection.send(Error.ERR_INVITEONLYCHAN, request.getClient(), channel.id + " :Cannot join channel (+i)");
+                if (channel.checkPassword((request.args.length >= 2) ? request.args[1] : "")) {
+					if (channel.getMode(ChannelMode.INVITE_ONLY) && !channel.isUserInvited(request.client) && !request.client.isServerOP()) {
+						request.connection.send(Error.ERR_INVITEONLYCHAN, request.client, channel.id + " :Cannot join channel (+i)");
 						continue;
 					}
 					channel.addClient(request.connection.getClient());
 					request.connection.getClient().addChannel(channel);
-					request.connection.send(Reply.RPL_TOPIC, request.getClient(), channel.id + " :" + channel.getTopic());
+					request.connection.send(Reply.RPL_TOPIC, request.client, channel.id + " :" + channel.getTopic());
 				} else {
-					request.connection.send(Error.ERR_BADCHANNELKEY, request.getClient(), channel.id + " :Cannot join channel (+k)");
+					request.connection.send(Error.ERR_BADCHANNELKEY, request.client, channel.id + " :Cannot join channel (+k)");
 				}
 
 			} else {
-				request.connection.send(Error.ERR_CHANNELISFULL, request.getClient(), channel.id + " :Cannot join channel (+l)");
+				request.connection.send(Error.ERR_CHANNELISFULL, request.client, channel.id + " :Cannot join channel (+l)");
 			}
 
 		}

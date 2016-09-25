@@ -19,11 +19,11 @@ public class Mode extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		if (request.getArgs().length <= 1) {
-			String target = request.getArgs()[0];
+        if (request.args.length <= 1) {
+            String target = request.args[0];
 			Channel channel = server.getChannel(target);
 			if (channel == null) {
-				request.connection.send(Error.ERR_NOSUCHCHANNEL, request.getClient(), target + " :No such channel");
+				request.connection.send(Error.ERR_NOSUCHCHANNEL, request.client, target + " :No such channel");
 			}
 			Map<ChannelMode, Boolean> modeMap = channel.getModeMap();
 			Iterator<ChannelMode> modeKey = modeMap.keySet().iterator();
@@ -32,26 +32,26 @@ public class Mode extends Command {
 				ChannelMode mode = modeKey.next();
 				if (modeMap.get(mode)) modes = modes + mode.getSymbol();
 			}
-			request.connection.send(Reply.RPL_CHANNELMODEIS, request.getClient(), target + " +" + modes);
+			request.connection.send(Reply.RPL_CHANNELMODEIS, request.client, target + " +" + modes);
 		} else {
-			String modeFlag = request.getArgs()[1];
-			if (!(modeFlag.startsWith("+") || modeFlag.startsWith("-"))) request.connection.send(Error.ERR_UMODEUNKNOWNFLAG, request.getClient(), "Unknown MODE flag");
+            String modeFlag = request.args[1];
+			if (!(modeFlag.startsWith("+") || modeFlag.startsWith("-"))) request.connection.send(Error.ERR_UMODEUNKNOWNFLAG, request.client, "Unknown MODE flag");
 			boolean add = true;
 			if (modeFlag.startsWith("-")) add = false;
-			if (request.getArgs()[0].startsWith("#") || request.getArgs()[0].startsWith("&")) {
+            if (request.args[0].startsWith("#") || request.args[0].startsWith("&")) {
 				// Channels
-				Channel target = server.getChannel(request.getArgs()[0]);
+                Channel target = server.getChannel(request.args[0]);
 				if (target == null) {
-					request.connection.send(Error.ERR_NOSUCHCHANNEL, request.getClient(), modeFlag + " :No such channel");
+					request.connection.send(Error.ERR_NOSUCHCHANNEL, request.client, modeFlag + " :No such channel");
 					return;
 				}
 				for (char mode : modeFlag.toLowerCase().toCharArray()) {
-					if (request.getClient().isServerOP() || target.checkOP(request.getClient())) {
+					if (request.client.isServerOP() || target.checkOP(request.client)) {
 						switch (mode) {
 						case 'o':
-							Client clientTarget = server.getClient(request.getArgs()[2]);
+                            Client clientTarget = server.getClient(request.args[2]);
 							if (clientTarget == null) {
-								request.connection.send(Error.ERR_NOSUCHNICK, request.getClient(), request.getArgs()[2] + " :No such nick");
+								request.connection.send(Error.ERR_NOSUCHNICK, request.client, request.args[2] + " :No such nick");
 								continue;
 							}
 							if (add) {
@@ -62,35 +62,35 @@ public class Mode extends Command {
 							target.send(Reply.RPL_CHANNELMODEIS, target.id + (add ? " +" : " -") + "o " + clientTarget.id);
 							break;
 						case 'p':
-							target.setMode(ChannelMode.PRIVATE, add, request.getClient());
+							target.setMode(ChannelMode.PRIVATE, add, request.client);
 							break;
 						case 's':
-							target.setMode(ChannelMode.SECRET, add, request.getClient());
+							target.setMode(ChannelMode.SECRET, add, request.client);
 							break;
 						case 'i':
-							target.setMode(ChannelMode.INVITE_ONLY, add, request.getClient());
+							target.setMode(ChannelMode.INVITE_ONLY, add, request.client);
 							break;
 						case 't':
-							target.setMode(ChannelMode.TOPIC, add, request.getClient());
+							target.setMode(ChannelMode.TOPIC, add, request.client);
 							break;
 						case 'n':
-							target.setMode(ChannelMode.NO_MESSAGE_BY_OUTSIDE, add, request.getClient());
+							target.setMode(ChannelMode.NO_MESSAGE_BY_OUTSIDE, add, request.client);
 							break;
 						case 'm':
-							target.setMode(ChannelMode.MODERATED_CHANNEL, add, request.getClient());
+							target.setMode(ChannelMode.MODERATED_CHANNEL, add, request.client);
 							break;
 						case 'l':
 							try {
-								int limit = Integer.parseInt(request.getArgs()[2]);
+                                int limit = Integer.parseInt(request.args[2]);
 								target.setUserLimit(limit);
 							} catch (NumberFormatException ignored) {
-								request.connection.send(Error.ERR_NEEDMOREPARAMS, request.getClient(), ":Not enough parameters");
+								request.connection.send(Error.ERR_NEEDMOREPARAMS, request.client, ":Not enough parameters");
 							}
 							break;
 						case 'b':
 							break;
 						case 'v':
-							Client voicee = server.getClient(request.getArgs()[2]);
+                            Client voicee = server.getClient(request.args[2]);
 							if (voicee != null) {
 								if (add) {
 									target.giveVoice(voicee);
@@ -98,54 +98,54 @@ public class Mode extends Command {
 									target.takeVoice(voicee);
 								}
 							} else {
-								request.connection.send(Error.ERR_NOSUCHNICK, request.getClient(), ":No such channel");
+								request.connection.send(Error.ERR_NOSUCHNICK, request.client, ":No such channel");
 							}
 							target.send(Reply.RPL_CHANNELMODEIS, target.id + (add ? " +" : " -") + "v " + voicee.id);
 							break;
 						case 'k':
-							target.setPassword(request.getArgs()[2]);
+                            target.setPassword(request.args[2]);
 							break;
 						}
 					} else {
-						request.connection.send(Error.ERR_NOPRIVILEGES, request.getClient(), ":Permission Denied- You're not an IRC operator");
+						request.connection.send(Error.ERR_NOPRIVILEGES, request.client, ":Permission Denied- You're not an IRC operator");
 					}
 				}
 
 			} else {
 				// Not channel
-				if (server.getClient(request.getArgs()[0]) != null) {
-					Client target = server.getClient(request.getArgs()[0]);
-					if (request.getClient().isServerOP()) {
+                if (server.getClient(request.args[0]) != null) {
+                    Client target = server.getClient(request.args[0]);
+					if (request.client.isServerOP()) {
 						for (char mode : modeFlag.toLowerCase().toCharArray()) {
 							switch (mode) {
 							case 'i':
-								if (target == request.getClient()) {
-									target.setMode(Client.ClientMode.INVISIBLE, add, request.getClient());
+								if (target == request.client) {
+									target.setMode(Client.ClientMode.INVISIBLE, add, request.client);
 								} else {
-									request.connection.send(Error.ERR_NOPRIVILEGES, request.getClient(), ":Permission Denied- You're not an IRC operator");
+									request.connection.send(Error.ERR_NOPRIVILEGES, request.client, ":Permission Denied- You're not an IRC operator");
 								}
 								break;
 							case 's':
-								if (target == request.getClient()) {
-									target.setMode(Client.ClientMode.SERVER_NOTICES, add, request.getClient());
+								if (target == request.client) {
+									target.setMode(Client.ClientMode.SERVER_NOTICES, add, request.client);
 								} else {
-									request.connection.send(Error.ERR_NOPRIVILEGES, request.getClient(), ":Permission Denied- You're not an IRC operator");
+									request.connection.send(Error.ERR_NOPRIVILEGES, request.client, ":Permission Denied- You're not an IRC operator");
 								}
 								break;
 							case 'w':
-								target.setMode(Client.ClientMode.WALLOPS, add, request.getClient());
+								target.setMode(Client.ClientMode.WALLOPS, add, request.client);
 								break;
 							case 'o':
-								target.setMode(Client.ClientMode.OPERATOR, add, request.getClient());
+								target.setMode(Client.ClientMode.OPERATOR, add, request.client);
 								target.connection.send(Reply.RPL_YOUREOPER, request.connection.getClient(), ":You are now an IRC operator");
 								break;
 							}
 						}
 					} else {
-						request.connection.send(Error.ERR_NOPRIVILEGES, request.getClient(), ":Permission Denied- You're not an IRC operator");
+						request.connection.send(Error.ERR_NOPRIVILEGES, request.client, ":Permission Denied- You're not an IRC operator");
 					}
 				} else {
-					request.connection.send(Error.ERR_NOSUCHNICK, request.getClient(), modeFlag + " :No such nick/channel");
+					request.connection.send(Error.ERR_NOSUCHNICK, request.client, modeFlag + " :No such nick/channel");
 				}
 			}
 		}

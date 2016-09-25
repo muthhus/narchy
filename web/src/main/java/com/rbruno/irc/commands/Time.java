@@ -16,9 +16,9 @@ public class Time extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		if (request.getArgs().length == 0) {
+        if (request.args.length == 0) {
 			Date date = new Date();
-			request.connection.send(Reply.RPL_TIME, request.getClient(), Config.getProperty("hostname") + " :" + new Timestamp(date.getTime()));
+			request.connection.send(Reply.RPL_TIME, request.client, Config.getProperty("hostname") + " :" + new Timestamp(date.getTime()));
 		} else {
 			//TODO: Servers
 		}

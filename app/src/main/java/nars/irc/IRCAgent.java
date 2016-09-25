@@ -1,5 +1,6 @@
 package nars.irc;
 
+import nars.NAR;
 import nars.Task;
 import nars.experiment.misc.Talk;
 import nars.index.TermIndex;
@@ -25,34 +26,41 @@ import static nars.experiment.misc.Talk.context;
 public class IRCAgent extends IRCBot {
     private static final Logger logger = LoggerFactory.getLogger(IRCAgent.class);
 
-    final Terminal nar = new Terminal(16, new XorShift128PlusRandom(1), new RealtimeMSClock());
 
-    static boolean running = true;
+    boolean running = true;
 
-    private final InterNAR inter;
-    private final Talk talk;
+    //private final Talk talk;
+    private final NAR nar;
     private float ircMessagePri = 0.9f;
 
-    public IRCAgent(String server, String nick, String channel, int udpPort) throws Exception {
+    public IRCAgent(NAR nar, String server, String nick, String channel) throws Exception {
         super(server, nick, channel);
 
-        talk = new Talk(nar);
+        this.nar = nar;
 
-        nar.log();
+        //talk = new Talk(nar);
 
-        nar.onExec(new TermProcedure("say") {
-            @Override public @Nullable Object function(Compound arguments, TermIndex i) {
-                Term content = arguments.term(0);
-                String context = arguments.size() > 1 ? arguments.term(1).toString() : "";
-                if (context.equals("I"))
-                    send(channel, content.toString());
+        //nar.log();
 
-                return null;
-            }
+        nar.onTask(t -> {
+           if (t.pri() >= 0.5f) {
+               send(channel, t.toString());
+           }
         });
 
-        inter = new InterNAR(nar, (short)udpPort );
-        inter.broadcastPriorityThreshold = 0.25f; //lower threshold
+//        nar.onExec(new TermProcedure("say") {
+//            @Override public @Nullable Object function(Compound arguments, TermIndex i) {
+//                Term content = arguments.term(0);
+//                String context = arguments.size() > 1 ? arguments.term(1).toString() : "";
+//                if (context.equals("I"))
+//                    send(channel, content.toString());
+//
+//                return null;
+//            }
+//        });
+
+        //inter = new InterNAR(nar, (short)udpPort );
+        //inter.broadcastPriorityThreshold = 0.25f; //lower threshold
 
         nar.believe("connect(\"" + server + "\").", Tense.Present, 1f, 0.9f);
     }
@@ -96,21 +104,21 @@ public class IRCAgent extends IRCBot {
         } catch (Exception e) { }
 
         logger.info("hear({},{}): {}", channel, nick, msg);
-        talk.hear(msg, context(channel, nick), ircMessagePri);
+        //talk.hear(msg, context(channel, nick), ircMessagePri);
 
 
     }
-    public static void main(String[] args) throws Exception {
-        //while (running) {
-            try {
-                new IRCAgent(
-                        "irc.freenode.net",
-                        //"localhost",
-                        "NARchy", "#netention", 11001);
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-        //}
-    }
+//    public static void main(String[] args) throws Exception {
+//        //while (running) {
+//            try {
+//                new IRCAgent(
+//                        "irc.freenode.net",
+//                        //"localhost",
+//                        "NARchy", "#netention");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//
+//            }
+//        //}
+//    }
 }

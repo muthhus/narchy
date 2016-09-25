@@ -142,6 +142,7 @@ public class PremiseEval extends FindSubst {
         this.punct = new Versioned(versioning, 2);
 
         replace(new substitute(this));
+        replace(new substituteIfUnifiesAny(this));
         replace(new substituteIfUnifiesDep(this));
         replace(new substituteOnlyIfUnifiesDep(this));
         replace(new substituteIfUnifiesIndep(this));

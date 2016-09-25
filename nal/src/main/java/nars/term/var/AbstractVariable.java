@@ -65,11 +65,13 @@ public abstract class AbstractVariable implements Variable {
     @Override
     public final boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
 
-        Op op = op();
-        if (op == y.op()) {
-            return subst.putCommon(this, y);
-        } else if (op == subst.type) { //TODO is this necessary? probably to allow the matchVarY condition below
+        Op xo = op();
+        if (subst.matchType(xo)) {
             return subst.matchVarX(this, y);
+        } else {
+            if (y.op() == xo) {
+                return subst.putCommon(this, y);
+            }
         }
 
         return false;

@@ -13,11 +13,11 @@ public class Notice extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		Client client = server.getClient(request.getArgs()[0]);
+        Client client = server.getClient(request.args[0]);
 		if (client != null) {
-			client.connection.send(':' + request.getClient().getAbsoluteName() + " NOTICE " + client.id + ' ' + request.getArgs()[1]);
+			client.connection.send(':' + request.client.getAbsoluteName() + " NOTICE " + client.id + ' ' + request.args[1]);
 		} else {
-            request.getClient().connection.send(Error.ERR_NOSUCHNICK, client, request.getArgs()[0] + " :No such nick");
+			request.client.connection.send(Error.ERR_NOSUCHNICK, client, request.args[0] + " :No such nick");
 		}
 	}
 }

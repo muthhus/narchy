@@ -13,14 +13,14 @@ public class Part extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		String[] channels = request.getArgs()[0].split(",");
+        String[] channels = request.args[0].split(",");
 		for (String channelName : channels) {
 			Channel channel = server.getChannel(channelName);
 			String message = "Leaving";
-			if (request.getArgs().length != 0)
-				message = request.getArgs()[0];
+            if (request.args.length != 0)
+                message = request.args[0];
 			for (Client client : channel.getClients())
-                client.connection.send(':' + request.getClient().getAbsoluteName() + " PART " + message);
+				client.connection.send(':' + request.client.getAbsoluteName() + " PART " + message);
 			channel.removeClient(request.connection.getClient());
 			request.connection.getClient().removeChannel(channel);
 

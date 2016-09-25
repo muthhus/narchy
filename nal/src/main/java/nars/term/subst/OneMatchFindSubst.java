@@ -20,16 +20,13 @@ public final class OneMatchFindSubst extends FindSubst {
 
     @Nullable private Term result;
 
-    public OneMatchFindSubst(@NotNull NAR nar) {
-        this(nar.concepts, nar.random);
+
+    public OneMatchFindSubst(TermIndex index, Op type, Random r) {
+        super(index, type, r);
     }
 
-    public OneMatchFindSubst(TermIndex index, Random r) {
-        super(index, null, r);
-    }
-
-    public OneMatchFindSubst(FindSubst parent) {
-        this(parent.index, parent.random);
+    public OneMatchFindSubst(FindSubst parent, @Nullable Op type) {
+        this(parent.index, type, parent.random);
     }
 
 
@@ -50,14 +47,13 @@ public final class OneMatchFindSubst extends FindSubst {
         return false;
     }
 
-    public boolean tryMatch(@NotNull Op op, @NotNull Term x, @NotNull Term y) {
-        tryMatch(op, null, null, x, y);
+    public boolean tryMatch(@NotNull Term x, @NotNull Term y) {
+        tryMatch(null, null, x, y);
         return !xy.isEmpty();
     }
 
     @Nullable
-    public Term tryMatch(@NotNull Op op, @Nullable PremiseEval target, @Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
-        this.type = op;
+    public Term tryMatch(@Nullable PremiseEval target, @Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
         this.xterm = xterm;
         this.target = target;
         this.result = null;

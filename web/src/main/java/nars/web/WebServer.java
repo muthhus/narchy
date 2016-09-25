@@ -1,5 +1,6 @@
 package nars.web;
 
+import com.rbruno.irc.IRCServer;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
@@ -10,6 +11,9 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import nars.NARLoop;
 import nars.index.CaffeineIndex;
+import nars.irc.IRCAgent;
+import nars.irc.IRCBot;
+import nars.irc.NarseseIRCBot;
 import nars.nar.Default;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
@@ -36,7 +40,6 @@ public class WebServer /*extends PathHandler*/ {
 
     public final Undertow server;
     private final PathHandler path;
-    public NARLoop loop;
 
 
     final static Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -96,7 +99,7 @@ public class WebServer /*extends PathHandler*/ {
 
 
 
-        logger.info("http/ws start: port={} staticFiles={}", httpPort, resourcePath.getBasePath());
+        logger.info("http start: port={} staticFiles={}", httpPort, resourcePath.getBasePath());
         synchronized (server) {
             server.start();
         }
@@ -109,8 +112,6 @@ public class WebServer /*extends PathHandler*/ {
         synchronized (server) {
             server.stop();
             logger.info("stop");
-
-            loop.stop();
         }
     }
 
@@ -121,7 +122,14 @@ public class WebServer /*extends PathHandler*/ {
 
         WebServer w = new WebServer(httpPort);
 
-        new NARServices( newRealtimeNAR(1024, 2, 2), w.path);
+        new IRCServer("localhost", 6667);
+
+        @NotNull Default nar = newRealtimeNAR(1024, 2, 2);
+
+        new NARServices(nar, w.path);
+
+        new IRCAgent(nar, "localhost", "NARchy", "#x");
+
 
 
     }

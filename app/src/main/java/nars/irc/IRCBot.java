@@ -63,7 +63,7 @@ public abstract class IRCBot {
                 // Read lines from the server until it tells us we have connected.
                 String line = null;
                 while ((line = reader.readLine( )) != null) {
-                    if (line.contains("004")) {
+                    if (line.contains("372")) {
                         // We are now logged in.
                         break;
                     }

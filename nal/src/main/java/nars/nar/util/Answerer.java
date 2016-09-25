@@ -29,8 +29,8 @@ abstract public class Answerer implements Consumer<Task> {
     @Override
     public void accept(@NotNull Task task) {
         if (task.isQuestion()) {
-            final OneMatchFindSubst match = new OneMatchFindSubst(nar); //re-using this is not thread-safe
-            if (match.tryMatch(Op.VAR_PATTERN, pattern, task.term())) {
+            final OneMatchFindSubst match = new OneMatchFindSubst(nar.concepts, Op.VAR_PATTERN, nar.random); //re-using this is not thread-safe
+            if (match.tryMatch(pattern, task.term())) {
                 onMatch(match.xy);
             }
         }

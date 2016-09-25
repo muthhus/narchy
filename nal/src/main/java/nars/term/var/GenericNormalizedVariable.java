@@ -15,7 +15,7 @@ public abstract class GenericNormalizedVariable extends AbstractVariable {
     }
 
     /** to combine multiple variables into a unique hash;
-     *  this limits # of variables to 256 per term */
+     *  this limits # of variables to 127 (or is it the full 255) per term */
     public static int multiVariable(int a, int b) {
         return ((a+1) << 8) | (b+1);
     }

@@ -25,8 +25,8 @@ public class Channel {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ((obj instanceof String) || (obj instanceof Channel)) {
-			return obj.toString().equals(id);
+		if (obj instanceof Channel) {
+			return ((Channel)obj).id.equals(id);
 		}
 		return false;
 	}
@@ -78,8 +78,8 @@ public class Channel {
 	 * @return True if mode is set false if not.
 	 */
 	public boolean getMode(ChannelMode mode) {
-		if (!modes.containsKey(mode)) return false;
-		return modes.get(mode);
+		//if (!modes.containsKey(mode)) return false;
+		return modes.get(mode)==Boolean.TRUE;
 	}
 
 	/**

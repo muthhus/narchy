@@ -14,7 +14,7 @@ public class Ping extends Command {
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
 		switch (request.connection.getType()){
 		case CLIENT:
-			request.connection.send(':' + Config.getProperty("hostname") + " PONG " + request.getClient().id);
+            request.connection.send(':' + Config.getProperty("hostname") + " PONG " + request.client.id);
 			break;
 		case LOGGIN_IN:
 			break;

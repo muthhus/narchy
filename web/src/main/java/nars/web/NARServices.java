@@ -14,7 +14,7 @@ import static nars.web.WebServer.socket;
 /**
  * Created by me on 9/23/16.
  */
-public class NARServices {
+@Deprecated public class NARServices {
 
     public NARServices(NAR nar, PathHandler path) {
 

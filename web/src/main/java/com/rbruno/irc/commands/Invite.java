@@ -15,23 +15,23 @@ public class Invite extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		Channel channel = server.getChannel(request.getArgs()[1]);
+        Channel channel = server.getChannel(request.args[1]);
 		if (channel == null) {
-			request.connection.send(Error.ERR_NOSUCHCHANNEL, request.getClient(), request.getArgs()[1] + " :No such channel");
+			request.connection.send(Error.ERR_NOSUCHCHANNEL, request.client, request.args[1] + " :No such channel");
 			return;
 		}
-		if (!channel.checkOP(request.getClient()) && !request.getClient().isServerOP()) {
-			request.connection.send(Error.ERR_CHANOPRIVSNEEDED, request.getClient(), request.getArgs()[1] + " :You're not channel operator");
+		if (!channel.checkOP(request.client) && !request.client.isServerOP()) {
+			request.connection.send(Error.ERR_CHANOPRIVSNEEDED, request.client, request.args[1] + " :You're not channel operator");
 			return;
 		}
-		Client target = server.getClient(request.getArgs()[0]);
+        Client target = server.getClient(request.args[0]);
 		if (target == null) {
-			request.connection.send(Error.ERR_NOSUCHNICK, request.getClient(), request.getArgs()[1] + " :No such nick");
+			request.connection.send(Error.ERR_NOSUCHNICK, request.client, request.args[1] + " :No such nick");
 			return;
 		}
 		channel.inviteUser(target);
-		request.connection.send(Reply.RPL_INVITING, request.getClient(), target.id + ' ' + channel.id);
-		target.connection.send(':' + request.getClient().getAbsoluteName() + " INVITE " + target.id + ' ' + channel.id);
+		request.connection.send(Reply.RPL_INVITING, request.client, target.id + ' ' + channel.id);
+		target.connection.send(':' + request.client.getAbsoluteName() + " INVITE " + target.id + ' ' + channel.id);
 	}
 
 }

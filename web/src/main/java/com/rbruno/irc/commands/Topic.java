@@ -15,20 +15,20 @@ public class Topic extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		Channel channel = server.getChannel(request.getArgs()[0]);
+        Channel channel = server.getChannel(request.args[0]);
 		if (channel == null) {
-			request.connection.send(Error.ERR_NOSUCHCHANNEL, request.getClient(), request.getArgs()[0] + " :No such channel");
+			request.connection.send(Error.ERR_NOSUCHCHANNEL, request.client, request.args[0] + " :No such channel");
 			return;
 		}
-		if (channel.getMode(ChannelMode.TOPIC) && !channel.checkOP(request.getClient())) {
-			request.connection.send(Error.ERR_CHANOPRIVSNEEDED, request.getClient(), channel.id + " :You're not channel operator");
-			request.connection.send(Reply.RPL_TOPIC, request.getClient(), channel.id + ' ' + channel.getTopic());
+		if (channel.getMode(ChannelMode.TOPIC) && !channel.checkOP(request.client)) {
+			request.connection.send(Error.ERR_CHANOPRIVSNEEDED, request.client, channel.id + " :You're not channel operator");
+			request.connection.send(Reply.RPL_TOPIC, request.client, channel.id + ' ' + channel.getTopic());
 			return;
 		}
-		if (request.getArgs().length == 1) {
-			request.connection.send(Reply.RPL_TOPIC, request.getClient(), channel.id + ' ' + channel.getTopic());
+        if (request.args.length == 1) {
+			request.connection.send(Reply.RPL_TOPIC, request.client, channel.id + ' ' + channel.getTopic());
 		} else {
-			channel.setTopic(request.getArgs()[1]);
+            channel.setTopic(request.args[1]);
 		}
 	}
 

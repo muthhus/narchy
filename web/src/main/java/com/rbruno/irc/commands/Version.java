@@ -13,8 +13,8 @@ public class Version extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		if (request.getArgs().length == 0) {
-			request.connection.send(Reply.RPL_VERSION, request.getClient(), IRCServer.getVersion() + ' ' + Config.getProperty("hostname"));
+        if (request.args.length == 0) {
+			request.connection.send(Reply.RPL_VERSION, request.client, IRCServer.getVersion() + ' ' + Config.getProperty("hostname"));
 		} else {
 			//TODO: Server
 		}

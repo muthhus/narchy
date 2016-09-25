@@ -14,12 +14,12 @@ public class Who extends Command {
 
 	@Override
 	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
-		String target = request.getArgs()[0];
+        String target = request.args[0];
 		if (target.startsWith("#") || target.startsWith("&")) {
 			Channel channel = server.getChannel(target);
 			for (Client client : channel.getClients())
-				request.connection.send(Reply.RPL_WHOREPLY, request.getClient(), channel.id + ' ' + client.getUsername() + " * " + client.getHostname() + ' ' + client.id + " H+ :" + Client.getHopCount() + ' ' + client.getRealName());
-			request.connection.send(Reply.RPL_ENDOFWHO, request.getClient(), target + " :End of /WHO list");
+				request.connection.send(Reply.RPL_WHOREPLY, request.client, channel.id + ' ' + client.getUsername() + " * " + client.getHostname() + ' ' + client.id + " H+ :" + Client.getHopCount() + ' ' + client.getRealName());
+			request.connection.send(Reply.RPL_ENDOFWHO, request.client, target + " :End of /WHO list");
 		}
 	}
 

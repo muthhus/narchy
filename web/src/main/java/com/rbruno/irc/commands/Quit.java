@@ -12,17 +12,18 @@ public class Quit extends Command {
 	}
 
 	@Override
-	public void run(Request request) throws java.io.IOException { IRCServer server = request.server();
+	public void run(Request request) throws java.io.IOException {
+
 		if (request.connection.isClient()) {
 			request.connection.close();
 
 			String message = "Leaving";
-			if (request.getArgs().length != 0) message = request.getArgs()[0];
+            if (request.args.length != 0) message = request.args[0];
 
-			for (Channel current : request.getClient().getChannels()) {
-				current.removeClient(request.getClient());
+			for (Channel current : request.client.getChannels()) {
+				current.removeClient(request.client);
 				for (Client client : current.getClients())
-                    client.connection.send(':' + request.getClient().getAbsoluteName() + " QUIT " + message);
+					client.connection.send(':' + request.client.getAbsoluteName() + " QUIT " + message);
 			}
 			// TODO: Notify all clients and servers
 		} else {

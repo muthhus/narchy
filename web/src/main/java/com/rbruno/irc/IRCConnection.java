@@ -53,10 +53,14 @@ public class IRCConnection implements Runnable {
 	 */
 	@Override
 	public void run() {
+
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+
 			while (open) {
+
 				String line = null;
+
 				try {
 					line = reader.readLine();
 				} catch (Exception e) {
@@ -65,31 +69,29 @@ public class IRCConnection implements Runnable {
 						continue;
 					}
 				}
-//				if (server.getConfig().getProperty("debug").equals("true")) logger.info(line, Level.FINE);
-//				if (line == null) {
-//					close();
-//					continue;
-//				}
+
+				if (line == null) {
+					close();
+					break;
+				}
+
 				Request request = null;
 				try {
 					request = new Request(this, line);
-				} catch (Exception ignored) {
-					logger.info(socket.getInetAddress() + " sent an unparseable line: " + line, Level.FINE);
-					continue;
-				}
-				try {
+					logger.info("req: {}", request);
 					runCommand(request);
 				} catch (Exception e) {
-					logger.info(socket.getInetAddress() + " ran a command that resulted in an error: " + line, Level.FINE);
+					logger.info("{} error in line: {}\n\t{}", socket.getInetAddress(), line, e);
 					e.printStackTrace();
 				}
 
 			}
 			reader.close();
-		} catch (IOException ignored) {
-			logger.info(socket.getInetAddress() + " closed in an error state.", Level.FINE);
+		} catch (IOException eee) {
+			logger.info("{} closed due to error {}", socket.getInetAddress(), eee);
 			this.close();
 		}
+
 	}
 
 	/**
@@ -101,15 +103,14 @@ public class IRCConnection implements Runnable {
 	 * @throws Exception
 	 */
 	public void runCommand(Request request) throws Exception {
-		if (request.getClient() != null) request.getClient().setLastCheckin(System.currentTimeMillis());
-		server.plugins.runOnRequest(request);
+		if (request.client != null) request.client.setLastCheckin(System.currentTimeMillis());
 		if (request.isCancelled()) return;
-		Command command = the(request.getCommand());
+		Command command = the(request.command);
 		if (command == null) {
-			if (request.getClient() != null) request.connection.send(Error.ERR_UNKNOWNCOMMAND, request.getClient(), request.getCommand() + " :Unknown command");
+			if (request.client != null) request.connection.send(Error.ERR_UNKNOWNCOMMAND, request.client, request.command + " :Unknown command");
 			return;
 		}
-		if (request.getArgs().length < command.arity) {
+		if (request.args.length < command.arity) {
 			request.connection.send(Error.ERR_NEEDMOREPARAMS, request.connection.getClient(), ":Not enough parameters");
 			return;
 		}

@@ -3,6 +3,7 @@ package com.rbruno.irc;
 import com.rbruno.irc.reply.Reply;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Phrases and stores information on a request made by a client.
@@ -11,11 +12,21 @@ public class Request {
 
 	public final IRCConnection connection;
 	private String prefix;
-	private final String command;
-	private String[] args = new String[0];
-	private final Client client;
+	public final String command;
+	public final String[] args;
+	public final Client client;
 
 	private boolean cancelled;
+
+	@Override
+	public String toString() {
+		return "Req{" +
+				"client=" + client +
+				", prefix='" + prefix + '\'' +
+				", command='" + command + '\'' +
+				", args=" + Arrays.toString(args) +
+				'}';
+	}
 
 	/**
 	 * Creates a new Request object. Phrases the line into prefix, command and
@@ -36,34 +47,31 @@ public class Request {
 		}
 		this.command = line.split(" ")[0];
 
+		String[] args = null;
 		line = line.substring(line.length() != command.length() ? command.length() + 1 : command.length());
 		String postDelimiter = line.substring(line.split(":")[0].length());
 		line = line.substring(0, line.length() - postDelimiter.length());
-		if (line.length() > 0) this.args = line.split(" ");
-		if (postDelimiter.length() > 0) {
+		if (line.length() > 0)
+			args = line.split(" ");
+		if (args!=null && postDelimiter.length() > 0) {
 			String[] newArgs = new String[args.length + 1];
 			System.arraycopy(args, 0, newArgs, 0, args.length);
 			newArgs[newArgs.length - 1] = postDelimiter;
-			this.args = newArgs;
+			args = newArgs;
 		}
 		if (prefix != null && connection.isServer()) {
 			client = connection.server.getClient(prefix);
-		} else if (connection.isClient()) {
+		} else { //else if (connection.isClient()) {
 			client = connection.getClient();
-		} else {
-			client = null;
 		}
+		//}/* else {
+			//client = null;
+		//}*/
+		this.args = args!=null ? args : emptyArgs;
 	}
 
-	/**
-	 * Returns the prefix of the that was sent. The prefix should only be used
-	 * when sent by server.
-	 * 
-	 * @return The prefix of the that was sent.
-	 */
-	public String getPrefix() {
-		return prefix;
-	}
+	public final String[] emptyArgs = new String[0];
+
 
 	/**
 	 * Returns the command that was sent.

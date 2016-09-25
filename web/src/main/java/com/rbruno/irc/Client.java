@@ -37,6 +37,22 @@ public class Client {
 		this.id = nickname;
 	}
 
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Client)) return false;
+
+		Client client = (Client) o;
+
+		return id.equals(client.id);
+
+	}
+
 	/**
 	 * 
 	 * Creates a new Client object. Will not add to ClientManager.
@@ -154,13 +170,13 @@ public class Client {
 	}
 
 	public boolean hasMode(ClientMode mode) {
-		if (!modes.containsKey(mode)) return false;
-		return modes.get(mode);
+		//if (!modes.containsKey(mode)) return false;
+		return modes.get(mode)!=null;
 	}
 
 	public boolean isServerOP() {
-		if (!modes.containsKey(ClientMode.OPERATOR)) return false;
-		return modes.get(ClientMode.OPERATOR);
+		//if (!modes.containsKey(ClientMode.OPERATOR)) return false;
+		return modes.get(ClientMode.OPERATOR)!=null;
 	}
 
 	public long getLastCheckin() {
