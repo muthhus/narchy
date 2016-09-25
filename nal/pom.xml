@@ -104,6 +104,18 @@
 
 
     </dependencies>
+    <build>
+
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.nal</include>
+                </includes>
+            </resource>
+
+        </resources>
+    </build>
 
 
 </project>

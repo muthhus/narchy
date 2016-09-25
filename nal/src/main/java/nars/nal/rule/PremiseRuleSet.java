@@ -1,5 +1,6 @@
 package nars.nal.rule;
 
+import com.google.common.collect.Lists;
 import nars.$;
 import nars.IO;
 import nars.Param;
@@ -31,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static java.nio.file.Files.readAllLines;
 import static java.util.stream.Collectors.toList;
 import static nars.IO.readTerm;
 
@@ -53,7 +55,7 @@ public class PremiseRuleSet {
     };
 
     @NotNull
-    public static PremiseRuleSet resource(String name) throws IOException, URISyntaxException {
+    public static PremiseRuleSet rulesCached(String name) throws IOException, URISyntaxException {
 
         PatternIndex p = new PatternIndex(1024);
 
@@ -75,20 +77,29 @@ public class PremiseRuleSet {
 
         Stream<Pair<Compound, String>> parsed =
                 Util.fileCache(path, PremiseRuleSet.class.getSimpleName(),
-                        () -> {
-                            try {
-
-                                return parse(load(Files.readAllLines(Paths.get(path.toURI()))), p);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
+                        () -> load(p, path),
                         encoder,
                         decoder,
                         logger
                 );
 
         return new PremiseRuleSet(parsed, p);
+    }
+
+    @NotNull
+    public static PremiseRuleSet rules(String name) throws IOException {
+
+        PatternIndex p = new PatternIndex(1024);
+        return new PremiseRuleSet(parse(load(Deriver.class.getResourceAsStream(name).readAllBytes()), p), p);
+    }
+
+    static Stream<Pair<Compound, String>> load(PatternIndex p, URL path) {
+        try {
+
+            return parse(load(readAllLines(Paths.get(path.toURI()))), p);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -131,6 +142,10 @@ public class PremiseRuleSet {
     }
 
 
+    @NotNull
+    static Stream<CharSequence> load(@NotNull byte[] data) {
+        return load(Lists.newArrayList(new String(data).split("\n")));
+    }
 
     @NotNull
     static Stream<CharSequence> load(@NotNull List<String> lines) {

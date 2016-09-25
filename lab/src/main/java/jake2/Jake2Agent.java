@@ -6,6 +6,7 @@ import com.jogamp.nativewindow.SurfaceUpdatedListener;
 import com.jogamp.opengl.util.GLPixelBuffer;
 import com.jogamp.opengl.util.GLReadBufferUtil;
 
+import jake2.client.CL;
 import jake2.client.CL_input;
 import jake2.client.VID;
 import jake2.client.refexport_t;
@@ -15,6 +16,7 @@ import jake2.qcommon.Qcommon;
 import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.render.opengl.JoglGL2Driver;
+import jake2.sys.IN;
 import jogamp.newt.WindowImpl;
 import nars.NAR;
 import nars.experiment.minicraft.PixelAutoClassifier;
@@ -42,7 +44,7 @@ import static spacegraph.SpaceGraph.window;
  */
 public class Jake2Agent extends SwingAgent implements Runnable {
 
-    private final PixelAutoClassifier camAE;
+    private PixelAutoClassifier camAE = null;
     ByteBuffer seen = null;
     int width, height;
     boolean see = true;
@@ -71,6 +73,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
         public float speed;
         public int weaponState;
         public short frags;
+        public float angle;
 
         protected void update() {
             edict_t p = PlayerView.current_player;
@@ -80,6 +83,9 @@ public class Jake2Agent extends SwingAgent implements Runnable {
             weaponState = p.client.weaponstate;
 
             frags = p.client.ps.stats[STAT_FRAGS];
+
+
+            angle = p.angle;
 
             float[] v = p.velocity;
             velX = v[0];
@@ -98,8 +104,8 @@ public class Jake2Agent extends SwingAgent implements Runnable {
         MatrixSensor<PixelBag> qcam = addCamera("q", screenshotter, 64, 64, (v) -> t(v, alpha));
         qcam.src.vflip = true;
 
-        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);
-        window(camAE.newChart(), 500, 500);
+//        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);
+//        window(camAE.newChart(), 500, 500);
 
         new NObj("p", player, nar).readAllFields(false).into(this);
 
@@ -110,6 +116,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
         //actionToggle("(right)", (x) -> CL_input.in_right.state = x ? 1 : 0);
         actionToggle("(moveleft)", (x) -> CL_input.in_moveleft.state = x ? 1 : 0);
         actionToggle("(moveright)", (x) -> CL_input.in_moveright.state = x ? 1 : 0);
+        actionToggle("(jump)", (x) -> CL_input.in_up.state = x ? 1 : 0);
         actionBipolar("(lookyaw)", (x) -> {
             float yawSpeed = 10;
             cl.viewangles[Defines.YAW] += yawSpeed * x;
@@ -117,7 +124,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
             return true;
         });
         actionBipolar("(lookpitch)", (x) -> {
-            float pitchSpeed = 30; //absolute
+            float pitchSpeed = 20; //absolute
             cl.viewangles[Defines.PITCH] = pitchSpeed * x;
             //return CL_input.in_lookup.state = x ? 1 : 0;
             return true;
@@ -131,11 +138,12 @@ public class Jake2Agent extends SwingAgent implements Runnable {
     @Override
     protected float reward() {
 
-        camAE.frame();
+        if (camAE!=null)
+            camAE.frame();
 
         player.update();
 
-        return player.health + player.speed;
+        return player.health * 4f + player.speed/2f + player.frags * 2f;
     }
 
     @Override
@@ -144,6 +152,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
         //https://www.quaddicted.com/reviews/
         //http://tastyspleen.net/~quake2/baseq2/maps/
         //https://www.eecis.udel.edu/~portnoi/quake/quakeiicom.html
+        IN.mouse_avail = false;
         Jake2.run(new String[]{
                 "+god",
                 //"+debuggraph",
@@ -151,10 +160,10 @@ public class Jake2Agent extends SwingAgent implements Runnable {
                 //"+use chaingun",
                 //"+mlook 0", //disable mouse
                 //"+in_initmouse 0",
-                "+in_mouse 0",
+                //"+in_mouse 0",
                 "+cl_gun 0", //hide gun
-                "+timescale 0.2",
-                "+map base3"
+                "+timescale 0.5",
+                "+map base1"
                 //"+connect .."
         }, this::onDraw);
 

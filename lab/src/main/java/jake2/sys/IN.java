@@ -39,7 +39,7 @@ import jake2.util.Math3D;
  */
 public final class IN extends Globals {
 
-    static boolean mouse_avail = true;
+    public static boolean mouse_avail = true;
 
     static boolean mouse_active = false;
 
@@ -136,7 +136,7 @@ public final class IN extends Globals {
             }
         });
 
-        IN.mouse_avail = true;
+        //IN.mouse_avail = true;
     }
 
     public static void Commands() {

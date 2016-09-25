@@ -29,6 +29,7 @@ public class PatternIndex extends MapIndex {
 
     public PatternIndex(int capacity) {
         super(ConceptBuilder.Null,
+            new ConcurrentHashMap<>(capacity),
             new ConcurrentHashMap<>(capacity));
 
         loadBuiltins();

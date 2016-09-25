@@ -51,7 +51,7 @@ abstract public class SwingAgent extends NAgent {
             new SingleThreadExecutioner();
             //new MultiThreadExecutioner(2, 1024*16);
 
-        int maxVol = 32;
+        int maxVol = 26;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
