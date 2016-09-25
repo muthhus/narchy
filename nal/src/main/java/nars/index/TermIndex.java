@@ -462,10 +462,19 @@ public abstract class TermIndex extends TermBuilder {
                     break;
 
                 default:
-                    if (term instanceof Compound)
-                        term = normalize((Compound)term);
-                    if (term instanceof Compound)
-                        term = Terms.atemporalize((Compound)term);
+
+                    if (term instanceof Compound) {
+
+                        if (term.size() == 0)
+                            return null; //example: ()
+
+                        term = normalize((Compound) term);
+                    }
+
+                    if (term instanceof Compound) {
+                        term = Terms.atemporalize((Compound) term);
+                    }
+
                     break;
 
             }

@@ -84,53 +84,56 @@ public class PremiseEval extends FindSubst {
      * run parameters
      */
     int termutesRemain;
-    private int termutesMax;
+    final int termutesMax;
 
 
     /**
-     * cached value
+     * cached values
      */
+
     public float confMin = Param.TRUTH_EPSILON;
 
     /** op ordinals, 0=task, 1=belief */
-    public int termSub0op, termSub1op;
+    public final int termSub0op;
+    public final int termSub1op;
 
     /** op bits, 0=task, 1=belief */
-    public int termSub0opBit, termSub1opBit;
+    public final int termSub0opBit;
+    public final int termSub1opBit;
 
     /** structs, 0=task, 1=belief */
-    public int termSub0Struct, termSub1Struct;
+    public final int termSub0Struct;
+    public final int termSub1Struct;
 
-    public boolean overlap;
+    public final boolean overlap;
 
     @Nullable
-    public Truth taskTruth, beliefTruth;
+    public final Truth taskTruth;
+    @Nullable
+    public final Truth beliefTruth;
 
-    public Compound taskTerm;
-    public Term beliefTerm;
+    public final Compound taskTerm;
+    public final Term beliefTerm;
     public final NAR nar;
 
-    public Task task;
+    public final Task task;
     @Nullable
-    public Task belief;
-    public char taskPunct;
+    public final Task belief;
+    public final char taskPunct;
 
     /**
      * whether the premise involves temporality that must be calculated upon derivation
      */
-    public boolean temporal;
+    public final boolean temporal;
     @Nullable
     private long[] evidenceDouble, evidenceSingle;
 
     @Nullable
-    public Conclusion conclusion;
-    private boolean cyclic;
+    public final Conclusion conclusion;
+    private final boolean cyclic;
 
-    public PremiseEval(@NotNull NAR nar) {
-        this(nar, null);
-    }
 
-    public PremiseEval(@NotNull NAR nar, @Nullable Premise p) {
+    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Premise p, @NotNull Conclusion c) {
         super(nar.concepts, VAR_PATTERN, nar.random);
 
         this.nar = nar;
@@ -143,17 +146,10 @@ public class PremiseEval extends FindSubst {
 
         replace(new substitute(this));
         replace(new substituteIfUnifiesAny(this));
+        replace(new substituteIfUnifiesForward(this));
         replace(new substituteIfUnifiesDep(this));
-        replace(new substituteOnlyIfUnifiesDep(this));
-        replace(new substituteIfUnifiesIndep(this));
-        replace(new substituteIfUnifiesIndepForward(this));
-        replace(new substituteOnlyIfUnifiesIndep(this));
 
         this.premise = p;
-    }
-
-    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Premise p, @NotNull Conclusion c) {
-        this(nar, p);
 
         Task task;
         this.task = task = p.task();

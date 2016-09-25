@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 250;
+    final int cycles = 100;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
@@ -242,7 +242,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_introduction()  {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<swan --> bird>"); //en("A swan is a bird.");
         tester.believe("<swan --> swimmer>", 0.80f, 0.9f); //en("A swan is usually a swimmer.");
         tester.mustBelieve(cycles, "<<$1 --> bird> ==> <$1 --> swimmer>>", 0.80f, 0.45f); //en("I guess a bird is usually a swimmer.");
@@ -290,7 +290,7 @@ public class NAL6Test extends AbstractNALTest {
     public void variable_introduction_with_existing_vars2()  {
         //test that an introduced variable doesn't interfere with an existing variable of same name ($1)
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<#1 --> swimmer>"); //en("A gull is a swimmer.");
         tester.believe("<swan --> swimmer>", 0.80f, 0.9f); //en("Usually, a swan is a swimmer.");
         tester.mustBelieve(cycles, "<<#1 --> $2> ==> <swan --> $2>>", 0.80f, 0.45f); //en("I guess what can be said about gull usually can also be said about swan.");
@@ -313,7 +313,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void multiple_variables_introduction()  {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<<$x --> key> ==> <{lock1} --> (/,open,$x,_)>>"); //en("Lock-1 can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
@@ -380,7 +380,7 @@ public class NAL6Test extends AbstractNALTest {
     public void second_variable_introduction_induction()  {
 
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>"); //en("if something opens lock1, it is a key");
         tester.believe("<lock1 --> lock>"); //en("lock1 is a key");
         tester.mustBelieve(cycles, "<(&&,<#1 --> lock>,<#1 --> (/,open,$2,_)>) ==> <$2 --> key>>", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
@@ -391,7 +391,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_elimination_deduction()  {
         test()
-            .log()
+            //.log()
             .believe("((&&,(#1 --> lock),open:($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is a lock with the property that when opened by something, this something is a key");
             .believe("(lock1 --> lock)", 1.00f, 0.90f) //en("lock1 is a lock");
             .mustBelieve(cycles, "(open:($1,lock1) ==> ($1 --> key))", 1.00f, 0.81f); //en("whatever opens lock1 is a key");
@@ -401,13 +401,13 @@ public class NAL6Test extends AbstractNALTest {
 
     @Test
     public void abduction_with_variable_elimination()  {
-        TestNAR tester = test();
-        tester.log();
-        //tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.90f); //en("whatever opens lock1 is a key");
-        tester.believe("(open:($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f); //en("whatever opens lock1 is a key");
-        tester.believe("(((#1 --> lock) && open:($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f); //en("there is a lock with the property that when opened by something, this something is a key");
-        tester.mustBelieve(cycles, "lock:lock1", 1.00f, 0.45f); //en("lock1 is a lock");
-
+        test()
+            .log()
+            .believe("(open:($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f) //en("whatever opens lock1 is a key");
+                ///tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.90f); //en("whatever opens lock1 is a key");
+            .believe("(((#1 --> lock) && open:($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is a lock with the property that when opened by something, this something is a key");
+            .mustBelieve(cycles, "lock:lock1", 1.00f, 0.45f) //en("lock1 is a lock");
+        ;
     }
 
     @Test //see discussion on https://groups.google.com/forum/#!topic/open-nars/1TmvmQx2hMk

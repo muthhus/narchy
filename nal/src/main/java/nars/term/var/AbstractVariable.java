@@ -66,12 +66,10 @@ public abstract class AbstractVariable implements Variable {
     public final boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
 
         Op xo = op();
-        if (subst.matchType(xo)) {
+        if (y.op() == xo) {
+            return subst.putCommon(this, y);
+        } else if (subst.matchType(xo)) {
             return subst.matchVarX(this, y);
-        } else {
-            if (y.op() == xo) {
-                return subst.putCommon(this, y);
-            }
         }
 
         return false;

@@ -222,7 +222,7 @@ public class UnificationTest {
 
         //additional test that verifies correct common variable substitution result
         assertEquals("{$1={t002}}", sub.xy.toString());
-        assertEquals("{$1=(SELF,x)}", sub.yx.toString());
+        assertEquals("{(SELF,x)=$1}", sub.yx.toString());
     }
 
     @Test

@@ -104,16 +104,17 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     }
 
     public @NotNull Term unify(Term term, Term x, Term y) {
-        @Nullable Op type = unifying();
+        @Nullable Op op = unifying();
 
-        boolean hasAnyOp = type == null || term.hasAny(type);
+        boolean hasAnyOp = op == null || term.hasAny(op);
 
         if (!hasAnyOp && mustSubstitute()) {
-            return False; //FAILED?
+            return False; //FAILED
         }
 
         boolean equals = x.equals(y);
         if (!equals) {
+            //try auto-negation:
             boolean xn = (x.op()==NEG);
             boolean yn = (y.op()==NEG);
             Term px = (xn) ? $.unneg(x) : x; //positive X
@@ -139,17 +140,9 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         }
 
         if (!equals && hasAnyOp) {
-            OneMatchFindSubst m = new OneMatchFindSubst(parent, type);
+            OneMatchFindSubst m = new OneMatchFindSubst(parent, op);
 
             Term newTerm = m.tryMatch(parent, term, x, y);
-
-//            if (mustSubstitute()) {
-//                if (newTerm == null || newTerm.equals(term))
-//                    return False;
-//                return newTerm;
-//            } else {
-//                return (newTerm != null) ? newTerm : term;
-//            }
             return newTerm != null ? newTerm : False;
         } else {
             return equals ? term : False;
@@ -176,24 +169,12 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             super("subIfUnifiesDep", parent);
         }
 
-        @NotNull
-        @Override
-        public Op unifying() {
-            return Op.VAR_DEP;
-        }
-    }
-
-    public static final class substituteOnlyIfUnifiesDep extends substituteIfUnifies {
-
-        public substituteOnlyIfUnifiesDep(PremiseEval parent) {
-            super("subOnlyIfUnifiesDep", parent);
-        }
-
         @Override
         protected boolean mustSubstitute() {
             return true;
         }
 
+
         @NotNull
         @Override
         public Op unifying() {
@@ -201,18 +182,37 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         }
     }
 
-    public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
+//    public static final class substituteOnlyIfUnifiesDep extends substituteIfUnifies {
+//
+//        public substituteOnlyIfUnifiesDep(PremiseEval parent) {
+//            super("subOnlyIfUnifiesDep", parent);
+//        }
+//
+//        @Override
+//        protected boolean mustSubstitute() {
+//            return true;
+//        }
+//
+//        @NotNull
+//        @Override
+//        public Op unifying() {
+//            return Op.VAR_DEP;
+//        }
+//    }
 
-        public substituteIfUnifiesIndep(PremiseEval parent) {
-            super("subIfUnifiesIndep",parent);
-        }
-
-        @NotNull
-        @Override
-        public Op unifying() {
-            return Op.VAR_INDEP;
-        }
-    }
+//    public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
+//
+//        public substituteIfUnifiesIndep(PremiseEval parent) {
+//            super("subIfUnifiesIndep",parent);
+//        }
+//
+//
+//        @NotNull
+//        @Override
+//        public Op unifying() {
+//            return Op.VAR_INDEP;
+//        }
+//    }
 
 
     /** specifies a forward ordering constraint, for example:
@@ -222,10 +222,10 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
      *
      *  for now, this assumes the decomposed term is in the belief position
      */
-    public static final class substituteIfUnifiesIndepForward extends substituteIfUnifies {
+    public static final class substituteIfUnifiesForward extends substituteIfUnifies {
 
-        public substituteIfUnifiesIndepForward(PremiseEval parent) {
-            super("subIfUnifiesIndepForward",parent);
+        public substituteIfUnifiesForward(PremiseEval parent) {
+            super("subIfUnifiesForward",parent);
         }
 
         @Override
@@ -251,29 +251,29 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return super.unify(C, A, B);
         }
 
-        @NotNull
+        @Nullable
         @Override
         public Op unifying() {
-            return Op.VAR_INDEP;
+            return null;
         }
     }
 
-    public static final class substituteOnlyIfUnifiesIndep extends substituteIfUnifies {
-
-        public substituteOnlyIfUnifiesIndep(PremiseEval parent) {
-
-            super("subOnlyIfUnifiesIndep", parent);
-        }
-
-        @Override
-        protected boolean mustSubstitute() {
-            return true;
-        }
-
-        @NotNull
-        @Override
-        public Op unifying() {
-            return Op.VAR_INDEP;
-        }
-    }
+//    public static final class substituteOnlyIfUnifiesIndep extends substituteIfUnifies {
+//
+//        public substituteOnlyIfUnifiesIndep(PremiseEval parent) {
+//
+//            super("subOnlyIfUnifiesIndep", parent);
+//        }
+//
+//        @Override
+//        protected boolean mustSubstitute() {
+//            return true;
+//        }
+//
+//        @NotNull
+//        @Override
+//        public Op unifying() {
+//            return Op.VAR_INDEP;
+//        }
+//    }
 }

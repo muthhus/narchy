@@ -243,7 +243,7 @@
 
     B, (A <=> C), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
 
-    B, (C && A), time(decomposeBelief) |- subIfUnifiesIndepForward(C,A,B), (Goal:Strong)
+    B, (C && A), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
         //^ this is only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
 
@@ -303,7 +303,7 @@
      (&&,X,A..+), X, time(decomposeTask), task("?") |- (&&,A..+), (Permute:NoSwap)
 
      (&&,X,A), B, time(decomposeTask) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
-     (&&,X,A..+), B, time(decomposeTask) |- subOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
+     (&&,X,A..+), B, time(decomposeTask) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
      //(&&,X,A..+), B, time(decomposeTask) |- subOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
@@ -328,8 +328,8 @@
 
 
 //conditional abduction
+    ((&&,M,X,A..*) ==> C), (Y ==> C) |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction)
-//    ((&&,M,N) ==> C), (N ==> C) |- M, (Belief:Abduction)
         //TODO modify ellipsis to allow these two rules to be expressed as one:
         // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
         //  which will match A..+ to a Conjunction
