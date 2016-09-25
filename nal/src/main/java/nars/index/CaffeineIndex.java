@@ -7,6 +7,8 @@ import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
+import nars.util.data.map.nbhm.HijacKache;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
@@ -29,6 +31,8 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     /** holds compounds and subterm vectors */
     @NotNull public final Cache<Term, Termed> cache;
 
+    private final Cache<TermContainer,TermContainer> subterms;
+
 //    @NotNull
 //    private final Cache<TermContainer, TermContainer> subs;
 
@@ -50,31 +54,25 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         //return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
     };
 
-//    private static float maxConfidence(@NotNull CompoundConcept v) {
-//        //return Math.max(v.beliefs().confMax(), v.goals().confMax());
-//        //return ((v.beliefs().confMax()) + (v.goals().confMax()));
-//        return or((v.beliefs().confMax()), (v.goals().confMax()));
-//    }
-
-
-    public CaffeineIndex(ConceptBuilder builder, long maxWeight) {
-        this(builder, maxWeight, false,
-                //ForkJoinPool.commonPool()
-                //Executors.newFixedThreadPool(1)
-                Executors.newSingleThreadExecutor()
-        );
+    public CaffeineIndex(ConceptBuilder conceptBuilder, int capacity, int avgVolume, boolean soft, @NotNull Executor exe) {
+        this(conceptBuilder, capacity * avgVolume, soft, exe, capacity);
     }
 
+    /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
+    public CaffeineIndex(ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor exe) {
+        this(conceptBuilder, maxWeight, soft, exe, 0);
+    }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor executor) {
+    public CaffeineIndex(ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor exe, int maxSubterms) {
         super(conceptBuilder);
+
 
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
         Caffeine<Term, Termed> builder = Caffeine.newBuilder()
                 .removalListener(this)
-                .executor(executor);
+                .executor(exe);
 
         if (soft) {
             builder.softValues();
@@ -84,14 +82,23 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                 .maximumWeight(maxWeight);
         }
 
-       //.recordStats()
+        //.recordStats()
 
         cache = builder.build();
+
+
+        if (maxSubterms > 0)
+            this.subterms = Caffeine.newBuilder().maximumSize(maxSubterms).executor(exe).build();
+        else
+            this.subterms = null;
 
     }
 
 
-
+    @Override
+    protected final TermContainer intern(TermContainer s) {
+        return subterms!=null ? subterms.get(s, (ss) -> ss) :s;
+    }
 
     @Override
     public void remove(@NotNull Term x) {
@@ -150,7 +157,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     @Override
     public @NotNull String summary() {
         //CacheStats s = cache.stats();
-        return cache.estimatedSize() + " concepts";
+        return cache.estimatedSize() + " concepts, " + (subterms.estimatedSize()) + " subterms";
         //(" + n2(s.hitRate()) + " hitrate, " +
                 //s.requestCount() + " reqs)";
 

@@ -381,10 +381,11 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
+        int maxVol = 32;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
                 16, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
                 new FrameClock(), e
@@ -417,7 +418,7 @@ public class Tetris extends NAgent {
 
         //Abbreviation abbr = new Abbreviation(nar, "the", 4, 0.5f, 32);
 
-        nar.compoundVolumeMax.setValue(32);
+        nar.compoundVolumeMax.setValue(maxVol);
         //nar.linkFeedbackRate.setValue(0.95f);
 
         //nar.truthResolution.setValue(0.02f);

@@ -71,8 +71,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
             }
         } else {
             if (!hasTP) {
-                tgt.set(src); //target has no influence, it becomes set entirely by incoming
-                tgt.priMult(sScale);
+                tgt.setBudget(sPri * sScale, src.dur(), src.qua()); //target has no influence, it becomes set entirely by incoming
                 return 0;
             }
         }

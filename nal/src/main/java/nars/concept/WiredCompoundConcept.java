@@ -1,6 +1,7 @@
 package nars.concept;
 
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.policy.ConceptPolicy;
@@ -8,6 +9,8 @@ import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
+import nars.term.Terms;
+import nars.term.container.TermContainer;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,14 +50,14 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
         this.nar = n;
     }
 
-//    @Override
-//    protected TermContainer buildTemplates(Compound term, NAR nar) {
-//        if (term.volume()==2 && term.op() == Op.PROD) {
-//            //special case. these are atom-like products of 1 term
-//            return Terms.ZeroSubterms;
-//        }
-//        return super.buildTemplates(term, nar);
-//    }
+    @Override
+    protected TermContainer buildTemplates(Compound term, NAR nar) {
+        if (term.volume()==2 && term.op() == Op.PROD) {
+            //special case. these are atom-like products of 1 term
+            return Terms.NoSubterms;
+        }
+        return super.buildTemplates(term, nar);
+    }
 
     @Nullable protected Task filter(@NotNull Task t, @NotNull BeliefTable table, @Nullable BiPredicate<Task,NAR> valid, @NotNull NAR nar, @NotNull List<Task> displaced) {
 

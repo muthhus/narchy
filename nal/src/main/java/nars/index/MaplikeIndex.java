@@ -28,13 +28,12 @@ public abstract class MaplikeIndex extends TermIndex {
     }
 
 
-//    @NotNull
-//    @Override protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
-//        return super.newCompound(op, dt, internSubterms(subterms));
-//    }
-//
-//    /** doesnt work, needs to be done recursively */
-//    abstract public @NotNull TermContainer internSubterms(@NotNull TermContainer s);
+    @NotNull
+    protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer s) {
+        return super.newCompound(op, dt, intern(s));
+    }
+
+    abstract protected TermContainer intern(TermContainer s);
 
 
     @Nullable @Override abstract public Termed get(@NotNull Term key, boolean createIfMissing);

@@ -8,6 +8,7 @@ import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
@@ -94,9 +95,10 @@ public class Activation {
         if (targetConcept!=null) {
             activateConcept(targetConcept, subScale);
 
-            @NotNull Term[] tmpl = targetConcept.templates().terms();
-            if (tmpl.length > 0)
-                linkTerms(targetConcept, tmpl, subScale, depth);
+            @NotNull TermContainer ttt = targetConcept.templates();
+            if (ttt.size() > 0) {
+                linkTerms(targetConcept, ttt.terms(), subScale, depth);
+            }
 
             targetTerm = targetConcept.term();
         } else {

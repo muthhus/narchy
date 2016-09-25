@@ -99,7 +99,7 @@ public class HijacKache<TypeK, TypeV>
 
     public Random rng;
 
-    private long hit = 0;
+    public long hit = 0;
     public long miss = 0;
 
     private static long rawIndex(/*final Object[] ary, */final int idx) {
@@ -550,7 +550,10 @@ public class HijacKache<TypeK, TypeV>
 //        assert res != null;
 //
 //        return res == TOMBSTONE ? null : (TypeV) res;
-        return (TypeV) putIfMatch(this, data, key, newVal, oldVal);
+        Object x = putIfMatch(this, data, key, newVal, oldVal);
+        if (/*(x == null) || */(x == TOMBSTONE))
+            return null;
+        return (TypeV)x;
     }
 
 

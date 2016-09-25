@@ -193,7 +193,7 @@ public class Line1DContinuous extends NAgent {
 
         Default nar = new Default(1024,
                 conceptsPerCycle, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 4*DEFAULT_INDEX_WEIGHT, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*16, 12, false, exe),
                 new FrameClock(), exe
         );
 
