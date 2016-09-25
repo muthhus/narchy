@@ -1,10 +1,8 @@
 package nars.experiment.hypernova.gui.backgrounds;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
 import nars.experiment.hypernova.gui.Background;
+
+import java.awt.*;
 
 public class BlankBackground extends Background{
     public void drawBackground(Graphics g, Graphics2D g2d, double focusX, double focusY) {

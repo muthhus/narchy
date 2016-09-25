@@ -2,11 +2,8 @@ package nars.budget;
 
 import nars.NAR;
 import nars.Param;
-import nars.Task;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 import static nars.budget.Budget.aveGeo;
 

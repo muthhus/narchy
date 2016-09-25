@@ -1,7 +1,6 @@
 package nars.experiment.minicraft.side;
 
 import nars.$;
-import nars.util.data.list.FasterList;
 
 import java.io.Serializable;
 import java.util.*;

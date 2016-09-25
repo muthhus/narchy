@@ -1,10 +1,8 @@
 package nars.experiment.math;
 
-import nars.$;
-import nars.NAR;
-import nars.NARLoop;
-import nars.Param;
-import nars.NAgent;
+import nars.*;
+import nars.concept.ActionConcept;
+import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
@@ -19,8 +17,6 @@ import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.concept.ActionConcept;
-import nars.concept.SensorConcept;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

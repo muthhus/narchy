@@ -1,21 +1,17 @@
 package nars.experiment.minicraft;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
 import nars.experiment.minicraft.side.SideScrollMinicraft;
 import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
 import nars.remote.SwingAgent;
 import nars.util.Util;
 import nars.video.MatrixSensor;
 import nars.video.PixelBag;
-import spacegraph.SpaceGraph;
-import spacegraph.obj.MatrixView;
 
 import java.awt.image.BufferedImage;
 
-import static nars.util.Texts.n2;
-import static nars.util.Texts.n4;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.GridSurface.col;
 
 /**
  * Created by me on 9/19/16.

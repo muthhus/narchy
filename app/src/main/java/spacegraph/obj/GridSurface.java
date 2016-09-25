@@ -1,9 +1,6 @@
 package spacegraph.obj;
 
 import com.google.common.collect.Iterables;
-import nars.concept.Concept;
-import nars.gui.BagChart;
-import nars.video.CameraSensorView;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Surface;
 

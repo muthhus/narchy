@@ -1,11 +1,11 @@
 package nars.experiment.hypernova.activities;
 
-import java.util.Random;
-
-import nars.experiment.hypernova.Mass;
-import nars.experiment.hypernova.Loot;
-import nars.experiment.hypernova.Universe;
 import nars.experiment.hypernova.Activity;
+import nars.experiment.hypernova.Loot;
+import nars.experiment.hypernova.Mass;
+import nars.experiment.hypernova.Universe;
+
+import java.util.Random;
 
 public class GoodieField extends Activity {
     public static final double SPREAD = 100.0;

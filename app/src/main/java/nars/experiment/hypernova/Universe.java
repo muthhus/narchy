@@ -1,27 +1,20 @@
 package nars.experiment.hypernova;
 
-import java.util.Queue;
-import java.util.HashSet;
-import java.util.Calendar;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Observable;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import java.awt.Color;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-
 import nars.experiment.hypernova.activities.FactoryBattle;
 import nars.experiment.hypernova.activities.GoodieField;
-import org.apache.log4j.Logger;
-
-import nars.experiment.hypernova.pilots.KeyboardPilot;
-import nars.experiment.hypernova.pilots.EmptyCockpit;
+import nars.experiment.hypernova.audio.MinimWrapper;
 import nars.experiment.hypernova.gui.MapMarker;
 import nars.experiment.hypernova.gui.Wormhole;
-import nars.experiment.hypernova.audio.MinimWrapper;
+import nars.experiment.hypernova.pilots.EmptyCockpit;
+import nars.experiment.hypernova.pilots.KeyboardPilot;
+import org.apache.log4j.Logger;
+
+import java.awt.*;
+import java.util.*;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Universe extends Observable implements Runnable {
     public static final int DELAY_MSEC = 40;

@@ -1,16 +1,10 @@
 package nars.experiment.hypernova;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.Properties;
-
+import nars.experiment.hypernova.pilots.EmptyCockpit;
+import nars.experiment.hypernova.pilots.Pilot;
 import org.apache.log4j.Logger;
 
-import nars.experiment.hypernova.pilots.Pilot;
-import nars.experiment.hypernova.pilots.EmptyCockpit;
+import java.util.*;
 
 public class Ship extends Mass {
     public static final double BACK_LIMIT = -0.5;

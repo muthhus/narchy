@@ -2,7 +2,6 @@ package spacegraph.obj;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import javafx.scene.text.TextAlignment;
 import nars.$;
 import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;

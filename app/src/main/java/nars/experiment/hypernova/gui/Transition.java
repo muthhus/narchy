@@ -2,11 +2,10 @@ package nars.experiment.hypernova.gui;
 
 import nars.experiment.hypernova.Universe;
 
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.Color;
 
 public class Transition
 {

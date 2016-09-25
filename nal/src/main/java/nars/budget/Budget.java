@@ -9,8 +9,6 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 import static java.lang.Math.pow;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;

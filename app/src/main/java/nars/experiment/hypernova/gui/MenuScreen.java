@@ -1,15 +1,12 @@
 package nars.experiment.hypernova.gui;
 
-import java.util.ArrayList;
-import java.awt.Graphics2D;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Color;
-import java.io.File;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-
 import nars.experiment.hypernova.Hypernova;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
 
 public abstract class MenuScreen
 {

@@ -7,10 +7,8 @@ import nars.term.Term;
 import nars.util.Util;
 import nars.util.signal.Autoencoder;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.MatrixView;
-import spacegraph.render.JoglSpace;
 
 import java.util.List;
 

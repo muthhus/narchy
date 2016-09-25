@@ -8,14 +8,10 @@ import nars.concept.util.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
-import nars.util.data.map.nbhm.HijacKache;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-
-import static nars.util.Texts.n2;
 
 
 public class CaffeineIndex extends MaplikeIndex implements RemovalListener {

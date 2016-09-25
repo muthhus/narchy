@@ -2,7 +2,6 @@ package nars.experiment.minicraft.top.level.tile;
 
 import nars.experiment.minicraft.top.entity.AirWizard;
 import nars.experiment.minicraft.top.entity.Entity;
-import nars.experiment.minicraft.top.gfx.Screen;
 import nars.experiment.minicraft.top.level.Level;
 
 public class InfiniteFallTile extends Tile {

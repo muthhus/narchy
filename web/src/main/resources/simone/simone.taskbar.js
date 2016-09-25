@@ -993,7 +993,9 @@ $.widget( "simone.taskbar", {
 	_removeTaskbarRoundedCorners: function ( options ) {
 		var $elem = options && options.elem ? options.elem : this.$elem;
 
-		$elem.find( "." + this.classes.resizable ).andSelf().removeClass(
+		$elem.find( "." + this.classes.resizable )
+			//.andSelf()
+			.removeClass(
 			        this.classes.uiCornerTl
 			+ " " + this.classes.uiCornerTr
 			+ " " + this.classes.uiCornerBl

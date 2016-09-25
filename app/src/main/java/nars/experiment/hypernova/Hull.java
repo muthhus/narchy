@@ -1,14 +1,12 @@
 package nars.experiment.hypernova;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Properties;
-
-import java.awt.geom.Point2D;
-
+import nars.experiment.hypernova.gui.Model;
 import org.apache.log4j.Logger;
 
-import nars.experiment.hypernova.gui.Model;
+import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class Hull {
     public static final double DEFAULT_BATT = 0.0;

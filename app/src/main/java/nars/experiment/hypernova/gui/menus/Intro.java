@@ -1,12 +1,12 @@
 package nars.experiment.hypernova.gui.menus;
 
-import nars.experiment.hypernova.gui.MenuScreen;
-import nars.experiment.hypernova.gui.Menu;
-import nars.experiment.hypernova.universes.Alter;
-import nars.experiment.hypernova.gui.Viewer;
-import nars.experiment.hypernova.gui.Info;
-import nars.experiment.hypernova.Universe;
 import nars.experiment.hypernova.SaveGame;
+import nars.experiment.hypernova.Universe;
+import nars.experiment.hypernova.gui.Info;
+import nars.experiment.hypernova.gui.Menu;
+import nars.experiment.hypernova.gui.MenuScreen;
+import nars.experiment.hypernova.gui.Viewer;
+import nars.experiment.hypernova.universes.Alter;
 
 public class Intro extends MenuScreen
 {

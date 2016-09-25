@@ -4,7 +4,6 @@ import nars.experiment.minicraft.top.gfx.Screen;
 import nars.experiment.minicraft.top.item.Item;
 import nars.experiment.minicraft.top.level.Level;
 import nars.experiment.minicraft.top.level.tile.Tile;
-import nars.util.data.random.XorShift128PlusRandom;
 
 import java.util.List;
 import java.util.Random;

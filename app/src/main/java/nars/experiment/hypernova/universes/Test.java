@@ -1,20 +1,18 @@
 package nars.experiment.hypernova.universes;
 
-import java.awt.Color;
-import nars.experiment.hypernova.NewUniverse;
-import nars.experiment.hypernova.Activity;
-import nars.experiment.hypernova.Faction;
-import nars.experiment.hypernova.SaveGame;
-import nars.experiment.hypernova.UniNames;
+import nars.experiment.hypernova.*;
 import nars.experiment.hypernova.activities.CountDown;
 import nars.experiment.hypernova.activities.FactoryBattle;
 import nars.experiment.hypernova.activities.OneBeamer;
+import nars.experiment.hypernova.gui.Transition;
 import nars.experiment.hypernova.gui.Viewer;
 import nars.experiment.hypernova.gui.Wormhole;
-import nars.experiment.hypernova.gui.Transition;
-//import nars.experiment.hypernova.gui.backgrounds.LineField;
 import nars.experiment.hypernova.gui.backgrounds.BlankBackground;
 import nars.experiment.hypernova.sounds.WarbleEffect;
+
+import java.awt.*;
+
+//import nars.experiment.hypernova.gui.backgrounds.LineField;
 
 public class Test extends NewUniverse {
    public static Test INSTANCE = new Test();

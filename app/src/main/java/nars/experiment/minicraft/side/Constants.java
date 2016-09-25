@@ -4,7 +4,6 @@ import org.eclipse.collections.impl.map.mutable.primitive.CharObjectHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Constants {

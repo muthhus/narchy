@@ -1,12 +1,12 @@
 package nars.experiment.hypernova;
 
-import java.util.LinkedList;
-import java.util.Collection;
-import java.util.Random;
-import java.awt.Shape;
-import java.awt.geom.Area;
-
 import nars.experiment.hypernova.gui.Model;
+
+import java.awt.*;
+import java.awt.geom.Area;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Random;
 
 public class Mass {
     public static final double BREAKUP_SPEED = 0.25;

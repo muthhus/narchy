@@ -1,8 +1,8 @@
 package nars.experiment.hypernova.pilots;
 
+import nars.experiment.hypernova.Faction;
 import nars.experiment.hypernova.Mass;
 import nars.experiment.hypernova.Ship;
-import nars.experiment.hypernova.Faction;
 import nars.experiment.hypernova.Universe;
 
 public class HunterSeeker extends Hunter {

@@ -4,7 +4,8 @@ package nars.experiment.hypernova.audio;
 //import ddf.minim.*;
 //import ddf.minim.analysis.*;
 
-import nars.experiment.hypernova.sounds.*;
+import nars.experiment.hypernova.sounds.AudioEffect;
+import nars.experiment.hypernova.sounds.VolumeEffect;
 
 public class MinimWrapper {
 

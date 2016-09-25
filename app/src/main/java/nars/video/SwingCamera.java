@@ -1,9 +1,6 @@
 package nars.video;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;

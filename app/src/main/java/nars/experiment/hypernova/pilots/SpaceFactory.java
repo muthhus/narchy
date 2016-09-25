@@ -1,11 +1,11 @@
 package nars.experiment.hypernova.pilots;
 
-import java.util.Random;
-import java.util.HashSet;
-import java.util.Collection;
-
 import nars.experiment.hypernova.Ship;
 import nars.experiment.hypernova.Universe;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Random;
 
 public class SpaceFactory extends Pilot {
     public static final double SHIP_OFFSET = 25;

@@ -1,15 +1,12 @@
 package nars.experiment.hypernova.gui;
 
-import java.awt.Graphics;
-import java.text.DecimalFormat;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.FontMetrics;
-
-import nars.experiment.hypernova.Universe;
-import nars.experiment.hypernova.Ship;
 import nars.experiment.hypernova.Hypernova;
+import nars.experiment.hypernova.Ship;
+import nars.experiment.hypernova.Universe;
 import nars.experiment.hypernova.sounds.VolumeEffect;
+
+import java.awt.*;
+import java.text.DecimalFormat;
 
 
 public class Info {

@@ -23,7 +23,6 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;

@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
-import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;

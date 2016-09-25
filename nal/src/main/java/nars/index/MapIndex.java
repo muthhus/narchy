@@ -1,16 +1,13 @@
 package nars.index;
 
-import nars.Op;
 import nars.concept.util.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 

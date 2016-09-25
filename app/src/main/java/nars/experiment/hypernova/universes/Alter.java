@@ -1,16 +1,17 @@
 package nars.experiment.hypernova.universes;
 
-import java.awt.Color;
-import nars.experiment.hypernova.NewUniverse;
 import nars.experiment.hypernova.Faction;
-import nars.experiment.hypernova.gui.backgrounds.BlankBackground;
+import nars.experiment.hypernova.NewUniverse;
 import nars.experiment.hypernova.SaveGame;
 import nars.experiment.hypernova.UniNames;
-import nars.experiment.hypernova.gui.Viewer;
-import nars.experiment.hypernova.gui.Info;
-import nars.experiment.hypernova.gui.Wormhole;
-import nars.experiment.hypernova.gui.Transition;
 import nars.experiment.hypernova.activities.MovieEvent;
+import nars.experiment.hypernova.gui.Info;
+import nars.experiment.hypernova.gui.Transition;
+import nars.experiment.hypernova.gui.Viewer;
+import nars.experiment.hypernova.gui.Wormhole;
+import nars.experiment.hypernova.gui.backgrounds.BlankBackground;
+
+import java.awt.*;
 
 public class Alter extends NewUniverse {
    public static Alter INSTANCE = new Alter();

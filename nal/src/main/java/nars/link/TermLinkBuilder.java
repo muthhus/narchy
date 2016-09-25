@@ -1,9 +1,6 @@
 package nars.link;
 
-import nars.$;
 import nars.NAR;
-import nars.Op;
-import nars.index.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.Variable;
@@ -11,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.TreeSet;
-
-import static nars.Op.NEG;
 
 
 public enum TermLinkBuilder {

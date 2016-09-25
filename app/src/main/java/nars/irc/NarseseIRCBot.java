@@ -1,28 +1,25 @@
 package nars.irc;
 
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Op;
+import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.experiment.misc.Talk;
-import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
 import nars.nar.Default;
-import nars.nar.util.DefaultConceptBuilder;
-import nars.net.InterNAR;
-import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
-import nars.time.RealtimeMSClock;
 import nars.time.Tense;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.Wiki;
-import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.markov.MarkovChain;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

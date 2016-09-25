@@ -8,13 +8,8 @@ import nars.remote.SwingAgent;
 import nars.util.signal.NObj;
 import nars.video.MatrixSensor;
 import nars.video.PixelBag;
-import spacegraph.SpaceGraph;
-import spacegraph.obj.MatrixView;
 
-import static java.lang.Math.round;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.MatrixView.arrayRenderer;
-import static spacegraph.obj.GridSurface.col;
 
 /**
  * Created by me on 9/19/16.

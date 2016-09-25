@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.truth.Truth;
-import nars.concept.SensorConcept;
 import spacegraph.obj.MatrixView;
 
 /**

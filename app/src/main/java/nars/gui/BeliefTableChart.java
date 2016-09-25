@@ -3,7 +3,6 @@ package nars.gui;
 import com.jogamp.opengl.GL2;
 import nars.NAR;
 import nars.Task;
-import nars.NAgent;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.term.Termed;

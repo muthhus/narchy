@@ -1,11 +1,13 @@
 package nars.experiment.hypernova;
 
-import java.awt.Color;
-//import nars.experiment.hypernova.gui.backgrounds.EqualizerBackground;
-import nars.experiment.hypernova.gui.Viewer;
 import nars.experiment.hypernova.gui.Menu;
+import nars.experiment.hypernova.gui.Viewer;
 import nars.experiment.hypernova.gui.backgrounds.BlankBackground;
 import nars.experiment.hypernova.gui.menus.Intro;
+
+import java.awt.*;
+
+//import nars.experiment.hypernova.gui.backgrounds.EqualizerBackground;
 
 public class StartScreen extends NewUniverse {
    static final long serialVersionUID = 137133L;  

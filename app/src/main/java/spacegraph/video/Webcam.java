@@ -7,7 +7,6 @@ import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import nars.$;
 import nars.remote.SwingAgent;
-import nars.video.CameraSensor;
 import nars.video.ImageCamera;
 
 import javax.swing.*;

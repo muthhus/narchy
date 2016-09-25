@@ -1,11 +1,9 @@
 package nars.experiment.hypernova.gui.backgrounds;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
 import nars.experiment.hypernova.gui.Background;
 import nars.experiment.hypernova.gui.Viewer;
+
+import java.awt.*;
 
 public class MusicStarfield extends Background{
     public static final int STAR_SEED = 0x9d2c5680;

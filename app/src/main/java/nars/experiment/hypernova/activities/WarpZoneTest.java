@@ -3,7 +3,7 @@ package nars.experiment.hypernova.activities;
 import nars.experiment.hypernova.ActivitySimple;
 import nars.experiment.hypernova.NewUniverse;
 import nars.experiment.hypernova.gui.Transition;
-import nars.experiment.hypernova.universes.*;
+import nars.experiment.hypernova.universes.Test;
 //import nars.experiment.hypernova.gui.backgrounds.EqualizerBackground;
 
 public class WarpZoneTest extends ActivitySimple {

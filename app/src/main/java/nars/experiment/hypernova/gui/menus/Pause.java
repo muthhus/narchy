@@ -1,9 +1,10 @@
 package nars.experiment.hypernova.gui.menus;
 
-import nars.experiment.hypernova.gui.MenuScreen;
-import nars.experiment.hypernova.gui.Menu;
-import nars.experiment.hypernova.Universe;
 import nars.experiment.hypernova.Hypernova;
+import nars.experiment.hypernova.Universe;
+import nars.experiment.hypernova.gui.Menu;
+import nars.experiment.hypernova.gui.MenuScreen;
+
 import java.awt.image.BufferedImage;
 
 public class Pause extends MenuScreen

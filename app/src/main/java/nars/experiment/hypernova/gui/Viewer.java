@@ -1,34 +1,26 @@
 package nars.experiment.hypernova.gui;
 
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Observer;
-import java.util.Observable;
-
-import java.awt.Font;
-import java.awt.Shape;
-import java.awt.Color;
-import java.awt.Polygon;
-import java.awt.Graphics;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.FontMetrics;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
-
-import javax.swing.JComponent;
-
-import nars.experiment.hypernova.*;
+import nars.experiment.hypernova.Loot;
+import nars.experiment.hypernova.Mass;
+import nars.experiment.hypernova.Ship;
+import nars.experiment.hypernova.Universe;
+import nars.experiment.hypernova.audio.MinimWrapper;
+import nars.experiment.hypernova.gui.backgrounds.BlankBackground;
+import nars.experiment.hypernova.pilots.KeyboardPilot;
 import org.apache.log4j.Logger;
 
-import nars.experiment.hypernova.pilots.KeyboardPilot;
-import nars.experiment.hypernova.audio.MinimWrapper;
-import nars.experiment.hypernova.gui.backgrounds.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Observable;
+import java.util.Observer;
 
 public class Viewer extends JComponent implements Observer {
     public static final long serialVersionUID = 850159523722721935l;

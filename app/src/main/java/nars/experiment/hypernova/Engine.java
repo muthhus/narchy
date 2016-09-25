@@ -1,10 +1,10 @@
 package nars.experiment.hypernova;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Properties;
-
 import org.apache.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class Engine {
     private static Map<String, Engine> cache = new HashMap<String, Engine>();

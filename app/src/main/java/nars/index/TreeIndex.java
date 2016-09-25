@@ -2,15 +2,11 @@ package nars.index;
 
 import com.googlecode.concurrenttrees.radix.node.Node;
 import nars.NAR;
-import nars.Op;
 import nars.concept.Concept;
-import nars.concept.util.ConceptBuilder;
 import nars.concept.PermanentConcept;
-import nars.term.Compound;
+import nars.concept.util.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.GenericCompound;
-import nars.term.container.TermContainer;
 import nars.util.MyConcurrentRadixTree;
 import nars.util.data.map.nbhm.HijacKache;
 import org.jetbrains.annotations.NotNull;

@@ -1,7 +1,5 @@
 package nars.experiment.misc;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
 import com.google.common.io.LineProcessor;

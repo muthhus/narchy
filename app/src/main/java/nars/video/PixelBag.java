@@ -9,9 +9,7 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 import static java.lang.Math.max;
-import static java.lang.Math.round;
 import static nars.util.Util.lerp;
-import static nars.util.Util.unitize;
 
 /**
  * 2D flat Raytracing Retina

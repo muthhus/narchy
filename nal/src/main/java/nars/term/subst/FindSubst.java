@@ -43,7 +43,7 @@ public abstract class FindSubst extends Termunator implements Subst {
 
 
     public final Random random;
-    public Op type; //TODO make final again
+    public final Op type;
     private final List<Termutator> termutes;
 
     @NotNull

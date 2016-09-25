@@ -1,7 +1,6 @@
 package nars.video;
 
 import nars.concept.Concept;
-import nars.concept.SensorConcept;
 
 /**
  * Created by me on 9/21/16.

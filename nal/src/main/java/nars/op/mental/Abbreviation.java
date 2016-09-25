@@ -1,12 +1,10 @@
 package nars.op.mental;
 
-import com.sun.deploy.util.ArrayUtil;
 import nars.*;
 import nars.bag.impl.CurveBag;
 import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.ConceptPolicy;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -31,13 +29,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static nars.nal.UtilityFunctions.or;
-import static nars.time.Tense.ETERNAL;
-import static nars.util.Util.unitize;
 
 /**
  * compound<->dynamic atom abbreviation.

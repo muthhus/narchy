@@ -1,7 +1,6 @@
 package nars.experiment.hypernova.gui;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 
 public abstract class Background {
     

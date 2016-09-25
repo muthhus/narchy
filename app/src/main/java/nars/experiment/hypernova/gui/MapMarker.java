@@ -1,11 +1,9 @@
 package nars.experiment.hypernova.gui;
 
+import java.awt.*;
+import java.awt.geom.Arc2D;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.awt.BasicStroke;
-import java.awt.geom.Arc2D;
-import java.awt.Graphics2D;
-import java.awt.Color;
 
 
 public class MapMarker

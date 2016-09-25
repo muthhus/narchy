@@ -1,13 +1,14 @@
 package nars.experiment.hypernova;
 
-import java.util.Random;
-
-import java.awt.Shape;
-import java.awt.Color;
-import java.awt.geom.Rectangle2D;
-
-import nars.experiment.hypernova.pilots.*;
 import nars.experiment.hypernova.gui.MapMarker;
+import nars.experiment.hypernova.pilots.CirclePilot;
+import nars.experiment.hypernova.pilots.EventDrone;
+import nars.experiment.hypernova.pilots.Pilot;
+import nars.experiment.hypernova.pilots.PlayerHunter;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.Random;
 
 public class ActivitySimple extends Activity implements Realization {
     public static final int SHIP_DESTROY = -1;

@@ -18,8 +18,6 @@ import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Operator;
-import nars.term.compound.GenericCompound;
-import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.obj.IntTerm;
 import nars.term.var.AbstractVariable;

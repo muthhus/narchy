@@ -42,94 +42,8 @@
     <script type="text/javascript" src="socketview.js"></script>
     <link rel="stylesheet" href="lib/semantic/dist/semantic.min.css"/>
 
+    <link rel="stylesheet" href="index.css"/>
 
-    <style>
-
-
-
-
-        #active {
-            position: fixed;
-            width: 100%;
-        }
-
-        #view {
-            height: 100%;
-        }
-
-        #mainButtons {
-            z-index: 20000 !important;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-
-        .mainPopup {
-            position: relative;
-            top: 15px;
-            left: 15px;
-        }
-
-        #mainButtons div {
-            margin: 0 !important;
-            z-index: 20000 !important;
-        }
-
-        #mainButtons .button {
-            opacity: 0.75;
-            vertical-align: top !important;
-        }
-
-        #mainButtons .button.active {
-            opacity: 1.0;
-        }
-
-        .NARConsole {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        #nalInput {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 30px;
-            opacity: 0.8;
-            margin: 0;
-            border: 0;
-        }
-
-        #nalInput .NALEditor {
-            font-size: 30px;
-        }
-
-        .ui-dialog {
-            opacity: 0.8 !important;
-        }
-
-        .simone-taskbar-horizontal.simone-taskbar-stick-top .simone-taskbar-window-buttons-container {
-            padding-left: 80px; /* shift over so that the main buttons dont cover the left taskbar buttons */
-
-        }
-
-        div.ConceptTable {
-            width: 100%;
-            height: 100%;
-            background-color: black;
-            font-family: monospace;
-            font-stretch: condensed;
-        }
-
-        .ConceptRow {
-           /*width: 100%;*/
-            line-height: 100%;
-
-
-            padding-right: 10px;
-        }
-
-    </style>
 
 
 </head>
@@ -148,18 +62,6 @@
 
 </div>
 
-<!--<div class="ui grid">-->
-
-<!--<div class="four wide column">-->
-<!--<div class="ui segment" style="opacity: 0.2">-->
-<!--<h1>Emotion</h1>-->
-<!--<div id="emotion"></div>-->
-<!--</div>-->
-<!--</div>-->
-
-<!--</div>-->
-
-<!--<div id="menu"></div>-->
 
 <div id="narOutput">
 </div>
@@ -360,7 +262,6 @@
 
     $(document).ready(function () {
 
-        terminal = NARTerminal();
 
         //TaskDB(DB(), terminal);
 
@@ -370,6 +271,14 @@
             color: 'orange',
             menu: function () {
                 return $('#menu');
+            },
+            start: function () {
+                this.terminal = NARTerminal();
+                $('#view').append(new NARConsole(this.terminal));
+            },
+            stop: function() {
+                this.terminal.close();
+                this.terminal = undefined;
             }
         });
 
@@ -385,6 +294,7 @@
             },
             stop: function () {
                 this.graph.stop();
+                this.graph = undefined;
             }
         });
         addView({
@@ -431,14 +341,13 @@
         var taskbar = TaskBar($(".taskbar"), {
             'log': {
                 onClick: function (taskbar) {
+                    var terminal = this.terminal = NARTerminal();
                     var c = NARConsole(terminal);
 
                     taskbar.newWindow("Log",
-                            function () {
-                                return c;
-                            },
+                            function () {  c; },
                             function (event) {
-                                console.log('close');
+                              terminal.close();
                             },
                             function (event, ui) {
                                 c.editor.resize(true); //ace editor needs resized manually when its container has
@@ -451,14 +360,10 @@
                     var g = SocketNARGraph("active");
 
                     taskbar.newWindow("Timeline",
-                            function () {
-                                return c;
-                            },
-                            function (event) {
-                                console.log('close');
-                            },
+                            function () {  g; },
+                            function (event) {  },
                             function (event, ui) {
-                                c.editor.resize(true); //ace editor needs resized manually when its container has
+                                g.editor.resize(true); //ace editor needs resized manually when its container has
                             }
                     );
                 }
@@ -467,7 +372,7 @@
 
 
         /** input line */
-        $("body").append(NARInputter(terminal).attr('id', 'nalInput'));
+        $("body").append(NARInputter(NARTerminal()).attr('id', 'nalInput'));
 
 
 

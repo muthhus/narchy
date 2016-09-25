@@ -1,17 +1,16 @@
 package nars.experiment.hypernova.activities;
 
-import java.util.Random;
-
-import java.awt.Shape;
-import java.awt.geom.Rectangle2D;
-
+import nars.experiment.hypernova.Activity;
+import nars.experiment.hypernova.Realization;
 import nars.experiment.hypernova.Ship;
 import nars.experiment.hypernova.Universe;
-import nars.experiment.hypernova.Activity;
 import nars.experiment.hypernova.gui.MapMarker;
-import nars.experiment.hypernova.Realization;
-import nars.experiment.hypernova.pilots.SpaceFactory;
 import nars.experiment.hypernova.pilots.PilotFactory;
+import nars.experiment.hypernova.pilots.SpaceFactory;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.Random;
 
 public class FactoryBattle extends Activity implements Realization {
     private static final Random RNG = new Random();

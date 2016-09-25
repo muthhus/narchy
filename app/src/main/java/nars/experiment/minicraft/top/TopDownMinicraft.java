@@ -7,8 +7,10 @@ import nars.experiment.minicraft.top.gfx.Screen;
 import nars.experiment.minicraft.top.gfx.SpriteSheet;
 import nars.experiment.minicraft.top.level.Level;
 import nars.experiment.minicraft.top.level.tile.Tile;
-import nars.experiment.minicraft.top.screen.*;
+import nars.experiment.minicraft.top.screen.LevelTransitionMenu;
 import nars.experiment.minicraft.top.screen.Menu;
+import nars.experiment.minicraft.top.screen.TitleMenu;
+import nars.experiment.minicraft.top.screen.WonMenu;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

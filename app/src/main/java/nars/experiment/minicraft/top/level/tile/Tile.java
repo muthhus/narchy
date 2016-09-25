@@ -5,8 +5,8 @@ import nars.experiment.minicraft.top.entity.Entity;
 import nars.experiment.minicraft.top.entity.Mob;
 import nars.experiment.minicraft.top.entity.Player;
 import nars.experiment.minicraft.top.gfx.Screen;
-import nars.experiment.minicraft.top.item.*;
-import nars.experiment.minicraft.top.item.resource.*;
+import nars.experiment.minicraft.top.item.Item;
+import nars.experiment.minicraft.top.item.resource.Resource;
 import nars.experiment.minicraft.top.level.Level;
 
 import java.util.Random;

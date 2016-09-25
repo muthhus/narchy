@@ -5,15 +5,12 @@ import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.experiment.arkanoid.Arkancide;
 import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
-import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -24,7 +21,6 @@ import spacegraph.Surface;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -32,9 +28,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static nars.$.t;
-import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 import static nars.experiment.tetris.Tetris.conceptLinePlot;
-import static nars.experiment.tetris.Tetris.exe;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.GridSurface.grid;
 

@@ -1,17 +1,13 @@
 package nars.experiment.hypernova;
 
-import java.io.Serializable;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.File;
-import javax.imageio.ImageIO;
-import java.io.ObjectOutputStream;
-import java.awt.image.BufferedImage;
-import java.io.ObjectInputStream;
-
-import nars.experiment.hypernova.universes.*;
 import nars.experiment.hypernova.gui.Transition;
+import nars.experiment.hypernova.universes.Alter;
+import nars.experiment.hypernova.universes.Start;
+import nars.experiment.hypernova.universes.Test;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 
 public class SaveGame extends Thread implements Serializable
 {

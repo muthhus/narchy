@@ -1,28 +1,20 @@
 package nars.experiment.hypernova.gui;
 
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.ArrayList;
-
-import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import java.awt.Font;
-import java.awt.Shape;
-import java.awt.geom.Path2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.AffineTransform;
-import java.awt.font.GlyphVector;
-import java.awt.font.FontRenderContext;
-
 import nars.experiment.hypernova.Hypernova;
+import nars.experiment.hypernova.Mass;
 import org.apache.log4j.Logger;
 
-import nars.experiment.hypernova.Mass;
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Model {
     public static final double BREAKUP_DIVISION = 0.005;

@@ -1,8 +1,8 @@
 package nars.experiment.hypernova;
 
-import java.awt.Color;
-import java.util.Map;
+import java.awt.*;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Faction {
     private static Map<String, Faction> store = new HashMap<String, Faction>();

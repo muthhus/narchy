@@ -1,17 +1,14 @@
 package nars.experiment.asteroids;
 
-import com.jogamp.nativewindow.GraphicsConfigurationFactory;
-
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.awt.image.VolatileImage;
-import java.util.ArrayList;
-import java.text.*;
-import javax.imageio.*;
-import java.awt.Image;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class Asteroids extends JFrame implements KeyListener, ActionListener {
 

@@ -1,6 +1,5 @@
 package nars.video;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.function.Supplier;
 

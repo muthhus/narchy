@@ -2,12 +2,8 @@ package nars.experiment.arkanoid;
 
 
 import nars.NAR;
-import nars.remote.SwingAgent;
 import nars.concept.ActionConcept;
-
-import static nars.$.t;
-import static spacegraph.SpaceGraph.window;
-import static spacegraph.obj.GridSurface.grid;
+import nars.remote.SwingAgent;
 
 public class Arkancide extends SwingAgent {
 

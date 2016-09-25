@@ -1,7 +1,7 @@
 package nars.experiment.minicraft.top.entity;
 
-import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.experiment.minicraft.top.InputHandler;
+import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.experiment.minicraft.top.entity.particle.TextParticle;
 import nars.experiment.minicraft.top.gfx.Color;
 import nars.experiment.minicraft.top.gfx.Screen;

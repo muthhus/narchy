@@ -1,13 +1,9 @@
 package nars.video;
 
 
-
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.function.Supplier;
-
-import static java.awt.Image.SCALE_FAST;
 
 /**
  * Pan/Zoom filter for a BuferredImage source

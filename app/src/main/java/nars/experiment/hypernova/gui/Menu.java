@@ -1,9 +1,9 @@
 package nars.experiment.hypernova.gui;
 
-import java.awt.event.KeyEvent;
-
 import nars.experiment.hypernova.Hypernova;
-import java.awt.Graphics2D;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 public class Menu

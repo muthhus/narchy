@@ -9,10 +9,7 @@ import nars.util.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;
-import spacegraph.obj.GridSurface;
 import spacegraph.render.Draw;
-
-import static spacegraph.obj.GridSurface.VERTICAL;
 
 /**
  * Created by me on 9/2/16.

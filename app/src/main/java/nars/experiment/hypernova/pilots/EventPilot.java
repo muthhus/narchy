@@ -1,9 +1,9 @@
 package nars.experiment.hypernova.pilots;
 
-import nars.experiment.hypernova.Mass;
-import nars.experiment.hypernova.Ship;
 import nars.experiment.hypernova.ActivitySimple;
 import nars.experiment.hypernova.DestructionListener;
+import nars.experiment.hypernova.Mass;
+import nars.experiment.hypernova.Ship;
 
 public abstract class EventPilot extends Pilot 
                                  implements DestructionListener {

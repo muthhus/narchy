@@ -7,7 +7,6 @@ import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;

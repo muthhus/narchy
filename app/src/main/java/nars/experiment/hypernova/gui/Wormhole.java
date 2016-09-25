@@ -1,18 +1,17 @@
 package nars.experiment.hypernova.gui;
 
+import nars.experiment.hypernova.UniNames;
+import nars.experiment.hypernova.Universe;
+import nars.experiment.hypernova.universes.Alter;
+import nars.experiment.hypernova.universes.Start;
+import nars.experiment.hypernova.universes.Test;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.lang.Math;
-import java.awt.Graphics2D;
-import java.awt.Color;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-
-import nars.experiment.hypernova.Universe;
-import nars.experiment.hypernova.UniNames;
-import nars.experiment.hypernova.universes.*;
 
 public class Wormhole
 {

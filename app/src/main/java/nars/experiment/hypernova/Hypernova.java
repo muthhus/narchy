@@ -1,32 +1,15 @@
 package nars.experiment.hypernova;
 
 
-import java.awt.GraphicsEnvironment;
-import java.awt.GraphicsDevice;
-import java.awt.DisplayMode;
-import java.awt.Toolkit;
-import java.awt.Cursor;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Component;
-import java.awt.MediaTracker;
-
-import javax.swing.JFrame;
-
+import nars.experiment.hypernova.gui.Transition;
+import nars.experiment.hypernova.gui.Viewer;
+import org.apache.commons.cli.*;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.BasicConfigurator;
 
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.CommandLineParser;
-
-import nars.experiment.hypernova.gui.Viewer;
-import nars.experiment.hypernova.gui.Transition;
+import javax.swing.*;
+import java.awt.*;
 
 public class Hypernova {
     public static final String PROGRAM = "Hypernova";

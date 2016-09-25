@@ -1,12 +1,13 @@
 package nars.experiment.hypernova.activities;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import nars.experiment.hypernova.ActivitySimple;
 import nars.experiment.hypernova.Ship;
 import nars.experiment.hypernova.Universe;
-import nars.experiment.hypernova.ActivitySimple;
 import nars.experiment.hypernova.gui.Info;
 import nars.experiment.hypernova.universes.Test;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class CountDown extends ActivitySimple {
     private int countDown = 10;

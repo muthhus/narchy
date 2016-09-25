@@ -1,11 +1,10 @@
 package nars.experiment.hypernova.pilots;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
+import nars.experiment.hypernova.Ship;
 import org.apache.log4j.Logger;
 
-import nars.experiment.hypernova.Ship;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class KeyboardPilot extends Pilot implements KeyListener {
     private static Logger log = Logger.getLogger("KeyboardPilot");

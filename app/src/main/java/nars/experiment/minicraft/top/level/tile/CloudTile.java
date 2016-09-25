@@ -1,6 +1,5 @@
 package nars.experiment.minicraft.top.level.tile;
 
-import nars.experiment.minicraft.top.entity.Entity;
 import nars.experiment.minicraft.top.entity.ItemEntity;
 import nars.experiment.minicraft.top.entity.Player;
 import nars.experiment.minicraft.top.gfx.Color;

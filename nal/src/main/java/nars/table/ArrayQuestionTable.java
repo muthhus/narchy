@@ -213,7 +213,6 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
         list.withWriteLockAndDelegate(l -> {
 
-
             int sizeStart = l.size();
             if (sizeStart > 0) {
 
@@ -246,7 +245,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
         });
 
 
-        return t;
+        return result[0];
     }
 
     private float remove(Task q, Object reason, @NotNull List<Task> displaced) {

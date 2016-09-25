@@ -16,9 +16,6 @@ import nars.experiment.minicraft.side.items.Items;
 import nars.experiment.minicraft.side.items.Tools;
 import org.eclipse.collections.impl.map.mutable.primitive.CharObjectHashMap;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class ItemLoader {
 	//private static final FSTGson gson = new Gson();

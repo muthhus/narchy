@@ -301,6 +301,7 @@ function NARTerminal() {
     e.send = function(x) {
         ws.send(x);
     };
+    e.close = ws.close;
 
     return e;
 }
@@ -500,7 +501,7 @@ function NARConsole(terminal) {
     editor.renderer.setShowGutter(false);
 
     div.editor = editor;
-    
+
     var maxLines = 256;
 
     function line(m) {

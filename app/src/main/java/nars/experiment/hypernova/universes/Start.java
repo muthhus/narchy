@@ -1,19 +1,21 @@
 package nars.experiment.hypernova.universes;
 
-import java.awt.Color;
-import nars.experiment.hypernova.NewUniverse;
 import nars.experiment.hypernova.Faction;
-//import nars.experiment.hypernova.activities.ChuckToTheFuture;
-//import nars.experiment.hypernova.activities.ChuckToTheFuture2;
+import nars.experiment.hypernova.NewUniverse;
 import nars.experiment.hypernova.SaveGame;
 import nars.experiment.hypernova.UniNames;
-import nars.experiment.hypernova.gui.Viewer;
+import nars.experiment.hypernova.audio.MinimWrapper;
 import nars.experiment.hypernova.gui.Info;
-import nars.experiment.hypernova.gui.Wormhole;
 import nars.experiment.hypernova.gui.Transition;
+import nars.experiment.hypernova.gui.Viewer;
+import nars.experiment.hypernova.gui.Wormhole;
 import nars.experiment.hypernova.gui.backgrounds.MusicStarfield;
 import nars.experiment.hypernova.sounds.VolumeEffect;
-import nars.experiment.hypernova.audio.MinimWrapper;
+
+import java.awt.*;
+
+//import nars.experiment.hypernova.activities.ChuckToTheFuture;
+//import nars.experiment.hypernova.activities.ChuckToTheFuture2;
 
 public class Start extends NewUniverse {
    public static Start INSTANCE = new Start();

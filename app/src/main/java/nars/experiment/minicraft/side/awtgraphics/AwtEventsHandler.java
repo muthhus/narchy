@@ -2,14 +2,8 @@ package nars.experiment.minicraft.side.awtgraphics;
 
 import nars.experiment.minicraft.side.SideScrollMinicraft;
 
-import java.awt.Canvas;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.*;
+import java.awt.event.*;
 
 
 public class AwtEventsHandler {

@@ -1,6 +1,5 @@
 package nars.experiment.minicraft.top.item;
 
-import nars.experiment.minicraft.top.entity.ItemEntity;
 import nars.experiment.minicraft.top.entity.Player;
 import nars.experiment.minicraft.top.gfx.Color;
 import nars.experiment.minicraft.top.gfx.Font;

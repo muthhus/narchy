@@ -2,23 +2,12 @@ package nars.irc;
 
 import nars.NAR;
 import nars.Task;
-import nars.experiment.misc.Talk;
-import nars.index.TermIndex;
-import nars.nar.Terminal;
-import nars.net.InterNAR;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.time.RealtimeMSClock;
 import nars.time.Tense;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
-import static nars.experiment.misc.Talk.context;
 
 /**
  * Created by me on 7/10/16.

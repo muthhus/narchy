@@ -1,14 +1,10 @@
 package nars.index;
 
 import nars.Op;
-import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atomic;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +24,7 @@ public abstract class MaplikeIndex extends TermIndex {
     }
 
 
+    @Override
     @NotNull
     protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer s) {
         return super.newCompound(op, dt, intern(s));

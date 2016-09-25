@@ -1,22 +1,18 @@
 package nars.experiment.minicraft.side.awtgraphics;
 
-import nars.experiment.minicraft.side.*;
 import nars.experiment.minicraft.side.Color;
+import nars.experiment.minicraft.side.*;
 import nars.experiment.minicraft.side.SpriteStore.AwtSprite;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public class AwtGraphicsHandler extends GraphicsHandler {
 	public final Canvas canvas = new Canvas();

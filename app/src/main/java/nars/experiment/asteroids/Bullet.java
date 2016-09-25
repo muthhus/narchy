@@ -1,6 +1,6 @@
 package nars.experiment.asteroids;
 
-import java.awt.Polygon;
+import java.awt.*;
 
 public class Bullet extends VectorSprite
 {

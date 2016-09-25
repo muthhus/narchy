@@ -2,7 +2,6 @@ package nars.util.signal;
 
 import nars.util.Util;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
-import org.eclipse.collections.impl.set.mutable.primitive.ShortHashSet;
 
 import java.util.Random;
 

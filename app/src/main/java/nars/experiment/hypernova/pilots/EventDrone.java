@@ -1,9 +1,11 @@
 package nars.experiment.hypernova.pilots;
 
+import nars.experiment.hypernova.ActivitySimple;
 import nars.experiment.hypernova.Mass;
 import nars.experiment.hypernova.Ship;
-import nars.experiment.hypernova.Universe;;
-import nars.experiment.hypernova.ActivitySimple;
+import nars.experiment.hypernova.Universe;
+
+;
 
 public class EventDrone extends EventPilot {
     public static final double TARGET_DIST = 60.0;

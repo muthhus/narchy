@@ -3,12 +3,12 @@ package nars.video;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.data.list.FasterList;
 import nars.util.math.FloatSupplier;
-import nars.concept.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 
 import java.util.List;

@@ -1,10 +1,5 @@
 package nars.term.atom;
 
-import nars.Op;
-import nars.term.Term;
-import nars.term.subst.FindSubst;
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Created by me on 1/1/16.
  */

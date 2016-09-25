@@ -3,15 +3,9 @@ package nars.op;
 import nars.NAR;
 import nars.Task;
 import nars.bag.Bag;
-import nars.bag.impl.CurveBag;
-import nars.budget.Budgeted;
 import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 
 /**

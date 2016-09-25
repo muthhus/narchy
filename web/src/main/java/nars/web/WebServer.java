@@ -53,24 +53,7 @@ public class WebServer /*extends PathHandler*/ {
     @SuppressWarnings("HardcodedFileSeparator")
     public WebServer(int httpPort) {
 
-
-
-        //TODO use ClassPathHandler and store the resources in the .jar
-
-        File c = new File("./web/src/main/resources/");
-        //File c = new File(WebServer.class.getResource("/").getPath());
-        String cp = c.getAbsolutePath().replace("./", "");
-
-        if (cp.contains("web/web")) //happens if run from web/ directory
-            cp = cp.replace("web/web", "web");
-
-        Path p = Paths.get(
-                //System.getProperty("user.home")
-                cp
-        );//.toAbsolutePath();
-
-
-        PathResourceManager resourcePath = new PathResourceManager(p, 0, true, true);
+        PathResourceManager resourcePath = new PathResourceManager(getResourcePath(), 0, true, true);
 
         this.path = path()
                 .addPrefixPath("/", resource(
@@ -105,6 +88,22 @@ public class WebServer /*extends PathHandler*/ {
         }
 
 
+    }
+
+    private Path getResourcePath() {
+        //TODO use ClassPathHandler and store the resources in the .jar
+
+        File c = new File("./web/src/main/resources/");
+        //File c = new File(WebServer.class.getResource("/").getPath());
+        String cp = c.getAbsolutePath().replace("./", "");
+
+        if (cp.contains("web/web")) //happens if run from web/ directory
+            cp = cp.replace("web/web", "web");
+
+        return Paths.get(
+                //System.getProperty("user.home")
+                cp
+        );
     }
 
 

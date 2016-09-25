@@ -7,8 +7,7 @@ import nars.video.MatrixSensor;
 import nars.video.Scale;
 import nars.video.SwingCamera;
 
-import static java.lang.Math.*;
-import static nars.$.t;
+import static java.lang.Math.round;
 
 /**
  * Created by me on 9/19/16.

@@ -1,10 +1,11 @@
 package nars.experiment.hypernova.gui;
 
-import nars.experiment.hypernova.Universe;
 import nars.experiment.hypernova.Hypernova;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
+import nars.experiment.hypernova.Universe;
+
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class Movie

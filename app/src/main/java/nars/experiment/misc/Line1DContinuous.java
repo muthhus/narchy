@@ -3,6 +3,8 @@ package nars.experiment.misc;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.concept.ActionConcept;
+import nars.concept.SensorConcept;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
@@ -11,14 +13,11 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.term.Term;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.concept.ActionConcept;
-import nars.concept.SensorConcept;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
 import static java.lang.System.out;
-import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
 
 
 /**

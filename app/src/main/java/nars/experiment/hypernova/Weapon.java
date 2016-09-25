@@ -1,11 +1,11 @@
 package nars.experiment.hypernova;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Properties;
-import java.awt.geom.Point2D;
-
 import org.apache.log4j.Logger;
+
+import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class Weapon {
     public static final double DEFAULT_ENERGY = 0.0;

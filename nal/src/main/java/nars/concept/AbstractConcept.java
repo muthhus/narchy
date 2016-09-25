@@ -1,15 +1,5 @@
 package nars.concept;
 
-import javassist.scopedpool.SoftValueHashMap;
-import nars.NAR;
-import nars.budget.policy.ConceptPolicy;
-import nars.term.container.TermContainer;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-import java.util.function.BiFunction;
-
 public interface AbstractConcept extends Concept {
 
     //private final Bag<Task> taskLinks;

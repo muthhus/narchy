@@ -1,6 +1,5 @@
 package nars.nar.util;
 
-import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -12,11 +11,9 @@ import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.*;
 import nars.concept.util.ConceptBuilder;
-import nars.concept.util.InvalidConceptException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.obj.Termject;
 import nars.term.obj.TermjectConcept;
@@ -31,8 +28,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-
-import static nars.time.Tense.DTERNAL;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
@@ -136,7 +131,7 @@ import static nars.time.Tense.DTERNAL;
     @NotNull
     public final Random rng; //shared
     @NotNull
-    public CurveBag.CurveSampler defaultCurveSampler; //shared
+    public final CurveBag.CurveSampler defaultCurveSampler; //shared
 
 
     public DefaultConceptBuilder(@NotNull Random r) {
