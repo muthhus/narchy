@@ -58,7 +58,6 @@
         <version>1.5.0</version>
         <configuration>
           <mainClass>nars.web.WebServer</mainClass>
-          <keepAlive>true</keepAlive>
         </configuration>
       </plugin>
     </plugins>

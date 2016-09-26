@@ -76,10 +76,6 @@ public interface BeliefTable extends TaskTable {
         }
 
 
-        @Override
-        public float confMax(float minFreq, float maxFreq) {
-            return 0;
-        }
 
         @Nullable
         @Override
@@ -326,11 +322,11 @@ public interface BeliefTable extends TaskTable {
 //    }
 
 
-    default float confMax() {
-        return confMax(0f, 1f);
-    }
-
-    float confMax(float minFreq, float maxFreq);
+//    default float confMax() {
+//        return confMax(0f, 1f);
+//    }
+//
+//    float confMax(float minFreq, float maxFreq);
 
 
     /**

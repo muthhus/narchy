@@ -22,12 +22,13 @@ public final class DefaultConceptPolicy extends AtomicStringConstant implements 
     private final MutableInteger beliefsMaxTemp;
     private final MutableInteger goalsMaxTemp;
 
+    /** minimum of 3 beliefs per belief table. for eternal, this allows revision between two goals to produce a third  */
     public DefaultConceptPolicy(String id, int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
         this(   id,
-                new MutableInteger(Math.max(1, beliefsCapTotal / 4)), //belief ete ~1/4
-                new MutableInteger(Math.max(1, goalsCapTotal / 4)),   //goal ete  ~1/4
-                new MutableInteger(Math.max(1, beliefsCapTotal * 3 / 4)), //belief temp ~3/4
-                new MutableInteger(Math.max(1, beliefsCapTotal * 3 / 4)), //goal temp  ~3/4
+                new MutableInteger(Math.max(3, beliefsCapTotal / 4)), //belief ete ~1/4
+                new MutableInteger(Math.max(3, goalsCapTotal   / 4)),   //goal ete  ~1/4
+                new MutableInteger(Math.max(3, beliefsCapTotal * 3 / 4)), //belief temp ~3/4
+                new MutableInteger(Math.max(3, goalsCapTotal   * 3 / 4)), //goal temp  ~3/4
                 new MutableInteger(questionsMax),
                 new MutableInteger(termlinksCapacity),
                 new MutableInteger(taskLinksCapacity)

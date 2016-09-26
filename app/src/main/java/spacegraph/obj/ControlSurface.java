@@ -4,7 +4,6 @@ import nars.$;
 import nars.util.Texts;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.infinispan.cdi.common.util.Reflections;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -150,7 +149,7 @@ public class ControlSurface extends PanelSurface {
 
         FasterList<Surface> w = $.newArrayList();
 
-        Set<Field> fields = Reflections.getAllDeclaredFields(aClass);
+        Field[] fields = aClass.getDeclaredFields();
         for (Field f : fields) {
 
             if (f.getDeclaringClass()!=Object.class) {
@@ -164,14 +163,14 @@ public class ControlSurface extends PanelSurface {
             }
         }
         try {
-            Set<Method> methods = Reflections.getAllDeclaredMethods(aClass);
-            methods.forEach((m) -> {
+            Method[] methods = aClass.getDeclaredMethods();
+            for (Method m : methods) {
                 if (m.getDeclaringClass() != Object.class) {
                     if (Modifier.isPublic(m.getModifiers())) {
                         w.addIfNotNull(method(remainingDepth - 1, m.getName(), m, built));
                     }
                 }
-            });
+            }
         } catch (NoClassDefFoundError e) {
 
         }

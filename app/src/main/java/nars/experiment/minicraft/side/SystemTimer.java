@@ -3,7 +3,8 @@ package nars.experiment.minicraft.side;
 
 //AdvancedTimer;
 
-import org.jgroups.util.Util;
+
+import nars.util.Util;
 
 /**
  * A wrapper class that provides timing methods. This class
@@ -48,7 +49,7 @@ public class SystemTimer {
 	 */
 	public static void sleep(long duration) {
 		if (duration <= 0) return;
-		Util.sleep(duration);
+		Util.pause(duration);
 		//timer.sleep((duration * timerTicksPerSecond) / 1000);
 	}
 }

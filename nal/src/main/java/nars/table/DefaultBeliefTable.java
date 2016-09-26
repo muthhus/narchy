@@ -119,37 +119,37 @@ public class DefaultBeliefTable implements BeliefTable {
 //        ((belief.isEternal()) ? eternal : temporal).remove(belief, displ);
 //    }
 
-    /**
-     * calculates the max confidence of a belief within the given frequency range
-     */
-    public float confMax(float minFreq, float maxFreq) {
-        float max = 0;
-
-        //HACK eternal top task may not hold the highest confidence (since rank involves originality) however we'll use that value here
-        Task eternalMax = eternalTop();
-        if (eternalMax != null) {
-            float f = eternalMax.freq();
-            if ((f >= minFreq) && (f <= maxFreq)) {
-                max = eternalMax.conf();
-            }
-        }
-
-        List<Task> temporals = ((MicrosphereTemporalBeliefTable) temporal).list;
-        for (int i = 0, temporalsSize = temporals.size(); i < temporalsSize; i++) {
-            Task t = temporals.get(i);
-            if (t != null) {
-                float f = t.freq();
-                if ((f >= minFreq) && (f <= maxFreq)) {
-                    float c = t.conf();
-                    if (c > max)
-                        max = c;
-                }
-            }
-        }
-
-
-        return max;
-    }
+//    /**
+//     * calculates the max confidence of a belief within the given frequency range
+//     */
+//    public float confMax(float minFreq, float maxFreq) {
+//        float max = 0;
+//
+//        //HACK eternal top task may not hold the highest confidence (since rank involves originality) however we'll use that value here
+//        Task eternalMax = eternalTop();
+//        if (eternalMax != null) {
+//            float f = eternalMax.freq();
+//            if ((f >= minFreq) && (f <= maxFreq)) {
+//                max = eternalMax.conf();
+//            }
+//        }
+//
+//        List<Task> temporals = ((MicrosphereTemporalBeliefTable) temporal).list;
+//        for (int i = 0, temporalsSize = temporals.size(); i < temporalsSize; i++) {
+//            Task t = temporals.get(i);
+//            if (t != null) {
+//                float f = t.freq();
+//                if ((f >= minFreq) && (f <= maxFreq)) {
+//                    float c = t.conf();
+//                    if (c > max)
+//                        max = c;
+//                }
+//            }
+//        }
+//
+//
+//        return max;
+//    }
 
 
     @Nullable
@@ -186,9 +186,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     private EternalTable nonEmptyEternal(CompoundConcept<?> concept, @NotNull Task input) {
         if (eternal == EternalTable.EMPTY) {
-            synchronized (concept) {
-                eternal = new EternalTable(concept.policy().beliefCap(concept, input.isBelief(), true));
-            }
+            eternal = new EternalTable(concept.policy().beliefCap(concept, input.isBelief(), true));
         }
         return eternal;
     }

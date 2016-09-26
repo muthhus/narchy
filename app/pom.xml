@@ -49,10 +49,10 @@
         </dependency>
 
         <!--<dependency>-->
-            <!--<groupId>org.apache.commons</groupId>-->
-            <!--<artifactId>commons-vfs2</artifactId>-->
-            <!--<version>2.1</version>-->
-            <!--<scope>compile</scope>-->
+        <!--<groupId>org.apache.commons</groupId>-->
+        <!--<artifactId>commons-vfs2</artifactId>-->
+        <!--<version>2.1</version>-->
+        <!--<scope>compile</scope>-->
         <!--</dependency>-->
 
         <dependency>
@@ -79,19 +79,19 @@
 
 
         <!-- http://mvnrepository.com/artifact/com.eclipsesource.minimal-json/minimal-json -->
-        <dependency>
-            <groupId>com.eclipsesource.minimal-json</groupId>
-            <artifactId>minimal-json</artifactId>
-            <version>0.9.4</version>
-            <scope>compile</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.eclipsesource.minimal-json</groupId>-->
+            <!--<artifactId>minimal-json</artifactId>-->
+            <!--<version>0.9.4</version>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-embedded</artifactId>
-            <version>9.0.0.Alpha4</version>
-            <scope>compile</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.infinispan</groupId>-->
+            <!--<artifactId>infinispan-embedded</artifactId>-->
+            <!--<version>9.0.0.Alpha4</version>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.jfxvnc</groupId>
@@ -163,13 +163,12 @@
     <build>
         <plugins>
             <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>1.5.0</version>
-                    <configuration>
-                        <mainClass>nars.Repl</mainClass>
-                        <keepAlive>true</keepAlive>
-                    </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <configuration>
+                    <mainClass>nars.Repl</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

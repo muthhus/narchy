@@ -7,14 +7,16 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
 import nars.util.Util;
-import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {
@@ -44,7 +46,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         return w;
     }
 
-    public static final Set<GLWindow> windows = new ConcurrentHashSet<>();
+    public static final Set<GLWindow> windows = Collections.synchronizedSet(  new HashSet<>() );
 
     public static final Logger logger = LoggerFactory.getLogger(JoglSpace.class);
 

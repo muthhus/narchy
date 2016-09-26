@@ -15,7 +15,6 @@ import nars.term.atom.Atom;
 import nars.test.DeductiveMeshTest;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
-import org.infinispan.util.function.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
@@ -30,6 +29,10 @@ import java.util.function.Consumer;
 public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static final @NotNull Atom L = $.the("_l");
+
+    public interface TriConsumer<A,B,C> {
+        void accept(A a, B b, C c);
+    }
 
     private final TriConsumer<NAR, SpaceGraph<X>, List<Y>> collect;
     private On on;

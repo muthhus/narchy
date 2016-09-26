@@ -3,7 +3,6 @@ package nars.experiment.hypernova;
 
 import nars.experiment.hypernova.gui.Transition;
 import nars.experiment.hypernova.gui.Viewer;
-import org.apache.commons.cli.*;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -28,58 +27,58 @@ public class Hypernova {
         BasicConfigurator.configure();
         log.setLevel(Level.WARN);
 
-        /* Parse the command line options. */
-        CommandLine line = parseArgs(args);
-        if (line.hasOption("debug")) {
-            debug = true;
-            log.setLevel(Level.DEBUG);
-            log.info("extra debugging information enabled");
-        }
-
-        if (line.hasOption("accel")) {
-            System.setProperty("sun.java2d.opengl","true");
-            System.setProperty("sun.java2d.translaccel","true");
-            System.setProperty("sun.java2d.ddforcevram","true");
-        }
-
+//        /* Parse the command line options. */
+//        CommandLine line = parseArgs(args);
+//        if (line.hasOption("debug")) {
+//            debug = true;
+//            log.setLevel(Level.DEBUG);
+//            log.info("extra debugging information enabled");
+//        }
+//
+//        if (line.hasOption("accel")) {
+//            System.setProperty("sun.java2d.opengl","true");
+//            System.setProperty("sun.java2d.translaccel","true");
+//            System.setProperty("sun.java2d.ddforcevram","true");
+//        }
+//
         /* Fullscreen Setup */
         JFrame frame = new JFrame(PROGRAM);
-        if (line.hasOption("fullscreen"))
-        {
-            frame.setUndecorated(true);
-            String str = line.getOptionValue("fullscreen");
-            try {
-                int modeNum = Integer.parseInt(str);
-                GraphicsEnvironment env = GraphicsEnvironment.
-                                          getLocalGraphicsEnvironment();
-                GraphicsDevice device = env.getDefaultScreenDevice();
-                DisplayMode[] modes = device.getDisplayModes();
-                DisplayMode newDisplayMode = modes[modeNum];
-                DisplayMode oldDisplayMode = device.getDisplayMode();
-                device.setFullScreenWindow(frame);
-                device.setDisplayMode(newDisplayMode);
-                Viewer.WIDTH  = newDisplayMode.getWidth();
-                Viewer.HEIGHT = newDisplayMode.getHeight();
-            } catch (Exception e) {
-                System.err.println("Invalid mode '" + str + "'");
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
-
-
-        /* Determine quality settings. */
-        if (line.hasOption("quality")) {
-            String str = line.getOptionValue("quality");
-            try {
-                int level = Integer.parseInt(str);
-                if (level < 0 || level > 2) throw new Exception();
-                viewer.setQuality(level);
-            } catch (Throwable t) {
-                System.err.println("Unknown quality level '" + str + "'");
-                System.exit(1);
-            }
-        }
+//        if (line.hasOption("fullscreen"))
+//        {
+//            frame.setUndecorated(true);
+//            String str = line.getOptionValue("fullscreen");
+//            try {
+//                int modeNum = Integer.parseInt(str);
+//                GraphicsEnvironment env = GraphicsEnvironment.
+//                                          getLocalGraphicsEnvironment();
+//                GraphicsDevice device = env.getDefaultScreenDevice();
+//                DisplayMode[] modes = device.getDisplayModes();
+//                DisplayMode newDisplayMode = modes[modeNum];
+//                DisplayMode oldDisplayMode = device.getDisplayMode();
+//                device.setFullScreenWindow(frame);
+//                device.setDisplayMode(newDisplayMode);
+//                Viewer.WIDTH  = newDisplayMode.getWidth();
+//                Viewer.HEIGHT = newDisplayMode.getHeight();
+//            } catch (Exception e) {
+//                System.err.println("Invalid mode '" + str + "'");
+//                e.printStackTrace();
+//                System.exit(1);
+//            }
+//        }
+//
+//
+//        /* Determine quality settings. */
+//        if (line.hasOption("quality")) {
+//            String str = line.getOptionValue("quality");
+//            try {
+//                int level = Integer.parseInt(str);
+//                if (level < 0 || level > 2) throw new Exception();
+//                viewer.setQuality(level);
+//            } catch (Throwable t) {
+//                System.err.println("Unknown quality level '" + str + "'");
+//                System.exit(1);
+//            }
+//        }
 
         viewer = new Viewer();
 
@@ -136,56 +135,56 @@ public class Hypernova {
 //        }
     }
 
-    private static CommandLine parseArgs(String[] args) {
-        Options opts = new Options();
-        String[][] str = {
-            {"h", "help",       "f", "print this message"},
-            {"v", "version",    "f", "print program version"},
-            {"a", "accel",      "f", "use hardware acceleration"},
-            {"m", "modes",      "f", "print available graphics modes"},
-            {"d", "debug",      "f", "turn on extra debugging info"},
-            {"q", "quality",    "t", "set display quality (0-2)"},
-            {"f", "fullscreen", "t", "fullscreen display (must specify mode"},
-            {"l", "load",       "t", "load a game (0-10)"},
-            {"s", "nosound",    "n", "disable sound"},
-            {"r", "repl",       "n", "expose a REPL on standard IO"},
-        };
-        for (String[] o : str) {
-            opts.addOption(new Option(o[0], o[1], "t".equals(o[2]), o[3]));
-        }
-        CommandLineParser parser = new GnuParser();
-        CommandLine line = null;
-        try {
-            line = parser.parse(opts, args);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-        if (line.hasOption("help")) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("Hypernova [options]", opts);
-            System.exit(0);
-        }
-        if (line.hasOption("version")) {
-            printVersion();
-            System.exit(0);
-        }
-        if (line.hasOption("modes")) {
-            GraphicsEnvironment env = GraphicsEnvironment.
-                                      getLocalGraphicsEnvironment();
-            GraphicsDevice device = env.getDefaultScreenDevice();
-            DisplayMode[] modes = device.getDisplayModes();
-            for (int i = 0; i < modes.length; i++) {
-                System.out.println("Mode " + i);
-                System.out.println("  Width:   " + modes[i].getWidth());
-                System.out.println("  Height:  " + modes[i].getHeight());
-                System.out.println("  Depth:   " + modes[i].getBitDepth());
-                System.out.println("  Refresh: " + modes[i].getRefreshRate());
-            }
-            System.exit(0);
-        }
-        return line;
-    }
+//    private static CommandLine parseArgs(String[] args) {
+//        Options opts = new Options();
+//        String[][] str = {
+//            {"h", "help",       "f", "print this message"},
+//            {"v", "version",    "f", "print program version"},
+//            {"a", "accel",      "f", "use hardware acceleration"},
+//            {"m", "modes",      "f", "print available graphics modes"},
+//            {"d", "debug",      "f", "turn on extra debugging info"},
+//            {"q", "quality",    "t", "set display quality (0-2)"},
+//            {"f", "fullscreen", "t", "fullscreen display (must specify mode"},
+//            {"l", "load",       "t", "load a game (0-10)"},
+//            {"s", "nosound",    "n", "disable sound"},
+//            {"r", "repl",       "n", "expose a REPL on standard IO"},
+//        };
+//        for (String[] o : str) {
+//            opts.addOption(new Option(o[0], o[1], "t".equals(o[2]), o[3]));
+//        }
+//        CommandLineParser parser = new GnuParser();
+//        CommandLine line = null;
+//        try {
+//            line = parser.parse(opts, args);
+//        } catch (ParseException e) {
+//            System.err.println(e.getMessage());
+//            System.exit(1);
+//        }
+//        if (line.hasOption("help")) {
+//            HelpFormatter formatter = new HelpFormatter();
+//            formatter.printHelp("Hypernova [options]", opts);
+//            System.exit(0);
+//        }
+//        if (line.hasOption("version")) {
+//            printVersion();
+//            System.exit(0);
+//        }
+//        if (line.hasOption("modes")) {
+//            GraphicsEnvironment env = GraphicsEnvironment.
+//                                      getLocalGraphicsEnvironment();
+//            GraphicsDevice device = env.getDefaultScreenDevice();
+//            DisplayMode[] modes = device.getDisplayModes();
+//            for (int i = 0; i < modes.length; i++) {
+//                System.out.println("Mode " + i);
+//                System.out.println("  Width:   " + modes[i].getWidth());
+//                System.out.println("  Height:  " + modes[i].getHeight());
+//                System.out.println("  Depth:   " + modes[i].getBitDepth());
+//                System.out.println("  Refresh: " + modes[i].getRefreshRate());
+//            }
+//            System.exit(0);
+//        }
+//        return line;
+//    }
 
     private static void printVersion() {
         System.out.println(PROGRAM + " " + VERSION);
