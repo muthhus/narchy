@@ -4,10 +4,16 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.io.SerializedString;
+import io.undertow.websockets.core.WebSocketCallback;
+import io.undertow.websockets.core.WebSocketChannel;
+import io.undertow.websockets.core.WebSockets;
 import nars.util.data.list.FasterList;
 
 import nars.util.meter.event.FloatGuage;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.nustaq.serialization.*;
 import org.nustaq.serialization.coders.FSTJsonDecoder;
 import org.nustaq.serialization.coders.Unknown;
@@ -17,6 +23,7 @@ import org.nustaq.serialization.util.FSTUtil;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -95,6 +102,30 @@ public class Json {
         }
         sb.append(']');
         return sb;
+    }
+
+    @NotNull
+    public static ByteBuffer jsonize(Object object) {
+        return ByteBuffer.wrap(jsonizer.asByteArray(object));
+    }
+
+    @Nullable
+    public static String escape(Object o) {
+        return o == null ? null : StringEscapeUtils.escapeJson(o.toString());
+    }
+
+    public static void send(WebSocketChannel socket, Object object, WebSocketCallback t) {
+        if (object instanceof Object[]) {
+            WebSockets.sendText(Json.arrayToJson((Object[]) object, new StringBuilder()).toString(), socket, t);
+        } else if (object instanceof String) {
+            WebSockets.sendText((String) object, socket, t);
+        } else if (object instanceof StringBuilder) {
+            WebSockets.sendText(object.toString(), socket, t);
+        } else if (object instanceof ByteBuffer) {
+            WebSockets.sendText((ByteBuffer) object, socket, t);
+        } else {
+            WebSockets.sendText(Json.jsonize(object), socket, t);
+        }
     }
 
     /* BROKEN */

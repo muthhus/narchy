@@ -3,65 +3,50 @@ package nars.web;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.*;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Websocket handler that interfaces with a NAR.
  * mounted at a path on the server
  */
-public abstract class WebsocketService extends AbstractWebsocketService {
+public class WebsocketRouter extends AbstractWebsocketService {
 
-    protected final Set<WebSocketChannel> connections = new ConcurrentHashSet<>();
+    /** channel -> connection map */
+    protected final Map<String,Set<WebSocketChannel>> connections = new ConcurrentHashMap<>();
 
-
-//    static {
-//        ((JsonFactory)jsonizer.getCoderSpecific()).
-//    }
-
-
-    //.setForceSerializable(true)
-    //.setForceClzInit(true)
-
-    public WebsocketService() {
+    public WebsocketRouter() {
 
     }
-
-    /**
-     * broadcast to all
-     */
-    public void send(Object object) {
-        for (WebSocketChannel s : connections)
-            send(s, object);
-    }
-
 
     @Override
     protected void onFullBinaryMessage(WebSocketChannel channel, BufferedBinaryMessage message) throws IOException {
 
-        //System.out.println(channel + " recv bin: " + message.getData());
     }
+
+
+
 
     @Override
     public void onError(WebSocketChannel wsc, Void t, Throwable thrwbl) {
-        //System.out.println("Error: " + thrwbl);
-        //WebServer.logger.error("{}", thrwbl);
+
     }
 
     @Override
     public void complete(WebSocketChannel channel, Void context) {
 
-        //log.info("Complete: " + channel);
     }
 
     @Override
     public void onConnect(WebSocketHttpExchange exchange, WebSocketChannel socket) {
 
+        /*if (log.isInfoEnabled())
+            log.info(socket.getPeerAddress() + " connected websocket");*/
 
         if (connections.isEmpty()) {
             onStart();
@@ -71,11 +56,13 @@ public abstract class WebsocketService extends AbstractWebsocketService {
         socket.resumeReceives();
 
         onConnect(socket);
-        connections.add(socket);
+        System.out.println(exchange.getRequestHeaders());
 
     }
 
-
+    /**
+     * called for each new connection
+     */
     protected void onConnect(WebSocketChannel socket) {
 
     }
@@ -87,24 +74,34 @@ public abstract class WebsocketService extends AbstractWebsocketService {
     @Override
     protected void onClose(WebSocketChannel socket, StreamSourceFrameChannel channel) throws IOException {
 
+
         onDisconnect(socket);
-        connections.remove(socket);
+        //connections.remove(socket);
 
-        if (connections.isEmpty()) {
-            onStop();
-        }
+//        if (connections.isEmpty()) {
+//            onStop();
+//        }
 
+
+
+        /*if (log.isInfoEnabled())
+            log.info(socket.getPeerAddress() + " disconnected websocket");*/
     }
 
 
     /**
      * called if one or more connected
      */
-    abstract public void onStart();
+    public void onStart() {
+
+    }
 
     /**
      * called when # connections becomes zero
      */
-    abstract public void onStop();
+    public void onStop() {
+
+    }
+
 
 }

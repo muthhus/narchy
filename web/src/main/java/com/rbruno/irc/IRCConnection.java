@@ -3,6 +3,7 @@ package com.rbruno.irc;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 
@@ -78,7 +79,7 @@ public class IRCConnection implements Runnable {
 				Request request = null;
 				try {
 					request = new Request(this, line);
-					logger.info("req: {}", request);
+					//logger.info("req: {}", request);
 					runCommand(request);
 				} catch (Exception e) {
 					logger.info("{} error in line: {}\n\t{}", socket.getInetAddress(), line, e);
@@ -107,7 +108,8 @@ public class IRCConnection implements Runnable {
 		if (request.isCancelled()) return;
 		Command command = the(request.command);
 		if (command == null) {
-			if (request.client != null) request.connection.send(Error.ERR_UNKNOWNCOMMAND, request.client, request.command + " :Unknown command");
+			if (request.client != null)
+				request.connection.send(Error.ERR_UNKNOWNCOMMAND, request.client, request.command + " :Unknown command");
 			return;
 		}
 		if (request.args.length < command.arity) {
@@ -129,12 +131,17 @@ public class IRCConnection implements Runnable {
 	 * @throws IOException
 	 */
 	public void send(String message) throws IOException {
-		if (Config.getProperty("debug").equals("true")) System.out.println("[DeBug]" + message);
-		byte[] block = message.concat("\r\n").getBytes();
+//		if (Config.getProperty("debug").equals("true"))
+//			System.out.println("[DeBug]" + message);
+		//byte[] block = message.concat("\r\n").getBytes();
 
-		socket.getOutputStream().write(block);
-		socket.getOutputStream().flush();
+		OutputStream os = socket.getOutputStream();
+		os.write(message.getBytes());
+		os.write(newline);
+		os.flush();
 	}
+
+	final static byte[] newline = "\r\n".getBytes();
 
 	/**
 	 * Creates a formated string from the given arguments and passes them to

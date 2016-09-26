@@ -66,7 +66,6 @@ public class WebServer /*extends PathHandler*/ {
                         ))
                             .setDirectoryListingEnabled(true)
                             .addWelcomeFiles("index.html")
-
                 );
 
         //https://github.com/undertow-io/undertow/blob/master/examples/src/main/java/io/undertow/examples/sessionhandling/SessionServer.java
@@ -80,6 +79,8 @@ public class WebServer /*extends PathHandler*/ {
                 .build();
 
 
+        path
+                .addPrefixPath("/{chan}/feed", socket(new WebsocketRouter()));
 
 
         logger.info("http start: port={} staticFiles={}", httpPort, resourcePath.getBasePath());

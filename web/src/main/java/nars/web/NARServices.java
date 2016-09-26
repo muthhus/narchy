@@ -27,7 +27,7 @@ import static nars.web.WebServer.socket;
                     Object[] summarize(BLink<? extends Concept> bc, int n) {
                         Concept c = bc.get();
                         return new Object[] {
-                                escape(c), //ID
+                                Json.escape(c), //ID
                                 b(bc.pri()), b(bc.dur()), b(bc.qua()),
                                 termLinks(c, (int)Math.ceil(((float)n/maxConcepts.intValue())*(maxTermLinks-minTermLinks)+minTermLinks) ),
                                 truth(c.beliefs()),
@@ -51,7 +51,7 @@ import static nars.web.WebServer.socket;
                         final int[] n = {0};
                         b.forEach(num, t -> {
                             tl[n[0]++] = new Object[] {
-                                    escape(t.get()), //ID
+                                    Json.escape(t.get()), //ID
                                     b(t.pri()), b(t.dur()), b(t.qua())
                             };
                         });
