@@ -17,7 +17,7 @@ import static spacegraph.SpaceGraph.window;
 public class TopCraft extends SwingAgent {
 
     private final TopDownMinicraft craft;
-    private final MatrixSensor pixels;
+    private final MatrixSensor<PixelBag> pixels;
     private final PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
@@ -29,63 +29,10 @@ public class TopCraft extends SwingAgent {
 
         this.craft = new TopDownMinicraft();
 
+        pixels = addCamera("cra", ()->craft.image, 64,64,(v) -> $.t( v, alpha));
 
-        //swingCam.input(W/4, H/4, W/2, H/2); //50%
-
-//        Scale cam = new Scale(swingCam, 48, 48);
-        PixelBag cam = new PixelBag(craft.image, 64, 64);
-
-        pixels = addCamera("cra", cam, (v) -> $.t( v, alpha));
-
-        camAE = new PixelAutoClassifier("cra", cam.pixels, 8, 8, 48, this);
+        camAE = new PixelAutoClassifier("cra", pixels.src.pixels, 8, 8, 48, this);
         window(camAE.newChart(), 500, 500);
-
-
-        actionBipolar("cra(cam,X)", (f)-> {
-            cam.setX(f);
-            return true;
-        });
-        actionBipolar("cra(cam,Y)", (f)-> {
-            cam.setY(f);
-            return true;
-        });
-        actionBipolar("cra(cam,Z)", (f)-> {
-            cam.setZ(f);
-            return true;
-        });
-
-//relative camera controls:
-//        float camXYSpeed = 0.1f;
-//        float camZoomRate = 0.1f;
-//        int minZoomX = 64;
-//        int minZoomY = 64;
-//        addIncrementalRangeAction("cra:(cam,L)", (f)-> {
-//            cam.minX = Math.max(0, Math.min(cam.minX + f * camXYSpeed, cam.maxX - minWidth));
-//            return true;
-//        });
-//        addIncrementalRangeAction("cra:(cam,R)", (f)-> {
-//            cam.maxX = Math.max(cam.minX + minWidth, Math.min(cam.maxX + f * camXYSpeed, 1));
-//            return true;
-//        });
-//        addIncrementalRangeAction("cra:(cam,U)", (f)-> {
-//            cam.minY = Math.max(0, Math.min(cam.minY + f * camXYSpeed, cam.maxY - minWidth));
-//            return true;
-//        });
-//        addIncrementalRangeAction("cra:(cam,D)", (f)-> {
-//            cam.maxY = Math.max(cam.minY + minWidth, Math.min(cam.maxY + f * camXYSpeed, 1));
-//            return true;
-//        });
-
-//        addIncrementalRangeAction("cra:(cam,R)", (f)->
-//            swingCam.inputTranslate(round(+camXYSpeed * f), 0 ) );
-//        addIncrementalRangeAction("cra:(cam,U)", (f)->
-//            swingCam.inputTranslate(0, round(-camXYSpeed * f)) );
-//        addIncrementalRangeAction("cra:(cam,D)", (f)->
-//            swingCam.inputTranslate(0, round(+camXYSpeed * f)) );
-//        addIncrementalRangeAction("cra:(cam,I)", (f)->
-//            swingCam.inputZoom( (1 - camZoomRate * f), minZoomX, minZoomY) );
-//        addIncrementalRangeAction("cra:(cam,O)", (f)->
-//            swingCam.inputZoom( (1 + camZoomRate * f), minZoomX, minZoomY) );
 
         new NObj("cra", craft, nar)
                 .read(
@@ -95,12 +42,13 @@ public class TopCraft extends SwingAgent {
                     "player.getTile().connectsToWater"
                 ).into(this);
 
+
         InputHandler input = craft.input;
-        actionToggle("cra(fire)", (b) -> input.attack.toggle(b) );
-        actionToggle("cra(up)", (b) -> input.up.toggle(b) );
-        actionToggle("cra(down)", (b) -> input.down.toggle(b) );
-        actionToggle("cra(left)", (b) -> input.left.toggle(b) );
-        actionToggle("cra(right)", (b) -> input.right.toggle(b) );
+        actionToggle("cra:(fire)", (b) -> input.attack.toggle(b) );
+        actionToggle("cra:(up)", (b) -> input.up.toggle(b) );
+        actionToggle("cra:(down)", (b) -> input.down.toggle(b) );
+        actionToggle("cra:(left)", (b) -> input.left.toggle(b) );
+        actionToggle("cra:(right)", (b) -> input.right.toggle(b) );
 
         TopDownMinicraft.start(craft, false);
     }

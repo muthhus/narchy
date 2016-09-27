@@ -319,23 +319,22 @@ abstract public class NAgent {
                             happinssDurability));
         }
 
-        predictors.addAll(
-                //what will imply reward
-                new MutableTask($.equi(what, dt, happiness), '?', null).time(now, now),
-                //new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
+//        predictors.addAll(
+//                //what will imply reward
+//                new MutableTask($.equi(what, dt, happiness), '?', null).time(now, now),
+//                //new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
+//
+//                //what will imply non-reward
+//                new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
+//                //new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
+//
+//                //what co-occurs with reward
+//                new MutableTask($.parallel(what, happiness), '?', null).time(now, now),
+//
+//                //what co-occurs with non-reward
+//                new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
+//        );
 
-                //what will imply non-reward
-                new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
-                //new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
-
-                //what co-occurs with reward
-                new MutableTask($.parallel(what, happiness), '?', null).time(now, now),
-
-                //what co-occurs with non-reward
-                new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
-
-
-        );
 //        predictors.add(
 //                nar.ask($.seq(what, dt, happy.term()), '?', now)
 //        );
@@ -345,36 +344,20 @@ abstract public class NAgent {
 
 
         for (Concept a : actions) {
-
-            //quest for each action
-            //predictors.add(nar.ask(x, '@', now));
-
-            //does action A co-occur with reward R?
             Term action = a.term();
 
-
-            predictors.addAll(
-                    new MutableTask($.seq(action, dt, happiness), '?', null).present(now),
-                    //new MutableTask($.seq(action, dt, $.neg(happiness)), '?', null).present(now),
-                    new MutableTask($.impl(action, dt, happiness), '?', null).present(now),
-                    new MutableTask($.impl(action, dt, $.neg(happiness)), '?', null).present(now),
-//                    new MutableTask($.seq(action, dt * 2, happiness), '?', null).present(now),
-//                    new MutableTask($.seq(action, dt * 2, $.neg(happiness)), '?', null).present(now),
-//                    new MutableTask($.seq(action, dt * 4, happiness), '?', null).present(now),
-//                    new MutableTask($.seq(action, dt * 4, $.neg(happiness)), '?', null).present(now),
-//                    new MutableTask($.seq(action, dt * 8, happiness), '?', null).present(now),
-//                    new MutableTask($.seq(action, dt * 8, $.neg(happiness)), '?', null).present(now),
-                    new MutableTask(action, '@', null).present(now)
-                    //new MutableTask($.seq(what, dt, action), '?', null).present(now),
-                    //new MutableTask($.impl(what, dt, action), '?', null).present(now),
-                    //new MutableTask($.impl(what, dt, $.neg(action)), '?', null).present(now),
-            );
-
-
+            int lookahead = 3;
+            for (int i = 0; i < lookahead; i++) {
+                long then = now + dt * (i*i);
+                predictors.addAll(
+                    new MutableTask($.seq(action, dt, happiness), '?', null).time(now, then),
+                    new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),
+                    new MutableTask(action, '@', null).time(now, then+dt)
+                );
+            }
         }
 
         System.out.println(Joiner.on('\n').join(predictors));
-
     }
 
     public NARLoop run(final int cycles) {
@@ -508,11 +491,10 @@ abstract public class NAgent {
             return; //ignore this one
 
         if (t.occurrence() != ETERNAL) {
-            int lookAhead = nar.random.nextInt(predictionHorizon);
 
             nar.inputLater(
                     new GeneratedTask(t.term(), t.punc(), t.truth())
-                            .time(now, now + lookAhead)
+                            .time(now, now + (t.occurrence() - t.creation()))
                             .budget(budget).log("Agent Predictor"));
 
         } else {

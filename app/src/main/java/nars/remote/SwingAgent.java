@@ -86,6 +86,19 @@ abstract public class SwingAgent extends NAgent {
 
 
         int history = 200;
+        chart(a, history);
+
+
+        a.run(framesToRun).join();
+        //a.runSync(runFrames);
+
+        NAR.printTasks(nar, true);
+        NAR.printTasks(nar, false);
+        nar.printConceptStatistics();
+    }
+
+    public static void chart(SwingAgent a, int history) {
+        Default nar = (Default)a.nar;
         window(
                 grid(
                         grid(a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new)),
@@ -98,14 +111,6 @@ abstract public class SwingAgent extends NAgent {
                                 Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                                 200)
                 ), 1200, 900);
-
-
-        a.run(framesToRun).join();
-        //a.runSync(runFrames);
-
-        NAR.printTasks(nar, true);
-        NAR.printTasks(nar, false);
-        nar.printConceptStatistics();
     }
 
     /**

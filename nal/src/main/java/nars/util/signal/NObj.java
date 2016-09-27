@@ -113,7 +113,7 @@ public class NObj<X> {
                         e.printStackTrace();
                         return Float.NaN;
                     }
-                }), nar, id + '(' + term(expr) + ')'
+                }), nar, id + ":(" + term(expr) + ')'
         ).resolution(0.05f);
         sensors.addAll(fs.sensors);
         return fs;

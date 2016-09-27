@@ -862,7 +862,10 @@ public class PremiseRule extends GenericCompound {
                             pres.add( TaskPunctuation.Question);
                             taskPunc = '?';
                             break;
-
+//                        case "\"@\"":
+//                            pres.add( TaskPunctuation.Quest );
+//                            taskPunc = '@';
+//                            break;
                         case "\".\"":
                             pres.add( TaskPunctuation.Belief );
                             taskPunc = '.';
@@ -1050,11 +1053,13 @@ public class PremiseRule extends GenericCompound {
 
             // C, B, [pre], task_is_question() |- T, [post]
             PremiseRule clone1 = clonePermutation(C, B, T, true, index);
-            w.accept(clone1, "C,B,question |- B");
+            if (clone1!=null)
+                w.accept(clone1, "C,B,question |- B");
 
             // T, C, [pre], task_is_question() |- B, [post]
             PremiseRule clone2 = clonePermutation(T, C, B, true, index);
-            w.accept(clone2, "T,C,question |- B");
+            if (clone2!=null)
+                w.accept(clone2, "T,C,question |- B");
 
 
     }

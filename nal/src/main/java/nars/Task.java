@@ -405,9 +405,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Nullable
     default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
 
-
-        Compound t = term();
-        String contentName = t.toString();
+        String contentName;
+        if (term) {
+            contentName = term().toString();
+        } else {
+            contentName = "";
+        }
 
         CharSequence tenseString;
         if (memory != null) {

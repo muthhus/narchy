@@ -13,6 +13,7 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
+import nars.remote.SwingAgent;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -23,6 +24,7 @@ import nars.time.Tense;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
+import nars.video.CameraSensorView;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
@@ -40,6 +42,7 @@ import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.ControlSurface.newControlWindow;
 import static spacegraph.obj.GridSurface.VERTICAL;
+import static spacegraph.obj.GridSurface.grid;
 
 /**
  * Created by me on 7/28/16.
@@ -55,8 +58,8 @@ public class Tetris extends NAgent {
 //    public static final Executioner exe4 =
 //            new MultiThreadExecutioner(4, 1024*32);
 
-    public static final int runFrames = 5550;
-    public static final int cyclesPerFrame = 8;
+    public static final int runFrames = 25550;
+    public static final int cyclesPerFrame = 6;
     public static final int tetris_width = 8;
     public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 2;
@@ -92,7 +95,7 @@ public class Tetris extends NAgent {
      * @param timePerFall larger is slower gravity
      */
     public Tetris(NAR nar, int width, int height, int timePerFall) {
-        super(nar, 2);
+        super(nar, 8);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override
@@ -141,7 +144,8 @@ public class Tetris extends NAgent {
                 int xx = x;
                 Compound squareTerm =
                         //$.p(x, y);
-                        $.p($.pRecurse($.radixArray(x, 2, state.width)), $.pRecurse($.radixArray(y, 2, state.height)));
+                        $.inh($.p($.pRecurse($.radixArray(x, 2, state.width)), $.pRecurse($.radixArray(y, 2, state.height))),
+                              $.the("tetris"));
 
                 //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
                 @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
@@ -166,7 +170,7 @@ public class Tetris extends NAgent {
 
         float actionMargin =
                 //0.33f; //divide the range into 3 sections: left/nothing/right
-                0.33f;
+                0.25f;
 
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
@@ -224,13 +228,13 @@ public class Tetris extends NAgent {
         reset();
     }
 
-    //TODO
-    public static class NARCam {
-        public int width;/*how wide our board is*/
-        public int height;/*how tall our board is*/
-
-
-    }
+//    //TODO
+//    public static class NARCam {
+//        public int width;/*how wide our board is*/
+//        public int height;/*how tall our board is*/
+//
+//
+//    }
 
     /**
      * RLE/scanline input method: groups similar pixels (monochrome) into a runline using a integer range
@@ -374,10 +378,10 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        int maxVol = 20;
+        int maxVol = 40;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                16, 2, 2, rng,
+                12, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
@@ -385,7 +389,7 @@ public class Tetris extends NAgent {
         );
 
 
-        nar.beliefConfidence(0.95f);
+        nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
         Param.DEBUG_ANSWERS = Param.DEBUG;
@@ -400,11 +404,11 @@ public class Tetris extends NAgent {
 //            }
 //        });
 
-        float p = 0.02f;
-        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
+        float p = 0.1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.8f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.3f * p;
         nar.cyclesPerFrame.set(cyclesPerFrame);
 
         nar.confMin.setValue(0.02f);
@@ -448,7 +452,7 @@ public class Tetris extends NAgent {
         //new Abbreviation(nar,"aKa_");
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new VariableCompressor(nar);
@@ -477,6 +481,19 @@ public class Tetris extends NAgent {
         //window(Vis.concepts(nar, 1024), 500, 500);
 
         //STMView.show(stm, 800, 600);
+
+        window(
+                grid(
+
+                        //Vis.concepts(nar, 32),
+                        Vis.agentActions(t, 250),
+
+                        Vis.budgetHistogram(nar, 10),
+                        conceptLinePlot(nar,
+                                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
+                                200)
+                ), 1200, 900);
+
 
         view.plot1 =
                 newCPanel(nar, 256, () -> t.rewardValue);

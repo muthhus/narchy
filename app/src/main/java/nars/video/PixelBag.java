@@ -174,9 +174,9 @@ public class PixelBag implements PixelCamera {
     }
 
     public PixelBag addActions(String termRoot, NAgent a) {
-        a.actionBipolar(termRoot + "(moveX)", this::setX);
-        a.actionBipolar(termRoot + "(moveY)", this::setY);
-        a.actionBipolar(termRoot + "(zoom)", this::setZ);
+        a.actionBipolar(termRoot + ":(moveX)", this::setX);
+        a.actionBipolar(termRoot + ":(moveY)", this::setY);
+        a.actionBipolar(termRoot + ":(zoom)", this::setZ);
         return this;
     }
 

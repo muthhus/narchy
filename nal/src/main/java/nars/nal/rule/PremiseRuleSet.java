@@ -265,8 +265,8 @@ public class PremiseRuleSet {
         if (Param.BACKWARD_QUESTION_RULES && r.allowBackward) {
 
             r.backwardPermutation(index, (q, reason) -> {
-
                 PremiseRule b = add(q, src + ':' + reason, ur, index);
+                //System.out.println("BACKWARD: " + b);
 
                 //                    //2nd-order backward
                 //                    if (forwardPermutes(b)) {
@@ -312,21 +312,19 @@ public class PremiseRuleSet {
                 return; //already disqualified
 
 
-            String x = s.toString();
-
-            if ((x.contains("task(")) ||
-                    (x.contains("belief(")) ||
-                    (x.contains("time(")) ||
-                    //(x.contains("Punctuation"))  ||
-                    //(x.contains("Structural")) ||
-                    //(x.contains("Identity")) ||
-                    (x.contains("structural")) ||
-                    (x.contains("substitute"))  //TESTING THIS
-                //(x.contains("Negation"))
-
-                    ) {
-                fwd[0] = false;
-            }
+//            String x = s.toString().toLowerCase();
+//
+//            if ((x.contains("task(")) ||
+//                    (x.contains("belief(")) ||
+//                    (x.contains("punctuation(")) ||
+//                    //(x.contains("time(")) ||
+//                    //(x.contains("Identity")) ||
+//                    (x.contains("sub"))
+//                //(x.contains("Negation"))
+//
+//                    ) {
+//                fwd[0] = false;
+//            }
         });
         return fwd[0];
     }

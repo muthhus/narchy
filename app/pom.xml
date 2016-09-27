@@ -130,6 +130,7 @@
             <version>5prealpha-SNAPSHOT</version>
         </dependency>
 
+
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/cz.advel.jbullet/jbullet &ndash;&gt;-->
         <!--<dependency>-->
         <!--<groupId>cz.advel.jbullet</groupId>-->
@@ -159,6 +160,11 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.zeromq</groupId>
+            <artifactId>jeromq</artifactId>
+            <version>0.3.5</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

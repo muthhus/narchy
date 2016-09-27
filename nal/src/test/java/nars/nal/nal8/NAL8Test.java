@@ -820,13 +820,22 @@ public class NAL8Test extends AbstractNALTest {
         //   cam(out)!
 
         test()
-                
                 .inputAt(0, "(((in)|(left))-->^cam). :|:")
                 .mustBelieve(cycles, "cam(in)", 1f,0.81f, 0)
                 .mustBelieve(cycles, "cam(left)", 1f,0.81f, 0);
 
     }
 
+//    @Test public void testImplBackward1() {
+//        test()
+//            .log()
+//                //.inputAt(2, "(?x ==>+2 (b))? :|:")
+//                //.inputAt(2, "(?x &&+2 (b))? :|:")
+//                .inputAt(2, "(a). :|:")
+//                .inputAt(4, "(b). :|:")
+//                .mustBelieve(cycles, "(UNWRITTEN)", 1f,0.81f, 0);
+//
+//    }
 //    @Test public void testMixedTemporalInductionGoalConj() {
 //        test()
 //                .log()
