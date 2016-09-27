@@ -466,15 +466,15 @@ public class PremiseRule extends GenericCompound {
         premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
 
-    @Nullable
-    public Compound reified() {
-
-        //TODO include representation of precondition and postconditions
-        return $.impl(
-                p(getTask(), getBelief()),
-                getConclusion()
-        );
-    }
+//    @NotNull
+//    public Term reified() {
+//
+//        //TODO include representation of precondition and postconditions
+//        return $.impl(
+//                p(getTask(), getBelief()),
+//                getConclusion()
+//        );
+//    }
 
     static final class UppercaseAtomsToPatternVariables implements CompoundTransform<Compound, Term> {
 

@@ -717,9 +717,7 @@ public abstract class TermBuilder {
                         throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
 
                     if (predicate.op() == NEG) {
-                        Compound unNegatedPred = $.impl(subject, dt, $.unneg(predicate));
-                        if (unNegatedPred == null) //reduced to an invalid term
-                            return False;
+                        Term unNegatedPred = $.impl(subject, dt, $.unneg(predicate));
                         return //negation
                                $.neg( //to be safe use the full negation but likely it can be the local negation pipeline
                                        unNegatedPred

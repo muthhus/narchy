@@ -162,13 +162,14 @@ public enum $ {
     }
 
 
-    @Nullable
-    public static Compound impl(@NotNull Term a, @NotNull Term b) {
-        return (Compound) compound(IMPL, a, b);
+    @NotNull
+    public static Term impl(@NotNull Term a, @NotNull Term b) {
+        return compound(IMPL, a, b);
     }
-    @Nullable
-    public static Compound impl(@NotNull Term a, int dt, @NotNull Term b) {
-        return (Compound) compound(IMPL, dt, a, b);
+
+    @NotNull
+    public static Term impl(@NotNull Term a, int dt, @NotNull Term b) {
+        return compound(IMPL, dt, a, b);
     }
 
     @NotNull
@@ -572,12 +573,12 @@ public enum $ {
 
 
 
-    @Nullable
+    @NotNull
     public static Term compound(@NotNull Op op, Term... subterms) {
         return compound(op, DTERNAL, subterms);
     }
 
-    @Nullable
+    @NotNull
     public static Term compound(@NotNull Op op, int dt, @NotNull Term... subterms) {
         return terms.the(op, dt, subterms);
     }

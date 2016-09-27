@@ -32,14 +32,6 @@ public class NALLevelTest {
 
         String productSentence = "<(a,b) --> c>.\n<c <-> a>?\n";
 
-        try {
-            n1.input(productSentence);
-            n1.run(5);
-            assertTrue(false); //should not reach here
-        } catch (Exception e) {
-            //this is normal
-        }
-
         assertEquals(0, n1.time());
 
 

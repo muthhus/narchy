@@ -21,13 +21,13 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(6);
+        return AbstractNALTest.nars(4);
     }
 
     //this test only works because the confidence matches, but the related task has insufficient budget
     @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {
-        int time = 2050;
+        int time = 1050;
 
         //Global.DEBUG = true;
 

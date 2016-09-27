@@ -33,7 +33,7 @@ public class TermHashTest {
     }
 
     @Test public void testHasAnyVSAll() {
-        @Nullable Compound iii = impl(inh("a", "b"), $("c"));
+        @Nullable Term iii = impl(inh("a", "b"), $("c"));
         assertTrue(iii.hasAll(or(IMPL, INH)));
         assertFalse(iii.hasAll(or(IMPL, SIM)));
         assertTrue(iii.hasAny(or(IMPL, INH)));
