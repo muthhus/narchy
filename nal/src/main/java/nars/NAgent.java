@@ -21,16 +21,13 @@ import nars.util.math.FloatNormalized;
 import nars.util.math.FloatPolarNormalized;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
-import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
-import java.util.function.IntConsumer;
-import java.util.function.IntSupplier;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
@@ -42,7 +39,7 @@ import static nars.util.Texts.n4;
 /**
  * explicit management of sensor concepts and motor functions
  */
-abstract public class NAgent {
+abstract public class NAgent implements NSense, NAction {
 
 
     public static final Logger logger = LoggerFactory.getLogger(NAgent.class);
@@ -126,7 +123,17 @@ abstract public class NAgent {
 
     }
 
+    @Override public final Collection<SensorConcept> sensors() {
+        return sensors;
+    }
 
+    @Override public final Collection<ActionConcept> actions() {
+        return actions;
+    }
+
+    @Override public final NAR nar() {
+        return nar;
+    }
 
     /** should only be invoked before agent has started TODO check for this */
     public void addSensor(SensorConcept... s) {
@@ -148,63 +155,7 @@ abstract public class NAgent {
         Iterables.addAll(actions, s);
     }
 
-    /** latches to either one of 2 states until it shifts to the other one. suitable for representing
-     * push-buttons like keyboard keys. by default with no desire the state is off.  the 'on' and 'off'
-     * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
-     * its initial state will remain indetermined until the first feedback is generated.
-     * */
-    public ActionConcept actionToggle(String s, Runnable on, Runnable off) {
 
-        final int[] state = { 0 }; // 0: unknown, -1: false, +1: true
-
-        ActionConcept m = new ActionConcept(s, nar, (b, d) -> {
-            int now = state[0];
-            boolean next = d!=null && d.freq() >= 0.5f;
-            if (now>=0 && !next) {
-                state[0] = -1; off.run(); return $.t(0, alpha);
-            } else if (now<=0 && next) {
-                state[0] = +1; on.run(); return $.t(1f, alpha);
-            }
-            return null;
-        });
-
-        actions.add(m);
-        return m;
-    }
-
-    public ActionConcept actionToggle(String s, BooleanProcedure onChange) {
-        return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false) );
-    }
-
-    /** the supplied value will be in the range -1..+1. if the predicate returns false, then
-     * it will not allow feedback through. this can be used for situations where the action
-     * hits a limit or boundary that it did not pass through.
-     *
-     * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
-     */
-    public ActionConcept actionBipolar(String s, FloatPredicate update) {
-
-        ActionConcept m = new ActionConcept(s, nar, (b, d) -> {
-            if (d!=null) {
-                float f = d.freq();
-                float y = (f - 0.5f) * 2f;
-                if (update.accept(y)) {
-                    return $.t(f, alpha);
-                } else {
-                    return $.t(0.5f, alpha); //neutral on failure
-                }
-            }
-            return null;
-        });
-
-        actions.add(m);
-        return m;
-    }
-
-    public ActionConcept actionRangeIncrement(String s, IntSupplier in, int dx, int min, int max, IntConsumer out) {
-        //TODO
-        return null;
-    }
 
     /**
      * interpret motor states into env actions

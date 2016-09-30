@@ -12,11 +12,11 @@ import nars.experiment.minicraft.top.level.Level;
 import java.util.Random;
 
 public class Tile {
+	public static Tile[] tiles = new Tile[256];
 	public static int tickCount = 0;
 	public static Tile none = new Tile(-1);
     protected Random random = new Random();
 
-	public static Tile[] tiles = new Tile[256];
 	public static final Tile grass = new GrassTile(0);
 	public static Tile rock = new RockTile(1);
 	public static final Tile water = new WaterTile(2);

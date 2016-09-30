@@ -37,18 +37,19 @@ public class TopCraft extends SwingAgent {
         new NObj("cra", craft, nar)
                 .read(
                     //"player.health",
-                    "player.dir",
+                    //"player.dir",
                     "player.getTile().connectsToGrass",
                     "player.getTile().connectsToWater"
                 ).into(this);
 
+        senseEnum("cra:dir", ()->craft.player.dir, new int[] { 0, 1, 2, 3});
 
         InputHandler input = craft.input;
-        actionToggle("cra:(fire)", (b) -> input.attack.toggle(b) );
-        actionToggle("cra:(up)", (b) -> input.up.toggle(b) );
-        actionToggle("cra:(down)", (b) -> input.down.toggle(b) );
-        actionToggle("cra:(left)", (b) -> input.left.toggle(b) );
-        actionToggle("cra:(right)", (b) -> input.right.toggle(b) );
+        actionToggle("cra:fire", (b) -> input.attack.toggle(b) );
+        actionToggle("cra:(move,up)", (b) -> input.up.toggle(b) );
+        actionToggle("cra:(move,down)", (b) -> input.down.toggle(b) );
+        actionToggle("cra:(move,left)", (b) -> input.left.toggle(b) );
+        actionToggle("cra:(move,right)", (b) -> input.right.toggle(b) );
 
         TopDownMinicraft.start(craft, false);
     }
