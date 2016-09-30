@@ -7,6 +7,7 @@ import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.nal.nal8.operator.NullOperator;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,6 +16,7 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 
 
+@Ignore
 public class CommandTest {
 
     @Test

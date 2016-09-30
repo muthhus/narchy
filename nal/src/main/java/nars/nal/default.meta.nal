@@ -84,13 +84,13 @@
 //  corresponds to extensional union, and extensional intersection corresponds
 //  to intensional union.
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((S | P) --> M), (Belief:Intersection, Permute:Backward, Permute:NoSwap)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((S & P) --> M), (Belief:Union, Permute:Backward, Permute:NoSwap)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((P ~ S) --> M), (Belief:Difference, Permute:Backward, Permute:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((S | P) --> M), (Belief:Intersection, Permute:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((S & P) --> M), (Belief:Union, Permute:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqRec(S,P) |- ((P ~ S) --> M), (Belief:Difference, Permute:NoSwap)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P & S)), (Belief:Intersection, Permute:Backward, Permute:NoSwap)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P | S)), (Belief:Union, Permute:Backward, Permute:NoSwap)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P - S)), (Belief:Difference, Permute:Backward, Permute:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P & S)), (Belief:Intersection, Permute:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P | S)), (Belief:Union, Permute:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqRec(S,P) |- (M --> (P - S)), (Belief:Difference, Permute:NoSwap)
 
 //raw product composition
 //    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection, Permute:NoSwap)
@@ -177,31 +177,31 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (M ==>+- P), (S ==>+- M), neqCom(S,P), time(dtUnionReverse), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
+    (M ==> P), (S ==> M), neqCom(S,P), time(dtUnionReverse), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
 
-    (P ==>+- M), (S ==>+- M), neqCom(S,P), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction)
+    (P ==> M), (S ==> M), neqCom(S,P), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction)
 
-    (M ==>+- P), (M ==>+- S), neqCom(S,P), time(dtTminB), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction)
+    (M ==> P), (M ==> S), neqCom(S,P), time(dtTminB), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction)
 
-    (P ==>+- M), (M ==>+- S), neqCom(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)
+    (P ==> M), (M ==> S), neqCom(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
 
-    (S ==>+- P), (P ==>+- S), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Intersection)
+    (S ==> P), (P ==> S), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Intersection)
 
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==>+- M), (S ==>+- M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
+    (P ==> M), (S ==> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
 
-    (M ==>+- P), (M ==>+- S), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
+    (M ==> P), (M ==> S), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
 
-    (M <=>+- P), (S <=>+- M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance)
+    (M <=> P), (S <=> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance)
 
-    (M ==>+- P), (S <=>+- M), neqCom(S,P), notImplEqui(S), notEqui(P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy)
+    (M ==> P), (S <=> M), neqCom(S,P), notImplEqui(S), notEqui(P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy)
 
-    (P ==>+- M), (S <=>+- M), neqCom(S,P), notImplEqui(S), notEqui(P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy)
+    (P ==> M), (S <=> M), neqCom(S,P), notImplEqui(S), notEqui(P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy)
 
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
@@ -471,7 +471,7 @@
 //Similarity to Inheritance
 
     (S --> P), (S <-> P), neqCom(S,P), task("?") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief, Permute:NoSwap)
-    (S ==> P), (S <=> P), neqCom(S,P), task("?") |- (S ==> P), (Belief:StructuralIntersection, Punctuation:Belief, Permute:NoSwap)
+    (S ==> P), (S <=> P), neqCom(S,P), time(dtCombine), task("?") |- (S ==>+- P), (Belief:StructuralIntersection, Punctuation:Belief, Permute:NoSwap)
 
 //NAL2:
 

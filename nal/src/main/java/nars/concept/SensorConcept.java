@@ -62,9 +62,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
         this.input = input;
 
-        pri(() -> {
-            return nar.priorityDefault(Symbols.BELIEF);
-        });
+        pri(() -> nar.priorityDefault(Symbols.BELIEF));
 
 
     }
@@ -90,14 +88,14 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 //    }
 
 
-    public static boolean onlyDerivationsIfFuture(@NotNull Task belief, @NotNull NAR nar) {
-        if (!(belief instanceof DerivedTask))
-            return true;
-
-        long bocc = belief.occurrence();
-        return (bocc!=ETERNAL && bocc > nar.time());
-    }
-
+//    public static boolean onlyDerivationsIfFuture(@NotNull Task belief, @NotNull NAR nar) {
+//        if (!(belief instanceof DerivedTask))
+//            return true;
+//
+//        long bocc = belief.occurrence();
+//        return (bocc!=ETERNAL && bocc > nar.time());
+//    }
+//
 
 
     @Override

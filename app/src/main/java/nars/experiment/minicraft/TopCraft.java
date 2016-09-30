@@ -18,7 +18,7 @@ public class TopCraft extends SwingAgent {
 
     private final TopDownMinicraft craft;
     private final MatrixSensor<PixelBag> pixels;
-    private final PixelAutoClassifier camAE;
+    private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
         run(TopCraft::new, 67500);
@@ -29,14 +29,14 @@ public class TopCraft extends SwingAgent {
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addCamera("cra", ()->craft.image, 64,64,(v) -> $.t( v, alpha));
+        pixels = addCamera("cra", ()->craft.image, 48,48,(v) -> $.t( v, alpha));
 
-        camAE = new PixelAutoClassifier("cra", pixels.src.pixels, 8, 8, 48, this);
-        window(camAE.newChart(), 500, 500);
+//        camAE = new PixelAutoClassifier("cra", pixels.src.pixels, 8, 8, 48, this);
+//        window(camAE.newChart(), 500, 500);
 
         new NObj("cra", craft, nar)
                 .read(
-                    "player.health",
+                    //"player.health",
                     "player.dir",
                     "player.getTile().connectsToGrass",
                     "player.getTile().connectsToWater"
@@ -59,12 +59,14 @@ public class TopCraft extends SwingAgent {
     @Override protected float reward() {
 
         //camAE.learn = (nar.time() % 500 < 250);
-        camAE.frame();
+        if (camAE!=null)
+            camAE.frame();
 
         float nextScore = craft.frameImmediate();
         float ds = nextScore - prevScore;
         this.prevScore = nextScore;
-        return ds;
+        float r = 0.5f * ds + (craft.player.health/((float)craft.player.maxHealth)*2f - 1f);// + 0.25f * (craft.player.stamina*((float)craft.player.maxStamina))-0.5f);
+        return r;
     }
 
 }

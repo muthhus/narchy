@@ -4,11 +4,12 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.*;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Set;
  */
 public abstract class WebsocketService extends AbstractWebsocketService {
 
-    protected final Set<WebSocketChannel> connections = new ConcurrentHashSet<>();
+    protected final Set<WebSocketChannel> connections = Collections.synchronizedSet( new HashSet<>() );
 
 
 //    static {

@@ -59,10 +59,10 @@ public class Tetris extends NAgent {
 //            new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 25550;
-    public static final int cyclesPerFrame = 6;
-    public static final int tetris_width = 8;
-    public static final int tetris_height = 16;
-    public static final int TIME_PER_FALL = 2;
+    public static final int cyclesPerFrame = 12;
+    public static final int tetris_width = 6;
+    public static final int tetris_height = 12;
+    public static final int TIME_PER_FALL = 3;
     static boolean easy;
 
     static int frameDelay;
@@ -95,7 +95,7 @@ public class Tetris extends NAgent {
      * @param timePerFall larger is slower gravity
      */
     public Tetris(NAR nar, int width, int height, int timePerFall) {
-        super(nar, 8);
+        super(nar, 2);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override
@@ -170,7 +170,7 @@ public class Tetris extends NAgent {
 
         float actionMargin =
                 //0.33f; //divide the range into 3 sections: left/nothing/right
-                0.25f;
+                0.3f;
 
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
@@ -381,7 +381,7 @@ public class Tetris extends NAgent {
         int maxVol = 40;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                12, 2, 2, rng,
+                6, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),

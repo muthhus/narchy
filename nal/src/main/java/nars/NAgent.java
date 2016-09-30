@@ -319,21 +319,21 @@ abstract public class NAgent {
                             happinssDurability));
         }
 
-//        predictors.addAll(
-//                //what will imply reward
-//                new MutableTask($.equi(what, dt, happiness), '?', null).time(now, now),
-//                //new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
-//
-//                //what will imply non-reward
-//                new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
-//                //new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
-//
-//                //what co-occurs with reward
-//                new MutableTask($.parallel(what, happiness), '?', null).time(now, now),
-//
-//                //what co-occurs with non-reward
-//                new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
-//        );
+        predictors.addAll(
+                //what will imply reward
+                new MutableTask($.equi(what, dt, happiness), '?', null).time(now, now),
+                //new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
+
+                //what will imply non-reward
+                //new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
+                //new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
+
+                //what co-occurs with reward
+                new MutableTask($.parallel(what, happiness), '?', null).time(now, now)
+
+                //what co-occurs with non-reward
+                //new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
+        );
 
 //        predictors.add(
 //                nar.ask($.seq(what, dt, happy.term()), '?', now)

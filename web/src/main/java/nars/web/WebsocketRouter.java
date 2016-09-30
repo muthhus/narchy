@@ -3,7 +3,6 @@ package nars.web;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.*;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
-import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
