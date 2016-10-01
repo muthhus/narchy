@@ -9,7 +9,6 @@ import nars.guifx.graph2.layout.IterativeLayout;
 import nars.guifx.graph2.layout.None;
 import nars.guifx.util.Animate;
 import nars.term.Termed;
-import org.infinispan.commons.util.WeakValueHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,7 @@ public class SpaceGrapher extends Spacegraph {
 
     public static final Logger logger = LoggerFactory.getLogger(SpaceGrapher.class);
 
-    final Map<Termed, TermNode> terms = new WeakValueHashMap<>();
+    final Map<Termed, TermNode> terms = new HashMap<>();
 
     static final int defaultFramePeriodMS = 30; //~60hz/2
 

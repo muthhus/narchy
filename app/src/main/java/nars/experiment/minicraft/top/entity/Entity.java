@@ -61,12 +61,16 @@ public class Entity {
 	}
 
 	/** tile standing on */
-	public Tile getTile() {
-		int xt = x >> 4;
-		int yt = y >> 4;
+	public Tile tile() {
+		return tile(0,0);
+	}
+
+	public Tile tile(int dx, int dy) {
 		if (level == null)
 			return Tile.none;
-		Tile t = level.getTile(xt, yt);
+		int xt = x >> 4;
+		int yt = y >> 4;
+		Tile t = level.getTile(xt+dx, yt+dy);
 		if (t == null)
 			return Tile.none;
 		return t;
