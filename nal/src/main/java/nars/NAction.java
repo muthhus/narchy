@@ -54,6 +54,8 @@ public interface NAction {
     /**
      * rapid-fire pushbutton with a minPeriod after which it is reset to off, allowing
      * re-triggering to ON while the true state remains enabled
+     *
+     * TODO generalize to actionPWM (pulse width modulation) with controllable reset period (ex: by frequency, or conf etc)
      * */
     default ActionConcept actionToggleRapid(String term, Runnable on, Runnable off, int minPeriod) {
 

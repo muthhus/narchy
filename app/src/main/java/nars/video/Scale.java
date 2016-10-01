@@ -38,8 +38,8 @@ public class Scale extends ImageCamera {
 
     @Override
     public void update() {
-        if (src instanceof PixelCamera)
-            ((PixelCamera) src).update();
+        if (src instanceof Bitmap2D)
+            ((Bitmap2D) src).update();
 
         Image in = src.get();
         if (in == null)

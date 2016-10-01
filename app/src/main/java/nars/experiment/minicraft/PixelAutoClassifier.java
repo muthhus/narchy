@@ -1,8 +1,7 @@
 package nars.experiment.minicraft;
 
 import nars.*;
-import nars.budget.Budgeted;
-import nars.task.MutableTask;
+import nars.concept.SensorConcept;
 import nars.term.Term;
 import nars.util.Util;
 import nars.util.signal.Autoencoder;
@@ -10,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.obj.MatrixView;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static nars.nal.UtilityFunctions.w2c;
@@ -23,12 +23,13 @@ public class PixelAutoClassifier extends Autoencoder {
     public static final MetaBits NoMetaBits = (x, y) -> Util.EmptyFloatArray;
     private final NAR nar;
     private final MetaBits metabits;
+    private final SensorConcept[][][] conceptOut;
 
     @NotNull String TAG = ("ae");
 
     private final float[][] pixIn;
 
-    private final short[][][] pixOut;
+    private final boolean[][][] pixEnable;
     private final float[][] pixConf;
 
     public final float[][] pixRecon; //reconstructed input
@@ -82,8 +83,21 @@ public class PixelAutoClassifier extends Autoencoder {
         this.in = new float[xx.length];
         this.pixRecon = new float[pw][ph];
 
-        this.pixOut = new short[nw][nh][];
+        this.pixEnable = new boolean[nw][nh][states];
         this.pixConf = new float[nw][nh];
+
+        this.conceptOut = new SensorConcept[nw][nh][states];
+
+        float res = 0.05f;
+        for (int i = 0; i< nw; i++) {
+            for (int j = 0; j < nh; j++) {
+                for (int k = 0; k < states; k++) {
+                    String term = "(" + root + ",(" + i + "," + j + ")," + k + ")";
+                    int ii = i;  int jj = j; int kk = k;
+                    agent.sense(term, () -> pixEnable[ii][jj][kk] ? 1f : 0f, res, (v) -> $.t(v, pixConf[ii][jj]));
+                }
+            }
+        }
 
 
     }
@@ -96,14 +110,14 @@ public class PixelAutoClassifier extends Autoencoder {
         float basePri = nar.priorityDefault(Symbols.BELIEF);
         float baseDur = nar.durabilityDefault(Symbols.BELIEF);
 
-        float alpha = 0.1f; //this represents the overall rate; the sub-block rate will be a fraction of this
-        float corruption = 0.3f;
+        float alpha = 0.075f; //this represents the overall rate; the sub-block rate will be a fraction of this
+        float corruption = 0.2f;
         int regionPixels = sw * sh;
         float sumErr = 0;
 
         int states = y.length;
         float outputThresh = 1f - (1f / (states - 1));
-        int maxStatesPerRegion = 2; //states / 4; //limit before considered ambiguous
+        //int maxStatesPerRegion = 2; //states / 4; //limit before considered ambiguous
 
         //forget(alpha*alpha);
 
@@ -147,12 +161,12 @@ public class PixelAutoClassifier extends Autoencoder {
                     if ((evi = 1f - (regionError / regionPixels)) > 0) {
                         short[] features = max(outputThresh);
                         if (features != null) {
-                            if (features.length < maxStatesPerRegion) {
+                            //if (features.length < maxStatesPerRegion) {
                                 evi /= features.length;
                                 if ((pixConf[i][j] = (baseConf * w2c(evi))) >= minConf) {
                                     po = features;
                                 }
-                            }
+                            //}
                         }
                     }
                     //System.out.println(n2(y) + ", +-" + n4(regionError / y.length));
@@ -160,12 +174,21 @@ public class PixelAutoClassifier extends Autoencoder {
                     //System.out.println(n2(y));
                     recode(in, true, false, true);
                 }
-                pixOut[i][j] = po;
+
+                float mult;
+
+                Arrays.fill(pixEnable[i][j], false);
+                if (po!=null) {
+                    mult = +1;
+                    for (short ppp : po)
+                        pixEnable[i][j][ppp] = true;
+                } else {
+                    mult = -1;
+                }
 
 
                 if (reconstruct) {
 
-                    float mult = (pixOut[i][j] == null) ? -1f  /* invert */ : +1f /* normal */;
 
                     float z[] = this.z;
                     p = 0;
@@ -193,44 +216,44 @@ public class PixelAutoClassifier extends Autoencoder {
             i++;
         }
 
-        if (learn) {
-            //float meanErrPerPixel = sumErr / (pw * ph);
-            //System.out.println(Arrays.toString(pixOut) + ", +-" + n4(meanErrPerPixel));
-
-
-            for (int i = 0; i < pixOut.length; i++) {
-                short[][] po = pixOut[i];
-                float[] pc = pixConf[i];
-                for (int j = 0; j < po.length; j++) {
-                    short[] v = po[j];
-                    if (v == null)
-                        continue;
-
-                    float conf = pc[j];
-
-                    Term[] vt = new Term[v.length];
-                    int vtt = 0;
-                    for (short x : v) {
-                        vt[vtt++] = $.the(TAG.toString() + x);
-                    }
-
-                    Term Y = $.inh($.p(root, $.the(i), $.the(j)), $.seti(vt));
-                    tasks.add(
-                        new MutableTask(Y, Symbols.BELIEF, 1f, conf)
-                            .budget(conf * basePri, baseDur)
-                            .present(nar) //.log(TAG))
-                    );
-
-                }
-            }
-
-
-            if (!tasks.isEmpty()) {
-                Budgeted.normalizePriSum(tasks, 1f);
-                nar.inputLater(tasks);
-            }
-
-        }
+//        if (learn) {
+//            //float meanErrPerPixel = sumErr / (pw * ph);
+//            //System.out.println(Arrays.toString(pixOut) + ", +-" + n4(meanErrPerPixel));
+//
+//
+//            for (int i = 0; i < pixOut.length; i++) {
+//                short[][] po = pixOut[i];
+//                float[] pc = pixConf[i];
+//                for (int j = 0; j < po.length; j++) {
+//                    short[] v = po[j];
+//                    if (v == null)
+//                        continue;
+//
+//                    float conf = pc[j];
+//
+//                    Term[] vt = new Term[v.length];
+//                    int vtt = 0;
+//                    for (short x : v) {
+//                        vt[vtt++] = $.the(TAG.toString() + x);
+//                    }
+//
+//                    Term Y = $.inh($.p(root, $.the(i), $.the(j)), $.seti(vt));
+//                    tasks.add(
+//                        new MutableTask(Y, Symbols.BELIEF, 1f, conf)
+//                            .budget(conf * basePri, baseDur)
+//                            .present(nar) //.log(TAG))
+//                    );
+//
+//                }
+//            }
+//
+//
+//            if (!tasks.isEmpty()) {
+//                Budgeted.normalizePriSum(tasks, 1f);
+//                nar.inputLater(tasks);
+//            }
+//
+//        }
     }
 
 

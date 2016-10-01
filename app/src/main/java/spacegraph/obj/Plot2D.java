@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 
 public class Plot2D extends Surface {
-    private final FasterList<Series> series;
+    private final List<Series> series;
     private String title = null;
 
     public void setTitle(String title) {

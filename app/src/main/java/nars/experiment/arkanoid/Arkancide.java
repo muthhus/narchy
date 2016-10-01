@@ -8,8 +8,8 @@ import nars.remote.SwingAgent;
 public class Arkancide extends SwingAgent {
 
 
-    final int visW = 32;
-    final int visH = 18;
+    final int visW = 64;
+    final int visH = 32;
 
 
     float paddleSpeed = 10f;
@@ -21,7 +21,7 @@ public class Arkancide extends SwingAgent {
 
 
     public Arkancide(NAR nar) {
-        super(nar, 10 /* additional decision frames */);
+        super(nar, 4 /* additional decision frames */);
 
         noid = new Arkanoid();
 
@@ -52,7 +52,7 @@ public class Arkancide extends SwingAgent {
     }
 
     @Override
-    protected float reward() {
+    protected float act() {
         float nextScore = noid.next();
         float reward = nextScore - prevScore;
         this.prevScore = nextScore;

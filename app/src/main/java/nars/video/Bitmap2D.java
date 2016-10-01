@@ -1,7 +1,7 @@
 package nars.video;
 
 
-public interface PixelCamera {
+public interface Bitmap2D {
 
     /** explicit refresh update the image */
     void update();

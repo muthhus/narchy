@@ -82,7 +82,7 @@ public class commai extends SwingAgent {
     }
 
     @Override
-    protected float reward() {
+    protected float act() {
 
         if (!ready)
             return 0f;

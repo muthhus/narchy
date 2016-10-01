@@ -5,8 +5,7 @@ import nars.NAR;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.remote.SwingAgent;
-import nars.util.signal.NObj;
-import nars.video.MatrixSensor;
+import nars.video.Sensor2D;
 import nars.video.PixelBag;
 
 import static spacegraph.SpaceGraph.window;
@@ -17,11 +16,11 @@ import static spacegraph.SpaceGraph.window;
 public class TopCraft extends SwingAgent {
 
     private final TopDownMinicraft craft;
-    private final MatrixSensor<PixelBag> pixels;
+    private final Sensor2D<PixelBag> pixels;
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 15500);
+        run(TopCraft::new, 3500);
     }
 
     public TopCraft(NAR nar) {
@@ -29,10 +28,15 @@ public class TopCraft extends SwingAgent {
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addCamera("see", ()->craft.image, 48,48,(v) -> $.t( v, alpha));
+        pixels = addCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
-//        camAE = new PixelAutoClassifier("cra", pixels.src.pixels, 8, 8, 48, this);
-//        window(camAE.newChart(), 500, 500);
+        int nx = 4;
+        camAE = new PixelAutoClassifier("seeAE", pixels.src.pixels, nx, nx,   (subX, subY) -> {
+            //context metadata: camera zoom, to give a sense of scale
+            //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
+            return new float[]{ pixels.src.Z};
+        }, 24, this);
+        window(camAE.newChart(), 500, 500);
 
 //        new NObj("cra", craft, nar)
 //                .read(
@@ -44,6 +48,7 @@ public class TopCraft extends SwingAgent {
 
         senseSwitch("dir", ()->craft.player.dir, 0, 4);
         sense("(stamina)", ()->(craft.player.stamina)/((float)craft.player.maxStamina));
+        sense("(health)", ()->(craft.player.health)/((float)craft.player.maxHealth));
 
         int tileMax = 13;
         senseSwitch("(tile,(0,0))", ()->craft.player.tile().id, 0, tileMax);
@@ -65,7 +70,7 @@ public class TopCraft extends SwingAgent {
 
 
     float prevScore = 0;
-    @Override protected float reward() {
+    @Override protected float act() {
 
         //camAE.learn = (nar.time() % 500 < 250);
         if (camAE!=null)

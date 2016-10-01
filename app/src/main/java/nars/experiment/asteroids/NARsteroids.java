@@ -3,7 +3,7 @@ package nars.experiment.asteroids;
 import nars.$;
 import nars.NAR;
 import nars.remote.SwingAgent;
-import nars.video.MatrixSensor;
+import nars.video.Sensor2D;
 import nars.video.Scale;
 import nars.video.SwingCamera;
 
@@ -15,7 +15,7 @@ import static java.lang.Math.round;
 public class NARsteroids extends SwingAgent {
 
     private final Asteroids space;
-    private final MatrixSensor/*<SwingCamera>*/ pixels;
+    private final Sensor2D/*<SwingCamera>*/ pixels;
 
     public static void main(String[] args) {
         run(NARsteroids::new, 5000);
@@ -66,7 +66,7 @@ public class NARsteroids extends SwingAgent {
 
 
     float prevScore = 0;
-    @Override protected float reward() {
+    @Override protected float act() {
         float nextScore = space.frame();
         float ds = nextScore - prevScore;
         this.prevScore = nextScore;

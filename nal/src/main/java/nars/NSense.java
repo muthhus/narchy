@@ -1,8 +1,10 @@
 package nars;
 
 import nars.concept.SensorConcept;
+import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
@@ -19,20 +21,21 @@ public interface NSense {
     NAR nar();
 
 
-    default void sense(String term, BooleanSupplier value) {
-        sense(term, () -> value.getAsBoolean() ? 1f : 0f, nar().truthResolution.floatValue());
+    default SensorConcept sense(String term, BooleanSupplier value) {
+        return sense(term, () -> value.getAsBoolean() ? 1f : 0f);
     }
 
-    default void sense(String term, FloatSupplier value) {
-        sense(term, value, nar().truthResolution.floatValue());
+    default SensorConcept sense(String term, FloatSupplier value) {
+        return sense(term, value, nar().truthResolution.floatValue(), (v) -> $.t(v, alpha()) );
     }
 
-    default void sense(String term, FloatSupplier value, float resolution) {
+    default SensorConcept sense(String term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
         SensorConcept s = new SensorConcept(term, nar(), value,
-                (v) -> $.t(v, alpha()));
+                truthFunc);
         s.resolution(resolution);
 
         sensors().add( s );
+        return s;
     }
 
     /** learning rate */
@@ -73,5 +76,6 @@ public interface NSense {
             sense(t, ()->value.get().equals(e));
         }
     }
+
 
 }

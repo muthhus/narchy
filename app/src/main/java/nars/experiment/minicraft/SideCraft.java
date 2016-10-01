@@ -6,7 +6,7 @@ import nars.experiment.minicraft.side.SideScrollMinicraft;
 import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
 import nars.remote.SwingAgent;
 import nars.util.Util;
-import nars.video.MatrixSensor;
+import nars.video.Sensor2D;
 import nars.video.PixelBag;
 
 import java.awt.image.BufferedImage;
@@ -19,7 +19,7 @@ import static spacegraph.SpaceGraph.window;
 public class SideCraft extends SwingAgent {
 
     private final SideScrollMinicraft craft;
-    private final MatrixSensor pixels;
+    private final Sensor2D pixels;
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
@@ -108,7 +108,7 @@ public class SideCraft extends SwingAgent {
     float prevScore = 0;
 
     @Override
-    protected float reward() {
+    protected float act() {
 
         if (camAE != null)
             camAE.frame();

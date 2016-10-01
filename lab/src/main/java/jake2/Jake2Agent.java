@@ -1,40 +1,27 @@
 package jake2;
 
-import boofcv.io.image.ConvertBufferedImage;
-import com.jogamp.nativewindow.NativeSurface;
-import com.jogamp.nativewindow.SurfaceUpdatedListener;
-import com.jogamp.opengl.util.GLPixelBuffer;
-import com.jogamp.opengl.util.GLReadBufferUtil;
-
-import jake2.client.CL;
 import jake2.client.CL_input;
-import jake2.client.VID;
 import jake2.client.refexport_t;
 import jake2.game.PlayerView;
 import jake2.game.edict_t;
-import jake2.qcommon.Qcommon;
 import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
-import jake2.render.opengl.JoglGL2Driver;
 import jake2.sys.IN;
-import jogamp.newt.WindowImpl;
 import nars.NAR;
 import nars.experiment.minicraft.PixelAutoClassifier;
 import nars.remote.SwingAgent;
 import nars.util.signal.NObj;
-import nars.video.MatrixSensor;
+import nars.video.Sensor2D;
 import nars.video.PixelBag;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.function.Supplier;
 
 import static jake2.Globals.*;
-import static jake2.game.PlayerView.current_player;
 import static jake2.render.Base.vid;
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
@@ -101,7 +88,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
         super(nar, 1);
 
 
-        MatrixSensor<PixelBag> qcam = addCamera("q", screenshotter, 64, 64, (v) -> t(v, alpha));
+        Sensor2D<PixelBag> qcam = addCamera("q", screenshotter, 64, 64, (v) -> t(v, alpha));
         qcam.src.vflip = true;
 
 //        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);
@@ -136,7 +123,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
     }
 
     @Override
-    protected float reward() {
+    protected float act() {
 
         if (camAE!=null)
             camAE.frame();

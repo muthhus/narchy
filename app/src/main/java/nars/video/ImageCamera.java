@@ -3,12 +3,12 @@ package nars.video;
 import java.awt.image.BufferedImage;
 import java.util.function.Supplier;
 
-import static nars.video.PixelCamera.*;
+import static nars.video.Bitmap2D.*;
 
 /**
  * exposes a buffered image as a camera video source
  */
-public class ImageCamera implements PixelCamera, Supplier<BufferedImage> {
+public class ImageCamera implements Bitmap2D, Supplier<BufferedImage> {
 
     Supplier<BufferedImage> source;
     public BufferedImage out;

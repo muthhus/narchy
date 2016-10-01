@@ -104,7 +104,7 @@ public class Webcam extends ImageCamera implements WebcamListener {
             }
 
             @Override
-            protected float reward() {
+            protected float act() {
                 return 0;
             }
         }, 5000);

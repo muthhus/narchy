@@ -173,8 +173,8 @@ public class Tetris extends NAgent {
 
 
         float actionMargin =
-                //0.33f; //divide the range into 3 sections: left/nothing/right
-                0.3f;
+                //0.33f; //divides the range into 3 sections: left/nothing/right
+                0.25f;
 
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
@@ -190,14 +190,14 @@ public class Tetris extends NAgent {
                     if (state.take_action(RIGHT))
                         //return d; //legal move
                         //return d.withConf(gamma);
-                        return $.t(1, gamma);
+                        return $.t(1, alpha);
                 } else if (x < actionThresholdLow) {
                     if (state.take_action(LEFT))
                         //return d; //legal move
                         //return d.withConf(gamma);
-                        return $.t(0, gamma);
+                        return $.t(0, alpha);
                 } else {
-                    return $.t(0.5f, gamma); //no action taken or move ineffective
+                    return $.t(0.5f, alpha); //no action taken or move ineffective
                 }
             }
             return null;
@@ -211,14 +211,14 @@ public class Tetris extends NAgent {
                         if (state.take_action(CW))
                             //return d; //legal move
                             //return d.withConf(gamma);
-                            return $.t(1, gamma);
+                            return $.t(1, alpha);
                     } else if (r < actionThresholdLower) {
                         if (state.take_action(CCW))
                             //return d; //legal move
                             //return d.withConf(gamma);
-                            return $.t(0, gamma);
+                            return $.t(0, alpha);
                     } else {
-                        return $.t(0.5f, gamma); //no action taken or move ineffective
+                        return $.t(0.5f, alpha); //no action taken or move ineffective
                     }
                 }
                 return null;

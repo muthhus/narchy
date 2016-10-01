@@ -12,17 +12,18 @@ import nars.util.math.FloatSupplier;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
  * monochrome
  */
-public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P> {
+public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR> {
 
 
     private final int radix = 3;
     private final NAR nar;
-    float maxResolution = 0.02f, minResolution = 0.12f; //TODO less precision for peripheral pixels than center?
+    float resolution = 0.05f;
 
     public CameraSensor(Term root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         super(src, src.width(), src.height());
@@ -40,6 +41,7 @@ public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P> {
 
             , brightnessToTruth));
 
+        agent.nar.onFrame(this);
     }
 
     public List<SensorConcept> encode(Int2Function<Compound> cellTerm, FloatToObjectFunction<Truth> brightnessToTruth) {
@@ -65,7 +67,7 @@ public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P> {
                         brightnessToTruth
                 ).resolution(
                         //distToResolution(cdist)
-                        maxResolution
+                        resolution
                 ));
                 matrix[x][y] = sss;
             }
@@ -80,7 +82,7 @@ public class CameraSensor<P extends PixelCamera> extends MatrixSensor<P> {
 //        return r;
 //    }
 
-    public void update() {
+    public void accept(NAR n) {
         src.update();
     }
 

@@ -13,12 +13,12 @@ import spacegraph.obj.MatrixView;
  */
 public class CameraSensorView extends MatrixView implements MatrixView.ViewFunc {
 
-    private final MatrixSensor cam;
+    private final Sensor2D cam;
     private final NAR nar;
     private float maxConceptPriority;
     private long now;
 
-    public CameraSensorView(MatrixSensor cam, NAR nar) {
+    public CameraSensorView(Sensor2D cam, NAR nar) {
         super(cam.width, cam.height);
         this.cam = cam;
         this.nar = nar;

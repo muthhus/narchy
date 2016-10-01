@@ -14,7 +14,7 @@ import static nars.util.Util.lerp;
 /**
  * 2D flat Raytracing Retina
  */
-public class PixelBag implements PixelCamera {
+public class PixelBag implements Bitmap2D {
 
     final Supplier<BufferedImage> source;
     private final int px;
@@ -124,9 +124,9 @@ public class PixelBag implements PixelCamera {
 
                 //pixel value
                 int RGB = b.getRGB(sx, sy);
-                float R = PixelCamera.decodeRed(RGB);
-                float G = PixelCamera.decodeGreen(RGB);
-                float B = PixelCamera.decodeBlue(RGB);
+                float R = Bitmap2D.decodeRed(RGB);
+                float G = Bitmap2D.decodeGreen(RGB);
+                float B = Bitmap2D.decodeBlue(RGB);
                 pixels[lx][ly] = (R + G + B) / 3f;
                 //p.pixel(lx, ly, );
             }

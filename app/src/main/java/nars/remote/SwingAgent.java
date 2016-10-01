@@ -56,7 +56,7 @@ abstract public class SwingAgent extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 16, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, exe)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*256, maxVol/2, false, exe)
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 8192, 2)
 
                 , new FrameClock(), exe);
@@ -116,41 +116,30 @@ abstract public class SwingAgent extends NAgent {
     /**
      * pixelTruth defaults to linear monochrome brightness -> frequency
      */
-    protected MatrixSensor addCamera(String id, Container w, int pw, int ph) {
+    protected Sensor2D addCamera(String id, Container w, int pw, int ph) {
         return addCamera(id, w, pw, ph, (v) -> t(v, alpha));
     }
 
-    protected MatrixSensor addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected Sensor2D addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }
 
-    protected MatrixSensor<PixelBag> addCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected Sensor2D<PixelBag> addCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         PixelBag pb = new PixelBag(w, pw, ph);
         pb.addActions(id, this);
         return addCamera(id, pb, pixelTruth);
     }
 
-    protected <C extends PixelCamera> MatrixSensor addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+    protected <C extends Bitmap2D> Sensor2D addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
         CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
         cam.put(id, c);
         return c;
     }
-    protected <C extends PixelCamera> MatrixSensor addMatrixAutoEncoder(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
-        CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
-        cam.put(id, c);
-        return c;
-    }
+//    protected <C extends PixelCamera> MatrixSensor addMatrixAutoEncoder(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+//        CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
+//        cam.put(id, c);
+//        return c;
+//    }
 
 
-    @Override
-    protected float act() {
-
-        cam.values().forEach(CameraSensor::update);
-
-        //TODO update input
-
-        return reward();
-    }
-
-    protected abstract float reward();
 }
