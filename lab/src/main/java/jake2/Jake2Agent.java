@@ -10,7 +10,6 @@ import jake2.sys.IN;
 import nars.NAR;
 import nars.experiment.minicraft.PixelAutoClassifier;
 import nars.remote.SwingAgent;
-import nars.util.signal.NObj;
 import nars.video.Sensor2D;
 import nars.video.PixelBag;
 
@@ -94,7 +93,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
 //        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);
 //        window(camAE.newChart(), 500, 500);
 
-        new NObj("p", player, nar).readAllFields(false).into(this);
+        senseFields("q", player);
 
         actionToggle("(fore)", (x) -> CL_input.in_forward.state = x ? 1 : 0);
         actionToggle("(back)", (x) -> CL_input.in_back.state = x ? 1 : 0);
@@ -125,8 +124,6 @@ public class Jake2Agent extends SwingAgent implements Runnable {
     @Override
     protected float act() {
 
-        if (camAE!=null)
-            camAE.frame();
 
         player.update();
 

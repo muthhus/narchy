@@ -36,7 +36,6 @@ import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.signal.NObj;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.Nullable;
 
@@ -187,7 +186,7 @@ public class Pacman extends NAgent {
 
 
         //PAC-GPS
-        new NObj("pcpman", pacman, nar).read("pac.iX", "pac.iY").into(this);
+        //new NObj("pcpman", pacman, nar).read("pac.iX", "pac.iY").into(this);
     }
 
 
@@ -222,9 +221,10 @@ public class Pacman extends NAgent {
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * pMult;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * pMult;
         nar.cyclesPerFrame.set(cyclesPerFrame);
+        nar.linkFeedbackRate.setValue(0.1f);
 
         nar.confMin.setValue(0.04f);
-        nar.compoundVolumeMax.set(24);
+        nar.compoundVolumeMax.set(32);
 
         //nar.truthResolution.setValue(0.02f);
 
@@ -251,7 +251,7 @@ public class Pacman extends NAgent {
         //Param.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
 

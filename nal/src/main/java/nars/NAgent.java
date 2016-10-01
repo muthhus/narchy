@@ -486,4 +486,6 @@ abstract public class NAgent implements NSense, NAction {
         }
         return Float.NaN;
     }
+
+
 }
