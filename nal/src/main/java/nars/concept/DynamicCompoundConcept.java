@@ -37,18 +37,18 @@ public class DynamicCompoundConcept extends CompoundConcept {
     }
 
     public static final class DynTruth {
-        @NotNull private final List<Truth> t;
+        //@NotNull private final List<Truth> t;
         @Nullable final List<Task> e;
         @Nullable final Budget b;
         private final float confMin;
 
         @Deprecated float freq, conf; //running product
 
-        public DynTruth(Op o, float confMin, List<Truth> t, List<Task> e, Budget b) {
+        public DynTruth(Op o, float confMin, List<Task> e, Budget b) {
             if (o!=CONJ)
                 throw new UnsupportedOperationException("aggregate truth for " + o + " not implemented or not applicable");
             this.confMin = confMin;
-            this.t = t;
+            //this.t = t;
             this.e = e;
             this.b = b;
             freq = conf = 1f;
@@ -59,9 +59,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         }
 
         @Nullable public Truth truth() {
-            if (t.isEmpty())
-                return null;
-            return $.t(freq, conf);
+            return conf <= 0 ? null : $.t(freq, conf);
         }
 
         public boolean add(@NotNull Truth truth) {
@@ -73,14 +71,6 @@ public class DynamicCompoundConcept extends CompoundConcept {
             return true;
         }
 
-//        @Nullable public Truth truth(@NotNull Op op, float confMin) {
-//            switch (op) {
-//                case CONJ:
-//                    return TruthFunctions.intersection(t, confMin);
-//                default:
-//                    throw new UnsupportedOperationException("aggregate truth for " + op + " not implemented or not applicable");
-//            }
-//        }
     }
 
     @NotNull
@@ -119,11 +109,10 @@ public class DynamicCompoundConcept extends CompoundConcept {
         @Nullable private DynamicCompoundConcept.DynTruth truth(long when, long now, Compound template, boolean evidence) {
 
             int n = size();
-            final List<Truth> t = $.newArrayList(n);
             final List<Task> e = evidence ? $.newArrayList(n) : null;
             Budget b = evidence ? new RawBudget() : null;
 
-            DynTruth d = new DynTruth(op(), nar.confMin.floatValue(), t, e, b);
+            DynTruth d = new DynTruth(op(), nar.confMin.floatValue(), e, b);
             Term[] subs = template.terms();
             for (Term s : subs) {
                 if (!subTruth(s, template, when, now, d))

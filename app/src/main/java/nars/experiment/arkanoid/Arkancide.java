@@ -12,7 +12,7 @@ public class Arkancide extends SwingAgent {
     final int visH = 18;
 
 
-    float paddleSpeed = 20f;
+    float paddleSpeed = 10f;
 
 
     final Arkanoid noid;
