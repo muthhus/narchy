@@ -63,7 +63,7 @@ public class commai extends SwingAgent {
             int ii = i;
 
             actionToggle("(o," + i + ")", () -> out[ii] = true, () -> out[ii] = false);
-            addSensor(new SensorConcept("(i," + i + ')', nar, () -> in[ii] ? 1f : 0f, (f) -> $.t(f, alpha)));
+            sense(new SensorConcept("(i," + i + ')', nar, () -> in[ii] ? 1f : 0f, (f) -> $.t(f, alpha)));
         }
 
 

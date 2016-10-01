@@ -31,7 +31,7 @@ public class Arkancide extends SwingAgent {
 
         addCamera("noid", noid, visW, visH);
 
-        addAction(new ActionConcept(
+        action(new ActionConcept(
                 //"happy:noid(paddle,x)"
                 "(leftright)"
                 , nar, (b,d)->{

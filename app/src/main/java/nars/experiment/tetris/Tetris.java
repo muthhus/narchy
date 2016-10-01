@@ -59,9 +59,9 @@ public class Tetris extends NAgent {
 //            new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 25550;
-    public static final int cyclesPerFrame = 4;
+    public static final int cyclesPerFrame = 8;
     public static final int tetris_width = 8;
-    public static final int tetris_height = 16;
+    public static final int tetris_height = 13;
     public static final int TIME_PER_FALL = 3;
     static boolean easy;
 
@@ -173,8 +173,8 @@ public class Tetris extends NAgent {
 
 
         float actionMargin =
-                //0.33f; //divides the range into 3 sections: left/nothing/right
-                0.25f;
+                0.33f; //divides the range into 3 sections: left/nothing/right
+                //0.25f;
 
         float actionThresholdHigh = 1f - actionMargin;
         float actionThresholdLow = actionMargin;
@@ -197,10 +197,11 @@ public class Tetris extends NAgent {
                         //return d.withConf(gamma);
                         return $.t(0, alpha);
                 } else {
-                    return $.t(0.5f, alpha); //no action taken or move ineffective
+                    //return $.t(0.5f, alpha); //no action taken or move ineffective
                 }
             }
-            return null;
+            return $.t(0.5f, alpha); //no action taken or move ineffective
+            //return null;
         }));
 
         if (rotate) {
@@ -218,10 +219,11 @@ public class Tetris extends NAgent {
                             //return d.withConf(gamma);
                             return $.t(0, alpha);
                     } else {
-                        return $.t(0.5f, alpha); //no action taken or move ineffective
+                        //return $.t(0.5f, alpha); //no action taken or move ineffective
                     }
                 }
-                return null;
+                return $.t(0.5f, alpha); //no action taken or move ineffective
+                //return null;
             }));
         } else {
             motorRotate = null;
@@ -384,7 +386,7 @@ public class Tetris extends NAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        int maxVol = 40;
+        int maxVol = 45;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
                 6, 2, 2, rng,
@@ -410,7 +412,7 @@ public class Tetris extends NAgent {
 //            }
 //        });
 
-        float p = 0.1f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.8f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
@@ -458,7 +460,7 @@ public class Tetris extends NAgent {
         //new Abbreviation(nar,"aKa_");
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
 
         //new VariableCompressor(nar);
@@ -572,7 +574,7 @@ public class Tetris extends NAgent {
 
         //Vis.newBeliefChartWindow(t, 200);
 
-        window(Vis.budgetHistogram(nar, 30), 500, 300);
+        //window(Vis.budgetHistogram(nar, 30), 500, 300);
 
         //Arkancide.newBeliefChartWindow(nar, 200, nar.inputTask("(&&, ((happy) ==>+0 (joy)), ((joy) ==>+0 (happy)), ((happy) <=>+0 (joy))). :|:").term());
 

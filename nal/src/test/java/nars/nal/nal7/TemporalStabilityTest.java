@@ -65,12 +65,12 @@ abstract public class TemporalStabilityTest {
 
             TimeMap m = new TimeMap(n);
 
-            irregular.forEach(i -> {
+//            irregular.forEach(i -> {
+//
+//                System.err.println(i.proof());
+//            });
 
-                System.err.println(i.proof());
-            });
-
-            m.print();
+            //m.print();
 
             assertTrue(false);
         }

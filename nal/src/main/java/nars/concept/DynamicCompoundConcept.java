@@ -281,7 +281,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
                         xx.setBudget(dt.b);
                         xx.log("Dynamic");
 
-                        nar.inputLater(xx);
+                        //nar.inputLater(xx);
 
                         //System.err.println(xx + "\tvs\t" + x);
 

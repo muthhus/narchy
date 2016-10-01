@@ -1,6 +1,0 @@
-#http://classycle.sourceforge.net/ddf.html
-
-show allResults
-
-{package} = nars
-check absenceOfPackageCycles > 1 in ${package}.*

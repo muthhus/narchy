@@ -136,22 +136,22 @@ abstract public class NAgent implements NSense, NAction {
     }
 
     /** should only be invoked before agent has started TODO check for this */
-    public void addSensor(SensorConcept... s) {
-        addSensor(Lists.newArrayList(s));
+    public void sense(SensorConcept... s) {
+        sense(Lists.newArrayList(s));
     }
 
     /** should only be invoked before agent has started TODO check for this */
-    public void addSensor(Iterable<SensorConcept> s) {
+    public void sense(Iterable<SensorConcept> s) {
         Iterables.addAll(sensors, s);
     }
 
     /** should only be invoked before agent has started TODO check for this */
-    public void addAction(ActionConcept... s) {
-        addAction(Lists.newArrayList(s));
+    public void action(ActionConcept... s) {
+        action(Lists.newArrayList(s));
     }
 
     /** should only be invoked before agent has started TODO check for this */
-    public void addAction(Iterable<ActionConcept> s) {
+    public void action(Iterable<ActionConcept> s) {
         Iterables.addAll(actions, s);
     }
 
@@ -270,21 +270,21 @@ abstract public class NAgent implements NSense, NAction {
                             happinssDurability));
         }
 
-        predictors.addAll(
-                //what will imply reward
-                new MutableTask($.equi(what, dt, happiness), '?', null).time(now, now),
-                //new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
-
-                //what will imply non-reward
-                //new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
-                //new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
-
-                //what co-occurs with reward
-                new MutableTask($.parallel(what, happiness), '?', null).time(now, now)
-
-                //what co-occurs with non-reward
-                //new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
-        );
+//        predictors.addAll(
+//                //what will imply reward
+//                new MutableTask($.equi(what, dt, happiness), '?', null).time(now, now),
+//                //new MutableTask($.equi(sth, dt, happiness), '.', null).time(now,now),
+//
+//                //what will imply non-reward
+//                //new MutableTask($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
+//                //new MutableTask($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
+//
+//                //what co-occurs with reward
+//                new MutableTask($.parallel(what, happiness), '?', null).time(now, now)
+//
+//                //what co-occurs with non-reward
+//                //new MutableTask($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
+//        );
 
 //        predictors.add(
 //                nar.ask($.seq(what, dt, happy.term()), '?', now)
@@ -297,13 +297,13 @@ abstract public class NAgent implements NSense, NAction {
         for (Concept a : actions) {
             Term action = a.term();
 
-            int lookahead = 3;
+            int lookahead = 1;
             for (int i = 0; i < lookahead; i++) {
                 long then = now + dt * (i*i);
                 predictors.addAll(
                     new MutableTask($.seq(action, dt, happiness), '?', null).time(now, then),
-                    new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),
-                    new MutableTask(action, '@', null).time(now, then+dt)
+                    //new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),
+                    new MutableTask(action, '@', null).time(now, then)
                 );
             }
         }
