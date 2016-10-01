@@ -153,7 +153,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     @Override
     public @NotNull String summary() {
         //CacheStats s = cache.stats();
-        return cache.estimatedSize() + " concepts, " + (subterms.estimatedSize()) + " subterms";
+        return cache.estimatedSize() + " concepts, " + (subterms!=null ? (subterms.estimatedSize() + " subterms") : "");
         //(" + n2(s.hitRate()) + " hitrate, " +
                 //s.requestCount() + " reqs)";
 

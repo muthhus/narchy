@@ -35,7 +35,7 @@ public class ActionConcept extends WiredCompoundConcept implements Consumer<NAR>
     private Task nextFeedback;
 
     float feedbackResolution;
-
+    //private Truth lastDesire, lastBelief;
 
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept
@@ -141,15 +141,26 @@ public class ActionConcept extends WiredCompoundConcept implements Consumer<NAR>
     @Override
     public void accept(NAR nar) {
         long now = nar.time();
-        @Nullable Truth d = this.desire(now + decisionDT);
-        @Nullable Truth b = this.belief(now + decisionDT);
 
-        Truth feedback = motor.motor(b, d);
-        if (feedback != null) {
-            //if feedback is different from last
-            if (nextFeedback == null || !nextFeedback.equalsTruth(feedback, feedbackResolution)) {
-                this.nextFeedback = feedback(feedback, now + feedbackDT);
-                nar.inputLater(nextFeedback);
+        //boolean desireChange, beliefChange;
+
+        @Nullable Truth d = this.desire(now + decisionDT);
+        //desireChange = (lastDesire == null || !lastDesire.equals(d));
+
+        @Nullable Truth b = this.belief(now + decisionDT);
+        //beliefChange = (lastBelief == null || !lastBelief.equals(d));
+
+        //lastBelief = b; lastDesire = d;
+
+        /*if (beliefChange || desireChange)*/ {
+
+            Truth feedback = motor.motor(b, d);
+            if (feedback != null) {
+                //if feedback is different from last
+                if (nextFeedback == null || !nextFeedback.equalsTruth(feedback, feedbackResolution)) {
+                    this.nextFeedback = feedback(feedback, now + feedbackDT);
+                    nar.inputLater(nextFeedback);
+                }
             }
         }
     }

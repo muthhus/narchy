@@ -10,6 +10,7 @@ import nars.truth.Truth;
 import nars.util.data.list.FasterList;
 import nars.util.math.FloatSupplier;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -21,9 +22,9 @@ import java.util.function.Consumer;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR> {
 
 
-    private final int radix = 3;
+    private static final int radix = 2;
     private final NAR nar;
-    float resolution = 0.05f;
+    float resolution = 0.02f;
 
     public CameraSensor(Term root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         super(src, src.width(), src.height());
@@ -35,13 +36,19 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
                 $.inh( $.p(
                     (radix > 1 ?
-                        $.p( $.pRecurse($.radixArray(x, radix, width)), $.pRecurse($.radixArray(y, radix, height))) :
+                        $.p(coord(x, width), coord(y, height)) :
                         $.p(x, y)
                     )), root)
 
             , brightnessToTruth));
 
         agent.nar.onFrame(this);
+    }
+
+
+    @NotNull
+    public static Compound coord(int x, int width) {
+        return $.pRecurse($.radixArray(x, radix, width));
     }
 
     public List<SensorConcept> encode(Int2Function<Compound> cellTerm, FloatToObjectFunction<Truth> brightnessToTruth) {

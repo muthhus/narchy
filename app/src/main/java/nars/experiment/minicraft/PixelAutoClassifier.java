@@ -2,6 +2,7 @@ package nars.experiment.minicraft;
 
 import nars.*;
 import nars.concept.SensorConcept;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.util.Util;
 import nars.util.signal.Autoencoder;
@@ -11,14 +12,16 @@ import spacegraph.obj.MatrixView;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static nars.nal.UtilityFunctions.w2c;
+import static nars.video.CameraSensor.coord;
 import static spacegraph.obj.GridSurface.col;
 
 /**
  * Created by me on 9/22/16.
  */
-public class PixelAutoClassifier extends Autoencoder {
+public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
 
     public static final MetaBits NoMetaBits = (x, y) -> Util.EmptyFloatArray;
     private final NAR nar;
@@ -89,20 +92,24 @@ public class PixelAutoClassifier extends Autoencoder {
         this.conceptOut = new SensorConcept[nw][nh][states];
 
         float res = 0.05f;
+
+        Term r = $.$(root);
         for (int i = 0; i< nw; i++) {
             for (int j = 0; j < nh; j++) {
+                Term coord= $.p(coord(i, nw), coord(j, nh));
                 for (int k = 0; k < states; k++) {
-                    String term = "(" + root + ",(" + i + "," + j + ")," + k + ")";
+                    Compound term = $.inh($.p(coord, $.the(k)), r);
                     int ii = i;  int jj = j; int kk = k;
                     agent.sense(term, () -> pixEnable[ii][jj][kk] ? 1f : 0f, res, (v) -> $.t(v, pixConf[ii][jj]));
                 }
             }
         }
 
+        agent.nar.onFrame(this);
 
     }
 
-    public void frame() {
+    @Override public void accept(NAR n) {
         //int q = 0;
 
         float minConf = nar.confMin.floatValue();

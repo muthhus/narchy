@@ -51,11 +51,11 @@ abstract public class SwingAgent extends NAgent {
             new SingleThreadExecutioner();
             //new MultiThreadExecutioner(2, 1024*16);
 
-        int maxVol = 32;
+        int maxVol = 40;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                16, 2, 2, rng,
+                100, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*256, maxVol/2, false, exe)
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 8192, 2)
 
@@ -65,10 +65,10 @@ abstract public class SwingAgent extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.05f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         //nar.cyclesPerFrame.set(Arkancide.cyclesPerFrame);
@@ -76,7 +76,7 @@ abstract public class SwingAgent extends NAgent {
         nar.compoundVolumeMax.setValue(maxVol);
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2);
 
         //Abbreviation abbr = new Abbreviation(nar, "the", 4, 0.5f, 32);
@@ -120,7 +120,7 @@ abstract public class SwingAgent extends NAgent {
         return addCamera(id, w, pw, ph, (v) -> t(v, alpha));
     }
 
-    protected Sensor2D addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected Sensor2D<Scale> addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }
 
@@ -130,7 +130,7 @@ abstract public class SwingAgent extends NAgent {
         return addCamera(id, pb, pixelTruth);
     }
 
-    protected <C extends Bitmap2D> Sensor2D addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+    protected <C extends Bitmap2D> Sensor2D<C> addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
         CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
         cam.put(id, c);
         return c;

@@ -1,6 +1,7 @@
 package nars;
 
 import nars.concept.SensorConcept;
+import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
@@ -30,8 +31,11 @@ public interface NSense {
     }
 
     default SensorConcept sense(String term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
-        SensorConcept s = new SensorConcept(term, nar(), value,
-                truthFunc);
+        return sense($.$(term), value, resolution, truthFunc);
+    }
+
+    default SensorConcept sense(Compound term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
+        SensorConcept s = new SensorConcept(term, nar(), value, truthFunc);
         s.resolution(resolution);
 
         sensors().add( s );

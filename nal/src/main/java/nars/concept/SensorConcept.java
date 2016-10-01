@@ -143,20 +143,20 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         return this;
     }
 
-    public Task desire(@Nullable Truth t, float pri, float dur) {
-        if (this.desire==null || !this.desire.truth().equals(t)) {
-            if (this.desire != null) {
-                this.desire.delete(nar);
-            }
-
-            if (t!=null) {
-                this.desire = new MutableTask(term(), Symbols.GOAL, t).budget(pri, dur).log("Sensor Goal");
-                //policy(policy(), nar.time()); //trigger capacity update
-                sensor.nar.inputLater(this.desire);
-            }
-        }
-        return this.desire;
-    }
+//    public Task desire(@Nullable Truth t, float pri, float dur) {
+//        if (this.desire==null || !this.desire.truth().equals(t)) {
+//            if (this.desire != null) {
+//                this.desire.delete(nar);
+//            }
+//
+//            if (t!=null) {
+//                this.desire = new MutableTask(term(), Symbols.GOAL, t).budget(pri, dur).log("Sensor Goal");
+//                //policy(policy(), nar.time()); //trigger capacity update
+//                sensor.nar.inputLater(this.desire);
+//            }
+//        }
+//        return this.desire;
+//    }
 
 
     public void setInput(FloatSupplier input) {

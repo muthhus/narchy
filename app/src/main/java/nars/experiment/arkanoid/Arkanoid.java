@@ -113,10 +113,13 @@ public class Arkanoid extends JFrame implements KeyListener {
 			this.sizeY = PADDLE_HEIGHT;
 		}
 
-		public void move(float dx) {
+		/** returns percent of movement accomplished */
+		public float move(float dx) {
+			double px = x;
 			x += dx;
 			x = Math.max(x, sizeX);
 			x = Math.min(x, SCREEN_WIDTH - sizeX);
+			return (float) (Math.abs(x - px) / dx);
 		}
 
 		void update() {

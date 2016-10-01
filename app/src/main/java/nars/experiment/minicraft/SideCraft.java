@@ -110,9 +110,6 @@ public class SideCraft extends SwingAgent {
     @Override
     protected float act() {
 
-        if (camAE != null)
-            camAE.frame();
-
         float nextScore = craft.frame();
         float ds = nextScore - prevScore;
         this.prevScore = nextScore;

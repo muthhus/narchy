@@ -69,7 +69,7 @@ abstract public class NAgent implements NSense, NAction {
     public float rewardValue;
 
     float predictorProbability = 0.25f;
-    private int predictionHorizon = curiosityMonitorDuration/4;
+
     private final FasterList<Task> predictors = $.newArrayList();
     private float predictorPriFactor = 1f;
 
@@ -261,13 +261,15 @@ abstract public class NAgent implements NSense, NAction {
                     ;
 
 
-            float happinssDurability =
-                    nar.durabilityDefault(Symbols.GOAL);
+//            float happinssDurability =
+//                    nar.durabilityDefault(Symbols.GOAL);
 
             predictors.add(
-                    happy.desire($.t(1f, rewardGamma),
-                            nar.priorityDefault(Symbols.GOAL),
-                            happinssDurability));
+                    new MutableTask(happy, '!', 1f, rewardGamma).present(nar.time()+dt)
+            );
+//                    happy.desire($.t(1f, rewardGamma),
+//                            nar.priorityDefault(Symbols.GOAL),
+//                            happinssDurability));
         }
 
 //        predictors.addAll(
@@ -299,7 +301,7 @@ abstract public class NAgent implements NSense, NAction {
 
             int lookahead = 1;
             for (int i = 0; i < lookahead; i++) {
-                long then = now + dt * (i*i);
+                long then = now + (i+1)*dt;
                 predictors.addAll(
                     new MutableTask($.seq(action, dt, happiness), '?', null).time(now, then),
                     //new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),

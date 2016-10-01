@@ -30,7 +30,7 @@ public class TopCraft extends SwingAgent {
 
         pixels = addCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
-        int nx = 4;
+        int nx = 8;
         camAE = new PixelAutoClassifier("seeAE", pixels.src.pixels, nx, nx,   (subX, subY) -> {
             //context metadata: camera zoom, to give a sense of scale
             //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
@@ -72,9 +72,7 @@ public class TopCraft extends SwingAgent {
     float prevScore = 0;
     @Override protected float act() {
 
-        //camAE.learn = (nar.time() % 500 < 250);
-        if (camAE!=null)
-            camAE.frame();
+
 
         float nextScore = craft.frameImmediate();
         float ds = nextScore - prevScore;

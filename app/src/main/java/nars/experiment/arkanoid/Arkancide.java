@@ -1,9 +1,11 @@
 package nars.experiment.arkanoid;
 
 
+import nars.$;
 import nars.NAR;
 import nars.concept.ActionConcept;
 import nars.remote.SwingAgent;
+import nars.util.Util;
 
 public class Arkancide extends SwingAgent {
 
@@ -12,7 +14,7 @@ public class Arkancide extends SwingAgent {
     final int visH = 32;
 
 
-    float paddleSpeed = 10f;
+    float paddleSpeed = 15f;
 
 
     final Arkanoid noid;
@@ -21,13 +23,20 @@ public class Arkancide extends SwingAgent {
 
 
     public Arkancide(NAR nar) {
-        super(nar, 4 /* additional decision frames */);
+        super(nar, 0 /* additional decision frames */);
 
         noid = new Arkanoid();
 
 //        new NObj("noid", noid, nar)
 //                .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
 //                .into(this);
+
+//        nar.onTask(t -> {
+//            if (t.isEternal()) {
+//                System.err.println(t);
+//                System.err.println(t.proof());
+//            }
+//        });
 
         addCamera("noid", noid, visW, visH);
 
@@ -38,11 +47,13 @@ public class Arkancide extends SwingAgent {
             if (d!=null) {
                 //TODO add limits for feedback, dont just return the value
                 //do this with a re-usable feedback interface because this kind of acton -> limitation detection will be common
-                noid.paddle.move((d.freq() - 0.5f) * paddleSpeed);
-                return d.withConf(alpha);
-            } else {
-                return null;
+                float pct = noid.paddle.move((d.freq() - 0.5f) * paddleSpeed);
+                if (pct > 0)
+                    return $.t(d.freq(), alpha*pct);
+                    //return $.t(Util.lerp(d.freq(), 0.5f, pct), alpha);
+
             }
+            return $.t(0.5f, alpha);
         }));
 
 //        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
