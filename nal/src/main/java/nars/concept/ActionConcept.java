@@ -12,11 +12,13 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 import static nars.$.$;
 
 
 /** TODO make extend SensorConcept and utilize that for feedback control */
-public class ActionConcept extends WiredCompoundConcept {
+public class ActionConcept extends WiredCompoundConcept implements Consumer<NAR> {
 
 
     /** relative temporal delta time for desire/belief prediction */
@@ -32,7 +34,7 @@ public class ActionConcept extends WiredCompoundConcept {
 
     private Task nextFeedback;
 
-    float feedbackResolution = 0.05f;
+    float feedbackResolution;
 
 
 
@@ -42,7 +44,7 @@ public class ActionConcept extends WiredCompoundConcept {
      *  although this may be reduced to indicate that the motion has hit a limit or
      *  experienced resistence
      * */
-    @FunctionalInterface  public interface MotorFunction {
+    @FunctionalInterface  public interface MotorFunction  {
 
         /**
          * @param desired current desire - null if no desire Truth can be determined
@@ -78,11 +80,12 @@ public class ActionConcept extends WiredCompoundConcept {
 
         this.feedbackPriority = n.priorityDefault(Symbols.GOAL /* though these will be used for beliefs */);
         this.feedbackDurability = n.durabilityDefault(Symbols.GOAL /* though these will be used for beliefs */);
+        this.feedbackResolution = n.truthResolution.floatValue();
         this.motor = motor;
 
-        nar.onFrame(nn->{
-            run();
-        });
+
+        nar.onFrame(this);
+
     }
 
 //    @Override
@@ -120,11 +123,11 @@ public class ActionConcept extends WiredCompoundConcept {
         return motor;
     }
 
-    @Override
-    protected final boolean runLater(@NotNull Task t, @NotNull NAR nar) {
-        //return hasGoals();
-        return false; //will run automatically each frame, as set in constructor
-    }
+//    @Override
+//    protected final boolean runLater(@NotNull Task t, @NotNull NAR nar) {
+//        //return hasGoals();
+//        return true; //will run automatically each frame, as set in constructor
+//    }
 
 
     /**
@@ -135,23 +138,24 @@ public class ActionConcept extends WiredCompoundConcept {
     }
 
 
-
     @Override
-    protected final void update() {
-
+    public void accept(NAR nar) {
         long now = nar.time();
         @Nullable Truth d = this.desire(now + decisionDT);
         @Nullable Truth b = this.belief(now + decisionDT);
 
         Truth feedback = motor.motor(b, d);
         if (feedback != null) {
-            Task next = feedback(feedback, now + feedbackDT);
-            if (nextFeedback == null || !nextFeedback.equalsTruth(next, feedbackResolution)) { //if feedback is different from last
-                nextFeedback = next;
-                nar.inputLater(next);
+            //if feedback is different from last
+            if (nextFeedback == null || !nextFeedback.equalsTruth(feedback, feedbackResolution)) {
+                this.nextFeedback = feedback(feedback, now + feedbackDT);
+                nar.inputLater(nextFeedback);
             }
         }
+    }
 
+    protected boolean alwaysUpdateFeedback() {
+        return false;
     }
 
     protected final Task feedback(Truth t, long when) {
@@ -185,9 +189,9 @@ public class ActionConcept extends WiredCompoundConcept {
             if (nextFeedback !=null && when <= now && when >= nextFeedback.occurrence()) {
                 //now = when = sensor.lastInputTime;
                 return nextFeedback.truth();
+            } else {
+                return super.truth(when, now);
             }
-
-            return super.truth(when, now);
         }
 
         @Override

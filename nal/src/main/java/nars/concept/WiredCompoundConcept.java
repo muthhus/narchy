@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 /**
  * base class for concepts which are more or less programmatically "hard-wired" into
@@ -35,19 +36,19 @@ import java.util.function.BiPredicate;
  * to make them directly reflect the sensor concept as the authority.
  *
  * */
-public abstract class WiredCompoundConcept extends CompoundConcept<Compound> implements Runnable, PermanentConcept {
+public abstract class WiredCompoundConcept extends CompoundConcept<Compound> implements PermanentConcept {
 
     @NotNull
     protected final NAR nar;
     int beliefCapacity = Param.DEFAULT_WIRED_CONCEPT_BELIEFS;
     int goalCapacity = Param.DEFAULT_WIRED_CONCEPT_GOALS;
 
-    @NotNull final private AtomicBoolean pendingRun = new AtomicBoolean(false);
+    //@NotNull final private AtomicBoolean pendingRun = new AtomicBoolean(false);
 
     public WiredCompoundConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
-        n.on(this);
         this.nar = n;
+        n.on(this);
     }
 
     @Override
@@ -88,7 +89,7 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
         if (t != null) {
             TruthDelta td = super.processBelief(t, nar, displaced);
             if (td != null) {
-                executeLater(t, nar);
+                //executeLater(t, nar);
                 return td;
             }
         }
@@ -101,7 +102,7 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
         if (t != null) {
             TruthDelta td = super.processGoal(t, nar, displaced);
             if (td != null) {
-                executeLater(t, nar);
+                //executeLater(t, nar);
                 return td;
             }
         }
@@ -121,30 +122,30 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
     }
 
 
-    @Nullable
-    private Task executeLater(@Nullable Task t, @NotNull NAR nar) {
-        if (t != null && runLater(t, nar) && pendingRun.compareAndSet(false, true)) {
-            nar.runLater(this);
-        }
+//    @Nullable
+//    private Task executeLater(@Nullable Task t, @NotNull NAR nar) {
+//        if (t != null && pendingRun.compareAndSet(false, true)) {
+//            nar.runLater(this);
+//        }
+//
+//        return t;
+//    }
 
-        return t;
-    }
+//    /** called at most once per frame */
+//    @Override public final void accept(NAR n) {
+//        pendingRun.set(false); //this needs to happen first in case update re-triggers a change in this concept
+//        update();
+//    }
+//
+//
+//    protected void update() {
+//        //override in subclasses when used in combination with runLater(t,n)
+//    }
 
-    @Override
-    public final void run() {
-        pendingRun.set(false); //this needs to happen first in case update re-triggers a change in this concept
-        update();
-    }
-
-
-    protected void update() {
-        //override in subclasses when used in combination with runLater(t,n)
-    }
-
-    /** when true, update(nar) will be called before the next frame */
-    protected boolean runLater(@NotNull Task t, @NotNull NAR nar) {
-        return false;
-    }
+//    /** when true, update(nar) will be called before the next frame */
+//    protected boolean runLater(@NotNull Task t, @NotNull NAR nar) {
+//        return false;
+//    }
 
 
 //    public abstract boolean validBelief(@NotNull Task belief, @NotNull NAR nar);

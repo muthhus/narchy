@@ -59,9 +59,9 @@ public class Tetris extends NAgent {
 //            new MultiThreadExecutioner(4, 1024*32);
 
     public static final int runFrames = 25550;
-    public static final int cyclesPerFrame = 12;
-    public static final int tetris_width = 6;
-    public static final int tetris_height = 12;
+    public static final int cyclesPerFrame = 4;
+    public static final int tetris_width = 8;
+    public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 3;
     static boolean easy;
 
@@ -95,7 +95,7 @@ public class Tetris extends NAgent {
      * @param timePerFall larger is slower gravity
      */
     public Tetris(NAR nar, int width, int height, int timePerFall) {
-        super(nar, 2);
+        super(nar, 0);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override
@@ -144,12 +144,16 @@ public class Tetris extends NAgent {
                 int xx = x;
                 Compound squareTerm =
                         //$.p(x, y);
-                        $.inh($.p($.pRecurse($.radixArray(x, 2, state.width)), $.pRecurse($.radixArray(y, 2, state.height))),
-                              $.the("tetris"));
+                        //$.inh(
+                              $.p($.pRecurse($.radixArray(x, 2, state.width)),
+                                  $.pRecurse($.radixArray(y, 2, state.height)))
+                          //   , $.the("tetris")
+                ;
 
                 //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
+                int index = yy * state.width + xx;
                 @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
-                        () -> state.seen[yy * state.width + xx] > 0 ? 1f : 0f,
+                        () -> state.seen[index] > 0 ? 1f : 0f,
 
                         //null //disable input
 
@@ -192,10 +196,11 @@ public class Tetris extends NAgent {
                         //return d; //legal move
                         //return d.withConf(gamma);
                         return $.t(0, gamma);
+                } else {
+                    return $.t(0.5f, gamma); //no action taken or move ineffective
                 }
             }
-            //return null;
-            return $.t(0.5f, gamma); //no action taken or move ineffective
+            return null;
         }));
 
         if (rotate) {
@@ -212,10 +217,11 @@ public class Tetris extends NAgent {
                             //return d; //legal move
                             //return d.withConf(gamma);
                             return $.t(0, gamma);
+                    } else {
+                        return $.t(0.5f, gamma); //no action taken or move ineffective
                     }
                 }
-                //return null;
-                return $.t(0.5f, gamma); //no action taken or move ineffective
+                return null;
             }));
         } else {
             motorRotate = null;

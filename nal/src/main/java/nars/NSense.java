@@ -44,9 +44,14 @@ public interface NSense {
     default <E extends Enum> void senseSwitch(String term, Supplier<E> value) {
         E[] values = ((Class<? extends E>)value.get().getClass()).getEnumConstants();
         for (E e : values) {
-            String t = "(" + term + "-->[" + e.toString() + "])";
+            String t = switchTerm(term, e.toString());
             sense(t, ()->value.get()==e);
         }
+    }
+
+    static String switchTerm(String term, String e) {
+        //return "(" + e + " --> " + term + ")";
+        return  "(" + term + " , " + e + ")";
     }
 
     default void senseSwitch(String term, IntSupplier value, int min, int max) {
@@ -56,7 +61,7 @@ public interface NSense {
     /** interpret an int as a selector between (enumerated) integer values */
     default void senseSwitch(String term, IntSupplier value, int[] values) {
         for (int e : values) {
-            String t = "(" + term + "-->[" + String.valueOf(e) + "])";
+            String t = switchTerm(term, String.valueOf(e));
             sense(t, ()->value.getAsInt()==e);
         }
     }
@@ -64,7 +69,7 @@ public interface NSense {
     /** interpret an int as a selector between (enumerated) object values */
     default <O> void senseSwitch(String term, Supplier<O> value, O... values) {
         for (O e : values) {
-            String t = "(" + term + "-->[\"" + String.valueOf(e) + "\"])";
+            String t = switchTerm(term, "\"" + e.toString() + "\"");
             sense(t, ()->value.get().equals(e));
         }
     }

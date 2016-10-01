@@ -2,6 +2,7 @@ package nars;
 
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 
@@ -45,6 +46,66 @@ public interface NAction {
 
     default ActionConcept actionToggle(String s, BooleanProcedure onChange) {
         return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false) );
+    }
+    default ActionConcept actionToggleRapid(String s, BooleanProcedure onChange, int minPeriod) {
+        return actionToggleRapid(s, () -> onChange.value(true), () -> onChange.value(false), minPeriod );
+    }
+
+    /**
+     * rapid-fire pushbutton with a minPeriod after which it is reset to off, allowing
+     * re-triggering to ON while the true state remains enabled
+     * */
+    default ActionConcept actionToggleRapid(String term, Runnable on, Runnable off, int minPeriod) {
+
+        if (minPeriod < 1)
+            throw new UnsupportedOperationException();
+
+        final long[] reset = { Tense.ETERNAL }; //last enable time
+        final int[] state = { 0 }; // 0: unknown, -1: false, +1: true
+
+        ActionConcept m = new ActionConcept(term, nar(), (b, d) -> {
+
+            boolean next = d!=null && d.freq() >= 0.5f;
+
+            float alpha = nar().confidenceDefault(Symbols.BELIEF);
+            int v;
+            int s;
+            if (!next) {
+                reset[0] = Tense.ETERNAL;
+                s = -1;
+                v = 0;
+            } else {
+
+                long lastReset = reset[0];
+                long now = nar().time();
+                if (lastReset == Tense.ETERNAL) {
+                    reset[0] = now;
+                    s = -1;
+                } else {
+                    if ((now - lastReset) % minPeriod == 0) {
+                        s = -1;
+                    } else {
+                        s = +1;
+                    }
+                }
+                v = 1;
+            }
+
+            if (state[0]!=s) {
+                if (s < 0)
+                    off.run();
+                else
+                    on.run();
+                state[0] = s;
+            }
+
+            return $.t(v, alpha);
+        }) {
+            protected boolean alwaysUpdateFeedback() { return true; }
+        };
+
+        actions().add(m);
+        return m;
     }
 
     /** the supplied value will be in the range -1..+1. if the predicate returns false, then

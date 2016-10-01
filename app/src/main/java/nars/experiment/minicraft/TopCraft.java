@@ -25,11 +25,11 @@ public class TopCraft extends SwingAgent {
     }
 
     public TopCraft(NAR nar) {
-        super(nar, 1);
+        super(nar, 0);
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addCamera("cra", ()->craft.image, 48,48,(v) -> $.t( v, alpha));
+        pixels = addCamera("see", ()->craft.image, 48,48,(v) -> $.t( v, alpha));
 
 //        camAE = new PixelAutoClassifier("cra", pixels.src.pixels, 8, 8, 48, this);
 //        window(camAE.newChart(), 500, 500);
@@ -42,22 +42,22 @@ public class TopCraft extends SwingAgent {
 //                    "player.getTile().connectsToWater"
 //                ).into(this);
 
-        senseSwitch("cra:dir", ()->craft.player.dir, 0, 4);
-        sense("cra:stamina", ()->(craft.player.stamina)/((float)craft.player.maxStamina));
+        senseSwitch("dir", ()->craft.player.dir, 0, 4);
+        sense("(stamina)", ()->(craft.player.stamina)/((float)craft.player.maxStamina));
 
         int tileMax = 13;
-        senseSwitch("cra:(tile,0,0)", ()->craft.player.tile().id, 0, tileMax);
-        senseSwitch("cra:(tile,0,1)", ()->craft.player.tile(0,1).id, 0, tileMax);
-        senseSwitch("cra:(tile,0,-1)", ()->craft.player.tile(0,-1).id, 0, tileMax);
-        senseSwitch("cra:(tile,1,0)", ()->craft.player.tile(1,0).id, 0, tileMax);
-        senseSwitch("cra:(tile,-1,0)", ()->craft.player.tile(-1,0).id, 0, tileMax);
+        senseSwitch("(tile,(0,0))", ()->craft.player.tile().id, 0, tileMax);
+        senseSwitch("(tile,(0,1))", ()->craft.player.tile(0,1).id, 0, tileMax);
+        senseSwitch("(tile,(0,-1))", ()->craft.player.tile(0,-1).id, 0, tileMax);
+        senseSwitch("(tile,(1,0))", ()->craft.player.tile(1,0).id, 0, tileMax);
+        senseSwitch("(tile,(-1,0))", ()->craft.player.tile(-1,0).id, 0, tileMax);
 
         InputHandler input = craft.input;
-        actionToggle("cra:fire", (b) -> input.attack.toggle(b) );
-        actionToggle("cra:(move,0,1)", (b) -> input.up.toggle(b) );
-        actionToggle("cra:(move,0,-1)", (b) -> input.down.toggle(b) );
-        actionToggle("cra:(move,-1,0)", (b) -> input.left.toggle(b) );
-        actionToggle("cra:(move,1,0)", (b) -> input.right.toggle(b) );
+        actionToggleRapid("(fire)", (b) -> input.attack.toggle(b), 16 );
+        actionToggle("(move,(0,1))", (b) -> input.up.toggle(b) );
+        actionToggle("(move,(0,-1))", (b) -> input.down.toggle(b) );
+        actionToggle("(move,(-1,0))", (b) -> input.left.toggle(b) );
+        actionToggle("(move,(1,0))", (b) -> input.right.toggle(b) );
 
         TopDownMinicraft.start(craft, false);
     }
@@ -74,7 +74,7 @@ public class TopCraft extends SwingAgent {
         float nextScore = craft.frameImmediate();
         float ds = nextScore - prevScore;
         this.prevScore = nextScore;
-        float r = 0.5f * ds + 2f * (craft.player.health/((float)craft.player.maxHealth)*2f);// + 0.25f * (craft.player.stamina*((float)craft.player.maxStamina))-0.5f);
+        float r = 0.5f * ds + 2f * (craft.player.health/((float)craft.player.maxHealth)-1f);// + 0.25f * (craft.player.stamina*((float)craft.player.maxStamina))-0.5f);
         return r;
     }
 
