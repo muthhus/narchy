@@ -6,8 +6,9 @@ import nars.experiment.minicraft.side.SideScrollMinicraft;
 import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
 import nars.remote.SwingAgent;
 import nars.util.Util;
-import nars.video.Sensor2D;
+import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
+import nars.video.Sensor2D;
 
 import java.awt.image.BufferedImage;
 

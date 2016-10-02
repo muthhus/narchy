@@ -5,7 +5,6 @@ import nars.$;
 import nars.NAR;
 import nars.concept.ActionConcept;
 import nars.remote.SwingAgent;
-import nars.util.Util;
 
 public class Arkancide extends SwingAgent {
 
@@ -14,7 +13,7 @@ public class Arkancide extends SwingAgent {
     final int visH = 32;
 
 
-    float paddleSpeed = 15f;
+    float paddleSpeed = 25f;
 
 
     final Arkanoid noid;
@@ -27,16 +26,11 @@ public class Arkancide extends SwingAgent {
 
         noid = new Arkanoid();
 
-//        new NObj("noid", noid, nar)
-//                .read("paddle.x", "ball.x", "ball.y", "ball.velocityX", "ball.velocityY")
-//                .into(this);
-
-//        nar.onTask(t -> {
-//            if (t.isEternal()) {
-//                System.err.println(t);
-//                System.err.println(t.proof());
-//            }
-//        });
+        senseNumber("noid", noid, "paddle.x");
+        senseNumber("noid", noid, "ball.x");
+        senseNumber("noid", noid, "ball.y");
+        senseNumber("noid", noid, "ball.velocityX");
+        senseNumber("noid", noid, "ball.velocityY");
 
         addCamera("noid", noid, visW, visH);
 
@@ -56,9 +50,6 @@ public class Arkancide extends SwingAgent {
             return $.t(0.5f, alpha);
         }));
 
-//        AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,
-//                4, 8 /* states */,
-//                0.05f);
 
     }
 
@@ -71,7 +62,7 @@ public class Arkancide extends SwingAgent {
     }
 
     public static void main(String[] args) {
-        run(Arkancide::new, 15500);
+        run(Arkancide::new, 3500);
     }
 
 

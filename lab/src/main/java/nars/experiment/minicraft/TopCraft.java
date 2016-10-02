@@ -5,8 +5,9 @@ import nars.NAR;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.remote.SwingAgent;
-import nars.video.Sensor2D;
+import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
+import nars.video.Sensor2D;
 
 import static spacegraph.SpaceGraph.window;
 
@@ -28,7 +29,7 @@ public class TopCraft extends SwingAgent {
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
+        pixels = addCamera("see", ()->craft.image, 32,32, (v) -> $.t( v, alpha));
 
         int nx = 8;
         camAE = new PixelAutoClassifier("seeAE", pixels.src.pixels, nx, nx,   (subX, subY) -> {
