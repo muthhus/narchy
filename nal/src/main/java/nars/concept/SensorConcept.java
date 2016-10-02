@@ -5,8 +5,6 @@ import nars.budget.policy.ConceptPolicy;
 import nars.nal.UtilityFunctions;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
-import nars.task.DerivedTask;
-import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -23,8 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
-import static nars.time.Tense.ETERNAL;
 
 
 /**

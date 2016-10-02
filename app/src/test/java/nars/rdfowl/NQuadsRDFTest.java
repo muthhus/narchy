@@ -2,10 +2,11 @@ package nars.rdfowl;
 
 import nars.NAR;
 import nars.Param;
-import nars.experiment.tetris.Tetris;
+
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
+import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -41,7 +42,7 @@ public class NQuadsRDFTest {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        Executioner e = Tetris.exe;
+        Executioner e = new SingleThreadExecutioner();
         Default n = new Default(1024,
                 72, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),

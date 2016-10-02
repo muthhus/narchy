@@ -91,9 +91,9 @@ public abstract class TermIndex extends TermBuilder {
 
 
     public final HijacKache<TermContainer,TermContainer> normalizations =
-            new HijacKache<>(Param.NORMALIZATION_CACHE_SIZE, 3 );
+            new HijacKache<>(Param.NORMALIZATION_CACHE_SIZE, 4 );
     public final HijacKache<ProtoCompound,Term> terms =
-            new HijacKache<>(Param.TERM_CACHE_SIZE, 3 );
+            new HijacKache<>(Param.TERM_CACHE_SIZE, 4 );
 
 //    final ThreadLocal<Map<Compound,Compound>> normalizations =
 //            ThreadLocal.withInitial( () ->

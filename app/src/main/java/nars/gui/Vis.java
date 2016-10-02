@@ -12,6 +12,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
@@ -19,6 +20,7 @@ import spacegraph.Surface;
 import spacegraph.math.Color3f;
 import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.GridSurface;
+import spacegraph.obj.Plot2D;
 
 import java.util.List;
 
@@ -164,4 +166,48 @@ public class Vis {
                 );
           //  ).maximize()).show(800,600);
     }
+
+    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory, FloatFunction<Termed> value) {
+
+        //TODO make a lambda Grid constructor
+        GridSurface grid = new GridSurface();
+        List<Plot2D> plots = $.newArrayList();
+        for (Termed t : concepts) {
+            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
+            p.add(t.toString(), ()->value.floatValueOf(t), 0f, 1f );
+            grid.children.add(p);
+            plots.add(p);
+        }
+        grid.layout();
+
+        nar.onFrame(f -> {
+            plots.forEach(Plot2D::update);
+        });
+
+        return grid;
+    }
+    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory) {
+
+        //TODO make a lambda Grid constructor
+        GridSurface grid = new GridSurface();
+        List<Plot2D> plots = $.newArrayList();
+        for (Termed t : concepts) {
+            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
+            p.setTitle(t.toString());
+            p.add("P", ()->nar.conceptPriority(t), 0f, 1f );
+            p.add("B", ()->nar.concept(t).beliefFreq(nar.time()), 0f, 1f );
+            p.add("G", ()->nar.concept(t).goalFreq(nar.time()), 0f, 1f );
+            grid.children.add(p);
+            plots.add(p);
+        }
+        grid.layout();
+
+        nar.onFrame(f -> {
+            plots.forEach(Plot2D::update);
+        });
+
+        return grid;
+    }
+
+
 }

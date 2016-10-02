@@ -3,8 +3,8 @@ package nars.experiment.asteroids;
 import nars.$;
 import nars.NAR;
 import nars.remote.SwingAgent;
-import nars.video.Sensor2D;
 import nars.video.Scale;
+import nars.video.Sensor2D;
 import nars.video.SwingCamera;
 
 import static java.lang.Math.round;

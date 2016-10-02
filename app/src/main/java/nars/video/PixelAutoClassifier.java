@@ -1,4 +1,4 @@
-package nars.experiment.minicraft;
+package nars.video;
 
 import nars.*;
 import nars.concept.SensorConcept;
@@ -6,7 +6,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.util.Util;
 import nars.util.signal.Autoencoder;
-import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.obj.MatrixView;
 
@@ -28,15 +27,13 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
     private final MetaBits metabits;
     private final SensorConcept[][][] conceptOut;
 
-    @NotNull String TAG = ("ae");
-
     private final float[][] pixIn;
 
     private final boolean[][][] pixEnable;
     private final float[][] pixConf;
 
     public final float[][] pixRecon; //reconstructed input
-    private final Term root;
+
     private final float in[];
     private final int sw, sh;
     private final int nw, nh;
@@ -75,7 +72,6 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
         super(sw * sh + metabits.get(0, 0).length, states, agent.nar.random);
         this.metabits = metabits;
         this.nar = agent.nar;
-        this.root = $.the(root);
         this.pixIn = pixIn;
         this.sw = sw; //stride width
         this.sh = sh; //stride height

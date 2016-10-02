@@ -42,7 +42,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 
 import static nars.experiment.tetris.Tetris.DEFAULT_INDEX_WEIGHT;
-import static nars.experiment.tetris.Tetris.conceptLinePlot;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.GridSurface.col;
 import static spacegraph.obj.GridSurface.grid;
@@ -332,7 +331,7 @@ public class Pacman extends NAgent {
                     Vis.concepts(nar, 64),
                     col(
                             Vis.budgetHistogram(nar, 50),
-                            conceptLinePlot(nar,
+                            Vis.conceptLinePlot(nar,
                                     Iterables.concat(p.actions, Lists.newArrayList(p.happy, p.joy)),
                                     200, nar::conceptPriority)
                     )

@@ -8,11 +8,11 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
-import nars.term.container.TermVector;
 import nars.term.obj.IntTerm;
 import nars.term.obj.Termject.IntInterval;
 import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
@@ -37,51 +37,57 @@ public class ArithmeticInduction {
 
     public static Logger logger = LoggerFactory.getLogger(ArithmeticInduction.class);
 
+    private static final MultimapBuilder.SetMultimapBuilder setSetMapBuilder = MultimapBuilder.hashKeys().hashSetValues();
+
     @NotNull
-    public static TermContainer compress(@NotNull TermContainer subs) {
-        return compress(subs, 2);
+    public static TermContainer compress(@NotNull TermContainer args) {
+        if (args.size() < 2 || !args.hasAny(Op.INT))
+            return args; //early exit condition
+
+        @NotNull MutableSet<Term> ss = args.toSet();
+        Set<Term> ss2 = compress(ss, 2);
+        if (ss2.equals(ss))
+            return args;
+
+        return TermSet.the(ss2);
     }
 
     @NotNull
-    public static TermContainer compress(@NotNull TermContainer subs, int depthRemain) {
+    public static Set<Term> compress(@NotNull Set<Term> subs, int depthRemain) {
 
         int subCount = subs.size();
-        if (subCount == 1 || !subs.hasAny(Op.INT))
+        if (subCount < 2/* || !subs.hasAny(Op.INT)*/)
             return subs; //early exit condition
 
-
-        ListMultimap<ByteList, Term> subTermStructures = MultimapBuilder.hashKeys().arrayListValues().build();
-        for (Term x : subs)
-            subTermStructures.put(x.structureKey(), x);
+        SetMultimap<ByteList, Term> subTermStructures = setSetMapBuilder.build();
+        int intContainingSubCount = 0;
+        for (Term x : subs) {
+            if (x.hasAny(Op.INT)) {
+                intContainingSubCount++;
+                subTermStructures.put(x.structureKey(), x);
+            }
+        }
 
         int numUniqueSubstructures = subTermStructures.keySet().size();
-        if (numUniqueSubstructures == subCount) {
+        if (numUniqueSubstructures == intContainingSubCount) {
             return subs; //each subterm has a unique structure so nothing will be combined
         } else if (numUniqueSubstructures > 1) {
             //recurse with each sub-structure group and re-combine
 
             Set<Term> ss = new HashSet();
             for (Collection<Term> stg : subTermStructures.asMap().values()) {
-                int gs = stg.size();
-
-                if (gs > 1) {
-                    TermContainer gg = TermVector.the(stg);
-                    gg = compress(gg, depthRemain-1);
-                    for (Term ggg : gg)
-                        ss.add(ggg);
-                } else {
-                    ss.addAll(stg);
-                }
-
+                ss.addAll(compress((Set<Term>)stg, depthRemain-1));
             }
 
             return recompressIfChanged(subs, ss, depthRemain-1);
         }
 
         //group again according to appearance of unique atoms
-        ListMultimap<List<Term>, Term> subAtomSeqs = MultimapBuilder.hashKeys().arrayListValues().build();
-        for (Term x : subs)
-            subAtomSeqs.put(atomSeq(x), x);
+        SetMultimap<List<Term>, Term> subAtomSeqs = setSetMapBuilder.build();
+        for (Term x : subs) {
+            if (x.hasAny(Op.INT))
+                subAtomSeqs.put(atomSeq(x), x);
+        }
 
         int ssa = subAtomSeqs.keySet().size();
         if (ssa == subCount) {
@@ -92,43 +98,33 @@ public class ArithmeticInduction {
                     //new TreeSet();
                     new HashSet();
             for (Collection<Term> ssg : subAtomSeqs.asMap().values()) {
-                TermContainer gg = TermVector.the(ssg);
-                gg = compress(gg, depthRemain-1);
-                for (Term ggg : gg)
-                    ss.add(ggg);
+                ss.addAll(compress((Set<Term>)ssg, depthRemain-1));
             }
             return recompressIfChanged(subs, ss, -1);
         }
 
 
-//        int negs = subs.count(x -> x.op() == Op.NEG);
-//        boolean negate = (negs == subCount);
-//        if (negs != 0 && !negate) {
-//            //only if none or all of the subterms are negated
+
+//        if (!subs.equivalentStructures())
 //            return subs;
-//        }
+//
+//        if (!equalNonIntegerAtoms(subs))
+//            return subs;
 
-        if (!subs.equivalentStructures())
-            return subs;
-
-        if (!equalNonIntegerAtoms(subs))
-            return subs;
-
-//        if (negate) {
-//            subs = $.neg((TermVector) subs);
-//        }
 
         //paths * extracted sequence of numbers at given path for each subterm
         Map<ByteList, Pair<ByteHashSet, List<Term>>> data = new HashMap();
 
 
         //analyze subtermss
-        for (int i = 0; i < subCount; i++) {
-            //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
-            @NotNull Term f = subs.term(i);
+        final int[] i = {0};
+        subs.forEach(f -> {
+//        for (int i = 0; i < subCount; i++) {
+//            //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
+//            @NotNull Term f = subs.term(i);
 
             //first subterm: infer location of all inductables
-            int ii = i;
+            int ii = i[0]++;
             BiPredicate<ByteList, Term> collect = (p, t) -> {
                 if ((!p.isEmpty() || (t instanceof IntTerm) || (t instanceof IntInterval))) {
                     Pair<ByteHashSet, List<Term>> c = data.computeIfAbsent(p.toImmutable(), (pp) ->
@@ -146,7 +142,7 @@ public class ArithmeticInduction {
                 if (f instanceof IntTerm) //raw atomic int term
                     data.put(new ByteArrayList(new byte[] {0}), $.newArrayList(f));
             }*/
-        }
+        });
 
         Set<Term> result = new HashSet();//new TreeSet();
         Set<Term> subsumed = new HashSet();
@@ -236,12 +232,11 @@ public class ArithmeticInduction {
 
     public
     @NotNull
-    static TermContainer recompressIfChanged(@NotNull TermContainer subs, Set<Term> ss, int depthRemain) {
+    static Set<Term> recompressIfChanged(@NotNull Set<Term> orig, Set<Term> newSubs, int depthRemain) {
         //try {
 
-        TermSet newSubs = TermSet.the(ss);
-        if (newSubs.equals(subs)) {
-            return subs; //nothing changed
+        if (newSubs.equals(orig)) {
+            return orig; //nothing changed
         } else {
             if (depthRemain <= 0)
                 return newSubs;
@@ -249,10 +244,6 @@ public class ArithmeticInduction {
                 return compress(newSubs, depthRemain);
             //return newSubs;
         }
-//        } catch (StackOverflowError e) {
-//            throw new RuntimeException("compression: " + subs + " " + ss);
-//        }
-
     }
 
     private static List<Term> atomSeq(Term x) {
@@ -272,12 +263,10 @@ public class ArithmeticInduction {
 
     @Nullable
     public static IntArrayList ints(List<Term> term) {
-        IntArrayList l = new IntArrayList(term.size());
-        for (Term x : term) {
-            Integer i = intOrNull(x);
-            if (i != null)
-                l.add(i);
-        }
+        int termSize = term.size();
+        IntArrayList l = new IntArrayList(termSize);
+        for (int i = 0; i < termSize; i++)
+            intOrNull(term.get(i), l);
         return l;
     }
 
@@ -295,11 +284,11 @@ public class ArithmeticInduction {
 
 
     @Nullable
-    public static Integer intOrNull(Term term) {
+    public static void intOrNull(Term term, IntArrayList target) {
         if (term.op() == INT) {
-            return ((IntTerm) term).val();
+            target.add( ((IntTerm) term).val() );
         }
-        return null;
+
     }
 
 

@@ -1,7 +1,6 @@
 package nars;
 
 import nars.concept.ActionConcept;
-import nars.concept.SensorConcept;
 import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;

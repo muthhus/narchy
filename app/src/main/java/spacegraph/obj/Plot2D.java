@@ -3,7 +3,6 @@ package spacegraph.obj;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import nars.$;
-import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;

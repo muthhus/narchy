@@ -369,9 +369,8 @@ public abstract class TermBuilder {
             }
         }
 
-        if (args.hasAny(Op.INT) && (op==CONJ && commutive(op, dt)) || (op.isSet() || op.isIntersect())) {
+        if ((op==CONJ && commutive(op, dt)) || (op.isSet() || op.isIntersect()))
             args = ArithmeticInduction.compress(args);
-        }
 
         int s = args.size();
         if (s == 0) {

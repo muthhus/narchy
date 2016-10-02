@@ -8,7 +8,7 @@ import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
 import nars.NAR;
-import nars.experiment.minicraft.PixelAutoClassifier;
+import nars.video.PixelAutoClassifier;
 import nars.remote.SwingAgent;
 import nars.video.Sensor2D;
 import nars.video.PixelBag;

@@ -13,7 +13,6 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
-import nars.remote.SwingAgent;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -24,7 +23,6 @@ import nars.time.Tense;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
-import nars.video.CameraSensorView;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
@@ -497,7 +495,7 @@ public class Tetris extends NAgent {
                         Vis.agentActions(t, 250),
 
                         Vis.budgetHistogram(nar, 10),
-                        conceptLinePlot(nar,
+                        Vis.conceptLinePlot(nar,
                                 Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
                                 200)
                 ), 1200, 900);
@@ -671,7 +669,7 @@ public class Tetris extends NAgent {
     }
 
     public static GridSurface agentBudgetPlot(NAgent t, int history) {
-        return conceptLinePlot(t.nar,
+        return Vis.conceptLinePlot(t.nar,
                 Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history);
     }
 
@@ -743,48 +741,6 @@ public class Tetris extends NAgent {
         });
 
         return new GridSurface(VERTICAL, plot, plot1, plot2, plot3, plot4);
-    }
-
-    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory, FloatFunction<Termed> value) {
-
-        //TODO make a lambda Grid constructor
-        GridSurface grid = new GridSurface();
-        List<Plot2D> plots = $.newArrayList();
-        for (Termed t : concepts) {
-            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
-            p.add(t.toString(), ()->value.floatValueOf(t), 0f, 1f );
-            grid.children.add(p);
-            plots.add(p);
-        }
-        grid.layout();
-
-        nar.onFrame(f -> {
-            plots.forEach(Plot2D::update);
-        });
-
-        return grid;
-    }
-    public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory) {
-
-        //TODO make a lambda Grid constructor
-        GridSurface grid = new GridSurface();
-        List<Plot2D> plots = $.newArrayList();
-        for (Termed t : concepts) {
-            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
-            p.setTitle(t.toString());
-            p.add("P", ()->nar.conceptPriority(t), 0f, 1f );
-            p.add("B", ()->nar.concept(t).beliefFreq(nar.time()), 0f, 1f );
-            p.add("G", ()->nar.concept(t).goalFreq(nar.time()), 0f, 1f );
-            grid.children.add(p);
-            plots.add(p);
-        }
-        grid.layout();
-
-        nar.onFrame(f -> {
-            plots.forEach(Plot2D::update);
-        });
-
-        return grid;
     }
 
 //    public static class NARController extends NAgent {
