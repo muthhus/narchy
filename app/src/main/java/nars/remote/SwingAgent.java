@@ -11,6 +11,7 @@ import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -80,7 +81,7 @@ abstract public class SwingAgent extends NAgent {
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2);
 
-        //Abbreviation abbr = new Abbreviation(nar, "the", 4, 0.5f, 32);
+        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 4, 0.5f, 32);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;

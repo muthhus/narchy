@@ -1,6 +1,7 @@
 package nars.nlp;
 
 import nars.NAR;
+import nars.util.NLPGen;
 import nars.nar.Default;
 import org.junit.Test;
 
@@ -17,13 +18,15 @@ public class NLPGenTest {
 
     @Test
     public void testSimple1() {
-        assertEquals("a is b.", g.toString(n.task("(a --> b).")));
-        assertEquals("a isn't b.", g.toString(n.task("(--,(a --> b)).")));
+        assertEquals("a a b", g.toString(n.task("(a --> b).")));
+        //assertEquals("a notA b", g.toString(n.task("(--,(a --> b)).")));
+        assertEquals("(bbb) and (a)", g.toString(n.task("(&&, (a), (bbb)).")));
+        //assertEquals("(a) or (bbb)", g.toString(n.task("(||, (a), (bbb)).")));
     }
 
     @Test
     public void testSimple2() {
-        assertEquals("b same as a.", g.toString(n.task("(a <-> b).")));
+        assertEquals("b same a", g.toString(n.task("(a <-> b).")));
     }
 
 //    @Test

@@ -104,7 +104,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
     }
 
 
-    private static final class VarIntroducedTask extends GeneratedTask {
+    public static final class VarIntroducedTask extends GeneratedTask {
 
         @Nullable private volatile transient Task original;
 

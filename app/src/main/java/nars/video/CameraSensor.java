@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR> {
 
 
-    private static final int radix = 2;
+    private static final int radix = 3;
     private final NAR nar;
     float resolution = 0.02f;
 

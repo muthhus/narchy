@@ -70,7 +70,7 @@ abstract public class NAgent implements NSense, NAction {
 
     float predictorProbability = 0.25f;
 
-    private final FasterList<Task> predictors = $.newArrayList();
+    private final FasterList<MutableTask> predictors = $.newArrayList();
     private float predictorPriFactor = 1f;
 
     public boolean trace = false;
@@ -265,7 +265,8 @@ abstract public class NAgent implements NSense, NAction {
 //                    nar.durabilityDefault(Symbols.GOAL);
 
             predictors.add(
-                    new MutableTask(happy, '!', 1f, rewardGamma).present(nar.time()+dt)
+                    new MutableTask(happy, '!', 1f, rewardGamma)
+                            .eternal() //.present(nar.time()+dt)
             );
 //                    happy.desire($.t(1f, rewardGamma),
 //                            nar.priorityDefault(Symbols.GOAL),
@@ -413,9 +414,10 @@ abstract public class NAgent implements NSense, NAction {
                         / (predictors.size()/predictorProbability) * predictorPriFactor;
 
         Budget boostBudget = Budget.One.clone().multiplied(pri, 0.5f, 0.99f);
-        predictors.forEach(t -> {
-            boost(t, boostBudget);
-        });
+
+        for (int i = 0, predictorsSize = predictors.size(); i < predictorsSize; i++) {
+            predictors.set(i, boost(predictors.get(i), boostBudget));
+        }
     }
 
     public float desireConf() {
@@ -438,30 +440,27 @@ abstract public class NAgent implements NSense, NAction {
 //    }
 
 
-    private void boost(@NotNull Task t, Budget budget) {
+    private MutableTask boost(@NotNull MutableTask t, Budget budget) {
 
         if (nar.random.nextFloat() > predictorProbability)
-            return; //ignore this one
+            return t;
 
+        MutableTask s;
         if (t.occurrence() != ETERNAL) {
-
-            nar.inputLater(
-                    new GeneratedTask(t.term(), t.punc(), t.truth())
-                            .time(now, now + (t.occurrence() - t.creation()))
-                            .budget(budget).log("Agent Predictor"));
-
+            s = new GeneratedTask(t.term(), t.punc(), t.truth())
+                            .time(now, now + (t.occurrence() - t.creation()));
         } else {
-            //re-use existing eternal task; first recharge budget
-//            BudgetMerge.max.apply(t.budget(), boostBudget, 1); //resurrect
-//            Activation a = new Activation(t, nar, 1f);
-
-
-            nar.inputLater(
-                    new GeneratedTask(t.term(), t.punc(), t.truth())
+            s = new GeneratedTask(t.term(), t.punc(), t.truth())
                             .time(now, ETERNAL)
-                            .budget(budget).log("Agent Predictor"));
+                            ;
         }
 
+        s.evidence(t)
+          .budget(budget)
+          .log("Agent Predictor");
+
+        nar.inputLater(s);
+        return s;
     }
 
     public float rewardSum() {

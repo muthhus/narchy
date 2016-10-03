@@ -2,8 +2,12 @@ package nars.experiment.minicraft;
 
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
+import nars.op.DepIndepVarIntroduction;
+import nars.op.VarIntroduction;
+import nars.op.mental.Abbreviation;
 import nars.remote.SwingAgent;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
@@ -64,6 +68,14 @@ public class TopCraft extends SwingAgent {
         actionToggle("(move,(0,-1))", (b) -> input.down.toggle(b) );
         actionToggle("(move,(-1,0))", (b) -> input.left.toggle(b) );
         actionToggle("(move,(1,0))", (b) -> input.right.toggle(b) );
+
+//        Param.DEBUG = true;
+//        nar.onTask(t ->{
+//            if (t.isEternal() && (!(t instanceof VarIntroduction.VarIntroducedTask)) && t.concept(nar).get(Abbreviation.class)==null) {
+//                System.err.println(t.proof());
+//                System.err.println();
+//            }
+//        });
 
         TopDownMinicraft.start(craft, false);
     }

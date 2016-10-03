@@ -1,4 +1,4 @@
-package nars.nlp;
+package nars.util;
 
 import nars.Narsese;
 import nars.Task;
@@ -28,20 +28,24 @@ public class NLPGen {
     final List<Rule> rules = new ArrayList();
 
     public NLPGen() {
-        train("A is B.", "(A --> B).");
-        train("A is a B.", "({A} --> B).");
-        train("A has B.", "(A --> [B]).");
+        train("A a B", "(A --> B).");
+        train("A instancing B", "({A} --> B).");
+        train("A propertied B", "(A --> [B]).");
 
-        train("A same as B.", "(A <-> B).");
-        train("A implies B.", "(A ==> B).");
-        train("A doesn't imply B.", "(--,(A ==> B)).");
+        train("A same B", "(A <-> B).");
+        train("A imply B", "(A ==> B).");
+        //train("A not imply B", "(--,(A ==> B)).");
 
-        train("A isn't B.", "(--,(A --> B)).");
-        train("A different from B.", "(--,(A <-> B)).");
+        train("A not a B", "(--,(A --> B)).");
+        train("A not same B", "(--,(A <-> B)).");
 
-        train("A and B.", "(A && B).");
-        train("A and not B.", "(A && (--,B)).");
-        train("not A and not B.", "((--,A) && (--,B)).");
+        train("A or B", "(--,((--,A) && (--,B))).");
+        train("A and B", "(A && B).");
+        train("A, B, and C", "(&&,A,B,C).");
+        train("A, B, C, and D", "(&&,A,B,C,D).");
+
+        train("A and not B", "(A && (--,B)).");
+        train("not A and not B", "((--,A) && (--,B)).");
 
     }
 
@@ -102,9 +106,9 @@ public class NLPGen {
         //TODO non-eternal case
     }
 
-    public String toString(Term x, boolean tru) {
+    /*public String toString(Term x, boolean tru) {
         return x.toString();
-    }
+    }*/
 
     public String toString(Term x, float freq, float conf, Tense tense) {
         for (Rule r : rules) {

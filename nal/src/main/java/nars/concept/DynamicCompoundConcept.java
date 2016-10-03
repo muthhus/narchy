@@ -23,6 +23,7 @@ import java.util.*;
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Adds support for dynamically calculated truth values
@@ -266,7 +267,10 @@ public class DynamicCompoundConcept extends CompoundConcept {
             long then = target.occurrence();
 
             long occThresh = 1;
-            if (x == null || Math.abs(then - x.occurrence() ) >= occThresh) {
+            if (x == null || then == ETERNAL || Math.abs(then - x.occurrence() ) >= occThresh) {
+
+                if (then == ETERNAL)
+                    then = now;
 
                 //template which may contain temporal relationship to emulate
                 Compound template = x!=null ?  x.term() : term();
@@ -285,12 +289,16 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
                         //System.err.println(xx + "\tvs\t" + x);
 
+
                         x = xx;
                     }
 
                 }
             }
 
+            if (x.isEternal()) {
+                throw new RuntimeException(x + " should not be eternal");
+            }
             return x;
         }
     }

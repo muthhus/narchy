@@ -75,7 +75,7 @@
 
     (M --> P), (S <-> M), neqCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Permute:Backward, Permute:NoSwap)
     (P --> M), (S <-> M), neqCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Permute:Backward, Permute:NoSwap)
-    (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong, Permute:Backward, Permute:NoSwap)
+    (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong, Permute:NoSwap)
 
 //// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:
