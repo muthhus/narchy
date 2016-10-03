@@ -289,6 +289,9 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
                         //System.err.println(xx + "\tvs\t" + x);
 
+                        if (xx.isEternal()) {
+                            throw new RuntimeException(xx + " should not be eternal");
+                        }
 
                         x = xx;
                     }
@@ -296,9 +299,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 }
             }
 
-            if (x.isEternal()) {
-                throw new RuntimeException(x + " should not be eternal");
-            }
+
             return x;
         }
     }
