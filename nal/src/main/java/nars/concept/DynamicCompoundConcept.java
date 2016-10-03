@@ -99,8 +99,12 @@ public class DynamicCompoundConcept extends CompoundConcept {
         @Override
         @Nullable
         public Truth truth(long when, long now) {
-            DynTruth d = truth(when, now, DynamicCompoundConcept.this, false, false);
+            DynTruth d = dyntruth(when, now);
             return d != null ? d.truth() : super.truth(when, now);
+        }
+
+        protected DynTruth dyntruth(long when, long now) {
+            return truth(when, now, DynamicCompoundConcept.this, false, false);
         }
 
         @Nullable private DynamicCompoundConcept.DynTruth truth(long when, Compound template, boolean evidence) {
@@ -112,33 +116,44 @@ public class DynamicCompoundConcept extends CompoundConcept {
             if (templateConcept == null)
                 return null;
 
-            int n = size();
-            final List<Task> e = evidence ? $.newArrayList(n) : null;
-            Budget b = evidence ? new RawBudget() : null;
 
-            DynTruth d = new DynTruth(op(), nar.confMin.floatValue(), e, b);
 
             Term template = templateConcept.term();
             if (template instanceof Compound) {
                 Compound ctemplate = (Compound)template;
                 Term[] subs = ctemplate.terms();
+                DynTruth d = newDyn(evidence);
                 for (Term s : subs) {
                     if (!subTruth(ctemplate, s, when, now, negated, d))
                         return null;
                 }
+                return d;
             } else {
-                Task x = (beliefOrGoal ? templateConcept.beliefs() : templateConcept.goals()).top(when, now);
-                if (x == null)
-                    return null;
-                else {
-                    if (d.add(x.truth().negated(negated))) {
-                        if (d.e!=null)
-                            d.e.add(x);
+                @NotNull BeliefTable table = beliefOrGoal ? templateConcept.beliefs() : templateConcept.goals();
+                if (table instanceof DynamicBeliefTable) {
+                    return ((DynamicBeliefTable)table).dyntruth(when, now);
+                } else {
+                    Task x = table.top(when, now);
+                    if (x == null)
+                        return null;
+                    else {
+                        DynTruth d = newDyn(evidence);
+                        if (d.add(x.truth().negated(negated))) {
+                            if (d.e != null)
+                                d.e.add(x);
+                        }
+                        return d;
                     }
                 }
             }
 
-            return d;
+        }
+
+        private DynTruth newDyn(boolean evidence) {
+            int n = size();
+            final List<Task> e = evidence ? $.newArrayList(n) : null;
+            Budget b = evidence ? new RawBudget() : null;
+            return new DynTruth(op(), nar.confMin.floatValue(), e, b);
         }
 
         /** returns true if the subterm was evaluated successfully, false otherwise */
@@ -194,7 +209,9 @@ public class DynamicCompoundConcept extends CompoundConcept {
                     nt = ndt.truth();
                 }
             } else {
-                nt = table.truth(when + dt, now).negated(negated);
+                nt = table.truth(when + dt, now);
+                if (nt!=null)
+                    nt = nt.negated(negated);
             }
 
             if (nt==null) {
