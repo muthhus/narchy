@@ -38,9 +38,9 @@ public final class OneMatchFindSubst extends FindSubst {
         if (xterm != null) {
             if (target != null) {
                 target.replaceAllXY(this);
-                result = target.resolve(xterm, target);
+                result = target.transform(xterm, target);
             } else {
-                result = resolve(xterm, this);
+                result = transform(xterm, this);
             }
         }
         return false;

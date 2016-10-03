@@ -421,12 +421,12 @@ public abstract class FindSubst extends Termunator implements Subst {
     @Nullable
     public final Term resolve(@NotNull Term t) {
         //TODO make a half resolve that only does xy?
-        return resolve(t, this);
+        return transform(t, this);
     }
 
 
     @Nullable
-    public final Term resolve(@NotNull Term t, @NotNull Subst subst) {
+    public final Term transform(@NotNull Term t, @NotNull Subst subst) {
         return index.transform(t, subst);
     }
 
@@ -654,7 +654,7 @@ public abstract class FindSubst extends Termunator implements Subst {
         return versioning.isFull();
     }
 
-    public final Term yxResolve(Term y) {
+    @NotNull public final Term yxResolve(@NotNull Term y) {
         Term y1 = yx.get(y);
         return (y1 == null) ? y : y1;
     }

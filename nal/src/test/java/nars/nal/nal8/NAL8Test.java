@@ -578,6 +578,62 @@ public class NAL8Test extends AbstractNALTest {
         tester.input("c:d!");
         tester.mustDesire(cycles, "a:b", 1.0f, 0.81f);
     }
+    @Test
+    public void goalInferredFromSimilarityEternalAndPresent()  {
+        TestNAR tester = test();
+
+        tester.input("(a:b<->c:d)."); //ETERNAL
+        tester.input("c:d! :|:"); //PRESENT
+        tester.mustDesire(cycles, "a:b", 1.0f, 0.81f, 0);
+        tester.mustNotOutput(cycles*3, "a:b", '!', ETERNAL);
+
+    }
+    @Test
+    public void goalInferredFromSimilarityAndImplEternalAndPresent()  {
+        TestNAR tester = test();
+
+        tester.input("(a:b<->c:d)."); //ETERNAL
+        tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
+        tester.input("e:f! :|:"); //PRESENT
+        tester.mustDesire(cycles, "a:b", 1.0f, 0.73f, 0);
+        tester.mustNotOutput(cycles*3, "a:b", '!', ETERNAL);
+
+    }
+
+    @Test
+    public void conjunctionSubstitutionViaSimilarity()  {
+        TestNAR tester = test();
+
+        tester.input("(a:b<->c:d)."); //ETERNAL
+        tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
+        tester.mustBelieve(cycles, "(a:b &&+0 e:f)", 1.0f, 0.81f, 0);
+        tester.mustNotOutput(cycles*3, "(a:b &&+0 e:f)", '.', ETERNAL);
+
+    }
+    @Test
+    public void implSubstitutionViaSimilarity()  {
+        test()
+            .input("(a:b<->c:d).") //ETERNAL
+            .input("(c:d ==>+1 e:f). :|:") //PRESENT
+            .mustBelieve(cycles, "(a:b ==>+1 e:f)", 1.0f, 0.81f, 0)
+            .mustNotOutput(cycles, "(a:b ==>+1 e:f)", '.', ETERNAL);
+    }
+    @Test
+    public void implSubstitutionViaSimilarityReverse()  {
+        test()
+                .input("(a:b<->c:d).") //ETERNAL
+                .input("(e:f ==>+1 c:d). :|:") //PRESENT
+                .mustBelieve(cycles, "(e:f ==>+1 a:b)", 1.0f, 0.81f, 0)
+                .mustNotOutput(cycles, "(e:f ==>+1 a:b)", '.', ETERNAL);
+    }
+    @Test
+    public void equiSubstitutionViaSimilarity()  {
+        test()
+                .input("(a:b<->c:d).") //ETERNAL
+                .input("(e:f <=>+1 c:d). :|:") //PRESENT
+                .mustBelieve(cycles, "(e:f <=>+1 a:b)", 1.0f, 0.81f, 0)
+                .mustNotOutput(cycles, "(e:f <=>+1 a:b)", '.', ETERNAL);
+    }
 
     @Test public void testDeiredImpl() {
         /*

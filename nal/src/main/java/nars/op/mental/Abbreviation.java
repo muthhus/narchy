@@ -195,11 +195,12 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
 
             Compound abbreviatedTerm = abbreviated.term();
 
-            AliasConcept alias = new AliasConcept(id, abbreviated, nar);
+            Compound abbreviation = newRelation(abbreviated, id);
+
+            AliasConcept alias = new AliasConcept(id, abbreviated, nar, abbreviation);
             nar.concepts.set(alias, alias);
 
 
-            Compound abbreviation = newRelation(abbreviated, id);
             //if (abbreviation != null) {
 
             //logger.info("{} <=== {}", alias, abbreviatedTerm);
@@ -273,13 +274,16 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
         private final Concept abbr;
         private TermContainer templates;
 
-        public AliasConcept(@NotNull String term, @NotNull Concept abbreviated, @NotNull NAR nar) {
+        public AliasConcept(@NotNull String term, @NotNull Concept abbreviated, @NotNull NAR nar, Term... additionalTerms) {
             super(term, Op.ATOM, abbreviated.termlinks(), abbreviated.tasklinks());
 
             abbreviated.put(Concept.Savior.class, this);
 
             this.abbr = abbreviated;
-            this.templates = TermVector.the(ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term()));
+            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
+            if (additionalTerms.length > 0)
+                tl = ArrayUtils.addAll(tl, additionalTerms);
+            this.templates = TermVector.the(tl);
             rewriteLinks(nar);
         }
 
@@ -294,7 +298,7 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
             termlinks().compute(existingLink -> {
                 Term x = existingLink.get();
                 Term y = nar.concepts.replace(x, that, this);
-                return (y != null && y != x) ?
+                return (y != null && y != x && y!=Term.False) ?
                         termlinks().newLink(y, existingLink) :
                         existingLink;
             });
@@ -302,7 +306,7 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
                 Task xt = existingLink.get();
                 Term x = xt.term();
 
-                if (!x.equals(that) /*&& !x.hasTemporal()*/) {
+                if (!x.equals(that) && !x.hasTemporal()) {
                     Term y = $.terms.replace(x, that, this);
                     if (y != x && y instanceof Compound) {
                         Task yt = MutableTask.clone(xt, (Compound) y, nar);
@@ -404,7 +408,8 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
 
             super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
             if (!isDeleted()) {
-                concept(nar).put(Abbreviation.class, alias);
+                @Nullable Concept c = concept(nar);
+                c.put(Abbreviation.class, alias);
             }
         }
     }

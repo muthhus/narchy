@@ -17,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Activation {
 
-    private static final int TASKLINK_DEPTH_LIMIT = 1;
-    private static final int TERMLINK_DEPTH_LIMIT = 1; //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
+    private final int tasklinkDepth;
+    private final int termlinkDepth;
 
     public final Budgeted in;
 
@@ -31,18 +31,20 @@ public class Activation {
     private final float minScale; //cut-off limit for recursive spread
 
 
-    protected Activation(Budgeted in, Concept src, NAR nar) {
+    protected Activation(Budgeted in, Concept src, NAR nar, int termlinkDepth, int taskLinkDepth) {
         this.nar = nar;
         this.in = in;
         this.src = src;
         this.minScale = Param.BUDGET_EPSILON / in.pri();
+        this.termlinkDepth = Math.max(taskLinkDepth, termlinkDepth);  //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
+        this.tasklinkDepth = taskLinkDepth;
     }
 
     /**
      * runs the task activation procedure
      */
-    public Activation(Budgeted in, Concept src, Concept target, NAR nar, float scale) {
-        this(in, src, nar);
+    public Activation(Budgeted in, Concept src, Concept target, NAR nar, float scale, int termlinkDepth, int taskLinkDepth) {
+        this(in, src, nar, termlinkDepth, taskLinkDepth);
 
         link(src, target, scale, 0);
 
@@ -53,7 +55,7 @@ public class Activation {
      * runs the task activation procedure
      */
     public Activation(Budgeted in, Concept c, NAR nar, float scale) {
-        this(in, c, c, nar, scale);
+        this(in, c, c, nar, scale, 1, 1);
     }
 
 
@@ -121,19 +123,20 @@ public class Activation {
 
     public void link(Concept src, Termed target, float scale, int depth) {
 
+
         if (scale < minScale)
             return;
 
 
         Concept targetConcept = null;
-        if (depth <= TERMLINK_DEPTH_LIMIT)  {
+        if (depth <= termlinkDepth)  {
             targetConcept = linkSubterm(src, target, scale, depth+1);
         } else {
             return;
         }
 
 
-        if (depth <= TASKLINK_DEPTH_LIMIT) {
+        if (depth <= tasklinkDepth) {
             if (targetConcept != null && in instanceof Task) {
                 targetConcept.tasklinks().put((Task)in, in, scale, null);
             }

@@ -27,16 +27,12 @@ public final class substitute extends TermTransformOperator  {
         final Term term = xx[0];
 
         //original term (x)
-        final Term x = xx[1];
+        final Term x = parent.yxResolve(xx[1]);
 
         //replacement term (y)
-        final Term y = xx[2];
+        final Term y = parent.yxResolve(xx[2]);
 
-
-        return parent.resolve(term,
-                new MapSubst.MapSubstWithOverride(parent.yx,
-                        parent.yxResolve(x),
-                        parent.yxResolve(y)));
+        return parent.transform(term, new MapSubst.MapSubstWithOverride(parent.yx,  x, y));
     }
 
 

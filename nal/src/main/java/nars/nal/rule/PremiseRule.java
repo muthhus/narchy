@@ -660,6 +660,10 @@ public class PremiseRule extends GenericCompound {
                 case "events":
                     throw new RuntimeException("depr");
 
+                case "contains":
+                    posts.add( new Contains(X, Y) );
+                    break;
+
                 case "time":
                     switch (X.toString()) {
                         case "after":

@@ -25,7 +25,7 @@ public class TopCraft extends SwingAgent {
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 3500);
+        run(TopCraft::new, 500);
     }
 
     public TopCraft(NAR nar) {
@@ -69,7 +69,7 @@ public class TopCraft extends SwingAgent {
         actionToggle("(move,(-1,0))", (b) -> input.left.toggle(b) );
         actionToggle("(move,(1,0))", (b) -> input.right.toggle(b) );
 
-//        Param.DEBUG = true;
+        Param.DEBUG = true;
 //        nar.onTask(t ->{
 //            if (t.isEternal() && (!(t instanceof VarIntroduction.VarIntroducedTask)) && t.concept(nar).get(Abbreviation.class)==null) {
 //                System.err.println(t.proof());
