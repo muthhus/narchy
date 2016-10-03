@@ -21,8 +21,27 @@ public final class TermNotEquals extends AtomicBoolCondition {
     @NotNull
     private final String id;
 
+    public static TermNotEquals the(int a, byte[] aPath, int b, byte[] bPath) {
+        //sort
+        if (a < b) {
+            return new TermNotEquals(a, aPath, b, bPath);
+        } else if (a > b) {
+            return new TermNotEquals(b, bPath, a, aPath);
+        } else {
+            //sort by the path
+            int pc = Arrays.compare(aPath, bPath);
+            if (pc < 0) {
+                return new TermNotEquals(a, aPath, b, bPath);
+            } else if (pc > 0) {
+                return new TermNotEquals(b, bPath, a, aPath);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
+    }
+
     /** TODO the shorter path should be set for 'a' if possible, because it will be compared first */
-    public TermNotEquals(int a, byte[] aPath, int b, byte[] bPath) {
+    protected TermNotEquals(int a, byte[] aPath, int b, byte[] bPath) {
         this.a = a;
         this.aPath = aPath;
         this.b = b;
@@ -44,17 +63,20 @@ public final class TermNotEquals extends AtomicBoolCondition {
 
     @Override
     public boolean run(@NotNull PremiseEval ff, int now) {
-        Term ca = a == 0 ? ff.taskTerm : ff.beliefTerm;
-        Term cb = b == 0 ? ff.taskTerm : ff.beliefTerm;
 
         Term ta;
-        if ((ta = resolve(ca, aPath)) == null)
+        if ((ta = resolve(ff, a, aPath)) == null)
             return false;
+
         Term tb;
-        if ((tb = resolve(cb, bPath)) == null)
+        if ((tb = resolve(ff, b, bPath)) == null)
             return false;
 
         return !ta.equals(tb);
+    }
+
+    public static Term resolve(@NotNull PremiseEval ff, int aOrB, byte[] path) {
+        return resolve(aOrB == 0 ? ff.taskTerm : ff.beliefTerm, path);
     }
 
     public static Term resolve(@NotNull Term ca, @NotNull byte[] aPath) {

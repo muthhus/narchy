@@ -606,12 +606,6 @@ public class PremiseRule extends GenericCompound {
 
                     break;
 
-                case "neqExc":
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
-
-                    constraints.put(X, new NotSubtermOfConstraint(Y));
-                    constraints.put(Y, new NotSubtermOfConstraint(X));
-                    break;
 
                 case "neqCom":
                     neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
@@ -1020,7 +1014,7 @@ public class PremiseRule extends GenericCompound {
 
             if (p2 != null) {
                 //cheaper to compute this in precondition
-                pres.add(new TermNotEquals(t1, p1, t2, p2));
+                pres.add(TermNotEquals.the(t1, p1, t2, p2));
                 return true;
             }
         }
