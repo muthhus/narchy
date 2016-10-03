@@ -60,7 +60,7 @@ public class bAblTests extends AbstractNALTest {
             .inputAt(0,"pick:({john},{football}). :|:") ////John picked up the football.
             .inputAt(0,"isIn:({bob},{kitchen}). :|:") ////Bob went to the kitchen.
             .askAt  (0,"isIn:({football},{?where})") ////Where is the football?
-            .mustBelieve(500, "<(*,{football},{playground}) --> isIn>", 1f, 0.59f, 0); ////A: playground
+            .mustBelieve(500, "<(*,{football},{playground}) --> isIn>", 1f, 0.73f, 0); ////A: playground
 
     }
 

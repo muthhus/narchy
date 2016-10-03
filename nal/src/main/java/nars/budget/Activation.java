@@ -46,9 +46,10 @@ public class Activation {
     public Activation(Budgeted in, Concept src, Concept target, NAR nar, float scale, int termlinkDepth, int taskLinkDepth) {
         this(in, src, nar, termlinkDepth, taskLinkDepth);
 
-        link(src, target, scale, 0);
-
-        commit(scale); //values will already be scaled
+        if (scale >= minScale) {
+            link(src, target, scale, 0);
+            commit(scale); //values will already be scaled
+        }
     }
 
     /**
@@ -61,13 +62,13 @@ public class Activation {
 
 
 
-    public void linkTermLinks(Concept src, float scale) {
-        src.termlinks().forEach(n -> {
-            Term nn = n.get();
-            if (nn!=null)
-                link(src, nn, scale, 0);
-        });
-    }
+//    public void linkTermLinks(Concept src, float scale) {
+//        src.termlinks().forEach(n -> {
+//            Term nn = n.get();
+//            if (nn!=null)
+//                link(src, nn, scale, 0);
+//        });
+//    }
 
     void linkTerms(@NotNull Concept src, @NotNull Term[] tgt, float scale, int depth) {
 
@@ -95,9 +96,11 @@ public class Activation {
         if (targetConcept!=null) {
             activateConcept(targetConcept, subScale);
 
-            @NotNull TermContainer ttt = targetConcept.templates();
-            if (ttt.size() > 0) {
-                linkTerms(targetConcept, ttt.terms(), subScale, depth);
+            if (depth < termlinkDepth) {
+                @NotNull TermContainer ttt = targetConcept.templates();
+                if (ttt.size() > 0) {
+                    linkTerms(targetConcept, ttt.terms(), subScale, depth + 1);
+                }
             }
 
             targetTerm = targetConcept.term();
@@ -121,25 +124,12 @@ public class Activation {
         return targetConcept;
     }
 
-    public void link(Concept src, Termed target, float scale, int depth) {
+    protected final void link(Concept src, Termed target, float scale, int depth) {
 
+        Concept targetConcept = linkSubterm(src, target, scale, depth);;
 
-        if (scale < minScale)
-            return;
-
-
-        Concept targetConcept = null;
-        if (depth <= termlinkDepth)  {
-            targetConcept = linkSubterm(src, target, scale, depth+1);
-        } else {
-            return;
-        }
-
-
-        if (depth <= tasklinkDepth) {
-            if (targetConcept != null && in instanceof Task) {
-                targetConcept.tasklinks().put((Task)in, in, scale, null);
-            }
+        if (targetConcept != null && depth <= tasklinkDepth && in instanceof Task) {
+            targetConcept.tasklinks().put((Task) in, in, scale, null);
         }
 
     }

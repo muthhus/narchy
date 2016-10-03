@@ -38,12 +38,12 @@ public enum TermLinkBuilder {
             case IMGe:
             case IMGi:
             case PROD:
-            case SIM:
             case DIFFe:
             case DIFFi:
             case SECTi:
             case SECTe:
-            //case INH:
+            case INH:
+            case SIM:
                 return 1;
             default:
                 return 2;
