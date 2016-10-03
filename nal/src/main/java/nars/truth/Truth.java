@@ -263,8 +263,9 @@ public interface Truth extends Truthed {
         return Util.equals(freq(), x.freq(), tolerance) && Util.equals(conf(), x.conf(), tolerance);
     }
 
-
-
+    default Truth negated(boolean negate) {
+        return negate ? negated() : this;
+    }
 
 
 

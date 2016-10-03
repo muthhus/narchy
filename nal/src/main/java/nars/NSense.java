@@ -145,7 +145,13 @@ public interface NSense {
     /**
      * generic lowest common denominator numeric input
      */
-    default Object senseNumber(String id, Object o, String expr) {
+    default Object senseNumber(String id, Object o, String _expr) {
+        Object expr;
+        try {
+            expr = Ognl.parseExpression(_expr);
+        } catch (OgnlException e) {
+            throw new RuntimeException(e);
+        }
         FuzzyScalarConcepts fs = new FuzzyScalarConcepts(
 
                 new FloatNormalized(() -> {

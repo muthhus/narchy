@@ -81,7 +81,7 @@ abstract public class SwingAgent extends NAgent {
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2);
 
-        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 4, 8, 0.05f, 32);
+        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 6, 12, 0.05f, 32);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;
