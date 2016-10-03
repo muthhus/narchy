@@ -194,13 +194,13 @@ public interface Concept extends Termed {
      * @param tgt task with a term equal to another concept's
      * @return true if the tgt task's concept is different from this Concept, in which case a crossLink has been applied. false otherwise
      */
-    default boolean crossLink(@NotNull Budgeted src, @NotNull Task tgt, float scale, @NotNull NAR nar) {
+    @Nullable default Concept crossLink(@NotNull Budgeted src, @NotNull Task tgt, float scale, @NotNull NAR nar) {
         Concept other = tgt.concept(nar);
         if (other == null || other.equals(this))
-            return false; //null or same concept
+            return null; //null or same concept
 
         crossLink(src, tgt, other, scale, nar);
-        return true;
+        return other;
     }
 
     /** termlinks only */

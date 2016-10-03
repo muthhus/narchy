@@ -3,7 +3,9 @@ package nars.op;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.concept.Concept;
 import nars.nal.Stamp;
+import nars.op.mental.Abbreviation;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -111,6 +113,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
         public VarIntroducedTask(@NotNull Compound c, @NotNull Task original) {
             super(c, original.punc(), original.truth());
             this.original = original;
+
         }
 
         /** if input was successful, crosslink to the original */
@@ -124,7 +127,13 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
             }
 
             if (deltaConfidence==deltaConfidence /* wasn't deleted, even for questions */) {
-                concept(nar).crossLink(this, orig, isBeliefOrGoal() ? conf() : qua(), nar);
+                @Nullable Concept thisConcept = concept(nar);
+                Concept other = thisConcept.crossLink(this, orig, isBeliefOrGoal() ? conf() : qua(), nar);
+
+                if (original instanceof Abbreviation.AbbreviationTask) {
+                    //share abbreviation meta; prevents some cases of recursive abbreviation
+                    thisConcept.put(Abbreviation.class, other.get(Abbreviation.class));
+                }
             }
 
             super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);

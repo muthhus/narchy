@@ -610,9 +610,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         return term.size();
     }
 
-    @Deprecated
-    @Override
-    public boolean containsTerm(@NotNull Termlike t) {
+    /** first-level only */
+    @Deprecated @Override public boolean containsTerm(@NotNull Termlike t) {
         return term.containsTerm(t);
     }
 

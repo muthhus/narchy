@@ -606,6 +606,13 @@ public class PremiseRule extends GenericCompound {
 
                     break;
 
+                case "neqExc":
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
+
+                    constraints.put(X, new NotSubtermOfConstraint(Y));
+                    constraints.put(Y, new NotSubtermOfConstraint(X));
+                    break;
+
                 case "neqCom":
                     neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
 

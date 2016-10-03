@@ -240,6 +240,13 @@ public class NAL6Test extends AbstractNALTest {
 
     }
 
+    @Test
+    public void testBeliefToEquivalence() {
+        TestNAR tester = test();
+        tester.believe("<<$1 --> bird> ==> <$1 --> swimmer>>", 1f, 0.9f); //en("I guess a bird is usually a swimmer.");
+        tester.believe("<<$1 --> swimmer> ==> <$1 --> bird>>", 1f, 0.9f); //en("I guess a bird is usually a swimmer.");
+        tester.mustBelieve(cycles, "<<$1 --> swimmer> <=> <$1 --> bird>>", 1.00f, 0.81f); //en("I guess a swimmer is a bird.");
+    }
 
     @Test
     public void variable_introduction()  {

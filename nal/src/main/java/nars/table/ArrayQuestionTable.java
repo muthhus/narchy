@@ -141,7 +141,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
             }
 
             boolean sameConcept;
-            sameConcept = !(answerConcept != null && answerConcept.crossLink(a, q, scale * aConf, nar));
+            sameConcept = !(answerConcept != null && answerConcept.crossLink(a, q, scale * aConf, nar)!=null);
 
             if (Param.DEBUG_ANSWERS && !sameConcept) {
                 //if (q.term().equals(a.term()))
