@@ -1,11 +1,12 @@
 package nars.util;
 
 import nars.Narsese;
+import nars.Param;
 import nars.Task;
 import nars.index.PatternIndex;
 import nars.nar.Terminal;
 import nars.term.Term;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.time.Tense;
 
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class NLPGen {
 
                         final String[] result = {null};
 
-                        FindSubst u = new FindSubst(terminal.concepts, VAR_PATTERN, terminal.random) {
+                        Unify u = new Unify(terminal.concepts, VAR_PATTERN, terminal.random, Param.UnificationStackMax, Param.UnificationTermutesMax) {
 
                             @Override
                             public boolean onMatch() {

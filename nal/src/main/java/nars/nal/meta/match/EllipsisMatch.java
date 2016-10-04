@@ -5,7 +5,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.container.TermVector;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import org.jetbrains.annotations.NotNull;
@@ -101,7 +101,7 @@ public final class EllipsisMatch extends TermVector implements Term {
     }
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
         throw new UnsupportedOperationException();
     }
 

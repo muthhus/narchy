@@ -2,6 +2,7 @@ package nars.term.subst;
 
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
@@ -14,7 +15,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /** not thread safe, use 1 per thread (do not interrupt matchAll) */
-public class UnifySubst extends FindSubst  {
+public class UnifySubst extends Unify {
 
     static final Logger logger = LoggerFactory.getLogger(UnifySubst.class);
 
@@ -28,7 +29,7 @@ public class UnifySubst extends FindSubst  {
     int matches;
 
     public UnifySubst(Op varType, NAR memory, Collection<Termed> target, int maxMatches) {
-        super(memory.concepts, varType, memory.random);
+        super(memory.concepts, varType, memory.random, Param.SubUnificationStackMax, Param.SubUnificationTermutesMax);
 
         this.memory = memory;
         this.maxMatches = maxMatches;
@@ -37,7 +38,7 @@ public class UnifySubst extends FindSubst  {
     }
 
     @Override
-    public void unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
+    public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
         this.a = x;
         this.matches = 0;
 
@@ -45,6 +46,7 @@ public class UnifySubst extends FindSubst  {
             super.unify(x, y, start, finish);
         }
 
+        return start;
     }
 
 

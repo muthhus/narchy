@@ -2,7 +2,7 @@ package nars.nal.meta.constraint;
 
 import nars.Op;
 import nars.term.Term;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -17,7 +17,7 @@ public final class OpConstraint implements MatchConstraint {
 
 
     @Override
-    public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f) {
+    public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
 
         return value.op()!=op;
     }

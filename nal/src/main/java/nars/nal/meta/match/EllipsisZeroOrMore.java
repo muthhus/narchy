@@ -11,13 +11,9 @@ import org.jetbrains.annotations.NotNull;
 public class EllipsisZeroOrMore extends Ellipsis {
 
     public EllipsisZeroOrMore(@NotNull AbstractVariable /*Variable*/ name) {
-        super(name);
+        super(name, 0);
     }
 
-    @Override
-    public boolean validSize(int collectable) {
-        return collectable >= 0;
-    }
 
     @Override
     public @NotNull Variable clone(@NotNull AbstractVariable newVar, VariableNormalization normalizer) {
@@ -32,8 +28,4 @@ public class EllipsisZeroOrMore extends Ellipsis {
         return super.toString() + "..*";
     }
 
-    @Override
-    public int sizeMin() {
-        return 0;
-    }
 }

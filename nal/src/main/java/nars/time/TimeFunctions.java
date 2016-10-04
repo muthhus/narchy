@@ -899,11 +899,13 @@ public interface TimeFunctions {
         //}
         //}
 
+
         if ((t != DTERNAL) && (t != derived.dt())) {
         /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
                 t, derived.subterms());*/
 
-            derived = dt(derived, t, p, occReturn);
+            if(derived.size()==2 || t == 0 )
+                derived = dt(derived, t, p, occReturn);
 
 //            int nt = derived.t();
 //            if (occ > TIMELESS) {
@@ -936,7 +938,7 @@ public interface TimeFunctions {
         }
         if (derived.dt() != dt) {
             Term[] derivedSubterms = derived.subterms().terms();
-            @NotNull Term n = p.index.the(o, dt, derivedSubterms);
+            @NotNull Term n = $.terms.the(o, dt, derivedSubterms);
             if (!(n instanceof Compound))
                 throw new InvalidTermException(o, dt, derivedSubterms, "Untemporalizable to new DT");
             return (Compound) n;

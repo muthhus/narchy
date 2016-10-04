@@ -17,7 +17,7 @@ import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -347,7 +347,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f) {
+        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
             return x.equals(assignee) && constraint.invalid(assignee, value, f);
         }
     }
@@ -363,7 +363,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f) {
+        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
             return (x.equals(assignee) && xConstraint.invalid(assignee, value, f)) ||
                    (y.equals(assignee) && yConstraint.invalid(assignee, value, f));
         }
@@ -377,7 +377,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f) {
+        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
             MatchConstraint cN = mm.get(assignee);
             return (cN != null) && cN.invalid(assignee, value, f);
         }

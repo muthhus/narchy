@@ -2,10 +2,12 @@ package nars.term.transform;
 
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.term.Term;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.term.subst.Subst;
 import nars.util.data.random.XORShiftRandom;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -16,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 
 @Deprecated
-public class FindSubstTest {
+public class UnifyTest {
 
     @Test
     public void testFindSubst1() {
@@ -30,7 +32,7 @@ public class FindSubstTest {
 
         AtomicBoolean matched = new AtomicBoolean(false);
 
-        FindSubst f = new FindSubst($.terms, Op.VAR_QUERY, new XORShiftRandom()) {
+        Unify f = new Unify($.terms, Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax, Param.UnificationTermutesMax) {
 
             @Override
             public boolean onMatch() {

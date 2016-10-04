@@ -2,6 +2,7 @@ package nars.term.subst;
 
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.index.TermIndex;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
@@ -10,22 +11,25 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
+import static nars.term.Term.False;
+
 /**
- * Created by me on 5/24/16.
+ * Less powerful one-match only unification
  */
-public final class OneMatchFindSubst extends FindSubst {
+public final class SubUnify extends Unify {
 
     private @Nullable Term xterm;
     private @Nullable PremiseEval target;
 
     @Nullable private Term result;
+    int retries = Param.SubUnificationMatchRetries;
 
 
-    public OneMatchFindSubst(TermIndex index, Op type, Random r) {
-        super(index, type, r);
+    public SubUnify(TermIndex index, Op type, Random r) {
+        super(index, type, r, Param.SubUnificationStackMax, Param.SubUnificationTermutesMax);
     }
 
-    public OneMatchFindSubst(FindSubst parent, @Nullable Op type) {
+    public SubUnify(Unify parent, @Nullable Op type) {
         this(parent.index, type, parent.random);
     }
 
@@ -44,7 +48,11 @@ public final class OneMatchFindSubst extends FindSubst {
                 result = transform(xterm, this);
             }
         }
-        return false;
+
+        if ((result==null || result==False) && --retries > 0)
+            return true; //continue trying
+
+        return false; //found the one match we wanted (stored in result), end here
     }
 
     public boolean tryMatch(@NotNull Term x, @NotNull Term y) {

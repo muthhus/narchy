@@ -14,7 +14,7 @@ import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.term.transform.substitute;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -30,7 +30,7 @@ import static nars.time.Tense.DTERNAL;
 /**
  * evaluates a premise (task, belief, termlink, taskLink, ...) to derive 0 or more new tasks
  */
-public class PremiseEval extends FindSubst {
+public class PremiseEval extends Unify {
 
 
     /**
@@ -81,10 +81,11 @@ public class PremiseEval extends FindSubst {
 
 
     /**
-     * run parameters
+     * only continues termuting while matchesRemain > 0
      */
-    int termutesRemain;
-    final int termutesMax;
+    int matchesRemain;
+
+    final int matchesMax;
 
 
     /**
@@ -134,7 +135,7 @@ public class PremiseEval extends FindSubst {
 
 
     public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Premise p, @NotNull Conclusion c) {
-        super(nar.concepts, VAR_PATTERN, nar.random);
+        super(nar.concepts, VAR_PATTERN, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax);
 
         this.nar = nar;
         this.truthResolution = nar.truthResolution.floatValue();
@@ -164,7 +165,7 @@ public class PremiseEval extends FindSubst {
         this.taskTruth = task.truth();
         this.taskPunct = task.punc();
         this.beliefTruth = belief != null ? belief.truth() : null;
-        this.termutesMax = matchesMax(task.qua() /* .summary() */);
+        this.matchesMax = matchesMax(task.qua() /* .summary() */);
 
 //        //normalize to positive truth
 //        if (taskTruth != null && Global.INVERT_NEGATIVE_PREMISE_TASK && taskTruth.isNegative()) {
@@ -239,10 +240,10 @@ public class PremiseEval extends FindSubst {
             //set the # of matches according to the # of conclusions in this branch
             //each matched termutation will be used to derive F=matchFactor conclusions,
             //so divide the premiseMatches value by it to equalize the derivation quantity
-            this.termutesRemain = Math.max(1, termutesMax / matchFactor);
+            this.matchesRemain = Math.max(1, matchesMax / matchFactor);
             finish = true;
         } else {
-            this.termutesRemain = -1; //will not apply unless eachMatch!=null (final step)
+            this.matchesRemain = -1; //will not apply unless eachMatch!=null (final step)
             finish = false;
         }
 
@@ -264,16 +265,17 @@ public class PremiseEval extends FindSubst {
 
     @Override
     public boolean onMatch() {
-        if (termutesRemain-- < 0) {
-            return false;
-        }
+
         try {
-            return forEachMatch.run(this, now());
+            if (!forEachMatch.run(this, now()))
+                return false;
         } catch (RuntimeException e) {
             if (Param.DEBUG_DERIVER)
                 Conclude.logger.warn("{}\n\tderiving {}", e, ((Conclude)forEachMatch).rule.source);
-            return true; //continue
+            //continue
         }
+
+        return (--matchesRemain > 0);
     }
 
 
@@ -392,7 +394,7 @@ public class PremiseEval extends FindSubst {
 //        return true;
 //    }
 
-    public void replaceAllXY(@NotNull FindSubst m) {
+    public void replaceAllXY(@NotNull Unify m) {
         m.xy.forEachVersioned(this::replaceXY);
     }
 

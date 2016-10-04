@@ -21,7 +21,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.time.Tense;
 import nars.truth.TruthDelta;
 import nars.util.NLPGen;
@@ -343,7 +343,7 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
          * equality will have already been tested here, and the parent super.unify() method is just return false. so skip it and just try the abbreviated
          */
         @Override
-        public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
             return /*super.unify(y, subst) || */abbr.term().unify(y, subst);
         }
 

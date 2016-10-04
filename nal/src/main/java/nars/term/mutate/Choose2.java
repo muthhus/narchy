@@ -5,7 +5,7 @@ import nars.nal.meta.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.util.Util;
 import nars.util.data.array.IntArrays;
 import nars.util.math.Combinations;
@@ -28,7 +28,7 @@ public class Choose2 extends Termutator {
     @NotNull
     private final Ellipsis xEllipsis;
     @NotNull
-    private final FindSubst f;
+    private final Unify f;
     @NotNull
     private final ShuffledSubterms yy;
 
@@ -44,7 +44,7 @@ public class Choose2 extends Termutator {
 
     }
 
-    public Choose2(@NotNull FindSubst f, @NotNull Ellipsis xEllipsis, @NotNull Collection<Term> x, @NotNull Collection<Term> yFreeSet) {
+    public Choose2(@NotNull Unify f, @NotNull Ellipsis xEllipsis, @NotNull Collection<Term> x, @NotNull Collection<Term> yFreeSet) {
         super(Util.tuple(Choose2.class,xEllipsis, x, yFreeSet));
         this.f = f;
         this.xEllipsis = xEllipsis;
@@ -63,7 +63,7 @@ public class Choose2 extends Termutator {
     }
 
     @Override
-    public void run(FindSubst versioneds, Termutator[] chain, int current) {
+    public boolean run(Unify versioneds, Termutator[] chain, int current) {
 
         @NotNull Combinations ccc = this.comb;
         ccc.reset();
@@ -76,7 +76,7 @@ public class Choose2 extends Termutator {
         Term[] m = new Term[this.yy.size()-2];
 
         Ellipsis xEllipsis = this.xEllipsis;
-        FindSubst f = this.f;
+        Unify f = this.f;
         Term[] x = this.x;
 
         int[] c = null;
@@ -98,7 +98,8 @@ public class Choose2 extends Termutator {
                 if (f.unify(x[1], y2) &&
                         f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)))) {
 
-                    next(f, chain, current);
+                    if (!next(f, chain, current))
+                        return false;
 
                 }
 
@@ -109,6 +110,7 @@ public class Choose2 extends Termutator {
 
         }
 
+        return true;
     }
 
 }

@@ -5,7 +5,7 @@ import nars.Op;
 import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.subst.OneMatchFindSubst;
+import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ abstract public class Answerer implements Consumer<Task> {
     @Override
     public void accept(@NotNull Task task) {
         if (task.isQuestion()) {
-            final OneMatchFindSubst match = new OneMatchFindSubst(nar.concepts, Op.VAR_PATTERN, nar.random); //re-using this is not thread-safe
+            final SubUnify match = new SubUnify(nar.concepts, Op.VAR_PATTERN, nar.random); //re-using this is not thread-safe
             if (match.tryMatch(pattern, task.term())) {
                 onMatch(match.xy);
             }

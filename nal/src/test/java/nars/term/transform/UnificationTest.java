@@ -10,7 +10,7 @@ import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.test.TestNAR;
 import nars.util.signal.RuleTest;
 import org.eclipse.collections.impl.factory.Sets;
@@ -45,9 +45,9 @@ public class UnificationTest {
 
 
     @NotNull
-    FindSubst test(@NotNull Op type, @NotNull String s1, @NotNull String s2, boolean shouldSub) {
+    Unify test(@NotNull Op type, @NotNull String s1, @NotNull String s2, boolean shouldSub) {
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
         TestNAR test = test();
         NAR nar = test.nar;
 
@@ -83,7 +83,7 @@ public class UnificationTest {
         AtomicBoolean subbed = new AtomicBoolean(false);
 
         final Term finalT = t1;
-        FindSubst sub = new FindSubst($.terms /* new Indexes.DefaultTermIndex(256, new XorShift128PlusRandom(1)) */, type, nar.random) {
+        Unify sub = new Unify($.terms /* new Indexes.DefaultTermIndex(256, new XorShift128PlusRandom(1)) */, type, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax) {
 
 //            @Override
 //            public void onPartial() {
@@ -215,7 +215,7 @@ public class UnificationTest {
 
     @Test
     public void pattern_trySubs_Indep_Var_2_product_and_common_depvar_bidirectional() {
-        FindSubst sub = test(Op.VAR_INDEP,
+        Unify sub = test(Op.VAR_INDEP,
                 "(<($1,x) --> on>,<(SELF,x) --> at>)",
                 "(<({t002},x) --> on>,<$1 --> at>)",
                 true);
@@ -913,7 +913,7 @@ public class UnificationTest {
 
     @Test
     public void patternMatchesQuery1() {
-        FindSubst f = test(Op.VAR_PATTERN,
+        Unify f = test(Op.VAR_PATTERN,
                 "(<%1 <-> %2>, <%3 <-> %2>)",
                 "(<x <-> ?1>, <y <-> ?1>)",
                 true);
@@ -921,7 +921,7 @@ public class UnificationTest {
 
     @Test
     public void patternMatchesQuery2() {
-        FindSubst f = test(Op.VAR_PATTERN,
+        Unify f = test(Op.VAR_PATTERN,
                 "(<%1 <-> %2>, <%3 <-> %2>)",
                 "(<bird <-> {?1}>, <bird <-> {?1}>)",
                 true);
@@ -929,7 +929,7 @@ public class UnificationTest {
 
     @Test
     public void varIndep2() {
-        FindSubst f = test(Op.VAR_INDEP,
+        Unify f = test(Op.VAR_INDEP,
                 "t:($x | {$y})",
                 "t:(x | {y})",
                 true);

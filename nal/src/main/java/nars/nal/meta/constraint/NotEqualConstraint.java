@@ -1,7 +1,7 @@
 package nars.nal.meta.constraint;
 
 import nars.term.Term;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.term.Terms.equalsAnonymous;
@@ -16,7 +16,7 @@ public final class NotEqualConstraint implements MatchConstraint {
     }
 
     @Override
-    public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull FindSubst f) {
+    public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull Unify f) {
         Term canNotEqual = f.xy.get(b);
         return canNotEqual!=null &&
                 equalsAnonymous(y, canNotEqual);

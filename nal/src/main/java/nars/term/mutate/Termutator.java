@@ -1,6 +1,6 @@
 package nars.term.mutate;
 
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,20 +17,15 @@ public abstract class Termutator  {
 
 
     /** match all termutations recursing to the next after each successful one */
-    public abstract void run(FindSubst f, Termutator[] chain, int current);
+    public abstract boolean run(Unify f, Termutator[] chain, int current);
 
     /** call this to invoke the next termutator in the chain */
-    protected static boolean next(FindSubst f, Termutator[] chain, int next) {
+    protected static boolean next(Unify f, Termutator[] chain, int next) {
 
         //increment the version counter by one and detect if the limit exceeded.
         // this is to prevent infinite recursions in which no version incrementing
         // occurrs that would otherwise trigger overflow to interrupt it.
-        if (!f.versioning.nextChange(null, null))
-            return false;
-        else {
-            chain[++next].run(f, chain, next);
-            return true;
-        }
+        return f.versioning.nextChange(null, null) && chain[++next].run(f, chain, next);
     }
 
     public abstract int getEstimatedPermutations();

@@ -10,7 +10,7 @@ import nars.Op;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.atom.AtomicString;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -231,7 +231,7 @@ public interface Termject<X> extends Term {
 
 
         @Override
-        public boolean unify(Term y, FindSubst f) {
+        public boolean unify(Term y, Unify f) {
 
             //if (y.op() == INT) {
             if (y instanceof IntTerm) {

@@ -26,7 +26,7 @@ import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
@@ -114,7 +114,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
      * @param subst the unification context
      * @return whether unification succeeded
      */
-    boolean unify(@NotNull Term y, @NotNull FindSubst subst);
+    boolean unify(@NotNull Term y, @NotNull Unify subst);
 
 
 

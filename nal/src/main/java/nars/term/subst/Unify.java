@@ -1,7 +1,6 @@
 package nars.term.subst;
 
 import nars.Op;
-import nars.Param;
 import nars.index.TermIndex;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
@@ -21,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Random;
-import java.util.function.BiConsumer;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -39,7 +37,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class FindSubst extends Termunator implements Subst {
+public abstract class Unify extends Termunator implements Subst {
 
 
     public final Random random;
@@ -91,14 +89,14 @@ public abstract class FindSubst extends Termunator implements Subst {
 //    }
 
 
-    protected FindSubst(TermIndex index, Op type, Random random) {
-        this(index, type, random, new Versioning(Param.UnificationStackMax) );
+    protected Unify(TermIndex index, Op type, Random random, int stackMax, int termutesMax) {
+        this(index, type, random, new Versioning(stackMax), termutesMax );
     }
 
-    protected FindSubst(TermIndex index, Op type, Random random, @NotNull Versioning versioning) {
+    protected Unify(TermIndex index, Op type, Random random, @NotNull Versioning versioning, int termutesMax) {
         super();
 
-        this.termutes = new LimitedFasterList(Param.UnificationTermutesMax);
+        this.termutes = new LimitedFasterList(termutesMax);
 
         this.index = index;
 
@@ -159,7 +157,7 @@ public abstract class FindSubst extends Termunator implements Subst {
      *
      * setting finish=false allows matching in pieces before finishing
      */
-    public void unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
+    public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
 
         if (start) {
             termutes.clear();
@@ -168,18 +166,22 @@ public abstract class FindSubst extends Termunator implements Subst {
         if (unify(x, y)) {
 
             if (finish) {
-                run(this, null, -1);
+                return run(this, null, -1);
             }
+
+            return true;
         }
+
+        return false;
     }
 
     @Override
-    public final void run(@NotNull FindSubst f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
+    public final boolean run(@NotNull Unify f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
         Termutator[] n = next();
         if (n != null) {
-            Termutator.next(f, n, -1); //combinatorial recurse starts here
+            return Termutator.next(f, n, -1); //combinatorial recurse starts here
         } else {
-            f.onMatch(); //ends here when termutes exhausted
+            return f.onMatch(); //ends here when termutes exhausted
         }
     }
 

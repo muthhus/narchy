@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class Ellipsis extends AbstractVariable implements Ellipsislike {
 
+    private final int minArity;
+
 
 //    /** a placeholder that indicates an expansion of one or more terms that will be provided by an Ellipsis match.
 //     *  necessary for terms which require > 1 argument but an expression that will expand one ellipsis variable will not construct a valid prototype of it
@@ -32,8 +34,10 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
     @NotNull
     public abstract Variable clone(AbstractVariable newVar, VariableNormalization normalizer);
 
-    public abstract int sizeMin();
 
+    public final int sizeMin() {
+        return minArity;
+    }
 
 
     //public final Variable target;
@@ -91,12 +95,21 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
     }
 
 
-    protected Ellipsis(@NotNull AbstractVariable target) {
-        this(target, target.id);
+    protected Ellipsis(@NotNull AbstractVariable target, int minArity) {
+        this(target, minArity, target.id);
     }
 
-    protected Ellipsis(@NotNull AbstractVariable target, int id) {
-        super(target.op(), id);
+    protected Ellipsis(@NotNull AbstractVariable target, int minArity, int id) {
+        super(target.op(), hash(id, minArity));
+        this.minArity = minArity;
+    }
+
+    private static final int hash(int id, int minArity) {
+        //the 30th bit (arbitrarily chosen here) is what will store the 1-bit minArity value. provided id's should all have that bit free
+        if (minArity > 1 || ((id & (1 << 30)) != 0)) throw new UnsupportedOperationException();
+        if (minArity==1)
+            id |= (1 << 30);
+        return id;
     }
 
     @Override
@@ -272,7 +285,9 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 //    }
 
 
-    public abstract boolean validSize(int collectable);
+    public final boolean validSize(int collectable) {
+        return collectable >= minArity;
+    }
 
     @NotNull
     @Override

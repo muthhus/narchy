@@ -2,7 +2,7 @@ package nars.nal.meta.constraint;
 
 import com.google.common.base.Joiner;
 import nars.term.Term;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -20,7 +20,7 @@ public class AndConstraint implements MatchConstraint {
     }
 
     @Override
-    public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f) {
+    public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
         for (MatchConstraint m : subConst) {
             if (m.invalid(assignee, value, f))
                 return true;

@@ -11,11 +11,11 @@ import org.jetbrains.annotations.NotNull;
 public class EllipsisOneOrMore extends Ellipsis {
 
     public EllipsisOneOrMore(@NotNull AbstractVariable /*Variable*/ name) {
-        super(name); //TODO decide if EllipsisTransform, a subclass, needs its own uniqueness hashmask
+        super(name, 1); //TODO decide if EllipsisTransform, a subclass, needs its own uniqueness hashmask
     }
 
     protected EllipsisOneOrMore(@NotNull AbstractVariable name, int id) {
-        super(name, id);
+        super(name, 1, id);
     }
 
     @Override
@@ -26,15 +26,7 @@ public class EllipsisOneOrMore extends Ellipsis {
     }
 
 
-    @Override
-    public int sizeMin() {
-        return 1;
-    }
 
-    @Override
-    public boolean validSize(int collectable) {
-        return collectable > 0;
-    }
 
     @NotNull
     @Override

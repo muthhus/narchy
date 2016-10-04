@@ -12,7 +12,7 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.mutate.Choose1;
 import nars.term.mutate.Choose2;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,7 +69,7 @@ abstract public class PatternCompound extends GenericCompound {
 
         }
 
-        abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst);
+        abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst);
 
         protected boolean canMatch(@NotNull Compound y) {
             if (op() == y.op()) {
@@ -80,7 +80,7 @@ abstract public class PatternCompound extends GenericCompound {
         }
 
         @Override
-        public boolean unify(@NotNull Term ty, @NotNull FindSubst subst) {
+        public boolean unify(@NotNull Term ty, @NotNull Unify subst) {
             if (ty instanceof Compound) {
                 Compound y = (Compound)ty;
                 return canMatch(y) && matchEllipsis(y, subst);
@@ -99,7 +99,7 @@ abstract public class PatternCompound extends GenericCompound {
         }
 
         @Override
-        protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
+        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
             return matchEllipsedLinear(y, subst);
         }
 
@@ -112,7 +112,7 @@ abstract public class PatternCompound extends GenericCompound {
          * WARNING this implementation only works if there is one ellipse in the subterms
          * this is not tested for either
          */
-        protected final boolean matchEllipsedLinear(@NotNull Compound Y, @NotNull FindSubst subst) {
+        protected final boolean matchEllipsedLinear(@NotNull Compound Y, @NotNull Unify subst) {
 
             int i = 0, j = 0;
             int xsize = sizeCached;
@@ -207,7 +207,7 @@ abstract public class PatternCompound extends GenericCompound {
 
 
         @Override
-        protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
+        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
             return matchEllipsisWithImage(y) && super.matchEllipsis(y, subst);
         }
 
@@ -238,7 +238,7 @@ abstract public class PatternCompound extends GenericCompound {
         }
 
         @Override
-        protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
+        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
 
             //return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
             //public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull EllipsisTransform et, @NotNull Compound Y) {
@@ -313,7 +313,7 @@ abstract public class PatternCompound extends GenericCompound {
          * @param y the compound being matched to this
          */
         @Override
-        protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
+        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
             //return subst.matchEllipsedCommutative(
             //        this, ellipsis, y
             //);
@@ -387,7 +387,7 @@ abstract public class PatternCompound extends GenericCompound {
         /**
          * toMatch matched into some or all of Y's terms
          */
-        boolean matchEllipsisCommutive(@NotNull FindSubst subst, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
+        boolean matchEllipsisCommutive(@NotNull Unify subst, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
             int xs = xFree.size();
 
             switch (xs) {

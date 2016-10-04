@@ -3,7 +3,7 @@ package nars.term.atom;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Termlike;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -37,7 +37,7 @@ public final class AtomicSingleton extends AtomicStringConstant {
     }
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
         throw new UnsupportedOperationException("AtomicSingleton leak");
     }
 

@@ -25,7 +25,7 @@ import nars.Op;
 import nars.Param;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.VAR_QUERY;
@@ -63,7 +63,7 @@ public abstract class AbstractVariable implements Variable {
     }
 
     @Override
-    public final boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+    public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
 
         Op xo = op();
         if (y.op() == xo) {

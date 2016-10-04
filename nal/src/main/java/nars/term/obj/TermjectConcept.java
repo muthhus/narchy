@@ -14,7 +14,7 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
 import nars.term.container.TermContainer;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import org.jetbrains.annotations.NotNull;
@@ -80,7 +80,7 @@ public class TermjectConcept<X> implements AbstractConcept, Termject<X> {
     }
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
         return term().unify(y, subst);
     }
 

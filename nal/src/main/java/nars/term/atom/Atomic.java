@@ -3,7 +3,7 @@ package nars.term.atom;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ public interface Atomic extends Term {
 
 
     /** default atomic unification is equality */
-    @Override default boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
+    @Override default boolean unify(@NotNull Term y, @NotNull Unify subst) {
         return false;
     }
 

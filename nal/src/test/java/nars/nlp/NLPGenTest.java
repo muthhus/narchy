@@ -20,13 +20,13 @@ public class NLPGenTest {
     public void testSimple1() {
         assertEquals("a a b", g.toString(n.task("(a --> b).")));
         //assertEquals("a notA b", g.toString(n.task("(--,(a --> b)).")));
-        assertEquals("(bbb) and (a)", g.toString(n.task("(&&, (a), (bbb)).")));
+        assertEquals("(a) and (bbb)", g.toString(n.task("(&&, (a), (bbb)).")));
         //assertEquals("(a) or (bbb)", g.toString(n.task("(||, (a), (bbb)).")));
     }
 
     @Test
     public void testSimple2() {
-        assertEquals("b same a", g.toString(n.task("(a <-> b).")));
+        assertEquals("a same b", g.toString(n.task("(a <-> b).")));
     }
 
 //    @Test

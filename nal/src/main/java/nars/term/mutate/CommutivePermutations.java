@@ -2,7 +2,7 @@ package nars.term.mutate;
 
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ public final class CommutivePermutations extends Termutator {
                     '}';
     }
 
-    public CommutivePermutations(@NotNull FindSubst f, @NotNull TermContainer x, @NotNull TermContainer y) {
+    public CommutivePermutations(@NotNull Unify f, @NotNull TermContainer x, @NotNull TermContainer y) {
         super(Util.tuple(CommutivePermutations.class, x, y));
         this.y = y;
         this.perm = new ShuffledSubterms(f.random,  x);
@@ -37,7 +37,7 @@ public final class CommutivePermutations extends Termutator {
     }
 
     @Override
-    public void run(@NotNull FindSubst f, Termutator[] chain, int current) {
+    public boolean run(@NotNull Unify f, Termutator[] chain, int current) {
         int start = f.now();
 
         ShuffledSubterms p = this.perm;
@@ -48,12 +48,15 @@ public final class CommutivePermutations extends Termutator {
 
             p.next();
 
-            if (f.matchLinear(p, y))
-                next(f, chain, current);
+            if (f.matchLinear(p, y)) {
+                if (!next(f, chain, current))
+                    return false;
+            }
 
             f.revert(start);
         }
 
+        return true;
     }
 
 

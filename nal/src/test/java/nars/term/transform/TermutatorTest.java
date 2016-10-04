@@ -2,13 +2,14 @@ package nars.term.transform;
 
 import com.google.common.collect.Lists;
 import nars.Op;
+import nars.Param;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Term;
 import nars.term.mutate.Choose1;
 import nars.term.mutate.Choose2;
 import nars.term.mutate.CommutivePermutations;
 import nars.term.mutate.Termutator;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.term.var.Variable;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TermutatorTest {
 
-    final FindSubst f = new FindSubst(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1)) {
+    final Unify f = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1), Param.UnificationStackMax, Param.UnificationTermutesMax) {
         @Override
         public boolean onMatch() {
             return true;
@@ -124,13 +125,14 @@ public class TermutatorTest {
         t.run(f, new Termutator[] { t, new Termutator("evaluate") {
 
             @Override
-            public void run(@NotNull FindSubst f, Termutator[] chain, int current) {
+            public boolean run(@NotNull Unify f, Termutator[] chain, int current) {
                 if (s.add( f.xy.toString() )) {
                     actual[0]++;
                 } else {
                     duplicates[0]++;
                 }
 
+                return true;
             }
 
             @Override

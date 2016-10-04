@@ -10,6 +10,7 @@ import nars.gui.Vis;
 import nars.index.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
+import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
@@ -52,14 +53,12 @@ public class Tetris extends SwingAgent {
     public static final int DEFAULT_INDEX_WEIGHT = 25 * 100000;
 
     public static final Executioner exe =
-            new SingleThreadExecutioner();
-//    public static final Executioner exe2 =
+            //new SingleThreadExecutioner();
 //            new MultiThreadExecutioner(2, 1024*8);
-//    public static final Executioner exe4 =
-//            new MultiThreadExecutioner(4, 1024*32);
+            new MultiThreadExecutioner(2, 1024*32);
 
     public static final int runFrames = 25550;
-    public static final int cyclesPerFrame = 8;
+    public static final int cyclesPerFrame = 16;
     public static final int tetris_width = 8;
     public static final int tetris_height = 15;
     public static final int TIME_PER_FALL = 3;
@@ -389,7 +388,7 @@ public class Tetris extends SwingAgent {
         int maxVol = 45;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                8, 2, 2, rng,
+                16, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
@@ -397,8 +396,8 @@ public class Tetris extends SwingAgent {
         );
 
 
-        nar.beliefConfidence(0.7f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.95f);
+        nar.goalConfidence(0.8f);
 
         Param.DEBUG_ANSWERS = Param.DEBUG;
 

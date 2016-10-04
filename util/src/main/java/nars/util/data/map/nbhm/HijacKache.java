@@ -99,8 +99,8 @@ public class HijacKache<TypeK, TypeV>
 
     public Random rng;
 
-    public long hit = 0;
-    public long miss = 0;
+    public long hit;
+    public long miss;
 
     private static long rawIndex(/*final Object[] ary, */final int idx) {
         //assert idx >= 0 && idx < ary.length;
@@ -231,21 +231,13 @@ public class HijacKache<TypeK, TypeV>
     public static final boolean CAS_key(Object[] kvs, int idx, Object old, Object key) {
         //return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), old, key);
 
-        if (_unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), old, key)) {
-            //System.out.println("key " + idx + " to " + key + " <- " + old);
-            return true;
-        }
-        return false;
+        return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 2), old, key);
     }
 
     public static final boolean CAS_val(Object[] kvs, int idx, Object old, Object val) {
         //return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), old, val);
 
-        if (_unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), old, val)) {
-            //System.out.println("val " + idx + " to " + val + " <- " + old);
-            return true;
-        }
-        return false;
+        return _unsafe.compareAndSwapObject(kvs, rawIndex(/*kvs,*/ (idx << 1) + 3), old, val);
     }
 
     public static final void set_key(Object[] kvs, int idx, Object key) {
@@ -481,7 +473,7 @@ public class HijacKache<TypeK, TypeV>
      * @return
      */
     @NotNull @Override public final TypeV computeIfAbsent(@NotNull TypeK key, @NotNull Function<? super TypeK, ? extends TypeV> mappingFunction) {
-        return (TypeV) putIfMatch(key, mappingFunction, NO_MATCH_OLD);
+        return putIfMatch(key, mappingFunction, NO_MATCH_OLD);
     }
 
     @Nullable public final Object computeIfAbsent2(@NotNull TypeK key, @NotNull Function<? super TypeK, Object> mappingFunction) {
@@ -497,6 +489,7 @@ public class HijacKache<TypeK, TypeV>
      * or <tt>null</tt> if there was no mapping for the key
      * @throws NullPointerException if the specified key or value is null
      */
+    @Override
     public TypeV putIfAbsent(TypeK key, TypeV val) {
         return putIfMatch(key, val, TOMBSTONE);
     }
@@ -520,6 +513,7 @@ public class HijacKache<TypeK, TypeV>
      *
      * @throws NullPointerException if the specified key or value is null
      */
+    @Override
     public boolean remove(Object key, Object val) {
         return putIfMatch(key, TOMBSTONE, val) == val;
     }
@@ -530,6 +524,7 @@ public class HijacKache<TypeK, TypeV>
      *
      * @throws NullPointerException if the specified key or value is null
      */
+    @Override
     public TypeV replace(TypeK key, TypeV val) {
         return putIfMatch(key, val, MATCH_ANY);
     }
@@ -540,6 +535,7 @@ public class HijacKache<TypeK, TypeV>
      *
      * @throws NullPointerException if the specified key or value is null
      */
+    @Override
     public boolean replace(TypeK key, TypeV oldValue, TypeV newValue) {
         return putIfMatch(key, newValue, oldValue) == oldValue;
     }
@@ -1222,14 +1218,14 @@ public class HijacKache<TypeK, TypeV>
         // table to the new table.  Workers are not required to finish any chunk;
         // the counter simply wraps and work is copied duplicately until somebody
         // somewhere completes the count.
-        volatile long _copyIdx = 0;
+        volatile long _copyIdx;
         static private final AtomicLongFieldUpdater<CHM> _copyIdxUpdater =
                 AtomicLongFieldUpdater.newUpdater(CHM.class, "_copyIdx");
 
         // Work-done reporting.  Used to efficiently signal when we can move to
         // the new table.  From 0 to len(oldkvs) refers to copying from the old
         // table to the new.
-        volatile long _copyDone = 0;
+        volatile long _copyDone;
         static private final AtomicLongFieldUpdater<CHM> _copyDoneUpdater =
                 AtomicLongFieldUpdater.newUpdater(CHM.class, "_copyDone");
 
@@ -1450,10 +1446,12 @@ public class HijacKache<TypeK, TypeV>
         private Object _nextK, _prevK; // Last 2 keys found
         private TypeV _nextV, _prevV; // Last 2 values found
 
+        @Override
         public boolean hasNext() {
             return _nextV != null;
         }
 
+        @Override
         public TypeV next() {
             // 'next' actually knows what the next value will be - it had to
             // figure that out last go-around lest 'hasNext' report true and
@@ -1476,16 +1474,19 @@ public class HijacKache<TypeK, TypeV>
             return _prevV;            // Return current value.
         }
 
+        @Override
         public void remove() {
             if (_prevV == null) throw new IllegalStateException();
             putIfMatch(HijacKache.this, _sskvs, _prevK, TOMBSTONE, _prevV);
             _prevV = null;
         }
 
+        @Override
         public TypeV nextElement() {
             return next();
         }
 
+        @Override
         public boolean hasMoreElements() {
             return hasNext();
         }
@@ -1551,23 +1552,28 @@ public class HijacKache<TypeK, TypeV>
             _ss = new SnapshotV();
         }
 
+        @Override
         public void remove() {
             _ss.remove();
         }
 
+        @Override
         public TypeK next() {
             _ss.next();
             return (TypeK) _ss._prevK;
         }
 
+        @Override
         public boolean hasNext() {
             return _ss.hasNext();
         }
 
+        @Override
         public TypeK nextElement() {
             return next();
         }
 
+        @Override
         public boolean hasMoreElements() {
             return hasNext();
         }
@@ -1636,6 +1642,7 @@ public class HijacKache<TypeK, TypeV>
             super(k, v);
         }
 
+        @Override
         public TypeV setValue(final TypeV val) {
             if (val == null) throw new NullPointerException();
             _val = val;
@@ -1651,15 +1658,18 @@ public class HijacKache<TypeK, TypeV>
             _ss = new SnapshotV();
         }
 
+        @Override
         public void remove() {
             _ss.remove();
         }
 
+        @Override
         public Map.Entry<TypeK, TypeV> next() {
             _ss.next();
             return new NBHMEntry((TypeK) _ss._prevK, _ss._prevV);
         }
 
+        @Override
         public boolean hasNext() {
             return _ss.hasNext();
         }

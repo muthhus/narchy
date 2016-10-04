@@ -5,7 +5,7 @@ import nars.Op;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.subst.OneMatchFindSubst;
+import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -140,7 +140,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         }
 
         if (!equals && hasAnyOp) {
-            OneMatchFindSubst m = new OneMatchFindSubst(parent, op);
+            SubUnify m = new SubUnify(parent, op);
 
             Term newTerm = m.tryMatch(parent, term, x, y);
             return newTerm != null ? newTerm : False;
@@ -244,7 +244,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
                     if (dt > 0)
                         return False;
                 } else {
-                    throw new RuntimeException("missing C in decomposed");
+                    //throw new RuntimeException("missing C in decomposed");
+                    return False;
                 }
             }
 

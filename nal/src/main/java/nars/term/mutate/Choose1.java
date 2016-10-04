@@ -4,7 +4,7 @@ import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +58,7 @@ public class Choose1 extends Termutator {
     }
 
     @Override
-    public void run(@NotNull FindSubst f, Termutator[] chain, int current) {
+    public boolean run(@NotNull Unify f, Termutator[] chain, int current) {
 
         @NotNull Term[] yy = this.yy;
 
@@ -75,7 +75,8 @@ public class Choose1 extends Termutator {
             Term y = next(shuffle, l);
             if (f.unify(x, y)) {
                 if (f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y, m)))) {
-                    next(f, chain, current);
+                    if (!next(f, chain, current))
+                        return false;
                 }
 
             }
@@ -83,6 +84,7 @@ public class Choose1 extends Termutator {
             f.revert(start);
         }
 
+        return true;
     }
 
 

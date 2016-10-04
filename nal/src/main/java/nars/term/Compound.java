@@ -24,7 +24,7 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.term.container.TermContainer;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import nars.time.Tense;
@@ -248,7 +248,7 @@ public interface Compound extends Term, IPair, TermContainer {
      * @param subst the substitution context holding the match state
      * @return whether match was successful or not, possibly having modified subst regardless
      */
-    @Override default boolean unify(@NotNull Term ty, @NotNull FindSubst subst) {
+    @Override default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
 
 
         if (ty instanceof Compound) {

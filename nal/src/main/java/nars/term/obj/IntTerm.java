@@ -2,7 +2,7 @@ package nars.term.obj;
 
 import nars.Op;
 import nars.term.Term;
-import nars.term.subst.FindSubst;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.INT;
@@ -33,7 +33,7 @@ public class IntTerm extends Termject.PrimTermject<Integer> {
     }
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull FindSubst f) {
+    public boolean unify(@NotNull Term y, @NotNull Unify f) {
 
         if (y instanceof IntInterval) {
             return y.unify(this, f); //reverse x,y necessary?
