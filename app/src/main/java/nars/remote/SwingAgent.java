@@ -133,6 +133,10 @@ abstract public class SwingAgent extends NAgent {
         pb.addActions(id, this);
         return addCamera(id, pb, pixelTruth);
     }
+    protected Sensor2D<WaveletBag> addFreqCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+        WaveletBag pb = new WaveletBag(w, pw, ph);
+        return addCamera(id, pb, pixelTruth);
+    }
 
     protected <C extends Bitmap2D> Sensor2D<C> addCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
         CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);

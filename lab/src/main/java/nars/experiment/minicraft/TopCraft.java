@@ -21,7 +21,7 @@ import static spacegraph.SpaceGraph.window;
 public class TopCraft extends SwingAgent {
 
     private final TopDownMinicraft craft;
-    private Sensor2D<PixelBag> pixels;
+    private Sensor2D pixels;
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
@@ -33,15 +33,15 @@ public class TopCraft extends SwingAgent {
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addCamera("see", ()->craft.image, 32,32, (v) -> $.t( v, alpha));
+        pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
-        int nx = 8;
-        camAE = new PixelAutoClassifier("seeAE", pixels.src.pixels, nx, nx,   (subX, subY) -> {
-            //context metadata: camera zoom, to give a sense of scale
-            //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
-            return new float[]{ pixels.src.Z};
-        }, 24, this);
-        window(camAE.newChart(), 500, 500);
+//        int nx = 8;
+//        camAE = new PixelAutoClassifier("seeAE", pixels.src.pixels, nx, nx,   (subX, subY) -> {
+//            //context metadata: camera zoom, to give a sense of scale
+//            //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
+//            return new float[]{ pixels.src.Z};
+//        }, 24, this);
+//        window(camAE.newChart(), 500, 500);
 
 //        new NObj("cra", craft, nar)
 //                .read(
