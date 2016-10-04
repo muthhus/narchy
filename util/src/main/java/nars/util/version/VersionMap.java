@@ -145,8 +145,12 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return map.compute(x, r)!=null;
     }
 
-    public void forEachVersioned(BiConsumer<? super X, ? super Versioned<Y>> each) {
-        map.forEach(each);
+    public void forEachVersioned(@NotNull BiConsumer<? super X, ? super Y> each) {
+        map.forEach((x,v)-> {
+           Y y = v.get();
+           if (y!=null)
+               each.accept(x,y);
+        });
     }
 
 

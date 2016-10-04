@@ -86,8 +86,12 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
     // ------------- Helper methods for serializing writes -------------
 
-    public final void acquireWriteLock() {
+    /** essentially a version number which increments each acquired write lock, to know if the tree has changed */
+    final static AtomicInteger writes = new AtomicInteger();
+
+    public final int acquireWriteLock() {
         writeLock.lock();
+        return writes.incrementAndGet();
     }
 
     public final void releaseWriteLock() {
@@ -138,24 +142,9 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     }
 
     @NotNull public final X putIfAbsent(@NotNull CharSequence key, @NotNull Supplier<X> newValue) {
-        return compute(key, newValue, (k, r, existing, v) -> {
-
-            if (existing!=null) {
-                return existing;
-            } else {
-                return v.get();
-            }
-//            if (r.charsMatched == k.length()) {
-//                Node existingNode = r.found;
-//                if (existingNode != null) {
-//                    Object existingValue = existingNode.getValue();
-//                    if (existingValue != null /*&& key.equals(existingValue.toString())*/) {
-//                        return (X) existingValue;
-//                    }
-//                }
-//            }
-
-        });
+        return compute(key, newValue, (k, r, existing, v) ->
+            existing != null ? existing : v.get()
+        );
     }
 
     /**
@@ -715,125 +704,165 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 //            throw new IllegalArgumentException("The key argument was zero-length");
 //        }
 
-        acquireWriteLock();
-        try {
-            // Note we search the tree here after we have acquired the write lock...
-            SearchResult result = searchTree(key);
-            SearchResult.Classification classification = result.classification;
 
+
+
+
+        int version;
+        X newValue, foundX;
+        SearchResult result;
+        int matched;
+        Object foundValue;
+        Node found;
+
+        {
+
+            version = writes.intValue();
+
+            acquireReadLockIfNecessary();
+            try {
+
+                // Note we search the tree here after we have acquired the write lock...
+                result = searchTree(key);
+                found = result.found;
+                matched = result.charsMatched;
+                foundValue = found != null ? found.getValue() : null;
+                foundX = ((matched == key.length()) && (foundValue != VoidValue.SINGLETON)) ? ((X) foundValue) : null;
+            } finally {
+                releaseReadLockIfNecessary();
+            }
+
+        }
+
+        newValue = computeFunc.apply(key, result, foundX, value);
+
+        if (newValue != foundX) {
 
             NodeFactory factory = this.nodeFactory;
-            Node found = result.found;
-            int matched = result.charsMatched;
-            Object foundValue = found != null ? found.getValue() : null;
-            X foundX = ((result.charsMatched == key.length()) && (foundValue != VoidValue.SINGLETON)) ?
-                    ((X) foundValue) :
-                    null;
-            X newValue = computeFunc.apply(key, result,
-                    foundX,
-                    value);
 
-            if (foundX==null)
-                estSize.incrementAndGet();
+            int version2 = acquireWriteLock();
+            try {
 
-            List<Node> oedges = found.getOutgoingEdges();
-            switch (classification) {
-                case EXACT_MATCH:
-                    // Search found an exact match for all edges leading to this node.
-                    // -> Add or update the value in the node found, by replacing
-                    // the existing node with a new node containing the value...
-
-                    // First check if existing node has a value, and if we are allowed to overwrite it.
-                    // Return early without overwriting if necessary...
-
-                    if (newValue != foundValue) {
-                        //clone and reattach
-                        cloneAndReattach(result, factory, found, foundValue, oedges);
-                    }
-                    return newValue;
-                case KEY_ENDS_MID_EDGE: {
-                    // Search ran out of characters from the key while in the middle of an edge in the node.
-                    // -> Split the node in two: Create a new parent node storing the new value,
-                    // and a new child node holding the original value and edges from the existing node...
-                    CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
-                    CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
-                    CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
-
-
-                    // Create new nodes...
-                    Node newChild = factory.createNode(suffixFromExistingEdge, foundValue, oedges, false);
-
-                    Node newParent = factory.createNode(commonPrefix, newValue, Arrays.asList(newChild), false);
-
-                    // Add the new parent to the parent of the node being replaced (replacing the existing node)...
-                    result.parentNode.updateOutgoingEdge(newParent);
-
-                    // Return null for the existing value...
-                    return newValue;
+                if (version+1!=version2) {
+                    //search again because the tree has changed since the initial lookup
+                    result = searchTree(key);
+                    found = result.found;
+                    matched = result.charsMatched;
+                    foundValue = found != null ? found.getValue() : null;
+                    foundX = ((matched == key.length()) && (foundValue != VoidValue.SINGLETON)) ? ((X) foundValue) : null;
+                    if (foundX == newValue)
+                        return newValue; //no change; the requested value has already been supplied since the last access
                 }
-                case INCOMPLETE_MATCH_TO_END_OF_EDGE:
-                    // Search found a difference in characters between the key and the start of all child edges leaving the
-                    // node, the key still has trailing unmatched characters.
-                    // -> Add a new child to the node, containing the trailing characters from the key.
 
-                    // NOTE: this is the only branch which allows an edge to be added to the root.
-                    // (Root node's own edge is "" empty string, so is considered a prefixing edge of every key)
+                SearchResult.Classification classification = result.classification;
 
-                    // Create a new child node containing the trailing characters...
-                    CharSequence keySuffix = key.subSequence(matched, key.length());
+                if (foundX == null)
+                    estSize.incrementAndGet();
 
-                    Node newChild = factory.createNode(keySuffix, newValue, Collections.emptyList(), false);
+                List<Node> oedges = found.getOutgoingEdges();
+                switch (classification) {
+                    case EXACT_MATCH:
+                        // Search found an exact match for all edges leading to this node.
+                        // -> Add or update the value in the node found, by replacing
+                        // the existing node with a new node containing the value...
 
-                    // Clone the current node adding the new child...
-                    List<Node> edges = $.newArrayList(oedges.size() + 1);
-                    edges.addAll(oedges);
-                    edges.add(newChild);
-                    cloneAndReattach(result, factory, found, foundValue, edges);
+                        // First check if existing node has a value, and if we are allowed to overwrite it.
+                        // Return early without overwriting if necessary...
 
-                    // Return null for the existing value...
-                    return newValue;
-                case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE:
-                    // Search found a difference in characters between the key and the characters in the middle of the
-                    // edge in the current node, and the key still has trailing unmatched characters.
-                    // -> Split the node in three:
-                    // Let's call node found: NF
-                    // (1) Create a new node N1 containing the unmatched characters from the rest of the key, and the
-                    // value supplied to this method
-                    // (2) Create a new node N2 containing the unmatched characters from the rest of the edge in NF, and
-                    // copy the original edges and the value from NF unmodified into N2
-                    // (3) Create a new node N3, which will be the split node, containing the matched characters from
-                    // the key and the edge, and add N1 and N2 as child nodes of N3
-                    // (4) Re-add N3 to the parent node of NF, effectively replacing NF in the tree
+                        if (newValue != foundValue) {
+                            //clone and reattach
+                            cloneAndReattach(result, factory, found, foundValue, oedges);
+                        }
+                        break;
+                    case KEY_ENDS_MID_EDGE: {
+                        // Search ran out of characters from the key while in the middle of an edge in the node.
+                        // -> Split the node in two: Create a new parent node storing the new value,
+                        // and a new child node holding the original value and edges from the existing node...
+                        CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
+                        CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
+                        CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
 
-                    CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
-                    CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
-                    CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
-                    CharSequence suffixFromKey = key.subSequence(matched, key.length());
 
-                    // Create new nodes...
-                    Node n1 = factory.createNode(suffixFromKey, newValue, Collections.emptyList(), false);
-                    Node n2 = factory.createNode(suffixFromExistingEdge, foundValue, oedges, false);
-                    @SuppressWarnings({"NullableProblems"})
-                    Node n3 = factory.createNode(commonPrefix, null, Arrays.asList(n1, n2), false);
+                        // Create new nodes...
+                        Node newChild = factory.createNode(suffixFromExistingEdge, foundValue, oedges, false);
 
-                    result.parentNode.updateOutgoingEdge(n3);
+                        Node newParent = factory.createNode(commonPrefix, newValue, Arrays.asList(newChild), false);
 
-                    // Return null for the existing value...
-                    return newValue;
-                default:
-                    // This is a safeguard against a new enum constant being added in future.
-                    throw new IllegalStateException("Unexpected classification for search result: " + result);
+                        // Add the new parent to the parent of the node being replaced (replacing the existing node)...
+                        result.parentNode.updateOutgoingEdge(newParent);
+
+                        break;
+                    }
+                    case INCOMPLETE_MATCH_TO_END_OF_EDGE:
+                        // Search found a difference in characters between the key and the start of all child edges leaving the
+                        // node, the key still has trailing unmatched characters.
+                        // -> Add a new child to the node, containing the trailing characters from the key.
+
+                        // NOTE: this is the only branch which allows an edge to be added to the root.
+                        // (Root node's own edge is "" empty string, so is considered a prefixing edge of every key)
+
+                        // Create a new child node containing the trailing characters...
+                        CharSequence keySuffix = key.subSequence(matched, key.length());
+
+                        Node newChild = factory.createNode(keySuffix, newValue, Collections.emptyList(), false);
+
+                        // Clone the current node adding the new child...
+                        List<Node> edges = $.newArrayList(oedges.size() + 1);
+                        edges.addAll(oedges);
+                        edges.add(newChild);
+                        cloneAndReattach(result, factory, found, foundValue, edges);
+
+                        break;
+
+                    case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE:
+                        // Search found a difference in characters between the key and the characters in the middle of the
+                        // edge in the current node, and the key still has trailing unmatched characters.
+                        // -> Split the node in three:
+                        // Let's call node found: NF
+                        // (1) Create a new node N1 containing the unmatched characters from the rest of the key, and the
+                        // value supplied to this method
+                        // (2) Create a new node N2 containing the unmatched characters from the rest of the edge in NF, and
+                        // copy the original edges and the value from NF unmodified into N2
+                        // (3) Create a new node N3, which will be the split node, containing the matched characters from
+                        // the key and the edge, and add N1 and N2 as child nodes of N3
+                        // (4) Re-add N3 to the parent node of NF, effectively replacing NF in the tree
+
+                        CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
+                        CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
+                        CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
+                        CharSequence suffixFromKey = key.subSequence(matched, key.length());
+
+                        // Create new nodes...
+                        Node n1 = factory.createNode(suffixFromKey, newValue, Collections.emptyList(), false);
+                        Node n2 = factory.createNode(suffixFromExistingEdge, foundValue, oedges, false);
+                        @SuppressWarnings({"NullableProblems"})
+                        Node n3 = factory.createNode(commonPrefix, null, Arrays.asList(n1, n2), false);
+
+                        result.parentNode.updateOutgoingEdge(n3);
+
+                        // Return null for the existing value...
+                        break;
+
+                    default:
+                        // This is a safeguard against a new enum constant being added in future.
+                        throw new IllegalStateException("Unexpected classification for search result: " + result);
+                }
+            } finally {
+                releaseWriteLock();
             }
-        } finally {
-            releaseWriteLock();
         }
+
+        return newValue;
     }
 
     private void cloneAndReattach(SearchResult searchResult, NodeFactory factory, Node found, Object foundValue, List<Node> edges) {
-        Node clonedNode = factory.createNode(found.getIncomingEdge(), foundValue, edges, found == root);
+        CharSequence ie = found.getIncomingEdge();
+        boolean root = ie.length() == 0;
+
+        Node clonedNode = factory.createNode(ie, foundValue, edges, root);
 
         // Re-add the cloned node to its parent node...
-        if (found == root) {
+        if (root) {
             this.root = clonedNode;
         } else {
             searchResult.parentNode.updateOutgoingEdge(clonedNode);

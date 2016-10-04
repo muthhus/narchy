@@ -1,5 +1,6 @@
 package nars.term.subst;
 
+import nars.$;
 import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.PremiseEval;
@@ -38,7 +39,7 @@ public final class OneMatchFindSubst extends FindSubst {
         if (xterm != null) {
             if (target != null) {
                 target.replaceAllXY(this);
-                result = target.transform(xterm, target);
+                result = $.terms.transform(xterm, target);
             } else {
                 result = transform(xterm, this);
             }

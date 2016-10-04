@@ -84,7 +84,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
 
             Task derived = clone(original, c);
 
-            nar.input(derived);
+            nar.inputLater(derived);
 
         }
 

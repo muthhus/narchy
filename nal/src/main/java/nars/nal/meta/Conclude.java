@@ -1,11 +1,9 @@
 package nars.nal.meta;
 
 import com.google.common.base.Joiner;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.budget.Budget;
+import nars.index.TermIndex;
 import nars.nal.Premise;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
@@ -103,7 +101,11 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         Term r;
         try {
-            r = m.index.transform(this.conclusionPattern, m);
+            TermIndex transformer =
+                    //m.index;
+                    $.terms;
+
+            r = transformer.transform(this.conclusionPattern, m);
         } catch (InvalidTermException e) {
             if (Param.DEBUG_EXTRA)
                 logger.error("Term: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);

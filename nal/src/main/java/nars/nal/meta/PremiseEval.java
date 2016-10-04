@@ -393,7 +393,7 @@ public class PremiseEval extends FindSubst {
 //    }
 
     public void replaceAllXY(@NotNull FindSubst m) {
-        m.forEachVersioned(this::replaceXY);
+        m.xy.forEachVersioned(this::replaceXY);
     }
 
 

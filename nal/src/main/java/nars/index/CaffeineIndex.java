@@ -51,7 +51,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     };
 
     public CaffeineIndex(ConceptBuilder conceptBuilder, int capacity, int avgVolume, boolean soft, @NotNull Executor exe) {
-        this(conceptBuilder, capacity * avgVolume, soft, exe, capacity);
+        this(conceptBuilder, capacity * avgVolume, soft, exe, capacity*4);
     }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */

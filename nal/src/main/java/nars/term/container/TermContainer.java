@@ -643,6 +643,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
         return c; //unchanged
     }
+    @NotNull
+    static MutableSet<Term> exceptToSet(@NotNull TermContainer c, @NotNull MutableSet<Term> toRemove) {
+        MutableSet<Term> s = c.toSet();
+        s.removeAll(toRemove);
+        return s;
+    }
 
     @NotNull
     default TermVector filter(Predicate<Term> p) {

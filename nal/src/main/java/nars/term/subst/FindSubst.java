@@ -606,9 +606,9 @@ public abstract class FindSubst extends Termunator implements Subst {
     }
 
 
-    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Versioned<Term> y) {
-        return replaceXY(x, y.get());
-    }
+//    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Versioned<Term> y) {
+//        return replaceXY(x, y.get());
+//    }
 
     public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
         return xy.tryPut(x, y);
@@ -646,9 +646,6 @@ public abstract class FindSubst extends Termunator implements Subst {
 //        //TODO yx also?
 //    }
 
-    public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
-        xy.forEachVersioned(each);
-    }
 
     public final boolean isFull() {
         return versioning.isFull();

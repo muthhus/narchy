@@ -102,7 +102,7 @@ public class UnificationTest {
 
                     assertFalse("incomplete: " + toString(), this.isEmpty());
 
-                    this.forEachVersioned((k, v) -> {
+                    this.xy.forEachVersioned((k, v) -> {
                         if (matchType(k))
                             assertNotNull(v);
                     });

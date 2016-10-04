@@ -687,10 +687,8 @@ public abstract class TermBuilder {
 
                             MutableSet<Term> common = TermContainer.intersect(subjs, preds);
                             if (!common.isEmpty()) {
-                                Term newSubject = the(csub, TermContainer.except(subjs, common));
-                                Term newPredicate = the(cpred, TermContainer.except(preds, common));
-                                subject = newSubject;
-                                predicate = newPredicate;
+                                subject = the(csub, TermContainer.exceptToSet(subjs, common));
+                                predicate = the(cpred, TermContainer.exceptToSet(preds, common));
                                 continue;
                             }
                         }
@@ -948,14 +946,15 @@ public abstract class TermBuilder {
             return (Compound) finish(o, u);
     }
 
-    @NotNull
-    public Term the(@NotNull Compound csrc, @NotNull Term[] newSubs) {
+    @NotNull public Term the(@NotNull Compound csrc, @NotNull Term[] newSubs) {
         return the(csrc.op(), csrc.dt(), newSubs);
     }
     @NotNull public Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
         return the(csrc.op(), csrc.dt(), newSubs.terms());
     }
-
+    @NotNull public Term the(@NotNull Compound csrc, @NotNull Collection<Term> newSubs) {
+        return the(csrc.op(), csrc.dt(), newSubs.toArray(new Term[newSubs.size()]));
+    }
 
     public final Term disjunction(@NotNull Term[] u) {
         return negation(conj(DTERNAL, negation(u)));

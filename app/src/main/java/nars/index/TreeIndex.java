@@ -184,7 +184,6 @@ public class TreeIndex extends TermIndex {
             if (!(existing instanceof PermanentConcept)) {
                 concepts.put(k, target);
             }
-            concepts.releaseWriteLock();
         } finally {
             concepts.releaseWriteLock();
         }

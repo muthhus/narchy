@@ -7,14 +7,17 @@ import nars.NAR;
 import nars.NAgent;
 import nars.gui.Vis;
 import nars.index.CaffeineIndex;
+import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
+import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.truth.Truth;
+import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -48,8 +51,8 @@ abstract public class SwingAgent extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
 
         final Executioner exe =
-            new SingleThreadExecutioner();
-            //new MultiThreadExecutioner(2, 1024*16);
+            //new SingleThreadExecutioner();
+            new MultiThreadExecutioner(3, 1024*16);
 
         int maxVol = 35;
         int cyclesPerFrame = 8;
@@ -58,8 +61,8 @@ abstract public class SwingAgent extends NAgent {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 conceptsPerCycle, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*256, maxVol/2, false, exe)
-                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 8192, 2)
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*256, maxVol/2, false, exe)
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 100000, 8192, 2)
 
                 , new FrameClock(), exe);
 

@@ -22,7 +22,7 @@ public class Arkancide extends SwingAgent {
 
 
     public Arkancide(NAR nar) {
-        super(nar, 0 /* additional decision frames */);
+        super(nar, 1 /* additional decision frames */);
 
         noid = new Arkanoid();
 
@@ -62,7 +62,7 @@ public class Arkancide extends SwingAgent {
     }
 
     public static void main(String[] args) {
-        run(Arkancide::new, 3500);
+        run(Arkancide::new, 23500);
     }
 
 

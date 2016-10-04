@@ -13,7 +13,6 @@ import nars.NARLoop;
 import nars.index.CaffeineIndex;
 import nars.irc.IRCAgent;
 import nars.irc.IRCBot;
-import nars.irc.NarseseIRCBot;
 import nars.nar.Default;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;

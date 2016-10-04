@@ -264,13 +264,13 @@
 //These cases are handled by "Variable Introduction" and "Temporal Induction"
 
     //implications may be constructed with implications for preds but not subjs
-    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- (S ==> P), (Belief:Induction)
-        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- ((--,%S) ==> P), (Belief:InductionN)
-    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction)
-        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> (--,%S)) (Belief:AbductionN)
-    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- (S <=> P), (Belief:Comparison)
-        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- (--,(S <=> P)), (Belief:ComparisonN)
-    S, P, time(eternal), task("."), neqCom(P,S) |- (S && P), (Belief:Intersection)
+    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- (S ==> P), (Belief:Induction, Permute:NoSwap)
+        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- ((--,%S) ==> P), (Belief:InductionN, Permute:NoSwap)
+    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction, Permute:NoSwap)
+        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> (--,%S)) (Belief:AbductionN, Permute:NoSwap)
+    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- (S <=> P), (Belief:Comparison, Permute:NoSwap)
+        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- (--,(S <=> P)), (Belief:ComparisonN, Permute:NoSwap)
+    S, P, time(eternal), task("."), neqCom(P,S) |- (S && P), (Belief:Intersection, Permute:NoSwap)
         //S, P, time(eternal), task(negative), task("."), neq(P,S) |- ((--,%S) && P), (Belief:IntersectionN)
     //%S, %P, time(eternal), neqCom(P,S) |- (%S || %P), (Belief:Union)
 
@@ -278,16 +278,16 @@
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
     //implications may be constructed with implications for preds but not subjs
-    A, B, task(positive), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- (A ==>+- B), (Belief:Induction)
-        A, B, task(negative), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
+    A, B, task(positive), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- (A ==>+- B), (Belief:Induction, Permute:NoSwap)
+        A, B, task(negative), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN, Permute:NoSwap)
 
-    A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
-        A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
+    A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction, Permute:NoSwap)
+        A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- (--,%A)), (Belief:AbductionN, Permute:NoSwap)
 
-    A, B, task(positive), task("."), time(dtForward), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
-        A, B, task(negative), task("."), time(dtForward), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
+    A, B, task(positive), task("."), time(dtForward), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison, Permute:NoSwap)
+        A, B, task(negative), task("."), time(dtForward), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN, Permute:NoSwap)
 
-    A, B, task("."), time(dtAfter), neqCom(A,B) |- (A &&+- B), (Belief:Intersection)
+    A, B, task("."), time(dtAfter), neqCom(A,B) |- (A &&+- B), (Belief:Intersection, Permute:NoSwap)
         ///A, B, task(negative), task("."), time(dtAfter), neq(A,B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
 
                 //A, B, task(negative), task("."), time(dtAfter), neqRec(A,B) notImplEqui(A), notImplEqui(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
