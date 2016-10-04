@@ -64,7 +64,7 @@ public class PostCondition implements Serializable, Level //since there can be m
             conversion = the("Conversion"),
             contraposition = the("Contraposition"),
             identity = the("Identity"),*/
-            noSwap = the("NoSwap"),
+            swap = the("Swap"),
             backward = the("Backward"),
 //            fromTask = the("FromTask"),
 //            fromBelief = the("FromBelief"),
@@ -139,8 +139,8 @@ public class PostCondition implements Serializable, Level //since there can be m
                 case "Permute":
                     if (which.equals(PostCondition.backward))
                         rule.setAllowBackward();
-                    if (which.equals(PostCondition.noSwap))
-                        rule.allowForward = false;
+                    if (which.equals(PostCondition.swap))
+                        rule.allowForward = true;
                     break;
 
                 case "Order":

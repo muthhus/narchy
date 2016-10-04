@@ -6,6 +6,7 @@ import nars.IO;
 import nars.Param;
 import nars.index.PatternIndex;
 import nars.nal.Deriver;
+import nars.nal.meta.PostCondition;
 import nars.term.Compound;
 import nars.util.Util;
 import org.eclipse.collections.api.tuple.Pair;
@@ -305,26 +306,27 @@ public class PremiseRuleSet {
      */
     static boolean permuteSwap(@NotNull PremiseRule r) {
         boolean[] fwd = {true};
-        r.recurseTerms((s) -> {
-
-            if (!fwd[0])
-                return; //already disqualified
-
-
-//            String x = s.toString().toLowerCase();
+//        r.recurseTerms((s) -> {
 //
-//            if ((x.contains("task(")) ||
-//                    (x.contains("belief(")) ||
-//                    (x.contains("punctuation(")) ||
-//                    //(x.contains("time(")) ||
-//                    //(x.contains("Identity")) ||
-//                    (x.contains("sub"))
-//                //(x.contains("Negation"))
+//            if (!fwd[0])
+//                return; //already disqualified
 //
-//                    ) {
-//                fwd[0] = false;
-//            }
-        });
+//
+//
+////            String x = s.toString().toLowerCase();
+////
+////            if ((x.contains("task(")) ||
+////                    (x.contains("belief(")) ||
+////                    (x.contains("punctuation(")) ||
+////                    //(x.contains("time(")) ||
+////                    //(x.contains("Identity")) ||
+////                    (x.contains("sub"))
+////                //(x.contains("Negation"))
+////
+////                    ) {
+////                fwd[0] = false;
+////            }
+//        });
         return fwd[0];
     }
 

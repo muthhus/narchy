@@ -35,7 +35,7 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
     @NotNull
     @Override
     protected BoolCondition build(BoolCondition eachMatch) {
-        return new MatchOneSubterm(id, subterm, pattern, constraints, finish ? eachMatch : null, matchFactor);
+        return new MatchOneSubterm(id, subterm, pattern, constraints, finish ? eachMatch : null);
     }
 
 }

@@ -52,7 +52,7 @@ public class PremiseRule extends GenericCompound {
 
     public char taskPunc = 0;
     public boolean allowBackward;
-    public boolean allowForward = true;
+    public boolean allowForward = false;
 
 //    @NotNull
 //    @Override
@@ -1090,7 +1090,7 @@ public class PremiseRule extends GenericCompound {
      * <p>
      * after generating, these are then backward permuted
      */
-    @NotNull
+    @Nullable
     public final PremiseRule swapPermutation(@NotNull PatternIndex index) {
 
         // T, B, [pre] |- C, [post] ||--

@@ -222,7 +222,7 @@ public class PremiseEval extends Unify {
     }
 
     public static int matchesMax(float p) {
-        final float min = Param.matchTermutationsMin, max = Param.matchTermutationsMax;
+        final float min = Param.UnificationMatchesMin, max = Param.UnificationMatchesMax;
         return (int) Math.ceil(p * (max - min) + min);
     }
 
@@ -264,16 +264,16 @@ public class PremiseEval extends Unify {
     }
 
     @Override
-    public boolean onMatch() {
+    public final boolean onMatch() {
 
-        try {
+ //       try {
             if (!forEachMatch.run(this, now()))
                 return false;
-        } catch (RuntimeException e) {
-            if (Param.DEBUG_DERIVER)
-                Conclude.logger.warn("{}\n\tderiving {}", e, ((Conclude)forEachMatch).rule.source);
-            //continue
-        }
+//        } catch (RuntimeException e) {
+//            if (Param.DEBUG_DERIVER)
+//                Conclude.logger.warn("{}\n\tderiving {}", e, ((Conclude)forEachMatch).rule.source);
+//            //continue
+//        }
 
         return (--matchesRemain > 0);
     }

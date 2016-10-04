@@ -43,7 +43,6 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
     private final Set<Conclude> conclude = $.newHashSet(1);
 
 
-    int matchFactor;
 
 
     public MatchTermPrototype(@NotNull Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
@@ -107,7 +106,6 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
                     break;
             }
 
-            matchFactor = conclude.size();
 
             this.id = $.the("MatchTerm(" + pid +
                     ((om!=null) ? ",  " + om  : "") + ')');

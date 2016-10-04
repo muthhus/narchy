@@ -74,6 +74,12 @@ public abstract class Param /*extends Container*/ implements Level {
     public final static int UnificationStackMax = 48;
 
     /**
+     * upper and lower limits for # of termutations derived, determined by premise's priority
+     */
+    public static float UnificationMatchesMax = 4, UnificationMatchesMin = 2;
+
+
+    /**
      * max # of chained termutes which can be active
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
@@ -82,12 +88,12 @@ public abstract class Param /*extends Container*/ implements Level {
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
     public final static int SubUnificationTermutesMax = UnificationTermutesMax/2;
-    public static final int SubUnificationMatchRetries = 3;
+    public static final int SubUnificationMatchRetries = Math.round(UnificationMatchesMin);
 
     /**
      * swap task and belief in eligible rules ("forward" permutation)
      */
-    public static final boolean SWAP_RULES = true;
+    public static final boolean SWAP_RULES = false;
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
@@ -120,15 +126,8 @@ public abstract class Param /*extends Container*/ implements Level {
     //public static boolean DEBUG_INVALID_SENTENCES = true;
     //public static boolean DEBUG_NONETERNAL_QUESTIONS = false;
     public static boolean DEBUG_TASK_LOG = true; //false disables task history completely
-    /**
-     * lower limit for # of termutations derived, determined by premise's priority
-     */
-    public static float matchTermutationsMin = 1;
 
-    /**
-     * upper limit for # of termutations derived, determined by premise's priority
-     */
-    public static float matchTermutationsMax = 3;
+
 
     public static int QUERY_ANSWERS_PER_MATCH = 1;
     //public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;

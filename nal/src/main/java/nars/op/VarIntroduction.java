@@ -1,5 +1,7 @@
 package nars.op;
 
+import com.google.common.base.Joiner;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -7,6 +9,7 @@ import nars.concept.Concept;
 import nars.nal.Stamp;
 import nars.op.mental.Abbreviation;
 import nars.task.GeneratedTask;
+import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.TruthDelta;
@@ -50,7 +53,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
 
                         Term d = dd[nar.random.nextInt(replacements)]; //choose one randomly
                         //for (Term d : dd) {
-                        Term newContent = nar.concepts.replace(c, s, d);
+                        Term newContent = $.terms.replace(c, s, d);
                         if ((newContent instanceof Compound) && !newContent.equals(c)) {
                             input(nar, input, newContent);
                         }
@@ -90,12 +93,19 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
 
     }
 
-    protected Task clone(@NotNull Task original, Compound c) {
-        return new VarIntroducedTask(c, original)
+    @NotNull protected Task clone(@NotNull Task original, @NotNull Compound c) {
+        MutableTask t = new VarIntroducedTask(c, original)
             .time(original.creation(), original.occurrence())
             .evidence(Stamp.cyclic(original.evidence()))
-            .budgetSafe(original.budget())
-            .log(tag);
+            .budgetSafe(original.budget());
+
+//            if (Param.DEBUG)
+//                t.log(tag + ":\n" + (original.log() != null ? Joiner.on("\t\n").join(original.log()) : ""));
+//            else
+        t.log(tag);
+
+
+        return t;
     }
 
     public VarIntroduction each(NAR nar) {
