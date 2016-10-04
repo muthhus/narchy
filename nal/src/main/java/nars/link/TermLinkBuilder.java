@@ -1,6 +1,7 @@
 package nars.link;
 
 import nars.NAR;
+import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.Variable;
@@ -45,10 +46,16 @@ public enum TermLinkBuilder {
             case INH:
             case SIM:
                 return 1;
+
+            case IMPL:
+            case EQUI:
+                return (host.vars() > 0) ? 2 : 1;
+            case CONJ:
+                return (host.vars() > 0) && (host.size() < Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) ? 2 : 1;
+
             default:
-                return 2;
+                throw new UnsupportedOperationException("unhandled operator type: " + host.op());
         }
-//            return 2;
     }
 
 

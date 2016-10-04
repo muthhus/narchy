@@ -123,9 +123,10 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
         if ((abbreviable != null) &&
                 !(abbreviable instanceof PermanentConcept) &&
                 !(abbreviable instanceof AliasConcept) &&
-                (!term.hasTemporal()) &&
-                (abbreviable.get(Abbreviation.class) == null) &&
-                (abbreviable.get(Concept.Savior.class) == null)) {
+                term.vars() == 0 &&
+                term.hasTemporal() &&
+                abbreviable.get(Abbreviation.class) == null &&
+                abbreviable.get(Concept.Savior.class) == null) {
 
             abbreviate((CompoundConcept) abbreviable, b);
         }
@@ -194,7 +195,7 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
             Compound abbreviation = newRelation(abbreviated, id);
 
             AliasConcept alias = new AliasConcept(id, abbreviated, nar, abbreviation);
-            nar.concepts.set(alias, alias);
+            nar.on(alias);
 
 
             //if (abbreviation != null) {
@@ -280,7 +281,7 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
             if (additionalTerms.length > 0)
                 tl = ArrayUtils.addAll(tl, additionalTerms);
             this.templates = TermVector.the(tl);
-            rewriteLinks(nar);
+            //rewriteLinks(nar);
         }
 
 

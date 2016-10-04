@@ -48,6 +48,9 @@ public abstract class Param /*extends Container*/ implements Level {
     /** average priority target for bag forgetting */
     public static final float BAG_THRESHOLD = 0.5f;
 
+    /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
+    public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
+
     public static boolean DEBUG_ANSWERS;
 
     /** how many times the desired selection size that bags should sample in case some of the selections are unused */

@@ -179,8 +179,10 @@ abstract public class NAgent implements NSense, NAction {
         now = nar.time();
 
         float r = rewardValue = act();
-        rewardSum += r;
-        rewardWindow.addValue(rewardValue);
+        if (r==r) {
+            rewardSum += r;
+            rewardWindow.addValue(rewardValue);
+        }
 
         if (trace)
             System.out.println(summary());

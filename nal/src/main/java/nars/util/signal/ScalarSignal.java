@@ -114,8 +114,10 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
 
         float next = value.floatValueOf(term);
-        if (next!=next)
-            return; //allow the value function to prevent input by returning NaN
+        if (next!=next) {
+            this.prevF = next;
+            return; //all
+        }// ow the value function to prevent input by returning NaN
 
         float f = Util.round(next, resolution);
 
@@ -126,7 +128,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         boolean tooSoon = (limitsMinTime && (timeSinceLastInput < minT));
         boolean lateEnough = (limitsMaxTime && (timeSinceLastInput >= maxT));
-        boolean different = !Util.equals(f, prevF, Param.TRUTH_EPSILON);
+        boolean different = (prevF!=prevF /* NaN */) || !Util.equals(f, prevF, Param.TRUTH_EPSILON);
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 

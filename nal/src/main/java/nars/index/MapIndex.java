@@ -28,7 +28,8 @@ public class MapIndex extends MaplikeIndex {
         this.subterms = subMap;
     }
 
-    protected final TermContainer intern(TermContainer s) {
+    @Override
+    public final TermContainer intern(TermContainer s) {
         if (subterms==null)
             return s;
         else {

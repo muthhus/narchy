@@ -64,10 +64,10 @@ abstract public class SwingAgent extends NAgent {
                 , new FrameClock(), exe);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.7f);
 
-        float p = 0.1f;
+        float p = 0.15f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f * p;
@@ -76,6 +76,8 @@ abstract public class SwingAgent extends NAgent {
         nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.confMin.setValue(0.02f);
         nar.compoundVolumeMax.setValue(maxVol);
+
+        nar.linkFeedbackRate.setValue(0.05f);
         //new Abbreviation2(nar, "_");
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);

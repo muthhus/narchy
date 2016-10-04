@@ -30,7 +30,7 @@ public abstract class MaplikeIndex extends TermIndex {
         return super.newCompound(op, dt, intern(s));
     }
 
-    abstract protected TermContainer intern(TermContainer s);
+    public abstract TermContainer intern(TermContainer s);
 
 
     @Nullable @Override abstract public Termed get(@NotNull Term key, boolean createIfMissing);

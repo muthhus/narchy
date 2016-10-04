@@ -15,23 +15,23 @@ import org.jetbrains.annotations.NotNull;
 /**
  * static-level instant term transform operations
  */
-public final class TransformConcept extends AtomConcept implements PermanentConcept, TermTransform {
+public final class TermTransformConcept extends AtomConcept implements PermanentConcept, TermTransform {
 
-    public static final TransformConcept[] BuiltIn = {
-            new TransformConcept(new intersect()),
-            new TransformConcept(new differ()),
-            new TransformConcept(new union())
+    public static final TermTransformConcept[] BuiltIn = {
+            new TermTransformConcept(new intersect()),
+            new TermTransformConcept(new differ()),
+            new TermTransformConcept(new union())
     };
 
     @NotNull
     private final TermTransform function;
 
-    private TransformConcept(@NotNull String opName, @NotNull TermTransform o) {
+    private TermTransformConcept(@NotNull String opName, @NotNull TermTransform o) {
         super($.oper(opName), Bag.EMPTY, Bag.EMPTY);
         this.function = o;
     }
 
-    private TransformConcept(@NotNull TermTransform o) {
+    private TermTransformConcept(@NotNull TermTransform o) {
         this(o.getClass().getSimpleName(), o);
     }
 

@@ -11,9 +11,11 @@ import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
 import nars.index.TermIndex;
+import nars.index.TermTransformConcept;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
+import nars.nal.nal8.operator.ImmediateOperator;
 import nars.nar.exe.Executioner;
 import nars.table.BeliefTable;
 import nars.task.MutableTask;
@@ -111,7 +113,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
     private NARLoop loop;
 
-    private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
+    //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
 
     private Function<Task, Task> preprocessor = (t) -> t; //by default, pass-through
 
@@ -145,16 +147,18 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
             @Nullable ConceptPolicy p = c.policy();
             policy.addValue(p != null ? p.toString() : "null");
 
-            termlinksCap.accept(c.termlinks().capacity());
-            termlinksUsed.accept(c.termlinks().size());
-            tasklinksCap.accept(c.tasklinks().capacity());
-            tasklinksUsed.accept(c.tasklinks().size());
+            if (!(c instanceof TermTransformConcept)) {
+                termlinksCap.accept(c.termlinks().capacity());
+                termlinksUsed.accept(c.termlinks().size());
+                tasklinksCap.accept(c.tasklinks().capacity());
+                tasklinksUsed.accept(c.tasklinks().size());
 
-            beliefs.accept(c.beliefs().size());
-            goals.accept(c.goals().size());
-            questions.accept(c.questions().size());
-            quests.accept(c.quests().size());
+                beliefs.accept(c.beliefs().size());
+                goals.accept(c.goals().size());
+                questions.accept(c.questions().size());
+                quests.accept(c.quests().size());
 
+            }
 
                     
         });
@@ -704,7 +708,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
                 .<Topic<OperationConcept>>meta(Execution.class,
                         (k, v) -> v != null ? v : new DefaultTopic<>())
                 .on(each);
-        this.on.add(o);
+        //this.on.add(o);
         return o;
     }
 
@@ -1129,7 +1133,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     @NotNull
     public On onFrame(@NotNull Consumer<NAR> each) {
         On r;
-        on.add(r = eventFrameStart.on(each));
+        /*on.add(*/r = eventFrameStart.on(each);//);
         return r;
     }
 
@@ -1205,7 +1209,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
      */
     public final void on(@NotNull Concept c) {
         concepts.set(c);
-        on.add(c);
+        //on.add(c);
     }
 
     /**

@@ -106,11 +106,16 @@ abstract public class DerivedTask extends MutableTask {
             } else {
 
                 /* HEURISTIC */
+                float confBoost = Math.abs(deltaConfidence);
+                float satisBoost =
+                        //Math.abs(deltaSatisfaction);
+                        Math.abs(deltaSatisfaction);
+
                 float boost =
                         //1f + or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
                         //1f + deltaConfidence * Math.abs(deltaSatisfaction);
                         //1f + Math.max(deltaConfidence, deltaSatisfaction);
-                        1f + Math.max(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
+                        1f + confBoost/2f + satisBoost/2f;
 
                 feedback(boost, nar);
 
@@ -126,16 +131,16 @@ abstract public class DerivedTask extends MutableTask {
             //reduce the score factor intensity by lerping it closer to 1.0
             score = Util.lerp(score, 1f, nar.linkFeedbackRate.floatValue());
 
-            if (!Util.equals(score, 1f, Param.TRUTH_EPSILON)) {
+            if (!Util.equals(score, 1f, Param.BUDGET_EPSILON)) {
 
                 @Nullable Premise premise = this.premise;
                 if (premise != null) {
 
-                    Concept c = nar.concept(premise.term, score);
+                    Concept c = nar.concept(premise.concept, score);
 
                     if (c != null) {
                         c.termlinks().boost(premise.term, score);
-                        //c.tasklinks().boost(premise.task, score);
+                        c.tasklinks().boost(premise.task, score);
                     }
 
                     ((Default)nar).core.concepts.boost(c.term(), score);

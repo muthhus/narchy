@@ -85,7 +85,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     protected TermContainer buildTemplates(@NotNull T term, @NotNull NAR nar) {
         TermSet tt = TermSet.the(TermLinkBuilder.components(term, nar));
         TermContainer ts = term.subterms();
-        return tt.equals(ts) ? ts : tt; //re-use the term's own subterms as the termlink templates if they are equal
+        return tt.equals(ts) ? ts : nar.concepts.intern(tt); //re-use the term's own subterms as the termlink templates if they are equal
     }
 
     @NotNull

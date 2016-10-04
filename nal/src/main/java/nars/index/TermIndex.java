@@ -80,6 +80,11 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable abstract public ConceptBuilder conceptBuilder();
 
+    /** override to possibly intern termcontainers */
+    public TermContainer intern(TermContainer s) {
+        return s;
+    }
+
 
     /**
      * a string containing statistics of the index's current state
@@ -496,7 +501,7 @@ public abstract class TermIndex extends TermBuilder {
 
 
     public void loadBuiltins() {
-        for (TransformConcept t : TransformConcept.BuiltIn) {
+        for (TermTransformConcept t : TermTransformConcept.BuiltIn) {
             set(t);
         }
     }

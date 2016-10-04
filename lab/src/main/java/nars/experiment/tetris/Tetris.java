@@ -12,7 +12,9 @@ import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
+import nars.remote.SwingAgent;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -45,7 +47,7 @@ import static spacegraph.obj.GridSurface.grid;
 /**
  * Created by me on 7/28/16.
  */
-public class Tetris extends NAgent {
+public class Tetris extends SwingAgent {
 
     public static final int DEFAULT_INDEX_WEIGHT = 25 * 100000;
 
@@ -59,7 +61,7 @@ public class Tetris extends NAgent {
     public static final int runFrames = 25550;
     public static final int cyclesPerFrame = 8;
     public static final int tetris_width = 8;
-    public static final int tetris_height = 13;
+    public static final int tetris_height = 15;
     public static final int TIME_PER_FALL = 3;
     static boolean easy;
 
@@ -387,7 +389,7 @@ public class Tetris extends NAgent {
         int maxVol = 45;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                6, 2, 2, rng,
+                8, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
@@ -395,8 +397,8 @@ public class Tetris extends NAgent {
         );
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.7f);
+        nar.goalConfidence(0.5f);
 
         Param.DEBUG_ANSWERS = Param.DEBUG;
 
@@ -455,8 +457,7 @@ public class Tetris extends NAgent {
 //		});
 
 
-        //new Abbreviation(nar,"aKa_");
-        //new Abbreviation2(nar, "_");
+        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 6, 16, 0.05f, 32);
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);

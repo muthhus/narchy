@@ -48,6 +48,7 @@ public final class Premise extends RawBudget implements Tasked {
 
     @Nullable public final Task belief;
 
+    @NotNull public final Term concept;
 
 
     ///** not used in creating a Premise key, because the same premise components may be generated from different originating concepts or even other methods of forming them*/
@@ -60,7 +61,7 @@ public final class Premise extends RawBudget implements Tasked {
 
         super(p, d, q);
 
-        //this.concept = concept;
+        this.concept = concept;
 
         this.task = taskLink;
 

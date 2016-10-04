@@ -12,10 +12,14 @@ public class FloatPolarNormalized extends FloatNormalized {
 
     @Override
     public float normalize(float raw) {
-        float araw = Math.abs(raw);
-        float n = super.normalize(araw);
-        if (raw < 0) n = -n;
-        return n/2f + 0.5f;
+        if (raw==raw) {
+            float araw = Math.abs(raw);
+            float n = super.normalize(araw);
+            if (raw < 0) n = -n;
+            return n / 2f + 0.5f;
+        } else {
+            return Float.NaN;
+        }
     }
 
     public FloatPolarNormalized radius(float radius) {

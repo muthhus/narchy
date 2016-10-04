@@ -92,7 +92,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
 
     @Override
-    protected final TermContainer intern(TermContainer s) {
+    public final TermContainer intern(TermContainer s) {
         return subterms!=null ? subterms.get(s, (ss) -> ss) :s;
     }
 
