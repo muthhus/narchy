@@ -24,11 +24,11 @@ public class SideCraft extends SwingAgent {
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        run(SideCraft::new, 6512);
+        run(SideCraft::new, 106512);
     }
 
     public SideCraft(NAR nar) {
-        super(nar, 0);
+        super(nar, 32);
 
         this.craft = new SideScrollMinicraft();
 

@@ -33,7 +33,9 @@ public class Default extends AbstractNAR {
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
     public final @NotNull ConceptBagCycle core;
-    public final MutableInteger cyclesPerFrame = new MutableInteger(1); //this is specific to a Core implementation, not the entire NAR
+
+    /** this doesnt make sense for multithread cases when ConceptBagCycle executes asynchronosly     */
+    @Deprecated public final MutableInteger cyclesPerFrame = new MutableInteger(1);
 
     private VarIntroduction depIndepIntroducer;
 

@@ -6,12 +6,10 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.gui.Vis;
-import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
-import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
@@ -47,7 +45,7 @@ abstract public class SwingAgent extends NAgent {
 
     }
 
-    public static void run(Function<NAR, SwingAgent> init, int framesToRun) {
+    public static void run(Function<NAR, SwingAgent> init, int frameRate) {
         Random rng = new XorShift128PlusRandom(1);
 
         final Executioner exe =
@@ -55,8 +53,7 @@ abstract public class SwingAgent extends NAgent {
             new MultiThreadExecutioner(3, 1024*16);
 
         int maxVol = 40;
-        int cyclesPerFrame = 1;
-        int conceptsPerCycle = 128;
+        int conceptsPerCycle = 16;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
@@ -70,20 +67,19 @@ abstract public class SwingAgent extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.05f;
+        float p = 0.15f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.confMin.setValue(0.03f);
         nar.compoundVolumeMax.setValue(maxVol);
 
         //nar.linkFeedbackRate.setValue(0.01f);
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4, false);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4, true);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
         Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 6, 24, 0.05f, 32);
@@ -96,7 +92,7 @@ abstract public class SwingAgent extends NAgent {
         chart(a, history);
 
 
-        a.run(framesToRun).join();
+        a.run(frameRate).join();
         //a.runSync(runFrames);
 
         NAR.printTasks(nar, true);
@@ -113,7 +109,7 @@ abstract public class SwingAgent extends NAgent {
                         //Vis.concepts(nar, 32),
                         Vis.agentActions(a, history),
 
-                        Vis.budgetHistogram(nar, 20),
+                        Vis.budgetHistogram(nar, 32),
                         Vis.conceptLinePlot(nar,
                                 Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                                 200)
@@ -129,6 +125,10 @@ abstract public class SwingAgent extends NAgent {
 
     protected Sensor2D<Scale> addCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         return addCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
+    }
+
+    protected Sensor2D<PixelBag> addCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+        return addCamera(id, new SwingCamera(w), pw, ph, pixelTruth);
     }
 
     protected Sensor2D<PixelBag> addCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {

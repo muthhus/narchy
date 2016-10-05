@@ -58,7 +58,7 @@ public class WaveletBag implements Bitmap2D {
     }
 
     @Override
-    public void update() {
+    public void update(float frameRate) {
         //image = ConvertBufferedImage.convertFrom(source.get(), image);
         BufferedImage src = source.get();
         if (image == null || image.getWidth()!=src.getWidth() || image.getHeight()!=src.getHeight())

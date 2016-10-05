@@ -42,6 +42,48 @@ public interface NAction {
         actions().add(m);
         return m;
     }
+    /** latches to either one of 2 states until it shifts to the other one. suitable for representing
+     * push-buttons like keyboard keys. by default with no desire the state is off.  the 'on' and 'off'
+     * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
+     * its initial state will remain indetermined until the first feedback is generated.
+     * */
+    default ActionConcept actionTriState(String s, IntConsumer i) {
+
+
+        ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
+            float deadZoneFreq = 1f/4;
+
+            int ii;
+            if (d == null) {
+                ii = 0;
+            } else {
+                float f = d.freq();
+                if (f > 0.5f + deadZoneFreq)
+                    ii = +1;
+                else if (f < 0.5f - deadZoneFreq)
+                    ii = -1;
+                else
+                    ii = 0;
+            }
+            i.accept(ii);
+
+            float f;
+            switch (ii) {
+                case 1:
+                    f = 1f; break;
+                case 0:
+                    f = 0.5f; break;
+                case -1:
+                    f = 0f; break;
+                default:
+                    throw new RuntimeException();
+            }
+            return $.t(f, nar().confidenceDefault(Symbols.BELIEF));
+        });
+
+        actions().add(m);
+        return m;
+    }
 
     default ActionConcept actionToggle(String s, BooleanProcedure onChange) {
         return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false) );

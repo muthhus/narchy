@@ -5,9 +5,7 @@ import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.experiment.minicraft.top.entity.particle.TextParticle;
 import nars.experiment.minicraft.top.gfx.Color;
 import nars.experiment.minicraft.top.gfx.Screen;
-import nars.experiment.minicraft.top.item.FurnitureItem;
-import nars.experiment.minicraft.top.item.Item;
-import nars.experiment.minicraft.top.item.PowerGloveItem;
+import nars.experiment.minicraft.top.item.*;
 import nars.experiment.minicraft.top.level.Level;
 import nars.experiment.minicraft.top.level.tile.Tile;
 import nars.experiment.minicraft.top.screen.InventoryMenu;
@@ -38,7 +36,19 @@ public class Player extends Mob {
 		y = 24;
 		stamina = maxStamina;
 
+		inventory.add(new ToolItem(ToolType.pickaxe, 4));
+		inventory.add(new ToolItem(ToolType.sword, 4));
+		inventory.add(new ToolItem(ToolType.axe, 4));
+		inventory.add(new ToolItem(ToolType.shovel, 4));
+		inventory.add(new ToolItem(ToolType.hoe, 4));
+
 		inventory.add(new FurnitureItem(new Workbench()));
+		inventory.add(new FurnitureItem(new Anvil()));
+		inventory.add(new FurnitureItem(new Chest()));
+		inventory.add(new FurnitureItem(new Furnace()));
+		inventory.add(new FurnitureItem(new Lantern()));
+		inventory.add(new FurnitureItem(new Oven()));
+
 		inventory.add(new PowerGloveItem());
 	}
 

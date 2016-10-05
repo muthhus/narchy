@@ -18,12 +18,12 @@ public class SwingCamera extends ImageCamera {
     public SwingCamera(Component component) {
         this.component = component;
         input(0, 0, component.getWidth(), component.getHeight());
-        update();
+        update(1);
     }
 
 //    final AtomicBoolean ready = new AtomicBoolean(true);
 
-    public void update() {
+    @Override public void update(float frameRate) {
 //        if (ready.compareAndSet(true, false)) {
             //SwingUtilities.invokeLater(() -> {
 //                ready.set(true);

@@ -21,35 +21,29 @@ import static spacegraph.SpaceGraph.window;
 public class TopCraft extends SwingAgent {
 
     private final TopDownMinicraft craft;
-    private Sensor2D pixels;
+    private Sensor2D<PixelBag> pixels;
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 500);
+        run(TopCraft::new, 555500);
     }
 
     public TopCraft(NAR nar) {
-        super(nar, 0);
+        super(nar, 16);
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
+        pixels = addCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
+        //pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
-//        int nx = 8;
-//        camAE = new PixelAutoClassifier("seeAE", pixels.src.pixels, nx, nx,   (subX, subY) -> {
-//            //context metadata: camera zoom, to give a sense of scale
-//            //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
-//            return new float[]{ pixels.src.Z};
-//        }, 24, this);
-//        window(camAE.newChart(), 500, 500);
+        int nx = 8;
+        camAE = new PixelAutoClassifier("seeAE", pixels.src.pixels, nx, nx,   (subX, subY) -> {
+            //context metadata: camera zoom, to give a sense of scale
+            //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
+            return new float[]{ pixels.src.Z};
+        }, 24, this);
+        window(camAE.newChart(), 500, 500);
 
-//        new NObj("cra", craft, nar)
-//                .read(
-//                    //"player.health",
-//                    //"player.dir",
-//                    "player.getTile().connectsToGrass",
-//                    "player.getTile().connectsToWater"
-//                ).into(this);
 
         senseSwitch("dir", ()->craft.player.dir, 0, 4);
         sense("(stamina)", ()->(craft.player.stamina)/((float)craft.player.maxStamina));
@@ -64,10 +58,33 @@ public class TopCraft extends SwingAgent {
 
         InputHandler input = craft.input;
         actionToggleRapid("(fire)", (b) -> input.attack.toggle(b), 16 );
-        actionToggle("(move,(0,1))", (b) -> input.up.toggle(b) );
-        actionToggle("(move,(0,-1))", (b) -> input.down.toggle(b) );
-        actionToggle("(move,(-1,0))", (b) -> input.left.toggle(b) );
-        actionToggle("(move,(1,0))", (b) -> input.right.toggle(b) );
+//        actionToggleRapid("(move,(0,1))", (b) -> input.up.toggle(b), 32 );
+//        actionToggleRapid("(move,(0,-1))", (b) -> input.down.toggle(b),32 );
+//        actionToggleRapid("(move,(-1,0))", (b) -> input.left.toggle(b),32 );
+//        actionToggleRapid("(move,(1,0))", (b) -> input.right.toggle(b),32 );
+        actionTriState("(move,x)", (i)->{
+           boolean l = false, r = false;
+           switch (i) {
+               case -1:
+                   l = true;  break;
+               case +1:
+                   r = true;  break;
+           }
+           input.left.toggle(l);
+           input.right.toggle(r);
+        });
+        actionTriState("(move,y)", (i)->{
+            boolean u = false, d = false;
+            switch (i) {
+                case -1:
+                    u = true;  break;
+                case +1:
+                    d = true;  break;
+            }
+            input.up.toggle(u);
+            input.down.toggle(d);
+        });
+        actionToggle("(menu)", (b) -> input.menu.toggle(b) );
 
 //        Param.DEBUG = true;
 //        nar.onTask(t ->{

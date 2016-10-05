@@ -38,6 +38,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
     private final int sw, sh;
     private final int nw, nh;
     private final int pw, ph;
+    private final NAgent agent;
     private boolean reconstruct = true;
     public boolean learn = true;
 
@@ -71,6 +72,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
     public PixelAutoClassifier(String root, float[][] pixIn, int sw, int sh, MetaBits metabits, int states, NAgent agent) {
         super(sw * sh + metabits.get(0, 0).length, states, agent.nar.random);
         this.metabits = metabits;
+        this.agent = agent;
         this.nar = agent.nar;
         this.pixIn = pixIn;
         this.sw = sw; //stride width
@@ -113,8 +115,8 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
         float basePri = nar.priorityDefault(Symbols.BELIEF);
         float baseDur = nar.durabilityDefault(Symbols.BELIEF);
 
-        float alpha = 0.075f; //this represents the overall rate; the sub-block rate will be a fraction of this
-        float corruption = 0.2f;
+        float alpha = 0.075f / agent.frameRate; //this represents the overall rate; the sub-block rate will be a fraction of this
+        float corruption = 0.05f;
         int regionPixels = sw * sh;
         float sumErr = 0;
 

@@ -37,9 +37,9 @@ public class Scale extends ImageCamera {
     }
 
     @Override
-    public void update() {
+    public void update(float frameRate) {
         if (src instanceof Bitmap2D)
-            ((Bitmap2D) src).update();
+            ((Bitmap2D) src).update(frameRate);
 
         Image in = src.get();
         if (in == null)

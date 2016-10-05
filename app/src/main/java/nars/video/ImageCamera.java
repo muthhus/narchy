@@ -35,7 +35,7 @@ public class ImageCamera implements Bitmap2D, Supplier<BufferedImage> {
 
 
     @Override
-    public void update() {
+    public void update(float frameRate) {
         if (this.source!=null) //get next frame
             out = source.get();
     }
@@ -80,6 +80,7 @@ public class ImageCamera implements Bitmap2D, Supplier<BufferedImage> {
 
     /** for chaining these together */
     @Override public BufferedImage get() {
+        update(1);
         return out;
     }
 }

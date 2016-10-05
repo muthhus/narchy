@@ -58,7 +58,7 @@ public class Tetris extends SwingAgent {
             new MultiThreadExecutioner(3, 1024*32);
 
     public static final int runFrames = 25550;
-    public static final int cyclesPerFrame = 32;
+
     public static final int tetris_width = 6;
     public static final int tetris_height = 15;
     public static final int TIME_PER_FALL = 3;
@@ -93,8 +93,8 @@ public class Tetris extends SwingAgent {
      * @param height
      * @param timePerFall larger is slower gravity
      */
-    public Tetris(NAR nar, int width, int height, int timePerFall) {
-        super(nar, 0);
+    public Tetris(NAR nar, int frameRate, int width, int height, int timePerFall) {
+        super(nar, frameRate);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override
@@ -416,7 +416,7 @@ public class Tetris extends SwingAgent {
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.3f * p;
-        nar.cyclesPerFrame.set(cyclesPerFrame);
+
 
         nar.confMin.setValue(0.02f);
 
@@ -464,7 +464,7 @@ public class Tetris extends SwingAgent {
         //new VariableCompressor(nar);
 
 
-        Tetris t = new Tetris(nar, tetris_width, tetris_height, TIME_PER_FALL);
+        Tetris t = new Tetris(nar, 40, tetris_width, tetris_height, TIME_PER_FALL);
 
 
 //                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,

@@ -4,7 +4,7 @@ package nars.video;
 public interface Bitmap2D {
 
     /** explicit refresh update the image */
-    void update();
+    void update(float frameRate);
 
     void see(EachPixelRGB p);
 

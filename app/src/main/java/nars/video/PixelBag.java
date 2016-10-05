@@ -39,6 +39,10 @@ public class PixelBag implements Bitmap2D {
     public final float[][] pixels;
 
     private int pixMin = 3;
+
+    /** increase >1 to allow zoom out beyond input size (ex: thumbnail size) */
+    float maxZoomOut = 1;
+
     public boolean vflip = false;
 
 
@@ -56,7 +60,7 @@ public class PixelBag implements Bitmap2D {
     }
 
     @Override
-    public void update() {
+    public void update(float frameRate) {
 
 
 
@@ -67,11 +71,23 @@ public class PixelBag implements Bitmap2D {
         int sw = b.getWidth();
         int sh = b.getHeight();
 
-        float ew = max(Z * sw, pixMin);
-        float eh = max(Z * sh, pixMin);
+        float ew = max(Z * sw * maxZoomOut, pixMin);
+        float eh = max(Z * sh * maxZoomOut, pixMin);
 
-        float mw = sw - ew; //margin size
-        float mh = sh - eh; //margin size
+
+        //margin size
+        float mw, mh;
+        if (ew > sw) {
+            mw = 0;
+        } else {
+            mw = sw - ew;
+        }
+        if (eh > sh) {
+            mh = 0;
+        } else {
+            mh = sh - eh;
+        }
+
         float minX = (X*mw);
         float maxX = minX + ew;
         float minY = (Y*mh);
@@ -91,11 +107,11 @@ public class PixelBag implements Bitmap2D {
         float pxf = px-1;
         float pyf = py-1;
 
-        float minClarity = 0.05f, maxClarity = 0.8f;
+        float minClarity = 0.05f/frameRate, maxClarity = 0.8f/frameRate;
 
         for (int ly = 0; ly < py; ly++) {
             float l = ly / pyf;
-            int sy = Util.clamp(lerp(maxY, minY, !vflip ? l : 1f-l), 0, sh-1);
+            int sy = Math.round(lerp(maxY, minY, !vflip ? l : 1f-l));
 
             float dy = Math.abs(ly - cy);
             float yDistFromCenterSq = dy * dy;
@@ -120,15 +136,20 @@ public class PixelBag implements Bitmap2D {
                     continue;
 
                 //project to the viewed image plane
-                int sx = Util.clamp(lerp(maxX, minX, lx/pxf), 0, sw-1);
+                int sx = Math.round(lerp(maxX, minX, lx/pxf));
 
-                //pixel value
-                int RGB = b.getRGB(sx, sy);
-                float R = Bitmap2D.decodeRed(RGB);
-                float G = Bitmap2D.decodeGreen(RGB);
-                float B = Bitmap2D.decodeBlue(RGB);
-                pixels[lx][ly] = (R + G + B) / 3f;
-                //p.pixel(lx, ly, );
+                float v;
+                if (sx < 0 || sx > sw-1 || sy < 0 || sy > sh-1) {
+                    v = 0;
+                } else {
+                    //pixel value
+                    int RGB = b.getRGB(sx, sy);
+                    float R = Bitmap2D.decodeRed(RGB);
+                    float G = Bitmap2D.decodeGreen(RGB);
+                    float B = Bitmap2D.decodeBlue(RGB);
+                    v = (R + G + B) / 3f;
+                }
+                pixels[lx][ly] = v;
             }
         }
     }

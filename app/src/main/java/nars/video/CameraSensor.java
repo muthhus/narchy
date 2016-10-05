@@ -24,12 +24,14 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     private static final int radix = 3;
     private final NAR nar;
+    private final NAgent agent;
     float resolution = 0.02f;
 
     public CameraSensor(Term root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         super(src, src.width(), src.height());
 
         this.nar = agent.nar;
+        this.agent = agent;
 
         agent.sensors.addAll(
             encode((x,y)->
@@ -91,7 +93,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public void accept(NAR n) {
 
-        src.update();
+        src.update(agent.frameRate);
 
 
 

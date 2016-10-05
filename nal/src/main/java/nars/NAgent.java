@@ -80,7 +80,7 @@ abstract public class NAgent implements NSense, NAction {
 
 
     /** >=0 : additional NAR frames that are computed between each Agent frame */
-    final int decisionFrames;
+    public final int frameRate;
 
     protected long now;
     private long stopTime;
@@ -98,12 +98,12 @@ abstract public class NAgent implements NSense, NAction {
         this(nar, 0);
     }
 
-    public NAgent(NAR nar, int decisionFrames) {
+    public NAgent(NAR nar, int frameRate) {
 
         this.nar = nar;
         alpha = this.nar.confidenceDefault(BELIEF);
         gamma = this.nar.confidenceDefault(GOAL);
-        this.decisionFrames = decisionFrames;
+        this.frameRate = frameRate;
 
         float rewardConf = alpha;
 
@@ -168,7 +168,7 @@ abstract public class NAgent implements NSense, NAction {
     protected void frame() {
 
         now = nar.time();
-        if (now % (1+decisionFrames) != 0)
+        if (now % (1+ frameRate) != 0)
             return;
 
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
@@ -233,7 +233,7 @@ abstract public class NAgent implements NSense, NAction {
 
     protected void init() {
 
-        int dt = 1 + decisionFrames;
+        int dt = 1 + frameRate;
         //this.curiosityAttention = reinforcementAttention / actions.size();
 
 
