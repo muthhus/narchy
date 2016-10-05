@@ -12,7 +12,7 @@ import java.util.function.IntFunction;
 /**
  * Created by me on 1/15/16.
  */
-abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implements SortedTable<V,L>, Comparator<L> {
+abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implements SortedTable<V,L>, SortedArray.Ranker<L> {
 
     /**
      * array of lists of items, for items on different level
@@ -99,7 +99,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
         if (size == cap) {
             L last = items.last();
-            if (compare(last, i) < 0) {
+            if (Float.compare(rank(last), rank(i)) < 0) {
                 //insufficient rank, bounce
                 return i;
             }

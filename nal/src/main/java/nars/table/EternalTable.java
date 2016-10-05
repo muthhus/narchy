@@ -26,7 +26,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Created by me on 5/7/16.
  */
-public class EternalTable extends SortedArray<Task> implements TaskTable, Comparator<Task> {
+public class EternalTable extends SortedArray<Task> implements TaskTable, SortedArray.Ranker<Task> {
 
     public static final EternalTable EMPTY = new EternalTable(0) {
 
@@ -100,26 +100,26 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
     }
 
-    protected static float rank(@NotNull Task w) {
+    public final float rank(@NotNull Task w) {
         //return rankEternalByConfAndOriginality(w);
-        return w.conf();
+        return -w.conf();
     }
 
 //    public final float minRank() {
 //        Task w = weakest();
 //        return w == null ? 0 : rank(w);
 //    }
-
-    @Override
-    public final int compare(@NotNull Task o1, @NotNull Task o2) {
-        float f1 = rank(o2); //reversed
-        float f2 = rank(o1);
-        if (f1 < f2)
-            return -1;
-        if (f1 > f2)
-            return 1;
-        return 0;
-    }
+//
+//    @Override
+//    public final int compare(@NotNull Task o1, @NotNull Task o2) {
+//        float f1 = rank(o2); //reversed
+//        float f2 = rank(o1);
+//        if (f1 < f2)
+//            return -1;
+//        if (f1 > f2)
+//            return 1;
+//        return 0;
+//    }
 
     @Nullable
     public /*Revision*/Task tryRevision(@NotNull Task newBelief, Concept concept, @NotNull NAR nar) {

@@ -21,7 +21,9 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.eclipse.collections.api.list.primitive.DoubleList;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +40,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
@@ -1008,6 +1011,22 @@ public enum Util { ;
         return new double[] { average, variance };
     }
 
+    public static double[] variance(DoubleStream s) {
+        DoubleArrayList dd = new DoubleArrayList();
+        double average = s.peek(x -> dd.add(x)).average().getAsDouble();
+
+        double variance = 0.0;
+        int n = dd.size();
+        for (int i = 0; i < n; i++) {
+            double p = dd.get(i);
+            double d = p - average;
+            variance += d * d;
+        }
+        variance /= n;
+
+        return new double[] { average, variance };
+    }
+
     public static String className(Object p) {
         String s = p.getClass().getSimpleName();
         if (s.isEmpty())
@@ -1270,4 +1289,6 @@ public enum Util { ;
         }
         return x;
     }
+
+
 }

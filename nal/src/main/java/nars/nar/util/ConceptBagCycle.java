@@ -58,6 +58,9 @@ public class ConceptBagCycle implements Consumer<NAR> {
     private final MutableInteger cyclesPerFrame;
     private final ConceptBuilder conceptBuilder;
 
+    //cached value for use in the next firing
+    private int taskLinks, termLinks;
+
 //
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
@@ -113,42 +116,47 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         int cpf = conceptsFiredPerCycle.intValue();
 
-        int taskLinks = tasklinksFiredPerFiredConcept.intValue();
-        int termLinks = termlinksFiredPerFiredConcept.intValue();
+        taskLinks = tasklinksFiredPerFiredConcept.intValue();
+        termLinks = termlinksFiredPerFiredConcept.intValue();
 
         for (int cycleNum = 0; cycleNum < cycles; cycleNum++)
-            cycle(cpf, taskLinks, termLinks);
+            cycle(cpf);
 
 
     }
 
-    void cycle(int cpf, int taskLinks, int termLinks) {
+    void cycle(int cpf) {
 
         concepts.commit();
 
         List<BLink<Concept>> toFire = $.newArrayList();
 
         //gather the concepts into a list before firing. if firing while sampling, the bag can block itself
-        int cpfSampled = (int)Math.ceil(cpf * Param.BAG_OVERSAMPLING);
-        concepts.sample(cpfSampled, toFire::add);
+//        int cpfSampled = (int)Math.ceil(cpf * Param.BAG_OVERSAMPLING);
+//        concepts.sample(cpfSampled, toFire::add);
+        concepts.sample(cpf, toFire::add);
 
-        int conceptsFired = 0;
-        int premisesFired = 0;
+//        int conceptsFired = 0;
+//        int premisesFired = 0;
 
-        for (int i = 0, toFireSize = toFire.size(); i < toFireSize && conceptsFired < cpf; i++) {
+        for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
             @Nullable Concept c = toFire.get(i).get();
-            if (c != null) {
+            if (c == null) {
+                throw new NullPointerException();
+            }
+            nar.runLaterMaybe(()-> {
                 FireConceptSquared f = new FireConceptSquared(c, nar,
                         taskLinks, termLinks,
                         nar::inputLater);
+            });
 
-                int p = f.premisesFired;
-                if (p > 0) {
-                    premisesFired += p;
-                    conceptsFired++;
-                }
+//                int p = f.premisesFired;
+//                if (p > 0) {
+//                    premisesFired += p;
+//                    conceptsFired++;
+//                }
 
-            }
+
         }
     }
 

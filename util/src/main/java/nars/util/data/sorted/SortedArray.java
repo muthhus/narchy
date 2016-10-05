@@ -82,7 +82,7 @@ public class SortedArray<E> implements Iterable<E> {
         this.size = s;
     }
 
-    public boolean remove(E removed, Comparator<E> cmp) {
+    public boolean remove(E removed, Ranker<E> cmp) {
         int i = indexOf(removed, cmp);
         return i != -1 && remove(i) != null;
     }
@@ -154,7 +154,7 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
 
-    public void add(final E element, Comparator<E> cmp) {
+    public final void add(final E element, Ranker<E> cmp) {
         // use the linked-list sorting if the type is set or if the list-size
         // is to small
         int s = this.size;
@@ -166,12 +166,17 @@ public class SortedArray<E> implements Iterable<E> {
 
     }
 
-    public void addBinary(E element, int s, Comparator<E> cmp) {
+    public interface Ranker<X> {
+        public float rank(X x);
+    }
+
+    public void addBinary(E element, int s, Ranker<E> cmp) {
         // use the binary search
-        final int index = this.findInsertionIndex(element, 0, s - 1, new int[1], cmp);
+        float elementRank = cmp.rank(element);
+        final int index = this.findInsertionIndex(elementRank, 0, s - 1, new int[1], cmp);
 
         final E last = list[s - 1];
-        if (index == s || cmp.compare(last, element) < 0) {
+        if (index == s || Float.compare(cmp.rank(last), elementRank) < 0) {
             addInternal(element);
         } else {
             if (index == -1)
@@ -181,11 +186,13 @@ public class SortedArray<E> implements Iterable<E> {
         }
     }
 
-    public void addLinear(E element, int s, Comparator<E> cmp) {
-        if (list.length > 0) {
+    public void addLinear(E element, int s, Ranker<E> cmp) {
+        E[] l = this.list;
+        if (l.length > 0) {
+            float elementRank = cmp.rank(element);
             for (int i = 0; i < s; i++) {
-                final E current = list[i];
-                if (0 <= cmp.compare(current, element)) {
+                final E current = l[i];
+                if (0 <= Float.compare(cmp.rank(current), elementRank)) {
                     addInternal(i, element);
                     return;
                 }
@@ -473,7 +480,7 @@ public class SortedArray<E> implements Iterable<E> {
 
 
 	@SuppressWarnings("unchecked")
-	public int indexOf(@NotNull final E element, Comparator<E> cmp) {
+	public int indexOf(@NotNull final E element, Ranker<E> cmp) {
 
 		/*if (element == null)
 			return -1;*/
@@ -485,7 +492,7 @@ public class SortedArray<E> implements Iterable<E> {
 
 
         final int[] rightBorder = { 0 };
-		final int left = this.findInsertionIndex(element, 0, size, rightBorder, cmp);
+		final int left = this.findInsertionIndex(cmp.rank(element), 0, size, rightBorder, cmp);
 
         E[] l = this.list;
 		for (int index = left; index < rightBorder[0]; index++) {
@@ -573,14 +580,14 @@ public class SortedArray<E> implements Iterable<E> {
      * @return first index of the element where the element should be inserted
      */
     private int findInsertionIndex(
-            final E element, final int left, final int right,
-            @NotNull final int[] rightBorder, Comparator<E> cmp) {
+            float elementRank, final int left, final int right,
+            @NotNull final int[] rightBorder, Ranker<E> cmp) {
 
         assert(right >= left); //"right must be bigger or equals as the left"
 
         if ((right - left) <= binarySearchThreshold) {
             rightBorder[0] = right;//.setObject(right);
-            return findFirstIndex(element, left, right, cmp);
+            return findFirstIndex(elementRank, left, right, cmp);
         }
 
         final int midle = left + (right - left) / 2;
@@ -590,13 +597,13 @@ public class SortedArray<E> implements Iterable<E> {
         final E midleE = list[midle];
 
 
-        final int comparedValue = cmp.compare(midleE, element);
+        final int comparedValue = Float.compare(cmp.rank(midleE), elementRank);
         if (comparedValue == 0) {
             // find the first element
             int index = midle;
             for (; index >= 0; ) {
                 final E e = list[index];
-                if (0 != cmp.compare(e, element)) {
+                if (0 != Float.compare(cmp.rank(e), elementRank)) {
                     break;
                 }
                 index--;
@@ -607,24 +614,24 @@ public class SortedArray<E> implements Iterable<E> {
 
         boolean c = (0 < comparedValue);
 
-        return this.findInsertionIndex(element, c ? left : midle, c ? midle: right, rightBorder, cmp);
+        return this.findInsertionIndex(elementRank, c ? left : midle, c ? midle: right, rightBorder, cmp);
     }
 
     /**
      * searches for the first index found for given element
      *
      * @param list    the list or sublist which should be invastigated
-     * @param element element for which the index should be found
      * @param left    left index (inclusively)
      * @param right   right index (exclusively)
      * @return
      */
-    private int findFirstIndex(final E element,
-                               final int left, final int right, Comparator<E> cmp) {
+    private int findFirstIndex(float elementRank,
+                               final int left, final int right, Ranker<E> cmp) {
 
 
+        E[] l = this.list;
         for (int index = left; index < right; ) {
-            if (0 <= cmp.compare(list[index], element)) {
+            if (0 <= Float.compare(cmp.rank(l[index]), elementRank)) {
                 return index;
             }
             index++;

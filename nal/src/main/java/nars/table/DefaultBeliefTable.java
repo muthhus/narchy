@@ -197,7 +197,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         @NotNull EternalTable eternal = this.eternal;
 
-        float minRank = eternal.isFull() ? EternalTable.rank(eternal.weakest()) : 0;
+        float minRank = eternal.isFull() ? eternal.rank(eternal.weakest()) : 0;
 
         int displacedSize = displaced.size();
 

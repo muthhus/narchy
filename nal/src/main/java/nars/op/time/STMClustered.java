@@ -139,7 +139,7 @@ public class STMClustered extends STM {
         @Nullable
         public double[] coherence(int dim) {
             if (size() == 0) return null;
-            double[] v = Util.avgvar(tasks.stream().mapToDouble(t -> t.coord[dim]).toArray()); //HACK slow
+            double[] v = Util.variance(tasks.stream().mapToDouble(t -> t.coord[dim])); //HACK slow
             v[1] = 1f - v[1]; //convert variance to coherence
             return v;
         }

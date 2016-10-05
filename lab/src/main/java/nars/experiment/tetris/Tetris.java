@@ -50,16 +50,16 @@ import static spacegraph.obj.GridSurface.grid;
  */
 public class Tetris extends SwingAgent {
 
-    public static final int DEFAULT_INDEX_WEIGHT = 25 * 100000;
+    @Deprecated public static final int DEFAULT_INDEX_WEIGHT = 25 * 100000;
 
     public static final Executioner exe =
             //new SingleThreadExecutioner();
 //            new MultiThreadExecutioner(2, 1024*8);
-            new MultiThreadExecutioner(2, 1024*32);
+            new MultiThreadExecutioner(3, 1024*32);
 
     public static final int runFrames = 25550;
-    public static final int cyclesPerFrame = 16;
-    public static final int tetris_width = 8;
+    public static final int cyclesPerFrame = 32;
+    public static final int tetris_width = 6;
     public static final int tetris_height = 15;
     public static final int TIME_PER_FALL = 3;
     static boolean easy;

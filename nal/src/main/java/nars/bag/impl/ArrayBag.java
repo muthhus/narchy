@@ -145,16 +145,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     @Override
-    public final int compare(@Nullable BLink o1, @Nullable BLink o2) {
-        float f1 = cmp(o1);
-        float f2 = cmp(o2);
-
-        if (f1 < f2)
-            return 1;           // Neither val is NaN, thisVal is smaller
-        if (f1 > f2)
-            return -1;            // Neither val is NaN, thisVal is larger
-        return 0;
+    public final float rank(BLink x) {
+        return -cmp(x);
     }
+
+    //    @Override
+//    public final int compare(@Nullable BLink o1, @Nullable BLink o2) {
+//        float f1 = cmp(o1);
+//        float f2 = cmp(o2);
+//
+//        if (f1 < f2)
+//            return 1;           // Neither val is NaN, thisVal is smaller
+//        if (f1 > f2)
+//            return -1;            // Neither val is NaN, thisVal is larger
+//        return 0;
+//    }
 
 
     /**
