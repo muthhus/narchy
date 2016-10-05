@@ -65,10 +65,8 @@ public class TopCraft extends SwingAgent {
         actionTriState("(move,x)", (i)->{
            boolean l = false, r = false;
            switch (i) {
-               case -1:
-                   l = true;  break;
-               case +1:
-                   r = true;  break;
+               case -1: l = true;  break;
+               case +1: r = true;  break;
            }
            input.left.toggle(l);
            input.right.toggle(r);
@@ -76,10 +74,8 @@ public class TopCraft extends SwingAgent {
         actionTriState("(move,y)", (i)->{
             boolean u = false, d = false;
             switch (i) {
-                case -1:
-                    u = true;  break;
-                case +1:
-                    d = true;  break;
+                case -1:  u = true;  break;
+                case +1:  d = true;  break;
             }
             input.up.toggle(u);
             input.down.toggle(d);

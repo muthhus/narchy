@@ -24,6 +24,12 @@ public class Versioned<X> extends FasterList<X> {
         this.context = context;
     }
 
+    public Versioned(X constValue) {
+        super(1);
+        add(constValue);
+        this.context = null;
+    }
+
     @Override
     public final boolean equals(Object otherVersioned) {
         return this == otherVersioned;

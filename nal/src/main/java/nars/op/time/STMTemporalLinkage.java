@@ -4,6 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.term.Term;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +48,7 @@ public final class STMTemporalLinkage extends STM {
         /** current task's... */
         Concept concept = t.concept(nar);
 
-        int stmSize = capacity.intValue();
+        int stmCapacity = capacity.intValue();
 
 
 //        if (!currentTask.isTemporalInductable() && !anticipation) { //todo refine, add directbool in task
@@ -60,14 +61,15 @@ public final class STMTemporalLinkage extends STM {
         //final long now = nal.memory.time();
 
 
-        FasterList<Task> queued = null;
+        Term tt = $.unneg(t);
+
+
+        FasterList<Task> queued = $.newArrayList(stm.size());
 
         synchronized (stm) {
-            int numExtra = Math.max(0, stm.size() - stmSize);
-
+            int numExtra = Math.max(0, (stm.size()+1) - stmCapacity);
 
             Iterator<Task> ss = stm.iterator();
-
             while (ss.hasNext()) {
 
                 Task previousTask = ss.next();
@@ -77,44 +79,24 @@ public final class STMTemporalLinkage extends STM {
                     ss.remove();
                 } else {
 
-                    //is this valid ?
-                    //                if (Terms.equalSubTermsInRespectToImageAndProduct(previousTask.term(), t.term())) {
-                    //                    //the premise would be invalid anyway
-                    //                    continue;
-                    //                }
-
-                    if ($.unneg(previousTask).equals($.unneg(t)))
-                        continue;
-
-
-                    //t.conf() * previousTask.conf(); //scale strength of the tasklink by the confidence intersection
-
-                    if (strength > 0) {
-                        if (queued == null)
-                            queued = $.newArrayList(stm.size());
+                    if (!tt.equals($.unneg(previousTask)))
                         queued.add(previousTask);
-                    }
-
                 }
 
 
             }
 
             stm.add(t);
-
-            if (queued!=null) {
-
-                Object[] x = queued.array();
-                nar.runLater(()-> {
-                    for (Object u : x) {
-                        if (u == null)
-                            break; //null terminated array
-
-                        concept.crossLink(t, (Task)u, strength, nar);
-                    }
-                });
-            }
         }
+
+        if (!queued.isEmpty()) {
+            nar.runLater(()-> {
+                for (int i = 0, queuedSize = queued.size(); i < queuedSize; i++) {
+                    concept.crossLink(t, queued.get(i), strength, nar);
+                }
+            });
+        }
+
     }
 
 

@@ -3,6 +3,7 @@ package nars.util.signal;
 import com.google.common.collect.Iterables;
 import nars.NAR;
 import nars.concept.FuzzyScalarConcepts;
+import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.truth.Truth;
 import nars.util.Texts;
@@ -80,9 +81,12 @@ public class FuzzyScalarConceptsTest {
         for (int i = 0; i < 32; i++) {
             m.setValue(Math.sin(i/2f));
             d.next();
-            Iterable<Truth> beliefs = Iterables.transform(f, x -> x.belief(d.time()));
 
-            double freqSum = StreamSupport.stream(beliefs.spliterator(), false).mapToDouble(x -> x.freq()).sum();
+
+            double freqSum = StreamSupport.stream(f.spliterator(), false)
+                    .peek(SensorConcept::run)
+                    .map(x -> x.belief(d.time()))
+                    .mapToDouble(x -> x.freq()).sum();
 
             System.out.println(
                     Texts.n4(m.floatValue()) + "\t" +

@@ -15,7 +15,7 @@ public abstract class TermTransformOperator extends AtomicStringConstant impleme
 
     @NotNull
     @Override
-    public Op op() {
+    public final Op op() {
         return Op.OPER;
     }
 }

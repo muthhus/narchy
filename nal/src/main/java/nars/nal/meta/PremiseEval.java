@@ -145,10 +145,10 @@ public class PremiseEval extends Unify {
         //tDelta = new Versioned(this);
         this.punct = new Versioned(versioning, 2);
 
-        replace(new substitute(this));
-        replace(new substituteIfUnifiesAny(this));
-        replace(new substituteIfUnifiesForward(this));
-        replace(new substituteIfUnifiesDep(this));
+        set(new substitute(this));
+        set(new substituteIfUnifiesAny(this));
+        set(new substituteIfUnifiesForward(this));
+        set(new substituteIfUnifiesDep(this));
 
         this.premise = p;
 
@@ -217,8 +217,9 @@ public class PremiseEval extends Unify {
     protected final void put(@NotNull Term t) {
         putXY(t, t);
     }
-    protected final void replace(@NotNull Term t) {
-        replaceXY(t, t);
+
+    protected final void set(@NotNull Term t) {
+        setXY(t, t);
     }
 
     public static int matchesMax(float p) {

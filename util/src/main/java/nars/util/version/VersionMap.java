@@ -1,5 +1,6 @@
 package nars.util.version;
 
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
@@ -18,7 +19,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     public VersionMap(Versioning context, int initialSize) {
         this(context,
-            //new UnifriedMap(initialSize)
+            //new UnifiedMap(initialSize)
             //new LinkedHashMap<>(initialSize)
             new HashMap(initialSize)
             //new ConcurrentHashMap(initialSize)
@@ -125,6 +126,10 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     public final boolean tryPut(X key, Y value) {
         return getOrCreateIfAbsent(key).set(value)!=null;
+    }
+
+    public final void putConstant(X key, Y value) {
+        map.put(key, new Versioned<>(value));
     }
 
 

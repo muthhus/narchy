@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.BiPredicate;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -54,8 +55,8 @@ public abstract class Unify extends Termunator implements Subst {
     /**
      * variables whose contents are disallowed to equal each other
      */
-    @NotNull public final Versioned<MatchConstraint> constraints;
-    @NotNull public final VersionMap.Reassigner<Term, Term> reassignerXY, reassignerYX;
+    @NotNull public final Constraints constraints;
+    @NotNull public final VersionMap.Reassigner<Term, Term> reassignerXY;//, reassignerYX;
 
     /*
     @NotNull public final Matcher matcherXY, matcherYX;
@@ -93,6 +94,25 @@ public abstract class Unify extends Termunator implements Subst {
         this(index, type, random, new Versioning(stackMax), termutesMax );
     }
 
+    protected final class Constraints extends Versioned<MatchConstraint> implements BiPredicate<Term,Term> {
+
+        public Constraints(Versioning context, int maxConstr) {
+            super(context, new MatchConstraint[maxConstr]);
+        }
+
+        @Override
+        public boolean test(Term x, Term y) {
+            int s = size;
+            if (s > 0) {
+                MatchConstraint[] ccc = items;
+                for (; s > 0; ) {
+                    if (ccc[--s].invalid(x, y, Unify.this))
+                        return false;
+                }
+            }
+            return true;        }
+    }
+
     protected Unify(TermIndex index, Op type, Random random, @NotNull Versioning versioning, int termutesMax) {
         super();
 
@@ -104,17 +124,15 @@ public abstract class Unify extends Termunator implements Subst {
         this.type = type;
 
         this.versioning = versioning;
-        xy = new VersionMap(versioning, 64);
-        reassignerXY = new VersionMap.Reassigner<>(this::assignable, xy);
-        yx = new VersionMap(versioning, 32);
-        reassignerYX = new VersionMap.Reassigner<>(this::assignable, yx);
 
         int constraintsLimit = 6;
-        constraints = new Versioned(versioning, new MatchConstraint[constraintsLimit]);
+        constraints = new Constraints(versioning, constraintsLimit);
 
-        //matcherXY = new Matcher(this::assignable, xy);
-        //matcherYX = new Matcher(this::assignable, yx);
+        xy = new VersionMap(versioning, 16);
+        reassignerXY = new VersionMap.Reassigner(constraints, xy);
 
+        yx = new VersionMap(versioning, 8);
+        //reassignerYX = new VersionMap.Reassigner<>(constraintPredicate, yx);
     }
 
 //    @Override
@@ -597,7 +615,8 @@ public abstract class Unify extends Termunator implements Subst {
      * returns true if the assignment was allowed, false otherwise
      */
     public final boolean putYX(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
-        return reassignerYX.compute(y, x);
+        return yx.tryPut(y,x);
+        //return reassignerYX.compute(y, x);
     }
 
     /**
@@ -615,24 +634,12 @@ public abstract class Unify extends Termunator implements Subst {
     public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
         return xy.tryPut(x, y);
     }
-
-
-    /**
-     * true if the match assignment is allowed by constraints
-     * TODO find a way to efficiently eliminate redundant rules shared between versions
-     */
-    public final boolean assignable(@NotNull Term x, @NotNull Term y) {
-        Versioned<MatchConstraint> cc = this.constraints;
-        int s = cc.size();
-        if (s > 0) {
-            MatchConstraint[] ccc = cc.array();
-            for (; s > 0; ) {
-                if (ccc[--s].invalid(x, y, this))
-                    return false;
-            }
-        }
-        return true;
+    public final void setXY(Term x /* usually a Variable */, @NotNull Term y) {
+        xy.putConstant(x, y);
     }
+
+
+
 
 
     public final int now() {
