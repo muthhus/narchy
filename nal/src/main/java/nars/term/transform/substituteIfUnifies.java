@@ -5,6 +5,7 @@ import nars.Op;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -119,7 +120,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             boolean yn = (y.op()==NEG);
             Term px = (xn) ? $.unneg(x) : x; //positive X
             Term py = (yn) ? $.unneg(y) : y; //positive Y
-            if (Term.equalAtemporally(px, py)) {
+            if (Terms.equalAtemporally(px, py)) {
                 equals = true;
                 if (xn ^ yn) {
                     if (yn && !xn) { //x isnt negated and y is, so

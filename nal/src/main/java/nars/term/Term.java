@@ -391,13 +391,5 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     }
 
 
-    static boolean equalAtemporally(@NotNull Termed _a, @NotNull Termed _b) {
-        Term a = _a.term();
-        Term b = _b.term();
-        return ((a.structure() == b.structure()) &&
-                (a.volume() == b.volume()) &&
-                (a.op() == b.op()) &&
-                b.equals(Terms.atemporalize(a)));
-    }
 }
 

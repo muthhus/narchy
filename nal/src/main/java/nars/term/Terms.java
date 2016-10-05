@@ -774,15 +774,28 @@ public class Terms   {
         return uniques;
     }
 
-    /** x must already contains atemporal terms */
+    /**
+     *  atemporally set equality AND with any outer negations removed
+     * NOTE: assumes that x must already contain only atemporal terms */
     public static boolean equalAtemporally(Set<Term> x, Set<Term> y) {
         if (x.size()!=y.size())
             return false;
         for (Term yy : y) {
-            if (!x.contains(Terms.atemporalize(yy)))
+            @NotNull Term ay = Terms.atemporalize(yy);
+            if (!x.contains(ay) && !x.contains($.neg(ay)))
                 return false;
         }
         return true;
+    }
+
+    /** equal atemporally AND with any outer negations removed */
+    public static boolean equalAtemporally(@NotNull Termed _a, @NotNull Termed _b) {
+        Term a = $.unneg(_a);//.term();
+        Term b = $.unneg(_b);//.term();
+        return ((a.structure() == b.structure()) &&
+                (a.volume() == b.volume()) &&
+                (a.op() == b.op()) &&
+                b.equals(atemporalize(a)));
     }
 
     interface SubtermScorer {

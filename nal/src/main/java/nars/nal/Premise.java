@@ -185,7 +185,7 @@ public final class Premise extends RawBudget implements Tasked {
             //attempt to Unify any Query variables; answer if unifies
             if (question.term().hasVarQuery()) {
                 matchQueryQuestion(nar, question, answer, answerConcept);
-            } else if (answerConcept instanceof Compound && Term.equalAtemporally(question, answerConcept)) {
+            } else if (answerConcept instanceof Compound && Terms.equalAtemporally(question, answerConcept)) {
                 matchAnswer(nar, question, answer, answerConcept);
             }
 

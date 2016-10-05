@@ -614,7 +614,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     default boolean containsTermAtemporally(Term y) {
-        return !impossibleSubterm(y) && or(x-> Term.equalAtemporally(x, y));
+        return !impossibleSubterm(y) && or(x-> Terms.equalAtemporally(x, y));
     }
 
     default MutableSet<Term> toSetAtemporal() {
