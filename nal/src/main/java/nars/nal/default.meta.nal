@@ -297,13 +297,15 @@
 
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
-     //structural decompose any component of a conjunction
-     //(&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Goal:StructuralDeduction)
+     //structural decompose any component of a conjunction.
+     //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
      (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
-     (&&,X,A..+), X, time(decomposeTask), task("?") |- (&&,A..+), ()
+         //(&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Goal:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTask), task("?@") |- (&&,A..+), ()
+        //(&&,X,A..+), X, time(decomposeTask), task("?") |- X, (Punctuation:Question)
 
-     //(&&,X,A), B, time(decomposeTask) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
      (&&,X,A..+), B, time(decomposeTask) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
+         //(&&,X,A), B, time(decomposeTask) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
 //substitutionViaSimilarity
      X, (B<->C), contains(X,B), neqCom(X,C) |- substitute(X,B,C), (Belief:Intersection, Goal:Intersection)
@@ -448,11 +450,11 @@
 //backward inference rules which should really only work on backward inference:
 
 
-    (A --> S), (B --> S), neqCom(A,B), task("?") |- (A --> B), ()
-    (A --> S), (B --> S), neqCom(A,B), task("?") |- (B --> A), ()
+    (A --> S), (B --> S), neqCom(A,B), task("?@") |- (A --> B), ()
+    (A --> S), (B --> S), neqCom(A,B), task("?@") |- (B --> A), ()
 
-    (A ==> S), (B ==> S), neqCom(A,B), task("?"), notImplEqui(A), notEqui(B)  |- (A ==>+- B), ()
-    (A ==> S), (B ==> S), neqCom(A,B), task("?"), notImplEqui(B), notEqui(A)  |- (B ==>+- A), ()
+    (A ==> S), (B ==> S), neqCom(A,B), task("?@"), notImplEqui(A), notEqui(B)  |- (A ==>+- B), ()
+    (A ==> S), (B ==> S), neqCom(A,B), task("?@"), notImplEqui(B), notEqui(A)  |- (B ==>+- A), ()
 
 //Inheritance to Similarity
 
@@ -460,7 +462,6 @@
 
 
 //backward temporal induction
-    (&&, B, A..+), B, time(decomposeTask), task("?")  |- B, (Punctuation:Question)
     (A ==> B), A, time(decomposeTask), task("?") |- B, (Punctuation:Question)
     (A ==> B), B, time(decomposeTask), task("?") |- A, (Punctuation:Question)
     (A <=> B), A, time(decomposeTask), task("?") |- B, (Punctuation:Question)
@@ -514,13 +515,13 @@
 ////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
 //Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate
 
-    (B --> (/, M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity)
+    (B --> (/, M, A.._=B..+)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity)
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity)
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+)), (Belief:Identity)
 
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity)
+    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+) --> B), (Belief:Identity)
 
-    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity)
+    ((\, M, A.._=B..+) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity)
 
 //Recursion Force - TODO use varargs
 
@@ -546,8 +547,11 @@
 
 
 //use variables here to force the image/product normalization to not apply
-    ((/,%N,_,%A) --> %Z), (%B --> %A), task("?") |- ((/,%N,_,%A) --> (/,%N,_,%B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((\,%N,%A,_) --> %Z), (%N --> %R), task("?") |- ((\,%N,%A,_) --> (\,%R,%A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((/, M, A.._=B..+) --> Z), (C --> B), task("?") |- ((/, M, A.._=B..+) --> substitute((/, M, A.._=B..+),B,C)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((\, N, A..+) --> Z), (N --> R), task("?") |- ((\, N, A..+) --> (\, R, A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
+//    ((/,%N,_,%A) --> %Z), (%B --> %A), task("?") |- ((/,%N,_,%A) --> (/,%N,_,%B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+//    ((\,%N,%A,_) --> %Z), (%N --> %R), task("?") |- ((\,%N,%A,_) --> (\,%R,%A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 
 

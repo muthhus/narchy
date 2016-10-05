@@ -45,13 +45,13 @@ public enum TermLinkBuilder {
             case SECTe:
             case INH:
             case SIM:
-                return 1;
+                return 2;
 
             case IMPL:
             case EQUI:
-                return (host.vars() > 0) ? 2 : 1;
+                return (host.vars() > 0) ? 3 : 2;
             case CONJ:
-                return (host.vars() > 0) && (host.size() < Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) ? 2 : 1;
+                return (host.vars() > 0) && (host.size() < Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) ? 3 : 2;
 
             default:
                 throw new UnsupportedOperationException("unhandled operator type: " + host.op());
@@ -77,10 +77,11 @@ public enum TermLinkBuilder {
 
             if (t != null && target.add(t)) { //do not descend on repeats
 
+                level--;
                 if (level > 0 && t instanceof Compound) {
                     Compound cct = (Compound) t;
                     for (int i = 0, ii = cct.size(); i < ii; i++) {
-                        components(cct.term(i), level - 1, target, nar);
+                        components(cct.term(i), level, target, nar);
                     }
                 }
             }

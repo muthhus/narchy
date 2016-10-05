@@ -3,6 +3,7 @@ package nars.op;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
+import nars.nal.TermBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -16,6 +17,7 @@ import java.util.function.Predicate;
 import static nars.$.varDep;
 import static nars.$.varIndep;
 import static nars.Op.CONJ;
+import static nars.Op.Imdex;
 
 /**
  * 1-iteration DepVar and IndepVar introduction that emulates and expands the original NAL6 Variable Introduction Rules
@@ -63,6 +65,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     @Override
     protected Term[] next(Compound input, Term selected) {
+
+        if (selected == Imdex)
+            return null;
 
         List<byte[]> p = input.pathsTo(selected);
         if (p.isEmpty())

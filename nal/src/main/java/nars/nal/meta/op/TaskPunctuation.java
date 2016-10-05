@@ -17,13 +17,29 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     public static final TaskPunctuation Belief = new TaskPunctuation('.');
     public static final TaskPunctuation Goal = new TaskPunctuation('!');
 
-    public static final AtomicBoolCondition Question = new AtomicBoolCondition() {
+    public static final AtomicBoolCondition QuestionOrQuest = new AtomicBoolCondition() {
         @Override public boolean run(@NotNull PremiseEval o, int now) {
             char c = o.taskPunct;
             return c == Symbols.QUESTION || c == Symbols.QUEST;
         }
         @Override public String toString() {
             return "task:\"?@\"";
+        }
+    };
+    public static final AtomicBoolCondition Question = new AtomicBoolCondition() {
+        @Override public boolean run(@NotNull PremiseEval o, int now) {
+            return o.taskPunct == Symbols.QUESTION;
+        }
+        @Override public String toString() {
+            return "task:\"?\"";
+        }
+    };
+    public static final AtomicBoolCondition Quest = new AtomicBoolCondition() {
+        @Override public boolean run(@NotNull PremiseEval o, int now) {
+            return o.taskPunct == Symbols.QUEST;
+        }
+        @Override public String toString() {
+            return "task:\"@\"";
         }
     };
 

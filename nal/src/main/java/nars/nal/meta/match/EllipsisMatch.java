@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Holds results of an ellipsis match and
@@ -19,7 +21,7 @@ import java.util.Collection;
  * subterm collection, and post-filter before
  * forming a resulting substituted term.
  */
-public final class EllipsisMatch extends TermVector implements Term {
+public class EllipsisMatch extends TermVector implements Term {
 
     //    public static ArrayEllipsisMatch matchedSubterms(Compound Y, IntObjectPredicate<Term> filter) {
 //        Function<IntObjectPredicate,Term[]> arrayGen =
@@ -48,7 +50,16 @@ public final class EllipsisMatch extends TermVector implements Term {
 
 
     public static Term match(@NotNull Compound y, int from, int to) {
-        return match(Terms.subRange(y, from, to));
+        Term[] yy;
+        if (!y.op().image) {
+            yy = Terms.subRange(y, from, to);
+        } else {
+            if (to == y.size())
+                return ImageMatch.getRemaining(y, from);
+            else
+                throw new UnsupportedOperationException();
+        }
+        return match(yy);
     }
 
     public static Term match(@NotNull Collection<Term> term) {
@@ -122,4 +133,15 @@ public final class EllipsisMatch extends TermVector implements Term {
     }
 
 
+    /** returns whether anything has changed in the target */
+    public void expand(Op op, List<Term> target) {
+        switch (term.length) {
+            case 1:
+                target.add(term[0]);
+                break;
+            default:
+                Collections.addAll(target, term);
+                break;
+        }
+    }
 }

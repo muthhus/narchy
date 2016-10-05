@@ -138,10 +138,8 @@ abstract public class PatternCompound extends GenericCompound {
 
                             //TODO special handling to extract intermvals from Sequence terms here
 
-                            if (!subst.putXY(ellipsis,
-                                    EllipsisMatch.match(Y, j, j + available))) {
-                                return false;
-                            }
+                            return subst.putXY(ellipsis, EllipsisMatch.match(Y, j, j + available));
+
                         } else {
                             //PREFIX the ellipsis occurred at the start and there are additional terms following it
                             //TODO
@@ -189,10 +187,10 @@ abstract public class PatternCompound extends GenericCompound {
             super(seed, ellipsis, subterms);
         }
 
-        @Override
-        protected boolean canMatch(@NotNull Compound y) {
-            return (dt == y.dt() && super.canMatch(y));
-        }
+//        @Override
+//        protected boolean canMatch(@NotNull Compound y) {
+//            return (dt == y.dt() && super.canMatch(y));
+//        }
 
 
     }
@@ -206,21 +204,25 @@ abstract public class PatternCompound extends GenericCompound {
             this.ellipseIndex = indexOf(ellipsis);
         }
 
+//        @Override
+//        protected boolean canMatch(@NotNull Compound y) {
+//            return super.canMatch(y);
+//        }
 
-        @Override
-        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
-            return matchEllipsisWithImage(y) && super.matchEllipsis(y, subst);
-        }
+//        @Override
+//        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
+//            return matchEllipsisWithImage(y) && super.matchEllipsis(y, subst);
+//        }
 
-        public boolean matchEllipsisWithImage(@NotNull Compound y) {
-
-            int xdt = dt();
-
-            //compare relation from beginning as in non-ellipsis case
-            //OR compare relation from end
-            return (ellipseIndex >= xdt) ? (xdt == y.dt()) : ((sizeCached - xdt) == (y.size() - y.dt()));
-
-        }
+//        public boolean matchEllipsisWithImage(@NotNull Compound y) {
+//
+//            int xdt = dt();
+//
+//            //compare relation from beginning as in non-ellipsis case
+//            //OR compare relation from end
+//            return (ellipseIndex >= xdt) ? (xdt == y.dt()) : ((sizeCached - xdt) == (y.size() - y.dt()));
+//
+//        }
 
 
     }

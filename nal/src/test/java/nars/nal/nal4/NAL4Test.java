@@ -177,20 +177,19 @@ public class NAL4Test extends AbstractNALTest {
 //    @Test public void composition_on_both_sides_of_a_statement_long3()  {
 //        composition_on_both_sides_of_a_statement_long(3);
 //    }
-
-    /** stresses product/image matching rules with a long product */
-    public void composition_on_both_sides_of_a_statement_long(int n)  {
-        String additional = "";
-        for (int i = 0; i < n; i++)
-            additional += ("x" + i) + ',';
-
-        TestNAR tester = test();
-        tester.nar.trace();
-        tester.believe("<neutralization --> reaction>",1.0f,0.9f);
-        tester.ask("<(\\,neutralization," + additional + " acid,_) --> ?x>");
-        tester.mustBelieve(CYCLES*10, "<(\\,neutralization," + additional + " acid,_) --> (\\,reaction," + additional + " acid,_)>", 1.0f, 0.81f);
-
-    }
+//    /** stresses product/image matching rules with a long product */
+//    public void composition_on_both_sides_of_a_statement_long(int n)  {
+//        String additional = "";
+//        for (int i = 0; i < n; i++)
+//            additional += ("x" + i) + ',';
+//
+//        TestNAR tester = test();
+//        tester.nar.trace();
+//        tester.believe("<neutralization --> reaction>",1.0f,0.9f);
+//        tester.ask("<(\\,neutralization," + additional + " acid,_) --> ?x>");
+//        tester.mustBelieve(CYCLES*10, "<(\\,neutralization," + additional + " acid,_) --> (\\,reaction," + additional + " acid,_)>", 1.0f, 0.81f);
+//
+//    }
 
     @Test
     public void composition_on_both_sides_of_a_statement2()  {
@@ -198,6 +197,7 @@ public class NAL4Test extends AbstractNALTest {
         tester.log();
         tester.believe("<neutralization --> reaction>",1.0f,0.9f); //en("Neutralization is a type of reaction.");
         tester.ask("<(\\,neutralization,acid,_) --> ?x>"); //en("What can be neutralized by acid?");
+            //?x could be anything, including #x, or some other non-variable value
         tester.mustBelieve(CYCLES, "<(\\,neutralization,acid,_) --> (\\,reaction,acid,_)>", 1.0f, 0.81f); //en("What can be neutralized by acid can react with acid.");
 
     }
@@ -206,19 +206,34 @@ public class NAL4Test extends AbstractNALTest {
     public void composition_on_both_sides_of_a_statement2_2()  {
         TestNAR tester = test();
         tester.believe("<neutralization --> reaction>",1.0f,0.9f); //en("Neutralization is a type of reaction.");
-        tester.ask("<(\\,neutralization,acid,_) --> (\\,reaction,acid,_)>");
+        tester.ask("((\\,neutralization,acid,_) --> (\\,reaction,acid,_))");
         tester.mustBelieve(CYCLES, "<(\\,neutralization,acid,_) --> (\\,reaction,acid,_)>", 1.0f, 0.81f); //en("What can be neutralized by acid can react with acid.");
 
     }
 
     @Test
     public void composition_on_both_sides_of_a_statement3()  {
-        TestNAR tester = test();
-        tester.believe("<soda --> base>",1.0f,0.9f); //en("Soda is a type of base.");
-        tester.ask("<(/,neutralization,_,base) --> ?x>"); //en("What is something that can neutralize a base?");
-        tester.mustBelieve(CYCLES, "<(/,neutralization,_,base) --> (/,neutralization,_,soda)>", 1.0f, 0.81f); //en("What can neutraliz base can react with base.");
-
+        test()
+            .believe("<soda --> base>",1.0f,0.9f) //en("Soda is a type of base.");
+            .ask("<(/,neutralization,_,base) --> ?x>") //en("What is something that can neutralize a base?");
+            .mustBelieve(CYCLES, "<(/,neutralization,_,base) --> (/,neutralization,_,soda)>", 1.0f, 0.81f); //en("What can neutraliz base can react with base.");
     }
+    @Test
+    public void composition_on_both_sides_of_a_statement3b()  {
+        test()
+                .believe("<soda --> base>",1.0f,0.9f) //en("Soda is a type of base.");
+                .ask("<(/,neutralization,liquid,_,base) --> ?x>") //en("What is something that can neutralize a base?");
+                .mustBelieve(CYCLES, "<(/,neutralization,liquid,_,base) --> (/,neutralization,liquid,_,soda)>", 1.0f, 0.81f); //en("What can neutraliz base can react with base.");
+    }
+    @Test
+    public void composition_on_both_sides_of_a_statement3c()  {
+        test()
+                .log()
+                .believe("<soda --> base>",1.0f,0.9f) //en("Soda is a type of base.");
+                .ask("<(/,neutralization,liquid,base,_) --> ?x>") //en("What is something that can neutralize a base?");
+                .mustBelieve(CYCLES, "<(/,neutralization,liquid,base,_) --> (/,neutralization,liquid,soda,_)>", 1.0f, 0.81f); //en("What can neutraliz base can react with base.");
+    }
+
 
 
     @Ignore

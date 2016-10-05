@@ -589,7 +589,6 @@ public abstract class Unify extends Termunator implements Subst {
         }
     }
 
-
     public final boolean matchLinearN(@NotNull TermContainer X, @NotNull TermContainer Y) {
         final int s = X.size();
         for (int i = 0; i < s; i++) {

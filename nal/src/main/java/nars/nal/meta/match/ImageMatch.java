@@ -1,8 +1,11 @@
 package nars.nal.meta.match;
 
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 import static nars.Op.Imdex;
 
@@ -15,10 +18,9 @@ public enum ImageMatch {
     ;
 
     /**
-     *
-     * @param t the subvector of image terms collected in the ellipsis match, to be expanded with relationTerm inserted in the correct imdex position
+     * @param t            the subvector of image terms collected in the ellipsis match, to be expanded with relationTerm inserted in the correct imdex position
      * @param relationTerm the term which replaces the _ in the formed term vector
-     * @param y the (concrete) image being matched against the pattern
+     * @param y            the (concrete) image being matched against the pattern
      * @return
      */
     @NotNull
@@ -34,31 +36,82 @@ public enum ImageMatch {
         int j = 0;
         Term[] t2;
 
-        int relOffset = y.indexOf(relationTerm);
-        if (relOffset == -1) {
+        int dt = y.indexOf(relationTerm);
+        if (dt == -1) {
             //insert the relation term
             int yOff = y.dt() - yOffset; //where to expect _ in t
-            t2 = new Term[l+1];
+            t2 = new Term[l + 1];
             for (Term x : t) {
                 if (j == yOff)
                     t2[j++] = relationTerm;
                 t2[j++] = x;
             }
-            if (j < l+1)
+            if (j < l + 1)
                 t2[j] = relationTerm; //it replaces the final position
         } else {
-            //mask the relation term where found
-            t2 = new Term[l];
-            for (Term x : t) {
-                t2[j] = (j == relOffset) ? Imdex : x;
-                j++;
+            //TODO make this work to share code:
+            //t2 = getRemaining(y, 0, dt);
+
+            //insert the relation term where found
+            int m = l ;
+            t2 = new Term[m];
+            int numPreMatched = y.size() - t.length;
+            for (int i = 0, tLength = t.length; i < tLength; ) {
+                t2[j++] = t[i++];
+                if ((i >= (y.dt() - numPreMatched)) && (i == (dt - 1)))
+                    t2[j++] = Imdex;
             }
+
         }
 
 
-        return EllipsisMatch.match(t2);
+        //return EllipsisMatch.match(t2);
+        return new ImageEllipsisMatch(t2);
     }
 
+    static final class ImageEllipsisMatch extends EllipsisMatch {
+
+        public ImageEllipsisMatch(Term[] t2) {
+            super(t2);
+        }
+
+        public void expand(Op op, List<Term> target) {
+            if (op.image) {
+                //expand normally because imdexes will be included in the expansion
+                super.expand(op, target);
+            } else {
+                //exclude any imdexes because the target is not an image
+                for (Term t : term) {
+                    if (t!=Imdex) {
+                        target.add(t);
+                    }
+                }
+            }
+        }
+
+    }
+
+    public static ImageEllipsisMatch getRemaining(Compound y, int from) {
+        return getRemaining(y, from, y.dt());
+    }
+    public static ImageEllipsisMatch getRemaining(Compound y, int from, int dt) {
+
+        int l = y.size();
+        //insert the relation term where found
+        int m = l - from + 1;
+        Term[] t2 = new Term[m];
+        int j = 0;
+        for (int i = from; i < l; ) {
+            if ((i >= (y.dt() - from)) && (i-from == (dt - 1)))
+                t2[j++] = Imdex;
+            t2[j++] = y.term(i);
+            i++;
+        }
+        if (m > j)
+            t2[j] = Imdex;
+
+        return new ImageEllipsisMatch(t2);
+    }
 
 
     @NotNull

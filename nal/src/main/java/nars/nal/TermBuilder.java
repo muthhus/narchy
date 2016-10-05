@@ -138,15 +138,19 @@ public abstract class TermBuilder {
             case IMGe:
                 //if no relation was specified and it's an Image,
                 //it must contain a _ placeholder
+
+                if ((arity < 1) || (dt > arity))
+                    throw new InvalidTermException(op, dt, u, "image requires size=2 excluding _ imdex");
+
                 if (hasImdex(u)) {
-                    if (arity < 2)
-                        throw new InvalidTermException(op, dt, u, "image requires size=2 excluding _ imdex");
-                    //TODO use result of hasImdex in image construction to avoid repeat iteration to find it
                     return image(op, u);
-                } else if ((dt < 0) || (dt > arity) || (arity < 1)) {
-                    throw new InvalidTermException(op, dt, u, "Invalid Image");
                 }
-                break;
+
+                if ((dt < 0) && !(u[0].varPattern()>0 || u[1].varPattern()>0))
+                    throw new InvalidTermException(op, dt, u, "Invalid Image");
+
+
+                break; //construct below
 
 
             case DIFFe:
@@ -447,20 +451,29 @@ public abstract class TermBuilder {
     private Term image(@NotNull Op o, @NotNull Term[] res) {
 
         int index = DTERNAL, j = 0;
+        boolean hasPatternVar = false;
         for (Term x : res) {
             if (x.equals(Imdex)) {
                 index = j;
+            } else if (!hasPatternVar && x.varPattern() > 0) {
+                hasPatternVar = true;
             }
             j++;
         }
 
-        if (index == DTERNAL)
-            throw new InvalidTermException(o, DTERNAL, res, "image missing '_' (Imdex)");
+        Term[] ser;
+        if (hasPatternVar) {
+            ser = res;
+        } else {
 
-        int serN = res.length - 1;
-        Term[] ser = new Term[serN];
-        System.arraycopy(res, 0, ser, 0, index);
-        System.arraycopy(res, index + 1, ser, index, (serN - index));
+            if (index == DTERNAL)
+                throw new InvalidTermException(o, DTERNAL, res, "image missing '_' (Imdex)");
+
+            int serN = res.length - 1;
+            ser = new Term[serN];
+            System.arraycopy(res, 0, ser, 0, index);
+            System.arraycopy(res, index + 1, ser, index, (serN - index));
+        }
 
         return finish(o, index, ser);
     }

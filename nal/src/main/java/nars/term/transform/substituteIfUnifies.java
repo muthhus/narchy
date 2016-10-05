@@ -107,7 +107,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public @NotNull Term unify(Term term, Term x, Term y) {
         @Nullable Op op = unifying();
 
-        boolean hasAnyOp = op == null || term.hasAny(op);
+        boolean hasAnyOp = op == null || (x.hasAny(op) && term.hasAny(op));
 
         if (!hasAnyOp && mustSubstitute()) {
             return False; //FAILED

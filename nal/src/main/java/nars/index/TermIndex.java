@@ -165,17 +165,16 @@ public abstract class TermIndex extends TermBuilder {
         if (y != null)
             return y; //an assigned substitution, whether a variable or other type of term
 
+        Op op = src.op();
 
-        if (src instanceof Variable) {
-
-            if (src.op() == VAR_PATTERN)
+        if (op.var) {
+            if (op == VAR_PATTERN)
                 return null; //unassigned pattern variable
-            else
-                return src; //unassigned but literal non-pattern var
-
-        } else if (src instanceof Atomic) {
+            return src; //unassigned but literal non-pattern var
+         }
+         else if (src instanceof Atomic)
             return src;
-        }
+
 
         //no variables that could be substituted, so return this constant
         if (f instanceof PremiseEval && src.vars() + src.varPattern() == 0) //shortcut for premise evaluation matching
@@ -196,18 +195,10 @@ public abstract class TermIndex extends TermBuilder {
 
             if (u instanceof EllipsisMatch) {
 
-                //                if (maxArity != -1 && m.size() + sub.size() > maxArity) {
-//                    return src; //invalid transformation, violated arity constraint
-//                }
-
-                Collections.addAll(sub, ((EllipsisMatch) u).term);
+                ((EllipsisMatch) u).expand(op, sub);
                 changed = true;
 
             } else {
-
-                //                if (maxArity != -1 && 1 + sub.size() > maxArity) {
-                //                    return src; //invalid transformation, violates arity constraint
-                //                }
 
                 if (u == null) {
 
