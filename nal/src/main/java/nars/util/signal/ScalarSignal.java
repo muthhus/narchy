@@ -180,12 +180,9 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     }
 
     /** provides an immediate truth assessment with the last known signal value */
-    public final Truth truth() {
-        float f = this.prevF;
-        if (f == f)
-            return truthFloatFunction.valueOf(f);
-        else
-            return null;
+    @Nullable public final Truth truth() {
+        Task t = this.next;
+        return t!=null ? t.truth() : null;
     }
 
     @NotNull
