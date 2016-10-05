@@ -25,7 +25,7 @@ public class TopCraft extends SwingAgent {
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 15500);
+        run(TopCraft::new, 500);
     }
 
     public TopCraft(NAR nar) {
@@ -33,7 +33,7 @@ public class TopCraft extends SwingAgent {
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addFreqCamera("see", ()->craft.image, 64,32, (v) -> $.t( v, alpha));
+        pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
 //        int nx = 8;
 //        camAE = new PixelAutoClassifier("seeAE", pixels.src.pixels, nx, nx,   (subX, subY) -> {

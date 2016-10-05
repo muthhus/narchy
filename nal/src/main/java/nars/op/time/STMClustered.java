@@ -14,12 +14,14 @@ import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
+import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,7 +55,7 @@ public class STMClustered extends STM {
     public final class TasksNode extends Node {
 
         /** current members */
-        public final Set<TLink> tasks = new LinkedHashSet();
+        public final Set<TLink> tasks = nar.exe.concurrent() ? new CopyOnWriteArraySet<>() : new LinkedHashSet<>();
 
 
 

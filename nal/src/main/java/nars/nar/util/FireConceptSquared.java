@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Consumer;
 
 /**
- * creates a matrix of termlink x tasklink premises and derives them
+ * derives matrix of: concept => (tasklink x termlink) => premises
  */
 public class FireConceptSquared extends Conclusion {
 

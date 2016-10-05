@@ -22,6 +22,13 @@ abstract public class Executioner implements Executor {
 
     abstract public void stop();
 
+    /** an estimate or exact number of parallel processes this runs */
+    abstract public int concurrency();
+
     /** true if this executioner executes procedures concurrently */
-    public abstract boolean concurrent();
+    public final boolean concurrent() {
+        return concurrency() > 1;
+    }
+
+
 }

@@ -22,9 +22,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * The original deterministic memory cycle implementation that is currently used as a standard
+ * The default deterministic memory cycle implementation that is currently used as a standard
  * for development and testing.
  *
+ * multithreading granularity at the concept (outermost loop)
  */
 public class ConceptBagCycle implements Consumer<NAR> {
     /**
@@ -141,14 +142,14 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
             @Nullable Concept c = toFire.get(i).get();
-            if (c == null) {
-                throw new NullPointerException();
+            if (c != null) {
+                nar.runLaterMaybe(() -> {
+                    FireConceptSquared f = new FireConceptSquared(c, nar,
+                            taskLinks, termLinks,
+                            nar::input //input them within the current thread here
+                    );
+                });
             }
-            nar.runLaterMaybe(()-> {
-                FireConceptSquared f = new FireConceptSquared(c, nar,
-                        taskLinks, termLinks,
-                        nar::inputLater);
-            });
 
 //                int p = f.premisesFired;
 //                if (p > 0) {

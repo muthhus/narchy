@@ -76,8 +76,6 @@ public final class TaskIndex {
                 DuplicateMerge.merge(existing.budget(), x, 1f);
                 x.feedback(null, Float.NaN, Float.NaN, nar);
                 x.delete();
-            } else {
-                System.err.println("duplicate");
             }
 
             return false;

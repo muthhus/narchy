@@ -59,6 +59,9 @@ public class Activation {
         this(in, c, c, nar, scale, 1, 1);
     }
 
+    public Activation(Task in, NAR nar, float scale) {
+        this(in, in.concept(nar), nar, scale);
+    }
 
 
 

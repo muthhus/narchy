@@ -26,8 +26,8 @@ public final class SingleThreadExecutioner extends Executioner {
     }
 
     @Override
-    public final boolean concurrent() {
-        return false;
+    public final int concurrency() {
+        return 1;
     }
 
     @Override

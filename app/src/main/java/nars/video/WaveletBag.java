@@ -29,7 +29,7 @@ import static nars.util.Util.lerp;
  */
 public class WaveletBag implements Bitmap2D {
 
-    public static final int NUM_LEVELS = 3;
+    public static final int NUM_LEVELS = 2;
     final Supplier<BufferedImage> source;
     private int px;
     private int py;

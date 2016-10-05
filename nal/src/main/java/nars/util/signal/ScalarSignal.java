@@ -192,8 +192,8 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     protected Task newInputTask(Truth t, long now, long when) {
         return new MutableTask(term(), punc, t)
                 .time(now, when)
-                .budget(pri.asFloat() /*(v, now, prevF, lastInput)*/, dur)
-                .log(this);
+                .budget(pri.asFloat() /*(v, now, prevF, lastInput)*/, dur);
+                //.log(this);
     }
 
 //    public float pri(float v, long now, float prevV, long lastV) {

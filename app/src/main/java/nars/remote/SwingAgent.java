@@ -55,8 +55,8 @@ abstract public class SwingAgent extends NAgent {
             new MultiThreadExecutioner(3, 1024*16);
 
         int maxVol = 40;
-        int cyclesPerFrame = 8;
-        int conceptsPerCycle = 16;
+        int cyclesPerFrame = 1;
+        int conceptsPerCycle = 128;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
@@ -68,25 +68,25 @@ abstract public class SwingAgent extends NAgent {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.7f);
+        nar.goalConfidence(0.8f);
 
-        float p = 0.15f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.04f);
+        nar.confMin.setValue(0.03f);
         nar.compoundVolumeMax.setValue(maxVol);
 
-        nar.linkFeedbackRate.setValue(0.01f);
+        //nar.linkFeedbackRate.setValue(0.01f);
         //new Abbreviation2(nar, "_");
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4, false);
+        //MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
-        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 6, 12, 0.05f, 32);
+        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 6, 24, 0.05f, 32);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;

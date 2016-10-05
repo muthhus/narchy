@@ -9,16 +9,18 @@ import nars.table.DefaultBeliefTable;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
+import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 import static nars.$.$;
+import static nars.Symbols.GOAL;
 
 
 /** TODO make extend SensorConcept and utilize that for feedback control */
-public class ActionConcept extends WiredCompoundConcept implements Consumer<NAR> {
+public class ActionConcept extends WiredCompoundConcept implements WiredCompoundConcept.Prioritizable, Runnable {
 
 
     /** relative temporal delta time for desire/belief prediction */
@@ -29,12 +31,19 @@ public class ActionConcept extends WiredCompoundConcept implements Consumer<NAR>
 
 
 
-    private final float feedbackPriority;
+
     private final float feedbackDurability;
 
     private Task nextFeedback;
 
     float feedbackResolution;
+    public FloatSupplier pri;
+    private Truth currentDesire;
+
+    @Override
+    public void pri(FloatSupplier v) {
+        this.pri = v;
+    }
     //private Truth lastDesire, lastBelief;
 
 
@@ -78,14 +87,10 @@ public class ActionConcept extends WiredCompoundConcept implements Consumer<NAR>
 
         //assert (Op.isOperation(this));
 
-        this.feedbackPriority = n.priorityDefault(Symbols.GOAL /* though these will be used for beliefs */);
-        this.feedbackDurability = n.durabilityDefault(Symbols.GOAL /* though these will be used for beliefs */);
+        this.pri = () -> n.priorityDefault(GOAL /* though these will be used for beliefs */);
+        this.feedbackDurability = n.durabilityDefault(GOAL /* though these will be used for beliefs */);
         this.feedbackResolution = n.truthResolution.floatValue();
         this.motor = motor;
-
-
-        nar.onFrame(this);
-
     }
 
 //    @Override
@@ -139,12 +144,13 @@ public class ActionConcept extends WiredCompoundConcept implements Consumer<NAR>
 
 
     @Override
-    public void accept(NAR nar) {
+    public void run() {
         long now = nar.time();
 
         //boolean desireChange, beliefChange;
 
         @Nullable Truth d = this.desire(now + decisionDT);
+        this.currentDesire = d;
         //desireChange = (lastDesire == null || !lastDesire.equals(d));
 
         @Nullable Truth b = this.belief(now + decisionDT);
@@ -159,11 +165,13 @@ public class ActionConcept extends WiredCompoundConcept implements Consumer<NAR>
                 //if feedback is different from last
                 if (nextFeedback == null || !nextFeedback.equalsTruth(feedback, feedbackResolution)) {
                     this.nextFeedback = feedback(feedback, now + feedbackDT);
-                    nar.inputLater(nextFeedback);
+                    nar.input(nextFeedback);
                 }
             }
         }
     }
+
+    public Truth desire() { return currentDesire; }
 
     protected boolean alwaysUpdateFeedback() {
         return false;
@@ -172,7 +180,7 @@ public class ActionConcept extends WiredCompoundConcept implements Consumer<NAR>
     protected final Task feedback(Truth t, long when) {
         return new GeneratedTask(this, Symbols.BELIEF, t)
                 .time(when, when)
-                .budget(feedbackPriority, feedbackDurability)
+                .budget(pri.asFloat(), feedbackDurability)
                 .log("Motor Feedback");
     }
 

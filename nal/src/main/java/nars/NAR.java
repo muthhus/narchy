@@ -924,6 +924,30 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         exe.execute(t);
     }
 
+    /** run a procedure for each item in chunked stripes */
+    public final <X> void runLater(@NotNull List<X> items, Consumer<X> each, float granularityFactor) {
+        int conc = exe.concurrency();
+        if (conc == 1) {
+            //special single-thread case: just execute all
+            items.forEach(each);
+            return;
+        } else {
+
+            int s = items.size();
+            int chunkSize = (int) Math.ceil(s / (conc * granularityFactor));
+            for (int i = 0; i < s; ) {
+                int start = i;
+                int end = Math.min(i + chunkSize, s);
+                runLater(() -> {
+                    for (int j = start; j < end; j++) {
+                        each.accept(items.get(j));
+                    }
+                });
+                i += chunkSize;
+            }
+        }
+    }
+
     public final void runLater(@NotNull Consumer<NAR> t) {
         //TODO lambda may be optimized slightly
         runLater(() -> t.accept(this));

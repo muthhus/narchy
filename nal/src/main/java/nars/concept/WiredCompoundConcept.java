@@ -12,6 +12,7 @@ import nars.term.Compound;
 import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.truth.TruthDelta;
+import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +43,10 @@ public abstract class WiredCompoundConcept extends CompoundConcept<Compound> imp
     int goalCapacity = Param.DEFAULT_WIRED_CONCEPT_GOALS;
 
     //@NotNull final private AtomicBoolean pendingRun = new AtomicBoolean(false);
+
+    public interface Prioritizable {
+        void pri(FloatSupplier v);
+    }
 
     public WiredCompoundConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);

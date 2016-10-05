@@ -7,6 +7,7 @@ import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
@@ -22,11 +23,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static nars.Symbols.BELIEF;
+
 
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredCompoundConcept implements FloatFunction<Term>, FloatSupplier {
+public class SensorConcept extends WiredCompoundConcept implements FloatFunction<Term>, FloatSupplier, WiredCompoundConcept.Prioritizable, Runnable {
 
     @NotNull
     public final ScalarSignal sensor;
@@ -35,8 +38,6 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-    /** implicit motivation task */
-    private Task desire;
 
 
 
@@ -48,6 +49,12 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         super(term, n);
 
         this.sensor = new ScalarSignal(n, this, this, truth) {
+
+            @Override
+            protected void init() {
+                //dont auto-start, do nothing here
+            }
+
             @Override
             public void input(Task prev, Task next) {
 
@@ -58,15 +65,18 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
         this.input = input;
 
-        pri(() -> nar.priorityDefault(Symbols.BELIEF));
+        pri(() -> nar.priorityDefault(BELIEF));
 
 
     }
 
 
 
-    protected void input(Task t) {
-        nar.inputLater(t);
+    protected final void input(Task t) {
+//        if (autoupdate())
+//            nar.inputLater(t);
+//        else
+            nar.input(t);
     }
 
 
@@ -96,7 +106,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
     @Override
     final protected void beliefCapacity(ConceptPolicy p, long now, List<Task> removed) {
-        beliefCapacity(0, beliefCapacity, desire!=null ? 1 : 0, goalCapacity, now, removed);
+        beliefCapacity(0, beliefCapacity, 1, goalCapacity, now, removed);
     }
 
     @Override
@@ -106,7 +116,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
     @Override
     final protected @NotNull BeliefTable newGoalTable() {
-        return newGoalTable(desire!=null ? 1 : 0,goalCapacity);
+        return newGoalTable(1,goalCapacity);
     }
 
 
@@ -174,9 +184,8 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         return this;
     }
 
-    @NotNull public final SensorConcept pri(FloatSupplier v) {
+    @Override @NotNull public final void pri(FloatSupplier v) {
         sensor.pri(v);
-        return this;
     }
 
     @Deprecated @NotNull public SensorConcept pri(float v) {
@@ -202,9 +211,9 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     }
 
 
-    public static void attentionGroup(List<SensorConcept> sensors, MutableFloat min, MutableFloat limit, NAR nar) {
+    public static void attentionGroup(List<? extends Prioritizable> c, MutableFloat min, MutableFloat limit, NAR nar) {
 
-        attentionGroup(sensors,
+        attentionGroup(c,
                 //(cp) -> Util.lerp( limit.floatValue(), min.floatValue(), cp) //direct pri -> pri mapping
                 (cp) -> Util.lerp(limit.floatValue(), min.floatValue(),
                             UtilityFunctions.sawtoothCurved(cp))
@@ -214,10 +223,15 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
 
     /** adaptively sets the priority of a group of sensors via a function  */
-    public static void attentionGroup(List<SensorConcept> sensors, FloatToFloatFunction conceptPriToTaskPri, NAR nar) {
-        sensors.forEach( s -> s.pri(() -> {
-            return conceptPriToTaskPri.valueOf(nar.conceptPriority(s));
+    public static void attentionGroup(List<? extends Prioritizable> c, FloatToFloatFunction conceptPriToTaskPri, NAR nar) {
+        c.forEach( s -> s.pri(() -> {
+            return conceptPriToTaskPri.valueOf(nar.conceptPriority((Termed)s));
         } ) );
+    }
+
+    /** should only be called if autoupdate() is false */
+    @Override public final void run() {
+        sensor.accept(nar);
     }
 
     private final class SensorBeliefTable extends DefaultBeliefTable {

@@ -43,7 +43,7 @@ public class SideCraft extends SwingAgent {
 
         BufferedImage camBuffer = ((AwtGraphicsHandler) craft.gfx).buffer;
 
-        PixelBag cam = new PixelBag(camBuffer, 64, 64).addActions("cra", this);
+        PixelBag cam = new PixelBag(camBuffer, 48, 48).addActions("cra", this);
 
 
         camAE = new PixelAutoClassifier("cra", cam.pixels, 8, 8, 32, this);

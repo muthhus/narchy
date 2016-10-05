@@ -90,7 +90,11 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //    }
 
     public void accept(NAR n) {
+
         src.update();
+
+
+
     }
 
     interface Int2Function<T> {

@@ -569,6 +569,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 swap = c[median];
                 c[median] = c[i];
                 c[i] = swap;
+
                 if (cmpGT(c[left], c[right])) {
                     swap = c[left];
                     c[left] = c[right];

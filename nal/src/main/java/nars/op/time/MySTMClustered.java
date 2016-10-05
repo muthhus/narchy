@@ -34,6 +34,7 @@ public class MySTMClustered extends STMClustered {
 
 	private final int maxGroupSize;
 	private final int maxInputVolume;
+	private final int minGroupSize;
 
 	float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
 	float freqCoherenceThresh = 0.9f;
@@ -42,17 +43,26 @@ public class MySTMClustered extends STMClustered {
 	float confMin;
 
 	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize) {
-		this(nar, size, punc, maxGroupSize, Math.round(((float)nar.compoundVolumeMax.intValue()) / (2)) /* estimate, based on 2-ary grouping as a minimum */);
+		this(nar, size, punc, maxGroupSize, true);
 	}
 
-	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, int maxInputVolume) {
+	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, boolean allowNonInput) {
+		this(nar, size, punc, maxGroupSize, maxGroupSize,
+				Math.round(((float)nar.compoundVolumeMax.intValue()) / (2)) /* estimate */
+				, allowNonInput
+		);
+	}
+
+	public MySTMClustered(@NotNull NAR nar, int size, char punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput) {
         super(nar, new MutableInteger(size), punc, maxGroupSize);
-		this.maxGroupSize = maxGroupSize;
+
+        this.minGroupSize = minGroupSize;
+        this.maxGroupSize = maxGroupSize;
 		this.maxInputVolume = maxInputVolume;
 
 		//this.logger = LoggerFactory.getLogger(toString());
 
-		allowNonInput = true;
+		this.allowNonInput = allowNonInput;
 
 		net.setAlpha(0.05f);
 		net.setBeta(0.05f);
@@ -83,7 +93,7 @@ public class MySTMClustered extends STMClustered {
 
 			//clusters where all terms occurr simultaneously at precisely the same time
 			//cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
-			cluster(maxGroupSize);
+			cluster(minGroupSize, maxGroupSize);
 
 			//clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
 			//if (maxGroupSize != 2)
@@ -94,12 +104,12 @@ public class MySTMClustered extends STMClustered {
 		}
 	}
 
-	private void cluster(int maxGroupSize) {
+	private void cluster(int minGroupSize, int maxGroupSize) {
 		net.nodeStream()
 			//.parallel()
 				//.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
 			.filter(n -> {
-				if (n.size() < 2)
+				if (n.size() < minGroupSize)
 					return false;
 
 				//TODO wrap all the coherence tests in one function call which the node can handle in a synchronized way because the results could change in between each of the sub-tests:

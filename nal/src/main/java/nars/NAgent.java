@@ -3,6 +3,7 @@ package nars;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
@@ -31,6 +32,8 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
+import static nars.Symbols.BELIEF;
+import static nars.Symbols.GOAL;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.Texts.n2;
@@ -98,8 +101,8 @@ abstract public class NAgent implements NSense, NAction {
     public NAgent(NAR nar, int decisionFrames) {
 
         this.nar = nar;
-        alpha = this.nar.confidenceDefault(Symbols.BELIEF);
-        gamma = this.nar.confidenceDefault(Symbols.GOAL);
+        alpha = this.nar.confidenceDefault(BELIEF);
+        gamma = this.nar.confidenceDefault(GOAL);
         this.decisionFrames = decisionFrames;
 
         float rewardConf = alpha;
@@ -168,13 +171,7 @@ abstract public class NAgent implements NSense, NAction {
         if (now % (1+decisionFrames) != 0)
             return;
 
-        updateActionDesire();
-
-        curiosity();
-
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
-
-        predict();
 
         now = nar.time();
 
@@ -184,9 +181,16 @@ abstract public class NAgent implements NSense, NAction {
             rewardWindow.addValue(rewardValue);
         }
 
+        updateActions();
+
+        curiosity();
+
+        updateSensors();
+
+        predict();
+
         if (trace)
             System.out.println(summary());
-
 
         if (stopTime > 0 && now >= stopTime) {
             if (loop != null) {
@@ -235,23 +239,25 @@ abstract public class NAgent implements NSense, NAction {
 
         /** set the sensor budget policy */
         int numSensors = sensors.size();
+        int numActions = actions.size();
 
 //        /** represents the approx equivalent number of sensors which can be fully budgeted at any time */
 //        float activeSensors =
 //                //(float) Math.sqrt(numSensors); //HEURISTIC
 //                numSensors / 2f;
 
-        minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 10 /* to be safe */);
-        maxSensorPriority = new MutableFloat(Util.unitize(nar.priorityDefault(Symbols.BELIEF) / numSensors + minSensorPriority.floatValue())); //measured per-each sensor
+        minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 2);
+        maxSensorPriority = new MutableFloat(Util.unitize(nar.priorityDefault(BELIEF) / (numActions + numSensors) + minSensorPriority.floatValue())); //measured per-each sensor
         SensorConcept.attentionGroup(sensors, minSensorPriority, maxSensorPriority, nar);
+        SensorConcept.attentionGroup(actions, minSensorPriority, maxSensorPriority, nar);
 
-        minRewardPriority = new MutableFloat(Param.BUDGET_EPSILON * 20 /* estimate */);
-        maxRewardPriority = new MutableFloat(Util.unitize(nar.priorityDefault(Symbols.BELIEF) / numSensors + minRewardPriority.floatValue()));
+        minRewardPriority = new MutableFloat(Param.BUDGET_EPSILON * 2);
+        maxRewardPriority = new MutableFloat(Util.unitize(nar.priorityDefault(BELIEF) / 2 + minRewardPriority.floatValue()));
         SensorConcept.attentionGroup(newArrayList(happy, joy), minRewardPriority, maxRewardPriority, nar);
 
 
         //@NotNull Term what = $.$("?w"); //#w
-        @NotNull Term what = $.$("#s"); //#w
+        //@NotNull Term what = $.$("#s"); //#w
 
         @NotNull Compound happiness = happy.term();
 
@@ -364,17 +370,17 @@ abstract public class NAgent implements NSense, NAction {
 
 
     private void curiosity() {
-        Budget curiosityBudget = Budget.One.clone().multiplied(minSensorPriority.floatValue(), 0.5f, 0.9f);
+        //Budget curiosityBudget = Budget.One.clone().multiplied(minSensorPriority.floatValue(), 0.5f, 0.9f);
 
         float motorEpsilonProbability = epsilonProbability / actions.size() * (1f - (desireConf() / gamma));
         for (ActionConcept c : actions) {
             if (nar.random.nextFloat() < motorEpsilonProbability) {
                 nar.inputLater(
-                    new GeneratedTask(c, Symbols.GOAL,
+                    new GeneratedTask(c, GOAL,
                             $.t(nar.random.nextFloat()
                                 //Math.random() > 0.5f ? 1f : 0f
                                 , Math.max(nar.truthResolution.floatValue(), nar.random.nextFloat() * gamma * gammaEpsilonFactor)))
-                                .time(now, now).budget(curiosityBudget).log("Curiosity"));
+                                .time(now, now).budget(c.pri.asFloat(), nar.durabilityDefault(GOAL)).log("Curiosity"));
 
                                 //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
                 /* {
@@ -397,23 +403,32 @@ abstract public class NAgent implements NSense, NAction {
         }
     }
 
-    private void updateActionDesire() {
+    private void updateSensors() {
+        nar.runLater(sensors, SensorConcept::run, 2);
+        happy.run();
+        joy.run();
+    }
+
+    private void updateActions() {
         float m = 0;
-        int a = actions.size();
-        for (ActionConcept c : actions) {
-            Truth d = c.desire(now);
+        int n = actions.size();
+        for (ActionConcept a : actions) {
+
+            Truth d = a.desire();
             if (d != null)
                 m += d.confWeight();
         }
-        m/=a;
-        avgActionDesire.addValue(w2c(m));
+        m/=n;
+        avgActionDesire.addValue(w2c(m)); //resulting from the previous frame
+
+        nar.runLater(actions, ActionConcept::run, 2);
     }
 
     protected void predict() {
 
         float pri =
                 UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
-                        / (predictors.size()/predictorProbability) * predictorPriFactor;
+                       /* / (predictors.size()/predictorProbability)*/ * predictorPriFactor;
 
         Budget boostBudget = Budget.One.clone().multiplied(pri, 0.5f, 0.99f);
 
@@ -451,18 +466,24 @@ abstract public class NAgent implements NSense, NAction {
         if (t.occurrence() != ETERNAL) {
             s = new GeneratedTask(t.term(), t.punc(), t.truth())
                             .time(now, now + (t.occurrence() - t.creation()));
+
+            s.evidence(t)
+                    .budget(budget)
+                    .log("Agent Predictor");
+
+            nar.input(s);
+            return s;
         } else {
-            s = new GeneratedTask(t.term(), t.punc(), t.truth())
-                            .time(now, ETERNAL)
-                            ;
+
+            t.budget(budget);
+            if (nar.input(t)==null) {
+                //if task is already present, just re-activate it
+                new Activation(t, nar, 1f);
+            }
+            return t;
         }
 
-        s.evidence(t)
-          .budget(budget)
-          .log("Agent Predictor");
 
-        nar.inputLater(s);
-        return s;
     }
 
     public float rewardSum() {

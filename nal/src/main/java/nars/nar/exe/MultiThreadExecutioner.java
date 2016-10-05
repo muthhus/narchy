@@ -88,8 +88,8 @@ public class MultiThreadExecutioner extends Executioner {
     }
 
     @Override
-    public final boolean concurrent() {
-        return true;
+    public int concurrency() {
+        return threads;
     }
 
     @Override
