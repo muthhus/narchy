@@ -51,6 +51,7 @@ public class FireConceptSquared extends Conclusion {
                 FasterList<BLink<Term>> termsBuffer = $.newArrayList(termlinksSampled);
                 c.termlinks().sample(termlinksSampled, termsBuffer::addIfNotNull);
 
+
                 int termsBufferSize = termsBuffer.size();
                 if (termsBufferSize > 0) {
 
@@ -81,6 +82,7 @@ public class FireConceptSquared extends Conclusion {
                         for (int j = 0; j < termsBufferSize && countPerTermlink < termlinks; j++, jl++) {
 
                             Premise p = Premise.build(nar, c, now, task, taskLinkBudget, termsBuffer.get( jl % termsBufferSize ));
+
                             if (p != null) {
 
                                 new PremiseEval(nar, deriver, p, this);

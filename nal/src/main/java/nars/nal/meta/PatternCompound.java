@@ -8,6 +8,7 @@ import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.ImageMatch;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.mutate.Choose1;
@@ -349,11 +350,11 @@ abstract public class PatternCompound extends GenericCompound {
 
                 } else if (v != null) {
 
-                    if (!y.containsTerm(v)) {
+                    if (y.containsTermAtemporally(v)) {
+                        alreadyInY.add(Terms.atemporalize(v));
+                    } else {
                         //required but not actually present in Y
                         return false;
-                    } else {
-                        alreadyInY.add(v);
                     }
 
                 } else {
@@ -368,10 +369,10 @@ abstract public class PatternCompound extends GenericCompound {
 
             if (ellipsisMatched) {
                 //Xellipsis = null;
-                return alreadyInY.equals(yFree);
+                return Terms.equalAtemporally(alreadyInY, yFree);
             } else {
 
-                yFree.removeAll(alreadyInY);
+                yFree.removeIf(yy -> alreadyInY.contains(Terms.atemporalize(yy)) );
 
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
 

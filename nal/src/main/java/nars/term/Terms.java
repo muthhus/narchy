@@ -12,6 +12,7 @@ import nars.util.data.sorted.SortedList;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
@@ -584,6 +585,11 @@ public class Terms   {
 //    }
 
     @NotNull
+    public static Term atemporalize(@NotNull Term t) {
+        return t instanceof Compound ? atemporalize((Compound) t) : t;
+    }
+
+    @NotNull
     public static Compound atemporalize(@NotNull Compound c) {
 
 
@@ -766,6 +772,17 @@ public class Terms   {
         });
 
         return uniques;
+    }
+
+    /** x must already contains atemporal terms */
+    public static boolean equalAtemporally(Set<Term> x, Set<Term> y) {
+        if (x.size()!=y.size())
+            return false;
+        for (Term yy : y) {
+            if (!x.contains(Terms.atemporalize(yy)))
+                return false;
+        }
+        return true;
     }
 
     interface SubtermScorer {

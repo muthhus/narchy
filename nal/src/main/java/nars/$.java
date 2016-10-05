@@ -30,6 +30,7 @@ import nars.util.Util;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
@@ -889,14 +890,14 @@ public enum $ {
     }
 
     public static @NotNull <X> Set<X> newHashSet(int capacity) {
-        //if (capacity < 4) {
-        //    return new UnifiedSet(0);
-        //} else {
+        if (capacity < 4) {
+            return new UnifiedSet(0);
+        } else {
             //return new UnifiedSet(capacity);
             //return new SimpleHashSet(capacity);
             return new HashSet(capacity);
             //return new LinkedHashSet(capacity);
-        //}
+        }
     }
 
     @NotNull

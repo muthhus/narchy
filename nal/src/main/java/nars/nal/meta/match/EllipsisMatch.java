@@ -114,7 +114,7 @@ public final class EllipsisMatch extends TermVector implements Term {
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
         int n = 0;
         for (Term e : term) {
-            if (!y.containsTerm(e) || !target.add(e))
+            if (!y.containsTermAtemporally(e) || !target.add(e))
                 return false;
             n++;
         }

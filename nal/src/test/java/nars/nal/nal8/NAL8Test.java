@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 550;
+    final int cycles = 150;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -377,8 +377,8 @@ public class NAL8Test extends AbstractNALTest {
     public void subgoal_2_inner_dt()  {
         test()
             .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001})))! :|:")
-            .mustDesire(cycles*4, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
-            .mustNotOutput(cycles*4, "hold:(SELF,{t002})", '!', ETERNAL);
+            .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
+            .mustNotOutput(cycles, "hold:(SELF,{t002})", '!', ETERNAL);
     }
 
     @Test

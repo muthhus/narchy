@@ -69,13 +69,13 @@ public enum DesireFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap @SinglePremise
-    StructuralStrong() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return TruthFunctions.desireStrong(T, defaultTruth(m), minConf);
-        }
-    },
+//    @AllowOverlap @SinglePremise
+//    StructuralStrong() {
+//        @Nullable
+//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+//            return TruthFunctions.desireStrong(T, defaultTruth(m), minConf);
+//        }
+//    },
 
     @SinglePremise
     @AllowOverlap

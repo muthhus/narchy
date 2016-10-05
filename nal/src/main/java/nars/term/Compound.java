@@ -33,9 +33,11 @@ import nars.util.data.array.IntArrays;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;
 import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -610,6 +612,20 @@ public interface Compound extends Term, IPair, TermContainer {
         }
         return false;
     }
+
+    default boolean containsTermAtemporally(Term y) {
+        return !impossibleSubterm(y) && or(x-> Term.equalAtemporally(x, y));
+    }
+
+    default MutableSet<Term> toSetAtemporal() {
+        int ss = size();
+        MutableSet<Term> s = new UnifiedSet<>(ss);
+        for (int i = 0; i < ss; i++) {
+            s.add(Terms.atemporalize(term(i)));
+        }
+        return s;
+    }
+
 
     //    public int countOccurrences(final Term t) {
 //        final AtomicInteger o = new AtomicInteger(0);

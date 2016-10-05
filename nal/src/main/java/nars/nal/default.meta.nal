@@ -298,11 +298,11 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //structural decompose any component of a conjunction
-     (&&,X,A..+), X, time(decomposeTaskIfTemporal) |- X, (Belief:StructuralDeduction,Goal:StructuralStrong)
-     (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralStrong)
+     //(&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Goal:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
      (&&,X,A..+), X, time(decomposeTask), task("?") |- (&&,A..+), ()
 
-     (&&,X,A), B, time(decomposeTask) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
+     //(&&,X,A), B, time(decomposeTask) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
      (&&,X,A..+), B, time(decomposeTask) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
 //substitutionViaSimilarity
@@ -460,10 +460,10 @@
 
 
 //backward temporal induction
-    (&&, B, A..+), B, time(decomposeTask), task("?")  |- B, (Permute:NoSwap, Punctuation:Question)
-    (A ==> B), A, time(decomposeTask), task("?") |- B, (Permute:NoSwap, Punctuation:Question)
-    (A ==> B), B, time(decomposeTask), task("?") |- A, (Permute:NoSwap, Punctuation:Question)
-    (A <=> B), A, time(decomposeTask), task("?") |- B, (Permute:NoSwap, Punctuation:Question)
+    (&&, B, A..+), B, time(decomposeTask), task("?")  |- B, (Punctuation:Question)
+    (A ==> B), A, time(decomposeTask), task("?") |- B, (Punctuation:Question)
+    (A ==> B), B, time(decomposeTask), task("?") |- A, (Punctuation:Question)
+    (A <=> B), A, time(decomposeTask), task("?") |- B, (Punctuation:Question)
 
 //If S can stand for P, P can to a certain low degree also represent the class S
 //If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
