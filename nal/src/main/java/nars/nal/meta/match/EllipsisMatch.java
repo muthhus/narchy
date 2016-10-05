@@ -33,7 +33,8 @@ public class EllipsisMatch extends TermVector implements Term {
 //    }
 
 
-    final static EllipsisMatch empty = new EllipsisMatch(Terms.empty);
+    public final static EllipsisMatch empty = new EllipsisMatch(Terms.empty);
+
 
     protected EllipsisMatch(Term[] t) {
         super(t);
@@ -50,16 +51,21 @@ public class EllipsisMatch extends TermVector implements Term {
 
 
     public static Term match(@NotNull Compound y, int from, int to) {
-        Term[] yy;
+
+
+        if (from == to) {
+            return EllipsisMatch.empty;
+        }
+
         if (!y.op().image) {
-            yy = Terms.subRange(y, from, to);
+            return match(Terms.subRange(y, from, to));
         } else {
             if (to == y.size())
                 return ImageMatch.getRemaining(y, from);
             else
                 throw new UnsupportedOperationException();
         }
-        return match(yy);
+
     }
 
     public static Term match(@NotNull Collection<Term> term) {

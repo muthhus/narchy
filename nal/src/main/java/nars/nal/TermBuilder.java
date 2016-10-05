@@ -462,7 +462,7 @@ public abstract class TermBuilder {
         }
 
         Term[] ser;
-        if (hasPatternVar) {
+        if (hasPatternVar && index == DTERNAL) {
             ser = res;
         } else {
 
