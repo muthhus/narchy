@@ -354,6 +354,18 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
         return -1;
     }
+    default int indexOfAtemporally(Term t) {
+        t = $.unneg(t); //unneg before testing impossible
+        if (!impossibleSubterm(t)) {
+            Term at = Terms.atemporalize(t);
+            int s = size();
+            for (int i = 0; i < s; i++) {
+                if (Terms.equalAtemporally(at, term(i)))
+                    return i;
+            }
+        }
+        return -1;
+    }
 
 
 //    /** writes subterm bytes, including any attached metadata preceding or following it */

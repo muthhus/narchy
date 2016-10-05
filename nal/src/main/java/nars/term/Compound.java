@@ -614,17 +614,24 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     default boolean containsTermAtemporally(Term y) {
-        return !impossibleSubterm(y) && or(x-> Terms.equalAtemporally(x, y));
+        y = $.unneg(y);
+        if (!impossibleSubterm(y)) {
+            Term ay = Terms.atemporalize(y);
+            if (or(x -> Terms.equalAtemporally(x, ay)))
+                return true;
+        }
+        return false;
     }
 
-    default MutableSet<Term> toSetAtemporal() {
-        int ss = size();
-        MutableSet<Term> s = new UnifiedSet<>(ss);
-        for (int i = 0; i < ss; i++) {
-            s.add(Terms.atemporalize(term(i)));
-        }
-        return s;
-    }
+//    default MutableSet<Term> toSetAtemporal() {
+//        int ss = size();
+//        MutableSet<Term> s = new UnifiedSet<>(ss);
+//        for (int i = 0; i < ss; i++) {
+//            s.add(Terms.atemporalize(term(i)));
+//        }
+//        return s;
+//    }
+
 
 
     //    public int countOccurrences(final Term t) {

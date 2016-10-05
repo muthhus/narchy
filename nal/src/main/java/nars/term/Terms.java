@@ -795,7 +795,7 @@ public class Terms   {
         return ((a.structure() == b.structure()) &&
                 (a.volume() == b.volume()) &&
                 (a.op() == b.op()) &&
-                b.equals(atemporalize(a)));
+                atemporalize(b).equals(atemporalize(a)));
     }
 
     interface SubtermScorer {

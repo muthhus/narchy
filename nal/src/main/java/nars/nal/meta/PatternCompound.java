@@ -270,7 +270,7 @@ abstract public class PatternCompound extends GenericCompound {
 //                }
 
                 if (n != null /*&& n.op() != subst.type*/) {
-                    int imageIndex = y.indexOf(n);
+                    int imageIndex = y.indexOfAtemporally(n);
                     if (imageIndex != -1)
                         return matchEllipsedLinear(y, subst) &&
                                 subst.replaceXY(et,
