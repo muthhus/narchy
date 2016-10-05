@@ -194,18 +194,16 @@ public class Autoencoder {
 		float[] vbias = this.vbias;
 		int ins = vbias.length;
 		int outs = y.length;
+		float[] z = this.z;
 
-		for (int i = 0; i < ins; i++) {
+		for (int i = 0; i < ins; ) {
 			float zi = vbias[i];
 
-			for (int j = 0; j < outs; j++) {
-				zi += w[j][i] * y[j];
+			for (int j = 0; j < outs; ) {
+				zi += w[j][i] * y[j++];
 			}
 
-			if (sigmoid)
-				zi = Util.sigmoid(zi);
-
-			z[i] = zi;
+			z[i++] = sigmoid ? Util.sigmoid(zi) : zi;
 		}
 
 		return z;

@@ -8,6 +8,7 @@ import nars.concept.SensorConcept;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.Vis;
 import nars.index.CaffeineIndex;
+import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
@@ -55,13 +56,14 @@ public class Tetris extends SwingAgent {
     public static final Executioner exe =
             //new SingleThreadExecutioner();
 //            new MultiThreadExecutioner(2, 1024*8);
-            new MultiThreadExecutioner(3, 1024*32);
+            new MultiThreadExecutioner(5, 1024*8);
 
-    public static final int runFrames = 25550;
+    public static final int runFrames = 1125550;
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 15;
     public static final int TIME_PER_FALL = 3;
+    public static final int frameRate = 80;
     static boolean easy;
 
     static int frameDelay;
@@ -385,19 +387,19 @@ public class Tetris extends SwingAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        int maxVol = 45;
+        int maxVol = 40;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
                 16, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
-                //new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
                 new FrameClock(), e
         );
 
 
-        nar.beliefConfidence(0.95f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.7f);
 
         Param.DEBUG_ANSWERS = Param.DEBUG;
 
@@ -412,20 +414,20 @@ public class Tetris extends SwingAgent {
 //        });
 
         float p = 0.05f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.8f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.3f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
 
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
 
         //Abbreviation abbr = new Abbreviation(nar, "the", 4, 0.5f, 32);
 
         nar.compoundVolumeMax.setValue(maxVol);
         //nar.linkFeedbackRate.setValue(0.95f);
 
-        //nar.truthResolution.setValue(0.02f);
+        nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -464,7 +466,7 @@ public class Tetris extends SwingAgent {
         //new VariableCompressor(nar);
 
 
-        Tetris t = new Tetris(nar, 40, tetris_width, tetris_height, TIME_PER_FALL);
+        Tetris t = new Tetris(nar, frameRate, tetris_width, tetris_height, TIME_PER_FALL);
 
 
 //                AutoClassifier ac = new AutoClassifier($.the("row"), nar, sensors,

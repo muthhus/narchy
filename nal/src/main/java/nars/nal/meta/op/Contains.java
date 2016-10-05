@@ -37,9 +37,7 @@ public final class Contains extends AtomicBoolCondition {
         Term container = ff.resolve(this.container);
         if (container!=null) {
             Term contained = ff.resolve(this.contained);
-            if (contained!=null) {
-                return container.containsTerm(contained) && !container.equals(contained);
-            }
+            return (contained instanceof Compound && !container.equals(contained) && ((Compound)container).containsTermRecursively(contained));
         }
         return false;
     }

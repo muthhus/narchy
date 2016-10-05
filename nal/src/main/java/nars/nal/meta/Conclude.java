@@ -17,7 +17,10 @@ import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.Texts;
+import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.eclipse.collections.api.bag.Bag;
+import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -235,6 +238,20 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     }
 
+    final static HashBag<PremiseRule> posGoal = new HashBag();
+    final static HashBag<PremiseRule> negGoal = new HashBag();
+    static {
+
+        Runtime.getRuntime().addShutdownHook(new Thread(()-> {
+            System.out.println("POS GOAL:\n" + print(posGoal));
+            System.out.println("NEG GOAL:\n" + print(negGoal));
+        }));
+    }
+
+    private static String print(HashBag<PremiseRule> h) {
+        return Joiner.on("\n").join(h.topOccurrences(h.size())) + "\n" + h.size() + " total";
+    }
+
     /**
      * part 2
      */
@@ -251,6 +268,15 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     .budget(budget) // copied in, not shared
                     //.anticipate(derivedTemporal && d.anticipate)
                     .log(Param.DEBUG ? rule : null);
+
+
+            //TEMPORARY MEASUREMENT
+            if (dt.isGoal()) {
+               synchronized (posGoal) {
+                   ((dt.freq() >= 0.5f) ? posGoal : negGoal).addOccurrences(rule, (int)(Math.abs(dt.freq()-0.5f)*100));
+               }
+            }
+            //</TEMPORARY MEASUREMENT
 
             return dt;
         } catch (Exception e) {

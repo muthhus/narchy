@@ -7,8 +7,6 @@
 
 
 
-//desire spreading by similarity
-     S, (S <-> P), task("!") |- P, (Goal:Intersection)
 
 
 
@@ -193,11 +191,11 @@
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
+    (P ==> M), (S ==> M), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
 
-    (M ==> P), (M ==> S), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
+    (M ==> P), (M ==> S), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
 
-    (M <=> P), (S <=> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance)
+    (M <=> P), (S <=> M), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance)
 
     (M ==> P), (S <=> M), neqCom(S,P), notImplEqui(S), notEqui(P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy)
 
@@ -270,9 +268,9 @@
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- ((--,%S) ==> P), (Belief:InductionN)
     S, P, time(eternal), task(positive), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction)
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> (--,%S)) (Belief:AbductionN)
-    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- (S <=> P), (Belief:Comparison)
-        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- (--,(S <=> P)), (Belief:ComparisonN)
-    S, P, time(eternal), task("."), neqCom(P,S) |- (S && P), (Belief:Intersection)
+    S, P, time(eternal), task(positive), task("."), neq(P,S), notImplEqui(S), notImplEqui(P) |- (S <=> P), (Belief:Comparison)
+        S, P, time(eternal), task(negative), task("."), neq(P,S), notImplEqui(S), notImplEqui(P) |- (--,(S <=> P)), (Belief:ComparisonN)
+    S, P, time(eternal), task("."), neq(P,S) |- (S && P), (Belief:Intersection)
         //S, P, time(eternal), task(negative), task("."), neq(P,S) |- ((--,%S) && P), (Belief:IntersectionN)
     //%S, %P, time(eternal), neqCom(P,S) |- (%S || %P), (Belief:Union)
 
@@ -286,10 +284,10 @@
     A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
         A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
 
-    A, B, task(positive), task("."), time(dtForward), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
-        A, B, task(negative), task("."), time(dtForward), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
+    A, B, task(positive), task("."), time(dtForward), neq(A,B), notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
+        A, B, task(negative), task("."), time(dtForward), neq(A,B), notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
 
-    A, B, task("."), time(dtAfter), neqCom(A,B) |- (A &&+- B), (Belief:Intersection)
+    A, B, task("."), time(dtAfter), neq(A,B) |- (A &&+- B), (Belief:Intersection)
         ///A, B, task(negative), task("."), time(dtAfter), neq(A,B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
 
                 //A, B, task(negative), task("."), time(dtAfter), neqRec(A,B) notImplEqui(A), notImplEqui(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
@@ -308,7 +306,9 @@
      (&&,X,A..+), B, time(decomposeTask) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
 //substitutionViaSimilarity
-     X, (B<->C), contains(X,B) |- substitute(X,B,C), (Belief:Intersection, Goal:Intersection)
+     X, (B<->C), contains(X,B), neqCom(X,C) |- substitute(X,B,C), (Belief:Intersection, Goal:Intersection)
+//desire spreading by similarity
+     S, (S<->P) |- P, (Goal:Intersection)
 
         //(&&,(--,%X),A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
      //(&&,X,A..+), B, time(decomposeTask) |- subOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
@@ -516,11 +516,11 @@
 
     (B --> (/, M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity)
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Goal:Identity)
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity)
 
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Goal:Identity)
+    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity)
 
-    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity)
+    ((\, M, A.._=B..+, _) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity)
 
 //Recursion Force - TODO use varargs
 
