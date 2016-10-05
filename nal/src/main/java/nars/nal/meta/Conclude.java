@@ -238,19 +238,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     }
 
-    final static HashBag<PremiseRule> posGoal = new HashBag();
-    final static HashBag<PremiseRule> negGoal = new HashBag();
-    static {
 
-        Runtime.getRuntime().addShutdownHook(new Thread(()-> {
-            System.out.println("POS GOAL:\n" + print(posGoal));
-            System.out.println("NEG GOAL:\n" + print(negGoal));
-        }));
-    }
-
-    private static String print(HashBag<PremiseRule> h) {
-        return Joiner.on("\n").join(h.topOccurrences(h.size())) + "\n" + h.size() + " total";
-    }
 
     /**
      * part 2
@@ -270,13 +258,13 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     .log(Param.DEBUG ? rule : null);
 
 
-            //TEMPORARY MEASUREMENT
-            if (dt.isGoal()) {
-               synchronized (posGoal) {
-                   ((dt.freq() >= 0.5f) ? posGoal : negGoal).addOccurrences(rule, (int)(Math.abs(dt.freq()-0.5f)*100));
-               }
-            }
-            //</TEMPORARY MEASUREMENT
+//            //TEMPORARY MEASUREMENT
+//            if (dt.isGoal()) {
+//               synchronized (posGoal) {
+//                   ((dt.freq() >= 0.5f) ? posGoal : negGoal).addOccurrences(rule, (int)(Math.abs(dt.freq()-0.5f)*100));
+//               }
+//            }
+//            //</TEMPORARY MEASUREMENT
 
             return dt;
         } catch (Exception e) {
@@ -370,4 +358,19 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     );
         });
     }
+
+
+//    final static HashBag<PremiseRule> posGoal = new HashBag();
+//    final static HashBag<PremiseRule> negGoal = new HashBag();
+//    static {
+//
+//        Runtime.getRuntime().addShutdownHook(new Thread(()-> {
+//            System.out.println("POS GOAL:\n" + print(posGoal));
+//            System.out.println("NEG GOAL:\n" + print(negGoal));
+//        }));
+//    }
+//
+//    private static String print(HashBag<PremiseRule> h) {
+//        return Joiner.on("\n").join(h.topOccurrences(h.size())) + "\n" + h.size() + " total";
+//    }
 }

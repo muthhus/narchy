@@ -430,20 +430,11 @@ public final class TruthFunctions extends UtilityFunctions {
 
         float c1 = v1.conf();
         float c2 = v2.conf();
-        float f1 = v1.freq();
-        float f2 = v2.freq();
 
-        //F = and( f1 , f2 )
-        //C = or( and( not( f1 ), c1 ), and( not( f2 ), c2 ) ) +
-        //    and( f1 , c1 , f2 , c2 )
-        //float cA = or( and( 1-f1, c1), and(1-f2, c2 ));
-        //float c = confComposition(f1, c1, f2, c2);
-        //float c = or(and(1 - f1, c1), and(1 - f2, c2)) + and(f1, f2, c1, c2);
         float c = and(c1, c2);
-
         return (c < minConf) ?
                 null :
-                t(and(f1, f2), c);
+                t(and(v1.freq(), v2.freq()), c);
     }
 
     public static Truth intersection(@Nullable List<Truth> truths, float minConf) {

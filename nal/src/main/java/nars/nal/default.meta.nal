@@ -243,8 +243,10 @@
 
     B, (A <=> C), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
 
-    B, (C && A), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
-        //^ this is only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
+    //these are only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
+    B, (C && A), task(positive), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
+        //experimental pos/neg polarization
+        B, (C && (--,%A)), task(negative), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:StrongN)
 
 
     //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
@@ -309,6 +311,7 @@
 
 //substitutionViaSimilarity
      X, (B<->C), contains(X,B), neqCom(X,C) |- substitute(X,B,C), (Belief:Intersection, Goal:Intersection)
+
 //desire spreading by similarity
      S, (S<->P) |- P, (Goal:Intersection)
 
@@ -523,6 +526,20 @@
 
     ((\, M, A.._=B..+) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity)
 
+
+//NAL4 backwards composition
+    ((/, M, A.._=B..+) --> Z), (C --> B), task("?") |- ((/, M, A.._=B..+) --> substitute((/, M, A.._=B..+),B,C)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((\, N, A..+) --> Z), (N --> R), task("?") |- ((\, N, A..+) --> (\, R, A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
+
+////composition on both sides of a statement  TODO - quests handling of these
+    ((A..+) <-> Z), (X <-> Y), contains(A..+,X), task("?") |- ((A..+) <-> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((A..+) --> Z), (X --> Y), contains(A..+,X), task("?") |- ((A..+) --> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
+
+
+
+
 //Recursion Force - TODO use varargs
 
   //2
@@ -533,25 +550,11 @@
 //    ((A,B,C) --> Y), B |- ((A,B,C)-->(A, (/,Y, A, _, C), C)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 //    ((A,B,C) --> Y), C |- ((A,B,C)-->(A, B, (/,Y, A, B, _))), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-
-
-////composition on both sides of a statement:
-
-
-//    ((B,P) <-> Z) ,(B <-> A), task("?") |- ((B,P) <-> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-//    ((P,B) <-> Z) ,(B <-> A), task("?") |- ((P,B) <-> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-//    ((B,P) --> Z) ,(B --> A), task("?") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-//    ((P,B) --> Z) ,(B --> A), task("?") |- ((P,B) --> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-
-
-//use variables here to force the image/product normalization to not apply
-    ((/, M, A.._=B..+) --> Z), (C --> B), task("?") |- ((/, M, A.._=B..+) --> substitute((/, M, A.._=B..+),B,C)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((\, N, A..+) --> Z), (N --> R), task("?") |- ((\, N, A..+) --> (\, R, A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
 //    ((/,%N,_,%A) --> %Z), (%B --> %A), task("?") |- ((/,%N,_,%A) --> (/,%N,_,%B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 //    ((\,%N,%A,_) --> %Z), (%N --> %R), task("?") |- ((\,%N,%A,_) --> (\,%R,%A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
+
+
 
 
 
@@ -572,8 +575,7 @@
 
 
 //compound composition one premise
-
-    (||,%B,A..+), B, task("?") |- (||,%B,A..+), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 
 //TODO for desire

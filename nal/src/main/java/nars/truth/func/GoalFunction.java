@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public enum DesireFunction implements TruthOperator {
+public enum GoalFunction implements TruthOperator {
 
     @SinglePremise
     Negation() {
@@ -126,10 +126,10 @@ public enum DesireFunction implements TruthOperator {
     }
 
 
-    static final Map<Term, TruthOperator> atomToTruthModifier = $.newHashMap(DesireFunction.values().length);
+    static final Map<Term, TruthOperator> atomToTruthModifier = $.newHashMap(GoalFunction.values().length);
 
     static {
-        TruthOperator.permuteTruth(DesireFunction.values(), atomToTruthModifier);
+        TruthOperator.permuteTruth(GoalFunction.values(), atomToTruthModifier);
     }
 
 
@@ -141,7 +141,7 @@ public enum DesireFunction implements TruthOperator {
     private final boolean single;
     private final boolean overlap;
 
-    DesireFunction() {
+    GoalFunction() {
 
         try {
             Field enumField = getClass().getField(name());

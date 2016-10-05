@@ -6,6 +6,11 @@ import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.Symbols.*;
+import static nars.Symbols.GOAL;
+import static nars.Symbols.QUEST;
+import static nars.Symbols.QUESTION;
+
 /**
  * Evaluates the truth of a premise
  */
@@ -34,10 +39,20 @@ abstract public class Solve extends AtomicBoolCondition {
 
     final boolean measure(@NotNull PremiseEval m, char punct) {
 
+        if (punct == BELIEF_OR_GOAL) {
+            //determine belief or goal according to whether the premise task is a question or quest
+            switch (m.taskPunct) {
+                case QUESTION:  punct = BELIEF; break;
+                case QUEST:     punct = GOAL;  break;
+                default:
+                    throw new UnsupportedOperationException("incompatible task punctuation with BELIEF_OR_GOAL: " + m.task);
+            }
+        }
+
         switch (punct) {
-            case Symbols.BELIEF:
-            case Symbols.GOAL:
-                TruthOperator tf = (punct == Symbols.BELIEF) ? belief : desire;
+            case BELIEF:
+            case GOAL:
+                TruthOperator tf = (punct == BELIEF) ? belief : desire;
                 if (tf == null)
                     return false; //there isnt a truth function for this punctuation
 
@@ -48,8 +63,8 @@ abstract public class Solve extends AtomicBoolCondition {
                     return false;
 
                 break;
-            case Symbols.QUESTION:
-            case Symbols.QUEST:
+            case QUESTION:
+            case QUEST:
                 //a truth function so check cyclicity
                 if (m.overlap(true))
                     return false;
@@ -59,9 +74,9 @@ abstract public class Solve extends AtomicBoolCondition {
         }
 
         TruthOperator f;
-        if (punct == Symbols.BELIEF)
+        if (punct == BELIEF)
             f = belief;
-        else if (punct == Symbols.GOAL)
+        else if (punct == GOAL)
             f = desire;
         else
             f = null;

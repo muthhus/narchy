@@ -882,6 +882,21 @@ public class NAL8Test extends AbstractNALTest {
 
     }
 
+    @Test public void disjunctionBackwardsQuestionEternal() {
+        test()
+                .log()
+                .inputAt(0, "(||, (x), (y))?")
+                .believe("(x)")
+                .mustBelieve(cycles, "(&&, (--,(x)), (--,(y)))", 0f,0.81f, ETERNAL);
+    }
+    @Test public void disjunctionBackwardsQuestionTemporal() {
+        test()
+                .inputAt(0, "(||, (x), (y))?")
+                .believe("(x)", Tense.Present, 1f, 0.9f)
+                .mustBelieve(cycles, "(&&, (--,(x)), (--,(y)))", 0f,0.81f, 0);
+    }
+
+
 //    @Test public void testImplBackward1() {
 //        test()
 //            .log()

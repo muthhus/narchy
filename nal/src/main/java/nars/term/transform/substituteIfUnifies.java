@@ -245,8 +245,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
                     if (dt > 0)
                         return False;
                 } else {
-                    //throw new RuntimeException("missing C in decomposed");
-                    return False;
+                    throw new RuntimeException("missing C in decomposed");
+                    //return False;
                 }
             }
 

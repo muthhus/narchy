@@ -120,6 +120,9 @@ public class PostCondition implements Serializable, Level //since there can be m
                         case "Quest":
                             puncOverride = Symbols.QUEST;
                             break;
+                        case "Answer":
+                            puncOverride = Symbols.BELIEF_OR_GOAL;
+                            break;
                         default:
                             throw new RuntimeException("unknown punctuation: " + which);
                     }

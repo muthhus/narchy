@@ -228,12 +228,24 @@ public class NAL4Test extends AbstractNALTest {
     @Test
     public void composition_on_both_sides_of_a_statement3c()  {
         test()
-                .log()
                 .believe("<soda --> base>",1.0f,0.9f) //en("Soda is a type of base.");
                 .ask("<(/,neutralization,liquid,base,_) --> ?x>") //en("What is something that can neutralize a base?");
                 .mustBelieve(CYCLES, "<(/,neutralization,liquid,base,_) --> (/,neutralization,liquid,soda,_)>", 1.0f, 0.81f); //en("What can neutraliz base can react with base.");
     }
 
+    @Test public void testCompositionFromProductInh() {
+        //((A..+) --> Z), (X --> Y), contains(A..+,X), task("?") |- ((A..+) --> (substitute(A..+,X,Y))), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+        test()
+                .believe("(soda --> acid)",1.0f,0.9f)
+                .ask("((drink,soda) --> ?death)")
+                .mustBelieve(CYCLES, "((drink,soda) --> (drink,acid))", 1.0f, 0.81f);
+    }
+    @Test public void testCompositionFromProductSim() {
+        test()
+                .believe("(soda <-> deadly)",1.0f,0.9f)
+                .ask("((soda,food) <-> #x)")
+                .mustBelieve(CYCLES, "((soda,food) <-> (deadly,food))", 1.0f, 0.81f);
+    }
 
 
     @Ignore

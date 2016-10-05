@@ -28,7 +28,7 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import nars.time.TimeFunctions;
 import nars.truth.func.BeliefFunction;
-import nars.truth.func.DesireFunction;
+import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.ArrayUtils;
@@ -50,7 +50,6 @@ import static nars.term.Terms.*;
  */
 public class PremiseRule extends GenericCompound {
 
-    public char taskPunc = 0;
     public boolean allowBackward;
     public boolean allowForward = false;
 
@@ -384,7 +383,7 @@ public class PremiseRule extends GenericCompound {
         if ((p.beliefTruth != null) && !p.beliefTruth.equals(TruthOperator.NONE) && (belief == null)) {
             throw new RuntimeException("unknown BeliefFunction: " + p.beliefTruth);
         }
-        TruthOperator desire = DesireFunction.get(p.goalTruth);
+        TruthOperator desire = GoalFunction.get(p.goalTruth);
         if ((p.goalTruth != null) && !p.goalTruth.equals(TruthOperator.NONE) && (desire == null)) {
             throw new RuntimeException("unknown DesireFunction: " + p.goalTruth);
         }
@@ -572,6 +571,7 @@ public class PremiseRule extends GenericCompound {
         ListMultimap<Term, MatchConstraint> constraints =
                 MultimapBuilder.treeKeys().arrayListValues().build();
 
+        char taskPunc = 0;
 
         //additional modifiers: either preConditionsList or beforeConcs, classify them here
         for (int i = 2; i < precon.length; i++) {
@@ -871,7 +871,7 @@ public class PremiseRule extends GenericCompound {
                             break;
                         case "\"?@\"":
                             pres.add( TaskPunctuation.QuestionOrQuest);
-                            taskPunc = '?'; //this will choose quest as punctuation type when necessary, according to the task
+                            //taskPunc = '?'; //this will choose quest as punctuation type when necessary, according to the task
                             break;
                         case "\"@\"":
                             pres.add( TaskPunctuation.Quest );
