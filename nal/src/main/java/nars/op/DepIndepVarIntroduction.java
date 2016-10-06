@@ -1,12 +1,13 @@
 package nars.op;
 
+import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.nal.TermBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.transform.TermTransformOperator;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,20 +28,18 @@ import static nars.Op.Imdex;
 public class DepIndepVarIntroduction extends VarIntroduction {
 
 
-    public DepIndepVarIntroduction() {
-        super(1);
+
+    public DepIndepVarIntroduction(NAR nar) {
+        super(1, nar);
     }
 
     @Override
-    public void accept(Task task, NAR nar) {
-
-        if (!task.term().hasAny(ConjOrStatementBits))
-            return; //early failure test
+    public void accept(Task task) {
 
         if (task.cyclic())
             return; //avoids reprocessing the same
 
-        super.accept(task, nar);
+        super.accept(task);
     }
 
     @Override
@@ -57,7 +56,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     @Nullable
     @Override
-    protected Term[] nextSelection(Compound input) {
+    protected Term[] select(Compound input) {
         Predicate<Term> condition = subterm -> !subterm.isAny(DepOrIndepBits);
         return Terms.substAllRepeats(input, condition, 2);
         //return Terms.substRoulette(input, condition, 2, rng);
@@ -128,5 +127,27 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             return null;
         }
 
+    }
+
+    public static class VarIntro extends TermTransformOperator {
+
+        final DepIndepVarIntroduction introducer;
+
+        public VarIntro(NAR nar) {
+            super("varIntro");
+            this.introducer = new DepIndepVarIntroduction(nar);
+        }
+
+        @Override
+        public @NotNull Term function(@NotNull Compound args) {
+            Term x = args.term(0);
+            if (x instanceof Compound) {
+                List<Compound> l = $.newArrayList();
+                introducer.accept((Compound)x, l::add);
+                if (!l.isEmpty())
+                    return l.get(0);
+            }
+            return False;
+        }
     }
 }

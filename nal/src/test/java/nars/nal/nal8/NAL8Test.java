@@ -164,7 +164,6 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deductionWithVariableEliminationOpposite()  {
 
         test()
-                .log()
                 .input("goto({t003}). :|:")
                 .inputAt(10, "(goto(#1) &&+5 at:(SELF,#1))!")
 
@@ -233,7 +232,6 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void further_detachment()  {
         test()
-            .log()
             .input("reachable:(SELF,{t002}). :|:")
             .inputAt(10, "(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
             .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f, 5);
@@ -801,7 +799,6 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void testNegatedImplicationTerm1() {
 
         test()
-                .log()
                 .goal("(R)")
                 .input("((--,a:b) ==>+0 (R)). :|:")
                 .mustDesire(cycles, "a:b", 0.0f, 0.81f, 0);
@@ -884,7 +881,6 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void disjunctionBackwardsQuestionEternal() {
         test()
-                .log()
                 .inputAt(0, "(||, (x), (y))?")
                 .believe("(x)")
                 .mustBelieve(cycles, "(&&, (--,(x)), (--,(y)))", 0f,0.81f, ETERNAL);

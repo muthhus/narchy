@@ -248,6 +248,7 @@ public class NAL4Test extends AbstractNALTest {
     }
 
 
+
     @Ignore
     @Test public void testRecursionForce1() {
         //    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z),Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)

@@ -1204,7 +1204,7 @@ public enum Util { ;
     }
 
     // Implementing Fisher–Yates shuffle
-    static void shuffle(Object[] ar, Random rnd) {
+    public static void shuffle(Object[] ar, Random rnd) {
         for (int i = ar.length - 1; i > 0; i--)
         {
             int index = rnd.nextInt(i + 1);

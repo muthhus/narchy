@@ -270,6 +270,16 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
+    /** same as identity but allows overlap */
+    @SinglePremise
+    @AllowOverlap
+    IdentityTransform() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return TruthOperator.identity(T, minConf);
+        }
+    },
+
     BeliefIdentity() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, NAR m, float minConf) {

@@ -69,6 +69,16 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
+    /** same as identity but allows overlap */
+    @SinglePremise
+    @AllowOverlap
+    IdentityTransform() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return TruthOperator.identity(T, minConf);
+        }
+    },
+
 //    @AllowOverlap @SinglePremise
 //    StructuralStrong() {
 //        @Nullable
@@ -85,6 +95,15 @@ public enum GoalFunction implements TruthOperator {
             return T != null ? TruthFunctions.deduction1(T, defaultTruth(m).conf(), minConf) : null;
         }
     },
+
+    BeliefStructuralDeduction() {
+        @Nullable
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            if (B == null) return null;
+            return TruthFunctions.deduction1(B, defaultConfidence(m), minConf);
+        }
+    },
+
 
 //    @AllowOverlap @SinglePremise
 //    StructuralStrongNeg() {
@@ -163,4 +182,7 @@ public enum GoalFunction implements TruthOperator {
         return overlap;
     }
 
+    private static float defaultConfidence(NAR m) {
+        return m.confidenceDefault(Symbols.GOAL);
+    }
 }

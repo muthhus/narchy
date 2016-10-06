@@ -1,15 +1,11 @@
 package nars.nal.meta;
 
 import nars.Op;
-import nars.Symbols;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Symbols.*;
-import static nars.Symbols.GOAL;
-import static nars.Symbols.QUEST;
-import static nars.Symbols.QUESTION;
 
 /**
  * Evaluates the truth of a premise

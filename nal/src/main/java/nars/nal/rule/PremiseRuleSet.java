@@ -6,7 +6,6 @@ import nars.IO;
 import nars.Param;
 import nars.index.PatternIndex;
 import nars.nal.Deriver;
-import nars.nal.meta.PostCondition;
 import nars.term.Compound;
 import nars.util.Util;
 import org.eclipse.collections.api.tuple.Pair;

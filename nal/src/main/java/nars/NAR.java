@@ -15,7 +15,6 @@ import nars.index.TermTransformConcept;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
-import nars.nal.nal8.operator.ImmediateOperator;
 import nars.nar.exe.Executioner;
 import nars.table.BeliefTable;
 import nars.task.MutableTask;

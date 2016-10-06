@@ -18,7 +18,6 @@ import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.TermTransform;
 import nars.term.transform.VariableNormalization;
-import nars.term.var.Variable;
 import nars.util.data.map.nbhm.HijacKache;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
@@ -28,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -289,29 +287,30 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable public final Compound normalize(@NotNull Compound t) {
 
-        if (t.isNormalized())
-            return t;
+        Compound c;
 
-        TermContainer src = t.subterms();
-        TermContainer tgt = normalize(src);
-        if (src == tgt) {
-            //no change
-            ((GenericCompound)t).setNormalized();
-            return t;
-        }
-
-        if (tgt != InvalidSubterms) {
-            Compound c = compoundOrNull($.terms.the(t, tgt));
-            if (c == null)
-                return null;
-            c = compoundOrNull( $.unneg((Compound) c) );
-            if (c!=null) {
-                ((GenericCompound)c).setNormalized();
-                return c;
+        if (t.isNormalized()) {
+            c = t; //already normalized
+        } else {
+            //see if subterms need change
+            TermContainer src = t.subterms();
+            TermContainer tgt = normalize(src);
+            if (src == tgt) {
+                c =  t; //subterms dont change
+            } else if (tgt != InvalidSubterms) {
+                c = compoundOrNull($.terms.the(t, tgt));
+            } else {
+                c = null;
             }
         }
 
-        return null;
+        //if (c!=null) {
+            //c = compoundOrNull($.unneg((Compound) c));
+            if (c != null) {
+                ((GenericCompound) c).setNormalized();
+            }
+        //}
+        return c;
     }
 
     @Nullable public final TermContainer normalize(@NotNull TermContainer t) {

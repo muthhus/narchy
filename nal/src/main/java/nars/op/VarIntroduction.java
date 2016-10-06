@@ -1,6 +1,5 @@
 package nars.op;
 
-import com.google.common.base.Joiner;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -13,62 +12,74 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.TruthDelta;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiConsumer;
+import java.util.Random;
+import java.util.function.Consumer;
+
+import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
 
 /**
  * a generalized variable introduction model that can transform tasks
  */
-public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
+public abstract class VarIntroduction {
 
     @Deprecated final static String tag = VarIntroduction.class.getSimpleName();
 
-    final int introductionThreshold = 0;
+    final NAR nar;
     final int maxIterations;
 
-    public VarIntroduction(int maxIterations) {
+    public VarIntroduction(int maxIterations, NAR nar) {
         this.maxIterations = maxIterations;
+        this.nar = nar;
     }
 
-    @Override public void accept(Task input, NAR nar) {
-        Compound c = input.term();
+    @NotNull public void accept(@NotNull Compound c,  Consumer<Compound> each) {
 
-        //size limitations
-        if ((c.volume()) < 2 || (c.volume() + introductionThreshold > nar.compoundVolumeMax.intValue()))
-            return;
+        if (!c.hasAny(ConjOrStatementBits) || (c.volume()) < 2 || (c.volume() > nar.compoundVolumeMax.intValue()))
+            return; //earliest failure test
 
 
-        Term[] selections = nextSelection(c);
+        Term[] selections = select(c);
         if (selections != null && selections.length > 0) {
 
+            int max = maxIterations;
+            @NotNull Random rng = nar.random;
+
+            Util.shuffle(selections, rng);
             for (Term s : selections) {
 
                 Term[] dd = next(c, s);
 
-                if (dd!=null) {
+                if (dd != null) {
                     int replacements = dd.length;
                     if (replacements > 0) {
 
-                        Term d = dd[nar.random.nextInt(replacements)]; //choose one randomly
+                        Term d = dd[rng.nextInt(replacements)]; //choose one randomly
                         //for (Term d : dd) {
                         Term newContent = $.terms.replace(c, s, d);
+
                         if ((newContent instanceof Compound) && !newContent.equals(c)) {
-                            input(nar, input, newContent);
+                            each.accept((Compound) newContent);
+                            if (--max <= 0)
+                                return;
                         }
-                        //}
                     }
                 }
             }
         }
+    }
 
-
+    public void accept(Task input) {
+        Compound c = input.term();
+        accept(c, newContent -> input(input, newContent));
     }
 
 
     @Nullable
-    abstract protected Term[] nextSelection(Compound input);
+    abstract protected Term[] select(Compound input);
 
 
     /** provides the next terms that will be substituted in separate permutations; return null to prevent introduction */
@@ -80,7 +91,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
 
 
     @Nullable
-    protected void input(NAR nar, @NotNull Task original, @NotNull Term newContent) {
+    protected void input(@NotNull Task original, @NotNull Term newContent) {
 
         Compound c = nar.normalize((Compound) newContent);
         if (c != null && !c.equals(original.term())) {
@@ -110,7 +121,7 @@ public abstract class VarIntroduction implements BiConsumer<Task,NAR> {
 
     public VarIntroduction each(NAR nar) {
         nar.onTask(t -> {
-            accept(t, nar);
+            accept(t);
         });
         return this;
     }

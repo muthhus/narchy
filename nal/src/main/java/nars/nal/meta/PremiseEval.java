@@ -11,6 +11,7 @@ import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
+import nars.op.DepIndepVarIntroduction;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -149,6 +150,7 @@ public class PremiseEval extends Unify {
         set(new substituteIfUnifiesAny(this));
         set(new substituteIfUnifiesForward(this));
         set(new substituteIfUnifiesDep(this));
+        set(new DepIndepVarIntroduction.VarIntro(nar));
 
         this.premise = p;
 

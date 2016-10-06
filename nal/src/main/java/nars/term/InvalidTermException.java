@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.Op;
 import nars.Param;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -20,6 +21,10 @@ public final class InvalidTermException extends RuntimeException {
 
     public InvalidTermException(@NotNull Op op, @NotNull Term[] args, @NotNull String reason) {
         this(op, DTERNAL, args, reason);
+    }
+
+    public InvalidTermException(@NotNull Op op, int dt, @NotNull TermContainer args, @NotNull String reason) {
+        this(op, dt, args.terms(), reason);
     }
 
     public InvalidTermException(@NotNull Op op, int dt, @NotNull Term[] args, @NotNull String reason) {

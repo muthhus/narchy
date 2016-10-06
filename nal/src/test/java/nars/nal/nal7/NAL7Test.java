@@ -18,7 +18,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 100;
+    final int cycles = 500;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -515,6 +515,7 @@ public class NAL7Test extends AbstractNALTest {
     public void variable_introduction_on_events_with_negation() {
         test()
 
+        .log()
         .input("(--,a:x). :|: %0.9;0.8% ")
         .inputAt(10, "b:x. :|: %0.8;0.9% ")
 
@@ -731,7 +732,7 @@ public class NAL7Test extends AbstractNALTest {
     }
     @Test public void testDecomposeConjunctionQuest() {
         test()
-                
+                .log()
                 .input("((x) &&+5 (y))@ :|:")
                 .mustOutput(0, cycles,"(x)",'@', Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0)
                 .mustOutput(0, cycles,"(y)",'@', Float.NaN, Float.NaN, Float.NaN, Float.NaN, 5)

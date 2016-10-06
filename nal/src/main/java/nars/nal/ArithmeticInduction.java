@@ -38,6 +38,7 @@ public class ArithmeticInduction {
     public static Logger logger = LoggerFactory.getLogger(ArithmeticInduction.class);
 
     private static final MultimapBuilder.SetMultimapBuilder setSetMapBuilder = MultimapBuilder.hashKeys().hashSetValues();
+    private static final int resultLimit = 1;
 
     @NotNull
     public static TermContainer compress(@NotNull TermContainer args) {
@@ -213,11 +214,13 @@ public class ArithmeticInduction {
                     j++;
                 }
 
-                if (result.size() == 1) {
-                    break; //reduced to one, go no further
-                }
+
             }
 
+            int results = result.size();
+            if ((results == 1) || (results > resultLimit * subCount)) {
+                break; //reduced to one or exploded, go no further
+            }
         }
 
         result.removeAll(subsumed);

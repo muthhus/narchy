@@ -179,8 +179,8 @@ public interface TimeFunctions {
 
             //TODO check valid int/long conversion
             eventDelta = (int) (
-                    p.belief.occurrence() -
-                    p.task.occurrence());
+                    beliefO -
+                    taskO);
 
 
             occReturn[0] = earliest;
@@ -937,10 +937,9 @@ public interface TimeFunctions {
             dt = DTERNAL;
         }
         if (derived.dt() != dt) {
-            Term[] derivedSubterms = derived.subterms().terms();
-            @NotNull Term n = $.terms.the(o, dt, derivedSubterms);
+            @NotNull Term n = $.terms.the(o, dt, derived.subterms());
             if (!(n instanceof Compound))
-                throw new InvalidTermException(o, dt, derivedSubterms, "Untemporalizable to new DT");
+                throw new InvalidTermException(o, dt, derived.subterms(), "Untemporalizable to new DT");
             return (Compound) n;
         } else {
             return derived;

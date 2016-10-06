@@ -2,7 +2,6 @@ package nars.nar.util;
 
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;

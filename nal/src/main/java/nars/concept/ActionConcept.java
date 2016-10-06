@@ -13,8 +13,6 @@ import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 import static nars.$.$;
 import static nars.Symbols.GOAL;
 

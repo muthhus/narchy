@@ -17,10 +17,7 @@ import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.Texts;
-import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.eclipse.collections.api.bag.Bag;
-import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -31,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.*;
 
 /**
@@ -131,17 +129,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     final void derive(@NotNull PremiseEval m, @NotNull Compound content, @NotNull PremiseEval.TruthPuncEvidence ct) {
 
         Truth truth = ct.truth;
-        if (content.op() == NEG) {
-            //negations cant term concepts or tasks, so we unwrap and invert the truth (fi
-            Term raw2 = content.term(0);
-            if (!(raw2 instanceof Compound))
-                return; //unwrapped to a variable (negations of atomics are not allowed)
-            content = (Compound) raw2;
-            if (truth != null)
-                truth = truth.negated();
-        }
 
 
+        //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
         Budget budget = m.budget(truth, content);
         if (budget == null)
             return; //INSUFFICIENT BUDGET
@@ -152,9 +142,18 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         if (content == null)
             return; //somehow became null
 
+        Op o = content.op();
+        if (o == NEG) {
+            content = compoundOrNull($.unneg(content));
+            if (content == null)
+                return;
+
+            truth = truth.negated();
+            o = content.op();
+        }
+
         if (!Task.taskContentPreTest(content, ct.punc, nar, true /* !Param.DEBUG*/))
             return; //INVALID TERM FOR TASK
-
 
         long occ;
 
@@ -212,12 +211,20 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
             occ = occReturn[0];
         } else {
+
+
+            occ = ETERNAL;
+        }
+
+
+        if (content!=null) {
             //the derived compound indicated a potential dt, but the premise was actually atemporal;
             // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
 
-            Op o = content.op();
+
+
             if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
-                Term ete = m.index.the(o, DTERNAL, content.terms());
+                Term ete = $.terms.the(o, DTERNAL, content.terms());
                 if (!(ete instanceof Compound)) {
                     //throw new InvalidTermException(o, content.dt(), content.terms(), "untemporalization failed");
                     return;
@@ -225,12 +232,6 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 content = nar.normalize((Compound)ete);
             }
 
-            occ = ETERNAL;
-        }
-
-
-        if (content!=null) {
-            //TermIndex.preConceptualize(content)
             DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
             if (d != null)
                 m.conclusion.derive.accept(d);

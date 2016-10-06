@@ -1,14 +1,22 @@
 // Pei Wang's "Non-Axiomatic Logic" specified with a math. notation inspired DSL with given intiutive explainations:
 
+
+// Variable Introduction
+//    (A-->B), A                     |- varIntro((A-->B)), (Belief:IdentityTransform, Goal:IdentityTransform)
+//    (A-->B), B                     |- varIntro((A-->B)), (Belief:IdentityTransform, Goal:IdentityTransform)
+//    (A<->B), A                     |- varIntro((A<->B)), (Belief:IdentityTransform, Goal:IdentityTransform)
+//    (A && B), A, time(dtTask) |- varIntro((A &&+- B)), (Belief:IdentityTransform, Goal:IdentityTransform)
+//    //(&&, X, A..+), X, time(dtTask) |- varIntro((&&, X, A..+)), (Belief:IdentityTransform, Goal:IdentityTransform)
+//    (A==>B), A, time(dtTask)       |- varIntro((A ==>+- B)), (Belief:IdentityTransform, Goal:IdentityTransform)
+//    (A==>B), B, time(dtTask)       |- varIntro((A ==>+- B)), (Belief:IdentityTransform, Goal:IdentityTransform)
+//    (A<=>B), A, time(dtTask)       |- varIntro((A <=>+- B)), (Belief:IdentityTransform, Goal:IdentityTransform)
+
+    X, Y, time(dtTask)       |- varIntro(X), (Belief:IdentityTransform, Goal:IdentityTransform)
+
 //The rules of NAL, can be interpreted by considering the intiution behind the following two relations:
 // Statement:                 (A --> B):               A can stand for B
 // Statement about Statement: (A --> B) ==> (X --> Y): If A is true, so is/will be B
 // --> is a relation in meaning of terms, while ==> is a relation of truth between statements.
-
-
-
-
-
 
 //Set Definition Similarity to Inheritance
 

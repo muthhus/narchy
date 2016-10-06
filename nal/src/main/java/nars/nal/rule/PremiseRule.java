@@ -871,7 +871,7 @@ public class PremiseRule extends GenericCompound {
                             break;
                         case "\"?@\"":
                             pres.add( TaskPunctuation.QuestionOrQuest);
-                            //taskPunc = '?'; //this will choose quest as punctuation type when necessary, according to the task
+                            taskPunc = '?'; //this will choose quest as punctuation type when necessary, according to the task
                             break;
                         case "\"@\"":
                             pres.add( TaskPunctuation.Quest );

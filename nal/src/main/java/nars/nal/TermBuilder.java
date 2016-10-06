@@ -965,6 +965,9 @@ public abstract class TermBuilder {
     @NotNull public Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
         return the(csrc.op(), csrc.dt(), newSubs.terms());
     }
+    @NotNull public Term the(@NotNull Op op, int dt, @NotNull TermContainer newSubs) {
+        return the(op, dt, newSubs.terms());
+    }
     @NotNull public Term the(@NotNull Compound csrc, @NotNull Collection<Term> newSubs) {
         return the(csrc.op(), csrc.dt(), newSubs.toArray(new Term[newSubs.size()]));
     }

@@ -10,8 +10,6 @@ import nars.link.BLink;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.ConceptBagCycle;
-import nars.op.DepIndepVarIntroduction;
-import nars.op.VarIntroduction;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
@@ -37,7 +35,6 @@ public class Default extends AbstractNAR {
     /** this doesnt make sense for multithread cases when ConceptBagCycle executes asynchronosly     */
     @Deprecated public final MutableInteger cyclesPerFrame = new MutableInteger(1);
 
-    private VarIntroduction depIndepIntroducer;
 
     @Deprecated
     public Default() {
@@ -76,9 +73,6 @@ public class Default extends AbstractNAR {
         int level = level();
 
         if (level >= 5) {
-
-            this.depIndepIntroducer = new DepIndepVarIntroduction().each(this);
-
 
             if (level >= 7) {
                 initNAL7();

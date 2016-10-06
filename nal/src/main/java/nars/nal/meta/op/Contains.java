@@ -6,8 +6,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
 /**
  * 'container' contains 'contained' but also not equal to it
  */
