@@ -56,14 +56,14 @@ public class Tetris extends SwingAgent {
     public static final Executioner exe =
             //new SingleThreadExecutioner();
 //            new MultiThreadExecutioner(2, 1024*8);
-            new MultiThreadExecutioner(5, 1024*8);
+            new MultiThreadExecutioner(3, 1024*8);
 
     public static final int runFrames = 1125550;
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 15;
     public static final int TIME_PER_FALL = 3;
-    public static final int frameRate = 80;
+    public static final int frameRate = 25;
     static boolean easy;
 
     static int frameDelay;
@@ -494,9 +494,9 @@ public class Tetris extends SwingAgent {
                 grid(
 
                         //Vis.concepts(nar, 32),
-                        Vis.agentActions(t, 250),
+                        Vis.agentActions(t, 450),
 
-                        Vis.budgetHistogram(nar, 10),
+                        Vis.budgetHistogram(nar, 32),
                         Vis.conceptLinePlot(nar,
                                 Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
                                 200)
