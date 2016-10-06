@@ -125,13 +125,14 @@ public class BagTest {
 
         a.put("x", new RawBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new RawBudget(0.2f, 0.5f, 0.5f));
+        a.commit();        a.print();
+        assertEquals(2, a.size());
+
+        assertEquals( 0.1f , a.minPri, 0.01f);
+        System.out.println("..");
+
         a.put("z", new RawBudget(0.05f, 0.5f, 0.5f));
-
-        a.commit();
-
-        //System.out.println(a.items);
-        //System.out.println(ArrayTable.this);
-
+        a.commit();        a.print();
         assertEquals(2, a.size());
         assertTrue(a.contains("x") && a.contains("y"));
         assertFalse(a.contains("z"));

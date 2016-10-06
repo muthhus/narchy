@@ -59,74 +59,111 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     protected void update(BLink<V> toAdd) {
 
-        int s = size();
-        int c = capacity();
 
-        boolean forceClean = toAdd == null; //force clean if this is a commit and not an addition update
-
-        int sizeThresh = forceClean ? 0 : c + ((toAdd != null) ? 1 : 0);
-        boolean modified = false;
+        int additional = (toAdd != null) ? 1 : 0;
 
         SortedArray<BLink<V>> items = this.items;
-        if (s > sizeThresh) {
 
-            List<BLink<V>> toRemove = $.newArrayList(s - sizeThresh);
+        synchronized (items) {
+            int s = size();
+            int c = capacity();
 
-            //first step: remove any nulls and deleted values
-            s -= removeDeletedAtBottom(toRemove);
+            if (s + additional > c) {
+                s = clean(toAdd, s, additional);
+                if (s + additional > c)
+                    throw new RuntimeException("overflow");
+            }
 
-            //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
-            removeWeakestUntilUnderCapacity(s, toRemove, toAdd != null);
+            if (toAdd != null) {
 
+                //append somewhere in the items; will get sorted to appropriate location during next commit
+                //TODO update range
 
-            //do full removal outside of the synchronized phase, possibly interleaving with another thread doing the same thing
-            for (int i = 0, toRemoveSize = toRemove.size(); i < toRemoveSize; i++) {
-                BLink<V> w = toRemove.get(i);
+//                Object[] a = items.array();
 
-                V k = w.get();
-                if (k == null)
-                    continue;
+//                //scan for an empty slot at or after index 's'
+//                for (int k = s; k < a.length; k++) {
+//                    if ((a[k] == null) /*|| (((BLink)a[k]).isDeleted())*/) {
+//                        a[k] = toAdd;
+//                        items._setSize(s+1);
+//                        return;
+//                    }
+//                }
 
-                BLink<V> k2 = map.remove(k);
-
-                if (k2 != w && k2 != null) {
-                    //throw new RuntimeException(
-                    logger.error("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
-                    //reinsert it because it must have been added in the mean-time:
-                    map.putIfAbsent(k, k2);
+                int ss = size();
+                if (ss < capacity) {
+                    items.addInternal(toAdd); //grows the list if necessary
+                } else {
+                    throw new RuntimeException("list became full during insert");
                 }
 
-                onRemoved(k, w);
+                float p = toAdd.pri();
+                if (minPri < p) {
+                    this.minPri = p;
+                }
 
-                w.delete();
 
-                modified = true;
             }
+
         }
 
-        if (toAdd != null) {
-            synchronized (items) {
-                //the item key,value should already be in the map before reaching here
-                items.add(toAdd, this);
-                modified = true;
-            }
-        }
-
-        if (modified)
-            updateRange(); //regardless, this also handles case when policy changed and allowed more capacity which should cause minPri to go to -1
+//        if (toAdd != null) {
+//            synchronized (items) {
+//                //the item key,value should already be in the map before reaching here
+//                items.add(toAdd, this);
+//            }
+//            modified = true;
+//        }
+//
+//        if (modified)
+//            updateRange(); //regardless, this also handles case when policy changed and allowed more capacity which should cause minPri to go to -1
 
     }
 
-    private void removeWeakestUntilUnderCapacity(int s, List<BLink<V>> toRemove, boolean pendingAddition) {
+    private int clean(BLink<V> toAdd, int s, int sizeThresh) {
+        List<BLink<V>> toRemove = $.newArrayList(s - sizeThresh);
+
+        //first step: remove any nulls and deleted values
+        s -= removeDeleted(toRemove);
+
+        //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
+        s = removeWeakestUntilUnderCapacity(s, toRemove, toAdd != null);
+
+
+        //do full removal
+        for (int i = 0, toRemoveSize = toRemove.size(); i < toRemoveSize; i++) {
+            BLink<V> w = toRemove.get(i);
+
+            V k = w.get();
+            if (k == null)
+                continue;
+
+            BLink<V> k2 = map.remove(k);
+
+            if (k2 != w && k2 != null) {
+                //throw new RuntimeException(
+                logger.error("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
+                //reinsert it because it must have been added in the mean-time:
+                map.putIfAbsent(k, k2);
+            }
+
+            onRemoved(k, w);
+
+            w.delete();
+
+        }
+        return s;
+    }
+
+    private int removeWeakestUntilUnderCapacity(int s, List<BLink<V>> toRemove, boolean pendingAddition) {
         SortedArray<BLink<V>> items = this.items;
         while (!isEmpty() && ((s - capacity()) + (pendingAddition ? 1 : 0)) > 0) {
-            BLink<V> w;
-            synchronized (items) {
-                w = items.remove(size() - 1);
-            }
-            toRemove.add(w);
+            BLink<V> w = items.remove(s - 1);
+            if (w != null)
+                toRemove.add(w);
             s--;
         }
+        return s;
     }
 
     @Override
@@ -338,7 +375,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
             commit(a);
         } else {
-            minPriIfFull = -1;
+            minPri = -1;
         }
 
         return this;
@@ -354,15 +391,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         int s = size();
         if (s > 0) {
+
             synchronized (items) {
+
+                update(null);
+
                 int lowestUnsorted = updateExisting(each, s);
 
                 if (lowestUnsorted != -1) {
                     qsort(new int[24 /* estimate */], items.array(), 0 /*dirtyStart - 1*/, s);
                 } // else: perfectly sorted
+
+                updateRange();
+
             }
 
-            update(null);
         }
 
 
@@ -381,10 +424,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    /**
-     * if not full, this value must be set to -1
-     */
-    float minPriIfFull = -1;
+
+    public float minPri = -1;
 
 //    private final float minPriIfFull() {
 //        BLink<V>[] ii = items.last();
@@ -440,39 +481,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * must be called in synchronized(items) block
      */
-    private int removeDeletedAtBottom(List<BLink<V>> removed) {
+    private int removeDeleted(List<BLink<V>> removed) {
 
 
         SortedArray<BLink<V>> items = this.items;
-
-        int i, j;
         BLink<V>[] l = items.array();
-        j = i = Math.min(l.length, size()) - 1;
-
         int removedFromMap = 0;
-
-        if (i > 0) {
-
-            synchronized (items) {
-                while ((i >= 0) && (l[i] == null)) {
-                    i--;
-                    removedFromMap++;
-                }
-
-                BLink<V> ii;
-                while (i >= 0 && (ii = l[i]).isDeleted()) {
-
-                    removed.add(ii);
-
-                    l[i--] = null;
-
-                    removedFromMap++;
-                }
-
-                if (i != j)
-                    items._setSize(i + 1); //quickly remove null entries from the end by skipping past them
+        for (int s = items.size()-1; s >= 0; s--) {
+            BLink<V> x = l[s];
+            if (x == null || x.isDeleted()) {
+                items.removeFast(s);
+                if (x!=null)
+                    removed.add(x);
+                removedFromMap++;
             }
-
         }
 
         return removedFromMap;
@@ -485,22 +507,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     private final void updateRange() {
-
         int s = size();
-        int cap = capacity();
-        float min = -1;
-        if (s >= cap) {
-            BLink<V>[] a = items.array();
-            if (a.length > cap - 1) {
-                BLink<V> last = a[cap - 1];
-                if (last != null) {
-                    min = last.priIfFiniteElseNeg1();
-                }
-            } //else the array hasnt even grown large enough to reach the capacity so it is not full
-        }
-
-        this.minPriIfFull = min;
-
+        this.minPri = s > 0 ? get(s -1).priIfFiniteElseNeg1() : -1;
     }
 
 
@@ -519,7 +527,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public void forEach(Consumer<? super BLink<V>> action) {
         Object[] x = items.array();
         if (x.length > 0) {
-            for (BLink a : ((BLink[])x)) {
+            for (BLink a : ((BLink[]) x)) {
                 if (a != null) {
                     BLink<V> b = a;
                     if (!b.isDeleted())
@@ -528,7 +536,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             }
         }
     }
-
 
 
     /**
@@ -718,13 +725,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     final class Insertion<V> implements BiFunction<V, BLink, BLink> {
 
 
-
         private final float pri;
 
-         /**
-          * TODO this field can be re-used for 'activated' return value
-          * -1 = deactivated, +1 = activated, 0 = no change
-          */
+        /**
+         * TODO this field can be re-used for 'activated' return value
+         * -1 = deactivated, +1 = activated, 0 = no change
+         */
         int result = 0;
 
         public Insertion(float pri) {
@@ -741,7 +747,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 //result=0
                 return existing;
             } else {
-                if (minPriIfFull > pri) {
+                if (size()>=capacity && minPri > pri) {
                     this.result = -1;
                     return null;
                 } else {

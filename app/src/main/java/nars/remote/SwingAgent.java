@@ -79,7 +79,7 @@ abstract public class SwingAgent extends NAgent {
         //nar.linkFeedbackRate.setValue(0.01f);
 
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true);
+        MySTMClustered stm = new MySTMClustered(nar, 16, '.', 3, true);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
         Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the",
@@ -107,7 +107,8 @@ abstract public class SwingAgent extends NAgent {
                 grid(
                         grid(a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new)),
 
-                        //Vis.concepts(nar, 32),
+                        //Vis.concepts(nar, 512),
+
                         Vis.agentActions(a, history),
 
                         Vis.budgetHistogram(nar, 32),

@@ -62,9 +62,9 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     public E remove(int index) {
-        if (size < index)
-            throw new ArrayIndexOutOfBoundsException(index);
-            //return null;
+//        if (size < index)
+//            throw new ArrayIndexOutOfBoundsException(index);
+//            //return null;
 
         E[] list = this.list;
         E previous = list[index];
@@ -75,7 +75,18 @@ public class SortedArray<E> implements Iterable<E> {
         list[--this.size] = null;
         return previous;
     }
+    public void removeFast(int index) {
+//        if (size < index)
+//            throw new ArrayIndexOutOfBoundsException(index);
+//            //return null;
 
+        E[] list = this.list;
+        int totalOffset = this.size - index - 1;
+        if (totalOffset > 0) {
+            System.arraycopy(list , index + 1, list, index, totalOffset);
+        }
+        list[--this.size] = null;
+    }
 
     /** set the size as a quick way to remove null entries from the end */
     public void _setSize(int s) {
@@ -166,6 +177,8 @@ public class SortedArray<E> implements Iterable<E> {
 
     }
 
+
+
     public interface Ranker<X> {
         public float rank(X x);
     }
@@ -245,7 +258,7 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     private static int grow(int oldSize) {
-        return oldSize == 0 ? 1 : (int) Math.ceil(oldSize * 1.5f);
+        return oldSize == 0 ? 4 : oldSize * 2;
     }
 
     public E removeWeakest() {

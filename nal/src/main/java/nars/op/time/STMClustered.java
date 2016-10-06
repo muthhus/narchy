@@ -225,7 +225,7 @@ public class STMClustered extends STM {
         public String toString() {
             return id + "<<" +
                     (coord!=null ? Arrays.toString(coord) : "0") +
-                    '|' + node.id +
+                    '|' + (node!=null ? node.id : "null")+
                     ">>";
         }
 
