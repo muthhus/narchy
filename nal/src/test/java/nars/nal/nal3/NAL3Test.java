@@ -289,9 +289,9 @@ public class NAL3Test extends AbstractNALTest {
             .believe("<{x,y}-->c>")
             .believe("<{x,z}-->c>")
             .mustBelieve(cycles, "<{x,y,z}-->c>", 1f, 0.81f) //union
-            .mustBelieve(cycles, "<{x}-->c>", 1f, 0.81f) //intersect
-            .mustBelieve(cycles, "<{y}-->c>", 1f, 0.81f) //difference
-            .mustBelieve(cycles, "<{y}-->c>", 0f, 0.81f) //difference
+            .mustBelieve(cycles, "<{x}-->c>", 1f, 0.73f) //intersect
+            .mustBelieve(cycles, "<{y}-->c>", 1f, 0.73f) //difference
+            .mustBelieve(cycles, "<{y}-->c>", 0f, 0.73f) //difference
             .mustBelieve(cycles, "<{z}-->c>", 0f, 0.73f) //difference
         //these are probably ok:
             //.mustNotOutput(cycles,"<{x}-->c>", '.', 0, 0, 0.5f, 1, ETERNAL) //contradiction of input above conf=0.5

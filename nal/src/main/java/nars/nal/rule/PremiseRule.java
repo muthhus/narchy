@@ -875,8 +875,8 @@ public class PremiseRule extends GenericCompound {
                             pres.add(TaskPunctuation.Goal);
                             taskPunc = '!';
                             break;
-                        case "all":
-                            taskPunc = 0;
+                        case "any":
+                            taskPunc = ' ';
                             break;
                         default:
                             throw new RuntimeException("Unknown task punctuation type: " + X.toString());
@@ -902,6 +902,9 @@ public class PremiseRule extends GenericCompound {
         if (taskPunc == 0) {
             //default: add explicit no-questions rule
             pres.add(TaskPunctuation.NotQuestion);
+        } else if (taskPunc == ' ') {
+            //any task type
+            taskPunc = 0;
         }
 
         //store to arrays
@@ -1067,7 +1070,7 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
-    static final Term TaskAny = exec($.oper("task"), $.the("all"));
+    static final Term TaskAny = exec($.oper("task"), $.the("any"));
 
 //    static final Term BELIEF = $.the("Belief");
 //    static final Term DESIRE = $.the("Desire");

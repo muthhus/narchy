@@ -2,7 +2,7 @@
 
 
 // Variable Introduction
-    X, Y, component(task,belief), time(dtTask)       |- varIntro(X), (Belief:IdentityTransform, Goal:IdentityTransform)
+    X, Y, component(task,belief), time(dtTask), task(any)       |- varIntro(X), (Belief:IdentityTransform, Goal:IdentityTransform)
 
 //The rules of NAL, can be interpreted by considering the intiution behind the following two relations:
 // Statement:                 (A --> B):               A can stand for B

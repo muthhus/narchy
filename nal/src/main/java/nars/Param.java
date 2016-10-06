@@ -93,7 +93,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * swap task and belief in eligible rules ("forward" permutation)
      */
-    public static final boolean SWAP_RULES = false;
+    public static final boolean SWAP_RULES = true;
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
