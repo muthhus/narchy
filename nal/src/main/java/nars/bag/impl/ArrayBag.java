@@ -231,6 +231,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     /**
      * gets the scalar float value used in a comparison of BLink's
+     * essentially the same as b.priIfFiniteElseNeg1 except it also includes a null test. otherwise they are interchangeable
      */
     static float cmp(@Nullable Budgeted b) {
         if (b == null) return -1f;
@@ -309,9 +310,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 if (overflow != null)
                     overflow.add(o);
 
-                mass += v.pri() - pBefore;
+                float pAfter = v.pri();
+                mass += pAfter - pBefore;
 
-                updateRange(); //in case the merged item determined the min priority
+                //technically this should be in a synchronized block but ...
+                if (nars.util.Util.equals(minPri,pBefore,Param.BUDGET_EPSILON)) {
+                    //in case the merged item determined the min priority
+                    this.minPri = pAfter;
+                }
+
                 break;
             case +1:
                 bp *= scale;
@@ -446,30 +453,30 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //        int dirtyStart = -1;
         int lowestUnsorted = -1;
 
-        final boolean eachNotNull = each != null;
 
         BLink<V>[] l = items.array();
         int i = s - 1;
         float m = 0;
-        @NotNull BLink<V> beneath = l[i]; //compares with self below to avoid a null check in subsequent iterations
+        //@NotNull BLink<V> beneath = l[i]; //compares with self below to avoid a null check in subsequent iterations
+        float beneath = Float.POSITIVE_INFINITY;
         for (; i >= 0; ) {
             BLink<V> b = l[i];
 
-            if (b != null && b.get() != null) {
-                if (eachNotNull)
-                    each.accept(b);
-            }
+            float bCmp;
+            bCmp = b != null ? b.priIfFiniteElseNeg1() : -2; //sort nulls to the end of the end
 
-            float bCmp = cmp(b);
             if (bCmp > 0) {
-                m += bCmp;// * b.dur();
+                if (each!=null)
+                    each.accept(b);
+                m += bCmp;
             }
 
-            if (lowestUnsorted == -1 && cmpGT(bCmp, beneath)) {
+
+            if (lowestUnsorted == -1 && bCmp < beneath) {
                 lowestUnsorted = i + 1;
             }
 
-            beneath = b;
+            beneath = bCmp;
             i--;
         }
 

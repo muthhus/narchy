@@ -24,7 +24,6 @@ import nars.term.container.TermVector;
 import nars.term.subst.Unify;
 import nars.time.Tense;
 import nars.truth.TruthDelta;
-import nars.util.NLPGen;
 import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -216,13 +215,13 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
             logger.info("{} <== {}\t{}", alias, abbreviatedTerm, abbreviationTask);
         }
 
-        final NLPGen nlpGen = new NLPGen();
-
-        @Nullable private String newCanonicalTerm(@NotNull Termed abbreviated) {
-            if (abbreviated.volume() < 12)
-                return "\"" + nlpGen.toString(abbreviated.term(), 1f, 1f, Tense.Eternal) + "\"";
-            return null;
-        }
+//        final NLPGen nlpGen = new NLPGen();
+//
+//        @Nullable private String newCanonicalTerm(@NotNull Termed abbreviated) {
+//            if (abbreviated.volume() < 12)
+//                return "\"" + nlpGen.toString(abbreviated.term(), 1f, 1f, Tense.Eternal) + "\"";
+//            return null;
+//        }
 
         @Nullable
         static Compound newRelation(@NotNull Concept abbreviated, @NotNull String id) {
