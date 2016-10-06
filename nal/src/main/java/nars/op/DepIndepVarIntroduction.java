@@ -53,13 +53,12 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     final static int ConjOrStatementBits = Op.StatementBits | Op.CONJ.bit;
     final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
+    static final Predicate<Term> condition = subterm -> !subterm.isAny(DepOrIndepBits);
 
     @Nullable
     @Override
     protected Term[] select(Compound input) {
-        Predicate<Term> condition = subterm -> !subterm.isAny(DepOrIndepBits);
         return Terms.substAllRepeats(input, condition, 2);
-        //return Terms.substRoulette(input, condition, 2, rng);
     }
 
     @Override
@@ -142,10 +141,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         public @NotNull Term function(@NotNull Compound args) {
             Term x = args.term(0);
             if (x instanceof Compound) {
-                List<Compound> l = $.newArrayList();
-                introducer.accept((Compound)x, l::add);
-                if (!l.isEmpty())
-                    return l.get(0);
+                Term[] only = new Term[] { False };
+                introducer.accept((Compound)x, y -> only[0] = y);
+                return only[0];
             }
             return False;
         }

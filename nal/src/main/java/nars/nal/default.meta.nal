@@ -2,16 +2,7 @@
 
 
 // Variable Introduction
-//    (A-->B), A                     |- varIntro((A-->B)), (Belief:IdentityTransform, Goal:IdentityTransform)
-//    (A-->B), B                     |- varIntro((A-->B)), (Belief:IdentityTransform, Goal:IdentityTransform)
-//    (A<->B), A                     |- varIntro((A<->B)), (Belief:IdentityTransform, Goal:IdentityTransform)
-//    (A && B), A, time(dtTask) |- varIntro((A &&+- B)), (Belief:IdentityTransform, Goal:IdentityTransform)
-//    //(&&, X, A..+), X, time(dtTask) |- varIntro((&&, X, A..+)), (Belief:IdentityTransform, Goal:IdentityTransform)
-//    (A==>B), A, time(dtTask)       |- varIntro((A ==>+- B)), (Belief:IdentityTransform, Goal:IdentityTransform)
-//    (A==>B), B, time(dtTask)       |- varIntro((A ==>+- B)), (Belief:IdentityTransform, Goal:IdentityTransform)
-//    (A<=>B), A, time(dtTask)       |- varIntro((A <=>+- B)), (Belief:IdentityTransform, Goal:IdentityTransform)
-
-    X, Y, time(dtTask)       |- varIntro(X), (Belief:IdentityTransform, Goal:IdentityTransform)
+    X, Y, component(task,belief), time(dtTask)       |- varIntro(X), (Belief:IdentityTransform, Goal:IdentityTransform)
 
 //The rules of NAL, can be interpreted by considering the intiution behind the following two relations:
 // Statement:                 (A --> B):               A can stand for B
@@ -56,10 +47,10 @@
 //                (A --> C)
 //If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
 
-(A --> B), (B --> C), neqRec(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)
-(A --> B), (A --> C), neqRec(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak)
-(A --> C), (B --> C), neqRec(A,B) |- (A --> B), (Belief:Induction, Goal:Weak)
-(A --> B), (B --> C), neqRec(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak)
+    (A --> B), (B --> C), neqRec(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)
+    (A --> B), (A --> C), neqRec(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak)
+    (A --> C), (B --> C), neqRec(A,B) |- (A --> B), (Belief:Induction, Goal:Weak)
+    (A --> B), (B --> C), neqRec(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak)
 
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
@@ -318,7 +309,7 @@
          //(&&,X,A), B, time(decomposeTask) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
 //substitutionViaSimilarity
-     X, (B<->C), contains(X,B), neqCom(X,C) |- substitute(X,B,C), (Belief:Intersection, Goal:Intersection)
+     X, (B<->C), neqCom(X,C) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
 
 //desire spreading by similarity
      S, (S<->P) |- P, (Goal:Intersection)
@@ -403,15 +394,15 @@
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
-    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U), (Belief:Deduction)
+    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U,strict), (Belief:Deduction)
 
 
 
 //// second level variable handling rules ////////////////////////////////////////////////////////////////////////////////////
 //second level variable elimination (termlink level2 growth needed in order for these rules to work)
 
-    (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)), time(dtBeliefExact) |- substitute((&&, (#X --> L), A), $Y,B), (Belief:Deduction)
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), time(dtBeliefExact) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
+    (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)), time(dtBeliefExact) |- substitute((&&, (#X --> L), A), $Y, B, strict), (Belief:Deduction)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), time(dtBeliefExact) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B, strict), (Belief:AnonymousAnalogy)
 
 //    (B --> K), (&&,(#X --> L),(($Y --> K) ==> (&&,A..+))), time(dtBeliefExact) |- substitute((&&,(#X --> L),A..+),$Y,B), (Belief:Deduction)
 //    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A)), time(dtBeliefExact) |- substitute((($X --> L) ==>+- A),#Y,B), (Belief:AnonymousAnalogy)
@@ -541,8 +532,8 @@
 
 
 ////composition on both sides of a statement  TODO - quests handling of these
-    ((A..+) <-> Z), (X <-> Y), contains(A..+,X), task("?") |- ((A..+) <-> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((A..+) --> Z), (X --> Y), contains(A..+,X), task("?") |- ((A..+) --> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((A..+) <-> Z), (X <-> Y), task("?") |- ((A..+) <-> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((A..+) --> Z), (X --> Y), task("?") |- ((A..+) --> substitute((A..+),X,Y)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 
 

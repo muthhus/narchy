@@ -727,7 +727,6 @@ public class Terms   {
                 }
             }
 
-
             return oi.toArray(new Term[oi.size()]);
         }
         return null;

@@ -76,7 +76,7 @@ public class SideCraft extends SwingAgent {
         });
         actionToggle("cra:(key,mouseL)", (b) -> craft.leftClick = b);
         actionToggle("cra:(key,mouseR)", (b) -> craft.rightClick = b);
-        float mSpeed = 25f;
+        float mSpeed = 45f;
         actionBipolar("cra:(mouse,X)", (v) -> {
             int x = craft.screenMousePos.x;
             int xx = Util.clamp(x + v * mSpeed, 0, camBuffer.getWidth() - 1);

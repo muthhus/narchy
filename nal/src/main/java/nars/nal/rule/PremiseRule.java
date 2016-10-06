@@ -42,6 +42,7 @@ import java.util.function.BiConsumer;
 import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.VAR_PATTERN;
+import static nars.nal.meta.TaskBeliefSubterms.withinNonCommutive;
 import static nars.term.Terms.*;
 
 /**
@@ -92,15 +93,13 @@ public class PremiseRule extends GenericCompound {
     /**
      * conditions which can be tested before term matching
      */
-    public BoolCondition[] precon;
-
+    public BoolCondition[] pre;
 
     public PostCondition[] postconditions;
 
 //    public PatternCompound pattern;
 
     //it has certain pre-conditions, all given as predicates after the two input premises
-
 
 
     /**
@@ -117,7 +116,6 @@ public class PremiseRule extends GenericCompound {
     private @Nullable TimeFunctions timeFunction = TimeFunctions.Auto;
 
 
-
     @Nullable
     private static final CompoundTransform<Compound, Term> truthSwap = new PremiseTruthTransform(true, true) {
         @Override
@@ -125,13 +123,13 @@ public class PremiseRule extends GenericCompound {
             return $.the(func.toString() + 'X');
         }
     };
-    @Nullable
-    private static final CompoundTransform<Compound, Term> truthNegate = new PremiseTruthTransform(true, true) {
-        @Override
-        public Term apply(@NotNull Term func) {
-            return $.the(func.toString() + 'N');
-        }
-    };
+//    @Nullable
+//    private static final CompoundTransform<Compound, Term> truthNegate = new PremiseTruthTransform(true, true) {
+//        @Override
+//        public Term apply(@NotNull Term func) {
+//            return $.the(func.toString() + 'N');
+//        }
+//    };
 
     @NotNull
     public final Compound getPremise() {
@@ -199,12 +197,11 @@ public class PremiseRule extends GenericCompound {
 
         //PREFIX
         {
-            addAll(s, precon);
+            addAll(s, pre);
 
             s.add(truth);
 
-
-            addAll(s, match.preconditions);
+            addAll(s, match.pre);
         }
 
         List<Term> l = sort(new FasterList(s));
@@ -215,16 +212,13 @@ public class PremiseRule extends GenericCompound {
             addAll(l, match.procedure);
 
             l.add(truth.conclude); //will be linked to and invoked by match callbacks
+
         }
 
         return l;
     }
 
-    public void setAllowBackward() {
-        allowBackward = true;
-    }
-
-//    public static void eachOperator(NAR nar, BiConsumer<Class, TermTransform> eachTransform) {
+    //    public static void eachOperator(NAR nar, BiConsumer<Class, TermTransform> eachTransform) {
 //        for (Class<? extends TermTransform> c : PremiseRule.Operators) {
 //
 //            Constructor<?>[] ccc = c.getConstructors();
@@ -257,7 +251,6 @@ public class PremiseRule extends GenericCompound {
 //    }
 
 
-
     /**
      * higher is earlier
      */
@@ -282,15 +275,8 @@ public class PremiseRule extends GenericCompound {
         put(Solve.class, 10);
 
 
-
-
-
-
-
 //        put(BeliefNegative.class, 7);
 //        put(BeliefPositive.class, 7);
-
-
 
 
 //        put(SubTermOp.class, 10);
@@ -509,20 +495,20 @@ public class PremiseRule extends GenericCompound {
     public final PremiseRule normalizeRule(@NotNull PatternIndex index) {
         //try {
 
-            //HACK
-            Compound ss = (Compound) index.transform(this, UppercaseAtomsToPatternVariables);
-            if (ss == null)
-                throw new RuntimeException("unnormalizable: " + this);
+        //HACK
+        Compound ss = (Compound) index.transform(this, UppercaseAtomsToPatternVariables);
+        if (ss == null)
+            throw new RuntimeException("unnormalizable: " + this);
 
-            Term tt = index.transform(ss, new PremiseRuleVariableNormalization());
+        Term tt = index.transform(ss, new PremiseRuleVariableNormalization());
 
-            if (tt == null)
-                throw new RuntimeException("unnormalizable: " + this);
+        if (tt == null)
+            throw new RuntimeException("unnormalizable: " + this);
 
         Compound premiseComponents = (Compound) index.get(tt, true);
 
 
-            return new PremiseRule(premiseComponents);
+        return new PremiseRule(premiseComponents);
 
 //        } catch (Exception e) {
 //            e.printStackTrace();
@@ -546,12 +532,10 @@ public class PremiseRule extends GenericCompound {
         Term[] postcons = ((Compound) term(1)).terms();
 
 
-
         Set<BoolCondition> pres =
                 //Global.newArrayList(precon.length);
                 new TreeSet(); //for consistent ordering to maximize folding
 
-        List<BoolCondition> posts = newArrayList(precon.length);
 
 
         Term taskTermPattern = getTask();
@@ -580,8 +564,6 @@ public class PremiseRule extends GenericCompound {
             Term predicate_name = predicate.term(1);
 
             String predicateNameStr = predicate_name.toString().substring(1);//.replace("^", "");
-
-            BoolCondition next = null;
 
             Term[] args;
             Term X, Y;
@@ -637,7 +619,7 @@ public class PremiseRule extends GenericCompound {
                     //assumes arity=2 but arity=1 support can be written
                     constraints.put(X, new OpConstraint(Op.SETe));
                     constraints.put(Y, new OpConstraint(Op.SETe));
-                    pres.add( new SubTermsStructure(Op.SETe.bit) );
+                    pres.add(new SubTermsStructure(Op.SETe.bit));
                     ////additionally prohibits the two terms being equal
                     neq(constraints, X, Y);
                     break;
@@ -646,7 +628,7 @@ public class PremiseRule extends GenericCompound {
                     //assumes arity=2 but arity=1 support can be written
                     constraints.put(X, new OpConstraint(Op.SETi));
                     constraints.put(Y, new OpConstraint(Op.SETi));
-                    pres.add( new SubTermsStructure(Op.SETi.bit) );
+                    pres.add(new SubTermsStructure(Op.SETi.bit));
                     //additionally prohibits the two terms being equal
                     neq(constraints, X, Y);
                     break;
@@ -663,23 +645,31 @@ public class PremiseRule extends GenericCompound {
                 case "events":
                     throw new RuntimeException("depr");
 
-                case "contains":
-                    posts.add( new Contains(X, Y) );
+//                case "contains":
+//                    pres.add(new ContainedBy(withinNonCommutive(taskTermPattern, beliefTermPattern, X, Y)));
+//                    break;
+
+                case "component":
+                    if (X.toString().equals("task") && Y.toString().equals("belief")) {
+                        pres.add(new ComposedBy(0,1));
+                    } else {
+                        throw new UnsupportedOperationException();
+                    }
                     break;
 
                 case "time":
                     switch (X.toString()) {
                         case "after":
-                            pres.add( events.after );
+                            pres.add(events.after);
                             break;
 
                         case "eternal":
-                            pres.add( events.eternal );
+                            pres.add(events.eternal);
                             timeFunction = TimeFunctions.dternal;
                             break;
 
                         case "afterOrEternal":
-                            pres.add( events.afterOrEternal );
+                            pres.add(events.afterOrEternal);
                             break;
                         /*case "taskPredicate":
                             pres.add( events.taskPredicate;
@@ -713,19 +703,19 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = TimeFunctions.decomposeTask;
                             break;
                         case "decomposeTaskIfTemporal":
-                            pres.add( events.taskNotDTernal);
+                            pres.add(events.taskNotDTernal);
                             timeFunction = TimeFunctions.decomposeTask;
                             break;
 
 
                         case "decomposeTaskIfTermLinkBefore":
                             timeFunction = TimeFunctions.decomposeTask;
-                            pres.add( IfTermLinkBefore.ifTermLinkBefore );
+                            pres.add(IfTermLinkBefore.ifTermLinkBefore);
                             break;
 
                         case "decomposeTaskIfBeliefBefore":
                             timeFunction = TimeFunctions.decomposeTask;
-                            pres.add( IfTermLinkBefore.ifBeliefBefore );
+                            pres.add(IfTermLinkBefore.ifBeliefBefore);
                             break;
 
                         case "decomposeBelief":
@@ -738,7 +728,7 @@ public class PremiseRule extends GenericCompound {
 
                         case "dtForward":
                             timeFunction = TimeFunctions.occForward;
-                            pres.add( events.bothTemporal);
+                            pres.add(events.bothTemporal);
                             break;
 
                         case "dtReverse":
@@ -750,25 +740,25 @@ public class PremiseRule extends GenericCompound {
 
                         case "dtBefore":
                             timeFunction = TimeFunctions.occForward; //may need reversed or changed
-                            pres.add( events.before );
+                            pres.add(events.before);
                             break;
 
                         case "dtAfter":
                             timeFunction = TimeFunctions.occForward;
-                            pres.add( events.after );
+                            pres.add(events.after);
                             break;
                         case "dtAfterReverse":
                             timeFunction = TimeFunctions.occReverse;
-                            pres.add( events.after );
+                            pres.add(events.after);
                             break;
 
                         case "dtAfterOrEternal":
                             timeFunction = TimeFunctions.occForward;
-                            pres.add( events.afterOrEternal );
+                            pres.add(events.afterOrEternal);
                             break;
                         case "dtAfterOrEternalReverse":
                             timeFunction = TimeFunctions.occReverse;
-                            pres.add( events.afterOrEternal );
+                            pres.add(events.afterOrEternal);
                             break;
 
                         case "dtTminB":
@@ -860,29 +850,29 @@ public class PremiseRule extends GenericCompound {
                 case "task":
                     switch (X.toString()) {
                         case "negative":
-                            pres.add( TaskNegative.the );
+                            pres.add(TaskNegative.the);
                             break;
                         case "positive":
-                            pres.add( TaskPositive.the );
+                            pres.add(TaskPositive.the);
                             break;
                         case "\"?\"":
-                            pres.add( TaskPunctuation.Question);
+                            pres.add(TaskPunctuation.Question);
                             taskPunc = '?';
                             break;
                         case "\"?@\"":
-                            pres.add( TaskPunctuation.QuestionOrQuest);
+                            pres.add(TaskPunctuation.QuestionOrQuest);
                             taskPunc = '?'; //this will choose quest as punctuation type when necessary, according to the task
                             break;
                         case "\"@\"":
-                            pres.add( TaskPunctuation.Quest );
+                            pres.add(TaskPunctuation.Quest);
                             taskPunc = '@';
                             break;
                         case "\".\"":
-                            pres.add( TaskPunctuation.Belief );
+                            pres.add(TaskPunctuation.Belief);
                             taskPunc = '.';
                             break;
                         case "\"!\"":
-                            pres.add( TaskPunctuation.Goal );
+                            pres.add(TaskPunctuation.Goal);
                             taskPunc = '!';
                             break;
                         case "all":
@@ -899,8 +889,6 @@ public class PremiseRule extends GenericCompound {
 
             }
 
-            if (next != null)
-                posts.add(next);
 
         }
 
@@ -917,8 +905,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         //store to arrays
-        this.precon = pres.toArray(new BoolCondition[pres.size()]);
-
+        this.pre = pres.toArray(new BoolCondition[pres.size()]);
 
         List<PostCondition> postConditions = newArrayList();
 
@@ -1001,47 +988,15 @@ public class PremiseRule extends GenericCompound {
     }
 
     public boolean neqPrefilter(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2) {
-        //locate an occurrence of arg1
-        int t1 = 0;
-        byte[] p1 = nonCommutivePathTo(task, arg1);
-        if (p1 == null) {
-            t1 = 1;
-            p1 = nonCommutivePathTo(belief, arg1);
+        TaskBeliefSubterms tb = withinNonCommutive(task, belief, arg1, arg2);
+        if (tb != null) {
+            //cheaper to compute this in precondition
+            pres.add(TermNotEquals.the(tb));
+            return true;
         }
-        if (p1 != null) {
 
-            //locate an occurrence of arg2
-            int t2 = 0;
-            byte[] p2 = nonCommutivePathTo(task, arg2);
-            if (p2 == null) {
-                t2 = 1;
-                p2 = nonCommutivePathTo(belief, arg2);
-            }
-
-            if (p2 != null) {
-                //cheaper to compute this in precondition
-                pres.add(TermNotEquals.the(t1, p1, t2, p2));
-                return true;
-            }
-        }
         return false;
     }
-
-    static @Nullable byte[] nonCommutivePathTo(@NotNull Term term, @NotNull Term arg1) {
-        byte[] p = term.pathTo(arg1);
-        if (p == null) return null;
-        if (p.length == 0) return p;
-        //verify that the path does not select a subterm of a commutive term
-
-        for (int i = 0; i < 1+p.length; i++) {
-            Term s = ((Compound)term).subterm(ArrayUtils.subarray(p, 0, i));
-            if (s.isCommutative())
-                return null;
-        }
-        return p;
-    }
-
-
 
 
     /**
@@ -1058,19 +1013,19 @@ public class PremiseRule extends GenericCompound {
      */
     public final void backwardPermutation(@NotNull PatternIndex index, @NotNull BiConsumer<PremiseRule, String> w) {
 
-            Term T = getTask(); //Task
-            Term B = getBelief(); //Belief
-            Term C = getConclusionTermPattern(); //Conclusion
+        Term T = getTask(); //Task
+        Term B = getBelief(); //Belief
+        Term C = getConclusionTermPattern(); //Conclusion
 
-            // C, B, [pre], task_is_question() |- T, [post]
-            PremiseRule clone1 = clonePermutation(C, B, T, true, index);
-            if (clone1!=null)
-                w.accept(clone1, "C,B,question |- B");
+        // C, B, [pre], task_is_question() |- T, [post]
+        PremiseRule clone1 = clonePermutation(C, B, T, true, index);
+        if (clone1 != null)
+            w.accept(clone1, "C,B,question |- B");
 
-            // T, C, [pre], task_is_question() |- B, [post]
-            PremiseRule clone2 = clonePermutation(T, C, B, true, index);
-            if (clone2!=null)
-                w.accept(clone2, "T,C,question |- B");
+        // T, C, [pre], task_is_question() |- B, [post]
+        PremiseRule clone2 = clonePermutation(T, C, B, true, index);
+        if (clone2 != null)
+            w.accept(clone2, "T,C,question |- B");
 
 
     }
@@ -1212,14 +1167,14 @@ public class PremiseRule extends GenericCompound {
 
 
             //remove truth values and add '?' punct
-            TermContainer ss = ((Compound)newConclusion.term(1)).subterms();
+            TermContainer ss = ((Compound) newConclusion.term(1)).subterms();
             newConclusion = p(
 
-                newConclusion.term(0), $.p(ss.filter((x) -> {
-                        return !(((Compound)x).op() == Op.INH && (
-                                   ((Compound) x).term(1).equals($.the("Belief"))
-                                || ((Compound) x).term(1).equals($.the("Goal"))));
-                }).append($("Punctuation:Question")))
+                    newConclusion.term(0), $.p(ss.filter((x) -> {
+                        return !(((Compound) x).op() == Op.INH && (
+                                ((Compound) x).term(1).equals($.the("Belief"))
+                                        || ((Compound) x).term(1).equals($.the("Goal"))));
+                    }).append($("Punctuation:Question")))
             );
 
         } else {

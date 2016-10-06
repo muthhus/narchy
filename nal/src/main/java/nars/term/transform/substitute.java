@@ -1,5 +1,7 @@
 package nars.term.transform;
 
+import com.google.common.base.Objects;
+import nars.$;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
@@ -10,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 public final class substitute extends TermTransformOperator  {
 
     @NotNull private final PremiseEval parent;
+
+    final static Term STRICT = $.the("strict");
 
     public substitute(@NotNull PremiseEval parent) {
         super("substitute");
@@ -31,6 +35,13 @@ public final class substitute extends TermTransformOperator  {
 
         //replacement term (y)
         final Term y = parent.yxResolve(xx[2]);
+
+        final Term strict = xx.length > 3 ? xx[3] : null;
+        if (Objects.equal(strict, STRICT)) {
+            if (term instanceof Compound && !((Compound)term).containsTermRecursively(x)) {
+                return False;
+            }
+        }
 
         return parent.transform(term, new MapSubst.MapSubstWithOverride(parent.yx,  x, y));
     }

@@ -41,7 +41,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
     @NotNull
     public final Term[] procedure;
     @NotNull
-    public final Term[] preconditions;
+    public final Term[] pre;
 
 //    @NotNull
 //    public final Term term;
@@ -61,7 +61,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
         compile(pattern, pre, code, index, constraints);
 
-        this.preconditions = pre.toArray(new BoolCondition[pre.size()]);
+        this.pre = pre.toArray(new BoolCondition[pre.size()]);
         this.procedure = code.toArray(new BoolCondition[code.size()]);
 
 

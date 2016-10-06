@@ -141,7 +141,7 @@ public class PostCondition implements Serializable, Level //since there can be m
 
                 case "Permute":
                     if (which.equals(PostCondition.backward))
-                        rule.setAllowBackward();
+                        rule.allowBackward = true;
                     if (which.equals(PostCondition.swap))
                         rule.allowForward = true;
                     break;

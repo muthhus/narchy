@@ -34,15 +34,17 @@ public enum TermLinkBuilder {
 
     private static int levels(Compound host) {
         switch (host.op()) {
+            case PROD:
             case SETe:
             case SETi:
-            case IMGe:
-            case IMGi:
-            case PROD:
             case DIFFe:
             case DIFFi:
             case SECTi:
             case SECTe:
+            case IMGe:
+            case IMGi:
+                return 1;
+
             case INH:
             case SIM:
                 return 2;

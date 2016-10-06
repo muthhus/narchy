@@ -619,6 +619,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void implSubstitutionViaSimilarityReverse()  {
         test()
+                .log()
                 .input("(a:b<->c:d).") //ETERNAL
                 .input("(e:f ==>+1 c:d). :|:") //PRESENT
                 .mustBelieve(cycles, "(e:f ==>+1 a:b)", 1.0f, 0.81f, 0)

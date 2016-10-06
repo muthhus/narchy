@@ -45,7 +45,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     @NotNull
     public final PremiseRule rule;
-    private final @NotNull TimeFunctions temporalizer;
+    private final @NotNull TimeFunctions time;
 
     /**
      * result pattern
@@ -58,11 +58,11 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
 
     public Conclude(@NotNull PremiseRule rule, @NotNull Term term,
-                    @Deprecated boolean eternalize, @NotNull TimeFunctions temporalizer) {
+                    @Deprecated boolean eternalize, @NotNull TimeFunctions time) {
         super("Derive(" +
                 Joiner.on(',').join(
                         term,
-                        "temporal" + Integer.toHexString(temporalizer.hashCode()) //HACK todo until names are given to unique classes
+                        "time" + Integer.toHexString(time.hashCode()) //HACK todo until names are given to unique classes
                         //belief != null ? belief : "_",
                         //goal != null ? goal : "_",
                         //eternalize ? "Et" : "_") +
@@ -77,7 +77,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
 
         //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
-        this.temporalizer = temporalizer;
+        this.time = time;
 
         this.eternalize = eternalize;
 
@@ -164,7 +164,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             long[] occReturn = {ETERNAL};
             float[] confScale = {1f};
 
-            Compound temporalized = this.temporalizer.compute(content,
+            Compound temporalized = this.time.compute(content,
                     m, this, occReturn, confScale
             );
 
@@ -172,7 +172,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             if (temporalized == null)
                 return;
 
-            if (temporalized.dt() == XTERNAL || temporalized.dt() == -XTERNAL) {
+            int tdt = temporalized.dt();
+            if (tdt == XTERNAL || tdt == -XTERNAL) {
                    // || Math.abs(occReturn[0] - DTERNAL) < 1000) { //tempoary
 //                this.temporalizer.compute(content,
 //                        m, this, occReturn, confScale

@@ -25,7 +25,7 @@ public class TopCraft extends SwingAgent {
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 5500);
+        run(TopCraft::new, 555500);
     }
 
     public TopCraft(NAR nar) {
@@ -58,10 +58,6 @@ public class TopCraft extends SwingAgent {
 
         InputHandler input = craft.input;
         actionToggleRapid("(fire)", (b) -> input.attack.toggle(b), 16 );
-//        actionToggleRapid("(move,(0,1))", (b) -> input.up.toggle(b), 32 );
-//        actionToggleRapid("(move,(0,-1))", (b) -> input.down.toggle(b),32 );
-//        actionToggleRapid("(move,(-1,0))", (b) -> input.left.toggle(b),32 );
-//        actionToggleRapid("(move,(1,0))", (b) -> input.right.toggle(b),32 );
         actionTriState("(move,x)", (i)->{
            boolean l = false, r = false;
            switch (i) {
