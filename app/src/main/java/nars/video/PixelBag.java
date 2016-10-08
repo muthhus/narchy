@@ -38,7 +38,7 @@ public class PixelBag implements Bitmap2D {
 
     public final float[][] pixels;
 
-    private int pixMin = 3;
+    private int pixMin = 5;
 
     /** increase >1 to allow zoom out beyond input size (ex: thumbnail size) */
     float maxZoomOut = 1;

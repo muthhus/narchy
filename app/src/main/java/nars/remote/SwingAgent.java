@@ -83,7 +83,7 @@ abstract public class SwingAgent extends NAgent {
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
         Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the",
-                volMax/2, volMax-2, 0.02f, 32);
+                Math.round(volMax*3f/4), volMax*3-2, 0.01f, 64);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;
@@ -109,7 +109,7 @@ abstract public class SwingAgent extends NAgent {
 
                         //Vis.concepts(nar, 512),
 
-                        Vis.agentActions(a, history),
+                        Vis.agentActions(a, history*a.frameRate),
 
                         Vis.budgetHistogram(nar, 32),
                         Vis.conceptLinePlot(nar,

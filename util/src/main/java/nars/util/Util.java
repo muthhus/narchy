@@ -1285,7 +1285,7 @@ public enum Util { ;
         int ba = b - a;
         int[] x = new int[ba];
         for (int i = 0; i < ba; i++) {
-            x[i+a] = i;
+            x[i] = a + i;
         }
         return x;
     }

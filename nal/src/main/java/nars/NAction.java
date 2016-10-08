@@ -157,9 +157,20 @@ public interface NAction {
      *
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
-    default ActionConcept actionBipolar(String s, FloatPredicate update) {
+    default ActionConcept action(String s, ActionConcept.MotorFunction update) {
+        ActionConcept m = new ActionConcept(s, nar(), update);
+        actions().add(m);
+        return m;
+    }
 
-        ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
+    /** the supplied value will be in the range -1..+1. if the predicate returns false, then
+     * it will not allow feedback through. this can be used for situations where the action
+     * hits a limit or boundary that it did not pass through.
+     *
+     * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
+     */
+    default ActionConcept actionBipolar(String s, FloatPredicate update) {
+        return action(s, (b, d) -> {
             if (d!=null) {
                 float f = d.freq();
                 float y = (f - 0.5f) * 2f;
@@ -172,9 +183,6 @@ public interface NAction {
             }
             return null;
         });
-
-        actions().add(m);
-        return m;
     }
 
     default ActionConcept actionRangeIncrement(String s, IntSupplier in, int dx, int min, int max, IntConsumer out) {
