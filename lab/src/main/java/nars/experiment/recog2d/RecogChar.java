@@ -36,6 +36,7 @@ public class RecogChar extends SwingAgent {
         g = ((Graphics2D) canvas.getGraphics());
 
         g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 24 ));
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         //senseSwitch("(current)", ()-> train ? -1 : image , -1, maxImages);
 
@@ -80,7 +81,7 @@ public class RecogChar extends SwingAgent {
 
     protected int nextImage() {
 
-        image = (image+1) % maxImages;
+        image = nar.random.nextInt(maxImages);
 
         g.clearRect(0, 0, w, h);
         FontMetrics fontMetrics = g.getFontMetrics();

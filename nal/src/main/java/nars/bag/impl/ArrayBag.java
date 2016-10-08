@@ -406,7 +406,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 int lowestUnsorted = updateExisting(each, s);
 
                 if (lowestUnsorted != -1) {
-                    qsort(new int[24 /* estimate */], items.array(), 0 /*dirtyStart - 1*/, s);
+                    qsort(new int[24 /* estimate */], items.array(), 0 /*dirtyStart - 1*/, s-1);
                 } // else: perfectly sorted
 
                 updateRange();
@@ -549,21 +549,22 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * http://kosbie.net/cmu/summer-08/15-100/handouts/IterativeQuickSort.java
      */
 
-    public static void qsort(int[] stack, BLink[] c, int start, int size) {
-        int left = start, right = size - 1, stack_pointer = -1;
+    public static void qsort(int[] stack, BLink[] c, int left, int right) {
+        int stack_pointer = -1;
         while (true) {
             int i, j;
             if (right - left <= 7) {
                 BLink swap;
-                //bubble sort on a region of size less than 8?
+                //bubble sort on a region of right less than 8?
                 for (j = left + 1; j <= right; j++) {
                     swap = c[j];
                     i = j - 1;
                     float swapV = cmp(swap);
                     while (i >= left && cmpGT(c[i], swapV)) {
-                        BLink x = c[i];
-                        c[i] = c[i + 1];
-                        c[i + 1] = x;
+                        swap(c, i+1, i);
+//                        BLink x = c[i];
+//                        c[i] = c[i + 1];
+//                        c[i + 1] = x;
                         i--;
                     }
                     c[i + 1] = swap;
@@ -580,24 +581,17 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 int median = (left + right) >> 1;
                 i = left + 1;
                 j = right;
-                swap = c[median];
-                c[median] = c[i];
-                c[i] = swap;
+
+                swap(c, i, median);
 
                 if (cmpGT(c[left], c[right])) {
-                    swap = c[left];
-                    c[left] = c[right];
-                    c[right] = swap;
+                    swap(c, right, left);
                 }
                 if (cmpGT(c[i], c[right])) {
-                    swap = c[i];
-                    c[i] = c[right];
-                    c[right] = swap;
+                    swap(c, right, i);
                 }
                 if (cmpGT(c[left], c[i])) {
-                    swap = c[left];
-                    c[left] = c[i];
-                    c[i] = swap;
+                    swap(c, i, left);
                 }
 
                 {
@@ -610,9 +604,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                         if (j < i) {
                             break;
                         }
-                        swap = c[i];
-                        c[i] = c[j];
-                        c[j] = swap;
+                        swap(c, j, i);
                     }
 
                     c[left + 1] = c[j];
@@ -634,6 +626,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 stack[++stack_pointer] = b;
             }
         }
+    }
+
+    public static void swap(BLink[] c, int x, int y) {
+        BLink swap;
+        swap = c[y];
+        c[y] = c[x];
+        c[x] = swap;
     }
 
     //    final Comparator<? super BLink<V>> comparator = (a, b) -> {

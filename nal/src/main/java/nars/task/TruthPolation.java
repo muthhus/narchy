@@ -66,7 +66,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
         long minT = Long.MAX_VALUE, maxT = Long.MIN_VALUE;
 
-        int volume = -1;
+        int volume = tasks[0].term().volume();
         int i = 0;
         for (Task t : tasks) {
 

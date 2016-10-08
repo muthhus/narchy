@@ -73,7 +73,7 @@ public class Vis {
         s.add(new BeliefTableChart(nar, a.happy, btRange));
         s.add(new BeliefTableChart(nar, a.joy, btRange));
 
-        return new GridSurface(VERTICAL, s);
+        return new GridSurface(s);
     }
 
     public static void show(Default d) {
