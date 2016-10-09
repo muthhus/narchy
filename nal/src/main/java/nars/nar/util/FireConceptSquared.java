@@ -13,6 +13,7 @@ import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import nars.util.data.list.FasterList;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public class FireConceptSquared extends Conclusion {
     public final int premisesFired;
 
 
-    public FireConceptSquared(Concept c, NAR nar, int tasklinks, int termlinks, Consumer<Task> batch) {
+    public FireConceptSquared(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> batch) {
         super(batch);
 
         int count = 0;

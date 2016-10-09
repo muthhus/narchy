@@ -25,7 +25,7 @@ public class TopCraft extends SwingAgent {
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 555500);
+        run(TopCraft::new, 5500);
     }
 
     public TopCraft(NAR nar) {
@@ -50,15 +50,15 @@ public class TopCraft extends SwingAgent {
         sense("(health)", ()->(craft.player.health)/((float)craft.player.maxHealth));
 
         int tileMax = 13;
-        senseSwitch("(tile,(0,0))", ()->craft.player.tile().id, 0, tileMax);
-        senseSwitch("(tile,(0,1))", ()->craft.player.tile(0,1).id, 0, tileMax);
-        senseSwitch("(tile,(0,-1))", ()->craft.player.tile(0,-1).id, 0, tileMax);
-        senseSwitch("(tile,(1,0))", ()->craft.player.tile(1,0).id, 0, tileMax);
-        senseSwitch("(tile,(-1,0))", ()->craft.player.tile(-1,0).id, 0, tileMax);
+        senseSwitch("tile:here", ()->craft.player.tile().id, 0, tileMax);
+        senseSwitch("tile:up", ()->craft.player.tile(0,1).id, 0, tileMax);
+        senseSwitch("tile:down", ()->craft.player.tile(0,-1).id, 0, tileMax);
+        senseSwitch("tile:right", ()->craft.player.tile(1,0).id, 0, tileMax);
+        senseSwitch("tile:left", ()->craft.player.tile(-1,0).id, 0, tileMax);
 
         InputHandler input = craft.input;
         actionToggleRapid("(fire)", (b) -> input.attack.toggle(b), 16 );
-        actionTriState("(move,x)", (i)->{
+        actionTriState("move:x", (i)->{
            boolean l = false, r = false;
            switch (i) {
                case -1: l = true;  break;
@@ -67,7 +67,7 @@ public class TopCraft extends SwingAgent {
            input.left.toggle(l);
            input.right.toggle(r);
         });
-        actionTriState("(move,y)", (i)->{
+        actionTriState("move:y", (i)->{
             boolean u = false, d = false;
             switch (i) {
                 case -1:  u = true;  break;
@@ -94,12 +94,10 @@ public class TopCraft extends SwingAgent {
     float prevScore = 0;
     @Override protected float act() {
 
-
-
         float nextScore = craft.frameImmediate();
         float ds = nextScore - prevScore;
         this.prevScore = nextScore;
-        float r = 0.5f * ds + 2f * (craft.player.health/((float)craft.player.maxHealth)-1f);// + 0.25f * (craft.player.stamina*((float)craft.player.maxStamina))-0.5f);
+        float r = ((ds/2f)-1) + - 2f * (craft.player.health/((float)craft.player.maxHealth)-0.5f);// + 0.25f * (craft.player.stamina*((float)craft.player.maxStamina))-0.5f);
         return r;
     }
 

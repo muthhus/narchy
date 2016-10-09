@@ -151,7 +151,7 @@ public interface Concept extends Termed {
     }
 
     @Nullable
-    default Truth desire(long when, long now) {
+    default Truth goal(long when, long now) {
         return goals().truth(when, now);
     }
 
@@ -161,8 +161,18 @@ public interface Concept extends Termed {
     }
 
     @Nullable
-    default Truth desire(long now) {
+    default Truth goal(long now) {
         return goals().truth(now);
+    }
+    @Nullable
+    default float goalConf(long now, float ifMissing) {
+        Truth t = goals().truth(now);
+        return (t!=null) ? t.conf() : ifMissing;
+    }
+    @Nullable
+    default float goalFreq(long now, float ifMissing) {
+        Truth t = goals().truth(now);
+        return (t!=null) ? t.freq() : ifMissing;
     }
 
 

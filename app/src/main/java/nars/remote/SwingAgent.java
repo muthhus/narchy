@@ -50,16 +50,16 @@ abstract public class SwingAgent extends NAgent {
 
         final Executioner exe =
             //new SingleThreadExecutioner();
-            new MultiThreadExecutioner(3, 1024*16);
+            new MultiThreadExecutioner(4, 1024*16);
 
-        int volMax = 45;
-        int conceptsPerCycle = 16;
+        int volMax = 40;
+        int conceptsPerCycle = 64;
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(1024,
+        Default nar = new Default(2048,
                 conceptsPerCycle, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*256, maxVol/2, false, exe)
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 200000, 8192, 2)
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 400000, 16384, 2)
 
                 , new FrameClock(), exe);
 
@@ -67,7 +67,7 @@ abstract public class SwingAgent extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.15f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
@@ -79,17 +79,17 @@ abstract public class SwingAgent extends NAgent {
         //nar.linkFeedbackRate.setValue(0.01f);
 
 
-        MySTMClustered stm = new MySTMClustered(nar, 16, '.', 3, true);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
         Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the",
-                Math.round(volMax*3f/4), volMax*3-2, 0.01f, 64);
+                Math.round(volMax*3f/4), volMax*3-2, 0.01f, 32);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;
 
 
-        int history = 100;
+        int history = 200;
         chart(a, history);
 
 

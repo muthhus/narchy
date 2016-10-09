@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -55,19 +56,25 @@ public class ConceptBagCycle implements Consumer<NAR> {
     public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
 
-    private final MutableInteger cyclesPerFrame;
+    @Deprecated private final MutableInteger cyclesPerFrame;
     private final ConceptBuilder conceptBuilder;
 
     //cached value for use in the next firing
     private int taskLinks, termLinks;
 
-//
+
+//    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
+//        Concept A = a.get();
+//        Concept B = b.get();
+//        String as = A!=null ? A.term
+//    };
+
 //    private static final Logger logger = LoggerFactory.getLogger(AbstractCore.class);
 
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
 
-    public ConceptBagCycle(@NotNull NAR nar, int initialCapacity, MutableInteger cyclesPerFrame) {
+    public ConceptBagCycle(@NotNull NAR nar, int initialCapacity, @Deprecated MutableInteger cyclesPerFrame) {
 
         this.nar = nar;
 
@@ -127,37 +134,23 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
     void cycle(int cpf) {
 
+        List<BLink<Concept>> toFire = $.newArrayList(cpf);
+
         concepts.commit();
-
-        List<BLink<Concept>> toFire = $.newArrayList();
-
-        //gather the concepts into a list before firing. if firing while sampling, the bag can block itself
-//        int cpfSampled = (int)Math.ceil(cpf * Param.BAG_OVERSAMPLING);
-//        concepts.sample(cpfSampled, toFire::add);
         concepts.sample(cpf, toFire::add);
 
-//        int conceptsFired = 0;
-//        int premisesFired = 0;
+        //toFire.sort(sortConceptLinks);
 
-        for (int i = 0, toFireSize = toFire.size(); i < toFireSize; i++) {
-            @Nullable Concept c = toFire.get(i).get();
+        nar.runLater(toFire, bc -> {
+            Concept c = bc.get();
             if (c != null) {
-                nar.runLaterMaybe(() -> {
-                    FireConceptSquared f = new FireConceptSquared(c, nar,
-                            taskLinks, termLinks,
-                            nar::input //input them within the current thread here
-                    );
-                });
+                new FireConceptSquared(c, nar,
+                        taskLinks, termLinks,
+                        nar::input //input them within the current thread here
+                );
             }
+        }, 2f);
 
-//                int p = f.premisesFired;
-//                if (p > 0) {
-//                    premisesFired += p;
-//                    conceptsFired++;
-//                }
-
-
-        }
     }
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */

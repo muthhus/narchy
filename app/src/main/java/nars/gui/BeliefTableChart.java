@@ -249,20 +249,11 @@ public class BeliefTableChart extends Surface {
         ge.glColor4f(0.3f + 0.7f * c, 0.1f, 0.1f, 0.75f + 0.2f * q);
         Draw.rect(ge, x - w / 2, y - h / 4, w, h / 2, dz);
     };
-    final static TaskRenderer beliefProjRenderer = (ge, q, c, w, h, x, y) -> {
-        float a = 0.1f + 0.9f * c;
-        ge.glColor4f(a * 0.8f, 0.1f, a * 0.5f, 0.75f + 0.25f * q);
-        Draw.rect(ge, x - w / 2, y - h / 4, w / 2, h / 2, dz);
-    };
+
     //vertical block
     final static TaskRenderer goalRenderer = (ge, q, c, w, h, x, y) -> {
         ge.glColor4f(0.1f, 0.3f + 0.7f * c, 0.1f, 0.7f + 0.2f * q);
         Draw.rect(ge, x - w / 4, y - h / 2, w / 2, h, dz);
-    };
-    final static TaskRenderer goalProjRenderer = (ge, q, c, w, h, x, y) -> {
-        float a = 0.1f + 0.9f * c;
-        ge.glColor4f(0.1f, a * 0.8f, a * 0.5f, 0.75f + 0.25f * q);
-        Draw.rect(ge, x - w / 4, y - h / 2, w / 2, h / 2, dz);
     };
 
 
@@ -323,7 +314,7 @@ public class BeliefTableChart extends Surface {
 
             TruthWave pwave = beliefProj;
             pwave.setProjected(table, minT, maxT, projections);
-            renderWaveLine(nowX, minT, maxT, gl, pwave, beliefOrGoal ? beliefProjRenderer : goalProjRenderer);
+            renderWaveLine(nowX, minT, maxT, gl, pwave, beliefOrGoal);
         }
 
         Truth bc = wave.current;
@@ -366,10 +357,17 @@ public class BeliefTableChart extends Surface {
             }
         });
     }
-    private void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, TaskRenderer r) {
+    private void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
 
         gl.glBegin(GL2.GL_LINE_STRIP);
-        gl.glLineWidth(1.0f);
+        gl.glLineWidth(2.0f);
+
+        if(beliefOrGoal) {
+            gl.glColor4f(1f, 0f, 0f, 0.5f);
+        }
+        else {
+            gl.glColor4f(0f, 1f, 0f, 0.5f);
+        }
 
         wave.forEach((freq, conf, o, qua) -> {
 

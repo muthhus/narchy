@@ -48,7 +48,7 @@ public class OperationConceptTest {
 
     public static void assertMotive(@NotNull NAR n, @NotNull Termed operation, float b, float g) {
         Concept c = n.concept(operation);
-        assertEquals(g, c.desire(n.time()).expectation(), 0.01f);
+        assertEquals(g, c.goal(n.time()).expectation(), 0.01f);
         if (b != b /* NaN */)
             assertTrue(c.beliefs().isEmpty());
         else

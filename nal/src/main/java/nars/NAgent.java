@@ -31,6 +31,7 @@ import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static nars.$.quote;
 import static nars.$.t;
 import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;
@@ -60,9 +61,9 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.25f;
+    public float alpha, gamma, epsilonProbability = 0.1f;
     @Deprecated
-    public float gammaEpsilonFactor = 0.5f;
+    public float gammaEpsilonFactor = 0.75f;
 
     final int curiosityMonitorDuration = 32; //frames
     final DescriptiveStatistics avgActionDesire = new DescriptiveStatistics(curiosityMonitorDuration);
@@ -372,9 +373,15 @@ abstract public class NAgent implements NSense, NAction {
     private void curiosity() {
         //Budget curiosityBudget = Budget.One.clone().multiplied(minSensorPriority.floatValue(), 0.5f, 0.9f);
 
-        float motorEpsilonProbability = epsilonProbability / actions.size() * (1f - (desireConf() / gamma));
+
         for (ActionConcept c : actions) {
+
+            float motorEpsilonProbability = epsilonProbability * (1f - Math.min(1f, c.goalConf(now, 0)/gamma));
+
             if (nar.random.nextFloat() < motorEpsilonProbability) {
+
+                //System.out.println(c + " " + c.goalConf(now, 0) + " -> " + motorEpsilonProbability);
+
                 nar.inputLater(
                     new GeneratedTask(c, GOAL,
                             $.t(nar.random.nextFloat()

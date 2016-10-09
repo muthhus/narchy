@@ -169,7 +169,7 @@ public interface Execution  {
 
         //Budgeted b = !operation.isDeleted() ? operation : UnitBudget.Zero;
 
-        return $.belief(operation.term(), operation.desire(nar.time())). //equal to input, balanced
+        return $.belief(operation.term(), operation.goal(nar.time())). //equal to input, balanced
                 //1f, DEFAULT_EXECUTION_CONFIDENCE).
 
                         //budget(b).

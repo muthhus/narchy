@@ -937,7 +937,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
             for (int i = 0; i < s; ) {
                 int start = i;
                 int end = Math.min(i + chunkSize, s);
-                runLater(() -> {
+                runLaterMaybe(() -> {
                     for (int j = start; j < end; j++) {
                         each.accept(items.get(j));
                     }

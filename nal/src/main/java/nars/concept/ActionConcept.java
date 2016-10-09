@@ -147,7 +147,7 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
 
         //boolean desireChange, beliefChange;
 
-        @Nullable Truth d = this.desire(now + decisionDT);
+        @Nullable Truth d = this.goal(now + decisionDT);
         this.currentDesire = d;
         //desireChange = (lastDesire == null || !lastDesire.equals(d));
 
