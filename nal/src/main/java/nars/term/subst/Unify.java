@@ -297,15 +297,15 @@ public abstract class Unify extends Termunator implements Subst {
      */
     public final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
         Term x2 = xy(x);
-        try {
+        //try {
             return (x2 != null) ?
                     unify(x2, y) :
                     putVarX(/* (Variable) */ x, y);
-        } catch (StackOverflowError e) {
-            //TEMPORARY FOR DEBUGGING
-            e.printStackTrace();
-            return false;
-        }
+//        } catch (StackOverflowError e) {
+//            //TEMPORARY FOR DEBUGGING
+//            e.printStackTrace();
+//            return false;
+//        }
 
         //return matcherXY.computeMatch(x, y);
     }

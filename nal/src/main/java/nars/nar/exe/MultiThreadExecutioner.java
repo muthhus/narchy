@@ -44,15 +44,19 @@ public class MultiThreadExecutioner extends Executioner {
     final Disruptor<TaskEvent> disruptor;
 
     public MultiThreadExecutioner(int threads, int ringSize) {
+        this(threads, ringSize, 1);
+    }
+
+    public MultiThreadExecutioner(int threads, int ringSize, int extraThreads) {
         this(threads, ringSize,
                 //new BasicExecutor(Executors.defaultThreadFactory())
                 new ForkJoinPool(
-                        threads,
+                        threads+extraThreads,
                         //Runtime.getRuntime().availableProcessors()-1 /* leave one thread available */,
                         defaultForkJoinWorkerThreadFactory, null, true /* async */,
-                        threads,
+                        threads+extraThreads,
                         threads*64, //max threads (safe to increase)
-                        threads, //minimum threads to keep running otherwise new ones will be created
+                        threads+extraThreads, //minimum threads to keep running otherwise new ones will be created
                         null, 1000L, TimeUnit.MILLISECONDS)
         );
     }

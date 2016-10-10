@@ -46,10 +46,14 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     /** average priority target for bag forgetting */
-    public static final float BAG_THRESHOLD = 0.5f;
+    public static final float BAG_THRESHOLD = 0.25f;
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
+
+    /** 1 should work */
+    public static final int ACTIVATION_TERMLINK_DEPTH = 1;
+    public static final int ACTIVATION_TASKLINK_DEPTH = 1;
 
 
     public static boolean DEBUG_ANSWERS;
@@ -83,7 +87,7 @@ public abstract class Param /*extends Container*/ implements Level {
      * max # of chained termutes which can be active
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationTermutesMax = 4;
+    public final static int UnificationTermutesMax = 3;
 
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
@@ -100,12 +104,12 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float BUDGET_EPSILON = 0.0001f;
 
 
-    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 16;
+    public static final int DEFAULT_WIRED_CONCEPT_BELIEFS = 24;
     public static final int DEFAULT_WIRED_CONCEPT_GOALS = 16;
 
     /** size of each thread's normalization cache, in entries */
-    public static final int NORMALIZATION_CACHE_SIZE = 32*1024;
-    public static final int TERM_CACHE_SIZE = 64*1024;
+    public static final int NORMALIZATION_CACHE_SIZE = 16*1024;
+    public static final int TERM_CACHE_SIZE = 32*1024;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;

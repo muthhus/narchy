@@ -275,7 +275,8 @@ abstract public class NAgent implements NSense, NAction {
 
             predictors.add(
                     new MutableTask(happy, '!', 1f, rewardGamma)
-                            .eternal() //.present(nar.time()+dt)
+                            //.eternal()
+                            .present(nar.time()+dt)
             );
 //                    happy.desire($.t(1f, rewardGamma),
 //                            nar.priorityDefault(Symbols.GOAL),

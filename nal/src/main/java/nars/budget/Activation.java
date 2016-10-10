@@ -56,7 +56,7 @@ public class Activation {
      * runs the task activation procedure
      */
     public Activation(Budgeted in, Concept c, NAR nar, float scale) {
-        this(in, c, c, nar, scale, 1, 1);
+        this(in, c, c, nar, scale, Param.ACTIVATION_TERMLINK_DEPTH, Param.ACTIVATION_TASKLINK_DEPTH);
     }
 
     public Activation(Task in, NAR nar, float scale) {

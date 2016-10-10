@@ -107,7 +107,7 @@ public class PixelBag implements Bitmap2D {
         float pxf = px-1;
         float pyf = py-1;
 
-        float minClarity = 0.05f/frameRate, maxClarity = 0.8f/frameRate;
+        float minClarity = 0.35f/frameRate, maxClarity = 1f/frameRate;
 
         for (int ly = 0; ly < py; ly++) {
             float l = ly / pyf;

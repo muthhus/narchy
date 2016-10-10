@@ -49,13 +49,13 @@
     <dependency>
       <groupId>com.lmax</groupId>
       <artifactId>disruptor</artifactId>
-      <version>3.3.5</version>
+      <version>3.3.6</version>
     </dependency>
     <dependency>
       <!-- https://vimeo.com/12165742 -->
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>19.0</version>
+      <version>20.0-rc1</version>
       <scope>compile</scope>
     </dependency>
 
@@ -115,7 +115,7 @@
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
-      <version>1.4.30</version>
+      <version>1.4.31</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

@@ -103,8 +103,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         Term r;
         try {
             TermIndex transformer =
-                    //m.index;
-                    $.terms;
+                    m.index;
+                    //$.terms;
 
             r = transformer.transform(this.conclusionPattern, m);
         } catch (InvalidTermException e) {

@@ -68,7 +68,10 @@ public abstract class AbstractVariable implements Variable {
         Op xo = op();
         if (y.op() == xo) {
             return subst.putCommon(this, y);
-        } else if (subst.matchType(xo)) {
+        } else if (subst.matchType(xo) && !subst.matchType(y) ) {
+            /*
+            note: the !subst.matchType(y) subcondition is an attempt at preventing infinite cycles of variable references
+            */
             return subst.matchVarX(this, y);
         }
 

@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import nars.util.data.list.FasterList;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -172,7 +173,7 @@ public class ArraySharingList<C> implements Iterable<C> {
     /** not recommended to use this since it involves instantiating an iterator */
     @Override public Iterator<C> iterator() {
         C[] a = getCachedNullTerminatedArray();
-        if (a == null) return Iterators.emptyIterator();
+        if (a == null) return Collections.emptyIterator();
 
         return new Iterator<C>() {
 
