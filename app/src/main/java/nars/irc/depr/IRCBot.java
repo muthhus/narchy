@@ -1,4 +1,4 @@
-package nars.irc;
+package nars.irc.depr;
 
 
 import org.slf4j.Logger;

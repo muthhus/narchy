@@ -41,26 +41,23 @@ public class Revision {
      * Revision for Eternal tasks
      */
     @Nullable
-    public static Truth revision(@NotNull Truthed a, @NotNull Truthed b, float match, float minConf) {
-        float w1 = a.confWeight();
-        float w2 = b.confWeight();
+    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minConf) {
+        float w1 = a.confWeight() * factor;
+        float w2 = b.confWeight() * factor;
         float w = (w1 + w2);
-        float newConf = UtilityFunctions.w2c(w) * match;
-        if (newConf < minConf)
+        float c = UtilityFunctions.w2c(w);
+        if (c < minConf)
             return null;
 
-        float f1 = a.freq();
-        float f2 = b.freq();
-
-        return new DefaultTruth(
-                (w1 * f1 + w2 * f2) / w,
-                newConf
+        return $.t(
+            (w1 * a.freq() + w2 * b.freq()) / w,
+            c
         );
     }
 
     @Nullable
-    public static Truth revision(@NotNull Truthed a, @NotNull Truthed b) {
-        return revision(a, b, 1f, 0f);
+    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {
+        return revise(a, b, 1f, 0f);
     }
 
 

@@ -9,6 +9,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.nal.Stamp;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
+import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -313,25 +314,32 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 //template which may contain temporal relationship to emulate
                 Compound template = x!=null ?  x.term() : term();
 
-                DynTruth dt = truth(then, template, true);
-                if (dt!=null) {
-                    Truth yt = dt.truth();
-                    if ((yt != null) && (yt.conf() > x.conf())) { //!y.equals(x.truth())) {
-
-                        RevisionTask y = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
-                                yt, nar.time(), then, dt.evidence());
-                        y.setBudget(dt.b);
-                        y.log("Dynamic");
+                DynTruth yy = truth(then, template, true);
+                if (yy!=null) {
+                    Truth y = yy.truth();
+                    if ((y != null) && (x==null || (y.conf() > x.conf()))) { //!y.equals(x.truth())) {
 
 
-                        if (y.isEternal()) {
-                            throw new RuntimeException(y + " should not be eternal");
+                        /*if the belief tables provided a value, interpolate this with the dynamic value to get the final truth value */
+                        float overlap = 0; //TODO compute overlap %
+                        Truth z = x != null ? Revision.revise(y,x,1f-overlap,nar.confMin.floatValue()) : y;
+                        long[] e = x!=null ? Stamp.zip(yy.evidence(), x.evidence()) : yy.evidence();
+                        //System.err.println(x + " + " + y + " = " + z);
+
+                        RevisionTask t = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
+                                z, nar.time(), then, e);
+                        t.setBudget(yy.b);
+                        t.log("Dynamic");
+
+
+                        if (t.isEternal()) {
+                            throw new RuntimeException(t + " should not be eternal");
                         }
 
 
                         //System.err.println(xx + "\tvs\t" + x);
                         //nar.inputLater(xx);
-                        x = y;
+                        x = t;
 
                     }
 

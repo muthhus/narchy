@@ -9,16 +9,13 @@ import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
-import nars.NARLoop;
 import nars.index.CaffeineIndex;
 import nars.irc.IRCAgent;
-import nars.irc.IRCBot;
 import nars.nar.Default;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.time.RealtimeMSClock;
 import nars.util.data.random.XorShift128PlusRandom;
-import ognl.OgnlException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +28,7 @@ import java.util.Random;
 import static io.undertow.Handlers.*;
 import static io.undertow.UndertowOptions.*;
 import static java.util.zip.Deflater.BEST_SPEED;
+import static nars.irc.IRCAgent.newRealtimeNAR;
 
 
 public class WebServer /*extends PathHandler*/ {
@@ -148,21 +146,5 @@ public class WebServer /*extends PathHandler*/ {
             }
         }
     }*/
-    @NotNull
-    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) {
-
-        Random random = new XorShift128PlusRandom(System.currentTimeMillis());
-
-        SingleThreadExecutioner exe = new SingleThreadExecutioner();
-        Default nar = new Default(activeConcepts, conceptsPerFrame, 2, 2, random,
-                new CaffeineIndex(new DefaultConceptBuilder(random),10000000,false,exe),
-                new RealtimeMSClock(),
-                exe
-        );
-
-        nar.loop(framesPerSecond);
-
-        return nar;
-    }
 
 }

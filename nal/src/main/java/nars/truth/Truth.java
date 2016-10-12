@@ -36,6 +36,7 @@ import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.eternalize;
+import static nars.util.Util.*;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
@@ -242,19 +243,20 @@ public interface Truth extends Truthed {
 //        return withConf(conf() * temporalIntersection( when, occ, now, dur ));
 //    }
 
-    @NotNull
-    default Truth interpolate(@NotNull Truth y) {
-        float xc = conf();
-        float yc = y.conf();
-        return new DefaultTruth(
-                //lerp by proportion of confidence contributed
-                Util.lerp(freq(), y.freq(), xc / (xc+yc)),
-
-                //difference in freq means closer to the AND conf, otherwise if they are the same then closer to max
-                Util.lerp(and(xc, yc), max(xc, yc), Math.abs(freq()-y.freq()))
-
-        );
-    }
+//    @NotNull
+//    default Truth interpolate(@NotNull Truthed y) {
+//        float xc = confWeight();
+//        float yc = y.confWeight();
+//
+//        return new DefaultTruth(
+//                //lerp by proportion of confidence contributed
+//                lerp(freq(), y.freq(), xc / (xc+yc)),
+//
+//                //difference in freq means closer to the AND conf, otherwise if they are the same then closer to max
+//                lerp(and(xc, yc), max(xc, yc), Math.abs(freq()-y.freq()))
+//
+//        );
+//    }
 
     /** the negated (1 - freq) of this truth value */
     @NotNull Truth negated();

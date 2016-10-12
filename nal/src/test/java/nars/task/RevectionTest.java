@@ -36,7 +36,7 @@ public class RevectionTest {
         //assertEquals(a.truth(), polation.truth(0, a, a)); //same item
 
         //System.out.println( polation.truth(0, a, b) );
-        assertEquals(Revision.revision(a, b), polation.truth(0, a, b));
+        assertEquals(Revision.revise(a, b), polation.truth(0, a, b));
 
         polation.print(System.out);
     }
@@ -47,7 +47,7 @@ public class RevectionTest {
         Task b = t(0f, 0.5f, 4);
 
         Truth pt = polation.truth(0, a, b);
-        @Nullable Truth rt = Revision.revision(a, b);
+        @Nullable Truth rt = Revision.revise(a, b);
 
         assertEquals(pt.freq(), rt.freq(), 0.01f);
         assertTrue(pt.conf() < rt.conf()); //revection result will be less than eternal revision
@@ -59,7 +59,7 @@ public class RevectionTest {
     public void testRevisionEquivalence2Instant() {
         Task a = t(1f, 0.5f, 0);
         Task b = t(0f, 0.5f, 0);
-        assertEquals( Revision.revision(a, b), polation.truth(0, a, b) );
+        assertEquals( Revision.revise(a, b), polation.truth(0, a, b) );
     }
 
     @Test

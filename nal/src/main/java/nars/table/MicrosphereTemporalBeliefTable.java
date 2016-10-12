@@ -263,7 +263,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
         float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
 
-        Truth t = Revision.revision(a, b, 1f - (overlap / 2f), Param.TRUTH_EPSILON /*nar.confMin*/);
+        Truth t = Revision.revise(a, b, 1f - (overlap / 2f), Param.TRUTH_EPSILON /*nar.confMin*/);
         if (t != null)
             return Revision.mergeInterpolate(a, b, mid, now, t, concept);
 
