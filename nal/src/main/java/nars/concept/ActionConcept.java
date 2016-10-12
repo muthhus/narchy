@@ -1,14 +1,12 @@
 package nars.concept;
 
-import nars.NAR;
-import nars.Narsese;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
+import nars.util.data.array.LongArrays;
 import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +29,7 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
 
 
     private final float feedbackDurability;
+    private final long[] commonEvidence;
 
     private Task nextFeedback;
 
@@ -89,6 +88,9 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
         this.feedbackDurability = n.durabilityDefault(GOAL /* though these will be used for beliefs */);
         this.feedbackResolution = n.truthResolution.floatValue();
         this.motor = motor;
+
+        this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.clock.nextStamp() } : LongArrays.EMPTY_ARRAY;
+
     }
 
 //    @Override
@@ -178,6 +180,7 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
     protected final Task feedback(Truth t, long when) {
         return new GeneratedTask(this, Symbols.BELIEF, t)
                 .time(when, when)
+                .evidence(commonEvidence)
                 .budget(pri.asFloat(), feedbackDurability)
                 .log("Motor Feedback");
     }

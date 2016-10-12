@@ -244,7 +244,7 @@ public class RevisionTest {
 
 
         float beliefAfter2;
-        assertEquals(1.0f, beliefAfter2 = b.priSum(), 0.01f);
+        assertEquals(1.0f, beliefAfter2 = b.priSum(), 0.25f /* large delta to allow for forgetting */);
         assertEquals(2 * linksBeforeRevisionLink, tasklinks.priSum(), 0.15f);
 
         assertEquals(0.71f, b.beliefs().topEternalTruth(null).conf(), 0.06f); //the revised task on top

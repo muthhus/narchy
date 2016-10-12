@@ -89,7 +89,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
 
         this.conceptOut = new SensorConcept[nw][nh][states];
 
-        float res = 0.05f;
+        float res = 0.02f;
 
         Term r = $.$(root);
         for (int i = 0; i< nw; i++) {
@@ -98,7 +98,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
                 for (int k = 0; k < states; k++) {
                     Compound term = $.inh($.p(coord, $.the(k)), r);
                     int ii = i;  int jj = j; int kk = k;
-                    agent.sense(term, () -> pixEnable[ii][jj][kk] ? 1f : 0f, res, (v) -> $.t(v, pixConf[ii][jj]));
+                    agent.sense(term, () -> pixEnable[ii][jj][kk] ? 1f : Float.NaN, res, (v) -> $.t(v, pixConf[ii][jj]));
                 }
             }
         }
@@ -112,8 +112,8 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
 
         float minConf = nar.confMin.floatValue();
         float baseConf = nar.confidenceDefault(Symbols.BELIEF);
-        float basePri = nar.priorityDefault(Symbols.BELIEF);
-        float baseDur = nar.durabilityDefault(Symbols.BELIEF);
+        //float basePri = nar.priorityDefault(Symbols.BELIEF);
+        //float baseDur = nar.durabilityDefault(Symbols.BELIEF);
 
         float alpha = 0.075f / agent.frameRate; //this represents the overall rate; the sub-block rate will be a fraction of this
         float corruption = 0.05f;
@@ -182,11 +182,13 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
 
                 float mult;
 
-                Arrays.fill(pixEnable[i][j], false);
+                boolean[] peij = pixEnable[i][j];
+
+                Arrays.fill(peij, false);
                 if (po!=null) {
                     mult = +1;
                     for (short ppp : po)
-                        pixEnable[i][j][ppp] = true;
+                        peij[ppp] = true;
                 } else {
                     mult = -1;
                 }

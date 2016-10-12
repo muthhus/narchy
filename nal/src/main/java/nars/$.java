@@ -75,7 +75,7 @@ public enum $ {
 
     @NotNull
     public static <T extends Term> T $(@NotNull String term) throws Narsese.NarseseException {
-        return (T)Narsese.the().term(term, terms, true);
+        return terms.parse(term);
     }
 
 

@@ -25,11 +25,11 @@ public class TopCraft extends SwingAgent {
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 555500);
+        run(TopCraft::new, 5500);
     }
 
     public TopCraft(NAR nar) {
-        super(nar, 8);
+        super(nar, 4);
 
         this.craft = new TopDownMinicraft();
 

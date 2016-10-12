@@ -1,6 +1,7 @@
 package nars.concept;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -57,4 +58,6 @@ public class OperationConceptTest {
         //assertEquals(b, n.concept(operation).belief(n.time()).expectation(), 0.01f);
 
     }
+
+
 }

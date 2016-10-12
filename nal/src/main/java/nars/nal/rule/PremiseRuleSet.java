@@ -199,8 +199,8 @@ public class PremiseRuleSet {
         }
 
         return unparsed_rules
-                //.parallelStream();
-                .stream();
+                .parallelStream();
+                //.stream();
     }
 
     @NotNull

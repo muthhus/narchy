@@ -211,38 +211,7 @@ public class TermTest {
 
     }
 
-    @Test
-    public void testConceptInstancing() throws Narsese.NarseseException {
-        Default n = new Default();
 
-        String statement1 = "<a --> b>.";
-
-        Termed a = n.term("a");
-        assertTrue(a != null);
-        Termed a1 = n.term("a");
-        assertTrue(a.equals(a1));
-
-        n.input(statement1);
-        n.run(4);
-
-        n.input(" <a  --> b>.  ");
-        n.run(1);
-        n.input(" <a--> b>.  ");
-        n.run(1);
-
-        String statement2 = "<a --> c>.";
-        n.input(statement2);
-        n.run(4);
-
-        Termed a2 = n.term("a");
-        assertTrue(a2 != null);
-
-        Concept ca = n.concept(a2);
-        assertTrue(ca != null);
-
-        assertEquals(true, !n.core.concepts.isEmpty());
-
-    }
 
 //    @Test
 //    public void testEscaping() {
@@ -319,10 +288,10 @@ public class TermTest {
         assertFalse(Op.isOperation(n.term("^wonder").term()));
 
         try {
-            Term x = n.term("wonder(a,b)").term();
+            Term x = n.term("^wonder(a,b)").term();
             assertEquals(INH, x.op());
             assertTrue(Op.isOperation(x));
-            assertEquals("wonder(a,b)", x.toString());
+            assertEquals("^wonder(a,b)", x.toString());
 
         } catch (Narsese.NarseseException ex) {
             ex.printStackTrace();

@@ -315,23 +315,24 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
                 DynTruth dt = truth(then, template, true);
                 if (dt!=null) {
-                    Truth y = dt.truth();
-                    if (y!=null && !y.equals(x.truth())) {
+                    Truth yt = dt.truth();
+                    if ((yt != null) && (yt.conf() > x.conf())) { //!y.equals(x.truth())) {
 
-                        RevisionTask xx = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
-                                y, nar.time(), then, dt.evidence());
-                        xx.setBudget(dt.b);
-                        xx.log("Dynamic");
+                        RevisionTask y = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
+                                yt, nar.time(), then, dt.evidence());
+                        y.setBudget(dt.b);
+                        y.log("Dynamic");
 
-                        //nar.inputLater(xx);
 
-                        //System.err.println(xx + "\tvs\t" + x);
-
-                        if (xx.isEternal()) {
-                            throw new RuntimeException(xx + " should not be eternal");
+                        if (y.isEternal()) {
+                            throw new RuntimeException(y + " should not be eternal");
                         }
 
-                        x = xx;
+
+                        //System.err.println(xx + "\tvs\t" + x);
+                        //nar.inputLater(xx);
+                        x = y;
+
                     }
 
                 }

@@ -1,6 +1,7 @@
 package nars;
 
 import nars.nar.Default;
+import nars.util.Util;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -9,6 +10,7 @@ import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.history.history.MemoryHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.zeromq.ZMQ;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -55,7 +57,6 @@ public class Repl {
 //                .append("> ").toAnsi(terminal);
 
 
-
         LineReader reader = LineReaderBuilder.builder()
                 .terminal(terminal)
                 //.completer(completer)
@@ -91,7 +92,6 @@ public class Repl {
             }
 
 
-
             line = line.trim();
             if (!line.isEmpty()) {
 
@@ -115,13 +115,100 @@ public class Repl {
         loop.stop();
 
 
-
-//ConsoleReader reader = new ConsoleReader();
-
-
     }
 
     public static void main(String[] args) throws IOException {
-        new Repl(new Default());
+        //Default e = new Default();
+        //new InterNAR2(e, 15000);
+
+        Default d = new Default();
+        //InterNAR2 ii = new InterNAR2(d, 15001);
+        //ii.connect("tcp://localhost:15000");
+
+        //Util.pause(1000);
+        //ii.send("test");
+
+        new Repl(d);
     }
+
+    /**
+     * https://github.com/zeromq/jeromq/blob/master/src/test/java/guide/psenvpub.java
+     */
+    private static class InterNAR2 implements Runnable {
+
+        private final NAR nar;
+        private final ZMQ.Context context;
+        private final ZMQ.Socket publisher;
+        private final Thread thread;
+        private ZMQ.Socket subscriber;
+
+        public InterNAR2(NAR n, int port) {
+            //super("tcp://0.0.0.0:" + port);
+
+            context = ZMQ.context(1);
+            publisher = context.socket(ZMQ.PUB);
+            subscriber = context.socket(ZMQ.SUB);
+
+            //publisher.bind("tcp://*:5563");
+            publisher.bind("tcp://*:" + port);
+
+            new Thread(() -> {
+                while (!Thread.currentThread().isInterrupted()) {
+                    // Write two messages, each with an envelope and content
+                    publisher.sendMore("A");
+                    publisher.send("We don't want to see this");
+                    Util.pause(100);
+                    publisher.sendMore("B");
+                    publisher.send("We would like to see this");
+                    Util.pause(100);
+                }
+            }).start();
+
+
+            this.nar = n;
+
+            thread = new Thread(this);
+            thread.start();
+
+        }
+
+        public void connect(String url) {
+            subscriber.connect(url);
+        }
+
+        @Override
+        public void run() {
+
+
+            // Prepare our context and subscriber
+
+
+
+            subscriber.subscribe("B".getBytes(ZMQ.CHARSET));
+            while (!Thread.currentThread().isInterrupted()) {
+
+                // Read envelope with address
+                String address = subscriber.recvStr();
+                // Read message contents
+                String contents = subscriber.recvStr();
+                System.out.println(this + " " + address + " : " + contents);
+            }
+        }
+
+        public void stop() {
+            publisher.close();
+            subscriber.close();
+            context.term();
+        }
+
+        public void send(String x) {
+            publisher.send(x);
+        }
+
+//        @Override
+//        protected String receive(ZMQ.Socket sub) {
+//            return sub.recvStr();
+//        }
+    }
+
 }

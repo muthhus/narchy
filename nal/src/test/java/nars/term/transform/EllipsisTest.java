@@ -241,7 +241,7 @@ public class EllipsisTest {
         @Override
         public Compound getPattern(String prefix, String suffix) {
             PatternIndex pi = new PatternIndex();
-            Compound pattern = (Compound) Narsese.the().term(prefix + "%1, " + ellipsisTerm + suffix, pi).term();
+            Compound pattern = (Compound) pi.parse(prefix + "%1, " + ellipsisTerm + suffix).term();
             return pattern;
         }
 

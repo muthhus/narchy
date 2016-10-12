@@ -10,6 +10,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.Util;
+import nars.util.data.array.LongArrays;
 import nars.util.math.FloatSupplier;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
@@ -56,7 +57,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     @Nullable
     public Task next;
     private int dt;
-
+    private final long[] commonEvidence;
 
 
     public ScalarSignal(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
@@ -68,6 +69,8 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
         this.term = t.term();
         this.value = value;
         this.truthFloatFunction = truthFloatFunction == null ? (v)->null : truthFloatFunction;
+
+        this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.clock.nextStamp() } : LongArrays.EMPTY_ARRAY;
 
         pri(pri);
         this.dur = dur;
@@ -188,6 +191,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     @NotNull
     protected Task newInputTask(Truth t, long now, long when) {
         return new MutableTask(term(), punc, t)
+                .evidence(commonEvidence)
                 .time(now, when)
                 .budget(pri.asFloat() /*(v, now, prevF, lastInput)*/, dur);
                 //.log(this);

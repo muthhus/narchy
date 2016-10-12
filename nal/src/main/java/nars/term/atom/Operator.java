@@ -26,8 +26,7 @@ public class Operator<T extends Term> extends AtomicStringConstant {
     }
 
     public Operator(@NotNull String id) {
-        //super((id.charAt(0)!=Op.OPER.ch ? Op.OPER.ch + id : id));
-        super(id);
+        super((id.charAt(0)!=Op.OPER.ch ? Op.OPER.ch + id : id));
     }
 
 

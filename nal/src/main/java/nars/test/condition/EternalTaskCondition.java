@@ -77,13 +77,14 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException {
         //super(n.task(sentenceTerm + punc).normalize(n.memory));
 
-            nar = n;
 
             if (freqMax < freqMin) throw new RuntimeException("freqMax < freqMin");
             if (confMax < confMin) throw new RuntimeException("confMax < confMin");
 
             if (creationEnd - creationStart < 1)
                 throw new RuntimeException("cycleEnd must be after cycleStart by at least 1 cycle");
+
+            this.nar = n;
 
             this.creationStart = creationStart;
             this.creationEnd = creationEnd;
@@ -93,15 +94,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             this.confMin = Math.max(0.0f, confMin);
             this.punc = punc;
             this.term =
-                    //Narsese.the().termRaw(
-                    Narsese.the().term(
-                            sentenceTerm,
-                            $.terms
-                    ).term();
-
-
-            //this.duration = n.memory.duration();
-
+                    $.terms.parse( sentenceTerm ).term();
     }
 
     @NotNull

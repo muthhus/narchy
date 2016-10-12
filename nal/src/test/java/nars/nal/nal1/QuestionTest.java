@@ -93,11 +93,12 @@ public class QuestionTest {
         assertEquals(3, s[0]);
 
     }
+
     @Test public void testOperationHandler() {
         NAR nar = new Terminal();
 
         final int[] s = {0};
-        new OperationAnswerer( $.$("add(%1, %2, #x)"), nar) {
+        new OperationAnswerer( $.$("^add(%1, %2, #x)"), nar) {
 
             @Override
             protected void onMatch(Term[] args) {
@@ -105,7 +106,7 @@ public class QuestionTest {
             }
         };
 
-        nar.ask($.$("add(1, 2, #x)"));
+        nar.ask($.$("^add(1, 2, #x)"));
 
 
     }

@@ -3,6 +3,8 @@ package nars.nar;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
+import nars.concept.Concept;
+import nars.term.Termed;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -12,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -168,4 +171,36 @@ public class NARTest {
 //
 //    }
 
+    @Test
+    public void testConceptInstancing() throws Narsese.NarseseException {
+        Default n = new Default();
+
+        String statement1 = "<a --> b>.";
+
+        Termed a = n.term("a");
+        assertTrue(a != null);
+        Termed a1 = n.term("a");
+        assertTrue(a.equals(a1));
+
+        n.input(statement1);
+        n.run(4);
+
+        n.input(" <a  --> b>.  ");
+        n.run(1);
+        n.input(" <a--> b>.  ");
+        n.run(1);
+
+        String statement2 = "<a --> c>.";
+        n.input(statement2);
+        n.run(4);
+
+        Termed a2 = n.term("a");
+        assertNotNull(a2);
+
+        Concept ca = n.concept(a2);
+        assertTrue(ca != null);
+
+        assertEquals(true, !n.core.concepts.isEmpty());
+
+    }
 }

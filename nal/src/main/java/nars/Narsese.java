@@ -48,6 +48,7 @@ import java.util.function.Function;
 
 import static nars.Op.*;
 import static nars.Symbols.*;
+import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
  * NARese, syntax and language for interacting with a NAR in NARS.
@@ -69,10 +70,9 @@ public class Narsese extends BaseParser<Object> {
 
     static final ThreadLocal<Narsese> parsers = ThreadLocal.withInitial(() -> Grappa.createParser(Narsese.class));
 
-    static final ThreadLocal<Map<Pair<Op, List>, Term>> vectorTerms = ThreadLocal.withInitial(() ->
-            new CapacityLinkedHashMap<Pair<Op, List>, Term>(512));
+//    static final ThreadLocal<Map<Pair<Op, List>, Term>> vectorTerms = ThreadLocal.withInitial(() ->
+//            new CapacityLinkedHashMap<Pair<Op, List>, Term>(512));
 
-    public Object nextMatch = null;
 
 
 
@@ -1024,7 +1024,8 @@ public class Narsese extends BaseParser<Object> {
 
         if (vectorterms.isEmpty()) return null;
 
-        return vectorTerms.get().computeIfAbsent(Tuples.pair(op, (List) vectorterms), popTermFunction);
+        return popTermFunction.apply(pair(op, (List)vectorterms));
+        //return vectorTerms.get().computeIfAbsent(Tuples.pair(op, (List) vectorterms), popTermFunction);
     }
 
 
@@ -1203,9 +1204,8 @@ public class Narsese extends BaseParser<Object> {
         ParsingResult r = null;
 
         try {
-            nextMatch = null;
-            r = singleTermParser.run(s);
 
+            r = singleTermParser.run(s);
 
             ValueStack stack = r.getValueStack();
 
@@ -1226,9 +1226,6 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    public Term term(String s, TermIndex t) throws NarseseException {
-        return term(s, t, t != null);
-    }
 
     @NotNull
     public Term term(String s, @Nullable TermIndex index, boolean normalize) throws NarseseException {
@@ -1373,7 +1370,7 @@ public class Narsese extends BaseParser<Object> {
 
         @Nullable
         @Override
-        public synchronized Throwable fillInStackTrace() {
+        public Throwable fillInStackTrace() {
             return null;
         }
     }
