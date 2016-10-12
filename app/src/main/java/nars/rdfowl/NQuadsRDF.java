@@ -8,6 +8,7 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -192,7 +193,7 @@ public abstract class NQuadsRDF {
 //    }
 
     //TODO interpret Node subclasses in special ways, possibly returning Compounds not only Atom's
-    public static Atom resource(@NotNull Node n) {
+    public static Atomic resource(@NotNull Node n) {
         String s = n.getLabel();
         //if (s.startsWith("<") && s.endsWith(">")) {
             //s = s.substring(1, s.length() - 1);
@@ -275,21 +276,21 @@ public abstract class NQuadsRDF {
 //        return Instance.make(clas, owlClass);
 //    }
 
-    public static final Atom owlClass = the("Class");
-    static final Atom parentOf = the("parentOf");
-    static final Atom type = the("type");
-    static final Atom subClassOf = the("subClassOf");
-    static final Atom isPartOf = the("isPartOf");
-    static final Atom subPropertyOf = the("subPropertyOf");
-    static final Atom equivalentClass = the("equivalentClass");
-    static final Atom equivalentProperty = the("equivalentProperty");
-    static final Atom inverseOf = the("inverseOf");
-    static final Atom disjointWith = the("disjointWith");
-    static final Atom domain = the("domain");
-    static final Atom range = the("range");
-    static final Atom sameAs = the("sameAs");
-    static final Atom differentFrom = the("differentFrom");
-    static final Atom dataTypeProperty = the("DatatypeProperty");
+    public static final Atomic owlClass = the("Class");
+    static final Atomic parentOf = the("parentOf");
+    static final Atomic type = the("type");
+    static final Atomic subClassOf = the("subClassOf");
+    static final Atomic isPartOf = the("isPartOf");
+    static final Atomic subPropertyOf = the("subPropertyOf");
+    static final Atomic equivalentClass = the("equivalentClass");
+    static final Atomic equivalentProperty = the("equivalentProperty");
+    static final Atomic inverseOf = the("inverseOf");
+    static final Atomic disjointWith = the("disjointWith");
+    static final Atomic domain = the("domain");
+    static final Atomic range = the("range");
+    static final Atomic sameAs = the("sameAs");
+    static final Atomic differentFrom = the("differentFrom");
+    static final Atomic dataTypeProperty = the("DatatypeProperty");
 
 
     @Nullable
@@ -337,8 +338,8 @@ public abstract class NQuadsRDF {
          *
          */
     public static MutableTask inputNALlike(@NotNull NAR nar,
-                              @Nullable Atom subject,
-                              @Nullable Atom predicate, @Nullable Term object) {
+                              @Nullable Atomic subject,
+                              @Nullable Atomic predicate, @Nullable Term object) {
 
         //http://www.w3.org/TR/owl-ref/
 

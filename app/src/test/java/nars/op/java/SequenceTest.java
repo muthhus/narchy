@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.time.Tense;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
@@ -26,8 +27,8 @@ import static nars.Op.ATOM;
  */
 public class SequenceTest {
 
-    final static Atom hear = $.the("hear");
-    final static Atom heard = $.the("heard");
+    final static Atomic hear = $.the("hear");
+    final static Atomic heard = $.the("heard");
 
     public static void main(String[] args) {
         Param.DEBUG = true;
@@ -36,7 +37,6 @@ public class SequenceTest {
 
         Default n = new Default(1000, 8, 2, 2);
         //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        n.cyclesPerFrame.set(4);
         //n.shortTermMemoryHistory.set(4);
 
         n.onExec(new TermFunction("vocalize") {

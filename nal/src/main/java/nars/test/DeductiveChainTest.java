@@ -6,6 +6,7 @@ import nars.Param;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,7 +61,7 @@ public class DeductiveChainTest  {
 
 
     @NotNull
-    public static Atom a(int i) {
+    static Atomic a(int i) {
         return $.the((byte)('a' + i));
     }
 

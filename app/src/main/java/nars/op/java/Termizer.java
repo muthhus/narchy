@@ -3,6 +3,7 @@ package nars.op.java;
 import nars.$;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -10,12 +11,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Termizer {
 
-	Atom TRUE = $.the("true");
+	Atomic TRUE = $.the("true");
 	@Nullable
 	Term FALSE = $.neg(TRUE);
-	Atom VOID = $.the("void");
-	Atom EMPTY = $.the("empty");
-	Atom NULL = $.the("null");
+	Atomic VOID = $.the("void");
+	Atomic EMPTY = $.the("empty");
+	Atomic NULL = $.the("null");
 
 	@Nullable
 	Term term(Object o);

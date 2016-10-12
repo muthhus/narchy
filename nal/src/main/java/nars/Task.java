@@ -103,7 +103,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
-        if (op.isStatement() && subjectOrPredicateIsIndependentVar(ct))
+        if (op.statement && subjectOrPredicateIsIndependentVar(ct))
             return test(t, "Statement Task's subject or predicate is VAR_INDEP", safe);
 
         //prevent conceptualization of non-statement VarIndep containing terms

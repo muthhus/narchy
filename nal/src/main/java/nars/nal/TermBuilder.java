@@ -196,10 +196,10 @@ public abstract class TermBuilder {
             Term p = (((Compound) t).term(1));
             Op so = s.op();
             Op po = p.op();
-            if (so == Op.IMGi && !po.isImage()) {
+            if (so == Op.IMGi && !po.image) {
                 Compound ii  = (Compound)s;
                 t = $.inh(ii.term(0), imageUnwrapToProd(p, ii));
-            } else if (po == Op.IMGe && !so.isImage()) {
+            } else if (po == Op.IMGe && !so.image) {
                 Compound ii  = (Compound)p;
                 t = $.inh(imageUnwrapToProd(s, ii), ii.term(0));
             }

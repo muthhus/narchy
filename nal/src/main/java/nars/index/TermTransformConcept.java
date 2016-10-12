@@ -27,7 +27,7 @@ public final class TermTransformConcept extends AtomConcept implements Permanent
     private final TermTransform function;
 
     private TermTransformConcept(@NotNull String opName, @NotNull TermTransform o) {
-        super($.oper(opName), Bag.EMPTY, Bag.EMPTY);
+        super($.the(opName), Bag.EMPTY, Bag.EMPTY);
         this.function = o;
     }
 

@@ -504,7 +504,7 @@ public class Terms   {
             if (as == b.structure()) {
                 Op ao = a.op();
                 if (ao == b.op()) {
-                    if (ao.isImage() && a.dt() != b.dt()) //must match dt for image
+                    if (ao.image && a.dt() != b.dt()) //must match dt for image
                         return false;
 
                     return equalsAnonymous(a.subterms(), b.subterms());

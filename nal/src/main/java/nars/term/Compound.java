@@ -264,7 +264,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
                 if ((xs = xsubs.size()) == y.size()) {
 
-                    if (!op.isImage() || (dt() == y.dt())) {
+                    if (!op.image || (dt() == y.dt())) {
 
                         TermContainer ysubs = y.subterms();
 

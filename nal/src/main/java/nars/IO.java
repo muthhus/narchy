@@ -25,6 +25,8 @@ import org.nustaq.serialization.*;
 import java.io.*;
 import java.util.function.Function;
 
+import static nars.Op.ATOM;
+import static nars.Op.OPER;
 import static nars.Symbols.*;
 
 /**
@@ -33,7 +35,7 @@ import static nars.Symbols.*;
 public class IO {
 
 
-    public static final byte SPECIAL_OP = (byte)(Op.values().length+1);
+    public static final byte SPECIAL_OP = (byte) (Op.values().length + 1);
 
     static boolean hasTruth(char punc) {
         return punc == Symbols.BELIEF || punc == Symbols.GOAL;
@@ -147,7 +149,8 @@ public class IO {
 
 
     /**
-     * called by readTerm after determining the op type */
+     * called by readTerm after determining the op type
+     */
     @Nullable
     public static Term readTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
@@ -192,8 +195,9 @@ public class IO {
                 writeAtomic(out, (Atomic) term);
             }
         } else
-            writeCompound(out, (Compound)term);
+            writeCompound(out, (Compound) term);
     }
+
     public static void writeTermSeq(@NotNull DataOutput out, @NotNull Term term) throws IOException {
 
 
@@ -219,7 +223,7 @@ public class IO {
         writeTermContainer(out, c.subterms());
 
         //TODO write only a byte for image, int for temporal
-        if (c.op().isImage() || c.op().temporal)
+        if (c.op().image || c.op().temporal)
             out.writeInt(c.dt());
     }
 
@@ -229,7 +233,7 @@ public class IO {
 
         @NotNull Op o = c.op();
         out.writeByte(o.ordinal()); //put operator last
-        if (o.isImage() )
+        if (o.image)
             out.writeByte(c.dt());
         /* else if (o.temporal..) */
 
@@ -242,6 +246,7 @@ public class IO {
             writeTerm(out, c.term(i));
         }
     }
+
     static void writeTermContainerSeq(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
         int siz = c.size();
 
@@ -252,6 +257,7 @@ public class IO {
         }
 
     }
+
     @Nullable
     public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
         int siz = in.readByte();
@@ -265,7 +271,8 @@ public class IO {
 
     /**
      * called by readTerm after determining the op type
-     * TODO make a version which reads directlyinto TermIndex */
+     * TODO make a version which reads directlyinto TermIndex
+     */
     @Nullable
     static Compound readCompound(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
 
@@ -290,6 +297,7 @@ public class IO {
             throw new RuntimeException(e);
         }
     }
+
     public static byte[] asBytes(@NotNull Term t) {
         try {
             ByteArrayOutputStream bs = new ByteArrayOutputStream();
@@ -318,7 +326,9 @@ public class IO {
         }
     }
 
-    /** serialization and deserialization of terms, tasks, etc. */
+    /**
+     * serialization and deserialization of terms, tasks, etc.
+     */
     public static class DefaultCodec extends FSTConfiguration {
 
         final TermIndex index;
@@ -339,15 +349,12 @@ public class IO {
             setCrossPlatform(false);
 
 
-
-
             registerClass(Atom.class, GenericCompound.class,
                     AbstractTask.class,
                     Term[].class,
                     TermContainer.class,
                     //long[].class, char.class,
                     Op.class);
-
 
 
             registerSerializer(AbstractTask.class, new FSTBasicObjectSerializer() {
@@ -423,18 +430,18 @@ public class IO {
 
     public interface Printer {
 
-    //    static void appendSeparator(@NotNull Appendable p) throws IOException {
-    //        p.append(ARGUMENT_SEPARATOR);
-    //        //if (pretty) p.append(' ');
-    //    }
-    //
-    //    static void writeCompound1(@NotNull Op op, @NotNull Term singleTerm, @NotNull Appendable writer) throws IOException {
-    //        writer.append(COMPOUND_TERM_OPENER);
-    //        writer.append(op.str);
-    //        writer.append(ARGUMENT_SEPARATOR);
-    //        singleTerm.append(writer);
-    //        writer.append(COMPOUND_TERM_CLOSER);
-    //    }
+        //    static void appendSeparator(@NotNull Appendable p) throws IOException {
+        //        p.append(ARGUMENT_SEPARATOR);
+        //        //if (pretty) p.append(' ');
+        //    }
+        //
+        //    static void writeCompound1(@NotNull Op op, @NotNull Term singleTerm, @NotNull Appendable writer) throws IOException {
+        //        writer.append(COMPOUND_TERM_OPENER);
+        //        writer.append(op.str);
+        //        writer.append(ARGUMENT_SEPARATOR);
+        //        singleTerm.append(writer);
+        //        writer.append(COMPOUND_TERM_CLOSER);
+        //    }
 
         static void compoundAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
 
@@ -450,6 +457,7 @@ public class IO {
             appendCloser(p);
 
         }
+
         static void compoundAppend(String o, @NotNull TermContainer c, @NotNull Function<Term, Term> filter, @NotNull Appendable p) throws IOException {
 
             p.append(COMPOUND_TERM_OPENER);
@@ -516,17 +524,26 @@ public class IO {
                 case NEG:
                     //special case disjunction: (--,(&&,.....))
                     if (Terms.isDisjunction(c)) {
-                        compoundAppend(Op.DISJ.toString(), ((Compound)c.term(0)).subterms(), $::neg, p);
+                        compoundAppend(Op.DISJ.toString(), ((Compound) c.term(0)).subterms(), $::neg, p);
                         return;
                     }
             }
 
-            if (op.isStatement() || c.size()==2) {
-                if (Op.isOperation(c)) {
-                    operationAppend((Compound) c.term(0), (Atomic)c.term(1), p); //TODO Appender
-                } else {
-                    statementAppend(c, p, op);
+            if (op.statement || c.size() == 2) {
+                Term subj = c.term(0);
+
+                //special case: functional form
+                if (subj.op() == Op.PROD) {
+                    Term pred = c.term(1);
+                    Op pOp = pred.op();
+                    if (pOp == ATOM || pOp == OPER) {
+                        operationAppend((Compound) c.term(0), (Atomic) pred, p);
+                        return;
+                    }
                 }
+
+                statementAppend(c, p, op);
+
             } else {
                 compoundAppend(c, p);
             }
@@ -640,17 +657,16 @@ public class IO {
         static void operationAppend(@NotNull Compound argsProduct, @NotNull Atomic operator, @NotNull Appendable p) throws IOException {
 
             //Term predTerm = operator.identifier(); //getOperatorTerm();
-    //        if ((predTerm.volume() != 1) || (predTerm.hasVar())) {
-    //            //if the predicate (operator) of this operation (inheritance) is not an atom, use Inheritance's append format
-    //            appendSeparator(p, pretty);
-    //            return;
-    //        }
+            //        if ((predTerm.volume() != 1) || (predTerm.hasVar())) {
+            //            //if the predicate (operator) of this operation (inheritance) is not an atom, use Inheritance's append format
+            //            appendSeparator(p, pretty);
+            //            return;
+            //        }
 
 
             Term[] xt = argsProduct.terms();
 
-            //append the operator name without leading '^'
-            p.append(operator.toString().substring(1));  //predTerm.append(p, pretty);
+            p.append(operator.toString());
 
             p.append(COMPOUND_TERM_OPENER);
 
@@ -675,7 +691,7 @@ public class IO {
 
         @NotNull
         static StringBuilder stringify(@NotNull Compound c) {
-            StringBuilder sb = new StringBuilder(/* conservative estimate */ c.volume()*2 );
+            StringBuilder sb = new StringBuilder(/* conservative estimate */ c.volume() * 2);
             try {
                 c.append(sb);
             } catch (IOException e) {
@@ -700,10 +716,10 @@ public class IO {
      * plus the length of <code>str</code>, and at most two plus
      * thrice the length of <code>str</code>.
      *
-     * @param      str   a string to be written.
-     * @param      out   destination to write to
-     * @return     The number of bytes written out.
-     * @exception  IOException  if an I/O error occurs.
+     * @param str a string to be written.
+     * @param out destination to write to
+     * @return The number of bytes written out.
+     * @throws IOException if an I/O error occurs.
      */
     static void writeUTFWithoutLength(String str, DataOutput out) throws IOException {
 
@@ -733,7 +749,7 @@ public class IO {
 //                dos.bytearr = new byte[(utflen*2) + 2];
 //            bytearr = dos.bytearr;
 //        } else {
-            //bytearr = new byte[utflen];
+        //bytearr = new byte[utflen];
 //        }
 
         //Length information, not written
@@ -742,24 +758,24 @@ public class IO {
 
         int strlen = str.length();
         int i, c;
-        for (i=0; i<strlen; i++) {
+        for (i = 0; i < strlen; i++) {
             c = str.charAt(i);
             if (!((c >= 0x0001) && (c <= 0x007F))) break;
-            out.writeByte((byte)c);
+            out.writeByte((byte) c);
         }
 
-        for (;i < strlen; i++){
+        for (; i < strlen; i++) {
             c = str.charAt(i);
             if ((c >= 0x0001) && (c <= 0x007F)) {
-                out.writeByte((byte)c);
+                out.writeByte((byte) c);
 
             } else if (c > 0x07FF) {
                 out.writeByte((byte) (0xE0 | ((c >> 12) & 0x0F)));
-                out.writeByte((byte) (0x80 | ((c >>  6) & 0x3F)));
-                out.writeByte((byte) (0x80 | ((c >>  0) & 0x3F)));
+                out.writeByte((byte) (0x80 | ((c >> 6) & 0x3F)));
+                out.writeByte((byte) (0x80 | ((c >> 0) & 0x3F)));
             } else {
-                out.writeByte((byte) (0xC0 | ((c >>  6) & 0x1F)));
-                out.writeByte((byte) (0x80 | ((c >>  0) & 0x3F)));
+                out.writeByte((byte) (0xC0 | ((c >> 6) & 0x1F)));
+                out.writeByte((byte) (0x80 | ((c >> 0) & 0x3F)));
             }
         }
     }

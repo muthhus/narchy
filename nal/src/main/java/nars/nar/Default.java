@@ -32,9 +32,6 @@ public class Default extends AbstractNAR {
 
     public final @NotNull ConceptBagCycle core;
 
-    /** this doesnt make sense for multithread cases when ConceptBagCycle executes asynchronosly     */
-    @Deprecated public final MutableInteger cyclesPerFrame = new MutableInteger(1);
-
 
     @Deprecated
     public Default() {
@@ -90,7 +87,7 @@ public class Default extends AbstractNAR {
 
     protected @NotNull ConceptBagCycle newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
 
-        ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts, cyclesPerFrame);
+        ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies
         c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);

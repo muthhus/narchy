@@ -129,7 +129,7 @@ public class SubButton extends HBox {
             //Pane ig = new FlowPane();
             //ig.setMaxWidth(0);
 
-            if (t.op().isStatement()) {
+            if (t.op().statement) {
                 Compound st = (Compound)t;
                 sb.getChildren().setAll(
                     make(nar, st.term(0)),

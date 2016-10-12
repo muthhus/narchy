@@ -8,6 +8,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -44,7 +45,7 @@ public class PostCondition implements Serializable, Level //since there can be m
     }
 
 
-    public static final Set<Atom> reservedMetaInfoCategories = new LinkedHashSet() {{
+    public static final Set<Atomic> reservedMetaInfoCategories = new LinkedHashSet() {{
         add(the("Belief"));
         add(the("Stamp"));
         add(the("Goal"));
@@ -59,7 +60,7 @@ public class PostCondition implements Serializable, Level //since there can be m
     }};
 
 
-    static final Atom
+    static final Atomic
             /*negation = the("Negation"),
             conversion = the("Conversion"),
             contraposition = the("Contraposition"),

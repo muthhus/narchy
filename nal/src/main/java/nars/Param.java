@@ -22,7 +22,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     //TODO use 'I' for SELf, it is 3 characters shorter
-    public static final Atom DEFAULT_SELF = $.the("I");
+    public static final Atom DEFAULT_SELF = (Atom) $.the("I");
     /**
      * limited because some subterm paths are stored as byte[]. to be safe, use 7-bits
      */

@@ -84,6 +84,8 @@ public class ArithmeticInductionTest {
     }
 
     @Test public void testIntRangeDual() {
+        //This requires the recursive arithmetic induction
+
         //two separate intervals
         assertEquals(
                 "((x,`1<=?<=2`)&&(`2<=?<=3`,y))",
@@ -97,6 +99,7 @@ public class ArithmeticInductionTest {
     }
 
     @Test public void testIntRangeMultiple() {
+        //This requires the recursive arithmetic induction
         //two separate intervals
         assertEquals(
                 "(&&,(x,8),(x,`1<=?<=2`),(x,`4<=?<=6`))",

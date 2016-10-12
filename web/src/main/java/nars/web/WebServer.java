@@ -160,7 +160,6 @@ public class WebServer /*extends PathHandler*/ {
                 exe
         );
 
-        nar.cyclesPerFrame.set(1);
         nar.loop(framesPerSecond);
 
         return nar;

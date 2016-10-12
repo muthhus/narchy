@@ -16,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -56,7 +55,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
 
-    @Deprecated private final MutableInteger cyclesPerFrame;
+
     private final ConceptBuilder conceptBuilder;
 
     //cached value for use in the next firing
@@ -74,12 +73,11 @@ public class ConceptBagCycle implements Consumer<NAR> {
     //private final CapacityLinkedHashMap<Premise,Premise> recent = new CapacityLinkedHashMap<>(256);
     //long novel=0, total=0;
 
-    public ConceptBagCycle(@NotNull NAR nar, int initialCapacity, @Deprecated MutableInteger cyclesPerFrame) {
+    public ConceptBagCycle(@NotNull NAR nar, int initialCapacity) {
 
         this.nar = nar;
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
-        this.cyclesPerFrame = cyclesPerFrame;
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
         this.concepts = new MonitoredCurveBag(nar, initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
@@ -119,20 +117,10 @@ public class ConceptBagCycle implements Consumer<NAR> {
     /** called each frame */
     @Override public void accept(NAR nar) {
 
-        int cycles = cyclesPerFrame.intValue();
-
         int cpf = conceptsFiredPerCycle.intValue();
 
         taskLinks = tasklinksFiredPerFiredConcept.intValue();
         termLinks = termlinksFiredPerFiredConcept.intValue();
-
-        for (int cycleNum = 0; cycleNum < cycles; cycleNum++)
-            cycle(cpf);
-
-
-    }
-
-    void cycle(int cpf) {
 
         List<BLink<Concept>> toFire = $.newArrayList(cpf);
 
@@ -141,12 +129,12 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         //toFire.sort(sortConceptLinks);
 
-        nar.runLater(toFire, bc -> {
+        this.nar.runLater(toFire, bc -> {
             Concept c = bc.get();
             if (c != null) {
-                new FireConceptSquared(c, nar,
+                new FireConceptSquared(c, this.nar,
                         taskLinks, termLinks,
-                        nar::input //input them within the current thread here
+                        this.nar::input //input them within the current thread here
                 );
             }
         }, 2f);

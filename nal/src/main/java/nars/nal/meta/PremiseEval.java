@@ -270,15 +270,16 @@ public class PremiseEval extends Unify {
     public final boolean onMatch() {
 
  //       try {
-            if (!forEachMatch.run(this, now()))
-                return false;
+//            if (!forEachMatch.run(this, now()))
+//                return false;
 //        } catch (RuntimeException e) {
 //            if (Param.DEBUG_DERIVER)
 //                Conclude.logger.warn("{}\n\tderiving {}", e, ((Conclude)forEachMatch).rule.source);
 //            //continue
 //        }
 
-        return (--matchesRemain > 0);
+        //return forEachMatch.run(this, now()) && (--matchesRemain > 0);
+        return  (--matchesRemain > 0) && forEachMatch.run(this, now());
     }
 
 

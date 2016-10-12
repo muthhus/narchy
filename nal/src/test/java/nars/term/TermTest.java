@@ -609,8 +609,8 @@ public class TermTest {
 
     @Test
     public void testImageConstruction2() {
-        assertTrue( $("(/,_,X,Y)").op().isImage() );
-        assertFalse( $("(X,Y)").op().isImage() );
+        assertTrue($("(/,_,X,Y)").op().image);
+        assertFalse($("(X,Y)").op().image);
 
         assertValidTermValidConceptInvalidTaskContent(()->imageExt($("X"), $("Y")));
         assertValidTermValidConceptInvalidTaskContent(()->imageInt($("X"), $("Y")));
@@ -664,7 +664,7 @@ public class TermTest {
     }
 
     @Test public void testStatemntString() {
-        assertTrue( inh("a", "b").op().isStatement() );
+        assertTrue(inh("a", "b").op().statement);
         Term aInhB = $("<a-->b>");
         assertTrue(aInhB instanceof Compound);
         assertEquals("(a-->b)",

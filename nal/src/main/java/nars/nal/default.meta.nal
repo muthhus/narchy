@@ -268,7 +268,7 @@
     S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- (S ==> P), (Belief:Induction)
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- ((--,%S) ==> P), (Belief:InductionN)
     S, P, time(eternal), task(positive), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction)
-        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> (--,%S)) (Belief:AbductionN)
+        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> (--,%S)), (Belief:AbductionN)
     S, P, time(eternal), task(positive), task("."), neq(P,S), notImplEqui(S), notImplEqui(P) |- (S <=> P), (Belief:Comparison)
         S, P, time(eternal), task(negative), task("."), neq(P,S), notImplEqui(S), notImplEqui(P) |- (--,(S <=> P)), (Belief:ComparisonN)
     S, P, time(eternal), task("."), neq(P,S) |- (S && P), (Belief:Intersection)

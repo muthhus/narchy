@@ -99,8 +99,9 @@ public class PremiseRuleTest {
     }
 
     @NotNull static PremiseRule rule(@NotNull String onlyRule) {
+        PremiseRule r = (PremiseRule) p.term(onlyRule);
         return rule(
-            (PremiseRule) p.term(onlyRule)
+                r
         );
     }
 

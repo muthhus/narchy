@@ -196,7 +196,6 @@ public class Line1DContinuous extends NAgent {
                 new FrameClock(), exe
         );
 
-        nar.cyclesPerFrame.setValue(cyclesPerFrame);
 
         nar.beliefConfidence(0.95f);
         nar.goalConfidence(0.7f);

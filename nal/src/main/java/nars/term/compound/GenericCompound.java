@@ -51,7 +51,7 @@ public class GenericCompound implements Compound {
         TermVector subterms = (TermVector) _subterms; //HACK for future support of alternate TermContainer impls
 
         if (Param.DEBUG && dt != DTERNAL) {
-            if (!((op.isImage() && ((dt >= 0) || (dt < subterms.size()))) ||
+            if (!((op.image && ((dt >= 0) || (dt < subterms.size()))) ||
                     (Op.isTemporal(op, dt, subterms.size()))))
                 throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for operator " + op);
         }

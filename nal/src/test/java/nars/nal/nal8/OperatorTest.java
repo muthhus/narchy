@@ -76,7 +76,7 @@ public class OperatorTest {
     }
 
     @Test public void testInhIsOperation() {
-        Compound o = $("<(a,b,c)-->^x>");
+        Compound o = $("<(a,b,c)-->x>");
         assertTrue(o.term(0).op() == Op.PROD);
         assertTrue(o.term(1) instanceof Atomic);
         assertTrue(o.term(1).op() == Op.OPER);

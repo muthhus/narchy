@@ -5,6 +5,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.time.Tense;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.jetbrains.annotations.NotNull;
@@ -117,7 +118,7 @@ public enum Op {
 
 
     /** Image index ("imdex") symbol */
-    public static final Atom Imdex = $.the("_");
+    public static final Atomic Imdex = $.the("_");
     public static final int StatementBits = Op.or(Op.INH,Op.SIM,Op.IMPL,Op.EQUI);
     public static final int IMGbits = Op.or(Op.IMGe, Op.IMGi);
 
@@ -320,14 +321,6 @@ public enum Op {
 //        return !(max != -1 && length > max);
 //    }
 
-    public final boolean isImage() {
-        return image;
-    }
-
-
-    public boolean isStatement() {
-        return statement;
-    }
 
     /** true if matches any of the on bits of the vector */
     public final boolean in(int vector) {

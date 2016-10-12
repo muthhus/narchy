@@ -12,6 +12,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.test.DeductiveMeshTest;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
@@ -28,7 +29,7 @@ import java.util.function.Consumer;
  */
 public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
-    public static final @NotNull Atom L = $.the("_l");
+    public static final @NotNull Atomic L = $.the("_l");
 
     public interface TriConsumer<A,B,C> {
         void accept(A a, B b, C c);
@@ -41,7 +42,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 1, 2, 2 );
+        Default n = new Default(512, 4, 2, 2 );
         //n.nal(4);
 
 
@@ -49,7 +50,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n, 32, 8);
+        newConceptWindow(n,  64, 6);
 
         //n.run(20); //headstart
 
@@ -76,8 +77,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                );
 //                //.run(800);
 //
-        n.linkFeedbackRate.setValue(0.01f);
-        n.loop(2f);
+        n.linkFeedbackRate.setValue(0.5f);
+        n.loop(30f);
         //n.run(1);
 //        n.forEachConcept(c -> {
 //            c.print();

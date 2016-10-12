@@ -563,7 +563,7 @@ public class PremiseRule extends GenericCompound {
             Compound predicate = (Compound) precon[i];
             Term predicate_name = predicate.term(1);
 
-            String predicateNameStr = predicate_name.toString().substring(1);//.replace("^", "");
+            String predicateNameStr = predicate_name.toString();
 
             Term[] args;
             Term X, Y;
@@ -1070,7 +1070,7 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
-    static final Term TaskAny = exec($.oper("task"), $.the("any"));
+    static final Term TaskAny = $.$("task(any)");
 
 //    static final Term BELIEF = $.the("Belief");
 //    static final Term DESIRE = $.the("Desire");

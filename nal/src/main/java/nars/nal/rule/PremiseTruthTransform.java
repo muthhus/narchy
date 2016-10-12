@@ -4,6 +4,7 @@ import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.transform.CompoundTransform;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
@@ -21,8 +22,8 @@ abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term
 
 
 
-    final Atom belief = $.the("Belief");
-    final Atom desire = $.the("Desire");
+    final static Atomic belief = $.the("Belief");
+    final static Atomic desire = $.the("Desire");
 
 
     protected PremiseTruthTransform(boolean includeBelief, boolean includeDesire) {

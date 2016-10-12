@@ -26,7 +26,8 @@ public class Operator<T extends Term> extends AtomicStringConstant {
     }
 
     public Operator(@NotNull String id) {
-        super((id.charAt(0)!=Op.OPER.ch ? Op.OPER.ch + id : id));
+        //super((id.charAt(0)!=Op.OPER.ch ? Op.OPER.ch + id : id));
+        super(id);
     }
 
 
@@ -34,12 +35,12 @@ public class Operator<T extends Term> extends AtomicStringConstant {
     public static @Nullable Compound opArgs(@NotNull Compound operation) {
         return (Compound) operation.term(0);
     }
-    @Nullable
-    public static Compound opArgs(@NotNull Term x) {
-        if (x instanceof Compound)
-            return opArgs((Compound)x);
-        return null;
-    }
+//    @Nullable
+//    public static Compound opArgs(@NotNull Term x) {
+//        if (x instanceof Compound)
+//            return opArgs((Compound)x);
+//        return null;
+//    }
 
 
     /** returns the terms array of the arguments of an operation. does not check if the input is actually an operation */

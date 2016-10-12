@@ -215,7 +215,8 @@ public class PremiseRuleSet {
             ret = ret.replace("%A.._=B", "%A.._=%B"); //add var pattern manually to ellipsis
         }
 
-        return '<' + ret + '>'; //ret.replace("\n", "");/*.replace("A_1..n","\"A_1..n\"")*/ //TODO: implement A_1...n notation, needs dynamic term construction before matching
+        return ret;
+        //return '<' + ret + '>'; //ret.replace("\n", "");/*.replace("A_1..n","\"A_1..n\"")*/ //TODO: implement A_1...n notation, needs dynamic term construction before matching
     }
 
 
@@ -226,7 +227,25 @@ public class PremiseRuleSet {
                 .distinct()
                 //.parallel()
                 //.sequential()
-                .map(src -> Tuples.pair((Compound) index.parseRaw(src), src));
+                .map(src -> Tuples.pair(parse(src), src));
+    }
+
+    private static Compound parse(String src) {
+        src = src.trim();
+        if (src.isEmpty())
+            return null;
+
+        //(Compound) index.parseRaw(src)
+        String[] ab = src.split("\\|\\-");
+        if (ab.length!=2) {
+            throw new RuntimeException("parse error");
+        }
+
+        String A = "(" + ab[0].trim() + ")";
+        Compound ap = (Compound) $.terms.parseRaw(A);
+        String B = "(" + ab[1].trim() + ")";
+        Compound bp = (Compound) $.terms.parseRaw(B);
+        return new PremiseRule(ap, bp);
     }
 
     @NotNull

@@ -10,6 +10,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -37,7 +38,7 @@ public class BooleanSATTest {
 
     public static class BooleanConcept extends MutableBoolean {
 
-        final static Atom TRUE = $.the("TRUE");
+        final static Atomic TRUE = $.the("TRUE");
 
         private final NAR nar;
         private final Term term;

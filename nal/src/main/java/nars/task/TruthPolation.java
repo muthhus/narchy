@@ -126,7 +126,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         }
 
 
-        float duration = 1f * Math.max(1, volume - 1);
+        float duration = 1f * Math.max(1, volume - 2);
 
         FloatToFloatFunction lightCurve = (dt) -> {
 

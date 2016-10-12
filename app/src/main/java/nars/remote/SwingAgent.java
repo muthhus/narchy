@@ -60,7 +60,7 @@ abstract public class SwingAgent extends NAgent {
         Default nar = new Default(2048,
                 conceptsPerCycle, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 400000, 16384, 6)
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 400000, 64*1024, 3)
 
                 , new FrameClock(), exe);
 
@@ -77,7 +77,7 @@ abstract public class SwingAgent extends NAgent {
         nar.confMin.setValue(0.04f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        //nar.linkFeedbackRate.setValue(0.01f);
+        nar.linkFeedbackRate.setValue(0.05f);
 
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);

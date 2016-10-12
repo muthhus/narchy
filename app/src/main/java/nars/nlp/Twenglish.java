@@ -23,6 +23,7 @@ import nars.Narsese;
 import nars.task.MutableTask;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.util.io.Twokenize;
 import nars.util.io.Twokenize.Span;
 import org.jetbrains.annotations.NotNull;
@@ -35,11 +36,11 @@ import java.util.*;
  * Twitter English - english with additional tags for twitter-like content 
  */
 public class Twenglish {
-    public static final Atom GOAL = $.the("exclaims");
-    public static final Atom QUESTION = $.the("asks");
+    public static final Atomic GOAL = $.the("exclaims");
+    public static final Atomic QUESTION = $.the("asks");
     //public static final Atom QUEST = $.the("quest");
-    public static final Atom JUDGMENT = $.the("declares");
-    public static final Atom FRAGMENT = $.the("says");
+    public static final Atomic JUDGMENT = $.the("declares");
+    public static final Atomic FRAGMENT = $.the("says");
 
     //public final ArrayList<String> vocabulary = new ArrayList<>();
     
@@ -112,7 +113,7 @@ public class Twenglish {
         }
         if (t.isEmpty()) return Collections.emptyList();
 
-        Atom sentenceType = FRAGMENT;
+        Atomic sentenceType = FRAGMENT;
         if ((last!=null) && ("punct".equals(last.pattern))) {
             switch (last.content) {
                 case ".": sentenceType = JUDGMENT; break;

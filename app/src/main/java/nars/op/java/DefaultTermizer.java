@@ -5,6 +5,7 @@ import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
@@ -25,8 +26,8 @@ import java.util.stream.Collectors;
 public class DefaultTermizer implements Termizer {
 
 
-    public static final Atom PACKAGE = $.the("package");
-    public static final Atom PRIMITIVE = $.the("primitive");
+    public static final Atomic PACKAGE = $.the("package");
+    public static final Atomic PRIMITIVE = $.the("primitive");
     public static final Variable INSTANCE_VAR = $.varDep("instance");
 
     final Map<Package, Term> packages = new HashMap();

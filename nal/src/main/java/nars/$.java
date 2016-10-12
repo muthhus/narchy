@@ -86,12 +86,16 @@ public enum $ {
 //    }
 
     @NotNull
-    public static Atom the(@NotNull String id) {
-        return new Atom(id);
+    public static Atomic the(@NotNull String id) {
+        if (id.startsWith("^")) {
+            return new Operator(id);
+        } else {
+            return new Atom(id);
+        }
     }
     @NotNull
     public static Atom quote(String text) {
-        return $.the('"' + text + '"');
+        return (Atom)$.the('"' + text + '"');
     }
 
     @NotNull
@@ -112,7 +116,7 @@ public enum $ {
 
     @NotNull
     public static Atom the(char c) {
-        return the(String.valueOf(c));
+        return (Atom) the(String.valueOf(c));
     }
 
     /**
@@ -147,7 +151,7 @@ public enum $ {
 
     /** execution (NARS "operation") */
     @NotNull
-    public static Compound exec(@NotNull Operator opTerm, @Nullable Term... arg) {
+    public static Compound exec(@NotNull Term opTerm, @Nullable Term... arg) {
         return (Compound) compound(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
@@ -592,7 +596,7 @@ public enum $ {
 
     /** create a literal atom from a class (it's name) */
     public static Atom the(@NotNull Class c) {
-        return $.the(c.getName());
+        return (Atom) $.the(c.getName());
     }
 
 
@@ -624,7 +628,7 @@ public enum $ {
         }
         //return Atom.the(Utf8.toUtf8(name));
 
-        return the(Integer.toString(i, radix));
+        return (Atom) the(Integer.toString(i, radix));
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -671,7 +675,7 @@ public enum $ {
     }
 
     @NotNull
-    public static Atom the(@NotNull String name, boolean quoteIfNecessary) {
+    public static Atomic the(@NotNull String name, boolean quoteIfNecessary) {
         if (quoteIfNecessary && quoteNecessary(name))
             return quote(name);
 
@@ -823,12 +827,12 @@ public enum $ {
     }
 
     @NotNull
-    public static Atom the(@NotNull byte[] id) {
+    public static Atomic the(@NotNull byte[] id) {
         return the(new String(id));
     }
 
     @NotNull
-    public static Atom the(byte c) {
+    public static Atomic the(byte c) {
         return the(new byte[] { c });
     }
 

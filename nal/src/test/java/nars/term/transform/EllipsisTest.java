@@ -488,20 +488,20 @@ public class EllipsisTest {
 
 
     @Test public void testEllipsisInMinArity() {
-        Atom a = $.the("a");
+        Atomic a = $.the("a");
         Ellipsis b = new EllipsisOneOrMore($.varPattern(1));
 
         for (Op o : Op.values()) {
             if (o.minSize <= 1) continue;
             if (o == DISJ) continue;
 
-            if (o.isStatement()) continue;
+            if (o.statement) continue;
 
             assertEquals(o + " with normal term",
                     a, $.compound(o, a));
 
             assertEquals(o + " with ellipsis not reduced",
-                    o.isStatement() ? VAR_PATTERN : o,
+                    o.statement ? VAR_PATTERN : o,
                     $.compound(o,b).op());
         }
     }

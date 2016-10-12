@@ -39,6 +39,7 @@ public class ArithmeticInduction {
 
     private static final MultimapBuilder.SetMultimapBuilder setSetMapBuilder = MultimapBuilder.hashKeys().hashSetValues();
     private static final int resultLimit = 1;
+    private static boolean recurseAllSubstructures = false;
 
     @NotNull
     public static TermContainer compress(@NotNull TermContainer args) {
@@ -74,13 +75,19 @@ public class ArithmeticInduction {
             return subs; //each subterm has a unique structure so nothing will be combined
         } else if (numUniqueSubstructures > 1) {
             //recurse with each sub-structure group and re-combine
+            if (recurseAllSubstructures) {
 
-            Set<Term> ss = new HashSet();
-            for (Collection<Term> stg : subTermStructures.asMap().values()) {
-                ss.addAll(compress((Set<Term>)stg, depthRemain-1));
+                Set<Term> ss = new HashSet();
+                for (Collection<Term> stg : subTermStructures.asMap().values()) {
+                    ss.addAll(compress((Set<Term>) stg, depthRemain - 1));
+                }
+
+                return recompressIfChanged(subs, ss, depthRemain - 1);
+
+
+            } else {
+                return subs;
             }
-
-            return recompressIfChanged(subs, ss, depthRemain-1);
         }
 
         //group again according to appearance of unique atoms

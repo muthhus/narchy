@@ -219,7 +219,6 @@ public class Pacman extends NAgent {
         nar.DEFAULT_GOAL_PRIORITY = 1f * pMult;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * pMult;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * pMult;
-        nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.linkFeedbackRate.setValue(0.1f);
 
         nar.confMin.setValue(0.04f);

@@ -258,42 +258,55 @@ public class NarseseTest {
 
 
 
-    protected void testBelieveAB(@NotNull Compound t) {
+    private void testOperationStructure(@NotNull Compound t) {
         Term[] aa = Operator.argArray(t);
         assertEquals(2, aa.length);
-        assertEquals("^believe", t.term(1).toString());
-        assertEquals("^believe", Operator.operator(t).toString());
+        assertEquals("believe", t.term(1).toString());
+        //assertEquals("^believe", Operator.operator(t).toString());
         assertEquals("a", aa[0].toString());
         assertEquals("b", aa[1].toString());
     }
 
     @Test
     public void testOperationNoArgs() {
-        taskParses("believe()!");
-    }
-    @Test
-    public void testOperationNoArgsWithSpace() {
-        taskParses("believe( )!");
+        Term t = term("op()");
+        assertNotNull(t);
+        assertEquals(t.toString(), Op.INH, t.op());
+        assertEquals(0, Operator.opArgs((Compound)t).size());
+
+        taskParses("op()!");
+        taskParses("op( )!");
     }
 
 
 
     @Test
     public void testOperation2() throws Narsese.NarseseException {
-        testBelieveAB(term("believe(a,b)"));
-        testBelieveAB(term("believe(a, b)"));
+        testOperationStructure(term("believe(a,b)"));
+        testOperationStructure(term("believe(a, b)"));
     }
 
     @Test
     public void testOperationEquivalence() throws Narsese.NarseseException {
         Term a, b;
         a = term("a(b,c)");
-        b = term("<(b,c) --> ^a>");
+        b = term("((b,c) --> a)");
         assertEquals(a.op(), b.op());
         assertEquals(a.getClass(), b.getClass());
         assertEquals(a, b);
+    }
+    @Test
+    public void testOperationEquivalenceWithOper() throws Narsese.NarseseException {
+        Term a;
+        a = term("^a(b,c)");
+        Compound b = term("((b,c) --> ^a)");
 
+        assertEquals(a, b);
 
+        assertEquals(a.op(), b.op());
+        assertEquals(a.getClass(), b.getClass());
+
+        assertEquals(Op.OPER, b.term(1).op());
 
     }
 
@@ -444,7 +457,7 @@ public class NarseseTest {
         //TODO test parsing to numeric atom types
         float f = 1.24f;
         String ff = Float.toString(f);
-        Atom a = term(ff);
+        Atomic a = term(ff);
         assertNotNull(a);
         assertEquals('"' + ff + '"', a.toString());
     }
@@ -630,13 +643,6 @@ public class NarseseTest {
         assertEquals(Operator.class, o.getClass());
     }
 
-    @Test
-    public void testOperatorWithNoParams() {
-        Term t = term("op()");
-        assertNotNull(t);
-        assertEquals(t.toString(), Op.INH, t.op());
-        assertEquals(0, Operator.opArgs((Compound)t).size());
-    }
 
 }
 //class OldNarseseParser {
