@@ -677,16 +677,16 @@ public class TermReductionsTest {
         //  <base --> (/,reaction,acid,_)> //en("A base is something that has a reaction with an acid.");
         //  <acid --> (/,reaction,_,base)> //en("Acid can react with base.");
         assertEquals(
-                  "{((a,b)-->r)}",
+                  "{r(a,b)}",
                 $("{(b-->(/,r,a,_))}").toString());
         assertEquals(
-                  "(--,((a,b)-->r))",
+                  "(--,r(a,b))",
                 $("(--,(a-->(/,r,_,b)))").toString());
 
     }
     @Test public void testNegatedImageInSubtermsProductNormalForm() {
         assertEquals(
-                  "{(--,((a,b)-->r)),(z-->(x,y))}",
+                  "{(--,r(a,b)),(z-->(x,y))}",
                 $("{ (--,(b-->(/,r,a,_))), ((\\,z,x,_)-->y) }").toString());
 
     }

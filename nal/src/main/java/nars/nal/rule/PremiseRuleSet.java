@@ -224,13 +224,13 @@ public class PremiseRuleSet {
     static Stream<Pair<Compound, String>> parse(@NotNull Stream<CharSequence> rawRules, @NotNull PatternIndex index) {
         return rawRules
                 .map(PremiseRuleSet::preprocess)
-                .distinct()
-                //.parallel()
+                //.distinct()
+                .parallel()
                 //.sequential()
-                .map(src -> Tuples.pair(parse(src), src));
+                .map(src -> Tuples.pair(parse(src, index), src));
     }
 
-    private static Compound parse(String src) {
+    public static PremiseRule parse(String src, PatternIndex index) {
         src = src.trim();
         if (src.isEmpty())
             return null;
@@ -242,9 +242,9 @@ public class PremiseRuleSet {
         }
 
         String A = "(" + ab[0].trim() + ")";
-        Compound ap = (Compound) $.terms.parseRaw(A);
+        Compound ap = (Compound) index.parseRaw(A);
         String B = "(" + ab[1].trim() + ")";
-        Compound bp = (Compound) $.terms.parseRaw(B);
+        Compound bp = (Compound) index.parseRaw(B);
         return new PremiseRule(ap, bp);
     }
 

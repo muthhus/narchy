@@ -88,7 +88,11 @@ public class TemporalTest {
         assertTrue( na == nc );
 
         assertTrue( ((CompoundConcept) na).term(0) == ((CompoundConcept)nc).term(0));
-        assertTrue( ((CompoundConcept)b.concept(n)).term(0) == ((CompoundConcept)c.concept(n)).term(0));
+
+        System.out.println( ((CompoundConcept)b.concept(n)) );
+        System.out.println( ((CompoundConcept)c.concept(n)) );
+
+        assertTrue( ((CompoundConcept)b.concept(n)).term(0).equals( ((CompoundConcept)c.concept(n)).term(0)) );
 
     }
 
@@ -99,7 +103,7 @@ public class TemporalTest {
     @Test public void testParseOperationInFunctionalForm2() {
         assertEquals("(do(that) &&+0 ((a)&&(b)))", n.term("(do(that) &&+0 ((a)&&(b)))").toString());
 
-        Termed<Term> nt = n.term("(((that)-->^do) &&+0 ((a)&&(b)))");
+        Termed<Term> nt = n.term("(((that)-->do) &&+0 ((a)&&(b)))");
         assertEquals("(do(that) &&+0 ((a)&&(b)))", nt.toString());
 
         //assertNotNull(n.conceptualize(nt, UnitBudget.One));
@@ -128,20 +132,20 @@ public class TemporalTest {
         testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "((#1-->$2) &&-20 ({(row,3)}-->$2))");
     }
     @Test public void testCommutiveTemporalityConj2() {
-        testParse("(goto(a) &&+5 ((SELF,b)-->at))", "(goto(a) &&+5 ((SELF,b)-->at))");
+        testParse("(goto(a) &&+5 ((SELF,b)-->at))", "(goto(a) &&+5 at(SELF,b))");
     }
 
 
     @Test public void testCommutiveTemporality1() {
-        testParse("(goto(a) &&-5 ((SELF,b)-->at))", "(goto(a) &&-5 ((SELF,b)-->at))");
-        testParse("(goto(a) &&+0 ((SELF,b)-->at))", "(goto(a) &&+0 ((SELF,b)-->at))");
-        testParse("(goto(a)&&((SELF,b)-->at))", "(goto(a)&&((SELF,b)-->at))");
+        testParse("(goto(a) &&-5 ((SELF,b)-->at))", "(goto(a) &&-5 at(SELF,b))");
+        testParse("(goto(a) &&+0 ((SELF,b)-->at))", "(goto(a) &&+0 at(SELF,b))");
+        testParse("(goto(a)&&((SELF,b)-->at))", "(goto(a)&&at(SELF,b))");
     }
     @Test public void testCommutiveTemporality2() {
-        testParse("(goto(a) &&-5 ((SELF,b)-->at))");
-        testParse("(goto(a) &&+5 ((SELF,b)-->at))");
-        testParse("(goto(a) &&+0 ((SELF,b)-->at))");
-        testParse("(goto(a)&&((SELF,b)-->at))");
+        testParse("(goto(a) &&-5 at(SELF,b))");
+        testParse("(goto(a) &&+5 at(SELF,b))");
+        testParse("(goto(a) &&+0 at(SELF,b))");
+        testParse("(goto(a)&&at(SELF,b))");
     }
 
     @Test public void testCommutiveTemporalityDepVar0() {
@@ -154,11 +158,11 @@ public class TemporalTest {
     }
 
     @Test public void testCommutiveTemporalityDepVar1() {
-        testParse("(goto(#1) &&+5 ((SELF,#1)-->at))");
+        testParse("(goto(#1) &&+5 at(SELF,#1))");
     }
     @Test public void testCommutiveTemporalityDepVar2() {
-        testParse("(goto(#1) &&+5 ((SELF,#1)-->at))", "(goto(#1) &&+5 ((SELF,#1)-->at))");
-        testParse("(goto(#1) &&-5 ((SELF,#1)-->at))", "(goto(#1) &&-5 ((SELF,#1)-->at))");
+        testParse("(goto(#1) &&+5 at(SELF,#1))", "(goto(#1) &&+5 at(SELF,#1))");
+        testParse("(goto(#1) &&-5 at(SELF,#1))", "(goto(#1) &&-5 at(SELF,#1))");
     }
 
     @Test public void testCommutiveEquivAgain1() {
@@ -211,7 +215,7 @@ public class TemporalTest {
 
         a.beliefs().print();
 
-        assertEquals(3, a.beliefs().size());
+        assertEquals(7, a.beliefs().size());
     }
 
     @Nullable
@@ -329,9 +333,13 @@ public class TemporalTest {
 
         Bag<Concept> cb = d.core.concepts;
         cb.print();
-        assertEquals(7, cb.size());
+        assertEquals(5, cb.size());
         Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
-        assertEquals("((\\,(a==>b),_)-->[pill])", cc.toString());
+
+        String q = "((\\,(a==>b),_)-->[pill])";
+        assertEquals(q,cb.get($(q)).toString());
+        //assertEquals(q, cc.toString());
+
         cc.print();
         //INTERMPOLATION APPLIED DURING REVISION:
         assertEquals("((\\,(a ==>+4 b),_)-->[pill])", cc.beliefs().eternalTop().term().toString());
@@ -347,7 +355,7 @@ public class TemporalTest {
 
         Bag<Concept> cb = d.core.concepts;
         cb.print();
-        assertTrue(7 <= cb.size());
+        assertTrue(5 <= cb.size());
         Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
         assertEquals("((\\,(a==>b),_)-->[pill])", cc.toString());
         cc.print();
@@ -409,12 +417,11 @@ public class TemporalTest {
         n.input("(x ==>+5 y).", "(y ==>-5 x).");
         n.next().next().next();
 
-        StringBuilder cc = new StringBuilder();
         TreeSet d = new TreeSet((x,y)-> x.toString().compareTo(y.toString()));
         n.forEachActiveConcept(d::add);
 
         //2 unique impl concepts created
-        assertEquals("[(x<=>y), (x==>y), (y==>x), x, y]", d.toString());
+        assertEquals("[((x==>y)&&(y==>x)), (x<=>y), (x==>y), (y==>x), x, y]", d.toString());
     }
 
     @Test public void testCommutivity() {

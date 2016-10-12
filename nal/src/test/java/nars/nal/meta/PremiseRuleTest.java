@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import java.util.Set;
 
+import static nars.nal.rule.PremiseRuleSet.parse;
 import static org.junit.Assert.*;
 
 /**
@@ -51,7 +52,7 @@ public class PremiseRuleTest {
         assertEquals(1, p.term("<%A --> %B>").complexity());
 
         {
-            PremiseRule x = (PremiseRule) p.term("<A, A |- A, (Belief:Revision, Goal:Weak)>");
+            PremiseRule x = rule("A, A |- A, (Belief:Revision, Goal:Weak)");
             assertNotNull(x);
             //assertEquals("((A,A),(A,((Revision-->Belief),(Weak-->Desire))))", x.toString());
             // assertEquals(12, x.getVolume());
@@ -60,20 +61,20 @@ public class PremiseRuleTest {
 
         int vv = 19;
         {
-            PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Goal:Weak)>");
+            PremiseRule x = rule("<A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Goal:Weak)");
             x = rule(x);
             assertEquals(vv, x.volume());
             //assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Revision-->Belief),(Weak-->Desire))))", x.toString());
 
         }
         {
-            PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Goal:Weak)>");
+            PremiseRule x = rule("<A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Goal:Weak)");
             x = rule(x);
             assertEquals(vv, x.volume()); //same volume as previous block
             //assertEquals("(((%1-->%2),(%2-->%1)),((nonvar<->%1),((Revision-->Belief),(Weak-->Desire))))", x.toString());
         }
         {
-            PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> B>,  (Belief:Conversion, Punctuation:Judgment)>");
+            PremiseRule x = rule(" <A --> B>, <B --> A> |- <A <-> B>,  (Belief:Conversion, Punctuation:Judgment)");
             x = rule(x);
             assertEquals(vv, x.volume());
             //assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Conversion-->Belief),(Judgment-->Punctuation))))", x.toString());
@@ -87,7 +88,7 @@ public class PremiseRuleTest {
 //        }
 
         //and the first complete rule:
-        PremiseRule x = (PremiseRule) p.term("<(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Goal:Strong)>");
+        PremiseRule x = rule("(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Goal:Strong)");
         x = rule(x);
         //assertEquals("(((%1-->%2),(%3-->%2)),((%1<->%3),((Comparison-->Belief),(Strong-->Desire))))", x.toString());
         assertEquals(vv, x.volume());
@@ -99,10 +100,11 @@ public class PremiseRuleTest {
     }
 
     @NotNull static PremiseRule rule(@NotNull String onlyRule) {
-        PremiseRule r = (PremiseRule) p.term(onlyRule);
-        return rule(
-                r
-        );
+        return parse(onlyRule, new PatternIndex());
+//        PremiseRule r = (PremiseRule) p.term(onlyRule);
+//        return rule(
+//                r
+//        );
     }
 
     @Test
@@ -111,8 +113,8 @@ public class PremiseRuleTest {
 
         PatternIndex i = new PatternIndex();
 
-        String l = "<((B,P) --> ?X) ,(B --> A), task(\"?\") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)>";
-        Compound x = ((PremiseRule) p.term(l)).normalizeRule(i);
+        String l = "((B,P) --> ?X) ,(B --> A), task(\"?\") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)";
+        Compound x = parse(l, i).normalizeRule(i);
         assertNotNull(x);
         assertNotNull(x.toString());
         assertTrue(!x.toString().contains("%B"));
@@ -131,7 +133,7 @@ public class PremiseRuleTest {
         PatternIndex i = new PatternIndex();
 
 
-        Compound y = (Compound) p.term("<(S --> P), --%S |- (P --> S), (Belief:Conversion)>");
+        Compound y = rule("(S --> P), --%S |- (P --> S), (Belief:Conversion)");
         assertNotNull(y);
         y = ((PremiseRule) y).normalizeRule(i);
         assertNotNull(y);
@@ -145,7 +147,7 @@ public class PremiseRuleTest {
 
     @Test
     public void printTermRecursive() {
-        Compound y = (Compound) p.term("<(S --> P), --%S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)>");
+        Compound y = rule("(S --> P), --%S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)");
         printRecursive(y);
     }
 
@@ -173,7 +175,7 @@ public class PremiseRuleTest {
     public void testBackwardPermutations() {
         if (Param.BACKWARD_QUESTION_RULES) {
             Set<PremiseRule> s = PremiseRuleSet.permute(
-                    rule("<(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:Swap)>")
+                    rule("(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:Swap)")
             );
             assertNotNull(s);
             //System.out.println(Joiner.on('\n').join(s));
@@ -196,7 +198,7 @@ public class PremiseRuleTest {
     }
 
     @Test public void testSubstIfUnifies() {
-        PremiseRule r = rule("<(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Goal:Induction)>");
+        PremiseRule r = rule("(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Goal:Induction)");
         System.out.println(r);
         System.out.println(r.source);
         Set<PremiseRule> s = PremiseRuleSet.permute(r);

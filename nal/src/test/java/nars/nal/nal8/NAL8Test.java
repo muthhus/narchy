@@ -241,14 +241,14 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void desiredFeedbackReversedIntoGoalEternal()  {
         TestNAR tester = test();
-        tester.input("<y --> (/,^exe,x,_)>!");
+        tester.input("<y --> (/,exe,x,_)>!");
         tester.mustDesire(5, "exe(x, y)", 1.0f, 0.9f);
     }
 
 
     @Test public void desiredFeedbackReversedIntoGoalNow()  {
         TestNAR tester = test();
-        tester.input("<y --> (/,^exe,x,_)>! :|:");
+        tester.input("<y --> (/,exe,x,_)>! :|:");
         tester.mustDesire(5, "exe(x, y)", 1.0f, 0.9f, 0);
     }
 
@@ -267,14 +267,14 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void testExecutionResultConstant() {
         test()
             
-            .input("<z --> (/,^exe,x,_)>! :|:")
+            .input("<z --> (/,exe,x,_)>! :|:")
             .mustDesire(64, "exe(x, z)", 1.0f, 0.9f, 0);
     }
 
     @Test public void testExecutionResult()  {
         test()
                 
-            .input("<#1 --> (/,^exe,x,_)>! :|:")
+            .input("<#1 --> (/,exe,x,_)>! :|:")
             .mustDesire(64, "exe(x, #1)", 1.0f, 0.9f, 0);
 
         //if (!(tester.nar instanceof SingleStepNAR)) {
@@ -863,7 +863,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test()
                 
-                .inputAt(0, "(((in)|(left))-->^cam)! :|:")
+                .inputAt(0, "(((in)|(left))-->cam)! :|:")
                 .mustDesire(cycles, "cam(in)", 1f,0.81f, 0)
                 .mustDesire(cycles, "cam(left)", 1f,0.81f, 0);
 
@@ -874,7 +874,7 @@ public class NAL8Test extends AbstractNALTest {
         //   cam(out)!
 
         test()
-                .inputAt(0, "(((in)|(left))-->^cam). :|:")
+                .inputAt(0, "(((in)|(left))-->cam). :|:")
                 .mustBelieve(cycles, "cam(in)", 1f,0.81f, 0)
                 .mustBelieve(cycles, "cam(left)", 1f,0.81f, 0);
 

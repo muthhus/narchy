@@ -161,64 +161,64 @@ public class Narsese extends BaseParser<Object> {
                 ), eof());
     }
 
-    /**
-     * {Premise1,Premise2} |- Conclusion.
-     */
-    public Rule TaskRule() {
-
-        //use a var to count how many rule conditions so that they can be pulled off the stack without reallocating an arraylist
-        return sequence(
-                STATEMENT_OPENER, s(),
-                push(PremiseRule.class),
-
-                Term(), //cause
-
-                zeroOrMore(sepArgSep(), Term()),
-                s(), TASK_RULE_FWD, s(),
-
-                push(PremiseRule.class), //stack marker
-
-                Term(), //effect
-
-                zeroOrMore(sepArgSep(), Term()),
-                s(), STATEMENT_CLOSER, s(),
-
-                eof(),
-
-                push(popTaskRule())
-        );
-    }
-
-
-    @Nullable
-    public PremiseRule popTaskRule() {
-        //(Term)pop(), (Term)pop()
-
-        List<Term> r = $.newArrayList(16);
-        List<Term> l = $.newArrayList(16);
-
-        Object popped;
-        while ((popped = pop()) != PremiseRule.class) { //lets go back till to the start now
-            r.add(the(popped));
-        }
-        if (r.isEmpty()) //empty premise list is invalid
-            return null;
-
-        while ((popped = pop()) != PremiseRule.class) {
-            l.add(the(popped));
-        }
-        if (l.isEmpty()) //empty premise list is invalid
-            return null;
+//    /**
+//     * {Premise1,Premise2} |- Conclusion.
+//     */
+//    public Rule TaskRule() {
+//
+//        //use a var to count how many rule conditions so that they can be pulled off the stack without reallocating an arraylist
+//        return sequence(
+//                STATEMENT_OPENER, s(),
+//                push(PremiseRule.class),
+//
+//                Term(), //cause
+//
+//                zeroOrMore(sepArgSep(), Term()),
+//                s(), TASK_RULE_FWD, s(),
+//
+//                push(PremiseRule.class), //stack marker
+//
+//                Term(), //effect
+//
+//                zeroOrMore(sepArgSep(), Term()),
+//                s(), STATEMENT_CLOSER, s(),
+//
+//                eof(),
+//
+//                push(popTaskRule())
+//        );
+//    }
 
 
-        Collections.reverse(l);
-        Collections.reverse(r);
-
-        Compound premise = $.p(l);
-        Compound conclusion = $.p(r);
-
-        return new PremiseRule(premise, conclusion);
-    }
+//    @Nullable
+//    public PremiseRule popTaskRule() {
+//        //(Term)pop(), (Term)pop()
+//
+//        List<Term> r = $.newArrayList(16);
+//        List<Term> l = $.newArrayList(16);
+//
+//        Object popped;
+//        while ((popped = pop()) != PremiseRule.class) { //lets go back till to the start now
+//            r.add(the(popped));
+//        }
+//        if (r.isEmpty()) //empty premise list is invalid
+//            return null;
+//
+//        while ((popped = pop()) != PremiseRule.class) {
+//            l.add(the(popped));
+//        }
+//        if (l.isEmpty()) //empty premise list is invalid
+//            return null;
+//
+//
+//        Collections.reverse(l);
+//        Collections.reverse(r);
+//
+//        Compound premise = $.p(l);
+//        Compound conclusion = $.p(r);
+//
+//        return new PremiseRule(premise, conclusion);
+//    }
 
     public Rule LineComment() {
         return sequence(
@@ -466,7 +466,7 @@ public class Narsese extends BaseParser<Object> {
 
                         seq(meta, Ellipsis()),
 
-                        seq(meta, TaskRule()),
+                        //seq(meta, TaskRule()),
 
                         TemporalRelation(),
 
