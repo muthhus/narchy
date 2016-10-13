@@ -1,6 +1,5 @@
 package nars.util.event;
 
-import com.google.common.collect.Iterators;
 import nars.util.data.list.FasterList;
 
 import java.util.Collection;

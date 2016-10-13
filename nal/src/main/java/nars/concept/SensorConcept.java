@@ -214,9 +214,9 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     }
 
 
-    public static void attentionGroup(Iterable<? extends Prioritizable> c, MutableFloat min, MutableFloat limit, NAR nar) {
+    public static void activeAttention(Iterable<? extends Prioritizable> c, MutableFloat min, MutableFloat limit, NAR nar) {
 
-        attentionGroup(c,
+        activeAttention(c,
                 //(cp) -> Util.lerp( limit.floatValue(), min.floatValue(), cp) //direct pri -> pri mapping
                 (cp) -> Util.lerp(limit.floatValue(), min.floatValue(),
                             UtilityFunctions.sawtoothCurved(cp))
@@ -226,7 +226,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
 
     /** adaptively sets the priority of a group of sensors via a function  */
-    public static void attentionGroup(Iterable<? extends Prioritizable> c, FloatToFloatFunction f, NAR nar) {
+    public static void activeAttention(Iterable<? extends Prioritizable> c, FloatToFloatFunction f, NAR nar) {
         c.forEach( s -> s.pri(() -> {
             return f.valueOf(nar.conceptPriority((Termed)s));
         } ) );

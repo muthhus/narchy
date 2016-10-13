@@ -607,7 +607,7 @@ public class TermReductionsTest {
     public void testGroupNonDTemporalParallelComponents() {
         //$.76;.45;.70$ ( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right))). :3537: %.64;.15%
         //$.39;.44;.70$ (((--,(ball_left)) &&-233 (ball_right)) &&-1 ((ball_left) &&+0 (ball_right))). :3243: %.53;.23%
-        assertEquals("(((ball_left) &&+0 (ball_right)) &&+0 ((--,(ball_left)) &&-270 (ball_right)))",
+        assertEquals("(((ball_left) &&+0 (ball_right)) &&+0 ((ball_right) &&+270 (--,(ball_left))))",
 
                 //HACK: this narsese parser isnt implemented yet:
                 //$("( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right)))")

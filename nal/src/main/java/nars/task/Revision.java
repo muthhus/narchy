@@ -12,7 +12,6 @@ import nars.table.DefaultBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.DefaultTruth;
 import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;

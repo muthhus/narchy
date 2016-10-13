@@ -137,7 +137,7 @@ public class TemporalTest {
 
 
     @Test public void testCommutiveTemporality1() {
-        testParse("(goto(a) &&-5 ((SELF,b)-->at))", "(goto(a) &&-5 at(SELF,b))");
+        testParse("(at(SELF,b) &&+5 goto(a))", "(goto(a) &&-5 at(SELF,b))");
         testParse("(goto(a) &&+0 ((SELF,b)-->at))", "(goto(a) &&+0 at(SELF,b))");
         testParse("(goto(a)&&((SELF,b)-->at))", "(goto(a)&&at(SELF,b))");
     }

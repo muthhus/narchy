@@ -7,7 +7,6 @@ import nars.concept.OperationConcept;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
-
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

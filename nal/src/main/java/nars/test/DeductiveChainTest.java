@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Param;
 import nars.nar.Default;
 import nars.term.Compound;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

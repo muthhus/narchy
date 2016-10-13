@@ -228,13 +228,13 @@ import java.util.function.Function;
 
     public Map newBagMap() {
         int defaultInitialCap = 16;
-//        if (nar.exe.concurrent()) {
+        if (nar.exe.concurrent()) {
             return new ConcurrentHashMap(defaultInitialCap);
             //return new NonBlockingHashMap(cap);
             //return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMap<>();
             //ConcurrentHashMapUnsafe(cap);
-//        } else {
-//            return new HashMap(defaultInitialCap);
-//        }
+        } else {
+            return new HashMap(defaultInitialCap);
+        }
     }
 }

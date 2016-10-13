@@ -10,7 +10,6 @@ import nars.nlp.Twenglish;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
 import nars.truth.Truth;

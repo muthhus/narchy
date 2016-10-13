@@ -293,10 +293,10 @@ public class TermTest {
 //        assertFalse(Op.isOperation(n.term("^wonder")));
 
         try {
-            Term x = n.term("^wonder(a,b)").term();
+            Term x = n.term("wonder(a,b)").term();
             assertEquals(INH, x.op());
             assertTrue(Op.isOperation(x));
-            assertEquals("^wonder(a,b)", x.toString());
+            assertEquals("wonder(a,b)", x.toString());
 
         } catch (Narsese.NarseseException ex) {
             ex.printStackTrace();

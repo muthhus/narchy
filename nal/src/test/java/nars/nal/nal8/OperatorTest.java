@@ -9,9 +9,9 @@ import nars.term.atom.Atomic;
 import nars.test.TestNAR;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class OperatorTest {
 
@@ -76,11 +76,11 @@ public class OperatorTest {
     }
 
     @Test public void testInhIsOperation() {
-        Compound o = $("<(a,b,c)-->^x>");
+        Compound o = $("<(a,b,c)-->x>");
         assertTrue(o.term(0).op() == Op.PROD);
         assertTrue(o.term(1) instanceof Atomic);
         assertTrue(o.term(1).op() == Op.ATOM);
-        assertEquals("^x(a,b,c)", o.toString());
+        assertEquals("x(a,b,c)", o.toString());
         assertEquals(Op.INH, o.op());
     }
 

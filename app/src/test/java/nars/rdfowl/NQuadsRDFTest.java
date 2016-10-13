@@ -2,7 +2,6 @@ package nars.rdfowl;
 
 import nars.NAR;
 import nars.Param;
-
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;

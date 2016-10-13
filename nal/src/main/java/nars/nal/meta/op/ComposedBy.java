@@ -2,12 +2,9 @@ package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
-import nars.nal.meta.TaskBeliefSubterms;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
 
 /**
  * compound 'container' contains (1st-level only) 'contained' but also not equal to it

@@ -2,26 +2,14 @@ package nars.video;
 
 import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.transform.wavelet.UtilWavelet;
-import boofcv.alg.transform.wavelet.WaveletTransformOps;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.factory.transform.wavelet.GFactoryWavelet;
-import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WlCoef_F32;
-import nars.NAgent;
-import nars.util.Util;
-import nars.util.data.random.XorShift128PlusRandom;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.util.Random;
 import java.util.function.Supplier;
-
-import static java.lang.Math.max;
-import static nars.util.Util.lerp;
 
 /**
  * 2D wavelet transform of input image

@@ -9,6 +9,8 @@ import nars.index.TermIndex;
 import nars.index.TreeIndex;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
+import nars.nar.exe.Executioner;
+import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
@@ -18,7 +20,6 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.RealtimeMSClock;
-import nars.time.Tense;
 import nars.util.Texts;
 import nars.util.Wiki;
 import nars.util.data.random.XORShiftRandom;
@@ -167,7 +168,8 @@ public class IRCAgent extends IRC {
 
         @Nullable
         @Override
-        public final Object function(Compound arguments, TermIndex i) {
+        public final synchronized Object function(Compound arguments, TermIndex i) {
+
             Object y = function(arguments);
 
             if (y != null)
@@ -176,7 +178,7 @@ public class IRCAgent extends IRC {
             //loop back as hearing
             //say($.quote(y.toString()), $.p(nar.self, $.the("controller")));
 
-            return y;
+            return null;
         }
 
         protected abstract Object function(Compound arguments);
@@ -284,9 +286,10 @@ public class IRCAgent extends IRC {
 
         nar.runLater(() -> {
 
-            Term pr = $.p($.quote(channel), $.quote(nick));
+
             for (Term token : tokenize(msg)) {
-                nar.believe($.inh(token, pr), time[0], 1f);
+                Term pr = $.exec("hear", $.quote(channel), $.quote(nick), token );
+                nar.believe(pr, time[0], 1f);
                 time[0] += wordDelay;
             }
 
@@ -299,9 +302,9 @@ public class IRCAgent extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        SingleThreadExecutioner exe = new SingleThreadExecutioner();
-        //new SingleThreadExecutioner();
-        //new MultiThreadExecutioner(3, 1024*8);
+        Executioner exe =
+                //new SingleThreadExecutioner();
+                new MultiThreadExecutioner(3, 1024*8);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 2, 2, random,
 
@@ -314,7 +317,7 @@ public class IRCAgent extends IRC {
         );
 
 
-        int volMax = 40;
+        int volMax = 50;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -328,7 +331,7 @@ public class IRCAgent extends IRC {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.1f;
+        float p = 0.01f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
@@ -344,7 +347,7 @@ public class IRCAgent extends IRC {
                         "/home/me/Downloads/nquad"
                 )).
                         peek(t -> {
-                            t.setBudget(Param.BUDGET_EPSILON * 2, 0.5f, 0.75f); //zero priority
+                            t.setBudget(Param.BUDGET_EPSILON * 64, 0.5f, 0.5f); //low priority
                         }).
                         collect(Collectors.toList())
                 , 4f

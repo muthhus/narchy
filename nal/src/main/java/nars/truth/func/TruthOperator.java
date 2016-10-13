@@ -3,7 +3,6 @@ package nars.truth.func;
 import nars.$;
 import nars.NAR;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

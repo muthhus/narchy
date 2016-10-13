@@ -1,6 +1,7 @@
 package nars.index;
 
 import nars.*;
+import nars.Op;
 import nars.concept.Concept;
 import nars.concept.util.ConceptBuilder;
 import nars.concept.util.InvalidConceptException;
@@ -32,9 +33,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.Op.INH;
-import static nars.Op.PROD;
-import static nars.Op.VAR_PATTERN;
+import static nars.Op.*;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
 import static nars.term.Terms.compoundOrNull;

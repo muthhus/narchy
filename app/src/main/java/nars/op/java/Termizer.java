@@ -2,7 +2,6 @@ package nars.op.java;
 
 import nars.$;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.Nullable;
 

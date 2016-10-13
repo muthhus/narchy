@@ -3,7 +3,6 @@ package nars.rdfowl;
 import nars.$;
 import nars.NAR;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 
 import javax.xml.namespace.QName;

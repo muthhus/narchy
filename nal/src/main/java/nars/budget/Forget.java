@@ -28,9 +28,9 @@ public final class Forget implements Consumer<BLink> {
      forgetRate ~= -((capacity * avgMass) - pressure - existingMass) / existingMass
      */
     @Nullable
-    public static Forget forget(float pressure, float existingMass, int cap, float expectedAvgMass) {
+    public static Forget forget(float pressure, float existingMass, int size, float expectedAvgMass) {
 
-        float r = -((cap * expectedAvgMass) - pressure - existingMass) / existingMass;
+        float r = -((size * expectedAvgMass) - pressure - existingMass) / existingMass;
 
         Forget f;
         if (r >= Param.BUDGET_EPSILON)
@@ -41,8 +41,8 @@ public final class Forget implements Consumer<BLink> {
     }
 
     @Nullable
-    public static Forget forget(float pressure, float existingMass, int cap) {
-        return forget(pressure, existingMass, cap, Param.BAG_THRESHOLD);
+    public static Forget forget(float pressure, float existingMass, int siz) {
+        return forget(pressure, existingMass, siz, Param.BAG_THRESHOLD);
     }
 
     @Override

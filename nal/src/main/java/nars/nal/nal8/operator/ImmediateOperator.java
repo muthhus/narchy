@@ -5,7 +5,6 @@ import nars.$;
 import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
 /** an operation that executes immediately, and without logical consequences;

@@ -60,7 +60,7 @@ public class TaskBudgeting {
         //volRatioScale = (float) Math.pow(volRatioScale, 2);
 
 
-        final float durability = pp.dur() * volRatioScale * qual;
+        final float durability = pp.dur() * qual;
         if (durability < minDur)
             return null;
 
@@ -70,12 +70,12 @@ public class TaskBudgeting {
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 pp.pri()
                     * volRatioScale //priority should be reduced as well as durability, because in the time between here and the next forgetting it should not have similar priority as parent in cases like Belief:Identity truth function derivations
-                    * qual
+                    //* qual
         ;
         //if (priority * durability < Param.BUDGET_EPSILON)
             //return null;
 
-        final float quality = qual * volRatioScale;
+        final float quality = pp.qua() * volRatioScale * qual;
 
 
         return $.b(priority, durability, quality);

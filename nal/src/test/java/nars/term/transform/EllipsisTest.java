@@ -1,7 +1,6 @@
 package nars.term.transform;
 
 import nars.$;
-import nars.Narsese;
 import nars.Op;
 import nars.Param;
 import nars.index.Indexes;
@@ -15,7 +14,6 @@ import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
@@ -30,7 +28,8 @@ import java.util.Random;
 import java.util.Set;
 
 import static nars.$.$;
-import static nars.Op.*;
+import static nars.Op.DISJ;
+import static nars.Op.VAR_PATTERN;
 import static nars.nal.meta.match.Ellipsis.firstEllipsis;
 import static org.junit.Assert.*;
 

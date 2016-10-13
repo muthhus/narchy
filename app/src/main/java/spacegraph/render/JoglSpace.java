@@ -92,7 +92,9 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     @Override
     public final void init(GLAutoDrawable drawable) {
         this.window = (GLWindow)drawable;
-        init(this.gl = drawable.getGL().getGL2());
+        GL ggl = drawable.getGL();
+
+        init(this.gl = ggl.getGL2());
 
     }
 
@@ -116,8 +118,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public synchronized static GLCapabilitiesImmutable newDefaultConfig() {
 
         GLCapabilities config = new GLCapabilities(
-                GLProfile.getMinimum(true)
-                //GLProfile.getDefault()
+                //GLProfile.getMinimum(true)
+                GLProfile.getDefault()
                 //GLProfile.getMaximum(true)
 
         );

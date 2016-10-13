@@ -14,7 +14,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
-import nars.util.data.MutableInteger;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;

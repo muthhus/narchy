@@ -483,7 +483,7 @@ public class HijackBag<X> implements Bag<X> {
             float p = this.pressure;
             this.pressure = 0;
 
-            f = Forget.forget(p, existingMass, cap, 0.5f);
+            f = Forget.forget(p, existingMass, count[0], 0.5f);
 
         } else {
             f = null;

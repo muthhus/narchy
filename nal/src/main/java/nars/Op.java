@@ -4,7 +4,6 @@ package nars;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
@@ -250,10 +249,18 @@ public enum Op {
                     str + ((t >= 0) ? "+" : "") + (Integer.toString(t));
     }
 
+
     /**
      * writes this operator to a Writer in (human-readable) expanded UTF16 mode
      */
     public final void append(@NotNull Compound c, @NotNull Appendable w) throws IOException {
+        append(c, w, false);
+    }
+
+    /**
+     * writes this operator to a Writer in (human-readable) expanded UTF16 mode
+     */
+    public final void append(@NotNull Compound c, @NotNull Appendable w, boolean invertDT) throws IOException {
         int t = c.dt();
         boolean hasTime = t != Tense.DTERNAL;
 
@@ -267,6 +274,10 @@ public enum Op {
             w.append(ch);
 
         if (hasTime) {
+
+            if (invertDT)
+                t = -t;
+
             if (t >= 0) w.append('+');
             String ts;
             if (t == Tense.XTERNAL)

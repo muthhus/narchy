@@ -377,7 +377,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 this.pressure = 0; //reset pending accumulator
 
 
-                a = Forget.forget(p, existing, capacity);
+                a = Forget.forget(p, existing, size());
             }
 
             commit(a);

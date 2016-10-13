@@ -1,8 +1,8 @@
 package nars.nlp;
 
 import nars.NAR;
-import nars.util.NLPGen;
 import nars.nar.Default;
+import nars.util.NLPGen;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

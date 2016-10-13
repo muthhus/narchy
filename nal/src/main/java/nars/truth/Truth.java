@@ -31,12 +31,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 
-import static java.lang.Math.max;
-import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.eternalize;
-import static nars.util.Util.*;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */

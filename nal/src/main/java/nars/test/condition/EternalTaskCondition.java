@@ -1,7 +1,10 @@
 package nars.test.condition;
 
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Symbols;
+import nars.Task;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;

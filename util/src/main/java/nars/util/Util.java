@@ -21,7 +21,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
-import org.eclipse.collections.api.list.primitive.DoubleList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;

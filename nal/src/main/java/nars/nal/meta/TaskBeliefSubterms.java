@@ -1,10 +1,7 @@
 package nars.nal.meta;
 
-import nars.$;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 import static nars.nal.meta.op.SubtermPathCondition.nonCommutivePathTo;
 

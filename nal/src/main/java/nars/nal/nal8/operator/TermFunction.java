@@ -14,6 +14,7 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -140,6 +141,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
 //        //no notice
 //    }
 
+    @NotNull static final Variable feedbackVarAuto = $.varDep("F");
 
     @Override
     public void execute(@NotNull OperationConcept exec) {
@@ -154,23 +156,21 @@ public abstract class TermFunction<O> extends AbstractOperator {
         boolean feedback = true;
         if (!validArgs(args)) {
             if (autoReturnVariable()) {
-                args = $.p(ArrayUtils.add(args.terms(), $.varDep(0))); //HACK
+                args = $.p(ArrayUtils.add(args.terms(), feedbackVarAuto)); //HACK
                 feedback = false; //HACK
             } else {
-                args = null;
+                //args = null;
             }
         }
         //}
 
-        if (args!=null) {
-            O y = function(args, nar.concepts);
-            if (y != null) {
+        O y = function(args, nar.concepts);
+        if (y != null) {
 
-                //if (!tt.isCommand()) {
-                if (feedback)
-                    feedback(exec, y);
-                //}
-            }
+            //if (!tt.isCommand()) {
+            if (feedback)
+                feedback(exec, y);
+            //}
         }
 
         //prevent re-occurring goals
@@ -236,11 +236,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
         Term t = $.the(ys, true);
 
-        if (t != null) {
-            Execution.feedback(cause, result(cause, t/*, x, lastTerm*/), nar);
-        } else {
-            throw new RuntimeException(this + " return value invalid: " + y);
-        }
+        Execution.feedback(cause, result(cause, t/*, x, lastTerm*/), nar);
     }
 
     ///** the term that the output will inherit from; analogous to the 'Range' of a function in mathematical terminology */

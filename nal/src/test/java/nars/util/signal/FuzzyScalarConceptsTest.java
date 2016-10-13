@@ -1,11 +1,9 @@
 package nars.util.signal;
 
-import com.google.common.collect.Iterables;
 import nars.NAR;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
-import nars.truth.Truth;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.math.FloatNormalized;

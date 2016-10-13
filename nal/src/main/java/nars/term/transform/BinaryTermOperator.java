@@ -5,7 +5,6 @@ import nars.bag.Bag;
 import nars.concept.AtomConcept;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
 
 /**

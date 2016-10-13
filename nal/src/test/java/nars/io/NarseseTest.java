@@ -6,9 +6,7 @@ import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-
 import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

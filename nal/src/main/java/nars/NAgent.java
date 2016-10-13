@@ -31,7 +31,6 @@ import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static nars.$.quote;
 import static nars.$.t;
 import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;
@@ -90,10 +89,7 @@ abstract public class NAgent implements NSense, NAction {
 
     //private float curiosityAttention;
     private float rewardSum = 0;
-    private MutableFloat maxSensorPriority;
-    private MutableFloat maxRewardPriority;
-    private MutableFloat minSensorPriority;
-    private MutableFloat minRewardPriority;
+    private MutableFloat minSensorPriority, maxSensorPriority;
 
     public NAgent(NAR nar) {
         this(nar, 0);
@@ -249,12 +245,12 @@ abstract public class NAgent implements NSense, NAction {
 
         minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 2);
         maxSensorPriority = new MutableFloat(Util.unitize(nar.priorityDefault(BELIEF) / (numActions + numSensors) + minSensorPriority.floatValue())); //measured per-each sensor
-        SensorConcept.attentionGroup(sensors, minSensorPriority, maxSensorPriority, nar);
-        SensorConcept.attentionGroup(actions, minSensorPriority, maxSensorPriority, nar);
 
-        minRewardPriority = new MutableFloat(Param.BUDGET_EPSILON * 2);
-        maxRewardPriority = new MutableFloat(Util.unitize(nar.priorityDefault(BELIEF) / 2 + minRewardPriority.floatValue()));
-        SensorConcept.attentionGroup(newArrayList(happy, joy), minRewardPriority, maxRewardPriority, nar);
+        SensorConcept.activeAttention(Iterables.concat(
+                sensors,
+                actions,
+                newArrayList(happy, joy)
+        ), minSensorPriority, maxSensorPriority, nar);
 
 
         //@NotNull Term what = $.$("?w"); //#w

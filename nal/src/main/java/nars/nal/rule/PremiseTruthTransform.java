@@ -3,7 +3,6 @@ package nars.nal.rule;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.transform.CompoundTransform;
 import nars.truth.func.TruthOperator;

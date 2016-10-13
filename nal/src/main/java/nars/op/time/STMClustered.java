@@ -317,6 +317,7 @@ public class STMClustered extends STM {
             }
 
 
+
             @Override
             protected void onRemoved(Task key, BLink<Task> value) {
                 if (value!=null)

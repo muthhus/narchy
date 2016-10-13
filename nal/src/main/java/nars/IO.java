@@ -26,6 +26,8 @@ import java.util.function.Function;
 
 import static nars.Op.ATOM;
 import static nars.Symbols.*;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * Created by me on 5/29/16.
@@ -273,7 +275,7 @@ public class IO {
 
         Term[] v = readTermContainer(in, t);
 
-        int dt = Tense.DTERNAL;
+        int dt = DTERNAL;
         if (o.hasNumeric) //TODO o.hasNumeric
             dt = in.readInt();
 
@@ -569,10 +571,21 @@ public class IO {
             Term a = Statement.subj(c);
             Term b = Statement.pred(c);
 
+            int dt = c.dt();
+            boolean reversedDT;
+            if (dt < 0 && c.isCommutative() && dt!=DTERNAL && dt!=XTERNAL) {
+                reversedDT = true;
+                Term x = a;
+                a = b;
+                b = x;
+            } else {
+                reversedDT = false;
+            }
+
             p.append(COMPOUND_TERM_OPENER);
             a.append(p);
 
-            op.append(c, p);
+            op.append(c, p, reversedDT);
 
             b.append(p);
 

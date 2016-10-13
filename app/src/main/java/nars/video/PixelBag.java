@@ -1,7 +1,6 @@
 package nars.video;
 
 import nars.NAgent;
-import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 
 import java.awt.image.BufferedImage;
