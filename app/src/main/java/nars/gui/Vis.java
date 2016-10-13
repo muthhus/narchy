@@ -1,5 +1,6 @@
 package nars.gui;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import nars.$;
@@ -12,6 +13,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
+import nars.util.math.FloatSupplier;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
@@ -26,6 +28,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static spacegraph.obj.GridSurface.VERTICAL;
+import static spacegraph.obj.GridSurface.grid;
 
 /**
  * SpaceGraph-based visualization utilities for NAR analysis
@@ -81,15 +84,23 @@ public class Vis {
     }
 
     public static void show(Default d, int count) {
-        BagChart<Concept> tc = concepts(d, count);
-        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
+
+        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>(
+
+        );
+
+
+        s.add(new Facial(grid(
+                concepts(d, count),
+                budgetHistogram(d, 24),
+                emotionPlots(d, 256)
+        )).maximize());
+        s.add(new Facial(new CrosshairSurface(s)));
 
 
         s.show(1400, 800);
 
 
-        s.add(new Facial(tc).maximize());
-        s.add(new Facial(new CrosshairSurface(s)));
     }
 
     public static BagChart<Concept> concepts(final Default d, final int count) {
@@ -210,4 +221,41 @@ public class Vis {
     }
 
 
+    public static GridSurface agentBudgetPlot(NAgent t, int history) {
+        return conceptLinePlot(t.nar,
+                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history);
+    }
+
+    public static GridSurface emotionPlots(NAR nar, int plotHistory) {
+//        Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
+//        plot.add("Rwrd", reward);
+
+        Plot2D plot1 = new Plot2D(plotHistory, Plot2D.Line);
+        plot1.add("Conf", () -> nar.emotion.confident.getSum());
+
+        Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
+        plot2.add("Busy", () -> nar.emotion.busy.getSum());
+        plot2.add("Lern", () -> nar.emotion.busy.getSum() - nar.emotion.frustration.getSum());
+
+        Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
+        plot3.add("Strs", () -> nar.emotion.stress.getSum());
+
+
+        Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
+        plot4.add("Hapy", () -> nar.emotion.happy.getSum());
+        plot4.add("Sad", () -> nar.emotion.sad.getSum());
+
+//                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
+//                plot4.add("Errr", ()->nar.emotion.errr.getSum());
+
+        nar.onFrame(f -> {
+            //plot.update();
+            plot1.update();
+            plot2.update();
+            plot3.update();
+            plot4.update();
+        });
+
+        return GridSurface.col(plot1, plot2, plot3, plot4);
+    }
 }

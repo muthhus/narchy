@@ -5,8 +5,9 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.OperationConcept;
 import nars.nar.Default;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Operator;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -44,11 +45,11 @@ public class GoalPrecisionTest {
     protected void run(@NotNull NAR n, int end) {
 
         Param.DEBUG = true;
-        n.onExecution($.oper("x"), (OperationConcept c) -> {
+        n.onExecution($.the("x"), (OperationConcept c) -> {
 
             c.goals().forEach((a)-> {
 
-                    Term[] aa = Operator.argArray(a.term());
+                    Term[] aa = ((Compound)(a.term(0))).terms();
                     float pri = a.pri() * a.expectation();
 
                     float[] d = plan.get(aa[0].toString());

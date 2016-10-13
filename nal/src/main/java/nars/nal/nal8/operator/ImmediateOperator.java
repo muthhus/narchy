@@ -6,17 +6,15 @@ import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.atom.Operator;
 import org.jetbrains.annotations.NotNull;
 
 /** an operation that executes immediately, and without logical consequences;
  *  used for system control functions  */
 public abstract class ImmediateOperator extends NullOperator  {
 
-    public final @NotNull Atomic op;
 
     protected ImmediateOperator() {
-        op = new Operator(operator());
+
     }
 
 //    public Operation newOperation(Object...args) {
@@ -59,7 +57,7 @@ public abstract class ImmediateOperator extends NullOperator  {
 //    }
     public static Compound operation(@NotNull Class<? extends ImmediateOperator> opClass, Term... args) {
         return $.exec(
-                $.oper(opClass.getSimpleName()),
+                $.the(opClass.getSimpleName()),
                 args);
     }
 

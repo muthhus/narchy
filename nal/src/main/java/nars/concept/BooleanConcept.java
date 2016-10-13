@@ -11,7 +11,7 @@
 //import nars.term.Compound;
 //import nars.term.Term;
 //import nars.term.Termed;
-//import nars.term.atom.Operator;
+//
 //import nars.truth.DefaultTruth;
 //import nars.truth.Truth;
 //import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;

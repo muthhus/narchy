@@ -11,7 +11,6 @@ import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
 import nars.index.TermIndex;
-import nars.index.TermTransformConcept;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
@@ -23,7 +22,8 @@ import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.atom.Operator;
+import nars.term.atom.Atomic;
+import nars.term.transform.TermTransform;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.time.Tense;
@@ -146,7 +146,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
             @Nullable ConceptPolicy p = c.policy();
             policy.addValue(p != null ? p.toString() : "null");
 
-            if (!(c instanceof TermTransformConcept)) {
+            if (!(c instanceof TermTransform)) {
                 termlinksCap.accept(c.termlinks().capacity());
                 termlinksUsed.accept(c.termlinks().size());
                 tasklinksCap.accept(c.tasklinks().capacity());
@@ -423,13 +423,22 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq, float conf) {
-        believe(priorityDefault(BELIEF), term, time(tense), freq, conf);
+        return believe(term, time(tense), freq, conf);
+    }
+
+    @NotNull
+    public NAR believe(@NotNull Termed<Compound> term, @NotNull long when, float freq, float conf) {
+        believe(priorityDefault(BELIEF), term, when, freq, conf);
         return this;
     }
 
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
         return believe(term, tense, freq, confidenceDefault(Symbols.BELIEF));
+    }
+    @NotNull
+    public NAR believe(@NotNull Termed<Compound> term, long when, float freq) {
+        return believe(term, when, freq, confidenceDefault(Symbols.BELIEF));
     }
 
     @NotNull
@@ -702,11 +711,12 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
 
     @NotNull
-    public final On onExecution(@NotNull Operator op, @NotNull Consumer<OperationConcept> each) {
+    public final On onExecution(@NotNull Atomic op, @NotNull Consumer<OperationConcept> each) {
         On o = concept(op, true)
                 .<Topic<OperationConcept>>meta(Execution.class,
                         (k, v) -> v != null ? v : new DefaultTopic<>())
                 .on(each);
+        concepts.set(op);
         //this.on.add(o);
         return o;
     }
@@ -1172,8 +1182,16 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         return this;
     }
 
-    public void input(@NotNull Stream<? extends Task> taskStream) {
-        taskStream.forEach(this::input);
+    public void inputLater(@NotNull List<? extends Task> tasks) {
+        inputLater(tasks, 1f);
+    }
+
+    public void inputLater(@NotNull List<? extends Task> tasks, float granularity) {
+        runLater(tasks, this::input, granularity);
+    }
+
+    public void inputLater(@NotNull Stream<? extends Task> taskStream) {
+        taskStream.forEach(this::inputLater);
         //input(new TaskStream(taskStream));
     }
 

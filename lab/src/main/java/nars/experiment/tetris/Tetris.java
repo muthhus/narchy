@@ -7,43 +7,34 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.Vis;
-import nars.index.CaffeineIndex;
 import nars.index.TreeIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
-import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
 import nars.remote.SwingAgent;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.obj.IntTerm;
 import nars.term.obj.Termject;
 import nars.time.FrameClock;
 import nars.time.Tense;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.math.FloatSupplier;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.math.Vector2f;
 import spacegraph.obj.ConsoleSurface;
-import spacegraph.obj.GridSurface;
 import spacegraph.obj.MatrixView;
-import spacegraph.obj.Plot2D;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Random;
 
 import static nars.experiment.tetris.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.obj.ControlSurface.newControlWindow;
-import static spacegraph.obj.GridSurface.VERTICAL;
 import static spacegraph.obj.GridSurface.grid;
 
 /**
@@ -504,10 +495,10 @@ public class Tetris extends SwingAgent {
 
 
         view.plot1 =
-                newCPanel(nar, 256, () -> t.rewardValue);
+                Vis.emotionPlots(nar, 256);
 
 
-        view.plot2 = agentBudgetPlot(t, 256);
+        view.plot2 = Vis.agentBudgetPlot(t, 256);
             /*view.plot2 = new GridSurface(HORIZONTAL,
                 //conceptLinePlot(nar, Lists.newArrayList( t.happy, t.joy ), (c) -> nar.conceptPriority(c), 256),
 
@@ -670,11 +661,6 @@ public class Tetris extends SwingAgent {
 //        });
     }
 
-    public static GridSurface agentBudgetPlot(NAgent t, int history) {
-        return Vis.conceptLinePlot(t.nar,
-                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history);
-    }
-
     public MatrixView.ViewFunc sensorMatrixView(NAR nar, long whenRelative) {
         return (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
@@ -711,41 +697,7 @@ public class Tetris extends SwingAgent {
     }
 
 
-
-    public static GridSurface newCPanel(NAR nar, int plotHistory, FloatSupplier reward) {
-        Plot2D plot = new Plot2D(plotHistory, Plot2D.Line);
-        plot.add("Rwrd", reward);
-
-        Plot2D plot1 = new Plot2D(plotHistory, Plot2D.Line);
-        plot1.add("Conf", () -> nar.emotion.confident.getSum());
-
-        Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
-        plot2.add("Busy", () -> nar.emotion.busy.getSum());
-        plot2.add("Lern", () -> nar.emotion.busy.getSum() - nar.emotion.frustration.getSum());
-
-        Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
-        plot3.add("Strs", () -> nar.emotion.stress.getSum());
-
-
-        Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
-        plot4.add("Hapy", () -> nar.emotion.happy.getSum());
-        plot4.add("Sad", () -> nar.emotion.sad.getSum());
-
-//                Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
-//                plot4.add("Errr", ()->nar.emotion.errr.getSum());
-
-        nar.onFrame(f -> {
-            plot.update();
-            plot1.update();
-            plot2.update();
-            plot3.update();
-            plot4.update();
-        });
-
-        return new GridSurface(VERTICAL, plot, plot1, plot2, plot3, plot4);
-    }
-
-//    public static class NARController extends NAgent {
+    //    public static class NARController extends NAgent {
 //
 //        private final NARLoop loop;
 //        private final NAR worker;

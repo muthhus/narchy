@@ -641,7 +641,7 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    private Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
+    protected Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
 
         while (true) {

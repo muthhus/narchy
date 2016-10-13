@@ -8,7 +8,7 @@ import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.Operator;
+
 import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -259,7 +259,8 @@ public class NarseseTest {
 
 
     private void testOperationStructure(@NotNull Compound t) {
-        Term[] aa = Operator.argArray(t);
+        //Term[] aa = Operator.argArray(t);
+        Term[] aa = ((Compound)t.term(0)).terms();
         assertEquals(2, aa.length);
         assertEquals("believe", t.term(1).toString());
         //assertEquals("^believe", Operator.operator(t).toString());
@@ -272,7 +273,7 @@ public class NarseseTest {
         Term t = term("op()");
         assertNotNull(t);
         assertEquals(t.toString(), Op.INH, t.op());
-        assertEquals(0, Operator.opArgs((Compound)t).size());
+        //assertEquals(0, Operator.opArgs((Compound)t).size());
 
         taskParses("op()!");
         taskParses("op( )!");
@@ -298,15 +299,15 @@ public class NarseseTest {
     @Test
     public void testOperationEquivalenceWithOper() throws Narsese.NarseseException {
         Term a;
-        a = term("^a(b,c)");
-        Compound b = term("((b,c) --> ^a)");
+        a = term("a(b,c)");
+        Compound b = term("((b,c) --> a)");
 
         assertEquals(a, b);
 
         assertEquals(a.op(), b.op());
         assertEquals(a.getClass(), b.getClass());
 
-        assertEquals(Op.OPER, b.term(1).op());
+        assertEquals(Op.ATOM, b.term(1).op());
 
     }
 
@@ -617,7 +618,7 @@ public class NarseseTest {
         assertEquals(term("()"),   term("( )"));
         assertEquals(term("()"), term(" (   )"));
 
-        Term o = term("<#x --> (/, ^Model_valid, T, (), _)>?");
+        Term o = term("<#x --> (/, Model_valid, T, (), _)>?");
         assertNotNull(o);
     }
 
@@ -635,13 +636,6 @@ public class NarseseTest {
 
 
 
-    @Test
-    public void testOperatorTerm() {
-        Atomic o = term("^op");
-        assertNotNull(o);
-        assertEquals("^op", o.toString());
-        assertEquals(Operator.class, o.getClass());
-    }
 
 
 }

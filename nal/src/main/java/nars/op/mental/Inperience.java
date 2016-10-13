@@ -8,7 +8,7 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.atom.Operator;
+import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,18 +75,18 @@ public class Inperience {
 //    }
 
 
-    public static final Operator believe = $.oper("believe");
-    public static final Operator want = $.oper("want");
-    public static final Operator wonder = $.oper("wonder");
-    public static final Operator evaluate = $.oper("evaluate");
-    public static final Operator anticipate = $.oper("anticipate");
+    public static final Atomic believe = $.the("believe");
+    public static final Atomic want = $.the("want");
+    public static final Atomic wonder = $.the("wonder");
+    public static final Atomic evaluate = $.the("evaluate");
+    public static final Atomic anticipate = $.the("anticipate");
 
     static final Atomic[] NON_INNATE_BELIEF_ATOMICs = {
-            $.oper("remind"),
-            $.oper("doubt"),
-            $.oper("consider"),
+            $.the("remind"),
+            $.the("doubt"),
+            $.the("consider"),
             evaluate,
-            $.oper("hestitate"),
+            $.the("hestitate"),
             wonder,
             believe,
             want
@@ -124,8 +124,8 @@ public class Inperience {
 
 
     @Nullable
-    public static Operator reify(char punc) {
-        Operator opTerm;
+    public static Atomic reify(char punc) {
+        Atomic opTerm;
         switch (punc) {
             case Symbols.BELIEF:
                 opTerm = believe;
@@ -277,8 +277,8 @@ public class Inperience {
         }
     }
 
-    void nonInnate(@NotNull Task task, @NotNull Task belief, @NotNull Operator op) {
-        //the operators which dont have a innate belief
+    void nonInnate(@NotNull Task task, @NotNull Task belief, @NotNull Atomic op) {
+        //the Atomics which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 
         Compound c = $.exec(op, $.p( belief.term() ) );

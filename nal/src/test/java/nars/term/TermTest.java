@@ -44,8 +44,6 @@ public class TermTest {
         Param.DEBUG = true;
     }
 
-    @NotNull
-    NAR n = new Terminal(16);
 
     @Nullable
     public static Term imageInt(Term... x) {
@@ -60,6 +58,8 @@ public class TermTest {
 
     protected void assertEquivalentTerm(@NotNull String term1String, @NotNull String term2String) {
         try {
+
+            NAR n = new Terminal(16);
 
             Termed term1 = n.term(term1String);
             Termed term2 = n.term(term2String);
@@ -124,6 +124,8 @@ public class TermTest {
     @Test
     public void testTermSort() throws Exception {
 
+        NAR n = new Terminal(16);
+
         Term a = n.term("a").term();
         Term b = n.term("b").term();
         Term c = n.term("c").term();
@@ -137,6 +139,8 @@ public class TermTest {
 
     @Test
     public void testConjunction1Term() throws Narsese.NarseseException {
+        NAR n = new Terminal(16);
+
         assertEquals("a", n.term("(&&,a)").toString());
         assertEquals("x(a)", n.term("(&&,x(a))").toString());
         assertEquals("a", n.term("(&&,a, a)").toString());
@@ -146,6 +150,7 @@ public class TermTest {
 
     @Test
     public void testConjunctionTreeSet() throws Narsese.NarseseException {
+        NAR n = new Terminal(16);
 
         //these 2 representations are equal, after natural ordering
         String term1String = "<#1 --> (&,boy,(/,taller_than,{Tom},_))>";
@@ -284,8 +289,8 @@ public class TermTest {
 
         NAR n = new Terminal(8);
 
-        assertFalse(Op.isOperation(n.term("(a,b)").term()));
-        assertFalse(Op.isOperation(n.term("^wonder").term()));
+//        assertFalse(Op.isOperation(n.term("(a,b)")));
+//        assertFalse(Op.isOperation(n.term("^wonder")));
 
         try {
             Term x = n.term("^wonder(a,b)").term();
@@ -348,6 +353,8 @@ public class TermTest {
         testTermEquality(s, true);
     }
     protected void testTermEquality(@NotNull String s, boolean normalize) {
+
+        NAR n = new Terminal(16);
 
         Term a = n.term(s).term();
 
@@ -422,6 +429,8 @@ public class TermTest {
 
     @Test
     public void termEqualityWithMixedVariables() {
+
+        NAR n = new Terminal(16);
 
         String s = "(&&, <<$1 --> key> ==> <#2 --> (/, open, $1, _)>>, <#2 --> lock>)";
         Termed a = n.term(s);
@@ -526,6 +535,7 @@ public class TermTest {
 
     @NotNull
     public <C extends Compound> C testStructure(@NotNull String term, String bits) {
+        NAR n = new Terminal(16);
         C a = (C) n.term(term).term();
         assertEquals(bits, toBinaryString(a.structure()));
         assertEquals(term, a.toString());
@@ -690,6 +700,7 @@ public class TermTest {
     }
 
     void testImageOrdering(char v) {
+        NAR n = new Terminal(16);
 
         Termed<Compound> aa = n.term("(" + v + ",x, y, _)");
         Compound a = aa.term();
@@ -725,8 +736,8 @@ public class TermTest {
 
         String i1 = "(/,x,y,_)";
         String i2 = "(/,x,_,y)";
-        Compound a = testStructure(i1, "10000000000001");
-        Compound b = testStructure(i2, "10000000000001");
+        Compound a = testStructure(i1, "1000000000001");
+        Compound b = testStructure(i2, "1000000000001");
 
         /*assertNotEquals("additional structure code in upper bits",
                 a.structure2(), b.structure2());*/
@@ -749,6 +760,7 @@ public class TermTest {
 
     @Test
     public void testSubTermStructure() {
+        NAR n = new Terminal(16);
 
         assertTrue(
                 n.term("<a --> b>").term().impossibleSubterm(
@@ -763,6 +775,8 @@ public class TermTest {
 
     @Test
     public void testCommutativeWithVariableEquality() {
+        NAR n = new Terminal(16);
+
         Termed a = n.term("<(&&, <#1 --> M>, <#2 --> M>) ==> <#2 --> nonsense>>");
         Termed b = n.term("<(&&, <#2 --> M>, <#1 --> M>) ==> <#2 --> nonsense>>");
         assertEquals(a, b);
@@ -792,6 +806,8 @@ public class TermTest {
     }
 
     public void testUniqueHash(@NotNull String a, @NotNull String b) {
+        NAR n = new Terminal(16);
+
         int h1 = n.term(a).hashCode();
         int h2 = n.term(b).hashCode();
         assertNotEquals(h1, h2);

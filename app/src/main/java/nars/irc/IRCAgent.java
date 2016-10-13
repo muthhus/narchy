@@ -1,38 +1,41 @@
 package nars.irc;
 
 import com.github.fge.grappa.exceptions.GrappaException;
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Task;
+import nars.*;
 import nars.bag.Bag;
 import nars.concept.Concept;
-import nars.index.CaffeineIndex;
+import nars.gui.Vis;
+import nars.index.TermIndex;
+import nars.index.TreeIndex;
+import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.nlp.Twenglish;
+import nars.op.time.MySTMClustered;
+import nars.rdfowl.NQuadsRDF;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.RealtimeMSClock;
 import nars.time.Tense;
 import nars.util.Texts;
+import nars.util.Wiki;
+import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.pircbotx.hooks.events.MessageEvent;
-import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static nars.nlp.Twenglish.tokenize;
 
@@ -46,6 +49,8 @@ public class IRCAgent extends IRC {
     private final NAR nar;
     //private float ircMessagePri = 0.9f;
 
+    final int wordDelay = 50; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
+
     public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);
 
@@ -58,6 +63,40 @@ public class IRCAgent extends IRC {
         nar.onTask(t -> {
             if (t.pri() >= 0.5f) {
                 send(channels, t.toString());
+            }
+        });
+
+        nar.onExec(new IRCBotOperator("readWiki") {
+
+
+            @Override
+            protected Object function(Compound arguments) {
+
+                String base = "simple.wikipedia.org";
+                //"en.wikipedia.org";
+                Wiki enWiki = new Wiki(base);
+
+                String lookup = arguments.term(0).toString();
+                try {
+                    //remove quotes
+                    String page = enWiki.normalize(lookup.replace("\"", ""));
+                    //System.out.println(page);
+
+                    enWiki.setMaxLag(-1);
+
+                    String html = enWiki.getRenderedText(page);
+                    html = StringEscapeUtils.unescapeHtml4(html);
+                    String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ");
+                    //System.out.println(strippedText);
+
+                    hear(strippedText, "wikipedia", page);
+
+                    return "Reading " + base + ":" + page + ": " + strippedText.length() + " characters";
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return e.toString();
+                }
             }
         });
 
@@ -88,7 +127,60 @@ public class IRCAgent extends IRC {
         //inter = new InterNAR(nar, (short)udpPort );
         //inter.broadcastPriorityThreshold = 0.25f; //lower threshold
 
-        nar.believe("connect(\"" + server + "\").", Tense.Present, 1f, 0.9f);
+        //nar.believe("connect(\"" + server + "\").", Tense.Present, 1f, 0.9f);
+    }
+
+    //    abstract class IRCBotOperator extends TermProcedure {
+//
+//
+//        public IRCBotOperator(String id) {
+//            super(id);
+//        }
+//
+//
+//        @Nullable
+//        @Override
+//        public final Object function(Compound arguments, TermIndex i) {
+//            Object y = function(arguments);
+//
+//            if (y!=null)
+//                send( y.toString().replace("\n"," ") );
+//
+//            //loop back as hearing
+//            //say($.quote(y.toString()), $.p(nar.self, $.the("controller")));
+//
+//            return y;
+//        }
+//
+//        protected abstract Object function(Compound arguments);
+//
+//
+//    }
+
+    abstract class IRCBotOperator extends TermFunction {
+
+
+        public IRCBotOperator(String id) {
+            super(id);
+        }
+
+
+        @Nullable
+        @Override
+        public final Object function(Compound arguments, TermIndex i) {
+            Object y = function(arguments);
+
+            if (y != null)
+                broadcast(y.toString().replace("\n", " "));
+
+            //loop back as hearing
+            //say($.quote(y.toString()), $.p(nar.self, $.the("controller")));
+
+            return y;
+        }
+
+        protected abstract Object function(Compound arguments);
+
     }
 
     @Override
@@ -168,10 +260,7 @@ public class IRCAgent extends IRC {
                         return;
                     }
                 } catch (GrappaException | Narsese.NarseseException f) {
-                    nar.believe(
-                            $.inst($.p(tokenize(msg)), $.p($.quote(channel), $.quote(nick))),
-                            Tense.Present
-                    );
+                    hear(msg, nick, channel);
                 }
             } catch (Exception e) {
                 pevent.respond(e.toString());
@@ -184,16 +273,81 @@ public class IRCAgent extends IRC {
 
     }
 
+
+    void hear(String msg, String nick, String channel) {
+//        nar.believe(
+//                $.inst($.p(tokenize(msg)), $.p($.quote(channel), $.quote(nick))),
+//                Tense.Present
+//        );
+
+        final long[] time = {nar.time()};
+
+        nar.runLater(() -> {
+
+            Term pr = $.p($.quote(channel), $.quote(nick));
+            for (Term token : tokenize(msg)) {
+                nar.believe($.inh(token, pr), time[0], 1f);
+                time[0] += wordDelay;
+            }
+
+        });
+
+    }
+
     @NotNull
-    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) {
+    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) throws FileNotFoundException {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
         SingleThreadExecutioner exe = new SingleThreadExecutioner();
+        //new SingleThreadExecutioner();
+        //new MultiThreadExecutioner(3, 1024*8);
+
         Default nar = new Default(activeConcepts, conceptsPerFrame, 2, 2, random,
-                new CaffeineIndex(new DefaultConceptBuilder(random), 10000000, false, exe),
+
+                //new CaffeineIndex(new DefaultConceptBuilder(random), 10000000, false, exe),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 400000, 64 * 1024, 3),
+
+
                 new RealtimeMSClock(),
                 exe
+        );
+
+
+        int volMax = 40;
+
+//        //Multi nar = new Multi(3,512,
+//        Default nar = new Default(2048,
+//                conceptsPerCycle, 2, 2, rng,
+//                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
+//                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 400000, 64*1024, 3)
+//
+//                , new FrameClock(), exe);
+
+
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.8f);
+
+        float p = 0.1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+
+        nar.confMin.setValue(0.02f);
+        nar.compoundVolumeMax.setValue(volMax);
+
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
+
+        nar.inputLater(
+                NQuadsRDF.stream(nar, new File(
+                        "/home/me/Downloads/nquad"
+                )).
+                        peek(t -> {
+                            t.setBudget(Param.BUDGET_EPSILON * 2, 0.5f, 0.75f); //zero priority
+                        }).
+                        collect(Collectors.toList())
+                , 4f
         );
 
         nar.loop(framesPerSecond);
@@ -203,13 +357,16 @@ public class IRCAgent extends IRC {
 
     public static void main(String[] args) throws Exception {
 
-        @NotNull Default n = newRealtimeNAR(512, 4, 128);
+        @NotNull Default n = newRealtimeNAR(1024, 10, 32);
 
 
         IRC bot = new IRCAgent(n,
-                "experiment1", "irc.freenode.net", "#123xyz");
+                "experiment1", "irc.freenode.net", "#123xyz", "#netention", "#genifer");
+
+        Vis.show(n);
 
         bot.start();
+
 
     }
 //    public static void main(String[] args) throws Exception {
@@ -235,28 +392,20 @@ public class IRCAgent extends IRC {
         StringBuilder b = new StringBuilder();
         @NotNull Bag<Concept> cbag = ((Default) nar).core.concepts;
 
+        String query;
         if (arguments.size() > 0 && arguments.term(0) instanceof Atom) {
-            String query = arguments.term(0).toString().toLowerCase();
-            cbag.topWhile(c -> {
-                String bs = c.toString();
-                String cs = bs.toLowerCase();
-                if (cs.contains(query)) {
-                    b.append(bs).append("  ");
-                    if (b.length() > MAX_RESULT_LENGTH)
-                        return false;
-                }
-                return true;
-            });
+            query = arguments.term(0).toString().toLowerCase();
         } else {
-
-            cbag.topWhile(c -> {
-                b.append(c.get()).append('=').append(Texts.n2(c.pri())).append("  ");
-                if (b.length() > MAX_RESULT_LENGTH)
-                    return false;
-
-                return true;
-            });
+            query = null;
         }
+
+        cbag.topWhile(c -> {
+            String bs = c.get().toString();
+            if (query == null || bs.toLowerCase().contains(query)) {
+                b.append(c.get()).append('=').append(Texts.n2(c.pri())).append("  ");
+            }
+            return b.length() <= MAX_RESULT_LENGTH;
+        });
 
         return b.toString();
     }

@@ -26,7 +26,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
-import nars.term.atom.Operator;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
 import nars.time.Tense;
@@ -676,7 +675,7 @@ public class Narsese extends BaseParser<Object> {
             case Symbols.QUEST:
             case '\"':
 
-                //case '^':
+            case '^':
 
             case '<':
             case '>':
@@ -885,6 +884,8 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
+    static final Object functionalForm = new Object();
+
     /**
      * list of terms prefixed by a particular compound term operate
      */
@@ -897,7 +898,7 @@ public class Narsese extends BaseParser<Object> {
                 /*operatorPrecedes ? *OperationPrefixTerm()* true :*/
 
                 operatorPrecedes ?
-                        push(new Object[]{pop(), (Operator.class)})
+                        push(new Object[]{pop(), functionalForm})
                         :
                         push(Compound.class),
 
@@ -995,8 +996,8 @@ public class Narsese extends BaseParser<Object> {
             }
 
 
-            if (p == Operator.class) {
-                op = OPER;
+            if (p == functionalForm) {
+                op = ATOM;
                 break;
             }
 
@@ -1047,15 +1048,15 @@ public class Narsese extends BaseParser<Object> {
 //        }
 
 
-        switch (op) {
-            case OPER:
-                return $.inh(
-                        $.p(vectorterms.subList(1, vectorterms.size())),
-                        $.the(vectorterms.get(0).toString())
-                );
-            default:
+//        switch (op) {
+////            case OPER:
+////                return $.inh(
+////                        $.p(vectorterms.subList(1, vectorterms.size())),
+////                        $.the(vectorterms.get(0).toString())
+////                );
+//            default:
                 return $.compound(op, vectorterms);
-        }
+//        }
     };
 
 

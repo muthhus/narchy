@@ -24,7 +24,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.NAR;
 import nars.concept.OperationConcept;
-import nars.term.atom.Operator;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +36,7 @@ import java.util.function.Consumer;
 public abstract class AbstractOperator implements Consumer<OperationConcept> {
 
 
-    public final @NotNull Operator atomicTerm;
+    public final @NotNull Atomic atomicTerm;
 
     protected NAR nar; //TODO make private
 
@@ -58,7 +58,7 @@ public abstract class AbstractOperator implements Consumer<OperationConcept> {
         if (operatorName == null) {
             operatorName = getClass().getSimpleName();
         }
-        this.atomicTerm = $.oper(operatorName);
+        this.atomicTerm = $.the(operatorName);
     }
 
 
@@ -90,7 +90,7 @@ public abstract class AbstractOperator implements Consumer<OperationConcept> {
 
 
 
-    public final @Nullable Operator operator() {
+    public final @Nullable Atomic operator() {
         return atomicTerm;
     }
 

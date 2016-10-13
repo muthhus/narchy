@@ -8,6 +8,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class union extends BinaryTermOperator {
 
+    public union() {
+        super("union");
+    }
+
     @NotNull
     @Override public Term apply(@NotNull Term a, @NotNull Term b) {
         ensureCompounds(a, b);

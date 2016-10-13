@@ -1,5 +1,6 @@
 package nars.term;
 
+import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.index.Indexes;
@@ -17,7 +18,7 @@ import org.junit.Test;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static nars.$.oper;
+
 import static org.junit.Assert.*;
 
 
@@ -235,8 +236,8 @@ public class TermIndexTest {
 
     public static void testCommonPrefix(boolean direction) {
         MaplikeIndex i = (MaplikeIndex)(new Default().concepts);
-        Atomic sui = oper("substituteIfUnifies");
-        Atomic su = oper("substitute");
+        Atomic sui = $.the("substituteIfUnifies");
+        Atomic su = $.the("substitute");
 
         if (direction) {
             i.get(sui, true);

@@ -74,7 +74,7 @@ abstract public class SwingAgent extends NAgent {
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.04f);
+        nar.confMin.setValue(0.02f);
         nar.compoundVolumeMax.setValue(volMax);
 
         nar.linkFeedbackRate.setValue(0.05f);

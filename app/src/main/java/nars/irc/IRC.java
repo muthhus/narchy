@@ -1,19 +1,32 @@
 package nars.irc;
 
+import ch.qos.logback.classic.Level;
+import nars.$;
 import org.eclipse.collections.impl.factory.Iterables;
+import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
+import org.pircbotx.InputParser;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.pircbotx.output.OutputIRC;
+import org.pircbotx.output.OutputRaw;
 
 import java.io.IOException;
 
 /**
- * Created by me on 10/12/16.
+ * Generic IRC Bot interface via PircBotX
  */
 public class IRC extends ListenerAdapter {
+
+    static {
+        //set the logging levels:
+        $.logLevel(InputParser.class, Level.WARN);
+        $.logLevel(ThreadedListenerManager.class, Level.WARN);
+        $.logLevel(OutputRaw.class, Level.INFO);
+    }
 
     public final PircBotX irc;
 
@@ -52,6 +65,15 @@ public class IRC extends ListenerAdapter {
 
     public final void stop() {
         irc.stopBotReconnect();
+    }
+
+
+    void broadcast(String message) {
+        if (irc.isConnected()) {
+            for (Channel c : irc.getUserBot().getChannels()) {
+                irc.send().message(c.getName(), message);
+            }
+        }
     }
 
     public void send(String[] channels, String message) {

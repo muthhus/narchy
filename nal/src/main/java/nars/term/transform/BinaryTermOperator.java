@@ -1,13 +1,21 @@
 package nars.term.transform;
 
+import nars.$;
+import nars.bag.Bag;
+import nars.concept.AtomConcept;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/12/15.
  */
-public abstract class BinaryTermOperator implements TermTransform {
+public abstract class BinaryTermOperator extends AtomConcept implements TermTransform {
+
+    protected BinaryTermOperator(@NotNull String id) {
+        super($.the(id), Bag.EMPTY, Bag.EMPTY);
+    }
 
     protected static void ensureCompounds(@NotNull Term a, @NotNull Term b) {
         if (!(a instanceof Compound) || !(b instanceof Compound))

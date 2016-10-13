@@ -137,7 +137,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
                         this.nar::input //input them within the current thread here
                 );
             }
-        }, 2f);
+        }, 4f);
 
     }
 

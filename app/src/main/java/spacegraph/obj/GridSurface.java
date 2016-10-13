@@ -119,17 +119,17 @@ public class GridSurface extends LayoutSurface {
     }
 
 
-    public static Surface grid(Iterable<Surface> content) {
+    public static GridSurface grid(Iterable<Surface> content) {
         return grid( Iterables.toArray(content, Surface.class ) );
     }
 
-    public static Surface grid(Surface... content) {
+    public static GridSurface grid(Surface... content) {
         return new GridSurface(content);
     }
-    public static Surface row(Surface... content) {
+    public static GridSurface row(Surface... content) {
         return new GridSurface(HORIZONTAL, content);
     }
-    public static Surface col(Surface... content) {
+    public static GridSurface col(Surface... content) {
         return new GridSurface(VERTICAL, content);
     }
 

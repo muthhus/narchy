@@ -10,7 +10,6 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
@@ -26,7 +25,6 @@ import java.io.*;
 import java.util.function.Function;
 
 import static nars.Op.ATOM;
-import static nars.Op.OPER;
 import static nars.Symbols.*;
 
 /**
@@ -136,9 +134,6 @@ public class IO {
         switch (o) {
             case ATOM:
                 key = new Atom(s);
-                break;
-            case OPER:
-                key = new Operator(s);
                 break;
             default:
                 throw new UnsupportedOperationException();
@@ -536,7 +531,7 @@ public class IO {
                 if (subj.op() == Op.PROD) {
                     Term pred = c.term(1);
                     Op pOp = pred.op();
-                    if (pOp == ATOM || pOp == OPER) {
+                    if (pOp == ATOM) {
                         operationAppend((Compound) c.term(0), (Atomic) pred, p);
                         return;
                     }

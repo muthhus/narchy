@@ -18,7 +18,6 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.Operator;
 import nars.term.container.TermVector;
 import nars.term.obj.IntTerm;
 import nars.term.var.AbstractVariable;
@@ -88,12 +87,9 @@ public enum $ {
 
     @NotNull
     public static Atomic the(@NotNull String id) {
-        if (id.startsWith("^")) {
-            return new Operator(id);
-        } else {
-            return new Atom(id);
-        }
+        return new Atom(id);
     }
+
     @NotNull
     public static Atom quote(String text) {
         return (Atom)$.the('"' + text + '"');
@@ -147,19 +143,19 @@ public enum $ {
 
 
     public static Compound exec(@NotNull String opTerm, @Nullable Term... arg) {
-        return exec($.oper(opTerm), arg);
+        return exec($.the(opTerm), arg);
     }
 
     /** execution (NARS "operation") */
     @NotNull
-    public static Compound exec(@NotNull Term opTerm, @Nullable Term... arg) {
+    public static Compound exec(@NotNull Atomic opTerm, @Nullable Term... arg) {
         return (Compound) compound(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
         );
     }
-    @NotNull public static Compound exec(@NotNull Operator opTerm, @Nullable Collection<Term> arg) {
+    @NotNull public static Compound exec(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
         return (Compound) compound(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
@@ -567,10 +563,6 @@ public enum $ {
     @Nullable
     public static Term secti(Term... x) { return compound(SECTi, x); }
 
-
-    public static @NotNull Operator oper(@NotNull String name) {
-        return new Operator(name);
-    }
 
 
 
@@ -1006,6 +998,10 @@ public enum $ {
             nextInner = $.p(t[i], nextInner);
         }
         return nextInner;
+    }
+
+    public static void logLevel(Class logClass, Level l) {
+        ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(logClass)).setLevel(l);
     }
 
 

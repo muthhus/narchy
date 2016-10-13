@@ -4,7 +4,6 @@ import nars.index.TermIndex;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Operator;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +18,7 @@ public class similaritree extends TermFunction<Float> {
     @Override
     public Float function(@NotNull Compound o, TermIndex i) {
 
-        Term[] x = Operator.argArray(o);
+        Term[] x = ((Compound)o.term(0)).terms();
         if (x.length!=2) return Float.NaN;
 
         String a = x[0].toString();

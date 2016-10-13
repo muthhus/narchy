@@ -6,7 +6,6 @@ import nars.index.TermIndex;
 import nars.nal.nal8.AbstractOperator;
 import nars.nar.exe.Executioner;
 import nars.op.data.*;
-import nars.op.math.length;
 import nars.op.mental.doubt;
 import nars.op.mental.schizo;
 import nars.op.out.say;
@@ -156,7 +155,7 @@ public abstract class AbstractNAR extends NAR {
 
 
             // math operations
-            new length(),
+            //new length(),
             //new add(),
 
             new intToBitSet(),

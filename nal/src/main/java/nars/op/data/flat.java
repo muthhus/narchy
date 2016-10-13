@@ -6,7 +6,7 @@ import nars.index.TermIndex;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Operator;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -26,8 +26,8 @@ public abstract class flat extends TermFunction {
     @NotNull
     @Override
     public Object function(@NotNull Compound op, TermIndex i) {
-        List<Term> l = new ArrayList();
-        collect(Operator.argArray(op), l);
+        List<Term> l = $.newArrayList();
+        collect(((Compound)op.term(0)).terms(), l);
         return result(l);
     }
 

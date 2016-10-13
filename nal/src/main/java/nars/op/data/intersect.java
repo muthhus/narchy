@@ -8,6 +8,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class intersect extends BinaryTermOperator {
 
+    public intersect() {
+        super("intersect");
+    }
+
     @NotNull
     @Override public Term apply(@NotNull Term a, @NotNull Term b) {
         ensureCompounds(a, b);

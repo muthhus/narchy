@@ -16,12 +16,12 @@ import static org.junit.Assert.*;
 public class OperatorTest {
 
 
-    @Test public void testOperatorEquality() {
-        assertNotNull( $.oper("echo") );
-        assertEquals( $.oper("echo"), $.oper("echo"));
-        assertNotEquals( $.oper("echo"), $.the("echo")); //echo vs. ^echo
-        //assertNotEquals( $.oper("echo"), $.the("^echo")); //'^echo' vs echo .. this should be disallowed
-    }
+//    @Test public void testOperatorEquality() {
+//        assertNotNull( $.oper("echo") );
+//        assertEquals( $.oper("echo"), $.oper("echo"));
+//        assertNotEquals( $.oper("echo"), $.the("echo")); //echo vs. ^echo
+//        //assertNotEquals( $.oper("echo"), $.the("^echo")); //'^echo' vs echo .. this should be disallowed
+//    }
 
     @Test public void testMustExecuteSuccess() {
 
@@ -71,7 +71,7 @@ public class OperatorTest {
 //    }
 
     @Test public void testOperationIsInheritance() {
-        Compound o = $.exec($.oper("x"), $.p("x"));
+        Compound o = $.exec($.the("x"), $.p("x"));
         assertEquals(Op.INH, o.op());
     }
 
@@ -79,7 +79,7 @@ public class OperatorTest {
         Compound o = $("<(a,b,c)-->^x>");
         assertTrue(o.term(0).op() == Op.PROD);
         assertTrue(o.term(1) instanceof Atomic);
-        assertTrue(o.term(1).op() == Op.OPER);
+        assertTrue(o.term(1).op() == Op.ATOM);
         assertEquals("^x(a,b,c)", o.toString());
         assertEquals(Op.INH, o.op());
     }

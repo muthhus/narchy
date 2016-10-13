@@ -14,6 +14,10 @@ import org.jetbrains.annotations.Nullable;
 public class differ extends BinaryTermOperator {
 
 
+    public differ() {
+        super("differ");
+    }
+
     /**
      * returns null if empty set
      */

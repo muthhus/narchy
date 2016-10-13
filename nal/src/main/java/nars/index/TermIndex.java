@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.Op.INH;
+import static nars.Op.PROD;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
@@ -51,18 +52,23 @@ public abstract class TermIndex extends TermBuilder {
     /**
      * get if not absent
      */
-    @Nullable public final Termed get(@NotNull Term t) {
+    @Nullable
+    public final Termed get(@NotNull Term t) {
         return get(t, false);
     }
 
-    @Nullable public abstract Termed get(@NotNull Term key, boolean createIfMissing);
+    @Nullable
+    public abstract Termed get(@NotNull Term key, boolean createIfMissing);
+
     /**
      * sets or replaces the existing value, unless the existing value is a PermanentConcept it must not
      * be replaced with a non-Permanent concept
      */
     public abstract void set(@NotNull Term src, Termed target);
 
-    public final void set(@NotNull Termed t) { set(t.term(), t);     }
+    public final void set(@NotNull Termed t) {
+        set(t.term(), t);
+    }
 
 
     abstract public void clear();
@@ -70,16 +76,20 @@ public abstract class TermIndex extends TermBuilder {
     abstract public void forEach(Consumer<? super Termed> c);
 
 
-    public void start(NAR nar) { }
+    public void start(NAR nar) {
+    }
 
     /**
      * # of contained terms
      */
     public abstract int size();
 
-    @Nullable abstract public ConceptBuilder conceptBuilder();
+    @Nullable
+    abstract public ConceptBuilder conceptBuilder();
 
-    /** override to possibly intern termcontainers */
+    /**
+     * override to possibly intern termcontainers
+     */
     public TermContainer intern(TermContainer s) {
         return s;
     }
@@ -88,16 +98,16 @@ public abstract class TermIndex extends TermBuilder {
     /**
      * a string containing statistics of the index's current state
      */
-    @NotNull public abstract String summary();
+    @NotNull
+    public abstract String summary();
 
     public abstract void remove(@NotNull Term entry);
 
 
-
-    public final HijacKache<TermContainer,TermContainer> normalizations =
-            new HijacKache<>(Param.NORMALIZATION_CACHE_SIZE, 4 );
-    public final HijacKache<ProtoCompound,Term> terms =
-            new HijacKache<>(Param.TERM_CACHE_SIZE, 4 );
+    public final HijacKache<TermContainer, TermContainer> normalizations =
+            new HijacKache<>(Param.NORMALIZATION_CACHE_SIZE, 4);
+    public final HijacKache<ProtoCompound, Term> terms =
+            new HijacKache<>(Param.TERM_CACHE_SIZE, 4);
 
 //    final ThreadLocal<Map<Compound,Compound>> normalizations =
 //            ThreadLocal.withInitial( () ->
@@ -116,17 +126,17 @@ public abstract class TermIndex extends TermBuilder {
             logger.info("Termizer: {} {}", pc, x);
             return False; //place a False placeholder so that a repeat call will not have to discover this manually
         } catch (Throwable e) {
-            logger.error("Termizer: {} {}", pc ,e);
+            logger.error("Termizer: {} {}", pc, e);
             return False;
         }
     };
 
-    @NotNull public final Term cached(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
+    @NotNull
+    public final Term cached(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
 
         if (cacheable(op, u)) {
 
             ProtoCompound p = ProtoCompound.the(op, dt, u);
-
 
 
             Term t = terms.computeIfAbsent(p, termizer);
@@ -148,9 +158,10 @@ public abstract class TermIndex extends TermBuilder {
             return t;
 
         } else {
-            return super.the(op,dt,u);
+            return super.the(op, dt, u);
         }
     }
+
 
     /**
      * returns the resolved term according to the substitution
@@ -165,13 +176,22 @@ public abstract class TermIndex extends TermBuilder {
 
         Op op = src.op();
 
-        if (op.var) {
-            if (op == VAR_PATTERN)
-                return null; //unassigned pattern variable
-            return src; //unassigned but literal non-pattern var
-         }
-         else if (src instanceof Atomic)
-            return src;
+        if (src instanceof Atomic) {
+
+            if (op.var) {
+                if (op == VAR_PATTERN)
+                    return null; //unassigned pattern variable
+                else
+                    return src; //unassigned but literal non-pattern var
+            } else {
+
+                Termed existing = get(src); //reresolve
+                if (existing != null)
+                    return existing.term();
+                else
+                    return src;
+            }
+        }
 
 
         //no variables that could be substituted, so return this constant
@@ -235,7 +255,8 @@ public abstract class TermIndex extends TermBuilder {
         return cached(op, dt, args);
     }
 
-    @Deprecated public final @NotNull Term the(@NotNull Op op, @NotNull Term... tt) {
+    @Deprecated
+    public final @NotNull Term the(@NotNull Op op, @NotNull Term... tt) {
         return the(op, DTERNAL, tt); //call this implementation's, not super class's
     }
 
@@ -244,8 +265,11 @@ public abstract class TermIndex extends TermBuilder {
             return false; //probably not worth caching small compounds
         }
         if (op == INH) {
-            if (u[1] instanceof TermTransform) //skip any immediate transforms as these must be dynamically computed
+
+            Term u1 = u[1];
+            if (u1 instanceof Atomic && !u1.op().var && u[0].op()==PROD) //prevents caching for potential transforming terms
                 return false;
+
         }
         return true;
     }
@@ -266,11 +290,11 @@ public abstract class TermIndex extends TermBuilder {
             @NotNull Term[] src = u.terms();
 
             Term[] tgt =
-                transform(src, null,
-                    (numVars == 1 && u.varPattern() == 0) ?
-                            VariableNormalization.singleVariableNormalization :
-                            new VariableNormalization(numVars /* estimate */)
-                );
+                    transform(src, null,
+                            (numVars == 1 && u.varPattern() == 0) ?
+                                    VariableNormalization.singleVariableNormalization :
+                                    new VariableNormalization(numVars /* estimate */)
+                    );
 
             result = tgt != src ? TermVector.the(tgt) : u;
 
@@ -285,7 +309,8 @@ public abstract class TermIndex extends TermBuilder {
         return result;
     };
 
-    @Nullable public final Compound normalize(@NotNull Compound t) {
+    @Nullable
+    public final Compound normalize(@NotNull Compound t) {
 
         Compound c;
 
@@ -296,7 +321,7 @@ public abstract class TermIndex extends TermBuilder {
             TermContainer src = t.subterms();
             TermContainer tgt = normalize(src);
             if (src == tgt) {
-                c =  t; //subterms dont change
+                c = t; //subterms dont change
             } else if (tgt != InvalidSubterms) {
                 c = compoundOrNull($.terms.the(t, tgt));
             } else {
@@ -305,15 +330,16 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         //if (c!=null) {
-            //c = compoundOrNull($.unneg((Compound) c));
-            if (c != null) {
-                ((GenericCompound) c).setNormalized();
-            }
+        //c = compoundOrNull($.unneg((Compound) c));
+        if (c != null) {
+            ((GenericCompound) c).setNormalized();
+        }
         //}
         return c;
     }
 
-    @Nullable public final TermContainer normalize(@NotNull TermContainer t) {
+    @Nullable
+    public final TermContainer normalize(@NotNull TermContainer t) {
         return normalizations.computeIfAbsent(t, normalizer);
     }
 
@@ -332,7 +358,7 @@ public abstract class TermIndex extends TermBuilder {
         Term[] srcSubs = src.terms();
         Term[] tgtSubs = transform(srcSubs, src, t);
 
-        return tgtSubs!=srcSubs ?
+        return tgtSubs != srcSubs ?
                 the(src.op(), src.dt(), tgtSubs) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
                 src;
 
@@ -422,7 +448,7 @@ public abstract class TermIndex extends TermBuilder {
     public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
         term = conceptualizable(term);
-        if (term==null)
+        if (term == null)
             return null;
 
         @Nullable Termed c = get(term, createIfMissing);
@@ -433,7 +459,7 @@ public abstract class TermIndex extends TermBuilder {
             return null;
         }
 
-        Concept cc = (Concept)c;
+        Concept cc = (Concept) c;
         if (cc.policy() == null) {
             conceptBuilder().init(cc);
         }
@@ -474,7 +500,7 @@ public abstract class TermIndex extends TermBuilder {
                     break;
 
             }
-        } while (termPre!=term && term!=null);
+        } while (termPre != term && term != null);
 
         return term;
     }
@@ -492,22 +518,25 @@ public abstract class TermIndex extends TermBuilder {
 
 
     public void loadBuiltins() {
-        for (TermTransformConcept t : TermTransformConcept.BuiltIn) {
+        for (Concept t : TermTransform.StaticBuiltins)
             set(t);
-        }
     }
 
-    /** implementations can override this to update the index when a concept's state changes, ex: to re-evaluate it's features */
+    /**
+     * implementations can override this to update the index when a concept's state changes, ex: to re-evaluate it's features
+     */
     public void onPolicyChanged(Concept c) {
         /* nothing */
     }
 
 
     static boolean isDeletable(Concept c) {
-        return c.get(Concept.Savior.class)==null;
+        return c.get(Concept.Savior.class) == null;
     }
 
-    /** attempts to delete a concept */
+    /**
+     * attempts to delete a concept
+     */
     protected void delete(@NotNull Concept value, @NotNull NAR nar) {
         if (isDeletable(value))
             value.delete(nar);

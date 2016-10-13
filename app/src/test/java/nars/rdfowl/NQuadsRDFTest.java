@@ -53,7 +53,7 @@ public class NQuadsRDFTest {
         File output = new File("/tmp/onto.nal");
         PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512*1024));
 
-        n.input(
+        n.inputLater(
                 NQuadsRDF.stream(n, new File(
                         //"/tmp/all-layers.nq"
                         "/home/me/Downloads/nquad"

@@ -151,7 +151,7 @@ public class PremiseRuleSet {
 
         List<CharSequence> unparsed_rules = $.newArrayList(1024);
 
-        StringBuilder current_rule = new StringBuilder();
+        StringBuilder current_rule = new StringBuilder(256);
         boolean single_rule_test = false;
 
         for (String s : lines) {
@@ -225,7 +225,7 @@ public class PremiseRuleSet {
         return rawRules
                 .map(PremiseRuleSet::preprocess)
                 //.distinct()
-                .parallel()
+                //.parallel()
                 //.sequential()
                 .map(src -> Tuples.pair(parse(src, index), src));
     }
@@ -254,7 +254,7 @@ public class PremiseRuleSet {
 
             String src = rawAndSrc.getTwo();
 
-            Set<PremiseRule> ur = $.newHashSet(4);
+            Collection<PremiseRule> ur = $.newArrayList(4);
             try {
                 PremiseRule preNorm = new PremiseRule(rawAndSrc.getOne());
                 permute(preNorm, src, index, ur);

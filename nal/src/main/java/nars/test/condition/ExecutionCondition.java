@@ -2,7 +2,7 @@ package nars.test.condition;
 
 import nars.$;
 import nars.NAR;
-import nars.term.atom.Operator;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,7 +13,7 @@ public class ExecutionCondition implements NARCondition {
 
     private final long start, end;
     private final float minExpect, maxExpect;
-    private final @NotNull Operator operator;
+    private final @NotNull Atomic operator;
     private boolean success;
     //private long successTime = Tense.TIMELESS;
 
@@ -25,7 +25,7 @@ public class ExecutionCondition implements NARCondition {
         this.minExpect = minExpect;
         this.maxExpect = maxExpect;
 
-        operator = $.oper(opTerm);
+        operator = $.the(opTerm);
         n.onExecution(operator, tt -> {
             if (!success) {
                 this.success = (tt.goals().motivation(n.time()) > 0);

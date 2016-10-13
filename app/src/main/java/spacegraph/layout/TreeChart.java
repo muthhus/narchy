@@ -182,11 +182,11 @@ public class TreeChart<X> extends Surface {
 			double topItem = 0;
 
 			for (ItemVis item : row) {
-				double area = item.area;
-				item.top = top + topItem;
-				item.left = left;
-				item.width = rowWidth;
-				double h = (area / rowWidth);
+				float area = item.area;
+				item.top = (float) (top + topItem);
+				item.left = (float)left;
+				item.width = (float)rowWidth;
+				float h = (float)(area / rowWidth);
 				item.height = h;
 
 				topItem += h;
@@ -204,11 +204,11 @@ public class TreeChart<X> extends Surface {
 			double rowLeft = 0;
 
 			for (ItemVis item : row) {
-				double area = item.area;
-				item.top = top;
-				item.left = left + rowLeft;
-				item.height = rowHeight;
-				double wi = (area / rowHeight);
+				float area = item.area;
+				item.top = (float)top;
+				item.left = (float)(left + rowLeft);
+				item.height = (float)rowHeight;
+				float wi = (float)(area / rowHeight);
 				item.width = wi;
 
 				rowLeft += wi;
@@ -239,15 +239,14 @@ public class TreeChart<X> extends Surface {
 	}
 
 	private void scaleArea(Collection<ItemVis<X>> children) {
-		double areaGiven = width * height;
-		double areaTotalTaken = 0.0;
+		float areaGiven = (float) (width * height);
+		float areaTotalTaken = 0.0f;
 		for (ItemVis child : children) {
-			double area = child.area;
-			areaTotalTaken += area;
+			areaTotalTaken += child.area;
 		}
-		double ratio = areaTotalTaken / areaGiven;
+		float ratio = areaTotalTaken / areaGiven;
 		for (ItemVis child : children) {
-			child.setArea(child.area / ratio );
+			child.mulArea( 1f / ratio );
 		}
 	}
 
@@ -309,11 +308,11 @@ public class TreeChart<X> extends Surface {
 
         public final String label;
         public final X item;
-        public double left;
-        public double top;
-        public double width;
-        public double height;
-        public double area;
+        public float left;
+        public float top;
+        public float width;
+        public float height;
+        public float area;
         private float r;
         private float g;
         private float b;
@@ -352,9 +351,12 @@ public class TreeChart<X> extends Surface {
                     '}';
         }
 
-        void setArea(double area) {
+        void setArea(float area) {
             this.area = area;
         }
+		void mulArea(float factor) {
+			this.area *= factor;
+		}
 
     //    boolean isContainer() {
     //        return item.isContainer();
@@ -390,21 +392,30 @@ public class TreeChart<X> extends Surface {
                 b = 0.1f;
             }
 
-            gl.glColor3f(r, g, b);
 
-            Draw.rect(gl,
-                (float)left, (float)top,
-                (float)width, (float)height
-            );
+            float z = 0;
 
-            gl.glColor3f(1,1,1);
-            float labelSize = (float) (height * percent * 20f ); /// 4f * Math.min(0.5f,percent));
+			gl.glColor3f(r, g, b);
+			float m = 0.002f; //margin, space between cells
+            Draw.rect(gl, left+m/2, top+m/2, width-m, height-m);
 
-			if ((labelSize > 0.003f) && (labelSize < 0.1f)) {
+            float labelSize = 0.1f; //Math.min(16, (float) (height * percent * 20f ) ); /// 4f * Math.min(0.5f,percent));
+
+			if ((labelSize*area > 0.001f) && (labelSize*area < 0.2f)) {
+
+				gl.glLineWidth(2f);
+				gl.glColor3f(1,1,1);
+
+
+
 				Draw.text(gl, label,
-						labelSize, //label size
-						(float) (left + width / 2f), (float) (top + height / 2f), 0);
+						labelSize*Math.min(width,height), //label size
+						left, top, 0f);
+						//(float) (left + width / 2f), (float) (top + height / 2f), 0);
+
 			}
+
+
 
         }
     }

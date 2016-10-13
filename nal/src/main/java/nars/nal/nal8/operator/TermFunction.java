@@ -14,7 +14,6 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.Operator;
 import nars.time.Tense;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -24,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static nars.Op.INH;
 
 
 /**
@@ -146,7 +147,8 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
 
         final Compound ttt = exec.term();
-        Compound args = Operator.opArgs(ttt);
+        assert(ttt.op()==INH);
+        Compound args = (Compound) ttt.term(0);
         //if (!tt.isCommand()) {
 
         boolean feedback = true;

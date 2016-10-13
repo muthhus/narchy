@@ -44,7 +44,6 @@ public enum Op {
     VAR_DEP(Symbols.VAR_DEPENDENT, Op.ANY, OpType.Variable),
     VAR_QUERY(Symbols.VAR_QUERY, Op.ANY, OpType.Variable),
 
-    OPER("^", 8, Args.One),
 
     NEG("--", 5, Args.One),
 
@@ -215,11 +214,11 @@ public enum Op {
 
     }
 
-    public static boolean isOperation(@NotNull Termed _t) {
+    @Deprecated public static boolean isOperation(@NotNull Termed _t) {
         Term t = _t.term();
-        if (Op.hasAll(t.structure(), Op.OperationBits) && t.op() == Op.INH) {
+        if (t.op() == Op.INH) { //Op.hasAll(t.structure(), Op.OperationBits) &&
             Compound c = (Compound) t;
-            return c.isTerm(1, Op.OPER) &&
+            return c.isTerm(1, Op.ATOM) &&
                    c.isTerm(0, Op.PROD);
         }
         return false;
@@ -364,9 +363,7 @@ public enum Op {
     public static final int SetsBits =
             Op.or(Op.SETe, Op.SETi);
 
-    /** all Operations will have these 3 elements in its subterms: */
-    public static final int OperationBits =
-            Op.or(Op.INH, Op.PROD, OPER);
+
 
 
 

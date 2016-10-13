@@ -15,7 +15,7 @@
 //import nars.term.Term;
 //import nars.term.atom.Atom;
 //import nars.term.atom.Atomic;
-//import nars.term.atom.Operator;
+//
 //import nars.time.Tense;
 //import nars.util.Texts;
 //import nars.util.Util;

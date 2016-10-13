@@ -847,7 +847,7 @@ public enum Draw {
             boolean penUp = true;
             IntArrayList currentSeg = new IntArrayList();
 
-            for (int i = 0; i < spec.length() - 1; i += 2) {
+            for (int i = 0; i < spec.length() - 1; i+=2) {
                 if (spec.charAt(i+1) == 'R' && spec.charAt(i) == ' ') {
                     penUp = true;
                     segments.add(currentSeg.toArray());
@@ -856,7 +856,7 @@ public enum Draw {
                 }
 
                 curX = (int)(spec.charAt(i)) - offsetR;
-                curY = (int)(spec.charAt(i + 1)) - offsetR;
+                curY = (int)(spec.charAt(i+1)) - offsetR;
                 currentSeg.add(curX);
                 currentSeg.add(20 - curY);
             }
@@ -869,7 +869,6 @@ public enum Draw {
 
         public void draw(GL2 gl, float scale, float tx, float ty, float tz) {
             //int pLastX = 0, pLastY = 0;
-            int px=0, py =0;
 
             for (int[] seg : segments) {
 
@@ -878,6 +877,7 @@ public enum Draw {
 
                 int ss = seg.length;
                 for (int j = 0; j < ss; ) {
+                    int px=0, py =0;
 
                     px= seg[j++];
                     py= seg[j++];
@@ -918,12 +918,11 @@ public enum Draw {
         Left, Center, Right
     }
     public static void text(GL2 gl, String s, float scale, float x, float y, float z) {
-        text(gl, s, scale, x, y, z, TextAlignment.Center );
+        text(gl, s, scale, x, y, z, TextAlignment.Left );
     }
 
     public static void text(GL2 gl, String s, float scale, float x, float y, float z, TextAlignment a) {
         int l = s.length();
-        int N = fontMono.length;
 
         scale *= 1f/20f; //to normalize
 
@@ -933,26 +932,24 @@ public enum Draw {
         //align center:
         switch (a) {
             case Left:
-                x = 0;
+                //nothing
                 break;
             case Right:
-                x -= width;
+                x -= width; //TODO check this
                 break;
             case Center:
-                x -= width/2f;
+                x -= width/2f; //TODO check this
                 break;
         }
 
 
+        int N = fontMono.length;
         for (int i = 0; i < l; i++) {
-            char c = s.charAt(i);
-            int ci = c - 32; //ASCII to index
-            if (ci < N) {
-                HGlyph g = fontMono[ci];
-                g.draw(gl, scale, x, y, z);
+            int ci = s.charAt(i) - 32; //ASCII to index
+            if (ci >= 0 && (ci < N)) {
+                fontMono[ci].draw(gl, scale, x, y, z);
             }
             x += letterWidth;
-
         }
     }
 

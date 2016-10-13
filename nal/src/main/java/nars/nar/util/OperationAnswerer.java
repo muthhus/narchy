@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Operator;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +24,7 @@ abstract public class OperationAnswerer extends Answerer {
             throw new RuntimeException(pattern + " is not an operation compound pattern");
 
         this.argIndex = new ObjectIntHashMap<>();
-        Compound args = Operator.opArgs(pattern);
+        Compound args = (Compound) pattern.term(0);
         int i = 0;
         this.numArgs = args.size();
         for (Term t : args.terms()) {

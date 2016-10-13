@@ -41,7 +41,7 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
     }
 
     @NotNull protected ItemVis<BLink<X>> newItem(@NotNull BLink<X> i) {
-        return new ItemVis<>(i, label(i.get(), 16));
+        return new ItemVis<>(i, label(i.get(), 13));
     }
 
 
