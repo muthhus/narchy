@@ -33,7 +33,7 @@ public class TopCraft extends SwingAgent {
 
         this.craft = new TopDownMinicraft();
 
-        pixels = addCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
+        pixels = addCamera("see", ()->craft.image, 32,32, (v) -> $.t( v, alpha));
         //pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
         int nx = 8;

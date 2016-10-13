@@ -254,8 +254,8 @@ abstract public class NAgent implements NSense, NAction {
         );
 
 
-        //SensorConcept.activeAttention(p, minSensorPriority, maxSensorPriority, nar);
-        SensorConcept.flatAttention(p, minSensorPriority);
+        SensorConcept.activeAttention(p, minSensorPriority, maxSensorPriority, nar);
+        //SensorConcept.flatAttention(p, minSensorPriority);
 
 
         //@NotNull Term what = $.$("?w"); //#w
