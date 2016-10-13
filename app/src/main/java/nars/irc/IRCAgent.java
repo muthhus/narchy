@@ -61,10 +61,12 @@ public class IRCAgent extends IRC {
 
         //nar.log();
 
+
+        //SPEAK
         nar.onTask(t -> {
-            if (t.pri() >= 0.5f) {
-                send(channels, t.toString());
-            }
+//            if (t.pri() >= 0.5f) {
+//                send(channels, t.toString());
+//            }
         });
 
         nar.onExec(new IRCBotOperator("readWiki") {
@@ -123,6 +125,10 @@ public class IRCAgent extends IRC {
 //        });
 //        nar.onExec(new IRCBotOperator("top") {
 //
+//            @Override
+//            protected Object function(Compound arguments) {
+//                return null;
+//            }
 //        });
 
         //inter = new InterNAR(nar, (short)udpPort );
@@ -364,7 +370,10 @@ public class IRCAgent extends IRC {
 
 
         IRC bot = new IRCAgent(n,
-                "experiment1", "irc.freenode.net", "#123xyz", "#netention", "#genifer");
+                "experiment1", "irc.freenode.net",
+                "#123xyz",
+                //"#netention",
+                "#nars");
 
         Vis.show(n);
 

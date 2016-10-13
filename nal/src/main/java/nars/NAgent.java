@@ -171,7 +171,6 @@ abstract public class NAgent implements NSense, NAction {
 
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
-        now = nar.time();
 
         float r = rewardValue = act();
         if (r==r) {

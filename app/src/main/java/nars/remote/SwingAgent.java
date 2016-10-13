@@ -11,6 +11,7 @@ import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -51,7 +52,7 @@ abstract public class SwingAgent extends NAgent {
             //new SingleThreadExecutioner();
             new MultiThreadExecutioner(3, 1024*8);
 
-        int volMax = 40;
+        int volMax = 30;
         int conceptsPerCycle = 32;
 
         //Multi nar = new Multi(3,512,
@@ -72,17 +73,17 @@ abstract public class SwingAgent extends NAgent {
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.01f);
+        nar.confMin.setValue(0.03f);
         nar.compoundVolumeMax.setValue(volMax);
 
         //nar.linkFeedbackRate.setValue(0.05f);
 
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4, true);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
-//        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the",
-//                Math.round(volMax*3f/4), volMax-2, 0.01f, 32);
+        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the",
+                Math.round(volMax/4), volMax-2, 0.01f, 32);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;
