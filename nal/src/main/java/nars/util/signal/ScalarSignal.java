@@ -55,7 +55,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     public final static FloatToFloatFunction direct = n -> n;
     @Nullable
-    public Task next;
+    public Task current;
     private int dt;
     private final long[] commonEvidence;
 
@@ -137,8 +137,8 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
             Task t = newInputTask(f, now);
             if (t!=null) {
-                Task prev = this.next;
-                input(prev, this.next = t);
+                Task prev = this.current;
+                input(prev, this.current = t);
                 this.lastInputTime = now;
                 this.prevF = f;
             }
@@ -153,7 +153,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     @Nullable
     public Task next() {
-        return next;
+        return current;
     }
 
     @NotNull
@@ -184,7 +184,7 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     /** provides an immediate truth assessment with the last known signal value */
     @Nullable public final Truth truth() {
-        Task t = this.next;
+        Task t = this.current;
         return t!=null ? t.truth() : null;
     }
 

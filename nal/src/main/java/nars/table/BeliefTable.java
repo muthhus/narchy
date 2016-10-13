@@ -83,6 +83,11 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
+        @Override
+        public void clear(NAR nar) {
+
+        }
+
 //        @Override
 //        public void range(long[] t) {
 //
@@ -390,6 +395,9 @@ public interface BeliefTable extends TaskTable {
         Truth t = truth(when);
         return t != null ? t.freq() : 0.5f;
     }
+
+    /** empties the table, carefully allownig the NAR to also remove the tasks forgotten here */
+    void clear(NAR nar);
 
 //    /** 2-element array containing running min/max range accumulator */
 //    void range(long[] t);

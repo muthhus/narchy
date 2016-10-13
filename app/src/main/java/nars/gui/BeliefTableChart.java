@@ -88,16 +88,20 @@ public class BeliefTableChart extends Surface {
 
     public static void newBeliefChart(NAR nar, Collection<? extends Termed> terms, long window) {
 
+        List<Surface> actionTables = beliefTableCharts(nar, terms, window);
+
+
+        new SpaceGraph().add(new Facial(new GridSurface(VERTICAL, actionTables)).maximize()).show(800,600);
+    }
+
+    public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {
         long[] btRange = new long[2];
         nar.onFrame(nn -> {
             long now = nn.time();
             btRange[0] = now - window;
             btRange[1] = now + window;
         });
-        List<Surface> actionTables = terms.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
-
-
-        new SpaceGraph().add(new Facial(new GridSurface(VERTICAL, actionTables)).maximize()).show(800,600);
+        return terms.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
     }
 
     public void update() {

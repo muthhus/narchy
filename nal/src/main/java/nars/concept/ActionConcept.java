@@ -4,6 +4,7 @@ import nars.*;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
 import nars.task.GeneratedTask;
+import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.data.array.LongArrays;
@@ -220,7 +221,8 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
 
             Task f = ActionConcept.this.nextFeedback;
             if (f !=null && when <= now && when >= f.occurrence()) {
-                return f;
+                //but project it to the target time unchanged
+                return MutableTask.clone(f, now);
             }
 
             return super.match(target, now);

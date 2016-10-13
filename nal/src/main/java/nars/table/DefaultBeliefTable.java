@@ -62,6 +62,17 @@ public class DefaultBeliefTable implements BeliefTable {
 
     }
 
+    @Override
+    public void clear(NAR nar) {
+        if (!eternal.isEmpty())
+            throw new UnsupportedOperationException("eternal clear impl soon");
+
+        if (!temporal.isEmpty()) {
+            List<Task> l = $.newArrayList();
+            temporal.removeIf((Task x)->true,l);
+            nar.tasks.remove(l);
+        }
+    }
 
     @NotNull
     @Override

@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Surface;
 
+import java.util.Collection;
 import java.util.List;
 
 /** TODO parameterize DX/DY to choose between row, column, or grid of arbitrary aspect ratio
@@ -126,6 +127,18 @@ public class GridSurface extends LayoutSurface {
     public static GridSurface grid(Surface... content) {
         return new GridSurface(content);
     }
+
+    public static GridSurface row(Collection<Surface> content) {
+        return row(array(content));
+    }
+    public static GridSurface col(Collection<Surface> content) {
+        return col(array(content));
+    }
+
+    static Surface[] array(Collection<Surface> content) {
+        return content.toArray(new Surface[content.size()]);
+    }
+
     public static GridSurface row(Surface... content) {
         return new GridSurface(HORIZONTAL, content);
     }

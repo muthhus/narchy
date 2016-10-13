@@ -3,6 +3,7 @@ package nars.gui;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
+import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -22,12 +23,13 @@ import spacegraph.math.Color3f;
 import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.Plot2D;
+import spacegraph.render.Draw;
 
+import java.util.Collection;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static spacegraph.obj.GridSurface.VERTICAL;
-import static spacegraph.obj.GridSurface.grid;
+import static spacegraph.obj.GridSurface.*;
 
 /**
  * SpaceGraph-based visualization utilities for NAR analysis
@@ -35,17 +37,50 @@ import static spacegraph.obj.GridSurface.grid;
 public class Vis {
     public static void newBeliefChartWindow(NAgent narenv, long window) {
         GridSurface chart = agentActions(narenv, window);
-        new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
+        new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
     }
 
     public static void newBeliefChartWindow(NAR nar, long window, Term... t) {
         GridSurface chart = agentActions(nar, Lists.newArrayList(t), window);
-        new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
+        new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
     }
 
     public static void newBeliefChartWindow(NAR nar, long window, List<? extends Termed> t) {
         GridSurface chart = agentActions(nar, t, window);
-        new SpaceGraph().add(new Facial(chart).maximize()).show(800,600);
+        new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
+    }
+
+    public static Surface newBeliefLEDs(Collection<? extends Termed> t, NAR nar) {
+        GridSurface g =
+            col(
+
+                row(BeliefTableChart.beliefTableCharts(nar, t, 1024)),
+
+                row(t.stream().map(tt -> {
+                    return new Surface() {
+                        @Override
+                        protected void paint(GL2 gl) {
+                            super.paint(gl);
+                            Concept c = nar.concept(tt);
+                            float r, g, b, conf;
+                            r = g = b = 0.5f;
+                            conf = 0.75f;
+                            if (c != null) {
+                                Truth t = c.belief(nar.time());
+                                if (t != null) {
+                                    r = g = b = t.freq(); //TODO
+                                    conf = t.conf();
+                                }
+                            }
+
+                            float m = 0.25f * 1f * conf;
+
+                            gl.glColor3f(r, g, b);
+                            Draw.rect(gl, m / 2, m / 2, 1 - m, 1 - m);
+                        }
+                    };
+                }).toArray(Surface[]::new)));
+        return g;
     }
 
     public static GridSurface agentActions(NAR nar, Iterable<? extends Termed> cc, long window) {
@@ -57,7 +92,7 @@ public class Vis {
         });
         List<Surface> actionTables = $.newArrayList();
         for (Termed c : cc) {
-            actionTables.add( new BeliefTableChart(nar, c, btRange) );
+            actionTables.add(new BeliefTableChart(nar, c, btRange));
         }
 
         return new GridSurface(VERTICAL, actionTables);
@@ -112,19 +147,19 @@ public class Vis {
                 float r, g, b;
 
                 Concept c = x.get();
-                if (c!=null) if (c instanceof Atomic) {
+                if (c != null) if (c instanceof Atomic) {
                     r = g = b = ph * 0.5f;
                 } else {
                     float belief = 0;
 
                     @Nullable Truth bt = c.beliefs().truth(now);
-                    if (bt!=null)
+                    if (bt != null)
                         belief = bt.conf();
 
 
                     float goal = 0;
                     @Nullable Truth gt = c.goals().truth(now);
-                    if (gt!=null)
+                    if (gt != null)
                         goal = gt.conf();
 
                     if (belief > 0 || goal > 0) {
@@ -162,19 +197,19 @@ public class Vis {
 
     public static GridSurface budgetHistogram(NAR nar, int bins) {
         //new SpaceGraph().add(new Facial(
-                return new GridSurface(VERTICAL,
-                    new HistogramChart(nar, c -> {
-                        if (c!=null)
-                            return c.pri();
-                        return 0;
-                    }, bins, new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)),
-                    new HistogramChart(nar, c -> {
-                        if (c!=null)
-                            return c.dur();
-                        return 0;
-                    }, bins, new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f))
-                );
-          //  ).maximize()).show(800,600);
+        return new GridSurface(VERTICAL,
+                new HistogramChart(nar, c -> {
+                    if (c != null)
+                        return c.pri();
+                    return 0;
+                }, bins, new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)),
+                new HistogramChart(nar, c -> {
+                    if (c != null)
+                        return c.dur();
+                    return 0;
+                }, bins, new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f))
+        );
+        //  ).maximize()).show(800,600);
     }
 
     public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory, FloatFunction<Termed> value) {
@@ -184,7 +219,7 @@ public class Vis {
         List<Plot2D> plots = $.newArrayList();
         for (Termed t : concepts) {
             Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
-            p.add(t.toString(), ()->value.floatValueOf(t), 0f, 1f );
+            p.add(t.toString(), () -> value.floatValueOf(t), 0f, 1f);
             grid.children.add(p);
             plots.add(p);
         }
@@ -196,6 +231,7 @@ public class Vis {
 
         return grid;
     }
+
     public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory) {
 
         //TODO make a lambda Grid constructor
@@ -204,9 +240,9 @@ public class Vis {
         for (Termed t : concepts) {
             Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
             p.setTitle(t.toString());
-            p.add("P", ()->nar.conceptPriority(t), 0f, 1f );
-            p.add("B", ()->nar.concept(t).beliefFreq(nar.time()), 0f, 1f );
-            p.add("G", ()->nar.concept(t).goalFreq(nar.time()), 0f, 1f );
+            p.add("P", () -> nar.conceptPriority(t), 0f, 1f);
+            p.add("B", () -> nar.concept(t).beliefFreq(nar.time()), 0f, 1f);
+            p.add("G", () -> nar.concept(t).goalFreq(nar.time()), 0f, 1f);
             grid.children.add(p);
             plots.add(p);
         }
@@ -255,6 +291,6 @@ public class Vis {
             plot4.update();
         });
 
-        return GridSurface.col(plot1, plot2, plot3, plot4);
+        return col(plot1, plot2, plot3, plot4);
     }
 }

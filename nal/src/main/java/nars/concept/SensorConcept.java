@@ -8,6 +8,7 @@ import nars.budget.policy.ConceptPolicy;
 import nars.nal.UtilityFunctions;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
+import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -37,9 +38,11 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     @NotNull
     public final ScalarSignal sensor;
     private FloatSupplier input;
-    private float current = Float.NaN;
+    protected float currentValue = Float.NaN;
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
+
+    private boolean latchLastValue = true;
 
 
 
@@ -178,7 +181,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
     @Override
     public final float floatValueOf(Term anObject) {
-        return this.current = input.asFloat();
+        return this.currentValue = input.asFloat();
     }
 
     @NotNull
@@ -204,7 +207,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
     @Override
     public float asFloat() {
-        return current;
+        return currentValue;
     }
 
     @NotNull
@@ -213,6 +216,11 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         return new SensorBeliefTable(tCap);
     }
 
+
+    public SensorConcept setLatched(boolean l) {
+        this.latchLastValue = l;
+        return this;
+    }
 
     public static void activeAttention(Iterable<? extends Prioritizable> c, MutableFloat min, MutableFloat limit, NAR nar) {
 
@@ -237,10 +245,26 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         sensor.accept(nar);
     }
 
+
+    public static void flatAttention(Iterable<? extends Prioritizable> c, MutableFloat p) {
+        c.forEach( s -> s.pri(() -> {
+            return p.floatValue();
+        } ) );
+    }
+
     private final class SensorBeliefTable extends DefaultBeliefTable {
+
 
         public SensorBeliefTable(int tCap) {
             super(tCap);
+        }
+
+        @Override
+        public void clear(NAR nar) {
+            //TODO this will happen even if goal.clear is called, which shouldnt
+            sensor.current = null;
+            currentValue = Float.NaN;
+            super.clear(nar);
         }
 
         @Override
@@ -251,20 +275,24 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
             // if when is between the last input time and now, evaluate the truth at the last input time
             // to avoid any truth decay across time. this emulates a persistent latched sensor value
             // ie. if it has not changed
-            if (when <= now && when >= sensor.lastInputTime) {
+            if (latchLastValue && when <= now && when >= sensor.lastInputTime) {
                 //now = when = sensor.lastInputTime;
                 return sensor.truth();
             }
 
             return super.truth(when, now);
         }
+
         @Override
         public Task match(@NotNull Task target, long now) {
-            long when = target.occurrence();
-            @Nullable Task next = sensor.next;
-            if (next !=null && when <= now && when >= next.occurrence()) {
-                //use the last known sensor value as-is
-                return next;
+            if (latchLastValue) {
+                long when = target.occurrence();
+                @Nullable Task next = sensor.current;
+                if (next != null && when <= now && when >= next.occurrence()) {
+                    //use the last known sensor value as-is
+                    //but project it to the target time unchanged (due to the implicit 'latching' of an unchanged value
+                    return MutableTask.clone(next, now);
+                }
             }
             return super.match(target, now);
         }

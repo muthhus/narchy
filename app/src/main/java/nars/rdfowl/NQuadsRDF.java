@@ -369,8 +369,8 @@ public abstract class NQuadsRDF {
         else if (predicate.equals(equivalentClass)) {
 
             belief = equi(
-                inh(varIndep(1), subject),
-                inh(varIndep(1), object)
+                inh(varIndep("subj"), subject),
+                inh(varIndep("pred"), object)
             );
         } else if (predicate.equals(isPartOf)) {
             belief = $.instprop( subject, object );

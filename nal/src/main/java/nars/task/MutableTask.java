@@ -255,4 +255,16 @@ public class MutableTask extends AbstractTask {
         yt.time(xt.creation(), xt.occurrence());
         return yt;
     }
+
+    public static Task clone(Task t, long newOccurrence) {
+        if (t.occurrence()==newOccurrence)
+            return t;
+
+        MutableTask yt = new MutableTask(t.term(), t.punc(), t.truth());
+        yt.budgetSafe(t.budget());
+        yt.setEvidence(t.evidence());
+        yt.time(t.creation(), newOccurrence);
+        return yt;
+    }
+
 }

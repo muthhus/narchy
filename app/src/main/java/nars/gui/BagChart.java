@@ -54,8 +54,8 @@ public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink
 
     @Override
     protected void paint(GL2 gl) {
-        busy.set(false);
         super.paint(gl);
+        busy.set(false);
     }
 
 

@@ -8,6 +8,7 @@ import nars.budget.Budget;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
+import nars.concept.WiredCompoundConcept;
 import nars.nal.UtilityFunctions;
 import nars.nar.Default;
 import nars.task.GeneratedTask;
@@ -73,7 +74,7 @@ abstract public class NAgent implements NSense, NAction {
 
     float predictorProbability = 0.25f;
 
-    private final FasterList<MutableTask> predictors = $.newArrayList();
+    protected final FasterList<MutableTask> predictors = $.newArrayList();
     private float predictorPriFactor = 1f;
 
     public boolean trace = false;
@@ -246,11 +247,15 @@ abstract public class NAgent implements NSense, NAction {
         minSensorPriority = new MutableFloat(Param.BUDGET_EPSILON * 2);
         maxSensorPriority = new MutableFloat(Util.unitize(nar.priorityDefault(BELIEF) / (numActions + numSensors) + minSensorPriority.floatValue())); //measured per-each sensor
 
-        SensorConcept.activeAttention(Iterables.concat(
+        Iterable<? extends WiredCompoundConcept.Prioritizable> p = Iterables.concat(
                 sensors,
                 actions,
                 newArrayList(happy, joy)
-        ), minSensorPriority, maxSensorPriority, nar);
+        );
+
+
+        //SensorConcept.activeAttention(p, minSensorPriority, maxSensorPriority, nar);
+        SensorConcept.flatAttention(p, minSensorPriority);
 
 
         //@NotNull Term what = $.$("?w"); //#w

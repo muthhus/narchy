@@ -44,7 +44,7 @@ abstract public class SwingAgent extends NAgent {
 
     }
 
-    public static void run(Function<NAR, SwingAgent> init, int frameRate) {
+    public static void run(Function<NAR, SwingAgent> init, int frames) {
         Random rng = new XorShift128PlusRandom(1);
 
         final Executioner exe =
@@ -66,19 +66,19 @@ abstract public class SwingAgent extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.1f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.01f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        nar.linkFeedbackRate.setValue(0.05f);
+        //nar.linkFeedbackRate.setValue(0.05f);
 
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4, true);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
 //        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the",
@@ -92,7 +92,7 @@ abstract public class SwingAgent extends NAgent {
         chart(a, history);
 
 
-        a.run(frameRate).join();
+        a.run(frames).join();
         //a.runSync(runFrames);
 
         NAR.printTasks(nar, true);
