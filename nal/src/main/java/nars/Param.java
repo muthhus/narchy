@@ -561,22 +561,20 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     /**
-     * returns a value <= 1.0
+     * a multiplicative factor which represents the relative separation in time. if  returns a value <= 1.0
      */
-    public static float temporalIrrelevance(float delta /* positive only */, float duration /* <1, divides usually */) {
+    public static float simultaneity(long delta /* positive only */, float duration /* <1, divides usually */) {
         //return (1f + (float)Math.log(1+delta/duration));
-        return (delta / duration);
+        return 1f / (1f + delta / duration);
     }
 
     /**
      * @param t
-     * @param when target time that is being evaluated (may be 'now' or some other time projected to)
      * @return
      */
-    public static float rankTemporalByConfidence(@NotNull Task t, long when, long now) {
-        float c = t.conf();
-        //float c = t.confWeight(); //<- doesnt seem to work, produces values too high
-
+    public static float rankTemporalByConfidence(@Nullable Task t, long now) {
+        if (t == null || t.isDeleted())
+            return Float.NEGATIVE_INFINITY;
 
         long tOcc = t.occurrence();
         //long dWhenNow = Math.abs(when - now);
@@ -586,13 +584,12 @@ public abstract class Param /*extends Container*/ implements Level {
         float pastAndPresentDuration = 1f;
         float futureDuration = 1f;
 
-        float rank = c2w(c) / (1f +
-                temporalIrrelevance(
-                        //(dtOcc+dWhenNow),
+        float rank = t.conf() *
+                simultaneity(
                         dtOcc,
-                        tOcc <= now ? pastAndPresentDuration : futureDuration)
+                        tOcc <= now ? pastAndPresentDuration : futureDuration);
                 //+ temporalIrrelevance(dWhenNow, 1f)
-        ); // + temporalIrrelevance(dtCre, 1f));
+         // + temporalIrrelevance(dtCre, 1f));
         //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);
         return rank;
 

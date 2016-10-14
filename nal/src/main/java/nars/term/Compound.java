@@ -473,6 +473,7 @@ public interface Compound extends Term, IPair, TermContainer {
         subterms().forEach(action, start, stop);
     }
 
+
     @Override
     default Iterator<Term> iterator() {
         return subterms().iterator();

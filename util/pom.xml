@@ -97,15 +97,12 @@
 
 
 
-
-
-
-    <dependency>
-      <groupId>me.qmx.jitescript</groupId>
-      <artifactId>jitescript</artifactId>
-      <version>0.4.1</version>
-      <scope>compile</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>me.qmx.jitescript</groupId>-->
+      <!--<artifactId>jitescript</artifactId>-->
+      <!--<version>0.4.1</version>-->
+      <!--<scope>compile</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.javassist</groupId>
       <artifactId>javassist</artifactId>

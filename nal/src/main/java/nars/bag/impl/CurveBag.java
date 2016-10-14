@@ -3,6 +3,7 @@ package nars.bag.impl;
 import nars.bag.Bag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
+import nars.util.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import static nars.util.Util.*;
 
 /**
  * Bag which stores items, sorted, in one array.
@@ -353,11 +356,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
      * maps y in 0..1.0 to an index in [0..size). as if window=1
      */
     static int index(float y, int size) {
-        size--;
-
-        return Math.max(Math.min(
-                Math.round(y * size - 0.5f),
-                size), 0);
+        return clamp(Math.round(y * (size-1) - 0.5f), 0, size);
     }
 
 

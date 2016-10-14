@@ -309,7 +309,7 @@
          //(&&,X,A), B, time(decomposeTask) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
 //substitutionViaSimilarity
-     X, (B<->C), neqCom(X,C) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
+     X, (B<->C), neq(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
 
 //desire spreading by similarity
      S, (S<->P) |- P, (Goal:Intersection)

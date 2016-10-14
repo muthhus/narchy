@@ -33,7 +33,7 @@ public class TermVector implements TermContainer {
      * TODO make not public
      */
     @NotNull
-    public final Term[] term;
+    public final Term[] terms;
 
 
 
@@ -75,7 +75,7 @@ public class TermVector implements TermContainer {
 
      @SafeVarargs
      public TermVector(@NotNull Term... terms) {
-        this.term = terms;
+        this.terms = terms;
 
          if (terms.length > Param.MAX_SUBTERMS)
              throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Param.MAX_SUBTERMS);
@@ -89,7 +89,7 @@ public class TermVector implements TermContainer {
          5: struct
          */
         int[] meta = new int[6];
-        this.hash = Terms.hashSubterms(term, meta);
+        this.hash = Terms.hashSubterms(this.terms, meta);
 
 
          final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
@@ -116,20 +116,20 @@ public class TermVector implements TermContainer {
 
     @Override
     public final boolean isTerm(int i, @NotNull Op o) {
-        return term[i].op() == o;
+        return terms[i].op() == o;
     }
 
     @NotNull @Override public final Term[] terms() {
-        return term;
+        return terms;
     }
 
     @NotNull
     @Override public final Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
-        return Terms.filter(term, filter);
+        return Terms.filter(terms, filter);
     }
 
     public TermVector append(Term x) {
-        return new TermVector(ArrayUtils.add(term,x));
+        return new TermVector(ArrayUtils.add(terms,x));
     }
 
     @Override
@@ -139,7 +139,7 @@ public class TermVector implements TermContainer {
 
     @Override
     @NotNull public final Term term(int i) {
-        return term[i];
+        return terms[i];
     }
 
 //    public final boolean equals(Term[] t) {
@@ -168,7 +168,7 @@ public class TermVector implements TermContainer {
      */
     @Override
     public final int size() {
-        return term.length;
+        return terms.length;
     }
 
 //
@@ -181,7 +181,7 @@ public class TermVector implements TermContainer {
     @NotNull
     @Override
     public String toString() {
-        return '(' + Joiner.on(',').join(term) + ')';
+        return '(' + Joiner.on(',').join(terms) + ')';
     }
 
     @Override
@@ -234,21 +234,20 @@ public class TermVector implements TermContainer {
 
     @Override
     public final Iterator<Term> iterator() {
-        return Arrays.stream(term).iterator();
+        return Arrays.stream(terms).iterator();
     }
 
 
     @Override
     public final void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
-        Term[] tt = term;
+        Term[] tt = terms;
         for (int i = start; i < stop; i++)
             action.accept(tt[i]);
     }
 
     @Override
     public final void forEach(@NotNull Consumer<? super Term> action) {
-        Term[] tt = term;
-        for (Term t : tt)
+        for (Term t : terms)
             action.accept(t);
     }
 
@@ -263,7 +262,7 @@ public class TermVector implements TermContainer {
 
         if (obj instanceof TermVector) {
             TermVector ot = (TermVector) obj;
-            return Util.equals(term, ot.term);
+            return Util.equals(terms, ot.terms);
         } else {
             return (obj instanceof TermContainer) && (equalTo((TermContainer) obj));
         }
@@ -272,7 +271,7 @@ public class TermVector implements TermContainer {
     /** accelerated implementation */
     @Override
     public final boolean equalTerms(@NotNull TermContainer c) {
-        Term[] tt = this.term;
+        Term[] tt = this.terms;
         int cl = tt.length;
         for (int i = 0; i < cl; i++) {
             if (!tt[i].equals(c.term(i)))
@@ -284,7 +283,7 @@ public class TermVector implements TermContainer {
 
     @Override
     public final void copyInto(@NotNull Collection<Term> target) {
-        Collections.addAll(target, term);
+        Collections.addAll(target, terms);
     }
 
     @Override
@@ -293,13 +292,13 @@ public class TermVector implements TermContainer {
     }
 
     public final void visit(@NotNull SubtermVisitorX v, Compound parent) {
-        for (Term t : term)
+        for (Term t : terms)
             v.accept(t, parent);
     }
 
     @NotNull
     public TermVector reverse() {
-        Term[] s = this.term;
+        Term[] s = this.terms;
         if (s.length < 2)
             return this; //no change needed
         Term[] r = s.clone();
@@ -350,7 +349,7 @@ public class TermVector implements TermContainer {
     @Override public final boolean hasAll(int equivalentSize, int baseStructure, int minVol) {
             return  (minVol <= this.volume)
                     &&
-                    (equivalentSize == this.term.length)
+                    (equivalentSize == this.terms.length)
                     &&
                     Op.hasAll(this.structure, baseStructure)
             ;

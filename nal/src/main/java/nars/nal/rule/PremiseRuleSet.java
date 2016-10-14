@@ -21,9 +21,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -31,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static java.nio.file.Files.list;
 import static java.nio.file.Files.readAllLines;
 import static java.util.stream.Collectors.toList;
 import static nars.IO.readTerm;
@@ -142,88 +141,97 @@ public class PremiseRuleSet {
 
 
     @NotNull
-    static Stream<CharSequence> load(@NotNull byte[] data) {
+    static Collection<String> load(@NotNull byte[] data) {
         return load(Lists.newArrayList(new String(data).split("\n")));
     }
 
     @NotNull
-    static Stream<CharSequence> load(@NotNull List<String> lines) {
+    static Collection<String> load(@NotNull List<String> lines) {
 
-        List<CharSequence> unparsed_rules = $.newArrayList(1024);
 
         StringBuilder current_rule = new StringBuilder(256);
-        boolean single_rule_test = false;
+        boolean filtering = false;
+
+        List<String> lines2 = $.newArrayList(1024);
 
         for (String s : lines) {
+
             s = s.trim(); //HACK write a better file loader
+
+            if (s.isEmpty() || s.startsWith("//")) {
+                continue;
+            }
+
+            if (s.contains("..")) {
+                s = s.replace("A..", "%A.."); //add var pattern manually to ellipsis
+                s = s.replace("%A..B=_", "%A..%B=_"); //add var pattern manually to ellipsis
+                s = s.replace("B..", "%B.."); //add var pattern manually to ellipsis
+                s = s.replace("%A.._=B", "%A.._=%B"); //add var pattern manually to ellipsis
+            }
+
             if (s.startsWith("try:")) {
-                single_rule_test = true;
-                break;
+                filtering = true;
             }
+
+            lines2.add(s);
+
         }
 
-        for (String s : lines) {
+        lines = lines2;
 
-            s = s.trim(); //HACK write a better file loader
+        if (filtering) {
+            List<String> unparsed_rules = $.newArrayList(1024);
+            for (String s : lines) {
 
-            boolean currentRuleEmpty = current_rule.length() == 0;
-            if (s.startsWith("//") || spacePattern.matcher(s).replaceAll(Matcher.quoteReplacement("")).isEmpty()) {
+                s = s.trim(); //HACK write a better file loader
 
-                if (!currentRuleEmpty) {
+                boolean currentRuleEmpty = current_rule.length() == 0;
+                if (s.startsWith("//") || spacePattern.matcher(s).replaceAll(Matcher.quoteReplacement("")).isEmpty()) {
 
-                    if (!single_rule_test || single_rule_test && current_rule.toString().contains("try:")) {
-                        unparsed_rules.add(current_rule.toString().trim().replace("try:", "")); //rule is finished, add it
+                    if (!currentRuleEmpty) {
+
+                        if (!filtering || filtering && current_rule.toString().contains("try:")) {
+                            unparsed_rules.add(current_rule.toString().trim().replace("try:", "")); //rule is finished, add it
+                        }
+                        current_rule.setLength(0); //start identifying a new rule
                     }
-                    current_rule.setLength(0); //start identifying a new rule
-                }
 
-            } else {
-                //note, it can also be that the current_rule is not empty and this line contains |- which means
-                //its already a new rule, in which case the old rule has to be added before we go on
-                if (!currentRuleEmpty && s.contains("|-")) {
+                } else {
+                    //note, it can also be that the current_rule is not empty and this line contains |- which means
+                    //its already a new rule, in which case the old rule has to be added before we go on
+                    if (!currentRuleEmpty && s.contains("|-")) {
 
-                    if (!single_rule_test || single_rule_test && current_rule.toString().contains("try:")) {
-                        unparsed_rules.add(current_rule.toString().trim().replace("try:", "")); //rule is finished, add it
+                        if (!filtering || filtering && current_rule.toString().contains("try:")) {
+                            unparsed_rules.add(current_rule.toString().trim().replace("try:", "")); //rule is finished, add it
+                        }
+                        current_rule.setLength(0); //start identifying a new rule
+
                     }
-                    current_rule.setLength(0); //start identifying a new rule
-
+                    current_rule.append(s).append('\n');
                 }
-                current_rule.append(s).append('\n');
             }
-        }
 
-        if (current_rule.length() > 0) {
-            if (!single_rule_test || single_rule_test && current_rule.toString().contains("try:")) {
-                unparsed_rules.add(current_rule.toString());
+            if (current_rule.length() > 0) {
+                if (!filtering || filtering && current_rule.toString().contains("try:")) {
+                    unparsed_rules.add(current_rule.toString());
+                }
             }
+
+            return unparsed_rules;
+                    //.parallelStream();
+                    //.stream();
+        } else {
+            return lines;//.stream();
         }
 
-        return unparsed_rules
-                .parallelStream();
-                //.stream();
-    }
-
-    @NotNull
-    @Deprecated /* soon */ static String preprocess(@NotNull CharSequence rule) //minor things like Truth.Comparison -> Truth_Comparison
-    {
-        String ret = rule.toString();
-
-        if (ret.contains("..")) {
-            ret = ret.replace("A..", "%A.."); //add var pattern manually to ellipsis
-            ret = ret.replace("%A..B=_", "%A..%B=_"); //add var pattern manually to ellipsis
-            ret = ret.replace("B..", "%B.."); //add var pattern manually to ellipsis
-            ret = ret.replace("%A.._=B", "%A.._=%B"); //add var pattern manually to ellipsis
-        }
-
-        return ret;
-        //return '<' + ret + '>'; //ret.replace("\n", "");/*.replace("A_1..n","\"A_1..n\"")*/ //TODO: implement A_1...n notation, needs dynamic term construction before matching
     }
 
 
+
+
     @NotNull
-    static Stream<Pair<Compound, String>> parse(@NotNull Stream<CharSequence> rawRules, @NotNull PatternIndex index) {
-        return rawRules
-                .map(PremiseRuleSet::preprocess)
+    static Stream<Pair<Compound, String>> parse(@NotNull Collection<String> rawRules, @NotNull PatternIndex index) {
+        return rawRules.parallelStream()
                 //.distinct()
                 //.parallel()
                 //.sequential()
@@ -231,9 +239,7 @@ public class PremiseRuleSet {
     }
 
     public static PremiseRule parse(String src, PatternIndex index) {
-        src = src.trim();
-        if (src.isEmpty())
-            return null;
+
 
         //(Compound) index.parseRaw(src)
         String[] ab = src.split("\\|\\-");

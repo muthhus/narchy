@@ -4,6 +4,7 @@ import nars.*;
 import nars.bag.impl.CurveBag;
 import nars.budget.Activation;
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
@@ -11,7 +12,7 @@ import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
-import nars.op.MutaTaskBag;
+import nars.op.Leak;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.task.GeneratedTask;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import static nars.nal.UtilityFunctions.or;
 import static nars.time.Tense.ETERNAL;
@@ -41,11 +43,7 @@ import static nars.time.Tense.ETERNAL;
  *
  * @param S serial term type
  */
-abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink<Compound>> {
-
-    static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
-
-    private static final AtomicInteger currentTermSerial = new AtomicInteger(0);
+abstract public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
 
     /**
      * when a concept is important and exceeds a syntactic complexity above
@@ -66,6 +64,10 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
     public final MutableFloat abbreviationProbability = new MutableFloat(2f);
 
 
+    static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
+
+    private static final AtomicInteger currentTermSerial = new AtomicInteger(0);
+
     @NotNull
     protected final NAR nar;
     private final String termPrefix;
@@ -73,7 +75,7 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
-        super(selectionRate, new CurveBag<>(BudgetMerge.plusBlend, n.random), n);
+        super(new CurveBag<>(BudgetMerge.plusBlend, n.random), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;
@@ -86,47 +88,41 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
 
     @Nullable
     @Override
-    protected BLink<Compound> filter(Task task) {
+    protected void input(Task task, Consumer<BLink<CompoundConcept>> each) {
 
-        if (task instanceof AbbreviationTask) //avoids feedback
-            return null;
+        if (task instanceof AbbreviationTask)
+            return;
 
-        Term t = task.term();
-        int vol = t.volume();
-        int minVol = this.minAbbreviableVolume.intValue();
-        if ((vol >= minVol) && (vol <= maxVol)) {
+        input(task.budget(), each, task.term());
 
-            float score;
-            if ((score = scoreIfExceeds(task, nar.random.nextFloat())) > 0) {
+    }
 
-                score *= (1f / (1f + Math.max(0, (t.volume() - minVol)))); //decrease score by any additional complexity above the volume threshold
-                @NotNull Budget b = task.budget();
-                return new DefaultBLink(t,
-                        score,
-                        b.dur(),
-                        b.qua());
+    private void input(Budget b, Consumer<BLink<CompoundConcept>> each, Compound t) {
+        if (t.vars() == 0) {
+            int vol = t.volume();
+            if (vol >= minAbbreviableVolume.intValue())
+                if (vol <= maxVol && !t.hasTemporal()) {
+                    CompoundConcept abbreviable = (CompoundConcept) nar.concept(t);
+                    if ((abbreviable != null) &&
+                            !(abbreviable instanceof PermanentConcept) &&
+                            abbreviable.get(Abbreviation.class) == null &&
+                            abbreviable.get(Concept.Savior.class) == null) {
+
+                        each.accept(new DefaultBLink(abbreviable, b));
+                    }
+                } else {
+                    //recursiely try subterms of a temporal or exceedingly large concept
+                    t.forEachCompound(x -> input(b, each, ((Compound) x)));
+                }
             }
-        }
-
-        return null;
     }
 
 
     @Override
-    protected void accept(BLink<Compound> b) {
+    protected float accept(BLink<CompoundConcept> b) {
 
-        Term term = b.get();
-        Concept abbreviable = nar.concept(term);
-        if ((abbreviable != null) &&
-                !(abbreviable instanceof PermanentConcept) &&
-                !(abbreviable instanceof AliasConcept) &&
-                term.vars() == 0 &&
-                term.hasTemporal() &&
-                abbreviable.get(Abbreviation.class) == null &&
-                abbreviable.get(Concept.Savior.class) == null) {
-
-            abbreviate((CompoundConcept) abbreviable, b);
-        }
+        abbreviate(b.get(), b);
+        return 1f;
 
     }
 
@@ -153,23 +149,23 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
         //  }
     }
 
-    private float scoreIfExceeds(Task task, float min) {
-        float s = or(task.priIfFiniteElseZero(), task.qua());
-        if (s >= min) {
-            s *= abbreviationProbability.floatValue();
-            if (s >= min) {
-
-                //higher probability for terms nearer the thresh. smaller and larger get less chance
-//                s *= 1f - unitize(
-//                        Math.abs(task.volume() - volThresh) /
-//                                (threshFalloffRate) );
-
-                if (s >= min)
-                    return s;
-            }
-        }
-        return -1;
-    }
+//    private float scoreIfExceeds(Budget task, float min) {
+//        float s = or(task.priIfFiniteElseZero(), task.qua());
+//        if (s >= min) {
+//            s *= abbreviationProbability.floatValue();
+//            if (s >= min) {
+//
+//                //higher probability for terms nearer the thresh. smaller and larger get less chance
+////                s *= 1f - unitize(
+////                        Math.abs(task.volume() - volThresh) /
+////                                (threshFalloffRate) );
+//
+//                if (s >= min)
+//                    return s;
+//            }
+//        }
+//        return -1;
+//    }
 
     abstract protected void abbreviate(@NotNull CompoundConcept abbreviated, Budget b);
 
@@ -194,19 +190,19 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
             AliasConcept alias = new AliasConcept(id, abbreviated, nar, abbreviation);
             nar.on(alias);
 
+            @Nullable Concept a = nar.concept(abbreviated);
+            a.put(Abbreviation.class, alias);
+
 
             //if (abbreviation != null) {
 
             //logger.info("{} <=== {}", alias, abbreviatedTerm);
 
-            AbbreviationTask abbreviationTask = new AbbreviationTask(
-                    abbreviation, abbreviatedTerm, alias, abbreviationConfidence.floatValue());
-            long now = nar.time();
-            abbreviationTask.time(now,
-                    //now);
-                    ETERNAL);
-            abbreviationTask.setBudget(b);
-            abbreviationTask.log("Abbreviate");
+            Task abbreviationTask = new AbbreviationTask(
+                    abbreviation, abbreviatedTerm, alias, abbreviationConfidence.floatValue())
+                    .time(nar.time(), ETERNAL)
+                    .log("Abbreviate")
+                    .budgetSafe(b);
 
             nar.inputLater( abbreviationTask );
 
@@ -224,7 +220,10 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
         @Nullable
         static Compound newRelation(@NotNull Concept abbreviated, @NotNull String id) {
             return
-                    (Compound) $.sim(abbreviated.term(), $.the(id));
+                    (Compound)
+                            //$.sim
+                            $.equi
+                                    (abbreviated.term(), $.the(id));
             //(Compound) $.equi(abbreviated.term(), id);
             //(Compound) $.secte(abbreviated.term(), id);
 
@@ -405,6 +404,7 @@ abstract public class Abbreviation/*<S extends Term>*/ extends MutaTaskBag<BLink
             if (deltaConfidence==deltaConfidence /* wasn't deleted, even for questions */ && !isDeleted()) {
                 @Nullable Concept c = concept(nar);
                 c.put(Abbreviation.class, alias);
+
             }
         }
     }

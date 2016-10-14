@@ -36,23 +36,40 @@ public class Revision {
 
     public static final Logger logger = LoggerFactory.getLogger(Revision.class);
 
-    /**
-     * Revision for Eternal tasks
-     */
     @Nullable
     public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minConf) {
         float w1 = a.confWeight() * factor;
         float w2 = b.confWeight() * factor;
         float w = (w1 + w2);
         float c = UtilityFunctions.w2c(w);
-        if (c < minConf)
-            return null;
-
-        return $.t(
-            (w1 * a.freq() + w2 * b.freq()) / w,
-            c
-        );
+        return c < minConf ?
+                null :
+                $.t(
+                    (w1 * a.freq() + w2 * b.freq()) / w,
+                    c
+                );
     }
+    @Nullable
+    public static Truth revise(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float minConf) {
+        float w1 = a.confWeight();
+        float w2 = b.confWeight();
+        float c = UtilityFunctions.w2c(w1+w2);
+
+        if (c >= minConf) {
+            //find the right balance of frequency
+            float w1f = aFrequencyBalance * w1;
+            float w2f = (1f-aFrequencyBalance) * w2;
+            float p = w2f/(w1f+w2f);
+
+            float f = Util.lerp(b.freq(), a.freq(), p);
+
+            return $.t( f, c );
+
+        } else {
+            return null;
+        }
+    }
+
 
     @Nullable
     public static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {

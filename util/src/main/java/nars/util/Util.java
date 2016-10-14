@@ -537,15 +537,16 @@ public enum Util { ;
      * linear interpolate between target & current, factor is between 0 and 1.0
      */
     public static float lerp(float target, float current, float factor) {
-        factor = unitize(factor);
-        return target * factor + current * (1.0f - factor);
-        //return Math.fma(target, factor, current * (1.0f - factor));
+        return current + (target-current) * unitize(factor);
     }
     public static double lerp(double target, double current, double factor) {
-        factor = unitize(factor);
-        return target * factor + current * (1.0f - factor);
-        //return Math.fma(target, factor, current * (1.0f - factor));
+        return current + (target-current) * unitize(factor);
     }
+
+    public static long lerp(long target, long current, float factor) {
+        return current + Math.round((long)(target-current) * unitize(factor));
+    }
+
     /**
      * maximum, simpler and faster than Math.max without its additional tests
      */
@@ -1273,7 +1274,10 @@ public enum Util { ;
     }
 
     public static int clamp(float v, int min, int max) {
-        int i = Math.round(v);
+        return clamp(Math.round(v), min, max);
+    }
+
+    public static int clamp(int i, int min, int max) {
         if (i < min) i = min;
         if (i > max) i = max;
         return i;

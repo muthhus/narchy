@@ -101,7 +101,7 @@ public class EllipsisTest {
 
                             if (u instanceof EllipsisMatch) {
                                 EllipsisMatch m = (EllipsisMatch)u;
-                                Collections.addAll(varArgTerms, m.term);
+                                Collections.addAll(varArgTerms, m.terms);
                             } else {
                                 varArgTerms.add(u);
                             }

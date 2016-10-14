@@ -80,7 +80,7 @@ public class EllipsisMatch extends TermVector implements Term {
     @NotNull
     static Term[] expand(Term raw) {
         return raw instanceof EllipsisMatch ?
-                ((EllipsisMatch)raw).term :
+                ((EllipsisMatch)raw).terms :
                 new Term[] { raw };
     }
 
@@ -130,7 +130,7 @@ public class EllipsisMatch extends TermVector implements Term {
 
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
         int n = 0;
-        for (Term e : term) {
+        for (Term e : terms) {
             if (!y.containsTermAtemporally(e) || !target.add(e))
                 return false;
             n++;
@@ -141,12 +141,12 @@ public class EllipsisMatch extends TermVector implements Term {
 
     /** returns whether anything has changed in the target */
     public void expand(Op op, List<Term> target) {
-        switch (term.length) {
+        switch (terms.length) {
             case 1:
-                target.add(term[0]);
+                target.add(terms[0]);
                 break;
             default:
-                Collections.addAll(target, term);
+                Collections.addAll(target, terms);
                 break;
         }
     }

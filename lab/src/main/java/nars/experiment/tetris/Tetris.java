@@ -47,9 +47,9 @@ public class Tetris extends SwingAgent {
     public static final Executioner exe =
             //new SingleThreadExecutioner();
 //            new MultiThreadExecutioner(2, 1024*8);
-            new MultiThreadExecutioner(3, 1024*8);
+            new MultiThreadExecutioner(4, 1024*8);
 
-    public static final int runFrames = 1125550;
+    public static final int runFrames = 5550;
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 15;
@@ -413,7 +413,6 @@ public class Tetris extends SwingAgent {
 
         nar.confMin.setValue(0.05f);
 
-        //Abbreviation abbr = new Abbreviation(nar, "the", 4, 0.5f, 32);
 
         nar.compoundVolumeMax.setValue(maxVol);
         //nar.linkFeedbackRate.setValue(0.95f);
@@ -449,7 +448,8 @@ public class Tetris extends SwingAgent {
 //		});
 
 
-        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 6, 16, 0.05f, 32);
+        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 6, 16,
+                1f, 32);
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
@@ -485,12 +485,12 @@ public class Tetris extends SwingAgent {
                 grid(
 
                         //Vis.concepts(nar, 32),
-                        Vis.agentActions(t, 450),
+                        Vis.agentActions(t, 2000),
 
                         Vis.budgetHistogram(nar, 32),
                         Vis.conceptLinePlot(nar,
                                 Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)),
-                                200)
+                                1200)
                 ), 1200, 900);
 
 

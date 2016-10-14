@@ -81,7 +81,7 @@ public enum ImageMatch {
                 super.expand(op, target);
             } else {
                 //exclude any imdexes because the target is not an image
-                for (Term t : term) {
+                for (Term t : terms) {
                     if (t!=Imdex) {
                         target.add(t);
                     }

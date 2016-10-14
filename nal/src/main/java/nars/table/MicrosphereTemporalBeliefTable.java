@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static nars.Param.rankTemporalByConfidence;
+import static nars.Param.simultaneity;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 
@@ -65,7 +66,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             int toRemove = list.size() - newCapacity;
             for (int i = 0; i < toRemove && nullAttempts > 0; ) {
 
-                Task ww = weakest(now, null); //read-lock
+                Task ww = weakest(now); //read-lock
                 if (ww!=null) {
                     remove(ww, removed);
                     i++;
@@ -192,41 +193,34 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 //    }
 
 
-    public Task weakest(long now, @Nullable Task toMergeWith) {
+    public Task weakest(long now) {
+        return list.minBy(x -> rankTemporalByConfidence(x, now));
+    }
 
-        if (toMergeWith == null) {
-            return list.minBy(x -> rank(x, now, now));
-        } else {
-            return list.minBy(rankPenalizingOverlap(now, toMergeWith));
-        }
+    public Task weakest(long now, @NotNull Task toMergeWith) {
+        return list.minBy(rankPenalizingFreqAndTemporalDistance( toMergeWith, now ));
+    }
 
+    @NotNull public Function<Task, Float> rankPenalizingFreqAndTemporalDistance(@NotNull Task y, long now) {
+
+        return x ->
+                y.conf() *
+                simultaneity(x.occurrence() - y.occurrence(), 1f) *
+                (1f / (1f + Math.abs(x.freq()-y.freq())) );
     }
 
     @NotNull public Function<Task, Float> rankPenalizingOverlap(long now, @NotNull Task toMergeWith) {
         long occ = toMergeWith.occurrence();
         ImmutableLongSet toMergeWithEvidence = toMergeWith.evidenceSet();
-        return x -> rank(x, toMergeWithEvidence, occ, now);
+        return x -> rankPenalizingOverlap(x, toMergeWithEvidence, occ, now);
     }
 
-    public static float rank(@Nullable Task x, @NotNull LongSet evidence, long occ, long now) {
-        return (x == null) ? Float.NEGATIVE_INFINITY : (Stamp.overlapFraction(evidence, x.evidence()) * rank(x, occ, now));
-    }
-
-
-    /**
-     * according to a balance of temporal proximity and confidence
-     */
-    public static float rank(@Nullable Task t, long when, long now) {
-        if (t == null || t.isDeleted())
-            return Float.NEGATIVE_INFINITY;
-        return rankTemporalByConfidence(t, when, now);
+    public static float rankPenalizingOverlap(@Nullable Task x, @NotNull LongSet evidence, long occ, long now) {
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
+        return (x == null) ? Float.NEGATIVE_INFINITY : (Stamp.overlapFraction(evidence, x.evidence()) * rankTemporalByConfidence(x, now));
     }
 
-//    @Nullable
-//    protected Task compress(@NotNull List<Task> displ, long now) {
-//        return compress(null, now, null, displ, null);
-//    }
+
 
     /**
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
@@ -241,10 +235,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         }
 
 
-        float inputRank = input != null ? rank(input, now, now) : Float.POSITIVE_INFINITY;
+        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
+        float inputRank = input != null ? rankTemporalByConfidence(input, now) : Float.POSITIVE_INFINITY;
 
-        Task a = weakest(now, null);
-        if (a == null || inputRank < rank(a, now, now) || !remove(a, displ)) {
+        Task a = weakest(now);
+        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
+        if (a == null || inputRank <= rankTemporalByConfidence(a, now) || !remove(a, displ)) {
             //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
         }
@@ -263,15 +259,19 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
      */
     @Nullable
     private Task merge(@NotNull Task a, @NotNull Task b, long now, Concept concept, @Nullable EternalTable eternal) {
-        double ac = c2w(a.conf());
-        double bc = c2w(b.conf());
-        long mid = (long) Math.round(Util.lerp((double) a.occurrence(), (double) b.occurrence(), ac / (ac + bc)));
 
-        //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
-        //TODO weight the contributed overlap amount by the relative confidence provided by each task
-        float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
+        float ac = c2w(a.conf());
+        float bc = c2w(b.conf());
+        long mid = (long) Math.round(Util.lerp(a.occurrence(), b.occurrence(), ac / (ac + bc)));
 
-        Truth t = Revision.revise(a, b, 1f - (overlap / 2f), Param.TRUTH_EPSILON /*nar.confMin*/);
+//        float f =
+//                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
+//                //TODO weight the contributed overlap amount by the relative confidence provided by each task
+//                //1f - Stamp.overlapFraction(a.evidence(), b.evidence())/2f;
+//                1f;
+        float p = ac/(ac+bc);
+        Truth t = Revision.revise(a, p, b, Param.TRUTH_EPSILON /*nar.confMin*/);
+
         if (t != null)
             return Revision.mergeInterpolate(a, b, mid, now, t, concept);
 
@@ -284,7 +284,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     public final Task match(long when, long now, @Nullable Task against) {
 
         if (against == null) {
-            return list.maxBy(x -> rank(x, when, now));
+            return list.maxBy(x -> rankTemporalByConfidence(x, now));
         } else {
             return list.maxBy(rankPenalizingOverlap(now, against));
         }

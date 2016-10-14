@@ -28,7 +28,6 @@ import nars.time.Tense;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Texts;
-import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,11 +35,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static nars.Op.*;
 import static nars.Symbols.*;
-import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
  * NARese, syntax and language for interacting with a NAR in NARS.
@@ -454,20 +451,33 @@ public class Narsese extends BaseParser<Object> {
                         QuotedMultilineLiteral(),
                         QuotedLiteral(),
 
-                        //Operator(),
+                        seq(oper, ColonReverseInheritance()),
 
                         seq(meta, Ellipsis()),
+                        Variable(),
 
-                        //seq(meta, TaskRule()),
+                        NumberAtom(),
+
+
+                        seq(SETe.str,
+
+                                MultiArgTerm(SETe, SET_EXT_CLOSER, false, false)
+
+                        ),
+
+                        seq(SETi.str,
+
+                                MultiArgTerm(SETi, SET_INT_CLOSER, false, false)
+
+                        ),
 
                         TemporalRelation(),
-
-                        seq(oper, ColonReverseInheritance()),
 
                         //Functional form of an Operation, ex: operate(p1,p2), TODO move to FunctionalOperationTerm() rule
                         seq(oper,
 
-                                Term(false, false), //<-- allows non-atom terms for operator names
+                                Atom(),
+                                //Term(false, false), //<-- allows non-atom terms for operator names
                                 //Atom(), //push(nonNull($.oper((String)pop()))), // <-- allows only atoms for operator names, normal
 
                                 push($.the(pop())),
@@ -476,7 +486,7 @@ public class Narsese extends BaseParser<Object> {
 
                                 firstOf(
                                         seq(COMPOUND_TERM_CLOSER, push(Terms.ZeroProduct)),// nonNull($.exec((Term)pop())) )),
-                                        MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false, false, false)
+                                        MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false)
                                 ),
 
                                 push($.inh((Term) pop(), (Term) pop()))
@@ -484,50 +494,41 @@ public class Narsese extends BaseParser<Object> {
                         ),
 
 
-                        seq(STATEMENT_OPENER,
-                                MultiArgTerm(null, STATEMENT_CLOSER, false, true, true, false)
-                        ),
 
-                        Variable(),
 
-                        seq(SETe.str,
 
-                                firstOf(
-                                        EmptyCompound(SET_EXT_CLOSER, SETe),
-                                        MultiArgTerm(SETe, SET_EXT_CLOSER, false, false, false, false)
-                                )
-                        ),
 
-                        seq(SETi.str,
-                                firstOf(
-                                        EmptyCompound(SET_INT_CLOSER, SETi),
-                                        MultiArgTerm(SETi, SET_INT_CLOSER, false, false, false, false)
-                                )
-                        ),
-
-                        seq(COMPOUND_TERM_OPENER,
+                        seq(COMPOUND_TERM_OPENER, s(),
                                 firstOf(
 
-                                        EmptyCompound(COMPOUND_TERM_CLOSER, PROD),
+                                        sequence(
+                                                COMPOUND_TERM_CLOSER, push(TermBuilder.empty(PROD))
+                                        ),
 
-                                        MultiArgTerm(null, COMPOUND_TERM_CLOSER, true, false, false, false),
+
+                                        MultiArgTerm(null, COMPOUND_TERM_CLOSER, true, false),
 
                                         //default to product if no operator specified in ( )
-                                        MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false, false, false),
+                                        MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, false),
 
-                                        MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, true, true, false)
+                                        MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, true)
+
                                 )
+
                         ),
 
+                        //deprecated form: <a --> b>
+                        seq(STATEMENT_OPENER,
+                                MultiArgTerm(null, STATEMENT_CLOSER, false, true)
+                        ),
 
                         //negation shorthand
                         seq(NEG.str, s(), Term(), push(
                                 //Negation.make(popTerm(null, true)))),
                                 $.neg( /*$.$(*/ (Term) pop()))),
 
-                        NumberAtom(),
-                        Atom()
 
+                        Atom()
 
                 ),
 
@@ -544,13 +545,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    Rule EmptyCompound(char c, Op op) {
-        return sequence(
-                s(), c, push(TermBuilder.empty(op))
-        );
-    }
-
-//    public Rule ConjunctionParallel() {
+    //    public Rule ConjunctionParallel() {
 //    }
 
     @Deprecated
@@ -561,8 +556,10 @@ public class Narsese extends BaseParser<Object> {
                 s(),
                 Term(true, false),
                 s(),
-                OpTemporal(),
-                CycleDelta(),
+                firstOf(
+                        seq( OpTemporal(), CycleDelta() ),
+                        seq( OpTemporalParallel(), push(0) /* dt=0 */ )
+                ),
                 s(),
                 Term(true, false),
                 s(),
@@ -799,11 +796,6 @@ public class Narsese extends BaseParser<Object> {
                 Atom(),
                 swap(),
                 push($.v(((String) pop()).charAt(0), (String) pop()))
-//
-//                sequence(Symbols.VAR_INDEPENDENT, Atom(), push($.v(VAR_INDEP, (String) pop()))),
-//                sequence(Symbols.VAR_DEPENDENT, Atom(), push($.v(VAR_DEP, ((String) pop())))),
-//                sequence(Symbols.VAR_QUERY, Atom(), push($.v(Op.VAR_QUERY, (String) pop()))),
-//                sequence(Symbols.VAR_PATTERN, Atom(), push($.v(Op.VAR_PATTERN, (String) pop())))
         );
     }
 
@@ -871,6 +863,13 @@ public class Narsese extends BaseParser<Object> {
                 push(getOperator(match()))
         );
     }
+    Rule OpTemporalParallel() {
+        return firstOf(
+                seq("<|>", push(EQUI)),
+                seq("=|>", push(IMPL)),
+                seq("&|",  push(EQUI))
+        );
+    }
 
     Rule sepArgSep() {
         return sequence(s(), optional(ARGUMENT_SEPARATOR), s());
@@ -882,22 +881,21 @@ public class Narsese extends BaseParser<Object> {
     /**
      * list of terms prefixed by a particular compound term operate
      */
-    @Cached
-    Rule MultiArgTerm(Op defaultOp, char close, boolean initialOp, boolean allowInternalOp, @Deprecated boolean spaceSeparates, boolean operatorPrecedes) {
-
+    //@Cached
+    Rule MultiArgTerm(@Nullable Op defaultOp, char close, boolean initialOp, boolean allowInternalOp) {
 
         return sequence(
 
                 /*operatorPrecedes ? *OperationPrefixTerm()* true :*/
 
-                operatorPrecedes ?
-                        push(new Object[]{pop(), functionalForm})
-                        :
-                        push(Compound.class),
+//                operatorPrecedes ?
+//                        push(new Object[]{pop(), functionalForm})
+//                        :
+                push(Compound.class),
 
                 initialOp ? Op() : Term(),
 
-                spaceSeparates ?
+                allowInternalOp ?
 
                         sequence(s(), Op(), s(), Term())
 
@@ -1000,7 +998,7 @@ public class Narsese extends BaseParser<Object> {
             if (p instanceof String) {
                 //throw new RuntimeException("string not expected here");
                 //Term t = $.the((String) p);
-                vectorterms.add(p);
+                vectorterms.add($.the(p));
             } else if (p instanceof Term) {
                 vectorterms.add(p);
             } else if (p instanceof Op) {
@@ -1016,41 +1014,49 @@ public class Narsese extends BaseParser<Object> {
             }
         }
 
-        if (vectorterms.isEmpty()) return null;
+        Collections.reverse(vectorterms);
 
-        return popTermFunction.apply(pair(op, (List)vectorterms));
+        if (op == null)
+            op = PROD;
+
+        return $.compound(op, vectorterms);
+
+//        if (vectorterms.isEmpty())
+//            return null;
+//
+//        return popTermFunction.apply(pair(op, (List)vectorterms));
         //return vectorTerms.get().computeIfAbsent(Tuples.pair(op, (List) vectorterms), popTermFunction);
     }
 
 
-    @Nullable
-    public static final Function<Pair<Op, List>, Term> popTermFunction = (x) -> {
-        Op op = x.getOne();
-        List vectorterms = x.getTwo();
-        Collections.reverse(vectorterms);
-
-        for (int i = 0, vectortermsSize = vectorterms.size(); i < vectortermsSize; i++) {
-            Object x1 = vectorterms.get(i);
-            if (x1 instanceof String) {
-                //string to atom
-                vectorterms.set(i, $.the(x1));
-            }
-        }
-//        if ((op == null || op == PRODUCT) && (vectorterms.get(0) instanceof Operator)) {
-//            op = NALOperator.OPERATION;
+//    @Nullable
+//    public static final Function<Pair<Op, List>, Term> popTermFunction = (x) -> {
+//        Op op = x.getOne();
+//        List vectorterms = x.getTwo();
+//        Collections.reverse(vectorterms);
+//
+//        for (int i = 0, vectortermsSize = vectorterms.size(); i < vectortermsSize; i++) {
+//            Object x1 = vectorterms.get(i);
+//            if (x1 instanceof String) {
+//                //string to atom
+//                vectorterms.set(i, $.the(x1));
+//            }
 //        }
-
-
-//        switch (op) {
-////            case OPER:
-////                return $.inh(
-////                        $.p(vectorterms.subList(1, vectorterms.size())),
-////                        $.the(vectorterms.get(0).toString())
-////                );
-//            default:
-                return $.compound(op, vectorterms);
-//        }
-    };
+////        if ((op == null || op == PRODUCT) && (vectorterms.get(0) instanceof Operator)) {
+////            op = NALOperator.OPERATION;
+////        }
+//
+//
+////        switch (op) {
+//////            case OPER:
+//////                return $.inh(
+//////                        $.p(vectorterms.subList(1, vectorterms.size())),
+//////                        $.the(vectorterms.get(0).toString())
+//////                );
+////            default:
+//                return $.compound(op, vectorterms);
+////        }
+//    };
 
 
     /**

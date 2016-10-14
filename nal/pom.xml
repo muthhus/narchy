@@ -91,12 +91,15 @@
             <artifactId>grappa</artifactId>
             <version>2.1.0-beta.3</version>
             <scope>compile</scope>
+
             <exclusions>
-
                 <exclusion>
-
                     <artifactId>org.ow2.asm</artifactId>
                     <groupId>asm-debug-all</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>com.google.guava</artifactId>
+                    <groupId>guava</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

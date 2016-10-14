@@ -332,11 +332,6 @@ public class DynamicCompoundConcept extends CompoundConcept {
                         t.log("Dynamic");
 
 
-                        if (t.isEternal()) {
-                            throw new RuntimeException(t + " should not be eternal");
-                        }
-
-
                         //System.err.println(xx + "\tvs\t" + x);
                         //nar.inputLater(xx);
                         x = t;

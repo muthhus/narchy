@@ -6,6 +6,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
+import nars.term.atom.Atomic;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.ImmutableSet;
@@ -291,6 +292,20 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     void forEach(Consumer<? super Term> action, int start, int stop);
 
+
+    default void forEachAtomic(Consumer<? super Atomic> action) {
+        forEach(x -> {
+            if (x instanceof Atomic)
+                action.accept((Atomic)x);
+        });
+    }
+
+    default void forEachCompound(Consumer<? super Compound> action) {
+        forEach(x -> {
+            if (x instanceof Compound)
+                action.accept((Compound)x);
+        });
+    }
 
     @Override
     default void forEach(Consumer<? super Term> action) {

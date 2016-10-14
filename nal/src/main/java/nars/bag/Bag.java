@@ -140,7 +140,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     /**
      * fills a collection with at-most N items, if an item passes the predicate.
      * returns how many items added
-     */    @NotNull
+     */
+    @NotNull
     Bag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target);
 
 
@@ -575,13 +576,15 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     /** gets the link if present, applies a priority multiplier factor, and returns the link */
     V boost(Object key, float factor);
 
-    /** samples and removes the sampled item. returns null if sample did not return an item */
-    default V pop() {
+    /** samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed  */
+    @Nullable default BLink<V> pop() {
         BLink<V> x = sample();
         if (x!=null) {
             V v = x.get();
-            x.delete();
-            return v;
+            if (v!=null) {
+                remove(v);
+                return x;
+            }
         }
         return null;
     }
