@@ -675,7 +675,10 @@ public enum Util { ;
     }
 
     public static int hash(float f, int discretness) {
-        return (int) (f * discretness);
+        return Math.round(f * discretness);
+    }
+    public static float unhash(int i, int discretness) {
+        return ((float)i) / discretness;
     }
 
     public static boolean equals(double a, double b) {

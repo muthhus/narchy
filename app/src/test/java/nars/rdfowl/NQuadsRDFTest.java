@@ -2,7 +2,7 @@ package nars.rdfowl;
 
 import nars.NAR;
 import nars.Param;
-import nars.index.TreeIndex;
+import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
@@ -45,7 +45,7 @@ public class NQuadsRDFTest {
         Default n = new Default(1024,
                 72, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 1000000, 32768, 3),
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 1000000, 32768, 3),
                 new FrameClock(), e
         );
 

@@ -2,7 +2,7 @@ package nars.nar;
 
 import nars.NAR;
 import nars.Param;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.nal8.AbstractOperator;
 import nars.nar.exe.Executioner;
 import nars.op.data.*;

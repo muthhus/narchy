@@ -171,8 +171,8 @@ public class TaskLabel extends AutoLabel<Task> {
 
     @Override
     protected String getText(Task task) {
-        if (nar!=null)
-            return task.appendTo(new StringBuilder(), nar, true, false, false, false).toString();
+//        if (nar!=null)
+//            return task.appendTo(new StringBuilder(), nar, true, false, false, false).toString();
         return "";
     }
 }

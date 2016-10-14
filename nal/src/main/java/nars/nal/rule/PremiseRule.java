@@ -5,8 +5,8 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Sets;
 import nars.$;
 import nars.Op;
-import nars.index.PatternIndex;
-import nars.index.TermIndex;
+import nars.index.term.PatternTermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.meta.*;
 import nars.nal.meta.constraint.*;
 import nars.nal.meta.match.Ellipsis;
@@ -491,7 +491,7 @@ public class PremiseRule extends GenericCompound {
 
 
     @NotNull
-    public final PremiseRule normalizeRule(@NotNull PatternIndex index) {
+    public final PremiseRule normalizeRule(@NotNull PatternTermIndex index) {
         //try {
 
         //HACK
@@ -520,7 +520,7 @@ public class PremiseRule extends GenericCompound {
 
 
     @NotNull
-    public final PremiseRule setup(@NotNull PatternIndex index) /* throws PremiseRuleException */ {
+    public final PremiseRule setup(@NotNull PatternTermIndex index) /* throws PremiseRuleException */ {
 
         compile(index);
 
@@ -1013,7 +1013,7 @@ public class PremiseRule extends GenericCompound {
      * so each premise gets exchanged with the conclusion in order to form a own rule,
      * additionally task("?") is added to ensure that the derived rule is only used in backward inference.
      */
-    public final void backwardPermutation(@NotNull PatternIndex index, @NotNull BiConsumer<PremiseRule, String> w) {
+    public final void backwardPermutation(@NotNull PatternTermIndex index, @NotNull BiConsumer<PremiseRule, String> w) {
 
         Term T = getTask(); //Task
         Term B = getBelief(); //Belief
@@ -1054,7 +1054,7 @@ public class PremiseRule extends GenericCompound {
      * after generating, these are then backward permuted
      */
     @Nullable
-    public final PremiseRule swapPermutation(@NotNull PatternIndex index) {
+    public final PremiseRule swapPermutation(@NotNull PatternTermIndex index) {
 
         // T, B, [pre] |- C, [post] ||--
         Term T = getTask();
@@ -1075,7 +1075,7 @@ public class PremiseRule extends GenericCompound {
 //    static final Term DESIRE = $.the("Desire");
 
     @NotNull
-    public PremiseRule positive(PatternIndex index) {
+    public PremiseRule positive(PatternTermIndex index) {
 
 //        Term[] pp = getPremise().terms().clone();
 //        pp = ArrayUtils.add(pp, TaskPositive.proto);
@@ -1142,7 +1142,7 @@ public class PremiseRule extends GenericCompound {
     }
 
     @NotNull
-    private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question, @NotNull PatternIndex index) {
+    private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question, @NotNull PatternTermIndex index) {
 
 
         Map<Term, Term> m = new HashMap(3);

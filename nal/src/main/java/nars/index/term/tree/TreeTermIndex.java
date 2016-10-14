@@ -1,10 +1,11 @@
-package nars.index;
+package nars.index.term.tree;
 
 import com.googlecode.concurrenttrees.radix.node.Node;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;
+import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.MyConcurrentRadixTree;
@@ -18,7 +19,7 @@ import java.util.function.Consumer;
 /**
  * concurrent radix tree index
  */
-public class TreeIndex extends TermIndex implements Runnable {
+public class TreeTermIndex extends TermIndex implements Runnable {
 
     public final TermTree concepts;
 
@@ -29,7 +30,7 @@ public class TreeIndex extends TermIndex implements Runnable {
 
     int sizeLimit;
 
-    public TreeIndex(ConceptBuilder conceptBuilder, int sizeLimit) {
+    public TreeTermIndex(ConceptBuilder conceptBuilder, int sizeLimit) {
 
         this.conceptBuilder = conceptBuilder;
         this.concepts = new TermTree() {
@@ -247,7 +248,7 @@ public class TreeIndex extends TermIndex implements Runnable {
     /**
      * Tree-index with a front-end "L1" non-blocking hashmap cache
      */
-    public static class L1TreeIndex extends TreeIndex {
+    public static class L1TreeIndex extends TreeTermIndex {
 
         private final HijacKache<Term, Termed> L1;
 

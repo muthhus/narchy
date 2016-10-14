@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.Op;
-import nars.index.PatternIndex;
+import nars.index.term.PatternTermIndex;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
@@ -21,7 +21,7 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
 
     private final boolean finish;
 
-    public MatchOneSubtermPrototype(@NotNull Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish, @NotNull PatternIndex index) {
+    public MatchOneSubtermPrototype(@NotNull Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish, @NotNull PatternTermIndex index) {
         super(
                 (subterm == 0 ?
                         index.the(Op.PROD, id(index, x, constraints), Op.Imdex) :

@@ -1,8 +1,9 @@
-package nars.index;
+package nars.index.term.map;
 
 import nars.Op;
 import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;
+import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
@@ -15,11 +16,11 @@ import java.util.function.Consumer;
 /**
  * Index which is supported by Map/Cache-like operations
  */
-public abstract class MaplikeIndex extends TermIndex {
+public abstract class MaplikeTermIndex extends TermIndex {
 
     @NotNull protected final ConceptBuilder conceptBuilder;
 
-    public MaplikeIndex(@NotNull ConceptBuilder conceptBuilder) {
+    public MaplikeTermIndex(@NotNull ConceptBuilder conceptBuilder) {
         this.conceptBuilder = conceptBuilder;
     }
 

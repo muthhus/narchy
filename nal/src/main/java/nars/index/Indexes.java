@@ -1,5 +1,6 @@
 package nars.index;
 
+import nars.index.term.map.MapTermIndex;
 import nars.nar.util.DefaultConceptBuilder;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,9 +25,9 @@ public enum Indexes {
     //    }
 
     /** suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution */
-    public static class DefaultTermIndex extends MapIndex {
+    public static class DefaultTermTermIndex extends MapTermIndex {
 
-        public DefaultTermIndex(int capacity, @NotNull Random random) {
+        public DefaultTermTermIndex(int capacity, @NotNull Random random) {
             super(
                     new DefaultConceptBuilder(random),
                     new HashMap(capacity),
@@ -47,9 +48,9 @@ public enum Indexes {
 //            }
 //        }
 
-    public static class WeakTermIndex extends MapIndex {
+    public static class WeakTermTermIndex extends MapTermIndex {
 
-            public WeakTermIndex(int capacity, @NotNull Random random) {
+            public WeakTermTermIndex(int capacity, @NotNull Random random) {
                 super(
                         new DefaultConceptBuilder(random),
                         //new SoftValueHashMap(capacity)

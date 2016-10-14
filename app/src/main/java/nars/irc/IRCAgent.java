@@ -5,13 +5,12 @@ import nars.*;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.gui.Vis;
-import nars.index.TermIndex;
-import nars.index.TreeIndex;
+import nars.index.term.TermIndex;
+import nars.index.term.tree.TreeTermIndex;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
-import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.rdfowl.NQuadsRDF;
@@ -22,7 +21,6 @@ import nars.term.atom.Atom;
 import nars.time.RealtimeMSClock;
 import nars.util.Texts;
 import nars.util.Wiki;
-import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
@@ -315,7 +313,7 @@ public class IRCAgent extends IRC {
         Default nar = new Default(activeConcepts, conceptsPerFrame, 2, 2, random,
 
                 //new CaffeineIndex(new DefaultConceptBuilder(random), 10000000, false, exe),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64 * 1024, 3),
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64 * 1024, 3),
 
 
                 new RealtimeMSClock(),

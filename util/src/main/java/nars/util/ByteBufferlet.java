@@ -1,12 +1,16 @@
 package nars.util;
 
+import com.fasterxml.jackson.core.io.UTF8Writer;
+import com.google.common.base.Utf8;
+import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.ByteArrayCharSequence;
+
 import java.io.DataOutput;
 import java.io.IOException;
 
 /**
  * copied from Infinispan SimpleDataOutput
  */
-public class ByteBufferlet implements DataOutput {
+public class ByteBufferlet implements DataOutput,CharSequence,Appendable {
 
     public static final int MIN_GROWTH_BYTES = 64;
     public byte[] buffer;
@@ -15,6 +19,25 @@ public class ByteBufferlet implements DataOutput {
     public ByteBufferlet(int bufferSize) {
         super();
         this.buffer = new byte[bufferSize];
+    }
+
+    @Override
+    @Deprecated
+    public final int length() {
+        return position;
+//        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public final char charAt(int index) {
+        return (char) buffer[index];
+        //return (char) Byte.toUnsignedInt(key[index]);
+    }
+
+    @Override
+    public CharSequence subSequence(int start, int end) {
+        //return str.subSequence(start, Math.min(str.length(),end));
+        return new ByteArrayCharSequence(buffer, start, end);
     }
 
 
@@ -178,9 +201,36 @@ public class ByteBufferlet implements DataOutput {
 
     @Override
     public void writeUTF(String s) throws IOException {
-        throw new UnsupportedOperationException("yet");
-//        this.writeShort(UTFUtils.getShortUTFLength(s));
+        //throw new UnsupportedOperationException("yet");
+
+        //WARNING this isnt UTF8
+        this.write(s.getBytes());
+
+//
+//        s.getBytes()
+//        this.writeBytes(s);
+//        UTF8Writer
+//        this.writeShort(s.length());
 //        UTFUtils.writeUTFBytes(this, s);
+    }
+
+    @Override
+    public Appendable append(CharSequence csq) throws IOException {
+        return append(csq, 0, csq.length());
+    }
+
+    @Override
+    public Appendable append(CharSequence csq, int start, int end) throws IOException {
+        for (int i = start; i < end; i++) {
+            writeChar(csq.charAt(i)); //TODO optimize
+        }
+        return this;
+    }
+
+    @Override
+    public Appendable append(char c) throws IOException {
+        writeChar(c);
+        return this;
     }
 
 //    @Override

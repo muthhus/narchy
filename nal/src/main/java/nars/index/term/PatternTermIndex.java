@@ -1,7 +1,8 @@
-package nars.index;
+package nars.index.term;
 
 import nars.Op;
 import nars.concept.util.ConceptBuilder;
+import nars.index.term.map.MapTermIndex;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisTransform;
@@ -21,13 +22,13 @@ import static nars.Op.NEG;
 /**
  * Index which specifically holds the term components of a deriver ruleset.
  */
-public class PatternIndex extends MapIndex {
+public class PatternTermIndex extends MapTermIndex {
 
-    @Deprecated public PatternIndex() {
+    @Deprecated public PatternTermIndex() {
         this(1024);
     }
 
-    public PatternIndex(int capacity) {
+    public PatternTermIndex(int capacity) {
         super(ConceptBuilder.Null,
             new ConcurrentHashMap<>(capacity),
             new ConcurrentHashMap<>(capacity));

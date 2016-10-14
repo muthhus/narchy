@@ -1,9 +1,11 @@
-package nars;
+package nars.index.task;
 
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by me on 10/14/16.
@@ -18,7 +20,7 @@ abstract public class TaskIndex {
      * @return null if no existing task alredy present, non-null of the pre-existing one
      */
     @Nullable
-    public abstract Task add(@NotNull Task x);
+    public abstract Task addIfAbsent(@NotNull Task x);
 
     public abstract void remove(@NotNull Task tt);
 
@@ -30,5 +32,7 @@ abstract public class TaskIndex {
             this.remove(tt.get(i));
         }
     }
+
+    abstract public void forEach(Consumer<Task> each);
 
 }

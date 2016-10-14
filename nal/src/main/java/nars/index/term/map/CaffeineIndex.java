@@ -1,4 +1,4 @@
-package nars.index;
+package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
 import nars.NAR;
@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 
-public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
+public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
 
     private NAR nar;
 

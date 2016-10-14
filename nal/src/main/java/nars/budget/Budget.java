@@ -9,6 +9,8 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 import static java.lang.Math.pow;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
@@ -54,18 +56,20 @@ public interface Budget extends Budgeted {
 //    }
 
 
-    public static String toString(@NotNull Budget b) {
+    public static String toString(@NotNull Budget b) throws IOException {
 
         return toStringBuilder(new StringBuilder(), Texts.n4(b.pri()), Texts.n4(b.dur()), Texts.n4(b.qua())).toString();
     }
 
     @NotNull
-    public static StringBuilder toStringBuilder(@org.jetbrains.annotations.Nullable StringBuilder sb, @NotNull CharSequence priorityString, @NotNull CharSequence durabilityString, @NotNull CharSequence qualityString) {
+    public static Appendable toStringBuilder(@Nullable Appendable sb, @NotNull CharSequence priorityString, @NotNull CharSequence durabilityString, @NotNull CharSequence qualityString) throws IOException {
         int c = 1 + priorityString.length() + 1 + durabilityString.length() + 1 + qualityString.length() + 1;
         if (sb == null)
             sb = new StringBuilder(c);
-        else
-            sb.ensureCapacity(c);
+        else {
+            if (sb instanceof StringBuilder)
+                ((StringBuilder)sb).ensureCapacity(c);
+        }
 
         sb.append(Symbols.BUDGET_VALUE_MARK)
                 .append(priorityString).append(Symbols.VALUE_SEPARATOR)
@@ -314,23 +318,31 @@ public interface Budget extends Budgeted {
      * @return String representation of the value with 2-digit accuracy
      */
     @NotNull
-    default StringBuilder toBudgetStringExternal() {
+    default Appendable toBudgetStringExternal() throws IOException {
         return toBudgetStringExternal(null);
     }
 
     @NotNull
-    default StringBuilder toBudgetStringExternal(StringBuilder sb) {
+    default Appendable toBudgetStringExternal(Appendable sb) throws IOException {
         return toStringBuilder(sb, Texts.n2(pri()), Texts.n2(dur()), Texts.n2(qua()));
     }
 
     @NotNull
     default String toBudgetString() {
-        return toBudgetStringExternal().toString();
+        try {
+            return toBudgetStringExternal().toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @NotNull
     default String getBudgetString() {
-        return toString(this);
+        try {
+            return toString(this);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     default void set(@NotNull Budgeted b) {

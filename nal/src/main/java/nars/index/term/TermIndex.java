@@ -1,4 +1,4 @@
-package nars.index;
+package nars.index.term;
 
 import nars.*;
 import nars.Op;
@@ -322,7 +322,7 @@ public abstract class TermIndex extends TermBuilder {
             if (src == tgt) {
                 c = t; //subterms dont change
             } else if (tgt != InvalidSubterms) {
-                c = compoundOrNull($.terms.the(t, tgt));
+                c = Terms.compoundOrNull($.terms.the(t, tgt));
             } else {
                 c = null;
             }

@@ -5,7 +5,7 @@ import nars.Param;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.index.Indexes;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.link.BLink;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
@@ -43,7 +43,7 @@ public class Default extends AbstractNAR {
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random,
-                new Indexes.DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO, random),
+                new Indexes.DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO, random),
                 //new CaffeineIndex(new DefaultConceptBuilder(random)),
                 new FrameClock());
     }

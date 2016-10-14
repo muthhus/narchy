@@ -363,7 +363,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     default int compareTo(@NotNull Termlike y) {
         if (this == y /*|| this.equals(y)*/) return 0;
 
-        int d = this.op().compareTo(((Term)y).op()); //HACK
+        int d = Integer.compare(this.op().ordinal(), ((Term)y).op().ordinal());
         if (d!=0)
             return d;
 

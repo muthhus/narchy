@@ -14,6 +14,7 @@ import nars.util.data.array.LongArrays;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -520,7 +521,11 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     @Override
     @Deprecated
     public String toString() {
-        return appendTo(null, null).toString();
+        try {
+            return appendTo(null, null).toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

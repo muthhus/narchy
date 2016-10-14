@@ -5,7 +5,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.primitives.Ints;
 import nars.$;
 import nars.Op;
-import nars.index.PatternIndex;
+import nars.index.term.PatternTermIndex;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseEval;
@@ -47,7 +47,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 //    public final Term term;
 
 
-    public MatchTaskBelief(@NotNull TaskBeliefPair pattern, @NotNull PatternIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+    public MatchTaskBelief(@NotNull TaskBeliefPair pattern, @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         //this.pattern = pattern;
         //compiled = new TermPattern(pattern, constraints);
@@ -103,7 +103,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
     private static void compile(@NotNull TaskBeliefPair pattern,
                                 @NotNull List<BoolCondition> pre, @NotNull List<BoolCondition> code,
-                                @NotNull PatternIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+                                @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
 
 
@@ -157,7 +157,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
     }
 
     private static void compileTaskBelief(@NotNull List<BoolCondition> pre,
-                                          @NotNull List<BoolCondition> code, @Nullable Term task, @Nullable Term belief, @NotNull PatternIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+                                          @NotNull List<BoolCondition> code, @Nullable Term task, @Nullable Term belief, @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 

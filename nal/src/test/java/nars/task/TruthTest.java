@@ -1,8 +1,10 @@
 package nars.task;
 
+import nars.$;
 import nars.Param;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.junit.Test;
 
 import static nars.$.t;
@@ -71,6 +73,20 @@ public class TruthTest {
         assertEquals( t(0.004f, 0.01f).hashCode(), t(0, 0.01f).hashCode() );
         assertNotEquals( t(0.006f, 0.01f).hashCode(), t(0, 0.01f).hashCode() );
 
+    }
+
+    @Test public void testTruthHashUnhash() {
+        XorShift128PlusRandom rng = new XorShift128PlusRandom(2);
+        for (int i = 0; i < 1000; i++)
+            hashUnhash(rng.nextFloat(), rng.nextFloat());
+    }
+
+    static void hashUnhash(float f, float c) {
+        Truth t = $.t(f, c);
+        if (t == null)
+            return;
+        Truth u = Truth.unhash(t.hashCode(), Param.TRUTH_EPSILON);
+        assertEquals(t, u);
     }
 
 //    @Test public void testInterpolate() {

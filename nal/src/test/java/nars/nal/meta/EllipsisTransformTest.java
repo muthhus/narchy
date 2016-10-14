@@ -2,8 +2,8 @@ package nars.nal.meta;
 
 import nars.$;
 import nars.Op;
-import nars.index.PatternIndex;
-import nars.index.TermIndex;
+import nars.index.term.PatternTermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.rule.PremiseRule;
@@ -44,7 +44,7 @@ public class EllipsisTransformTest {
         assertEquals($.$("%B"), t.from);
         assertEquals(Imdex, t.to);
 
-        TermIndex i = new PatternIndex();
+        TermIndex i = new PatternTermIndex();
 
         Term u = i.transform(
                 $.p(t), new PremiseRule.PremiseRuleVariableNormalization());

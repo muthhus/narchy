@@ -3,7 +3,7 @@ package nars.op.java;
 import nars.$;
 import nars.Param;
 import nars.Task;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.nlp.Twenglish;

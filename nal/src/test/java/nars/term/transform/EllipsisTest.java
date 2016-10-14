@@ -4,8 +4,8 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.index.Indexes;
-import nars.index.PatternIndex;
-import nars.index.TermIndex;
+import nars.index.term.PatternTermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.meta.match.EllipsisOneOrMore;
@@ -50,7 +50,7 @@ public class EllipsisTest {
         default Set<Term> test(int arity, int repeats) {
             Set<Term> selectedFixed = $.newHashSet(arity);
 
-            TermIndex index = new Indexes.DefaultTermIndex(1024, new XorShift128PlusRandom(1));
+            TermIndex index = new Indexes.DefaultTermTermIndex(1024, new XorShift128PlusRandom(1));
 
             Compound y = getMatchable(arity);
             assertNotNull(y);
@@ -173,7 +173,7 @@ public class EllipsisTest {
             this.prefix = prefix;
             this.suffix = suffix;
             this.ellipsisTerm = ellipsisTerm;
-            p = (Compound) new PatternIndex().get(getPattern(prefix, suffix), true).term();
+            p = (Compound) new PatternTermIndex().get(getPattern(prefix, suffix), true).term();
         }
 
 
@@ -239,7 +239,7 @@ public class EllipsisTest {
         @NotNull
         @Override
         public Compound getPattern(String prefix, String suffix) {
-            PatternIndex pi = new PatternIndex();
+            PatternTermIndex pi = new PatternTermIndex();
             Compound pattern = (Compound) pi.parse(prefix + "%1, " + ellipsisTerm + suffix).term();
             return pattern;
         }
@@ -249,7 +249,7 @@ public class EllipsisTest {
         @NotNull
         @Override
         public Compound getResult() {
-            final PatternIndex pi = new PatternIndex();
+            final PatternTermIndex pi = new PatternTermIndex();
             return pi.normalize(pi.parse("<%1 --> (" + ellipsisTerm +  ")>")).term();
         }
 
@@ -344,7 +344,7 @@ public class EllipsisTest {
         assertTrue(_x.toString(), _x instanceof PremiseRule);
         PremiseRule x = (PremiseRule)_x;
         //System.out.println(x);
-        x = x.normalizeRule(new PatternIndex());
+        x = x.normalizeRule(new PatternTermIndex());
         //System.out.println(x);
 
         assertEquals(
@@ -389,7 +389,7 @@ public class EllipsisTest {
     }
 
     static void testCombinations(Compound X, @NotNull Compound Y, int expect) {
-        X = (Compound) new PatternIndex().get(X, true).term();
+        X = (Compound) new PatternTermIndex().get(X, true).term();
         //Y = (Compound) new PatternIndex().the(Y).term();
 
         for (int seed = 0; seed < 1 /*expect*5*/; seed++) {

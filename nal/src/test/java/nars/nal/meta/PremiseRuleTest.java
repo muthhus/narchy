@@ -3,7 +3,7 @@ package nars.nal.meta;
 import com.google.common.base.Joiner;
 import nars.Narsese;
 import nars.Param;
-import nars.index.PatternIndex;
+import nars.index.term.PatternTermIndex;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
 import nars.term.Compound;
@@ -100,7 +100,7 @@ public class PremiseRuleTest {
     }
 
     @NotNull static PremiseRule rule(@NotNull String onlyRule) {
-        return parse(onlyRule, new PatternIndex());
+        return parse(onlyRule, new PatternTermIndex());
 //        PremiseRule r = (PremiseRule) p.term(onlyRule);
 //        return rule(
 //                r
@@ -111,7 +111,7 @@ public class PremiseRuleTest {
     public void testNotSingleVariableRule1() {
         //tests an exceptional case that should now be fixed
 
-        PatternIndex i = new PatternIndex();
+        PatternTermIndex i = new PatternTermIndex();
 
         String l = "((B,P) --> ?X) ,(B --> A), task(\"?\") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)";
         Compound x = parse(l, i).normalizeRule(i);
@@ -130,7 +130,7 @@ public class PremiseRuleTest {
 //
 //        assertEquals("((<%A --> b>), ((&, %X, y)))", x.toString());
 
-        PatternIndex i = new PatternIndex();
+        PatternTermIndex i = new PatternTermIndex();
 
 
         Compound y = rule("(S --> P), --%S |- (P --> S), (Belief:Conversion)");

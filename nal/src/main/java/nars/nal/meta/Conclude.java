@@ -3,7 +3,7 @@ package nars.nal.meta;
 import com.google.common.base.Joiner;
 import nars.*;
 import nars.budget.Budget;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.Premise;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;

@@ -6,6 +6,7 @@ import com.googlecode.concurrenttrees.common.LazyIterator;
 import com.googlecode.concurrenttrees.radix.RadixTree;
 import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
+import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.*;
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
 import nars.$;
@@ -38,6 +39,29 @@ import java.util.function.Supplier;
  */
 public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, Serializable, Iterable<X> {
 
+    /** default factory */
+    protected static final NodeFactory factory = (NodeFactory) (edgeCharacters, value, childNodes, isRoot) -> {
+        if (edgeCharacters == null) {
+            throw new IllegalStateException("The edgeCharacters argument was null");
+        } else if (!isRoot && edgeCharacters.length() == 0) {
+            throw new IllegalStateException("Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters));
+        } else if (childNodes == null) {
+            throw new IllegalStateException("The childNodes argument was null");
+        } else {
+            //NodeUtil.ensureNoDuplicateEdges(childNodes);
+            return (Node) (childNodes.isEmpty() ?
+                    ((value instanceof VoidValue) ?
+                            new ByteArrayNodeLeafVoidValue(edgeCharacters) :
+                            ((value != null) ?
+                                    new ByteArrayNodeLeafWithValue(edgeCharacters, value) :
+                                    new ByteArrayNodeLeafNullValue(edgeCharacters))) :
+                    ((value instanceof VoidValue) ?
+                            new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes) :
+                            ((value == null) ?
+                                    new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes) :
+                                    new ByteArrayNodeDefault(edgeCharacters, value, childNodes))));
+        }
+    };
     private final NodeFactory nodeFactory;
 
     public volatile Node root;
@@ -50,6 +74,11 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
 
     final AtomicInteger estSize = new AtomicInteger(0);
+
+
+    public MyConcurrentRadixTree() {
+        this(factory, false);
+    }
 
     /**
      * Creates a new {@link MyConcurrentRadixTree} which will use the given {@link NodeFactory} to create nodes.
@@ -76,12 +105,18 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
         ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
         this.writeLock = readWriteLock.writeLock();
-        if (restrictConcurrency) {
-            this.readLock = readWriteLock.readLock();
-        } else {
-            this.readLock = null;
+        this.readLock = restrictConcurrency ? readWriteLock.readLock() : null;
+
+        clear();
+    }
+
+    public void clear() {
+        acquireWriteLock();
+        try {
+            this.root = nodeFactory.createNode("", null, Collections.emptyList(), true);
+        } finally {
+            releaseWriteLock();
         }
-        this.root = nodeFactory.createNode("", null, Collections.emptyList(), true);
     }
 
     // ------------- Helper methods for serializing writes -------------
@@ -137,8 +172,10 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
      * {@inheritDoc}
      */
     @Override
-    public final X putIfAbsent(CharSequence key, X value) {
-        throw new UnsupportedOperationException();
+    public final X putIfAbsent(CharSequence key, X newValue) {
+        return compute(key, newValue, (k, r, existing, v) ->
+                existing != null ? existing : v
+        );
     }
 
     @NotNull public final X putIfAbsent(@NotNull CharSequence key, @NotNull Supplier<X> newValue) {

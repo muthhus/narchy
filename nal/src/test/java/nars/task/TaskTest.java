@@ -29,11 +29,9 @@ public class TaskTest {
     @Test public void testTruthHash() {
         //for TRUTH EPSILON 0.01:
 
-        DefaultTruth dt = new DefaultTruth(0, 0.1f);
-        assertEquals(9, dt.hashCode());
+        assertEquals(10, $.t(0, 0.1f).hashCode());
 
-        DefaultTruth du = new DefaultTruth(1, 1.0f);
-        assertEquals(6553700, du.hashCode());
+        assertEquals(6553700, $.t(1, 1.0f).hashCode());
     }
 
     /** tests the ordering of tasks that differ by truth values,

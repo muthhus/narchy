@@ -7,7 +7,7 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.Vis;
-import nars.index.TreeIndex;
+import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
@@ -384,7 +384,7 @@ public class Tetris extends SwingAgent {
                 16, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
                 new FrameClock(), e
         );
 

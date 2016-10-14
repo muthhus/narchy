@@ -1,5 +1,6 @@
-package nars;
+package nars.index.task;
 
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,8 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static nars.concept.CompoundConcept.DuplicateMerge;
+import java.util.function.Consumer;
 
 /**
  * Created by me on 8/14/16.
@@ -56,7 +56,7 @@ public final class MapTaskIndex extends TaskIndex {
 
 
     @Override
-    public Task add(@NotNull Task x) {
+    public Task addIfAbsent(@NotNull Task x) {
         return tasks.putIfAbsent(x,x);
     }
 
@@ -72,4 +72,8 @@ public final class MapTaskIndex extends TaskIndex {
         tasks.clear();
     }
 
+    @Override
+    public void forEach(Consumer<Task> each) {
+        tasks.forEach((k,v)->each.accept(v));
+    }
 }

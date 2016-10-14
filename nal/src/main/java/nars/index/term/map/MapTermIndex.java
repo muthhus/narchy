@@ -1,4 +1,4 @@
-package nars.index;
+package nars.index.term.map;
 
 import nars.concept.util.ConceptBuilder;
 import nars.term.Term;
@@ -12,17 +12,17 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /** additionally caches subterm vectors */
-public class MapIndex extends MaplikeIndex {
+public class MapTermIndex extends MaplikeTermIndex {
 
     protected final Map<Term,Termed> concepts;
 
     @Nullable protected final Map<TermContainer,TermContainer> subterms;
 
-    public MapIndex(ConceptBuilder conceptBuilder, Map<Term, Termed> map) {
+    public MapTermIndex(ConceptBuilder conceptBuilder, Map<Term, Termed> map) {
         this(conceptBuilder, map, null);
     }
 
-    public MapIndex(ConceptBuilder conceptBuilder, Map<Term, Termed> map, @Nullable Map<TermContainer,TermContainer> subMap) {
+    public MapTermIndex(ConceptBuilder conceptBuilder, Map<Term, Termed> map, @Nullable Map<TermContainer,TermContainer> subMap) {
         super(conceptBuilder);
         this.concepts = map;
         this.subterms = subMap;

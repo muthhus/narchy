@@ -2,7 +2,7 @@ package nars.op.data;
 
 import nars.$;
 import nars.Op;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;

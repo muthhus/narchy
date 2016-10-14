@@ -22,6 +22,7 @@ import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.List;
 
 import static nars.time.Tense.ETERNAL;
@@ -38,13 +39,19 @@ import static nars.truth.TruthFunctions.eternalize;
  */
 public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked {
 
-    static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
+    static void proof(@NotNull Task task, int indent, @NotNull Appendable sb) {
         //TODO StringBuilder
 
-        for (int i = 0; i < indent; i++)
-            sb.append("  ");
 
-        task.appendTo(sb, null, true);
+        try {
+            for (int i = 0; i < indent; i++)
+                sb.append("  ");
+            task.appendTo(sb, null, true);
+            sb.append("\n  ");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
 //        List l = task.getLog();
 //        if (l!=null)
@@ -57,7 +64,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //            }
 //        }
 
-        sb.append("\n  ");
 
         Task pt = task.getParentTask();
         if (pt != null) {
@@ -262,12 +268,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
     @Nullable
-    default StringBuilder appendTo(StringBuilder sb) {
+    default Appendable appendTo(Appendable sb) throws IOException {
         return appendTo(sb, null);
     }
 
     @Nullable
-    default CharSequence toString(NAR memory, boolean showStamp) {
+    default Appendable toString(NAR memory, boolean showStamp) throws IOException {
         return appendTo(new StringBuilder(), memory, showStamp);
     }
 
@@ -368,12 +374,15 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    }
 
     @NotNull
-    default StringBuilder toString(/**@Nullable*/NAR memory) {
-        return appendTo(null, memory);
+    default Appendable toString(/**@Nullable*/NAR memory) {
+        try {
+            return appendTo(null, memory);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @NotNull
-    default StringBuilder appendTo(@Nullable StringBuilder sb, /**@Nullable*/NAR memory) {
+    default @Nullable Appendable appendTo(@Nullable Appendable  sb, /**@Nullable*/NAR memory) throws IOException {
         if (sb == null) sb = new StringBuilder();
         return appendTo(sb, memory, false);
     }
@@ -388,16 +397,20 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Deprecated
     default String toStringWithoutBudget(NAR memory) {
         StringBuilder b = new StringBuilder();
-        appendTo(b, memory, true, false,
-                false, //budget
-                false//log
-        );
-        return b.toString();
+        try {
+            appendTo(b, memory, true, false,
+                    false, //budget
+                    false//log
+            );
+            return b.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Nullable
     @Deprecated
-    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/NAR memory, boolean showStamp) {
+    default Appendable appendTo(Appendable  buffer, /**@Nullable*/NAR memory, boolean showStamp) throws IOException {
         boolean notCommand = punc() != Symbols.COMMAND;
         return appendTo(buffer, memory, true, showStamp && notCommand,
                 notCommand, //budget
@@ -406,7 +419,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @Nullable
-    default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
+    default Appendable  appendTo(@Nullable Appendable buffer, /**@Nullable*/NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) throws IOException {
 
         String contentName;
         if (term) {
@@ -454,8 +467,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
         if (buffer == null)
             buffer = new StringBuilder(stringLength);
-        else
-            buffer.ensureCapacity(stringLength);
+        else {
+            if (buffer instanceof StringBuilder)
+                ((StringBuilder)buffer).ensureCapacity(stringLength);
+        }
 
 
         if (showBudget) {

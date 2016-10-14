@@ -1,11 +1,6 @@
-package nars.index;
+package nars.index.term.tree;
 
-import com.googlecode.concurrenttrees.common.CharSequences;
 import com.googlecode.concurrenttrees.common.PrettyPrinter;
-import com.googlecode.concurrenttrees.radix.node.Node;
-import com.googlecode.concurrenttrees.radix.node.NodeFactory;
-import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.*;
-import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import nars.$;
 import nars.term.Term;
 import nars.term.Termed;
@@ -19,35 +14,6 @@ import java.util.function.Function;
  */
 public class TermTree extends MyConcurrentRadixTree<Termed> {
 
-
-    static final NodeFactory factory = (NodeFactory) (edgeCharacters, value, childNodes, isRoot) -> {
-        if (edgeCharacters == null) {
-            throw new IllegalStateException("The edgeCharacters argument was null");
-        } else if (!isRoot && edgeCharacters.length() == 0) {
-            throw new IllegalStateException("Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters));
-        } else if (childNodes == null) {
-            throw new IllegalStateException("The childNodes argument was null");
-        } else {
-            //NodeUtil.ensureNoDuplicateEdges(childNodes);
-            return (Node) (childNodes.isEmpty() ?
-                    ((value instanceof VoidValue) ?
-                            new ByteArrayNodeLeafVoidValue(edgeCharacters) :
-                            ((value != null) ?
-                                    new ByteArrayNodeLeafWithValue(edgeCharacters, value) :
-                                    new ByteArrayNodeLeafNullValue(edgeCharacters))) :
-                    ((value instanceof VoidValue) ?
-                            new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes) :
-                            ((value == null) ?
-                                    new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes) :
-                                    new ByteArrayNodeDefault(edgeCharacters, value, childNodes))));
-        }
-    };
-
-    public TermTree() {
-        //super(new AtomNodeFactory());
-        //super(new DefaultByteArrayNodeFactory());
-        super(factory);
-    }
 
     public final Termed get(String id) {
         return getValueForExactKey(id);

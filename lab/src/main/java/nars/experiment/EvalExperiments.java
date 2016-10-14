@@ -4,7 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import nars.NAR;
 import nars.experiment.misc.Line1DContinuous;
 import nars.experiment.pacman.Pacman;
-import nars.index.CaffeineIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;

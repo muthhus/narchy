@@ -1,7 +1,7 @@
 package nars.term.subst;
 
 import nars.Op;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
 import nars.term.Termlike;

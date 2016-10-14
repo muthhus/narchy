@@ -3,7 +3,7 @@ package nars.term.subst;
 import nars.$;
 import nars.Op;
 import nars.Param;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

@@ -21,6 +21,7 @@
 package nars.truth;
 
 import nars.$;
+import nars.Param;
 import nars.Symbols;
 import nars.term.Term;
 import nars.util.Texts;
@@ -29,6 +30,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.Comparator;
 
 import static nars.nal.UtilityFunctions.w2c;
@@ -121,6 +123,14 @@ public interface Truth extends Truthed {
         return hash(t.freq(), t.conf(), hashDiscreteness);
     }
 
+    static int hash(float freq, float conf) {
+        return hash(freq, conf, Param.TRUTH_EPSILON);
+    }
+
+    static int hash(float freq, float conf, float epsilon) {
+        return hash(freq, conf, (int)(1f/epsilon));
+    }
+
     static int hash(float freq, float conf, int hashDiscreteness) {
         //assuming epsilon is large enough such that: 0 <= h < 2^15:
         int freqHash = Util.hash(freq, hashDiscreteness);
@@ -129,9 +139,20 @@ public interface Truth extends Truthed {
         return (freqHash << 16) | confHash;
     }
 
+    static Truth unhash(int h, float epsilon) {
+        return unhash(h, (int)(1f/epsilon));
+    }
+
+    static Truth unhash(int h, int hashDiscreteness) {
+        return $.t(
+                Util.unhash((h>>16) & 0xffff, hashDiscreteness),
+                Util.unhash(h & 0xffff, hashDiscreteness)
+        );
+    }
+
 
     @NotNull
-    default StringBuilder appendString(@NotNull StringBuilder sb) {
+    default Appendable appendString(@NotNull Appendable sb) throws IOException {
         return appendString(sb, 2);
     }
 
@@ -141,7 +162,7 @@ public interface Truth extends Truthed {
      * accruate to 1%
      */
     @NotNull
-    default StringBuilder appendString(@NotNull StringBuilder sb, int decimals) {
+    default Appendable appendString(@NotNull Appendable sb, int decimals) throws IOException {
         /*String s1 = DELIMITER + frequency.toStringBrief() + SEPARATOR;
         String s2 = confidence.toStringBrief();
         if (s2.equals("1.00")) {
@@ -150,7 +171,7 @@ public interface Truth extends Truthed {
             return s1 + s2 + DELIMITER;
         }*/
         
-        sb.ensureCapacity(3 + 2 * (2 + decimals) );
+        //sb.ensureCapacity(3 + 2 * (2 + decimals) );
         return sb
             .append(Symbols.TRUTH_VALUE_MARK)
             .append(Texts.n(freq(), decimals))
@@ -160,13 +181,7 @@ public interface Truth extends Truthed {
     }
 
 
-
-    @NotNull
-    default CharSequence toCharSequence() {
-        return appendString(new StringBuilder(7));
-    }
-    
-//    /** displays the truth value as a short string indicating degree of true/false */
+    //    /** displays the truth value as a short string indicating degree of true/false */
 //    @Nullable
 //    default String toTrueFalseString() {
 //        //TODO:
@@ -264,6 +279,10 @@ public interface Truth extends Truthed {
 
     default Truth negated(boolean negate) {
         return negate ? negated() : this;
+    }
+
+    default int hash(float truthEpsilon) {
+        return Truth.hash(freq(), conf(), truthEpsilon);
     }
 
 

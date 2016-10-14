@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.concept.Concept;
-import nars.index.PatternIndex;
+import nars.index.term.PatternTermIndex;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.term.Compound;
@@ -57,7 +57,7 @@ public class UnificationTest {
         if (type == Op.VAR_PATTERN) {
 
             //special handling
-            final PatternIndex pi = new PatternIndex();
+            final PatternTermIndex pi = new PatternTermIndex();
             t1 = pi.get(pi.parse(s1), true).term();
 
         } else {

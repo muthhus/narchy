@@ -2,7 +2,7 @@ package nars;
 
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -15,8 +15,8 @@ import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
-import nars.time.Tense;
 import nars.truth.Truth;
+import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nustaq.serialization.*;
@@ -49,7 +49,6 @@ public class IO {
 
         //TODO combine these into one byte
         char punc = (char) in.readByte();
-        int eviLength = in.readByte();
 
         Truth truth;
         if (hasTruth(punc)) {
@@ -59,17 +58,15 @@ public class IO {
         }
 
         long occ = in.readLong();
-        long cre = in.readLong();
 
-
-        long[] evi = new long[eviLength];
-        for (int i = 0; i < eviLength; i++) {
-            evi[i] = in.readLong();
-        }
+        long[] evi = readEvidence(in);
 
         float pri = in.readFloat();
         float dur = in.readFloat();
         float qua = in.readFloat();
+
+        long cre = in.readLong();
+
 
         MutableTask mm = new MutableTask(term, punc, truth).time(cre, occ);
         mm.evidence(evi);
@@ -77,11 +74,18 @@ public class IO {
         return mm;
     }
 
+    public static long[] readEvidence(@NotNull DataInput in) throws IOException {
+        int eviLength = in.readByte();
+        long[] evi = new long[eviLength];
+        for (int i = 0; i < eviLength; i++) {
+            evi[i] = in.readLong();
+        }
+        return evi;
+    }
+
     @NotNull
     public static Truth readTruth(@NotNull DataInput in) throws IOException {
-        float f = in.readFloat();
-        float c = in.readFloat();
-        return $.t(f, c);
+        return Truth.unhash(in.readInt(), Param.TRUTH_EPSILON);
     }
 
     public static void writeTask(@NotNull DataOutput out, @NotNull Task t) throws IOException {
@@ -89,32 +93,37 @@ public class IO {
         writeTerm(out, t.term());
 
         char p = t.punc();
-        long[] evi = t.evidence();
-        int evil;
-        evil = evi.length;
 
         //TODO combine these into one byte
         out.writeByte(p);
-        out.writeByte(evil);
 
         if (hasTruth(p)) {
-            writeTruth(out, t.freq(), t.conf());
+            writeTruth(out, t);
         }
         out.writeLong(t.occurrence());
-        out.writeLong(t.creation());
 
-        for (int i = 0; i < evil; i++)
-            out.writeLong(evi[i]);
+        writeEvidence(out, t.evidence());
 
-        out.writeFloat(t.pri());
+        out.writeFloat(t.priIfFiniteElseZero());
         out.writeFloat(t.dur());
         out.writeFloat(t.qua());
+
+        out.writeLong(t.creation()); //put this last because it is the least useful really
+
     }
 
-    public static void writeTruth(@NotNull DataOutput out, float freq, float conf) throws IOException {
-        out.writeFloat(freq);
-        out.writeFloat(conf);
+    public static void writeEvidence(@NotNull DataOutput out, @NotNull long[] evi) throws IOException {
+        int evil = evi.length;
+        out.writeByte(evil);
+        for (int i = 0; i < evil; i++)
+            out.writeLong(evi[i]);
     }
+
+    public static void writeTruth(@NotNull DataOutput out, Truthed t) throws IOException {
+        out.writeInt(t.truth().hash(Param.TRUTH_EPSILON));
+    }
+
+
 
     public static void writeAtomic(@NotNull DataOutput out, @NotNull Atomic a) throws IOException {
         out.writeUTF(a.toString());
@@ -195,20 +204,6 @@ public class IO {
             writeCompound(out, (Compound) term);
     }
 
-    public static void writeTermSeq(@NotNull DataOutput out, @NotNull Term term) throws IOException {
-
-
-        if (term instanceof Atomic) {
-            if (isSpecial(term)) {
-                out.writeByte(SPECIAL_OP);
-            }
-            //out.writeUTF(term.toString());
-            writeUTFWithoutLength(term.toString(), out);
-            //out.writeByte(term.op().ordinal()); //put operator last
-        } else {
-            writeCompoundSeq(out, (Compound) term);
-        }
-    }
 
     public static boolean isSpecial(@NotNull Term term) {
         return term instanceof GenericVariable;
@@ -224,18 +219,6 @@ public class IO {
             out.writeInt(c.dt());
     }
 
-    public static void writeCompoundSeq(@NotNull DataOutput out, @NotNull Compound c) throws IOException {
-
-        writeTermContainerSeq(out, c.subterms());
-
-        @NotNull Op o = c.op();
-        out.writeByte(o.ordinal()); //put operator last
-        if (o.image)
-            out.writeByte(c.dt());
-        /* else if (o.temporal..) */
-
-    }
-
     static void writeTermContainer(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
         int siz = c.size();
         out.writeByte(siz);
@@ -244,16 +227,6 @@ public class IO {
         }
     }
 
-    static void writeTermContainerSeq(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
-        int siz = c.size();
-
-        for (int i = 0; i < siz; i++) {
-            writeTermSeq(out, c.term(i));
-//            if (i < siz-1)
-//                out.writeByte(',');
-        }
-
-    }
 
     @Nullable
     public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
@@ -724,12 +697,12 @@ public class IO {
      * plus the length of <code>str</code>, and at most two plus
      * thrice the length of <code>str</code>.
      *
-     * @param str a string to be written.
      * @param out destination to write to
+     * @param str a string to be written.
      * @return The number of bytes written out.
      * @throws IOException if an I/O error occurs.
      */
-    static void writeUTFWithoutLength(String str, DataOutput out) throws IOException {
+    public static void writeUTFWithoutLength(DataOutput out, String str) throws IOException {
 
 
         //int c, count = 0;

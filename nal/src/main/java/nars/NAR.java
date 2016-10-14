@@ -10,7 +10,10 @@ import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
-import nars.index.TermIndex;
+import nars.index.task.MapTaskIndex;
+import nars.index.task.TaskIndex;
+import nars.index.task.TreeTaskIndex;
+import nars.index.term.TermIndex;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
@@ -198,7 +201,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
         this.concepts = concepts;
 
-        this.tasks = new MapTaskIndex();
+        this.tasks =
+                //new MapTaskIndex();
+                new TreeTaskIndex();
 
 
         self = Param.DEFAULT_SELF; //default value
@@ -639,7 +644,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         }
 
 
-        Task existing = tasks.add(input);
+        Task existing = tasks.addIfAbsent(input);
         if (existing == null) {
 
             if (clock instanceof FrameClock) {
@@ -1437,7 +1442,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
     @NotNull
     public NAR output(@NotNull OutputStream o) throws IOException {
-        return output(o, x -> true);
+        return output(o, x -> !x.isDeleted());
     }
 
     /**

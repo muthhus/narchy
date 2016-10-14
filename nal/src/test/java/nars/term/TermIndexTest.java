@@ -4,8 +4,8 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.index.Indexes;
-import nars.index.MaplikeIndex;
-import nars.index.TermIndex;
+import nars.index.term.map.MaplikeTermIndex;
+import nars.index.term.TermIndex;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.DefaultConceptBuilder;
@@ -80,7 +80,7 @@ public class TermIndexTest {
 //    }
     @Test public void testTermSharing5c() {
         testIndex(
-                new Indexes.DefaultTermIndex(1024, rng)
+                new Indexes.DefaultTermTermIndex(1024, rng)
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }
@@ -234,7 +234,7 @@ public class TermIndexTest {
     }
 
     public static void testCommonPrefix(boolean direction) {
-        MaplikeIndex i = (MaplikeIndex)(new Default().concepts);
+        MaplikeTermIndex i = (MaplikeTermIndex)(new Default().concepts);
         Atomic sui = $.the("substituteIfUnifies");
         Atomic su = $.the("substitute");
 

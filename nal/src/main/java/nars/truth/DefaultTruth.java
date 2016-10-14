@@ -5,6 +5,8 @@ import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 import static nars.util.Util.clampround;
 
 
@@ -79,7 +81,11 @@ public class DefaultTruth implements Truth  {
         //return DELIMITER + frequency.toString() + SEPARATOR + confidence.toString() + DELIMITER;
 
         //1 + 6 + 1 + 6 + 1
-        return toCharSequence().toString();
+        try {
+            return appendString(new StringBuilder(7)).toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -98,7 +104,7 @@ public class DefaultTruth implements Truth  {
 
     @Override
     public final int hashCode() {
-        return Truth.hash(freq, conf, (int)(1f/Param.TRUTH_EPSILON));
+        return Truth.hash(freq, conf);
         //return hash;
     }
 

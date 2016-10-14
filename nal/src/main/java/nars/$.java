@@ -10,7 +10,7 @@ import ch.qos.logback.core.ConsoleAppender;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.concept.util.ConceptBuilder;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;

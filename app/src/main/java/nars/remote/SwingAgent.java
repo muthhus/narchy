@@ -2,11 +2,13 @@ package nars.remote;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.googlecode.concurrenttrees.common.PrettyPrinter;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.gui.Vis;
-import nars.index.TreeIndex;
+import nars.index.task.TreeTaskIndex;
+import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
@@ -15,7 +17,6 @@ import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.truth.Truth;
-import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -59,7 +60,7 @@ abstract public class SwingAgent extends NAgent {
         Default nar = new Default(2048,
                 conceptsPerCycle, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64*1024, 3)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64*1024, 3)
 
                 , new FrameClock(), exe);
 
@@ -84,7 +85,7 @@ abstract public class SwingAgent extends NAgent {
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 Math.round(volMax/6), volMax-2,
-                4f, 64);
+                1f, 64);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;
@@ -99,7 +100,11 @@ abstract public class SwingAgent extends NAgent {
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
+
         nar.printConceptStatistics();
+
+        //nar.tasks.forEach(System.out::println);
+        PrettyPrinter.prettyPrint(((TreeTaskIndex)nar.tasks).tasks, System.out);
     }
 
     public static void chart(SwingAgent a, int history) {

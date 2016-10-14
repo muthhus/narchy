@@ -12,7 +12,7 @@ import com.github.fge.grappa.run.context.MatcherContext;
 import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
-import nars.index.TermIndex;
+import nars.index.term.TermIndex;
 import nars.nal.TermBuilder;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.nal8.operator.ImmediateOperator;

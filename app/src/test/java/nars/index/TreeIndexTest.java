@@ -3,6 +3,8 @@ package nars.index;
 import com.google.common.collect.Sets;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.index.term.tree.TermTree;
+import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.Termed;
@@ -61,7 +63,7 @@ public class TreeIndexTest {
     public void testCompoundInsertion() {
 
         Terminal nar = new Terminal();
-        TreeIndex index = new TreeIndex(nar.concepts.conceptBuilder(), 1000);
+        TreeTermIndex index = new TreeTermIndex(nar.concepts.conceptBuilder(), 1000);
 
         String[] terms = {
             "x",

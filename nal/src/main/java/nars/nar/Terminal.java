@@ -37,7 +37,7 @@ public class Terminal extends AbstractNAR {
         this(capacity, new XORShiftRandom(1), new FrameClock());
     }
     public Terminal(int capacity, @NotNull Random random, @NotNull Clock c) {
-        super(c, new Indexes.DefaultTermIndex(capacity, random), random, Param.DEFAULT_SELF, new SingleThreadExecutioner());
+        super(c, new Indexes.DefaultTermTermIndex(capacity, random), random, Param.DEFAULT_SELF, new SingleThreadExecutioner());
     }
 
 

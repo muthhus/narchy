@@ -2,7 +2,7 @@ package nars.nal;
 
 import com.google.common.collect.Sets;
 import nars.concept.util.ConceptBuilder;
-import nars.index.PatternIndex;
+import nars.index.term.PatternTermIndex;
 import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.BoolCondition;
 import nars.nal.rule.PremiseRule;
@@ -211,7 +211,7 @@ public class TrieDeriverTest {
 //    }
 
     @Test public void testPatternIndexContainsNoConcepts() {
-        PatternIndex p = d.rules.patterns;
+        PatternTermIndex p = d.rules.patterns;
         assertTrue(ConceptBuilder.Null == p.conceptBuilder());
 //        //out.println(p.data);
 //        //out.println(p.atoms);
