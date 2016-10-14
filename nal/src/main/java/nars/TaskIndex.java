@@ -1,105 +1,34 @@
 package nars;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static nars.concept.CompoundConcept.DuplicateMerge;
 
 /**
- * Created by me on 8/14/16.
+ * Created by me on 10/14/16.
  */
-public final class TaskIndex {
-
-    final static Logger logger = LoggerFactory.getLogger(TaskIndex.class);
-
-    @NotNull
-    protected final Map<Task, Task> tasks;
-    private NAR nar;
-    //private final ConcurrentMap<Task, Task> tasksMap;
+abstract public class TaskIndex {
 
 
-    public TaskIndex() {
-        this.tasks =
-                new ConcurrentHashMap(16 * 1024 /* estimate TODO */);
-                //new ConcurrentHashMapUnsafe(128 * 1024 /* estimate TODO */);
 
-        //Caffeine.newBuilder()
+    /**
+     *
+     * @param x
+     * @return null if no existing task alredy present, non-null of the pre-existing one
+     */
+    @Nullable
+    public abstract Task add(@NotNull Task x);
 
-//                .removalListener((k,v,cause) -> {
-//                    if (cause != RemovalCause.EXPLICIT)
-//                        logger.error("{} removal: {},{}", cause, k, v);
-//                })
+    public abstract void remove(@NotNull Task tt);
 
-//                .build();
-//        tasks.cleanUp();
-//
-//        this.tasksMap = tasks.asMap();
-    }
-
-    public void start(@NotNull NAR nar) {
-        this.nar = nar;
-//        if (Param.DEBUG) {
-//            int sweepInterval = 32;
-//            nar.onFrame(nn -> {
-//                if (nn.time()%sweepInterval == 0)
-//                    removeDeleted();
-//            });
-//        }
-    }
-
-    public void removeDeleted() {
-        Iterator<Task> ii = tasks.values().iterator();
-        while (ii.hasNext()) {
-            Task x = ii.next();
-            if (x.isDeleted()) {
-                logger.error("lingering deleted task: {}", x);
-                ii.remove();
-            }
-        }
-    }
-
-
-    public boolean add(@NotNull Task x) {
-
-
-        Task existing = tasks.putIfAbsent(x,x);
-        if (existing!=null) {
-
-            if (existing!=x) {
-                //different instance
-                DuplicateMerge.merge(existing.budget(), x, 1f);
-                x.feedback(null, Float.NaN, Float.NaN, nar);
-                x.delete();
-            }
-
-            return false;
-        } else {
-            return true;
-        }
-
-    }
-
-
-    public final void remove(@NotNull Task tt) {
-        tasks.remove(tt);
-        tt.delete();
-    }
+    public abstract void clear();
 
     public final void remove(@NotNull List<Task> tt) {
         int s = tt.size();
         for (int i = 0; i < s; i++) {
             this.remove(tt.get(i));
         }
-    }
-
-    public void clear() {
-        tasks.clear();
     }
 
 }

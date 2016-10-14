@@ -448,8 +448,8 @@ public class Tetris extends SwingAgent {
 //		});
 
 
-        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the", 6, 16,
-                1f, 32);
+        Abbreviation abbr = new Abbreviation(nar, "the", 3, 12,
+                1f, 64);
 
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);

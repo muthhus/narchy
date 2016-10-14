@@ -141,7 +141,6 @@ public class TinyCountingTable extends TinyTable {
      * @param chainId
      * @param items
      */
-
     private void storeChain(int bucketId, int chainId, LongList items) {
         // we change the chain in the table to be the same size as the new chain.
         IntList chainIndexes = adjustChainToItems(bucketId, chainId, items);

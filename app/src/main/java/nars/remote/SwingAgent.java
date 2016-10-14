@@ -52,7 +52,7 @@ abstract public class SwingAgent extends NAgent {
             //new SingleThreadExecutioner();
             new MultiThreadExecutioner(3, 1024*4);
 
-        int volMax = 40;
+        int volMax = 32;
         int conceptsPerCycle = 32;
 
         //Multi nar = new Multi(3,512,
@@ -82,8 +82,8 @@ abstract public class SwingAgent extends NAgent {
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
-        Abbreviation abbr = new Abbreviation.AbbreviationRelation(nar, "the",
-                Math.round(volMax/4), volMax-2,
+        Abbreviation abbr = new Abbreviation(nar, "the",
+                Math.round(volMax/6), volMax-2,
                 4f, 64);
 
         SwingAgent a = init.apply(nar);

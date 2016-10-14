@@ -53,6 +53,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.Symbols.*;
+import static nars.concept.CompoundConcept.DuplicateMerge;
 import static nars.time.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -197,7 +198,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
         this.concepts = concepts;
 
-        this.tasks = new TaskIndex();
+        this.tasks = new MapTaskIndex();
 
 
         self = Param.DEFAULT_SELF; //default value
@@ -234,9 +235,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
         concepts.loadBuiltins();
         concepts.start(this);
-
-        tasks.start(this);
-
 
     }
 
@@ -641,7 +639,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         }
 
 
-        if (tasks.add(input)) {
+        Task existing = tasks.add(input);
+        if (existing == null) {
 
             if (clock instanceof FrameClock) {
                 //HACK for unique serial number w/ frameclock
@@ -676,6 +675,25 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
                 emotion.eror();
             }
+        } else {
+
+            if (existing!=input) {
+
+                //different instance
+
+                float pBefore = existing.priIfFiniteElseZero();
+                DuplicateMerge.merge(existing.budget(), input, 1f);
+                float pAfter = existing.pri();
+                emotion.busy(pAfter - pBefore);
+
+                input.feedback(null, Float.NaN, Float.NaN, this);
+
+                input.delete("Duplicate");
+            }
+
+            //re-activate only
+            new Activation(existing, this, 1f);
+
         }
 
         emotion.frustration(input.priIfFiniteElseZero());

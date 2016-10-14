@@ -130,15 +130,7 @@ public class RevisionTask extends AnswerTask  {
                 resultPri,
                 newBeliefContribution);
 
-
-////        if (parentNewBelief!=null)
-////            weaken(parentNewBelief);
-////            //parentNewBelief.onRevision(this);
-////
-////        if (parentOldBelief!=null)
-////            weaken(parentOldBelief);
-////            //oldBelief.onRevision(this);
-
+        unlink();
     }
 
 //    private void weaken(Task parent) {

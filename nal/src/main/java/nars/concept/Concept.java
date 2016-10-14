@@ -28,6 +28,7 @@ import nars.bag.Bag;
 import nars.budget.Activation;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
+import nars.op.mental.Abbreviation;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TaskTable;
@@ -54,21 +55,28 @@ public interface Concept extends Termed {
 
     @NotNull Bag<Term> termlinks();
 
-    /** termlink templates; null if none exist */
+    /**
+     * termlink templates; null if none exist
+     */
     @NotNull TermContainer templates();
 
     @Nullable Map<Object, Object> meta();
 
-    /** should not be called directly */
+    /**
+     * should not be called directly
+     */
     void setMeta(@NotNull Map newMeta);
 
-    /** follows Map.compute() semantics */
-    @NotNull default <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
+    /**
+     * follows Map.compute() semantics
+     */
+    @NotNull
+    default <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
         @Nullable Map meta = meta();
         if (meta == null) {
             Object v;
             put(key, v = value.apply(key, null));
-            return (C)v;
+            return (C) v;
         } else {
             return (C) meta.compute(key, value);
         }
@@ -85,7 +93,6 @@ public interface Concept extends Termed {
     }
 
 
-
     @NotNull BeliefTable beliefs();
 
     @NotNull BeliefTable goals();
@@ -95,25 +102,30 @@ public interface Concept extends Termed {
     @NotNull QuestionTable quests();
 
 
-    /** like Map.put for storing data in meta map
-     *  @param value if null will perform a removal
-     * */
+    default Map metaOrCreate() {
+        Map<Object, Object> m = meta();
+        if (m == null) {
+            setMeta(m = new UnifiedMap(1));
+            //new WeakIdentityHashMap();
+            //new SoftValueHashMap(1));
+        }
+        return m;
+    }
+
+    /**
+     * like Map.put for storing data in meta map
+     *
+     * @param value if null will perform a removal
+     */
     @Nullable
     default Object put(@NotNull Object key, @Nullable Object value) {
 
         synchronized (term()) {
-            Map currMeta = meta();
 
             if (value != null) {
-
-                if (currMeta == null) {
-                    setMeta(currMeta = new UnifiedMap(1));
-                            //new WeakIdentityHashMap();
-                            //new SoftValueHashMap(1));
-                }
-
-                return currMeta.put(key, value);
+                return metaOrCreate().put(key, value);
             } else {
+                Map currMeta = meta();
                 return currMeta != null ? currMeta.remove(key) : null;
             }
         }
@@ -123,14 +135,23 @@ public interface Concept extends Termed {
 
     default void linkCapacity(@NotNull ConceptPolicy p) {
 
-        termlinks().setCapacity( p.linkCap(this, true) );
-        tasklinks().setCapacity( p.linkCap(this, false) );
+        termlinks().setCapacity(p.linkCap(this, true));
+        tasklinks().setCapacity(p.linkCap(this, false));
     }
 
 
     default void delete(NAR nar) {
         termlinks().clear();
         tasklinks().clear();
+    }
+
+    /**
+     * same Map.putIfAbsent semantics: returns null if no previous value existed
+     */
+    default Object putIfAbsent(@NotNull Object key, @NotNull Object value) {
+        synchronized (term()) {
+            return metaOrCreate().putIfAbsent(key, value);
+        }
     }
 
 
@@ -140,9 +161,8 @@ public interface Concept extends Termed {
      * manages and takes responsibility for the remainder of
      * this concept's lifecycle.
      */
-    interface Savior { }
-
-
+    interface Savior {
+    }
 
 
     @Nullable
@@ -164,26 +184,31 @@ public interface Concept extends Termed {
     default Truth goal(long now) {
         return goals().truth(now);
     }
+
     @Nullable
     default float goalConf(long now, float ifMissing) {
         Truth t = goals().truth(now);
-        return (t!=null) ? t.conf() : ifMissing;
+        return (t != null) ? t.conf() : ifMissing;
     }
+
     @Nullable
     default float goalFreq(long now, float ifMissing) {
         Truth t = goals().truth(now);
-        return (t!=null) ? t.freq() : ifMissing;
+        return (t != null) ? t.freq() : ifMissing;
     }
-
 
 
     @Nullable
     default TaskTable tableFor(char punc) {
-        switch(punc) {
-            case Symbols.BELIEF: return beliefs();
-            case Symbols.GOAL: return goals();
-            case Symbols.QUESTION: return questions();
-            case Symbols.QUEST: return quests();
+        switch (punc) {
+            case Symbols.BELIEF:
+                return beliefs();
+            case Symbols.GOAL:
+                return goals();
+            case Symbols.QUESTION:
+                return questions();
+            case Symbols.QUEST:
+                return quests();
             default:
                 throw new UnsupportedOperationException();
         }
@@ -198,13 +223,13 @@ public interface Concept extends Termed {
     }
 
 
-
     /**
-     * @param src  task with a term equal to this concept's
+     * @param src task with a term equal to this concept's
      * @param tgt task with a term equal to another concept's
      * @return true if the tgt task's concept is different from this Concept, in which case a crossLink has been applied. false otherwise
      */
-    @Nullable default Concept crossLink(@NotNull Budgeted src, @NotNull Task tgt, float scale, @NotNull NAR nar) {
+    @Nullable
+    default Concept crossLink(@NotNull Budgeted src, @NotNull Task tgt, float scale, @NotNull NAR nar) {
         Concept other = tgt.concept(nar);
         if (other == null || other.equals(this))
             return null; //null or same concept
@@ -213,7 +238,9 @@ public interface Concept extends Termed {
         return other;
     }
 
-    /** termlinks only */
+    /**
+     * termlinks only
+     */
     default void crossLink(Budgeted mine, Budgeted theirs, @NotNull Concept them, float scale, @NotNull NAR nar) {
 
         new Activation(theirs, this, them, nar, scale, 1, -1);
@@ -309,7 +336,6 @@ public interface Concept extends Termed {
     }
 
 
-
     default void print() {
         print(System.out);
     }
@@ -340,12 +366,14 @@ public interface Concept extends Termed {
             out.print(" Beliefs:");
             if (beliefs().isEmpty()) out.println(" none");
             else {
-                out.println(); beliefs().forEach(printTask);
+                out.println();
+                beliefs().forEach(printTask);
             }
             out.print(" Questions:");
             if (questions().isEmpty()) out.println(" none");
             else {
-                out.println(); questions().forEach(printTask);
+                out.println();
+                questions().forEach(printTask);
             }
         }
 
@@ -353,12 +381,14 @@ public interface Concept extends Termed {
             out.print(" Goals:");
             if (goals().isEmpty()) out.println(" none");
             else {
-                out.println();                goals().forEach(printTask);
+                out.println();
+                goals().forEach(printTask);
             }
             out.print(" Quests:");
             if (questions().isEmpty()) out.println(" none");
             else {
-                out.println();                quests().forEach(printTask);
+                out.println();
+                quests().forEach(printTask);
             }
         }
 
@@ -394,7 +424,7 @@ public interface Concept extends Termed {
     void policy(@NotNull ConceptPolicy c, long now, @NotNull List<Task> removed);
 
     default boolean active() {
-        return policy()!=null;
+        return policy() != null;
     }
 
     default void commit() {
@@ -405,13 +435,14 @@ public interface Concept extends Termed {
     default float beliefFreq(long time) {
         return freq(time, beliefs());
     }
+
     default float goalFreq(long time) {
         return freq(time, goals());
     }
 
     static float freq(long time, BeliefTable table) {
         Truth t = table.truth(time);
-        if (t!=null)
+        if (t != null)
             return t.freq();
         return 0.5f;
     }
