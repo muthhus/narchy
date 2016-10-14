@@ -203,7 +203,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * true iff o1 > o2
      */
     static final boolean cmpGT(@Nullable BLink o1, @Nullable BLink o2) {
-        return (cmp(o1) < cmp(o2));
+        return cmpGT(o1, cmp(o2));
     }
 
     static final boolean cmpGT(@Nullable BLink o1, float o2) {
@@ -213,8 +213,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * true iff o1 > o2
      */
-    static final boolean cmpGT(float o1PriElseNeg1, @Nullable BLink o2) {
-        return (o1PriElseNeg1 < cmp(o2));
+    static final boolean cmpGT(float o1, @Nullable BLink o2) {
+        return (o1 < cmp(o2));
     }
 
 
@@ -222,7 +222,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * true iff o1 < o2
      */
     static final boolean cmpLT(@Nullable BLink o1, @Nullable BLink o2) {
-        return (cmp(o1) > cmp(o2));
+        return cmpLT(o1, cmp(o2));
     }
 
     static final boolean cmpLT(@Nullable BLink o1, float o2) {
@@ -234,9 +234,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * essentially the same as b.priIfFiniteElseNeg1 except it also includes a null test. otherwise they are interchangeable
      */
     static float cmp(@Nullable Budgeted b) {
-        if (b == null) return -1f;
-        float p = b.pri();
-        return p == p ? p : -1f;
+        return (b == null) ? -1f : b.priIfFiniteElseNeg1();
+
+//        float p = b.pri();
+//        return p == p ? p : -1f;
         //return (b!=null) ? b.priIfFiniteElseNeg1() : -1f;
         //return b.priIfFiniteElseNeg1();
     }

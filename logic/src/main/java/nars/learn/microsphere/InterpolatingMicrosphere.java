@@ -321,15 +321,15 @@ public class InterpolatingMicrosphere {
 
             int vectors = distance!=0  ? this.size : 1; //if exactly on-point then only compute once, otherwise compute for each microsphere vecctor
 
-            for (int i1 = 0; i1 < vectors; i1++) {
+            for (int j = 0; j < vectors; j++) {
 
-                final float[] n = microsphere.get(i1);
+                final float[] n = microsphere.get(j);
                 final float cos = sampleDirection != null ? cosAngleNormalized(n, sampleDirection) : 1f;
 
                 if (cos > 0) {
                     final float illumination = cos * luminosity;
                     if (illumination > 0) {
-                        record(microsphereData.get(1), illumination, sampleValues[i], conf);
+                        record(microsphereData.get(j), illumination, sampleValues[i], conf);
                     }
                 }
             }
