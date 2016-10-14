@@ -50,9 +50,9 @@ abstract public class SwingAgent extends NAgent {
 
         final Executioner exe =
             //new SingleThreadExecutioner();
-            new MultiThreadExecutioner(3, 1024*8);
+            new MultiThreadExecutioner(3, 1024*4);
 
-        int volMax = 30;
+        int volMax = 40;
         int conceptsPerCycle = 32;
 
         //Multi nar = new Multi(3,512,
@@ -73,7 +73,7 @@ abstract public class SwingAgent extends NAgent {
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.2f);
+        nar.confMin.setValue(0.05f);
         nar.compoundVolumeMax.setValue(volMax);
 
         //nar.linkFeedbackRate.setValue(0.05f);

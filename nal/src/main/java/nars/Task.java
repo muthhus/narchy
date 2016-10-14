@@ -16,6 +16,9 @@ import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.truth.Truthed;
 import nars.util.data.LongString;
+import org.eclipse.collections.api.set.primitive.ImmutableLongSet;
+import org.eclipse.collections.api.set.primitive.LongSet;
+import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -785,6 +788,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     default int dt() {
         return term().dt();
+    }
+
+    @NotNull default ImmutableLongSet evidenceSet() {
+        return LongSets.immutable.of(evidence());
     }
 
 }

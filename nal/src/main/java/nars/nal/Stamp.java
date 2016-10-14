@@ -232,18 +232,23 @@ public interface Stamp {
      *
      * assumes the arrays are sorted and contain no duplicates
      */
-    static float overlapFraction(@Nullable long[] a, @Nullable long[] b) {
-        LongSet l = LongSets.immutable.of(a);
+    @Deprecated static float overlapFraction(@NotNull long[] a, @NotNull long[] b) {
+        return overlapFraction(LongSets.immutable.of(a), a.length, b);
+    }
+
+    static float overlapFraction(@NotNull LongSet aa, @NotNull long[] b) {
+        return overlapFraction(aa, aa.size(), b);
+    }
+
+
+    static float overlapFraction(@NotNull LongSet aa, int aSize, @NotNull long[] b) {
         int common = 0;
         for (long x: b) {
-            if (l.contains(x))
+            if (aa.contains(x))
                 common++;
         }
-        if (common == 0) {
-            return 0;
-        } else {
-            return (float) common / (a.length + b.length - (common));
-        }
+
+        return (common == 0) ? 0 : ((float) common / ((aSize + b.length) - (common)));
     }
 
     long creation();

@@ -11,6 +11,9 @@ import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.Util;
 import nars.util.data.list.MultiRWFasterList;
+import org.eclipse.collections.api.block.function.Function;
+import org.eclipse.collections.api.set.primitive.ImmutableLongSet;
+import org.eclipse.collections.api.set.primitive.LongSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,23 +54,24 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     public void capacity(int newCapacity, long now, @NotNull List<Task> removed) {
+
         if (this.capacity != newCapacity) {
 
             this.capacity = newCapacity;
 
             clean(removed);
 
-            if (size() > newCapacity) {
-                list.withWriteLockAndDelegate((l) -> {
+            int nullAttempts = 4; //
+            int toRemove = list.size() - newCapacity;
+            for (int i = 0; i < toRemove && nullAttempts > 0; ) {
 
-                    while (list.size() > newCapacity) {
-                        Task weakest = weakest(now, null);
-                        if (weakest == null)
-                            throw new NullPointerException();
-                        remove(weakest, removed);
-                    }
-
-                });
+                Task ww = weakest(now, null); //read-lock
+                if (ww!=null) {
+                    remove(ww, removed);
+                    i++;
+                } else {
+                    nullAttempts--;
+                }
             }
         }
 
@@ -88,16 +92,6 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         return capacity;
     }
 
-
-    /**
-     * according to a balance of temporal proximity and confidence
-     */
-    public static float rank(@Nullable Task t, long when, long now) {
-        if (t == null || t.isDeleted())
-            return -1;
-        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        return rankTemporalByConfidence(t, when, now);
-    }
 
 
     @Nullable
@@ -175,7 +169,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 //    }
 
 
-    public boolean remove(Object object) {
+    public boolean remove(@NotNull Object object) {
         return list.remove(object);
     }
 
@@ -203,17 +197,31 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         if (toMergeWith == null) {
             return list.minBy(x -> rank(x, now, now));
         } else {
-            long occ = toMergeWith.occurrence();
-            long[] evidence = toMergeWith.evidence();
-            return list.minBy(x -> rank(x, evidence, occ, now));
+            return list.minBy(rankPenalizingOverlap(now, toMergeWith));
         }
 
     }
 
-    public static Float rank(Task x, long[] evidence, long occ, long now) {
-        return Stamp.overlapFraction(evidence, x.evidence()) * rank(x, occ, now);
+    @NotNull public Function<Task, Float> rankPenalizingOverlap(long now, @NotNull Task toMergeWith) {
+        long occ = toMergeWith.occurrence();
+        ImmutableLongSet toMergeWithEvidence = toMergeWith.evidenceSet();
+        return x -> rank(x, toMergeWithEvidence, occ, now);
     }
 
+    public static float rank(@Nullable Task x, @NotNull LongSet evidence, long occ, long now) {
+        return (x == null) ? Float.NEGATIVE_INFINITY : (Stamp.overlapFraction(evidence, x.evidence()) * rank(x, occ, now));
+    }
+
+
+    /**
+     * according to a balance of temporal proximity and confidence
+     */
+    public static float rank(@Nullable Task t, long when, long now) {
+        if (t == null || t.isDeleted())
+            return Float.NEGATIVE_INFINITY;
+        return rankTemporalByConfidence(t, when, now);
+        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
+    }
 
 //    @Nullable
 //    protected Task compress(@NotNull List<Task> displ, long now) {
@@ -275,7 +283,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Override
     public final Task match(long when, long now, @Nullable Task against) {
 
-        return list.maxBy(x -> rank(x, when, now));
+        if (against == null) {
+            return list.maxBy(x -> rank(x, when, now));
+        } else {
+            return list.maxBy(rankPenalizingOverlap(now, against));
+        }
 
     }
 
@@ -321,12 +333,14 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     private boolean clean(@NotNull List<Task> displ) {
         return list.removeIf(x -> {
-            if (x == null) return true;
-            if (x.isDeleted()) {
+            if (x == null) {
+                return true;
+            } else if (x.isDeleted()) {
                 displ.add(x);
                 return true;
+            } else {
+                return false;
             }
-            return false;
         });
     }
 

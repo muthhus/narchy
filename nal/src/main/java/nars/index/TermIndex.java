@@ -232,7 +232,7 @@ public abstract class TermIndex extends TermBuilder {
             }
         }
 
-        return changed ? the(crc, sub.toArray(new Term[sub.size()])) : crc;
+        return changed ? the(crc, sub) : crc;
     }
 
     @NotNull
@@ -266,7 +266,7 @@ public abstract class TermIndex extends TermBuilder {
         if (op == INH) {
 
             Term u1 = u[1];
-            if (u1 instanceof Atomic && !u1.op().var && u[0].op()==PROD) //prevents caching for potential transforming terms
+            if (u1 instanceof TermTransform && u[0].op() == PROD) //prevents caching for potential transforming terms
                 return false;
 
         }
