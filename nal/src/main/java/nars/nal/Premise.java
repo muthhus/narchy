@@ -30,11 +30,9 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Defines the conditions used in an instance of a derivation
  * Contains the information necessary for generating derivation Tasks via reasoning rules.
- *
+ * <p>
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
- *
- *
  */
 public final class Premise extends RawBudget implements Tasked {
     private static final Logger logger = LoggerFactory.getLogger(Premise.class);
@@ -42,13 +40,17 @@ public final class Premise extends RawBudget implements Tasked {
 
     //@NotNull private final Term concept;
 
-    @NotNull public final Task task;
+    @NotNull
+    public final Task task;
 
-    @NotNull public final Term term;
+    @NotNull
+    public final Term term;
 
-    @Nullable public final Task belief;
+    @Nullable
+    public final Task belief;
 
-    @NotNull public final Term concept;
+    @NotNull
+    public final Term concept;
 
 
     ///** not used in creating a Premise key, because the same premise components may be generated from different originating concepts or even other methods of forming them*/
@@ -68,28 +70,27 @@ public final class Premise extends RawBudget implements Tasked {
         //use the belief's term and not the termlink because it is more specific if:
         // a) it contains temporal information that can be used in temporalization
         // b) a variable in the termlink was matched
-        this.term = belief!=null ? belief.term() : termLink;
+        this.term = belief != null ? belief.term() : termLink;
 
         this.belief = belief;
 
         //this.conceptLink = conceptLink;
 
 
-
     }
 
     /**
      * resolves the most relevant belief of a given term/concept
-     *
-     *   patham9 project-eternalize
-     patham9 depending on 4 cases
-     patham9 https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj
-     sseehh__ ok ill add that in a bit
-     patham9 you need  project-eternalize-to
-     sseehh__ btw i disabled immediate eternalization entirely
-     patham9 so https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj#L31
-     patham9 especially try to understand the "temporal temporal" case
-     patham9 its using the result of higher confidence
+     * <p>
+     * patham9 project-eternalize
+     * patham9 depending on 4 cases
+     * patham9 https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj
+     * sseehh__ ok ill add that in a bit
+     * patham9 you need  project-eternalize-to
+     * sseehh__ btw i disabled immediate eternalization entirely
+     * patham9 so https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj#L31
+     * patham9 especially try to understand the "temporal temporal" case
+     * patham9 its using the result of higher confidence
      */
     public static @Nullable Premise build(@NotNull NAR nar, @NotNull Concept c, long now, @NotNull Task task, @NotNull Budget taskLinkBudget,
                                           @NotNull BLink<Term> termLink) {
@@ -102,11 +103,11 @@ public final class Premise extends RawBudget implements Tasked {
             return null;
 
         Budget taskBudget = task.budget().clone();
-        if (taskBudget==null)
+        if (taskBudget == null)
             return null;
 
         Budget termLinkBudget = termLink.clone();
-        if (termLinkBudget==null)
+        if (termLinkBudget == null)
             return null;
 
 
@@ -116,25 +117,25 @@ public final class Premise extends RawBudget implements Tasked {
         if (beliefConcept != null) {
 
 
-            if ( task.isQuestOrQuestion()) {
+            if (task.isQuestOrQuestion()) {
 
                 //TODO is this correct handling for quests? this means a belief task may be a goal which may contradict deriver semantics
                 BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
 
                 belief = table.match(task, now);
-                if (belief !=null) {
+                if (belief != null) {
                     //try {
-                        Task answered = answer(nar, task, belief, beliefConcept);
+                    Task answered = answer(nar, task, belief, beliefConcept);
 
-//                            if (answered!=null && !answered.equals(belief)) {
-//                                nar.inputLater(answered);
-//                            }
+//                    if (answered != null && !answered.equals(belief)) {
+//                        nar.inputLater(answered);
+//                    }
 
-                        if (answered!=null && task.isQuestion())
-                            belief = answered;
+                    if (answered != null && task.isQuestion())
+                        belief = answered;
 
-                        if (task.isQuest())
-                            belief = beliefConcept.beliefs().match(task, now); //in case of quest, proceed with matching belief
+                    if (task.isQuest())
+                        belief = beliefConcept.beliefs().match(task, now); //in case of quest, proceed with matching belief
 
 
                     /*} catch (InvalidConceptException e) {
@@ -153,20 +154,20 @@ public final class Premise extends RawBudget implements Tasked {
 
 
         Budget beliefBudget;
-        if (belief!=null) {
+        if (belief != null) {
             beliefBudget = belief.budget().clone();
-            if (beliefBudget==null)
+            if (beliefBudget == null)
                 belief = null;
         } else {
             beliefBudget = null;
         }
 
-        float dur = belief==null ? taskBudget.dur() :     or(taskBudget.dur() , beliefBudget.dur());
+        float dur = belief == null ? taskBudget.dur() : or(taskBudget.dur(), beliefBudget.dur());
         if (dur < nar.durMin.floatValue())
             return null;
 
-        float pri = or(taskLinkBudget.pri() , termLinkBudget.pri());
-        float qua = belief==null ? taskBudget.qua() :     or(taskBudget.qua() , beliefBudget.qua());
+        float pri = or(taskLinkBudget.pri(), termLinkBudget.pri());
+        float qua = belief == null ? taskBudget.qua() : or(taskBudget.qua(), beliefBudget.qua());
         return new Premise(c.term(), task, term, belief, pri, dur, qua);
     }
 
@@ -190,7 +191,6 @@ public final class Premise extends RawBudget implements Tasked {
             }
 
 
-
         }
 
         return answer;
@@ -200,7 +200,7 @@ public final class Premise extends RawBudget implements Tasked {
         @Nullable Concept questionConcept = nar.concept(q);
         if (questionConcept != null) {
             List<Task> displ = $.newArrayList(0);
-            ((QuestionTable)questionConcept.tableFor(q.punc())).answer(a, answerConcept, nar, displ );
+            ((QuestionTable) questionConcept.tableFor(q.punc())).answer(a, answerConcept, nar, displ);
             nar.tasks.remove(displ);
         }
     }
@@ -208,9 +208,9 @@ public final class Premise extends RawBudget implements Tasked {
     static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief, Concept answerConcept) {
         List<Termed> result = $.newArrayList(Param.QUERY_ANSWERS_PER_MATCH);
         new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH)
-            .unifyAll(
-                task.term(), belief.term()
-            );
+                .unifyAll(
+                        task.term(), belief.term()
+                );
 
         if (!result.isEmpty()) {
             matchAnswer(nar, task, belief, answerConcept);
@@ -240,7 +240,7 @@ public final class Premise extends RawBudget implements Tasked {
     @NotNull
     @Override
     public String toString() {
-        return task + " | " + term + " | " + (belief!=null ?  belief : "");
+        return task + " | " + term + " | " + (belief != null ? belief : "");
     }
 
 
@@ -259,7 +259,8 @@ public final class Premise extends RawBudget implements Tasked {
 //        return termlink(nar.concept(concept));
 //    }
 
-    @Nullable public final BLink<? extends Termed> termlink(Concept c) {
+    @Nullable
+    public final BLink<? extends Termed> termlink(Concept c) {
         return c.termlinks().get(term);
     }
 
@@ -267,7 +268,8 @@ public final class Premise extends RawBudget implements Tasked {
 //        return tasklink(nar.concept(concept));
 //    }
 
-    @Nullable public final BLink<? extends Task> tasklink(Concept c) {
+    @Nullable
+    public final BLink<? extends Task> tasklink(Concept c) {
         return c.tasklinks().get(task);
     }
 

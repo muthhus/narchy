@@ -577,8 +577,9 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
             sum++;
 
         List<Node> l = n.getOutgoingEdges();
-        for (Node child : l)
-            sum += _size(child);
+        for (int i = 0, lSize = l.size(); i < lSize; i++) {
+            sum += _size(l.get(i));
+        }
 
         return sum;
     }
@@ -591,8 +592,8 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
             sum++;
 
         List<Node> l = n.getOutgoingEdges();
-        for (Node child : l) {
-            int s = _size(child);
+        for (int i = 0, lSize = l.size(); i < lSize; i++) {
+            int s = _size(l.get(i));
             if (s < 0)
                 return -1; //cascade
             sum += s;
@@ -629,8 +630,8 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
             action.accept(start.getIncomingEdge(), (X)v);
 
         List<Node> l = start.getOutgoingEdges();
-        for (Node child : l) {
-            forEach(child, action);
+        for (int i = 0, lSize = l.size(); i < lSize; i++) {
+            forEach(l.get(i), action);
         }
     }
 
@@ -662,11 +663,12 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
         try {*/
             while (true) {
                 List<Node> c = current.getOutgoingEdges();
-                if (c.isEmpty()) {
+                int s = c.size();
+                if (s == 0) {
                     break; //select it
                 } else {
                     if (rng.nextFloat() < descendProb) {
-                        int which = rng.nextInt(c.size());
+                        int which = rng.nextInt(s);
                         Node next = c.get(which);
 
                         parentParent = parent;

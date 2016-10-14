@@ -50,9 +50,10 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
         if (this.capacity != newCapacity) {
 
-            this.capacity = newCapacity;
 
             list.withWriteLockAndDelegate(ll -> {
+                this.capacity = newCapacity;
+
                 if (size() > newCapacity) {
                     int s = ll.size();
                     int toRemove = s - capacity;

@@ -235,6 +235,12 @@
       <!--</dependency>-->
 
 
+    <!-- https://mvnrepository.com/artifact/net.openhft/affinity -->
+    <dependency>
+      <groupId>net.openhft</groupId>
+      <artifactId>affinity</artifactId>
+      <version>3.0.6</version>
+    </dependency>
 
 
     <!-- https://mvnrepository.com/artifact/org.iq80.snappy/snappy -->

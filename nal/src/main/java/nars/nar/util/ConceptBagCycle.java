@@ -8,6 +8,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.concept.util.ConceptBuilder;
 import nars.link.BLink;
+import nars.nal.Deriver;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
@@ -27,15 +28,11 @@ import java.util.function.Consumer;
  * multithreading granularity at the concept (outermost loop)
  */
 public class ConceptBagCycle implements Consumer<NAR> {
-    /**
-     * How many concepts to fire each cycle; measures degree of parallelism in each cycle
-     */
-    @Range(min = 0, max = 64, unit = "Concept")
-    public final @NotNull MutableInteger conceptsFiredPerCycle;
 
 
     private static final Logger logger = LoggerFactory.getLogger(ConceptBagCycle.class);
 
+    final static Deriver deriver = Deriver.getDefaultDeriver();
 
 
     /**
@@ -46,6 +43,12 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
     @Deprecated
     public final transient @NotNull NAR nar;
+
+    /**
+     * How many concepts to fire each cycle; measures degree of parallelism in each cycle
+     */
+    @Range(min = 0, max = 64, unit = "Concept")
+    public final @NotNull MutableInteger conceptsFiredPerCycle;
 
 
     @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
@@ -122,9 +125,9 @@ public class ConceptBagCycle implements Consumer<NAR> {
         taskLinks = tasklinksFiredPerFiredConcept.intValue();
         termLinks = termlinksFiredPerFiredConcept.intValue();
 
-        List<BLink<Concept>> toFire = $.newArrayList(cpf);
-
         concepts.commit();
+
+        List<BLink<Concept>> toFire = $.newArrayList(cpf);
         concepts.sample(cpf, toFire::add);
 
         //toFire.sort(sortConceptLinks);
@@ -134,7 +137,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
             if (c != null) {
                 new FireConceptSquared(c, this.nar,
                         taskLinks, termLinks,
-                        this.nar::input //input them within the current thread here
+                        this.nar::input, //input them within the current thread here
+                        deriver
                 );
             }
         }, 4f);

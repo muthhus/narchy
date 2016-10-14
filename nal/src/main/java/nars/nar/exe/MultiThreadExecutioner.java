@@ -1,22 +1,21 @@
 package nars.nar.exe;
 
 import com.lmax.disruptor.*;
+import com.lmax.disruptor.dsl.BasicExecutor;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.ProducerType;
 import nars.NAR;
 import nars.Task;
+import net.openhft.affinity.AffinityLock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-
-import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 
 /**
  * Created by me on 8/16/16.
@@ -43,21 +42,39 @@ public class MultiThreadExecutioner extends Executioner {
     @NotNull
     final Disruptor<TaskEvent> disruptor;
 
-    public MultiThreadExecutioner(int threads, int ringSize) {
-        this(threads, ringSize, 1);
-    }
 
-    public MultiThreadExecutioner(int threads, int ringSize, int extraThreads) {
+    public MultiThreadExecutioner(int threads, int ringSize) {
         this(threads, ringSize,
-                //new BasicExecutor(Executors.defaultThreadFactory())
-                new ForkJoinPool(
-                        threads+extraThreads,
-                        //Runtime.getRuntime().availableProcessors()-1 /* leave one thread available */,
-                        defaultForkJoinWorkerThreadFactory, null, true /* async */,
-                        threads+extraThreads,
-                        threads*64, //max threads (safe to increase)
-                        threads+extraThreads, //minimum threads to keep running otherwise new ones will be created
-                        null, 1000L, TimeUnit.MILLISECONDS)
+                new BasicExecutor(Executors.defaultThreadFactory()) {
+
+                    @Override public void execute(Runnable command) {
+                        super.execute(()->{
+
+                            try (AffinityLock al = AffinityLock.acquireLock()) {
+
+                                //logger.info("CPU Thread AffinityLock {} ACQUIRE {}", al.toString() , al.cpuId() );
+
+                                command.run();
+
+                            }
+
+                            //logger.info("CPU Thread AffinityLock RELEASE");
+
+                        });
+                    }
+                }
+
+//                new ForkJoinPool(
+//                        threads+extraThreads,
+//                        //Runtime.getRuntime().availableProcessors()-1 /* leave one thread available */,
+//
+//                        defaultForkJoinWorkerThreadFactory,
+//
+//                        null, true /* async */,
+//                        threads+extraThreads,
+//                        threads*2+extraThreads, //max threads (safe to increase)
+//                        threads+extraThreads, //minimum threads to keep running otherwise new ones will be created
+//                        null, 10L, TimeUnit.MILLISECONDS)
         );
     }
 
@@ -72,8 +89,8 @@ public class MultiThreadExecutioner extends Executioner {
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
-                new SleepingWaitStrategy()
-                //new BlockingWaitStrategy()
+                //new SleepingWaitStrategy()
+                new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
                 //new LiteBlockingWaitStrategy()
         );
@@ -123,10 +140,7 @@ public class MultiThreadExecutioner extends Executioner {
             taskWorker[i] = new TaskEventWorkHandler(nar);
         EventHandlerGroup workers = disruptor.handleEventsWithWorkerPool(taskWorker);
 
-        //barrier = ring.newBarrier();
         barrier = workers.asSequenceBarrier();
-        //barrier = workers.asSequenceBarrier();
-
 
         disruptor.start();
     }

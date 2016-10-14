@@ -26,13 +26,14 @@ public class FireConceptSquared extends Conclusion {
 
     private static final Logger logger = LoggerFactory.getLogger(FireConceptSquared.class);
 
-    final static Deriver deriver = Deriver.getDefaultDeriver();
+    final Deriver deriver;
     public final int premisesFired;
 
 
-    public FireConceptSquared(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> batch) {
+    public FireConceptSquared(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> batch, Deriver deriver) {
         super(batch);
 
+        this.deriver = deriver;
         int count = 0;
 
         try {

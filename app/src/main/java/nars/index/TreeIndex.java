@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 /**
  * concurrent radix tree index
  */
-public class TreeIndex extends TermIndex {
+public class TreeIndex extends TermIndex implements Runnable {
 
     public final TermTree concepts;
 
@@ -50,8 +50,8 @@ public class TreeIndex extends TermIndex {
         };
         this.sizeLimit = sizeLimit;
 
-        Thread t = new Thread(this::forget, this.toString() + "_Forget");
-        t.setPriority(Thread.MAX_PRIORITY - 1);
+        Thread t = new Thread(this, this.toString() + "_Forget");
+        //t.setPriority(Thread.MAX_PRIORITY - 1);
         t.setUncaughtExceptionHandler((whichThread, e) -> {
             logger.error("Forget: {}", e);
             e.printStackTrace();
@@ -68,81 +68,93 @@ public class TreeIndex extends TermIndex {
 
     //1. decide how many items to remove, if any
     //2. search for items to meet this quota and remove them
-    protected void forget() {
-
+    @Override public void run() {
 
         while (true) {
 
-            //Util.pause(updatePeriodMS);
-            try { Thread.sleep(updatePeriodMS); } catch (InterruptedException e) { }
-
-            if (nar == null)
-                continue;
-
-            Random rng = nar.random;
-
-            if (capacitance() > 0) {
-
-
-                int sizeBefore = sizeEst();
-
-                float maxFractionThatCanBeRemovedAtATime = 0.005f;
-                int maxConceptsThatCanBeRemovedAtATime = (int) Math.max(1, sizeBefore * maxFractionThatCanBeRemovedAtATime);
-                float descentRate = 0.95f;
-
-                float cap;
-                MyConcurrentRadixTree.SearchResult s = null;
-
-                concepts.acquireWriteLock();
-                try {
-
-                    while ((cap = capacitance()) > 0) {
-
-                        s = concepts.random(s, descentRate, rng);
-                        Node f = s.found;
-
-                        if (f != null && f != concepts.root) {
-                            int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);
-
-                            if (subTreeSize == 0) {
-                                s = null; //restart
-                            } else if (subTreeSize > 0) {
-                                //long preBatch = sizeEst();
-                                concepts.removeHavingAcquiredWriteLock(s, true);
-                                //logger.info("  Forgot Batch {}", preBatch - sizeEst());
-                                s = null;
-                            } /*else {
-                            logger.info("avoided removing {} elements, continuing..", concepts.size(f));
-                            //continue descent
-                        }*/
-                        }
-                    }
-
-                } finally {
-                    concepts.releaseWriteLock();
-                }
-
-
-                int sizeAfter = sizeEst();
-
-                logger.info("Forgot {} Concepts", sizeBefore - sizeAfter);
+            try {
+                Thread.sleep(updatePeriodMS);
+            } catch (InterruptedException e) {
             }
+
+            if (nar != null)
+                forgetNextLater();
         }
 
+    }
+
+    private void forgetNextLater() {
+        nar.runLater(this::forgetNext);
+    }
+
+    private void forgetNext() {
+
+        int sizeBefore = sizeEst();
+
+
+        float maxFractionThatCanBeRemovedAtATime = 0.005f;
+        int maxConceptsThatCanBeRemovedAtATime = (int) Math.max(1, sizeBefore * maxFractionThatCanBeRemovedAtATime);
+
+
+        //none or too few to attempt removal
+        if (sizeBefore - sizeLimit <= maxConceptsThatCanBeRemovedAtATime)
+            return;
+
+        Random rng = nar.random;
+
+
+        float descentRate = 0.95f;
+
+
+        MyConcurrentRadixTree.SearchResult s = null;
+
+        concepts.acquireWriteLock();
+        try {
+
+            while ((sizeEst() - sizeLimit) > 0) {
+
+                s = concepts.random(s, descentRate, rng);
+                Node f = s.found;
+
+                if (f != null && f != concepts.root) {
+                    int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);
+
+                    if (subTreeSize == 0) {
+                        s = null; //restart
+                    } else if (subTreeSize > 0) {
+                        //long preBatch = sizeEst();
+                        concepts.removeHavingAcquiredWriteLock(s, true);
+                        //logger.info("  Forgot Batch {}", preBatch - sizeEst());
+                        s = null;
+                    } /*else {
+                    logger.info("avoided removing {} elements, continuing..", concepts.size(f));
+                    //continue descent
+                }*/
+                }
+            }
+
+        } finally {
+            concepts.releaseWriteLock();
+        }
+
+
+        int sizeAfter = sizeEst();
+
+        logger.info("Forgot {} Concepts", sizeBefore - sizeAfter);
     }
 
     private int sizeEst() {
         return concepts.sizeEst();
     }
 
-    /** relative capacitance; >0 = over-capacity, <0 = under-capacity */
-    private float capacitance() {
-        int s = sizeEst();
-        //if (s > sizeLimit) {
-        return s - sizeLimit;
-        //}
-        //return 0;
-    }
+//    /** relative capacitance; >0 = over-capacity, <0 = under-capacity */
+//    private float capacitance() {
+//        int s = sizeEst();
+//        //if (s > sizeLimit) {
+//        return s - sizeLimit;
+//        //}
+//        //return 0;
+//    }
 
     private boolean removeable(Concept c) {
         return !(c instanceof PermanentConcept);
@@ -230,7 +242,6 @@ public class TreeIndex extends TermIndex {
     protected void onRemoval(@NotNull Concept value) {
         delete(value, nar);
     }
-
 
 
     /**

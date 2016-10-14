@@ -52,7 +52,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
 
     /** 1 should work */
-    public static final int ACTIVATION_TERMLINK_DEPTH = 2;
+    public static final int ACTIVATION_TERMLINK_DEPTH = 1;
     public static final int ACTIVATION_TASKLINK_DEPTH = 2;
 
 

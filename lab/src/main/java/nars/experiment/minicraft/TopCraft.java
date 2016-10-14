@@ -25,7 +25,7 @@ public class TopCraft extends SwingAgent {
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 5500);
+        run(TopCraft::new, 55500);
     }
 
     public TopCraft(NAR nar) {

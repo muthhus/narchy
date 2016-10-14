@@ -25,7 +25,8 @@ public class Atom extends AtomicStringConstant {
                 throw new RuntimeException("invalid Atom name \"" + id + "\": leading character imitates another operation type");
         }
 
-        return id.intern();
+        //return id.intern();
+        return id;
     }
 
     @NotNull

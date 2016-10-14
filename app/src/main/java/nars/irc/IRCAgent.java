@@ -315,7 +315,7 @@ public class IRCAgent extends IRC {
         Default nar = new Default(activeConcepts, conceptsPerFrame, 2, 2, random,
 
                 //new CaffeineIndex(new DefaultConceptBuilder(random), 10000000, false, exe),
-                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 400000, 64 * 1024, 3),
+                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64 * 1024, 3),
 
 
                 new RealtimeMSClock(),
@@ -372,10 +372,11 @@ public class IRCAgent extends IRC {
         IRC bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
                 "#123xyz",
-                //"#netention",
-                "#nars");
+                "#netention"
+                //"#nars"
+        );
 
-        Vis.show(n);
+        Vis.show(n, 256);
 
         bot.start();
 

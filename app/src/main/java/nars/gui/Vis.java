@@ -126,7 +126,7 @@ public class Vis {
 
         s.add(new Facial(grid(
                 concepts(d, count),
-                budgetHistogram(d, 24),
+                budgetHistogram(d, 32),
                 emotionPlots(d, 256)
         )).maximize());
         s.add(new Facial(new CrosshairSurface(s)));

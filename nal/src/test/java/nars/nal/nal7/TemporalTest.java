@@ -125,10 +125,10 @@ public class TemporalTest {
     }
 
     @Test public void testCommutiveTemporalityConjEquiv() {
-        testParse("((#1-->$2) <=>-20 ({(row,3)}-->$2))", "((#1-->$2) <=>-20 ({(row,3)}-->$2))");
+        testParse("(({(row,3)}-->$2) <=>+20 (#1-->$2))", "((#1-->$2) <=>-20 ({(row,3)}-->$2))");
         testParse("(({(row,3)}-->$2) <=>+20 (#1-->$2))", "((#1-->$2) <=>-20 ({(row,3)}-->$2))");
 
-        testParse("((#1-->$2) &&-20 ({(row,3)}-->$2))", "((#1-->$2) &&-20 ({(row,3)}-->$2))");
+        testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "((#1-->$2) &&-20 ({(row,3)}-->$2))");
         testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "((#1-->$2) &&-20 ({(row,3)}-->$2))");
     }
     @Test public void testCommutiveTemporalityConj2() {
