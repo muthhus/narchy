@@ -594,9 +594,15 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
      * changes are buffered until after list iteration completes.
      */
     default void compute(Function<BLink<V>,BLink<V>> o) {
-        List<BLink<V>[]> changed = $.newArrayList();
+        List<BLink<V>[]> changed = $.newArrayList(size());
         forEach(x -> {
-           BLink<V> y = o.apply(x);
+            BLink<V> y;
+
+            if (x.isDeleted())
+                y = null;
+            else
+                y = o.apply(x);
+
            if (y!=x) {
                changed.add(new BLink[]{ x, y });
            }

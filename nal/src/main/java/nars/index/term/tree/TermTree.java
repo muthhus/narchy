@@ -40,17 +40,17 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
 //    }
 //
 
-
-    /**
-     * // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees...
-     */
-    public void print(Appendable out) {
-        PrettyPrinter.prettyPrint(this, out);
-    }
-
-    public void print() {
-        print(System.out);
-    }
+//
+//    /**
+//     * // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees...
+//     */
+//    public void print(Appendable out) {
+//        PrettyPrinter.prettyPrint(this, out);
+//    }
+//
+//    public void print() {
+//        print(System.out);
+//    }
 
 
     public Termed get(TermKey term) {

@@ -1,6 +1,5 @@
 package nars.index.term.tree;
 
-import com.googlecode.concurrenttrees.radix.node.Node;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -115,7 +114,7 @@ public class TreeTermIndex extends TermIndex implements Runnable {
             while ((sizeEst() - sizeLimit) > 0) {
 
                 s = concepts.random(s, descentRate, rng);
-                Node f = s.found;
+                MyConcurrentRadixTree.Node f = s.found;
 
                 if (f != null && f != concepts.root) {
                     int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);

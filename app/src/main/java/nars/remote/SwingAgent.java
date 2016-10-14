@@ -104,7 +104,7 @@ abstract public class SwingAgent extends NAgent {
         nar.printConceptStatistics();
 
         //nar.tasks.forEach(System.out::println);
-        PrettyPrinter.prettyPrint(((TreeTaskIndex)nar.tasks).tasks, System.out);
+        ((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
     }
 
     public static void chart(SwingAgent a, int history) {

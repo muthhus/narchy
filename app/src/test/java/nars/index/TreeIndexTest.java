@@ -37,7 +37,7 @@ public class TreeIndexTest {
         tree.computeIfAbsent("concept", cb);
         tree.computeIfAbsent("term", cb);
         tree.computeIfAbsent("termutator", cb);
-        tree.print(System.out);
+        //tree.print(System.out);
 
         assertNotNull(tree.get("term"));
         assertNull(tree.get("xerm"));
@@ -48,7 +48,7 @@ public class TreeIndexTest {
 
         assertNotNull(tree.computeIfAbsent("termunator", cb));
 
-        tree.print(System.out);
+        //tree.print(System.out);
 
         assertEquals(4, tree.size());
 
@@ -86,7 +86,7 @@ public class TreeIndexTest {
 
         assertEquals(Sets.symmetricDifference(input, stored) + " = difference", input, stored);
 
-        index.concepts.print();
+        //index.concepts.print();
         index.print(System.out);
 
 //        String stringWithUnicode = "unicode\u00easomething";

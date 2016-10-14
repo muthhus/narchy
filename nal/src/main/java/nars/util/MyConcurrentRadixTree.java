@@ -4,19 +4,22 @@ import com.googlecode.concurrenttrees.common.CharSequences;
 import com.googlecode.concurrenttrees.common.KeyValuePair;
 import com.googlecode.concurrenttrees.common.LazyIterator;
 import com.googlecode.concurrenttrees.radix.RadixTree;
+
 import com.googlecode.concurrenttrees.radix.node.Node;
-import com.googlecode.concurrenttrees.radix.node.NodeFactory;
-import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.*;
+import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.ByteArrayCharSequence;
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
-import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
+import com.googlecode.concurrenttrees.radix.node.util.*;
+
 import nars.$;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -37,10 +40,26 @@ import java.util.function.Supplier;
  * @author Niall Gallagher
  * @modified by seth
  */
-public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, Serializable, Iterable<X> {
+public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, Iterable<X> {
 
-    /** default factory */
-    protected static final NodeFactory factory = (NodeFactory) (edgeCharacters, value, childNodes, isRoot) -> {
+    public interface Node extends NodeCharacterProvider, Serializable {
+        Character getIncomingEdgeFirstCharacter();
+
+        CharSequence getIncomingEdge();
+
+        Object getValue();
+
+        Node getOutgoingEdge(Character var1);
+
+        void updateOutgoingEdge(Node var1);
+
+        List<Node> getOutgoingEdges();
+    }
+
+    /**
+     * default factory
+     */
+    protected static Node createNode(CharSequence edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
         if (edgeCharacters == null) {
             throw new IllegalStateException("The edgeCharacters argument was null");
         } else if (!isRoot && edgeCharacters.length() == 0) {
@@ -48,7 +67,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
         } else if (childNodes == null) {
             throw new IllegalStateException("The childNodes argument was null");
         } else {
-            //NodeUtil.ensureNoDuplicateEdges(childNodes);
+            //ensureNoDuplicateEdges(childNodes);
             return (Node) (childNodes.isEmpty() ?
                     ((value instanceof VoidValue) ?
                             new ByteArrayNodeLeafVoidValue(edgeCharacters) :
@@ -61,24 +80,318 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
                                     new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes) :
                                     new ByteArrayNodeDefault(edgeCharacters, value, childNodes))));
         }
+    }
+
+    final static Comparator<? super NodeCharacterProvider> NODE_COMPARATOR = (o1, o2) -> {
+        return o1.getIncomingEdgeFirstCharacter().compareTo(o2.getIncomingEdgeFirstCharacter());
     };
-    private final NodeFactory nodeFactory;
+
+    static int binarySearchForEdge(AtomicReferenceArray<Node> childNodes, Character edgeFirstCharacter) {
+        AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter(childNodes);
+        NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
+        return Collections.binarySearch(childNodesList, searchKey, NODE_COMPARATOR);
+    }
+
+    static final class ByteArrayNodeDefault implements Node {
+        private final byte[] incomingEdgeCharArray;
+        private final AtomicReferenceArray<Node> outgoingEdges;
+        private final Object value;
+
+        public ByteArrayNodeDefault(CharSequence edgeCharSequence, Object value, List<Node> outgoingEdges) {
+            Node[] childNodeArray = (Node[]) outgoingEdges.toArray(new Node[outgoingEdges.size()]);
+            Arrays.sort(childNodeArray, new NodeCharacterComparator());
+            this.outgoingEdges = new AtomicReferenceArray(childNodeArray);
+            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+            this.value = value;
+        }
+
+        public CharSequence getIncomingEdge() {
+            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        }
+
+        public Character getIncomingEdgeFirstCharacter() {
+            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        }
+
+        public Object getValue() {
+            return this.value;
+        }
+
+        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+            int index = binarySearchForEdge(this.outgoingEdges, edgeFirstCharacter);
+            return index < 0 ? null : (Node) this.outgoingEdges.get(index);
+        }
+
+        public void updateOutgoingEdge(Node childNode) {
+            int index = binarySearchForEdge(this.outgoingEdges, childNode.getIncomingEdgeFirstCharacter());
+            if (index < 0) {
+                throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
+            } else {
+                this.outgoingEdges.set(index, childNode);
+            }
+        }
+
+        public List<Node> getOutgoingEdges() {
+            return new AtomicReferenceArrayListAdapter(this.outgoingEdges);
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Node{");
+            sb.append("edge=").append(this.getIncomingEdge());
+            sb.append(", value=").append(this.value);
+            sb.append(", edges=").append(this.getOutgoingEdges());
+            sb.append("}");
+            return sb.toString();
+        }
+    }
+
+    static final class ByteArrayNodeLeafVoidValue implements Node {
+        private final byte[] incomingEdgeCharArray;
+
+        public ByteArrayNodeLeafVoidValue(CharSequence edgeCharSequence) {
+            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+        }
+
+        public CharSequence getIncomingEdge() {
+            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        }
+
+        public Character getIncomingEdgeFirstCharacter() {
+            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        }
+
+        public Object getValue() {
+            return VoidValue.SINGLETON;
+        }
+
+        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+            return null;
+        }
+
+        public void updateOutgoingEdge(Node childNode) {
+            throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
+        }
+
+        public List<Node> getOutgoingEdges() {
+            return Collections.emptyList();
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Node{");
+            sb.append("edge=").append(this.getIncomingEdge());
+            sb.append(", value=").append(VoidValue.SINGLETON);
+            sb.append(", edges=[]");
+            sb.append("}");
+            return sb.toString();
+        }
+    }
+
+
+    static final class ByteArrayNodeNonLeafNullValue implements Node {
+        private final byte[] incomingEdgeCharArray;
+        private final AtomicReferenceArray<Node> outgoingEdges;
+
+        public ByteArrayNodeNonLeafNullValue(CharSequence edgeCharSequence, List<Node> outgoingEdges) {
+            Node[] childNodeArray = (Node[]) outgoingEdges.toArray(new Node[outgoingEdges.size()]);
+            Arrays.sort(childNodeArray, new NodeCharacterComparator());
+            this.outgoingEdges = new AtomicReferenceArray(childNodeArray);
+            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+        }
+
+        public CharSequence getIncomingEdge() {
+            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        }
+
+        public Character getIncomingEdgeFirstCharacter() {
+            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        }
+
+        public Object getValue() {
+            return null;
+        }
+
+        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+            int index = binarySearchForEdge(this.outgoingEdges, edgeFirstCharacter);
+            return index < 0 ? null : (Node) this.outgoingEdges.get(index);
+        }
+
+        public void updateOutgoingEdge(Node childNode) {
+            int index = binarySearchForEdge(this.outgoingEdges, childNode.getIncomingEdgeFirstCharacter());
+            if (index < 0) {
+                throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
+            } else {
+                this.outgoingEdges.set(index, childNode);
+            }
+        }
+
+        public List<Node> getOutgoingEdges() {
+            return new AtomicReferenceArrayListAdapter(this.outgoingEdges);
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Node{");
+            sb.append("edge=").append(this.getIncomingEdge());
+            sb.append(", value=null");
+            sb.append(", edges=").append(this.getOutgoingEdges());
+            sb.append("}");
+            return sb.toString();
+        }
+    }
+
+    static final class ByteArrayNodeLeafWithValue implements Node {
+        private final byte[] incomingEdgeCharArray;
+        private final Object value;
+
+        public ByteArrayNodeLeafWithValue(CharSequence edgeCharSequence, Object value) {
+            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+            this.value = value;
+        }
+
+        public CharSequence getIncomingEdge() {
+            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        }
+
+        public Character getIncomingEdgeFirstCharacter() {
+            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        }
+
+        public Object getValue() {
+            return this.value;
+        }
+
+        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+            return null;
+        }
+
+        public void updateOutgoingEdge(Node childNode) {
+            throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
+        }
+
+        public List<Node> getOutgoingEdges() {
+            return Collections.emptyList();
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Node{");
+            sb.append("edge=").append(this.getIncomingEdge());
+            sb.append(", value=").append(this.value);
+            sb.append(", edges=[]");
+            sb.append("}");
+            return sb.toString();
+        }
+    }
+
+    static final class ByteArrayNodeLeafNullValue implements Node {
+        private final byte[] incomingEdgeCharArray;
+
+        public ByteArrayNodeLeafNullValue(CharSequence edgeCharSequence) {
+            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+        }
+
+        public CharSequence getIncomingEdge() {
+            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        }
+
+        public Character getIncomingEdgeFirstCharacter() {
+            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        }
+
+        public Object getValue() {
+            return null;
+        }
+
+        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+            return null;
+        }
+
+        public void updateOutgoingEdge(Node childNode) {
+            throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
+        }
+
+        public List<Node> getOutgoingEdges() {
+            return Collections.emptyList();
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Node{");
+            sb.append("edge=").append(this.getIncomingEdge());
+            sb.append(", value=null");
+            sb.append(", edges=[]");
+            sb.append("}");
+            return sb.toString();
+        }
+    }
+
+    static final class ByteArrayNodeNonLeafVoidValue implements Node {
+        private final byte[] incomingEdgeCharArray;
+        private final AtomicReferenceArray<Node> outgoingEdges;
+
+        public ByteArrayNodeNonLeafVoidValue(CharSequence edgeCharSequence, List<Node> outgoingEdges) {
+            Node[] childNodeArray = (Node[]) outgoingEdges.toArray(new Node[outgoingEdges.size()]);
+            Arrays.sort(childNodeArray, NODE_COMPARATOR);
+            this.outgoingEdges = new AtomicReferenceArray(childNodeArray);
+            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+        }
+
+        public CharSequence getIncomingEdge() {
+            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        }
+
+        public Character getIncomingEdgeFirstCharacter() {
+            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        }
+
+        public Object getValue() {
+            return VoidValue.SINGLETON;
+        }
+
+        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+            int index = binarySearchForEdge(this.outgoingEdges, edgeFirstCharacter);
+            return index < 0 ? null : (Node) this.outgoingEdges.get(index);
+        }
+
+        public void updateOutgoingEdge(Node childNode) {
+            int index = binarySearchForEdge(this.outgoingEdges, childNode.getIncomingEdgeFirstCharacter());
+            if (index < 0) {
+                throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
+            } else {
+                this.outgoingEdges.set(index, childNode);
+            }
+        }
+
+        public List<Node> getOutgoingEdges() {
+            return new AtomicReferenceArrayListAdapter(this.outgoingEdges);
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Node{");
+            sb.append("edge=").append(this.getIncomingEdge());
+            sb.append(", value=").append(VoidValue.SINGLETON);
+            sb.append(", edges=").append(this.getOutgoingEdges());
+            sb.append("}");
+            return sb.toString();
+        }
+    }
+
 
     public volatile Node root;
 
     // Write operations acquire write lock.
     // Read operations are lock-free by default, but can be forced to acquire read locks via constructor flag...
     // If non-null true, force reading threads to acquire read lock (they will block on writes).
-    @Nullable private final Lock readLock;
-    @NotNull private final Lock writeLock;
+    @Nullable
+    private final Lock readLock;
+    @NotNull
+    private final Lock writeLock;
 
 
     final AtomicInteger estSize = new AtomicInteger(0);
-
-
-    public MyConcurrentRadixTree() {
-        this(factory, false);
-    }
 
     /**
      * Creates a new {@link MyConcurrentRadixTree} which will use the given {@link NodeFactory} to create nodes.
@@ -86,8 +399,8 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
      * @param nodeFactory An object which creates {@link Node} objects on-demand, and which might return node
      *                    implementations optimized for storing the values supplied to it for the creation of each node
      */
-    public MyConcurrentRadixTree(NodeFactory nodeFactory) {
-        this(nodeFactory, false);
+    public MyConcurrentRadixTree() {
+        this(false);
     }
 
     /**
@@ -100,8 +413,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
      *                            if false, configures lock-free reads; allows concurrent non-blocking reads, even if writes are being performed
      *                            by other threads
      */
-    public MyConcurrentRadixTree(NodeFactory nodeFactory, boolean restrictConcurrency) {
-        this.nodeFactory = nodeFactory;
+    public MyConcurrentRadixTree(boolean restrictConcurrency) {
 
         ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
         this.writeLock = readWriteLock.writeLock();
@@ -113,7 +425,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     public void clear() {
         acquireWriteLock();
         try {
-            this.root = nodeFactory.createNode("", null, Collections.emptyList(), true);
+            this.root = createNode("", null, Collections.emptyList(), true);
         } finally {
             releaseWriteLock();
         }
@@ -121,7 +433,9 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
     // ------------- Helper methods for serializing writes -------------
 
-    /** essentially a version number which increments each acquired write lock, to know if the tree has changed */
+    /**
+     * essentially a version number which increments each acquired write lock, to know if the tree has changed
+     */
     final static AtomicInteger writes = new AtomicInteger();
 
     public final int acquireWriteLock() {
@@ -135,17 +449,17 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
 
     public final void acquireReadLockIfNecessary() {
-        if (readLock!=null)
+        if (readLock != null)
             readLock.lock();
     }
 
     public final void releaseReadLockIfNecessary() {
-        if (readLock!=null)
+        if (readLock != null)
             readLock.unlock();
     }
 
 
-    public final X put(Pair<CharSequence,X> value) {
+    public final X put(Pair<CharSequence, X> value) {
         return put(value.getOne(), value.getTwo());
     }
 
@@ -157,7 +471,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public final X put(CharSequence key, X value) {
 //        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
 //        O existingValue = (O) putInternal(key, value, true);  // putInternal acquires write lock
@@ -171,23 +484,22 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public final X putIfAbsent(CharSequence key, X newValue) {
         return compute(key, newValue, (k, r, existing, v) ->
                 existing != null ? existing : v
         );
     }
 
-    @NotNull public final X putIfAbsent(@NotNull CharSequence key, @NotNull Supplier<X> newValue) {
+    @NotNull
+    public final X putIfAbsent(@NotNull CharSequence key, @NotNull Supplier<X> newValue) {
         return compute(key, newValue, (k, r, existing, v) ->
-            existing != null ? existing : v.get()
+                existing != null ? existing : v.get()
         );
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     public X getValueForExactKey(CharSequence key) {
         acquireReadLockIfNecessary();
         try {
@@ -206,7 +518,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public Iterable<CharSequence> getKeysStartingWith(CharSequence prefix) {
         acquireReadLockIfNecessary();
         try {
@@ -234,7 +545,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public Iterable<X> getValuesForKeysStartingWith(CharSequence prefix) {
         acquireReadLockIfNecessary();
         try {
@@ -266,22 +576,22 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public Iterable<KeyValuePair<X>> getKeyValuePairsForKeysStartingWith(CharSequence prefix) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(prefix);
             SearchResult.Classification classification = searchResult.classification;
+            Node f = searchResult.found;
             switch (classification) {
                 case EXACT_MATCH:
-                    return getDescendantKeyValuePairs(prefix, searchResult.found);
+                    return getDescendantKeyValuePairs(prefix, f);
                 case KEY_ENDS_MID_EDGE:
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    CharSequence edgeSuffix = CharSequences.getSuffix(f.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
                     prefix = CharSequences.concatenate(prefix, edgeSuffix);
-                    return getDescendantKeyValuePairs(prefix, searchResult.found);
+                    return getDescendantKeyValuePairs(prefix, f);
                 default:
                     // Incomplete match means key is not a prefix of any node...
                     return Collections.emptySet();
@@ -294,7 +604,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean remove(@NotNull CharSequence key) {
         acquireWriteLock();
         try {
@@ -314,7 +623,9 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
         }
     }
 
-    /** allows subclasses to override this to handle removal events. return true if removal is accepted, false to reject the removal and reinsert */
+    /**
+     * allows subclasses to override this to handle removal events. return true if removal is accepted, false to reject the removal and reinsert
+     */
     protected boolean onRemove(X removed) {
 
         return true;
@@ -328,7 +639,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
                 Node parent = searchResult.parentNode;
 
                 Object v = found.getValue();
-                if (!recurse && ((v == null)||(v == VoidValue.SINGLETON))) {
+                if (!recurse && ((v == null) || (v == VoidValue.SINGLETON))) {
                     // This node was created automatically as a split between two branches (implicit node).
                     // No need to remove it...
                     return false;
@@ -336,7 +647,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
                 List<X> reinsertions = $.newArrayList(0);
 
-                if (v!=null && v != VoidValue.SINGLETON) {
+                if (v != null && v != VoidValue.SINGLETON) {
                     X xv = (X) v;
                     boolean removed = tryRemove(xv);
                     if (!recurse) {
@@ -361,7 +672,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
                             // Just delete the value associated with this node.
                             // -> Clone this node without its value, preserving its child nodes...
                             @SuppressWarnings({"NullableProblems"})
-                            Node cloned = nodeFactory.createNode(found.getIncomingEdge(), null, found.getOutgoingEdges(), false);
+                            Node cloned = createNode(found.getIncomingEdge(), null, found.getOutgoingEdges(), false);
                             // Re-add the replacement node to the parent...
                             parent.updateOutgoingEdge(cloned);
                         } else if (numChildren == 1) {
@@ -370,13 +681,13 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
                             // and which has the outgoing edges of the child and the value from the child.
                             Node child = childEdges.get(0);
                             CharSequence concatenatedEdges = CharSequences.concatenate(found.getIncomingEdge(), child.getIncomingEdge());
-                            Node mergedNode = nodeFactory.createNode(concatenatedEdges, child.getValue(), child.getOutgoingEdges(), false);
+                            Node mergedNode = createNode(concatenatedEdges, child.getValue(), child.getOutgoingEdges(), false);
                             // Re-add the merged node to the parent...
                             parent.updateOutgoingEdge(mergedNode);
                         }
                     } else {
                         //collect all values from the subtree, call onRemove for them. then proceed below with removal of this node and its value
-                        forEach(found, (k,f) -> {
+                        forEach(found, (k, f) -> {
                             boolean removed = tryRemove(f);
                             if (!removed) {
                                 reinsertions.add(f);
@@ -422,13 +733,13 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
                         Node parentsRemainingChild = newEdgesOfParent.get(0);
                         // Merge the parent with its only remaining child...
                         CharSequence concatenatedEdges = CharSequences.concatenate(parent.getIncomingEdge(), parentsRemainingChild.getIncomingEdge());
-                        newParent = nodeFactory.createNode(concatenatedEdges, parentsRemainingChild.getValue(), parentsRemainingChild.getOutgoingEdges(), parentIsRoot);
+                        newParent = createNode(concatenatedEdges, parentsRemainingChild.getValue(), parentsRemainingChild.getOutgoingEdges(), parentIsRoot);
                     } else {
                         // Parent is a node which either has a value of its own, has more than one remaining
                         // child, or is actually the root node (we never merge the root node).
                         // Create new parent node which is the same as is currently just without the edge to the
                         // node being deleted...
-                        newParent = nodeFactory.createNode(parent.getIncomingEdge(), parent.getValue(), newEdgesOfParent, parentIsRoot);
+                        newParent = createNode(parent.getIncomingEdge(), parent.getValue(), newEdgesOfParent, parentIsRoot);
                     }
                     // Re-add the parent node to its parent...
                     if (parentIsRoot) {
@@ -458,7 +769,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public Iterable<CharSequence> getClosestKeys(CharSequence candidate) {
         acquireReadLockIfNecessary();
         try {
@@ -500,7 +810,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public Iterable<X> getValuesForClosestKeys(CharSequence candidate) {
         acquireReadLockIfNecessary();
         try {
@@ -542,7 +851,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public Iterable<KeyValuePair<X>> getKeyValuePairsForClosestKeys(CharSequence candidate) {
         acquireReadLockIfNecessary();
         try {
@@ -584,7 +892,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     /**
      * {@inheritDoc}
      */
-    @Override
     public int size() {
         return size(this.root);
     }
@@ -621,7 +928,9 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
         return sum;
     }
 
-    /** as soon as the limit is exceeded, it returns -1 to cancel the recursion iteration */
+    /**
+     * as soon as the limit is exceeded, it returns -1 to cancel the recursion iteration
+     */
     private static int _sizeIfLessThan(Node n, int limit) {
         int sum = 0;
         Object v = n.getValue();
@@ -641,7 +950,9 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
         return sum;
     }
 
-    /** estimated size */
+    /**
+     * estimated size
+     */
     public int sizeEst() {
         return estSize.get();
     }
@@ -654,7 +965,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     public final void forEach(Node start, Consumer<? super X> action) {
         Object v = start.getValue();
         if (aValue(v))
-            action.accept((X)v);
+            action.accept((X) v);
 
         List<Node> l = start.getOutgoingEdges();
         for (Node child : l)
@@ -664,7 +975,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     public final void forEach(Node start, BiConsumer<CharSequence, ? super X> action) {
         Object v = start.getValue();
         if (aValue(v))
-            action.accept(start.getIncomingEdge(), (X)v);
+            action.accept(start.getIncomingEdge(), (X) v);
 
         List<Node> l = start.getOutgoingEdges();
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
@@ -673,7 +984,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     }
 
     public static boolean aValue(Object v) {
-        return (v != null) && v!= VoidValue.SINGLETON;
+        return (v != null) && v != VoidValue.SINGLETON;
     }
 
     // ------------- Helper method for put() -------------
@@ -681,13 +992,15 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
         throw new UnsupportedOperationException();
     }
 
-    @NotNull public SearchResult random(float descendProb, Random rng) {
+    @NotNull
+    public SearchResult random(float descendProb, Random rng) {
         return random(null, descendProb, rng);
     }
 
-    @NotNull public SearchResult random(@Nullable SearchResult at, float descendProb, Random rng) {
+    @NotNull
+    public SearchResult random(@Nullable SearchResult at, float descendProb, Random rng) {
         Node current, parent, parentParent;
-        if (at!=null && at.found!=null) {
+        if (at != null && at.found != null) {
             current = at.found;
             parent = at.parentNode;
             parentParent = at.parentNodesParent;
@@ -698,24 +1011,24 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
         /*acquireReadLockIfNecessary();
         try {*/
-            while (true) {
-                List<Node> c = current.getOutgoingEdges();
-                int s = c.size();
-                if (s == 0) {
-                    break; //select it
-                } else {
-                    if (rng.nextFloat() < descendProb) {
-                        int which = rng.nextInt(s);
-                        Node next = c.get(which);
+        while (true) {
+            List<Node> c = current.getOutgoingEdges();
+            int s = c.size();
+            if (s == 0) {
+                break; //select it
+            } else {
+                if (rng.nextFloat() < descendProb) {
+                    int which = rng.nextInt(s);
+                    Node next = c.get(which);
 
-                        parentParent = parent;
-                        parent = current;
-                        current = next;
-                    } else {
-                        break; //select it
-                    }
+                    parentParent = parent;
+                    parent = current;
+                    current = next;
+                } else {
+                    break; //select it
                 }
             }
+        }
         /*} finally {
             releaseReadLockIfNecessary();
         }*/
@@ -742,9 +1055,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 //        if (key.length() == 0) {
 //            throw new IllegalArgumentException("The key argument was zero-length");
 //        }
-
-
-
 
 
         int version;
@@ -777,12 +1087,10 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
         if (newValue != foundX) {
 
-            NodeFactory factory = this.nodeFactory;
-
             int version2 = acquireWriteLock();
             try {
 
-                if (version+1!=version2) {
+                if (version + 1 != version2) {
                     //search again because the tree has changed since the initial lookup
                     result = searchTree(key);
                     found = result.found;
@@ -810,7 +1118,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
                         if (newValue != foundValue) {
                             //clone and reattach
-                            cloneAndReattach(result, factory, found, foundValue, oedges);
+                            cloneAndReattach(result, found, foundValue, oedges);
                         }
                         break;
                     case KEY_ENDS_MID_EDGE: {
@@ -823,9 +1131,9 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
 
 
                         // Create new nodes...
-                        Node newChild = factory.createNode(suffixFromExistingEdge, foundValue, oedges, false);
+                        Node newChild = createNode(suffixFromExistingEdge, foundValue, oedges, false);
 
-                        Node newParent = factory.createNode(commonPrefix, newValue, Arrays.asList(newChild), false);
+                        Node newParent = createNode(commonPrefix, newValue, Arrays.asList(newChild), false);
 
                         // Add the new parent to the parent of the node being replaced (replacing the existing node)...
                         result.parentNode.updateOutgoingEdge(newParent);
@@ -843,13 +1151,13 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
                         // Create a new child node containing the trailing characters...
                         CharSequence keySuffix = key.subSequence(matched, key.length());
 
-                        Node newChild = factory.createNode(keySuffix, newValue, Collections.emptyList(), false);
+                        Node newChild = createNode(keySuffix, newValue, Collections.emptyList(), false);
 
                         // Clone the current node adding the new child...
                         List<Node> edges = $.newArrayList(oedges.size() + 1);
                         edges.addAll(oedges);
                         edges.add(newChild);
-                        cloneAndReattach(result, factory, found, foundValue, edges);
+                        cloneAndReattach(result, found, foundValue, edges);
 
                         break;
 
@@ -866,16 +1174,18 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
                         // the key and the edge, and add N1 and N2 as child nodes of N3
                         // (4) Re-add N3 to the parent node of NF, effectively replacing NF in the tree
 
-                        CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
-                        CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
-                        CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
                         CharSequence suffixFromKey = key.subSequence(matched, key.length());
 
                         // Create new nodes...
-                        Node n1 = factory.createNode(suffixFromKey, newValue, Collections.emptyList(), false);
-                        Node n2 = factory.createNode(suffixFromExistingEdge, foundValue, oedges, false);
+                        Node n1 = createNode(suffixFromKey, newValue, Collections.emptyList(), false);
+
+                        CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
+                        CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
+                        CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
+
+                        Node n2 = createNode(suffixFromExistingEdge, foundValue, oedges, false);
                         @SuppressWarnings({"NullableProblems"})
-                        Node n3 = factory.createNode(commonPrefix, null, Arrays.asList(n1, n2), false);
+                        Node n3 = createNode(commonPrefix, null, Arrays.asList(n1, n2), false);
 
                         result.parentNode.updateOutgoingEdge(n3);
 
@@ -894,11 +1204,11 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
         return newValue;
     }
 
-    private void cloneAndReattach(SearchResult searchResult, NodeFactory factory, Node found, Object foundValue, List<Node> edges) {
+    private void cloneAndReattach(SearchResult searchResult, Node found, Object foundValue, List<Node> edges) {
         CharSequence ie = found.getIncomingEdge();
         boolean root = ie.length() == 0;
 
-        Node clonedNode = factory.createNode(ie, foundValue, edges, root);
+        Node clonedNode = createNode(ie, foundValue, edges, root);
 
         // Re-add the cloned node to its parent node...
         if (root) {
@@ -1120,10 +1430,10 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
                         // -> Iterate child nodes in reverse order and so push them onto the stack in reverse order,
                         // to counteract that pushing them onto the stack alone would otherwise reverse their processing order.
                         // This ensures that we actually process nodes in ascending alphabetical order.
-                        for (int i = childNodes.size()-1; i >= 0; i--) {
+                        for (int i = childNodes.size() - 1; i >= 0; i--) {
                             Node child = childNodes.get(i);
                             stack.push(new NodeKeyPair(child,
-                                CharSequences.concatenate(current.key, child.getIncomingEdge())
+                                    CharSequences.concatenate(current.key, child.getIncomingEdge())
                             ));
                         }
                         return current;
@@ -1283,7 +1593,7 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
         }
 
         SearchResult(Node found, Node parentNode, Node parentParentNode) {
-            this(null, found, -1, -1, parentNode, parentParentNode, found!=null ? Classification.EXACT_MATCH : Classification.INVALID);
+            this(null, found, -1, -1, parentNode, parentParentNode, found != null ? Classification.EXACT_MATCH : Classification.INVALID);
         }
 
         SearchResult(CharSequence key, Node found, int charsMatched, int charsMatchedInNodeFound, Node parentNode, Node parentNodesParent) {
@@ -1335,12 +1645,6 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
         }
     }
 
-    // ------------- Helper method for pretty-printing tree (not public API) -------------
-
-    @Override
-    public Node getNode() {
-        return root;
-    }
 
     private class DescendantKeys extends LazyIterator<CharSequence> implements Iterable<CharSequence>, Iterator<CharSequence> {
         private final CharSequence startKey;
@@ -1392,4 +1696,47 @@ public class MyConcurrentRadixTree<X> implements RadixTree<X>, PrettyPrintable, 
     public Iterator<X> iterator() {
         return getValuesForKeysStartingWith("").iterator();
     }
+
+
+    public String prettyPrint(PrettyPrintable tree) {
+        StringBuilder sb = new StringBuilder();
+        prettyPrint(root, sb, "", true, true);
+        return sb.toString();
+    }
+
+    public void prettyPrint(Appendable appendable) {
+        prettyPrint(root, appendable, "", true, true);
+    }
+
+    static void prettyPrint(Node node, Appendable sb, String prefix, boolean isTail, boolean isRoot) {
+        try {
+            StringBuilder ioException = new StringBuilder();
+            if (isRoot) {
+                ioException.append("○");
+                if (node.getIncomingEdge().length() > 0) {
+                    ioException.append(" ");
+                }
+            }
+
+            ioException.append(node.getIncomingEdge());
+            if (node.getValue() != null) {
+                ioException.append(" (").append(node.getValue()).append(")");
+            }
+
+            sb.append(prefix).append(isTail ? (isRoot ? "" : "└── ○ ") : "├── ○ ").append(ioException).append("\n");
+            List children = node.getOutgoingEdges();
+
+            for (int i = 0; i < children.size() - 1; ++i) {
+                prettyPrint((Node) children.get(i), sb, prefix + (isTail ? (isRoot ? "" : "    ") : "│   "), false, false);
+            }
+
+            if (!children.isEmpty()) {
+                prettyPrint((Node) children.get(children.size() - 1), sb, prefix + (isTail ? (isRoot ? "" : "    ") : "│   "), true, false);
+            }
+
+        } catch (IOException var8) {
+            throw new IllegalStateException(var8);
+        }
+    }
+
 }
