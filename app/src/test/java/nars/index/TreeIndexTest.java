@@ -1,14 +1,17 @@
 package nars.index;
 
 import com.google.common.collect.Sets;
+import nars.$;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.index.term.tree.TermKey;
 import nars.index.term.tree.TermTree;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.util.ByteSeq;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -34,21 +37,21 @@ public class TreeIndexTest {
 
         Function<Term, Concept> cb = (t)->new AtomConcept((Atomic)t, null, null);
 
-        tree.computeIfAbsent("concept", cb);
-        tree.computeIfAbsent("term", cb);
-        tree.computeIfAbsent("termutator", cb);
+        tree.computeIfAbsent(new TermKey($("concept")), cb);
+        tree.computeIfAbsent(new TermKey($("term")), cb);
+        tree.computeIfAbsent(new TermKey($("termutator")), cb);
         //tree.print(System.out);
 
-        assertNotNull(tree.get("term"));
-        assertNull(tree.get("xerm"));
-        assertNull(tree.get("te")); //partial
+        assertNotNull(tree.get(new TermKey($("term"))));
+        assertNull(tree.get(new TermKey($("xerm"))));
+        assertNull(tree.get(new TermKey($("te")))); //partial
 
-        assertNotNull(tree.computeIfAbsent("term", cb));
+        assertNotNull(tree.computeIfAbsent(new ByteSeq.RawByteSeq("term"), cb));
         assertEquals(3, tree.size());
 
-        assertNotNull(tree.computeIfAbsent("termunator", cb));
+        assertNotNull(tree.computeIfAbsent(new ByteSeq.RawByteSeq("termunator"), cb));
 
-        //tree.print(System.out);
+        tree.prettyPrint(System.out);
 
         assertEquals(4, tree.size());
 
@@ -86,7 +89,7 @@ public class TreeIndexTest {
 
         assertEquals(Sets.symmetricDifference(input, stored) + " = difference", input, stored);
 
-        //index.concepts.print();
+        index.concepts.prettyPrint();
         index.print(System.out);
 
 //        String stringWithUnicode = "unicode\u00easomething";

@@ -709,7 +709,7 @@ import java.util.regex.Pattern;
      */
     static char[] getCharArray(String s) {
         try {
-            return (char[]) StringHack.val.get(s);
+            return (char[]) StringHack.String_value.get(s);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

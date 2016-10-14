@@ -1,93 +1,99 @@
 package nars.util;
 
-import com.fasterxml.jackson.core.io.UTF8Writer;
-import com.google.common.base.Utf8;
-import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.ByteArrayCharSequence;
+import com.github.benmanes.caffeine.base.UnsafeAccess;
+import com.google.common.base.Joiner;
+import com.googlecode.concurrenttrees.common.CharSequences;
+import nars.util.data.rope.StringHack;
+import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * copied from Infinispan SimpleDataOutput
  */
-public class ByteBufferlet implements DataOutput,CharSequence,Appendable {
+public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
 
-    public static final int MIN_GROWTH_BYTES = 64;
-    public byte[] buffer;
+    public static final int MIN_GROWTH_BYTES = 128;
+    private byte[] bytes;
     public int position;
 
     public ByteBufferlet(int bufferSize) {
-        super();
-        this.buffer = new byte[bufferSize];
+        this.bytes = new byte[bufferSize];
     }
 
     @Override
-    @Deprecated
     public final int length() {
         return position;
 //        return Integer.MAX_VALUE;
     }
 
     @Override
-    public final char charAt(int index) {
-        return (char) buffer[index];
-        //return (char) Byte.toUnsignedInt(key[index]);
+    public byte at(int index) {
+        return bytes[index];
     }
 
     @Override
-    public CharSequence subSequence(int start, int end) {
-        //return str.subSequence(start, Math.min(str.length(),end));
-        return new ByteArrayCharSequence(buffer, start, end);
+    public ByteSeq subSequence(int start, int end) {
+        return new WindowByteSeq(this.bytes, start, end);
     }
-
 
     @Override
     public void write(int v) throws IOException {
-        byte[] e = this.buffer;
+        byte[] e = this.bytes;
 
         ensureSized(1);
         e[this.position++] = (byte) v;
     }
 
     @Override
-    public void write(byte[] bytes) throws IOException {
+    public void write(@NotNull byte[] bytes) throws IOException {
         this.write(bytes, 0, bytes.length);
     }
 
     @Override
-    public void write(byte[] bytes, int off, int len) throws IOException {
+    public void write(@NotNull byte[] bytes, int off, int len) throws IOException {
         int position = ensureSized(len);
-        System.arraycopy(bytes, off, this.buffer, position, len);
+        System.arraycopy(bytes, off, this.bytes, position, len);
         this.position = position + len;
     }
 
     private final int ensureSized(int extra) {
-        int space = this.buffer.length;
+        int space = this.bytes.length;
         if (space - position <= extra) {
             byte[] newBuffer = new byte[space + Math.max(MIN_GROWTH_BYTES, 2 * extra)];
-            System.arraycopy(this.buffer, 0, newBuffer, 0, position);
-            this.buffer = newBuffer;
+            System.arraycopy(this.bytes, 0, newBuffer, 0, position);
+            this.bytes = newBuffer;
         }
         return this.position;
     }
 
+
+    @Override
+    public String toString() {
+        return Arrays.toString(ArrayUtils.subarray(bytes, 0, length()));
+    }
+
+
     @Override
     public void writeBoolean(boolean v) throws IOException {
-        byte[] e = this.buffer;
+        byte[] e = this.bytes;
         ensureSized(1);
         e[this.position++] = (byte) (v ? 1 : 0);
     }
 
     @Override
     public void writeByte(int v) throws IOException {
-        byte[] e = this.buffer;
+        byte[] e = this.bytes;
         ensureSized(1);
         e[this.position++] = (byte) v;
     }
 
     @Override
     public void writeShort(int v) throws IOException {
-        byte[] e = this.buffer;
+        byte[] e = this.bytes;
         int s = ensureSized(2);
         e[s] = (byte) (v >> 8);
         e[s + 1] = (byte) v;
@@ -97,7 +103,7 @@ public class ByteBufferlet implements DataOutput,CharSequence,Appendable {
     @Override
     public void writeChar(int v) throws IOException {
 
-        byte[] e = this.buffer;
+        byte[] e = this.bytes;
         int s = ensureSized(2);
         e[s] = (byte) (v >> 8);
         e[s + 1] = (byte) v;
@@ -108,7 +114,7 @@ public class ByteBufferlet implements DataOutput,CharSequence,Appendable {
     @Override
     public void writeInt(int v) throws IOException {
 
-        byte[] e = this.buffer;
+        byte[] e = this.bytes;
         int s = ensureSized(4);
         e[s] = (byte) (v >> 24);
         e[s + 1] = (byte) (v >> 16);
@@ -120,7 +126,7 @@ public class ByteBufferlet implements DataOutput,CharSequence,Appendable {
     @Override
     public void writeLong(long v) throws IOException {
 
-        byte[] e = this.buffer;
+        byte[] e = this.bytes;
         int s = ensureSized(8);
         e[s] = (byte) ((int) (v >> 56));
         e[s + 1] = (byte) ((int) (v >> 48));
@@ -136,7 +142,7 @@ public class ByteBufferlet implements DataOutput,CharSequence,Appendable {
     @Override
     public void writeFloat(float v) throws IOException {
 
-        byte[] e = this.buffer;
+        byte[] e = this.bytes;
         int s = ensureSized(4);
         int bits = Float.floatToIntBits(v);
         e[s] = (byte) (bits >> 24);
@@ -200,18 +206,23 @@ public class ByteBufferlet implements DataOutput,CharSequence,Appendable {
     }
 
     @Override
-    public void writeUTF(String s) throws IOException {
+    public void writeUTF(@NotNull String s) throws IOException {
         //throw new UnsupportedOperationException("yet");
 
         //WARNING this isnt UTF8
-        this.write(s.getBytes());
+        this.write(strToBytes(s));
 
-//
+
+
 //        s.getBytes()
 //        this.writeBytes(s);
 //        UTF8Writer
 //        this.writeShort(s.length());
 //        UTFUtils.writeUTFBytes(this, s);
+    }
+
+    private byte[] strToBytes(String s) {
+        return StringHack.bytes(s);
     }
 
     @Override

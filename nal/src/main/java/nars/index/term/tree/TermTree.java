@@ -1,10 +1,10 @@
 package nars.index.term.tree;
 
-import com.googlecode.concurrenttrees.common.PrettyPrinter;
 import nars.$;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.MyConcurrentRadixTree;
+import nars.util.ByteSeq;
+import nars.util.radixtree.MyConcurrentRadixTree;
 
 import java.util.function.Function;
 
@@ -16,12 +16,12 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
 
 
     public final Termed get(String id) {
-        return getValueForExactKey(id);
+        return getValueForExactKey(new TermKey($.$(id)));
     }
 
 
-    public final Termed computeIfAbsent(CharSequence s, Function<Term, ? extends Termed> conceptBuilder) {
-        return putIfAbsent(s, () -> conceptBuilder.apply($.the(s)));
+    public final Termed computeIfAbsent(ByteSeq s, Function<Term, ? extends Termed> conceptBuilder) {
+        return putIfAbsent(s, () -> conceptBuilder.apply($.the(s.toString())));
     }
 
     @Override
@@ -62,10 +62,10 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
 //
 //
 //        @Override
-//        public Node createNode(CharSequence edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
+//        public Node createNode(ByteSeq edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
 //            if (Param.DEBUG) {
 //                assert edgeCharacters != null : "The edgeCharacters argument was null";
-//                assert !(!isRoot && edgeCharacters.length() == 0) : "Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters);
+//                assert !(!isRoot && edgeCharacters.length() == 0) : "Invalid edge characters for non-root node: " + ByteSeqs.toString(edgeCharacters);
 //                assert childNodes != null : "The childNodes argument was null";
 //                if (Param.DEBUG_EXTRA)
 //                    NodeUtil.ensureNoDuplicateEdges(childNodes);
@@ -92,7 +92,7 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
 //                        return new ByteArrayNodeDefault(edgeCharacters, value, childNodes);
 //                    }
 //                }
-//            } catch (ByteArrayCharSequence.IncompatibleCharacterException e) {
+//            } catch (ByteArrayByteSeq.IncompatibleCharacterException e) {
 //
 //                if (childNodes.isEmpty()) {
 //                    // Leaf node...
@@ -134,7 +134,7 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
 //        }
 //
 //        @Override
-//        public CharSequence getIncomingEdge() {
+//        public ByteSeq getIncomingEdge() {
 //            return null;
 //        }
 //

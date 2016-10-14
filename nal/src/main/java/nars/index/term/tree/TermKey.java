@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static nars.IO.SPECIAL_OP;
 import static nars.IO.writeUTFWithoutLength;
@@ -20,7 +21,7 @@ import static nars.IO.writeUTFWithoutLength;
 /**
  * TODO lazily compute
  */
-public class TermKey extends ByteBufferlet  {
+public class TermKey extends ByteBufferlet {
 
     public TermKey(@NotNull Term conceptualizable) {
         super(conceptualizable.volume() * 8 /* ESTIMATE */);
@@ -31,6 +32,7 @@ public class TermKey extends ByteBufferlet  {
             throw new RuntimeException(e);
         }
     }
+
     public TermKey(@NotNull Task task) {
         super(task.volume() * 8 + 32 /* ESTIMATE */);
         try {
@@ -40,21 +42,28 @@ public class TermKey extends ByteBufferlet  {
 //            IO.writeTruth(this, task);
 //            IO.writeEvidence(this, task.evidence());
 
-            writeUTFWithoutLength(this, task.term().toString());
+            //writeUTFWithoutLength(this, task.term().toString());
+            IO.writeCompound(this, task.term());
+
             char punc = task.punc();
             this.writeByte(punc);
+
             for (long x : task.evidence())
                 writeUTFWithoutLength(this, Long.toString(x, 36));
-            writeUTFWithoutLength(this, Long.toString(task.occurrence(),36));
+
+            writeUTFWithoutLength(this, Long.toString(task.occurrence(), 36));
+
             if ((punc == Symbols.BELIEF) && (punc == Symbols.GOAL)) {
                 writeUTFWithoutLength(this, Integer.toString(task.truth().hashCode(), 36));
             }
+
             writeByte(0); //null terminator, signifying end-of-term
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -65,7 +74,6 @@ public class TermKey extends ByteBufferlet  {
     public int hashCode() {
         throw new UnsupportedOperationException();
     }
-
 
 
     public static void writeTermSeq(@NotNull DataOutput out, @NotNull Term term, boolean includeTemporal) throws IOException {
@@ -82,6 +90,7 @@ public class TermKey extends ByteBufferlet  {
             writeCompoundSeq(out, (Compound) term, includeTemporal);
         }
     }
+
     public static void writeCompoundSeq(@NotNull DataOutput out, @NotNull Compound c, boolean includeTemporal) throws IOException {
 
         writeTermContainerSeq(out, c.subterms(), includeTemporal);

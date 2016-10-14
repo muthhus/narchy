@@ -2,7 +2,8 @@ package nars.index.task;
 
 import nars.Task;
 import nars.index.term.tree.TermKey;
-import nars.util.MyConcurrentRadixTree;
+import nars.util.ByteSeq;
+import nars.util.radixtree.MyConcurrentRadixTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +29,7 @@ public class TreeTaskIndex extends TaskIndex {
         tasks.remove(key(tt));
     }
 
-    static CharSequence key(Task x) {
+    static ByteSeq key(Task x) {
         return new TermKey(x);
     }
 

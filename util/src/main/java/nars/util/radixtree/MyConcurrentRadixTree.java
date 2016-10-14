@@ -1,16 +1,14 @@
-package nars.util;
+package nars.util.radixtree;
 
-import com.googlecode.concurrenttrees.common.CharSequences;
 import com.googlecode.concurrenttrees.common.KeyValuePair;
 import com.googlecode.concurrenttrees.common.LazyIterator;
 import com.googlecode.concurrenttrees.radix.RadixTree;
 
-import com.googlecode.concurrenttrees.radix.node.Node;
-import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.ByteArrayCharSequence;
-import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
-import com.googlecode.concurrenttrees.radix.node.util.*;
 
-import nars.$;
+import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
+
+import nars.util.ByteSeq;
+import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +25,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.eclipse.collections.impl.tuple.Tuples.*;
+
 /**
  * seh's modifications to radix tree
  * <p>
@@ -42,14 +42,45 @@ import java.util.function.Supplier;
  */
 public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, Iterable<X> {
 
-    public interface Node extends NodeCharacterProvider, Serializable {
-        Character getIncomingEdgeFirstCharacter();
+    static final class AtomicReferenceArrayListAdapter<T> extends AbstractList<T> {
+        private final AtomicReferenceArray<T> atomicReferenceArray;
 
-        CharSequence getIncomingEdge();
+        public AtomicReferenceArrayListAdapter(AtomicReferenceArray<T> atomicReferenceArray) {
+            this.atomicReferenceArray = atomicReferenceArray;
+        }
+
+        public T get(int index) {
+            return this.atomicReferenceArray.get(index);
+        }
+
+        public int size() {
+            return this.atomicReferenceArray.length();
+        }
+    }
+
+    public interface Prefixed {
+        byte getIncomingEdgeFirstCharacter();
+    }
+
+    static class NodeCharacterKey implements Prefixed {
+        private final byte character;
+
+        public NodeCharacterKey(byte character) {
+            this.character = character;
+        }
+
+        public byte getIncomingEdgeFirstCharacter() {
+            return this.character;
+        }
+    }
+
+    public interface Node extends Prefixed, Serializable {
+
+        ByteSeq getIncomingEdge();
 
         Object getValue();
 
-        Node getOutgoingEdge(Character var1);
+        Node getOutgoingEdge(byte var1);
 
         void updateOutgoingEdge(Node var1);
 
@@ -59,11 +90,11 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     /**
      * default factory
      */
-    protected static Node createNode(CharSequence edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
+    protected static Node createNode(ByteSeq edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
         if (edgeCharacters == null) {
             throw new IllegalStateException("The edgeCharacters argument was null");
         } else if (!isRoot && edgeCharacters.length() == 0) {
-            throw new IllegalStateException("Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters));
+            throw new IllegalStateException("Invalid edge characters for non-root node: " + edgeCharacters);
         } else if (childNodes == null) {
             throw new IllegalStateException("The childNodes argument was null");
         } else {
@@ -82,42 +113,100 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         }
     }
 
-    final static Comparator<? super NodeCharacterProvider> NODE_COMPARATOR = (o1, o2) -> {
-        return o1.getIncomingEdgeFirstCharacter().compareTo(o2.getIncomingEdgeFirstCharacter());
+    final static Comparator<? super Prefixed> NODE_COMPARATOR = (o1, o2) -> {
+        return o1.getIncomingEdgeFirstCharacter() - o2.getIncomingEdgeFirstCharacter();
     };
 
-    static int binarySearchForEdge(AtomicReferenceArray<Node> childNodes, Character edgeFirstCharacter) {
-        AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter(childNodes);
-        NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
-        return Collections.binarySearch(childNodesList, searchKey, NODE_COMPARATOR);
+    private static int cmp(Prefixed o1, byte o2) {
+        return cmp(o1.getIncomingEdgeFirstCharacter(), o2);
     }
+
+    private static int cmp(byte o1, byte o2) {
+        return o1 - o2;
+    }
+
+    static ByteSeq getCommonPrefix(ByteSeq first, ByteSeq second) {
+        int minLength = Math.min(first.length(), second.length());
+
+        for(int i = 0; i < minLength; ++i) {
+            if(first.at(i) != second.at(i)) {
+                return first.subSequence(0, i);
+            }
+        }
+
+        return first.subSequence(0, minLength);
+    }
+
+    static ByteSeq subtractPrefix(ByteSeq main, ByteSeq prefix) {
+        int startIndex = prefix.length();
+        int mainLength = main.length();
+        return (startIndex > mainLength?ByteSeq.EMPTY:main.subSequence(startIndex, mainLength));
+    }
+
+    static int binarySearchForEdge(AtomicReferenceArray<? extends Prefixed> childNodes, byte edgeFirstCharacter) {
+        //AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter<>(childNodes);
+        //NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
+        return binarySearch(childNodes, edgeFirstCharacter);
+    }
+
+    static int binarySearch(AtomicReferenceArray<? extends Prefixed> l, byte key) {
+        int low = 0;
+
+        int high = l.length()-1;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            int cmp = cmp(l.get(mid), key);
+
+            if (cmp < 0) low = mid + 1;
+            else if (cmp > 0) high = mid - 1;
+            else return mid; // key found
+        }
+        return -(low + 1);  // key not found
+    }
+
+//    static <T> int binarySearch(AtomicReferenceArray<? extends T> l, T key, Comparator<? super T> c) {
+//        int low = 0;
+//
+//        int high = l.length()-1;
+//
+//        while (low <= high) {
+//            int mid = (low + high) >>> 1;
+//            int cmp = c.compare(l.get(mid), key);
+//
+//            if (cmp < 0) low = mid + 1;
+//            else if (cmp > 0) high = mid - 1;
+//            else return mid; // key found
+//        }
+//        return -(low + 1);  // key not found
+//    }
 
     static final class ByteArrayNodeDefault implements Node {
         private final byte[] incomingEdgeCharArray;
         private final AtomicReferenceArray<Node> outgoingEdges;
         private final Object value;
 
-        public ByteArrayNodeDefault(CharSequence edgeCharSequence, Object value, List<Node> outgoingEdges) {
+        public ByteArrayNodeDefault(ByteSeq edgeCharSequence, Object value, List<Node> outgoingEdges) {
             Node[] childNodeArray = (Node[]) outgoingEdges.toArray(new Node[outgoingEdges.size()]);
-            Arrays.sort(childNodeArray, new NodeCharacterComparator());
+            Arrays.sort(childNodeArray, NODE_COMPARATOR);
             this.outgoingEdges = new AtomicReferenceArray(childNodeArray);
-            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+            this.incomingEdgeCharArray = edgeCharSequence.array(); //does this need to clone?
             this.value = value;
         }
 
-        public CharSequence getIncomingEdge() {
-            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        public ByteSeq getIncomingEdge() {
+            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
         }
 
-        public Character getIncomingEdgeFirstCharacter() {
-            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        public byte getIncomingEdgeFirstCharacter() {
+            return this.incomingEdgeCharArray[0];
         }
 
         public Object getValue() {
             return this.value;
         }
 
-        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+        public Node getOutgoingEdge(byte edgeFirstCharacter) {
             int index = binarySearchForEdge(this.outgoingEdges, edgeFirstCharacter);
             return index < 0 ? null : (Node) this.outgoingEdges.get(index);
         }
@@ -149,23 +238,24 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     static final class ByteArrayNodeLeafVoidValue implements Node {
         private final byte[] incomingEdgeCharArray;
 
-        public ByteArrayNodeLeafVoidValue(CharSequence edgeCharSequence) {
-            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+        public ByteArrayNodeLeafVoidValue(ByteSeq edgeCharSequence) {
+            this.incomingEdgeCharArray = edgeCharSequence.array();
         }
 
-        public CharSequence getIncomingEdge() {
-            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        public ByteSeq getIncomingEdge() {
+            byte[] ii = this.incomingEdgeCharArray;
+            return new ByteSeq.RawByteSeq(ii);
         }
 
-        public Character getIncomingEdgeFirstCharacter() {
-            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        public byte getIncomingEdgeFirstCharacter() {
+            return this.incomingEdgeCharArray[0];
         }
 
         public Object getValue() {
             return VoidValue.SINGLETON;
         }
 
-        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+        public Node getOutgoingEdge(byte edgeFirstCharacter) {
             return null;
         }
 
@@ -193,26 +283,26 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         private final byte[] incomingEdgeCharArray;
         private final AtomicReferenceArray<Node> outgoingEdges;
 
-        public ByteArrayNodeNonLeafNullValue(CharSequence edgeCharSequence, List<Node> outgoingEdges) {
+        public ByteArrayNodeNonLeafNullValue(ByteSeq edgeCharSequence, List<Node> outgoingEdges) {
             Node[] childNodeArray = (Node[]) outgoingEdges.toArray(new Node[outgoingEdges.size()]);
-            Arrays.sort(childNodeArray, new NodeCharacterComparator());
+            Arrays.sort(childNodeArray, NODE_COMPARATOR);
             this.outgoingEdges = new AtomicReferenceArray(childNodeArray);
-            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+            this.incomingEdgeCharArray = edgeCharSequence.array();
         }
 
-        public CharSequence getIncomingEdge() {
-            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        public ByteSeq getIncomingEdge() {
+            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
         }
 
-        public Character getIncomingEdgeFirstCharacter() {
-            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        public byte getIncomingEdgeFirstCharacter() {
+            return this.incomingEdgeCharArray[0];
         }
 
         public Object getValue() {
             return null;
         }
 
-        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+        public Node getOutgoingEdge(byte edgeFirstCharacter) {
             int index = binarySearchForEdge(this.outgoingEdges, edgeFirstCharacter);
             return index < 0 ? null : (Node) this.outgoingEdges.get(index);
         }
@@ -245,24 +335,24 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         private final byte[] incomingEdgeCharArray;
         private final Object value;
 
-        public ByteArrayNodeLeafWithValue(CharSequence edgeCharSequence, Object value) {
-            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+        public ByteArrayNodeLeafWithValue(ByteSeq edgeCharSequence, Object value) {
+            this.incomingEdgeCharArray = edgeCharSequence.array();
             this.value = value;
         }
 
-        public CharSequence getIncomingEdge() {
-            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        public ByteSeq getIncomingEdge() {
+            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
         }
 
-        public Character getIncomingEdgeFirstCharacter() {
-            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        public byte getIncomingEdgeFirstCharacter() {
+            return incomingEdgeCharArray[0];
         }
 
         public Object getValue() {
             return this.value;
         }
 
-        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+        public Node getOutgoingEdge(byte edgeFirstCharacter) {
             return null;
         }
 
@@ -288,23 +378,23 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     static final class ByteArrayNodeLeafNullValue implements Node {
         private final byte[] incomingEdgeCharArray;
 
-        public ByteArrayNodeLeafNullValue(CharSequence edgeCharSequence) {
-            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+        public ByteArrayNodeLeafNullValue(ByteSeq edgeCharSequence) {
+            this.incomingEdgeCharArray = edgeCharSequence.array();
         }
 
-        public CharSequence getIncomingEdge() {
-            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        public ByteSeq getIncomingEdge() {
+            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
         }
 
-        public Character getIncomingEdgeFirstCharacter() {
-            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        public byte getIncomingEdgeFirstCharacter() {
+            return incomingEdgeCharArray[0];
         }
 
         public Object getValue() {
             return null;
         }
 
-        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+        public Node getOutgoingEdge(byte edgeFirstCharacter) {
             return null;
         }
 
@@ -331,26 +421,26 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         private final byte[] incomingEdgeCharArray;
         private final AtomicReferenceArray<Node> outgoingEdges;
 
-        public ByteArrayNodeNonLeafVoidValue(CharSequence edgeCharSequence, List<Node> outgoingEdges) {
+        public ByteArrayNodeNonLeafVoidValue(ByteSeq edgeCharSequence, List<Node> outgoingEdges) {
             Node[] childNodeArray = (Node[]) outgoingEdges.toArray(new Node[outgoingEdges.size()]);
             Arrays.sort(childNodeArray, NODE_COMPARATOR);
             this.outgoingEdges = new AtomicReferenceArray(childNodeArray);
-            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+            this.incomingEdgeCharArray = edgeCharSequence.array();
         }
 
-        public CharSequence getIncomingEdge() {
-            return new ByteArrayCharSequence(this.incomingEdgeCharArray, 0, this.incomingEdgeCharArray.length);
+        public ByteSeq getIncomingEdge() {
+            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
         }
 
-        public Character getIncomingEdgeFirstCharacter() {
-            return Character.valueOf((char) (this.incomingEdgeCharArray[0] & 255));
+        public byte getIncomingEdgeFirstCharacter() {
+            return incomingEdgeCharArray[0];
         }
 
         public Object getValue() {
             return VoidValue.SINGLETON;
         }
 
-        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+        public Node getOutgoingEdge(byte edgeFirstCharacter) {
             int index = binarySearchForEdge(this.outgoingEdges, edgeFirstCharacter);
             return index < 0 ? null : (Node) this.outgoingEdges.get(index);
         }
@@ -425,7 +515,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     public void clear() {
         acquireWriteLock();
         try {
-            this.root = createNode("", null, Collections.emptyList(), true);
+            this.root = createNode(ByteSeq.EMPTY, null, Collections.emptyList(), true);
         } finally {
             releaseWriteLock();
         }
@@ -459,7 +549,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     }
 
 
-    public final X put(Pair<CharSequence, X> value) {
+    public final X put(Pair<ByteSeq, X> value) {
         return put(value.getOne(), value.getTwo());
     }
 
@@ -471,7 +561,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     /**
      * {@inheritDoc}
      */
-    public final X put(CharSequence key, X value) {
+    public final X put(ByteSeq key, X value) {
 //        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
 //        O existingValue = (O) putInternal(key, value, true);  // putInternal acquires write lock
 //        return existingValue;
@@ -484,14 +574,14 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     /**
      * {@inheritDoc}
      */
-    public final X putIfAbsent(CharSequence key, X newValue) {
+    public final X putIfAbsent(ByteSeq key, X newValue) {
         return compute(key, newValue, (k, r, existing, v) ->
                 existing != null ? existing : v
         );
     }
 
     @NotNull
-    public final X putIfAbsent(@NotNull CharSequence key, @NotNull Supplier<X> newValue) {
+    public final X putIfAbsent(@NotNull ByteSeq key, @NotNull Supplier<X> newValue) {
         return compute(key, newValue, (k, r, existing, v) ->
                 existing != null ? existing : v.get()
         );
@@ -500,7 +590,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     /**
      * {@inheritDoc}
      */
-    public X getValueForExactKey(CharSequence key) {
+    public X getValueForExactKey(ByteSeq key) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(key);
@@ -518,7 +608,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     /**
      * {@inheritDoc}
      */
-    public Iterable<CharSequence> getKeysStartingWith(CharSequence prefix) {
+    public Iterable<ByteSeq> getKeysStartingWith(ByteSeq prefix) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(prefix);
@@ -530,8 +620,8 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(nodeFound.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
-                    prefix = CharSequences.concatenate(prefix, edgeSuffix);
+                    ByteSeq edgeSuffix = getSuffix(nodeFound.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    prefix = concatenate(prefix, edgeSuffix);
                     return getDescendantKeys(prefix, nodeFound);
                 default:
                     // Incomplete match means key is not a prefix of any node...
@@ -542,10 +632,11 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         }
     }
 
+
     /**
      * {@inheritDoc}
      */
-    public Iterable<X> getValuesForKeysStartingWith(CharSequence prefix) {
+    public Iterable<X> getValuesForKeysStartingWith(ByteSeq prefix) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(prefix);
@@ -558,9 +649,9 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
                     return getDescendantValues(
-                            CharSequences.concatenate(
+                            concatenate(
                                     prefix,
-                                    CharSequences.getSuffix(
+                                    getSuffix(
                                             Found.getIncomingEdge(),
                                             searchResult.charsMatchedInNodeFound)),
                             Found);
@@ -576,7 +667,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     /**
      * {@inheritDoc}
      */
-    public Iterable<KeyValuePair<X>> getKeyValuePairsForKeysStartingWith(CharSequence prefix) {
+    public Iterable<Pair<ByteSeq, X>> getKeyValuePairsForKeysStartingWith(ByteSeq prefix) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(prefix);
@@ -589,8 +680,8 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(f.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
-                    prefix = CharSequences.concatenate(prefix, edgeSuffix);
+                    ByteSeq edgeSuffix = getSuffix(f.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    prefix = concatenate(prefix, edgeSuffix);
                     return getDescendantKeyValuePairs(prefix, f);
                 default:
                     // Incomplete match means key is not a prefix of any node...
@@ -604,7 +695,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     /**
      * {@inheritDoc}
      */
-    public boolean remove(@NotNull CharSequence key) {
+    public boolean remove(@NotNull ByteSeq key) {
         acquireWriteLock();
         try {
             SearchResult searchResult = searchTree(key);
@@ -645,7 +736,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     return false;
                 }
 
-                List<X> reinsertions = $.newArrayList(0);
+                List<X> reinsertions = new FasterList(0);
 
                 if (v != null && v != VoidValue.SINGLETON) {
                     X xv = (X) v;
@@ -680,7 +771,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                             // Create a new node which is the concatenation of the edges from this node and its child,
                             // and which has the outgoing edges of the child and the value from the child.
                             Node child = childEdges.get(0);
-                            CharSequence concatenatedEdges = CharSequences.concatenate(found.getIncomingEdge(), child.getIncomingEdge());
+                            ByteSeq concatenatedEdges = concatenate(found.getIncomingEdge(), child.getIncomingEdge());
                             Node mergedNode = createNode(concatenatedEdges, child.getValue(), child.getOutgoingEdges(), false);
                             // Re-add the merged node to the parent...
                             parent.updateOutgoingEdge(mergedNode);
@@ -717,7 +808,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     // Create a list of the outgoing edges of the parent which will remain
                     // if we remove this child...
                     // Use a non-resizable list, as a sanity check to force ArrayIndexOutOfBounds...
-                    List<Node> newEdgesOfParent = $.newArrayList(parent.getOutgoingEdges().size());
+                    List<Node> newEdgesOfParent = new FasterList(parent.getOutgoingEdges().size());
                     for (int i = 0, numParentEdges = currentEdgesFromParent.size(); i < numParentEdges; i++) {
                         Node node = currentEdgesFromParent.get(i);
                         if (node != found) {
@@ -732,7 +823,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         // Parent is a non-root split node with only one remaining child, which can now be merged.
                         Node parentsRemainingChild = newEdgesOfParent.get(0);
                         // Merge the parent with its only remaining child...
-                        CharSequence concatenatedEdges = CharSequences.concatenate(parent.getIncomingEdge(), parentsRemainingChild.getIncomingEdge());
+                        ByteSeq concatenatedEdges = concatenate(parent.getIncomingEdge(), parentsRemainingChild.getIncomingEdge());
                         newParent = createNode(concatenatedEdges, parentsRemainingChild.getValue(), parentsRemainingChild.getOutgoingEdges(), parentIsRoot);
                     } else {
                         // Parent is a node which either has a value of its own, has more than one remaining
@@ -769,7 +860,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     /**
      * {@inheritDoc}
      */
-    public Iterable<CharSequence> getClosestKeys(CharSequence candidate) {
+    public Iterable<ByteSeq> getClosestKeys(ByteSeq candidate) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(candidate);
@@ -781,14 +872,14 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
-                    candidate = CharSequences.concatenate(candidate, edgeSuffix);
+                    ByteSeq edgeSuffix = getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    candidate = concatenate(candidate, edgeSuffix);
                     return getDescendantKeys(candidate, searchResult.found);
                 case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE: {
                     // Example: if we searched for CX, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
-                    CharSequence keyOfParentNode = CharSequences.getPrefix(candidate, searchResult.charsMatched - searchResult.charsMatchedInNodeFound);
-                    CharSequence keyOfNodeFound = CharSequences.concatenate(keyOfParentNode, searchResult.found.getIncomingEdge());
+                    ByteSeq keyOfParentNode = getPrefix(candidate, searchResult.charsMatched - searchResult.charsMatchedInNodeFound);
+                    ByteSeq keyOfNodeFound = concatenate(keyOfParentNode, searchResult.found.getIncomingEdge());
                     return getDescendantKeys(keyOfNodeFound, searchResult.found);
                 }
                 case INCOMPLETE_MATCH_TO_END_OF_EDGE:
@@ -798,7 +889,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     }
                     // Example: if we searched for COFFEE, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
-                    CharSequence keyOfNodeFound = CharSequences.getPrefix(candidate, searchResult.charsMatched);
+                    ByteSeq keyOfNodeFound = getPrefix(candidate, searchResult.charsMatched);
                     return getDescendantKeys(keyOfNodeFound, searchResult.found);
             }
             return Collections.emptySet();
@@ -810,7 +901,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     /**
      * {@inheritDoc}
      */
-    public Iterable<X> getValuesForClosestKeys(CharSequence candidate) {
+    public Iterable<X> getValuesForClosestKeys(ByteSeq candidate) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(candidate);
@@ -822,14 +913,14 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
-                    candidate = CharSequences.concatenate(candidate, edgeSuffix);
+                    ByteSeq edgeSuffix = getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    candidate = concatenate(candidate, edgeSuffix);
                     return getDescendantValues(candidate, searchResult.found);
                 case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE: {
                     // Example: if we searched for CX, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
-                    CharSequence keyOfParentNode = CharSequences.getPrefix(candidate, searchResult.charsMatched - searchResult.charsMatchedInNodeFound);
-                    CharSequence keyOfNodeFound = CharSequences.concatenate(keyOfParentNode, searchResult.found.getIncomingEdge());
+                    ByteSeq keyOfParentNode = getPrefix(candidate, searchResult.charsMatched - searchResult.charsMatchedInNodeFound);
+                    ByteSeq keyOfNodeFound = concatenate(keyOfParentNode, searchResult.found.getIncomingEdge());
                     return getDescendantValues(keyOfNodeFound, searchResult.found);
                 }
                 case INCOMPLETE_MATCH_TO_END_OF_EDGE:
@@ -839,7 +930,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     }
                     // Example: if we searched for COFFEE, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
-                    CharSequence keyOfNodeFound = CharSequences.getPrefix(candidate, searchResult.charsMatched);
+                    ByteSeq keyOfNodeFound = getPrefix(candidate, searchResult.charsMatched);
                     return getDescendantValues(keyOfNodeFound, searchResult.found);
             }
             return Collections.emptySet();
@@ -848,10 +939,28 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         }
     }
 
+    static ByteSeq getPrefix(ByteSeq input, int endIndex) {
+        return endIndex > input.length()?input:input.subSequence(0, endIndex);
+    }
+    public static ByteSeq getSuffix(ByteSeq input, int startIndex) {
+        return (startIndex >= input.length()?ByteSeq.EMPTY:input.subSequence(startIndex, input.length()));
+    }
+
+
+    static ByteSeq concatenate(ByteSeq a, ByteSeq b) {
+        int aLen = a.length();
+        int bLen = b.length();
+        byte[] c = new byte[aLen+bLen];
+        a.toArray(c, 0);
+        b.toArray(c, aLen);
+        return new ByteSeq.RawByteSeq(c);
+    }
+
+
     /**
      * {@inheritDoc}
      */
-    public Iterable<KeyValuePair<X>> getKeyValuePairsForClosestKeys(CharSequence candidate) {
+    public Iterable<Pair<ByteSeq, Object>> getKeyValuePairsForClosestKeys(ByteSeq candidate) {
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(candidate);
@@ -863,14 +972,14 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
-                    candidate = CharSequences.concatenate(candidate, edgeSuffix);
+                    ByteSeq edgeSuffix = getSuffix(searchResult.found.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    candidate = concatenate(candidate, edgeSuffix);
                     return getDescendantKeyValuePairs(candidate, searchResult.found);
                 case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE: {
                     // Example: if we searched for CX, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
-                    CharSequence keyOfParentNode = CharSequences.getPrefix(candidate, searchResult.charsMatched - searchResult.charsMatchedInNodeFound);
-                    CharSequence keyOfNodeFound = CharSequences.concatenate(keyOfParentNode, searchResult.found.getIncomingEdge());
+                    ByteSeq keyOfParentNode = getPrefix(candidate, searchResult.charsMatched - searchResult.charsMatchedInNodeFound);
+                    ByteSeq keyOfNodeFound = concatenate(keyOfParentNode, searchResult.found.getIncomingEdge());
                     return getDescendantKeyValuePairs(keyOfNodeFound, searchResult.found);
                 }
                 case INCOMPLETE_MATCH_TO_END_OF_EDGE:
@@ -880,7 +989,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                     }
                     // Example: if we searched for COFFEE, but deepest matching node was CO,
                     // the results should include node CO and its descendants...
-                    CharSequence keyOfNodeFound = CharSequences.getPrefix(candidate, searchResult.charsMatched);
+                    ByteSeq keyOfNodeFound = getPrefix(candidate, searchResult.charsMatched);
                     return getDescendantKeyValuePairs(keyOfNodeFound, searchResult.found);
             }
             return Collections.emptySet();
@@ -972,7 +1081,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             forEach(child, action);
     }
 
-    public final void forEach(Node start, BiConsumer<CharSequence, ? super X> action) {
+    public final void forEach(Node start, BiConsumer<ByteSeq, ? super X> action) {
         Object v = start.getValue();
         if (aValue(v))
             action.accept(start.getIncomingEdge(), (X) v);
@@ -1051,7 +1160,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * @param overwrite If true, should replace any existing value, if false should not replace any existing value
      * @return The existing value for this key, if there was one, otherwise null
      */
-    <V> X compute(@NotNull CharSequence key, V value, QuadFunction<CharSequence, SearchResult, X, V, X> computeFunc) {
+    <V> X compute(@NotNull ByteSeq key, V value, QuadFunction<ByteSeq, SearchResult, X, V, X> computeFunc) {
 //        if (key.length() == 0) {
 //            throw new IllegalArgumentException("The key argument was zero-length");
 //        }
@@ -1125,9 +1234,9 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         // Search ran out of characters from the key while in the middle of an edge in the node.
                         // -> Split the node in two: Create a new parent node storing the new value,
                         // and a new child node holding the original value and edges from the existing node...
-                        CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
-                        CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
-                        CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
+                        ByteSeq keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
+                        ByteSeq commonPrefix = getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
+                        ByteSeq suffixFromExistingEdge = subtractPrefix(found.getIncomingEdge(), commonPrefix);
 
 
                         // Create new nodes...
@@ -1149,12 +1258,12 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         // (Root node's own edge is "" empty string, so is considered a prefixing edge of every key)
 
                         // Create a new child node containing the trailing characters...
-                        CharSequence keySuffix = key.subSequence(matched, key.length());
+                        ByteSeq keySuffix = key.subSequence(matched, key.length());
 
                         Node newChild = createNode(keySuffix, newValue, Collections.emptyList(), false);
 
                         // Clone the current node adding the new child...
-                        List<Node> edges = $.newArrayList(oedges.size() + 1);
+                        List<Node> edges = new FasterList(oedges.size() + 1);
                         edges.addAll(oedges);
                         edges.add(newChild);
                         cloneAndReattach(result, found, foundValue, edges);
@@ -1174,14 +1283,14 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         // the key and the edge, and add N1 and N2 as child nodes of N3
                         // (4) Re-add N3 to the parent node of NF, effectively replacing NF in the tree
 
-                        CharSequence suffixFromKey = key.subSequence(matched, key.length());
+                        ByteSeq suffixFromKey = key.subSequence(matched, key.length());
 
                         // Create new nodes...
                         Node n1 = createNode(suffixFromKey, newValue, Collections.emptyList(), false);
 
-                        CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
-                        CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
-                        CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
+                        ByteSeq keyCharsFromStartOfNodeFound = key.subSequence(matched - result.charsMatchedInNodeFound, key.length());
+                        ByteSeq commonPrefix = getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
+                        ByteSeq suffixFromExistingEdge = subtractPrefix(found.getIncomingEdge(), commonPrefix);
 
                         Node n2 = createNode(suffixFromExistingEdge, foundValue, oedges, false);
                         @SuppressWarnings({"NullableProblems"})
@@ -1205,7 +1314,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     }
 
     private void cloneAndReattach(SearchResult searchResult, Node found, Object foundValue, List<Node> edges) {
-        CharSequence ie = found.getIncomingEdge();
+        ByteSeq ie = found.getIncomingEdge();
         boolean root = ie.length() == 0;
 
         Node clonedNode = createNode(ie, foundValue, edges, root);
@@ -1228,7 +1337,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * because equals() and hashCode() are not specified by the CharSequence API contract.
      */
     @SuppressWarnings({"JavaDoc"})
-    Iterable<CharSequence> getDescendantKeys(final CharSequence startKey, final Node startNode) {
+    Iterable<ByteSeq> getDescendantKeys(final ByteSeq startKey, final Node startNode) {
         return new DescendantKeys(startKey, startNode);
     }
 
@@ -1237,7 +1346,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * the given key is a prefix.
      */
     @SuppressWarnings({"JavaDoc"})
-    <O> Iterable<O> getDescendantValues(final CharSequence startKey, final Node startNode) {
+    <O> Iterable<O> getDescendantValues(final ByteSeq startKey, final Node startNode) {
         return new Iterable<O>() {
             @Override
             public Iterator<O> iterator() {
@@ -1279,15 +1388,15 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * because equals() and hashCode() are not specified by the CharSequence API contract.
      */
     @SuppressWarnings({"JavaDoc"})
-    <O> Iterable<KeyValuePair<O>> getDescendantKeyValuePairs(final CharSequence startKey, final Node startNode) {
-        return new Iterable<KeyValuePair<O>>() {
+    <O> Iterable<Pair<ByteSeq,O>> getDescendantKeyValuePairs(final ByteSeq startKey, final Node startNode) {
+        return new Iterable<Pair<ByteSeq,O>>() {
             @Override
-            public Iterator<KeyValuePair<O>> iterator() {
-                return new LazyIterator<KeyValuePair<O>>() {
+            public Iterator<Pair<ByteSeq,O>> iterator() {
+                return new LazyIterator<Pair<ByteSeq,O>>() {
                     Iterator<NodeKeyPair> descendantNodes = lazyTraverseDescendants(startKey, startNode).iterator();
 
                     @Override
-                    protected KeyValuePair<O> computeNext() {
+                    protected Pair<ByteSeq,O> computeNext() {
                         // Traverse to the next matching node in the tree and return its key and value...
                         while (descendantNodes.hasNext()) {
                             NodeKeyPair nodeKeyPair = descendantNodes.next();
@@ -1297,12 +1406,8 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
                                 // Call the transformKeyForResult method to allow key to be transformed before returning to client.
                                 // Used by subclasses such as ReversedRadixTree implementations...
-                                CharSequence optionallyTransformedKey = transformKeyForResult(nodeKeyPair.key);
 
-                                // -> Convert the CharSequence to a String before returning, to avoid set equality issues,
-                                // because equals() and hashCode() is not specified by the CharSequence API contract...
-                                String keyString = CharSequences.toString(optionallyTransformedKey);
-                                return new KeyValuePairImpl<O>(keyString, value);
+                                return pair(transformKeyForResult(nodeKeyPair.key), (O)value);
                             }
                         }
                         // Finished traversing the tree, no more matching nodes to return...
@@ -1313,80 +1418,6 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         };
     }
 
-    /**
-     * Implementation of the {@link KeyValuePair} interface.
-     */
-    public final static class KeyValuePairImpl<O> implements KeyValuePair<O> {
-
-        final String key;
-        final O value;
-        final int hash;
-
-        /**
-         * Constructor.
-         * <p>
-         * Implementation node: This constructor currently requires the key to be supplied as a {@link String}
-         * - this is to allow reliable testing of object equality; the alternative {@link CharSequence}
-         * does not specify a contract for {@link Object#equals(Object)}.
-         *
-         * @param key   The key as a string
-         * @param value The value
-         */
-        public KeyValuePairImpl(String key, Object value) {
-            this.key = key;
-            // We have to cast to generic type here, because Node objects are not generically typed.
-            // Background: Node objects are not generically typed, because arrays can't be generically typed,
-            // and we use arrays in nodes. We choose to cast here (in wrapper logic around the tree) rather than
-            // pollute the already-complex tree manipulation logic with casts.
-            @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-            O valueTyped = (O) value;
-            this.value = valueTyped;
-            this.hash = key.hashCode();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public CharSequence getKey() {
-            return key;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public O getValue() {
-            return value;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final boolean equals(Object o) {
-            //if (this == o) return true;
-            return (this == o) ||
-                    //(o instanceof KeyValuePairImpl) &&
-                    key.equals(((KeyValuePairImpl) o).key);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final int hashCode() {
-            return hash;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "(" + key + ", " + value + ")";
-        }
-    }
 
     /**
      * Traverses the tree using depth-first, preordered traversal, starting at the given node, using lazy evaluation
@@ -1403,7 +1434,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * @return An iterator which when iterated traverses the tree using depth-first, preordered traversal,
      * starting at the given start node
      */
-    protected Iterable<NodeKeyPair> lazyTraverseDescendants(final CharSequence startKey, final Node startNode) {
+    protected Iterable<NodeKeyPair> lazyTraverseDescendants(final ByteSeq startKey, final Node startNode) {
         return new Iterable<NodeKeyPair>() {
             @Override
             public Iterator<NodeKeyPair> iterator() {
@@ -1433,7 +1464,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         for (int i = childNodes.size() - 1; i >= 0; i--) {
                             Node child = childNodes.get(i);
                             stack.push(new NodeKeyPair(child,
-                                    CharSequences.concatenate(current.key, child.getIncomingEdge())
+                                    concatenate(current.key, child.getIncomingEdge())
                             ));
                         }
                         return current;
@@ -1449,9 +1480,9 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      */
     protected static final class NodeKeyPair {
         public final Node node;
-        public final CharSequence key;
+        public final ByteSeq key;
 
-        public NodeKeyPair(Node node, CharSequence key) {
+        public NodeKeyPair(Node node, ByteSeq key) {
             this.node = node;
             this.key = key;
         }
@@ -1471,7 +1502,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * @param rawKey The raw key as stored in the tree
      * @return A transformed version of the key
      */
-    protected CharSequence transformKeyForResult(CharSequence rawKey) {
+    protected ByteSeq transformKeyForResult(ByteSeq rawKey) {
         return rawKey;
     }
 
@@ -1533,7 +1564,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * parent node, the number of characters of the key which were matched in total and within the edge of the
      * matched node, and a {@link SearchResult#classification} of the match as described above
      */
-    SearchResult searchTree(CharSequence key) {
+    SearchResult searchTree(ByteSeq key) {
         Node parentNodesParent = null;
         Node parentNode = null;
         Node currentNode = root;
@@ -1542,7 +1573,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         final int keyLength = key.length();
         outer_loop:
         while (charsMatched < keyLength) {
-            Node nextNode = currentNode.getOutgoingEdge(key.charAt(charsMatched));
+            Node nextNode = currentNode.getOutgoingEdge(key.at(charsMatched));
             if (nextNode == null) {
                 // Next node is a dead end...
                 //noinspection UnnecessaryLabelOnBreakStatement
@@ -1553,9 +1584,9 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             parentNode = currentNode;
             currentNode = nextNode;
             charsMatchedInNodeFound = 0;
-            CharSequence currentNodeEdgeCharacters = currentNode.getIncomingEdge();
+            ByteSeq currentNodeEdgeCharacters = currentNode.getIncomingEdge();
             for (int i = 0, numEdgeChars = currentNodeEdgeCharacters.length(); i < numEdgeChars && charsMatched < keyLength; i++) {
-                if (currentNodeEdgeCharacters.charAt(i) != key.charAt(charsMatched)) {
+                if (currentNodeEdgeCharacters.at(i) != key.at(charsMatched)) {
                     // Found a difference in chars between character in key and a character in current node.
                     // Current node is the deepest match (inexact match)....
                     break outer_loop;
@@ -1576,7 +1607,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * and removing nodes from the tree, can select appropriate strategies based on the classification.
      */
     public static class SearchResult {
-        public final CharSequence key;
+        public final ByteSeq key;
         public final Node found;
         public final int charsMatched;
         public final int charsMatchedInNodeFound;
@@ -1596,11 +1627,11 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             this(null, found, -1, -1, parentNode, parentParentNode, found != null ? Classification.EXACT_MATCH : Classification.INVALID);
         }
 
-        SearchResult(CharSequence key, Node found, int charsMatched, int charsMatchedInNodeFound, Node parentNode, Node parentNodesParent) {
+        SearchResult(ByteSeq key, Node found, int charsMatched, int charsMatchedInNodeFound, Node parentNode, Node parentNodesParent) {
             this(key, found, charsMatched, charsMatchedInNodeFound, parentNode, parentNodesParent, classify(key, found, charsMatched, charsMatchedInNodeFound));
         }
 
-        SearchResult(CharSequence key, Node found, int charsMatched, int charsMatchedInNodeFound, Node parentNode, Node parentNodesParent, Classification c) {
+        SearchResult(ByteSeq key, Node found, int charsMatched, int charsMatchedInNodeFound, Node parentNode, Node parentNodesParent, Classification c) {
             this.key = key;
             this.found = found;
             this.charsMatched = charsMatched;
@@ -1612,7 +1643,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             this.classification = c;
         }
 
-        protected static SearchResult.Classification classify(CharSequence key, Node nodeFound, int charsMatched, int charsMatchedInNodeFound) {
+        protected static SearchResult.Classification classify(ByteSeq key, Node nodeFound, int charsMatched, int charsMatchedInNodeFound) {
             int len = nodeFound.getIncomingEdge().length();
             int keyLen = key.length();
             if (charsMatched == keyLen) {
@@ -1646,24 +1677,24 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     }
 
 
-    private class DescendantKeys extends LazyIterator<CharSequence> implements Iterable<CharSequence>, Iterator<CharSequence> {
-        private final CharSequence startKey;
+    private class DescendantKeys extends LazyIterator<ByteSeq> implements Iterable<ByteSeq>, Iterator<ByteSeq> {
+        private final ByteSeq startKey;
         private final Node startNode;
         private Iterator<NodeKeyPair> descendantNodes;
 
-        public DescendantKeys(CharSequence startKey, Node startNode) {
+        public DescendantKeys(ByteSeq startKey, Node startNode) {
             this.startKey = startKey;
             this.startNode = startNode;
         }
 
         @Override
-        public Iterator<CharSequence> iterator() {
+        public Iterator<ByteSeq> iterator() {
             descendantNodes = lazyTraverseDescendants(startKey, startNode).iterator();
             return this;
         }
 
         @Override
-        protected CharSequence computeNext() {
+        protected ByteSeq computeNext() {
             // Traverse to the next matching node in the tree and return its key and value...
             Iterator<NodeKeyPair> nodes = this.descendantNodes;
             while (nodes.hasNext()) {
@@ -1674,11 +1705,11 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
                     // Call the transformKeyForResult method to allow key to be transformed before returning to client.
                     // Used by subclasses such as ReversedRadixTree implementations...
-                    CharSequence optionallyTransformedKey = transformKeyForResult(nodeKeyPair.key);
+                    ByteSeq optionallyTransformedKey = transformKeyForResult(nodeKeyPair.key);
 
                     // -> Convert the CharSequence to a String before returning, to avoid set equality issues,
                     // because equals() and hashCode() is not specified by the CharSequence API contract...
-                    return CharSequences.toString(optionallyTransformedKey);
+                    return optionallyTransformedKey;
                 }
             }
             // Finished traversing the tree, no more matching nodes to return...
@@ -1694,11 +1725,11 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 //    }
 
     public Iterator<X> iterator() {
-        return getValuesForKeysStartingWith("").iterator();
+        return getValuesForKeysStartingWith(ByteSeq.EMPTY).iterator();
     }
 
 
-    public String prettyPrint(PrettyPrintable tree) {
+    public String prettyPrint() {
         StringBuilder sb = new StringBuilder();
         prettyPrint(root, sb, "", true, true);
         return sb.toString();

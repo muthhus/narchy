@@ -9,7 +9,7 @@ public   enum StringHack {
     ;
 
     public static final Field sbval;
-    public static final Field val;
+    public static final Field String_value;
 
     //Add reflection for String value access
     static {
@@ -26,17 +26,18 @@ public   enum StringHack {
             ex.printStackTrace();
             System.exit(1);
         }
-        val = sv;
+        String_value = sv;
         sbval = sbv;
     }
 
-    public static char[] chars(String s) {
+    public static byte[] bytes(String s) {
 
         try {
-            return (char[])val.get(s);
+            return (byte[]) String_value.get(s);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return s.toCharArray();
+        //return s.toCharArray();
     }
 }
