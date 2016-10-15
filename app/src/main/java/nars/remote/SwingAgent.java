@@ -84,8 +84,8 @@ abstract public class SwingAgent extends NAgent {
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
-                Math.round(volMax/6), volMax-2,
-                1f, 64);
+                4, 8,
+                0.5f, 64);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;

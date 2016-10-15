@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.log;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
@@ -127,6 +128,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
 
         float duration = 1f * Math.max(1, volume - 2);
+        float durationSq = duration*duration;
 
         FloatToFloatFunction lightCurve = (dt) -> {
 
@@ -138,6 +140,9 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             //return 1f / (1f + (dt / duration));
             //return 1f / (float)Math.log(dt/duration + Math.E);
             return 1f / (dt/duration + 1f);
+            //return 1f / ((dt*dt)/durationSq + 1f);
+            //return (float)Math.sqrt(1f / (dt/durationSq + 1f));
+            //return (1f / (1f + (float)log(dt + 1f)));
         };
 
         float[] v = this.value(

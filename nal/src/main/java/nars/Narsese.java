@@ -872,7 +872,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     Rule sepArgSep() {
-        return sequence(s(), optional(ARGUMENT_SEPARATOR), s());
+        return sequence(s(), /*optional*/(ARGUMENT_SEPARATOR), s());
     }
 
 
@@ -906,7 +906,9 @@ public class Narsese extends BaseParser<Object> {
                                 allowInternalOp ? AnyOperatorOrTerm() : Term()
                         )),
 
-                s(), close,
+                s(),
+
+                close,
 
                 push(popTerm(defaultOp))
         );
@@ -1019,7 +1021,9 @@ public class Narsese extends BaseParser<Object> {
         if (op == null)
             op = PROD;
 
-        return $.compound(op, vectorterms);
+        Term c = $.compound(op, vectorterms);
+        //System.out.println(c);
+        return c;
 
 //        if (vectorterms.isEmpty())
 //            return null;

@@ -147,10 +147,10 @@ import java.util.function.Function;
                         //CurveBag.power6BagCurve,
                         rng);
 
-        this.sleep = new DefaultConceptPolicy("sleep", 7, 8, 2, 8, 4);
+        this.sleep = new DefaultConceptPolicy("sleep", 6, 6, 1, 8, 4);
         this.init = sleep;
 
-        this.awake = new DefaultConceptPolicy("awake", 12, 10, 3, 24, 8);
+        this.awake = new DefaultConceptPolicy("awake", 12, 12, 3, 24, 16);
     }
 
     @Override

@@ -118,12 +118,12 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     };
 
     private static int cmp(Prefixed o1, byte o2) {
-        return cmp(o1.getIncomingEdgeFirstCharacter(), o2);
+        return o1.getIncomingEdgeFirstCharacter() - o2;
     }
 
-    private static int cmp(byte o1, byte o2) {
-        return o1 - o2;
-    }
+//    private static int cmp(byte o1, byte o2) {
+//        return o1 - o2;
+//    }
 
     static ByteSeq getCommonPrefix(ByteSeq first, ByteSeq second) {
         int minLength = Math.min(first.length(), second.length());
@@ -243,8 +243,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         }
 
         public ByteSeq getIncomingEdge() {
-            byte[] ii = this.incomingEdgeCharArray;
-            return new ByteSeq.RawByteSeq(ii);
+            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
         }
 
         public byte getIncomingEdgeFirstCharacter() {

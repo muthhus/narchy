@@ -277,20 +277,20 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events_0() {
         test()
                 
-            .input("open:(John,door). :|:")
-            .inputAt(4, "enter:(John,room). :|:")
-            .mustBelieve(cycles, "( enter:(John, room) ==>-4 open:(John, door) )",
+            .input("open(John,door). :|:")
+            .inputAt(4, "enter(John,room). :|:")
+            .mustBelieve(cycles, "( enter(John, room) ==>-4 open(John, door) )",
                     1.00f, 0.45f, 0);
     }
     @Test
     public void induction_on_events_0_neg() {
         test()
                 
-                .input("(--,open:(John,door)). :|:")
-                .inputAt(4, "enter:(John,room). :|:")
-                .mustBelieve(cycles, "( (--,open:(John, door)) ==>+4 enter:(John, room) )",
+                .input("(--,open(John,door)). :|:")
+                .inputAt(4, "enter(John,room). :|:")
+                .mustBelieve(cycles, "( (--,open(John, door)) ==>+4 enter(John, room) )",
                         1.00f, 0.45f, 0)
-                .mustBelieve(cycles, "( open:(John, door) &&+4 enter:(John, room) )",
+                .mustBelieve(cycles, "( open(John, door) &&+4 enter(John, room) )",
                         0f, 0.81f, 0)
         ;
     }
@@ -311,10 +311,10 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events3() {
         TestNAR tester = test();
 
-        tester.input("open:(John,door). :|:");
-        tester.inputAt(4, "enter:(John,room). :|:");
+        tester.input("open(John,door). :|:");
+        tester.inputAt(4, "enter(John,room). :|:");
 
-        tester.mustBelieve(cycles, "(open:(John, door) <=>+4 enter:(John, room))",
+        tester.mustBelieve(cycles, "(open(John, door) <=>+4 enter(John, room))",
                 1.00f, 0.45f,
                 0);
 
@@ -419,9 +419,9 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events_composition_pre() {
         test()
             
-            .input("hold:(John,key). :|:")
-            .input("(open:(John,door) <-> enter:(John,room)). :|:")
-            .mustBelieve(cycles, "(hold:(John,key) &&+0 (open:(John,door) <-> enter:(John,room)))",
+            .input("hold(John,key). :|:")
+            .input("(open(John,door) <-> enter(John,room)). :|:")
+            .mustBelieve(cycles, "(hold(John,key) &&+0 (open(John,door) <-> enter(John,room)))",
                     1.00f, 0.81f,
                     0);
     }
@@ -447,12 +447,12 @@ public class NAL7Test extends AbstractNALTest {
 //
 //        int t = 1;
 //        int dt = 7;
-//        String component = "(open:(John,door) &&+0 hold:(John,key))";
+//        String component = "(open(John,door) &&+0 hold(John,key))";
 //        tester.inputAt(t, component + ". :|:");
-//        tester.inputAt(t + dt, "enter:(John,room). :|:");
+//        tester.inputAt(t + dt, "enter(John,room). :|:");
 //
 //        tester.mustBelieve((t + dt) + dt + 1 /** approx */,
-//                "(" + component + " ==>+" + dt + " enter:(John,room))",
+//                "(" + component + " ==>+" + dt + " enter(John,room))",
 //                1.00f, 0.45f,
 //                t);
 //
@@ -461,23 +461,23 @@ public class NAL7Test extends AbstractNALTest {
 
     private void compositionTest(int t, int dt) {
         TestNAR tester = test();
-        tester.inputAt(t, "hold:(John,key). :|:");
-        tester.inputAt(t, "(open:(John,door) ==>+" + dt + " enter:(John,room)). :|:");
+        tester.inputAt(t, "hold(John,key). :|:");
+        tester.inputAt(t, "(open(John,door) ==>+" + dt + " enter(John,room)). :|:");
 
         //tester.log();
 
-        String component = "(open:(John,door) &&+0 hold:(John,key))";
+        String component = "(open(John,door) &&+0 hold(John,key))";
 
         //Given:
-        tester.mustBelieve(cycles * 2, "hold:(John,key)",
+        tester.mustBelieve(cycles * 2, "hold(John,key)",
                 1.00f, 0.9f,
                 t);
 
         //Result of 2nd Input's Decomposition
-        tester.mustBelieve(cycles * 2, "open:(John,door)",
+        tester.mustBelieve(cycles * 2, "open(John,door)",
                 1.00f, 0.81f,
                 t);
-        tester.mustBelieve(cycles * 2, "enter:(John,room)",
+        tester.mustBelieve(cycles * 2, "enter(John,room)",
                 1.00f, 0.81f,
                 t + dt);
 
@@ -486,7 +486,7 @@ public class NAL7Test extends AbstractNALTest {
                 t);
 
         //this is probably prevented by stamp overlap:
-//        tester.mustBelieve(cycles*12, "(" + component + " ==>+" + dt + " enter:(John,room))",
+//        tester.mustBelieve(cycles*12, "(" + component + " ==>+" + dt + " enter(John,room))",
 //                1.00f, 0.45f,
 //                t+dt);
     }

@@ -472,7 +472,7 @@
 //If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
 
     (P --> S), (S --> P), neqCom(S,P),                                              task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief)
-    (P ==> S), (S ==> P), neqCom(S,P), time(dtCombine), notImplEqui(P), notEqui(S)  task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief)
+    (P ==> S), (S ==> P), neqCom(S,P), time(dtCombine), notImplEqui(P), notEqui(S), task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief)
 
 //and the backward inference driven forward inference:
 

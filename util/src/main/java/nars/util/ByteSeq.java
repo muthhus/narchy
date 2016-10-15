@@ -1,13 +1,13 @@
 package nars.util;
 
-import org.eclipse.collections.impl.factory.primitive.CharSets;
+import java.util.Arrays;
 
 /**
  * Created by me on 10/14/16.
  */
 public interface ByteSeq {
 
-    static ByteSeq EMPTY = new ByteSeq() {
+    ByteSeq EMPTY = new ByteSeq() {
 
         @Override
         public int length() {
@@ -45,14 +45,58 @@ public interface ByteSeq {
         return b;
     }
 
+    class OneByteSeq implements ByteSeq /*implements CharSequence*/ {
+        public final byte b;
+
+        public OneByteSeq(byte b) {
+            this.b = b;
+        }
 
 
-    public class RawByteSeq implements ByteSeq /*implements CharSequence*/ {
+        @Override
+        public void toArray(byte[] c, int offset) { c[offset] = b; }
+
+        @Override
+        public byte[] array() {
+            return new byte[] { b };
+        }
+
+        @Override
+        public int length() {
+            return 1;
+        }
+
+        @Override
+        public byte at(int index) {
+            if (index!=0)
+                throw new RuntimeException();
+
+            return this.b;
+        }
+
+        @Override
+        public ByteSeq subSequence(int start, int end) {
+            throw new UnsupportedOperationException();
+//            if ((start!=0) || (end!=0))
+//                throw new RuntimeException();
+//            return this;
+        }
+
+
+
+        public String toString() {
+            return String.valueOf((char)b);
+        }
+
+    }
+
+
+    class RawByteSeq implements ByteSeq /*implements CharSequence*/ {
         public final byte[] bytes;
 
-        protected RawByteSeq(int capacity) {
-            this(new byte[capacity]);
-        }
+//        protected RawByteSeq(int capacity) {
+//            this(new byte[capacity]);
+//        }
 
         public RawByteSeq(byte[] bytes) {
             this.bytes = bytes;
@@ -62,35 +106,39 @@ public interface ByteSeq {
             this(s.getBytes());
         }
 
+        @Override
         public void toArray(byte[] c, int offset) {
             System.arraycopy(bytes, 0, c, offset, length());
         }
 
+        @Override
+        public byte[] array() {
+            return bytes;
+        }
+
+        @Override
         public int length() {
             return bytes.length;
         }
 
+        @Override
         public byte at(int index) {
             return this.bytes[index];
         }
 
+        @Override
         public ByteSeq subSequence(int start, int end) {
             return subSeq(start, end);
         }
 
         public ByteSeq subSeq(int start, int end) {
+            if (end-start == 1)
+                return new OneByteSeq(at(start));
+
             if (start == 0 && end == length())
                 return this; //no change
-//
-//            if(start < 0) {
-//                throw new IllegalArgumentException("start " + start + " < 0");
-//            } else if(end > this.length()) {
-//                throw new IllegalArgumentException("end " + end + " > length " + this.length());
-//            } else if(end < start) {
-//                throw new IllegalArgumentException("end " + end + " < start " + start);
-//            }
 
-            return new WindowByteSeq(this.bytes, start, end);
+            return new WindowByteSeq(bytes, start, end);
         }
 
         public String toString() {
@@ -98,11 +146,12 @@ public interface ByteSeq {
         }
 
     }
-    public final class WindowByteSeq extends RawByteSeq /*implements CharSequence*/ {
+
+    final class WindowByteSeq extends RawByteSeq /*implements CharSequence*/ {
         final int start;
         final int end;
 
-        public WindowByteSeq(byte[] bytes, int start, int end) {
+        protected WindowByteSeq(byte[] bytes, int start, int end) {
             super(bytes);
             if(start < 0) {
                 throw new IllegalArgumentException("start " + start + " < 0");
@@ -116,18 +165,27 @@ public interface ByteSeq {
             }
         }
 
+        @Override
         public final void toArray(byte[] c, int offset) {
             System.arraycopy(bytes, start, c, offset, length());
         }
 
+        @Override
+        public byte[] array() {
+            return Arrays.copyOfRange(bytes, start, end);
+        }
+
+        @Override
         public int length() {
             return this.end - this.start;
         }
 
+        @Override
         public byte at(int index) {
             return this.bytes[index + this.start];
         }
 
+        @Override
         public ByteSeq subSequence(int start, int end) {
             if(start < 0) {
                 throw new IllegalArgumentException("start " + start + " < 0");

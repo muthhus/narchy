@@ -8,23 +8,24 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.util.ByteBufferlet;
+import nars.util.DynByteSeq;
+import nars.util.data.rope.StringHack;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Arrays;
 
 import static nars.IO.SPECIAL_OP;
 import static nars.IO.writeUTFWithoutLength;
+import static nars.util.data.rope.StringHack.bytes;
 
 /**
  * TODO lazily compute
  */
-public class TermKey extends ByteBufferlet {
+public class TermKey extends DynByteSeq {
 
     public TermKey(@NotNull Term conceptualizable) {
-        super(conceptualizable.volume() * 8 /* ESTIMATE */);
+        super(conceptualizable.volume() * 8 + 64 /* ESTIMATE */);
         try {
             writeTermSeq(this, conceptualizable, false);
             this.writeByte(0); //null terminator, signifying end-of-term
@@ -34,7 +35,7 @@ public class TermKey extends ByteBufferlet {
     }
 
     public TermKey(@NotNull Task task) {
-        super(task.volume() * 8 + 32 /* ESTIMATE */);
+        super(task.volume() * 4 + 128 /* ESTIMATE */);
         try {
             //Term, Occurrence, Truth, Evidence
 //            writeTermSeq(this, task.term(), true);
@@ -43,18 +44,22 @@ public class TermKey extends ByteBufferlet {
 //            IO.writeEvidence(this, task.evidence());
 
             //writeUTFWithoutLength(this, task.term().toString());
-            IO.writeCompound(this, task.term());
+            writeCompoundSeq(this, task.term(), true);
 
             char punc = task.punc();
             this.writeByte(punc);
 
-            for (long x : task.evidence())
-                writeUTFWithoutLength(this, Long.toString(x, 36));
 
-            writeUTFWithoutLength(this, Long.toString(task.occurrence(), 36));
+            writeLong(task.occurrence());
 
             if ((punc == Symbols.BELIEF) && (punc == Symbols.GOAL)) {
-                writeUTFWithoutLength(this, Integer.toString(task.truth().hashCode(), 36));
+                writeInt(task.truth().hashCode());
+            }
+
+            @NotNull long[] len = task.evidence();
+            writeByte(len.length);
+            for (long x : len) {
+                writeLong(x);
             }
 
             writeByte(0); //null terminator, signifying end-of-term
@@ -84,12 +89,24 @@ public class TermKey extends ByteBufferlet {
                 out.writeByte(SPECIAL_OP);
             }
             //out.writeUTF(term.toString());
-            IO.writeUTFWithoutLength(out, term.toString());
+            //IO.writeUTFWithoutLength(out, term.toString());
+
+            writeStringBytes(out, term);
+
             //out.writeByte(term.op().ordinal()); //put operator last
         } else {
             writeCompoundSeq(out, (Compound) term, includeTemporal);
         }
     }
+
+    public static void writeStringBytes(DataOutput out, Object o) throws IOException {
+        out.write(bytes(o.toString()));
+    }
+
+    public static void writeStringBytes(DataOutput out, String s) throws IOException {
+        out.write(bytes(s));
+    }
+
 
     public static void writeCompoundSeq(@NotNull DataOutput out, @NotNull Compound c, boolean includeTemporal) throws IOException {
 
@@ -97,20 +114,25 @@ public class TermKey extends ByteBufferlet {
 
         @NotNull Op o = c.op();
         out.writeByte(o.ordinal()); //put operator last
-        if (o.image || (includeTemporal && o.temporal))
-            out.writeByte(c.dt());
+        if (o.image) {
+            out.writeByte((byte) c.dt());
+        } else if (includeTemporal && o.temporal) {
+            out.writeInt(c.dt());
+        }
 
     }
 
 
     static void writeTermContainerSeq(@NotNull DataOutput out, @NotNull TermContainer c, boolean includeTemporal) throws IOException {
-        int siz = c.size();
 
+        out.writeByte('(');
+        int siz = c.size();
         for (int i = 0; i < siz; i++) {
             writeTermSeq(out, c.term(i), includeTemporal);
-//            if (i < siz-1)
-//                out.writeByte(',');
+            if (i < siz-1)
+                out.writeByte(',');
         }
+        out.writeByte(')');
 
     }
 

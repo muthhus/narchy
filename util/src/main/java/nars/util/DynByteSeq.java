@@ -9,18 +9,19 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 /**
  * copied from Infinispan SimpleDataOutput
  */
-public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
+public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
     public static final int MIN_GROWTH_BYTES = 128;
     private byte[] bytes;
     public int position;
 
-    public ByteBufferlet(int bufferSize) {
+    public DynByteSeq(int bufferSize) {
         this.bytes = new byte[bufferSize];
     }
 
@@ -37,16 +38,27 @@ public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
 
     @Override
     public ByteSeq subSequence(int start, int end) {
-        return new WindowByteSeq(this.bytes, start, end);
+        if (end-start == 1)
+            return new OneByteSeq(at(start));
+
+        if (start == 0 && end == length())
+            return this; //no change
+
+        return new WindowByteSeq(bytes, start, end);
     }
 
     @Override
     public void write(int v) throws IOException {
-        byte[] e = this.bytes;
-
-        ensureSized(1);
-        e[this.position++] = (byte) v;
+        writeByte(v);
     }
+
+
+    @Override
+    public void writeByte(int v) throws IOException {
+        ensureSized(1);
+        this.bytes[this.position++] = (byte) v;
+    }
+
 
     @Override
     public void write(@NotNull byte[] bytes) throws IOException {
@@ -62,12 +74,14 @@ public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
 
     private final int ensureSized(int extra) {
         int space = this.bytes.length;
-        if (space - position <= extra) {
-            byte[] newBuffer = new byte[space + Math.max(MIN_GROWTH_BYTES, 2 * extra)];
-            System.arraycopy(this.bytes, 0, newBuffer, 0, position);
+        int p = this.position;
+        if (space - p <= extra) {
+            byte[] newBuffer = new byte[space + MIN_GROWTH_BYTES ];
+                    //Math.max(MIN_GROWTH_BYTES, 2 * extra)];
+            System.arraycopy(this.bytes, 0, newBuffer, 0, p);
             this.bytes = newBuffer;
         }
-        return this.position;
+        return p;
     }
 
 
@@ -79,22 +93,15 @@ public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
 
     @Override
     public void writeBoolean(boolean v) throws IOException {
-        byte[] e = this.bytes;
         ensureSized(1);
+        byte[] e = this.bytes;
         e[this.position++] = (byte) (v ? 1 : 0);
     }
 
     @Override
-    public void writeByte(int v) throws IOException {
-        byte[] e = this.bytes;
-        ensureSized(1);
-        e[this.position++] = (byte) v;
-    }
-
-    @Override
     public void writeShort(int v) throws IOException {
-        byte[] e = this.bytes;
         int s = ensureSized(2);
+        byte[] e = this.bytes;
         e[s] = (byte) (v >> 8);
         e[s + 1] = (byte) v;
         this.position += 2;
@@ -103,8 +110,8 @@ public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
     @Override
     public void writeChar(int v) throws IOException {
 
-        byte[] e = this.bytes;
         int s = ensureSized(2);
+        byte[] e = this.bytes;
         e[s] = (byte) (v >> 8);
         e[s + 1] = (byte) v;
         this.position += 2;
@@ -114,8 +121,8 @@ public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
     @Override
     public void writeInt(int v) throws IOException {
 
-        byte[] e = this.bytes;
         int s = ensureSized(4);
+        byte[] e = this.bytes;
         e[s] = (byte) (v >> 24);
         e[s + 1] = (byte) (v >> 16);
         e[s + 2] = (byte) (v >> 8);
@@ -126,8 +133,8 @@ public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
     @Override
     public void writeLong(long v) throws IOException {
 
-        byte[] e = this.bytes;
         int s = ensureSized(8);
+        byte[] e = this.bytes;
         e[s] = (byte) ((int) (v >> 56));
         e[s + 1] = (byte) ((int) (v >> 48));
         e[s + 2] = (byte) ((int) (v >> 40));
@@ -142,8 +149,8 @@ public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
     @Override
     public void writeFloat(float v) throws IOException {
 
-        byte[] e = this.bytes;
         int s = ensureSized(4);
+        byte[] e = this.bytes;
         int bits = Float.floatToIntBits(v);
         e[s] = (byte) (bits >> 24);
         e[s + 1] = (byte) (bits >> 16);
@@ -187,21 +194,23 @@ public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
 
     @Override
     public void writeBytes(String s) throws IOException {
-        int len = s.length();
-
-        for (int i = 0; i < len; ++i) {
-            this.write(s.charAt(i));
-        }
+//        int len = s.length();
+//
+//        for (int i = 0; i < len; ++i) {
+//            this.write(s.charAt(i));
+//        }
+        throw new UnsupportedEncodingException();
 
     }
 
     @Override
     public void writeChars(String s) throws IOException {
-        int len = s.length();
-
-        for (int i = 0; i < len; ++i) {
-            this.writeChar(s.charAt(i));
-        }
+//        int len = s.length();
+//
+//        for (int i = 0; i < len; ++i) {
+//            this.writeChar(s.charAt(i));
+//        }
+        throw new UnsupportedEncodingException();
 
     }
 
@@ -211,6 +220,7 @@ public class ByteBufferlet implements DataOutput, Appendable, ByteSeq {
 
         //WARNING this isnt UTF8
         this.write(strToBytes(s));
+        this.writeByte(0); //null-terminated
 
 
 

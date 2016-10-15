@@ -1,12 +1,8 @@
-package nars.index;
+package nars.index.term.tree;
 
 import com.google.common.collect.Sets;
-import nars.$;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
-import nars.index.term.tree.TermKey;
-import nars.index.term.tree.TermTree;
-import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.Termed;
@@ -25,10 +21,9 @@ import static nars.$.$;
 import static org.junit.Assert.*;
 
 /**
- * Created by me on 2/25/16.
+ * Created by me on 10/14/16.
  */
-public class TreeIndexTest {
-
+public class TermTreeTest {
 
     @Test
     public void testAtomInsertion() {
@@ -69,11 +64,11 @@ public class TreeIndexTest {
         TreeTermIndex index = new TreeTermIndex(nar.concepts.conceptBuilder(), 1000);
 
         String[] terms = {
-            "x",
-            "(x)", "(xx)", "(xxx)",
-            "(x,y)", "(x,z)",
-            "(x --> z)", "(x <-> z)",
-            "(x&&z)","(/,x,_)","(/,_,x)"
+                "x",
+                "(x)", "(xx)", "(xxx)",
+                "(x,y)", "(x,z)",
+                "(x --> z)", "(x <-> z)",
+                "(x&&z)","(/,x,_)","(/,_,x)"
         };
         HashSet<Term> input = new HashSet();
         for (String s : terms) {

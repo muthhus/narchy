@@ -19,6 +19,15 @@ import static org.junit.Assert.*;
 public class NarseseExtendedTest {
 
 
+    @Test public void testRuleComonent0() {
+        assertNotNull($.$("((P ==> S), (S ==> P))"));
+        assertNotNull($.$("((P ==> S), (S ==> P), neqCom(S,P), time(dtCombine))"));
+    }
+
+    @Test public void testRuleComonent1() {
+        String s = "((P ==> S), (S ==> P), neqCom(S,P), time(dtCombine), notImplEqui(P), notEqui(S), task(\"?\"))";
+        assertNotNull($.$(s));
+    }
 
     void eternal(Task t) {
         assertNotNull(t);
@@ -193,14 +202,14 @@ public class NarseseExtendedTest {
 //        }
     }
 
-    @Test public void testOptionalCommas() {
-        Term pABC1 = $.$("(a b c)");
-        Term pABC2 = $.$("(a,b,c)");
-        assertEquals(pABC1, pABC2);
-
-        Term pABC11 = $.$("(a      b c)");
-        assertEquals(pABC1, pABC11);
-    }
+//    @Test public void testOptionalCommas() {
+//        Term pABC1 = $.$("(a b c)");
+//        Term pABC2 = $.$("(a,b,c)");
+//        assertEquals(pABC1, pABC2);
+//
+//        Term pABC11 = $.$("(a      b c)");
+//        assertEquals(pABC1, pABC11);
+//    }
 
 
 

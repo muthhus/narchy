@@ -275,8 +275,8 @@ abstract public class NAgent implements NSense, NAction {
 
             predictors.add(
                     new MutableTask(happy, '!', 1f, rewardGamma)
-                            //.eternal()
-                            .present(nar.time()+dt)
+                            .eternal()
+                            //.present(nar.time()+dt)
             );
 //                    happy.desire($.t(1f, rewardGamma),
 //                            nar.priorityDefault(Symbols.GOAL),
@@ -479,15 +479,12 @@ abstract public class NAgent implements NSense, NAction {
                     .budget(budget)
                     .log("Agent Predictor");
 
-            nar.input(s);
+            nar.inputLater(s);
             return s;
         } else {
 
             t.budget(budget);
-            if (nar.input(t)==null) {
-                //if task is already present, just re-activate it
-                new Activation(t, nar, 1f);
-            }
+            nar.inputLater(t);
             return t;
         }
 

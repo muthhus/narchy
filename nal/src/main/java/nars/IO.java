@@ -215,7 +215,9 @@ public class IO {
         writeTermContainer(out, c.subterms());
 
         //TODO write only a byte for image, int for temporal
-        if (c.op().image || c.op().temporal)
+        if (c.op().image)
+            out.writeByte((byte)c.dt());
+        else if (c.op().temporal)
             out.writeInt(c.dt());
     }
 
@@ -249,7 +251,10 @@ public class IO {
         Term[] v = readTermContainer(in, t);
 
         int dt = DTERNAL;
-        if (o.hasNumeric) //TODO o.hasNumeric
+
+        if (o.image)
+            dt = in.readByte();
+        else if (o.temporal)
             dt = in.readInt();
 
         return (Compound) t.the(o, dt, v);

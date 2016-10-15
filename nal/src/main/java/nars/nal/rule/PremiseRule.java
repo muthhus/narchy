@@ -729,7 +729,10 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = TimeFunctions.occForward;
                             pres.add(events.bothTemporal);
                             break;
-
+                        case "dtAfter":
+                            timeFunction = TimeFunctions.occForward;
+                            pres.add(events.after);
+                            break;
                         case "dtReverse":
                             timeFunction = TimeFunctions.occReverse;
                             break;
@@ -742,10 +745,7 @@ public class PremiseRule extends GenericCompound {
                             pres.add(events.before);
                             break;
 
-                        case "dtAfter":
-                            timeFunction = TimeFunctions.occForward;
-                            pres.add(events.after);
-                            break;
+
                         case "dtAfterReverse":
                             timeFunction = TimeFunctions.occReverse;
                             pres.add(events.after);
