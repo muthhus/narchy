@@ -364,14 +364,7 @@ public class BeliefTableChart extends Surface {
     private void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
 
         gl.glBegin(GL2.GL_LINE_STRIP);
-        gl.glLineWidth(2.0f);
-
-        if(beliefOrGoal) {
-            gl.glColor4f(1f, 0f, 0f, 0.5f);
-        }
-        else {
-            gl.glColor4f(0f, 1f, 0f, 0.5f);
-        }
+        gl.glLineWidth(3.0f);
 
         wave.forEach((freq, conf, o, qua) -> {
 
@@ -389,6 +382,15 @@ public class BeliefTableChart extends Surface {
             }
 
             if(x==x) {
+
+                float a = 0.25f + 0.75f * conf;
+                if(beliefOrGoal) {
+                    gl.glColor4f(0.75f, 0.25f, 0f, a);
+                }
+                else {
+                    gl.glColor4f(0f, 0.75f, 0.25f,  a);
+                }
+
                 //r.renderTask(gl, qua, conf, pw, ph, x, freq);
                 gl.glVertex3f(x, freq, dz);
             }

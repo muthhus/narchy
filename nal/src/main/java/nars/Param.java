@@ -1,11 +1,14 @@
 package nars;
 
 import nars.budget.BudgetFunctions;
+import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.nal.Level;
 import nars.task.MutableTask;
+import nars.task.TruthPolation;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -54,6 +57,22 @@ public abstract class Param /*extends Container*/ implements Level {
     /** 1 should work */
     public static final int ACTIVATION_TERMLINK_DEPTH = 1;
     public static final int ACTIVATION_TASKLINK_DEPTH = 1;
+
+    final static float LIGHT_EPSILON = 0.000001f;
+
+    public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
+
+        if (dt <= LIGHT_EPSILON)
+            return evidence;
+        else {
+            float decayPeriod = evidence * 100f;
+            float decayFactor = Util.clamp(1f - dt / decayPeriod, 0f, 1f);
+            float newEvidence = evidence * decayFactor;
+            //System.out.println(dt + "," + evidence + "\t" + decayPeriod + ","+decayFactor + "\t --> " + newEvidence);
+            return newEvidence;
+        }
+
+    };
 
 
     public static boolean DEBUG_ANSWERS;

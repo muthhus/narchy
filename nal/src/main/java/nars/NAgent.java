@@ -231,6 +231,8 @@ abstract public class NAgent implements NSense, NAction {
     protected void init() {
 
         int dt = 1 + frameRate;
+        int ht = Math.max(1, Math.round(dt/2f)); //half dt cycle, min 1
+
         //this.curiosityAttention = reinforcementAttention / actions.size();
 
 
@@ -312,14 +314,20 @@ abstract public class NAgent implements NSense, NAction {
 
             int lookahead = 1;
             for (int i = 0; i < lookahead; i++) {
-                long then = now + (i+1)*dt;
+                long then = now + i * dt;
                 predictors.addAll(
-                    new MutableTask($.seq(action, dt, happiness), '?', null).time(now, then),
+                    new MutableTask($.seq(action, ht, happiness), '?', null).time(now, then),
+                    new MutableTask($.impl(action, ht, happiness), '?', null).time(now, then)
                     //new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),
-                    new MutableTask(action, '@', null).time(now, then)
+                    //new MutableTask(action, '@', null).time(now, then)
                 );
             }
+
         }
+
+        predictors.add(
+            new MutableTask($.impl($.varQuery("what"), ht, happiness), '?', null).time(now, now)
+        );
 
         System.out.println(Joiner.on('\n').join(predictors));
     }

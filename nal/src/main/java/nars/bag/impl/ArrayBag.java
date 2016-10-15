@@ -56,8 +56,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-    @Override
-    protected void update(BLink<V> toAdd) {
+    /** returns true unless failed to add during 'add' operation */
+    @Override protected boolean update(@Nullable BLink<V> toAdd) {
 
 
         int additional = (toAdd != null) ? 1 : 0;
@@ -71,7 +71,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             if (s + additional > c) {
                 s = clean(toAdd, s, additional);
                 if (s + additional > c)
-                    throw new RuntimeException("overflow");
+                    return false; //throw new RuntimeException("overflow");
             }
 
             if (toAdd != null) {
@@ -106,6 +106,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             }
 
         }
+
+        return true;
 
 //        if (toAdd != null) {
 //            synchronized (items) {
@@ -312,7 +314,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     overflow.add(o);
 
                 float pAfter = v.pri();
-                mass += pAfter - pBefore;
 
                 //technically this should be in a synchronized block but ...
                 if (nars.util.Util.equals(minPri,pBefore,Param.BUDGET_EPSILON)) {
@@ -322,11 +323,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 break;
             case +1:
-                bp *= scale;
-                v.setBudget(bp, b.dur(), b.qua());
-                mass += bp;
-                update(v);
-                onActive(key);
+                v.setBudget(bp * scale, b.dur(), b.qua());
+                if (update(v)) {
+                    //success
+                    onActive(key);
+                } else {
+                    //failure, undo: remove the key from the map
+                    map.remove(key);
+                    onRemoved(key, null);
+                }
                 break;
             case -1:
                 //reject due to insufficient budget

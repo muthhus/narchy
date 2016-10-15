@@ -62,10 +62,11 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
             }
 
             @Override
-            public void input(Task prev, Task next) {
+            public void input(Task prevStart, @Nullable Task prevEnd, Task next) {
 
                 SensorConcept.this.input(next);
-
+                if (prevEnd!=null)
+                    SensorConcept.this.input(prevEnd);
             }
         };
 
@@ -82,7 +83,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 //        if (autoupdate())
 //            nar.inputLater(t);
 //        else
-            nar.input(t);
+        nar.input(t);
     }
 
 

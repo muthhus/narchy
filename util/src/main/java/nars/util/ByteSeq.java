@@ -76,6 +76,9 @@ public interface ByteSeq {
 
         @Override
         public ByteSeq subSequence(int start, int end) {
+            if ((start == 0) && (end == 1))
+                return this;
+
             throw new UnsupportedOperationException();
 //            if ((start!=0) || (end!=0))
 //                throw new RuntimeException();

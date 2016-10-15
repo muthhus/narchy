@@ -146,7 +146,7 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     protected abstract Object commit();
 
     /** if v is non-null it will be added after making capacity for it */
-    protected abstract void update(@Nullable V v);
+    protected abstract boolean update(@Nullable V v);
 
 
 //    @Override

@@ -24,13 +24,16 @@ import java.util.function.DoubleSupplier;
 /**
  * Created by me on 2/2/16.
  */
-public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
+public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
 
     /**
      * resolution of the output freq value
      */
     float resolution = 0.01f;
+
+    /** in frames time */
+    long latchResolution = 2;
 
     @NotNull
     private final Term term;
@@ -137,8 +140,18 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
             Task t = newInputTask(f, now);
             if (t!=null) {
-                Task prev = this.current;
-                input(prev, this.current = t);
+                Task prevStart = this.current;
+
+                Task prevEnd = null;
+//                if (prevStart!=null && t.occurrence() - prevStart.occurrence() > latchResolution) {
+//                    //input a cloned version of the previous task as an intermediate task, squarewave approximation
+//                    prevEnd = newInputTask(prevStart.truth().confMultViaWeight(0.5f), now, now-1);
+//                } else {
+//                    prevEnd = null; //dont generate an intermediate task
+//                }
+
+
+                input(prevStart, prevEnd, this.current = t);
                 this.lastInputTime = now;
                 this.prevF = f;
             }
@@ -147,9 +160,10 @@ public class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
     }
 
-    public void input(Task prev, Task next) {
-        nar.inputLater(next);
-    }
+
+    abstract public void input(@NotNull Task prevStart, @Nullable Task prevEnd, @NotNull Task next);
+        //nar.inputLater(next);
+
 
     @Nullable
     public Task next() {

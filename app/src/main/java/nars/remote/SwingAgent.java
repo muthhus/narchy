@@ -104,7 +104,7 @@ abstract public class SwingAgent extends NAgent {
         nar.printConceptStatistics();
 
         //nar.tasks.forEach(System.out::println);
-        ((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
+        //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
     }
 
     public static void chart(SwingAgent a, int history) {
@@ -120,7 +120,7 @@ abstract public class SwingAgent extends NAgent {
                         Vis.budgetHistogram(nar, 32),
                         Vis.conceptLinePlot(nar,
                                 Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
-                                200)
+                                2000)
                 ), 1200, 900);
     }
 
