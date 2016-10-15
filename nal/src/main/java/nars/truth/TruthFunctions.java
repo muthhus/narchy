@@ -580,9 +580,25 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return The corresponding weight of evidence, a non-negative real number
      */
     public static float c2w(float c) {
-        return Param.HORIZON * c / (1 - Math.min(c, 1.0f - Param.TRUTH_EPSILON));
+        //return Param.HORIZON * c / (1f - Math.min(c, 1.0f - Param.TRUTH_EPSILON));
+
+        if (c < 0)
+            throw new RuntimeException("negative conf");
+
+        //limit by maximum possible confidence value
+        c = Math.min(c, 1.0f - Param.TRUTH_EPSILON);
+
+        return Param.HORIZON * c / (1f - c);
     }
 
+    /**
+     * A function to convert weight to confidence
+     * @param w Weight of evidence, a non-negative real number
+     * @return The corresponding confidence, in [0, 1)
+     */
+    public static float w2c(float w) {
+        return Math.min(1f-Param.TRUTH_EPSILON, w / (w + Param.HORIZON));
+    }
 
     public static float confAnd(@NotNull Iterable<? extends Truthed> tt) {
         float c = 1f;

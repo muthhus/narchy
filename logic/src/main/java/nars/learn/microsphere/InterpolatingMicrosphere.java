@@ -21,7 +21,6 @@ import nars.util.data.list.FasterList;
 import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
 import org.apache.commons.math3.util.FastMath;
-import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -208,7 +207,7 @@ public class InterpolatingMicrosphere {
      * @param samplePoints Sampling data points.
      * @param sampleValues Sampling data values at the corresponding
      *                     {@code samplePoints}.
-     * @param distanceToLuminosity     Exponent used in the power law that computes
+     * @param curve     Exponent used in the power law that computes
      *                     the weights (distance dimming factor) of the sample data.
      * @return the estimated value at the given {@code point}.
      * @throws NotPositiveException if {@code exponent < 0}.
@@ -218,7 +217,7 @@ public class InterpolatingMicrosphere {
                          float[][] samplePoints,
                          float[] sampleValues,
                          float[] sampleWeights,
-                         FloatToFloatFunction distanceToLuminosity,
+                         LightCurve curve,
                          int numSamples) {
 
         clear();
@@ -226,7 +225,7 @@ public class InterpolatingMicrosphere {
 
         // Contribution of each sample point to the illumination of the
         // microsphere's facets.
-        illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, distanceToLuminosity, numSamples);
+        illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, curve, numSamples);
 
         return interpolate();
 
@@ -305,7 +304,7 @@ public class InterpolatingMicrosphere {
         return (float) var24;
     }
 
-    public void illuminate(@NotNull float[] targetPoint, float[][] samplePoints, float[] sampleValues, @Nullable float[] sampleWeights, FloatToFloatFunction distanceToLuminosity, int numSamples) {
+    public void illuminate(@NotNull float[] targetPoint, float[][] samplePoints, float[] sampleValues, @Nullable float[] sampleEvidences, LightCurve lightCurve, int numSamples) {
         float epsilon = 0.01f;
 
         for (int i = 0; i < numSamples; i++) {
@@ -313,10 +312,9 @@ public class InterpolatingMicrosphere {
             final float[] diff = ebeSubtract(samplePoints[i], targetPoint);
             final float distance = safeNorm(epsilon, diff);
 
-            float luminosity = distanceToLuminosity.valueOf(distance);
 
             @Nullable float[] sampleDirection = distance!=0 ? diff : null;
-            float conf = sampleWeights == null ? 1f : sampleWeights[i];
+            float evidence = (sampleEvidences == null) ? 1f : sampleEvidences[i];
 
 
             int vectors = distance!=0  ? this.size : 1; //if exactly on-point then only compute once, otherwise compute for each microsphere vecctor
@@ -324,12 +322,14 @@ public class InterpolatingMicrosphere {
             for (int j = 0; j < vectors; j++) {
 
                 final float[] n = microsphere.get(j);
-                final float cos = sampleDirection != null ? cosAngleNormalized(n, sampleDirection) : 1f;
+                final float cos = (sampleDirection != null) ? cosAngleNormalized(n, sampleDirection) : 1f;
 
                 if (cos > 0) {
-                    final float illumination = cos * luminosity;
+                    final float illumination = cos * lightCurve.get(distance, evidence);
                     if (illumination > 0) {
-                        record(microsphereData.get(j), illumination, sampleValues[i], conf);
+                        final float[] d = microsphereData.get(j);
+                        d[0] += illumination;
+                        d[1] += illumination * sampleValues[i] /* 0...1.0 */;
                     }
                 }
             }
@@ -446,26 +446,6 @@ public class InterpolatingMicrosphere {
 //    }
 
     /**
-     * accumulate a measure of relevant evidence
-     */
-    protected void record(float[] d, float illuminationProportion, float sampleValue, float conf) {
-
-        //d[0] illumination doesnt change
-
-        //float existingValue = d[1];
-
-        //add the amount of confidence in proportion to how equal the frequency (sampleValue) is
-        /*if (conf!=conf) { //!Float.isFinite(conf)) {
-            throw new RuntimeException("?");
-        }*/
-
-
-        float i = conf * illuminationProportion;
-        d[0] += i;
-        d[1] += i * sampleValue; //(conf * illuminationProportion) * sampleValue; //weighted value
-    }
-
-    /**
      * Reset the all the {@link Facet facets} data to zero.
      */
     private void clear() {
@@ -541,4 +521,17 @@ public class InterpolatingMicrosphere {
 //        return value(floats, data, value, null, exp, ulp, data.length);
 //    }
 
+    /**
+     * Created by me on 10/15/16.
+     */
+    public static interface LightCurve {
+        /**
+         * @param dt absolute value of distance between target and the evidence's occurrence
+                * TODO use a directional vector between the target point and the origin point, allowing asymmetric handling between an event's relative past and future
+         * @param evidence evidence weight held by the light source
+         * @return the adjusted evidence contribution (illumination in the microsphere model). normally this will decay the evidence across time
+         */
+        float get(float dt, float evidence);
+
+    }
 }

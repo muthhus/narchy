@@ -6,7 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
-import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
+import nars.util.Util;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,10 +15,9 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static java.lang.Math.log;
-import static nars.nal.UtilityFunctions.w2c;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
@@ -28,8 +27,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     @NotNull final float[][] times;
     @NotNull final float[] freq;
     @NotNull final float[] conf;
-    @Nullable
-    //private static final Truth EterNull = $.t(0.5f, Param.TRUTH_EPSILON);
+    //@Nullable private static final Truth EterNull = $.t(0.5f, Param.TRUTH_EPSILON);
 
     public TruthPolation(int size) {
         super(1, 2 /* must be 2 for 1-D microsphere */, null);
@@ -44,7 +42,6 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     }
 
 
-
     @Nullable
     public Truth truth(long when, Task... tasks) {
         return truth(when, when, tasks);
@@ -55,6 +52,19 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         return truth(when, now, tasks.toArray(new Task[tasks.size()]));
     }
 
+
+    final static float LIGHT_EPSILON = 0.000001f;
+
+    static final LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
+
+        if (dt <= LIGHT_EPSILON)
+            return evidence;
+        else {
+            float decayPeriod = evidence * 1f;
+            return evidence * Util.clamp(1f - dt / decayPeriod, 0f, 1f);
+        }
+
+    };
 
     @Nullable
     public Truth truth(long when, long now, @NotNull Task[] tasks) {
@@ -127,34 +137,30 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         }
 
 
-        float duration = 1f * Math.max(1, volume - 2);
-        float durationSq = duration*duration;
-
-        FloatToFloatFunction lightCurve = (dt) -> {
-
-            //if (dt > dtTolerance) dt -= dtTolerance;
-
-
-            //return 1f / (1f + (dt*dt)/(duration*duration));
-            //return 1f / (1f + (dt/duration)*(dt/duration));
-            //return 1f / (1f + (dt / duration));
-            //return 1f / (float)Math.log(dt/duration + Math.E);
-            return 1f / (dt/duration + 1f);
-            //return 1f / ((dt*dt)/durationSq + 1f);
-            //return (float)Math.sqrt(1f / (dt/durationSq + 1f));
-            //return (1f / (1f + (float)log(dt + 1f)));
-        };
-
         float[] v = this.value(
                 new float[] { when },
                 times,
                 freq, conf,
-                //Param.timeToLuminosity,
-                lightCurve,
+                evidentialDecayThroughTime,
                 i);
         return $.t(v[0], w2c(v[1]));
     }
 
+
+//    LightCurve lightCurve = (dt, evidence) -> {
+//
+//        //if (dt > dtTolerance) dt -= dtTolerance;
+//
+//
+//        //return 1f / (1f + (dt*dt)/(duration*duration));
+//        //return 1f / (1f + (dt/duration)*(dt/duration));
+//        //return 1f / (1f + (dt / duration));
+//        //return 1f / (float)Math.log(dt/duration + Math.E);
+//        return 1f / (dt/duration + 1f);
+//        //return 1f / ((dt*dt)/durationSq + 1f);
+//        //return (float)Math.sqrt(1f / (dt/durationSq + 1f));
+//        //return (1f / (1f + (float)log(dt + 1f)));
+//    };
 
 //    public final WeakHashMap<Task,Float> credit =new WeakHashMap();
 //

@@ -14,6 +14,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.truth.Truthed;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -28,6 +29,7 @@ import java.util.Random;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.*;
+import static nars.util.Util.lerp;
 
 /**
  * Revision / Projection / Revection Utilities
@@ -41,7 +43,7 @@ public class Revision {
         float w1 = a.confWeight() * factor;
         float w2 = b.confWeight() * factor;
         float w = (w1 + w2);
-        float c = UtilityFunctions.w2c(w);
+        float c = w2c(w);
         return c < minConf ?
                 null :
                 $.t(
@@ -53,7 +55,7 @@ public class Revision {
     public static Truth revise(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float minConf) {
         float w1 = a.confWeight();
         float w2 = b.confWeight();
-        float c = UtilityFunctions.w2c(w1+w2);
+        float c = w2c(w1+w2);
 
         if (c >= minConf) {
             //find the right balance of frequency
@@ -61,7 +63,7 @@ public class Revision {
             float w2f = (1f-aFrequencyBalance) * w2;
             float p = w2f/(w1f+w2f);
 
-            float f = Util.lerp(b.freq(), a.freq(), p);
+            float f = lerp(b.freq(), a.freq(), p);
 
             return $.t( f, c );
 
@@ -435,7 +437,7 @@ public class Revision {
         if (at != DTERNAL) {
             int bt = bterm.dt();
             if (bt != DTERNAL) {
-                dt = Math.round(Util.lerp(at, bt, aProp));
+                dt = Math.round(lerp(at, bt, aProp));
             }
         }
 

@@ -485,7 +485,7 @@ public class Tetris extends SwingAgent {
                 grid(
 
                         //Vis.concepts(nar, 32),
-                        Vis.agentActions(t, 2000),
+                        Vis.agentActions(t, 5000),
 
                         Vis.budgetHistogram(nar, 32),
                         Vis.conceptLinePlot(nar,

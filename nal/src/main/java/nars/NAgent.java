@@ -35,8 +35,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import static nars.$.t;
 import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;
-import static nars.nal.UtilityFunctions.w2c;
 import static nars.time.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.w2c;
 import static nars.util.Texts.n2;
 import static nars.util.Texts.n4;
 

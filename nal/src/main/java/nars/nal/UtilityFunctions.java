@@ -121,14 +121,7 @@ public class UtilityFunctions   {
         return (float)sqrt(a*b);
     }
 
-    /**
-     * A function to convert weight to confidence
-     * @param w Weight of evidence, a non-negative real number
-     * @return The corresponding confidence, in [0, 1)
-     */
-    public static float w2c(float w) {
-        return w / (w + Param.HORIZON);
-    }
+
 
     /*
     curved-sawtooth function:

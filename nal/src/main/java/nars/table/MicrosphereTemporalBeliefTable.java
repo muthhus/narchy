@@ -204,9 +204,15 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @NotNull public Function<Task, Float> rankPenalizingFreqAndTemporalDistance(@NotNull Task y, long now) {
 
         return x ->
+
                 y.conf() *
-                simultaneity(x.occurrence() - y.occurrence(), 1f) *
-                (1f / (1f + Math.abs(x.freq()-y.freq())) );
+
+                //as freqDelta decreases, the impact of simultaneity is lessened
+                Util.lerp(
+                        simultaneity(x.occurrence() - y.occurrence(), 1f),
+                        1f,
+                        Math.abs(x.freq()-y.freq())
+                );
     }
 
     @NotNull public Function<Task, Float> rankPenalizingOverlap(long now, @NotNull Task toMergeWith) {

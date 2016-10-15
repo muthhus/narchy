@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Comparator;
 
-import static nars.nal.UtilityFunctions.w2c;
+import static nars.truth.TruthFunctions.w2c;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.eternalize;
 

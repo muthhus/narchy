@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nars.nal.UtilityFunctions.w2c;
+import static nars.truth.TruthFunctions.w2c;
 import static nars.video.CameraSensor.coord;
 import static spacegraph.obj.GridSurface.col;
 

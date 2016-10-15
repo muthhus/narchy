@@ -44,8 +44,8 @@ public class TermKey extends DynByteSeq {
 
             int before = length();
             if (compress()) {
-                int after = length();
-                System.out.println(conceptualizable + "\t" + before + " -> " + after + "\t" + new String(array()));
+                //int after = length();
+                //System.out.println(conceptualizable + "\t" + before + " -> " + after + "\t" + new String(array()));
             }
 
             //this.writeByte(0); //null terminator, signifying end-of-term
