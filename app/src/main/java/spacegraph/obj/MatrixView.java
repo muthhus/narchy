@@ -20,17 +20,7 @@ public class MatrixView extends Surface {
     public static ViewFunc arrayRenderer(float[][] ww) {
         return (x, y, gl) -> {
             float v = ww[x][y];
-            float r, g, b;
-            if (v < 0) {
-                r = -v / 2f;
-                g = 0f;
-                b = -v;
-            } else {
-                r = v;
-                g = v / 2;
-                b = 0f;
-            }
-            gl.glColor3f(r, g, b);
+            Draw.colorPolarized(gl, v);
             return 0;
         };
     }

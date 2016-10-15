@@ -641,6 +641,21 @@ public enum Draw {
         target[3] = a;
     }
 
+    /** uses the built-in color scheme for displaying values in the range -1..+1 */
+    public static void colorPolarized(GL2 gl, float v) {
+        float r, g, b;
+        if (v < 0) {
+            r = -v / 2f;
+            g = 0f;
+            b = -v;
+        } else {
+            r = v;
+            g = v / 2;
+            b = 0f;
+        }
+        gl.glColor3f(r, g, b);
+    }
+
 //
 //    public static void hsb(float h, float s, float b, float a, float[] target) {
 //        //TODO use a LUT matrix instaed of this shitty Color function

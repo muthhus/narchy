@@ -50,38 +50,6 @@ public class Vis {
         new SpaceGraph().add(new Facial(chart).maximize()).show(800, 600);
     }
 
-    public static Surface newBeliefLEDs(Collection<? extends Termed> t, NAR nar) {
-        GridSurface g =
-            col(
-
-                row(BeliefTableChart.beliefTableCharts(nar, t, 1024)),
-
-                row(t.stream().map(tt -> {
-                    return new Surface() {
-                        @Override
-                        protected void paint(GL2 gl) {
-                            super.paint(gl);
-                            Concept c = nar.concept(tt);
-                            float r, g, b, conf;
-                            r = g = b = 0.5f;
-                            conf = 0.75f;
-                            if (c != null) {
-                                Truth t = c.belief(nar.time());
-                                if (t != null) {
-                                    r = g = b = t.freq(); //TODO
-                                    conf = t.conf();
-                                }
-                            }
-
-                            float m = 0.25f * 1f * conf;
-
-                            gl.glColor3f(r, g, b);
-                            Draw.rect(gl, m / 2, m / 2, 1 - m, 1 - m);
-                        }
-                    };
-                }).toArray(Surface[]::new)));
-        return g;
-    }
 
     public static GridSurface agentActions(NAR nar, Iterable<? extends Termed> cc, long window) {
         long[] btRange = new long[2];

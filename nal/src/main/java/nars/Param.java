@@ -83,7 +83,7 @@ public abstract class Param /*extends Container*/ implements Level {
     };
 
 
-    public static boolean DEBUG_ANSWERS;
+    public static boolean DEBUG_ANSWERS = true;
 
     /** how many times the desired selection size that bags should sample in case some of the selections are unused */
     public static float BAG_OVERSAMPLING = 2.0f;

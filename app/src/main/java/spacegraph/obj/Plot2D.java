@@ -66,15 +66,8 @@ public class Plot2D extends Surface {
 
         public abstract void update();
 
-        protected void push(double d) {
-            if (Double.isFinite(d))
-                add((float)d);
-        }
 
-        protected void push(float d) {
-            if (Float.isFinite(d))
-                add(d);
-        }
+
 
         protected void autorange() {
             minValue = Float.POSITIVE_INFINITY;
@@ -118,13 +111,17 @@ public class Plot2D extends Surface {
         add(s = new Series(name, maxHistory) {
             @Override public void update() {
                 double v = valueFunc.getAsDouble();
-                if (!Double.isFinite(v)) {
-                    throw new RuntimeException("invalid value");
-                }
+
                 limit();
-                if (v < min) v = min;
-                if (v > max) v = max;
-                push(v);
+                if (v!=v) {
+                    //throw new RuntimeException("invalid value");
+                    add(Float.NaN);
+                } else {
+                    if (v < min) v = min;
+                    if (v > max) v = max;
+                    add((float)v);
+                }
+
             }
         });
         s.minValue = min;
@@ -136,7 +133,7 @@ public class Plot2D extends Surface {
         add(new Series(name, maxHistory) {
             @Override public void update() {
                 limit();
-                push((float)valueFunc.getAsDouble());
+                add((float)valueFunc.getAsDouble());
                 autorange();
             }
         });
@@ -257,9 +254,6 @@ public class Plot2D extends Surface {
                 float mid = ypos(minValue ,maxValue, (s.minValue + s.maxValue)/2f);
 
 
-
-
-
                 FloatArrayList sh = s;
                 int ss = sh.size();
 
@@ -281,13 +275,15 @@ public class Plot2D extends Surface {
                 float range = maxValue - minValue;
                 for (int i = 0; i < ss; i++) {
 
-                    ny = ypos(minValue, range, ssh[i]);
+                    float v = ssh[i];
+                    if (v==v) {
+                        ny = ypos(minValue, range, v);
 
-
-                    //if (i > 0) {
+                        //if (i > 0) {
                         gl.glVertex3f(x, ny, 0);
                         //Draw.line(gl, x - dx, py, x, ny);
-                    //}
+                        //}
+                    }
 
                     x += dx;
                     //py = ny;

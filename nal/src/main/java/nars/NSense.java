@@ -34,6 +34,9 @@ public interface NSense {
     default SensorConcept sense(String term, FloatSupplier value) {
         return sense(term, value, nar().truthResolution.floatValue(), (v) -> $.t(v, alpha()));
     }
+    default SensorConcept sense(Compound term, FloatSupplier value) {
+        return sense(term, value, nar().truthResolution.floatValue(), (v) -> $.t(v, alpha()));
+    }
 
     default SensorConcept sense(String term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
         return sense($.$(term), value, resolution, truthFunc);

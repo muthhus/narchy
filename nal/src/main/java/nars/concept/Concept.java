@@ -442,9 +442,7 @@ public interface Concept extends Termed {
 
     static float freq(long time, BeliefTable table) {
         Truth t = table.truth(time);
-        if (t != null)
-            return t.freq();
-        return 0.5f;
+        return t != null ? t.freq() : Float.NaN;
     }
 
     Activation process(@NotNull Task input, NAR nar);

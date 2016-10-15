@@ -1,24 +1,33 @@
 package nars.experiment.recog2d;
 
+import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
 import nars.Symbols;
+import nars.Task;
+import nars.concept.Concept;
 import nars.concept.SensorConcept;
+import nars.gui.BeliefTableChart;
 import nars.gui.Vis;
-import nars.guifx.Spacegraph;
 import nars.remote.SwingAgent;
 import nars.task.MutableTask;
 import nars.term.Termed;
-import nars.time.Tense;
-import nars.util.data.list.FasterList;
+import nars.truth.Truth;
 import nars.video.Scale;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
+import spacegraph.Surface;
+import spacegraph.obj.GridSurface;
+import spacegraph.render.Draw;
 
 import java.awt.*;
 import java.awt.font.LineMetrics;
 import java.awt.image.BufferedImage;
-import java.util.Collection;
+import java.util.*;
+
+import static nars.util.Texts.n2;
+import static spacegraph.obj.GridSurface.col;
+import static spacegraph.obj.GridSurface.row;
 
 /**
  * Created by me on 10/8/16.
@@ -28,110 +37,155 @@ public class RecogChar extends SwingAgent {
     private final Graphics2D g;
     private final int h;
     private final int w;
-    private final Collection<SensorConcept> predictions;
+    private final TrainVector imgTrainer;
     BufferedImage canvas;
 
-    boolean reset = true;
-    boolean train = true;
-    boolean verify = false;
 
     int a = 0;
 
     int image = 0;
-    final int maxImages = 4;
-    private int TRAINING_PERIOD = 64;
+    final int maxImages = 5;
     int imagePeriod = 16;
+    int TRAINING_PERIOD = imagePeriod * 4;
+
+    float theta;
+    float dTheta = 0.25f;
 
     public RecogChar(NAR n) {
         super(n, 32);
 
-        w = 20;
-        h = 32;
+        w = 24;
+        h = 24;
         canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
         g = ((Graphics2D) canvas.getGraphics());
 
-        g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 24 ));
+        g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 18));
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        //senseSwitch("(current)", ()-> train ? -1 : image , -1, maxImages);
 
-        predictions = $.newArrayList(maxImages);
-        for (int i = 0; i < maxImages; i++) {
-            int ii = i;
-            SensorConcept x = sense("((#xy --> img) <=>+0 i" + ii + ")", () -> {
+        imgTrainer = new TrainVector(ii -> $.p($.the("i"), $.the(ii)), maxImages, this);
+        imgTrainer.out.keySet().forEach(x ->
+                predictors.addAll(
+                    new MutableTask($.seq(x.term(), 1, happy.term()), '?', null).time(now, now),
+                    new MutableTask($.impl($.inh($.varQuery("wat"), $.the("cam")), 0, happy.term()), '?', null) {
+                        @Override
+                        public boolean onAnswered(Task answer) {
+                            System.err.println(this + "\n\t" + answer);
+                            return false;
+                        }
+                    }.time(now, now)
+                )
+//                predictors.add(new MutableTask(x, Symbols.QUESTION, null).present(nar.time()))
+        );
 
-                if (train) {
-                    return image == ii ? 1f : 0.5f - (1f/maxImages);
-                } else {
-                        /* compute error, optionally apply feedback */
-//                    if (reset) {
-//                        beliefs().re
-//                        return 0.5f;
-//                    }
-
-                    return
-                            //0.5f;
-                            Float.NaN;
-                }
-            });//.setLatched(false /* for predictive capabiities to not be silenced */);
-            predictions.add( x );
-
-            predictors.add(new MutableTask(x.term(), Symbols.QUESTION, null).present(nar.time()));
-        }
-
-        //addCamera("x", ()->canvas, w,h, v -> $.t(v, alpha));
-        addCamera("img", new Scale(()->canvas, w, h), v -> $.t(v, alpha));
+        addCamera("cam", ()->canvas, w,h, v -> $.t(v, alpha));
+        //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
 
-        new Thread(()->{
-            Facial f = new Facial(Vis.newBeliefLEDs(predictions, nar));
-            new SpaceGraph().add(f.maximize()).show(800,600);
+        new Thread(() -> {
+            Facial f = new Facial(conceptTraining(imgTrainer, nar));
+            new SpaceGraph().add(f.maximize()).show(800, 600);
         }).start();
 
     }
 
-    protected void eval() {
+    public static Surface conceptTraining(TrainVector tv, NAR nar) {
 
+        LinkedHashMap<SensorConcept, TrainVector.Neuron> out = tv.out;
+
+        GridSurface g = col(
+
+                row(BeliefTableChart.beliefTableCharts(nar, out.keySet(), 1024)),
+
+                row(out.entrySet().stream().map(ccnn -> new Surface() {
+                    @Override
+                    protected void paint(GL2 gl) {
+                        Concept c = ccnn.getKey();
+                        TrainVector.Neuron nn = ccnn.getValue();
+
+                        super.paint(gl);
+
+                        float freq, conf;
+
+                        long now = nar.time();
+                        Truth t = c.belief(now);
+                        if (t != null) {
+                            conf = t.conf();
+                            freq = t.freq();
+                        } else {
+                            conf = 0.75f;
+                            freq = Float.NaN;
+                        }
+
+
+                        Draw.colorPolarized(gl, 2f * (-0.5f + freq));
+
+                        float m = 0.25f * 1f * conf;
+                        Draw.rect(gl, m / 2, m / 2, 1 - m, 1 - m);
+
+                        if (tv.verify) {
+                            float error = nn.error;
+                            if (error != error) {
+
+                            } else {
+                                gl.glColor3f(error, 1f - error, 0f);
+                                float fontSize = 0.08f;
+                                Draw.text(gl, c.term().toString(), fontSize, m / 2, 1f - m / 2, 0);
+                                Draw.text(gl, "err=" + n2(error), fontSize, m / 2, m / 2, 0);
+                            }
+                        }
+                    }
+                }).toArray(Surface[]::new)));
+        return g;
     }
-
 
 
     @Override
     protected float act() {
-        if (a++ % imagePeriod == 0) {
-            eval();
+        a++;
+
+        float r;
+
+        if (imgTrainer.verify) {
+            r = (float) -imgTrainer.errorSum() + 0.5f;
+        } else {
+            r = 1f; //general positive reinforcement during training
+            // Float.NaN;
+        }
+
+        if (a % imagePeriod == 0) {
             nextImage();
         }
 
-        if (nar.time() % TRAINING_PERIOD == TRAINING_PERIOD-1) {
-            train = !train;
-            verify = !verify;
-            if (verify) {
+        redraw();
+
+
+
+        if (a % TRAINING_PERIOD == TRAINING_PERIOD - 1) {
+
+            //toggle
+            if (imgTrainer.verify)
+                imgTrainer.train();
+            else {
+                imgTrainer.verify();
                 image = -1;
-                reset = true; //for one frame
-
-//                predictions.forEach(p->{
-//                    p.beliefs().clear(nar);
-//                });
             }
-        } else {
-            reset = false;
+
         }
 
-        if (verify) {
-            return 0;
-        } else {
-
-
-            return Float.NaN;
-        }
+        return r;
     }
 
 
     protected int nextImage() {
 
         image = nar.random.nextInt(maxImages);
+        imgTrainer.expect(image);
 
+        return image;
+    }
+
+    private void redraw() {
         g.clearRect(0, 0, w, h);
         FontMetrics fontMetrics = g.getFontMetrics();
 
@@ -139,11 +193,12 @@ public class RecogChar extends SwingAgent {
         LineMetrics lineMetrics = fontMetrics.getLineMetrics(s, g);
         //System.out.println(s + " : " + lineMetrics.getHeight() + " pixel height");
 
+        //g.rotate(nar.random.nextFloat() * dTheta, w/2, h/2);
+
         g.drawString(s, 0, lineMetrics.getHeight());
-        return image;
     }
 
     public static void main(String[] arg) {
-        SwingAgent.run(RecogChar::new, 100000);
+        SwingAgent.run(RecogChar::new, 10000);
     }
 }

@@ -136,10 +136,10 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
         if (!qBudget.isDeleted() && !aBudget.isDeleted() && q.onAnswered(a)) {
 
             BudgetFunctions.transferPri(qBudget, aBudget, factor);
-            if (!qEtern) {
-                //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
-                qBudget.quaMult(1 - factor);
-            }
+//            if (!qEtern) {
+//                //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
+//                qBudget.quaMult(1 - factor);
+//            }
 
             boolean sameConcept;
             sameConcept = !(answerConcept != null && answerConcept.crossLink(a, q, scale * aConf, nar)!=null);
@@ -338,7 +338,9 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
     @Override
     public int compare(@NotNull Task o1, @NotNull Task o2) {
-        return Float.compare(o2.qua(), o1.qua());
+
+        //return Float.compare(o2.qua(), o1.qua());
+        return Float.compare(o2.priIfFiniteElseNeg1(), o1.priIfFiniteElseNeg1());
     }
 
     //    @Override

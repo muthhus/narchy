@@ -118,16 +118,7 @@ public abstract class TermIndex extends TermBuilder {
 
     final Function<? super ProtoCompound, ? extends Term> termizer = pc -> {
 
-        try {
-            return super.the(pc.op(), pc.dt(), pc.terms());
-        } catch (InvalidTermException x) {
-            //if (Param.DEBUG_EXTRA)
-            logger.info("Termizer: {} {}", pc, x);
-            return False; //place a False placeholder so that a repeat call will not have to discover this manually
-        } catch (Throwable e) {
-            logger.error("Termizer: {} {}", pc, e);
-            return False;
-        }
+        return _the(pc.op(), pc.dt(), pc.terms() );
     };
 
     @NotNull
@@ -135,7 +126,11 @@ public abstract class TermIndex extends TermBuilder {
 
         if (cacheable(op, u)) {
 
-            ProtoCompound p = ProtoCompound.the(op, dt, u);
+            //        for (Term x : args)
+//            if (x==null)
+//                throw new NullPointerException();
+
+            ProtoCompound p = new ProtoCompound.RawProtoCompound(op, dt, u);
 
 
             Term t = terms.computeIfAbsent(p, termizer);
@@ -157,10 +152,22 @@ public abstract class TermIndex extends TermBuilder {
             return t;
 
         } else {
-            return super.the(op, dt, u);
+            return _the(op, dt, u);
         }
     }
 
+    private final Term _the(Op o, int dt, Term[] u) {
+        try {
+            return super.the(o, dt, u);
+        } catch (InvalidTermException x) {
+            //if (Param.DEBUG_EXTRA)
+            logger.warn("Termizer: {x} : {} {} {}",  x, o, dt, u);
+            return False; //place a False placeholder so that a repeat call will not have to discover this manually
+        } catch (Throwable e) {
+            logger.error("Termizer: {x} : {} {} {}",  e, o, dt, u);
+            return False;
+        }
+    }
 
     /**
      * returns the resolved term according to the substitution

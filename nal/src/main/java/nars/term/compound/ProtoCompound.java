@@ -21,19 +21,6 @@ public interface ProtoCompound {
     int dt();
 
 
-    static ProtoCompound the(Op o, Term[] args) {
-        return the(o, DTERNAL, args);
-    }
-
-    static ProtoCompound the(Op o, int dt, Term[] args) {
-//        for (Term x : args)
-//            if (x==null)
-//                throw new NullPointerException();
-
-        return new RawProtoCompound(o, dt, args);
-    }
-
-
     class RawProtoCompound implements ProtoCompound {
 
 
@@ -43,7 +30,11 @@ public interface ProtoCompound {
 
         private final int hash;
 
-        protected RawProtoCompound(@NotNull Op op, int dt, @NotNull Term... t) {
+        protected RawProtoCompound(@NotNull Op op, @NotNull Term... t) {
+            this(op, DTERNAL, t);
+        }
+
+        public RawProtoCompound(@NotNull Op op, int dt, @NotNull Term... t) {
             this.op = op;
             this.dt = dt;
             this.args = t;

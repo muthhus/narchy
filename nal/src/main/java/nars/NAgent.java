@@ -312,11 +312,11 @@ abstract public class NAgent implements NSense, NAction {
         for (Concept a : actions) {
             Term action = a.term();
 
-            int lookahead = 2;
+            int lookahead = 1;
             for (int i = 0; i < lookahead; i++) {
                 predictors.addAll(
-                    new MutableTask($.seq(action, 1+lookahead, happiness), '?', null).time(now, now+1),
-                    new MutableTask($.impl(action, 1+lookahead, happiness), '?', null).time(now, now+1)
+                    new MutableTask($.seq(action, 1+lookahead, happiness), '?', null).time(now, now),
+                    new MutableTask($.impl(action, 1+lookahead, happiness), '?', null).time(now, now)
                     //new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),
                     //new MutableTask(action, '@', null).time(now, then)
                 );
