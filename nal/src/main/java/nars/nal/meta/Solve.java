@@ -35,15 +35,7 @@ abstract public class Solve extends AtomicBoolCondition {
 
     final boolean measure(@NotNull PremiseEval m, char punct) {
 
-        if (punct == BELIEF_OR_GOAL) {
-            //determine belief or goal according to whether the premise task is a question or quest
-            switch (m.taskPunct) {
-                case QUESTION:  punct = BELIEF; break;
-                case QUEST:     punct = GOAL;  break;
-                default:
-                    throw new UnsupportedOperationException("incompatible task punctuation with BELIEF_OR_GOAL: " + m.task);
-            }
-        }
+
 
         switch (punct) {
             case BELIEF:
@@ -53,8 +45,7 @@ abstract public class Solve extends AtomicBoolCondition {
                     return false; //there isnt a truth function for this punctuation
 
                 boolean single = tf.single();
-                if (!single && m.belief==null)
-                    return false;
+
                 if (!tf.allowOverlap() && m.overlap(single))
                     return false;
 
@@ -62,7 +53,7 @@ abstract public class Solve extends AtomicBoolCondition {
             case QUESTION:
             case QUEST:
                 //a truth function so check cyclicity
-                if (m.overlap(true))
+                if (m.cyclic)
                     return false;
                 break;
             default:

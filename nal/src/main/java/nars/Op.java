@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
@@ -280,7 +281,7 @@ public enum Op {
 
             if (t >= 0) w.append('+');
             String ts;
-            if (t == Tense.XTERNAL)
+            if (t == XTERNAL)
                 ts = "-";
             else
                 ts = Integer.toString(t);
@@ -313,17 +314,14 @@ public enum Op {
     public static final int ANY = 0;
 
 
-    public static boolean isTemporal(@NotNull Term t, int newDT) {
-        return isTemporal(t.op(), newDT, t.size());
-    }
-
-    public static boolean isTemporal(@NotNull Op o, int dt, int arity) {
-        if (o.temporal) {
-            return !(o == Op.CONJ && dt != 0 && dt != DTERNAL && arity > 2);
-        }
-        return false;
-    }
-
+//    public static boolean isTemporal(@NotNull Term t, int newDT) {
+//        return isTemporal(t.op(), newDT, t.size());
+//    }
+//
+//    public static boolean isTemporal(@NotNull Op o, int dt, int arity) {
+//        return o.temporal && !(arity > 2 && dt != 0 && o == Op.CONJ && dt != DTERNAL && dt != XTERNAL);
+//    }
+//
 //    public boolean validSize(int length) {
 //        int min = this.minSize;
 //        if (min!=-1 && length < min) return false;

@@ -121,9 +121,9 @@ public class PatrickTests extends AbstractNALTest {
 
                 );
 
-        tt.mustOutput(0, 4000, "lighter({SELF}, toothbrush)", '!', 1f, 1f,
+        tt.mustOutput(0, 400, "lighter({SELF}, toothbrush)", '!', 1f, 1f,
                 0.3f, 1f, //at least some confidence
-                /*@*/ -10L);  //is this correct time? might be off by +/-10 , will check
+                /*@*/ -20L);  //is this correct time? might be off by +/-10 , will check
 
 
     }

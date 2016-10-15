@@ -72,7 +72,7 @@ public abstract class Param /*extends Container*/ implements Level {
 //                    evidence/8f;
 
 
-            float decayPeriod = 2f;
+            float decayPeriod = 1f;
             float decayFactor = 1f / (1f + dt / decayPeriod);
             float newEvidence = evidence * decayFactor;
             //System.out.println(dt + "," + evidence + "\t" + decayPeriod + ","+decayFactor + "\t --> " + newEvidence);

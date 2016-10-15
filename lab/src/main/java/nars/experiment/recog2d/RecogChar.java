@@ -1,10 +1,7 @@
 package nars.experiment.recog2d;
 
 import com.jogamp.opengl.GL2;
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
-import nars.Task;
+import nars.*;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.gui.BeliefTableChart;
@@ -50,6 +47,10 @@ public class RecogChar extends SwingAgent {
 
     float theta;
     float dTheta = 0.25f;
+
+    static {
+        Param.DEBUG = true;
+    }
 
     public RecogChar(NAR n) {
         super(n, 32);
@@ -195,7 +196,7 @@ public class RecogChar extends SwingAgent {
 
         //g.rotate(nar.random.nextFloat() * dTheta, w/2, h/2);
 
-        g.drawString(s, 0, lineMetrics.getHeight());
+        g.drawString(s, w/2, lineMetrics.getHeight());
     }
 
     public static void main(String[] arg) {

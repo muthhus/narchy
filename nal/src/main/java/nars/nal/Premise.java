@@ -197,12 +197,12 @@ public final class Premise extends RawBudget implements Tasked {
     }
 
     static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a, @NotNull Concept answerConcept) {
-        @Nullable Concept questionConcept = nar.concept(q);
-        if (questionConcept != null) {
-            List<Task> displ = $.newArrayList(0);
-            ((QuestionTable) questionConcept.tableFor(q.punc())).answer(a, answerConcept, nar, displ);
-            nar.tasks.remove(displ);
-        }
+//        @Nullable Concept questionConcept = nar.concept(q);
+//        if (questionConcept != null) {
+//            List<Task> displ = $.newArrayList(0);
+//            ((QuestionTable) questionConcept.tableFor(q.punc())).answer(a, answerConcept, nar, displ);
+//            nar.tasks.remove(displ);
+//        }
     }
 
     static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief, Concept answerConcept) {

@@ -89,11 +89,13 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
             //TODO calculate this based on fraction of each question's priority of the total
             //TODO weaken the match based on dt discrepencies between question and answer. this will discriminate according to unique dt patterns of questions vs answers
 
+            boolean affected = false;
             for (int i = 0; i < size && !a.isDeleted(); ) {
                 Task q = l.get(i);
                 if (!q.isDeleted()) {
                     if (answer(q, a, 1f / size, answerConcept, nar)) {
                         i++;
+                        affected = true;
                         continue;
                     }
                 }
@@ -101,6 +103,10 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
                 remove(q, null, displ);
                 size--;
             }
+
+            if (affected && size > 1)
+                list.sortThis(this);
+
         });
 
 
@@ -190,12 +196,11 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
         //inserted if questioned!=null
         if (questioned != null && !answers.isEmpty()) {
-            Task a = answers.top(questioned.occurrence());
-
-            if (a != null && !a.isDeleted()) {
-
-                answer(questioned, a, 1f / size(), null, n);
-            }
+//            Task a = answers.top(questioned.occurrence());
+//            if (a != null && !a.isDeleted()) {
+//
+//                answer(questioned, a, 1f / size(), null, n);
+//            }
         }
 
 

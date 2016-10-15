@@ -14,6 +14,7 @@ import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -51,8 +52,11 @@ public class GenericCompound implements Compound {
         TermVector subterms = (TermVector) _subterms; //HACK for future support of alternate TermContainer impls
 
         if (Param.DEBUG && dt != DTERNAL) {
-            if (!((op.image && ((dt >= 0) || (dt < subterms.size()))) ||
-                    (Op.isTemporal(op, dt, subterms.size()))))
+
+            if (op.image && ((dt < 0) || (dt > subterms.size()))) {
+                throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for image " + op);
+            }
+            if (op != CONJ && (op.temporal && _subterms.size()!=2))
                 throw new InvalidTermException(op, dt, subterms.terms(), "Invalid dt value for operator " + op);
         }
 

@@ -53,12 +53,12 @@ abstract public class SwingAgent extends NAgent {
             //new SingleThreadExecutioner();
             new MultiThreadExecutioner(3, 1024*4);
 
-        int volMax = 32;
-        int conceptsPerCycle = 32;
+        int volMax = 40;
+        int conceptsPerCycle = 16;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                conceptsPerCycle, 2, 3, rng,
+                conceptsPerCycle, 3, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64*1024, 3)
 
@@ -68,19 +68,19 @@ abstract public class SwingAgent extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-        float p = 0.01f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        float p = 0.1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.7f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.8f * p;
 
         nar.confMin.setValue(0.02f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        //nar.linkFeedbackRate.setValue(0.05f);
+        nar.linkFeedbackRate.setValue(0.05f);
 
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3, true);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
@@ -100,9 +100,13 @@ abstract public class SwingAgent extends NAgent {
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
 
+        nar.tasks.forEach(x -> {
+            if (x.isQuestOrQuestion())
+                System.out.println(x.proof());
+        });
+
         nar.printConceptStatistics();
 
-        //nar.tasks.forEach(System.out::println);
         //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
     }
 

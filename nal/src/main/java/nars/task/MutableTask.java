@@ -211,6 +211,7 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     final List getOrCreateLog() {
+
         List exist = log();
         if (exist == null) {
             this.log = (exist = $.newArrayList(1));

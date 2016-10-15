@@ -131,8 +131,6 @@ public enum Symbols {
     private static final CharObjectHashMap<Op> _charToOperator
             = new CharObjectHashMap(Op.values().length * 2);
 
-    /** upside down question mark, meaning the opposite of question/quest */
-    public static final char BELIEF_OR_GOAL = 168;
 
 
 

@@ -55,23 +55,23 @@
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
 
-    (S --> P), (P --> S), neqCom(S,P) |- (S <-> P), (Belief:Intersection, Goal:Strong, Permute:Backward)
+    (S --> P), (P --> S), neqCom(S,P) |- (S <-> P), (Belief:Intersection, Goal:Strong)
 
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
-    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong, Permute:Backward)
+    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
-    (P --> M), (S --> M), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Permute:Backward)
-    (M --> P), (M --> S), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak, Permute:Backward)
+    (P --> M), (S --> M), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak)
+    (M --> P), (M --> S), neqCom(S,P) |- (S <-> P), (Belief:Comparison, Goal:Weak)
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
-    (M --> P), (S <-> M), neqCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Permute:Backward)
-    (P --> M), (S <-> M), neqCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Permute:Backward)
+    (M --> P), (S <-> M), neqCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong)
+    (P --> M), (S <-> M), neqCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong)
     (M <-> P), (S <-> M), neqCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong)
 
 //// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
@@ -519,7 +519,7 @@
 
     (B --> (/, M, A.._=B..+)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity)
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+)), (Belief:Identity)
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+)), (Belief:Identity, Goal:Identity)
 
     (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+) --> B), (Belief:Identity)
 
@@ -573,7 +573,7 @@
 //         #R[(A --> C) (B --> [C]) |- ((* A B) --> (* C [C])) :post (:t/intersection)]
 
 
-//compound composition one premise
+//disjunction
     (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 

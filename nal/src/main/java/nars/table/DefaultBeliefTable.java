@@ -188,9 +188,9 @@ public class DefaultBeliefTable implements BeliefTable {
             }
         }
 
-        if (result != null) {
-            questions.answer(input, concept, nar, displaced);
-        }
+//        if (result != null) {
+//            questions.answer(input, concept, nar, displaced);
+//        }
 
         return result;
     }

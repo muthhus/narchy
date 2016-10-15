@@ -471,7 +471,7 @@ public interface TimeFunctions {
         }
 
 
-        if (dtTerm instanceof Compound && Op.isTemporal(derived, ((Compound) dtTerm).dt())) {
+        if (dtTerm instanceof Compound) {
             int dtdt = ((Compound) dtTerm).dt();
             return deriveDT(derived, +1, p, dtdt, occReturn);
         } else

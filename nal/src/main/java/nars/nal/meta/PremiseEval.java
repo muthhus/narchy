@@ -132,7 +132,7 @@ public class PremiseEval extends Unify {
 
     @Nullable
     public final Conclusion conclusion;
-    private final boolean cyclic;
+    public final boolean cyclic;
 
 
     public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Premise p, @NotNull Conclusion c) {
