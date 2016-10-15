@@ -30,7 +30,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
     };
-    /** true if both are non-eternal and task is after belief  */
+    /** true if both are non-eternal and task is after or simultaneous with belief  */
     @Nullable
     public static final events before = new events() {
 

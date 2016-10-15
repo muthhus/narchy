@@ -249,11 +249,17 @@
     </dependency>
 
 
-    <!-- https://mvnrepository.com/artifact/org.iq80.snappy/snappy -->
+    <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.iq80.snappy/snappy &ndash;&gt;-->
+    <!--<dependency>-->
+      <!--<groupId>org.iq80.snappy</groupId>-->
+      <!--<artifactId>snappy</artifactId>-->
+      <!--<version>0.4</version>-->
+    <!--</dependency>-->
+    <!-- https://mvnrepository.com/artifact/io.airlift/aircompressor -->
     <dependency>
-      <groupId>org.iq80.snappy</groupId>
-      <artifactId>snappy</artifactId>
-      <version>0.4</version>
+      <groupId>io.airlift</groupId>
+      <artifactId>aircompressor</artifactId>
+      <version>0.3</version>
     </dependency>
 
 

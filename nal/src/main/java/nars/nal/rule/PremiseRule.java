@@ -725,31 +725,27 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = TimeFunctions.dtCombine;
                             break;
 
-                        case "dtForward":
-                            timeFunction = TimeFunctions.occForward;
-                            pres.add(events.bothTemporal);
-                            break;
+//                        case "dtForward":
+//                            timeFunction = TimeFunctions.occForward;
+//                            pres.add(events.bothTemporal);
+//                            break;
+
                         case "dtAfter":
                             timeFunction = TimeFunctions.occForward;
                             pres.add(events.after);
                             break;
-                        case "dtReverse":
+
+                        case "dtBefore":
                             timeFunction = TimeFunctions.occReverse;
+                            pres.add(events.after);
                             break;
+
 //                        case "dtIfEvent":
 //                            temporalize = Temporalize.dtIfEvent;
 //                            break;
 
-                        case "dtBefore":
-                            timeFunction = TimeFunctions.occForward; //may need reversed or changed
-                            pres.add(events.before);
-                            break;
 
 
-                        case "dtAfterReverse":
-                            timeFunction = TimeFunctions.occReverse;
-                            pres.add(events.after);
-                            break;
 
                         case "dtAfterOrEternal":
                             timeFunction = TimeFunctions.occForward;

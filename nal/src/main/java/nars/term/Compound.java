@@ -32,17 +32,22 @@ import nars.util.Util;
 import nars.util.data.array.IntArrays;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;
+import org.eclipse.collections.api.bimap.BiMap;
+import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
+import org.eclipse.collections.impl.factory.BiMaps;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -67,6 +72,25 @@ public interface Compound extends Term, IPair, TermContainer {
             if (t1.op() == onlyType)
                 t.add(t1);
         });
+        return t;
+    }
+
+    @NotNull
+    default Set<Term> recurseTermsToSet() {
+        Set<Term> t = $.newHashSet(volume());
+        recurseTerms((x) -> t.add(x));
+        return t;
+    }
+
+    @NotNull default SortedSet<Term> recurseTermsToSortedSet() {
+        TreeSet<Term> t = new TreeSet();
+        recurseTerms((x) -> t.add(x));
+        return t;
+    }
+
+    @NotNull default MutableBiMap<Term,Short> recurseTermsToBiMap() {
+        MutableBiMap<Term,Short> t = new HashBiMap(volume()); //BiMaps.mutable.empty();
+        recurseTerms((x) -> t.putIfAbsent(x, (short)t.size()));
         return t;
     }
 

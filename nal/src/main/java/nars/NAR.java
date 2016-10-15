@@ -2,6 +2,8 @@ package nars;
 
 
 import com.google.common.collect.Sets;
+import io.airlift.compress.snappy.SnappyFramedInputStream;
+import io.airlift.compress.snappy.SnappyFramedOutputStream;
 import nars.Narsese.NarseseException;
 import nars.budget.Activation;
 import nars.budget.Budget;
@@ -39,8 +41,7 @@ import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.fusesource.jansi.Ansi;
-import org.iq80.snappy.SnappyFramedInputStream;
-import org.iq80.snappy.SnappyFramedOutputStream;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -1413,6 +1414,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) throws IOException {
 
         SnappyFramedOutputStream os = new SnappyFramedOutputStream(o);
+
 
         DataOutputStream oo = new DataOutputStream(os);
 

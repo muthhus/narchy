@@ -282,11 +282,11 @@
     A, B, task(positive), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- (A ==>+- B), (Belief:Induction)
         A, B, task(negative), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
 
-    A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
-        A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
+    A, B, task(positive), task("."), time(dtAfter), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
+        A, B, task(negative), task("."), time(dtAfter), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
 
-    A, B, task(positive), task("."), time(dtForward), neq(A,B), notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
-        A, B, task(negative), task("."), time(dtForward), neq(A,B), notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
+    A, B, task(positive), task("."), time(dtAfter), neq(A,B), notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
+        A, B, task(negative), task("."), time(dtAfter), neq(A,B), notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
 
     A, B, task("."), time(dtAfter), neq(A,B) |- (A &&+- B), (Belief:Intersection)
         ///A, B, task(negative), task("."), time(dtAfter), neq(A,B) |- ((--,%A) &&+- B), (Belief:IntersectionN)

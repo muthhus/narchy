@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
     public static final int MIN_GROWTH_BYTES = 128;
-    private byte[] bytes;
+    protected byte[] bytes;
     public int position;
 
     public DynByteSeq(int bufferSize) {
@@ -72,7 +72,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         this.position = position + len;
     }
 
-    private final int ensureSized(int extra) {
+    protected final int ensureSized(int extra) {
         int space = this.bytes.length;
         int p = this.position;
         if (space - p <= extra) {

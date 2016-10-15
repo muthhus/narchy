@@ -515,7 +515,7 @@ public class NAL7Test extends AbstractNALTest {
     public void variable_introduction_on_events_with_negation() {
         test()
 
-        .log()
+        //.log()
         .input("(--,a:x). :|: %0.9;0.8% ")
         .inputAt(10, "b:x. :|: %0.8;0.9% ")
 

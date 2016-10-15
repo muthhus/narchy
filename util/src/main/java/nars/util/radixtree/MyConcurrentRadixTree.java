@@ -355,7 +355,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Node{");
-            sb.append("edge=").append(this.getIncomingEdge());
+            sb.append("edge=").append(new String(this.bytes));
             sb.append(", value=").append(this.value);
             sb.append(", edges=[]");
             sb.append("}");

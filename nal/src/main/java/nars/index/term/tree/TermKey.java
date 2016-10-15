@@ -1,5 +1,11 @@
 package nars.index.term.tree;
 
+import io.airlift.compress.lz4.Lz4Compressor;
+import io.airlift.compress.lz4.Lz4Decompressor;
+import io.airlift.compress.lz4.Lz4RawCompressor;
+import io.airlift.compress.lz4.Lz4RawDecompressor;
+import io.airlift.compress.snappy.SnappyCompressor;
+import io.airlift.compress.snappy.SnappyRawCompressor;
 import nars.IO;
 import nars.Op;
 import nars.Symbols;
@@ -14,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import static nars.IO.SPECIAL_OP;
 import static nars.IO.writeEvidence;
@@ -25,10 +33,21 @@ import static nars.util.data.rope.StringHack.bytes;
  */
 public class TermKey extends DynByteSeq {
 
+    private final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(()->new Lz4Compressor());
+    final static Lz4Decompressor decompressor = new Lz4Decompressor();
+    private final static float minCompressionRatio = 0.9f;
+
     public TermKey(@NotNull Term conceptualizable) {
-        super(conceptualizable.volume() * 4 + 4 /* ESTIMATE */);
+        super(conceptualizable.volume() * 4 + 64 /* ESTIMATE */);
         try {
             writeTermSeq(this, conceptualizable, false);
+
+            int before = length();
+            if (compress()) {
+                int after = length();
+                System.out.println(conceptualizable + "\t" + before + " -> " + after + "\t" + new String(array()));
+            }
+
             //this.writeByte(0); //null terminator, signifying end-of-term
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -36,7 +55,7 @@ public class TermKey extends DynByteSeq {
     }
 
     public TermKey(@NotNull Task task) {
-        super(task.volume() * 4 + 32 /* ESTIMATE */);
+        super(task.volume() * 4 + 64 /* ESTIMATE */);
         try {
             //Term, Occurrence, Truth, Evidence
 //            writeTermSeq(this, task.term(), true);
@@ -59,11 +78,44 @@ public class TermKey extends DynByteSeq {
 
             writeEvidence(this, task.evidence());
 
+            compress();
+
+            //System.out.println(task + " uncompressed=" + uncLength + " compressed=" + compressedLength);
+
+            {
+//            byte[] reUncompressed = new byte[uncLength];
+//            int unC2 = decompressor.decompress(compressed,0, length(), reUncompressed, 0, reUncompressed.length );
+//            reUncompressed = Arrays.copyOfRange(reUncompressed, 0, unC2);
+//            byte[] original = Arrays.copyOfRange(uncompressed, 0, uncLength);
+//            if (!Arrays.equals(original, reUncompressed)) {
+//                System.err.println(task + " compression failure:\n\t" + new String(original) + "\n\t" + new String(reUncompressed));
+//            }
+            }
+
             //writeByte(0); //null terminator, signifying end-of-term
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean compress() {
+        int uncLength = length();
+
+        //byte[] original = Arrays.copyOfRange(bytes, 0, len);
+        byte[] uncompressed = this.bytes;
+        byte[] compressed = new byte[Lz4RawCompressor.maxCompressedLength(uncLength)]; //this.bytes; //new byte[1024];
+        //public int compress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength) {
+
+
+        int compressedLength = compressor.get()
+                .compress(uncompressed, 0, uncLength, compressed, 0, compressed.length);
+        if (compressedLength <= (int)(uncLength * minCompressionRatio)) {
+            this.bytes = compressed;
+            this.position = compressedLength;
+            return true;
+        }
+        return false;
     }
 
 
