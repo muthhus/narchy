@@ -84,6 +84,15 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         return p;
     }
 
+    @Override
+    public byte[] array() {
+        return Arrays.copyOfRange(bytes, 0, length());
+    }
+
+    @Override
+    public void toArray(byte[] c, int offset) {
+        System.arraycopy(bytes, 0, c, offset, length());
+    }
 
     @Override
     public String toString() {

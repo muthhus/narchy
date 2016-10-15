@@ -49,7 +49,7 @@ public class Tetris extends SwingAgent {
 //            new MultiThreadExecutioner(2, 1024*8);
             new MultiThreadExecutioner(4, 1024*8);
 
-    public static final int runFrames = 5550;
+    public static final int runFrames = 665550;
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 15;

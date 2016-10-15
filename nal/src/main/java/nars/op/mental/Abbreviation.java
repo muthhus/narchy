@@ -282,7 +282,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
             if (additionalTerms.length > 0)
                 tl = ArrayUtils.addAll(tl, additionalTerms);
             this.templates = TermVector.the(tl);
-            rewriteLinks(nar);
+            //rewriteLinks(nar);
         }
 
 

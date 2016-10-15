@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.locks.Lock;
@@ -42,21 +43,21 @@ import static org.eclipse.collections.impl.tuple.Tuples.*;
  */
 public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, Iterable<X> {
 
-    static final class AtomicReferenceArrayListAdapter<T> extends AbstractList<T> {
-        private final AtomicReferenceArray<T> atomicReferenceArray;
-
-        public AtomicReferenceArrayListAdapter(AtomicReferenceArray<T> atomicReferenceArray) {
-            this.atomicReferenceArray = atomicReferenceArray;
-        }
-
-        public T get(int index) {
-            return this.atomicReferenceArray.get(index);
-        }
-
-        public int size() {
-            return this.atomicReferenceArray.length();
-        }
-    }
+//    static final class AtomicReferenceArrayListAdapter<T> extends AbstractList<T> {
+//        private final AtomicReferenceArray<T> atomicReferenceArray;
+//
+//        public AtomicReferenceArrayListAdapter(AtomicReferenceArray<T> atomicReferenceArray) {
+//            this.atomicReferenceArray = atomicReferenceArray;
+//        }
+//
+//        public T get(int index) {
+//            return this.atomicReferenceArray.get(index);
+//        }
+//
+//        public int size() {
+//            return this.atomicReferenceArray.length();
+//        }
+//    }
 
     public interface Prefixed {
         byte getIncomingEdgeFirstCharacter();
@@ -106,11 +107,24 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                                     new ByteArrayNodeLeafWithValue(edgeCharacters, value) :
                                     new ByteArrayNodeLeafNullValue(edgeCharacters))) :
                     ((value instanceof VoidValue) ?
-                            new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes) :
+                            innerVoid(edgeCharacters, childNodes) :
                             ((value == null) ?
-                                    new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes) :
-                                    new ByteArrayNodeDefault(edgeCharacters, value, childNodes))));
+                                    innerNull(edgeCharacters, childNodes) :
+                                    inner(edgeCharacters, value, childNodes))));
         }
+    }
+
+    static public ByteArrayNodeDefault inner(ByteSeq in, Object value, List<Node> outs) {
+        Collections.sort(outs, NODE_COMPARATOR);
+        return new ByteArrayNodeDefault(in.array(), value, outs);
+    }
+    static public ByteArrayNodeNonLeafVoidValue innerVoid(ByteSeq in, List<Node> outs) {
+        Collections.sort(outs, NODE_COMPARATOR);
+        return new ByteArrayNodeNonLeafVoidValue(in.array(), outs);
+    }
+    static public ByteArrayNodeNonLeafNullValue innerNull(ByteSeq in, List<Node> outs) {
+        Collections.sort(outs, NODE_COMPARATOR);
+        return new ByteArrayNodeNonLeafNullValue(in.array(), outs);
     }
 
     final static Comparator<? super Prefixed> NODE_COMPARATOR = (o1, o2) -> {
@@ -143,16 +157,25 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         return (startIndex > mainLength?ByteSeq.EMPTY:main.subSequence(startIndex, mainLength));
     }
 
-    static int binarySearchForEdge(AtomicReferenceArray<? extends Prefixed> childNodes, byte edgeFirstCharacter) {
-        //AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter<>(childNodes);
-        //NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
-        return binarySearch(childNodes, edgeFirstCharacter);
-    }
-
     static int binarySearch(AtomicReferenceArray<? extends Prefixed> l, byte key) {
         int low = 0;
 
         int high = l.length()-1;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            int cmp = cmp(l.get(mid), key);
+
+            if (cmp < 0) low = mid + 1;
+            else if (cmp > 0) high = mid - 1;
+            else return mid; // key found
+        }
+        return -(low + 1);  // key not found
+    }
+    static int binarySearch(List<? extends Prefixed> l, byte key) {
+        int low = 0;
+
+        int high = l.size()-1;
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
@@ -181,73 +204,34 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 //        return -(low + 1);  // key not found
 //    }
 
-    static final class ByteArrayNodeDefault implements Node {
-        private final byte[] incomingEdgeCharArray;
-        private final AtomicReferenceArray<Node> outgoingEdges;
+    static final class ByteArrayNodeDefault extends NonLeafNode {
         private final Object value;
 
-        public ByteArrayNodeDefault(ByteSeq edgeCharSequence, Object value, List<Node> outgoingEdges) {
-            Node[] childNodeArray = (Node[]) outgoingEdges.toArray(new Node[outgoingEdges.size()]);
-            Arrays.sort(childNodeArray, NODE_COMPARATOR);
-            this.outgoingEdges = new AtomicReferenceArray(childNodeArray);
-            this.incomingEdgeCharArray = edgeCharSequence.array(); //does this need to clone?
+        public ByteArrayNodeDefault(byte[] edgeCharSequence, Object value, List<Node> outgoingEdges) {
+            super(edgeCharSequence, outgoingEdges);
             this.value = value;
-        }
-
-        public ByteSeq getIncomingEdge() {
-            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
-        }
-
-        public byte getIncomingEdgeFirstCharacter() {
-            return this.incomingEdgeCharArray[0];
         }
 
         public Object getValue() {
             return this.value;
         }
 
-        public Node getOutgoingEdge(byte edgeFirstCharacter) {
-            int index = binarySearchForEdge(this.outgoingEdges, edgeFirstCharacter);
-            return index < 0 ? null : (Node) this.outgoingEdges.get(index);
-        }
-
-        public void updateOutgoingEdge(Node childNode) {
-            int index = binarySearchForEdge(this.outgoingEdges, childNode.getIncomingEdgeFirstCharacter());
-            if (index < 0) {
-                throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
-            } else {
-                this.outgoingEdges.set(index, childNode);
-            }
-        }
-
-        public List<Node> getOutgoingEdges() {
-            return new AtomicReferenceArrayListAdapter(this.outgoingEdges);
-        }
-
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Node{");
-            sb.append("edge=").append(this.getIncomingEdge());
-            sb.append(", value=").append(this.value);
-            sb.append(", edges=").append(this.getOutgoingEdges());
-            sb.append("}");
-            return sb.toString();
-        }
     }
 
-    static final class ByteArrayNodeLeafVoidValue implements Node {
-        private final byte[] incomingEdgeCharArray;
+    static class ByteArrayNodeLeafVoidValue extends ByteSeq.RawByteSeq implements Node {
+        //public final byte[] incomingEdgeCharArray;
 
         public ByteArrayNodeLeafVoidValue(ByteSeq edgeCharSequence) {
-            this.incomingEdgeCharArray = edgeCharSequence.array();
+            super(edgeCharSequence.array());
+            //this.incomingEdgeCharArray = edgeCharSequence.array();
         }
 
         public ByteSeq getIncomingEdge() {
-            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
+            return this;
         }
 
         public byte getIncomingEdgeFirstCharacter() {
-            return this.incomingEdgeCharArray[0];
+            return this.bytes[0];
         }
 
         public Object getValue() {
@@ -278,15 +262,15 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     }
 
 
-    static final class ByteArrayNodeNonLeafNullValue implements Node {
-        private final byte[] incomingEdgeCharArray;
-        private final AtomicReferenceArray<Node> outgoingEdges;
+    abstract static class NonLeafNode extends CopyOnWriteArrayList<Node> implements Node {
+        public final byte[] incomingEdgeCharArray;
+        //private final AtomicReferenceArray<Node> outgoingEdges;
+        //public final CopyOnWriteArrayList<Node> outgoingEdges;
 
-        public ByteArrayNodeNonLeafNullValue(ByteSeq edgeCharSequence, List<Node> outgoingEdges) {
-            Node[] childNodeArray = (Node[]) outgoingEdges.toArray(new Node[outgoingEdges.size()]);
-            Arrays.sort(childNodeArray, NODE_COMPARATOR);
-            this.outgoingEdges = new AtomicReferenceArray(childNodeArray);
-            this.incomingEdgeCharArray = edgeCharSequence.array();
+        protected NonLeafNode(byte[] incomingEdgeCharArray, List<Node> outs) {
+            super();
+            this.incomingEdgeCharArray = incomingEdgeCharArray;
+            addAll(outs);
         }
 
         public ByteSeq getIncomingEdge() {
@@ -296,71 +280,76 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         public byte getIncomingEdgeFirstCharacter() {
             return this.incomingEdgeCharArray[0];
         }
-
-        public Object getValue() {
-            return null;
-        }
-
         public Node getOutgoingEdge(byte edgeFirstCharacter) {
-            int index = binarySearchForEdge(this.outgoingEdges, edgeFirstCharacter);
-            return index < 0 ? null : (Node) this.outgoingEdges.get(index);
+            //AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter<>(childNodes);
+            //NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
+            int index = binarySearch(this, edgeFirstCharacter);
+            return index < 0 ? null : (Node) get(index);
         }
 
         public void updateOutgoingEdge(Node childNode) {
-            int index = binarySearchForEdge(this.outgoingEdges, childNode.getIncomingEdgeFirstCharacter());
+            //AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter<>(childNodes);
+            //NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
+
+            int index = binarySearch(this, childNode.getIncomingEdgeFirstCharacter());
             if (index < 0) {
                 throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
             } else {
-                this.outgoingEdges.set(index, childNode);
+                set(index, childNode);
             }
         }
 
         public List<Node> getOutgoingEdges() {
-            return new AtomicReferenceArrayListAdapter(this.outgoingEdges);
+            return this;
         }
 
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Node{");
             sb.append("edge=").append(this.getIncomingEdge());
-            sb.append(", value=null");
+            sb.append(", value=" + getValue());
             sb.append(", edges=").append(this.getOutgoingEdges());
             sb.append("}");
             return sb.toString();
         }
     }
 
-    static final class ByteArrayNodeLeafWithValue implements Node {
-        private final byte[] incomingEdgeCharArray;
+    static final class ByteArrayNodeNonLeafNullValue extends NonLeafNode {
+
+        protected ByteArrayNodeNonLeafNullValue(byte[] incomingEdgeCharArray, List<Node> outgoingEdges) {
+            super(incomingEdgeCharArray, outgoingEdges);
+        }
+
+        @Override
+        public Object getValue() {
+            return null;
+        }
+
+        //        public ByteArrayNodeNonLeafNullValue(ByteSeq edgeCharSequence, List<Node> outgoingEdges) {
+//            super(edgeCharSequence, outgoingEdges.toArray(new Node[outgoingEdges.size()]));
+//        }
+
+//        static public ByteArrayNodeNonLeafNullValue the(ByteSeq in, Node... outs) {
+//
+//            Arrays.sort(outs, NODE_COMPARATOR);
+//
+//            return new ByteArrayNodeNonLeafNullValue(in.array(), new CopyOnWriteArrayList<>(outs));
+//        }
+
+
+    }
+
+    static final class ByteArrayNodeLeafWithValue extends ByteArrayNodeLeafVoidValue {
+
         private final Object value;
 
         public ByteArrayNodeLeafWithValue(ByteSeq edgeCharSequence, Object value) {
-            this.incomingEdgeCharArray = edgeCharSequence.array();
+            super(edgeCharSequence);
             this.value = value;
-        }
-
-        public ByteSeq getIncomingEdge() {
-            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
-        }
-
-        public byte getIncomingEdgeFirstCharacter() {
-            return incomingEdgeCharArray[0];
         }
 
         public Object getValue() {
             return this.value;
-        }
-
-        public Node getOutgoingEdge(byte edgeFirstCharacter) {
-            return null;
-        }
-
-        public void updateOutgoingEdge(Node childNode) {
-            throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
-        }
-
-        public List<Node> getOutgoingEdges() {
-            return Collections.emptyList();
         }
 
         public String toString() {
@@ -374,35 +363,14 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         }
     }
 
-    static final class ByteArrayNodeLeafNullValue implements Node {
-        private final byte[] incomingEdgeCharArray;
+    static final class ByteArrayNodeLeafNullValue extends ByteArrayNodeLeafVoidValue {
 
         public ByteArrayNodeLeafNullValue(ByteSeq edgeCharSequence) {
-            this.incomingEdgeCharArray = edgeCharSequence.array();
-        }
-
-        public ByteSeq getIncomingEdge() {
-            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
-        }
-
-        public byte getIncomingEdgeFirstCharacter() {
-            return incomingEdgeCharArray[0];
+            super(edgeCharSequence);
         }
 
         public Object getValue() {
             return null;
-        }
-
-        public Node getOutgoingEdge(byte edgeFirstCharacter) {
-            return null;
-        }
-
-        public void updateOutgoingEdge(Node childNode) {
-            throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
-        }
-
-        public List<Node> getOutgoingEdges() {
-            return Collections.emptyList();
         }
 
         public String toString() {
@@ -416,56 +384,17 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         }
     }
 
-    static final class ByteArrayNodeNonLeafVoidValue implements Node {
-        private final byte[] incomingEdgeCharArray;
-        private final AtomicReferenceArray<Node> outgoingEdges;
+    static final class ByteArrayNodeNonLeafVoidValue extends NonLeafNode {
 
-        public ByteArrayNodeNonLeafVoidValue(ByteSeq edgeCharSequence, List<Node> outgoingEdges) {
-            Node[] childNodeArray = (Node[]) outgoingEdges.toArray(new Node[outgoingEdges.size()]);
-            Arrays.sort(childNodeArray, NODE_COMPARATOR);
-            this.outgoingEdges = new AtomicReferenceArray(childNodeArray);
-            this.incomingEdgeCharArray = edgeCharSequence.array();
-        }
 
-        public ByteSeq getIncomingEdge() {
-            return new ByteSeq.RawByteSeq(this.incomingEdgeCharArray);
-        }
-
-        public byte getIncomingEdgeFirstCharacter() {
-            return incomingEdgeCharArray[0];
+        public ByteArrayNodeNonLeafVoidValue(byte[] edgeCharSequence, List<Node> outgoingEdges) {
+            super(edgeCharSequence, outgoingEdges);
         }
 
         public Object getValue() {
             return VoidValue.SINGLETON;
         }
 
-        public Node getOutgoingEdge(byte edgeFirstCharacter) {
-            int index = binarySearchForEdge(this.outgoingEdges, edgeFirstCharacter);
-            return index < 0 ? null : (Node) this.outgoingEdges.get(index);
-        }
-
-        public void updateOutgoingEdge(Node childNode) {
-            int index = binarySearchForEdge(this.outgoingEdges, childNode.getIncomingEdgeFirstCharacter());
-            if (index < 0) {
-                throw new IllegalStateException("Cannot update the reference to the following child node for the edge starting with \'" + childNode.getIncomingEdgeFirstCharacter() + "\', no such edge already exists: " + childNode);
-            } else {
-                this.outgoingEdges.set(index, childNode);
-            }
-        }
-
-        public List<Node> getOutgoingEdges() {
-            return new AtomicReferenceArrayListAdapter(this.outgoingEdges);
-        }
-
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Node{");
-            sb.append("edge=").append(this.getIncomingEdge());
-            sb.append(", value=").append(VoidValue.SINGLETON);
-            sb.append(", edges=").append(this.getOutgoingEdges());
-            sb.append("}");
-            return sb.toString();
-        }
     }
 
 

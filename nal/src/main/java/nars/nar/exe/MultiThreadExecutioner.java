@@ -89,8 +89,8 @@ public class MultiThreadExecutioner extends Executioner {
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
-                //new SleepingWaitStrategy()
-                new BlockingWaitStrategy()
+                new SleepingWaitStrategy()
+                //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
                 //new LiteBlockingWaitStrategy()
         );
