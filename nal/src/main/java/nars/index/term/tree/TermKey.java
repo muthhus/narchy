@@ -16,6 +16,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static nars.IO.SPECIAL_OP;
+import static nars.IO.writeEvidence;
 import static nars.IO.writeUTFWithoutLength;
 import static nars.util.data.rope.StringHack.bytes;
 
@@ -25,17 +26,17 @@ import static nars.util.data.rope.StringHack.bytes;
 public class TermKey extends DynByteSeq {
 
     public TermKey(@NotNull Term conceptualizable) {
-        super(conceptualizable.volume() * 8 + 64 /* ESTIMATE */);
+        super(conceptualizable.volume() * 4 + 4 /* ESTIMATE */);
         try {
             writeTermSeq(this, conceptualizable, false);
-            this.writeByte(0); //null terminator, signifying end-of-term
+            //this.writeByte(0); //null terminator, signifying end-of-term
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public TermKey(@NotNull Task task) {
-        super(task.volume() * 4 + 128 /* ESTIMATE */);
+        super(task.volume() * 4 + 32 /* ESTIMATE */);
         try {
             //Term, Occurrence, Truth, Evidence
 //            writeTermSeq(this, task.term(), true);
@@ -52,17 +53,13 @@ public class TermKey extends DynByteSeq {
 
             writeLong(task.occurrence());
 
-            if ((punc == Symbols.BELIEF) && (punc == Symbols.GOAL)) {
+            if ((punc == Symbols.BELIEF) || (punc == Symbols.GOAL)) {
                 writeInt(task.truth().hashCode());
             }
 
-            @NotNull long[] len = task.evidence();
-            writeByte(len.length);
-            for (long x : len) {
-                writeLong(x);
-            }
+            writeEvidence(this, task.evidence());
 
-            writeByte(0); //null terminator, signifying end-of-term
+            //writeByte(0); //null terminator, signifying end-of-term
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -110,7 +107,9 @@ public class TermKey extends DynByteSeq {
 
     public static void writeCompoundSeq(@NotNull DataOutput out, @NotNull Compound c, boolean includeTemporal) throws IOException {
 
+        out.writeByte('(');
         writeTermContainerSeq(out, c.subterms(), includeTemporal);
+        out.writeByte(')');
 
         @NotNull Op o = c.op();
         out.writeByte(o.ordinal()); //put operator last
@@ -125,14 +124,12 @@ public class TermKey extends DynByteSeq {
 
     static void writeTermContainerSeq(@NotNull DataOutput out, @NotNull TermContainer c, boolean includeTemporal) throws IOException {
 
-        out.writeByte('(');
         int siz = c.size();
         for (int i = 0; i < siz; i++) {
             writeTermSeq(out, c.term(i), includeTemporal);
             if (i < siz-1)
                 out.writeByte(',');
         }
-        out.writeByte(')');
 
     }
 
