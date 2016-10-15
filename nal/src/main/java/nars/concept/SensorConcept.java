@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static nars.Symbols.BELIEF;
+import static nars.time.Tense.ETERNAL;
 
 
 /**
@@ -42,7 +43,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-    private boolean latchLastValue = true;
+    //private boolean latchLastValue = true;
 
 
 
@@ -218,11 +219,6 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     }
 
 
-    public SensorConcept setLatched(boolean l) {
-        this.latchLastValue = l;
-        return this;
-    }
-
     public static void activeAttention(Iterable<? extends Prioritizable> c, MutableFloat min, MutableFloat limit, NAR nar) {
 
         activeAttention(c,
@@ -273,10 +269,10 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 //            if (when == now || when == ETERNAL)
 //                return sensor.truth();
 
-            // if when is between the last input time and now, evaluate the truth at the last input time
-            // to avoid any truth decay across time. this emulates a persistent latched sensor value
-            // ie. if it has not changed
-            if (latchLastValue && when <= now && when >= sensor.lastInputTime) {
+//            // if when is between the last input time and now, evaluate the truth at the last input time
+//            // to avoid any truth decay across time. this emulates a persistent latched sensor value
+//            // ie. if it has not changed
+            if (when == ETERNAL || (when <= now && when >= sensor.lastInputTime)) {
                 //now = when = sensor.lastInputTime;
                 return sensor.truth();
             }
@@ -284,19 +280,19 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
             return super.truth(when, now);
         }
 
-        @Override
-        public Task match(@NotNull Task target, long now) {
-            if (latchLastValue) {
-                long when = target.occurrence();
-                @Nullable Task next = sensor.current;
-                if (next != null && when <= now && when >= next.occurrence()) {
-                    //use the last known sensor value as-is
-                    //but project it to the target time unchanged (due to the implicit 'latching' of an unchanged value
-                    return MutableTask.clone(next, now);
-                }
-            }
-            return super.match(target, now);
-        }
+//        @Override
+//        public Task match(@NotNull Task target, long now) {
+////            if (latchLastValue) {
+//                long when = target.occurrence();
+//                @Nullable Task next = sensor.current;
+//                if (next != null && when <= now && when >= next.occurrence()) {
+//                    //use the last known sensor value as-is
+//                    //but project it to the target time unchanged (due to the implicit 'latching' of an unchanged value
+//                    return MutableTask.clone(next, now);
+//                }
+////            }
+//            return super.match(target, now);
+//        }
 
 //        @Override
 //        public Task match(@NotNull Task target, long now) {

@@ -8,6 +8,7 @@ import nars.task.TruthPolation;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.Symbols.*;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * NAR Parameters which can be changed during runtime.
@@ -48,7 +50,7 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final boolean BACKWARD_QUESTION_RULES = true;
 
 
-    /** average priority target for bag forgetting */
+    /** average priority target for bag forgetting, between 0 and 1 usually 0.25..0.5 for balance */
     public static final float BAG_THRESHOLD = 0.25f;
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
@@ -58,17 +60,23 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int ACTIVATION_TERMLINK_DEPTH = 1;
     public static final int ACTIVATION_TASKLINK_DEPTH = 1;
 
-    final static float LIGHT_EPSILON = 0.000001f;
+    final static float LIGHT_EPSILON = 0.5f;
 
     public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
 
-        if (dt <= LIGHT_EPSILON)
+        if (dt <= LIGHT_EPSILON) {
             return evidence;
-        else {
-            float decayPeriod = evidence * 100f;
-            float decayFactor = Util.clamp(1f - dt / decayPeriod, 0f, 1f);
+        } else {
+//            float eternalized =
+//                    //c2w(TruthFunctions.eternalize(w2c(evidence)));
+//                    evidence/8f;
+
+
+            float decayPeriod = 2f;
+            float decayFactor = 1f / (1f + dt / decayPeriod);
             float newEvidence = evidence * decayFactor;
             //System.out.println(dt + "," + evidence + "\t" + decayPeriod + ","+decayFactor + "\t --> " + newEvidence);
+            //return Math.max(eternalized, newEvidence);
             return newEvidence;
         }
 

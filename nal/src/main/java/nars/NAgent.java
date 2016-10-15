@@ -15,6 +15,7 @@ import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
@@ -80,12 +81,10 @@ abstract public class NAgent implements NSense, NAction {
     public boolean trace = false;
 
 
-    /** >=0 : additional NAR frames that are computed between each Agent frame */
+    /** >=0 : NAR frames that are computed between each Agent frame */
     public final int frameRate;
 
     protected long now;
-    private long stopTime;
-    private NARLoop loop;
 
 
     //private float curiosityAttention;
@@ -93,7 +92,7 @@ abstract public class NAgent implements NSense, NAction {
     private MutableFloat minSensorPriority, maxSensorPriority;
 
     public NAgent(NAR nar) {
-        this(nar, 0);
+        this(nar, 1);
     }
 
     public NAgent(NAR nar, int frameRate) {
@@ -163,14 +162,24 @@ abstract public class NAgent implements NSense, NAction {
      */
     protected abstract float act();
 
+    int actionFrame = 0;
+
     protected void frame() {
 
-        now = nar.time();
-        if (now % (1+ frameRate) != 0)
-            return;
+        int phase = (actionFrame++) % (frameRate);
+        if (phase == 0) {
+            ((FrameClock) nar.clock).tick(0); //freeze clock
+        } else if ((phase == frameRate-1) || (frameRate < 2)) {
+            ((FrameClock) nar.clock).tick(1); //resume clock for the last cycle before repeating
+            now = nar.time();
+            doFrame();
+        }
 
+
+    }
+
+    private void doFrame() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
-
 
         float r = rewardValue = act();
         if (r==r) {
@@ -188,13 +197,6 @@ abstract public class NAgent implements NSense, NAction {
 
         if (trace)
             System.out.println(summary());
-
-        if (stopTime > 0 && now >= stopTime) {
-            if (loop != null) {
-                loop.stop();
-                this.loop = null;
-            }
-        }
     }
 
 
@@ -230,8 +232,6 @@ abstract public class NAgent implements NSense, NAction {
 
     protected void init() {
 
-        int dt = 1 + frameRate;
-        int ht = Math.max(1, Math.round(dt/2f)); //half dt cycle, min 1
 
         //this.curiosityAttention = reinforcementAttention / actions.size();
 
@@ -312,12 +312,11 @@ abstract public class NAgent implements NSense, NAction {
         for (Concept a : actions) {
             Term action = a.term();
 
-            int lookahead = 1;
+            int lookahead = 2;
             for (int i = 0; i < lookahead; i++) {
-                long then = now + i * dt;
                 predictors.addAll(
-                    new MutableTask($.seq(action, ht, happiness), '?', null).time(now, then),
-                    new MutableTask($.impl(action, ht, happiness), '?', null).time(now, then)
+                    new MutableTask($.seq(action, 1+lookahead, happiness), '?', null).time(now, now+1),
+                    new MutableTask($.impl(action, 1+lookahead, happiness), '?', null).time(now, now+1)
                     //new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),
                     //new MutableTask(action, '@', null).time(now, then)
                 );
@@ -326,57 +325,24 @@ abstract public class NAgent implements NSense, NAction {
         }
 
         predictors.add(
-            new MutableTask($.impl($.varQuery("what"), ht, happiness), '?', null).time(now, now)
+            new MutableTask($.seq($.varQuery("what"), 1, happiness), '?', null).time(now, now)
         );
 
         System.out.println(Joiner.on('\n').join(predictors));
     }
 
-    public NARLoop run(final int cycles) {
-        return run(cycles, 0);
-    }
-
-
-    public NAgent runSync(final int cycles) {
-        //run(cycles, 0).join();
-        start();
-        nar.run(cycles);
-        return this;
-    }
-
-    public NARLoop run(final int cycles, int frameDelayMS) {
-
-        start();
-
-        this.stopTime = nar.time() + cycles;
-
-        this.loop = new NARLoop(nar, frameDelayMS);
-
-
-        return loop;
-
-//        nar.next(); //step one for any mission() results to process first
-//
-//        for (int t = 0; t < cycles; t++) {
-//            next();
-//
-//            if (frameDelayMS > 0)
-//                Util.pause(frameDelayMS);
-//        }
-    }
-
-    private void start() {
-        if (this.loop != null)
-            throw new UnsupportedOperationException();
-
+    public NAgent run(final int cycles) {
         nar.runLater(() -> {
 
             init();
 
-
             nar.onFrame(nn -> frame());
         });
+        nar.run(cycles);
+        return this;
     }
+
+
 
 
     private void curiosity() {

@@ -10,6 +10,14 @@ public class FrameClock implements Clock {
     private final AtomicLong nextStamp = new AtomicLong(1);
 
     long t;
+    int dt;
+
+    public FrameClock() {
+        this(1);
+    }
+    public FrameClock(int dt) {
+        this.dt = dt;
+    }
 
     @Override
     public void clear() {
@@ -24,7 +32,7 @@ public class FrameClock implements Clock {
 
     @Override
     public final void tick() {
-        t++;
+        t+=dt;
     }
 
     @Override

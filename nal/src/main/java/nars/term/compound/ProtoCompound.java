@@ -26,6 +26,10 @@ public interface ProtoCompound {
     }
 
     static ProtoCompound the(Op o, int dt, Term[] args) {
+//        for (Term x : args)
+//            if (x==null)
+//                throw new NullPointerException();
+
         return new RawProtoCompound(o, dt, args);
     }
 

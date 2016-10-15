@@ -73,7 +73,7 @@ public class RecogChar extends SwingAgent {
                             //0.5f;
                             Float.NaN;
                 }
-            }).setLatched(false /* for predictive capabiities to not be silenced */);
+            });//.setLatched(false /* for predictive capabiities to not be silenced */);
             predictions.add( x );
 
             predictors.add(new MutableTask(x.term(), Symbols.QUESTION, null).present(nar.time()));

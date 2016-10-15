@@ -57,7 +57,7 @@ abstract public class SwingAgent extends NAgent {
         int conceptsPerCycle = 32;
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(2048,
+        Default nar = new Default(1024,
                 conceptsPerCycle, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64*1024, 3)
@@ -66,15 +66,15 @@ abstract public class SwingAgent extends NAgent {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.9f);
 
-        float p = 0.02f;
+        float p = 0.01f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
         nar.compoundVolumeMax.setValue(volMax);
 
         //nar.linkFeedbackRate.setValue(0.05f);
@@ -95,8 +95,7 @@ abstract public class SwingAgent extends NAgent {
         chart(a, history);
 
 
-        a.run(frames).join();
-        //a.runSync(runFrames);
+        a.run(frames);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
@@ -115,7 +114,7 @@ abstract public class SwingAgent extends NAgent {
 
                         //Vis.concepts(nar, 512),
 
-                        Vis.agentActions(a, history*a.frameRate),
+                        Vis.agentActions(a, 200),
 
                         Vis.budgetHistogram(nar, 32),
                         Vis.conceptLinePlot(nar,

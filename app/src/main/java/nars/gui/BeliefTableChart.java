@@ -363,8 +363,8 @@ public class BeliefTableChart extends Surface {
     }
     private void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
 
+        gl.glLineWidth(4.0f);
         gl.glBegin(GL2.GL_LINE_STRIP);
-        gl.glLineWidth(3.0f);
 
         wave.forEach((freq, conf, o, qua) -> {
 

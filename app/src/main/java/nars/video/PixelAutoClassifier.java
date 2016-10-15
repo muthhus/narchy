@@ -115,7 +115,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
         //float basePri = nar.priorityDefault(Symbols.BELIEF);
         //float baseDur = nar.durabilityDefault(Symbols.BELIEF);
 
-        float alpha = 0.075f / agent.frameRate; //this represents the overall rate; the sub-block rate will be a fraction of this
+        float alpha = 0.075f; //this represents the overall rate; the sub-block rate will be a fraction of this
         float corruption = 0.05f;
         int regionPixels = sw * sh;
         float sumErr = 0;

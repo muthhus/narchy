@@ -12,8 +12,10 @@ import static org.slf4j.LoggerFactory.getLogger;
  * self managed set of processes which run a NAR
  * as a loop at a certain frequency.
  * TODO extract the hft core reservation to a subclass and put that in the app module, along with the hft dependency
+ *
+ * mostly replaced by Executioner's
  */
-public class NARLoop implements Runnable {
+@Deprecated public class NARLoop implements Runnable {
 
     private static final Logger logger = getLogger(NARLoop.class);
 

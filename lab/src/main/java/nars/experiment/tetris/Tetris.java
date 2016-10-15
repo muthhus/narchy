@@ -633,7 +633,7 @@ public class Tetris extends SwingAgent {
         //addCamera(t, nar, 8, 8);
 
 
-        NARLoop loop = t.run(runFrames, frameDelay);
+        t.run(runFrames);
 
 //        NARController meta = new NARController(nar, loop, t);
 //
@@ -643,7 +643,6 @@ public class Tetris extends SwingAgent {
 //
 //        ));
 
-        loop.join();
 
 
         //nar.stop();

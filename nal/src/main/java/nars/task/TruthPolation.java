@@ -26,7 +26,8 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     @NotNull final float[] freq;
     @NotNull final float[] conf;
 
-    final static private boolean clipToBeliefs = false;
+    //private final static boolean clipToBeliefs = true;
+
 
     //@Nullable private static final Truth EterNull = $.t(0.5f, Param.TRUTH_EPSILON);
 
@@ -58,11 +59,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     @Nullable
     public Truth truth(long when, long now, @NotNull Task[] tasks) {
 
-
-//        int n = tasks.length;
-//        assert(times.length <= n);
-//
-//        assert(n >= 2);
+        assert(tasks.length > 2);
 
         long minT = Long.MAX_VALUE, maxT = Long.MIN_VALUE;
 
@@ -70,56 +67,31 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         int i = 0;
         for (Task t : tasks) {
 
-//            if (t == null)
-//                continue; //HACK
-
-
-            //n--;
-            //continue;
-            //}
-            //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
-
-            //offset the specified occurence time to a small window around the pure occurrence time,
-            //so that tasks with equivalent truths but different evidence (and thus different hash) will
-            //have a slightly different position on the time axis
-
-            //-when added is shifting relative to the target time, so the queried interpolation time will equal zero below
-            //this helps the floating point precision in calculations with numbers close together
-
-            //float window = 0.01f;
-
             long o = t.occurrence();
             times[i][0] = (o != ETERNAL) ? o : when;
             freq[i] = t.freq();
             conf[i] = t.confWeight();
-            //* ((now == ETERNAL || o == ETERNAL) ? 1f : projection(when, o, now));
-
-            ;
 
             if (minT > o) minT = o;
             if (maxT < o) maxT = o;
 
-
             i++;
         }
 
-        if (i < 2)
-            throw new RuntimeException("too few tasks for truthpolation: " + i);
 
-        //clip to out-of-range temporal margin, ie. beyond which confidence begins diminishing with distance
-        //final int dtTolerance;
-        if (clipToBeliefs) {
-            if ((minT > when) && (now <= minT)) {
-                //past looking into future
-                when = minT;
-            } else if ((maxT < when) && (now >= maxT)) {
-                //present/future looking into past
-                when = maxT;
-            } else {
-                //dtTolerance = 0;
-            }
-        }
-
+//        //clip to out-of-range temporal margin, ie. beyond which confidence begins diminishing with distance
+//        //final int dtTolerance;
+//        if (clipToBeliefs) {
+//            int window = 1;
+//            if (minT - when >= window) {
+//                //past looking into future
+//                when = minT;
+//            } else if (when - maxT >= window) {
+//                //present/future looking into past
+//                when = maxT;
+//            } else {
+//            }
+//        }
 
         float[] v = this.value(
                 new float[] { when },
