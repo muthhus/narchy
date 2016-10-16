@@ -57,7 +57,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         }
 
         @Nullable public long[] evidence() {
-            return e == null ? null : Stamp.zip((Collection) e);
+            return e == null ? null : Stamp.zip(e);
         }
 
         @Nullable public Truth truth() {
@@ -162,7 +162,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
             Term ss = subterm; //original pre-unnegated subterm for dt relative calculation
 
-            boolean negated = subterm.op()==NEG ? !neg : neg;
+            boolean negated = (subterm.op() == NEG) != neg;
             if (negated)
                 subterm = $.unneg(subterm);
 
@@ -186,7 +186,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
         private boolean subTruth(Term next, Compound superterm, long when, long now, DynTruth d, Term ss, boolean negated) {
             Concept nextConcept = nar.concept(next);
-            return nextConcept == null ? false : subTruth(superterm, nextConcept, when, now, d, ss, negated);
+            return nextConcept != null && subTruth(superterm, nextConcept, when, now, d, ss, negated);
 
         }
 

@@ -248,9 +248,9 @@ public class PremiseRuleSet {
             throw new RuntimeException("parse error");
         }
 
-        String A = "(" + ab[0].trim() + ")";
+        String A = '(' + ab[0].trim() + ')';
         Compound ap = (Compound) index.parseRaw(A);
-        String B = "(" + ab[1].trim() + ")";
+        String B = '(' + ab[1].trim() + ')';
         Compound bp = (Compound) index.parseRaw(B);
         return new PremiseRule(ap, bp);
     }

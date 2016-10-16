@@ -115,9 +115,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {
-        cache.asMap().values().forEach(x -> {
-            c.accept(x);
-        });
+        cache.asMap().values().forEach(c::accept);
     }
 
     @Override
@@ -129,7 +127,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
     @Override
     public Termed get(Term key, boolean createIfMissing) {
         if (createIfMissing) {
-            return cache.get(key, conceptBuilder::apply);
+            return cache.get(key, conceptBuilder);
         } else {
             return cache.getIfPresent(key);
         }

@@ -31,6 +31,7 @@ public abstract class MaplikeTermIndex extends TermIndex {
         return super.newCompound(op, dt, intern(s));
     }
 
+    @Override
     public abstract TermContainer intern(TermContainer s);
 
 

@@ -161,7 +161,7 @@ public interface NSense {
                     try {
                         Object v = Ognl.getValue(expr, o, Object.class);
                         if (v instanceof Boolean) {
-                            return ((Boolean) v).booleanValue() ? 1f : 0f;
+                            return (Boolean) v ? 1f : 0f;
                         } else if (v instanceof Number) {
                             return ((Number) v).floatValue();
                         } else {

@@ -104,7 +104,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /**
      * upper and lower limits for # of termutations derived, determined by premise's priority
      */
-    public static float UnificationMatchesMax = 4, UnificationMatchesMin = 2;
+    public static final float UnificationMatchesMax = 4, UnificationMatchesMin = 2;
 
 
     /**

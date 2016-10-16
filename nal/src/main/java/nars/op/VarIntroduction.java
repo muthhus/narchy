@@ -120,9 +120,7 @@ public abstract class VarIntroduction {
     }
 
     public VarIntroduction each(NAR nar) {
-        nar.onTask(t -> {
-            accept(t);
-        });
+        nar.onTask(this::accept);
         return this;
     }
 

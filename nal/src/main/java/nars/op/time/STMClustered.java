@@ -180,7 +180,7 @@ public class STMClustered extends STM {
                     }))
                     .entrySet().stream()
                     .filter(c -> c.getKey() >= 0)
-                    .map(c -> c.getValue())//ignore the -1 discard group
+                    .map(Map.Entry::getValue)//ignore the -1 discard group
                     .filter(c -> c.size() > 1); //only batches of >1
 
         }

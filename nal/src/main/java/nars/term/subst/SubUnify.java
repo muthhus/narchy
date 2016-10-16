@@ -49,10 +49,8 @@ public final class SubUnify extends Unify {
             }
         }
 
-        if ((result==null || result==False) && --retries > 0)
-            return true; //continue trying
+        return (result == null || result == False) && --retries > 0;
 
-        return false; //found the one match we wanted (stored in result), end here
     }
 
     public boolean tryMatch(@NotNull Term x, @NotNull Term y) {

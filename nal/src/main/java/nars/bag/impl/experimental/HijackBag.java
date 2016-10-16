@@ -439,7 +439,7 @@ public class HijackBag<X> implements Bag<X> {
     @NotNull
     @Override
     public Iterator<BLink<X>> iterator() {
-        return map.entrySet().stream().map(x -> (BLink<X>)new ArrayBLink<X>(x.getKey(), x.getValue())).iterator();
+        return map.entrySet().stream().map(x -> (BLink<X>) new ArrayBLink<>(x.getKey(), x.getValue())).iterator();
     }
 
     @Override

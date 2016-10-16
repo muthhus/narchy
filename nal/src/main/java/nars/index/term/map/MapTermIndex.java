@@ -59,7 +59,7 @@ public class MapTermIndex extends MaplikeTermIndex {
     @Override
     public Termed get(Term x, boolean createIfMissing) {
         if (createIfMissing) {
-            return concepts.computeIfAbsent(x, conceptBuilder::apply);
+            return concepts.computeIfAbsent(x, conceptBuilder);
         } else {
             return concepts.get(x);
         }

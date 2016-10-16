@@ -29,7 +29,7 @@ public class TermTree extends MyConcurrentRadixTree<Termed> {
         return put(key(value), value);
     }
 
-    public TermKey key(Termed value) {
+    public static TermKey key(Termed value) {
         return new TermKey(value.term());
     }
 

@@ -26,7 +26,7 @@ import static nars.util.data.rope.StringHack.bytes;
  */
 public class TermKey extends DynByteSeq {
 
-    private final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(()->new Lz4Compressor());
+    private final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(Lz4Compressor::new);
     final static Lz4Decompressor decompressor = new Lz4Decompressor();
     private final static float minCompressionRatio = 0.9f;
 

@@ -43,9 +43,7 @@ public class TrieUnderiver implements Underiver {
 
     public TrieUnderiver(@NotNull TrieDeriver t) {
         this.deriver = t;
-        g = new SimpleDirectedGraph<>((a, b) -> {
-            return new CauseEdge(a, b);
-        });
+        g = new SimpleDirectedGraph<>(CauseEdge::new);
 
         //traverse the derivation trie to a graph (DAG)
         t.recurse((a, b) -> {

@@ -3,7 +3,6 @@ package nars.term.transform;
 import nars.$;
 import nars.Op;
 import nars.Param;
-import nars.index.Indexes;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
 import nars.nal.meta.match.Ellipsis;
@@ -11,6 +10,7 @@ import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.nal.rule.PremiseRule;
+import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -50,7 +50,7 @@ public class EllipsisTest {
         default Set<Term> test(int arity, int repeats) {
             Set<Term> selectedFixed = $.newHashSet(arity);
 
-            TermIndex index = new Indexes.DefaultTermTermIndex(1024, new XorShift128PlusRandom(1));
+            TermIndex index = new Default.DefaultTermTermIndex(1024, new XorShift128PlusRandom(1));
 
             Compound y = getMatchable(arity);
             assertNotNull(y);

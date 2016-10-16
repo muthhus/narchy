@@ -3,11 +3,11 @@ package nars.truth.func;
 import nars.$;
 import nars.NAR;
 import nars.Symbols;
-import nars.nal.meta.AllowOverlap;
-import nars.nal.meta.SinglePremise;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
+import nars.truth.func.annotation.AllowOverlap;
+import nars.truth.func.annotation.SinglePremise;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;

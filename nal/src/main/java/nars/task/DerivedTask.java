@@ -9,7 +9,6 @@ import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
 import nars.nar.Default;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;

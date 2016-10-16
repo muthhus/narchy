@@ -642,130 +642,132 @@ public abstract class TermBuilder {
 
     @NotNull
     protected Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
-
-
+        statement:
         while (true) {
 
-            //special statement filters
-            switch (op) {
 
-                case INH:
-                    if (predicate instanceof TermTransform && transformImmediates() && subject.op() == PROD) {
-                        return ((TermTransform) predicate).function((Compound) subject);
-                    }
-                    break;
+            while (true) {
 
+                //special statement filters
+                switch (op) {
 
-                case EQUI:
-
-                    if (!validEquivalenceTerm(subject))
-                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence subject");
-                    if (!validEquivalenceTerm(predicate))
-                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
-
-                    boolean subjNeg = subject.op() == NEG;
-                    boolean predNeg = predicate.op() == NEG;
-                    if (subjNeg && predNeg) {
-                        return statement(op, dt, $.unneg(subject), $.unneg(predicate));
-                    } else if (!subjNeg && predNeg) {
-                        return $.neg( statement(op, dt, subject, $.unneg(predicate)));
-                    } else if (subjNeg && !predNeg) {
-                        return $.neg( statement(op, dt, $.unneg(subject), predicate));
-                    }
-
-                    break;
+                    case INH:
+                        if (predicate instanceof TermTransform && transformImmediates() && subject.op() == PROD) {
+                            return ((TermTransform) predicate).function((Compound) subject);
+                        }
+                        break;
 
 
-                case IMPL:
+                    case EQUI:
+
+                        if (!validEquivalenceTerm(subject))
+                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence subject");
+                        if (!validEquivalenceTerm(predicate))
+                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid equivalence predicate");
+
+                        boolean subjNeg = subject.op() == NEG;
+                        boolean predNeg = predicate.op() == NEG;
+                        if (subjNeg && predNeg) {
+                            subject = $.unneg(subject);
+                            predicate = $.unneg(predicate);
+                            continue statement;
+                        } else if (!subjNeg && predNeg) {
+                            return $.neg(statement(op, dt, subject, $.unneg(predicate)));
+                        } else if (subjNeg && !predNeg) {
+                            return $.neg(statement(op, dt, $.unneg(subject), predicate));
+                        }
+
+                        break;
 
 
-                    if (isTrue(subject)) {
-                        return predicate;
-                    } else if (isFalse(subject) || isTrueOrFalse(predicate)) {
-                        return False;
-                        //throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
-                        //return negation(predicate); /??
-                    }
+                    case IMPL:
 
 
+                        if (isTrue(subject)) {
+                            return predicate;
+                        } else if (isFalse(subject) || isTrueOrFalse(predicate)) {
+                            return False;
+                            //throw new InvalidTermException(op, dt, new Term[] { subject, predicate }, "Implication predicate is singular FALSE");
+                            //return negation(predicate); /??
+                        }
 
-                    //filter (factor out) any common subterms iff commutive
-                    if ((subject.op() == CONJ) && (predicate.op() == CONJ)) {
-                        Compound csub = (Compound) subject;
-                        Compound cpred = (Compound) predicate;
-                        if (commutive(dt) || dt==XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */) {
 
-                            TermContainer subjs = csub.subterms();
-                            TermContainer preds = cpred.subterms();
+                        //filter (factor out) any common subterms iff commutive
+                        if ((subject.op() == CONJ) && (predicate.op() == CONJ)) {
+                            Compound csub = (Compound) subject;
+                            Compound cpred = (Compound) predicate;
+                            if (commutive(dt) || dt == XTERNAL /* if XTERNAL somehow happens here, just consider it as commutive */) {
 
-                            MutableSet<Term> common = TermContainer.intersect(subjs, preds);
-                            if (!common.isEmpty()) {
-                                subject = the(csub, TermContainer.exceptToSet(subjs, common));
-                                predicate = the(cpred, TermContainer.exceptToSet(preds, common));
-                                continue;
+                                TermContainer subjs = csub.subterms();
+                                TermContainer preds = cpred.subterms();
+
+                                MutableSet<Term> common = TermContainer.intersect(subjs, preds);
+                                if (!common.isEmpty()) {
+                                    subject = the(csub, TermContainer.exceptToSet(subjs, common));
+                                    predicate = the(cpred, TermContainer.exceptToSet(preds, common));
+                                    continue;
+                                }
                             }
                         }
-                    }
 
-                    // (C ==> (A ==> B))   <<==>>  ((&&,A,C) ==> B)
-                    if (predicate.op() == IMPL) {
-                        Term oldCondition = subj(predicate);
-                        if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject))) {
-                            //throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Implication circularity");
-                            return True; //infinite loop
-                        } else {
-                            if (commutive(dt)  /* if XTERNAL somehow happens here, just consider it as commutive */)
-                                subject = conj(dt, subject, oldCondition);
-                                predicate = pred(predicate);
+                        // (C ==> (A ==> B))   <<==>>  ((&&,A,C) ==> B)
+                        if (predicate.op() == IMPL) {
+                            Term oldCondition = subj(predicate);
+                            if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject))) {
+                                //throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Implication circularity");
+                                return True; //infinite loop
+                            } else {
+                                if (commutive(dt)  /* if XTERNAL somehow happens here, just consider it as commutive */) {
+                                    subject = conj(dt, subject, oldCondition);
+                                    predicate = pred(predicate);
+                                }
+                            }
                         }
-                    }
 
 
-                    if (subject.isAny(InvalidImplicationSubject))
-                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
-                    if (predicate.isAny(InvalidImplicationPredicate))
-                        throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
+                        if (subject.isAny(InvalidImplicationSubject))
+                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication subject");
+                        if (predicate.isAny(InvalidImplicationPredicate))
+                            throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
 
-                    if (predicate.op() == NEG) {
-                        Term unNegatedPred = $.impl(subject, dt, $.unneg(predicate));
-                        return //negation
-                               $.neg( //to be safe use the full negation but likely it can be the local negation pipeline
-                                       unNegatedPred
-                               );
-                    }
-                    break;
+                        if (predicate.op() == NEG) {
+                            Term unNegatedPred = $.impl(subject, dt, $.unneg(predicate));
+                            return //negation
+                                    $.neg( //to be safe use the full negation but likely it can be the local negation pipeline
+                                            unNegatedPred
+                                    );
+                        }
+                        break;
 
-            }
+                }
 
-            //if either the subject or pred are True/False by this point, fail
-            if (isTrueOrFalse(subject) || isTrueOrFalse(predicate)) {
-                return subject.equals(predicate) ? True : False;
-            }
-
-
+                //if either the subject or pred are True/False by this point, fail
+                if (isTrueOrFalse(subject) || isTrueOrFalse(predicate)) {
+                    return subject.equals(predicate) ? True : False;
+                }
 
 
-            //compare unneg'd if it's not temporal or eternal/parallel
-            boolean preventInverse = !op.temporal || (commutive(dt) || dt == XTERNAL);
-            Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject) : subject;
-            Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate) : predicate;
-            if (Terms.equalsAnonymous(sRoot, pRoot))
-                return subject.op() == predicate.op() ? True : False; //True if same, False if negated
+                //compare unneg'd if it's not temporal or eternal/parallel
+                boolean preventInverse = !op.temporal || (commutive(dt) || dt == XTERNAL);
+                Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject) : subject;
+                Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate) : predicate;
+                if (Terms.equalsAnonymous(sRoot, pRoot))
+                    return subject.op() == predicate.op() ? True : False; //True if same, False if negated
 
 
-            //TODO its possible to disqualify invalid statement if there is no structural overlap here??
+                //TODO its possible to disqualify invalid statement if there is no structural overlap here??
 //
-            @NotNull Op sop = sRoot.op();
-            if (sop == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
-                //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
-                return True;
-            }
+                @NotNull Op sop = sRoot.op();
+                if (sop == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
+                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
+                    return True;
+                }
 
-            @NotNull Op pop = pRoot.op();
-            if (pop == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
-                //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
-                return True;
-            }
+                @NotNull Op pop = pRoot.op();
+                if (pop == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
+                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
+                    return True;
+                }
 
 //            if (sop.statement && pop.statement) {
 //                Compound csroot = (Compound) sRoot;
@@ -777,18 +779,18 @@ public abstract class TermBuilder {
 //            }
 
 
-            if (op.commutative) {
+                if (op.commutative) {
 
-                boolean crossesTime = dt != DTERNAL && dt != XTERNAL && dt != 0;
+                    boolean crossesTime = dt != DTERNAL && dt != XTERNAL && dt != 0;
 
-                //System.out.println("\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
+                    //System.out.println("\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
 
-                //normalize co-negation
-                boolean sn = subject.op() == NEG;
-                boolean pn = predicate.op() == NEG;
+                    //normalize co-negation
+                    boolean sn = subject.op() == NEG;
+                    boolean pn = predicate.op() == NEG;
 
-                if (sn ^ pn) {
-                    //this block should only happen for similarity, since the either-negated case for equivalence is factored out above
+                    if (sn ^ pn) {
+                        //this block should only happen for similarity, since the either-negated case for equivalence is factored out above
 //                    Term ss, pp;
 //                    if (sn) {
 //                        //subject negated;
@@ -809,33 +811,32 @@ public abstract class TermBuilder {
 //                        subject = ss;
 //                        predicate = $.neg(pp);
 //                    }
-                } else {
-                    if (sn && pn) {
+                    } else {
+                        if (sn && pn) {
 //                        //both negative: unnegate both but use the original sort ordering in case negation causes it to change, this will keep it stable
 //                        subject = $.unneg(subject);
 //                        predicate = $.unneg(predicate);
-                    } else {
-                        //both postiive
+                        } else {
+                            //both postiive
+                        }
+
+                        if (subject.compareTo(predicate) > 0) {
+                            Term x = predicate;
+                            predicate = subject;
+                            subject = x;
+                            if (crossesTime)
+                                dt = -dt;
+                        }
                     }
 
-                    if (subject.compareTo(predicate) > 0) {
-                        Term x = predicate;
-                        predicate = subject;
-                        subject = x;
-                        if (crossesTime)
-                            dt = -dt;
-                    }
+                    //System.out.println( "\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
+
+
                 }
 
-                //System.out.println( "\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
-
-
-
+                return finish(op, dt, TermVector.the(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
 
             }
-
-            return finish(op, dt, TermVector.the(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
-
         }
     }
 

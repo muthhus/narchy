@@ -65,8 +65,8 @@ public class doubt extends AbstractOperator {
                 table = concept.beliefs(); break;
             case Symbols.GOAL:
                 table = concept.goals(); break;
-            default:
-                return;
+//            default:
+//                return;
         }
 
 //        List<Task> tt = Lists.newArrayList(table);

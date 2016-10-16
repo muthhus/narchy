@@ -1,4 +1,4 @@
-package nars.nal.meta;
+package nars.truth.func.annotation;
 
 import java.lang.annotation.Retention;
 

@@ -78,11 +78,11 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         }
 
 
-        boolean[] withinConj = new boolean[p.size()];
+        //boolean[] withinConj = new boolean[p.size()];
         ObjectByteHashMap<Term> conjCoverage = new ObjectByteHashMap<>(p.size());
 
         ObjectByteHashMap<Term> statementCoverage = new ObjectByteHashMap<>(p.size() /* estimate */);
-        boolean[] withinStatement = new boolean[p.size()];
+        //boolean[] withinStatement = new boolean[p.size()];
 
         for (int occurrence = 0, pSize = p.size(); occurrence < pSize; occurrence++) {
             byte[] path = p.get(occurrence);
@@ -95,11 +95,11 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                     t = ((Compound) t).term(path[i]);
                 Op o = t.op();
                 if (o.statement) {
-                    withinStatement[occurrence] = true;
+                    //withinStatement[occurrence] = true;
                     byte inside = (byte) (1 << path[i + 1]);
                     statementCoverage.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
                 } else if (o == CONJ) {
-                    withinConj[occurrence] = true;
+                    //withinConj[occurrence] = true;
                     conjCoverage.addToValue(t, (byte) 1);
                 }
             }

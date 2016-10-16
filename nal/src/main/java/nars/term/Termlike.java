@@ -118,8 +118,8 @@ public interface Termlike {
 
     default long sizeVolumeStructure() {
         long l = (volume()+1);
-        l = (l << 16) | ((long)(size()+1));
-        l = (l << 32) | ((long)(structure()));
+        l = (l << 16) | (size()+1L);
+        l = (l << 32) | (structure());
         return l;
     }
 

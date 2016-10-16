@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Param;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.index.Indexes;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.term.Term;
 import nars.term.Termed;
@@ -37,7 +36,7 @@ public class Terminal extends AbstractNAR {
         this(capacity, new XORShiftRandom(1), new FrameClock());
     }
     public Terminal(int capacity, @NotNull Random random, @NotNull Clock c) {
-        super(c, new Indexes.DefaultTermTermIndex(capacity, random), random, Param.DEFAULT_SELF, new SingleThreadExecutioner());
+        super(c, new Default.DefaultTermTermIndex(capacity, random), random, Param.DEFAULT_SELF, new SingleThreadExecutioner());
     }
 
 

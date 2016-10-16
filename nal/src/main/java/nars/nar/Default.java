@@ -4,12 +4,13 @@ import nars.NAR;
 import nars.Param;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.index.Indexes;
 import nars.index.term.TermIndex;
+import nars.index.term.map.MapTermIndex;
 import nars.link.BLink;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.ConceptBagCycle;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -43,7 +45,7 @@ public class Default extends AbstractNAR {
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random,
-                new Indexes.DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO, random),
+                new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO, random),
                 //new CaffeineIndex(new DefaultConceptBuilder(random)),
                 new FrameClock());
     }
@@ -138,6 +140,21 @@ public class Default extends AbstractNAR {
     @Override
     public void clear() {
         core.concepts.clear();
+    }
+
+    /** suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution */
+    public static class DefaultTermTermIndex extends MapTermIndex {
+
+        public DefaultTermTermIndex(int capacity, @NotNull Random random) {
+            super(
+                    new DefaultConceptBuilder(random),
+                    new HashMap(capacity),
+                    new HashMap(capacity)
+                    //new ConcurrentHashMap<>(capacity),
+                    //new ConcurrentHashMap<>(capacity)
+                        //new ConcurrentHashMapUnsafe(capacity)
+            );
+        }
     }
 
 

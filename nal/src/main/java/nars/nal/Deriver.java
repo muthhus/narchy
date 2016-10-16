@@ -27,11 +27,12 @@ public abstract class Deriver  {
     final static Logger logger = LoggerFactory.getLogger(Deriver.class);
 
     @NotNull
-    public synchronized static TrieDeriver getDefaultDeriver() {
-        if (defaultRules == null) {
-            //synchronized(logger) {
+    public static TrieDeriver getDefaultDeriver() {
+        synchronized (Deriver.class) {
+            if (defaultRules == null) {
+                //synchronized(logger) {
                 if (defaultDeriver == null) { //double boiler
-                    Util.time(logger, "Rule parse", ()-> {
+                    Util.time(logger, "Rule parse", () -> {
                         try {
                             defaultRules = PremiseRuleSet
                                     //.rulesCached("default.meta.nal");
@@ -41,14 +42,15 @@ public abstract class Deriver  {
                             throw new RuntimeException(e);
                         }
                     });
-                    Util.time(logger, "Rule compile", ()-> {
+                    Util.time(logger, "Rule compile", () -> {
                         defaultDeriver = new TrieDeriver(defaultRules);
                     });
                 }
-            //}
+                //}
 
+            }
+            return defaultDeriver;
         }
-        return defaultDeriver;
     }
 
 

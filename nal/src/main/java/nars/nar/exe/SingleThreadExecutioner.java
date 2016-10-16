@@ -13,7 +13,7 @@ public final class SingleThreadExecutioner extends Executioner {
 
     private NAR nar;
 
-    final ArrayDeque<Runnable> pending = new ArrayDeque();
+    final ArrayDeque<Runnable> pending = new ArrayDeque<>(8192);
 
     @Override
     public void start(NAR nar) {
@@ -50,11 +50,12 @@ public final class SingleThreadExecutioner extends Executioner {
 
     @Override
     public final void execute(@NotNull Runnable r) {
-        pending.add(r);
+        pending.add/*Last*/(r);
     }
 
     @Override
     public void inputLater(Task[] t) {
+        //just execute here in this thread
         nar.input(t);
     }
 

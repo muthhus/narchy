@@ -243,9 +243,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
 
     public static void flatAttention(Iterable<? extends Prioritizable> c, MutableFloat p) {
-        c.forEach( s -> s.pri(() -> {
-            return p.floatValue();
-        } ) );
+        c.forEach( s -> s.pri(p::floatValue) );
     }
 
     private final class SensorBeliefTable extends DefaultBeliefTable {

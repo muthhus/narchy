@@ -45,24 +45,7 @@ public class MultiThreadExecutioner extends Executioner {
 
     public MultiThreadExecutioner(int threads, int ringSize) {
         this(threads, ringSize,
-                new BasicExecutor(Executors.defaultThreadFactory()) {
-
-                    @Override public void execute(Runnable command) {
-                        super.execute(()->{
-
-                            try (AffinityLock al = AffinityLock.acquireLock()) {
-
-                                //logger.info("CPU Thread AffinityLock {} ACQUIRE {}", al.toString() , al.cpuId() );
-
-                                command.run();
-
-                            }
-
-                            //logger.info("CPU Thread AffinityLock RELEASE");
-
-                        });
-                    }
-                }
+                new MyBasicExecutor()
 
 //                new ForkJoinPool(
 //                        threads+extraThreads,
@@ -171,7 +154,7 @@ public class MultiThreadExecutioner extends Executioner {
 
     public static void overflow(@NotNull Task[] t) {
         //TODO use a bag to collect these
-        logger.warn("dropped: {}", t);
+        //logger.warn("dropped: {}", t);
     }
 
     final static EventTranslatorOneArg<TaskEvent, Runnable> runPublisher = (TaskEvent x, long seq, Runnable b) -> {
@@ -212,4 +195,26 @@ public class MultiThreadExecutioner extends Executioner {
         }
     }
 
+    private static class MyBasicExecutor extends BasicExecutor {
+
+        public MyBasicExecutor() {
+            super(Executors.defaultThreadFactory());
+        }
+
+        @Override public void execute(Runnable command) {
+            super.execute(()->{
+
+                try (AffinityLock al = AffinityLock.acquireLock()) {
+
+                    //logger.info("CPU Thread AffinityLock {} ACQUIRE {}", al.toString() , al.cpuId() );
+
+                    command.run();
+
+                }
+
+                //logger.info("CPU Thread AffinityLock RELEASE");
+
+            });
+        }
+    }
 }

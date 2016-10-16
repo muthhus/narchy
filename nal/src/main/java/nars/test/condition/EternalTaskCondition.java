@@ -77,7 +77,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 //        return DefaultTruth.NULL;
 //    }
 
-    public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException {
+    public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException, nars.Narsese.NarseseException {
         //super(n.task(sentenceTerm + punc).normalize(n.memory));
 
 

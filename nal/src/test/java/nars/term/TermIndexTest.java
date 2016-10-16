@@ -3,7 +3,6 @@ package nars.term;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.index.Indexes;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.nar.Default;
@@ -80,7 +79,7 @@ public class TermIndexTest {
 //    }
     @Test public void testTermSharing5c() {
         testIndex(
-                new Indexes.DefaultTermTermIndex(1024, rng)
+                new Default.DefaultTermTermIndex(1024, rng)
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }

@@ -500,14 +500,14 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @Nullable
     default Object lastLogged() {
-        List<String> log = log();
+        List log = log();
         return log == null || log.isEmpty() ? null : log.get(log.size() - 1);
     }
 
 
     @NotNull
     default String proof() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(512);
         return proof(sb).toString();
     }
 

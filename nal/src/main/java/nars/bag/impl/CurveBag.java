@@ -59,8 +59,8 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     @NotNull
     @Override
     public Bag<V> commit(@Nullable Consumer<BLink> each) {
-            super.commit(each);
-            sampler.commit(this);
+        super.commit(each);
+        sampler.commit(this);
 
         return this;
     }
@@ -90,7 +90,6 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 //    }
 
 
-
     /**
      * optimized batch fill, using consecutive array elements, also ensuring uniqueness
      * returns the instance for fluentcy
@@ -99,7 +98,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     @Override
     public CurveBag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
 
-        synchronized(items) {
+        synchronized (items) {
 
             int ss = size();
             if (ss == 0)
@@ -355,7 +354,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
      * maps y in 0..1.0 to an index in [0..size). as if window=1
      */
     static int index(float y, int size) {
-        return clamp(Math.round(y * (size-1) - 0.5f), 0, size);
+        return clamp(Math.round(y * (size - 1) - 0.5f), 0, size);
     }
 
 

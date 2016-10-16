@@ -146,9 +146,6 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                    }
 //                });
 
-
-
-
                 return true;
 
             }, maxNodes);

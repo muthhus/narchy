@@ -156,14 +156,14 @@ public class TreeTermIndex extends TermIndex implements Runnable {
 //        //return 0;
 //    }
 
-    private boolean removeable(Concept c) {
+    private static boolean removeable(Concept c) {
         return !(c instanceof PermanentConcept);
     }
 
 
     @Override
     public @Nullable Termed get(@NotNull Term t, boolean createIfMissing) {
-        TermKey k = concepts.key(t);
+        TermKey k = TermTree.key(t);
 
         if (createIfMissing) {
             return _get(k, t);
@@ -182,7 +182,7 @@ public class TreeTermIndex extends TermIndex implements Runnable {
 
     @NotNull
     public TermKey key(@NotNull Term t) {
-        return concepts.key(t);
+        return TermTree.key(t);
     }
 
 

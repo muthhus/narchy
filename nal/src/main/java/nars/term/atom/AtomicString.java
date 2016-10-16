@@ -14,7 +14,7 @@ public abstract class AtomicString implements Atomic {
                 (
                     (this == u)
                         ||
-                    (toString().equals(u.toString()) && (u instanceof AtomicString ? true : op() == ((Atomic) u).op()))
+                    (toString().equals(u.toString()) && (u instanceof AtomicString || op() == ((Atomic) u).op()))
                 );
 
     }

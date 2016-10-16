@@ -75,6 +75,7 @@ public enum ImageMatch {
             super(t2);
         }
 
+        @Override
         public void expand(Op op, List<Term> target) {
             if (op.image) {
                 //expand normally because imdexes will be included in the expansion

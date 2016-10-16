@@ -45,10 +45,7 @@ public class NoCommonSubtermConstraint implements MatchConstraint {
 
         } else {
 
-            return bCompound ?
-                    B.containsTerm(y)
-                    :
-                    false; //B.equals(y);
+            return bCompound && B.containsTerm(y); //B.equals(y);
         }
 
     }

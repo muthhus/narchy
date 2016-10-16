@@ -20,11 +20,12 @@
  */
 package nars.op.out;
 
+import nars.nal.nal8.operator.ImmediateOperator;
 import nars.nal.nal8.operator.NullOperator;
 
 /**
  */
-public class say extends NullOperator {
+public class say extends ImmediateOperator {
 
 	// private Memory memory;
 	// private Operation currentOperation;

@@ -126,7 +126,7 @@ public class MySTMClustered extends STMClustered {
 						if (cc[1] >= confCoherenceThresh) {
 							return true;
 						}
-						return true;
+						//return true;
 					}
 				}
 				return false;
@@ -241,7 +241,7 @@ public class MySTMClustered extends STMClustered {
 
 		} else {
 
-			Term[] uu = uuu.stream().map(t -> t.term()).toArray(s -> new Term[s]);
+			Term[] uu = uuu.stream().map(Task::term).toArray(Term[]::new);
 
 			if (negated)
 				$.neg(uu);

@@ -83,7 +83,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
-        this.concepts = new MonitoredCurveBag(nar, initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
+        this.concepts = new MonitoredCurveBag(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
 
         nar.onFrame(this);
         nar.eventReset.on(this::reset);
@@ -148,15 +148,13 @@ public class ConceptBagCycle implements Consumer<NAR> {
     /** extends CurveBag to invoke entrance/exit event handler lambda */
     public final class MonitoredCurveBag extends CurveBag<Concept> {
 
-        final NAR nar;
 
-        public MonitoredCurveBag(NAR nar, int capacity, @NotNull CurveSampler sampler) {
+        public MonitoredCurveBag(int capacity, @NotNull CurveSampler sampler) {
             super(capacity, sampler, BudgetMerge.plusBlend,
                     //new ConcurrentHashMap<>(capacity)
                     nar.exe.concurrent() ?  new ConcurrentHashMapUnsafe<>(capacity) : new HashMap(capacity)
                     //new NonBlockingHashMap<>(capacity)
             );
-            this.nar = nar;
         }
 
         @Override
