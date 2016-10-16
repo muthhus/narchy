@@ -97,14 +97,10 @@ public class ConsoleSurface extends Surface {
         float aspect = fontHeight / fontWidth;
         float ch = 1 * aspect;
 
-        float charUnscaleX = fontUnscale * cw;
-        float charUnscaleY = fontUnscale * ch;
+        float charScaleX = cw * 0.9f;
+        float charScaleY = ch * 0.9f;
 
-        float charScaleX = 1 * charUnscaleX;
-        float charScaleY = 1 * charUnscaleY ;
-
-
-        float dz = 0.1f;
+        float dz = 0.05f;
 
         gl.glPushMatrix();
 
@@ -113,7 +109,7 @@ public class ConsoleSurface extends Surface {
 
         gl.glScalef(1 / tw, 1 / th, 1f);
 
-        gl.glLineWidth(2f);
+        gl.glLineWidth(3f);
 
         int cury = term.cursor().row;
         int curx = term.cursor().col;
@@ -156,12 +152,13 @@ public class ConsoleSurface extends Surface {
 
                         gl.glColor4f(fg.red(), fg.green(), fg.blue(), fgAlpha);
 
-                        gl.glPushMatrix();
-                        gl.glTranslatef(cw*i, +charScaleY, 0);
+                        //gl.glPushMatrix();
+                        //gl.glTranslatef(cw*i, +charScaleY, 0);
 
-                        gl.glScalef(charScaleX, charScaleY, 1f);
-                        glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, cc);
-                        gl.glPopMatrix();
+                        //gl.glScalef(charScaleX, charScaleY, 1f);
+                        Draw.text(gl, cc /* TODO char */, charScaleX, charScaleY, cw*i, 0, 0f);
+                        //glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, cc);
+                        //gl.glPopMatrix();
 
                     }
                 }

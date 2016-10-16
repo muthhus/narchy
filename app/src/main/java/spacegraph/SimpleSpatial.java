@@ -45,7 +45,11 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         shapeColor = new float[] { 0.5f, 0.5f, 0.5f, 0.9f };
         this.shape = newShape();
 
-        this.label = label(x);
+        String label = label(x);
+
+        //HACK
+        int MAX_LABEL_LEN = 16;
+        this.label = label.length() >= MAX_LABEL_LEN ? (label.substring(0, MAX_LABEL_LEN) + "..") : label;
 
     }
 
@@ -198,8 +202,14 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     }
 
     protected void renderLabel(GL2 gl, float scale) {
-        final float charAspect = 1.5f;
-        Draw.text(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
+        gl.glColor4f(1f, 1f, 1f, 1f);
+        gl.glLineWidth(3f);
+        Draw.text(gl, marquee(), scale, 0, 0, 0.5f);
+    }
+
+    public String marquee() {
+        //TODO add animated scrolling marquee substring window
+        return label;
     }
 
 //    @Override

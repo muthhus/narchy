@@ -3,7 +3,6 @@ package nars.gui;
 import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
-import nars.Task;
 import nars.budget.Budget;
 import nars.link.BLink;
 import nars.term.Term;
@@ -81,27 +80,28 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
     @Override
     protected void renderRelativeAspect(GL2 gl) {
-        gl.glColor4f(1f, 1f, 1f, pri);
-        renderLabel(gl, 0.0005f);
+        renderLabel(gl, 0.1f);
     }
 
 
     @Override
-    public void update(SpaceGraph<Term> s) {
+    public void update(@NotNull SpaceGraph<Term> s) {
         super.update(s);
 
         Term tt = key;
 
         //Budget b = instance;
 
+        this.pri = nar.conceptPriority(tt);
+
         float p = pri;// = 1; //pri = key.priIfFiniteElseZero();
 
-        float nodeScale = 0.5f + (p*p) * 5f;//1f + 2f * p;
+        float nodeScale = ((1+p)*(1+p)) * 5f;//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
-        scale(nodeScale, nodeScale, nodeScale / 6f);
+        scale(nodeScale, nodeScale, nodeScale / 4f);
 
 
-        Draw.hsb( (tt.op().ordinal()/16f), 0.75f, 0.75f  , 0.25f + 0.5f * p, shapeColor);
+        Draw.hsb( (tt.op().ordinal()/16f), 0.75f, 0.5f  , 1f, shapeColor);
 
 
 
@@ -152,73 +152,40 @@ public class ConceptWidget extends SimpleSpatial<Term> {
     }
 
     @Nullable
-    public EDraw addLink(SpaceGraph space, Termed gg, Budget ll) {
+    public EDraw addLink(@NotNull SpaceGraph space, @NotNull Termed gg, @NotNull  Budget ll) {
         SimpleSpatial target = (SimpleSpatial) space.getIfActive(gg.term());
         if (target == null)
             return null;
 
-        return addEdge(ll, target, gg instanceof Task);
+        return addEdge(ll, target);
     }
 
 
-    public EDraw addEdge(Budget l, SimpleSpatial target, boolean task) {
+    @Nullable public EDraw addEdge(@NotNull Budget l, @NotNull SimpleSpatial target) {
 
         List<EDraw> ee = edges;
 
         float pri = l.priIfFiniteElseZero();
-//        float dur = l.dur();
-//        float qua = l.qua();
+        if (pri > 0) {
 
-        //width relative to the radius of the atom
-        float minLineWidth = 0.05f;
-        float maxLineWidth = 0.3f;
-        float width = minLineWidth + (maxLineWidth - minLineWidth) * pri;
+            float minLineWidth = 1f;
+            float maxLineWidth = 5f;
+            float width = minLineWidth + (maxLineWidth - minLineWidth) * pri;
 
-        float r, g, b;
-        float hp = 0.25f + 0.75f * pri;
-        //float qh = 0.5f + 0.5f * qua;
-        float a;
-//        if (task) {
-//            Task x = (Task) l.get();
-//            if (x == null) {
-//                r = g = b = 0;
-//            } else {
-//                if (x.isBeliefOrGoal()) {
-//                    float e = x.expectation();
-//                    if (e >= 0.5f) {
-//                        //positive in green
-//                        g = 0.5f + 0.5f * e;
-//                        r = 0;
-//                    } else {
-//                        //negative in red
-//                        r = 0.5f + 0.5f * (1f - e);
-//                        g = 0;
-//                    }
-//                    b = 0.5f * dur;
-//
-//                } else {
-//                    //blue for questions and quests
-//                    b = 0.5f + hp * qua;
-//                    r = 0.2f;
-//                    g = 0.2f;
-//                }
-//            }
-//        } else {
-            //gray for termlinks
-            r = g = b = hp;
+            EDraw z = new EDraw();
+            z.target = target;
+            z.width = width;
+            z.r = 0.5f + 0.5f * pri;
+            z.g = 0.5f + 0.5f * l.qua();
+            z.b = 0.5f + 0.5f * l.dur();
+            z.a = 0.25f + 0.8f * pri;
+            z.attraction = 0.01f;
 
-            g *= 0.25f + 0.5f * l.qua();
-            b *= 0.25f + 0.5f * l.dur();
-//        }
-
-        //a = 0.5f + 0.5f * pri;
-        a = 0.75f;
-
-        EDraw z = new EDraw().set(target, width,
-                r, g, b, a);
-
-        ee.add(z);
-        return z;
+            ee.add(z);
+            return z;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -230,19 +197,22 @@ public class ConceptWidget extends SimpleSpatial<Term> {
     void renderEdges(GL2 gl) {
         List<EDraw> eee = edges;
         int n = eee.size();
-        for (int en = 0; en < n; en++)
-            render(gl, eee.get(en));
+        for (int en = 0; en < n; en++) {
+            EDraw f = eee.get(en);
+            if (f!=null)
+                render(gl, f);
+        }
     }
 
-    public void render(GL2 gl, EDraw e) {
+    public void render(@NotNull GL2 gl, @NotNull EDraw e) {
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
 
-        float width = e.width * radius;
-        if (width <= 0.1f) {
-            Draw.renderLineEdge(gl, this, e, width);
+        float width = e.width;
+        if (width <= 1f) {
+            Draw.renderLineEdge(gl, this, e, 4f+width*2f);
         } else {
-            Draw.renderHalfTriEdge(gl, this, e, width);
+            Draw.renderHalfTriEdge(gl, this, e, width*radius/12f, e.r*13f /* hack */);
         }
     }
 

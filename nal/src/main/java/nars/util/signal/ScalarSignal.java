@@ -33,7 +33,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     float resolution = 0.01f;
 
     /** in frames time */
-    long latchResolution = 2;
+    final static long latchResolution = 1;
 
     @NotNull
     private final Term term;

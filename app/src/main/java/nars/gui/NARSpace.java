@@ -44,11 +44,11 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 8, 2, 2 );
+        Default n = new Default(1024, 1, 2, 3 );
         //n.nal(4);
 
 
-        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
 
         //new ArithmeticInduction(n);
 
@@ -80,7 +80,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                //.run(800);
 //
         //n.linkFeedbackRate.setValue(0.5f);
-        n.loop(25f);
+        n.loop(10f);
         //n.run(1);
 //        n.forEachConcept(c -> {
 //            c.print();
@@ -99,6 +99,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
             //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
 
+            edges.clear();
 
             x.topWhile(b -> {
 
@@ -127,9 +128,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 //phase 2: add edges
                 edges.forEach(eb -> {
                     Pair<ConceptWidget, Term> ebt = eb.get();
-                    EDraw e = ebt.getOne().addLink(space, ebt.getTwo(), b);
-                    if (e!=null)
-                        e.attraction = 0.075f;
+                    ebt.getOne().addLink(space, ebt.getTwo(), b);
                 });
 
 
@@ -179,55 +178,55 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         return s.show(1300, 900);
     }
 
-    public static ConceptWidget newLinkWidget(final NAR nar, SpaceGraph<Term> space, final ConceptWidget core, Term SRC, Term TARGET, BLink bt, boolean task) {
-
-
-
-        @NotNull Compound vTerm = $.p(L, SRC, TARGET);
-        SimpleSpatial targetSpatial = (SimpleSpatial) space.getIfActive(TARGET);
-        if (targetSpatial!=null) {
-            ConceptWidget termLink = space.update(vTerm,
-                    t -> new ConceptWidget(t, nar) {
-
-                        //                                @Override
-//                                public Dynamic newBody(boolean collidesWithOthersLikeThis) {
-//                                    shape = new SphereShape(.5f);
-//                                    Dynamic bb = super.newBody(collidesWithOthersLikeThis);
-//                                    return bb;
-//                                }
-
-
-                        @Override
-                        protected String label(Term term) {
-                            return "";
-                        }
-
-                        @Override
-                        public void update(SpaceGraph<Term> s) {
-                            super.update(s);
-
-                            clearEdges();
-
-
-                            EDraw in = addEdge(bt, core, task);
-                            in.attraction = 2.5f;
-
-
-                            EDraw out = addEdge(bt, targetSpatial, task);
-                            out.attraction = 1f + (0.5f * bt.priIfFiniteElseZero());
-
-
-                        }
-                    });
-            if (termLink!=null) {
-                termLink.pri = bt.priIfFiniteElseZero();
-            }
-            return termLink;
-        }
-
-        return null;
-
-    }
+//    public static ConceptWidget newLinkWidget(final NAR nar, SpaceGraph<Term> space, final ConceptWidget core, Term SRC, Term TARGET, BLink bt, boolean task) {
+//
+//
+//
+//        @NotNull Compound vTerm = $.p(L, SRC, TARGET);
+//        SimpleSpatial targetSpatial = (SimpleSpatial) space.getIfActive(TARGET);
+//        if (targetSpatial!=null) {
+//            ConceptWidget termLink = space.update(vTerm,
+//                    t -> new ConceptWidget(t, nar) {
+//
+//                        //                                @Override
+////                                public Dynamic newBody(boolean collidesWithOthersLikeThis) {
+////                                    shape = new SphereShape(.5f);
+////                                    Dynamic bb = super.newBody(collidesWithOthersLikeThis);
+////                                    return bb;
+////                                }
+//
+//
+//                        @Override
+//                        protected String label(Term term) {
+//                            return "";
+//                        }
+//
+//                        @Override
+//                        public void update(SpaceGraph<Term> s) {
+//                            super.update(s);
+//
+//                            clearEdges();
+//
+//
+//                            EDraw in = addEdge(bt, core, task);
+//                            in.attraction = 0.25f;
+//
+//
+//                            EDraw out = addEdge(bt, targetSpatial, task);
+//                            out.attraction = 1f + (0.5f * bt.priIfFiniteElseZero());
+//
+//
+//                        }
+//                    });
+//            if (termLink!=null) {
+//                termLink.pri = bt.priIfFiniteElseZero();
+//            }
+//            return termLink;
+//        }
+//
+//        return null;
+//
+//    }
 
 
     private final int capacity;

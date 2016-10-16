@@ -69,14 +69,11 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         this.position = position + len;
     }
 
-    protected final int ensureSized(int extra) {
+    private int ensureSized(int extra) {
         int space = this.bytes.length;
         int p = this.position;
         if (space - p <= extra) {
-            byte[] newBuffer = new byte[space + MIN_GROWTH_BYTES ];
-                    //Math.max(MIN_GROWTH_BYTES, 2 * extra)];
-            System.arraycopy(this.bytes, 0, newBuffer, 0, p);
-            this.bytes = newBuffer;
+            this.bytes = Arrays.copyOf(this.bytes, space + Math.max(extra, MIN_GROWTH_BYTES));
         }
         return p;
     }

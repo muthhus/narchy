@@ -48,7 +48,7 @@ public class IRCAgent extends IRC {
     private final NAR nar;
     //private float ircMessagePri = 0.9f;
 
-    final int wordDelay = 50; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
+    final int wordDelay = 30; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
 
     public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);
@@ -280,7 +280,7 @@ public class IRCAgent extends IRC {
     }
 
 
-    void hear(String msg, String nick, String channel) {
+    void hear(String msg, String who, String channel) {
 //        nar.believe(
 //                $.inst($.p(tokenize(msg)), $.p($.quote(channel), $.quote(nick))),
 //                Tense.Present
@@ -288,11 +288,13 @@ public class IRCAgent extends IRC {
 
         final long[] time = {nar.time()};
 
+        Atom chan = $.quote(channel);
+        Atom nick = $.quote(who);
+
         nar.runLater(() -> {
 
-
             for (Term token : tokenize(msg)) {
-                Term pr = $.exec("hear", $.quote(channel), $.quote(nick), token );
+                Term pr = $.exec("hear", chan, nick, token );
                 nar.believe(pr, time[0], 1f);
                 time[0] += wordDelay;
             }

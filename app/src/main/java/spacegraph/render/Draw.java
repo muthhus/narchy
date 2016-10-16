@@ -30,6 +30,7 @@ import com.jogamp.opengl.util.ImmModeSink;
 import nars.$;
 import nars.util.data.list.FasterList;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
@@ -249,7 +250,7 @@ public enum Draw {
                     //sphere.draw(radius, 8, 8);
                     glsrt.drawSphere(gl, radius);
                             /*
-							glPointSize(10f);
+                            glPointSize(10f);
 							glBegin(gl.GL_POINTS);
 							glVertex3f(0f, 0f, 0f);
 							glEnd();
@@ -464,6 +465,7 @@ public enum Draw {
         gl.glVertex3f(x2, y2, 0);
         gl.glEnd();
     }
+
     public static void line(GL2 gl, v3 a, v3 b) {
         gl.glBegin(GL2.GL_LINES);
         gl.glVertex3f(a.x, a.y, a.z);
@@ -498,18 +500,23 @@ public enum Draw {
         gl.glEnd();
     }
 
-    /** thickness of font to avoid z-fighting */
+    /**
+     * thickness of font to avoid z-fighting
+     */
     final static float zStep = 0.05f;
 
-    @Deprecated static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
+    @Deprecated
+    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
         text(gl, scaleX, scaleY, label, dx, dy, dz, null);
     }
-    @Deprecated static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz, float[] color) {
+
+    @Deprecated
+    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz, float[] color) {
         gl.glPushMatrix();
         //gl.glNormal3f(0, 0, 1f);
         gl.glTranslatef(dx, dy, dz + zStep);
 
-        if (color!=null)
+        if (color != null)
             gl.glColor3fv(color, 0);
 
         float fontThick = 1f;
@@ -529,21 +536,23 @@ public enum Draw {
         gl.glPopMatrix();
     }
 
-//    static final float[] tmpV = new float[3];
+    //    static final float[] tmpV = new float[3];
     static final v3 ww = new v3();
     static final v3 vv = new v3();
     static final Quat4f tmpQ = new Quat4f();
-//    static final Matrix4f tmpM4 = new Matrix4f();
+    //    static final Matrix4f tmpM4 = new Matrix4f();
 //    static final Matrix3f tmpM3 = new Matrix3f();
     static final AxisAngle4f tmpA = new AxisAngle4f();
 
-    static public void renderHalfTriEdge(GL2 gl, SimpleSpatial src, EDraw e, float width) {
+    static public void renderHalfTriEdge(GL2 gl, SimpleSpatial src, EDraw e, float width, float twist) {
         SimpleSpatial tgt = e.target;
-
 
         src.transform().getRotation(tmpQ);
 
-        ww.set(0,0,1);
+        if (twist != 0)
+            tmpQ.setAngle(0, 1, 0, twist);
+
+        ww.set(0, 0, 1);
         tmpQ.rotateVector(ww, ww);
 
         //ww.normalize();
@@ -557,9 +566,7 @@ public enum Draw {
         float sz = src.z();
         float tz = tgt.z();
         float dz = tz - sz;
-
-
-        vv.set(dx,dy,dz);
+        vv.set(dx, dy, dz);
 
         vv.cross(vv, ww);
         vv.normalize();
@@ -568,13 +575,18 @@ public enum Draw {
         gl.glPushMatrix();
         gl.glBegin(GL2.GL_TRIANGLES);
 
-        gl.glNormal3f(ww.x, ww.y, ww.z);
-        gl.glVertex3f(sx+ vv.x, sy+ vv.y, sz+ vv.z); //right base
-        gl.glVertex3f( //right base
-                sx+-vv.x, sy+-vv.y, sz+-vv.z //full triangle
-                //sx, sy, sz  //half triangle
-        );
-        gl.glVertex3f(tx, ty, tz); //right base
+        {
+
+            gl.glNormal3f(ww.x, ww.y, ww.z);
+            gl.glVertex3f(sx + vv.x, sy + vv.y, sz + vv.z); //right base
+            gl.glVertex3f( //right base
+                    sx + -vv.x, sy + -vv.y, sz + -vv.z //full triangle
+                    //sx, sy, sz  //half triangle
+            );
+            gl.glVertex3f(tx, ty, tz); //right base
+        }
+
+
         gl.glEnd();
 
         gl.glPopMatrix();
@@ -597,41 +609,41 @@ public enum Draw {
         if (saturation == 0) {
             r = g = b = (int) (brightness * 255.0f + 0.5f);
         } else {
-            float h = (hue - (float)Math.floor(hue)) * 6.0f;
-            float f = h - (float)Math.floor(h);
+            float h = (hue - (float) Math.floor(hue)) * 6.0f;
+            float f = h - (float) Math.floor(h);
             float p = brightness * (1.0f - saturation);
             float q = brightness * (1.0f - saturation * f);
             float t = brightness * (1.0f - (saturation * (1.0f - f)));
             switch ((int) h) {
                 case 0:
-                    r =(brightness );
-                    g =(t );
-                    b =(p );
+                    r = (brightness);
+                    g = (t);
+                    b = (p);
                     break;
                 case 1:
-                    r =(q );
-                    g =(brightness );
-                    b =(p );
+                    r = (q);
+                    g = (brightness);
+                    b = (p);
                     break;
                 case 2:
-                    r =(p );
-                    g =(brightness );
-                    b =(t );
+                    r = (p);
+                    g = (brightness);
+                    b = (t);
                     break;
                 case 3:
-                    r =(p );
-                    g =(q );
-                    b =(brightness );
+                    r = (p);
+                    g = (q);
+                    b = (brightness);
                     break;
                 case 4:
-                    r =(t );
-                    g =(p );
-                    b =(brightness );
+                    r = (t);
+                    g = (p);
+                    b = (brightness);
                     break;
                 case 5:
-                    r =(brightness );
-                    g =(p );
-                    b =(q );
+                    r = (brightness);
+                    g = (p);
+                    b = (q);
                     break;
             }
         }
@@ -641,7 +653,9 @@ public enum Draw {
         target[3] = a;
     }
 
-    /** uses the built-in color scheme for displaying values in the range -1..+1 */
+    /**
+     * uses the built-in color scheme for displaying values in the range -1..+1
+     */
     public static void colorPolarized(GL2 gl, float v) {
         float r, g, b;
         if (v < 0) {
@@ -712,7 +726,7 @@ public enum Draw {
             vbo.glEnd(gl);
 
 			/*glBegin(gl.GL_LINES);
-			glColor3f(1, 1, 0);
+            glColor3f(1, 1, 0);
 			glNormal3d(normal.getX(),normal.getY(),normal.getZ());
 			glVertex3d(triangle[0].getX(), triangle[0].getY(), triangle[0].getZ());
 			glNormal3d(normal.getX(),normal.getY(),normal.getZ());
@@ -839,92 +853,60 @@ public enum Draw {
         /*int idx, verts, */
         int leftPos, rightPos;
         //String spec;
-        int[][] segments;
+        byte[][] segments;
 
         // Hershey fonts use coordinates represented by characters'
         // integer values relative to ascii 'R'
-        static final int offsetR = (int)('R');
-
+        static final int offsetR = (int) ('R');
 
 
         HGlyph(String hspec) {
-            FasterList<int[]> segments = $.newArrayList();
+            FasterList<byte[]> segments = $.newArrayList();
 
             //idx      = Integer.valueOf(hspec.substring(0, 5));
             //verts    = Integer.valueOf(hspec.substring(5, 8));
-            String spec     = (hspec.substring(10));
+            String spec = (hspec.substring(10));
 
             // TODO: is this needed?
-            leftPos  = (int)(hspec.charAt(8)) - offsetR;
-            rightPos = (int)(hspec.charAt(9)) - offsetR;
+            leftPos = (int) (hspec.charAt(8)) - offsetR;
+            rightPos = (int) (hspec.charAt(9)) - offsetR;
 
             int curX, curY;
             boolean penUp = true;
-            IntArrayList currentSeg = new IntArrayList();
+            ByteArrayList currentSeg = new ByteArrayList();
 
-            for (int i = 0; i < spec.length() - 1; i+=2) {
-                if (spec.charAt(i+1) == 'R' && spec.charAt(i) == ' ') {
+            for (int i = 0; i < spec.length() - 1; i += 2) {
+                if (spec.charAt(i + 1) == 'R' && spec.charAt(i) == ' ') {
                     penUp = true;
                     segments.add(currentSeg.toArray());
-                    currentSeg = new IntArrayList();
+                    currentSeg = new ByteArrayList();
                     continue;
                 }
 
-                curX = (int)(spec.charAt(i)) - offsetR;
-                curY = (int)(spec.charAt(i+1)) - offsetR;
-                currentSeg.add(curX);
-                currentSeg.add(20 - curY);
+                curX = (int) (spec.charAt(i)) - offsetR; //0..20
+                currentSeg.add((byte)curX);
+                curY = (int) (spec.charAt(i + 1)) - offsetR; //0..20
+                currentSeg.add((byte)(10 - curY)); //half above zero half below zero
             }
-            if (currentSeg.size()>0)
+            if (currentSeg.size() > 0)
                 segments.add(currentSeg.toArray());
 
-            this.segments = segments.toArray(new int[segments.size()][]);
+            this.segments = segments.toArray(new byte[segments.size()][]);
         }
 
 
-        public void draw(GL2 gl, float scale, float tx, float ty, float tz) {
+        public void draw(GL2 gl, float x) {
             //int pLastX = 0, pLastY = 0;
 
-            for (int[] seg : segments) {
-
-                gl.glBegin(GL2.GL_LINE_STRIP);
-
+            for (byte[] seg : segments) {
 
                 int ss = seg.length;
+                gl.glBegin(GL2.GL_LINE_STRIP);
                 for (int j = 0; j < ss; ) {
-                    int px=0, py =0;
-
-                    px= seg[j++];
-                    py= seg[j++];
-//
-//
-//                    if (j > 2) {
-//                        // annotate pLast
-//                        //ellipse(tx(pLastX, 20.0 + sin(frameCount)), ty(pLastY, 20.0+ sin(frameCount)), 10, 10);
-//                        //text(pLast.repr(), tx(pLastX, 20.0) + 20, ty(pLastY, 20.0) + 5);
-//                        //line(gl, tx(pLastX, 20.0f), tx(pLastY, 20.0f), tx(pLastX, 20.0f) + 20, ty(pLastY, 20.0f));
-//                        //line(gl, px+tx, py+ty, pLastX+tx, pLastY+ty, tz);
-//
-//                        //gl.glVertex3f(pLastX + tx, pLastY+ ty, tz);
-//
-//                        //p = seg.get(j);
-//                        // connect pLast to p
-//                        //line(tx(pLastX, 20.0 + sin(frameCount)), ty(pLasty, 20.0 + sin(frameCount)), tx(p.x, 20.0 + sin(frameCount)), ty(p.y, 20.0 + sin(frameCount)));
-//
-//                    }
-
-                    gl.glVertex3f(px*scale + tx, py*scale + ty, tz);
-//
-//                    pLastX = px;
-//                    pLastY = py;
+                    //gl.glVertex2fv
+                    gl.glVertex3f(seg[j++] + x, seg[j++], 0);
                 }
                 gl.glEnd();
-
-//                // handle last point since we haven't annotated it with an ellipse
-//                px = seg.get(ss - 1);
-//                //ellipse(tx(p.x, 20.0 + sin(frameCount)), ty(p.y, 20.0 + sin(frameCount)), 10, 10);
-//                //text(p.repr(), tx(p.x, 20.0) + 20, ty(p.y, 20.0) + 5);
-//                line(gl, tx(px, 20.0F), ty(py, 20.0F), tx(px, 20.0F) + 20, ty(py, 20.0F));
             }
         }
     }
@@ -932,16 +914,17 @@ public enum Draw {
     public enum TextAlignment {
         Left, Center, Right
     }
+
     public static void text(GL2 gl, String s, float scale, float x, float y, float z) {
-        text(gl, s, scale, x, y, z, TextAlignment.Left );
+        text(gl, s, scale, x, y, z, TextAlignment.Center);
     }
 
     public static void text(GL2 gl, String s, float scale, float x, float y, float z, TextAlignment a) {
         int l = s.length();
 
-        scale *= 1f/20f; //to normalize
 
-        float letterWidth = scale * 16;
+        float letterWidth = scale;
+        float letterHeight = scale;
         float width = letterWidth * s.length();
 
         //align center:
@@ -953,18 +936,43 @@ public enum Draw {
                 x -= width; //TODO check this
                 break;
             case Center:
-                x -= width/2f; //TODO check this
+                x -= width / 2f; //TODO check this
                 break;
         }
 
+        y -= letterHeight / 2;
 
         int N = fontMono.length;
+
+        gl.glPushMatrix();
+        gl.glTranslatef(x, y, z);
+        gl.glScalef(scale, scale, scale);
+
+        float dx = 0;
         for (int i = 0; i < l; i++) {
             int ci = s.charAt(i) - 32; //ASCII to index
             if (ci >= 0 && (ci < N)) {
-                fontMono[ci].draw(gl, scale, x, y, z);
+                fontMono[ci].draw(gl, dx);
             }
-            x += letterWidth;
+            dx += letterWidth;
+        }
+        gl.glPopMatrix();
+    }
+
+    public static void text(GL2 gl, char c, float scaleX, float scaleY, float x, float y, float z) {
+
+        int ci = c - 32; //ASCII to index
+        if (ci >= 0 && (ci < fontMono.length)) {
+
+            float sx = scaleX / 16f;
+            float sy = scaleY / 20f;
+
+            gl.glPushMatrix();
+            gl.glTranslatef(x, y, z);
+            gl.glScalef(sx, sy, 1f);
+
+            fontMono[ci].draw(gl, 0);
+            gl.glPopMatrix();
         }
     }
 
@@ -977,8 +985,7 @@ public enum Draw {
         try {
             String font =
                     //"meteorology"
-                    "rowmans"
-                    ;
+                    "rowmans";
             lines = IOUtils.readLines(Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf"), Charset.defaultCharset());
 
             String scratch = "";
@@ -986,7 +993,7 @@ public enum Draw {
             for (int i = 0; i < lines.size(); i++) {
                 String c = lines.get(i);
                 if (c.endsWith("\n"))
-                    c = c.substring(0, c.length()-1);
+                    c = c.substring(0, c.length() - 1);
 //                if (c.length() < 5) {
 //                    continue;
 //                }
@@ -996,8 +1003,7 @@ public enum Draw {
                     //      println("Instantiated glyph " + nextGlyph.idx);
                     glyphs.add(nextGlyph);
                     scratch = "";
-                }
-                else {
+                } else {
                     scratch += c;
                 }
             }
@@ -1011,9 +1017,6 @@ public enum Draw {
         fontMono = glyphs.toArray(new HGlyph[glyphs.size()]);
 
     }
-
-
-
 
 
 //    https://raw.githubusercontent.com/osresearch/vst/master/teensyv/asteroids_font.c

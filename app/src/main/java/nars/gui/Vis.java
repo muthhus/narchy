@@ -21,6 +21,7 @@ import spacegraph.Surface;
 import spacegraph.math.Color3f;
 import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.GridSurface;
+import spacegraph.obj.PanelSurface;
 import spacegraph.obj.Plot2D;
 
 import java.util.List;
@@ -84,11 +85,7 @@ public class Vis {
 
     public static void show(Default d, int count) {
 
-        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>(
-
-        );
-
-
+        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>(     );
         s.add(new Facial(grid(
                 concepts(d, count),
                 budgetHistogram(d, 32),
@@ -163,18 +160,17 @@ public class Vis {
     public static GridSurface budgetHistogram(NAR nar, int bins) {
         //new SpaceGraph().add(new Facial(
         return new GridSurface(VERTICAL,
-                new HistogramChart(nar, c -> {
+                PanelSurface.of("Concept Priority Distribution (0..1)", new HistogramChart(nar, c -> {
                     if (c != null)
                         return c.pri();
                     return 0;
-                }, bins, new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)),
-                new HistogramChart(nar, c -> {
+                }, bins, new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))),
+                PanelSurface.of("Concept Durability Distribution (0..1)", new HistogramChart(nar, c -> {
                     if (c != null)
                         return c.dur();
                     return 0;
-                }, bins, new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f))
+                }, bins, new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f)))
         );
-        //  ).maximize()).show(800,600);
     }
 
     public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory, FloatFunction<Termed> value) {
