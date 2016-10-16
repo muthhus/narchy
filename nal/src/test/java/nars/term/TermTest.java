@@ -764,7 +764,7 @@ public class TermTest {
         NAR n = new Terminal(16);
 
         assertTrue(
-                n.term("<a --> b>").term().impossibleSubterm(
+                n.term("<a --> b>").term().impossibleSubTerm(
                         n.term("<a-->b>").term()
                 )
         );

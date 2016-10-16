@@ -52,7 +52,7 @@ public interface Termlike {
         return (op == Op.VAR_PATTERN) ? (varPattern() > 0) : hasAny(op.bit);
     }
 
-    default boolean impossibleSubterm(@NotNull Termlike target) {
+    default boolean impossibleSubTerm(@NotNull Termlike target) {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);

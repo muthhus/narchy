@@ -7,6 +7,7 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import nars.term.var.Variable;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.ImmutableSet;
@@ -150,17 +151,42 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     @NotNull
     static boolean subtermOfTheOther(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
 
-        int commonStructure = a.structure() & b.structure();
-        if (excludeVariables)
-            commonStructure = commonStructure & ~(Op.VariableBits); //mask by variable bits since we do not want them
+        if ((excludeVariables) && (a instanceof Variable || b instanceof Variable))
+            return true;
 
-        if (commonStructure == 0)
-            return false;
-
-        //return (a.containsTermRecursively(b) || b.containsTermRecursively(a));
-        return ((!excludeVariables || !a.op().var) && a.containsTerm(b)) ||
-               ((!excludeVariables || !b.op().var) && b.containsTerm(a));
+        int d = a.volume() - b.volume();
+        if (d > 0) {
+            return a.containsTermRecursively(b);
+        } else if (d < 0) {
+            return b.containsTermRecursively(a);
+        } else {
+            return false; //same volume, they can not contain each other (equality is tested separately before this)
+        }
     }
+    /**
+     * Check the subterms (first level only) for a target term
+     *
+     * @param t The term to be searched
+     * @return Whether the target is in the current term
+     */
+    @Override
+    default boolean containsTerm(@NotNull Termlike t) {
+        return !impossibleSubTerm(t) && or(t::equals);
+    }
+
+    default boolean containsTermRecursively(@NotNull Term b) {
+        if (!impossibleSubTerm(b)) {
+            int s = size();
+            for (int i = 0; i < s; i++) {
+                Term x = term(i);
+                if (x.equals(b) || ((x instanceof Compound) && (((Compound) x).containsTermRecursively(b)))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     @NotNull
     static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, @NotNull HashSet<Term> scratch) {
@@ -271,23 +297,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return added > 0 ? Terms.empty : l.toArray(new Term[added]);
     }
 
-    /**
-     * Check the subterms (first level only) for a target term
-     *
-     * @param t The term to be searched
-     * @return Whether the target is in the current term
-     */
-    @Override
-    default boolean containsTerm(@NotNull Termlike t) {
-        if (!impossibleSubterm(t)) {
-            int s = size();
-            for (int i = 0; i < s; i++) {
-                if (t.equals(term(i)))
-                    return true;
-            }
-        }
-        return false;
-    }
+
 
 
     void forEach(Consumer<? super Term> action, int start, int stop);
@@ -360,7 +370,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * follows normal indexOf() semantics; -1 if not found
      */
     default int indexOf(@NotNull Term t) {
-        if (!impossibleSubterm(t)) {
+        if (!impossibleSubTerm(t)) {
             int s = size();
             for (int i = 0; i < s; i++) {
                 if (t.equals(term(i)))
@@ -371,7 +381,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
     default int indexOfAtemporally(Term t) {
         t = $.unneg(t); //unneg before testing impossible
-        if (!impossibleSubterm(t)) {
+        if (!impossibleSubTerm(t)) {
             Term at = Terms.atemporalize(t);
             int s = size();
             for (int i = 0; i < s; i++) {

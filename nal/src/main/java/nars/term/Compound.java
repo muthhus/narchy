@@ -556,7 +556,7 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     @Nullable
     default int[] isSubterm(@NotNull Term t) {
-        if (!impossibleSubterm(t)) {
+        if (!impossibleSubTerm(t)) {
             IntArrayList l = new IntArrayList();
 
             if (isSubterm(this, t, l)) {
@@ -582,27 +582,6 @@ public interface Compound extends Term, IPair, TermContainer {
         return false;
     }
 
-    default boolean containsTermRecursively(@NotNull Term b) {
-        if (this.equals(b))
-            return true;
-
-        if (impossibleSubTermOrEquality(b))
-            return false;
-
-        int s = size();
-        for (int i = 0; i < s; i++) {
-            Term x = term(i);
-            if (x instanceof Compound) {
-                if (((Compound) x).containsTermRecursively(b))
-                    return true;
-            } else {
-                if (x.equals(b))
-                    return true;
-            }
-        }
-
-        return false;
-    }
 
     @Override
     default boolean equalsIgnoringVariables(@NotNull Term other) {
@@ -633,7 +612,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     default boolean containsTermAtemporally(Term y) {
         y = $.unneg(y);
-        if (!impossibleSubterm(y)) {
+        if (!impossibleSubTerm(y)) {
             Term ay = Terms.atemporalize(y);
             if (or(x -> Terms.equalAtemporally(x, ay)))
                 return true;

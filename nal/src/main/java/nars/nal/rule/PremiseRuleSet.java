@@ -7,6 +7,7 @@ import nars.Param;
 import nars.index.term.PatternTermIndex;
 import nars.nal.Deriver;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.util.Util;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -251,7 +252,11 @@ public class PremiseRuleSet {
         String A = '(' + ab[0].trim() + ')';
         Compound ap = (Compound) index.parseRaw(A);
         String B = '(' + ab[1].trim() + ')';
-        Compound bp = (Compound) index.parseRaw(B);
+        Term b = index.parseRaw(B);
+        if (!(b instanceof Compound)) {
+            throw new RuntimeException("parse error not compound");
+        }
+        Compound bp = (Compound) b;
         return new PremiseRule(ap, bp);
     }
 

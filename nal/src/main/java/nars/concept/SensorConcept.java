@@ -8,6 +8,7 @@ import nars.budget.policy.ConceptPolicy;
 import nars.nal.UtilityFunctions;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
+import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -266,12 +267,23 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 //            if (when == now || when == ETERNAL)
 //                return sensor.truth();
 
-//            // if when is between the last input time and now, evaluate the truth at the last input time
-//            // to avoid any truth decay across time. this emulates a persistent latched sensor value
-//            // ie. if it has not changed
-            if (when == ETERNAL || (when <= now && when >= sensor.lastInputTime)) {
+
+            long lastSensorInputTime = sensor.lastInputTime;
+
+            //in the future after the last sensor input time,
+            // attempt to use the current sensor value as the best guess but fade it by projection
+            if (when == ETERNAL || (when >= lastSensorInputTime)) {
                 //now = when = sensor.lastInputTime;
-                return sensor.truth();
+                Truth t = sensor.truth();
+                if (t != null) {
+                    if (when==ETERNAL || lastSensorInputTime == when) {
+                        return t;
+                    } else {
+                        t = Revision.project(t, when, now, lastSensorInputTime, false);
+                        if (t!=null)
+                            return t;
+                    }
+                }
             }
 
             return super.truth(when, now);

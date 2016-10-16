@@ -52,6 +52,7 @@ public class NoCommonSubtermConstraint implements MatchConstraint {
 
     /** comparison between two compounds */
     @NotNull protected boolean invalid(Compound x, Compound y) {
+
         return subtermOfTheOther(x, y, true);
     }
 

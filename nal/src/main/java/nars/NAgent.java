@@ -165,7 +165,7 @@ abstract public class NAgent implements NSense, NAction {
 
     protected void frame() {
 
-        int phase = (actionFrame++) % (frameRate);
+        int phase = (actionFrame++) % (frameRate+1);
         if (phase == 0) {
             ((FrameClock) nar.clock).tick(0); //freeze clock
         } else if ((phase == frameRate-1) || (frameRate < 2)) {

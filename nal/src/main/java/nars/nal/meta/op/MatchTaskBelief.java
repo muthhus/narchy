@@ -321,7 +321,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
             Compound container = (Compound)maybeContainer;
 
             Term contained = this.contained == 0 ? m.taskTerm : m.beliefTerm;
-            if (!container.impossibleSubterm(contained)) {
+            if (!container.impossibleSubTerm(contained)) {
                 Term whatsThere = container.subterm(path);
                 if ((whatsThere != null) && contained.equals(whatsThere))
                     return true;
