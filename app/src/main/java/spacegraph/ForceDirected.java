@@ -62,14 +62,16 @@ public class ForceDirected<X> implements spacegraph.phys.constraint.BroadConstra
             Spatial A = ((Spatial) c.data());
             if (A instanceof ConceptWidget) {
                 for (EDraw e : ((ConceptWidget) A).edges) {
+                    if (e!=null) {
 
-                    SimpleSpatial B = e.target;
+                        SimpleSpatial B = e.target;
 
-                    if ((B != null) && (B != A) && (B.body != null)) {
+                        if ((B != null) && (B != A) && (B.body != null)) {
 
-                        float ew = e.width;
-                        float attractStrength = ew * e.attraction;
-                        attract(c, B.body, attractSpeed * attractStrength, attractDist);
+                            float ew = e.width;
+                            float attractStrength = ew * e.attraction;
+                            attract(c, B.body, attractSpeed * attractStrength, attractDist);
+                        }
                     }
                 }
             }

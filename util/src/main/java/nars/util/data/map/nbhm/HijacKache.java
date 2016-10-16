@@ -570,7 +570,7 @@ public class HijacKache<TypeK, TypeV>
      */
     @Override
     public void clear() {         // Smack a new empty table down
-        Object[] newkvs = new HijacKache(MIN_SIZE, reprobes).data;
+        Object[] newkvs = new HijacKache(capacity(), reprobes).data;
         reincarnate(newkvs);
     }
 

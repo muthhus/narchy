@@ -244,6 +244,9 @@ public class InterpolatingMicrosphere {
     }
 
     public static float safeNorm(float epsilon, float[] v) {
+        if (v.length == 1) {
+            return Math.abs(v[0]);
+        }
         boolean zero = true;
         for (float x : v) {
             if (Math.abs(x) > epsilon) {
@@ -265,7 +268,7 @@ public class InterpolatingMicrosphere {
         double agiant = rgiant / floatn;
 
         for (int norm = 0; norm < v.length; ++norm) {
-            double xabs = FastMath.abs(v[norm]);
+            double xabs = Math.abs(v[norm]);
             if (xabs >= rdwarf && xabs <= agiant) {
                 s2 += xabs * xabs;
             } else {

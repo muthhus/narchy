@@ -40,11 +40,13 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         this.nar = nar;
 
         this.pri = 0.5f;
-        clearEdges();
+        edges = $.newArrayList(0);
 //        for (int i = 0; i < edges; i++)
 //            this.edges.add(new EDraw());
 
     }
+
+
 
     @Override
     public Dynamic newBody(boolean collidesWithOthersLikeThis) {
@@ -70,7 +72,8 @@ public class ConceptWidget extends SimpleSpatial<Term> {
     }
 
     public void clearEdges() {
-        this.edges = $.newArrayList(1);
+        if (!edges.isEmpty())
+            this.edges = $.newArrayList(8);
     }
 
     public int edgeCount() {
@@ -80,7 +83,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
     @Override
     protected void renderRelativeAspect(GL2 gl) {
-        renderLabel(gl, 0.1f);
+        renderLabel(gl, 0.05f);
     }
 
 
@@ -96,12 +99,12 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         float p = pri;// = 1; //pri = key.priIfFiniteElseZero();
 
-        float nodeScale = ((1+p)*(1+p)) * 5f;//1f + 2f * p;
+        float nodeScale = ((1+p)*(1+p)) * 2f;//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
         scale(nodeScale, nodeScale, nodeScale / 4f);
 
 
-        Draw.hsb( (tt.op().ordinal()/16f), 0.75f, 0.5f  , 1f, shapeColor);
+        Draw.hsb( (tt.op().ordinal()/16f), 0.75f, 0.5f * pri + 0.1f  , 1f, shapeColor);
 
 
 
@@ -175,11 +178,11 @@ public class ConceptWidget extends SimpleSpatial<Term> {
             EDraw z = new EDraw();
             z.target = target;
             z.width = width;
-            z.r = 0.5f + 0.5f * pri;
-            z.g = 0.5f + 0.5f * l.qua();
-            z.b = 0.5f + 0.5f * l.dur();
-            z.a = 0.25f + 0.8f * pri;
-            z.attraction = 0.01f;
+            z.r = 0.1f + pri * (0.5f);
+            z.g = 0.1f + pri * (0.5f - 0.5f * l.qua());
+            z.b = 0.1f + pri * (0.5f - 0.5f * l.dur());
+            z.a = 1f;
+            z.attraction = 0.025f;
 
             ee.add(z);
             return z;
@@ -212,7 +215,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         if (width <= 1f) {
             Draw.renderLineEdge(gl, this, e, 4f+width*2f);
         } else {
-            Draw.renderHalfTriEdge(gl, this, e, width*radius/12f, e.r*13f /* hack */);
+            Draw.renderHalfTriEdge(gl, this, e, width*radius/18f, e.r*2f /* hack */);
         }
     }
 

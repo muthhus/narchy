@@ -410,7 +410,7 @@ public class TreeChart<X> extends Surface {
 
 				Draw.text(gl, label,
 						labelSize*Math.min(width,height), //label size
-						left, top, 0f);
+						left+width/2, top+height/2, 0f);
 						//(float) (left + width / 2f), (float) (top + height / 2f), 0);
 
 			}

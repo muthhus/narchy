@@ -98,12 +98,25 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
 
-            feedbackToPremiseConcepts(nar);
-            feedbackToPremiseLinks(delta, deltaConfidence, deltaSatisfaction, nar);
+            if (delta == null) {
+
+                negativeFeedback(nar);
+
+            } else {
+
+                feedbackToPremiseConcepts(nar);
+                feedbackToPremiseLinks(delta, deltaConfidence, deltaSatisfaction, nar);
+
+            }
 
             if (!Param.DEBUG) {
                 this.premise = null;
             }
+        }
+
+        private void negativeFeedback(NAR nar) {
+            feedback(1f - priIfFiniteElseZero() /* HEURISTIC */, nar);
+            //delete(); //delete will happen soon after this
         }
 
         private void feedbackToPremiseConcepts(NAR nar) {
@@ -132,12 +145,7 @@ abstract public class DerivedTask extends MutableTask {
         }
 
         public void feedbackToPremiseLinks(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
-            if (delta == null) {
 
-                feedback(1f - priIfFiniteElseZero() /* HEURISTIC */, nar);
-                //delete(); //delete will happen soon after this
-
-            } else {
 
                 /* HEURISTIC */
                 float confBoost = Math.abs(deltaConfidence);
@@ -153,7 +161,7 @@ abstract public class DerivedTask extends MutableTask {
 
                 feedback(boost, nar);
 
-            }
+
         }
 
         void feedback(float score, NAR nar) {

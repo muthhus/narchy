@@ -203,16 +203,18 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     @NotNull public Function<Task, Float> rankPenalizingFreqAndTemporalDistance(@NotNull Task y, long now) {
 
+        //(when selecting by minimum rank:)
+        //  more confidence and more freq delta increases rank which means less likely to select
+        //  more simultaneity should be more likely to select
+
+        float duration = 2f;
+
         return x ->
+            y.conf() +
+            Math.abs(x.freq()-y.freq()) +
+            Math.abs(x.occurrence() - y.occurrence())/duration
+       ;
 
-                y.conf() *
-
-                //as freqDelta decreases, the impact of simultaneity is lessened
-                Util.lerp(
-                        simultaneity(x.occurrence() - y.occurrence(), 1f),
-                        1f,
-                        Math.abs(x.freq()-y.freq())
-                );
     }
 
     @NotNull public Function<Task, Float> rankPenalizingOverlap(long now, @NotNull Task toMergeWith) {

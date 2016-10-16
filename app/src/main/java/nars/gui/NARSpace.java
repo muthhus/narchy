@@ -44,23 +44,25 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 1, 2, 3 );
+        Default n = new Default(256, 16, 1, 1 );
         //n.nal(4);
 
 
-        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
+
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n,  64, 8);
+        newConceptWindow(n,  128, 32);
 
         //n.run(20); //headstart
+
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
 
 
         //n.log();
         //n.input("(a<->b).", "(b<->c).");
-
         new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
+
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
 
@@ -79,8 +81,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                );
 //                //.run(800);
 //
-        //n.linkFeedbackRate.setValue(0.5f);
-        n.loop(10f);
+        n.linkFeedbackRate.setValue(0f); //<-- feedback off, it was ON before
+        n.loop(40f);
         //n.run(1);
 //        n.forEachConcept(c -> {
 //            c.print();
@@ -99,7 +101,6 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
             //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
 
-            edges.clear();
 
             x.topWhile(b -> {
 
@@ -116,7 +117,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
                 Consumer<BLink<? extends Termed>> absorb = tgt -> {
                     Term tt = tgt.get().term();
-                    if (!tt.equals(root.key) && space.getIfActive(tt)!=null) {
+                    if (!tt.equals(root.key)) {
                         edges.put(Tuples.pair(root, tt), tgt);
                     }
                 };
@@ -124,12 +125,6 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 //phase 1: collect
                 concept.tasklinks().forEach(absorb);
                 concept.termlinks().forEach(absorb);
-
-                //phase 2: add edges
-                edges.forEach(eb -> {
-                    Pair<ConceptWidget, Term> ebt = eb.get();
-                    ebt.getOne().addLink(space, ebt.getTwo(), b);
-                });
 
 
 //                concept.termlinks().forEach(bt -> {
@@ -149,7 +144,17 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
             }, maxNodes);
 
+
+            //phase 2: add edges
+            edges.forEach(eb -> {
+                Pair<ConceptWidget, Term> ebt = eb.get();
+                ebt.getOne().addLink(space, ebt.getTwo(), eb);
+            });
+            edges.clear();
+
+
         }, maxNodes);
+
 
 
         SpaceGraph s = new SpaceGraph<>(

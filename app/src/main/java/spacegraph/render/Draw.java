@@ -915,48 +915,60 @@ public enum Draw {
         Left, Center, Right
     }
 
-    public static void text(GL2 gl, String s, float scale, float x, float y, float z) {
+    public static void text(GL2 gl, CharSequence s, float scale, float x, float y, float z) {
         text(gl, s, scale, x, y, z, TextAlignment.Center);
     }
 
-    public static void text(GL2 gl, String s, float scale, float x, float y, float z, TextAlignment a) {
-        int l = s.length();
+    public static void text(GL2 gl, CharSequence s, float scale, float x, float y, float z, TextAlignment a) {
+//        int l = s.length();
+//
+//
+//        float letterWidth = scale;
+//        float letterHeight = scale;
+//        float width = letterWidth * s.length();
+//
+//
+//        y -= letterHeight / 2;
+//
+//        int N = fontMono.length;
+//
+//        gl.glPushMatrix();
+//        gl.glTranslatef(x, y, z);
+//        gl.glScalef(scale, scale, scale);
+//
+//        float dx = 0;
+//        for (int i = 0; i < l; i++) {
+//            int ci = s.charAt(i) - 32; //ASCII to index
+//            if (ci >= 0 && (ci < N)) {
+//                fontMono[ci].draw(gl, dx);
+//            }
+//            dx += letterWidth;
+//        }
+//        gl.glPopMatrix();
 
 
-        float letterWidth = scale;
-        float letterHeight = scale;
-        float width = letterWidth * s.length();
-
-        //align center:
+        int sl = s.length();
+        float totalWidth = sl * scale;
         switch (a) {
             case Left:
                 //nothing
                 break;
             case Right:
-                x -= width; //TODO check this
+                x -= totalWidth; //TODO check this
                 break;
             case Center:
-                x -= width / 2f; //TODO check this
+                x -= totalWidth / 2f; //TODO check this
                 break;
         }
 
-        y -= letterHeight / 2;
-
-        int N = fontMono.length;
-
-        gl.glPushMatrix();
-        gl.glTranslatef(x, y, z);
-        gl.glScalef(scale, scale, scale);
-
-        float dx = 0;
-        for (int i = 0; i < l; i++) {
-            int ci = s.charAt(i) - 32; //ASCII to index
-            if (ci >= 0 && (ci < N)) {
-                fontMono[ci].draw(gl, dx);
-            }
-            dx += letterWidth;
+        for (int i = 0; i < sl; i++) {
+            char c = s.charAt(i);
+            text(gl, c, scale, x + scale * i, y, z);
         }
-        gl.glPopMatrix();
+    }
+
+    public static void text(GL2 gl, char c, float scale, float x, float y, float z) {
+        text(gl, c, scale, scale/1.25f, x, y, z);
     }
 
     public static void text(GL2 gl, char c, float scaleX, float scaleY, float x, float y, float z) {

@@ -55,11 +55,10 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int ACTIVATION_TERMLINK_DEPTH = 1;
     public static final int ACTIVATION_TASKLINK_DEPTH = 1;
 
-    final static float LIGHT_EPSILON = 0.5f;
 
     public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
 
-        if (dt <= LIGHT_EPSILON) {
+        if (dt <= 0.5f) {
             return evidence;
         } else {
 //            float eternalized =

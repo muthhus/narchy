@@ -117,18 +117,23 @@ public class RevisionTask extends AnswerTask  {
             newBeliefContribution = 0.5f;
         }
 
-        //Balance Tasks
-        BudgetFunctions.balancePri(
-                parentNewBelief.budget(), parentOldBelief.budget(),
-                resultPri,
-                newBeliefContribution);
+        try {
+            //Balance Tasks
+            BudgetFunctions.balancePri(
+                    parentNewBelief.budget(), parentOldBelief.budget(),
+                    resultPri,
+                    newBeliefContribution);
 
-        //Balance Tasklinks
-        Bag<Task> tasklinks = concept(nar).tasklinks();
-        BudgetFunctions.balancePri(
-                tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
-                resultPri,
-                newBeliefContribution);
+            //Balance Tasklinks
+            Bag<Task> tasklinks = concept(nar).tasklinks();
+            BudgetFunctions.balancePri(
+                    tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
+                    resultPri,
+                    newBeliefContribution);
+
+        } catch (BudgetException e) {
+            //HACK
+        }
 
         unlink();
     }
