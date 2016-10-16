@@ -8,52 +8,22 @@ import org.jetbrains.annotations.NotNull;
 
 import static nars.term.container.TermContainer.subtermOfTheOther;
 
-/** ensures the compared terms are not equal and share no (1st-level only) terms in common.  variables excluded */
-public class NoCommonSubtermConstraint implements MatchConstraint {
+/** ensures the compared terms are not equal and share no (1st-level only, or recursively) terms in common.
+ *  variables excluded */
+public final class NoCommonSubtermConstraint extends CommonalityConstraint {
 
-    @NotNull
-    protected final Term b;
+    private final boolean recurse;
 
-    public NoCommonSubtermConstraint(@NotNull Term b) {
-        this.b = b;
-    }
-
-
-    @Override
-    public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull Unify f) {
-        if (y instanceof Variable)
-            return false;
-
-        Term B = f.xy(b);
-
-        if (B == null || B instanceof Variable)
-            return false;
-
-        boolean bCompound = B instanceof Compound;
-
-        if (B.equals(y))
-            return true;
-
-        if (y instanceof Compound) {
-
-            Compound C = (Compound) y;
-
-            return bCompound ?
-                    invalid((Compound) B, C)
-                    :
-                    C.containsTerm(B);
-
-        } else {
-
-            return bCompound && B.containsTerm(y); //B.equals(y);
-        }
-
+    public NoCommonSubtermConstraint(@NotNull Term b, boolean recurse) {
+        super(b);
+        this.recurse = recurse;
     }
 
     /** comparison between two compounds */
-    @NotNull protected boolean invalid(Compound x, Compound y) {
+    @Override
+    @NotNull protected final boolean invalid(Compound x, Compound y) {
 
-        return subtermOfTheOther(x, y, true);
+        return subtermOfTheOther(x, y, recurse, true);
     }
 
                  //commonSubtermsRecurse((Compound) B, C, true, new HashSet())
@@ -62,7 +32,7 @@ public class NoCommonSubtermConstraint implements MatchConstraint {
     @NotNull
     @Override
     public String toString() {
-        return "neqCom(" + b + ')';
+        return "neqCom(" + b + (recurse ? "R)" :  ")");
     }
 
 }

@@ -9,7 +9,7 @@ import java.util.HashSet;
 import static nars.term.container.TermContainer.commonSubtermsRecurse;
 
 /** ensures the compared terms are not equal and recursively share no terms in common.  variables excluded */
-public final class NoCommonRecursiveSubtermConstraint extends NoCommonSubtermConstraint {
+public final class NoCommonRecursiveSubtermConstraint extends CommonalityConstraint {
 
     public NoCommonRecursiveSubtermConstraint(@NotNull Term b) {
         super(b);
