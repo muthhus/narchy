@@ -72,8 +72,8 @@ abstract public class PatternCompound extends GenericCompound {
 
         abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst);
 
-        protected boolean canMatch(@NotNull Compound y) {
-            if (op() == y.op()) {
+        protected boolean canMatch(@NotNull Term y) {
+            if (op == y.op()) {
                 int yStructure = y.structure();
                 return ((yStructure | structureCached) == yStructure);
             }
@@ -81,12 +81,8 @@ abstract public class PatternCompound extends GenericCompound {
         }
 
         @Override
-        public boolean unify(@NotNull Term ty, @NotNull Unify subst) {
-            if (ty instanceof Compound) {
-                Compound y = (Compound)ty;
-                return canMatch(y) && matchEllipsis(y, subst);
-            }
-            return false;
+        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+            return canMatch(y) && matchEllipsis((Compound)y, subst);
         }
 
 
@@ -350,6 +346,7 @@ abstract public class PatternCompound extends GenericCompound {
                         break; //continued below
                     }
 
+
                 } else if (v != null) {
 
                     if (y.containsTermAtemporally(v)) {
@@ -374,7 +371,9 @@ abstract public class PatternCompound extends GenericCompound {
                 return Terms.equalAtemporally(alreadyInY, yFree);
             } else {
 
-                yFree.removeIf(yy -> alreadyInY.contains(Terms.atemporalize(yy)) );
+                yFree.removeIf(yy -> {
+                    return alreadyInY.contains(Terms.atemporalize(yy));
+                });
 
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
 

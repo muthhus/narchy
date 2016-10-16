@@ -1,7 +1,8 @@
-package nars.term;
+package nars.term.util;
 
 import nars.Op;
 import nars.Param;
+import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 

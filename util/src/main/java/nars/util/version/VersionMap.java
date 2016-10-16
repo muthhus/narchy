@@ -227,13 +227,13 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         @Override
         public Versioned<Y> apply(X x, @Nullable Versioned<Y> vy) {
             final Y y = this.y;
-            BiPredicate<X, Y> a = this.assigner;
+
             if (vy == null) {
-                return a.test(x, y) ?  map.newEntry(x).set(y) : null;
+                return assigner.test(x, y) ?  map.newEntry(x).set(y) : null;
             } else {
                 Y yy = vy.get();
                 if (yy == null) {
-                    if (!a.test(x, y) || (vy.set(y)==null))
+                    if (!assigner.test(x, y) || (vy.set(y)==null))
                         return null;
                 } else if (!Objects.equals(yy, y)) {
                     return null; //conflict

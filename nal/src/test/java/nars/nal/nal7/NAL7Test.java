@@ -1,7 +1,9 @@
 package nars.nal.nal7;
 
+import nars.$;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
+import nars.term.Compound;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -10,6 +12,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.$.$;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -732,7 +735,7 @@ public class NAL7Test extends AbstractNALTest {
     }
     @Test public void testDecomposeConjunctionQuest() {
         test()
-                .log()
+                //.log()
                 .input("((x) &&+5 (y))@ :|:")
                 .mustOutput(0, cycles,"(x)",'@', Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0)
                 .mustOutput(0, cycles,"(y)",'@', Float.NaN, Float.NaN, Float.NaN, Float.NaN, 5)
@@ -776,6 +779,22 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
+    /** conj subset decomposition */
+    @Test public void testConjSubsetDecomposition() {
+        test()
+                //.nar.input( $.task( (Compound)$.parallel( $("(x)"), $("(y)"), $("(z)")), '.', 1f, 0.9f) )
+                //.log()
+                .nar.believe( $.parallel( $("(x)"), $("(y)"), $("(z)")), 3, 1f, 0.9f);
+
+        test()
+                .mustBelieve(cycles, "((x) &&+0 (y))", 1f, 0.81f, 3)
+                .mustBelieve(cycles, "((y) &&+0 (z))", 1f, 0.81f, 3)
+                .mustBelieve(cycles, "((x) &&+0 (z))", 1f, 0.81f, 3)
+                .mustNotOutput(cycles, "((x) && (z))", '.', 0, 3, ETERNAL) //the dternal (non-parallel) version of the term
+                .mustNotOutput(cycles, "((x) &&+0 (z))", '.', 0, ETERNAL); //the correct form but at the wrong occurrence time
+        ;
+
+    }
 
 //    @Test public void testTruthDecayOverTime0() {
 //        testTruthDecayOverTime(0, 0.81f, 0.005f);

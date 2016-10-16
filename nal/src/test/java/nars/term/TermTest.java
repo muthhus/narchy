@@ -20,6 +20,7 @@ import nars.*;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
+import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;

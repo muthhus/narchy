@@ -211,7 +211,7 @@ public class Line1DContinuous extends NAgent {
                 //random(120)
         );
         l.print = true;
-        l.runSync(1500);
+        l.run(1500);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);

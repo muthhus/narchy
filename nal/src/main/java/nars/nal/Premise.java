@@ -116,40 +116,41 @@ public final class Premise extends RawBudget implements Tasked {
         Concept beliefConcept = nar.concept(term);
         if (beliefConcept != null) {
 
+            belief = beliefConcept.beliefs().match(task, now); //in case of quest, proceed with matching belief
 
-            if (task.isQuestOrQuestion()) {
-
-                //TODO is this correct handling for quests? this means a belief task may be a goal which may contradict deriver semantics
-                BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
-
-                belief = table.match(task, now);
-                if (belief != null) {
-                    //try {
-                    Task answered = answer(nar, task, belief, beliefConcept);
-
-//                    if (answered != null && !answered.equals(belief)) {
-//                        nar.inputLater(answered);
-//                    }
-
-                    if (answered != null && task.isQuestion())
-                        belief = answered;
-
-                    if (task.isQuest())
-                        belief = beliefConcept.beliefs().match(task, now); //in case of quest, proceed with matching belief
-
-
-                    /*} catch (InvalidConceptException e) {
-                        logger.warn("{}", e.getMessage());
-                    }*/
-
-                }
-
-
-            } else {
-
-                belief = beliefConcept.beliefs().match(task, now);
-
-            }
+//            if (task.isQuestOrQuestion()) {
+//
+//                //TODO is this correct handling for quests? this means a belief task may be a goal which may contradict deriver semantics
+//                BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
+//
+//                belief = table.match(task, now);
+//                if (belief != null) {
+//                    //try {
+//                    Task answered = answer(nar, task, belief, beliefConcept);
+//
+////                    if (answered != null && !answered.equals(belief)) {
+////                        nar.inputLater(answered);
+////                    }
+//
+//                    if (answered != null && task.isQuestion())
+//                        belief = answered;
+//
+//                    if (task.isQuest())
+//                        belief = beliefConcept.beliefs().match(task, now); //in case of quest, proceed with matching belief
+//
+//
+//                    /*} catch (InvalidConceptException e) {
+//                        logger.warn("{}", e.getMessage());
+//                    }*/
+//
+//                }
+//
+//
+//            } else {
+//
+//                belief = beliefConcept.beliefs().match(task, now);
+//
+//            }
         }
 
 

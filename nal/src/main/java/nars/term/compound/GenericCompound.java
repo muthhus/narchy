@@ -4,7 +4,7 @@ import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.term.Compound;
-import nars.term.InvalidTermException;
+import nars.term.util.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;

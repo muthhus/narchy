@@ -7,6 +7,7 @@ import nars.nal.Stamp;
 import nars.task.MutableTask;
 import nars.task.Revision;
 import nars.task.Tasked;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -17,7 +18,6 @@ import nars.truth.TruthDelta;
 import nars.truth.Truthed;
 import nars.util.data.LongString;
 import org.eclipse.collections.api.set.primitive.ImmutableLongSet;
-import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,7 +97,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * otherwise returns null
      */
     @Nullable
-    static boolean taskContentPreTest(@NotNull Term t, char punc, @NotNull NAR nar, boolean safe) {
+    static boolean taskContentValid(@NotNull Term t, char punc, @NotNull NAR nar, boolean safe) {
 
 
         if (!(t instanceof Compound) && !t.isNormalized())
@@ -130,7 +130,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         if (safe)
             return false;
         else
-            throw new NAR.InvalidTaskException(t, reason);
+            throw new InvalidTaskException(t, reason);
     }
 
 //    static boolean hasCoNegatedAtemporalConjunction(Term term) {
@@ -569,7 +569,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * if unnormalized, returns a normalized version of the task,
      * null if not normalizable
      */
-    void normalize(@NotNull NAR memory) throws NAR.InvalidTaskException, InvalidConceptException;
+    void normalize(@NotNull NAR memory) throws InvalidTaskException, InvalidConceptException;
 
 
 //    default void ensureValidParentTaskRef() {

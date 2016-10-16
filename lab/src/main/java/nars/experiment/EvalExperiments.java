@@ -37,11 +37,11 @@ public class EvalExperiments {
 
 
             for (int radius : new int[] { 1, 4}) {
-                out.put("Pacman_r" + radius, new Pacman(nar.get(), 0, radius, false).runSync(cycles).rewardSum());
+                out.put("Pacman_r" + radius, new Pacman(nar.get(), 0, radius, false).run(cycles).rewardSum());
             }
 
             for (int width : new int[] { 4, 8}) {
-                out.put("Line1DContinuous_" + width, new Line1DContinuous(nar.get(), width, random(120)).runSync(cycles).rewardSum());
+                out.put("Line1DContinuous_" + width, new Line1DContinuous(nar.get(), width, random(120)).run(cycles).rewardSum());
             }
         }
 
@@ -98,7 +98,7 @@ public class EvalExperiments {
 
             .run(500 /* max evaluations */, 4 /* repeats per evaluation */, (nar) ->
                     //new Pacman(nar, 0, 2, false).runSync(100).rewardSum()
-                    new Line1DContinuous(nar, 3, sine(50)).runSync(700).rewardSum()
+                    new Line1DContinuous(nar, 3, sine(50)).run(700).rewardSum()
             );
 
 //        //for (CurveBag.BagCurve c : new CurveBag.BagCurve[] { CurveBag.power2BagCurve, CurveBag.power4BagCurve, CurveBag.power6BagCurve } ) {

@@ -233,7 +233,7 @@
 //      //NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
-    (A ==> C), B, time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:DeductionX, Goal:InductionX)
+    (A ==> C), B, time(decomposeTask) |- subIfUnifiesAny(C,A,B), (Belief:DeductionX, Goal:InductionX)
     B, (A ==> C), task(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
         B, ((--,%A) ==> C), task(negative), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
 
@@ -243,9 +243,9 @@
     B, (A <=> C), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Strong)
 
     //these are only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
-    B, (C && A), task(positive), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
+    B, (C && A), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:Strong)
         //experimental pos/neg polarization
-        B, (C && (--,%A)), task(negative), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:StrongN)
+        //B, (C && (--,%A)), task(negative), time(decomposeBelief) |- subIfUnifiesForward(C,A,B), (Goal:StrongN)
 
 
     //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
@@ -269,8 +269,8 @@
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- ((--,%S) ==> P), (Belief:InductionN)
     S, P, time(eternal), task(positive), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction)
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> (--,%S)), (Belief:AbductionN)
-    S, P, time(eternal), task(positive), task("."), neq(P,S), notImplEqui(S), notImplEqui(P) |- (S <=> P), (Belief:Comparison)
-        S, P, time(eternal), task(negative), task("."), neq(P,S), notImplEqui(S), notImplEqui(P) |- (--,(S <=> P)), (Belief:ComparisonN)
+    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- (S <=> P), (Belief:Comparison)
+        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- (--,(S <=> P)), (Belief:ComparisonN)
     S, P, time(eternal), task("."), neq(P,S) |- (S && P), (Belief:Intersection)
         //S, P, time(eternal), task(negative), task("."), neq(P,S) |- ((--,%S) && P), (Belief:IntersectionN)
     //%S, %P, time(eternal), neqCom(P,S) |- (%S || %P), (Belief:Union)
@@ -285,8 +285,8 @@
     A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
         A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
 
-    A, B, task(positive), task("."), time(dtAfter), neq(A,B), notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
-        A, B, task(negative), task("."), time(dtAfter), neq(A,B), notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
+    A, B, task(positive), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
+        A, B, task(negative), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
 
     A, B, task("."), time(dtAfter), neq(A,B) |- (A &&+- B), (Belief:Intersection)
         ///A, B, task(negative), task("."), time(dtAfter), neq(A,B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
@@ -300,13 +300,13 @@
 
      //structural decompose any component of a conjunction.
      //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
-     (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
-         //(&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction,Goal:StructuralDeduction)
-     (&&,X,A..+), X, time(decomposeTask), task("?@") |- (&&,A..+), ()
-        //(&&,X,A..+), X, time(decomposeTask), task("?") |- X, (Punctuation:Question)
+     (&&,X,A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction,Goal:StructuralDeduction)
+         //(&&,X,A..+), X, time(decomposeTaskSubset) |- X, (Belief:StructuralDeduction,Goal:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
+        //(&&,X,A..+), X, time(decomposeTaskSubset), task("?") |- X, (Punctuation:Question)
 
-     (&&,X,A..+), B, time(decomposeTask) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
-         //(&&,X,A), B, time(decomposeTask) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
+     (&&,X,A..+), B, time(decomposeTaskSubset) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
+         //(&&,X,A), B, time(decomposeTaskSubset) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
 //substitutionViaSimilarity
      X, (B<->C), neq(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)

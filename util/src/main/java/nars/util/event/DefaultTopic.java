@@ -1,5 +1,8 @@
 package nars.util.event;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
@@ -8,6 +11,7 @@ import java.util.function.Consumer;
  */
 public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements Topic<V> {
 
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTopic.class);
 
     //TODO extract this to Topics and a graph metamodel of the events
 
@@ -55,23 +59,23 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
         if (vv != null) {
             for (int i = 0; ; ) {
                 Consumer c = vv[i++];
-                if (c != null)
-                    c.accept(arg);
-                else
+                if (c != null) {
+                    try {  c.accept(arg);  } catch (Exception e) {  logger.warn("{}: {}", c, e); }
+                } else
                     break; //null terminator hit
             }
         }
     }
 
     @Override
-    public void emitAsync(V inputted, ExecutorService e) {
+    public void emitAsync(V arg, ExecutorService exe) {
         Consumer[] vv = getCachedNullTerminatedArray();
         if (vv != null) {
             for (int i = 0; ; ) {
                 Consumer c = vv[i++];
                 if (c != null) {
-                    e.submit(()-> {
-                        c.accept(inputted);
+                    exe.submit(()-> {
+                        try {  c.accept(arg);  } catch (Exception e) {  logger.warn("{}: {}", c, e); }
                     });
                 } else
                     break; //null terminator hit

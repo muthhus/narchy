@@ -36,7 +36,7 @@ public class MultiThreadExecutioner extends Executioner {
         @Nullable
         public Task[] tasks;
         @Nullable
-        public Runnable r;
+        public Runnable runnable;
     }
 
     @NotNull
@@ -175,7 +175,7 @@ public class MultiThreadExecutioner extends Executioner {
     }
 
     final static EventTranslatorOneArg<TaskEvent, Runnable> runPublisher = (TaskEvent x, long seq, Runnable b) -> {
-        x.r = b;
+        x.runnable = b;
     };
 
     @Override
@@ -201,22 +201,13 @@ public class MultiThreadExecutioner extends Executioner {
             Task[] tt = te.tasks;
             if (tt != null) {
                 te.tasks = null;
-                try {
-                    nar.input(tt);
-                } catch (Throwable e) {
-                    NAR.logger.error("task: {}", e);
-                    //e.printStackTrace();
-                }
+                nar.input(tt);
             }
-            Runnable rr = te.r;
+
+            Runnable rr = te.runnable;
             if (rr != null) {
-                te.r = null;
-                try {
-                    rr.run();
-                } catch (Throwable e) {
-                    NAR.logger.error("run: {}", e);
-                    //e.printStackTrace();
-                }
+                te.runnable = null;
+                rr.run();
             }
         }
     }

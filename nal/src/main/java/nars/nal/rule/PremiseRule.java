@@ -706,6 +706,9 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = TimeFunctions.decomposeTask;
                             break;
 
+                        case "decomposeTaskSubset":
+                            timeFunction = TimeFunctions.decomposeTaskSubset;
+                            break;
 
                         case "decomposeTaskIfTermLinkBefore":
                             timeFunction = TimeFunctions.decomposeTask;

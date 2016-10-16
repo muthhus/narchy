@@ -8,6 +8,7 @@ import nars.concept.util.InvalidConceptException;
 import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
+import nars.task.util.InvalidTaskException;
 import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
@@ -19,6 +20,7 @@ import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.TermTransform;
 import nars.term.transform.VariableNormalization;
+import nars.term.util.InvalidTermException;
 import nars.util.data.map.nbhm.HijacKache;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
@@ -159,14 +161,14 @@ public abstract class TermIndex extends TermBuilder {
     private final Term _the(Op o, int dt, Term[] u) {
         try {
             return super.the(o, dt, u);
-        } catch (InvalidTermException x) {
-            //if (Param.DEBUG_EXTRA)
-            logger.warn("Termizer: {x} : {} {} {}",  x, o, dt, u);
-            return False; //place a False placeholder so that a repeat call will not have to discover this manually
+        } catch (InvalidTermException | InvalidTaskException x) {
+            if (Param.DEBUG_EXTRA) {
+                logger.warn("Termizer: {x} : {} {} {}", x, o, dt, u);
+            }
         } catch (Throwable e) {
             logger.error("Termizer: {x} : {} {} {}",  e, o, dt, u);
-            return False;
         }
+        return False; //place a False placeholder so that a repeat call will not have to discover this manually
     }
 
     /**

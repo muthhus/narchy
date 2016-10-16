@@ -3,7 +3,7 @@ package nars.term.subst;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
-import nars.term.InvalidTermException;
+import nars.term.util.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;

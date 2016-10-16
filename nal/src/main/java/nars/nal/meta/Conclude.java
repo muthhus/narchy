@@ -3,12 +3,12 @@ package nars.nal.meta;
 import com.google.common.base.Joiner;
 import nars.*;
 import nars.budget.Budget;
-import nars.index.term.TermIndex;
 import nars.nal.Premise;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
-import nars.term.InvalidTermException;
+import nars.term.util.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
@@ -33,7 +33,7 @@ import static nars.time.Tense.*;
 
 /**
  * Final conclusion step of the derivation process that produces a derived task
- *
+ * <p>
  * Each rule corresponds to a unique instance of this
  */
 public final class Conclude extends AtomicStringConstant implements BoolCondition {
@@ -41,7 +41,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     public final static Logger logger = LoggerFactory.getLogger(Conclude.class);
 
-    @Deprecated public final boolean eternalize;
+    @Deprecated
+    public final boolean eternalize;
 
     @NotNull
     public final PremiseRule rule;
@@ -100,26 +101,18 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     @Override
     public final boolean run(@NotNull PremiseEval m, int now) {
 
-        Term r;
-        try {
-            TermIndex transformer =
-                    m.index;
-                    //$.terms;
+        if (rule.minNAL <= m.nar.level()) {
 
-            r = transformer.transform(this.conclusionPattern, m);
-        } catch (InvalidTermException e) {
-            if (Param.DEBUG_EXTRA)
-                logger.error("Term: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);
-            return true;
-        }
+            try {
+                Term r = m.index.transform(this.conclusionPattern, m);
 
-        try {
-            if (r instanceof Compound) { //includes null test
-                derive(m, (Compound) r, m.punct.get());
+                if (r instanceof Compound) { //includes null test
+                    derive(m, (Compound) r, m.punct.get());
+                }
+            } catch (InvalidTermException | InvalidTaskException e) {
+                if (Param.DEBUG_EXTRA)
+                    logger.warn("{} {}", m, e.toString());
             }
-        } catch (InvalidTermException e) {
-            if (Param.DEBUG_EXTRA)
-                logger.error("Task: {}\n\t{}\n\t{}\n\t{}", e, rule, m.premise, m.xy);
         }
 
         return true;
@@ -138,7 +131,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         NAR nar = m.nar;
 
-        content = nar.normalize(content); //why isnt this sometimes normalized by here
+        content = nar.normalize(content); //TODO why isnt this sometimes normalized by here
         if (content == null)
             return; //somehow became null
 
@@ -152,14 +145,15 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             o = content.op();
         }
 
-        if (!Task.taskContentPreTest(content, ct.punc, nar, true /* !Param.DEBUG*/))
-            return; //INVALID TERM FOR TASK
+//this is performed on input also
+//        if (!Task.taskContentValid(content, ct.punc, nar, false/* !Param.DEBUG*/))
+//            return; //INVALID TERM FOR TASK
 
         long occ;
 
         if (m.temporal) {
-            if (nar.level() < 7)
-                throw new NAR.InvalidTaskException(content, "invalid NAL level");
+//            if (nar.level() < 7)
+//                throw new NAR.InvalidTaskException(content, "invalid NAL level");
 
             long[] occReturn = {ETERNAL};
             float[] confScale = {1f};
@@ -168,78 +162,65 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     m, this, occReturn, confScale
             );
 
-            //temporalization failure, could not determine temporal attributes
-            if (temporalized == null)
-                return;
+            //temporalization failure, could not determine temporal attributes. seems this can happen normally
+            if (temporalized == null) {
+//                Compound temporalized2 = this.time.compute(content,
+//                        m, this, occReturn, confScale
+//                );
+
+                throw new InvalidTermException(content.op(), content.dt(), content.terms(),
+                        "temporalization failure" + (Param.DEBUG ? rule : ""));
+            }
 
             int tdt = temporalized.dt();
             if (tdt == XTERNAL || tdt == -XTERNAL) {
-                   // || Math.abs(occReturn[0] - DTERNAL) < 1000) { //tempoary
-//                this.temporalizer.compute(content,
-//                        m, this, occReturn, confScale
-//                );
                 throw new InvalidTermException(content.op(), content.dt(), content.terms(), "XTERNAL/DTERNAL leak");
-                //return;
             }
 
-            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
-                //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
-                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
+//            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
+//                //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
+//                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
+//            }
+
+            if (temporalized != content) {
+                ((GenericCompound) (content = temporalized)).setNormalized();
             }
 
-            if (temporalized!=content) {
-                content = temporalized;
-                ((GenericCompound)content).setNormalized();
-            }
 
-
-
-            //apply the confidence scale
+            //apply any non 1.0 the confidence scale
             if (truth != null) {
-                //float projection;
-                //projection =
-                        //Param.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent() ? TruthFunctions.projection(m.task.occurrence(), m.belief.occurrence(), nar.time()) : 1f;
                 float cf = confScale[0];
                 if (cf != 1) {
                     truth = truth.confMultViaWeightMaxEternal(cf);
                     if (truth == null) {
-                        throw new NAR.InvalidTaskException(content, "temporal leak");
-                        //return;
+                        throw new InvalidTaskException(content, "temporal leak");
                     }
                 }
             }
 
-
             occ = occReturn[0];
-        } else {
 
+        } else {
 
             occ = ETERNAL;
         }
 
 
-        if (content!=null) {
-            //the derived compound indicated a potential dt, but the premise was actually atemporal;
-            // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
-
-
-
-            if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
-                Term ete = $.terms.the(o, DTERNAL, content.terms());
-                if (!(ete instanceof Compound)) {
-                    //throw new InvalidTermException(o, content.dt(), content.terms(), "untemporalization failed");
-                    return;
-                }
-                content = nar.normalize((Compound)ete);
+        //the derived compound indicated a potential dt, but the premise was actually atemporal;
+        // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
+        if (content.dt() == XTERNAL /*&& !o.isImage()*/) {
+            Term ete = m.index.the(o, DTERNAL, content.terms());
+            if (!(ete instanceof Compound)) {
+                throw new InvalidTermException(o, DTERNAL, content.terms(), "untemporalization failed");
             }
-
-            DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
-            if (d != null)
-                m.conclusion.derive.accept(d);
+            content = nar.normalize((Compound) ete);
         }
 
-    }
 
+        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, ct.punc, ct.evidence);
+        if (d != null)
+            m.conclusion.derive.accept(d);
+    }
 
 
     /**
@@ -248,16 +229,14 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     @Nullable
     public final DerivedTask derive(@NotNull Termed<Compound> c, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, Truth truth, char punc, long[] evidence) {
 
+        DerivedTask dt =
+                new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p);
+        //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
 
-        try {
-            DerivedTask dt =
-                    new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p);
-                    //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
-
-            dt.time(now, occ)
-                    .budget(budget) // copied in, not shared
-                    //.anticipate(derivedTemporal && d.anticipate)
-                    .log(Param.DEBUG ? rule : null);
+        dt.time(now, occ)
+                .budget(budget) // copied in, not shared
+                //.anticipate(derivedTemporal && d.anticipate)
+                .log(Param.DEBUG ? rule : null);
 
 
 //            //TEMPORARY MEASUREMENT
@@ -268,13 +247,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 //            }
 //            //</TEMPORARY MEASUREMENT
 
-            return dt;
-        } catch (Exception e) {
-            if (Param.DEBUG) {
-                logger.error("{}", e.toString());
-            }
-            return null;
-        }
+        return dt;
 
 
         //ETERNALIZE: (CURRENTLY DISABLED)
@@ -330,18 +303,18 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     }
 
-    static final Map<NAR, Map<PremiseRule,RuleStats>> stats = new ConcurrentHashMap();
+    static final Map<NAR, Map<PremiseRule, RuleStats>> stats = new ConcurrentHashMap();
 
     private static void feedback(Premise premise, @NotNull PremiseRule rule, RuleFeedbackDerivedTask t, TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
         Map<PremiseRule, RuleStats> x = stats.computeIfAbsent(nar, n -> new ConcurrentHashMap<>());
 
         RuleStats s = x.computeIfAbsent(rule, d -> new RuleStats());
 
-        s.pri.addValue( t.pri() );
+        s.pri.addValue(t.pri());
 
-        if (delta!=null) {
-            s.dSat.addValue( Math.abs(deltaSatisfaction) );
-            s.dConf.addValue( Math.abs(deltaConfidence) );
+        if (delta != null) {
+            s.dSat.addValue(Math.abs(deltaSatisfaction));
+            s.dConf.addValue(Math.abs(deltaConfidence));
         }
 
     }
@@ -352,12 +325,12 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
             System.out.println(
                     r + "\t" +
-                    Texts.n4(s.pri.getSum()) + "\t" +
-                    Texts.n4(s.dConf.getSum()) + "\t" +
-                    Texts.n4(s.dSat.getSum()) + "\t" +
-                    n
+                            Texts.n4(s.pri.getSum()) + "\t" +
+                            Texts.n4(s.dConf.getSum()) + "\t" +
+                            Texts.n4(s.dSat.getSum()) + "\t" +
+                            n
                     //" \t " + mean +
-                    );
+            );
         });
     }
 

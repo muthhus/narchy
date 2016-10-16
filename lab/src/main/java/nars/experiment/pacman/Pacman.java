@@ -376,7 +376,7 @@ public class Pacman extends NAgent {
 //               System.out.println(t);
 //           }
 //        });
-        p.runSync(runCycles);
+        p.run(runCycles);
 
 //		pacman.run(
 //				//new DQN(),

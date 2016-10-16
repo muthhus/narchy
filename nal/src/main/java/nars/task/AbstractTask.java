@@ -3,6 +3,7 @@ package nars.task;
 import nars.*;
 import nars.budget.RawBudget;
 import nars.concept.util.InvalidConceptException;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -127,7 +128,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
                 if (isBeliefOrGoal())
                     truth = truth.negated();
             } else {
-                throw new NAR.InvalidTaskException(this, "Top-level negation not wrapping a Compound");
+                throw new InvalidTaskException(this, "Top-level negation not wrapping a Compound");
             }
         }
 
@@ -140,19 +141,19 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
 
     @Override
-    public void normalize(@NotNull NAR nar) throws InvalidConceptException, NAR.InvalidTaskException  {
+    public void normalize(@NotNull NAR nar) throws InvalidConceptException, InvalidTaskException {
 
         if (isDeleted())
-            throw new NAR.InvalidTaskException(this, "Deleted");
+            throw new InvalidTaskException(this, "Deleted");
 
         Compound t = term;
 
         if (!t.levelValid( nar.level() ))
-            throw new NAR.InvalidTaskException(this, "Unsupported NAL level");
+            throw new InvalidTaskException(this, "Unsupported NAL level");
 
         char punc = punc();
         if (punc == 0)
-            throw new NAR.InvalidTaskException(this, "Unspecified punctuation");
+            throw new InvalidTaskException(this, "Unspecified punctuation");
 
 
         //this conflicts with weakref's
@@ -182,11 +183,11 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         }
 
-        Task.taskContentPreTest(t, punc, nar, false);
+        Task.taskContentValid(t, punc, nar, false);
 
         Compound ntt = nar.normalize(t);
         if (ntt == null)
-            throw new NAR.InvalidTaskException(t, "Failed normalization");
+            throw new InvalidTaskException(t, "Failed normalization");
 
         if (ntt!=t) {
             this.term = ntt;
@@ -305,7 +306,7 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
     public final void setTruth(@Nullable Truth t) {
 
         if (t == null && isBeliefOrGoal())
-            throw new NAR.InvalidTaskException(this, "null truth for belief or goal");
+            throw new InvalidTaskException(this, "null truth for belief or goal");
 
         if (!Objects.equals(truth, t)) {
             truth = t;

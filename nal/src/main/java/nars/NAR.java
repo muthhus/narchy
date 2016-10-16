@@ -12,7 +12,6 @@ import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
-import nars.index.task.MapTaskIndex;
 import nars.index.task.TaskIndex;
 import nars.index.task.TreeTaskIndex;
 import nars.index.term.TermIndex;
@@ -22,8 +21,9 @@ import nars.nal.nal8.Execution;
 import nars.nar.exe.Executioner;
 import nars.table.BeliefTable;
 import nars.task.MutableTask;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
-import nars.term.InvalidTermException;
+import nars.term.util.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -118,10 +118,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     private NARLoop loop;
 
     //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
-
-    private Function<Task, Task> preprocessor = (t) -> t; //by default, pass-through
-
-
 
     public void printConceptStatistics() {
         //Frequency complexity = new Frequency();
@@ -611,12 +607,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     }
 
 
-
-    @NotNull public NAR preprocess(@NotNull Function<Task,Task> preprocessor) {
-        this.preprocessor = preprocessor;
-        return this;
-    }
-
     /**
      * exposes the memory to an input, derived, or immediate task.
      * the memory then delegates it to its controller
@@ -629,16 +619,16 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
         //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {
-            input = preprocessor.apply(input);
             input.normalize(this); //accept into input buffer for eventual processing
-        } catch (Exception e) {
+        } catch (InvalidTaskException | InvalidTermException e) {
             emotion.frustration(input.priIfFiniteElseZero());
             emotion.eror();
 
             input.delete();
 
-            if (Param.DEBUG)
-                logger.warn("input preprocess: {}", e.toString());
+            if (Param.DEBUG_EXTRA)
+                logger.warn("input: {}", e.toString());
+
             //e.printStackTrace();
             //throw e;
             return null;
@@ -1358,27 +1348,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 //        with(values);
 //        //return (X)this;
 //    }
-
-    public static final class InvalidTaskException extends RuntimeException {
-
-        public final Termed task;
-
-
-        public InvalidTaskException(Termed t, String message) {
-            super(message);
-            this.task = t;
-            if (t instanceof Task)
-                ((Task) t).delete(message);
-        }
-
-        @NotNull
-        @Override
-        public String getMessage() {
-            return super.getMessage() + ": " +
-                    ((task instanceof Task) ? ((Task) task).proof() : task.toString());
-        }
-
-    }
 
     public static class RunStateException extends RuntimeException {
         public RunStateException(boolean shouldRun) {
