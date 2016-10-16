@@ -2,12 +2,10 @@ package nars.remote;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.googlecode.concurrenttrees.common.PrettyPrinter;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.gui.Vis;
-import nars.index.task.TreeTaskIndex;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
 import nars.nar.exe.Executioner;

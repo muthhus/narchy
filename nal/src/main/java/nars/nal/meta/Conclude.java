@@ -1,18 +1,21 @@
 package nars.nal.meta;
 
 import com.google.common.base.Joiner;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
 import nars.budget.Budget;
 import nars.nal.Premise;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
-import nars.term.util.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.term.compound.GenericCompound;
+import nars.term.util.InvalidTermException;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;

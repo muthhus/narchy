@@ -7,7 +7,6 @@
  */
 package jhelp.util.classLoader;
 
-import jhelp.util.compiler.Compiler;
 import jhelp.util.compiler.Compiler.NameCode;
 import jhelp.util.debug.Debug;
 import jhelp.util.debug.DebugLevel;

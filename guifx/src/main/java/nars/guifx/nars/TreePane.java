@@ -9,9 +9,9 @@ import javafx.scene.layout.FlowPane;
 import nars.NAR;
 import nars.Task;
 import nars.guifx.AutoLabel;
+import nars.guifx.util.FrameReaction;
 import nars.guifx.util.NSlider;
 import nars.util.FX;
-import nars.guifx.util.FrameReaction;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;

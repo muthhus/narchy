@@ -3,8 +3,9 @@ package nars.gui;
 import com.jogamp.newt.opengl.GLWindow;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.bag.Bag;
+import nars.bag.impl.experimental.HijackBag;
+import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
@@ -15,6 +16,8 @@ import nars.term.atom.Atomic;
 import nars.test.DeductiveMeshTest;
 import nars.util.data.list.FasterList;
 import nars.util.event.On;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
@@ -41,15 +44,15 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512, 4, 2, 2 );
+        Default n = new Default(512, 8, 2, 2 );
         //n.nal(4);
 
 
-        n.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n,  64, 6);
+        newConceptWindow(n,  64, 8);
 
         //n.run(20); //headstart
 
@@ -57,11 +60,11 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         //n.log();
         //n.input("(a<->b).", "(b<->c).");
 
-        new DeductiveMeshTest(n, new int[]{5, 5}, 16384);
+        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 //        n
 //                //.log()
 //                //.logSummaryGT(System.out, 0.05f)
@@ -76,8 +79,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                );
 //                //.run(800);
 //
-        n.linkFeedbackRate.setValue(0.5f);
-        n.loop(30f);
+        //n.linkFeedbackRate.setValue(0.5f);
+        n.loop(25f);
         //n.run(1);
 //        n.forEachConcept(c -> {
 //            c.print();
@@ -86,6 +89,10 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
     }
 
     public static GLWindow newConceptWindow(Default nn, int maxNodes, int maxEdges) {
+
+        Bag<Pair<ConceptWidget,Term>> edges =
+                //new CurveBag(BudgetMerge.plusBlend, nn.random);
+            new HijackBag(maxEdges*maxNodes, 4, BudgetMerge.plusBlend, nn.random);
 
         NARSpace<Term, Spatial<Term>> n = new NARSpace<>(nn, (nar, space, target) -> {
             Bag<Concept> x = ((Default) nar).core.concepts;
@@ -99,32 +106,45 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 Concept concept = b.get();
 
                 ConceptWidget root = space.update(concept.term(),
-                        t -> new ConceptWidget(t, maxEdges, nar));
+                        t -> new ConceptWidget(t, nar));
 
-                float bPri = root.pri = b.priIfFiniteElseZero();
+                //float bPri = root.pri = b.priIfFiniteElseZero();
                 target.add(root);
 
-                Term tlSrc = concept.term();
+                root.clearEdges();
 
-
-                Consumer<BLink<? extends Termed>> linkAdder = l -> {
-                    if (!l.get().term().equals(root.key) && root.numEdges < maxEdges)
-                        root.addLink(space, l);
-                };
-                concept.tasklinks().forEach(linkAdder);
-
-                concept.termlinks().forEach(bt -> {
-
-                    final Term tlTarget = bt.get();
-                    if (tlTarget.equals(tlSrc))
-                        return; //no self loop
-
-                    ConceptWidget termLink = newLinkWidget(nar, space, root, tlSrc, tlTarget, bt, false);
-                    if (termLink!=null) {
-                        termLink.pri = bt.pri() * bPri; //scale by its Concept's priority
-                        target.add(termLink);
+                Consumer<BLink<? extends Termed>> absorb = tgt -> {
+                    Term tt = tgt.get().term();
+                    if (!tt.equals(root.key) && space.getIfActive(tt)!=null) {
+                        edges.put(Tuples.pair(root, tt), tgt);
                     }
+                };
+
+                //phase 1: collect
+                concept.tasklinks().forEach(absorb);
+                concept.termlinks().forEach(absorb);
+
+                //phase 2: add edges
+                edges.forEach(eb -> {
+                    Pair<ConceptWidget, Term> ebt = eb.get();
+                    EDraw e = ebt.getOne().addLink(space, ebt.getTwo(), b);
+                    if (e!=null)
+                        e.attraction = 0.075f;
                 });
+
+
+//                concept.termlinks().forEach(bt -> {
+//
+//                    final Term tlTarget = bt.get();
+//                    if (tlTarget.equals(ss))
+//                        return; //no self loop
+//
+//                    ConceptWidget termLinkConnection = newLinkWidget(nar, space, root, ss, tlTarget, bt, false);
+//                    if (termLinkConnection!=null) {
+//                        termLinkConnection.pri = bt.pri() * (bPri*1.5f); //scale by its Concept's priority
+//                        target.add(termLinkConnection);
+//                    }
+//                });
 
 
 
@@ -162,15 +182,15 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
         return s.show(1300, 900);
     }
 
-    public static ConceptWidget newLinkWidget(final NAR nar, SpaceGraph<Term> space, final ConceptWidget core, Term tlSrc, Term tlTarget, BLink bt, boolean task) {
+    public static ConceptWidget newLinkWidget(final NAR nar, SpaceGraph<Term> space, final ConceptWidget core, Term SRC, Term TARGET, BLink bt, boolean task) {
 
 
 
-        @NotNull Compound vTerm = $.p(L, tlSrc, tlTarget);
-        SimpleSpatial targetSpatial = (SimpleSpatial) space.getIfActive(tlTarget);
+        @NotNull Compound vTerm = $.p(L, SRC, TARGET);
+        SimpleSpatial targetSpatial = (SimpleSpatial) space.getIfActive(TARGET);
         if (targetSpatial!=null) {
             ConceptWidget termLink = space.update(vTerm,
-                    t -> new ConceptWidget(t, 2, nar) {
+                    t -> new ConceptWidget(t, nar) {
 
                         //                                @Override
 //                                public Dynamic newBody(boolean collidesWithOthersLikeThis) {

@@ -9,7 +9,10 @@ import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.task.util.InvalidTaskException;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.ProtoCompound;
@@ -38,7 +41,6 @@ import java.util.function.Function;
 import static nars.Op.*;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 
 /**

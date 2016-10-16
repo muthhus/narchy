@@ -2,7 +2,9 @@ package nars.experiment.tetris;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;

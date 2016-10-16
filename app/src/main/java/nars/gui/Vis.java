@@ -3,7 +3,6 @@ package nars.gui;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
-import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -23,9 +22,7 @@ import spacegraph.math.Color3f;
 import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.Plot2D;
-import spacegraph.render.Draw;
 
-import java.util.Collection;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;

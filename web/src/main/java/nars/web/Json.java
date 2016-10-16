@@ -8,7 +8,6 @@ import io.undertow.websockets.core.WebSocketCallback;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
 import nars.util.data.list.FasterList;
-
 import nars.util.meter.event.FloatGuage;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;

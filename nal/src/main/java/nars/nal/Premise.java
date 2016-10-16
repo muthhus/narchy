@@ -9,8 +9,6 @@ import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.table.BeliefTable;
-import nars.table.QuestionTable;
 import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;

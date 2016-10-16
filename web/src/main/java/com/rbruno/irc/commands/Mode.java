@@ -1,15 +1,15 @@
 package com.rbruno.irc.commands;
 
-import java.util.Iterator;
-import java.util.Map;
-
-import com.rbruno.irc.IRCServer;
-import com.rbruno.irc.reply.Error;
-import com.rbruno.irc.reply.Reply;
 import com.rbruno.irc.Channel;
 import com.rbruno.irc.Channel.ChannelMode;
 import com.rbruno.irc.Client;
+import com.rbruno.irc.IRCServer;
 import com.rbruno.irc.Request;
+import com.rbruno.irc.reply.Error;
+import com.rbruno.irc.reply.Reply;
+
+import java.util.Iterator;
+import java.util.Map;
 
 public class Mode extends Command {
 

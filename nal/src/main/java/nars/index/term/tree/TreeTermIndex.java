@@ -7,8 +7,8 @@ import nars.concept.util.ConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.radixtree.MyConcurrentRadixTree;
 import nars.util.data.map.nbhm.HijacKache;
+import nars.util.radixtree.MyConcurrentRadixTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

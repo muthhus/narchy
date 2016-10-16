@@ -1,7 +1,6 @@
 package nars.nal;
 
 import nars.NAR;
-import nars.Task;
 import nars.concept.Concept;
 import nars.nar.Default;
 

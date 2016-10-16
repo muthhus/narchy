@@ -40,7 +40,6 @@ import jake2.util.QuakeFile;
 
 import java.io.RandomAccessFile;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.regex.Pattern;
 
 /**

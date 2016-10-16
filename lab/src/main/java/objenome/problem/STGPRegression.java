@@ -21,7 +21,6 @@
  */
 package objenome.problem;
 
-import objenome.util.MersenneTwisterFast;
 import objenome.goal.DoubleFitness;
 import objenome.goal.HitsCount;
 import objenome.op.Node;
@@ -36,6 +35,7 @@ import objenome.solver.evolve.init.Full;
 import objenome.solver.evolve.mutate.SubtreeCrossover;
 import objenome.solver.evolve.mutate.SubtreeMutation;
 import objenome.solver.evolve.selection.TournamentSelector;
+import objenome.util.MersenneTwisterFast;
 
 import java.util.ArrayList;
 import java.util.List;

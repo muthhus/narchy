@@ -1,7 +1,5 @@
 package nars.guifx;
 
-import nars.Task;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Parent;
@@ -13,6 +11,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import nars.$;
 import nars.NAR;
+import nars.Task;
 import nars.guifx.concept.AbstractConceptPane;
 import nars.guifx.concept.DetailedConceptPane;
 import nars.guifx.demo.NARide;
@@ -21,6 +20,7 @@ import nars.guifx.util.ColorMatrix;
 import nars.term.Termed;
 import nars.util.FX;
 import nars.util.Util;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import java.io.IOException;
 import java.util.Map;

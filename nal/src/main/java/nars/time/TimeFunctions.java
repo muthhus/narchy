@@ -9,15 +9,14 @@ import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
-import nars.term.util.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.$.unneg;
 import static nars.Op.CONJ;
-import static nars.Op.SUBTERMS;
 import static nars.nal.TermBuilder.productNormalize;
 import static nars.task.Revision.chooseByConf;
 import static nars.time.Tense.*;
@@ -249,7 +248,7 @@ public interface TimeFunctions {
         if (derived.op() == CONJ && (task.volume() == derived.volume() && taskSize == derived.size())) {
             //something wrong happened with the ellipsis selection.
             //being a decomposition it should produce a smaller result
-            throw new RuntimeException("ellipsis commutive match fault");
+            throw new InvalidTermException(derived.op(), derived.terms(), "ellipsis commutive match fault: same as parent");
         }
         int dt = task.dt();
 

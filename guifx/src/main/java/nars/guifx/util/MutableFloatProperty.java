@@ -1,11 +1,11 @@
 package nars.guifx.util;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import org.eclipse.collections.api.block.procedure.primitive.DoubleProcedure;
 import javafx.beans.property.SimpleDoubleProperty;
 import nars.util.data.MutableDouble;
 import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.procedure.primitive.DoubleProcedure;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.DoubleSupplier;

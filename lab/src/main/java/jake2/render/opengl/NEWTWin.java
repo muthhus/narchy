@@ -7,7 +7,6 @@ package jake2.render.opengl;
 
 import com.jogamp.common.os.Platform;
 import com.jogamp.nativewindow.CapabilitiesChooser;
-import com.jogamp.nativewindow.NativeSurface;
 import com.jogamp.nativewindow.NativeWindow;
 import com.jogamp.nativewindow.WindowClosingProtocol;
 import com.jogamp.nativewindow.util.Dimension;
@@ -25,8 +24,6 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.newt.util.MonitorModeUtil;
 import com.jogamp.opengl.*;
 import jake2.Defines;
-import jake2.Globals;
-import jake2.SizeChangeListener;
 import jake2.client.VID;
 import jake2.game.cvar_t;
 import jake2.qcommon.Cbuf;

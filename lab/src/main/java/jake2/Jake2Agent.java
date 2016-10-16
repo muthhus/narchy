@@ -8,10 +8,10 @@ import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
 import nars.NAR;
-import nars.video.PixelAutoClassifier;
 import nars.remote.SwingAgent;
-import nars.video.Sensor2D;
+import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
+import nars.video.Sensor2D;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -23,7 +23,6 @@ import java.util.function.Supplier;
 import static jake2.Globals.*;
 import static jake2.render.Base.vid;
 import static nars.$.t;
-import static spacegraph.SpaceGraph.window;
 
 /**
  * Created by me on 9/22/16.

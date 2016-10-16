@@ -9,6 +9,7 @@ import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
 import nars.nar.Default;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -98,6 +99,40 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
 
+            feedbackToPremiseConcepts(nar);
+            feedbackToPremiseLinks(delta, deltaConfidence, deltaSatisfaction, nar);
+
+            if (!Param.DEBUG) {
+                this.premise = null;
+            }
+        }
+
+        private void feedbackToPremiseConcepts(NAR nar) {
+            Concept thisConcept = concept(nar);
+            feedbackToPremiseConcepts(thisConcept, nar, getParentTask());
+            feedbackToPremiseConcepts(thisConcept, nar, getParentBelief());
+            feedbackToPremiseConcepts(thisConcept, nar, premise.concept);
+        }
+
+        private void feedbackToPremiseConcepts(Concept thisConcept, NAR nar, Termed p) {
+            if (p!=null) {
+                Concept parentConcept = nar.concept(p);
+                if (parentConcept!=null) {
+
+                    //TODO use CrossLink or other Activation's here?
+
+                    parentConcept.tasklinks().put(this);
+
+                    if (!thisConcept.equals(parentConcept)) {
+                        parentConcept.termlinks().put(thisConcept.term(), budget());
+                        thisConcept.termlinks().put(parentConcept.term(), budget());
+                    }
+
+                }
+            }
+        }
+
+        public void feedbackToPremiseLinks(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
             if (delta == null) {
 
                 feedback(1f - priIfFiniteElseZero() /* HEURISTIC */, nar);
@@ -119,10 +154,6 @@ abstract public class DerivedTask extends MutableTask {
 
                 feedback(boost, nar);
 
-            }
-
-            if (!Param.DEBUG) {
-                this.premise = null;
             }
         }
 

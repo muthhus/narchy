@@ -1,6 +1,5 @@
 package nars.guifx.concept;
 
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -8,6 +7,7 @@ import javafx.scene.shape.Box;
 import nars.guifx.graph3.SpaceNet;
 import nars.guifx.graph3.Xform;
 import nars.guifx.util.ColorArray;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import java.util.*;
 import java.util.function.Consumer;

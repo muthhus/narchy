@@ -3,7 +3,6 @@ package nars;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;

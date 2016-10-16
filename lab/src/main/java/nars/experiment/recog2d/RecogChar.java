@@ -1,16 +1,16 @@
 package nars.experiment.recog2d;
 
 import com.jogamp.opengl.GL2;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.gui.BeliefTableChart;
-import nars.gui.Vis;
 import nars.remote.SwingAgent;
 import nars.task.MutableTask;
-import nars.term.Termed;
 import nars.truth.Truth;
-import nars.video.Scale;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -20,7 +20,7 @@ import spacegraph.render.Draw;
 import java.awt.*;
 import java.awt.font.LineMetrics;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.LinkedHashMap;
 
 import static nars.util.Texts.n2;
 import static spacegraph.obj.GridSurface.col;
@@ -60,7 +60,7 @@ public class RecogChar extends SwingAgent {
         canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
         g = ((Graphics2D) canvas.getGraphics());
 
-        g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 18));
+        g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 
@@ -196,10 +196,10 @@ public class RecogChar extends SwingAgent {
 
         //g.rotate(nar.random.nextFloat() * dTheta, w/2, h/2);
 
-        g.drawString(s, w/2, lineMetrics.getHeight());
+        g.drawString(s, w/4, lineMetrics.getHeight());
     }
 
     public static void main(String[] arg) {
-        SwingAgent.run(RecogChar::new, 10000);
+        SwingAgent.run(RecogChar::new, 100000);
     }
 }

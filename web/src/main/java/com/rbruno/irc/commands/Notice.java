@@ -1,9 +1,9 @@
 package com.rbruno.irc.commands;
 
-import com.rbruno.irc.IRCServer;
-import com.rbruno.irc.reply.Error;
 import com.rbruno.irc.Client;
+import com.rbruno.irc.IRCServer;
 import com.rbruno.irc.Request;
+import com.rbruno.irc.reply.Error;
 
 public class Notice extends Command {
 

@@ -1,10 +1,10 @@
 package com.rbruno.irc;
 
+import com.rbruno.irc.reply.Reply;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
-
-import com.rbruno.irc.reply.Reply;
 
 /**
  * An object that stores all the information on a Channel including its clients.

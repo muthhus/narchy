@@ -1,11 +1,11 @@
 package com.rbruno.irc.commands;
 
-import com.rbruno.irc.IRCServer;
+import com.rbruno.irc.Client.ClientMode;
 import com.rbruno.irc.Config;
+import com.rbruno.irc.IRCServer;
+import com.rbruno.irc.Request;
 import com.rbruno.irc.reply.Error;
 import com.rbruno.irc.reply.Reply;
-import com.rbruno.irc.Client.ClientMode;
-import com.rbruno.irc.Request;
 
 public class Oper extends Command {
 

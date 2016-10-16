@@ -1,7 +1,7 @@
 package com.rbruno.irc.commands;
 
-import com.rbruno.irc.IRCServer;
 import com.rbruno.irc.Config;
+import com.rbruno.irc.IRCServer;
 import com.rbruno.irc.Request;
 
 public class Ping extends Command {

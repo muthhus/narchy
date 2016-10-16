@@ -1,8 +1,5 @@
 package nars.guifx.chart;
 
-import org.eclipse.collections.api.block.function.primitive.DoubleToDoubleFunction;
-import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.BlendMode;
@@ -12,6 +9,9 @@ import nars.guifx.NARfx;
 import nars.guifx.util.ColorMatrix;
 import nars.guifx.util.NControl;
 import org.apache.commons.math3.util.FastMath;
+import org.eclipse.collections.api.block.function.primitive.DoubleToDoubleFunction;
+import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,10 +1,10 @@
 package com.rbruno.irc;
 
+import com.rbruno.irc.reply.Reply;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import com.rbruno.irc.reply.Reply;
 
 /**
  * Stores information on a client local and remote.

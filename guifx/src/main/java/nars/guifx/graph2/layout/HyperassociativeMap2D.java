@@ -1,13 +1,13 @@
 package nars.guifx.graph2.layout;
 
 import automenta.vivisect.dimensionalize.HyperassociativeMap;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import javafx.beans.property.SimpleDoubleProperty;
-import nars.util.data.Range;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.term.Termed;
+import nars.util.data.Range;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 
 /**
  * Created by me on 9/6/15.

@@ -8,6 +8,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.SpaceTransform;
 
 import java.awt.*;
+import java.util.*;
 
 /**
  * Fast organic layout algorithm, adapted from JGraph
@@ -301,7 +302,7 @@ public class FastOrganicLayout<X> implements SpaceTransform<X> {
 
 
             //Set<E> edges = vd.getEdges();
-            EDraw[] edges = V.edges;
+            java.util.List<EDraw> edges = V.edges;
             int ne = V.edgeCount();
 
 
@@ -312,7 +313,7 @@ public class FastOrganicLayout<X> implements SpaceTransform<X> {
 
             for (int j = 0; j < ne; j++) {
 
-                ni[j] = edges[j].target.order; //THIS CAN CAUSE A PROBLEM
+                ni[j] = edges.get(j).target.order; //THIS CAN CAUSE A PROBLEM
 
 
                 // Check the connected cell in part of the vertex list to be

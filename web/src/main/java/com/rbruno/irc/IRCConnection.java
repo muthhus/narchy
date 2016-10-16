@@ -1,17 +1,16 @@
 package com.rbruno.irc;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.logging.Level;
-
 import com.rbruno.irc.commands.Command;
 import com.rbruno.irc.reply.Error;
 import com.rbruno.irc.reply.Reply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
 
 import static com.rbruno.irc.commands.Command.the;
 

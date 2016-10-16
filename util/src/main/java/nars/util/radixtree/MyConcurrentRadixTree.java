@@ -3,10 +3,7 @@ package nars.util.radixtree;
 import com.googlecode.concurrenttrees.common.KeyValuePair;
 import com.googlecode.concurrenttrees.common.LazyIterator;
 import com.googlecode.concurrenttrees.radix.RadixTree;
-
-
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
-
 import nars.util.ByteSeq;
 import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.tuple.Pair;
@@ -26,7 +23,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.eclipse.collections.impl.tuple.Tuples.*;
+import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
  * seh's modifications to radix tree

@@ -28,7 +28,6 @@ import nars.bag.Bag;
 import nars.budget.Activation;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
-import nars.op.mental.Abbreviation;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TaskTable;

@@ -20,7 +20,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static io.undertow.Handlers.*;
-import static io.undertow.UndertowOptions.*;
+import static io.undertow.UndertowOptions.ENABLE_HTTP2;
+import static io.undertow.UndertowOptions.ENABLE_SPDY;
 import static java.util.zip.Deflater.BEST_SPEED;
 import static nars.irc.IRCAgent.newRealtimeNAR;
 

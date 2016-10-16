@@ -1,14 +1,17 @@
 package nars.sonification;
 
-import nars.*;
+import nars.$;
+import nars.Audio;
+import nars.NAR;
+import nars.Task;
 import nars.audio.SoundProducer;
 import nars.audio.granular.Granulize;
 import nars.audio.sample.SampleLoader;
 import nars.audio.sample.SonarSample;
 import nars.budget.Budgeted;
+import nars.guifx.util.FrameReaction;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.guifx.util.FrameReaction;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.io.IOException;

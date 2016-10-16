@@ -24,7 +24,6 @@ package jake2.game;
 
 import jake2.qcommon.Com;
 
-import java.util.Hashtable;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class SuperAdapter {

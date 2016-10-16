@@ -24,6 +24,7 @@ package objenome.solver.evolve.init;
 import objenome.op.Node;
 import objenome.problem.ProblemSTGP;
 import objenome.solver.evolve.*;
+import objenome.solver.evolve.TypedOrganism;
 import objenome.solver.evolve.event.ConfigEvent;
 import objenome.solver.evolve.event.InitialisationEvent;
 import objenome.solver.evolve.event.Listener;

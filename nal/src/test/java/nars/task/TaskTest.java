@@ -8,7 +8,6 @@ import nars.Task;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
-import nars.truth.DefaultTruth;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

@@ -1,17 +1,22 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import nars.$;
 import nars.NAR;
 import nars.Task;
+import nars.budget.Budget;
 import nars.link.BLink;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.phys.Dynamic;
 import spacegraph.render.Draw;
+
+import java.util.List;
 
 import static spacegraph.math.v3.v;
 
@@ -26,20 +31,19 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
     public float pri;
 
-    @NotNull
-    public final EDraw[] edges;
-    @Deprecated public transient int numEdges;
+    public List<EDraw> edges;
 
 
 
-    public ConceptWidget(Term x, int edges, NAR nar) {
+
+    public ConceptWidget(Term x, NAR nar) {
         super(x);
         this.nar = nar;
 
         this.pri = 0.5f;
-        this.edges = new EDraw[edges];
-        for (int i = 0; i < edges; i++)
-            this.edges[i] = new EDraw();
+        clearEdges();
+//        for (int i = 0; i < edges; i++)
+//            this.edges.add(new EDraw());
 
     }
 
@@ -67,10 +71,11 @@ public class ConceptWidget extends SimpleSpatial<Term> {
     }
 
     public void clearEdges() {
-        this.numEdges = 0;
+        this.edges = $.newArrayList(1);
     }
+
     public int edgeCount() {
-        return numEdges;
+        return edges.size();
     }
 
 
@@ -143,72 +148,77 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         Termed gg = ll.get();
         if (gg == null)
             return true;
+        return addLink(space, gg, ll)!=null;
+    }
+
+    @Nullable
+    public EDraw addLink(SpaceGraph space, Termed gg, Budget ll) {
         SimpleSpatial target = (SimpleSpatial) space.getIfActive(gg.term());
         if (target == null)
-            return true;
+            return null;
 
-
-        return addEdge(ll, target, gg instanceof Task)!=null;
+        return addEdge(ll, target, gg instanceof Task);
     }
 
 
-    public EDraw addEdge(BLink l, SimpleSpatial target, boolean task) {
+    public EDraw addEdge(Budget l, SimpleSpatial target, boolean task) {
 
-        EDraw[] ee = edges;
+        List<EDraw> ee = edges;
 
-        float pri = l.pri();
-        float dur = l.dur();
-        float qua = l.qua();
+        float pri = l.priIfFiniteElseZero();
+//        float dur = l.dur();
+//        float qua = l.qua();
 
         //width relative to the radius of the atom
-        float minLineWidth = 0.1f;
-        float maxLineWidth = 0.5f;
+        float minLineWidth = 0.05f;
+        float maxLineWidth = 0.3f;
         float width = minLineWidth + (maxLineWidth - minLineWidth) * pri;
 
         float r, g, b;
-        float hp = 0.5f + 0.5f * pri;
+        float hp = 0.25f + 0.75f * pri;
         //float qh = 0.5f + 0.5f * qua;
         float a;
-        if (task) {
-            Task x = (Task) l.get();
-            if (x == null) {
-                r = g = b = 0;
-            } else {
-                if (x.isBeliefOrGoal()) {
-                    float e = x.expectation();
-                    if (e >= 0.5f) {
-                        //positive in green
-                        g = 0.5f + 0.5f * e;
-                        r = 0;
-                    } else {
-                        //negative in red
-                        r = 0.5f + 0.5f * (1f - e);
-                        g = 0;
-                    }
-                    b = 0.5f * dur;
-
-                } else {
-                    //blue for questions and quests
-                    b = 0.5f + hp * qua;
-                    r = 0.2f;
-                    g = 0.2f;
-                }
-            }
-        } else {
+//        if (task) {
+//            Task x = (Task) l.get();
+//            if (x == null) {
+//                r = g = b = 0;
+//            } else {
+//                if (x.isBeliefOrGoal()) {
+//                    float e = x.expectation();
+//                    if (e >= 0.5f) {
+//                        //positive in green
+//                        g = 0.5f + 0.5f * e;
+//                        r = 0;
+//                    } else {
+//                        //negative in red
+//                        r = 0.5f + 0.5f * (1f - e);
+//                        g = 0;
+//                    }
+//                    b = 0.5f * dur;
+//
+//                } else {
+//                    //blue for questions and quests
+//                    b = 0.5f + hp * qua;
+//                    r = 0.2f;
+//                    g = 0.2f;
+//                }
+//            }
+//        } else {
             //gray for termlinks
             r = g = b = hp;
-        }
+
+            g *= 0.25f + 0.5f * l.qua();
+            b *= 0.25f + 0.5f * l.dur();
+//        }
 
         //a = 0.5f + 0.5f * pri;
-        a = 0.9f;
+        a = 0.75f;
 
+        EDraw z = new EDraw().set(target, width,
+                r, g, b, a);
 
-
-        int n;
-        ee[n = (numEdges++)].set(target, width,
-                r, g, b, a
-        );
-        return (n - 1 <= ee.length) ? ee[n] : null;
+        ee.add(z);
+        return z;
     }
 
     @Override
@@ -218,10 +228,10 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
 
     void renderEdges(GL2 gl) {
-        int n = numEdges;
-        EDraw[] eee = edges;
+        List<EDraw> eee = edges;
+        int n = eee.size();
         for (int en = 0; en < n; en++)
-            render(gl, eee[en]);
+            render(gl, eee.get(en));
     }
 
     public void render(GL2 gl, EDraw e) {

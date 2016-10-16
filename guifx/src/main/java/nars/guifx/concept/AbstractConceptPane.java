@@ -5,9 +5,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.BorderPane;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.guifx.util.FrameReaction;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.guifx.util.FrameReaction;
 
 import static javafx.application.Platform.runLater;
 

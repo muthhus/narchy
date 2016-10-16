@@ -1,9 +1,9 @@
 package nars.guifx.graph2.layout;
 
 import javafx.beans.property.SimpleDoubleProperty;
-import nars.util.data.Range;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
+import nars.util.data.Range;
 
 import java.util.function.BiConsumer;
 import java.util.function.ToDoubleFunction;

@@ -4,8 +4,6 @@ import com.jogamp.nativewindow.util.Dimension;
 import jake2.client.refdef_t;
 import jake2.render.opengl.GLDriver;
 
-import java.nio.ByteBuffer;
-
 public interface RenderAPI {
 
     void setGLDriver(GLDriver impl);

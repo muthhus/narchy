@@ -33,9 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Comparator;
 
-import static nars.truth.TruthFunctions.w2c;
-import static nars.truth.TruthFunctions.c2w;
-import static nars.truth.TruthFunctions.eternalize;
+import static nars.truth.TruthFunctions.*;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */

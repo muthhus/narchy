@@ -23,12 +23,12 @@ import nars.table.BeliefTable;
 import nars.task.MutableTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
-import nars.term.util.InvalidTermException;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.transform.TermTransform;
+import nars.term.util.InvalidTermException;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.time.Tense;
@@ -41,7 +41,6 @@ import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.fusesource.jansi.Ansi;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -52,7 +51,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -661,7 +659,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
                 }
 
 
-            } catch (InvalidConceptException|InvalidTermException|InvalidTaskException e) {
+            } catch (InvalidConceptException|InvalidTermException|InvalidTaskException|Budget.BudgetException e) {
 
                 //input.feedback(null, Float.NaN, Float.NaN, this);
                 if (Param.DEBUG)

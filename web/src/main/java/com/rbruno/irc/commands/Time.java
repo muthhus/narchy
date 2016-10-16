@@ -1,12 +1,12 @@
 package com.rbruno.irc.commands;
 
+import com.rbruno.irc.Config;
+import com.rbruno.irc.IRCServer;
+import com.rbruno.irc.Request;
+import com.rbruno.irc.reply.Reply;
+
 import java.sql.Timestamp;
 import java.util.Date;
-
-import com.rbruno.irc.IRCServer;
-import com.rbruno.irc.Config;
-import com.rbruno.irc.reply.Reply;
-import com.rbruno.irc.Request;
 
 public class Time extends Command {
 

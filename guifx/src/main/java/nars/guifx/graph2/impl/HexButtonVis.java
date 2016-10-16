@@ -1,6 +1,5 @@
 package nars.guifx.graph2.impl;
 
-import org.eclipse.collections.impl.tuple.Tuples;
 import javafx.geometry.Bounds;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
@@ -18,6 +17,7 @@ import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.term.Termed;
 import nars.util.Util;
+import org.eclipse.collections.impl.tuple.Tuples;
 
 /**
  * Created by me on 12/27/15.

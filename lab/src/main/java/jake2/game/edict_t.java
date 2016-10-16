@@ -28,7 +28,6 @@ import jake2.util.Lib;
 import jake2.util.QuakeFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class edict_t {
 

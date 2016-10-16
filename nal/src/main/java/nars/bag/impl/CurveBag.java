@@ -3,7 +3,6 @@ package nars.bag.impl;
 import nars.bag.Bag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
-import nars.util.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +13,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static nars.util.Util.*;
+import static nars.util.Util.clamp;
 
 /**
  * Bag which stores items, sorted, in one array.

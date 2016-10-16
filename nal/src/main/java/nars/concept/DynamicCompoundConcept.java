@@ -277,11 +277,11 @@ public class DynamicCompoundConcept extends CompoundConcept {
                     for (int i = min1; i <= max1; i++) {
                         for (int j = min2; j <= max2; j++) {
                             Term c1 = $.terms.transform(cc, e1.getKey(), $.the(i));
-                            if (c1 == null)
+                            if (!(c1 instanceof Compound))
                                 //throw new RuntimeException("how not transformed to compound");
                                 continue;
                             Term c2 = $.terms.transform((Compound)c1, e2.getKey(), $.the(j));
-                            if (c2 == null)
+                            if (!(c2 instanceof Compound))
                                 //throw new RuntimeException("how not transformed to compound");
                                 continue;
                             t.add(c2);

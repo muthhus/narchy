@@ -27,10 +27,7 @@ package jake2.sys;
 
 import com.jogamp.newt.event.*;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**

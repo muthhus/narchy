@@ -1,6 +1,5 @@
 package nars.guifx;
 
-import org.eclipse.collections.impl.map.mutable.primitive.FloatObjectHashMap;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.application.Application;
@@ -16,6 +15,7 @@ import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 import nars.guifx.util.ColorArray;
 import org.apache.commons.math3.util.Precision;
+import org.eclipse.collections.impl.map.mutable.primitive.FloatObjectHashMap;
 
 /**
  * Created by me on 2/22/15.

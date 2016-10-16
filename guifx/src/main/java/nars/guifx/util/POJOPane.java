@@ -1,13 +1,13 @@
 package nars.guifx.util;
 
 import com.google.common.collect.Lists;
-import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.tuple.Tuples;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.tuple.Tuples;
 import za.co.knonchalant.builder.Ignore;
 import za.co.knonchalant.builder.POJONode;
 

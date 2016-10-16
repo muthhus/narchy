@@ -11,17 +11,17 @@ package nars.guifx.graph2.layout;
 //import com.mxgraph.view.mxGraph;
 //import com.mxgraph.view.mxGraphView;
 
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import nars.util.data.Range;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
+import nars.util.data.Range;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;

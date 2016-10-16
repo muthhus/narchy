@@ -5,13 +5,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.visit.SubtermVisitorXY;
-import org.eclipse.collections.api.bimap.BiMap;
-import org.eclipse.collections.api.bimap.MutableBiMap;
-import org.eclipse.collections.impl.factory.BiMaps;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
 
 import static nars.$.$;
 

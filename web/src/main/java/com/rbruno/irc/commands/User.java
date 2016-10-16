@@ -1,14 +1,13 @@
 package com.rbruno.irc.commands;
 
-import java.io.IOException;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import com.rbruno.irc.IRCServer;
-import com.rbruno.irc.Config;
-import com.rbruno.irc.reply.Reply;
 import com.rbruno.irc.Client;
+import com.rbruno.irc.Config;
+import com.rbruno.irc.IRCServer;
 import com.rbruno.irc.Request;
+import com.rbruno.irc.reply.Reply;
+
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class User extends Command {
 

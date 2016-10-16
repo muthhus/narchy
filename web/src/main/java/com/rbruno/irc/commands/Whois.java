@@ -1,11 +1,7 @@
 package com.rbruno.irc.commands;
 
-import com.rbruno.irc.IRCServer;
-import com.rbruno.irc.Config;
+import com.rbruno.irc.*;
 import com.rbruno.irc.reply.Reply;
-import com.rbruno.irc.Channel;
-import com.rbruno.irc.Client;
-import com.rbruno.irc.Request;
 
 public class Whois extends Command {
 

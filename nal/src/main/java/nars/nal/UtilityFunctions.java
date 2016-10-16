@@ -20,7 +20,6 @@
  */
 package nars.nal;
 
-import nars.Param;
 import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Math.pow;

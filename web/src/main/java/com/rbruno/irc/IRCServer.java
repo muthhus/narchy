@@ -1,18 +1,16 @@
 package com.rbruno.irc;
 
-import java.io.File;
+import com.rbruno.irc.commands.Command;
+import com.rbruno.irc.reply.Reply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-
-import com.rbruno.irc.commands.Command;
-import com.rbruno.irc.reply.Reply;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Contains main method. The main class creates a new Server object which starts

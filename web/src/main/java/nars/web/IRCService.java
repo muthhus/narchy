@@ -1,12 +1,6 @@
 package nars.web;
 
 import com.rbruno.irc.IRCServer;
-import com.sorcix.sirc.IrcConnection;
-import com.sorcix.sirc.IrcServer;
-import com.sorcix.sirc.NickNameException;
-import com.sorcix.sirc.PasswordException;
-
-import java.io.IOException;
 
 /**
  * https://sirc.sorcix.com/

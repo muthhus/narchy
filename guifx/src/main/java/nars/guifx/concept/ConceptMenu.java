@@ -9,10 +9,10 @@ import nars.NAR;
 import nars.guifx.NARfx;
 import nars.guifx.nars.NARActionButton;
 import nars.guifx.util.SimpleMenuItem;
-import nars.time.Tense;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Termed;
+import nars.time.Tense;
 
 import static javafx.application.Platform.runLater;
 

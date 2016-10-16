@@ -26,6 +26,7 @@ import com.google.common.collect.Table;
 import objenome.op.Node;
 import objenome.solver.evolve.*;
 import objenome.solver.evolve.GPContainer.GPContainerAware;
+import objenome.solver.evolve.TypedOrganism;
 import objenome.solver.evolve.event.ConfigEvent;
 import objenome.solver.evolve.event.InitialisationEvent;
 import objenome.solver.evolve.event.Listener;

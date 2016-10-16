@@ -4,7 +4,6 @@ import nars.*;
 import nars.bag.impl.CurveBag;
 import nars.budget.Activation;
 import nars.budget.Budget;
-import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
@@ -19,7 +18,6 @@ import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.Unify;
@@ -36,7 +34,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static nars.nal.UtilityFunctions.or;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 

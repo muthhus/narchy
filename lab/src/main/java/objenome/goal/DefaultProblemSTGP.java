@@ -1,6 +1,5 @@
 package objenome.goal;
 
-import objenome.util.MersenneTwisterFast;
 import objenome.op.DoubleVariable;
 import objenome.op.Node;
 import objenome.op.Variable;
@@ -15,6 +14,7 @@ import objenome.solver.evolve.mutate.PointMutation;
 import objenome.solver.evolve.mutate.SubtreeCrossover;
 import objenome.solver.evolve.mutate.SubtreeMutation;
 import objenome.solver.evolve.selection.RouletteSelector;
+import objenome.util.MersenneTwisterFast;
 
 import java.util.ArrayList;
 import java.util.List;

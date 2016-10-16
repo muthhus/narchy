@@ -1,8 +1,5 @@
 package nars.util;
 
-import com.github.benmanes.caffeine.base.UnsafeAccess;
-import com.google.common.base.Joiner;
-import com.googlecode.concurrenttrees.common.CharSequences;
 import nars.util.data.rope.StringHack;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;

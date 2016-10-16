@@ -3,9 +3,6 @@ package nars.index.term.tree;
 import io.airlift.compress.lz4.Lz4Compressor;
 import io.airlift.compress.lz4.Lz4Decompressor;
 import io.airlift.compress.lz4.Lz4RawCompressor;
-import io.airlift.compress.lz4.Lz4RawDecompressor;
-import io.airlift.compress.snappy.SnappyCompressor;
-import io.airlift.compress.snappy.SnappyRawCompressor;
 import nars.IO;
 import nars.Op;
 import nars.Symbols;
@@ -15,17 +12,13 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.util.DynByteSeq;
-import nars.util.data.rope.StringHack;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import static nars.IO.SPECIAL_OP;
 import static nars.IO.writeEvidence;
-import static nars.IO.writeUTFWithoutLength;
 import static nars.util.data.rope.StringHack.bytes;
 
 /**

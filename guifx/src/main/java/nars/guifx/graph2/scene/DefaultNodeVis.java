@@ -1,7 +1,5 @@
 package nars.guifx.graph2.scene;
 
-import nars.Task;
-import org.eclipse.collections.api.tuple.Pair;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
@@ -16,13 +14,15 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
 import nars.NAR;
-import nars.util.data.Range;
+import nars.Task;
 import nars.guifx.NARfx;
 import nars.guifx.graph2.NodeVis;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.ColorMatrix;
 import nars.term.Termed;
+import nars.util.data.Range;
+import org.eclipse.collections.api.tuple.Pair;
 
 import java.util.concurrent.atomic.AtomicReference;
 

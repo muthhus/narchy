@@ -8,7 +8,6 @@ import java.util.Random;
 
 import static com.jogamp.opencl.CLMemory.Mem.READ_ONLY;
 import static com.jogamp.opencl.CLMemory.Mem.WRITE_ONLY;
-import static java.lang.Math.min;
 import static java.lang.System.nanoTime;
 import static java.lang.System.out;
 

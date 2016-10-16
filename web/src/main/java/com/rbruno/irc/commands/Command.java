@@ -1,9 +1,9 @@
 package com.rbruno.irc.commands;
 
+import com.rbruno.irc.Request;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.rbruno.irc.Request;
 
 /**
  * A command that can be called when requested by a client. Also statically hold

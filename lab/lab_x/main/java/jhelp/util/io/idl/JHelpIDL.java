@@ -1,7 +1,6 @@
 package jhelp.util.io.idl;
 
 import jhelp.util.classLoader.JHelpClassLoader;
-import jhelp.util.compiler.Compiler;
 import jhelp.util.compiler.Compiler.NameCode;
 import jhelp.util.debug.Debug;
 import jhelp.util.debug.DebugLevel;

@@ -2,12 +2,8 @@ package nars.experiment.minicraft;
 
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
-import nars.op.DepIndepVarIntroduction;
-import nars.op.VarIntroduction;
-import nars.op.mental.Abbreviation;
 import nars.remote.SwingAgent;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
@@ -29,7 +25,7 @@ public class TopCraft extends SwingAgent {
     }
 
     public TopCraft(NAR nar) {
-        super(nar, 64);
+        super(nar, 32);
 
         this.craft = new TopDownMinicraft();
 

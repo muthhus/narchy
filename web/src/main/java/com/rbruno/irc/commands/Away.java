@@ -1,8 +1,8 @@
 package com.rbruno.irc.commands;
 
 import com.rbruno.irc.IRCServer;
-import com.rbruno.irc.reply.Reply;
 import com.rbruno.irc.Request;
+import com.rbruno.irc.reply.Reply;
 
 public class Away extends Command {
 

@@ -1,12 +1,12 @@
 package com.rbruno.irc.commands;
 
-import java.io.IOException;
-
-import com.rbruno.irc.IRCServer;
-import com.rbruno.irc.reply.Reply;
 import com.rbruno.irc.Channel;
 import com.rbruno.irc.Client;
+import com.rbruno.irc.IRCServer;
 import com.rbruno.irc.Request;
+import com.rbruno.irc.reply.Reply;
+
+import java.io.IOException;
 
 public class List extends Command {
 

@@ -9,7 +9,6 @@ import nars.op.PrologCore;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;

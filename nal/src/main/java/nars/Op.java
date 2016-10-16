@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 

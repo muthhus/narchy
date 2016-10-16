@@ -1,13 +1,13 @@
 package nars.guifx.graph2.layout;
 
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import javafx.beans.property.SimpleDoubleProperty;
 import nars.$;
-import nars.util.data.Range;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
+import nars.util.data.Range;
 import nars.util.data.list.FasterList;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 
 import java.awt.*;
 import java.util.List;

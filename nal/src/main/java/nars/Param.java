@@ -4,12 +4,9 @@ import nars.budget.BudgetFunctions;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.nal.Level;
 import nars.task.MutableTask;
-import nars.task.TruthPolation;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
-import nars.util.Util;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -17,8 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Symbols.*;
-import static nars.truth.TruthFunctions.c2w;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * NAR Parameters which can be changed during runtime.

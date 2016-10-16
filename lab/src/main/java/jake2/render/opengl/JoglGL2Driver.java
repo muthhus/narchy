@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 package jake2.render.opengl;
 
-import com.jogamp.nativewindow.NativeWindow;
 import com.jogamp.nativewindow.util.Dimension;
 import com.jogamp.newt.MonitorMode;
 import com.jogamp.opengl.GLException;

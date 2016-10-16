@@ -1,8 +1,8 @@
 package nars.guifx.util;
 
-import org.eclipse.collections.api.block.procedure.primitive.IntProcedure;
 import javafx.beans.property.SimpleIntegerProperty;
 import nars.util.data.MutableInteger;
+import org.eclipse.collections.api.block.procedure.primitive.IntProcedure;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntSupplier;
