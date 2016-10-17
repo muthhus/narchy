@@ -308,8 +308,11 @@
      (&&,X,A..+), B, time(decomposeTaskSubset) |- subIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Goal:Strong)
          //(&&,X,A), B, time(decomposeTaskSubset) |- subIfUnifiesDep(X,A,B), (Belief:AnonymousAnalogy, Goal:Strong)
 
+//disjunction
+    (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
 //substitutionViaSimilarity
-     X, (B<->C), neqCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
+     X, (B<->C), neqRCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
 
 //desire spreading by similarity
      S, (S<->P) |- P, (Goal:Intersection)
@@ -420,10 +423,6 @@
 
 //    (Y --> L), ((Y --> S) ==> R), neq(L,S), time(dtBeliefExact) |- substitute(((&&,(#X --> L),(#X --> S)) ==>+- R),Y,#X), (Belief:Induction)
 //    (Y --> L), ((&&,(Y --> S),A..+) ==> R), neq(L,S), time(dtBeliefExact) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==>+- R),Y,#X), (Belief:Intersection)
-
-
-
-
 
 
 
@@ -573,8 +572,6 @@
 //         #R[(A --> C) (B --> [C]) |- ((* A B) --> (* C [C])) :post (:t/intersection)]
 
 
-//disjunction
-    (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 
 //TODO for desire

@@ -3,12 +3,14 @@ package spacegraph.obj;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import nars.$;
+import nars.NAR;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
 public class Plot2D extends Surface {
@@ -18,6 +20,11 @@ public class Plot2D extends Surface {
     public void setTitle(String title) {
         this.title = title;
     }
+
+//    public <X> Surface to(Consumer<Consumer<X>> y) {
+//        y.accept((Consumer<X>)this);
+//        return this;
+//    }
 
 
     //public static final ColorArray BlueRed = new ColorArray(128, Color.BLUE, Color.RED);
@@ -200,8 +207,10 @@ public class Plot2D extends Surface {
                 float x = 0;
                 float prevX = -1;
 
-                for (int i = 0; i < histSize; i++) {
-                    float v = s.get(i);
+                float[] ss = s.toArray();
+                int len = Math.min(s.size(), ss.length);
+                for (int i = 0; i < len; i++) {
+                    float v = ss[i];
 
                     float py = (v - minValue) / (maxValue - minValue);
                     if (py < 0) py = 0;

@@ -470,7 +470,7 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         Concept cc = (Concept) c;
-        if (cc.policy() == null) {
+        if (cc.isDeleted()) {
             conceptBuilder().init(cc);
         }
 

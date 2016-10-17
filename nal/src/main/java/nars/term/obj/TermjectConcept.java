@@ -7,6 +7,7 @@ import nars.bag.Bag;
 import nars.budget.Activation;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.AbstractConcept;
+import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;
@@ -42,7 +43,12 @@ public class TermjectConcept<X> implements AbstractConcept, Termject<X> {
         this.taskLinks = taskLinks;
 
     }
-    
+
+    @Override
+    public void delete(NAR nar) {
+        Concept.delete(this, nar);
+    }
+
     @Override
     public @NotNull Op op() {
         return term().op();

@@ -98,7 +98,7 @@ public class TrainVector {
                 float f, c;
                 if (t == null) {
                     f = Float.NaN;
-                    c = 1f;
+                    c = Float.NaN;
                 } else {
                     f = t.freq();
                     c = t.conf();

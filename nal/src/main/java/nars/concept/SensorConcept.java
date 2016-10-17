@@ -262,32 +262,33 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
             super.clear(nar);
         }
 
-        @Override
-        public Truth truth(long when, long now) {
+//        @Override
+//        public Truth truth(long when, long now) {
 //            if (when == now || when == ETERNAL)
 //                return sensor.truth();
 
 
-            long lastSensorInputTime = sensor.lastInputTime;
+//            long lastSensorInputTime = sensor.lastInputTime;
 
             //in the future after the last sensor input time,
             // attempt to use the current sensor value as the best guess but fade it by projection
-            if (when == ETERNAL || (when >= lastSensorInputTime)) {
+//            if (when == ETERNAL || (when >= lastSensorInputTime)) {
                 //now = when = sensor.lastInputTime;
-                Truth t = sensor.truth();
-                if (t != null) {
-                    if (when==ETERNAL || lastSensorInputTime == when) {
-                        return t;
-                    } else {
-                        t = Revision.project(t, when, now, lastSensorInputTime, false);
-                        if (t!=null)
-                            return t;
-                    }
-                }
-            }
+//                Truth t = sensor.truth();
+//                if (t != null) {
+//                    if (when==ETERNAL || lastSensorInputTime == when) {
+//                        return t;
+//                    } else {
+//                        //t = t.confMult()
+//                        t = Revision.project(t, when, now, lastSensorInputTime, true);
+//                        if (t!=null)
+//                            return t;
+//                    }
+//                }
+//            }
 
-            return super.truth(when, now);
-        }
+//            return super.truth(when, now);
+//        }
 
 //        @Override
 //        public Task match(@NotNull Task target, long now) {

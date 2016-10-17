@@ -186,7 +186,7 @@ public class TopDownMinicraft extends Canvas implements Runnable {
         frames++;
         render();
 
-        System.out.println("score=" + player.score + " health=" + player.health + " stamina=" + player.stamina );
+        //System.out.println("score=" + player.score + " health=" + player.health + " stamina=" + player.stamina );
         return player.score;// + player.stamina;
     }
 

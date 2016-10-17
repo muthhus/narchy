@@ -60,11 +60,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override protected boolean update(@Nullable BLink<V> toAdd) {
 
 
-        int additional = (toAdd != null) ? 1 : 0;
 
         SortedArray<BLink<V>> items = this.items;
 
         synchronized (items) {
+            int additional = (toAdd != null) ? 1 : 0;
+
             int s = size();
             int c = capacity();
 
@@ -123,7 +124,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     private int clean(BLink<V> toAdd, int s, int sizeThresh) {
-        List<BLink<V>> toRemove = $.newArrayList(s - sizeThresh);
+
+        List<BLink<V>> toRemove = $.newArrayList(Math.max(0,s - sizeThresh));
 
         //first step: remove any nulls and deleted values
         s -= removeDeleted(toRemove);

@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 /**
  * interface for controlled draining of a bag
  */
-public abstract class Leak<B>  {
+public abstract class Leak</* TODO: A, */B>  {
 
     //private static final Logger logger = LoggerFactory.getLogger(MutaTaskBag.class);
     public final MutableFloat rate;
@@ -28,33 +28,37 @@ public abstract class Leak<B>  {
         this.bag = bag;
         this.rate = rate;
         n.onTask(task -> {
-            input(task, bag::putLink);
+            in(task, bag::putLink);
         });
         n.onFrame(this::next);
     }
 
     /** transduce an input to a series of created BLink's to be inserted */
-    @Nullable abstract protected void input(@NotNull Task task, Consumer<BLink<B>> each);
+    abstract protected void in(@NotNull Task task, Consumer<BLink<B>> each);
 
     /** returns a value, in relation to the 'rate' parameter, which is subtracted
      * from the rate each iteration. this can allow proportional consumption of
      * a finitely allocated resource.
      */
-    abstract protected float accept(@NotNull BLink<B> b);
+    abstract protected float onOut(@NotNull BLink<B> b);
 
     /** next iteration, each frame */
     protected void next(NAR nar) {
 
         bag.commit();
 
+        //for each full integer = 1 instanceof a 100% prob selection
+        // each fraction of an integer = some probability of a next one occurring
         for (float r = rate.floatValue();
-             (r > 0) && !bag.isEmpty() && ((r >= 1f) || (nar.random.nextFloat() < r));
+             (r > 0) &&
+             !bag.isEmpty() &&
+             ((r >= 1) || ((r < 1f) && (nar.random.nextFloat() < r)));
              ) {
             @Nullable BLink<B> t = bag.pop();
             if (t!=null) {
-                accept(t);
-                r-=1f;
+                onOut(t);
             }
+            r-=1f;
         }
 
     }

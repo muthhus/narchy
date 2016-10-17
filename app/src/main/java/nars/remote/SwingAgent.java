@@ -12,6 +12,7 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
+import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -49,14 +50,14 @@ abstract public class SwingAgent extends NAgent {
 
         final Executioner exe =
             //new SingleThreadExecutioner();
-            new MultiThreadExecutioner(3, 1024*4);
+            new MultiThreadExecutioner(3, 1024*8);
 
         int volMax = 40;
         int conceptsPerCycle = 16;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                conceptsPerCycle, 3, 3, rng,
+                conceptsPerCycle, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64*1024, 3)
 
@@ -83,7 +84,9 @@ abstract public class SwingAgent extends NAgent {
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 8,
-                0.1f, 64);
+                0.005f, 8);
+
+        new Inperience(nar);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;

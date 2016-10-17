@@ -13,7 +13,7 @@ import static nars.Op.ATOM;
 /**
  * Created by me on 5/11/16.
  */
-public final class DefaultConceptPolicy extends AtomicStringConstant implements ConceptPolicy {
+public final class DefaultConceptPolicy extends ConceptPolicy {
 
     public final MutableInteger beliefsMaxEte, goalsMaxEte;
     public final MutableInteger questionsMax;

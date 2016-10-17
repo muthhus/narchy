@@ -21,6 +21,7 @@
 package nars.concept;
 
 import com.google.common.collect.Iterators;
+import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.Task;
@@ -47,6 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+
+import static nars.time.Tense.ETERNAL;
 
 public interface Concept extends Termed {
 
@@ -139,10 +142,18 @@ public interface Concept extends Termed {
     }
 
 
-    default void delete(NAR nar) {
-        termlinks().clear();
-        tasklinks().clear();
+    void delete(NAR nar);
+
+
+    static void delete(Concept c, NAR nar) {
+        List<Task> removed = $.newArrayList();
+        c.policy(ConceptPolicy.Deleted, ETERNAL, removed);
+        nar.tasks.remove(removed);
+
+        c.termlinks().clear();
+        c.tasklinks().clear();
     }
+
 
     /**
      * same Map.putIfAbsent semantics: returns null if no previous value existed
@@ -152,6 +163,11 @@ public interface Concept extends Termed {
             return metaOrCreate().putIfAbsent(key, value);
         }
     }
+
+    default boolean isDeleted()  {
+        return policy() == ConceptPolicy.Deleted;
+    }
+
 
 
     /**
@@ -422,9 +438,7 @@ public interface Concept extends Termed {
 
     void policy(@NotNull ConceptPolicy c, long now, @NotNull List<Task> removed);
 
-    default boolean active() {
-        return policy() != null;
-    }
+
 
     default void commit() {
         tasklinks().commit();

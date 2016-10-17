@@ -1133,7 +1133,14 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     }
 
     public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing)  {
-        return concepts.concept(t, createIfMissing);
+        Concept c = concepts.concept(t, createIfMissing);
+        if (c!=null && createIfMissing && c.isDeleted()) {
+            //try again
+            concepts.remove(c.term());
+            return concepts.concept(t, createIfMissing);
+        }
+
+        return c;
     }
 
     @Nullable
@@ -1176,10 +1183,16 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
      * must be run per control frame.
      */
     @NotNull
-    public On onFrame(@NotNull Consumer<NAR> each) {
+    public final On onFrame(@NotNull Consumer<NAR> each) {
         On r;
         /*on.add(*/r = eventFrameStart.on(each);//);
         return r;
+    }
+    @NotNull
+    public final On onFrame(@NotNull Runnable each) {
+        return onFrame((ignored)->{
+            each.run();
+        });
     }
 
     @NotNull

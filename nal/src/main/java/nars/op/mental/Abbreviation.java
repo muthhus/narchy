@@ -90,7 +90,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
 
     @Nullable
     @Override
-    protected void input(Task task, Consumer<BLink<CompoundConcept>> each) {
+    protected void in(Task task, Consumer<BLink<CompoundConcept>> each) {
 
         if (task instanceof AbbreviationTask)
             return;
@@ -121,7 +121,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
 
 
     @Override
-    protected float accept(BLink<CompoundConcept> b) {
+    protected float onOut(BLink<CompoundConcept> b) {
 
         abbreviate(b.get(), b);
         return 1f;

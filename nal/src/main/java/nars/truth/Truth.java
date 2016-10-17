@@ -197,13 +197,13 @@ public interface Truth extends Truthed {
 
     
     @NotNull
-    default Term toWordTerm(float trueExpectationThreshold, boolean negated) {
-        float e = !negated ? expectation() : (1f-expectation());
+    default Term expectation(float e, float trueExpectationThreshold) {
+
 
         if (e > trueExpectationThreshold) {
             return Truth_TRUE;
         }
-        if (e < 1 - trueExpectationThreshold) {
+        if (e < 1f - trueExpectationThreshold) {
             return Truth_FALSE;
         }
         return Truth_UNSURE;

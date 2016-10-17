@@ -301,11 +301,19 @@ public class HijacKache<TypeK, TypeV>
         }
     }
 
-    public String summary() {
-        return //hit + "/" + (hit + miss) + " (" +
-                Texts.n2(100.0 * ((double) hit) / ((double) hit + miss)) +
+    public String summary(boolean resetStats) {
+        String s = //hit + "/" + (hit + miss) + " (" +
+                "HijacKache " + Texts.n2(100.0 * ((double) hit) / ((double) hit + miss)) +
                 "% hitrate";
+
+        if (resetStats) {
+            hit = miss = 0;
+        }
+
+        return s;
+
     }
+
 
 //    // Count of reprobes
 //    private transient ConcurrentAutoTable _reprobes = new ConcurrentAutoTable();

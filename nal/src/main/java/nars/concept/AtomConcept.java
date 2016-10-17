@@ -122,7 +122,9 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     }
 
 
-
-
-
+    @Override
+    public void delete(NAR nar) {
+        Concept.delete(this, nar);
+        meta = null;
+    }
 }

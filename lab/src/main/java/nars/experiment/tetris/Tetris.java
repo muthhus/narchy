@@ -15,6 +15,7 @@ import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
+import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
 import nars.remote.SwingAgent;
 import nars.term.Compound;
@@ -380,10 +381,10 @@ public class Tetris extends SwingAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        int maxVol = 40;
+        int maxVol = 30;
         Executioner e = Tetris.exe;
         Default nar = new Default(1024,
-                16, 2, 2, rng,
+                32, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
@@ -406,20 +407,20 @@ public class Tetris extends SwingAgent {
 //            }
 //        });
 
-        float p = 0.25f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
 
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
 
 
         nar.compoundVolumeMax.setValue(maxVol);
         //nar.linkFeedbackRate.setValue(0.95f);
 
-        nar.truthResolution.setValue(0.02f);
+        //nar.truthResolution.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -450,11 +451,13 @@ public class Tetris extends SwingAgent {
 //		});
 
 
-        Abbreviation abbr = new Abbreviation(nar, "the", 3, 12,
-                1f, 64);
+//        Abbreviation abbr = new Abbreviation(nar, "the", 3, 12,
+//                0.01f, 64);
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 4);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
+        new Inperience(nar);
+
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2);
 
         //new VariableCompressor(nar);
 

@@ -31,6 +31,7 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import static nars.Param.TRUTH_EPSILON;
+import static nars.time.Tense.ETERNAL;
 
 
 public class CompoundConcept<T extends Compound> implements AbstractConcept, Termlike {
@@ -61,7 +62,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
     private @Nullable Map meta;
 
-    @Nullable
+    @NotNull
     private transient ConceptPolicy policy;
 
 
@@ -79,6 +80,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
+
+        this.policy = ConceptPolicy.Deleted;
 
     }
 
@@ -250,18 +253,11 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     @Override
     public void delete(NAR nar) {
 
-        policy = null;
-
-        //remove all tasks from the index:
-        visitTasks((t) -> {
-            nar.tasks.remove(t);
-        }, true, true, true, true);
-
-        termlinks().clear();
-        tasklinks().clear();
+        Concept.delete(this, nar);
 
         beliefs = goals = null;
         questions = quests = null;
+        meta = null;
     }
 
 

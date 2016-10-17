@@ -284,7 +284,7 @@ public class TreeTermIndex extends TermIndex implements Runnable {
 
         @Override
         public @NotNull String summary() {
-            return super.summary() + "\tL1:" + L1.summary();
+            return super.summary() + "\t, L1:" + L1.summary(true);
         }
 
         @Override

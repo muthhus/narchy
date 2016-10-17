@@ -15,6 +15,7 @@ import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.GridSurface;
+import spacegraph.obj.Plot2D;
 import spacegraph.render.Draw;
 
 import java.awt.*;
@@ -29,7 +30,7 @@ import static spacegraph.obj.GridSurface.row;
 /**
  * Created by me on 10/8/16.
  */
-public class RecogChar extends SwingAgent {
+public class Recog2D extends SwingAgent {
 
     private final Graphics2D g;
     private final int h;
@@ -41,19 +42,19 @@ public class RecogChar extends SwingAgent {
     int a = 0;
 
     int image = 0;
-    final int maxImages = 5;
-    int imagePeriod = 16;
+    final int maxImages = 4;
+    int imagePeriod = 128;
     int TRAINING_PERIOD = imagePeriod * 4;
 
     float theta;
     float dTheta = 0.25f;
 
     static {
-        Param.DEBUG = true;
+        Param.DEBUG = false;
     }
 
-    public RecogChar(NAR n) {
-        super(n, 4);
+    public Recog2D(NAR n) {
+        super(n, 1);
 
         w = 24;
         h = 24;
@@ -63,6 +64,7 @@ public class RecogChar extends SwingAgent {
         g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        n.beliefConfidence(0.2f);
 
         imgTrainer = new TrainVector(ii -> $.p($.the("i"), $.the(ii)), maxImages, this);
         imgTrainer.out.keySet().forEach(x ->
@@ -94,9 +96,12 @@ public class RecogChar extends SwingAgent {
 
         LinkedHashMap<SensorConcept, TrainVector.Neuron> out = tv.out;
 
+        Plot2D p;
         GridSurface g = col(
 
                 row(BeliefTableChart.beliefTableCharts(nar, out.keySet(), 1024)),
+
+                row(p = new Plot2D(8192, Plot2D.Line).add("Error", ()->tv.errorSum())),
 
                 row(out.entrySet().stream().map(ccnn -> new Surface() {
                     @Override
@@ -135,8 +140,13 @@ public class RecogChar extends SwingAgent {
                                 Draw.text(gl, "err=" + n2(error), fontSize, m / 2, m / 2, 0);
                             }
                         }
+
+
                     }
                 }).toArray(Surface[]::new)));
+
+        nar.onFrame(p::update);
+
         return g;
     }
 
@@ -200,6 +210,6 @@ public class RecogChar extends SwingAgent {
     }
 
     public static void main(String[] arg) {
-        SwingAgent.run(RecogChar::new, 100000);
+        SwingAgent.run(Recog2D::new, 100000);
     }
 }
