@@ -18,6 +18,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.time.RealtimeDSClock;
 import nars.time.RealtimeMSClock;
 import nars.util.Texts;
 import nars.util.Wiki;
@@ -318,7 +319,7 @@ public class IRCAgent extends IRC {
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64 * 1024, 3),
 
 
-                new RealtimeMSClock(),
+                new RealtimeDSClock(),
                 exe
         );
 
@@ -343,7 +344,7 @@ public class IRCAgent extends IRC {
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.03f);
         nar.compoundVolumeMax.setValue(volMax);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);

@@ -7,18 +7,12 @@ import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.ProducerType;
 import nars.NAR;
 import nars.Task;
-import net.openhft.affinity.AffinityLock;
-import org.apache.commons.lang3.mutable.MutableFloat;
+import nars.time.RealtimeClock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
-import java.util.List;
-import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 /**
@@ -30,18 +24,29 @@ public class MultiThreadExecutioner extends Executioner {
 
     private final int threads;
     private final RingBuffer<TaskEvent> ring;
-    private final MyBasicExecutor exe;
-    private CPUThrottle throttle;
+    private final AffinityExecutor exe;
+
+    //private CPUThrottle throttle;
+
     private SequenceBarrier barrier;
     private long cursor;
+    private boolean synchronize;
     //private long cursor;
 
 
+    enum EventType {
+        TASK_ARRAY, RUNNABLE, NAR_CONSUMER
+    }
+
     static final class TaskEvent {
-        @Nullable
-        public Task[] tasks;
-        @Nullable
-        public Runnable runnable;
+        @Nullable EventType e;
+        @Nullable Object val;
+//        @Nullable
+//        public Task[] tasks;
+//        @Nullable
+//        public Runnable runnable;
+//        @Nullable
+//        public Consumer<NAR> nar;
     }
 
     @NotNull
@@ -68,10 +73,9 @@ public class MultiThreadExecutioner extends Executioner {
 //
     public MultiThreadExecutioner(int threads, int ringSize) {
 
-
         this.threads = threads;
 
-        this.exe = new MyBasicExecutor();
+        this.exe = new AffinityExecutor("exe");
 
         this.disruptor = new Disruptor<>(
                 TaskEvent::new,
@@ -91,6 +95,8 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public void stop() {
+        super.stop();
+
         synchronized (disruptor) {
             disruptor.shutdown();
             disruptor.halt();
@@ -104,16 +110,26 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public void next(@NotNull NAR nar) {
-        //nar.eventFrameStart.emitAsync(nar, runWorker);
+
+        //SYNCHRONIZE -----------------------------
+        if (synchronize) {
+            try {
+                long lastCursor = this.cursor;
+                if (lastCursor != (this.cursor = ring.getCursor())) {
+                    barrier.waitFor(cursor);
+                }
+            } catch (AlertException | InterruptedException | TimeoutException e1) {
+                logger.error("Barrier Synchronization: {}", e1);
+            }
+        }
+
 
         Consumer[] vv = nar.eventFrameStart.getCachedNullTerminatedArray();
         if (vv != null) {
             for (int i = 0; ; ) {
                 Consumer c = vv[i++];
                 if (c != null) {
-                    execute(() -> { //TODO these Runnables can be cached in an array parallel to 'vv'
-                        c.accept(nar);
-                    });
+                    execute(c);
                 } else
                     break; //null terminator hit
             }
@@ -123,6 +139,7 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public void start(@NotNull NAR nar) {
+        super.start(nar);
 
         WorkHandler[] taskWorker = new WorkHandler[threads];
         for (int i = 0; i < threads; i++)
@@ -134,47 +151,44 @@ public class MultiThreadExecutioner extends Executioner {
 
         disruptor.start();
 
-        this.throttle = new CPUThrottle(
-                new MutableFloat(25));
-                //new MutableFloat(0.5f),
-                //exe.threadIDs());
+        this.synchronize =
+                //!(nar.clock instanceof RealtimeClock);
+                true;
+
+//        this.throttle = new CPUThrottle(
+//                new MutableFloat(25));
+//                //new MutableFloat(0.5f),
+//                //exe.threadIDs());
     }
 
-    @Override public float throttle() {
-        return throttle.throttle;
-    }
-
-    @Override
-    public void synchronize() {
-
-        throttle.next(()->{
-
-            try {
-                long lastCursor = this.cursor;
-                if (lastCursor != (this.cursor = ring.getCursor())) {
-                    barrier.waitFor(cursor);
-                }
-
-            } catch (AlertException | InterruptedException | TimeoutException e1) {
-                logger.error("Barrier Synchronization: {}", e1);
-            }
-
-        });
-
-    }
+//    @Override public float throttle() {
+//        return throttle.throttle;
+//    }
 
 
-    final static EventTranslatorOneArg<TaskEvent, Task[]> taskPublisher = (TaskEvent x, long seq, Task[] b) -> x.tasks = b;
-
-
+    final static EventTranslatorOneArg<TaskEvent, Task[]> taskPublisher = (TaskEvent x, long seq, Task[] b) -> {
+        x.e = EventType.TASK_ARRAY;
+        x.val = b;
+    };
 
     final static EventTranslatorOneArg<TaskEvent, Runnable> runPublisher = (TaskEvent x, long seq, Runnable b) -> {
-        x.runnable = b;
+        x.e = EventType.RUNNABLE;
+        x.val = b;
+    };
+
+    final static EventTranslatorOneArg<TaskEvent, Consumer<NAR>> narPublisher = (TaskEvent x, long seq, Consumer<NAR> b) -> {
+        x.e = EventType.NAR_CONSUMER;
+        x.val = b;
     };
 
     @Override
     public final void execute(@NotNull Runnable r) {
         disruptor.publishEvent(runPublisher, r);
+    }
+
+    @Override
+    public final void execute(@NotNull Consumer<NAR> r) {
+        disruptor.publishEvent(narPublisher, r);
     }
 
     @Override
@@ -204,82 +218,28 @@ public class MultiThreadExecutioner extends Executioner {
         }
 
         @Override
-        public void onEvent(@NotNull TaskEvent te) throws Exception {
-            Task[] tt = te.tasks;
-            if (tt != null) {
-                te.tasks = null;
-                nar.input(tt);
-            }
-
-            Runnable rr = te.runnable;
-            if (rr != null) {
-                te.runnable = null;
-                rr.run();
+        public final void onEvent(@NotNull TaskEvent te) {
+            Object val = te.val;
+            te.val = null;
+            switch (te.e) {
+                case TASK_ARRAY:
+                    nar.input((Task[])val);
+                    break;
+                case RUNNABLE:
+                    ((Runnable)val).run();
+                    break;
+                case NAR_CONSUMER:
+                    ((Consumer<NAR>)val).accept(nar);
+                    break;
             }
         }
+
+        private void runTaskArray(Task[] tt) {
+            nar.input(tt);
+        }
+
     }
 
-    private static class MyBasicExecutor implements Executor {
 
-        private final ThreadFactory factory;
-        public final List<Thread> threads = new CopyOnWriteArrayList<Thread>();
 
-        public MyBasicExecutor() {
-            factory = Executors.defaultThreadFactory();
-        }
-
-        @Override
-        public void execute(Runnable command) {
-
-            final Thread thread = factory.newThread(() -> {
-                try (AffinityLock al = AffinityLock.acquireLock()) {
-                    //logger.info("CPU Thread AffinityLock {} ACQUIRE {}", al.toString() , al.cpuId() );
-                    command.run();
-                }
-
-                //logger.info("CPU Thread AffinityLock RELEASE");
-            });
-
-            if (null == thread) {
-                throw new RuntimeException("Failed to create thread to run: " + command);
-            }
-
-            threads.add(thread);
-
-            thread.start();
-
-        }
-
-        @Override
-        public String toString()
-        {
-            return "BasicExecutor{" +
-                    "threads=" + dumpThreadInfo() +
-                    '}';
-        }
-
-        private String dumpThreadInfo()
-        {
-            final StringBuilder sb = new StringBuilder();
-
-            final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-
-            for (Thread t : threads)
-            {
-                ThreadInfo threadInfo = threadMXBean.getThreadInfo(t.getId());
-                sb.append("{");
-                sb.append("name=").append(t.getName()).append(",");
-                sb.append("id=").append(t.getId()).append(",");
-                sb.append("state=").append(threadInfo.getThreadState()).append(",");
-                sb.append("lockInfo=").append(threadInfo.getLockInfo());
-                sb.append("}");
-            }
-
-            return sb.toString();
-        }
-
-        public long[] threadIDs() {
-            return threads.stream().mapToLong(t -> t.getId()).toArray();
-        }
-    }
 }

@@ -5,17 +5,20 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by me on 7/2/15.
  */
 public abstract class RealtimeClock implements Clock {
 
+
     long t, t0 = -1;
     private long start;
 
     long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000;
-    final AtomicInteger nextStamp = new AtomicInteger(1);
+    final AtomicLong nextStamp = new AtomicLong(1);
+
 
     @Override
     public long nextStamp() {
@@ -36,37 +39,26 @@ public abstract class RealtimeClock implements Clock {
         long now = getRealTime();
 
         t0 = t;
+
         t = now;
+    }
 
-        //        if (memory.resource!=null) {
-//            final double frameTime = memory.resource.FRAME_DURATION.stop();
+//    static class Lag implements Serializable {
 //
-//            //in real-time mode, warn if frame consumed more time than reasoner duration
-//            final int d = memory.duration();
+//        private final double frameTime;
+//        private final int dur;
 //
-//            if (frameTime > d) {
-//                memory.eventError.emit(new Lag(d, frameTime));
-//            }
-//
+//        public Lag(int duration, double frameTime) {
+//            dur = duration;
+//            this.frameTime = frameTime;
 //        }
-    }
-
-    static class Lag implements Serializable {
-
-        private final double frameTime;
-        private final int dur;
-
-        public Lag(int duration, double frameTime) {
-            dur = duration;
-            this.frameTime = frameTime;
-        }
-
-        @NotNull
-        public String toString() {
-            return "Lag frameTime=" +
-                    frameTime + ", duration=" + dur + " cycles)";
-        }
-    }
+//
+//        @NotNull
+//        public String toString() {
+//            return "Lag frameTime=" +
+//                    frameTime + ", duration=" + dur + " cycles)";
+//        }
+//    }
 
 
     @Override

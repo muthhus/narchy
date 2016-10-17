@@ -11,29 +11,14 @@ import java.util.ArrayDeque;
  */
 public final class SingleThreadExecutioner extends Executioner {
 
-    private NAR nar;
-
     final ArrayDeque<Runnable> pending = new ArrayDeque<>(8192);
 
-    @Override
-    public void start(NAR nar) {
-        this.nar = nar;
-    }
-
-    @Override
-    public void stop() {
-
-    }
 
     @Override
     public final int concurrency() {
         return 1;
     }
 
-    @Override
-    public void synchronize() {
-
-    }
 
     @Override
     public void next(@NotNull NAR nar) {

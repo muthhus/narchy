@@ -47,20 +47,19 @@ public class Tetris extends SwingAgent {
 
     @Deprecated public static final int DEFAULT_INDEX_WEIGHT = 25 * 100000;
 
-    public static final Executioner exe =
+    static final Executioner exe =
             //new SingleThreadExecutioner();
 //            new MultiThreadExecutioner(2, 1024*8);
             new MultiThreadExecutioner(4, 1024*8);
 
     public static final int runFrames = 665550;
 
-    public static final int tetris_width = 6;
-    public static final int tetris_height = 15;
+    public static final int tetris_width = 8;
+    public static final int tetris_height = 16;
     public static final int TIME_PER_FALL = 3;
-    public static final int frameRate = 25;
+    public static final int frameRate = 2;
     static boolean easy;
 
-    static int frameDelay;
 
 
     private final TetrisState state;
@@ -383,8 +382,8 @@ public class Tetris extends SwingAgent {
         //Multi nar = new Multi(3,512,
         int maxVol = 30;
         Executioner e = Tetris.exe;
-        Default nar = new Default(1024,
-                32, 2, 2, rng,
+        Default nar = new Default(2048,
+                512, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
@@ -393,7 +392,7 @@ public class Tetris extends SwingAgent {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.7f);
+        nar.goalConfidence(0.8f);
 
         Param.DEBUG_ANSWERS = Param.DEBUG;
 

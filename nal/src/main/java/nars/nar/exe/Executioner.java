@@ -5,22 +5,37 @@ import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 /**
  * Created by me on 8/16/16.
  */
 abstract public class Executioner implements Executor {
-    abstract public void start(@NotNull NAR nar);
+    protected NAR nar;
 
-    abstract public void synchronize();
 
+
+    public synchronized void start(NAR nar) {
+        if (this.nar == null) {
+            this.nar = nar;
+        } else {
+            throw new RuntimeException("already started");
+        }
+    }
+    public synchronized void stop() {
+        if (this.nar != null) {
+            this.nar = null;
+        } else {
+            throw new RuntimeException("not already started");
+        }
+    }
     abstract public void inputLater(@NotNull Task[] t);
 
     abstract public void next(@NotNull NAR nar);
 
     abstract public boolean executeMaybe(Runnable r);
 
-    abstract public void stop();
+
 
     /** an estimate or exact number of parallel processes this runs */
     abstract public int concurrency();
@@ -29,6 +44,12 @@ abstract public class Executioner implements Executor {
     public final boolean concurrent() {
         return concurrency() > 1;
     }
+
+    /** default impl: */
+    public void execute(@NotNull Consumer<NAR> r) {
+        execute(()->r.accept(nar));
+    }
+
 
     /** a postive or negative value indicating the percentage difference from the
      * currently configured CPU usage target to the actual measured CPU usage.

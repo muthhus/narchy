@@ -66,7 +66,7 @@ public class Repl {
 
         nar.logSummaryGT(new PrintStream(reader.getTerminal().output()), 0.1f);
         nar.next();
-        NARLoop loop = nar.loop(20);
+        NARLoop loop = nar.loop(20f);
 
 
         reader.setOpt(LineReader.Option.AUTO_FRESH_LINE);

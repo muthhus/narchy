@@ -42,6 +42,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
     /** average desired cpu percentage */
     public final MutableFloat priority = new MutableFloat(1f);
+    private int framesPerLoop = 1;
 
 
     @NotNull
@@ -60,9 +61,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 //    }
 //
 
-    public NARLoop(@NotNull NAR n) {
-        this(n, 0);
-    }
 
     @Deprecated public void join() {
         try {
@@ -79,9 +77,7 @@ import static org.slf4j.LoggerFactory.getLogger;
      */
     public NARLoop(@NotNull NAR n, int initialPeriod) {
 
-
         nar = n;
-
 
         setPeriodMS(initialPeriod);
 
@@ -162,7 +158,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
         while (!stopping) {
             try {
-                frame(nar);
+                loop(nar);
             } catch (Throwable e) {
                 logger.error("{}",e.toString());
                 e.printStackTrace();
@@ -181,7 +177,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
     long prevTime;
 
-    public void frame(@NotNull NAR nar) {
+    public void loop(@NotNull NAR nar) {
         int periodMS = this.periodMS;
 
         if (periodMS < 0) {
@@ -191,7 +187,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
             //if (!nar.running.get()) {
 
-            nar.run(1);
+            nar.run(framesPerLoop);
 
                 //this.prevTime = Util.pauseLockUntil(prevTime + periodMS);
             long prevPrevTime = this.prevTime;
@@ -202,13 +198,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
             frameTime.addValue(prevTime - prevPrevTime);
 
-                //throttle(periodMS, System.currentTimeMillis() - lastTime);
-
-
-//            } else {
-//                //logger.warn("nar began running before this frame attempted to start");
-//                Thread.yield();
-//            }
 
         }
 

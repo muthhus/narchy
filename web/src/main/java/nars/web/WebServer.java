@@ -116,7 +116,7 @@ public class WebServer /*extends PathHandler*/ {
 
         new IRCServer("localhost", 6667);
 
-        @NotNull Default nar = newRealtimeNAR(1024, 2, 2);
+        @NotNull Default nar = newRealtimeNAR(2048, 2, 2);
 
         new NARServices(nar, w.path);
 

@@ -167,8 +167,12 @@ public final class Premise extends RawBudget implements Tasked {
         if (dur < nar.durMin.floatValue())
             return null;
 
-        float pri = or(taskLinkBudget.pri(), termLinkBudget.pri());
         float qua = belief == null ? taskBudget.qua() : or(taskBudget.qua(), beliefBudget.qua());
+
+        float pri =
+                //or(taskLinkBudget.pri(), termLinkBudget.pri());
+                nar.conceptPriority(c);
+
         return new Premise(c.term(), task, term, belief, pri, dur, qua);
     }
 

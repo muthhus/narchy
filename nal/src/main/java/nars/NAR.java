@@ -280,8 +280,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     @NotNull
     public synchronized void reset() {
 
-        exe.synchronize();
-
+        exe.stop();
+        exe.start(this);
 
         eventReset.emit(this);
 
@@ -737,15 +737,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     /**
      * Exits an iteration loop if running
      */
-    public void stop() {
-//        if (!running) {
-//            throw new RuntimeException("wasnt running");
-//        }
-        synchronized (exe) {
-            exe.synchronize();
-            exe.stop();
-        }
-
+    public final void stop() {
+        exe.stop();
     }
 
     /**
@@ -775,14 +768,11 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
         for (; frames > 0; frames--) {
 
-            exe.synchronize();
-
             clock.tick();
-            emotion.frame();
-
 
             exe.next(this);
 
+            emotion.frame();
 
         }
 
@@ -915,7 +905,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     @NotNull
     public NARLoop loop(float initialFPS) {
         if (initialFPS == 0)
-            return loop((int) 0);
+            return loop((int) -1); //pause
         float millisecPerFrame = 1000.0f / initialFPS;
         return loop((int) millisecPerFrame);
     }
@@ -926,10 +916,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
      * @param initialFramePeriodMS in milliseconds
      */
     @NotNull
-    final NARLoop loop(int initialFramePeriodMS) {
-//        //TODO use DescriptiveStatistics to track history of frametimes to slow down (to decrease speed rate away from desired) or speed up (to reach desired framerate).  current method is too nervous, it should use a rolling average
+    private synchronized NARLoop loop(int initialFramePeriodMS) {
 
-        if (this.loop != null) {
+        if (this.loop != null ) {
             throw new RuntimeException("Already running: " + this.loop);
         }
 

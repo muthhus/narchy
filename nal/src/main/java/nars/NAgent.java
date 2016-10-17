@@ -165,10 +165,11 @@ abstract public class NAgent implements NSense, NAction {
 
     protected void frame() {
 
-        int phase = (actionFrame++) % (frameRate+1);
+        int phase = (actionFrame++) % (frameRate);
         if (phase == 0) {
             ((FrameClock) nar.clock).tick(0); //freeze clock
-        } else if ((phase == frameRate-1) || (frameRate < 2)) {
+        }
+        if ((phase == frameRate-1) || (frameRate < 2)) {
             ((FrameClock) nar.clock).tick(1); //resume clock for the last cycle before repeating
             now = nar.time();
             doFrame();
@@ -194,8 +195,9 @@ abstract public class NAgent implements NSense, NAction {
 
         predict();
 
-        if (trace)
-            System.out.println(summary());
+        if (trace) {
+            logger.info(summary());
+        }
     }
 
 
@@ -212,15 +214,7 @@ abstract public class NAgent implements NSense, NAction {
 //                             + "," +
 //                     n4( happy.beliefs().truth(now).motivation() )
 //                 + "] "
-                "rwrd=" + n2(rewardValue) + "\t"
-                        + "motv=" + n4(desireConf()) + " "
-                        + "hapy=" + n4(emotion.happy() - emotion.sad()) + " "
-                        + "busy=" + n4(emotion.busy.getSum()) + " "
-                        + "lern=" + n4(emotion.learning()) + " "
-                        + "strs=" + n4(emotion.stress.getSum()) + " "
-                        + "alrt=" + n4(emotion.alert.getSum()) + " "
-                        + " var=" + n4(varPct(nar)) + " "
-                        + "\t" + nar.concepts.summary()
+                new StringBuilder().append("rwrd=").append(n2(rewardValue)).append("\t").append("motv=").append(n4(desireConf())).append(" ").append("hapy=").append(n4(emotion.happy() - emotion.sad())).append(" ").append("busy=").append(n4(emotion.busy.getSum())).append(" ").append("lern=").append(n4(emotion.learning())).append(" ").append("strs=").append(n4(emotion.stress.getSum())).append(" ").append("alrt=").append(n4(emotion.alert.getSum())).append(" ").append(" var=").append(n4(varPct(nar))).append(" ").append("\t").append(nar.concepts.summary()).toString()
 
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());

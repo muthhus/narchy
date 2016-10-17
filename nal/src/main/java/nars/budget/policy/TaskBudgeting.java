@@ -51,32 +51,30 @@ public class TaskBudgeting {
 
 
         //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
-
-        float volRatioScale =
-                occamBasic(derived, pp);
+        /** occam factor */
+        float occam = occamBasic(derived, pp);
                 //occamSquareWithDeadzone(derived, pp);
 
         //volRatioScale = volRatioScale * volRatioScale; //sharpen
         //volRatioScale = (float) Math.pow(volRatioScale, 2);
 
 
-        final float durability = pp.dur() * qual;
+        final float durability = pp.dur() * occam;
         if (durability < minDur)
             return null;
+
+        final float quality = pp.qua() * qual;
+
 
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                pp.pri()
-                    * volRatioScale //priority should be reduced as well as durability, because in the time between here and the next forgetting it should not have similar priority as parent in cases like Belief:Identity truth function derivations
-                    //* qual
-        ;
+                pp.pri();
+        //* occam //priority should be reduced as well as durability, because in the time between here and the next forgetting it should not have similar priority as parent in cases like Belief:Identity truth function derivations
+        //* qual
         //if (priority * durability < Param.BUDGET_EPSILON)
-            //return null;
-
-        final float quality = pp.qua() * volRatioScale * qual;
-
+        //return null;
 
         return $.b(priority, durability, quality);
 
