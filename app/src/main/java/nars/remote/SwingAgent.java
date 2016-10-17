@@ -46,14 +46,14 @@ abstract public class SwingAgent extends NAgent {
     }
 
     public static void run(Function<NAR, SwingAgent> init, int frames) {
-        Random rng = new XorShift128PlusRandom(1);
+        Random rng = new XorShift128PlusRandom(4);
 
         final Executioner exe =
             //new SingleThreadExecutioner();
             new MultiThreadExecutioner(3, 1024*8);
 
         int volMax = 40;
-        int conceptsPerCycle = 16;
+        int conceptsPerCycle = 64;
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,

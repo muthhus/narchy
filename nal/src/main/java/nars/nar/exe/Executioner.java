@@ -30,5 +30,14 @@ abstract public class Executioner implements Executor {
         return concurrency() > 1;
     }
 
-
+    /** a postive or negative value indicating the percentage difference from the
+     * currently configured CPU usage target to the actual measured CPU usage.
+     *
+     * tasks can use this value to determine runtime parameters.
+     *
+     * if this value is positive then more work is allowed, if negative, less work is allowed.
+     *
+     * @return
+     */
+    public float throttle() { return 0; }
 }
