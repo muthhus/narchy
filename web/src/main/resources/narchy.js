@@ -1,7 +1,6 @@
 "use strict";
 
 
-
 /*var db = new loki('default', {
     //https://github.com/techfort/LokiJS/wiki/LokiJS-persistence-and-adapters
     adapter: new LokiIndexedAdapter('narchy'),
@@ -10,15 +9,16 @@
 } );(
 */
 
+/** client-side DB interface */
 function DB() {
-    var db = new loki('default', {});
+    const db = new loki('default', {});
     return db;
 }
 
 function TaskDB(db, terminal) {
 
 
-    var tasks = db.addCollection('tasks', {
+    const tasks = db.addCollection('tasks', {
         indices: ['occ', 'term', 'pri', 'conf', 'punc']
     });
 
@@ -68,22 +68,22 @@ function TaskDB(db, terminal) {
     return tasks;
 }
 
+const maxLabelLen = 16;
+function labelize(l) {
+    return l.length > maxLabelLen ? l.substr(0, maxLabelLen) + '..' : l;
+}
+
 function SocketNARGraph(path) {
-    var sg = SocketSpaceGraph(path, function(x) { return x[0]; },
-        function(id, x, newNodes, newEdges) {
+    const sg = SocketSpaceGraph(path, function (x) {
+            return x[0];
+        },
+        function (id, x, newNodes, newEdges) {
 
-            var pri = x[1]/1000.0;
-            var qua = x[3]/1000.0;
+            const pri = x[1] / 1000.0;
+            const qua = x[3] / 1000.0;
 
-            var belief = x[5] ? [x[5][0]/100.0, x[5][1]/100.0] : [0.5, 0];
-            var desire = x[6] ? [x[6][0]/100.0, x[6][1]/100.0] : [0.5, 0];
-
-            var maxLabelLen = 16;
-            function labelize(l) {
-                if (l.length > maxLabelLen)
-                    l = l.substr(0, maxLabelLen) + '..';
-                return l;
-            }
+            const belief = x[5] ? [x[5][0] / 100.0, x[5][1] / 100.0] : [0.5, 0];
+            const desire = x[6] ? [x[6][0] / 100.0, x[6][1] / 100.0] : [0.5, 0];
 
             newNodes.push({
                 id: id,
@@ -91,25 +91,25 @@ function SocketNARGraph(path) {
                 pri: pri,
                 qua: qua,
 
-                belief: 2.0 * (belief[0]-0.5) * belief[1],
-                desire: 2.0 * (desire[0]-0.5) * desire[1]
+                belief: 2.0 * (belief[0] - 0.5) * belief[1],
+                desire: 2.0 * (desire[0] - 0.5) * desire[1]
             });
 
-            var tlPrefix = 'tl_' + id;
-            var termlinks = x[4];
+            const termlinks = x[4];
             if (termlinks) {
-                for (var e of termlinks) {
+                for (let e of termlinks) {
                     /*if (!(e = e.seq))
                      return;*/
                     if (!e)
                         return;
 
-                    var target = e[0];
+                    const target = e[0];
 
-                    var tlpri = e[1] / 1000.0;
-                    var tldur = e[2] / 1000.0;
-                    var tlqua = e[3] / 1000.0;
+                    const tlpri = e[1] / 1000.0;
+                    const tldur = e[2] / 1000.0;
+                    const tlqua = e[3] / 1000.0;
 
+                    const tlPrefix = 'tl_' + id;
                     newEdges.push({
                         id: tlPrefix + '_' + target,
                         source: id, target: target,
@@ -127,7 +127,7 @@ function SocketNARGraph(path) {
 
     //var layoutUpdateMaxPeriodMS = 1000;
 
-    var currentLayout = sg.currentLayout = sg.spacegraph.makeLayout({
+    const currentLayout = sg.currentLayout = sg.spacegraph.makeLayout({
         /* https://github.com/cytoscape/cytoscape.js-spread */
         name: 'spread',
         minDist: 250,
@@ -148,16 +148,15 @@ function SocketNARGraph(path) {
         }
     });
 
-    var layoutUpdatePeriodMS = 150;
-    currentLayout.run();
 
 
-    var layout = function () {
-        var currentLayout = sg.currentLayout;
+    const layout = function () {
+        const currentLayout = sg.currentLayout;
         if (currentLayout) {
             currentLayout.stop();
             currentLayout.run();
 
+            const layoutUpdatePeriodMS = 50;
             setTimeout(layout, layoutUpdatePeriodMS); //self-trigger
 
         }
@@ -212,35 +211,36 @@ function SocketNARGraph(path) {
         // });
 
     };
-    setTimeout(layout, layoutUpdatePeriodMS);
 
 
     function d(x, key) {
-        return x._private.data[key] || 0;
+        return x._private.data[key];// || 0;
     }
 
-    var sizeFunc = function(x) {
-        var p1 = 1 + d(x, 'pri');// * d(x, 'belief');
+    const sizeFunc = function (x) {
+        const p1 = 1 + d(x, 'pri');// * d(x, 'belief');
         return parseInt(24 + 48 * (p1 * p1));
     };
 
 
-    var priToOpacity = function(x) {
-        var pri = d(x, 'pri');
-        return (25 + parseInt(pri*75))/100.0;
-    };
+    // const priToOpacity = function (x) {
+    //     const pri = d(x, 'pri');
+    //     return (25 + parseInt(pri * 75)) / 100.0;
+    // };
     sg.spacegraph.style().selector('node')
         .style('shape', 'hexagon')
         .style('width', sizeFunc)
         .style('height', sizeFunc)
         .style('background-color', function(x) {
-            var belief = d(x, 'belief');
-            var aBelief = Math.abs(belief);
-            var pri = d(x, 'pri');
-            var priColor = parseInt((0.5 + 0.5 * pri) * 128);
-            var beliefColor = parseInt(( aBelief) * 255);
-            var qua = d(x, 'qua');
-            var quaColor = parseInt((0.5 + 0.5 * qua) * 128);
+            const belief = d(x, 'belief');
+            const aBelief = Math.abs(belief);
+            const pri = d(x, 'pri');
+            const priColor = parseInt((0.5 + 0.5 * pri) * 128);
+            const beliefColor = parseInt(( aBelief) * 255);
+            //const qua = d(x, 'qua');
+            //const quaColor = parseInt((0.5 + 0.5 * qua) * 128);
+
+            const quaColor = 0.5;
             if (belief >= 0.05) {
                 return "rgb(" + priColor + "," + beliefColor + "," + quaColor + ")";
             } else if (belief <= -0.05) {
@@ -250,16 +250,20 @@ function SocketNARGraph(path) {
             }
 
         })
-        .style('background-opacity', priToOpacity);
+        //.style('background-opacity', priToOpacity)
+        .style('background-opacity', 1.0)
+        ;
 
     sg.spacegraph.style().selector('edge')
         .style('width', function(x) {
             return parseInt(2 + 5 * d(x, 'pri'));
         })
         .style('mid-target-arrow-shape', 'triangle')
-        .style('opacity', priToOpacity)
+        .style('opacity',
+            // priToOpacity)
+            1.0)
         .style('curve-style', function(x) {
-            var pri = d(x, 'pri');
+            const pri = d(x, 'pri');
             if (pri < 0.25) return 'haystack';
             return 'segments';
         })
@@ -271,27 +275,32 @@ function SocketNARGraph(path) {
         });
 
 
+    setTimeout(() => {
+        const layoutUpdatePeriodMS = 70;
+        setTimeout(layout, layoutUpdatePeriodMS);
+        currentLayout.run();
+    }, 0);
+
     return sg;
 }
 
 
 function NARTerminal() {
 
-    var ws = window.socket('terminal');
+    const ws = window.socket('terminal');
 
-    var e = new EventEmitter();
+    const e = new EventEmitter();
 
     ws.onopen = function() {
         e.emit('connect', this);
     };
     ws.onmessage = function(m) {
         try {
-            var x = JSON.parse(m.data);
+            const x = JSON.parse(m.data);
             e.emit('message', [x]);
-        } catch (c) {
-            console.error(c, m.data);
+        } catch (e) {
+            console.error(e, m.data);
         }
-
     };
     ws.onclose = function() {
         e.emit('disconnect', this);
@@ -302,14 +311,15 @@ function NARTerminal() {
         ws.send(x);
     };
     e.close = ws.close;
+    e.send = ws.send;
 
     return e;
 }
 
 function _ace(div) {
-    var editor = ace.edit(div[0]);//"editor");
+    const editor = ace.edit(div[0]);//"editor");
     editor.setTheme("ace/theme/vibrant_ink");
-    var LispMode = ace.require("ace/mode/lisp").Mode;
+    const LispMode = ace.require("ace/mode/lisp").Mode;
     editor.session.setMode(new LispMode());
 
     editor.$blockScrolling = Infinity;
@@ -326,22 +336,26 @@ function _ace(div) {
 function NALEditor(terminal, initialValue) {
 
 
-    var div = $('<div/>').addClass('NALEditor');
+    const div = $('<div/>').addClass('NALEditor');
 
-    var editor = _ace(div);
+    const editor = _ace(div);
 
     editor.setValue(initialValue || ''); //"((a ==> b) <-> x)!\n\necho(\"what\");");
 
     div.editor = editor;
 
-    var input = function(editor) {
-        var txt = editor.getValue();
+    const input = function (editor) {
+        const txt = editor.getValue();
+        if (txt) {
 
-        //console.log('submit:' , txt);
+            try {
+                terminal.send(txt);
+            } catch (e) {
+                console.error(e, terminal, txt);
+            }
 
-        terminal.send(txt);
-
-        editor.setValue('');
+            editor.setValue('');
+        }
     };
 
     editor.commands.addCommand({
@@ -361,20 +375,20 @@ function NARSpeechRecognition(editor) {
     }
 
     //http://semantic-ui.com/elements/icon.html#audio
-    var speechIcon = $('<i class="icon"></i>');
+    const speechIcon = $('<i class="icon"></i>');
 
-    var speechToggleButton = //$('<button/>').data('record', false);
+    const speechToggleButton = //$('<button/>').data('record', false);
         //$('<button class="ui inverted icon button"/>');
         $('<button class="ui icon button"></div>').attr('title', 'Record Speech').append(speechIcon);
 
 
-    var recognition = new webkitSpeechRecognition();
+    const recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    var ignore_onend;
-    var start_timestamp;
-    var recognizing;
+    let ignore_onend;
+    let start_timestamp;
+    let recognizing;
 
     function showInfo(msg) {
         console.log(msg);
@@ -421,8 +435,8 @@ function NARSpeechRecognition(editor) {
 
     };
     recognition.onresult = function(event) {
-        for (var i = event.resultIndex; i < event.results.length; ++i) {
-            var r = event.results[i];
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            const r = event.results[i];
             if (r.isFinal) {
                 editor.insert( r[0].transcript );
             }
@@ -467,7 +481,7 @@ function NARSpeechRecognition(editor) {
     setRecording(false);
 
     return speechToggleButton.click(function() {
-        var recording = !speechToggleButton.data('record');
+        const recording = !speechToggleButton.data('record');
 
         setRecording(recording);
 
@@ -478,9 +492,8 @@ function NARSpeechRecognition(editor) {
 
 function NARInputter(terminal, initialValue) {
 
-    var e = NALEditor(terminal, initialValue);
-    var d = $('<div/>').append(
-
+    const e = NALEditor(terminal, initialValue);
+    const d = $('<div/>').append(
         NARSpeechRecognition(e.editor),
 
         //other input types..
@@ -496,16 +509,16 @@ function NARInputter(terminal, initialValue) {
 }
 
 function NARConsole(terminal) {
-    var div = $('<div/>').addClass('NARConsole');
+    const div = $('<div/>').addClass('NARConsole');
 
 
-    var editor = _ace(div);
+    const editor = _ace(div);
     editor.setReadOnly(true);
     editor.renderer.setShowGutter(false);
 
     div.editor = editor;
 
-    var maxLines = 256;
+    const maxLines = 256;
 
     function line(m) {
         if (typeof(m) === "string") {
@@ -518,8 +531,8 @@ function NARConsole(terminal) {
     terminal.on('message', function(newTasks) {
 
         setTimeout(function() {
-            var lines = editor.session.getLength() + newTasks.length;
-            var linesOver = lines - maxLines;
+            const lines = editor.session.getLength() + newTasks.length;
+            const linesOver = lines - maxLines;
             if (linesOver > 0) {
                 editor.session.getDocument().removeFullLines(0, linesOver);
             }
@@ -527,7 +540,7 @@ function NARConsole(terminal) {
             editor.navigateFileEnd();
             editor.navigateLineEnd();
 
-            for (var n = Math.max(0, newTasks.length - maxLines); n < newTasks.length; n++) {
+            for (let n = Math.max(0, newTasks.length - maxLines); n < newTasks.length; n++) {
                 if (lines + n > 0)
                     editor.insert('\n');
                 editor.navigateLineStart();
@@ -545,13 +558,13 @@ function NARConsole(terminal) {
 }
 
 function TopTable(path) {
-    var d = $('<div/>');
-    var e = $('<div/>').attr('class', 'ConceptTable').css('overflow', 'scroll');
+    const d = $('<div/>');
+    const e = $('<div/>').attr('class', 'ConceptTable').css('overflow', 'scroll');
 
     function row(c) {
-        var pri = c[1]/1000.0;
-        var dur = c[2]/1000.0;
-        var qua = c[3]/1000.0;
+        const pri = c[1] / 1000.0;
+        const dur = c[2] / 1000.0;
+        const qua = c[3] / 1000.0;
 
         return $(document.createElement('span'))
             .attr('class', 'ConceptRow')
@@ -569,17 +582,17 @@ function TopTable(path) {
 
     d.append(e);
 
-    var sv = SocketView(path,
+    return SocketView(path,
 
-        function(p) {
+        function (p) {
             return d;
         },
 
-        function(msg) {
-            var m = JSON.parse(msg.data);
+        function (msg) {
+            const m = JSON.parse(msg.data);
 
-            var rr = [];
-            for (var k of m) {
+            const rr = [];
+            for (let k of m) {
                 rr.push(row(k));
             }
 
@@ -587,7 +600,5 @@ function TopTable(path) {
 
         }
     );
-
-    return sv;
 
 }

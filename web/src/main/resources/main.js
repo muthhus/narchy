@@ -1,9 +1,9 @@
 'use strict';
 
-var app = require('app');
-var BrowserWindow = require('browser-window');
+const app = require('app');
+const BrowserWindow = require('browser-window');
 
-var mainWindow = null;
+let mainWindow = null;
 
 app.on('ready', function() {
     mainWindow = new BrowserWindow({

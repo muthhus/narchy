@@ -1,7 +1,7 @@
 "use strict";
 
-var defaultHostname = window.location.hostname || 'localhost';
-var defaultWSPort = window.location.port || 8080;
+const defaultHostname = window.location.hostname || 'localhost';
+const defaultWSPort = window.location.port || 8080;
 
 
 /** creates a websocket connection to a path on the server that hosts the currently visible webpage */
@@ -18,9 +18,9 @@ function SocketView(path, pathToElement, onData) {
 
     mwdata[path] = ''; //initially empty
 
-    var view = pathToElement(path);
+    const view = pathToElement(path);
 
-    var ws = window.socket(path);
+    const ws = window.socket(path);
 
     ws.onopen = function () {
         //state.html("Connected");
@@ -46,8 +46,8 @@ var mwdata = { };
 
 function SocketMetaWidget(path) {
 
-    var varPath = "mwdata['" + path + "']";
-    var view = $('<x-metawidget readonly=true path="' + varPath + '"></x-metawidget>');
+    const varPath = "mwdata['" + path + "']";
+    const view = $('<x-metawidget readonly=true path="' + varPath + '"></x-metawidget>');
 
     return SocketView(path,
 
@@ -56,7 +56,7 @@ function SocketMetaWidget(path) {
         },
 
         function(msg) {
-            var v;
+            let v;
             try {
                 v = JSON.parse(msg.data);
             } catch (e) {
@@ -76,14 +76,14 @@ function SocketMetaWidget(path) {
 function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
 
-    var view = $('<div/>');
-    var sg = spacegraph(view, {
+    const view = $('<div/>');
+    const sg = spacegraph(view, {
         //options
     });
 
 
     sg.onMsg = function(msg) {
-        var v;
+        let v;
 
         if (msg.data && typeof msg.data === "string") {
             try {
@@ -95,17 +95,17 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
             v = msg;
         }
 
-        var nodesToRemove = view.nodesShown || new Set() /* empty */;
+        const nodesToRemove = view.nodesShown || new Set();
 
-        var newNodeSet = new Set();
+        const newNodeSet = new Set();
 
-        var nodesToShow = [];
-        var edgesToShow = [];
+        const nodesToShow = [];
+        const edgesToShow = [];
 
         //console.log(prev.size, 'previously');
         _.each(v, function(x) {
 
-            var id = idFunc(x); //x[1];
+            const id = idFunc(x); //x[1];
             //if (!toRemove.delete(id)) {
 
             /** nodeFunc can return false to cause any previous node to be removed */
@@ -119,14 +119,14 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
 
 
-        var edgesToRemove = view.edgesShown || new Set() /* empty */;
+        const edgesToRemove = view.edgesShown || new Set();
 
         _.each(edgesToShow, function(e) { edgesToRemove.delete(e.id); });
 
         //console.log(prev.size, 'to delete');
 
-        var changed = false;
-        var shownEdgeSet = new Set();
+        let changed = false;
+        const shownEdgeSet = new Set();
 
         sg.batch(function() {
 
@@ -151,7 +151,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
             if (edgesToShow.length > 0) {
                 _.each(edgesToShow, function (e) {
-                    var target = e.target;
+                    const target = e.target;
 
                     if (sg.get(target)) { //if target exists
                         sg.addEdge(e);
@@ -176,7 +176,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
         view.edgesShown = shownEdgeSet;
     };
 
-    var sv;
+    let sv;
     if (path) { //TODO different types of data interfaces/loaders
         sv = SocketView(path,
 

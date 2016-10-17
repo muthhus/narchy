@@ -12,7 +12,7 @@
             height: 400px;
         }
     </style>
-    <link rel="import" href="init.html">
+    <link rel="import" href="../init.html">
 
 </head>
 
@@ -20,9 +20,9 @@
     <div id="editor">some text</div>
 
     <script>
-        var editor = ace.edit("editor");
+        const editor = ace.edit("editor");
         editor.setTheme("ace/theme/ambiance");
-        var LispMode = ace.require("ace/mode/lisp").Mode;
+        const LispMode = ace.require("ace/mode/lisp").Mode;
         editor.session.setMode(new LispMode());
 
         editor.setValue("((a ==> b) <-> x)!\n\necho(\"what\");");

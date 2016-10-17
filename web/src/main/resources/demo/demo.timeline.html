@@ -4,11 +4,11 @@
     <title>NARchy</title>
 
     <style type="text/css">
-        @import url("spacegraph.dark.css");
-        @import url("terminal.css");
-        @import url("spacegraph.css");
+        @import url("../spacegraph.dark.css");
+        @import url("../terminal.css");
+        @import url("../spacegraph.css");
     </style>
-    <link rel="import" href="init.html">
+    <link rel="import" href="../init.html">
 
     <style>
 
@@ -28,28 +28,30 @@
 </body>
 
 
-<script src="narchy.js"></script>
+<script src="../narchy.js"></script>
 
 <script>
     "use strict";
 
     function SocketTimeline() {
 
-        var sample = [
-            ["id0" /* node id */, [1, 4] /* interval or time-point */, { /* attributes */} , [ /* edges.. */]],
-            ["id1" /* node id */, [2, 3] /* interval or time-point */, { /* attributes */} , [ /* edges.. */]],
-            ["id2" /* node id */, [3, 7] /* interval or time-point */, { /* attributes */} , [ /* edges.. */]],
-            ["id3" /* node id */, [4, 4] /* interval or time-point */, { /* attributes */} , [ /* edges.. */]],
-            ["id4" /* node id */, [5, 7] /* interval or time-point */, { /* attributes */} , [ /* edges.. */]]
+        const sample = [
+            ["id0" /* node id */, [1, 4] /* interval or time-point */, {/* attributes */}, [/* edges.. */]],
+            ["id1" /* node id */, [2, 3] /* interval or time-point */, {/* attributes */}, [/* edges.. */]],
+            ["id2" /* node id */, [3, 7] /* interval or time-point */, {/* attributes */}, [/* edges.. */]],
+            ["id3" /* node id */, [4, 4] /* interval or time-point */, {/* attributes */}, [/* edges.. */]],
+            ["id4" /* node id */, [5, 7] /* interval or time-point */, {/* attributes */}, [/* edges.. */]]
 
         ];
 
-        var iconWidth = 32;
+        const iconWidth = 32;
 
-        var sg = SocketSpaceGraph(null, function(x) { return x[0]; },
-                function(id, x, newNodes, newEdges) {
+        const sg = SocketSpaceGraph(null, function (x) {
+                return x[0];
+            },
+            function (id, x, newNodes, newEdges) {
 
-                    //console.log(id, x, newNodes, newEdges);
+                //console.log(id, x, newNodes, newEdges);
 
 //                    var pri = x[1]/1000.0;
 //                    var qua = x[3]/1000.0;
@@ -57,18 +59,18 @@
 //                    var belief = x[5] ? [x[5][0]/100.0, x[5][1]/100.0] : [0.5, 0];
 //                    var desire = x[6] ? [x[6][0]/100.0, x[6][1]/100.0] : [0.5, 0];
 
-                    var time = x[1];
-                        newNodes.push({
-                            id: id,
-                            label:id,
-                            //label: id,
-                            //pri: pri,
-                            //qua: qua,
-                            time: time
+                const time = x[1];
+                newNodes.push({
+                    id: id,
+                    label: id,
+                    //label: id,
+                    //pri: pri,
+                    //qua: qua,
+                    time: time
 
-                            //belief: 2.0 * (belief[0]-0.5) * belief[1],
-                            //desire: 2.0 * (desire[0]-0.5) * desire[1]
-                        });
+                    //belief: 2.0 * (belief[0]-0.5) * belief[1],
+                    //desire: 2.0 * (desire[0]-0.5) * desire[1]
+                });
 //
 //                    var tlPrefix = 'tl_' + id;
 //                    var termlinks = x[4];
@@ -94,12 +96,11 @@
 //                    }
 
 
-
-                }
+            }
         );
 
 
-        var space = sg.spacegraph;
+        const space = sg.spacegraph;
 
 
         function d(x, key) {
@@ -109,7 +110,7 @@
         space.style().selector('node')
                 .style('shape', 'rectangle')
                 .style('width', function(x) {
-                    var time = d(x, 'time');
+                    const time = d(x, 'time');
                     return Array.isArray(time) ? (Math.max(1, time[1]-time[0]) * iconWidth) : iconWidth;
                 })
                 .style('height', function(x) {
@@ -153,73 +154,80 @@
 
         }
 
-        var layout = space.makeLayout({
+        const layout = space.makeLayout({
             name: 'cose',
 
             // Called on `layoutready`
-            ready               : function() {},
+            ready: function () {
+            },
 
             // Called on `layoutstop`
-            stop                : function() {
+            stop: function () {
                 repos();
 
             },
 
             // Whether to animate while running the layout
-            animate             : true,
+            animate: true,
 
             // The layout animates only after this many milliseconds
             // (prevents flashing on fast runs)
-            animationThreshold  : 250,
+            animationThreshold: 250,
 
             // Number of iterations between consecutive screen positions update
             // (0 -> only updated on the end)
-            refresh             : 20,
+            refresh: 20,
 
             // Whether to fit the network view after when done
-            fit                 : false,
+            fit: false,
 
             // Padding on fit
-            padding             : 30,
+            padding: 30,
 
             // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
-            boundingBox         : undefined,
+            boundingBox: undefined,
 
             // Extra spacing between components in non-compound graphs
-            componentSpacing    : 100,
+            componentSpacing: 100,
 
             // Node repulsion (non overlapping) multiplier
-            nodeRepulsion       : function( node ){ return 400000; },
+            nodeRepulsion: function (node) {
+                return 400000;
+            },
 
             // Node repulsion (overlapping) multiplier
-            nodeOverlap         : 10,
+            nodeOverlap: 10,
 
             // Ideal edge (non nested) length
-            idealEdgeLength     : function( edge ){ return 10; },
+            idealEdgeLength: function (edge) {
+                return 10;
+            },
 
             // Divisor to compute edge forces
-            edgeElasticity      : function( edge ){ return 100; },
+            edgeElasticity: function (edge) {
+                return 100;
+            },
 
             // Nesting factor (multiplier) to compute ideal edge length for nested edges
-            nestingFactor       : 5,
+            nestingFactor: 5,
 
             // Gravity force (constant)
-            gravity             : 80,
+            gravity: 80,
 
             // Maximum number of iterations to perform
-            numIter             : 1000,
+            numIter: 1000,
 
             // Initial temperature (maximum node displacement)
-            initialTemp         : 200,
+            initialTemp: 200,
 
             // Cooling factor (how the temperature is reduced between consecutive iterations
-            coolingFactor       : 0.95,
+            coolingFactor: 0.95,
 
             // Lower temperature threshold (below this point the layout will end)
-            minTemp             : 1.0,
+            minTemp: 1.0,
 
             // Whether to use threading to speed up the layout
-            useMultitasking     : true
+            useMultitasking: true
         });
 
         layout.run();

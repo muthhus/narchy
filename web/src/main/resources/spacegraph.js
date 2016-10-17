@@ -115,12 +115,14 @@ class EventEmitter {
         return this
     }
     emit(type, args){
-        var listeners = this._events[type];
+        const listeners = this._events[type];
         if(!listeners || !listeners.length) {
             return false
         }
-        for (var i = 0; i < listeners.length; i++)
-            listeners[i].apply(null, args);
+        setTimeout( ()=> {
+            for (var i = 0; i < listeners.length; i++)
+                listeners[i].apply(null, args);
+        }, 0);
         //listeners.forEach(function(fn) { fn.apply(null, args) })
         return true
     }
@@ -401,12 +403,24 @@ function spacegraph(targetWrapper, opt) {
                     'text-shadow-blur': 0,
                     'shadow-opacity': 0,
                     'min-zoomed-font-size': 7,
+                    'text-events': false
+                    /*border-width : The size of the node’s border.
+        border-style : The style of the node’s border; may be solid, dotted, dashed, or double.
+        border-color : The colour of the node’s border.
+        border-opacity : The opacity of the node’s border.*/
                     /*'text-background-opacity': 1,
                     'text-background-color': '#ccc',
-                    'text-background-shape': 'roundrectangle',*/
-                    /*'text-border-color': '#000',
-                    'text-border-width': 1,
-                    'text-border-opacity': 1*/
+                    'text-background-shape': 'roundrectangle',
+                    text-border-opacity : The width of the border around the label; the border is disabled for 0 (default value).
+                    text-border-width : The width of the border around the label.
+                    text-border-style : The style of the border around the label; may be solid, dotted, dashed, or double.
+                    text-border-color : The colour of the border around the label.
+                     text-shadow-blur : The shadow blur distance.
+                     text-shadow-color : The colour of the shadow.
+                     text-shadow-offset-x : The x offset relative to the text where the shadow will be displayed, can be negative. If you set blur to 0, add an offset to view your shadow.
+                     text-shadow-offset-y : The y offset relative to the text where the shadow will be displayed, can be negative. If you set blur to 0, add an offset to view your shadow.
+                     text-shadow-opacity : The opacity of the shadow on the text; the shadow is disabled for 0 (default value).
+                     */
                 }
             }
             /*,

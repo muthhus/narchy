@@ -20,8 +20,8 @@ import static nars.web.WebServer.socket;
 
         path
                 .addPrefixPath("/terminal", socket(new NarseseIOService(nar)))
-                .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 500)))
-                .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 800, 128) {
+                .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 200)))
+                .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 200, 128) {
 
                     @Override
                     Object[] summarize(BLink<? extends Concept> bc, int n) {

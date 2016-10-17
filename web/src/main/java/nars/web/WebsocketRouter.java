@@ -55,7 +55,7 @@ public class WebsocketRouter extends AbstractWebsocketService {
         socket.resumeReceives();
 
         onConnect(socket);
-        System.out.println(exchange.getRequestHeaders());
+        //System.out.println(exchange.getRequestHeaders());
 
     }
 

@@ -2,7 +2,7 @@
 
 function NodeFrame(spacegraph) {
 
-    var f = {
+    const f = {
         hoverUpdate: function () { /* implemented below */
         },
         hide: function () { /* see below */
@@ -10,14 +10,14 @@ function NodeFrame(spacegraph) {
         hovered: null
     };
 
-    var frameTimeToFade = 200; //ms
-    var frameNodePixelScale = 300;
-    var frameNodeScale = 1.15;
+    const frameTimeToFade = 200; //ms
+    const frameNodePixelScale = 300;
+    const frameNodeScale = 1.15;
 
-    var frameVisible = false;
-    var frameHiding = -1;
-    var frameEleNode = null;
-    var frameEleResizing = false;
+    let frameVisible = false;
+    let frameHiding = -1;
+    let frameEleNode = null;
+    let frameEleResizing = false;
 
 
     // $.ajax({
@@ -34,7 +34,7 @@ function NodeFrame(spacegraph) {
 
         spacegraph.overlay.append(x);
 
-        var frameEle = $('#nodeframe');
+        const frameEle = $('#nodeframe');
         f.hovered = null;
 
 
@@ -43,14 +43,14 @@ function NodeFrame(spacegraph) {
 
         //http://threedubmedia.com/code/event/drag/demo/resize2
 
-        spacegraph.on('zoom', function (e) {
+        spacegraph.on('zoom', function () {
             setTimeout(f.hoverUpdate, 0);
         });
 
         spacegraph.on('mouseover mouseout mousemove', function (e) {
 
-            var target = e.cyTarget;
-            var over = (e.type !== "mouseout");
+            let target = e.cyTarget;
+            let over = (e.type !== "mouseout");
 
             if (frameEleResizing) {
                 target = frameEleNode;
@@ -102,7 +102,7 @@ function NodeFrame(spacegraph) {
 
         f.hoverUpdate = function () {
 
-            var that = this;
+            const that = this;
             if (frameVisible) {
                 if (!this.currentlyVisible) {
                     this.currentlyVisible = true;
@@ -136,15 +136,17 @@ function NodeFrame(spacegraph) {
 
     });
 
-    function initFrameDrag(nodeFrame) {
-        var frameEle = $('#nodeframe');
+    function initFrameDrag() {
+        const nodeFrame = $('#nodeframe');
+
+        const frameEle = nodeFrame;
 
 
-        var close = $('#nodeframe').find('#close');
+        const close = nodeFrame.find('#close');
         close.click(function () {
-            var node = frameEleNode;
+            const node = frameEleNode;
             if (node) {
-                var space = node.cy();
+                const space = node.cy();
 
                 space.removeNode(node);
 
@@ -153,8 +155,8 @@ function NodeFrame(spacegraph) {
             }
         });
 
-        var sese= '#nodeframe #resizeSE';
-        var se = $(sese);
+        const sese = '#nodeframe #resizeSE';
+        const se = $(sese);
         se.draggable({
                         //revert: true,
                         helper: "clone",
@@ -167,12 +169,12 @@ function NodeFrame(spacegraph) {
                         start: function (event, ui) {
 
 
-                            var node = frameEleNode;
+                            let node = frameEleNode;
 
                             if (!node)
                                 return;
 
-                            var pos = node.position();
+                            let pos = node.position();
                             if (!pos) {
                                 console.error('node ', node, 'has no position');
                                 return;
@@ -194,24 +196,24 @@ function NodeFrame(spacegraph) {
 
                             event.stopPropagation();
 
-                            var node = this.originalNode; //frameEleNode;
+                            const node = this.originalNode; //frameEleNode;
                             /*if (node !== this.originalNode)
                                 return;*/
 
-                            var oos = this.originalOffset;
-                            var dx = parseFloat(ui.offset.left - oos[0]);
-                            var dy = parseFloat(ui.offset.top - oos[1]);
+                            const oos = this.originalOffset;
+                            const dx = parseFloat(ui.offset.left - oos[0]);
+                            const dy = parseFloat(ui.offset.top - oos[1]);
 
-                            var p = this.originalPos;
-                            var os = this.originalSize;
+                            const p = this.originalPos;
+                            const os = this.originalSize;
 
-                            var os0 = os[0];
-                            var os1 = os[1];
+                            const os0 = os[0];
+                            const os1 = os[1];
 
-                            var dw = dx * (os0 / os[2]);
-                            var dh = dy * (os1 / os[3]);
+                            const dw = dx * (os0 / os[2]);
+                            const dh = dy * (os1 / os[3]);
 
-                            var ncy = node.cy();
+                            const ncy = node.cy();
                             ncy.startBatch();
 
                             node.position({
@@ -233,7 +235,7 @@ function NodeFrame(spacegraph) {
                             //setTimeout(nodeFrame.hoverUpdate, 0);
 
                         },
-                        stop: function (event, ui) {
+                        stop: function (event) {
                             frameEle[0].style.width = undefined; //reset width
 
                             event.stopPropagation();
@@ -293,30 +295,27 @@ class PopupMenu {
         "use strict";
 
 
-        var that = this;
+        const that = this;
 
-        var handler = {
-
-        };
+        const handler = {};
 
         //remove existing
         //$('#' + this.id).each(function(x) { $(x).fadeOut(function() { $(this).remove(); }); });
         this.hide();
 
         //add
-        target = target || $('body');
-        menu.attr('id', this.id).css('position', 'fixed').appendTo(target);
+        menu.attr('id', this.id).css('position', 'fixed').appendTo(target || $('body'));
 
         //http://codepen.io/MarcMalignan/full/xlAgJ/
 
-        var radius = this.radius || 70.0;
+        const radius = this.radius || 70.0;
 
-        var cx = position.left - radius / 2.0;
-        var cy = position.top - radius / 2.0;
+        const cx = position.left - radius / 2.0;
+        const cy = position.top - radius / 2.0;
 
-        var items = menu.find('li');
+        const items = menu.find('li');
 
-        var closebutton = menu.find('.closebutton');
+        const closebutton = menu.find('.closebutton');
         closebutton.unbind();
         items.unbind();
 
@@ -330,12 +329,12 @@ class PopupMenu {
             opacity: 1.0
         }, {
             duration: 400,
-            step: function (now, fx) {
-                for (var i = 0; i < items.length; i++) {
-                    var a = (i / (items.length)) * Math.PI * 2.0;
+            step: function (now) {
+                for (let i = 0; i < items.length; i++) {
+                    let a = (i / (items.length)) * Math.PI * 2.0;
                     a += now;
-                    var x = Math.cos(a) * now * radius;
-                    var y = Math.sin(a) * now * radius;
+                    const x = Math.cos(a) * now * radius;
+                    const y = Math.sin(a) * now * radius;
                     $(items[i]).css({
                         left: x, top: y
                     });
@@ -344,7 +343,7 @@ class PopupMenu {
         });
         items.click(function (e) {
 
-            var a = $(e.target).attr('action');
+            const a = $(e.target).attr('action');
             if (a && handler[a])
                 handler[a](position);
 
@@ -362,11 +361,11 @@ class PopupMenu {
 
 function newSpacePopupMenu(s) {
 
-    var prevMenu = null;
+    let prevMenu = null;
 
     //hit background
     //this.newNode(s.defaultChannel, 'text', e.cyPosition);
-    var handler = {
+    const handler = {
 
         addText: function (position) {
             //s.newNode(s.defaultChannel, 'text', position);
@@ -379,8 +378,8 @@ function newSpacePopupMenu(s) {
     };
 
     s.on('tap', function (e) {
-        var target = e.cyTarget;
-        var position = e.cyPosition;
+        const target = e.cyTarget;
+        const position = e.cyPosition;
 
         if (target.isNode) {
             //hit an element (because its isNode function is defined)
@@ -394,7 +393,7 @@ function newSpacePopupMenu(s) {
             return;
         }
 
-        var menu = prevMenu = $('#ContextPopup').clone();
+        const menu = prevMenu = $('#ContextPopup').clone();
         menu.appendTo(s.overlay);
         menu.destroy = function () {
             if (prevMenu === this)
@@ -408,14 +407,14 @@ function newSpacePopupMenu(s) {
 
         //http://codepen.io/MarcMalignan/full/xlAgJ/
 
-        var radius = 70.0;
+        const radius = 70.0;
 
-        var cx = e.originalEvent.clientX - radius / 2.0;
-        var cy = e.originalEvent.clientY - radius / 2.0;
+        const cx = e.originalEvent.clientX - radius / 2.0;
+        const cy = e.originalEvent.clientY - radius / 2.0;
 
-        var items = menu.find('li');
+        const items = menu.find('li');
 
-        var closebutton = menu.find('.closebutton');
+        const closebutton = menu.find('.closebutton');
         closebutton.unbind();
         items.unbind();
 
@@ -429,12 +428,12 @@ function newSpacePopupMenu(s) {
             opacity: 1.0
         }, {
             duration: 400,
-            step: function (now, fx) {
-                for (var i = 0; i < items.length; i++) {
-                    var a = (i / (items.length)) * Math.PI * 2.0;
+            step: function (now) {
+                for (let i = 0; i < items.length; i++) {
+                    let a = (i / (items.length)) * Math.PI * 2.0;
                     a += now;
-                    var x = Math.cos(a) * now * radius;
-                    var y = Math.sin(a) * now * radius;
+                    const x = Math.cos(a) * now * radius;
+                    const y = Math.sin(a) * now * radius;
                     $(items[i]).css({
                         left: x, top: y
                     });
@@ -443,7 +442,7 @@ function newSpacePopupMenu(s) {
         });
         items.click(function (e) {
 
-            var a = $(e.target).attr('action');
+            const a = $(e.target).attr('action');
             if (a && handler[a])
                 handler[a](position);
 
