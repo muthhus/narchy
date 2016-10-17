@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.UtilityFunctions.and;
+import static nars.nal.UtilityFunctions.or;
 
 /**
  * Created by me on 5/23/16.
@@ -44,33 +45,35 @@ public class TaskBudgeting {
 //        }
 //    }
 
-    public static @Nullable Budget derivation(float qual, @NotNull Termed derived, @NotNull PremiseEval p, float minDur) {
+    public static @Nullable Budget derivation(float derivationQuality, @NotNull Termed derived, @NotNull PremiseEval p, float minDur) {
 
-        Premise pp = p.premise;
+        Premise baseBudget = p.premise;
 
 
 
         //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
         /** occam factor */
-        float occam = occamBasic(derived, pp);
+        float occam = occamBasic(derived, baseBudget);
                 //occamSquareWithDeadzone(derived, pp);
 
         //volRatioScale = volRatioScale * volRatioScale; //sharpen
         //volRatioScale = (float) Math.pow(volRatioScale, 2);
 
 
-        final float durability = pp.dur() * occam;
+        final float durability = baseBudget.dur() * occam;
         if (durability < minDur)
             return null;
 
-        final float quality = pp.qua() * qual;
+        float baseQuality = baseBudget.qua();
+
+        final float quality = or(baseQuality, derivationQuality);
 
 
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                pp.pri();
+                baseBudget.pri() * quality;
         //* occam //priority should be reduced as well as durability, because in the time between here and the next forgetting it should not have similar priority as parent in cases like Belief:Identity truth function derivations
         //* qual
         //if (priority * durability < Param.BUDGET_EPSILON)

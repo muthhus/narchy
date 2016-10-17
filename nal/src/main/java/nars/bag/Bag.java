@@ -574,7 +574,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
 
     /** gets the link if present, applies a priority multiplier factor, and returns the link */
-    V boost(Object key, float factor);
+    @Nullable V boost(Object key, float factor);
 
     /** samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed  */
     @Nullable default BLink<V> pop() {

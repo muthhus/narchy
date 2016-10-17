@@ -2,8 +2,11 @@ package nars.nar.util;
 
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.budget.Budget;
+import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.concept.util.ConceptBuilder;
@@ -11,7 +14,6 @@ import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -33,6 +35,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     private static final Logger logger = LoggerFactory.getLogger(ConceptBagCycle.class);
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
+
 
 
     /**
@@ -63,6 +66,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
     //cached value for use in the next firing
     private int taskLinks, termLinks;
+    private long now;
 
 
 //    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
@@ -94,21 +98,11 @@ public class ConceptBagCycle implements Consumer<NAR> {
     protected void sleep(@NotNull Concept c) {
         NAR n = this.nar;
 
-        n.policy(c, conceptBuilder.sleep(), n.time());
+        n.policy(c, conceptBuilder.sleep(), now);
 
         n.emotion.alert(1f / concepts.size());
     }
 
-    /** called when a concept enters the concept bag
-     * @return whether to accept the item into the bag
-     * */
-    protected boolean awake(@NotNull Concept c) {
-
-        NAR n = this.nar;
-        n.policy(c, conceptBuilder.awake(), n.time());
-
-        return true;
-    }
 
 
     public void reset(NAR m) {
@@ -119,6 +113,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
     /** called each frame */
     @Override public void accept(NAR nar) {
+
+        now = nar.time();
 
         int cpf = conceptsFiredPerCycle.intValue();
 
@@ -145,6 +141,17 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
     }
 
+    static final class BudgetSavings extends RawBudget {
+        public final long savedAt;
+
+        public BudgetSavings(Budget value, long savedAt) {
+            super(value);
+            this.savedAt = savedAt;
+        }
+
+    }
+
+
     /** extends CurveBag to invoke entrance/exit event handler lambda */
     public final class MonitoredCurveBag extends CurveBag<Concept> {
 
@@ -152,9 +159,22 @@ public class ConceptBagCycle implements Consumer<NAR> {
         public MonitoredCurveBag(int capacity, @NotNull CurveSampler sampler) {
             super(capacity, sampler, BudgetMerge.plusBlend,
                     //new ConcurrentHashMap<>(capacity)
-                    nar.exe.concurrent() ?  new ConcurrentHashMapUnsafe<>(capacity) : new HashMap(capacity)
+                    nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>(capacity) : new HashMap(capacity)
                     //new NonBlockingHashMap<>(capacity)
             );
+        }
+
+        @Override
+        public Concept boost(Object key, float boost) {
+            Concept c = super.boost(key, boost);
+            if (c == null) {
+                //try to set in the long-term budget of the non-active concept
+                BLink<Concept> link = c.get(this /* specifically this one TODO */);
+                if (link!=null) {
+                    link.priMult(boost);
+                }
+            }
+            return c;
         }
 
         @Override
@@ -163,15 +183,40 @@ public class ConceptBagCycle implements Consumer<NAR> {
             super.clear();
         }
 
-        @Override
-        protected final void onActive(@NotNull Concept c) {
-            awake(c);
+
+
+        /** called when a concept enters the concept bag
+         * */
+        @Override protected final void onActive(@NotNull Concept c, BLink<Concept> v) {
+
+            float forgetPeriod = (float) Math.ceil(1 + Math.sqrt(capacity()));
+
+            nar.policy(c, conceptBuilder.awake(), now);
+            BudgetSavings existing = c.get(this);
+            if (existing!=null) {
+                if (existing.isDeleted())
+                    throw new UnsupportedOperationException();
+                float forgetScale = 1f / (1f + (now - existing.savedAt)/ forgetPeriod);
+                BudgetMerge.plusBlend.apply(v, existing, forgetScale);
+                c.put(this, null);
+            }
+
         }
+
+
 
         @Override
         protected final void onRemoved(@NotNull Concept c, @Nullable BLink<Concept> value) {
-            if (value!=null)
+            if (value!=null) {
                 sleep(c);
+
+                if (value.priIfFiniteElseNeg1() > Param.BUDGET_EPSILON) {
+                    BudgetSavings s = new BudgetSavings(value, now);
+                    if (!s.isDeleted()) {
+                        c.put(this, s);
+                    }
+                }
+            }
         }
 
         @Override

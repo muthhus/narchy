@@ -44,19 +44,17 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(256, 16, 1, 1 );
+        Default n = new Default(256, 1, 2, 1 );
         //n.nal(4);
-
-
 
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n,  32, 16);
+        newConceptWindow(n,  64, 8);
 
         //n.run(20); //headstart
 
-        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.05f;
 
 
         //n.log();
@@ -81,8 +79,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                );
 //                //.run(800);
 //
-        n.linkFeedbackRate.setValue(2f); //<-- feedback off, it was ON before
-        n.loop(40f);
+        n.linkFeedbackRate.setValue(0.05f);
+        n.loop(5f);
         //n.run(1);
 //        n.forEachConcept(c -> {
 //            c.print();

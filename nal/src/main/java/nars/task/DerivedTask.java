@@ -174,12 +174,14 @@ abstract public class DerivedTask extends MutableTask {
                 @Nullable Premise premise = this.premise;
                 if (premise != null) {
 
-                    Concept c = nar.concept(premise.concept, score);
+                    float b = score;
+
+                    Concept c = nar.concept(premise.concept, b);
 
                     if (c != null) {
-                        c.termlinks().boost(premise.term, score);
+                        c.termlinks().boost(premise.term, b);
                         //c.tasklinks().boost(premise.task, score);
-                        ((Default)nar).core.concepts.boost(c.term(), score);
+                        ((Default)nar).core.concepts.boost(c.term(), b);
                     }
 
 

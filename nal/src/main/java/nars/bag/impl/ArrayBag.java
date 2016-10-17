@@ -328,7 +328,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 v.setBudget(bp * scale, b.dur(), b.qua());
                 if (update(v)) {
                     //success
-                    onActive(key);
+                    onActive(key, v);
                 } else {
                     //failure, undo: remove the key from the map
                     map.remove(key);
@@ -435,7 +435,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    protected void onActive(V key) {
+    protected void onActive(V key, BLink<V> v) {
 
     }
 

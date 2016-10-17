@@ -76,9 +76,7 @@ public class Default extends AbstractNAR {
                 initNAL7();
                 if (level >= 8) {
                     initNAL8();
-                    //                if (nal() >= 9) {
-                    //                    initNAL9();
-                    //                }
+
                 }
             }
         }
