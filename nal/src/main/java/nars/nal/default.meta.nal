@@ -47,10 +47,10 @@
 //                (A --> C)
 //If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
 
-    (A --> B), (B --> C), neqRec(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)
-    (A --> B), (A --> C), neqRec(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak)
-    (A --> C), (B --> C), neqRec(A,B) |- (A --> B), (Belief:Induction, Goal:Weak)
-    (A --> B), (B --> C), neqRec(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak)
+    (A --> B), (B --> C), neqCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)
+    (A --> B), (A --> C), neqCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak)
+    (A --> C), (B --> C), neqCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak)
+    (A --> B), (B --> C), neqCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak)
 
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
@@ -148,18 +148,18 @@
 //    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
 //    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
 //    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
-    (C --> {X,A..+}), {X,A..+}, neqCom(X,C) |- (C --> {X}), (Belief:StructuralDeduction)
-    (C --> [X,A..+]), [X,A..+], neqCom(X,C) |- (C --> [X]), (Belief:StructuralDeduction)
-    ({X,A..+} --> C), {X,A..+}, neqCom(X,C) |- ({X} --> C), (Belief:StructuralDeduction)
-    ([X,A..+] --> C), [X,A..+], neqCom(X,C) |- ([X] --> C), (Belief:StructuralDeduction)
+    (C --> {X,A..+}), {X,A..+}, neqCom(X,C) |- (C --> {X}), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (C --> [X,A..+]), [X,A..+], neqCom(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ({X,A..+} --> C), {X,A..+}, neqCom(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ([X,A..+] --> C), [X,A..+], neqCom(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 //NAL3 single premise inference
 
-    ((|,X,A..+) --> M), (|,X,A..+), neqCom(X,M) |- (X --> M), (Belief:StructuralDeduction)
-    (M --> (&,X,A..+)), (&,X,A..+), neqCom(X,M) |- (M --> X), (Belief:StructuralDeduction)
+    ((|,X,A..+) --> M), (|,X,A..+), neqCom(X,M) |- (X --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (M --> (&,X,A..+)), (&,X,A..+), neqCom(X,M) |- (M --> X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-    ((B ~ G) --> S), S, neqCom(S,B) |- (B --> S), (Belief:StructuralDeduction)
-    (R --> (B - S)), R, neqCom(S,B) |- (R --> B), (Belief:StructuralDeduction)
+    ((B ~ G) --> S), S, neqCom(S,B) |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (R --> (B - S)), R, neqCom(S,B) |- (R --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)

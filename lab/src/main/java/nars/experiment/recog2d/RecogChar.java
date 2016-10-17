@@ -53,7 +53,7 @@ public class RecogChar extends SwingAgent {
     }
 
     public RecogChar(NAR n) {
-        super(n, 32);
+        super(n, 4);
 
         w = 24;
         h = 24;

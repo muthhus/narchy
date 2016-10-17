@@ -16,8 +16,7 @@ import java.util.function.Predicate;
 
 import static nars.$.varDep;
 import static nars.$.varIndep;
-import static nars.Op.CONJ;
-import static nars.Op.Imdex;
+import static nars.Op.*;
 
 /**
  * 1-iteration DepVar and IndepVar introduction that emulates and expands the original NAL6 Variable Introduction Rules
@@ -78,12 +77,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         }
 
 
-        //boolean[] withinConj = new boolean[p.size()];
+
         ObjectByteHashMap<Term> conjCoverage = new ObjectByteHashMap<>(p.size());
-
-        ObjectByteHashMap<Term> statementCoverage = new ObjectByteHashMap<>(p.size() /* estimate */);
-        //boolean[] withinStatement = new boolean[p.size()];
-
+        ObjectByteHashMap<Term> indepEquivCoverage = new ObjectByteHashMap<>(p.size() /* estimate */);
         for (int occurrence = 0, pSize = p.size(); occurrence < pSize; occurrence++) {
             byte[] path = p.get(occurrence);
             Term t = null; //root
@@ -94,12 +90,10 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                 else
                     t = ((Compound) t).term(path[i]);
                 Op o = t.op();
-                if (o.statement) {
-                    //withinStatement[occurrence] = true;
+                if (validIndepVarSuperterm(o)) {
                     byte inside = (byte) (1 << path[i + 1]);
-                    statementCoverage.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
-                } else if (o == CONJ) {
-                    //withinConj[occurrence] = true;
+                    indepEquivCoverage.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
+                } else if (validDepVarSuperterm(o)) {
                     conjCoverage.addToValue(t, (byte) 1);
                 }
             }
@@ -107,8 +101,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
         int iteration = 0;
 
-        //at least one statement must have both sides covered
-        Term I = (statementCoverage.anySatisfy(b -> b == 0b11)) ?
+        //at least one impl/equiv must have both sides covered
+        Term I = (indepEquivCoverage.anySatisfy(b -> b == 0b11)) ?
                 varIndep("i" + iteration) : null;
 
         //at least one conjunction must contain >=2 path instances
@@ -125,6 +119,14 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             return null;
         }
 
+    }
+
+    private boolean validDepVarSuperterm(Op o) {
+        return o.statement || o == CONJ;
+    }
+
+    boolean validIndepVarSuperterm(Op o) {
+        return o == IMPL || o == EQUI;
     }
 
     public static class VarIntro extends TermTransformOperator {

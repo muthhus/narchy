@@ -34,3 +34,4 @@ gradlew.bat
 nal/tree.xml
 nal/vis.xml
 
+/web/src/main/resources/nbproject/private/

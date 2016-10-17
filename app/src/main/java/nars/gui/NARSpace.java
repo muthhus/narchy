@@ -52,7 +52,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n,  128, 32);
+        newConceptWindow(n,  32, 16);
 
         //n.run(20); //headstart
 
@@ -81,7 +81,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                );
 //                //.run(800);
 //
-        n.linkFeedbackRate.setValue(0f); //<-- feedback off, it was ON before
+        n.linkFeedbackRate.setValue(2f); //<-- feedback off, it was ON before
         n.loop(40f);
         //n.run(1);
 //        n.forEachConcept(c -> {

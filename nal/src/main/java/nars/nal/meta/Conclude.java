@@ -144,7 +144,8 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             if (content == null)
                 return;
 
-            truth = truth.negated();
+            if (truth!=null)
+                truth = truth.negated();
             o = content.op();
         }
 

@@ -23,7 +23,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static nars.Param.rankTemporalByConfidence;
-import static nars.Param.simultaneity;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 
@@ -66,7 +65,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             int toRemove = list.size() - newCapacity;
             for (int i = 0; i < toRemove && nullAttempts > 0; ) {
 
-                Task ww = weakest(now); //read-lock
+                Task ww = matchWeakest(now); //read-lock
                 if (ww!=null) {
                     remove(ww, removed);
                     i++;
@@ -193,15 +192,16 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 //    }
 
 
-    public Task weakest(long now) {
+    public Task matchWeakest(long now) {
         return list.minBy(x -> rankTemporalByConfidence(x, now));
     }
 
-    public Task weakest(long now, @NotNull Task toMergeWith) {
-        return list.minBy(rankPenalizingFreqAndTemporalDistance( toMergeWith, now ));
+    public Task matchMerge(long now, @NotNull Task toMergeWith) {
+        return list.maxBy(rankMatchMerge( toMergeWith, now ));
     }
 
-    @NotNull public Function<Task, Float> rankPenalizingFreqAndTemporalDistance(@NotNull Task y, long now) {
+    /** max value given to the ideal match for the provided task to be merged with */
+    @NotNull public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now) {
 
         //(when selecting by minimum rank:)
         //  more confidence and more freq delta increases rank which means less likely to select
@@ -210,9 +210,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         float duration = 2f;
 
         return x ->
-            y.conf() +
-            Math.abs(x.freq()-y.freq()) +
-            Math.abs(x.occurrence() - y.occurrence())/duration
+                (1 + Math.abs(x.freq()-y.freq())) *
+                (1f / (1f + Math.abs(x.occurrence() - y.occurrence())/duration))
        ;
 
     }
@@ -246,14 +245,14 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
         float inputRank = input != null ? rankTemporalByConfidence(input, now) : Float.POSITIVE_INFINITY;
 
-        Task a = weakest(now);
+        Task a = matchWeakest(now);
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
         if (a == null || inputRank <= rankTemporalByConfidence(a, now) || !remove(a, displ)) {
             //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
         }
 
-        Task b = weakest(now, a);
+        Task b = matchMerge(now, a);
         if (b != null && remove(b, displ)) {
             return merge(a, b, now, concept, eternal);
         } else {
@@ -294,7 +293,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         if (against == null) {
             return list.maxBy(x -> rankTemporalByConfidence(x, now));
         } else {
-            return list.maxBy(rankPenalizingOverlap(now, against));
+            return list.maxBy(x -> rankTemporalByConfidence(x, against.occurrence()));
+            //return list.maxBy(rankPenalizingOverlap(now, against));
         }
 
     }

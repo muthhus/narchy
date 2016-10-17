@@ -62,9 +62,9 @@ public class IRCAgent extends IRC {
 
         //SPEAK
         nar.onTask(t -> {
-//            if (t.pri() >= 0.5f) {
-//                send(channels, t.toString());
-//            }
+            if (t.pri() >= 0.6f) {
+                send(channels, t.toString());
+            }
         });
 
         nar.onExec(new IRCBotOperator("readWiki") {
@@ -371,8 +371,8 @@ public class IRCAgent extends IRC {
 
         IRC bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz",
-                "#netention"
+                "#123xyz"
+                //"#netention"
                 //"#nars"
         );
 
@@ -397,7 +397,7 @@ public class IRCAgent extends IRC {
 //    }
 
 
-    public int MAX_RESULT_LENGTH = 200;
+    public int MAX_RESULT_LENGTH = 800;
 
     @Nullable
     public String top(Compound arguments) {
