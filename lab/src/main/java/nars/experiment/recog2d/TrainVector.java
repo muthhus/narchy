@@ -84,7 +84,8 @@ public class TrainVector {
                             } else {
                                 return Float.NaN; //no prediction
                             }
-                        }).timing(0, 1) //synchronous feed
+                        })
+                            ///.timing(0, 1) //synchronous feed
 
         ).peek(c -> out.put(c, new Neuron())).toArray(SensorConcept[]::new);
 

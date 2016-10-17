@@ -1305,4 +1305,7 @@ public enum Util { ;
     }
 
 
+    public static double sqr(long l) {
+        return l*l;
+    }
 }

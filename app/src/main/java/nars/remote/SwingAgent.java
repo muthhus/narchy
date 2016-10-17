@@ -83,7 +83,7 @@ abstract public class SwingAgent extends NAgent {
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 8,
-                0.5f, 64);
+                0.1f, 64);
 
         SwingAgent a = init.apply(nar);
         a.trace = true;

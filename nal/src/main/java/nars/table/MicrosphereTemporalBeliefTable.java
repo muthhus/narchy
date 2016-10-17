@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
+import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.nal.Stamp;
 import nars.task.Revision;
 import nars.task.TruthPolation;
@@ -22,14 +23,14 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static nars.Param.rankTemporalByConfidence;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.util.Util.sqr;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
-public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
+public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, InterpolatingMicrosphere.LightCurve {
 
 
 
@@ -129,6 +130,22 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         return delta[0];
     }
 
+    public float rankTemporalByConfidence(@Nullable Task t, long now) {
+        float duration = duration();
+        return Param.rankTemporalByConfidence(t, duration, now);
+    }
+
+    public float duration() {
+        long[] range = new long[] { Long.MAX_VALUE, Long.MIN_VALUE };
+        forEach(u -> {
+            long o = u.occurrence();
+            if (range[0] > o)
+                range[0] = o;
+            if (range[1] < o)
+                range[1] = o;
+        });
+        return (float) Math.max(1, range[1] - range[0]);
+    }
 
     @Override
     public boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> displ) {
@@ -203,16 +220,25 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     /** max value given to the ideal match for the provided task to be merged with */
     @NotNull public Function<Task, Float> rankMatchMerge(@NotNull Task y, long now) {
 
-        //(when selecting by minimum rank:)
-        //  more confidence and more freq delta increases rank which means less likely to select
-        //  more simultaneity should be more likely to select
+        //prefer (when selecting by minimum rank:)
+        //  less freq delta
+        //  less confidence
+        //  less time delta
+        //  more time from now
 
-        float duration = 2f;
+        long yo = y.occurrence();
+        float duration = Math.abs(now - yo);
 
-        return x ->
-                (1 + Math.abs(x.freq()-y.freq())) *
-                (1f / (1f + Math.abs(x.occurrence() - y.occurrence())/duration))
-       ;
+        return x -> {
+
+            long xo = x.occurrence();
+
+            float d2 = duration/2f;
+            return (1 + (1 - Math.abs(x.freq() - y.freq())))
+                    * (1 + (1 - y.conf()))
+                    * (1 + (1 - (float)sqr(xo - yo) / d2))
+                    / (1 + (float)sqr(now - xo) / d2);
+        };
 
     }
 
@@ -222,7 +248,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         return x -> rankPenalizingOverlap(x, toMergeWithEvidence, occ, now);
     }
 
-    public static float rankPenalizingOverlap(@Nullable Task x, @NotNull LongSet evidence, long occ, long now) {
+    public float rankPenalizingOverlap(@Nullable Task x, @NotNull LongSet evidence, long occ, long now) {
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
         return (x == null) ? Float.NEGATIVE_INFINITY : (Stamp.overlapFraction(evidence, x.evidence()) * rankTemporalByConfidence(x, now));
     }
@@ -290,10 +316,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     @Override
     public final Task match(long when, long now, @Nullable Task against) {
 
+
+
         if (against == null) {
             return list.maxBy(x -> rankTemporalByConfidence(x, now));
         } else {
-            return list.maxBy(x -> rankTemporalByConfidence(x, against.occurrence()));
+            return list.maxBy(x -> rankTemporalByConfidence(x,  against.occurrence()));
             //return list.maxBy(rankPenalizingOverlap(now, against));
         }
 
@@ -332,12 +360,16 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                     return Revision.project(res, when, now, o, false);
 
             default:
-                return new TruthPolation(s).truth(when, now, tr);
+                return new TruthPolation(s).truth(when, tr, this);
 
         }
 
     }
 
+    @Override
+    public float get(float dt, float evidence) {
+        return TruthPolation.defaultLightCurve(dt, evidence, duration());
+    }
 
     private boolean clean(@NotNull List<Task> displ) {
         return list.removeIf(x -> {

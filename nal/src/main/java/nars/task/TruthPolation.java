@@ -43,21 +43,37 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     }
 
+    public static float defaultLightCurve(float dt, float evidence, float decayPeriod) {
+        if (dt <= 0.5f) {
+            return evidence;
+        } else {
+//            float eternalized =
+//                    //c2w(TruthFunctions.eternalize(w2c(evidence)));
+//                    evidence/8f;
+
+
+            float newEvidence = evidence * 1f / (1f + (dt*dt) / (decayPeriod/2f));
+            //System.out.println(dt + "," + evidence + "\t" + decayPeriod + ","+decayFactor + "\t --> " + newEvidence);
+            //return Math.max(eternalized, newEvidence);
+            return newEvidence;
+        }
+    }
+
 
     @Nullable
     public Truth truth(long when, Task... tasks) {
-        return truth(when, when, tasks);
+        return truth(when, tasks, Param.evidentialDecayThroughTime);
     }
 
     @Nullable
-    public Truth truth(long when, long now, @NotNull Collection<Task> tasks) {
-        return truth(when, now, tasks.toArray(new Task[tasks.size()]));
+    public Truth truth(long when, @NotNull Collection<Task> tasks) {
+        return truth(when, tasks.toArray(new Task[tasks.size()]), Param.evidentialDecayThroughTime);
     }
 
 
 
     @Nullable
-    public Truth truth(long when, long now, @NotNull Task[] tasks) {
+    public Truth truth(long when, @NotNull Task[] tasks, LightCurve lightCurve) {
 
         assert(tasks.length > 2);
 
@@ -97,7 +113,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
                 new float[] { when },
                 times,
                 freq, conf,
-                Param.evidentialDecayThroughTime,
+                lightCurve,
                 i);
         return $.t(v[0], w2c(v[1]));
     }

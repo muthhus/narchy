@@ -2,7 +2,7 @@
 
 
 // Variable Introduction
-    X, Y, component(task,belief), time(dtTask), task(any)       |- varIntro(X), (Belief:IdentityTransform, Goal:IdentityTransform)
+    //X, Y, component(task,belief), time(dtTask), task(any)       |- varIntro(X), (Belief:Identity, Goal:Identity)
 
 //The rules of NAL, can be interpreted by considering the intiution behind the following two relations:
 // Statement:                 (A --> B):               A can stand for B
@@ -265,28 +265,28 @@
 //These cases are handled by "Variable Introduction" and "Temporal Induction"
 
     //implications may be constructed with implications for preds but not subjs
-    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- (S ==> P), (Belief:Induction)
-        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- ((--,%S) ==> P), (Belief:InductionN)
-    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> S), (Belief:Abduction)
-        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- (P ==> (--,%S)), (Belief:AbductionN)
-    S, P, time(eternal), task(positive), task("."), neqRCom(P,S), notImplEqui(S), notImplEqui(P) |- (S <=> P), (Belief:Comparison)
-        S, P, time(eternal), task(negative), task("."), neqRCom(P,S), notImplEqui(S), notImplEqui(P) |- (--,(S <=> P)), (Belief:ComparisonN)
-    S, P, time(eternal), task(positive), task("."), neq(P,S) |- (S && P), (Belief:Intersection)
-        S, P, time(eternal), task(negative), task("."), neq(P,S) |- ((--,%S) && P), (Belief:IntersectionN)
+    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- varIntro((S ==> P)), (Belief:Induction)
+        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- varIntro(((--,%S) ==> P)), (Belief:InductionN)
+    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- varIntro((P ==> S)), (Belief:Abduction)
+        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- varIntro((P ==> (--,%S))), (Belief:AbductionN)
+    S, P, time(eternal), task(positive), task("."), neqRCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((S <=> P)), (Belief:Comparison)
+        S, P, time(eternal), task(negative), task("."), neqRCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((--,(S <=> P))), (Belief:ComparisonN)
+    S, P, time(eternal), task("."), neq(P,S) |- varIntro((S && P)), (Belief:Intersection)
+        //S, P, time(eternal), task(negative), task("."), neq(P,S) |- varIntro(((--,%S) && P)), (Belief:IntersectionN)
     //%S, %P, time(eternal), neqCom(P,S) |- (%S || %P), (Belief:Union)
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
     //implications may be constructed with implications for preds but not subjs
-    A, B, task(positive), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- (A ==>+- B), (Belief:Induction)
-        A, B, task(negative), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
+    A, B, task(positive), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- varIntro((A ==>+- B)), (Belief:Induction)
+        A, B, task(negative), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notEqui(B) |- varIntro(((--,%A) ==>+- B)), (Belief:InductionN)
 
-    A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
-        A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- (B ==>+- (--,%A)), (Belief:AbductionN)
+    A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
+        A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- varIntro((B ==>+- (--,%A))), (Belief:AbductionN)
 
-    A, B, task(positive), task("."), time(dtAfter), neqRCom(A,B), notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
-        A, B, task(negative), task("."), time(dtAfter), neqRCom(A,B), notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
+    A, B, task(positive), task("."), time(dtAfter), neqRCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
+        A, B, task(negative), task("."), time(dtAfter), neqRCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((--,(A <=>+- B))), (Belief:ComparisonN)
 
     A, B, task("."), time(dtAfter), neq(A,B) |- (A &&+- B), (Belief:Intersection)
         ///A, B, task(negative), task("."), time(dtAfter), neq(A,B) |- ((--,%A) &&+- B), (Belief:IntersectionN)

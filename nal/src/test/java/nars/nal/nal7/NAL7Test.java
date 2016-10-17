@@ -20,7 +20,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 500;
+    final int cycles = 2000;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -40,15 +40,15 @@ public class NAL7Test extends AbstractNALTest {
         //    P, S, after(Task,Belief), notConjunction(P), notConjunction(S),  measure_time(I), notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |-
         //              (&/,S,I,P), (Belief:Intersection)
 
-        long time = 200;
+
         test()
                 
                 .input("x:before. :|:")
                 .inputAt(10, "x:after. :|:")
-                .mustBelieve(time, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/,    0)
-                .mustBelieve(time, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/,    0)
-                .mustBelieve(time, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/,   0)
-                .mustBelieve(time, "(x:after &&-10 x:before)",  1.00f, 0.81f /*intersectionConf*/, 0)
+                .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/,    0)
+                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/,    0)
+                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/,   0)
+                .mustBelieve(cycles, "(x:after &&-10 x:before)",  1.00f, 0.81f /*intersectionConf*/, 0)
         ;
     }
 
@@ -497,6 +497,7 @@ public class NAL7Test extends AbstractNALTest {
     public void variable_introduction_on_events() {
         TestNAR tester = test();
 
+        tester.log();
         tester.input("<{t003} --> (/,at,SELF,_)>. :|:");
         tester.inputAt(10, "<{t003} --> (/,on,{t002},_)>. :|:");
 

@@ -97,8 +97,10 @@ public final class Premise extends RawBudget implements Tasked {
         if (term == null)
             return null;
 
-        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
+        if (Terms.equalAtemporally(task.term(), term))
             return null;
+//        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
+//            return null;
 
         Budget taskBudget = task.budget().clone();
         if (taskBudget == null)

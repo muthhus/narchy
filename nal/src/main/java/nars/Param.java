@@ -4,6 +4,7 @@ import nars.budget.BudgetFunctions;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.nal.Level;
 import nars.task.MutableTask;
+import nars.task.TruthPolation;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -56,24 +57,10 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int ACTIVATION_TASKLINK_DEPTH = 1;
 
 
-    public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
-
-        if (dt <= 0.5f) {
-            return evidence;
-        } else {
-//            float eternalized =
-//                    //c2w(TruthFunctions.eternalize(w2c(evidence)));
-//                    evidence/8f;
 
 
-            float decayPeriod = 1f;
-            float decayFactor = 1f / (1f + dt / decayPeriod);
-            float newEvidence = evidence * decayFactor;
-            //System.out.println(dt + "," + evidence + "\t" + decayPeriod + ","+decayFactor + "\t --> " + newEvidence);
-            //return Math.max(eternalized, newEvidence);
-            return newEvidence;
-        }
-
+    @Deprecated public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
+        return TruthPolation.defaultLightCurve(dt, evidence, 1f);
     };
 
 
@@ -593,7 +580,8 @@ public abstract class Param /*extends Container*/ implements Level {
      * @param t
      * @return
      */
-    public static float rankTemporalByConfidence(@Nullable Task t, long now) {
+    public static float rankTemporalByConfidence(@Nullable Task t, float duration, long now) {
+
         if (t == null || t.isDeleted())
             return Float.NEGATIVE_INFINITY;
 
@@ -602,13 +590,13 @@ public abstract class Param /*extends Container*/ implements Level {
         //long dtCre = Math.abs(tOcc - t.creation());
         long dtOcc = Math.abs(tOcc - now);
 
-        float pastAndPresentDuration = 1f;
-        float futureDuration = 1f;
+//        float pastAndPresentDuration = 1f;
+//        float futureDuration = 1f;
 
         float rank = t.conf() *
                 simultaneity(
                         dtOcc,
-                        tOcc <= now ? pastAndPresentDuration : futureDuration);
+                        duration);
                 //+ temporalIrrelevance(dWhenNow, 1f)
          // + temporalIrrelevance(dtCre, 1f));
         //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);

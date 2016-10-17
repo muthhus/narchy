@@ -120,7 +120,7 @@ public class Terms   {
                         return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
 
                     default:
-                        if (a.equals(b))
+                        if (Terms.equalAtemporally(a, b))
                             return false;
                         break;
                 }

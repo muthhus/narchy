@@ -1260,9 +1260,10 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
      * installs a concept in the index and activates it, used for setup of custom concept implementations
      * implementations should apply active concept capacity policy
      */
-    public final void on(@NotNull Concept c) {
+    public final Concept on(@NotNull Concept c) {
         concepts.set(c);
         //on.add(c);
+        return c;
     }
 
     /**

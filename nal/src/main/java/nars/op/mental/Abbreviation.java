@@ -18,6 +18,7 @@ import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.Unify;
@@ -62,6 +63,8 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
      */
     public final MutableFloat abbreviationProbability = new MutableFloat(2f);
 
+    /** whether to use a (strong, proxying) alias atom concept */
+    boolean aliasConcept = false;
 
     static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 
@@ -183,14 +186,14 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
         Term[] aa;
         if (abbreviation != null) {
 
-            AliasConcept alias = new AliasConcept(id, abbreviated, nar, abbreviation);
-
             @Nullable Concept a = nar.concept(abbreviated);
             if (a!=null) {
 
-                if (a.putIfAbsent(Abbreviation.class, alias) == null) {
+                if (a.putIfAbsent(Abbreviation.class, id) == null) {
 
-                    nar.on(alias);
+                    Concept alias = aliasConcept ? nar.on(new AliasConcept(id, abbreviated, nar, abbreviation)) : null;
+
+                    Termed aliasTerm = alias!=null ? alias : $.the(id);
 
                     //if (abbreviation != null) {
 
@@ -198,7 +201,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
                     Compound abbreviatedTerm = abbreviated.term();
 
                     Task abbreviationTask = new AbbreviationTask(
-                            abbreviation, abbreviatedTerm, alias, abbreviationConfidence.floatValue())
+                            abbreviation, abbreviatedTerm, aliasTerm, abbreviationConfidence.floatValue())
                             .time(nar.time(), ETERNAL)
                             .log("Abbreviate")
                             .budgetSafe(b);
@@ -391,12 +394,12 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
         @NotNull
         private final Compound abbreviated;
         @NotNull
-        private final AliasConcept alias;
+        private final Term alias;
 
-        public AbbreviationTask(Compound abbreviation, @NotNull Compound abbreviated, AliasConcept alias, float conf) {
+        public AbbreviationTask(Compound abbreviation, @NotNull Compound abbreviated, Termed alias, float conf) {
             super(abbreviation, Symbols.BELIEF, $.t(1, conf));
             this.abbreviated = abbreviated;
-            this.alias = alias;
+            this.alias = alias.term();
         }
 
         @Override

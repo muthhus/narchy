@@ -143,12 +143,12 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
                 Task prevStart = this.current;
 
                 Task prevEnd = null;
-                if (prevStart!=null && t.occurrence() - prevStart.occurrence() > latchResolution) {
-                    //input a cloned version of the previous task as an intermediate task, squarewave approximation
-                    prevEnd = newInputTask(prevStart.truth(), now, now-1);
-                } else {
-                    prevEnd = null; //dont generate an intermediate task
-                }
+//                if (prevStart!=null && t.occurrence() - prevStart.occurrence() > latchResolution) {
+//                    //input a cloned version of the previous task as an intermediate task, squarewave approximation
+//                    prevEnd = newInputTask(prevStart.truth(), now, now-1);
+//                } else {
+//                    prevEnd = null; //dont generate an intermediate task
+//                }
 
 
                 input(prevStart, prevEnd, this.current = t);

@@ -129,7 +129,7 @@ public class RevectionTest {
 
         System.out.println("TRUTHPOLATION");
         for (long d = start; d < end; d++) {
-            Truth a1 = p.truth(d, d, l);
+            Truth a1 = p.truth(d, l);
             System.out.println(d + ": " + a1);
         }
     }

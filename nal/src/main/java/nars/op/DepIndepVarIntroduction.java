@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Random;
 import java.util.function.Predicate;
 
 import static nars.$.varDep;
@@ -49,7 +50,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         return t;
     }
 
-    final static int ConjOrStatementBits = Op.StatementBits | Op.CONJ.bit;
+    final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit;
     final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
     static final Predicate<Term> condition = subterm -> !subterm.isAny(DepOrIndepBits);
 
@@ -122,7 +123,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
     }
 
     private boolean validDepVarSuperterm(Op o) {
-        return o.statement || o == CONJ;
+        return /*o.statement ||*/ o == CONJ;
     }
 
     boolean validIndepVarSuperterm(Op o) {
@@ -132,21 +133,29 @@ public class DepIndepVarIntroduction extends VarIntroduction {
     public static class VarIntro extends TermTransformOperator {
 
         final DepIndepVarIntroduction introducer;
+        private final Random random;
 
         public VarIntro(NAR nar) {
             super("varIntro");
             this.introducer = new DepIndepVarIntroduction(nar);
+            this.random = nar.random;
+        }
+
+        protected boolean introduce(Term x) {
+            return x instanceof Compound &&
+                   random.nextFloat() < (1f / (2 + Math.sqrt(x.volume())));
         }
 
         @Override
         public @NotNull Term function(@NotNull Compound args) {
+
             Term x = args.term(0);
-            if (x instanceof Compound) {
-                Term[] only = new Term[] { False };
+            if (introduce(x)) {
+                Term[] only = new Term[] { x };
                 introducer.accept((Compound)x, y -> only[0] = y);
                 return only[0];
             }
-            return False;
+            return x;
         }
     }
 }
