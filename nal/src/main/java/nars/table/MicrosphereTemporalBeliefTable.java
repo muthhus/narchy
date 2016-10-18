@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static java.lang.Long.MAX_VALUE;
+import static java.lang.Long.MIN_VALUE;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.util.Util.sqr;
@@ -54,13 +56,13 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
         list.forEach(action);
     }
 
-    public void capacity(int newCapacity, long now, @NotNull List<Task> removed) {
+    public void capacity(int newCapacity, long now, @NotNull List<Task> trash) {
 
         if (this.capacity != newCapacity) {
 
             this.capacity = newCapacity;
 
-            clean(removed);
+            clean(trash);
 
             int nullAttempts = 4; //
             int toRemove = list.size() - newCapacity;
@@ -68,7 +70,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
 
                 Task ww = matchWeakest(now); //read-lock
                 if (ww!=null) {
-                    remove(ww, removed);
+                    remove(ww, trash);
                     i++;
                 } else {
                     nullAttempts--;
@@ -97,7 +99,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
 
     @Nullable
     @Override
-    public final TruthDelta add(@NotNull Task input, EternalTable eternal, @NotNull List<Task> displ, Concept concept, @NotNull NAR nar) {
+    public final TruthDelta add(@NotNull Task input, EternalTable eternal, @NotNull List<Task> trash, Concept concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0)
@@ -114,12 +116,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
             before = truth(now, eternal);
 
             Task next;
-            if ((next = compress(input, now, eternal, displ, concept)) != null) {
+            if ((next = compress(input, now, eternal, trash, concept)) != null) {
 
-                list.add(input);
+                add(input);
 
                 if (next != input && list.size() + 1 <= cap) {
-                    list.add(next);
+                    add(next);
                 }
 
                 final Truth after = truth(now, eternal);
@@ -127,7 +129,20 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
             }
         });
 
-        return delta[0];
+        TruthDelta x = delta[0];
+        return x;
+    }
+
+    private void add(Task x) {
+        if (list.add(x)) {
+            long o = x.occurrence();
+            if (minT!=MAX_VALUE) {
+                if (o < minT) minT = o;
+            }
+            if (maxT!=Long.MIN_VALUE) {
+                if (o > maxT) maxT = o;
+            }
+        }
     }
 
     public float rankTemporalByConfidence(@Nullable Task t, long now) {
@@ -135,26 +150,58 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
         return Param.rankTemporalByConfidence(t, duration, now);
     }
 
+    /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
+    private volatile long minT = MAX_VALUE, maxT = Long.MIN_VALUE;
+
     public float duration() {
-        long[] range = new long[] { Long.MAX_VALUE, Long.MIN_VALUE };
-        forEach(u -> {
-            long o = u.occurrence();
-            if (range[0] > o)
-                range[0] = o;
-            if (range[1] < o)
-                range[1] = o;
-        });
-        return (float) Math.max(1, range[1] - range[0]);
+
+        if (minT==MAX_VALUE || maxT==MIN_VALUE) {
+            //cached valus invalidated, re-compute
+            forEach(u -> {
+                long o = u.occurrence();
+                if (minT > o)
+                    minT = o;
+                if (maxT < o)
+                    maxT = o;
+            });
+        } else {
+            //using cached value
+        }
+
+        if (minT==MAX_VALUE || maxT==MIN_VALUE) {
+            return 1; //empty probably} else {
+        } else {
+            
+            return (float) Math.max(1, maxT - minT);
+        }
     }
 
     @Override
-    public boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> displ) {
+    public boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> trash) {
         return list.removeIf(((Predicate<Task>) t -> {
             if (o.test(t)) {
-                displ.add(t);
+                onRemoved( t, trash );
             }
             return false;
         }));
+    }
+
+
+    private void onRemoved(Task t, List<Task> trash) {
+        if (minT != MAX_VALUE) {
+            long o = t.occurrence();
+            if ((minT == o) || (maxT == o)) {
+                invalidateDuration();
+            }
+        }
+
+        trash.add(t);
+    }
+
+    private void invalidateDuration() {
+        //invalidate
+        minT = MAX_VALUE;
+        maxT = Long.MIN_VALUE;
     }
 
 
@@ -190,9 +237,9 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
         return list.remove(object);
     }
 
-    private final boolean remove(@NotNull Task x, @NotNull List<Task> displ) {
+    private final boolean remove(@NotNull Task x, @NotNull List<Task> trash) {
         if (list.remove(x)) {
-            displ.add(x);
+            onRemoved(x, trash);
             return true;
         }
         return false;
@@ -259,11 +306,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
     @Nullable
-    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull List<Task> displ, @Nullable Concept concept) {
+    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, @NotNull List<Task> trash, @Nullable Concept concept) {
 
         int cap = capacity();
 
-        if (size() < cap || clean(displ)) {
+        if (size() < cap || clean(trash)) {
             return input; //no need for compression
         }
 
@@ -273,13 +320,13 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
 
         Task a = matchWeakest(now);
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank <= rankTemporalByConfidence(a, now) || !remove(a, displ)) {
+        if (a == null || inputRank <= rankTemporalByConfidence(a, now) || !remove(a, trash)) {
             //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
         }
 
         Task b = matchMerge(now, a);
-        if (b != null && remove(b, displ)) {
+        if (b != null && remove(b, trash)) {
             return merge(a, b, now, concept, eternal);
         } else {
             return input;
@@ -371,12 +418,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
         return TruthPolation.defaultLightCurve(dt, evidence, duration());
     }
 
-    private boolean clean(@NotNull List<Task> displ) {
+    private boolean clean(@NotNull List<Task> trash) {
         return list.removeIf(x -> {
             if (x == null) {
                 return true;
             } else if (x.isDeleted()) {
-                displ.add(x);
+                onRemoved(x, trash);
                 return true;
             } else {
                 return false;

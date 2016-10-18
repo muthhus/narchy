@@ -25,7 +25,7 @@ public class TopCraft extends SwingAgent {
     }
 
     public TopCraft(NAR nar) {
-        super(nar, 1);
+        super(nar, 4);
 
         this.craft = new TopDownMinicraft();
 

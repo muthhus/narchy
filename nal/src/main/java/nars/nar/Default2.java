@@ -25,6 +25,8 @@ import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -37,11 +39,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
 /**
- * Experiments
+ * ALANN Hybrid - experimental
  */
 public class Default2 extends NAR {
 
-    //private static final Logger logger = LoggerFactory.getLogger(Default.class);
+    private static final Logger logger = LoggerFactory.getLogger(Default2.class);
 
     public final HijackBag<Concept> active;
     private final List<PremiseGraphBuilder> cores;
@@ -52,9 +54,10 @@ public class Default2 extends NAR {
 
         Concept at = null;
         //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
-        Bag<Term>    termlinks = new HijackBag<>(64, 2, BudgetMerge.plusBlend, random);
-        Bag<Task>    tasklinks = new HijackBag<>(64, 2, BudgetMerge.plusBlend, random);
-        private float atPri = 0;
+        Bag<Term>    termlinks = new HijackBag<>(24, 2, BudgetMerge.plusBlend, random);
+        Bag<Task>    tasklinks = new HijackBag<>(16, 2, BudgetMerge.plusBlend, random);
+        float atPri = 0;
+        int iterations = 1;
 
         public PremiseGraphBuilder() {
         }
@@ -68,7 +71,6 @@ public class Default2 extends NAR {
 
         @Override
         public void run() {
-            int iterations = 16;
             for (int i = 0; i < iterations; i++) {
                 iterate();
             }
@@ -84,7 +86,7 @@ public class Default2 extends NAR {
 
             if (at == null) {
 
-                seed(8);
+                seed(1); //the more seeded from 'active', the less localized this worker's interactions
 
                 BLink<Term> next = termlinks.commit().sample();
                 if (next != null) {
@@ -93,22 +95,24 @@ public class Default2 extends NAR {
                     Concept d = Default2.this.concept(next.get());
                     if (d != null) {
 
-                        atPri = next.pri(); //what about including the 'active.pri' measure
 
-                        d.termlinks().commit().sample(8, t -> {
+                        d.termlinks().commit().sample(4, t -> {
                             termlinks.putLink(t);
                             return true;
                         });
                         ;
-                        d.tasklinks().commit().sample(8, t -> {
+                        d.tasklinks().commit().sample(4, t -> {
                             tasklinks.putLink(t);
                             return true;
                         });
 
                         this.at = d;
+                        this.atPri = next.pri(); //what about including the 'active.pri' measure
                     }
                 }
-            } else {
+            }
+
+            if (at != null) {
 
                 PremiseMatrixBuilder.run(at, Default2.this,
                         4, 4,
@@ -139,7 +143,7 @@ public class Default2 extends NAR {
         super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 8192, 4),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
-        active = new HijackBag<>(1024, 4, random);
+        active = new HijackBag<>(2048, 4, random);
 
         durMin.setValue(BUDGET_EPSILON * 2f);
 
@@ -158,12 +162,12 @@ public class Default2 extends NAR {
 
         }
 
-        int numCores = 4;
+        int numCores = 16;
         this.cores = range(0, numCores ).mapToObj(i -> new PremiseGraphBuilder()).collect(toList());
 
         onFrame(()-> {
             active.commit();
-            cores.forEach(this::runLater);
+            runLater(cores, PremiseGraphBuilder::run, 1);
         });
     }
 

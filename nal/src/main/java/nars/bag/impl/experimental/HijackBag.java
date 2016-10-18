@@ -42,12 +42,6 @@ public class HijackBag<X> implements Bag<X> {
     int count;
 
 
-    /**
-     * the fraction of capacity which must contain entries to exceed in order to apply forgetting.
-     * this is somewhat analogous to hashmap load factor
-     */
-    private static final float FORGET_CAPACITY_THRESHOLD = 1f;
-
 
     public HijackBag(int capacity, int reprobes, Random random) {
         this(capacity, reprobes, BudgetMerge.plusBlend, random);
@@ -479,7 +473,7 @@ public class HijackBag<X> implements Bag<X> {
         float existingMass = mass[0];
 
         Forget f;
-        if (existingMass > 0 && pressure > 0 && (count[0] >= cap * FORGET_CAPACITY_THRESHOLD)) {
+        if (existingMass > 0 && pressure > 0 && (count[0] >= cap * Param.BAG_THRESHOLD)) {
             float p = this.pressure;
             this.pressure = 0;
 

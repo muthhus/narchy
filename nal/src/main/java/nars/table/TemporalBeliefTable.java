@@ -22,13 +22,13 @@ public interface TemporalBeliefTable extends TaskTable {
     @Nullable Truth truth(long when, long now, EternalTable eternal);
 
     /** return null if wasnt added */
-    @Nullable TruthDelta add(@NotNull Task input, EternalTable eternal, List<Task> displ, Concept concept, @NotNull NAR nar);
+    @Nullable TruthDelta add(@NotNull Task input, EternalTable eternal, List<Task> trash, Concept concept, @NotNull NAR nar);
 
-    boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> displ);
+    boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> trash);
 
 
 
-    void capacity(int c, long now, List<Task> removed);
+    void capacity(int c, long now, List<Task> trash);
 
     boolean isFull();
 
