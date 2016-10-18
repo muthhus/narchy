@@ -9,6 +9,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
+import nars.nar.Default2;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -45,6 +46,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
     public static void main(String[] args) {
 
         Default n = new Default(256, 3, 2, 3 );
+        //Default2 n = new Default2();
         //n.nal(4);
 
 
@@ -88,14 +90,17 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     }
 
-    public static GLWindow newConceptWindow(Default nn, int maxNodes, int maxEdges) {
+    public static GLWindow newConceptWindow(NAR nn, int maxNodes, int maxEdges) {
 
         Bag<Pair<ConceptWidget,Term>> edges =
                 //new CurveBag(BudgetMerge.plusBlend, nn.random);
             new HijackBag(maxEdges*maxNodes, 4, BudgetMerge.plusBlend, nn.random);
 
         NARSpace<Term, Spatial<Term>> n = new NARSpace<>(nn, (nar, space, target) -> {
-            Bag<Concept> x = ((Default) nar).core.concepts;
+            Bag<Concept> x =
+                    nar instanceof Default ?
+                            ((Default) nar).core.concepts :
+                            ((Default2)nar).active;
 
             //System.out.println(((Default) nar).core.concepts.size() + " "+ ((Default) nar).index.size());
 

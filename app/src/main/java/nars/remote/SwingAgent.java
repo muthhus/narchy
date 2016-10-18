@@ -8,6 +8,7 @@ import nars.NAgent;
 import nars.gui.Vis;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
+import nars.nar.Default2;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
@@ -46,37 +47,10 @@ abstract public class SwingAgent extends NAgent {
     }
 
     public static void run(Function<NAR, SwingAgent> init, int frames) {
-        Random rng = new XorShift128PlusRandom(4);
-
-        final Executioner exe =
-            //new SingleThreadExecutioner();
-            new MultiThreadExecutioner(3, 1024*8);
-
-        int volMax = 40;
-        int conceptsPerCycle = 64;
-
-        //Multi nar = new Multi(3,512,
-        Default nar = new Default(1024,
-                conceptsPerCycle, 2, 3, rng,
-                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64*1024, 3)
-
-                , new FrameClock(), exe);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
-
-        float p = 0.1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.7f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.8f * p;
-
-        nar.confMin.setValue(0.02f);
-        nar.compoundVolumeMax.setValue(volMax);
-
-        nar.linkFeedbackRate.setValue(0.05f);
+        //Default nar = newNAR(rng, exe, volMax, conceptsPerCycle);
+        Default2 nar = newNAR2();
 
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
@@ -111,8 +85,49 @@ abstract public class SwingAgent extends NAgent {
         //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
     }
 
+    private static Default2 newNAR2() {
+        Default2 d = new Default2();
+        d.compoundVolumeMax.setValue(30);
+        return d;
+    }
+
+    public static Default newNAR() {
+        Random rng = new XorShift128PlusRandom(4);
+        final Executioner exe =
+                //new SingleThreadExecutioner();
+                new MultiThreadExecutioner(3, 1024*8);
+
+        int volMax = 40;
+        int conceptsPerCycle = 64;
+
+
+        //Multi nar = new Multi(3,512,
+        Default nar = new Default(1024,
+                conceptsPerCycle, 2, 3, rng,
+                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64*1024, 3)
+
+                , new FrameClock(), exe);
+
+
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
+
+        float p = 0.1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.7f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.8f * p;
+
+        nar.confMin.setValue(0.02f);
+        nar.compoundVolumeMax.setValue(volMax);
+
+        nar.linkFeedbackRate.setValue(0.05f);
+        return nar;
+    }
+
     public static void chart(SwingAgent a, int history) {
-        Default nar = (Default)a.nar;
+        NAR nar = a.nar;
         window(
                 grid(
                         grid(a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new)),
@@ -121,7 +136,7 @@ abstract public class SwingAgent extends NAgent {
 
                         Vis.agentActions(a, 200),
 
-                        Vis.budgetHistogram(nar, 32),
+                        //Vis.budgetHistogram(nar, 32),
                         Vis.conceptLinePlot(nar,
                                 Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                                 2000)

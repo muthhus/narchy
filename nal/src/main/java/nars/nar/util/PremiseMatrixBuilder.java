@@ -116,10 +116,10 @@ public class PremiseMatrixBuilder  {
 
         } catch (RuntimeException e) {
 
-            if (Param.DEBUG)
-                e.printStackTrace();
+//            //if (Param.DEBUG)
+//                e.printStackTrace();
 
-            logger.error("run {}", e.toString());
+            logger.error("run {}", e);
         }
 
         return count;

@@ -43,7 +43,7 @@ public class Default2 extends NAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    final HijackBag<Concept> active;
+    public final HijackBag<Concept> active;
     private final List<PremiseGraphBuilder> cores;
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
@@ -52,8 +52,9 @@ public class Default2 extends NAR {
 
         Concept at = null;
         //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
-        Bag<Term>    termlinks = new HijackBag<>(64, 4, BudgetMerge.avgBlend, random);
-        Bag<Task>    tasklinks = new HijackBag<>(64, 4, BudgetMerge.avgBlend, random);
+        Bag<Term>    termlinks = new HijackBag<>(64, 2, BudgetMerge.plusBlend, random);
+        Bag<Task>    tasklinks = new HijackBag<>(64, 2, BudgetMerge.plusBlend, random);
+        private float atPri = 0;
 
         public PremiseGraphBuilder() {
         }
@@ -67,12 +68,16 @@ public class Default2 extends NAR {
 
         @Override
         public void run() {
+            int iterations = 16;
+            for (int i = 0; i < iterations; i++) {
+                iterate();
+            }
+        }
 
+        void iterate() {
             if (at!=null) {
                 //decide whether to remain here
-                float x = //at.pri() * at.dur() * at.qua();
-                        active.get(at).priIfFiniteElseZero();
-                if (random.nextFloat() > x) {
+                if (random.nextFloat() > atPri) {
                     at = null;
                 }
             }
@@ -88,13 +93,14 @@ public class Default2 extends NAR {
                     Concept d = Default2.this.concept(next.get());
                     if (d != null) {
 
+                        atPri = next.pri(); //what about including the 'active.pri' measure
 
-                        d.termlinks().commit().sample(4, t -> {
+                        d.termlinks().commit().sample(8, t -> {
                             termlinks.putLink(t);
                             return true;
                         });
                         ;
-                        d.tasklinks().commit().sample(4, t -> {
+                        d.tasklinks().commit().sample(8, t -> {
                             tasklinks.putLink(t);
                             return true;
                         });
@@ -105,7 +111,7 @@ public class Default2 extends NAR {
             } else {
 
                 PremiseMatrixBuilder.run(at, Default2.this,
-                        2, 2,
+                        4, 4,
                         Default2.this::input, //input them within the current thread here
                         deriver,
                         tasklinks, termlinks
@@ -178,7 +184,11 @@ public class Default2 extends NAR {
 
     @Override
     public final Concept concept(Term term, float boost) {
-        return active.boost(term, boost);
+        Concept c = concept(term);
+        if (c!=null) {
+            return active.boost(c, boost);
+        }
+        return null;
     }
 
     @Override
