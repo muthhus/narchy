@@ -319,7 +319,7 @@ public class STMClustered extends STM {
 
 
             @Override
-            public void onRemoved(Task key, BLink<Task> value) {
+            public void onRemoved(BLink<Task> value) {
                 if (value!=null)
                     drop((TLink)value);
             }

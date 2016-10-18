@@ -5,8 +5,10 @@ import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.Forget;
 import nars.budget.merge.BudgetMerge;
+import nars.concept.Concept;
 import nars.link.ArrayBLink;
 import nars.link.BLink;
+import nars.link.DefaultBLink;
 import nars.util.data.map.nbhm.HijacKache;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -148,6 +150,7 @@ public class HijackBag<X> implements Bag<X> {
                     if (p!=p) /* deleted, take it */ {
                         if (CAS_key(kvs, idx, K, key)) {
                             hashes[idx] = fullhash;
+                            //onRemoved(null);
                             break;
                         }
                     } else {
@@ -180,8 +183,12 @@ public class HijackBag<X> implements Bag<X> {
                         hashes[idx] = fullhash; // Memoize fullhash
 
                         Object V = val(kvs, idx);
-                        float[] f = (float[])V;
-                        f[0] = Float.NaN;
+                        if (V!=null) {
+                            float[] f = (float[]) V;
+                            //onRemoved(new DefaultBLink((X)K, f[0], f[1], f[2]));
+                            f[0] = Float.NaN;
+                        }
+
                     }
                 } else {
                     idx = -1;
@@ -201,7 +208,7 @@ public class HijackBag<X> implements Bag<X> {
             boolean newPriThresh = newPri > Param.BUDGET_EPSILON;
             boolean oldPriThresh = oldPri > Param.BUDGET_EPSILON;
             if (newPriThresh && oldPriThresh) {
-                return (map.rng.nextFloat() > (newPri / (newPri + oldPri)));
+                return (map.rng.nextFloat() > (oldPri / (newPri + oldPri)));
             } else return newPriThresh;
         }
     }
@@ -218,24 +225,27 @@ public class HijackBag<X> implements Bag<X> {
         if (f == null) {
             //rejected insert
             pressure += range(nP);
+            //onRemoved(null);
         } else {
 
             float pBefore = f[0];
             if (pBefore == pBefore) {
                 //existing to merge with
-                float overflow = merge.merge(new ArrayBLink(x, f), b, scale);
+                ArrayBLink y = new ArrayBLink(x, f);
+                float overflow = merge.merge(y, b, scale);
                 if (overflowing != null)
                     overflowing.add(overflow);
 
                 pressure += range(f[0]) - pBefore;
             } else {
-                //hijacked an empty entry
+                //overwite an empty or deleted entry
                 f[0] = range(nP);
                 f[1] = b.dur();
                 f[2] = b.qua();
                 pressure += range(nP);
             }
 
+            //onAdded(y);
         }
 
     }
@@ -509,4 +519,6 @@ public class HijackBag<X> implements Bag<X> {
         }
         return null;
     }
+
+
 }

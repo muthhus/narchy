@@ -33,7 +33,7 @@ public class TopCraft extends SwingAgent {
         //pixels = addFreqCamera("see", ()->craft.image, 64,64, (v) -> $.t( v, alpha));
 
         int nx = 8;
-        camAE = new PixelAutoClassifier("seeAE", pixels.src.pixels, nx, nx,   (subX, subY) -> {
+        camAE = new PixelAutoClassifier("see", pixels.src.pixels, nx, nx,   (subX, subY) -> {
             //context metadata: camera zoom, to give a sense of scale
             //return new float[]{subX / ((float) (nx - 1)), subY / ((float) (nx - 1)), pixels.src.Z};
             return new float[]{ pixels.src.Z};

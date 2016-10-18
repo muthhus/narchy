@@ -66,8 +66,9 @@ public class FrameClock implements Clock {
     }
 
     public final void validate(@NotNull long[] s) {
-        //assume that the evidence is sorted, and that the max value is in the last position
-        validate(s[s.length-1]);
+        //assume that the evidence is sorted, and that the max value is in the last position in addition to 1 or more preceding values
+        if (s.length > 1)
+            validate(s[s.length-1]);
     }
 
 }

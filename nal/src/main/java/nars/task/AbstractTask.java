@@ -183,7 +183,9 @@ public abstract class AbstractTask extends RawBudget implements Task, Temporal {
 
         }
 
-        Task.taskContentValid(t, punc, nar, false);
+        if (!Task.taskContentValid(t, punc, nar, !Param.DEBUG)) {
+            return;
+        }
 
         Compound ntt = nar.normalize(t);
         if (ntt == null)

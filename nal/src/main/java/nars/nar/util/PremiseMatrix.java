@@ -22,9 +22,9 @@ import java.util.function.Consumer;
 /**
  * derives matrix of: concept => (tasklink x termlink) => premises
  */
-public class PremiseMatrixBuilder  {
+public class PremiseMatrix {
 
-    private static final Logger logger = LoggerFactory.getLogger(PremiseMatrixBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(PremiseMatrix.class);
 
 
     public static int run(@NotNull Concept c,

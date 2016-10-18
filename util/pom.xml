@@ -62,7 +62,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.4</version>
+      <version>3.5</version>
       <scope>compile</scope>
     </dependency>
 
@@ -112,7 +112,7 @@
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
-      <version>1.4.32</version>
+      <version>1.4.33</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

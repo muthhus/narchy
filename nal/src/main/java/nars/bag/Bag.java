@@ -206,12 +206,19 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     /**
      * @return null if this is an event which was rejected on input, non-null if it was a re
      */
-    default void onRemoved(@NotNull V key, @Nullable BLink<V> value) {
+    default void onRemoved(@Nullable BLink<V> value) {
 
     }
 
-    default void onAdded(V key, BLink<V> v) {
+    default void onAdded(BLink<V> v) {
 
+    }
+
+    default float pri(V x, float valueIfMissing) {
+        BLink y = get(x);
+        if (y==null || y.isDeleted())
+            return valueIfMissing;
+        return y.pri();
     }
 
     /**

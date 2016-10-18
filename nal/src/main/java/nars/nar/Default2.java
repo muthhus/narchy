@@ -1,5 +1,6 @@
 package nars.nar;
 
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -13,9 +14,8 @@ import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
-import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.nar.util.PremiseMatrixBuilder;
+import nars.nar.util.PremiseMatrix;
 import nars.op.time.STMTemporalLinkage;
 import nars.term.Term;
 import nars.term.Termed;
@@ -30,9 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.StreamSupport;
 
 import static java.lang.System.out;
 import static java.util.stream.Collectors.toList;
@@ -54,17 +51,18 @@ public class Default2 extends NAR {
 
         Concept at = null;
         //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
-        Bag<Term>    termlinks = new HijackBag<>(24, 2, BudgetMerge.plusBlend, random);
-        Bag<Task>    tasklinks = new HijackBag<>(16, 2, BudgetMerge.plusBlend, random);
-        float atPri = 0;
+        Bag<Term> terms = new HijackBag<>(24, 4, BudgetMerge.plusBlend, random);
+        Bag<Task>    tasklinks = new HijackBag<>(16, 4, BudgetMerge.plusBlend, random);
+
         int iterations = 1;
+
 
         public PremiseGraphBuilder() {
         }
 
         protected void seed(int num) {
             active.sample(num, c -> {
-                termlinks.put(c.get().term(), c);
+                terms.put(c.get().term(), c);
                 return true;
             });
         }
@@ -76,58 +74,77 @@ public class Default2 extends NAR {
             }
         }
 
+        /** a value which should be less than 1.0,
+         * indicating the preference for the current value vs. a tendency to move */
+        float momentum = 0.1f;
+
         void iterate() {
+
+            //decide whether to remain here
+            boolean move;
             if (at!=null) {
-                //decide whether to remain here
-                if (random.nextFloat() > atPri) {
-                    at = null;
-                }
+                move = (random.nextFloat() > (1f-momentum)*active.pri(at, 0));
+            } else {
+                move = true;
             }
 
-            if (at == null) {
+            if (move) {
 
-                seed(1); //the more seeded from 'active', the less localized this worker's interactions
+                BLink<Term> next = go();
 
-                BLink<Term> next = termlinks.commit().sample();
-                if (next != null) {
-
-
-                    Concept d = Default2.this.concept(next.get());
-                    if (d != null) {
-
-
-                        d.termlinks().commit().sample(4, t -> {
-                            termlinks.putLink(t);
-                            return true;
-                        });
-                        ;
-                        d.tasklinks().commit().sample(4, t -> {
-                            tasklinks.putLink(t);
-                            return true;
-                        });
-
-                        this.at = d;
-                        this.atPri = next.pri(); //what about including the 'active.pri' measure
-                    }
+                if (next == null) {
+                    seed(terms.capacity()/2); //the more seeded from 'active', the less localized this worker's interactions
+                    go();
+                } else {
+                    seed(1);
                 }
             }
 
             if (at != null) {
 
-                PremiseMatrixBuilder.run(at, Default2.this,
-                        4, 4,
+                PremiseMatrix.run(at, Default2.this,
+                        2, 4,
                         Default2.this::input, //input them within the current thread here
                         deriver,
-                        tasklinks, termlinks
+                        tasklinks, terms
                 );
             }
 
         }
 
+
+        private BLink<Term> go() {
+            BLink<Term> next = terms.commit().sample();
+            if (next != null) {
+
+                Concept d = Default2.this.concept(next.get());
+                if (d != null) {
+
+                    List<Task> trash = $.newArrayList(0);
+                    d.policy(((DefaultConceptBuilder)concepts.conceptBuilder()).awake(), time(), trash);
+                    tasks.remove(trash);
+
+
+                    d.termlinks().commit().sample(2, t -> {
+                        terms.putLink(t);
+                        return true;
+                    });
+                    ;
+                    d.tasklinks().commit().sample(2, t -> {
+                        tasklinks.putLink(t);
+                        return true;
+                    });
+
+                    this.at = d;
+                }
+            }
+            return next;
+        }
+
         void print() {
             logger.info("at: {}", at);
             //out.println("\nlocal:"); local.print();
-            out.println("\ntermlinks:"); termlinks.print();
+            out.println("\ntermlinks:"); terms.print();
             out.println("\ntasklinks:"); tasklinks.print();
         }
     }
@@ -143,7 +160,7 @@ public class Default2 extends NAR {
         super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 8192, 4),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
-        active = new HijackBag<>(2048, 4, random);
+        active = new HijackBag<>(1024, 6, random);
 
         durMin.setValue(BUDGET_EPSILON * 2f);
 

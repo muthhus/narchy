@@ -126,7 +126,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
 
         //forget(alpha*alpha);
 
-        List<Task> tasks = $.newArrayList();
+        //List<Task> tasks = $.newArrayList();
 
         for (int i = 0; i < nw; ) {
             for (int j = 0; j < nh; ) {

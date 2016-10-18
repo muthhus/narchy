@@ -104,13 +104,19 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     @Override
     public final boolean run(@NotNull PremiseEval m, int now) {
 
-        if (rule.minNAL <= m.nar.level()) {
+        NAR nar = m.nar;
+
+        if (rule.minNAL <= nar.level()) { //HACK
 
             try {
                 Term r = m.index.transform(this.conclusionPattern, m);
 
                 if (r instanceof Compound) { //includes null test
-                    derive(m, (Compound) r, m.punct.get());
+
+                    if (r.volume() < nar.compoundVolumeMax.intValue())
+
+                        derive(m, (Compound) r, m.punct.get()); //Term exceeds maximum volume
+
                 }
             } catch (InvalidTermException | InvalidTaskException e) {
                 if (Param.DEBUG_EXTRA)

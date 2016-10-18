@@ -151,7 +151,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 map.putIfAbsent(k, k2);
             }
 
-            onRemoved(k, w);
+            onRemoved(w);
 
             w.delete();
 
@@ -328,16 +328,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 v.setBudget(bp * scale, b.dur(), b.qua());
                 if (update(v)) {
                     //success
-                    onAdded(key, v);
+                    onAdded(v);
                 } else {
                     //failure, undo: remove the key from the map
                     map.remove(key);
-                    onRemoved(key, null);
+                    onRemoved(null);
                 }
                 break;
             case -1:
                 //reject due to insufficient budget
-                onRemoved(key, null);
+                onRemoved(null);
                 break;
         }
 

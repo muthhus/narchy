@@ -14,7 +14,7 @@ import nars.concept.util.ConceptBuilder;
 import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.nar.util.PremiseMatrixBuilder;
+import nars.nar.util.PremiseMatrix;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -96,7 +96,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
-        this.concepts = new MonitoredCurveBag(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
+        this.concepts = new BagIndexAdapter(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
 
         this._activation = 1f;
 
@@ -144,7 +144,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
         this.nar.runLater(toFire, bc -> {
             Concept c = bc.get();
             if (c != null) {
-                PremiseMatrixBuilder.run(c, this.nar,
+                PremiseMatrix.run(c, this.nar,
                         _tasklinks, _termlinks,
                         this.nar::input, //input them within the current thread here
                         deriver
@@ -170,10 +170,10 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */
-    public final class MonitoredCurveBag extends CurveBag<Concept> {
+    public final class BagIndexAdapter extends CurveBag<Concept> {
 
 
-        public MonitoredCurveBag(int capacity, @NotNull CurveSampler sampler) {
+        public BagIndexAdapter(int capacity, @NotNull CurveSampler sampler) {
             super(capacity, sampler, BudgetMerge.plusBlend,
                     //new ConcurrentHashMap<>(capacity)
                     nar.exe.concurrent() ?  new java.util.concurrent.ConcurrentHashMap<>(capacity) : new HashMap(capacity)
@@ -196,8 +196,14 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         @Override
         public void clear() {
-            forEach((BLink<Concept> v) -> { if (v!=null)
-                sleep(v.get());
+            forEach((BLink<Concept> v) -> {
+                if (v!=null) {
+                    Concept c = v.get();
+                    if (c!=null) {
+                        sleep(c);
+                        c.put(this, null);
+                    }
+                }
                 //TODO clear BudgetSavings in the meta maps
             }); //HACK allow opportunity to process removals
             super.clear();
@@ -208,8 +214,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
         /** called when a concept enters the concept bag
          * */
         @Override
-        public final void onAdded(@NotNull Concept c, BLink<Concept> v) {
-
+        public final void onAdded(BLink<Concept> v) {
+            Concept c = v.get();
             float forgetPeriod = getForgetPeriod();
 
             nar.policy(c, conceptBuilder.awake(), now);
@@ -232,7 +238,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
         @Override
-        public final void onRemoved(@NotNull Concept c, @Nullable BLink<Concept> value) {
+        public final void onRemoved(@Nullable BLink<Concept> value) {
+            Concept c  = value.get();
             if (value!=null) {
                 sleep(c);
 
