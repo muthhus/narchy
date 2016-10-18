@@ -60,7 +60,7 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.02f;
+    public float alpha, gamma, epsilonProbability = 0.04f;
     @Deprecated
     public float gammaEpsilonFactor = 0.75f;
 
@@ -71,7 +71,7 @@ abstract public class NAgent implements NSense, NAction {
 
     public float rewardValue;
 
-    float predictorProbability = 0.25f;
+    float predictorProbability = 0.5f;
 
     protected final FasterList<MutableTask> predictors = $.newArrayList();
     private float predictorPriFactor = 1f;

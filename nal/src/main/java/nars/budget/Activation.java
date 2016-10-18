@@ -48,7 +48,13 @@ public class Activation {
 
         if (scale >= minScale) {
             link(src, target, scale, 0);
-            commit(scale); //values will already be scaled
+
+            if (!concepts.isEmpty()) {
+                concepts.compact();
+                this.nar.activationAdd(concepts, this.in,
+                        scale * (float)concepts.sum(),
+                        conceptOverflow);
+            }
         }
     }
 
@@ -137,15 +143,6 @@ public class Activation {
 
     }
 
-
-    public void commit(float scale) {
-        if (!concepts.isEmpty()) {
-            concepts.compact();
-            nar.activationAdd(concepts, in,
-                    scale * (float)concepts.sum(),
-                    conceptOverflow);
-        }
-    }
 
     public void activateConcept(Concept targetConcept, float scale) {
         //System.out.println("+" + scale + " x " + targetConcept);

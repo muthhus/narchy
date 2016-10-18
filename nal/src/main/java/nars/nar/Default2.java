@@ -46,6 +46,8 @@ public class Default2 extends NAR {
     private final List<PremiseGraphBuilder> cores;
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
+    private float _activation = 0;
+
 
     final class PremiseGraphBuilder implements Runnable {
 
@@ -55,6 +57,8 @@ public class Default2 extends NAR {
         Bag<Task>    tasklinks = new HijackBag<>(16, 4, BudgetMerge.plusBlend, random);
 
         int iterations = 1;
+        int tasklinksFired = 2;
+        int termlinksFired = 4;
 
 
         public PremiseGraphBuilder() {
@@ -103,10 +107,10 @@ public class Default2 extends NAR {
             if (at != null) {
 
                 PremiseMatrix.run(at, Default2.this,
-                        2, 4,
+                        tasklinksFired, termlinksFired,
                         Default2.this::input, //input them within the current thread here
                         deriver,
-                        tasklinks, terms
+                        this.tasklinks, terms
                 );
             }
 
@@ -147,6 +151,11 @@ public class Default2 extends NAR {
             out.println("\ntermlinks:"); terms.print();
             out.println("\ntasklinks:"); tasklinks.print();
         }
+
+        public int duty() {
+            return tasklinksFired * termlinksFired * iterations; /* * expected hit rate */
+        }
+
     }
 
     public Default2() {
@@ -179,13 +188,20 @@ public class Default2 extends NAR {
 
         }
 
-        int numCores = 16;
+        int numCores = 32;
         this.cores = range(0, numCores ).mapToObj(i -> new PremiseGraphBuilder()).collect(toList());
 
+
         onFrame(()-> {
+            this._activation = getNextActivationRate();
             active.commit();
             runLater(cores, PremiseGraphBuilder::run, 1);
         });
+    }
+
+    private float getNextActivationRate() {
+        return 1f / (cores.size() * cores.stream().mapToInt(PremiseGraphBuilder::duty).sum());
+
     }
 
     private STMTemporalLinkage stmLinkage = null;
@@ -214,7 +230,7 @@ public class Default2 extends NAR {
 
     @Override
     public final void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
-        active.put(concepts, in, activation, overflow);
+        active.put(concepts, in, activation * _activation, overflow);
     }
 
     @Override
@@ -222,7 +238,6 @@ public class Default2 extends NAR {
         BLink<Concept> c = active.get(concept);
         return c != null ? c.priIfFiniteElseZero() : 0;
     }
-
 
 
     @NotNull

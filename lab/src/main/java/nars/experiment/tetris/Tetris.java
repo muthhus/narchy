@@ -49,7 +49,7 @@ public class Tetris extends SwingAgent {
     static final Executioner exe =
             //new SingleThreadExecutioner();
 //            new MultiThreadExecutioner(2, 1024*8);
-            new MultiThreadExecutioner(4, 1024*8);
+            new MultiThreadExecutioner(3, 1024*8);
 
     public static final int runFrames = 665550;
 
@@ -379,10 +379,10 @@ public class Tetris extends SwingAgent {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        int maxVol = 30;
+        int maxVol = 24;
         Executioner e = Tetris.exe;
         Default nar = new Default(2048,
-                512, 2, 3, rng,
+                128, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 200000, 8192, 2),
@@ -405,7 +405,7 @@ public class Tetris extends SwingAgent {
 //            }
 //        });
 
-        float p = 0.25f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
