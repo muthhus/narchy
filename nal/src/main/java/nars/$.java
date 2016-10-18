@@ -176,7 +176,7 @@ public enum $ {
 
     @NotNull
     public static Term neg(@NotNull Term x) {
-        return terms.negation(x);
+        return terms.neg(x);
     }
 
     @Nullable public static Compound negIf(@NotNull Compound x, boolean negate) {
@@ -945,16 +945,6 @@ public enum $ {
         return dereference(s[index]);
     }
 
-    /** unwraps any negation superterm */
-    @NotNull public static Term unneg(@NotNull Termed term) {
-        Term t = term.term();
-        if (t.op() == NEG) {
-            t = ((Compound) t).term(0);
-            if (Param.DEBUG && t.op() == NEG)
-                throw new RuntimeException("double negation detected: " + term);
-        }
-        return t;
-    }
 
     public static <X> List<X> newArrayList(X... x) {
         FasterList<X> l = $.newArrayList(x.length);

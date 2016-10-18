@@ -61,7 +61,7 @@ public final class STMTemporalLinkage extends STM {
         //final long now = nal.memory.time();
 
 
-        Term tt = $.unneg(t);
+        Term tt = t.unneg();
 
 
         FasterList<Task> queued = $.newArrayList(stm.size());
@@ -79,7 +79,7 @@ public final class STMTemporalLinkage extends STM {
                     ss.remove();
                 } else {
 
-                    if (!tt.equals($.unneg(previousTask)))
+                    if (!tt.equals(previousTask.unneg()))
                         queued.add(previousTask);
                 }
 

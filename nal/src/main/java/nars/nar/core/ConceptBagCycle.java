@@ -239,8 +239,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         @Override
         public final void onRemoved(@Nullable BLink<Concept> value) {
-            Concept c  = value.get();
             if (value!=null) {
+                Concept c  = value.get();
                 sleep(c);
 
                 if (value.priIfFiniteElseNeg1() > Param.BUDGET_EPSILON) {

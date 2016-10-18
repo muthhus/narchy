@@ -7,7 +7,7 @@ import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 
-public final class AtomicSingleton extends AtomicStringConstant {
+public class AtomicSingleton extends AtomicStringConstant {
 
     public AtomicSingleton(@NotNull String id) {
         super(id);

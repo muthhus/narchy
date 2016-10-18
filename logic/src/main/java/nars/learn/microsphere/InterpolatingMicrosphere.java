@@ -328,7 +328,7 @@ public class InterpolatingMicrosphere {
                 final float cos = (sampleDirection != null) ? cosAngleNormalized(n, sampleDirection) : 1f;
 
                 if (cos > 0) {
-                    final float illumination = cos * lightCurve.get(Math.abs(distance), evidence);
+                    final float illumination = cos * lightCurve.get(distance, evidence);
                     if (illumination > 0) {
                         final float[] d = microsphereData.get(j);
                         d[0] += illumination;

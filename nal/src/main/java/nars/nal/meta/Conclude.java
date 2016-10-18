@@ -1,7 +1,6 @@
 package nars.nal.meta;
 
 import com.google.common.base.Joiner;
-import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -146,7 +145,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         Op o = content.op();
         if (o == NEG) {
-            content = compoundOrNull($.unneg(content));
+            content = compoundOrNull(content.unneg());
             if (content == null)
                 return;
 
@@ -199,12 +198,14 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
             //apply any non 1.0 the confidence scale
             if (truth != null) {
+
                 float cf = confScale[0];
                 if (cf != 1) {
-                    truth = truth.confMultViaWeightMaxEternal(cf);
-                    if (truth == null) {
-                        throw new InvalidTaskException(content, "temporal leak");
-                    }
+                    throw new UnsupportedOperationException("yet");
+//                    truth = truth.confMultViaWeightMaxEternal(cf);
+//                    if (truth == null) {
+//                        throw new InvalidTaskException(content, "temporal leak");
+//                    }
                 }
             }
 

@@ -25,14 +25,6 @@ public abstract class MaplikeTermIndex extends TermIndex {
     }
 
 
-    @Override
-    @NotNull
-    protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer s) {
-        return super.newCompound(op, dt, intern(s));
-    }
-
-    @Override
-    public abstract TermContainer intern(TermContainer s);
 
 
     @Nullable @Override abstract public Termed get(@NotNull Term key, boolean createIfMissing);

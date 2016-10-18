@@ -43,7 +43,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     }
 
-    public static float defaultLightCurve(float dt, float evidence, float decayPeriod) {
+    public static float temporalConfidenceLoss(float dt, float evidence, float decayPeriod) {
         if (dt <= 0.5f) {
             return evidence;
         } else {
@@ -59,15 +59,18 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         }
     }
 
+    public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
+        return TruthPolation.temporalConfidenceLoss(dt, evidence, 1f);
+    };
 
     @Nullable
     public Truth truth(long when, Task... tasks) {
-        return truth(when, tasks, Param.evidentialDecayThroughTime);
+        return truth(when, tasks, evidentialDecayThroughTime);
     }
 
     @Nullable
     public Truth truth(long when, @NotNull Collection<Task> tasks) {
-        return truth(when, tasks.toArray(new Task[tasks.size()]), Param.evidentialDecayThroughTime);
+        return truth(when, tasks.toArray(new Task[tasks.size()]), evidentialDecayThroughTime);
     }
 
 

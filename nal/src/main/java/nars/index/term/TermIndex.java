@@ -173,6 +173,16 @@ public abstract class TermIndex extends TermBuilder {
         return False; //place a False placeholder so that a repeat call will not have to discover this manually
     }
 
+
+    @Override
+    @NotNull
+    protected Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer s) {
+        return super.newCompound(op, dt, intern(s));
+    }
+
+
+
+
     /**
      * returns the resolved term according to the substitution
      */
@@ -265,10 +275,10 @@ public abstract class TermIndex extends TermBuilder {
         return cached(op, dt, args);
     }
 
-    @Deprecated
-    public final @NotNull Term the(@NotNull Op op, @NotNull Term... tt) {
-        return the(op, DTERNAL, tt); //call this implementation's, not super class's
-    }
+//    @Deprecated
+//    public final @NotNull Term the(@NotNull Op op, @NotNull Term... tt) {
+//        return the(op, DTERNAL, tt); //call this implementation's, not super class's
+//    }
 
     private static boolean cacheable(Op op, Term[] u) {
         if (u.length < 2) {
@@ -490,7 +500,7 @@ public abstract class TermIndex extends TermBuilder {
                     //throw new InvalidConceptException((Compound)term, "variables can not be conceptualized");
                     return null;
                 case NEG:
-                    term = $.unneg(term);
+                    term = term.unneg();
                     break;
 
                 default:

@@ -36,9 +36,16 @@ import java.util.function.Function;
  */
  public class DefaultConceptBuilder implements ConceptBuilder {
 
+    public DefaultConceptBuilder() {
+
+        this.sleep = new DefaultConceptPolicy("sleep", 6, 6, 1, 8, 4);
+        this.init = sleep;
+
+        this.awake = new DefaultConceptPolicy("awake", 12, 12, 3, 24, 16);
+    }
+
 //    private static final int DEFAULT_ATOM_LINK_MAP_CAPACITY = 128;
 //    private static final int DEFAULT_CONCEPT_LINK_MAP_CAPACITY = 32;
-    public static final int HIJACK_REPROBES = 5;
 
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> {
@@ -55,8 +62,8 @@ import java.util.function.Function;
 
             };
 
-    public <X> Bag<X> newHijackBag() {
-        return new HijackBag<>(1, HIJACK_REPROBES, mergeDefault, nar.random);
+    public <X> Bag<X> newHijackBag(int reprobes) {
+        return new HijackBag<>(1, reprobes, mergeDefault, nar.random);
     }
 
     public <X> Bag<X> newCurveBag(Map m) {
@@ -133,13 +140,7 @@ import java.util.function.Function;
     public CurveBag.CurveSampler defaultCurveSampler; //shared
 
 
-    public DefaultConceptBuilder() {
 
-        this.sleep = new DefaultConceptPolicy("sleep", 6, 6, 1, 8, 4);
-        this.init = sleep;
-
-        this.awake = new DefaultConceptPolicy("awake", 12, 12, 3, 24, 16);
-    }
 
     @Override
     public void start(NAR nar) {
@@ -226,7 +227,7 @@ import java.util.function.Function;
     }
 
     public Map newBagMap() {
-        int defaultInitialCap = 16;
+        int defaultInitialCap = 4;
         if (nar.exe.concurrent()) {
             return new ConcurrentHashMap(defaultInitialCap);
             //return new NonBlockingHashMap(cap);

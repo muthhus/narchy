@@ -64,7 +64,7 @@ public class Recog2D extends SwingAgent {
         g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        n.beliefConfidence(0.2f);
+        //n.beliefConfidence(0.2f);
 
         imgTrainer = new TrainVector(ii -> $.p($.the("i"), $.the(ii)), maxImages, this);
         imgTrainer.out.keySet().forEach(x ->
@@ -92,7 +92,7 @@ public class Recog2D extends SwingAgent {
 
     }
 
-    public static Surface conceptTraining(TrainVector tv, NAR nar) {
+    public Surface conceptTraining(TrainVector tv, NAR nar) {
 
         LinkedHashMap<SensorConcept, TrainVector.Neuron> out = tv.out;
 
@@ -102,6 +102,7 @@ public class Recog2D extends SwingAgent {
                 row(BeliefTableChart.beliefTableCharts(nar, out.keySet(), 1024)),
 
                 row(p = new Plot2D(8192, Plot2D.Line).add("Error", ()->tv.errorSum())),
+                row(p = new Plot2D(8192, Plot2D.Line).add("Rward", ()->rewardValue)),
 
                 row(out.entrySet().stream().map(ccnn -> new Surface() {
                     @Override
@@ -119,27 +120,46 @@ public class Recog2D extends SwingAgent {
                             conf = t.conf();
                             freq = t.freq();
                         } else {
-                            conf = 0.75f;
-                            freq = Float.NaN;
+                            conf = nar.confMin.floatValue();
+                            float defaultFreq =
+                                0f; //interpret no-belief as false
+                                //Float.NaN  //use NaN to force learning of negation as separate from no-belief
+                            freq = defaultFreq;
                         }
 
 
-                        Draw.colorPolarized(gl, 2f * (-0.5f + freq));
+                        Draw.colorPolarized(gl,
+                            freq //unipolar (1 color)
+                            //2f * (-0.5f + freq) //bipolar (2 colors)
+                        );
 
-                        float m = 0.25f * 1f * conf;
-                        Draw.rect(gl, m / 2, m / 2, 1 - m, 1 - m);
+                        float m = 0.5f * conf;
+
 
                         if (tv.verify) {
                             float error = nn.error;
                             if (error != error) {
 
+                                //training phase
+
                             } else {
+
+                                //verification
+
+                                //draw backgroudn/border
+                                Draw.colorPolarized(gl, -error);
+                                Draw.rect(gl, 0, 0, 1f, 1f);
+
                                 gl.glColor3f(error, 1f - error, 0f);
                                 float fontSize = 0.08f;
                                 Draw.text(gl, c.term().toString(), fontSize, m / 2, 1f - m / 2, 0);
                                 Draw.text(gl, "err=" + n2(error), fontSize, m / 2, m / 2, 0);
                             }
                         }
+
+
+                        //draw center icon
+                        Draw.rect(gl, m / 2, m / 2, 1 - m, 1 - m);
 
 
                     }
@@ -160,8 +180,8 @@ public class Recog2D extends SwingAgent {
         if (imgTrainer.verify) {
             r = (float) -imgTrainer.errorSum() + 0.5f;
         } else {
-            r = 1f; //general positive reinforcement during training
-            // Float.NaN;
+            //r = 1f; //general positive reinforcement during training
+            r = Float.NaN;
         }
 
         if (a % imagePeriod == 0) {

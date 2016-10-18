@@ -763,8 +763,8 @@ public class Terms   {
 
     /** equal atemporally AND with any outer negations removed */
     public static boolean equalAtemporally(@NotNull Termed _a, @NotNull Termed _b) {
-        Term a = $.unneg(_a);//.term();
-        Term b = $.unneg(_b);//.term();
+        Term a = _a.unneg();//.term();
+        Term b = _b.unneg();//.term();
         return ((a.structure() == b.structure()) &&
                 (a.volume() == b.volume()) &&
                 (a.op() == b.op()) &&

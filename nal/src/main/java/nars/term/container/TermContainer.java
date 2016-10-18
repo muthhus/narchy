@@ -391,7 +391,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return -1;
     }
     default int indexOfAtemporally(Term t) {
-        t = $.unneg(t); //unneg before testing impossible
+        t = t.unneg(); //unneg before testing impossible
         if (!impossibleSubTerm(t)) {
             Term at = Terms.atemporalize(t);
             int s = size();

@@ -1309,6 +1309,9 @@ public enum Util { ;
     public static double sqr(long l) {
         return l*l;
     }
+    public static float sqr(float f) {
+        return f * f;
+    }
 
     public static CharSequence uuid64() {
         UUID u = UUID.randomUUID();

@@ -5,7 +5,6 @@ import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import nars.learn.microsphere.InterpolatingMicrosphere;
-import nars.nal.Stamp;
 import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
@@ -13,8 +12,6 @@ import nars.truth.TruthDelta;
 import nars.util.Util;
 import nars.util.data.list.MultiRWFasterList;
 import org.eclipse.collections.api.block.function.Function;
-import org.eclipse.collections.api.set.primitive.ImmutableLongSet;
-import org.eclipse.collections.api.set.primitive.LongSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +29,7 @@ import static nars.util.Util.sqr;
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
-public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, InterpolatingMicrosphere.LightCurve {
+public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
 
 
@@ -145,15 +142,16 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
         }
     }
 
-    public float rankTemporalByConfidence(@Nullable Task t, long now) {
-        float duration = duration();
+
+
+    public float rankTemporalByConfidence(@Nullable Task t, long now, float duration) {
         return Param.rankTemporalByConfidence(t, duration, now);
     }
 
     /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
     private volatile long minT = MAX_VALUE, maxT = Long.MIN_VALUE;
 
-    public float duration() {
+    public long duration() {
 
         if (minT==MAX_VALUE || maxT==MIN_VALUE) {
             //cached valus invalidated, re-compute
@@ -172,7 +170,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
             return 1; //empty probably} else {
         } else {
             
-            return (float) Math.max(1, maxT - minT);
+            return Math.max(1, maxT - minT);
         }
     }
 
@@ -257,7 +255,8 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
 
 
     public Task matchWeakest(long now) {
-        return list.minBy(x -> rankTemporalByConfidence(x, now));
+        long duration = duration();
+        return list.minBy(x -> rankTemporalByConfidence(x, duration, now));
     }
 
     public Task matchMerge(long now, @NotNull Task toMergeWith) {
@@ -275,30 +274,31 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
 
         long yo = y.occurrence();
         float duration = Math.abs(now - yo);
+        float yf = y.freq();
 
         return x -> {
 
             long xo = x.occurrence();
 
             float d2 = duration/2f;
-            return (1 + (1 - Math.abs(x.freq() - y.freq())))
-                    * (1 + (1 - y.conf()))
-                    * (1 + (1 - (float)sqr(xo - yo) / d2))
-                    / (1 + (float)sqr(now - xo) / d2);
+            return (1f + (1f - Math.abs(x.freq() - yf)))
+                    * (1f + (1f - y.conf()))
+                    * (1f + (1f - (float)sqr(xo - yo) / d2))
+                    / (1f + (float)sqr(now - xo) / d2);
         };
 
     }
 
-    @NotNull public Function<Task, Float> rankPenalizingOverlap(long now, @NotNull Task toMergeWith) {
-        long occ = toMergeWith.occurrence();
-        ImmutableLongSet toMergeWithEvidence = toMergeWith.evidenceSet();
-        return x -> rankPenalizingOverlap(x, toMergeWithEvidence, occ, now);
-    }
+//    @NotNull public Function<Task, Float> rankPenalizingOverlap(long now, @NotNull Task toMergeWith) {
+//        long occ = toMergeWith.occurrence();
+//        ImmutableLongSet toMergeWithEvidence = toMergeWith.evidenceSet();
+//        return x -> rankPenalizingOverlap(x, toMergeWithEvidence, occ, now);
+//    }
 
-    public float rankPenalizingOverlap(@Nullable Task x, @NotNull LongSet evidence, long occ, long now) {
-        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        return (x == null) ? Float.NEGATIVE_INFINITY : (Stamp.overlapFraction(evidence, x.evidence()) * rankTemporalByConfidence(x, now));
-    }
+//    public float rankPenalizingOverlap(@Nullable Task x, @NotNull LongSet evidence, long occ, long now) {
+//        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
+//        return (x == null) ? Float.NEGATIVE_INFINITY : (Stamp.overlapFraction(evidence, x.evidence()) * rankTemporalByConfidence(x, now));
+//    }
 
 
 
@@ -314,13 +314,14 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
             return input; //no need for compression
         }
 
+        long dur = duration();
 
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        float inputRank = input != null ? rankTemporalByConfidence(input, now) : Float.POSITIVE_INFINITY;
+        float inputRank = input != null ? rankTemporalByConfidence(input, dur, now) : Float.POSITIVE_INFINITY;
 
         Task a = matchWeakest(now);
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank <= rankTemporalByConfidence(a, now) || !remove(a, trash)) {
+        if (a == null || inputRank <= rankTemporalByConfidence(a, dur, now) || !remove(a, trash)) {
             //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
         }
@@ -365,10 +366,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
 
 
 
+        long dur = duration();
         if (against == null) {
-            return list.maxBy(x -> rankTemporalByConfidence(x, now));
+            return list.maxBy(x -> rankTemporalByConfidence(x, dur, now));
         } else {
-            return list.maxBy(x -> rankTemporalByConfidence(x,  against.occurrence()));
+            return list.maxBy(x -> rankTemporalByConfidence(x, dur, against.occurrence()));
             //return list.maxBy(rankPenalizingOverlap(now, against));
         }
 
@@ -404,19 +406,19 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable, Inte
                 if ((now == ETERNAL || when == now) && o == when) //optimization: if at the current time and when
                     return res;
                 else
-                    return Revision.project(res, when, now, o, false);
+                    return Revision.project(res, when, now, o, true);
 
             default:
-                return new TruthPolation(s).truth(when, tr, this);
+                float dur = Math.max(1f, (float)duration()/s);///(s/2f));
+                return new TruthPolation(s).truth(when, tr, (dt, evi)->{
+                    return evi / (1f + sqr(dt/dur));
+                });
 
         }
 
     }
 
-    @Override
-    public float get(float dt, float evidence) {
-        return TruthPolation.defaultLightCurve(dt, evidence, duration());
-    }
+
 
     private boolean clean(@NotNull List<Task> trash) {
         return list.removeIf(x -> {

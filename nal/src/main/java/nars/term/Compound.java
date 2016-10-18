@@ -23,6 +23,7 @@ package nars.term;
 import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.Param;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.visit.SubtermVisitor;
@@ -47,6 +48,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -140,7 +142,18 @@ public interface Compound extends Term, IPair, TermContainer {
         return r[0];
     }
 
-//    @NotNull
+    @Override
+    default Term unneg() {
+        if (op() == NEG) {
+            Term t = term(0);
+            if (Param.DEBUG && t.op() == NEG)
+                throw new RuntimeException("double negation detected: " + t);
+            return t;
+        }
+        return this;
+    }
+
+    //    @NotNull
 //    default MutableSet<Term> termsToSet(boolean recurse, int inStructure, MutableSet<Term> t) {
 //        if (recurse) {
 //            recurseTerms((s) -> {
@@ -613,7 +626,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     default boolean containsTermAtemporally(Term y) {
-        y = $.unneg(y);
+        y = y.unneg();
         if (!impossibleSubTerm(y)) {
             Term ay = Terms.atemporalize(y);
             if (or(x -> Terms.equalAtemporally(x, ay)))

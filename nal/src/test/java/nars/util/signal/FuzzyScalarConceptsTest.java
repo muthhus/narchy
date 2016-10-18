@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
+import nars.nar.Terminal;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.math.FloatNormalized;
@@ -39,7 +40,7 @@ public class FuzzyScalarConceptsTest {
 
     @Test
     public void testRewardConceptsFuzzification3() {
-        NAR d = new Default();
+        NAR d = new Terminal();
         MutableFloat m = new MutableFloat(0f);
 
         FloatPolarNormalized range = new FloatPolarNormalized(() -> m.floatValue());
@@ -76,7 +77,8 @@ public class FuzzyScalarConceptsTest {
 
     public void testSteadyFreqCondition(MutableFloat m, FuzzyScalarConcepts f, FloatPredicate withFreqSum) {
         NAR d = f.nar;
-        for (int i = 0; i < 32; i++) {
+        //run a few oscillations
+        for (int i = 0; i < 5; i++) {
             m.setValue(Math.sin(i/2f));
             d.next();
 

@@ -26,7 +26,9 @@ import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import static nars.Op.CONJ;
 import static nars.Op.INT;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * arithmetic rule mining & variable introduction
@@ -42,17 +44,29 @@ public class ArithmeticInduction {
     private static boolean recurseAllSubstructures = false;
 
     @NotNull
-    public static TermContainer compress(@NotNull TermContainer args) {
+    public static TermContainer compress(Op op, int dt, @NotNull TermContainer args) {
         if (args.size() < 2 || !args.hasAny(Op.INT))
             return args; //early exit condition
 
-        @NotNull MutableSet<Term> ss = args.toSet();
-        Set<Term> ss2 = compress(ss, 2);
-        if (ss2.equals(ss))
-            return args;
+        if (
+                op==CONJ && ((dt == DTERNAL) || (dt == 0))
+                        ||
+                op.isSet()
+                        ||
+                op.isIntersect()
+           ) {
 
-        return TermSet.the(ss2);
+            MutableSet<Term> xx = args.toSet();
+            Set<Term> yy = compress(xx, 2);
+
+            if (!yy.equals(xx)) {
+                return TermSet.the(yy);
+            }
+        }
+
+        return args; //unchanged
     }
+
 
     @NotNull
     public static Set<Term> compress(@NotNull Set<Term> subs, int depthRemain) {
@@ -173,7 +187,8 @@ public class ArithmeticInduction {
 
 
             List<IntInterval> ff = features(nn.getTwo());
-            if (ff.isEmpty() || ff.size() >= numInvolved) {
+            int ffs = ff.size();
+            if (ffs == 0 || ffs >= numInvolved) {
                 //nothing would be gained; dont bother
                 continue;
             }

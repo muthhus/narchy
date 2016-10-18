@@ -53,7 +53,13 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
      * absolute/singular Boolean truths
      */
     AtomicSingleton True = new AtomicSingleton("†");
-    AtomicSingleton False = new AtomicSingleton("Ø");
+
+    AtomicSingleton False = new AtomicSingleton("Ø") {
+        @Override
+        public Term unneg() {
+            return True;
+        }
+    };
 
 
     @NotNull
@@ -214,9 +220,9 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
      */
     default int subtermTime(@NotNull Term x, int dt) {
 
-        x = $.unneg(x); //ignore polarity
+        x = x.unneg(); //ignore polarity
 
-        if ($.unneg(this).equalsIgnoringVariables(x))
+        if (unneg().equalsIgnoringVariables(x))
             return 0;
 
         if (!this.op().temporal)
@@ -255,11 +261,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
                 lastIndex = 1;
             }
 
-            Term first = $.unneg(c.term(firstIndex));
+            Term first = c.term(firstIndex).unneg();
             if (first.equalsIgnoringVariables(x))
                 return 0;
 
-            Term last = $.unneg(c.term(lastIndex));
+            Term last = c.term(lastIndex).unneg();
             if (last.equalsIgnoringVariables(x))
                 return dt;
 
@@ -390,6 +396,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         throw new RuntimeException("ordering exception: " + this + ", " + y);
     }
 
+
+    /** unwraps any negation superterm */
+    @Override default Term unneg() {
+        return this;
+    }
 
 }
 

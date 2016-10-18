@@ -167,7 +167,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
             boolean negated = (subterm.op() == NEG) != neg;
             if (negated)
-                subterm = $.unneg(subterm);
+                subterm = subterm.unneg();
 
             if (subterm instanceof Compound && subterm.hasAny(Op.INT)) {
 

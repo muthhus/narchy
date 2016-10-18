@@ -118,8 +118,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             //try auto-negation:
             boolean xn = (x.op()==NEG);
             boolean yn = (y.op()==NEG);
-            Term px = (xn) ? $.unneg(x) : x; //positive X
-            Term py = (yn) ? $.unneg(y) : y; //positive Y
+            Term px = (xn) ? x.unneg() : x; //positive X
+            Term py = (yn) ? y.unneg() : y; //positive Y
             if (Terms.equalAtemporally(px, py)) {
                 equals = true;
                 if (xn ^ yn) {

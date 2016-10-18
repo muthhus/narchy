@@ -8,10 +8,12 @@ import nars.budget.policy.ConceptPolicy;
 import nars.nal.UtilityFunctions;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
+import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
 import nars.util.signal.ScalarSignal;
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static nars.Symbols.BELIEF;
+import static nars.time.Tense.ETERNAL;
 
 
 /**
@@ -126,12 +129,12 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     }
 
 
-    /** async timing: only commits when value has changed significantly, and as often as necessary */
-    @NotNull
-    public SensorConcept async() {
-        timing(0, 0);
-        return this;
-    }
+//    /** async timing: only commits when value has changed significantly, and as often as necessary */
+//    @NotNull
+//    public SensorConcept async() {
+//        timing(0, 0);
+//        return this;
+//    }
 
     /** commits every N cycles only */
     @NotNull
@@ -260,33 +263,39 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
             super.clear(nar);
         }
 
-//        @Override
-//        public Truth truth(long when, long now) {
-//            if (when == now || when == ETERNAL)
-//                return sensor.truth();
 
+        @Override
+        public Truth truth(long when, long now) {
 
-//            long lastSensorInputTime = sensor.lastInputTime;
+            long lastSensorInputTime = sensor.lastInputTime;
 
-            //in the future after the last sensor input time,
-            // attempt to use the current sensor value as the best guess but fade it by projection
-//            if (when == ETERNAL || (when >= lastSensorInputTime)) {
-                //now = when = sensor.lastInputTime;
-//                Truth t = sensor.truth();
-//                if (t != null) {
-//                    if (when==ETERNAL || lastSensorInputTime == when) {
-//                        return t;
-//                    } else {
-//                        //t = t.confMult()
-//                        t = Revision.project(t, when, now, lastSensorInputTime, true);
-//                        if (t!=null)
-//                            return t;
-//                    }
-//                }
-//            }
+            Truth interpolated = super.truth(when, now);
 
-//            return super.truth(when, now);
-//        }
+            //in the future after the last sensor input time..
+
+            long futureDT = when - lastSensorInputTime;
+            if (when == ETERNAL || (futureDT > 0)) {
+
+                // Default implementation:
+                /** provides a prediction truth for this sensor at a (> 0) time dtFuture in the future.
+                 *  this could return the current sensor value, a sensor value which has decreased confidence,
+                 *  or some more advanced machine-learning predictor.
+                 */
+                // use last sensor value with projected, and ultimately eternalized confidence
+                Truth assumed = sensor.truth();
+                if (assumed!=null) {
+
+                    if (interpolated!=null) {
+                        return Truth.maxConf(assumed.eternalize(), interpolated);
+                            //predicted = Revision.project(predicted, when, now, lastSensorInputTime, true);
+                    } else if (interpolated == null) {
+                        return assumed;
+                    }
+                }
+
+            }
+            return interpolated;
+        }
 
 //        @Override
 //        public Task match(@NotNull Task target, long now) {
@@ -313,4 +322,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 //            return super.match(target, now);
 //        }
     }
+
+
+
 }

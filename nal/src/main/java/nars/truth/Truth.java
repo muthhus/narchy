@@ -231,19 +231,19 @@ public interface Truth extends Truthed {
 
     @Nullable Truth withConf(float f);
 
-    default @Nullable Truth confMultViaWeight(float f) {
-        return withConf(w2c(c2w(conf()) * f));
-    }
-    default @Nullable Truth confMultViaWeightMaxEternal(float f) {
-        if (f == 1f) {
-            return this;
-        }
-        else {
-            float c = conf();
-            return withConf(
-                    Math.max(eternalize(c), w2c(c2w(c) * f)));
-        }
-    }
+//    default @Nullable Truth confMultViaWeight(float f) {
+//        return withConf(w2c(c2w(conf()) * f));
+//    }
+//    default @Nullable Truth confMultViaWeightMaxEternal(float f) {
+//        if (f == 1f) {
+//            return this;
+//        }
+//        else {
+//            float c = conf();
+//            return withConf(
+//                    Math.max(eternalize(), w2c(c2w(c) * f)));
+//        }
+//    }
 
 
 //    @NotNull
@@ -283,6 +283,16 @@ public interface Truth extends Truthed {
         return Truth.hash(freq(), conf(), truthEpsilon);
     }
 
+    default Truth eternalize() {
+        return withConf(TruthFunctions.eternalize(conf()));
+    }
+
+    static Truth maxConf(Truth a, Truth b) {
+        return a.conf() >= b.conf() ? a : b;
+    }
+//    static <T extends Truthed> T minConf(T a, T b) {
+//        return a.conf() <= b.conf() ? a : b;
+//    }
 
 
     enum TruthComponent {

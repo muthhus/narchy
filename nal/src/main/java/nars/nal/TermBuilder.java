@@ -12,6 +12,7 @@ import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.transform.TermTransform;
 import nars.term.util.InvalidTermException;
+import nars.term.var.Variable;
 import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -109,7 +110,7 @@ public abstract class TermBuilder {
                 if (arity != 1)
                     throw new InvalidTermException(op, dt, u, "negation requires 1 subterm");
 
-                return negation(u[0]);
+                return neg(u[0]);
 
 //            case INTRANGE:
 //                System.err.println("intRange: " + Arrays.toString(u));
@@ -180,16 +181,16 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    private static void productNormalizeSubterms(Term[] u) {
+    private void productNormalizeSubterms(Term[] u) {
         for (int i = 0, uLength = u.length; i < uLength; i++) {
             u[i] = productNormalize(u[i]);
         }
     }
 
-    public static Term productNormalize(Term t) {
+    public Term productNormalize(Term t) {
         boolean neg = t.op() == NEG;
         if (neg)
-            t = $.unneg(t);
+            t = t.unneg();
 
         if (t instanceof Compound && (t.op() == INH) && (t.varPattern()==0) && t.hasAny(Op.IMGbits))  {
             Term s = (((Compound) t).term(0));
@@ -205,7 +206,7 @@ public abstract class TermBuilder {
             }
         }
 
-        return !neg ? t : $.neg(t);
+        return !neg ? t : neg(t);
     }
 
     @NotNull
@@ -299,7 +300,7 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    private Term the(@NotNull Op op, @NotNull Term... tt) {
+    public final Term the(@NotNull Op op, @NotNull Term... tt) {
         return the(op, DTERNAL, tt);
     }
 
@@ -373,8 +374,7 @@ public abstract class TermBuilder {
             }
         }
 
-        if ((op==CONJ && commutive(op, dt)) || (op.isSet() || op.isIntersect()))
-            args = ArithmeticInduction.compress(args);
+        args = ArithmeticInduction.compress(op, dt, args);
 
         int s = args.size();
         if (s == 0) {
@@ -393,10 +393,7 @@ public abstract class TermBuilder {
         return newCompound(op, dt, args);
     }
 
-    private static boolean commutive(Op op, int dt) {
-        return op.commutative &&
-                ((dt == DTERNAL) || (dt == 0) || (dt == XTERNAL));
-    }
+
 
 
     @Nullable
@@ -415,34 +412,31 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    private Term[] negation(@NotNull Term[] t) {
+    private Term[] neg(@NotNull Term[] t) {
         int l = t.length;
         Term[] u = new Term[l];
         for (int i = 0; i < l; i++) {
-            u[i] = negation(t[i]);
+            u[i] = neg(t[i]);
         }
         return u;
     }
 
     @NotNull
-    public final Term negation(@NotNull Term t) {
-
+    public final Term neg(@NotNull Term t) {
         //HACK testing for equality like this is not a complete solution. for that we need a new special term type
 
-        if (isTrue(t)) return False;
-        if (isFalse(t)) return True;
-
-        if (t.op() == NEG) {
-            // (--,(--,P)) = P
-            t = ((TermContainer) t).term(0);
-
-            if (isTrue(t)) return False;
-            if (isFalse(t)) return True;
-
-            return t;
-
+        if ((t instanceof Compound) || (t instanceof Variable)) {
+            if (t.op() == NEG) {
+                // (--,(--,P)) = P
+                return t.unneg();
+            } else {
+                return newCompound(NEG, DTERNAL, TermVector.the(t)); //newCompound bypasses some checks that finish involves
+                        //finish(NEG, t)
+            }
         } else {
-            return (t instanceof Compound) || (t.op().var) ? finish(NEG, t) : False;
+            if (isFalse(t)) return True;
+            if (isTrue(t)) return False;
+            return t;
         }
     }
 
@@ -619,7 +613,7 @@ public abstract class TermBuilder {
     /**
      * for commutive conjunction (0 or DTERNAL)
      */
-    private static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
+    private void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
 
         for (Term x : u) {
 
@@ -629,7 +623,7 @@ public abstract class TermBuilder {
                 if (x instanceof Compound) {
                     //cancel co-negations TODO optimize this?
                     if (!s.isEmpty()) {
-                        if (s.remove($.neg(x))) {
+                        if (s.remove(neg(x))) {
                             continue;
                         }
                     }
@@ -668,13 +662,13 @@ public abstract class TermBuilder {
                         boolean subjNeg = subject.op() == NEG;
                         boolean predNeg = predicate.op() == NEG;
                         if (subjNeg && predNeg) {
-                            subject = $.unneg(subject);
-                            predicate = $.unneg(predicate);
+                            subject = subject.unneg();
+                            predicate = predicate.unneg();
                             continue statement;
                         } else if (!subjNeg && predNeg) {
-                            return $.neg(statement(op, dt, subject, $.unneg(predicate)));
+                            return neg(statement(op, dt, subject, predicate.unneg()));
                         } else if (subjNeg && !predNeg) {
-                            return $.neg(statement(op, dt, $.unneg(subject), predicate));
+                            return neg(statement(op, dt, subject.unneg(), predicate));
                         }
 
                         break;
@@ -731,9 +725,9 @@ public abstract class TermBuilder {
                             throw new InvalidTermException(op, dt, new Term[]{subject, predicate}, "Invalid implication predicate");
 
                         if (predicate.op() == NEG) {
-                            Term unNegatedPred = $.impl(subject, dt, $.unneg(predicate));
+                            Term unNegatedPred = $.impl(subject, dt, predicate.unneg());
                             return //negation
-                                    $.neg( //to be safe use the full negation but likely it can be the local negation pipeline
+                                    neg( //to be safe use the full negation but likely it can be the local negation pipeline
                                             unNegatedPred
                                     );
                         }
@@ -747,8 +741,8 @@ public abstract class TermBuilder {
                 }
 
 
-                Term ss = $.unneg(subject);
-                Term pp = $.unneg(predicate);
+                Term ss = subject.unneg();
+                Term pp = predicate.unneg();
 
                 if (Terms.equalAtemporally(ss,pp)) {
                     return subject==ss ^ predicate==pp ? False : True;  //handle root-level negation comparison
@@ -833,13 +827,13 @@ public abstract class TermBuilder {
 //                        predicate = $.neg(pp);
 //                    }
                     } else {
-                        if (sn && pn) {
-//                        //both negative: unnegate both but use the original sort ordering in case negation causes it to change, this will keep it stable
-//                        subject = $.unneg(subject);
-//                        predicate = $.unneg(predicate);
-                        } else {
-                            //both postiive
-                        }
+//                        if (sn && pn) {
+////                        //both negative: unnegate both but use the original sort ordering in case negation causes it to change, this will keep it stable
+////                        subject = $.unneg(subject);
+////                        predicate = $.unneg(predicate);
+//                        } else {
+//                            //both postiive
+//                        }
 
                         if (subject.compareTo(predicate) > 0) {
                             Term x = predicate;
@@ -995,7 +989,7 @@ public abstract class TermBuilder {
     }
 
     public final Term disjunction(@NotNull Term[] u) {
-        return negation(conj(DTERNAL, negation(u)));
+        return neg(conj(DTERNAL, neg(u)));
     }
 
 

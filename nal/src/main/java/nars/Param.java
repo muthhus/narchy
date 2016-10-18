@@ -63,13 +63,6 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final int ACTIVATION_TASKLINK_DEPTH = 1;
 
 
-
-
-    @Deprecated public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
-        return TruthPolation.defaultLightCurve(dt, evidence, 1f);
-    };
-
-
     public static boolean DEBUG_ANSWERS = true;
 
     /** how many times the desired selection size that bags should sample in case some of the selections are unused */

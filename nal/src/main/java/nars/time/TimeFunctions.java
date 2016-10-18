@@ -15,9 +15,7 @@ import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.$.unneg;
 import static nars.Op.CONJ;
-import static nars.nal.TermBuilder.productNormalize;
 import static nars.task.Revision.chooseByConf;
 import static nars.time.Tense.*;
 
@@ -92,7 +90,7 @@ public interface TimeFunctions {
     @NotNull
     static Compound dtDiff(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
 
-        Compound taskTerm = (Compound) $.unneg(p.taskTerm);
+        Compound taskTerm = (Compound) p.taskTerm.unneg();
         Termed<Compound> beliefTerm = p.beliefTerm;
 
         int dt;
@@ -213,7 +211,7 @@ public interface TimeFunctions {
 
     @Deprecated
     static boolean derivationMatch(Term a, Term b) {
-        return productNormalize(unneg(a)).equalsIgnoringVariables(productNormalize(unneg(b)));
+        return /*productNormalize*/(a.unneg()).equalsIgnoringVariables(/*productNormalize*/(b.unneg()));
     }
 
     static boolean derivationMatch(Term a, Term b, PremiseEval p) {
@@ -384,7 +382,7 @@ public interface TimeFunctions {
 
     @Nullable
     static Term resolve(@NotNull PremiseEval p, Term t) {
-        return p.resolve(productNormalize(unneg(t)));
+        return p.resolve(/*productNormalize*/(t.unneg()));
     }
 
     @Nullable
@@ -482,7 +480,7 @@ public interface TimeFunctions {
     @NotNull
     static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull PremiseEval p, boolean taskOrBelief) {
 
-        Term dtTerm = taskOrBelief ? $.unneg(p.taskTerm) : p.beliefTerm;
+        Term dtTerm = taskOrBelief ? p.taskTerm.unneg() : p.beliefTerm;
 
         Task t = p.task;
         Task b = p.belief;
@@ -559,7 +557,7 @@ public interface TimeFunctions {
             if (taskOrBelief && end) {
                 //long taskDT = (taskOrBelief ? premise.task() : premise.belief()).term().dt();
 
-                long ddt = ((Compound) $.unneg(p.taskTerm)).dt();
+                long ddt = ((Compound) p.taskTerm.unneg()).dt();
                 if (ddt != DTERNAL)
                     o += ddt;
             } else if (taskOrBelief && !end) {
@@ -605,7 +603,7 @@ public interface TimeFunctions {
 
         Task task = p.task;
 
-        int taskDT = ((Compound) $.unneg(p.taskTerm)).dt();
+        int taskDT = ((Compound) p.taskTerm.unneg()).dt();
         Term bt = p.beliefTerm;
 
         int beliefDT = (bt instanceof Compound) ? ((Compound) bt).dt() : DTERNAL;
@@ -698,7 +696,7 @@ public interface TimeFunctions {
 
         long occ = chooseByConf(task, belief, p).occurrence(); //reset
 
-        Compound tt = (Compound) $.unneg(p.taskTerm);
+        Compound tt = (Compound) p.taskTerm.unneg();
         Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;
 
         int td = tt.dt();
