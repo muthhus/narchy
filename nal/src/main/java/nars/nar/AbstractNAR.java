@@ -27,7 +27,6 @@ import java.util.Random;
  */
 public abstract class AbstractNAR extends NAR {
 
-    public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;
 
 
     public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self, Executioner exe) {
@@ -35,85 +34,24 @@ public abstract class AbstractNAR extends NAR {
 
         durMin.setValue(BUDGET_EPSILON * 2f);
 
-        taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
-
-        //budget propagation thresholds
-        termLinkThreshold.setValue(Param.BUDGET_EPSILON);
-        taskLinkThreshold.setValue(Param.BUDGET_EPSILON);
 
 
     }
 
-    protected void initHigherNAL() {
-        if (level() >= 7) {
-            initNAL7();
-            if(level() >=8) {
-                initNAL8();
-//                if (nal() >= 9) {
-//                    initNAL9();
-//                }
-            }
-        }
-    }
 
 
     /** NAL7 plugins */
-    public void initNAL7() {
+    protected void initNAL7() {
 
         new STMTemporalLinkage(this, 2);
 
     }
 
     /* NAL8 plugins */
-    public void initNAL8() {
-//        /* derivation operators available at runtime */
-//        try {
-//            PremiseRule.eachOperator(this, (c, o) -> onExec(o));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            System.exit(1);
-//        }
-
-
-        //new shell(this);
+    protected void initNAL8() {
         for (AbstractOperator o : defaultOperators)
             onExec(o);
-
-
-//        for (AbstractOperator o : exampleOperators)
-//            onExec(o);
     }
-
-//    @Deprecated public void initNAL9() {
-//
-//        the(new Anticipate(this));
-//        the(new Inperience(this));
-//        //memory.the(new Abbreviation(this, "_"));
-//
-//        //onExec(Counting.class);
-//
-////                /*if (internalExperience == Minimal) {
-////                    new InternalExperience(this);
-////                    new Abbreviation(this);
-////                } else if (internalExperience == Full)*/ {
-////                    on(FullInternalExperience.class);
-////                    on(Counting.class);
-////                }
-//    }
-
-
-//    public static final AbstractOperator[] exampleOperators = {
-//            //new Wait(),
-//            new NullOperator("break"),
-//            new NullOperator("drop"),
-//            new NullOperator("goto"),
-//            new NullOperator("open"),
-//            new NullOperator("pick"),
-//            new NullOperator("strike"),
-//            new NullOperator("throw"),
-//            new NullOperator("activate"),
-//            new NullOperator("deactivate")
-//    };
 
 
 
@@ -230,58 +168,11 @@ public abstract class AbstractNAR extends NAR {
     };
 
 
-//    static String readFile(String path, Charset encoding)
-//            throws IOException {
-//        byte[] encoded = Files.readAllBytes(Paths.get(path));
-//        return new String(encoded, encoding);
-//    }
-
-//    protected DerivationFilter[] getDerivationFilters() {
-//        return new DerivationFilter[]{
-//                new FilterBelowConfidence(0.01),
-//                new FilterDuplicateExistingBelief()
-//                //param.getDefaultDerivationFilters().add(new BeRational());
-//        };
-//    }
-
-
-//    protected final Concept newConcept(Term t) {
-//        return conceptBuilder.apply(t);
-//    }
-
-
-
-
-    //    /**
-//     * rank function used for concept belief and goal tables
-//     */
-//    public BeliefTable.RankBuilder newConceptBeliefGoalRanking() {
-//        return (c, b) ->
-//                BeliefTable.BeliefConfidenceOrOriginality;
-//        //new BeliefTable.BeliefConfidenceAndCurrentTime(c);
-//
-//    }
-
-
-
-
     @NotNull
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '[' + level() + ']';
+        return self + ":" + getClass().getSimpleName();
     }
 
-
-
-
-
-//    public static class DefaultTermIndex2 extends MapIndex3 {
-//
-//        public DefaultTermIndex2(int capacity, Random random) {
-//            super(capacity, Terms.terms, new DefaultConceptBuilder(random, 32, 32));
-//
-//        }
-//
-//    }
 
 }

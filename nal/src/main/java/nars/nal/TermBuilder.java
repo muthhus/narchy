@@ -747,27 +747,48 @@ public abstract class TermBuilder {
                 }
 
 
-                //compare unneg'd if it's not temporal or eternal/parallel
-                boolean preventInverse = !op.temporal || (commutive(dt) || dt == XTERNAL);
-                Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject) : subject;
-                Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate) : predicate;
-                if (Terms.equalsAnonymous(sRoot, pRoot))
-                    return subject.op() == predicate.op() ? True : False; //True if same, False if negated
+                Term ss = $.unneg(subject);
+                Term pp = $.unneg(predicate);
+
+                if (Terms.equalAtemporally(ss,pp)) {
+                    return subject==ss ^ predicate==pp ? False : True;  //handle root-level negation comparison
+                }
+
+                //with exceptions for pattern variable containing terms
+                if ((subject.varPattern()==0 && ss.containsTermRecursivelyAtemporally(pp)) ||
+                        (predicate.varPattern()==0 && pp.containsTermRecursivelyAtemporally(ss))) {
+                    return False; //self-reference
+                }
 
 
-                //TODO its possible to disqualify invalid statement if there is no structural overlap here??
+//                //compare unneg'd if it's not temporal or eternal/parallel
+//                boolean preventInverse = !op.temporal || (commutive(dt) || dt == XTERNAL);
+//                Term sRoot = (subject instanceof Compound && preventInverse) ? $.unneg(subject) : subject;
+//                Term pRoot = (predicate instanceof Compound && preventInverse) ? $.unneg(predicate) : predicate;
+//                //        if (as == bs) {
+////            return true;
+////        } else if (as instanceof Compound && bs instanceof Compound) {
+////            return equalsAnonymous((Compound) as, (Compound) bs);
+////        } else {
+////            return as.equals(bs);
+////        }
+//                if (Terms.equalAtemporally(sRoot, pRoot))
+//                    return subject.op() == predicate.op() ? True : False; //True if same, False if negated
 //
-                @NotNull Op sop = sRoot.op();
-                if (sop == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
-                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
-                    return True;
-                }
-
-                @NotNull Op pop = pRoot.op();
-                if (pop == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
-                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
-                    return True;
-                }
+//
+//                //TODO its possible to disqualify invalid statement if there is no structural overlap here??
+////
+//                @NotNull Op sop = sRoot.op();
+//                if (sop == CONJ && (sRoot.containsTerm(pRoot) || (pRoot instanceof Compound && (preventInverse && sRoot.containsTerm($.neg(pRoot)))))) { //non-recursive
+//                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "subject conjunction contains predicate");
+//                    return True;
+//                }
+//
+//                @NotNull Op pop = pRoot.op();
+//                if (pop == CONJ && pRoot.containsTerm(sRoot) || (sRoot instanceof Compound && (preventInverse && pRoot.containsTerm($.neg(sRoot))))) {
+//                    //throw new InvalidTermException(op, new Term[]{subject, predicate}, "predicate conjunction contains subject");
+//                    return True;
+//                }
 
 //            if (sop.statement && pop.statement) {
 //                Compound csroot = (Compound) sRoot;

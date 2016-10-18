@@ -18,26 +18,40 @@ public class LongString {
         URIchars = x.toString().toCharArray();
     }
 
-    public static int maxBase() { return URIchars.length; }
+    public static final int maxBase = URIchars.length;
 
     /** URIchars must be at least base length */
     public static String toString(long aNumber, int base) {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder(8);
 
-        if (aNumber < 0) {
-            result.append('-');
-            aNumber = -aNumber;
-        }
-
-        int r = (int) (aNumber % base);
-
-        if (aNumber - r == 0)
-            result.append(URIchars[r]);
-        else
-            result.append(LongString.toString((aNumber - r) / base, base) + URIchars[r]);
+        append(result, aNumber, base);
 
         return result.toString();
     }
+
+    public static CharSequence toString(long l) {
+        return toString(l, LongString.maxBase);
+    }
+
+    public static void append(StringBuilder target, long v) {
+        append(target, v, maxBase);
+    }
+
+    public static void append(StringBuilder target, long v, int base) {
+        if (v < 0) {
+            target.append('-');
+            v = -v;
+        }
+
+        int r = (int) (v % base);
+
+        if (v - r != 0)
+            append(target, (v - r) / base, base);
+
+        target.append(URIchars[r]);
+
+    }
+
 
 //    public static long parseLong65(String aNumber, int base) {
 //        char[] digits;

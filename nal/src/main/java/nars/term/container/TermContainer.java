@@ -186,6 +186,18 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return false;
     }
 
+    default boolean containsTermRecursivelyAtemporally(@NotNull Term b) {
+        if (!impossibleSubTerm(b)) {
+            int s = size();
+            for (int i = 0; i < s; i++) {
+                Term x = term(i);
+                if (Terms.equalAtemporally(x,b) || ((x instanceof Compound) && (((Compound) x).containsTermRecursivelyAtemporally(b)))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     @NotNull
     static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, @NotNull HashSet<Term> scratch) {

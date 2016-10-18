@@ -35,7 +35,12 @@ public interface Termlike {
      */
     boolean containsTerm(Termlike t);
 
-    /** whether any subterms (recursively) have a non-DTernal temporal relation */
+    default boolean containsTermRecursivelyAtemporally(@NotNull Term b) {
+        return false;
+    }
+
+
+        /** whether any subterms (recursively) have a non-DTernal temporal relation */
     boolean hasTemporal();
 
     default boolean hasAll(int structuralVector) {

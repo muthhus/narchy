@@ -43,10 +43,11 @@ public class Default extends AbstractNAR {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, new XorShift128PlusRandom(1));
     }
 
+    public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;
+
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random,
                 new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO, random),
-                //new CaffeineIndex(new DefaultConceptBuilder(random)),
                 new FrameClock());
     }
 
@@ -59,47 +60,34 @@ public class Default extends AbstractNAR {
         super(clock,
                 index,
                 random,
-                Param.DEFAULT_SELF, exe);
+                Param.defaultSelf(), exe);
 
 
-        core = newCore(
-                activeConcepts,
-                conceptsFirePerCycle,
-                termLinksPerConcept, taskLinksPerConcept
-        );
+        ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts);
+
+        c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
+        c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
+        c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
+
+        this.core = c;
+
 
         int level = level();
 
-        if (level >= 5) {
+        if (level >= 7) {
 
-            if (level >= 7) {
-                initNAL7();
-                if (level >= 8) {
-                    initNAL8();
+            initNAL7();
 
-                }
+            if (level >= 8) {
+
+                initNAL8();
+
             }
+
         }
 
     }
 
-
-    protected @NotNull ConceptBagCycle newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
-
-        ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts);
-
-        //TODO move these to a PremiseGenerator which supplies
-        c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
-        c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
-
-        c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
-
-        //this.handlers = new Active(
-
-
-        //);
-        return c;
-    }
 
     @Override
     public final Concept concept(Term term, float boost) {
@@ -108,7 +96,7 @@ public class Default extends AbstractNAR {
 
     @Override
     public final void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
-        core.concepts.put(concepts, in, activation,overflow);
+        core.activate(concepts, in, activation, overflow);
     }
 
     @Override
@@ -140,7 +128,9 @@ public class Default extends AbstractNAR {
         core.concepts.clear();
     }
 
-    /** suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution */
+    /**
+     * suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution
+     */
     public static class DefaultTermTermIndex extends MapTermIndex {
 
         public DefaultTermTermIndex(int capacity, @NotNull Random random) {
@@ -150,7 +140,7 @@ public class Default extends AbstractNAR {
                     new HashMap(capacity)
                     //new ConcurrentHashMap<>(capacity),
                     //new ConcurrentHashMap<>(capacity)
-                        //new ConcurrentHashMapUnsafe(capacity)
+                    //new ConcurrentHashMapUnsafe(capacity)
             );
         }
     }

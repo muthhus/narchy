@@ -201,7 +201,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
                 new TreeTaskIndex();
 
 
-        self = Param.DEFAULT_SELF; //default value
+        self = Param.defaultSelf(); //default value
 
 
         emotion = new Emotion();

@@ -8,6 +8,7 @@ import nars.task.TruthPolation;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -22,8 +23,13 @@ import static nars.Symbols.*;
 public abstract class Param /*extends Container*/ implements Level {
 
 
-    //TODO use 'I' for SELf, it is 3 characters shorter
-    public static final Atom DEFAULT_SELF = (Atom) $.the("I");
+//    //TODO use 'I' for SELf, it is 3 characters shorter
+//    public static final Atom DEFAULT_SELF = (Atom) $.the("I");
+    public static Atom defaultSelf() {
+        return $.quote("I_" + Util.uuid32());
+    }
+
+
     /**
      * limited because some subterm paths are stored as byte[]. to be safe, use 7-bits
      */
@@ -47,7 +53,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     /** average priority target for bag forgetting, between 0 and 1 usually 0.25..0.5 for balance */
-    public static final float BAG_THRESHOLD = 0.5f;
+    public static final float BAG_THRESHOLD = 0.1f;
 
     /** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
     public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
@@ -69,7 +75,7 @@ public abstract class Param /*extends Container*/ implements Level {
     /** how many times the desired selection size that bags should sample in case some of the selections are unused */
     public static float BAG_OVERSAMPLING = 2.0f;
 
-    public static boolean SENSOR_TASKS_SHARE_COMMON_EVIDENCE = false;
+    public static boolean SENSOR_TASKS_SHARE_COMMON_EVIDENCE;
 
     /** used in linear interpolating link adjustments during feedback. set to zero to disable */
     public final MutableFloat linkFeedbackRate = new MutableFloat(0.0f);
@@ -278,36 +284,6 @@ public abstract class Param /*extends Container*/ implements Level {
      */
     public final MutableFloat durMin = new MutableFloat(0);
 
-
-//    /** budget summary necessary to execute a desired Goal */
-//    public final AtomicDouble questionFromGoalThreshold = new AtomicDouble(0);
-
-    /**
-     * budget summary necessary to run a TaskProcess for a given Task
-     * this should be equal to zero to allow subconcept seeding.
-     */
-    public final MutableFloat taskProcessThreshold = new MutableFloat(0);
-
-    /**
-     * budget summary necessary to propagte tasklink activation
-     */
-    public final MutableFloat taskLinkThreshold = new MutableFloat(0);
-
-    /**
-     * budget summary necessary to propagte termlink activation
-     */
-    public final MutableFloat termLinkThreshold = new MutableFloat(0);
-
-
-
-//    /** Maximum number of beliefs kept in a Concept */
-//    public final AtomicInteger conceptBeliefsMax = new AtomicInteger();
-//
-//    /** Maximum number of questions, and max # of quests kept in a Concept */
-//    public final AtomicInteger conceptQuestionsMax = new AtomicInteger();
-//
-//    /** Maximum number of goals kept in a Concept */
-//    public final AtomicInteger conceptGoalsMax = new AtomicInteger();
 
     public float confidenceDefault(char punctuation) {
 
@@ -604,5 +580,6 @@ public abstract class Param /*extends Container*/ implements Level {
 
 
     }
+
 
 }

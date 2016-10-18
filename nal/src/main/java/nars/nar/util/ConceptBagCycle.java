@@ -6,6 +6,7 @@ import nars.Param;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
@@ -14,6 +15,8 @@ import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
+import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -65,8 +68,12 @@ public class ConceptBagCycle implements Consumer<NAR> {
     private final ConceptBuilder conceptBuilder;
 
     //cached value for use in the next firing
-    private int taskLinks, termLinks;
+    private int _tasklinks, _termlinks;
     private long now;
+
+    /** internal activation multiplier, default=1.0 */
+    private final MutableFloat activation = new MutableFloat(1);
+    private float _activation;
 
 
 //    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
@@ -88,6 +95,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
         this.concepts = new MonitoredCurveBag(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
+
+        this._activation = 1f;
 
         nar.onFrame(this);
         nar.eventReset.on(this::reset);
@@ -118,8 +127,10 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         int cpf = conceptsFiredPerCycle.intValue();
 
-        taskLinks = tasklinksFiredPerFiredConcept.intValue();
-        termLinks = termlinksFiredPerFiredConcept.intValue();
+        this._activation = this.activation.floatValue()/cpf;
+
+        this._tasklinks = tasklinksFiredPerFiredConcept.intValue();
+        this._termlinks = termlinksFiredPerFiredConcept.intValue();
 
         concepts.commit();
 
@@ -132,13 +143,17 @@ public class ConceptBagCycle implements Consumer<NAR> {
             Concept c = bc.get();
             if (c != null) {
                 new FireConceptSquared(c, this.nar,
-                        taskLinks, termLinks,
+                        _tasklinks, _termlinks,
                         this.nar::input, //input them within the current thread here
                         deriver
                 );
             }
         }, 4f);
 
+    }
+
+    public void activate(ObjectFloatHashMap<Concept> activations, Budgeted in, float activation, MutableFloat overflow) {
+        this.concepts.put(activations, in, activation * this._activation, overflow);
     }
 
     static final class BudgetSavings extends RawBudget {
@@ -179,7 +194,10 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         @Override
         public void clear() {
-            forEach((BLink<Concept> v) -> { if (v!=null) sleep(v.get()); }); //HACK allow opportunity to process removals
+            forEach((BLink<Concept> v) -> { if (v!=null)
+                sleep(v.get());
+                //TODO clear BudgetSavings in the meta maps
+            }); //HACK allow opportunity to process removals
             super.clear();
         }
 
@@ -189,20 +207,25 @@ public class ConceptBagCycle implements Consumer<NAR> {
          * */
         @Override protected final void onActive(@NotNull Concept c, BLink<Concept> v) {
 
-            float forgetPeriod = (float) Math.ceil(1 + Math.sqrt(capacity()));
+            float forgetPeriod = getForgetPeriod();
 
             nar.policy(c, conceptBuilder.awake(), now);
             BudgetSavings existing = c.get(this);
             if (existing!=null) {
                 if (existing.isDeleted())
                     throw new UnsupportedOperationException();
-                float forgetScale = 1f / (1f + (now - existing.savedAt)/ forgetPeriod);
-                BudgetMerge.plusBlend.apply(v, existing, forgetScale);
-                c.put(this, null);
+                float forgetScale = 1f - (now - existing.savedAt) / forgetPeriod;
+                if (forgetScale > 0) {
+                    BudgetMerge.plusBlend.apply(v, existing, forgetScale);
+                    c.put(this, null);
+                }
             }
 
         }
 
+        private float getForgetPeriod() {
+            return (float) Math.ceil(1 + Math.sqrt(capacity()));
+        }
 
 
         @Override

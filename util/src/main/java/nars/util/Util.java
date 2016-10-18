@@ -19,6 +19,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import nars.util.data.LongString;
 import nars.util.data.list.FasterList;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
@@ -1307,5 +1308,22 @@ public enum Util { ;
 
     public static double sqr(long l) {
         return l*l;
+    }
+
+    public static CharSequence uuid64() {
+        UUID u = UUID.randomUUID();
+        long a = u.getLeastSignificantBits();
+        long b = u.getMostSignificantBits();
+        StringBuilder sb = new StringBuilder(6);
+        LongString.append(sb, a);
+        LongString.append(sb, b);
+        return sb.toString();
+    }
+    public static CharSequence uuid32() {
+        UUID u = UUID.randomUUID();
+        long a = u.getLeastSignificantBits();
+        long b = u.getMostSignificantBits();
+        long c = a ^ b;
+        return LongString.toString(c);
     }
 }

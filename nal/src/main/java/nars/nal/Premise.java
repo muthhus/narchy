@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static nars.nal.UtilityFunctions.and;
+import static nars.nal.UtilityFunctions.aveAri;
 import static nars.nal.UtilityFunctions.or;
 import static nars.time.Tense.ETERNAL;
 
@@ -163,6 +165,8 @@ public final class Premise extends RawBudget implements Tasked {
             beliefBudget = null;
         }
 
+        //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
+
         float dur = belief == null ? taskBudget.dur() : or(taskBudget.dur(), beliefBudget.dur());
         if (dur < nar.durMin.floatValue())
             return null;
@@ -170,8 +174,8 @@ public final class Premise extends RawBudget implements Tasked {
         float qua = belief == null ? taskBudget.qua() : or(taskBudget.qua(), beliefBudget.qua());
 
         float pri =
-                //or(taskLinkBudget.pri(), termLinkBudget.pri());
-                nar.conceptPriority(c);
+                or(taskLinkBudget.pri(), termLinkBudget.pri());
+                //nar.conceptPriority(c);
 
         return new Premise(c.term(), task, term, belief, pri, dur, qua);
     }

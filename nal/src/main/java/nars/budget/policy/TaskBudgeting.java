@@ -66,14 +66,16 @@ public class TaskBudgeting {
 
         float baseQuality = baseBudget.qua();
 
-        final float quality = or(baseQuality, derivationQuality);
+        final float quality = and(baseQuality, derivationQuality);
 
 
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                baseBudget.pri() * quality;
+                baseBudget.pri() * occam;
+                        //* quality
+        ;
         //* occam //priority should be reduced as well as durability, because in the time between here and the next forgetting it should not have similar priority as parent in cases like Belief:Identity truth function derivations
         //* qual
         //if (priority * durability < Param.BUDGET_EPSILON)

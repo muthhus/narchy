@@ -190,6 +190,8 @@ public interface Compound extends Term, IPair, TermContainer {
         return pathTo(new ByteArrayList(0), this, subterm);
     }
 
+
+
     @Nullable
     default <X> boolean pathsTo(@NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
         X ss = subterm.apply(this);

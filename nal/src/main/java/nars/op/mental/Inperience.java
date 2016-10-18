@@ -179,21 +179,25 @@ public class Inperience extends Leak<Task> {
 
         Task task = b.get();
 
-        Compound ret = reify(task, nar.self, conceptCreationExpectation.floatValue());
-        if (ret != null) {
+        try {
+            Compound ret = reify(task, nar.self, conceptCreationExpectation.floatValue());
+            if (ret != null) {
 
-            long o = task.occurrence();
-            if (o == ETERNAL)
-                o = nar.time();
+                long o = task.occurrence();
+                if (o == ETERNAL)
+                    o = nar.time();
 
-            MutableTask e = $.task(ret, Symbols.BELIEF, 1f, nar.confidenceDefault(Symbols.BELIEF))
-                    .time(nar.time(), o)
-                    .budget(task.priIfFiniteElseZero(), task.dur())
-                    .evidence(task)
-                    .because("Inperience");
+                MutableTask e = $.task(ret, Symbols.BELIEF, 1f, nar.confidenceDefault(Symbols.BELIEF))
+                        .time(nar.time(), o)
+                        .budget(task.priIfFiniteElseZero(), task.dur())
+                        .evidence(task)
+                        .because("Inperience");
 
-            logger.info(" {}", e);
-            nar.inputLater(e);
+                logger.info(" {}", e);
+                nar.inputLater(e);
+            }
+        } catch (ClassCastException cc) {
+            //TODO handle this if it happens (rare)
         }
 
         return 0;

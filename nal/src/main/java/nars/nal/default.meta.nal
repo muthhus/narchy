@@ -526,7 +526,7 @@
 
 
 //NAL4 backwards composition
-    ((/, M, A.._=B..+) --> Z), (C --> B), task("?") |- ((/, M, A.._=B..+) --> substitute((/, M, A.._=B..+),B,C)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((/, %M, A.._=B..+) --> Z), (C --> B), task("?") |- ((/, %M, A.._=B..+) --> substitute((/, %M, A.._=B..+),B,C)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
     ((\, N, A..+) --> Z), (N --> R), task("?") |- ((\, N, A..+) --> (\, R, A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 

@@ -406,7 +406,7 @@ public class Tetris extends SwingAgent {
 //            }
 //        });
 
-        float p = 0.05f;
+        float p = 0.25f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;

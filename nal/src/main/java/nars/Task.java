@@ -625,42 +625,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-    @NotNull
-    default StringBuilder appendOccurrenceTime(@NotNull StringBuilder sb) {
-        long oc = occurrence();
-        long ct = creation();
-
-        /*if (oc == Stamp.TIMELESS)
-            throw new RuntimeException("invalid occurrence time");*/
-        if (ct == ETERNAL)
-            throw new RuntimeException("invalid creation time");
-
-        //however, timeless creation time means it has not been perceived yet
-
-        if (oc == ETERNAL) {
-            if (ct == TIMELESS) {
-                sb.append(":-:");
-            } else {
-                sb.append(':').append(ct).append(':');
-            }
-
-        } else if (oc == TIMELESS) {
-            sb.append("N/A");
-
-        } else {
-            int estTimeLength = 8; /* # digits */
-            sb.ensureCapacity(estTimeLength);
-            sb.append(ct);
-
-            long OCrelativeToCT = (oc - ct);
-            if (OCrelativeToCT >= 0)
-                sb.append('+'); //+ sign if positive or zero, negative sign will be added automatically in converting the int to string:
-            sb.append(OCrelativeToCT);
-
-        }
-
-        return sb;
-    }
 
     default String getTense(long currentTime, int duration) {
 
@@ -680,49 +644,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         }
     }
 
-    @NotNull
-    default CharSequence stampAsStringBuilder() {
-
-        long[] ev = evidence();
-        int len = ev.length;
-        int estimatedInitialSize = 8 + (len * 3);
-
-        StringBuilder buffer = new StringBuilder(estimatedInitialSize);
-        buffer.append(Symbols.STAMP_OPENER);
-
-        if (creation() == TIMELESS) {
-            buffer.append('?');
-        } else if (!Tense.isEternal(occurrence())) {
-            appendOccurrenceTime(buffer);
-        } else {
-            buffer.append(creation());
-        }
-        buffer.append(Symbols.STAMP_STARTER).append(' ');
-
-        int base = LongString.maxBase();
-        for (int i = 0; i < len; i++) {
-
-            if (ev[i] == Long.MAX_VALUE && i == len - 1) {
-                buffer.append(';'); //trailing cyclic value
-            } else {
-                buffer.append(
-                        LongString.toString(ev[i], base)
-                );
-            }
-            if (i < (len - 1)) {
-                buffer.append(Symbols.STAMP_SEPARATOR);
-            }
-        }
-
-        buffer.append(Symbols.STAMP_CLOSER); //.append(' ');
-
-        //this is for estimating an initial size of the stringbuffer
-        //System.out.println(baseLength + " " + derivationChain.size() + " " + buffer.baseLength());
-
-        return buffer;
-
-
-    }
 
 
     default long occurrence() {

@@ -13,6 +13,7 @@ import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,6 @@ import java.util.TreeSet;
 import static java.lang.System.out;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
-import static nars.term.Terms.equalsAnonymous;
 import static org.junit.Assert.*;
 
 
@@ -454,58 +454,128 @@ public class TemporalTest {
 //        }
     }
     @Test public void testEqualsAnonymous() {
-        assertTrue(equalsAnonymous(
-                $("(x && y)"), $("(x &&+1 y)")
-        ));
-        assertTrue(equalsAnonymous(
-                $("(x && y)"), $("(y &&+1 x)")
-        ));
-        assertFalse(equalsAnonymous(
-                $("(x && y)"), $("(z &&+1 x)")
-        ));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertTrue(Terms.equalAtemporally($("(x && y)"), $.<Term>$("(x &&+1 y)")));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertTrue(Terms.equalAtemporally($("(x && y)"), $.<Term>$("(y &&+1 x)")));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertFalse(Terms.equalAtemporally($("(x && y)"), $.<Term>$("(z &&+1 x)")));
 
-        assertTrue(equalsAnonymous(
-                $("(x ==> y)"), $("(x ==>+1 y)")
-        ));
-        assertFalse(equalsAnonymous(
-                $("(x ==> y)"), $("(y ==>+1 x)")
-        ));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertTrue(Terms.equalAtemporally($("(x ==> y)"), $.<Term>$("(x ==>+1 y)")));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertFalse(Terms.equalAtemporally($("(x ==> y)"), $.<Term>$("(y ==>+1 x)")));
     }
     @Test public void testEqualsAnonymous3() {
-        assertTrue(equalsAnonymous(
-                $("(x && (y ==> z))"), $("(x &&+1 (y ==> z))")
-        ));
-        assertTrue(equalsAnonymous(
-                $("(x && (y ==> z))"), $("(x &&+1 (y ==>+1 z))")
-        ));
-        assertFalse(equalsAnonymous(
-                $("(x && (y ==> z))"), $("(x &&+1 (z ==>+1 w))")
-        ));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertTrue(Terms.equalAtemporally($("(x && (y ==> z))"), $.<Term>$("(x &&+1 (y ==> z))")));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertTrue(Terms.equalAtemporally($("(x && (y ==> z))"), $.<Term>$("(x &&+1 (y ==>+1 z))")));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertFalse(Terms.equalAtemporally($("(x && (y ==> z))"), $.<Term>$("(x &&+1 (z ==>+1 w))")));
     }
     @Test public void testEqualsAnonymous4() {
         //temporal terms within non-temporal terms
-        assertTrue(equalsAnonymous(
-                $("(a <-> (y ==> z))"), $("(a <-> (y ==>+1 z))")
-        ));
-        assertFalse(equalsAnonymous(
-                $("(a <-> (y ==> z))"), $("(a <-> (w ==>+1 z))")
-        ));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertTrue(Terms.equalAtemporally($("(a <-> (y ==> z))"), $.<Term>$("(a <-> (y ==>+1 z))")));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertFalse(Terms.equalAtemporally($("(a <-> (y ==> z))"), $.<Term>$("(a <-> (w ==>+1 z))")));
 
-        assertTrue(equalsAnonymous(
-                $("((a ==> b),(b ==> c))"), $("((a ==> b),(b ==>+1 c))")
-        ));
-        assertTrue(equalsAnonymous(
-                $("((a ==>+1 b),(b ==> c))"), $("((a ==> b),(b ==>+1 c))")
-        ));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertTrue(Terms.equalAtemporally($("((a ==> b),(b ==> c))"), $.<Term>$("((a ==> b),(b ==>+1 c))")));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertTrue(Terms.equalAtemporally($("((a ==>+1 b),(b ==> c))"), $.<Term>$("((a ==> b),(b ==>+1 c))")));
     }
     @Test public void testEqualsAnonymous5() {
         //special handling for images
-        assertTrue(equalsAnonymous(
-                $("(/, (a ==> b), c, _)"), $("(/, (a ==>+1 b), c, _)")
-        ));
-        assertFalse(equalsAnonymous(
-                $("(/, a, b, _)"), $("(/, a, _, b)")
-        ));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertTrue(Terms.equalAtemporally($("(/, (a ==> b), c, _)"), $.<Term>$("(/, (a ==>+1 b), c, _)")));
+        //        if (as == bs) {
+//            return true;
+//        } else if (as instanceof Compound && bs instanceof Compound) {
+//            return equalsAnonymous((Compound) as, (Compound) bs);
+//        } else {
+//            return as.equals(bs);
+//        }
+        assertFalse(Terms.equalAtemporally($("(/, a, b, _)"), $.<Term>$("(/, a, _, b)")));
     }
 
 //    @Test public void testRelationTaskNormalization() {

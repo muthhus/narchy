@@ -49,7 +49,7 @@ public class IRCAgent extends IRC {
     private final NAR nar;
     //private float ircMessagePri = 0.9f;
 
-    final int wordDelay = 30; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
+    final int wordDelay = 60; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
 
     public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);
@@ -63,7 +63,7 @@ public class IRCAgent extends IRC {
 
         //SPEAK
         nar.onTask(t -> {
-            if (t.pri() >= 0.6f) {
+            if (t.pri() >= 0.7f) {
                 send(channels, t.toString());
             }
         });
@@ -289,13 +289,12 @@ public class IRCAgent extends IRC {
 
         final long[] time = {nar.time()};
 
-        Atom chan = $.quote(channel);
-        Atom nick = $.quote(who);
+        Atom chan_nick = $.quote(channel + "/" + who);
 
         nar.runLater(() -> {
 
             for (Term token : tokenize(msg)) {
-                Term pr = $.exec("hear", chan, nick, token );
+                Term pr = $.exec("hear", chan_nick, token );
                 nar.believe(pr, time[0], 1f);
                 time[0] += wordDelay;
             }
@@ -324,7 +323,7 @@ public class IRCAgent extends IRC {
         );
 
 
-        int volMax = 50;
+        int volMax = 25;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -344,21 +343,23 @@ public class IRCAgent extends IRC {
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.03f);
+        nar.confMin.setValue(0.05f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
 
         nar.inputLater(
                 NQuadsRDF.stream(nar, new File(
                         "/home/me/Downloads/nquad"
                 )).
                         peek(t -> {
-                            t.setBudget(Param.BUDGET_EPSILON * 64, 0.5f, 0.5f); //low priority
+                            t.setBudget(0.01f, 0.25f, 0.75f); //low priority
                         }).
                         collect(Collectors.toList())
                 , 4f
         );
+        nar.run(1);
+
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
 
         nar.loop(framesPerSecond);
 

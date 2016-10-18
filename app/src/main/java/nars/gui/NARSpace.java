@@ -44,7 +44,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(256, 1, 2, 1 );
+        Default n = new Default(256, 3, 2, 3 );
         //n.nal(4);
 
 
@@ -80,7 +80,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                //.run(800);
 //
         n.linkFeedbackRate.setValue(0.05f);
-        n.loop(5f);
+        n.loop(25f);
         //n.run(1);
 //        n.forEachConcept(c -> {
 //            c.print();

@@ -486,55 +486,30 @@ public class Terms   {
     }
 
 
-    public static boolean equalsAnonymous(@NotNull Term as, @NotNull Term bs) {
-        if (as == bs) {
-            return true;
-        } else if (as instanceof Compound && bs instanceof Compound) {
-            return equalsAnonymous((Compound) as, (Compound) bs);
-        } else {
-            return as.equals(bs);
-        }
-    }
+//    /** compare everything except dt() when not in image case */
+//    @Deprecated private static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {
+//        int as = a.structure();
+//        if (Op.hasAny(as, Op.TemporalBits)) {
+//
+//            if (as == b.structure()) {
+//                Op ao = a.op();
+//                if (ao == b.op()) {
+//                    if (ao.image && a.dt() != b.dt()) //must match dt for image
+//                        return false;
+//
+//                    return equalsAnonymous(a.subterms(), b.subterms());
+//                }
+//            }
+//
+//            return false;
+//
+//        } else {
+//            //no temporal subterms
+//            return a.equals(b);
+//        }
+//
+//    }
 
-    /** compare everything except dt() when not in image case */
-    private static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {
-        int as = a.structure();
-        if (Op.hasAny(as, Op.TemporalBits)) {
-
-            if (as == b.structure()) {
-                Op ao = a.op();
-                if (ao == b.op()) {
-                    if (ao.image && a.dt() != b.dt()) //must match dt for image
-                        return false;
-
-                    return equalsAnonymous(a.subterms(), b.subterms());
-                }
-            }
-
-            return false;
-
-        } else {
-            //no temporal subterms
-            return a.equals(b);
-        }
-
-    }
-
-    private static boolean equalsAnonymous(@NotNull TermContainer a, @NotNull TermContainer b) {
-        if (a.volume() == b.volume()) {
-            int n = a.size();
-            if (n == b.size()) {
-                for (int i = 0; i < n; i++) {
-                    Term as = a.term(i);
-                    Term bs = b.term(i);
-                    if (!equalsAnonymous(as, bs))
-                        return false;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
 
 
 
@@ -813,3 +788,27 @@ public class Terms   {
         return uniques;
     }
 }
+
+
+//    private static boolean equalsAnonymous(@NotNull TermContainer a, @NotNull TermContainer b) {
+//        if (a.volume() == b.volume()) {
+//            int n = a.size();
+//            if (n == b.size()) {
+//                for (int i = 0; i < n; i++) {
+//                    Term as = a.term(i);
+//                    Term bs = b.term(i);
+//                    //        if (as == bs) {
+////            return true;
+////        } else if (as instanceof Compound && bs instanceof Compound) {
+////            return equalsAnonymous((Compound) as, (Compound) bs);
+////        } else {
+////            return as.equals(bs);
+////        }
+//                    if (!Terms.equalAtemporally(as, bs))
+//                        return false;
+//                }
+//                return true;
+//            }
+//        }
+//        return false;
+//    }

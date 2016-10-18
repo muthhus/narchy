@@ -21,9 +21,12 @@
 package nars.nal;
 
 import nars.Param;
+import nars.Symbols;
 import nars.Task;
 import nars.table.TemporalBeliefTable;
+import nars.time.Tense;
 import nars.truth.TruthFunctions;
+import nars.util.data.LongString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
@@ -34,6 +37,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
+
+import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.TIMELESS;
 
 public interface Stamp {
 
@@ -128,6 +134,86 @@ public interface Stamp {
         }
 
         return toSetArray(c, maxLen);
+    }
+
+    @NotNull
+    default StringBuilder appendOccurrenceTime(@NotNull StringBuilder sb) {
+        long oc = occurrence();
+        long ct = creation();
+
+        /*if (oc == Stamp.TIMELESS)
+            throw new RuntimeException("invalid occurrence time");*/
+        if (ct == ETERNAL)
+            throw new RuntimeException("invalid creation time");
+
+        //however, timeless creation time means it has not been perceived yet
+
+        if (oc == ETERNAL) {
+            if (ct == TIMELESS) {
+                sb.append(":-:");
+            } else {
+                sb.append(':').append(ct).append(':');
+            }
+
+        } else if (oc == TIMELESS) {
+            sb.append("N/A");
+
+        } else {
+            int estTimeLength = 8; /* # digits */
+            sb.ensureCapacity(estTimeLength);
+            sb.append(ct);
+
+            long OCrelativeToCT = (oc - ct);
+            if (OCrelativeToCT >= 0)
+                sb.append('+'); //+ sign if positive or zero, negative sign will be added automatically in converting the int to string:
+            sb.append(OCrelativeToCT);
+
+        }
+
+        return sb;
+    }
+
+
+    @NotNull
+    default CharSequence stampAsStringBuilder() {
+
+        long[] ev = evidence();
+        int len = ev.length;
+        int estimatedInitialSize = 8 + (len * 3);
+
+        StringBuilder buffer = new StringBuilder(estimatedInitialSize);
+        buffer.append(Symbols.STAMP_OPENER);
+
+        /*if (creation() == TIMELESS) {
+            buffer.append('?');
+        } else */
+        if (!Tense.isEternal(occurrence())) {
+            appendOccurrenceTime(buffer);
+        } else {
+            buffer.append(creation());
+        }
+        buffer.append(Symbols.STAMP_STARTER).append(' ');
+
+        for (int i = 0; i < len; i++) {
+
+            if (ev[i] == Long.MAX_VALUE && i == len - 1) {
+                buffer.append(';'); //trailing cyclic value
+            } else {
+                LongString.append(buffer, ev[i]);
+            }
+            if (i < (len - 1)) {
+                buffer.append(Symbols.STAMP_SEPARATOR);
+            }
+        }
+
+        buffer.append(Symbols.STAMP_CLOSER); //.append(' ');
+
+        //this is for estimating an initial size of the stringbuffer
+        //System.out.println(baseLength + " " + derivationChain.size() + " " + buffer.baseLength());
+
+        return buffer;
+
+
     }
 
     @NotNull
@@ -252,6 +338,7 @@ public interface Stamp {
     }
 
     long creation();
+    long occurrence();
 
     @NotNull
     Stamp setCreationTime(long t);
