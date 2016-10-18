@@ -262,7 +262,8 @@ public abstract class TermIndex extends TermBuilder {
 
             if (u instanceof EllipsisMatch) {
 
-                subAt += ((EllipsisMatch) u).expand(op, sub);
+                ((EllipsisMatch) u).expand(op, sub);
+                subAt = sub.size();
                 changed = true;
 
             } else {

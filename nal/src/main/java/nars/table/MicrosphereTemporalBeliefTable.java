@@ -143,9 +143,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     static float rankTemporalByConfidence(@Nullable Task t, long now, float duration) {
-        if (t == null)
-            return -1;
-        return timeDecay(t.confWeight(), duration, Math.abs(t.occurrence() - now) );
+        return t == null ? -1 : timeDecay(t.confWeight(), duration, Math.abs(t.occurrence() - now));
     }
 
     /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
@@ -170,7 +168,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             return 1; //empty probably} else {
         } else {
             
-            return Math.max(1, maxT - minT);
+            return Math.max(0, maxT - minT);
         }
     }
 
@@ -256,7 +254,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
     public Task matchWeakest(long now) {
         long duration = duration();
-        return list.minBy(x -> rankTemporalByConfidence(x, duration, now));
+        return list.minBy(x -> rankTemporalByConfidence(x, now, duration));
     }
 
     public Task matchMerge(long now, @NotNull Task toMergeWith) {
@@ -317,11 +315,11 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         long dur = duration();
 
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        float inputRank = input != null ? rankTemporalByConfidence(input, dur, now) : Float.POSITIVE_INFINITY;
+        float inputRank = input != null ? rankTemporalByConfidence(input, now, dur) : Float.POSITIVE_INFINITY;
 
         Task a = matchWeakest(now);
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        if (a == null || inputRank <= rankTemporalByConfidence(a, dur, now) || !remove(a, trash)) {
+        if (a == null || inputRank <= rankTemporalByConfidence(a, now, dur) || !remove(a, trash)) {
             //dont continue if the input was too weak, or there was a problem removing a (like it got removed already by a different thread or something)
             return null;
         }
@@ -368,9 +366,17 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
         long dur = duration();
         if (against == null) {
-            return list.maxBy(x -> rankTemporalByConfidence(x, dur, now));
+
+            //System.out.println(this + " against: " + against + " @ " + now);
+
+            //list.forEach(x -> System.out.println("\t" + x + "  " + rankTemporalByConfidence(x, now, dur)));
+
+            Task l = list.maxBy(x -> rankTemporalByConfidence(x, now, dur));
+            //System.out.println(l);
+            return l;
+
         } else {
-            return list.maxBy(x -> rankTemporalByConfidence(x, dur, against.occurrence()));
+            return list.maxBy(x -> rankTemporalByConfidence(x, against.occurrence(), dur));
             //return list.maxBy(rankPenalizingOverlap(now, against));
         }
 
@@ -409,7 +415,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                     return Revision.project(res, when, now, o, false);
 
             default:
-                float dur = (float)duration()/3;///(s/2f));
+                float dur = (float)duration();///(s/2f));
                 return new TruthPolation(s).truth(when, tr, (dt, evi)->{
                     return timeDecay(evi, dur, dt);
                 });
@@ -419,9 +425,12 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     static float timeDecay(float evi, float dur, float dt) {
-        if (dt == 0 || dur <= 1f)
-            return 1f;
-        return Math.max(0, evi * (1f - (dt * dt / (dur * dur ) ) ) );
+        if (dt == 0)
+            return evi;
+        dur = Math.max(dur, 1f);
+        float newEvi = evi / (1f + (dt * dt / (dur  ) ) );
+        //System.out.println("\t\t" + evi + " x ( dt=" + dt + " dur=" + dur + " ) ---> " + evi);
+        return newEvi;
     }
 
 

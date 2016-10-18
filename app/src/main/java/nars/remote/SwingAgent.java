@@ -49,8 +49,8 @@ abstract public class SwingAgent extends NAgent {
     public static void run(Function<NAR, SwingAgent> init, int frames) {
 
 
-        Default nar = newNAR();
-        //Default2 nar = newNAR2();
+        //Default nar = newNAR();
+        Default2 nar = newNAR2();
 
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);

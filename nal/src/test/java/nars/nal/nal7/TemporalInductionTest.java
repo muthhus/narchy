@@ -3,6 +3,7 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class TemporalInductionTest {
 
     @Test public void testTemporalRevision() {
 
-        NAR n = new Default();
+        NAR n = new Terminal();
 
         //TextOutput.out(n);
 
@@ -51,6 +52,9 @@ public class TemporalInductionTest {
 
         //when originality is considered:
         //assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().top(n.time()).toStringWithoutBudget());
+
+        //least relevant
+        assertEquals("(b-->a). 0+0 %1.0;.90%", c.beliefs().top(0).toStringWithoutBudget());
 
         //most current relevant overall:
         assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().top(n.time()).toStringWithoutBudget());

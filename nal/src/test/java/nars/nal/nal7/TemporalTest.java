@@ -336,7 +336,7 @@ public class TemporalTest {
         assertTrue(5 <= cb.size());
         Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
 
-        String q = "((\\,(a==>b),_)-->[pill])";
+        String q = "((\\,(a==>b),_)-->[pill])=$1.0000;0.5000;0.9000$";
         assertEquals(q,cb.get($(q)).toString());
         //assertEquals(q, cc.toString());
 
@@ -421,7 +421,7 @@ public class TemporalTest {
         n.forEachActiveConcept(d::add);
 
         //2 unique impl concepts created
-        assertEquals("[((x==>y)&&(y==>x)), (x<=>y), (x==>y), (y==>x), x, y]", d.toString());
+        assertEquals("[(#1==>y), ((y==>#1)&&(#1==>y)), (x<=>y), (x==>y), (y==>#1), (y==>x), x, y]", d.toString());
     }
 
     @Test public void testCommutivity() {

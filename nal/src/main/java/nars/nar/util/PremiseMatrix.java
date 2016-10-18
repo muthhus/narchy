@@ -116,8 +116,8 @@ public class PremiseMatrix {
 
         } catch (RuntimeException e) {
 
-//            //if (Param.DEBUG)
-//                e.printStackTrace();
+            //if (Param.DEBUG)
+                e.printStackTrace();
 
             logger.error("run {}", e);
         }

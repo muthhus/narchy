@@ -76,10 +76,10 @@ public enum ImageMatch {
         }
 
         @Override
-        public int expand(Op op, List<Term> target) {
+        public void expand(Op op, List<Term> target) {
             if (op.image) {
                 //expand normally because imdexes will be included in the expansion
-                return super.expand(op, target);
+                super.expand(op, target);
             } else {
                 //exclude any imdexes because the target is not an image
                 for (Term t : terms) {
@@ -87,7 +87,6 @@ public enum ImageMatch {
                         target.add(t);
                     }
                 }
-                return terms.length;
             }
         }
 
