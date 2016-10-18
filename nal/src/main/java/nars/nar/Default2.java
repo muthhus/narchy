@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
+import nars.bag.impl.CurveBag;
 import nars.bag.impl.experimental.HijackBag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
@@ -28,12 +29,14 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static java.lang.System.out;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
+import static nars.bag.impl.CurveBag.power2BagCurve;
 
 /**
  * ALANN Hybrid - experimental
@@ -42,7 +45,8 @@ public class Default2 extends NAR {
 
     private static final Logger logger = LoggerFactory.getLogger(Default2.class);
 
-    public final HijackBag<Concept> active;
+    public final Bag<Concept> active;
+
     public final List<GraphPremiseBuilder> cores;
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
@@ -57,12 +61,16 @@ public class Default2 extends NAR {
         private BLink<Term> linkHere;
 
         //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
-        public Bag<Term> terms = new HijackBag<>(24, 4, BudgetMerge.plusBlend, random);
-        Bag<Task>    tasklinks = new HijackBag<>(16, 4, BudgetMerge.plusBlend, random);
+        public final Bag<Term> terms =
+                //new HijackBag<>(24, 4, BudgetMerge.plusBlend, random);
+                new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new HashMap(16));
+        public final Bag<Task> tasklinks =
+                //new HijackBag<>(16, 4, BudgetMerge.plusBlend, random);
+                new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new HashMap(16));
 
         int iterations = 1;
         int tasklinksFiring = 2;
-        int termlinksFiring = 4;
+        int termlinksFiring = 2;
 
         /** multiplier to apply to links in the 'active' bag when they have been accepted as seeds to this core
          *  it is a cost (reduction) applied to the 'active' bag
@@ -78,20 +86,20 @@ public class Default2 extends NAR {
 
         protected void seed(int num) {
 
-//            while (num-- > 0) {
-//                BLink<Concept> c = active.pop();
-//                if (c != null)
-//                    terms.put(c.get().term(), c);
-//                else
-//                    break;
-//            }
+            while (num-- > 0) {
+                BLink<Concept> c = active.pop();
+                if (c != null)
+                    terms.put(c.get().term(), c);
+                else
+                    break;
+            }
 
 
-            active.sample(num, c -> {
-                terms.put(c.get().term(), c);
-                c.priMult(conceptSeedCost);
-                return true;
-            });
+//            active.sample(num, c -> {
+//                terms.put(c.get().term(), c);
+//                c.priMult(conceptSeedCost);
+//                return true;
+//            });
         }
 
         @Override
@@ -110,7 +118,7 @@ public class Default2 extends NAR {
             //decide whether to remain here
             boolean move;
             if (here !=null) {
-                move = (random.nextFloat() > (1f-momentum)*active.pri(here, 0));
+                move = (random.nextFloat() > (1f-momentum) * linkHere.priIfFiniteElseZero());
             } else {
                 move = true;
             }
@@ -121,14 +129,13 @@ public class Default2 extends NAR {
 
                 if (next == null) {
                     seed(seedRate);
-                    //seed(terms.capacity()/2); //the more seeded from 'active', the less localized this worker's interactions
                     go();
-                } else {
-                    //seed(1);
                 }
             }
 
             if (here != null) {
+
+                linkHere.priMult(conceptVisitCost);
 
                 PremiseMatrix.run(here, Default2.this,
                         tasklinksFiring, termlinksFiring,
@@ -159,7 +166,6 @@ public class Default2 extends NAR {
                     this.here = d;
                     this.linkHere = next;
 
-                    linkHere.priMult(conceptVisitCost);
                 }
             }
             return next;
@@ -189,7 +195,11 @@ public class Default2 extends NAR {
         super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 8192, 4),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
-        active = new HijackBag<>(1024, 6, random);
+        CurveBag<Concept> cb = new CurveBag(BudgetMerge.plusBlend, random);
+        cb.setCapacity(2048);
+        active = cb;
+                //new HijackBag<>(2048, 4, random);
+
 
         durMin.setValue(BUDGET_EPSILON * 2f);
 

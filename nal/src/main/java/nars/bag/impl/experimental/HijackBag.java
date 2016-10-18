@@ -461,7 +461,6 @@ public class HijackBag<X> implements Bag<X> {
         final float[] mass = {0};
 
         final int[] count = {0};
-        int cap = capacity();
         final float[] min = {Float.MAX_VALUE};
         final float[] max = {Float.MIN_VALUE};
 
@@ -481,16 +480,14 @@ public class HijackBag<X> implements Bag<X> {
         float existingMass = mass[0];
 
         Forget f;
-        if (existingMass > 0 && pressure > 0 && (count[0] >= cap * Param.BAG_THRESHOLD)) {
+        if (existingMass > 0 && pressure > 0) {
             float p = this.pressure;
-            this.pressure = 0;
-
-            f = Forget.forget(p, existingMass, count[0], 0.5f);
-
+            f = Forget.forget(p, existingMass, count[0], Param.BAG_THRESHOLD);
         } else {
             f = null;
-            this.pressure = 0;
         }
+
+        this.pressure = 0;
 
         return commit(f);
     }

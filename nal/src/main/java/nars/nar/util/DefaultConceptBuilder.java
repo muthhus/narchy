@@ -66,7 +66,7 @@ import java.util.function.Function;
     }
 
     public <X> Bag<X> newCurveBag(Map m) {
-        return new CurveBag<>(defaultCurveSampler, BudgetMerge.plusBlend, m);
+        return new CurveBag<>(8, defaultCurveSampler, BudgetMerge.plusBlend, m);
     }
 
 
