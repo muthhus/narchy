@@ -49,7 +49,7 @@ public class HijackBag<X> implements Bag<X> {
     private static final float FORGET_CAPACITY_THRESHOLD = 1f;
 
 
-    @Deprecated public HijackBag(int capacity, int reprobes, Random random) {
+    public HijackBag(int capacity, int reprobes, Random random) {
         this(capacity, reprobes, BudgetMerge.plusBlend, random);
     }
 

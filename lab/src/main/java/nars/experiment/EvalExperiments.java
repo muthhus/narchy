@@ -68,7 +68,7 @@ public class EvalExperiments {
                     //new MultiThreadExecutioner(2, 2048);
                     new SingleThreadExecutioner();
 
-            DefaultConceptBuilder cb = new DefaultConceptBuilder(rng);
+            DefaultConceptBuilder cb = new DefaultConceptBuilder();
             //cb.defaultCurveSampler = new CurveBag.NormalizedSampler(c, rng);
 
             Default nar = new Default(1024,

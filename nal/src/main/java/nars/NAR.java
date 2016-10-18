@@ -69,7 +69,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * memory operations.  It executes a series sof cycles in two possible modes:
  * * step mode - controlled by an outside system, such as during debugging or testing
  * * thread mode - runs in a pausable closed-loop at a specific maximum framerate.
- *  * Memory consists of the run-time state of a NAR, including: * term and concept
+ * * Memory consists of the run-time state of a NAR, including: * term and concept
  * memory * clock * reasoner state * etc.
  * <p>
  * Excluding input/output channels which are managed by a NAR.
@@ -83,19 +83,26 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
 
-    static final Set<String> logEvents = Sets.newHashSet( "eventTaskProcess", "eventAnswer", "eventExecute" );
+    static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
     public static final String VERSION = "NARchy v?.?";
 
     public final Executioner exe;
-    @NotNull public final Random random;
+    @NotNull
+    public final Random random;
     public final transient Topic<NAR> eventReset = new DefaultTopic<>();
     public final transient DefaultTopic<NAR> eventFrameStart = new DefaultTopic<>();
     public final transient Topic<Task> eventTaskProcess = new DefaultTopic<>();
-    @NotNull public final transient Emotion emotion;
-    @NotNull public final Clock clock;
-    /** holds known Term's and Concept's */
-    @NotNull public final TermIndex concepts;
-    @NotNull public final TaskIndex tasks;
+    @NotNull
+    public final transient Emotion emotion;
+    @NotNull
+    public final Clock clock;
+    /**
+     * holds known Term's and Concept's
+     */
+    @NotNull
+    public final TermIndex concepts;
+    @NotNull
+    public final TaskIndex tasks;
 
     /**
      * The id/name of the reasoner
@@ -109,7 +116,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
      */
     public volatile boolean running = false;
 
-    /** maximum NAL level currently supported by this memory, for restricting it to activity below NAL8 */
+    /**
+     * maximum NAL level currently supported by this memory, for restricting it to activity below NAL8
+     */
     int level;
 
 
@@ -158,7 +167,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
             }
 
-                    
+
         });
         System.out.println("Total Concepts:\n" + i.get());
         System.out.println("\ntermLinksUsed:\n" + termlinksUsed);
@@ -174,7 +183,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     }
 
 
-    @Nullable public final Compound normalize(Compound t) {
+    @Nullable
+    public final Compound normalize(Compound t) {
 
 ////        //TODO debug only
 //        if (random.nextFloat() < 0.001f) {
@@ -212,7 +222,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         (this.exe = exe).start(this);
 
 
-
 //        eventError.on(e -> {
 //            if (e instanceof Throwable) {
 //                Throwable ex = (Throwable) e;
@@ -228,7 +237,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 //                logger.error(e.toString());
 //            }
 //        });
-
 
 
         concepts.conceptBuilder().start(this);
@@ -434,6 +442,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
         return believe(term, tense, freq, confidenceDefault(Symbols.BELIEF));
     }
+
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, long when, float freq) {
         return believe(term, when, freq, confidenceDefault(Symbols.BELIEF));
@@ -648,7 +657,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
                 emotion.busy(input.pri());
 
                 Activation a = c.process(input, this);
-                if (a!=null) {
+                if (a != null) {
 
                     emotion.stress(a.linkOverflow);
 
@@ -659,7 +668,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
                 }
 
 
-            } catch (InvalidConceptException|InvalidTermException|InvalidTaskException|Budget.BudgetException e) {
+            } catch (InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
 
                 //input.feedback(null, Float.NaN, Float.NaN, this);
                 if (Param.DEBUG)
@@ -671,7 +680,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
             }
         } else {
 
-            if (existing!=input) {
+            if (existing != input) {
 
                 //different instance
 
@@ -918,7 +927,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     @NotNull
     private synchronized NARLoop loop(int initialFramePeriodMS) {
 
-        if (this.loop != null ) {
+        if (this.loop != null) {
             throw new RuntimeException("Already running: " + this.loop);
         }
 
@@ -934,7 +943,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         exe.execute(t);
     }
 
-    /** run a procedure for each item in chunked stripes */
+    /**
+     * run a procedure for each item in chunked stripes
+     */
     public final <X> void runLater(@NotNull List<X> items, Consumer<X> each, float granularityFactor) {
         int conc = exe.concurrency();
         if (conc == 1) {
@@ -988,7 +999,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     @NotNull
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '[' + toString() + ']';
+        return self + ":" + getClass().getSimpleName();
     }
 
 
@@ -1123,9 +1134,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         return concept(tt.term(), createIfMissing);
     }
 
-    public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing)  {
+    public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) {
         Concept c = concepts.concept(t, createIfMissing);
-        if (c!=null && createIfMissing && c.isDeleted()) {
+        if (c != null && createIfMissing && c.isDeleted()) {
             //try again
             concepts.remove(c.term());
             return concepts.concept(t, createIfMissing);
@@ -1135,7 +1146,8 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     }
 
     @Nullable
-    @Deprecated public abstract NAR forEachActiveConcept(@NotNull Consumer<Concept> recip);
+    @Deprecated
+    public abstract NAR forEachActiveConcept(@NotNull Consumer<Concept> recip);
 
     @NotNull
     public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
@@ -1176,12 +1188,14 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     @NotNull
     public final On onFrame(@NotNull Consumer<NAR> each) {
         On r;
-        /*on.add(*/r = eventFrameStart.on(each);//);
+        /*on.add(*/
+        r = eventFrameStart.on(each);//);
         return r;
     }
+
     @NotNull
     public final On onFrame(@NotNull Runnable each) {
-        return onFrame((ignored)->{
+        return onFrame((ignored) -> {
             each.run();
         });
     }
@@ -1300,12 +1314,16 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
             inputLater(tt.toArray(new Task[s]));
     }
 
-    /** will run this if the executioner is not completely saturated */
+    /**
+     * will run this if the executioner is not completely saturated
+     */
     public boolean runLaterMaybe(Runnable r) {
         return exe.executeMaybe(r);
     }
 
-    /** if the concept is active, returns the Concept while applying the boost factor to its budget */
+    /**
+     * if the concept is active, returns the Concept while applying the boost factor to its budget
+     */
     abstract public Concept concept(Term term, float boost);
 
     @Override
@@ -1460,7 +1478,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 //    }
 
 
-    /** batched concept activation */
+    /**
+     * batched concept activation
+     */
     abstract public void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow);
 
 

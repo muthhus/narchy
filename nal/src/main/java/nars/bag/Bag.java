@@ -203,6 +203,16 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 //        return null;
 //    }
 
+    /**
+     * @return null if this is an event which was rejected on input, non-null if it was a re
+     */
+    default void onRemoved(@NotNull V key, @Nullable BLink<V> value) {
+
+    }
+
+    default void onAdded(V key, BLink<V> v) {
+
+    }
 
     /**
      * commits the next set of changes and updates any sorting

@@ -1,13 +1,12 @@
 package nars.nar.exe;
 
 import com.lmax.disruptor.*;
-import com.lmax.disruptor.TimeoutException;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.ProducerType;
 import nars.NAR;
 import nars.Task;
-import nars.time.RealtimeClock;
+import nars.nar.exe.util.AffinityExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -71,6 +70,10 @@ public class MultiThreadExecutioner extends Executioner {
 //        );
 //    }
 //
+    public MultiThreadExecutioner(int threads) {
+        this(threads, 1024 * threads /* estimate */);
+    }
+
     public MultiThreadExecutioner(int threads, int ringSize) {
 
         this.threads = threads;

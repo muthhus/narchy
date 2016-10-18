@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  * stream which can be delegated to other
  * components like other NAR's
  */
-public class Terminal extends AbstractNAR {
+public class Terminal extends NAR {
 
     //final Predicate<Task> taskFilter = Task::isCommand;
 
@@ -37,6 +37,8 @@ public class Terminal extends AbstractNAR {
     }
     public Terminal(int capacity, @NotNull Random random, @NotNull Clock c) {
         super(c, new Default.DefaultTermTermIndex(capacity, random), random, Param.defaultSelf(), new SingleThreadExecutioner());
+
+
     }
 
 

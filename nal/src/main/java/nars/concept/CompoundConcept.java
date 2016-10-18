@@ -31,7 +31,6 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import static nars.Param.TRUTH_EPSILON;
-import static nars.time.Tense.ETERNAL;
 
 
 public class CompoundConcept<T extends Compound> implements AbstractConcept, Termlike {

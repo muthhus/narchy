@@ -21,7 +21,6 @@
 package nars.op.out;
 
 import nars.nal.nal8.operator.ImmediateOperator;
-import nars.nal.nal8.operator.NullOperator;
 
 /**
  */

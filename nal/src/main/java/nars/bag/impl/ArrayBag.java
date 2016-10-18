@@ -328,7 +328,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 v.setBudget(bp * scale, b.dur(), b.qua());
                 if (update(v)) {
                     //success
-                    onActive(key, v);
+                    onAdded(key, v);
                 } else {
                     //failure, undo: remove the key from the map
                     map.remove(key);
@@ -428,16 +428,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-    /**
-     * value will be null if this is an event which was rejected on input
-     */
-    protected void onRemoved(@NotNull V key, @Nullable BLink<V> value) {
 
-    }
-
-    protected void onActive(V key, BLink<V> v) {
-
-    }
 
 
     public float minPri = -1;

@@ -1,4 +1,4 @@
-package nars.nar.util;
+package nars.nar.core;
 
 import nars.$;
 import nars.NAR;
@@ -13,6 +13,8 @@ import nars.concept.Concept;
 import nars.concept.util.ConceptBuilder;
 import nars.link.BLink;
 import nars.nal.Deriver;
+import nars.nar.util.DefaultConceptBuilder;
+import nars.nar.util.PremiseMatrixBuilder;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -142,7 +144,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
         this.nar.runLater(toFire, bc -> {
             Concept c = bc.get();
             if (c != null) {
-                new FireConceptSquared(c, this.nar,
+                PremiseMatrixBuilder.run(c, this.nar,
                         _tasklinks, _termlinks,
                         this.nar::input, //input them within the current thread here
                         deriver
@@ -205,7 +207,8 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         /** called when a concept enters the concept bag
          * */
-        @Override protected final void onActive(@NotNull Concept c, BLink<Concept> v) {
+        @Override
+        public final void onAdded(@NotNull Concept c, BLink<Concept> v) {
 
             float forgetPeriod = getForgetPeriod();
 
@@ -229,7 +232,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
         @Override
-        protected final void onRemoved(@NotNull Concept c, @Nullable BLink<Concept> value) {
+        public final void onRemoved(@NotNull Concept c, @Nullable BLink<Concept> value) {
             if (value!=null) {
                 sleep(c);
 

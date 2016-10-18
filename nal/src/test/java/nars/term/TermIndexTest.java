@@ -24,7 +24,6 @@ public class TermIndexTest {
 
     public static final XorShift128PlusRandom rng = new XorShift128PlusRandom(2);
     public static final DefaultConceptBuilder defaultConceptBuilder = new DefaultConceptBuilder(
-            rng
     );
 
     @Test

@@ -385,7 +385,7 @@ public class Tetris extends SwingAgent {
                 512, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 200000, 8192, 2),
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 200000, 8192, 2),
                 new FrameClock(), e
         );
 

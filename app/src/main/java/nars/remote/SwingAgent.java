@@ -59,7 +59,7 @@ abstract public class SwingAgent extends NAgent {
         Default nar = new Default(1024,
                 conceptsPerCycle, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(new XorShift128PlusRandom(3)), 400000, 64*1024, 3)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64*1024, 3)
 
                 , new FrameClock(), exe);
 

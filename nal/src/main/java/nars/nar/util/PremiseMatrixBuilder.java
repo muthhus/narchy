@@ -4,10 +4,10 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.nal.Conclusion;
 import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
@@ -22,18 +22,21 @@ import java.util.function.Consumer;
 /**
  * derives matrix of: concept => (tasklink x termlink) => premises
  */
-public class FireConceptSquared extends Conclusion {
+public class PremiseMatrixBuilder  {
 
-    private static final Logger logger = LoggerFactory.getLogger(FireConceptSquared.class);
-
-    final Deriver deriver;
-    public final int premisesFired;
+    private static final Logger logger = LoggerFactory.getLogger(PremiseMatrixBuilder.class);
 
 
-    public FireConceptSquared(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> batch, Deriver deriver) {
-        super(batch);
+    public static int run(@NotNull Concept c,
+                          @NotNull NAR nar,
+                          int tasklinks, int termlinks,
+                          @NotNull Consumer<Task> target,
+                          Deriver deriver) {
 
-        this.deriver = deriver;
+        return run(c, nar, tasklinks, termlinks, target, deriver, c.tasklinks(), c.termlinks());
+    }
+
+    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> target, Deriver deriver, Bag<Task> tasklinkBag, Bag<Term> termlinkBag) {
         int count = 0;
 
         try {
@@ -43,7 +46,8 @@ public class FireConceptSquared extends Conclusion {
             int tasklinksSampled = (int)Math.ceil(tasklinks * Param.BAG_OVERSAMPLING);
 
             FasterList<BLink<Task>> tasksBuffer = $.newArrayList(tasklinksSampled);
-            c.tasklinks().sample(tasklinksSampled, tasksBuffer::addIfNotNull);
+
+            tasklinkBag.sample(tasklinksSampled, tasksBuffer::addIfNotNull);
 
             int tasksBufferSize = tasksBuffer.size();
             if (tasksBufferSize > 0) {
@@ -51,7 +55,7 @@ public class FireConceptSquared extends Conclusion {
                 int termlinksSampled = (int)Math.ceil(termlinks * Param.BAG_OVERSAMPLING);
 
                 FasterList<BLink<Term>> termsBuffer = $.newArrayList(termlinksSampled);
-                c.termlinks().sample(termlinksSampled, termsBuffer::addIfNotNull);
+                termlinkBag.sample(termlinksSampled, termsBuffer::addIfNotNull);
 
 
                 int termsBufferSize = termsBuffer.size();
@@ -87,7 +91,7 @@ public class FireConceptSquared extends Conclusion {
 
                             if (p != null) {
 
-                                new PremiseEval(nar, deriver, p, this);
+                                new PremiseEval(nar, deriver, p, target);
                                 countPerTermlink++;
                             }
 
@@ -118,6 +122,6 @@ public class FireConceptSquared extends Conclusion {
             logger.error("run {}", e.toString());
         }
 
-        this.premisesFired = count;
+        return count;
     }
 }

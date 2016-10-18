@@ -1,4 +1,4 @@
-package nars.nar.exe;
+package nars.nar.exe.util;
 
 import net.openhft.affinity.AffinityLock;
 

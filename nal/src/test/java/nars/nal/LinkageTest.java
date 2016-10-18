@@ -5,7 +5,6 @@ import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
@@ -414,7 +413,7 @@ public class LinkageTest extends AbstractNALTest {
 
     @Test
     public void Variable_Normalization_1() throws Exception {
-        AbstractNAR tester = new Default(100,1,1,1);
+        Default tester = new Default(100,1,1,1);
         String nonsense = "<(&&,<#1 --> M>,<#2 --> M>) ==> <#1 --> nonsense>>";
         tester.believe(nonsense); //.en("If robin is a type of bird then robin can fly.");
         tester.run(1);

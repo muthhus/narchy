@@ -45,7 +45,7 @@ public class NQuadsRDFTest {
         Default n = new Default(1024,
                 72, 2, 2, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), DEFAULT_INDEX_WEIGHT, false, e),
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(rng), 1000000, 32768, 3),
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
                 new FrameClock(), e
         );
 

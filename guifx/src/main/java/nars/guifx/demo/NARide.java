@@ -34,7 +34,7 @@ import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.nars.*;
 import nars.guifx.util.*;
 import nars.index.term.TermIndex;
-import nars.nar.util.ConceptBagCycle;
+import nars.nar.core.ConceptBagCycle;
 import nars.term.Term;
 import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;

@@ -128,24 +128,12 @@ import java.util.function.Function;
     final static Logger logger = LoggerFactory.getLogger(DefaultConceptBuilder.class);
 
 
+
     @NotNull
-    public final Random rng; //shared
-    @NotNull
-    public final CurveBag.CurveSampler defaultCurveSampler; //shared
+    public CurveBag.CurveSampler defaultCurveSampler; //shared
 
 
-    public DefaultConceptBuilder(@NotNull Random r) {
-        this.rng = r;
-
-        this.defaultCurveSampler =
-                //new CurveBag.DirectSampler(
-                new CurveBag.NormalizedSampler(
-                        //new CurveBag.DirectSampler(
-                        //CurveBag.linearBagCurve,
-                        CurveBag.power2BagCurve,
-                        //CurveBag.power4BagCurve,
-                        //CurveBag.power6BagCurve,
-                        rng);
+    public DefaultConceptBuilder() {
 
         this.sleep = new DefaultConceptPolicy("sleep", 6, 6, 1, 8, 4);
         this.init = sleep;
@@ -155,7 +143,18 @@ import java.util.function.Function;
 
     @Override
     public void start(NAR nar) {
+
         this.nar = nar;
+
+        this.defaultCurveSampler =
+                //new CurveBag.DirectSampler(
+                new CurveBag.NormalizedSampler(
+                        //new CurveBag.DirectSampler(
+                        //CurveBag.linearBagCurve,
+                        CurveBag.power2BagCurve,
+                        //CurveBag.power4BagCurve,
+                        //CurveBag.power6BagCurve,
+                        nar.random);
     }
 
 

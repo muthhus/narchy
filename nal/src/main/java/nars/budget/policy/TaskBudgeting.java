@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.UtilityFunctions.and;
-import static nars.nal.UtilityFunctions.or;
 
 /**
  * Created by me on 5/23/16.

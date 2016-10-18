@@ -16,7 +16,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.time.FrameClock;
 import nars.truth.Truth;
-import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.FloatNormalized;

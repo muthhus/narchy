@@ -6,14 +6,13 @@ import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
 import nars.budget.policy.DefaultConceptPolicy;
-import nars.nar.AbstractNAR;
 import nars.nar.Default;
+import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.test.analyze.BeliefAnalysis;
 import nars.time.Tense;
 import nars.util.data.random.XorShift128PlusRandom;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Random;
@@ -27,8 +26,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class RevisionTest {
 
-    @NotNull
-    public static AbstractNAR newNAR(int maxBeliefs) {
+    public static Default newNAR(int maxBeliefs) {
         Default d = new Default(256, 1, 2, 3);
         d.nal(7);// {
 
@@ -71,7 +69,7 @@ public class RevisionTest {
     void testRevision(int delay1, boolean beliefOrGoal) {
         Param.DEBUG = true;
 
-        AbstractNAR n = newNAR(6);
+        Default  n = newNAR(6);
         n.nal(1);
 
 
@@ -212,7 +210,7 @@ public class RevisionTest {
     /** test that budget is conserved during a revision between
      * the input tasks and the result */
     @Test public void testRevisionBudgetConserved() {
-        AbstractNAR n = newNAR(6);
+        Default  n = newNAR(6);
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
 

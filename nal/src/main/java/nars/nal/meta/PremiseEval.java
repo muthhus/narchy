@@ -6,7 +6,6 @@ import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
-import nars.nal.Conclusion;
 import nars.nal.Deriver;
 import nars.nal.Premise;
 import nars.nal.Stamp;
@@ -22,6 +21,8 @@ import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.*;
@@ -131,11 +132,11 @@ public class PremiseEval extends Unify {
     private long[] evidenceDouble, evidenceSingle;
 
     @Nullable
-    public final Conclusion conclusion;
+    public final Consumer<Task> target;
     public final boolean cyclic;
 
 
-    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Premise p, @NotNull Conclusion c) {
+    public PremiseEval(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Premise p, @NotNull Consumer<Task> c) {
         super(nar.concepts, VAR_PATTERN, nar.random, Param.UnificationStackMax, Param.UnificationTermutesMax);
 
         this.nar = nar;
@@ -205,7 +206,7 @@ public class PremiseEval extends Unify {
         this.temporal = temporal(task, belief);
 
 
-        this.conclusion = c;
+        this.target = c;
 
         //revert(start); //do this before starting in case the last execution was interrupted
 

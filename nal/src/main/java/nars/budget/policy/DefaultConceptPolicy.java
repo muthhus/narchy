@@ -3,7 +3,6 @@ package nars.budget.policy;
 import nars.Op;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.term.atom.AtomicStringConstant;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;

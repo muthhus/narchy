@@ -5,7 +5,6 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
@@ -113,7 +112,7 @@ public class TaskTest {
     @Test
     public void testDoublePremiseMultiEvidence() {
 
-        AbstractNAR d = new Default(100,1,1,3);
+        Default d = new Default(100,1,1,3);
         d.nal(2);
         d.input("<a --> b>.", "<b --> c>.");
 
