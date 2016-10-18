@@ -9,7 +9,7 @@ import static nars.budget.Budget.validBudgetValue;
 /**
  * Created by me on 9/6/16.
  */
-public class ArrayBLink<X> implements BLink<X> {
+@Deprecated public class ArrayBLink<X> implements BLink<X> {
 
     public X id;
     public float[] f;
@@ -38,11 +38,6 @@ public class ArrayBLink<X> implements BLink<X> {
         return id;
     }
 
-    @Override
-    public void set(X x) {
-        throw new UnsupportedOperationException();
-        //this.id = x;
-    }
 
     @Override
     public Budget setBudget(float p, float d, float q) {

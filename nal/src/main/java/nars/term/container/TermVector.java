@@ -77,6 +77,10 @@ public class TermVector implements TermContainer {
      public TermVector(@NotNull Term... terms) {
         this.terms = terms;
 
+         if (Param.DEBUG) {
+             for (Term x : terms)
+                 if (x == null) throw new NullPointerException();
+         }
          if (terms.length > Param.MAX_SUBTERMS)
              throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Param.MAX_SUBTERMS);
 
@@ -92,7 +96,7 @@ public class TermVector implements TermContainer {
         this.hash = Terms.hashSubterms(this.terms, meta);
 
 
-         final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
+        final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
 
         final int vD = meta[0];  this.varDeps = (byte)vD;
         final int vI = meta[1];  this.varIndeps = (byte)vI;

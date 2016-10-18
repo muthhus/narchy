@@ -328,7 +328,7 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    private Term finish(@NotNull Op op, @NotNull Term... args) {
+    private final Term finish(@NotNull Op op, @NotNull Term... args) {
         return finish(op, DTERNAL, args);
     }
 
@@ -397,26 +397,26 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    public Compound inst(Term subj, Term pred) {
-        return compoundOrNull(the(INH, the(SETe, subj), pred));
+    public Term inst(Term subj, Term pred) {
+        return the(INH, the(SETe, subj), pred);
     }
 
     @Nullable
-    public Compound prop(Term subj, Term pred) {
-        return compoundOrNull(the(INH, subj, the(SETi, pred)));
+    public Term prop(Term subj, Term pred) {
+        return the(INH, subj, the(SETi, pred));
     }
 
     @Nullable
-    public Compound instprop(@NotNull Term subj, @NotNull Term pred) {
-        return compoundOrNull(the(INH, the(SETe, subj), the(SETi, pred)));
+    public Term instprop(@NotNull Term subj, @NotNull Term pred) {
+        return the(INH, the(SETe, subj), the(SETi, pred));
     }
 
     @Nullable
-    private Term[] neg(@NotNull Term[] t) {
-        int l = t.length;
+    private Term[] neg(@NotNull Term[] modified) {
+        int l = modified.length;
         Term[] u = new Term[l];
         for (int i = 0; i < l; i++) {
-            u[i] = neg(t[i]);
+            u[i] = neg(modified[i]);
         }
         return u;
     }
@@ -430,8 +430,8 @@ public abstract class TermBuilder {
                 // (--,(--,P)) = P
                 return t.unneg();
             } else {
-                return newCompound(NEG, DTERNAL, TermVector.the(t)); //newCompound bypasses some checks that finish involves
-                        //finish(NEG, t)
+                return //newCompound(NEG, DTERNAL, TermVector.the(t)); //newCompound bypasses some checks that finish involves
+                       finish(NEG, t);
             }
         } else {
             if (isFalse(t)) return True;
@@ -737,7 +737,7 @@ public abstract class TermBuilder {
 
                 //if either the subject or pred are True/False by this point, fail
                 if (isTrueOrFalse(subject) || isTrueOrFalse(predicate)) {
-                    return subject.equals(predicate) ? True : False;
+                    return subject == predicate ? True : False;
                 }
 
 
@@ -749,8 +749,8 @@ public abstract class TermBuilder {
                 }
 
                 //with exceptions for pattern variable containing terms
-                if ((subject.varPattern()==0 && ss.containsTermRecursivelyAtemporally(pp)) ||
-                        (predicate.varPattern()==0 && pp.containsTermRecursivelyAtemporally(ss))) {
+                if ((ss.varPattern()==0 && ss.containsTermRecursivelyAtemporally(pp)) ||
+                        (pp.varPattern()==0 && pp.containsTermRecursivelyAtemporally(ss))) {
                     return False; //self-reference
                 }
 
@@ -886,6 +886,37 @@ public abstract class TermBuilder {
 
     @NotNull
     private Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
+
+        int trues = 0;
+        for (Term x : t) {
+            if (isTrue(x)) {
+                //everything intersects with the "all", so remove this TRUE below
+                trues++;
+            } else if (isFalse(x)) {
+                return False;
+            }
+        }
+        if (trues > 0) {
+            if (trues == t.length) {
+                return True; //all were true
+            } else if (t.length - trues == 1){
+                //find the element which is not true and return it
+                for (Term y : t) {
+                    if (!isTrue(y))
+                        return y;
+                }
+            } else {
+                //filter the True statements from t
+                Term[] t2 = new Term[t.length - trues];
+                int yy = 0;
+                for (Term y : t) {
+                    if (!isTrue(y))
+                        t2[yy++] = y;
+                }
+                t = t2;
+            }
+        }
+
         switch (t.length) {
 
             case 1:

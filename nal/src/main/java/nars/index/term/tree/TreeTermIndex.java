@@ -23,7 +23,6 @@ public class TreeTermIndex extends TermIndex implements Runnable {
     public final TermTree concepts;
 
     private final ConceptBuilder conceptBuilder;
-    private NAR nar;
 
     long updatePeriodMS = 1000;
 
@@ -61,10 +60,7 @@ public class TreeTermIndex extends TermIndex implements Runnable {
 
     }
 
-    @Override
-    public void start(NAR nar) {
-        this.nar = nar;
-    }
+
 
     //1. decide how many items to remove, if any
     //2. search for items to meet this quota and remove them

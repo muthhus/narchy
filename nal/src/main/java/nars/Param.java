@@ -23,7 +23,11 @@ import static nars.Symbols.*;
 public abstract class Param /*extends Container*/ implements Level {
 
 
-//    //TODO use 'I' for SELf, it is 3 characters shorter
+    /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
+     * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
+    public static final int COMPOUND_VOLUME_MAX = 64;
+
+    //    //TODO use 'I' for SELf, it is 3 characters shorter
 //    public static final Atom DEFAULT_SELF = (Atom) $.the("I");
     public static Atom defaultSelf() {
         return $.quote("I_" + Util.uuid32());
@@ -537,42 +541,6 @@ public abstract class Param /*extends Container*/ implements Level {
     public static final float ETERNALIZATION_CONFIDENCE_FACTOR = 0.5f;
 
 
-    /**
-     * a multiplicative factor which represents the relative separation in time. if  returns a value <= 1.0
-     */
-    public static float simultaneity(long delta /* positive only */, float duration /* <1, divides usually */) {
-        //return (1f + (float)Math.log(1+delta/duration));
-        return 1f / (1f + delta / duration);
-    }
-
-    /**
-     * @param t
-     * @return
-     */
-    public static float rankTemporalByConfidence(@Nullable Task t, float duration, long now) {
-
-        if (t == null || t.isDeleted())
-            return Float.NEGATIVE_INFINITY;
-
-        long tOcc = t.occurrence();
-        //long dWhenNow = Math.abs(when - now);
-        //long dtCre = Math.abs(tOcc - t.creation());
-        long dtOcc = Math.abs(tOcc - now);
-
-//        float pastAndPresentDuration = 1f;
-//        float futureDuration = 1f;
-
-        float rank = t.conf() *
-                simultaneity(
-                        dtOcc,
-                        duration);
-                //+ temporalIrrelevance(dWhenNow, 1f)
-         // + temporalIrrelevance(dtCre, 1f));
-        //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);
-        return rank;
-
-
-    }
 
 
 }

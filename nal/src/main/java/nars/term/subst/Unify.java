@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.BiPredicate;
 
+import static nars.term.Term.False;
+import static nars.term.Term.True;
+
 
 /* recurses a pair of compound term tree's subterms
 across a hierarchy of sequential and permutative fanouts
@@ -447,7 +450,10 @@ public abstract class Unify extends Termunator implements Subst {
     @Nullable
     public final Term resolve(@NotNull Term t) {
         //TODO make a half resolve that only does xy?
-        return transform(t, this);
+        Term x = transform(t, this);
+        if (x == True || x == False)
+            return null;
+        return x;
     }
 
 

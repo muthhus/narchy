@@ -42,7 +42,7 @@ public class Recog2D extends SwingAgent {
     int a = 0;
 
     int image = 0;
-    final int maxImages = 4;
+    final int maxImages = 7;
     int imagePeriod = 128;
     int TRAINING_PERIOD = imagePeriod * 4;
 
@@ -68,20 +68,20 @@ public class Recog2D extends SwingAgent {
 
         imgTrainer = new TrainVector(ii -> $.p($.the("i"), $.the(ii)), maxImages, this);
         imgTrainer.out.keySet().forEach(x ->
-                predictors.addAll(
-                    new MutableTask($.seq(x.term(), 1, happy.term()), '?', null).time(now, now),
-                    new MutableTask($.impl($.inh($.varQuery("wat"), $.the("cam")), 0, happy.term()), '?', null) {
-                        @Override
-                        public boolean onAnswered(Task answer) {
-                            System.err.println(this + "\n\t" + answer);
-                            return false;
-                        }
-                    }.time(now, now)
-                )
+                        predictors.addAll(
+                                new MutableTask($.seq(x.term(), 1, happy.term()), '?', null).time(now, now),
+                                new MutableTask($.impl($.inh($.varQuery("wat"), $.the("cam")), 0, happy.term()), '?', null) {
+                                    @Override
+                                    public boolean onAnswered(Task answer) {
+                                        System.err.println(this + "\n\t" + answer);
+                                        return false;
+                                    }
+                                }.time(now, now)
+                        )
 //                predictors.add(new MutableTask(x, Symbols.QUESTION, null).present(nar.time()))
         );
 
-        addCamera("cam", ()->canvas, w,h, v -> $.t(v, alpha));
+        addCamera("cam", () -> canvas, w, h, v -> $.t(v, alpha));
         //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
 
@@ -96,13 +96,13 @@ public class Recog2D extends SwingAgent {
 
         LinkedHashMap<SensorConcept, TrainVector.Neuron> out = tv.out;
 
-        Plot2D p;
+        Plot2D p, s;
         GridSurface g = col(
 
                 row(BeliefTableChart.beliefTableCharts(nar, out.keySet(), 1024)),
 
-                row(p = new Plot2D(8192, Plot2D.Line).add("Error", ()->tv.errorSum())),
-                row(p = new Plot2D(8192, Plot2D.Line).add("Rward", ()->rewardValue)),
+                row(p = new Plot2D(8192, Plot2D.Line).add("Error", () -> tv.errorSum())),
+                row(s = new Plot2D(8192, Plot2D.BarWave).add("Rward", () -> rewardValue)),
 
                 row(out.entrySet().stream().map(ccnn -> new Surface() {
                     @Override
@@ -122,15 +122,15 @@ public class Recog2D extends SwingAgent {
                         } else {
                             conf = nar.confMin.floatValue();
                             float defaultFreq =
-                                0f; //interpret no-belief as false
-                                //Float.NaN  //use NaN to force learning of negation as separate from no-belief
+                                    0f; //interpret no-belief as false
+                            //Float.NaN  //use NaN to force learning of negation as separate from no-belief
                             freq = defaultFreq;
                         }
 
 
                         Draw.colorPolarized(gl,
-                            freq //unipolar (1 color)
-                            //2f * (-0.5f + freq) //bipolar (2 colors)
+                                freq //unipolar (1 color)
+                                //2f * (-0.5f + freq) //bipolar (2 colors)
                         );
 
                         float m = 0.5f * conf;
@@ -165,7 +165,10 @@ public class Recog2D extends SwingAgent {
                     }
                 }).toArray(Surface[]::new)));
 
-        nar.onFrame(p::update);
+        nar.onFrame(() -> {
+            p.update();
+            s.update();
+        });
 
         return g;
     }
@@ -178,7 +181,7 @@ public class Recog2D extends SwingAgent {
         float r;
 
         if (imgTrainer.verify) {
-            r = (float) -imgTrainer.errorSum() + 0.5f;
+            r = 0.5f - (float) imgTrainer.errorSum() / imgTrainer.states;
         } else {
             //r = 1f; //general positive reinforcement during training
             r = Float.NaN;
@@ -189,7 +192,6 @@ public class Recog2D extends SwingAgent {
         }
 
         redraw();
-
 
 
         if (a % TRAINING_PERIOD == TRAINING_PERIOD - 1) {
@@ -226,7 +228,7 @@ public class Recog2D extends SwingAgent {
 
         //g.rotate(nar.random.nextFloat() * dTheta, w/2, h/2);
 
-        g.drawString(s, w/4, lineMetrics.getHeight());
+        g.drawString(s, w / 4, lineMetrics.getHeight());
     }
 
     public static void main(String[] arg) {

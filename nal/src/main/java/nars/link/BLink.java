@@ -11,7 +11,6 @@ public interface BLink<X> extends Budget, Link<X> {
 
     @Override
     X get();
-    void set(X x);
 
     @Override
     default boolean isDeleted() {
@@ -44,10 +43,5 @@ public interface BLink<X> extends Budget, Link<X> {
 //    }
 
 
-
-    default void set(X nx, Budgeted b, float scale) {
-        set(nx);
-        setBudget(b.pri()*scale, b.dur(), b.qua());
-    }
 
 }

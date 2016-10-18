@@ -215,7 +215,14 @@ public interface TimeFunctions {
     }
 
     static boolean derivationMatch(Term a, Term b, PremiseEval p) {
-        return resolve(p, a).equalsIgnoringVariables(resolve(p, b));
+        Term pa = resolve(p, a);
+        if (pa!=null) {
+            Term pb = resolve(p, b);
+            if (pb!=null) {
+                return pa.equalsIgnoringVariables(pb);
+            }
+        }
+        return false;
     }
 
 
@@ -315,12 +322,13 @@ public interface TimeFunctions {
 
                 occ = ETERNAL;
 
-                Term rDerived = resolve(p, derived);
-                Term rDecomposed = resolve(p, decomposedTerm);
-
                 long relOccDecomposed = ETERNAL, relOccOther = ETERNAL;
 
-                if (occDecomposed != ETERNAL) {
+                @Nullable Term rDecomposed = resolve(p, decomposedTerm);
+
+                @Nullable Term rDerived = resolve(p, derived);
+
+                if (rDecomposed!=null && rDerived!=null && occDecomposed != ETERNAL) {
 
                     int dt = rDecomposed.subtermTime(rDerived);
                     if (dt != DTERNAL)
@@ -334,13 +342,13 @@ public interface TimeFunctions {
 
                     if (derivationMatch(rOtherTerm, derived, p)) {
                         relOccOther = occOther;
-                    } else {
+                    } else if (rDecomposed!=null) {
                         int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
                         if (decomposedTerm.dt() == 0 && otherInDecomposed == 0) {
                             //special case for &&+0 having undergone some unrecognizable change
                             relOccOther = occOther - otherInDecomposed; //+0 should ensure it has the same time as this siblign event
 
-                        } else if (otherInDecomposed != DTERNAL) {
+                        } else if (rDerived!=null && otherInDecomposed != DTERNAL) {
                             int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
                             if (derivedInDecomposed != DTERNAL) {
                                 //now compute the dt between derived and otherTerm, as a shift added to occOther

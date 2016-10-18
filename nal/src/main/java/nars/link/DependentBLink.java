@@ -14,35 +14,13 @@ public class DependentBLink<B extends Budgeted> extends DefaultBLink<B> {
         super(id);
     }
 
-    public DependentBLink(@NotNull B id, Budgeted b) {
+    public DependentBLink(@NotNull B id, @NotNull Budgeted b) {
         super(id, b);
     }
 
 
     @Override
-    public boolean isDeleted() {
-        B x = id;
-
-        if (x!=null) {
-            boolean deleting = false;
-
-            if (x.isDeleted()) {
-                priority = Float.NaN;
-                deleting = true;
-            }
-            if (super.isDeleted()) {
-                deleting = true;
-            }
-
-            if (deleting) {
-                id = x = null;
-            }
-
-            return deleting;
-
-        } else {
-            return true;
-        }
-
+    public final boolean isDeleted() {
+        return super.isDeleted() || (id.isDeleted() && delete());
     }
 }

@@ -142,10 +142,10 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         }
     }
 
-
-
-    public float rankTemporalByConfidence(@Nullable Task t, long now, float duration) {
-        return Param.rankTemporalByConfidence(t, duration, now);
+    static float rankTemporalByConfidence(@Nullable Task t, long now, float duration) {
+        if (t == null)
+            return -1;
+        return timeDecay(t.confWeight(), duration, Math.abs(t.occurrence() - now) );
     }
 
     /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
@@ -406,18 +406,23 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                 if ((now == ETERNAL || when == now) && o == when) //optimization: if at the current time and when
                     return res;
                 else
-                    return Revision.project(res, when, now, o, true);
+                    return Revision.project(res, when, now, o, false);
 
             default:
-                float dur = Math.max(1f, (float)duration()/2);///(s/2f));
+                float dur = (float)duration()/3;///(s/2f));
                 return new TruthPolation(s).truth(when, tr, (dt, evi)->{
-                    return evi / (1f + (dt*dt/dur));
+                    return timeDecay(evi, dur, dt);
                 });
 
         }
 
     }
 
+    static float timeDecay(float evi, float dur, float dt) {
+        if (dt == 0 || dur <= 1f)
+            return 1f;
+        return Math.max(0, evi * (1f - (dt * dt / (dur * dur ) ) ) );
+    }
 
 
     private boolean clean(@NotNull List<Task> trash) {

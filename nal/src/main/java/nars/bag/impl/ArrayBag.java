@@ -95,7 +95,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 if (ss < capacity) {
                     items.addInternal(toAdd); //grows the list if necessary
                 } else {
-                    throw new RuntimeException("list became full during insert");
+                    //throw new RuntimeException("list became full during insert");
+                    return false;
                 }
 
                 float p = toAdd.pri();
@@ -326,6 +327,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 break;
             case +1:
                 v.setBudget(bp * scale, b.dur(), b.qua());
+                //v.set(key);
                 if (update(v)) {
                     //success
                     onAdded(v);
@@ -758,7 +760,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 } else {
                     //accepted for insert
                     this.result = +1;
-                    BLink<Object> b = newLink(key);
+                    BLink b = newLink(key);
                     return b;
                 }
             }

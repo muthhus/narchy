@@ -18,7 +18,7 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
 
 
     ///** the referred item */
-    protected X id;
+    @NotNull protected final X id;
 
     public DefaultBLink(@NotNull X id) {
         this.id = id;
@@ -63,21 +63,16 @@ public class DefaultBLink<X> extends RawBudget implements BLink<X> {
         if (p==p) {
             //not already deleted
             this.priority = (Float.NaN);
-            this.id = null;
             return true;
         }
         return false;
     }
 
 
-    @Nullable
+    @NotNull
     @Override
     public final X get() {
         return id;
     }
 
-    @Override
-    public final void set(@NotNull X id) {
-        this.id = id;
-    }
 }

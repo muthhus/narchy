@@ -60,7 +60,7 @@ abstract public class NAgent implements NSense, NAction {
     public final List<SensorConcept> sensors = $.newArrayList();
     public final List<ActionConcept> actions = $.newArrayList();
 
-    public float alpha, gamma, epsilonProbability = 0.1f;
+    public float alpha, gamma, epsilonProbability = 0.02f;
     @Deprecated
     public float gammaEpsilonFactor = 0.75f;
 
@@ -349,13 +349,13 @@ abstract public class NAgent implements NSense, NAction {
 
             if (nar.random.nextFloat() < motorEpsilonProbability) {
 
-                //System.out.println(c + " " + c.goalConf(now, 0) + " -> " + motorEpsilonProbability);
+                logger.info("curiosity: {} conf={}", c, c.goalConf(now, 0));
 
                 nar.inputLater(
                     new GeneratedTask(c, GOAL,
                             $.t(nar.random.nextFloat()
                                 //Math.random() > 0.5f ? 1f : 0f
-                                , Math.max(nar.truthResolution.floatValue(), nar.random.nextFloat() * gamma * gammaEpsilonFactor)))
+                                , Math.max(nar.truthResolution.floatValue(), 0.5f + (0.5f * nar.random.nextFloat() * gamma * gammaEpsilonFactor))))
                                 .time(now, now).budget(c.pri.asFloat(), nar.durabilityDefault(GOAL)).log("Curiosity"));
 
                                 //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too

@@ -140,18 +140,20 @@ public class TruthPolationLab extends VBox implements ChangeListener {
             double h = ch * 0.9;
             for (int i = 0; i < range; i++) {
                 Truth tc = truth.truth(i, tasks  /* TODO add eternal background control widget */ );
-                double x = dx * i;
-                double y = (1f - tc.freq()) * h;
-                double r = 5 + tc.conf() * rad;
+                if (tc!=null) {
+                    double x = dx * i;
+                    double y = (1f - tc.freq()) * h;
+                    double r = 5 + tc.conf() * rad;
 
-                x -= r / 2;
-                y -= r / 2;
-                y += my;
+                    x -= r / 2;
+                    y -= r / 2;
+                    y += my;
 
-                g.setFill(Color.hsb(tc.conf() * 100, 0.6f, 0.9).interpolate(Color.TRANSPARENT, 0.25f));
-                //g.strokeLine(x, y, x + dx, y);
+                    g.setFill(Color.hsb(tc.conf() * 100, 0.6f, 0.9).interpolate(Color.TRANSPARENT, 0.25f));
+                    //g.strokeLine(x, y, x + dx, y);
 
-                g.fillOval(x, y, r, r);
+                    g.fillOval(x, y, r, r);
+                }
             }
 
             for (Task tc : tasks) {

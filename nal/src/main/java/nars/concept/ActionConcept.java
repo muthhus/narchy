@@ -187,59 +187,59 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
     }
 
 
-    @NotNull
-    @Override
-    protected BeliefTable newBeliefTable(int eCap, int tCap) {
-        return new SensorBeliefTable(tCap);
-    }
-
-    private final class SensorBeliefTable extends DefaultBeliefTable {
-
-        public SensorBeliefTable(int tCap) {
-            super(tCap);
-        }
-
-        @Override
-        public Truth truth(long when, long now) {
-//            if (when == now || when == ETERNAL)
-//                return sensor.truth();
-
-            // if when is between the last input time and now, evaluate the truth at the last input time
-            // to avoid any truth decay across time. this emulates a persistent latched sensor value
-            // ie. if it has not changed
-            if (nextFeedback !=null && when <= now && when >= nextFeedback.occurrence()) {
-                //now = when = sensor.lastInputTime;
-                return nextFeedback.truth();
-            } else {
-                return super.truth(when, now);
-            }
-        }
-
-        @Override
-        public Task match(@NotNull Task target, long now) {
-            long when = target.occurrence();
-
-            Task f = ActionConcept.this.nextFeedback;
-            if (f !=null && when <= now && when >= f.occurrence()) {
-                //but project it to the target time unchanged
-                return MutableTask.clone(f, now);
-            }
-
-            return super.match(target, now);
-        }
-
-        //        @Override
+//    @NotNull
+//    @Override
+//    protected BeliefTable newBeliefTable(int eCap, int tCap) {
+//        return new SensorBeliefTable(tCap);
+//    }
+//
+//    private final class SensorBeliefTable extends DefaultBeliefTable {
+//
+//        public SensorBeliefTable(int tCap) {
+//            super(tCap);
+//        }
+//
+//        @Override
+//        public Truth truth(long when, long now) {
+////            if (when == now || when == ETERNAL)
+////                return sensor.truth();
+//
+//            // if when is between the last input time and now, evaluate the truth at the last input time
+//            // to avoid any truth decay across time. this emulates a persistent latched sensor value
+//            // ie. if it has not changed
+//            if (nextFeedback !=null && when <= now && when >= nextFeedback.occurrence()) {
+//                //now = when = sensor.lastInputTime;
+//                return nextFeedback.truth();
+//            } else {
+//                return super.truth(when, now);
+//            }
+//        }
+//
+//        @Override
 //        public Task match(@NotNull Task target, long now) {
 //            long when = target.occurrence();
-//            if (when == now || when == ETERNAL) {
-//                sensor.
-//                return sensor.truth();
+//
+//            Task f = ActionConcept.this.nextFeedback;
+//            if (f !=null && when <= now && when >= f.occurrence()) {
+//                //but project it to the target time unchanged
+//                return MutableTask.clone(f, now);
 //            }
 //
 //            return super.match(target, now);
 //        }
-    }
-
+//
+//        //        @Override
+////        public Task match(@NotNull Task target, long now) {
+////            long when = target.occurrence();
+////            if (when == now || when == ETERNAL) {
+////                sensor.
+////                return sensor.truth();
+////            }
+////
+////            return super.match(target, now);
+////        }
+//    }
+//
 
 
 

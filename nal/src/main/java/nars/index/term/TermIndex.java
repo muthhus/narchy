@@ -24,6 +24,7 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.TermTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
+import nars.util.data.list.FasterList;
 import nars.util.data.map.nbhm.HijacKache;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.factory.Maps;
@@ -50,6 +51,7 @@ public abstract class TermIndex extends TermBuilder {
 
 
     public static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
+    protected NAR nar;
 
 
     /**
@@ -80,6 +82,7 @@ public abstract class TermIndex extends TermBuilder {
 
 
     public void start(NAR nar) {
+        this.nar = nar;
     }
 
     /**
@@ -128,7 +131,20 @@ public abstract class TermIndex extends TermBuilder {
     @NotNull
     public final Term cached(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
 
-        if (cacheable(op, u)) {
+        int totalVolume = 0;
+        for (Term x : u)
+            totalVolume += x.volume();
+
+//        if (totalVolume > volumeMax(op))
+//            throw new InvalidTermException(op, dt, u, "Too voluminous");
+
+        boolean cacheable =
+                (totalVolume > 2)
+                        &&
+                ((op!=INH) || !(u[1] instanceof TermTransform && u[0].op() == PROD)) //prevents caching for potential transforming terms
+                ;
+
+        if (cacheable) {
 
             //        for (Term x : args)
 //            if (x==null)
@@ -157,6 +173,14 @@ public abstract class TermIndex extends TermBuilder {
 
         } else {
             return _the(op, dt, u);
+        }
+    }
+
+    private int volumeMax(Op op) {
+        if (nar!=null) {
+            return nar.compoundVolumeMax.intValue();
+        } else {
+            return Param.COMPOUND_VOLUME_MAX;
         }
     }
 
@@ -219,13 +243,18 @@ public abstract class TermIndex extends TermBuilder {
             return src;
 
         int len = src.size();
-        List<Term> sub = $.newArrayList(len /* estimate */);
+        FasterList<Term> sub = $.newArrayList(len /* estimate */);
 
         boolean strict = f instanceof PremiseEval;
 
         boolean changed = false;
         Compound crc = (Compound) src;
         Term[] cct = crc.terms();
+
+        //use COMPOUND_VOLUME_MAX instead of trying for the nar's to provide construction head-room that can allow terms
+        //to reduce and potentially meet the requirement
+        int volLimit = Param.COMPOUND_VOLUME_MAX-1; /* -1 for the wrapping compound contribution of +1 volume if succesful */
+        int volSum = 0, volAt = 0, subAt = 0;
         for (int i = 0; i < len; i++) {
             Term t = cct[i];
             Term u = transform(t, f);
@@ -233,7 +262,7 @@ public abstract class TermIndex extends TermBuilder {
 
             if (u instanceof EllipsisMatch) {
 
-                ((EllipsisMatch) u).expand(op, sub);
+                subAt += ((EllipsisMatch) u).expand(op, sub);
                 changed = true;
 
             } else {
@@ -250,6 +279,16 @@ public abstract class TermIndex extends TermBuilder {
                     changed |= (u != t);
                 }
 
+                subAt++;
+
+            }
+
+            for (; volAt < subAt; volAt++) {
+                volSum+=sub.get(volAt).volume();
+                if (volSum > volLimit) {
+                    //HARD VOLUME LIMIT REACHED
+                    return null;
+                }
             }
         }
 
@@ -279,20 +318,6 @@ public abstract class TermIndex extends TermBuilder {
 //    public final @NotNull Term the(@NotNull Op op, @NotNull Term... tt) {
 //        return the(op, DTERNAL, tt); //call this implementation's, not super class's
 //    }
-
-    private static boolean cacheable(Op op, Term[] u) {
-        if (u.length < 2) {
-            return false; //probably not worth caching small compounds
-        }
-        if (op == INH) {
-
-            Term u1 = u[1];
-            if (u1 instanceof TermTransform && u[0].op() == PROD) //prevents caching for potential transforming terms
-                return false;
-
-        }
-        return true;
-    }
 
 
     public void print(@NotNull PrintStream out) {
@@ -490,6 +515,10 @@ public abstract class TermIndex extends TermBuilder {
     public Term conceptualizable(@NotNull Term term) {
         Term termPre;
         do {
+//            //shouldnt need to check for this here
+//            if (isTrueOrFalse(term))
+//                throw new UnsupportedOperationException();
+
             termPre = term;
 
             switch (term.op()) {

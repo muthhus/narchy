@@ -21,7 +21,9 @@ public interface ProtoCompound {
     int dt();
 
 
-    class RawProtoCompound implements ProtoCompound {
+
+
+    public class RawProtoCompound implements ProtoCompound {
 
 
         @NotNull private final Op op;
@@ -29,10 +31,6 @@ public interface ProtoCompound {
         @NotNull private final int dt;
 
         private final int hash;
-
-        protected RawProtoCompound(@NotNull Op op, @NotNull Term... t) {
-            this(op, DTERNAL, t);
-        }
 
         public RawProtoCompound(@NotNull Op op, int dt, @NotNull Term... t) {
             this.op = op;

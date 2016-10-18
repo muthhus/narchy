@@ -523,16 +523,16 @@ public class Terms   {
         return u.toImmutable();
     }
 
-    @Nullable
-    public static Compound compoundOrNull(@Nullable Term t) {
+    /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */
+    @Deprecated @Nullable public static Compound compoundOrNull(@Nullable Term t) {
         if (t instanceof Compound)
             return ((Compound) t);
         else
             return null;
     }
 
-    @Nullable
-    public static Compound compoundOrNull(@Nullable Termed t) {
+    /** dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent */
+    @Deprecated @Nullable public static Compound compoundOrNull(@Nullable Termed t) {
         return t instanceof Compound ? ((Compound)t) : compoundOrNull(t.term());
     }
 
@@ -763,6 +763,8 @@ public class Terms   {
 
     /** equal atemporally AND with any outer negations removed */
     public static boolean equalAtemporally(@NotNull Termed _a, @NotNull Termed _b) {
+        if (_a == _b)
+            return true;
         Term a = _a.unneg();//.term();
         Term b = _b.unneg();//.term();
         return ((a.structure() == b.structure()) &&

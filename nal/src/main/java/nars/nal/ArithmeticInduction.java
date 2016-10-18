@@ -45,23 +45,14 @@ public class ArithmeticInduction {
 
     @NotNull
     public static TermContainer compress(Op op, int dt, @NotNull TermContainer args) {
-        if (args.size() < 2 || !args.hasAny(Op.INT))
+        if (op!=CONJ || !(((dt == DTERNAL) || (dt == 0))) || args.size() < 2 || !args.hasAny(Op.INT))
             return args; //early exit condition
 
-        if (
-                op==CONJ && ((dt == DTERNAL) || (dt == 0))
-                        ||
-                op.isSet()
-                        ||
-                op.isIntersect()
-           ) {
+        MutableSet<Term> xx = args.toSet();
+        Set<Term> yy = compress(xx, 2);
 
-            MutableSet<Term> xx = args.toSet();
-            Set<Term> yy = compress(xx, 2);
-
-            if (!yy.equals(xx)) {
-                return TermSet.the(yy);
-            }
+        if (!yy.equals(xx)) {
+            return TermSet.the(yy);
         }
 
         return args; //unchanged

@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 
 public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
 
-    private NAR nar;
 
 //    @NotNull
 //    public final Cache<Termed, Termed> atomics;
@@ -165,11 +164,6 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
     }
 
 
-
-    @Override
-    public void start(NAR nar) {
-        this.nar = nar;
-    }
 
 
 }

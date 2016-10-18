@@ -181,18 +181,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
             );
         }
 
-        @Override
-        public Concept boost(Object key, float boost) {
-            Concept c = super.boost(key, boost);
-            if (c == null) {
-                //try to set in the long-term budget of the non-active concept
-                BLink<Concept> link = c.get(this /* specifically this one TODO */);
-                if (link!=null) {
-                    link.priMult(boost);
-                }
-            }
-            return c;
-        }
+
 
         @Override
         public void clear() {
@@ -214,8 +203,11 @@ public class ConceptBagCycle implements Consumer<NAR> {
         /** called when a concept enters the concept bag
          * */
         @Override
-        public final void onAdded(BLink<Concept> v) {
+        public final void onAdded(@NotNull BLink<Concept> v) {
             Concept c = v.get();
+            if (c == null)
+                throw new NullPointerException();
+
             float forgetPeriod = getForgetPeriod();
 
             nar.policy(c, conceptBuilder.awake(), now);
