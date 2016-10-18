@@ -1,7 +1,5 @@
 package spacegraph;
 
-import org.codehaus.commons.nullanalysis.NotNull;
-
 /**
  * Drawn edge, lightweight
  */

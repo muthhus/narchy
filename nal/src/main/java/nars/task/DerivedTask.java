@@ -7,7 +7,6 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
-import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;

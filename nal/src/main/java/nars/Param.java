@@ -1,10 +1,8 @@
 package nars;
 
 import nars.budget.BudgetFunctions;
-import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.nal.Level;
 import nars.task.MutableTask;
-import nars.task.TruthPolation;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;

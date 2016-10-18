@@ -1,6 +1,9 @@
 package nars.video;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NAgent;
+import nars.Symbols;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
@@ -10,7 +13,6 @@ import spacegraph.Surface;
 import spacegraph.obj.MatrixView;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.truth.TruthFunctions.w2c;

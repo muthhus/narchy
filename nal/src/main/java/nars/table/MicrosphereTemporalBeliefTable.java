@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Truth;

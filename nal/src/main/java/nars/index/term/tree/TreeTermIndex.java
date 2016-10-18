@@ -1,6 +1,5 @@
 package nars.index.term.tree;
 
-import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;

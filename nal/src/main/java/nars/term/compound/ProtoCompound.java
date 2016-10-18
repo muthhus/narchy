@@ -7,8 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-import static nars.time.Tense.DTERNAL;
-
 /**
  * compound builder
  */

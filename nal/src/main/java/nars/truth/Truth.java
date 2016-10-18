@@ -33,8 +33,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Comparator;
 
-import static nars.truth.TruthFunctions.*;
-
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
 public interface Truth extends Truthed {

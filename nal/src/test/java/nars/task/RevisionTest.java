@@ -7,7 +7,6 @@ import nars.Task;
 import nars.bag.Bag;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.nar.Default;
-import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.test.analyze.BeliefAnalysis;

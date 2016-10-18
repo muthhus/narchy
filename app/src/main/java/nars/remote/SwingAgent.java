@@ -20,6 +20,7 @@ import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 
 import java.awt.*;
@@ -65,7 +66,6 @@ abstract public class SwingAgent extends NAgent {
         SwingAgent a = init.apply(nar);
         a.trace = true;
 
-
         int history = 200;
         chart(a, history);
 
@@ -87,7 +87,10 @@ abstract public class SwingAgent extends NAgent {
 
     private static Default2 newNAR2() {
         Default2 d = new Default2();
-        d.compoundVolumeMax.setValue(30);
+
+        SpaceGraph.window(grid( d.cores.stream().map(c ->
+                Vis.items(c.terms, d, 8)).toArray(Surface[]::new) ), 900, 700);
+
         return d;
     }
 
@@ -173,6 +176,15 @@ abstract public class SwingAgent extends NAgent {
         cam.put(id, c);
         return c;
     }
+
+//    private static class CorePanel extends Surface{
+//
+//        public CorePanel(Default2.GraphPremiseBuilder c, NAR nar) {
+//            super();
+//            grid(Vis.items(c.terms, nar, 10))
+//        }
+//    }
+
 //    protected <C extends PixelCamera> MatrixSensor addMatrixAutoEncoder(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
 //        CameraSensor c = new CameraSensor<>($.the(id), bc, this, pixelTruth);
 //        cam.put(id, c);

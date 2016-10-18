@@ -1,12 +1,10 @@
 package nars.index.term.map;
 
-import nars.Op;
 import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

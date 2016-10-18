@@ -210,11 +210,11 @@ public interface TimeFunctions {
     }
 
     @Deprecated
-    static boolean derivationMatch(Term a, Term b) {
+    static boolean derivationMatch(@NotNull Term a, @NotNull Term b) {
         return /*productNormalize*/(a.unneg()).equalsIgnoringVariables(/*productNormalize*/(b.unneg()));
     }
 
-    static boolean derivationMatch(Term a, Term b, PremiseEval p) {
+    static boolean derivationMatch(@NotNull Term a, @NotNull Term b, @NotNull PremiseEval p) {
         Term pa = resolve(p, a);
         if (pa!=null) {
             Term pb = resolve(p, b);
@@ -339,23 +339,25 @@ public interface TimeFunctions {
                 if (occOther != ETERNAL) {
 
                     @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm.term() : p.taskTerm);
+                    if (rOtherTerm!=null) {
 
-                    if (derivationMatch(rOtherTerm, derived, p)) {
-                        relOccOther = occOther;
-                    } else if (rDecomposed!=null) {
-                        int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
-                        if (decomposedTerm.dt() == 0 && otherInDecomposed == 0) {
-                            //special case for &&+0 having undergone some unrecognizable change
-                            relOccOther = occOther - otherInDecomposed; //+0 should ensure it has the same time as this siblign event
+                        if (derivationMatch(rOtherTerm, derived, p)) {
+                            relOccOther = occOther;
+                        } else if (rDecomposed != null) {
+                            int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
+                            if (decomposedTerm.dt() == 0 && otherInDecomposed == 0) {
+                                //special case for &&+0 having undergone some unrecognizable change
+                                relOccOther = occOther - otherInDecomposed; //+0 should ensure it has the same time as this siblign event
 
-                        } else if (rDerived!=null && otherInDecomposed != DTERNAL) {
-                            int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
-                            if (derivedInDecomposed != DTERNAL) {
-                                //now compute the dt between derived and otherTerm, as a shift added to occOther
-                                relOccOther = occOther + (derivedInDecomposed - otherInDecomposed);
+                            } else if (rDerived != null && otherInDecomposed != DTERNAL) {
+                                int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
+                                if (derivedInDecomposed != DTERNAL) {
+                                    //now compute the dt between derived and otherTerm, as a shift added to occOther
+                                    relOccOther = occOther + (derivedInDecomposed - otherInDecomposed);
+                                }
                             }
-                        }
 
+                        }
                     }
 
                 }
@@ -389,7 +391,7 @@ public interface TimeFunctions {
     }
 
     @Nullable
-    static Term resolve(@NotNull PremiseEval p, Term t) {
+    static Term resolve(@NotNull PremiseEval p, @NotNull Term t) {
         return p.resolve(/*productNormalize*/(t.unneg()));
     }
 

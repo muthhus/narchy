@@ -8,7 +8,6 @@ import spacegraph.SpaceGraph;
 import spacegraph.SpaceTransform;
 
 import java.awt.*;
-import java.util.*;
 
 /**
  * Fast organic layout algorithm, adapted from JGraph

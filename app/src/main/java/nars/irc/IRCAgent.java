@@ -1,7 +1,10 @@
 package nars.irc;
 
 import com.github.fge.grappa.exceptions.GrappaException;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Narsese;
+import nars.Task;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.gui.Vis;
@@ -40,6 +43,10 @@ import static nars.nlp.Twenglish.tokenize;
 
 /**
  * Created by me on 7/10/16.
+ *
+ <sseehh> (hear($someone, $something) ==> say($something)).
+ <sseehh> ((hear($someone,$something) &&+1 hear($someone,$nextThing)) && hear(I, $something)) ==>+1 say($nextThing).
+ <sseehh> (((I<->$someone) && hear($someone, $something)) ==> say($something)).
  */
 public class IRCAgent extends IRC {
     private static final Logger logger = LoggerFactory.getLogger(IRCAgent.class);
@@ -372,8 +379,8 @@ public class IRCAgent extends IRC {
 
         IRC bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz"
-                //"#netention"
+                //"#123xyz"
+                "#netention"
                 //"#nars"
         );
 

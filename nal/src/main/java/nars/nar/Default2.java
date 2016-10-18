@@ -43,25 +43,25 @@ public class Default2 extends NAR {
     private static final Logger logger = LoggerFactory.getLogger(Default2.class);
 
     public final HijackBag<Concept> active;
-    private final List<PremiseGraphBuilder> cores;
+    public final List<GraphPremiseBuilder> cores;
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
-    private float _activation = 0;
+    private float _activation;
 
 
-    final class PremiseGraphBuilder implements Runnable {
+    public final class GraphPremiseBuilder implements Runnable {
 
-        Concept at = null;
+        Concept at;
         //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
-        Bag<Term> terms = new HijackBag<>(24, 4, BudgetMerge.plusBlend, random);
+        public Bag<Term> terms = new HijackBag<>(24, 4, BudgetMerge.plusBlend, random);
         Bag<Task>    tasklinks = new HijackBag<>(16, 4, BudgetMerge.plusBlend, random);
 
         int iterations = 1;
-        int tasklinksFired = 2;
-        int termlinksFired = 4;
+        int tasklinksFiring = 2;
+        int termlinksFiring = 4;
 
 
-        public PremiseGraphBuilder() {
+        public GraphPremiseBuilder() {
         }
 
         protected void seed(int num) {
@@ -97,17 +97,18 @@ public class Default2 extends NAR {
                 BLink<Term> next = go();
 
                 if (next == null) {
-                    seed(terms.capacity()/2); //the more seeded from 'active', the less localized this worker's interactions
+                    seed(1);
+                    //seed(terms.capacity()/2); //the more seeded from 'active', the less localized this worker's interactions
                     go();
                 } else {
-                    seed(1);
+                    //seed(1);
                 }
             }
 
             if (at != null) {
 
                 PremiseMatrix.run(at, Default2.this,
-                        tasklinksFired, termlinksFired,
+                        tasklinksFiring, termlinksFiring,
                         Default2.this::input, //input them within the current thread here
                         deriver,
                         this.tasklinks, terms
@@ -125,19 +126,12 @@ public class Default2 extends NAR {
                 if (d != null) {
 
                     List<Task> trash = $.newArrayList(0);
-                    d.policy(((DefaultConceptBuilder)concepts.conceptBuilder()).awake(), time(), trash);
+                    d.policy(concepts.conceptBuilder().awake(), time(), trash);
                     tasks.remove(trash);
 
 
-                    d.termlinks().commit().sample(2, t -> {
-                        terms.putLink(t);
-                        return true;
-                    });
-                    ;
-                    d.tasklinks().commit().sample(2, t -> {
-                        tasklinks.putLink(t);
-                        return true;
-                    });
+                    d.termlinks().commit().transfer(2, terms);
+                    d.tasklinks().commit().transfer(2, tasklinks);
 
                     this.at = d;
                 }
@@ -153,7 +147,7 @@ public class Default2 extends NAR {
         }
 
         public int duty() {
-            return tasklinksFired * termlinksFired * iterations; /* * expected hit rate */
+            return tasklinksFiring * termlinksFiring * iterations; /* * expected hit rate */
         }
 
     }
@@ -189,22 +183,21 @@ public class Default2 extends NAR {
         }
 
         int numCores = 32;
-        this.cores = range(0, numCores ).mapToObj(i -> new PremiseGraphBuilder()).collect(toList());
-
+        this.cores = range(0, numCores ).mapToObj(i -> new GraphPremiseBuilder()).collect(toList());
 
         onFrame(()-> {
             this._activation = getNextActivationRate();
             active.commit();
-            runLater(cores, PremiseGraphBuilder::run, 1);
+            runLater(cores, GraphPremiseBuilder::run, 1);
         });
     }
 
     private float getNextActivationRate() {
-        return 1f / (cores.size() * cores.stream().mapToInt(PremiseGraphBuilder::duty).sum());
+        return 1f / (cores.size() * cores.stream().mapToInt(GraphPremiseBuilder::duty).sum());
 
     }
 
-    private STMTemporalLinkage stmLinkage = null;
+    private STMTemporalLinkage stmLinkage;
 
     /** NAL7 plugins */
     protected void initNAL7() {

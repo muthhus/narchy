@@ -6,6 +6,7 @@ import nars.budget.Budgeted;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.link.DependentBLink;
+import nars.term.Term;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
@@ -632,4 +633,12 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
                 putLink(toAdd);
         }
     }
+
+    default @NotNull Bag<V> transfer(int maxItemsToSend, Bag target) {
+        return this.sample(maxItemsToSend, t -> {
+            target.putLink(t);
+            return true; //assume it worked
+        });
+    }
+
 }

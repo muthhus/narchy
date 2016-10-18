@@ -6,6 +6,7 @@ import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
@@ -23,6 +24,7 @@ import spacegraph.obj.CrosshairSurface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.PanelSurface;
 import spacegraph.obj.Plot2D;
+import spacegraph.render.Draw;
 
 import java.util.List;
 
@@ -85,7 +87,7 @@ public class Vis {
 
     public static void show(Default d, int count) {
 
-        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>(     );
+        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
         s.add(new Facial(grid(
                 concepts(d, count),
                 budgetHistogram(d, 32),
@@ -142,6 +144,31 @@ public class Vis {
 
                 y.update(p, r, g, b);
 
+
+            }
+        };
+
+        d.onFrame(xx -> {
+
+            //if (s.window.isVisible()) {
+            tc.now = xx.time();
+            tc.update();
+            //}
+        });
+
+        return tc;
+    }
+
+    public static <X extends Termed> BagChart<X> items(Bag<X> bag, final NAR d, final int count) {
+        BagChart<X> tc = new BagChart<>(bag, count) {
+            @Override
+            public void accept(BLink<X> x, ItemVis<BLink<X>> y) {
+                float p = x.pri();
+
+                float[] f = Draw.hsb(
+                        (0.3f * x.get().hashCode() / (float) Integer.MAX_VALUE),
+                        .5f + 0.25f * p, 0.5f + 0.25f * p, 1f, null);
+                y.update(p, f[0], f[1], f[2]);
 
             }
         };

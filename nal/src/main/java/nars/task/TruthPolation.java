@@ -2,7 +2,6 @@ package nars.task;
 
 import com.google.common.base.Joiner;
 import nars.$;
-import nars.Param;
 import nars.Task;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;

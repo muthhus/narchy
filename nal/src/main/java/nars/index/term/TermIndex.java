@@ -42,7 +42,6 @@ import java.util.function.Function;
 import static nars.Op.*;
 import static nars.term.Term.False;
 import static nars.term.Termed.termOrNull;
-import static nars.time.Tense.DTERNAL;
 
 /**
  *

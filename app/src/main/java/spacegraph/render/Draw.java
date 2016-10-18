@@ -31,7 +31,8 @@ import nars.$;
 import nars.util.data.list.FasterList;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.EDraw;
 import spacegraph.SimpleSpatial;
 import spacegraph.math.AxisAngle4f;
@@ -604,7 +605,17 @@ public enum Draw {
     }
 
 
-    public static void hsb(float hue, float saturation, float brightness, float a, float[] target) {
+    public static void hsb(GL2 gl, float hue, float saturation, float brightness, float a) {
+        float[] f = new float[4];
+        hsb(hue, saturation, brightness, a, f);
+        gl.glColor4fv(f, 0);
+    }
+
+    @NotNull
+    public static float[] hsb(float hue, float saturation, float brightness, float a, @Nullable float[] target) {
+        if (target == null || target.length < 4)
+            target = new float[4];
+
         float r = 0, g = 0, b = 0;
         if (saturation == 0) {
             r = g = b = (int) (brightness * 255.0f + 0.5f);
@@ -651,6 +662,7 @@ public enum Draw {
         target[1] = g;
         target[2] = b;
         target[3] = a;
+        return target;
     }
 
     /**
@@ -669,6 +681,8 @@ public enum Draw {
         }
         gl.glColor3f(r, g, b);
     }
+
+
 
 //
 //    public static void hsb(float h, float s, float b, float a, float[] target) {

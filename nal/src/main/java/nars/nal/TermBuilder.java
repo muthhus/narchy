@@ -26,7 +26,6 @@ import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.term.Term.False;
 import static nars.term.Term.True;
-import static nars.term.Terms.compoundOrNull;
 import static nars.term.compound.Statement.pred;
 import static nars.term.compound.Statement.subj;
 import static nars.time.Tense.DTERNAL;

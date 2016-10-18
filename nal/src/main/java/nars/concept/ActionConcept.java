@@ -1,10 +1,7 @@
 package nars.concept;
 
 import nars.*;
-import nars.table.BeliefTable;
-import nars.table.DefaultBeliefTable;
 import nars.task.GeneratedTask;
-import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.data.array.LongArrays;

@@ -6,7 +6,6 @@ import nars.guifx.util.CodeInput;
 import nars.guifx.util.Windget;
 import nars.guifx.wikipedia.NARWikiBrowser;
 import nars.nar.Default;
-import nars.nar.Terminal;
 
 import java.util.function.Function;
 

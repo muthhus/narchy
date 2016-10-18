@@ -3,14 +3,12 @@ package spacegraph.obj;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import nars.$;
-import nars.NAR;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
 public class Plot2D extends Surface {

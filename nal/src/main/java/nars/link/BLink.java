@@ -1,7 +1,6 @@
 package nars.link;
 
 import nars.budget.Budget;
-import nars.budget.Budgeted;
 
 /**
  * Created by me on 5/29/16.
