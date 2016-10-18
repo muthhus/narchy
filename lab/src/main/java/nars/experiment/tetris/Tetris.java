@@ -14,7 +14,6 @@ import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
 import nars.remote.SwingAgent;
@@ -692,7 +691,7 @@ public class Tetris extends SwingAgent {
                 }
             }
 
-            float p = nar.conceptPriority(s);
+            float p = nar.activation(s);
             g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
             return b != null ? b.conf() : 0;

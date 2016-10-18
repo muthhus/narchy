@@ -8,7 +8,6 @@ import nars.budget.policy.ConceptPolicy;
 import nars.nal.UtilityFunctions;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
-import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -28,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static nars.Symbols.BELIEF;
-import static nars.time.Tense.ETERNAL;
 
 
 /**
@@ -233,7 +231,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     /** adaptively sets the priority of a group of sensors via a function  */
     public static void activeAttention(Iterable<? extends Prioritizable> c, FloatToFloatFunction f, NAR nar) {
         c.forEach( s -> s.pri(() -> {
-            return f.valueOf(nar.conceptPriority((Termed)s));
+            return f.valueOf(nar.activation((Termed)s));
         } ) );
     }
 

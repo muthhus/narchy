@@ -51,7 +51,7 @@ public class Terminal extends AbstractNAR {
     }
 
     @Override
-    public float conceptPriority(@NotNull Termed termed) {
+    public float activation(@NotNull Termed termed) {
         return 0;
     }
 
@@ -76,7 +76,7 @@ public class Terminal extends AbstractNAR {
     }
 
     @Override
-    public void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
+    public void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
         //nothing
     }
 

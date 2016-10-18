@@ -126,7 +126,7 @@ public class BeliefTableChart extends Surface {
 
 
 
-        float cp = nar.conceptPriority(cc);
+        float cp = nar.activation(cc);
         gl.glColor4f(0.5f, 0.5f, 0.5f, 0.2f + 0.25f * cp);
         float size = (cp > 0 ? (0.0003f + 0.00015f * cp) : 0.00015f); //if not active then show in small, otherwise if active show larger and grow in proportion to the activity
         Draw.text(gl, size, size, tt.toString(), 1 / 2f, 1 / 2f, 0);

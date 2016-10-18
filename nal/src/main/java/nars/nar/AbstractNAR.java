@@ -40,20 +40,6 @@ public abstract class AbstractNAR extends NAR {
 
 
 
-    /** NAL7 plugins */
-    protected void initNAL7() {
-
-        new STMTemporalLinkage(this, 2);
-
-    }
-
-    /* NAL8 plugins */
-    protected void initNAL8() {
-        for (AbstractOperator o : defaultOperators)
-            onExec(o);
-    }
-
-
 
 
 

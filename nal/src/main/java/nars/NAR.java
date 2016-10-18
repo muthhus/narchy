@@ -1105,7 +1105,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     }
 
     /**
-     * clears active memory (but not memory indices)
+     * clears active memory (but not memory indices).
+     * it is like asking NAR to empty its (conscious) mind to be ready for a new focus
+     * also can be considered a "soft" reset, vs the reset() which is "hard"
      */
     abstract public void clear();
 
@@ -1133,7 +1135,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     }
 
     @Nullable
-    public abstract NAR forEachActiveConcept(@NotNull Consumer<Concept> recip);
+    @Deprecated public abstract NAR forEachActiveConcept(@NotNull Consumer<Concept> recip);
 
     @NotNull
     public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
@@ -1219,7 +1221,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     /**
      * gets a measure of the current priority of the concept
      */
-    abstract public float conceptPriority(@NotNull Termed termed);
+    abstract public float activation(@NotNull Termed termed);
 
     public Termed[] terms(String... terms) {
         return Stream.of(terms).map(this::term).toArray(Termed[]::new);
@@ -1459,7 +1461,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
 
     /** batched concept activation */
-    abstract public void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow);
+    abstract public void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow);
 
 
 //    public final void activate(@NotNull Task t) {

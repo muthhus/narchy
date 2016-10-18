@@ -95,7 +95,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         //Budget b = instance;
 
-        this.pri = nar.conceptPriority(tt);
+        this.pri = nar.activation(tt);
 
         float p = pri;// = 1; //pri = key.priIfFiniteElseZero();
 

@@ -201,7 +201,7 @@ public class Vis {
         for (Termed t : concepts) {
             Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
             p.setTitle(t.toString());
-            p.add("P", () -> nar.conceptPriority(t), 0f, 1f);
+            p.add("P", () -> nar.activation(t), 0f, 1f);
             p.add("B", () -> nar.concept(t).beliefFreq(nar.time()), 0f, 1f);
             p.add("G", () -> nar.concept(t).goalFreq(nar.time()), 0f, 1f);
             grid.children.add(p);

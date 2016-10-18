@@ -7,10 +7,12 @@ import nars.concept.Concept;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.link.BLink;
+import nars.nal.nal8.AbstractOperator;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.SingleThreadExecutioner;
 import nars.nar.util.ConceptBagCycle;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.time.STMTemporalLinkage;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
@@ -88,6 +90,21 @@ public class Default extends AbstractNAR {
 
     }
 
+    private STMTemporalLinkage stmLinkage = null;
+
+    /** NAL7 plugins */
+    protected void initNAL7() {
+
+        stmLinkage = new STMTemporalLinkage(this, 2);
+
+    }
+
+    /* NAL8 plugins */
+    protected void initNAL8() {
+        for (AbstractOperator o : defaultOperators)
+            onExec(o);
+    }
+
 
     @Override
     public final Concept concept(Term term, float boost) {
@@ -95,13 +112,13 @@ public class Default extends AbstractNAR {
     }
 
     @Override
-    public final void activate(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
+    public final void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
         core.activate(concepts, in, activation, overflow);
     }
 
     @Override
-    public final float conceptPriority(@NotNull Termed termed) {
-        BLink<Concept> c = core.concepts.get(termed);
+    public final float activation(@NotNull Termed concept) {
+        BLink<Concept> c = core.concepts.get(concept);
         return c != null ? c.priIfFiniteElseZero() : 0;
     }
 
@@ -125,7 +142,13 @@ public class Default extends AbstractNAR {
 
     @Override
     public void clear() {
+        //TODO use a 'clear' event handler that these can attach to
+
         core.concepts.clear();
+
+        if (stmLinkage!=null)
+            stmLinkage.clear();
+
     }
 
     /**
@@ -137,7 +160,7 @@ public class Default extends AbstractNAR {
             super(
                     new DefaultConceptBuilder(random),
                     new HashMap(capacity),
-                    new HashMap(capacity)
+                    new HashMap(capacity*2)
                     //new ConcurrentHashMap<>(capacity),
                     //new ConcurrentHashMap<>(capacity)
                     //new ConcurrentHashMapUnsafe(capacity)
@@ -145,19 +168,6 @@ public class Default extends AbstractNAR {
         }
     }
 
-
-//    /** possibly faster access from active concept bag than the index
-//     * TODO faster access by providing a Concept instance, instead of its key.
-//     * this indicates the term is already known to be a key and does not need
-//     * atemporalized etc
-//     * */
-//    @Nullable @Override public final Concept concept(@NotNull Term t, boolean createIfMissing) {
-//        @Nullable BLink<Concept> activeLink = core.concepts.get(t);
-//        if (activeLink!=null) {
-//            return activeLink.get();
-//        }
-//        return super.concept(t, createIfMissing);
-//    }
 
 
 }
