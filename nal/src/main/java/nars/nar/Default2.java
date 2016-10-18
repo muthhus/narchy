@@ -51,7 +51,11 @@ public class Default2 extends NAR {
 
     public final class GraphPremiseBuilder implements Runnable {
 
-        Concept at;
+        public static final int seedRate = 1;
+
+        Concept here;
+        private BLink<Term> linkHere;
+
         //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
         public Bag<Term> terms = new HijackBag<>(24, 4, BudgetMerge.plusBlend, random);
         Bag<Task>    tasklinks = new HijackBag<>(16, 4, BudgetMerge.plusBlend, random);
@@ -60,13 +64,32 @@ public class Default2 extends NAR {
         int tasklinksFiring = 2;
         int termlinksFiring = 4;
 
+        /** multiplier to apply to links in the 'active' bag when they have been accepted as seeds to this core
+         *  it is a cost (reduction) applied to the 'active' bag
+         * */
+        private float conceptSeedCost = 0.5f;
+
+        /* a cost (reduction) applied to the local 'term' bag */
+        private float conceptVisitCost = 0.5f;
+
 
         public GraphPremiseBuilder() {
         }
 
         protected void seed(int num) {
+
+//            while (num-- > 0) {
+//                BLink<Concept> c = active.pop();
+//                if (c != null)
+//                    terms.put(c.get().term(), c);
+//                else
+//                    break;
+//            }
+
+
             active.sample(num, c -> {
                 terms.put(c.get().term(), c);
+                c.priMult(conceptSeedCost);
                 return true;
             });
         }
@@ -86,8 +109,8 @@ public class Default2 extends NAR {
 
             //decide whether to remain here
             boolean move;
-            if (at!=null) {
-                move = (random.nextFloat() > (1f-momentum)*active.pri(at, 0));
+            if (here !=null) {
+                move = (random.nextFloat() > (1f-momentum)*active.pri(here, 0));
             } else {
                 move = true;
             }
@@ -97,7 +120,7 @@ public class Default2 extends NAR {
                 BLink<Term> next = go();
 
                 if (next == null) {
-                    seed(1);
+                    seed(seedRate);
                     //seed(terms.capacity()/2); //the more seeded from 'active', the less localized this worker's interactions
                     go();
                 } else {
@@ -105,9 +128,9 @@ public class Default2 extends NAR {
                 }
             }
 
-            if (at != null) {
+            if (here != null) {
 
-                PremiseMatrix.run(at, Default2.this,
+                PremiseMatrix.run(here, Default2.this,
                         tasklinksFiring, termlinksFiring,
                         Default2.this::input, //input them within the current thread here
                         deriver,
@@ -133,14 +156,17 @@ public class Default2 extends NAR {
                     d.termlinks().commit().transfer(2, terms);
                     d.tasklinks().commit().transfer(2, tasklinks);
 
-                    this.at = d;
+                    this.here = d;
+                    this.linkHere = next;
+
+                    linkHere.priMult(conceptVisitCost);
                 }
             }
             return next;
         }
 
         void print() {
-            logger.info("at: {}", at);
+            logger.info("at: {}", here);
             //out.println("\nlocal:"); local.print();
             out.println("\ntermlinks:"); terms.print();
             out.println("\ntasklinks:"); tasklinks.print();
