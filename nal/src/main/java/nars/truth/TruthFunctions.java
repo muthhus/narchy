@@ -381,7 +381,9 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+    public static Truth desireInd(@Nullable Truth v1, @NotNull Truth v2, float minConf) {
+        if (v1 == null)
+            return null;
         float c = w2c(and(v2.freq(), v1.conf(), v2.conf()));
         return c < minConf ? null : t(v1.freq(), c);
     }

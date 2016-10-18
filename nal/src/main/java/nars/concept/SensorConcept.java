@@ -8,12 +8,14 @@ import nars.budget.policy.ConceptPolicy;
 import nars.nal.UtilityFunctions;
 import nars.table.BeliefTable;
 import nars.table.DefaultBeliefTable;
+import nars.table.EternalTable;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
+import nars.truth.Truthed;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
 import nars.util.signal.ScalarSignal;
@@ -264,6 +266,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         }
 
 
+
         @Override
         public Truth truth(long when, long now) {
 
@@ -284,45 +287,24 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
                 // use last sensor value with projected, and ultimately eternalized confidence
                 Truth assumed = sensor.truth();
                 if (assumed!=null) {
-
-                    if (interpolated!=null) {
-                        return Truth.maxConf(assumed.eternalize(), interpolated);
-                            //predicted = Revision.project(predicted, when, now, lastSensorInputTime, true);
-                    } else if (interpolated == null) {
-                        return assumed;
+                    assumed = Revision.project(assumed, when, now, lastSensorInputTime, false);
+                    if (assumed!=null) {
+                        if (interpolated != null) {
+                            //GUESS based on both
+                            //return Truth.maxConf(assumed, interpolated);
+                            //return interpolated;
+                            return Revision.revise(assumed, interpolated);
+                        } else if (interpolated == null) {
+                            return assumed;
+                        }
                     }
                 }
 
             }
+
             return interpolated;
         }
 
-//        @Override
-//        public Task match(@NotNull Task target, long now) {
-////            if (latchLastValue) {
-//                long when = target.occurrence();
-//                @Nullable Task next = sensor.current;
-//                if (next != null && when <= now && when >= next.occurrence()) {
-//                    //use the last known sensor value as-is
-//                    //but project it to the target time unchanged (due to the implicit 'latching' of an unchanged value
-//                    return MutableTask.clone(next, now);
-//                }
-////            }
-//            return super.match(target, now);
-//        }
-
-//        @Override
-//        public Task match(@NotNull Task target, long now) {
-//            long when = target.occurrence();
-//            if (when == now || when == ETERNAL) {
-//                sensor.
-//                return sensor.truth();
-//            }
-//
-//            return super.match(target, now);
-//        }
     }
-
-
 
 }

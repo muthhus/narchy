@@ -409,9 +409,9 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                     return Revision.project(res, when, now, o, true);
 
             default:
-                float dur = Math.max(1f, (float)duration()/s);///(s/2f));
+                float dur = Math.max(1f, (float)duration()/2);///(s/2f));
                 return new TruthPolation(s).truth(when, tr, (dt, evi)->{
-                    return evi / (1f + sqr(dt/dur));
+                    return evi / (1f + (dt*dt/dur));
                 });
 
         }
