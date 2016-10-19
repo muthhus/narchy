@@ -89,7 +89,7 @@ abstract public class SwingAgent extends NAgent {
         Default2 d = new Default2();
 
         SpaceGraph.window(grid( d.cores.stream().map(c ->
-                Vis.items(c.terms, d, 8)).toArray(Surface[]::new) ), 900, 700);
+                Vis.items(c.terms, d, 16)).toArray(Surface[]::new) ), 900, 700);
 
         return d;
     }

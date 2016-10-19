@@ -54,7 +54,7 @@ public class Recog2D extends SwingAgent {
     }
 
     public Recog2D(NAR n) {
-        super(n, 1);
+        super(n, 6);
 
         w = 24;
         h = 24;
@@ -85,10 +85,10 @@ public class Recog2D extends SwingAgent {
         //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
 
-        new Thread(() -> {
-            Facial f = new Facial(conceptTraining(imgTrainer, nar));
-            new SpaceGraph().add(f.maximize()).show(800, 600);
-        }).start();
+//        new Thread(() -> {
+//            Facial f = new Facial(conceptTraining(imgTrainer, nar));
+//            new SpaceGraph().add(f.maximize()).show(800, 600);
+//        }).start();
 
     }
 

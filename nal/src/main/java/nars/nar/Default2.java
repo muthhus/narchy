@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static java.lang.System.out;
@@ -63,43 +64,47 @@ public class Default2 extends NAR {
         //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
         public final Bag<Term> terms =
                 //new HijackBag<>(24, 4, BudgetMerge.plusBlend, random);
-                new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new HashMap(16));
+                new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new ConcurrentHashMap(16));
         public final Bag<Task> tasklinks =
                 //new HijackBag<>(16, 4, BudgetMerge.plusBlend, random);
-                new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new HashMap(16));
+                new CurveBag(16, new CurveBag.NormalizedSampler(power2BagCurve, random), BudgetMerge.plusBlend, new ConcurrentHashMap(16));
 
-        int iterations = 1;
+        int iterations = 2;
         int tasklinksFiring = 2;
         int termlinksFiring = 2;
 
         /** multiplier to apply to links in the 'active' bag when they have been accepted as seeds to this core
          *  it is a cost (reduction) applied to the 'active' bag
          * */
-        private float conceptSeedCost = 0.5f;
+        private float conceptSeedCost = 0.8f;
 
         /* a cost (reduction) applied to the local 'term' bag */
-        private float conceptVisitCost = 0.5f;
+        private float conceptVisitCost = 0.8f;
 
+        /** a value which should be less than 1.0,
+         * indicating the preference for the current value vs. a tendency to move */
+        float momentum = 0.1f;
 
         public GraphPremiseBuilder() {
         }
 
         protected void seed(int num) {
 
-            while (num-- > 0) {
-                BLink<Concept> c = active.pop();
-                if (c != null)
-                    terms.put(c.get().term(), c);
-                else
-                    break;
-            }
+//            while (num-- > 0) {
+//                BLink<Concept> c = active.pop();
+//                if (c != null)
+//                    terms.put(c.get().term(), c);
+//                else
+//                    break;
+//            }
 
 
-//            active.sample(num, c -> {
-//                terms.put(c.get().term(), c);
-//                c.priMult(conceptSeedCost);
-//                return true;
-//            });
+            active.sample(num, c -> {
+                Concept key = c.get();
+                terms.put(key.term(), c);
+                active.boost(key, conceptSeedCost);
+                return true;
+            });
         }
 
         @Override
@@ -109,9 +114,6 @@ public class Default2 extends NAR {
             }
         }
 
-        /** a value which should be less than 1.0,
-         * indicating the preference for the current value vs. a tendency to move */
-        float momentum = 0.1f;
 
         void iterate() {
 
@@ -135,7 +137,7 @@ public class Default2 extends NAR {
 
             if (here != null) {
 
-                linkHere.priMult(conceptVisitCost);
+                terms.boost(here, conceptVisitCost);
 
                 PremiseMatrix.run(here, Default2.this,
                         tasklinksFiring, termlinksFiring,
@@ -158,6 +160,7 @@ public class Default2 extends NAR {
                     List<Task> trash = $.newArrayList(0);
                     d.policy(concepts.conceptBuilder().awake(), time(), trash);
                     tasks.remove(trash);
+
 
 
                     d.termlinks().commit().transfer(2, terms);
@@ -195,10 +198,10 @@ public class Default2 extends NAR {
         super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 8192, 4),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
-        CurveBag<Concept> cb = new CurveBag(BudgetMerge.plusBlend, random);
-        cb.setCapacity(2048);
-        active = cb;
-                //new HijackBag<>(2048, 4, random);
+        //CurveBag<Concept> cb = new CurveBag(BudgetMerge.plusBlend, random);
+        //cb.setCapacity(2048);
+        active = //cb;
+                new HijackBag<>(2048, 4, random);
 
 
         durMin.setValue(BUDGET_EPSILON * 2f);
@@ -218,7 +221,7 @@ public class Default2 extends NAR {
 
         }
 
-        int numCores = 32;
+        int numCores = 4;
         this.cores = range(0, numCores ).mapToObj(i -> new GraphPremiseBuilder()).collect(toList());
 
         onFrame(()-> {

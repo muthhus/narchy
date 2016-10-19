@@ -57,7 +57,7 @@ public class WebServer /*extends PathHandler*/ {
                                 0 //7 * 24 * 60 * 60 * 1000
                         ))
                             .setDirectoryListingEnabled(true)
-                            .addWelcomeFiles("index.html")
+                            .addWelcomeFiles("index0.html")
                 );
 
         //https://github.com/undertow-io/undertow/blob/master/examples/src/main/java/io/undertow/examples/sessionhandling/SessionServer.java
@@ -117,6 +117,7 @@ public class WebServer /*extends PathHandler*/ {
         new IRCServer("localhost", 6667);
 
         @NotNull Default nar = newRealtimeNAR(2048, 2, 2);
+        //Default nar = new Default();
 
         new NARServices(nar, w.path);
 

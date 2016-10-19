@@ -19,19 +19,66 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+
+  <properties>
+    <java.version>1.8</java.version>
+    <teavm.version>0.4.3</teavm.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <dependencies>
+    <!-- Emulator of Java class library for TeaVM -->
+    <dependency>
+      <groupId>org.teavm</groupId>
+      <artifactId>teavm-classlib</artifactId>
+      <version>${teavm.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.ow2.asm</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- JavaScriptObjects (JSO) - a JavaScript binding for TeaVM -->
+    <dependency>
+      <groupId>org.teavm</groupId>
+      <artifactId>teavm-jso-apis</artifactId>
+      <version>${teavm.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.ow2.asm</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+
+
+    <!-- https://mvnrepository.com/artifact/io.undertow/undertow-websockets-jsr -->
+    <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-websockets-jsr</artifactId>
+      <version>2.0.0.Alpha1</version>
+    </dependency>
+
+      <dependency>
+          <groupId>opennars</groupId>
+          <artifactId>util</artifactId>
+          <version>1.8-SNAPSHOT</version>
+          <scope>compile</scope>
+      </dependency>
+
     <dependency>
       <groupId>opennars</groupId>
       <artifactId>app</artifactId>
       <version>1.8-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>io.undertow</groupId>
-      <artifactId>undertow-core</artifactId>
-      <version>2.0.0.Alpha1</version>
-      <scope>compile</scope>
-    </dependency>
+
 
 
     <!-- https://mvnrepository.com/artifact/com.hanhuy/sirc -->
@@ -60,6 +107,53 @@
           <mainClass>nars.web.WebServer</mainClass>
         </configuration>
       </plugin>
+
+
+      <!-- Configure Java compiler to use Java 8 syntax  -->
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+      </plugin>
+
+
+      <plugin>
+        <groupId>org.teavm</groupId>
+        <artifactId>teavm-maven-plugin</artifactId>
+        <version>0.4.3</version>
+        <dependencies>
+          <!-- This dependency is required by TeaVM to emulate subset of Java class library -->
+          <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-classlib</artifactId>
+            <version>0.4.3</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <phase>process-classes</phase>
+            <configuration>
+              <mainClass>nars.web.Client</mainClass>
+
+
+              <mainPageIncluded>false</mainPageIncluded>
+
+              <debugInformationGenerated>true</debugInformationGenerated>
+              <sourceMapsGenerated>true</sourceMapsGenerated>
+
+              <targetDirectory>src/main/resources/_compiled/</targetDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
+
 </project>

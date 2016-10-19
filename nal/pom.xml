@@ -71,6 +71,14 @@
         <!--<scope>test</scope>-->
         <!--</dependency>-->
 
+        <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm-all -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-debug-all</artifactId>
+            <version>6.0_ALPHA</version>
+            <scope>compile</scope>
+        </dependency>
+
 
         <!-- http://mvnrepository.com/artifact/com.github.fge/grappa -->
         <dependency>
@@ -79,10 +87,11 @@
             <version>2.1.0-beta.3</version>
             <scope>compile</scope>
 
+
             <exclusions>
                 <exclusion>
                     <artifactId>org.ow2.asm</artifactId>
-                    <groupId>asm-debug-all</groupId>
+                    <groupId>*</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>com.google.guava</artifactId>
