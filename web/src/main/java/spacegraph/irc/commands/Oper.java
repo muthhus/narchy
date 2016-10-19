@@ -1,11 +1,11 @@
 package spacegraph.irc.commands;
 
+import spacegraph.irc.Client;
 import spacegraph.irc.Config;
 import spacegraph.irc.IRCServer;
 import spacegraph.irc.Request;
 import spacegraph.irc.reply.Error;
 import spacegraph.irc.reply.Reply;
-import spacegraph.irc.Client;
 
 public class Oper extends Command {
 

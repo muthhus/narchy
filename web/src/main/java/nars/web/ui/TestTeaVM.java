@@ -1,10 +1,10 @@
-package spacegraph.web;
+package nars.web.ui;
 
 import org.teavm.jso.dom.html.HTMLDocument;
 import org.teavm.jso.dom.html.HTMLElement;
 
 
-public class Client {
+public class TestTeaVM {
 
     public static void main(String[] args) {
 

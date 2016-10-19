@@ -1,10 +1,10 @@
 package spacegraph.irc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spacegraph.irc.commands.Command;
 import spacegraph.irc.reply.Error;
 import spacegraph.irc.reply.Reply;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;

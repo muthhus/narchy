@@ -1,6 +1,5 @@
 package nars.web;
 
-import spacegraph.irc.IRCServer;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
@@ -9,12 +8,11 @@ import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
-import spacegraph.irc.IRCAgent;
 import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.web.WebsocketRouter;
+import spacegraph.irc.IRCServer;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -122,7 +120,7 @@ public class WebServer /*extends PathHandler*/ {
 
         new NARServices(nar, w.path);
 
-        new IRCAgent(nar, "localhost", "NARchy", "#x");
+        //new IRCAgent(nar, "localhost", "NARchy", "#x");
 
 
 

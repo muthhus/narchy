@@ -1143,7 +1143,7 @@ public enum Util { ;
 
         List<X> buffer = new FasterList(1024 /* estimate */);
 
-        String tempDir = System.getProperty("java.io.tmpdir");
+        String tempDir = tempDir();
 
         File cached = new File(tempDir, baseName + suffix);
         if (cached.exists()) {
@@ -1182,6 +1182,10 @@ public enum Util { ;
         return buffer.stream();
 
 
+    }
+
+    public static String tempDir() {
+        return System.getProperty("java.io.tmpdir");
     }
 
     public static float sum(float[] x) {

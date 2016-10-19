@@ -8,10 +8,10 @@ import nars.Task;
 import nars.nlp.Twenglish;
 import nars.truth.Truth;
 import nars.util.event.Active;
-import spacegraph.web.Json;
-import spacegraph.web.WebsocketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.web.Json;
+import spacegraph.web.WebsocketService;
 
 import java.io.IOException;
 import java.util.List;

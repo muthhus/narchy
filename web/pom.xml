@@ -22,18 +22,59 @@
 
 
   <properties>
-    <java.version>1.8</java.version>
+    <java.version>1.9</java.version>
     <teavm.version>0.4.3</teavm.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
-    <!-- Emulator of Java class library for TeaVM -->
+
+    <dependency>
+      <groupId>org.teavm</groupId>
+      <artifactId>teavm-core</artifactId>
+      <version>${teavm.version}</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.ow2.asm</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jetbrains.kotlin</groupId>
+          <artifactId>kotlin-stdlib</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jetbrains.kotlin</groupId>
+          <artifactId>kotlin-stdlib</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.teavm</groupId>
+      <artifactId>teavm-tooling</artifactId>
+      <version>${teavm.version}</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.ow2.asm</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jetbrains.kotlin</groupId>
+          <artifactId>kotlin-stdlib</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jetbrains.kotlin</groupId>
+          <artifactId>kotlin-stdlib</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <dependency>
       <groupId>org.teavm</groupId>
       <artifactId>teavm-classlib</artifactId>
       <version>${teavm.version}</version>
-      <scope>provided</scope>
+      <scope>compile</scope>
       <exclusions>
         <exclusion>
           <groupId>org.ow2.asm</groupId>
@@ -47,7 +88,7 @@
       <groupId>org.teavm</groupId>
       <artifactId>teavm-jso-apis</artifactId>
       <version>${teavm.version}</version>
-      <scope>provided</scope>
+      <scope>compile</scope>
       <exclusions>
         <exclusion>
           <groupId>org.ow2.asm</groupId>
@@ -65,12 +106,12 @@
       <version>2.0.0.Alpha1</version>
     </dependency>
 
-      <dependency>
-          <groupId>opennars</groupId>
-          <artifactId>util</artifactId>
-          <version>1.8-SNAPSHOT</version>
-          <scope>compile</scope>
-      </dependency>
+    <dependency>
+      <groupId>opennars</groupId>
+      <artifactId>app</artifactId>
+      <version>1.8-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
 
     <dependency>
       <groupId>opennars</groupId>
@@ -82,11 +123,11 @@
 
 
     <!-- https://mvnrepository.com/artifact/com.hanhuy/sirc -->
-    <dependency>
-      <groupId>com.hanhuy</groupId>
-      <artifactId>sirc</artifactId>
-      <version>1.1.6-pfn.2</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.hanhuy</groupId>-->
+      <!--<artifactId>sirc</artifactId>-->
+      <!--<version>1.1.6-pfn.2</version>-->
+    <!--</dependency>-->
 
 
     <dependency>
@@ -123,13 +164,13 @@
       <plugin>
         <groupId>org.teavm</groupId>
         <artifactId>teavm-maven-plugin</artifactId>
-        <version>0.4.3</version>
+        <version>${teavm.version}</version>
         <dependencies>
           <!-- This dependency is required by TeaVM to emulate subset of Java class library -->
           <dependency>
             <groupId>org.teavm</groupId>
             <artifactId>teavm-classlib</artifactId>
-            <version>0.4.3</version>
+            <version>${teavm.version}</version>
           </dependency>
         </dependencies>
         <executions>
@@ -144,8 +185,8 @@
 
               <mainPageIncluded>false</mainPageIncluded>
 
-              <debugInformationGenerated>true</debugInformationGenerated>
-              <sourceMapsGenerated>true</sourceMapsGenerated>
+              <debugInformationGenerated>false</debugInformationGenerated>
+              <sourceMapsGenerated>false</sourceMapsGenerated>
 
               <targetDirectory>src/main/resources/_compiled/</targetDirectory>
             </configuration>

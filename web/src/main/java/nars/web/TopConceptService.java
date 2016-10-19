@@ -6,8 +6,8 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.util.data.MutableInteger;
-import spacegraph.web.PeriodicWebsocketService;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.web.PeriodicWebsocketService;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;

@@ -1,11 +1,11 @@
 package nars.web;
 
-import spacegraph.web.PeriodicWebsocketService;
 import ognl.Ognl;
 import ognl.OgnlException;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.web.PeriodicWebsocketService;
 
 /**
  * Created by me on 4/21/16.
