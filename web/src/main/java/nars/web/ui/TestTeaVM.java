@@ -13,6 +13,7 @@ public class TestTeaVM {
         HTMLElement div = doc.createElement("div");
         div.appendChild(doc.createTextNode("TeaVM generated element"));
 
+
         doc.getBody().appendChild(div);
 
     }

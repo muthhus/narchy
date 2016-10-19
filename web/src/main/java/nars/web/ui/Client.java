@@ -15,6 +15,8 @@ public class Client {
 
     public static void main(String[] args) {
 
+        document.getHead();
+
         HTMLButtonElement saveButton = document.getElementById("save-button").cast();
         saveButton.listenClick(e -> {
             String key = document.getElementById("key").<HTMLInputElement>cast().getValue();
