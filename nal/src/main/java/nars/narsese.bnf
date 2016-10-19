@@ -1,3 +1,6 @@
+// TODO so far this is only a minimal JSON parser copied from GrammarKit's example
+// https://github.com/JetBrains/Grammar-Kit
+
 {
   tokens = [
     space='regexp:\s+'

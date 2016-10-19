@@ -6,6 +6,7 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.util.data.MutableInteger;
+import spacegraph.web.PeriodicWebsocketService;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

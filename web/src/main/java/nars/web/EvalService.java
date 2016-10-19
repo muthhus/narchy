@@ -1,5 +1,6 @@
 package nars.web;
 
+import spacegraph.web.PeriodicWebsocketService;
 import ognl.Ognl;
 import ognl.OgnlException;
 import org.jetbrains.annotations.Nullable;

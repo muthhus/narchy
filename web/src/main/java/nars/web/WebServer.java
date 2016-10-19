@@ -1,6 +1,6 @@
 package nars.web;
 
-import com.rbruno.irc.IRCServer;
+import spacegraph.irc.IRCServer;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
@@ -9,11 +9,12 @@ import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
-import nars.irc.IRCAgent;
+import spacegraph.irc.IRCAgent;
 import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.web.WebsocketRouter;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -23,7 +24,7 @@ import static io.undertow.Handlers.*;
 import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static io.undertow.UndertowOptions.ENABLE_SPDY;
 import static java.util.zip.Deflater.BEST_SPEED;
-import static nars.irc.IRCAgent.newRealtimeNAR;
+import static spacegraph.irc.IRCAgent.newRealtimeNAR;
 
 
 public class WebServer /*extends PathHandler*/ {
@@ -71,8 +72,8 @@ public class WebServer /*extends PathHandler*/ {
                 .build();
 
 
-        path
-                .addPrefixPath("/{chan}/feed", socket(new WebsocketRouter()));
+//        path
+//                .addPrefixPath("/{chan}/feed", socket(new WebsocketRouter()));
 
 
         logger.info("http start: port={} staticFiles={}", httpPort, resourcePath.getBasePath());

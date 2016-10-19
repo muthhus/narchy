@@ -8,6 +8,7 @@ import nars.link.BLink;
 import nars.table.BeliefTable;
 import nars.term.Term;
 import nars.truth.Truth;
+import spacegraph.web.Json;
 
 import static nars.web.WebServer.socket;
 
