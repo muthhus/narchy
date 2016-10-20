@@ -171,7 +171,6 @@ abstract public class NAgent implements NSense, NAction {
         }
         if ((phase == frameRate-1) || (frameRate < 2)) {
             ticks(1);
-            now = nar.time();
             doFrame();
         }
 
@@ -186,6 +185,7 @@ abstract public class NAgent implements NSense, NAction {
 
     private void doFrame() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
+        now = nar.time();
 
         float r = rewardValue = act();
         if (r==r) {

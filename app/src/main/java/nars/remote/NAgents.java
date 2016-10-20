@@ -55,6 +55,7 @@ abstract public class NAgents extends NAgent {
 
         //Default nar = newNAR();
         Default nar = newNAR1async(4);
+        //Default2 nar = newNAR2();
 
 
 
@@ -135,7 +136,7 @@ abstract public class NAgents extends NAgent {
                 new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
         int volMax = 40;
-        int conceptsPerCycle = 64;
+        int conceptsPerCycle = 4;
 
 
         //Multi nar = new Multi(3,512,
@@ -157,7 +158,7 @@ abstract public class NAgents extends NAgent {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.goalConfidence(0.8f);
 
         float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
@@ -178,7 +179,7 @@ abstract public class NAgents extends NAgent {
                 grid(
                         grid(a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new)),
 
-                        Vis.concepts((Default)nar, 128),
+                        //Vis.concepts((Default)nar, 128),
 
                         Vis.agentActions(a, 200),
 

@@ -943,13 +943,13 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      */
     public final <X> void runLater(@NotNull List<X> items, Consumer<X> each, float granularityFactor) {
 
-        if (exe.concurrent()) {
-            //special single-thread case: just execute all
-            items.forEach(each);
-            return;
-        } else {
+//        if (exe.concurrent()) {
+//            //special single-thread case: just execute all
+//            items.forEach(each);
+//            return;
+//        } else {
             int s = items.size();
-            int chunkSize = (int) Math.ceil(s / (exe.concurrency() * granularityFactor));
+            int chunkSize = Math.max(1, (int) Math.floor(s / (exe.concurrency() * granularityFactor)));
             for (int i = 0; i < s; ) {
                 int start = i;
                 int end = Math.min(i + chunkSize, s);
@@ -960,7 +960,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
                 });
                 i += chunkSize;
             }
-        }
+//        }
     }
 
     public final void runLater(@NotNull Consumer<NAR> t) {

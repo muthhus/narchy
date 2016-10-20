@@ -29,7 +29,7 @@ public class MultiThreadExecutioner extends Executioner {
 
     private SequenceBarrier barrier;
     private long cursor;
-    private boolean sync;
+    private boolean sync = true;
 
     public void sync(boolean b) {
         this.sync = b;
@@ -163,11 +163,9 @@ public class MultiThreadExecutioner extends Executioner {
 
         barrier = workers.asSequenceBarrier();
 
-        disruptor.start();
 
-        this.sync =
-                //!(nar.clock instanceof RealtimeClock);
-                true;
+
+        disruptor.start();
 
 //        this.throttle = new CPUThrottle(
 //                new MutableFloat(25));

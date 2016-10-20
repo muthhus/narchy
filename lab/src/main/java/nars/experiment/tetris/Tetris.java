@@ -379,10 +379,13 @@ public class Tetris extends NAgents {
 
         Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
-        int maxVol = 24;
+        int maxVol = 32;
+
         Executioner e = Tetris.exe;
+        ((MultiThreadExecutioner)exe).sync(false);
+
         Default nar = new Default(2048,
-                128, 2, 3, rng,
+                256, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 200000, 8192, 2),
@@ -416,7 +419,7 @@ public class Tetris extends NAgents {
 
 
         nar.compoundVolumeMax.setValue(maxVol);
-        //nar.linkFeedbackRate.setValue(0.95f);
+        nar.linkFeedbackRate.setValue(0.05f);
 
         //nar.truthResolution.setValue(0.02f);
 
@@ -636,7 +639,8 @@ public class Tetris extends NAgents {
         //addCamera(t, nar, 8, 8);
 
 
-        t.run(runFrames);
+        //t.run(runFrames);
+        t.runRT(25f);
 
 //        NARController meta = new NARController(nar, loop, t);
 //

@@ -150,7 +150,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
                         deriver
                 );
             }
-        }, 4f);
+        }, 2 * nar.exe.concurrency() /* estimate */);
 
     }
 
