@@ -8,7 +8,7 @@ import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
 import nars.NAR;
-import nars.remote.SwingAgent;
+import nars.remote.NAgents;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
 import nars.video.Sensor2D;
@@ -27,7 +27,7 @@ import static nars.$.t;
 /**
  * Created by me on 9/22/16.
  */
-public class Jake2Agent extends SwingAgent implements Runnable {
+public class Jake2Agent extends NAgents implements Runnable {
 
     private PixelAutoClassifier camAE = null;
     ByteBuffer seen = null;
@@ -221,7 +221,7 @@ public class Jake2Agent extends SwingAgent implements Runnable {
 
 
     public static void main(String[] args) {
-        SwingAgent.run(Jake2Agent::new, 100000);
+        NAgents.runRT(Jake2Agent::new);
     }
 }
 

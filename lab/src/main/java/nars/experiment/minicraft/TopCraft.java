@@ -4,7 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
-import nars.remote.SwingAgent;
+import nars.remote.NAgents;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
 import nars.video.Sensor2D;
@@ -14,18 +14,18 @@ import static spacegraph.SpaceGraph.window;
 /**
  * Created by me on 9/19/16.
  */
-public class TopCraft extends SwingAgent {
+public class TopCraft extends NAgents {
 
     private final TopDownMinicraft craft;
     private Sensor2D<PixelBag> pixels;
     private PixelAutoClassifier camAE = null;
 
     public static void main(String[] args) {
-        run(TopCraft::new, 55500);
+        runRT(TopCraft::new);
     }
 
     public TopCraft(NAR nar) {
-        super(nar, 4);
+        super(nar, 1);
 
         this.craft = new TopDownMinicraft();
 

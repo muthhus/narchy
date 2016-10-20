@@ -9,21 +9,22 @@ import java.util.ArrayDeque;
 /**
  * Created by me on 8/16/16.
  */
-public final class SingleThreadExecutioner extends Executioner {
+public class SingleThreadExecutioner extends Executioner {
 
-    final ArrayDeque<Runnable> pending = new ArrayDeque<>(8192);
-
+    final ArrayDeque<Runnable> pending = new ArrayDeque<>(128 );
 
     @Override
     public final int concurrency() {
         return 1;
     }
 
+    @Override
+    public boolean concurrent() {
+        return false;
+    }
 
     @Override
-    public void next(@NotNull NAR nar) {
-
-        nar.eventFrameStart.emit(nar);
+    public final void next(@NotNull NAR nar) {
 
         //only execute the current set of pending Runnable's here. more may be added but they will be handled in the next frame
         int p = pending.size();
@@ -31,22 +32,20 @@ public final class SingleThreadExecutioner extends Executioner {
             pending.removeFirst().run();
         }
 
+        nar.eventFrameStart.emit(nar);
+
     }
 
     @Override
-    public final void execute(@NotNull Runnable r) {
+    public final void run(@NotNull Runnable r) {
         pending.add/*Last*/(r);
     }
 
     @Override
-    public void inputLater(Task[] t) {
+    public final void run(Task[] t) {
         //just execute here in this thread
         nar.input(t);
     }
 
-    @Override
-    public boolean executeMaybe(Runnable r) {
-        execute(r);
-        return true;
-    }
+
 }

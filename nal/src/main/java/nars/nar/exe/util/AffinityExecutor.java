@@ -5,7 +5,9 @@ import net.openhft.affinity.AffinityLock;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 
@@ -14,7 +16,7 @@ import java.util.concurrent.Executor;
  */
 public class AffinityExecutor implements Executor {
 
-    public final List<Thread> threads = new CopyOnWriteArrayList<>();
+    public final Collection<Thread> threads = new ConcurrentLinkedDeque();
     public final String id;
 
     public AffinityExecutor(String id) {
@@ -23,17 +25,20 @@ public class AffinityExecutor implements Executor {
 
     static final class AffinityThread extends Thread {
 
+        Runnable cmd;
         public AffinityThread(String name, Runnable cmd) {
-            super(cmd, name);
+            super(name);
+            this.cmd = cmd;
         }
 
         @Override
         public void run() {
             try (AffinityLock al = AffinityLock.acquireLock()) {
-                super.run();
+                cmd.run(); //avoid virtual call to super etc
             }
         }
     }
+
 
 
     @Override
@@ -41,9 +46,9 @@ public class AffinityExecutor implements Executor {
 
         final Thread thread = new AffinityThread(id + ":" + threads.size(), command);
 
-        synchronized(threads) {
-            threads.add(thread);
-        }
+
+        threads.add(thread);
+
 
         thread.start();
 

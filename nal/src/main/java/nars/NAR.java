@@ -18,6 +18,8 @@ import nars.index.term.TermIndex;
 import nars.nal.Level;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
+import nars.nar.NARIn;
+import nars.nar.NAROut;
 import nars.nar.exe.Executioner;
 import nars.table.BeliefTable;
 import nars.task.MutableTask;
@@ -32,6 +34,7 @@ import nars.term.util.InvalidTermException;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.time.Tense;
+import nars.util.Iterative;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -78,7 +81,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * <p>
  * Memory is serializable so it can be persisted and transported.
  */
-public abstract class NAR extends Param implements Level, Consumer<Task> {
+public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn, NAROut, Iterative<NAR> {
 
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
@@ -111,10 +114,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
     @NotNull
     public final Atom self;
 
-    /**
-     * Flag for running continuously
-     */
-    public volatile boolean running = false;
 
     /**
      * maximum NAL level currently supported by this memory, for restricting it to activity below NAL8
@@ -286,18 +285,21 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
      * reactivated, a signal for them to empty their state (if necessary).
      */
     @NotNull
-    public synchronized void reset() {
+    public void reset() {
 
-        exe.stop();
-        exe.start(this);
+        synchronized (exe) {
 
-        eventReset.emit(this);
+            exe.stop();
+            exe.start(this);
 
-        clock.clear();
+            eventReset.emit(this);
 
-        concepts.clear();
+            clock.clear();
 
-        tasks.clear();
+            concepts.clear();
+
+            tasks.clear();
+        }
 
     }
 
@@ -765,15 +767,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
      * @return total time in seconds elapsed in realtime
      */
     @NotNull
-    public final synchronized NAR run(int frames) {
-
-        //AtomicBoolean r = this.running;
-        //synchronized (r = this.running) {
-
-        this.running = true;
-
-
-        Clock clock = this.clock;
+    public final NAR run(int frames) {
 
         for (; frames > 0; frames--) {
 
@@ -784,11 +778,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
             emotion.frame();
 
         }
-
-        this.running = false;
-        //if (!r.compareAndSet(true, false))
-        //throw new RunStateException(false);
-        //}
 
         return this;
     }
@@ -913,8 +902,12 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
 
     @NotNull
     public NARLoop loop(float initialFPS) {
-        if (initialFPS == 0)
+        if (initialFPS < 0)
             return loop((int) -1); //pause
+
+        if (initialFPS == 0)
+            return loop((int) 0); //infinite
+
         float millisecPerFrame = 1000.0f / initialFPS;
         return loop((int) millisecPerFrame);
     }
@@ -925,13 +918,15 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
      * @param initialFramePeriodMS in milliseconds
      */
     @NotNull
-    private synchronized NARLoop loop(int initialFramePeriodMS) {
+    private NARLoop loop(int initialFramePeriodMS) {
 
-        if (this.loop != null) {
-            throw new RuntimeException("Already running: " + this.loop);
+        synchronized (concepts) {
+            if (this.loop != null) {
+                throw new RuntimeException("Already running: " + this.loop);
+            }
+
+            return this.loop = new NARLoop(this, initialFramePeriodMS);
         }
-
-        return this.loop = new NARLoop(this, initialFramePeriodMS);
     }
 
 
@@ -940,26 +935,25 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
      * after the end of the current frame before the next frame.
      */
     public final void runLater(@NotNull Runnable t) {
-        exe.execute(t);
+        exe.run(t);
     }
 
     /**
      * run a procedure for each item in chunked stripes
      */
     public final <X> void runLater(@NotNull List<X> items, Consumer<X> each, float granularityFactor) {
-        int conc = exe.concurrency();
-        if (conc == 1) {
+
+        if (exe.concurrent()) {
             //special single-thread case: just execute all
             items.forEach(each);
             return;
         } else {
-
             int s = items.size();
-            int chunkSize = (int) Math.ceil(s / (conc * granularityFactor));
+            int chunkSize = (int) Math.ceil(s / (exe.concurrency() * granularityFactor));
             for (int i = 0; i < s; ) {
                 int start = i;
                 int end = Math.min(i + chunkSize, s);
-                runLaterMaybe(() -> {
+                runLater(() -> {
                     for (int j = start; j < end; j++) {
                         each.accept(items.get(j));
                     }
@@ -1291,7 +1285,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
         if (t.length == 0)
             throw new RuntimeException("empty task array");
 
-        exe.inputLater(t);
+        exe.run(t);
 
     }
 
@@ -1314,12 +1308,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task> {
             inputLater(tt.toArray(new Task[s]));
     }
 
-    /**
-     * will run this if the executioner is not completely saturated
-     */
-    public boolean runLaterMaybe(Runnable r) {
-        return exe.executeMaybe(r);
-    }
 
     /**
      * if the concept is active, returns the Concept while applying the boost factor to its budget

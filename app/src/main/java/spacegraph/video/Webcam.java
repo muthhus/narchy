@@ -6,7 +6,7 @@ import boofcv.io.webcamcapture.UtilWebcamCapture;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import nars.$;
-import nars.remote.SwingAgent;
+import nars.remote.NAgents;
 import nars.video.ImageCamera;
 
 import javax.swing.*;
@@ -94,20 +94,20 @@ public class Webcam extends ImageCamera implements WebcamListener {
 
     }
 
-    public static void main(String[] args) {
-
-        SwingAgent.run(n -> new SwingAgent(n, 0) {
-
-            {
-                Webcam webcam = new Webcam(800,600, true);
-                addCamera("webcam", webcam, 128, 128, (v) -> $.t(v, alpha));
-            }
-
-            @Override
-            protected float act() {
-                return 0;
-            }
-        }, 5000);
-
-    }
+//    public static void main(String[] args) {
+//
+//        NAgents.run(n -> new NAgents(n, 0) {
+//
+//            {
+//                Webcam webcam = new Webcam(800,600, true);
+//                addCamera("webcam", webcam, 128, 128, (v) -> $.t(v, alpha));
+//            }
+//
+//            @Override
+//            protected float act() {
+//                return 0;
+//            }
+//        });
+//
+//    }
 }

@@ -235,7 +235,7 @@ public class IRCAgent extends IRC {
                     pevent.respondWith(top(Terms.ZeroProduct));
                     return;
                 case "clear":
-                    ((Default) nar).core.concepts.clear();
+                    ((Default) nar).core.active.clear();
                     pevent.respondWith("Ready.");
                     return;
                 case "save":
@@ -411,7 +411,7 @@ public class IRCAgent extends IRC {
     public String top(Compound arguments) {
 
         StringBuilder b = new StringBuilder();
-        @NotNull Bag<Concept> cbag = ((Default) nar).core.concepts;
+        @NotNull Bag<Concept> cbag = ((Default) nar).core.active;
 
         String query;
         if (arguments.size() > 0 && arguments.term(0) instanceof Atom) {

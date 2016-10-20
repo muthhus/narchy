@@ -10,10 +10,12 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
+import nars.nar.Default2;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
+import nars.util.Iterative;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
@@ -90,7 +92,7 @@ public class Vis {
         SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
         s.add(new Facial(grid(
                 concepts(d, count),
-                budgetHistogram(d, 32),
+                budgetHistogram(d, 16),
                 emotionPlots(d, 256)
         )).maximize());
         s.add(new Facial(new CrosshairSurface(s)));
@@ -102,7 +104,9 @@ public class Vis {
     }
 
     public static BagChart<Concept> concepts(final Default d, final int count) {
-        BagChart<Concept> tc = new BagChart<Concept>(d.core.concepts, count) {
+        long[] now = new long[] { d.time() };
+        BagChart<Concept> tc = new BagChart<>(d.core.active, count) {
+
             @Override
             public void accept(BLink<Concept> x, ItemVis<BLink<Concept>> y) {
                 float p = x.pri();
@@ -116,13 +120,15 @@ public class Vis {
                 } else {
                     float belief = 0;
 
-                    @Nullable Truth bt = c.beliefs().truth(now);
+                    long n = now[0];
+
+                    @Nullable Truth bt = c.beliefs().truth(n);
                     if (bt != null)
                         belief = bt.conf();
 
 
                     float goal = 0;
-                    @Nullable Truth gt = c.goals().truth(now);
+                    @Nullable Truth gt = c.goals().truth(n);
                     if (gt != null)
                         goal = gt.conf();
 
@@ -151,7 +157,7 @@ public class Vis {
         d.onFrame(xx -> {
 
             //if (s.window.isVisible()) {
-            tc.now = xx.time();
+            now[0] = xx.time();
             tc.update();
             //}
         });
@@ -159,7 +165,7 @@ public class Vis {
         return tc;
     }
 
-    public static <X extends Termed> BagChart<X> items(Bag<X> bag, final NAR d, final int count) {
+    public static <X extends Termed> BagChart<X> items(Bag<X> bag, final Iterative d, final int count) {
         BagChart<X> tc = new BagChart<>(bag, count) {
             @Override
             public void accept(BLink<X> x, ItemVis<BLink<X>> y) {
@@ -176,7 +182,6 @@ public class Vis {
         d.onFrame(xx -> {
 
             //if (s.window.isVisible()) {
-            tc.now = xx.time();
             tc.update();
             //}
         });
@@ -184,20 +189,28 @@ public class Vis {
         return tc;
     }
 
-    public static GridSurface budgetHistogram(NAR nar, int bins) {
+    public static Surface budgetHistogram(NAR nar, int bins) {
+        if (nar instanceof Default) {
+            return budgetHistogram(((Default)nar).core.active, bins);
+        } else { //if (nar instance)
+            return budgetHistogram(((Default2)nar).active, bins);
+        }
+    }
+
+    public static Surface budgetHistogram(Bag bag, int bins) {
         //new SpaceGraph().add(new Facial(
-        return new GridSurface(VERTICAL,
-                PanelSurface.of("Concept Priority Distribution (0..1)", new HistogramChart(nar, c -> {
-                    if (c != null)
-                        return c.pri();
-                    return 0;
-                }, bins, new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))),
-                PanelSurface.of("Concept Durability Distribution (0..1)", new HistogramChart(nar, c -> {
-                    if (c != null)
-                        return c.dur();
-                    return 0;
-                }, bins, new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f)))
-        );
+
+        double[] d = new double[bins];
+        return //new GridSurface(VERTICAL,
+                PanelSurface.of("Concept Priority Distribution (0..1)", new HistogramChart(
+                        ()->bag.priHistogram(d), new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)));
+
+//                PanelSurface.of("Concept Durability Distribution (0..1)", new HistogramChart(nar, c -> {
+//                    if (c != null)
+//                        return c.dur();
+//                    return 0;
+//                }, bins, new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f)))
+
     }
 
     public static GridSurface conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory, FloatFunction<Termed> value) {

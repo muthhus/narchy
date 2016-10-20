@@ -623,7 +623,7 @@ public class NARide extends StackPane {
             Label status = new Label();
             nar.onFrame(c -> {
 
-                int activeConcepts = l.concepts.size();
+                int activeConcepts = l.active.size();
                 TermIndex index = nar.concepts;
                 int totalConcepts = index.size();
 

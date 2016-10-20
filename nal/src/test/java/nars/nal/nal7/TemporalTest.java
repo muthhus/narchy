@@ -320,8 +320,8 @@ public class TemporalTest {
         Default d = new Default();
         d.believe("((\\,((#1-->[happy])&&(#1-->[sad])),((0-->v),(0-->h)),_)-->[pill])");
         d.run(1);
-        d.core.concepts.print();
-        assertTrue(6 <= d.core.concepts.size());
+        d.core.active.print();
+        assertTrue(6 <= d.core.active.size());
     }
 
     @Test public void testConceptualizationIntermpolationEternal() {
@@ -331,7 +331,7 @@ public class TemporalTest {
         d.believe("((\\,(a ==>+6 b),_)-->[pill])"); //same concept
         //d.run(1);
 
-        Bag<Concept> cb = d.core.concepts;
+        Bag<Concept> cb = d.core.active;
         cb.print();
         assertTrue(5 <= cb.size());
         Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
@@ -353,7 +353,7 @@ public class TemporalTest {
         d.believe("((\\,(a ==>+6 b),_)-->[pill])", Tense.Present, 1f, 0.9f);
         d.run(1);
 
-        Bag<Concept> cb = d.core.concepts;
+        Bag<Concept> cb = d.core.active;
         cb.print();
         assertTrue(5 <= cb.size());
         Concept cc = ((ArrayBag<Concept>) cb).get(0).get();

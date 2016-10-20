@@ -29,8 +29,11 @@ public class MultiThreadExecutioner extends Executioner {
 
     private SequenceBarrier barrier;
     private long cursor;
-    private boolean synchronize;
-    //private long cursor;
+    private boolean sync;
+
+    public void sync(boolean b) {
+        this.sync = b;
+    }
 
 
     enum EventType {
@@ -70,9 +73,6 @@ public class MultiThreadExecutioner extends Executioner {
 //        );
 //    }
 //
-    public MultiThreadExecutioner(int threads) {
-        this(threads, 1024 * threads /* estimate */);
-    }
 
     public MultiThreadExecutioner(int threads, int ringSize) {
 
@@ -85,15 +85,20 @@ public class MultiThreadExecutioner extends Executioner {
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
-                new SleepingWaitStrategy()
+                //new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
-                //new LiteBlockingWaitStrategy()
+                new LiteBlockingWaitStrategy()
         );
 
         this.ring = disruptor.getRingBuffer();
         //this.cursor = ring.getCursor();
 
+    }
+
+    @Override
+    public boolean sync() {
+        return sync;
     }
 
     @Override
@@ -115,7 +120,7 @@ public class MultiThreadExecutioner extends Executioner {
     public void next(@NotNull NAR nar) {
 
         //SYNCHRONIZE -----------------------------
-        if (synchronize) {
+        if (sync) {
             try {
                 long lastCursor = this.cursor;
                 if (lastCursor != (this.cursor = ring.getCursor())) {
@@ -123,6 +128,10 @@ public class MultiThreadExecutioner extends Executioner {
                 }
             } catch (AlertException | InterruptedException | TimeoutException e1) {
                 logger.error("Barrier Synchronization: {}", e1);
+            }
+        } else {
+            if (!ring.hasAvailableCapacity(((int)(0.25f * ring.getBufferSize())))) {
+                return; //allow buffer to clear
             }
         }
 
@@ -132,11 +141,13 @@ public class MultiThreadExecutioner extends Executioner {
             for (int i = 0; ; ) {
                 Consumer c = vv[i++];
                 if (c != null) {
-                    execute(c);
+                    run(c);
                 } else
                     break; //null terminator hit
             }
         }
+
+
 
     }
 
@@ -154,7 +165,7 @@ public class MultiThreadExecutioner extends Executioner {
 
         disruptor.start();
 
-        this.synchronize =
+        this.sync =
                 //!(nar.clock instanceof RealtimeClock);
                 true;
 
@@ -185,27 +196,21 @@ public class MultiThreadExecutioner extends Executioner {
     };
 
     @Override
-    public final void execute(@NotNull Runnable r) {
-        disruptor.publishEvent(runPublisher, r);
+    public final void run(@NotNull Runnable r) {
+        //disruptor.publishEvent(runPublisher, r);
+        if (!ring.tryPublishEvent(runPublisher, r)) {
+            logger.warn("dropped: {}", r);
+        }
     }
 
     @Override
-    public final void execute(@NotNull Consumer<NAR> r) {
+    public final void run(@NotNull Consumer<NAR> r) {
         disruptor.publishEvent(narPublisher, r);
     }
 
-    @Override
-    public final boolean executeMaybe(Runnable r) {
-
-        if (!ring.tryPublishEvent(runPublisher, r)) {
-            logger.warn("dropped {}", r);
-            return true;
-        }
-        return false;
-    }
 
     @Override
-    public final void inputLater(@NotNull Task[] t) {
+    public final void run(@NotNull Task[] t) {
         if (!ring.tryPublishEvent(taskPublisher, t)) {
             //TODO use a bag to collect these
             logger.warn("dropped: {}", t);
@@ -234,12 +239,11 @@ public class MultiThreadExecutioner extends Executioner {
                 case NAR_CONSUMER:
                     ((Consumer<NAR>)val).accept(nar);
                     break;
+                default:
+                    throw new RuntimeException();
             }
         }
 
-        private void runTaskArray(Task[] tt) {
-            nar.input(tt);
-        }
 
     }
 

@@ -373,15 +373,14 @@ public class HijackBag<X> implements Bag<X> {
             int m = ((j++) & (c - 1)) * 2 + 2;
 
             //slight chance these values may be inconsistently paired. TODO use CAS double-checked access
+            //maybe use unsafe 64 bit atomic access?
             Object k = data[m];
-            if (k!=null) {
-                Object v = data[m + 1];
-                if (v != null) {
-                    float[] b = (float[]) v;
-                    float p = b[0];
-                    if (p == p) /* NaN */ {
-                        action.accept(a.set((X) k, b));
-                    }
+            Object v = data[m + 1];
+            if ((k!=null) && (v != null)) {
+                float[] b = (float[]) v;
+                float p = b[0];
+                if (p == p) /* NaN */ {
+                    action.accept(a.set((X) k, b));
                 }
             }
         }
@@ -454,6 +453,8 @@ public class HijackBag<X> implements Bag<X> {
         return map.isEmpty();
     }
 
+
+
     @NotNull
     @Override
     public Bag<X> commit() {
@@ -503,7 +504,7 @@ public class HijackBag<X> implements Bag<X> {
 
 
     @Override
-    public X boost(Object key, float factor) {
+    public X mul(Object key, float factor) {
         BLink<X> b = get(key);
         if (b != null && !b.isDeleted()) {
             float before = b.pri();
@@ -514,6 +515,17 @@ public class HijackBag<X> implements Bag<X> {
         }
         return null;
     }
-
+    @Override
+    public X add(Object key, float x) {
+        BLink<X> b = get(key);
+        if (b != null && !b.isDeleted()) {
+            float before = b.pri();
+            b.priAdd(x);
+            float after = range(b.pri());
+            pressure += (after - before);
+            return b.get();
+        }
+        return null;
+    }
 
 }

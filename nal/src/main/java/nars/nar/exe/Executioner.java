@@ -13,8 +13,6 @@ import java.util.function.Consumer;
 abstract public class Executioner implements Executor {
     protected NAR nar;
 
-
-
     public synchronized void start(NAR nar) {
         if (this.nar == null) {
             this.nar = nar;
@@ -29,26 +27,34 @@ abstract public class Executioner implements Executor {
             throw new RuntimeException("not already started");
         }
     }
-    abstract public void inputLater(@NotNull Task[] t);
 
     abstract public void next(@NotNull NAR nar);
-
-    abstract public boolean executeMaybe(Runnable r);
-
 
 
     /** an estimate or exact number of parallel processes this runs */
     abstract public int concurrency();
 
-    /** true if this executioner executes procedures concurrently */
-    public final boolean concurrent() {
+    /** true if this executioner executes procedures concurrently.
+     * in subclasses, if this is true but concurrency()==1, it will use
+     * concurrent data structures to bve safe.
+     */
+    public boolean concurrent() {
         return concurrency() > 1;
     }
 
-    /** default impl: */
-    public void execute(@NotNull Consumer<NAR> r) {
-        execute(()->r.accept(nar));
+    /** whether the execution model is synchronous or asynch */
+    public boolean sync() {
+        return false;
     }
+
+    /** default impl: */
+    public void run(@NotNull Consumer<NAR> r) {
+        this.run(()->r.accept(nar));
+    }
+
+    abstract public void run(Runnable cmd);
+
+    abstract public void run(@NotNull Task[] t);
 
 
     /** a postive or negative value indicating the percentage difference from the
@@ -61,4 +67,10 @@ abstract public class Executioner implements Executor {
      * @return
      */
     public float throttle() { return 0; }
+
+    @Override
+    public final void execute(Runnable command) {
+        run(command);
+    }
+
 }

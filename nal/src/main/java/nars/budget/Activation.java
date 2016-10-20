@@ -20,7 +20,7 @@ public class Activation {
     private final int tasklinkDepth;
     private final int termlinkDepth;
 
-    public final Budgeted in;
+    @NotNull public final Budgeted in;
 
     public final Concept src;
 
@@ -31,11 +31,11 @@ public class Activation {
     private final float minScale; //cut-off limit for recursive spread
 
 
-    protected Activation(Budgeted in, Concept src, NAR nar, int termlinkDepth, int taskLinkDepth) {
+    public Activation(@NotNull Budgeted in, float scale, @NotNull Concept src, @NotNull NAR nar, int termlinkDepth, int taskLinkDepth) {
         this.nar = nar;
         this.in = in;
         this.src = src;
-        this.minScale = Param.BUDGET_EPSILON / in.pri();
+        this.minScale = Param.BUDGET_EPSILON / (scale * in.pri());
         this.termlinkDepth = Math.max(taskLinkDepth, termlinkDepth);  //should be larger then TASKLINK_DEPTH_LIMIT because this resolves the Concept used for it in linkSubterms
         this.tasklinkDepth = taskLinkDepth;
     }
@@ -43,16 +43,16 @@ public class Activation {
     /**
      * runs the task activation procedure
      */
-    public Activation(Budgeted in, Concept src, Concept target, NAR nar, float scale, int termlinkDepth, int taskLinkDepth) {
-        this(in, src, nar, termlinkDepth, taskLinkDepth);
+    public Activation(@NotNull Budgeted in, @NotNull Concept src, @NotNull Concept target, @NotNull NAR nar, float scale, int termlinkDepth, int taskLinkDepth) {
+        this(in, scale, src, nar, termlinkDepth, taskLinkDepth);
 
         if (scale >= minScale) {
             link(src, target, scale, 0);
 
             if (!concepts.isEmpty()) {
-                concepts.compact();
+                //concepts.compact();
                 this.nar.activationAdd(concepts, this.in,
-                        scale * (float)concepts.sum(),
+                        scale,
                         conceptOverflow);
             }
         }
@@ -61,11 +61,11 @@ public class Activation {
     /**
      * runs the task activation procedure
      */
-    public Activation(Budgeted in, Concept c, NAR nar, float scale) {
+    public Activation(@NotNull Budgeted in, @NotNull Concept c, NAR nar, float scale) {
         this(in, c, c, nar, scale, Param.ACTIVATION_TERMLINK_DEPTH, Param.ACTIVATION_TASKLINK_DEPTH);
     }
 
-    public Activation(Task in, NAR nar, float scale) {
+    public Activation(@NotNull Task in, NAR nar, float scale) {
         this(in, in.concept(nar), nar, scale);
     }
 

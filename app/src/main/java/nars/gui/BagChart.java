@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
 public class BagChart<X> extends TreeChart<BLink<X>> implements BiConsumer<BLink<X>, TreeChart.ItemVis<BLink<X>>> {
 
 
-    protected long now;
+    //protected long now;
     final AtomicBoolean busy = new AtomicBoolean(false);
     private final Bag<X> bag;
 

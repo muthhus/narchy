@@ -4,7 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.experiment.minicraft.side.SideScrollMinicraft;
 import nars.experiment.minicraft.side.awtgraphics.AwtGraphicsHandler;
-import nars.remote.SwingAgent;
+import nars.remote.NAgents;
 import nars.util.Util;
 import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
@@ -17,14 +17,14 @@ import static spacegraph.SpaceGraph.window;
 /**
  * Created by me on 9/19/16.
  */
-public class SideCraft extends SwingAgent {
+public class SideCraft extends NAgents {
 
     private final SideScrollMinicraft craft;
     private final Sensor2D pixels;
     private PixelAutoClassifier camAE;
 
     public static void main(String[] args) {
-        run(SideCraft::new, 106512);
+        runRT(SideCraft::new);
     }
 
     public SideCraft(NAR nar) {

@@ -13,24 +13,14 @@ public final class TestTeaVM {
     public static void main(String[] args) {
         final HTMLDocument doc = Window.current().getDocument();
 
-        //new WebSocket("localhost", 8080, "active");
-        log("x");
-
-        String socket = Socket.socket("localhost", Integer.toString(8080), "active");
-
-        Console.log(socket);
+        Socket.socket("localhost", Integer.toString(8080), "active");
 
         HTMLElement div = doc.createElement("button");
-        div.appendChild(doc.createTextNode(" NARchy " + JSDate.now() ));
+        div.appendChild(doc.createTextNode("2333222222" + JSDate.now() ));
         doc.getBody().appendChild(div);
 
 
-
     }
-
-
-    @JSBody(params = { "message" }, script = "console.log(message);")
-    public static native void log(String message);
 
     @JSBody(params = {/*"host", "port", "path"*/}, script =
             //"console.log(\"ws://\"+ host + \":\" + port + \"/\" + path)")

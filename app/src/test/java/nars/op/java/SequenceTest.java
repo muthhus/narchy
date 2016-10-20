@@ -118,7 +118,7 @@ public class SequenceTest {
             int max = 5;
             List<Termed> top = new ArrayList();
             Termed finalNext = next;
-            n.core.concepts.topWhile(ww -> {
+            n.core.active.topWhile(ww -> {
                 Termed x = ww.get();
                 if (x.op() == ATOM && !x.equals(hear) && !x.equals(finalNext))
                     top.add(x);

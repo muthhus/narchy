@@ -4,9 +4,9 @@ package nars.experiment.arkanoid;
 import nars.$;
 import nars.NAR;
 import nars.concept.ActionConcept;
-import nars.remote.SwingAgent;
+import nars.remote.NAgents;
 
-public class Arkancide extends SwingAgent {
+public class Arkancide extends NAgents {
 
 
     final int visW = 64;
@@ -62,7 +62,7 @@ public class Arkancide extends SwingAgent {
     }
 
     public static void main(String[] args) {
-        run(Arkancide::new, 5500);
+        runRT(Arkancide::new);
     }
 
 

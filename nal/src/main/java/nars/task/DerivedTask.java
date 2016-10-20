@@ -178,7 +178,7 @@ abstract public class DerivedTask extends MutableTask {
                     Concept c = nar.concept(premise.concept, b);
 
                     if (c != null) {
-                        c.termlinks().boost(premise.term, b);
+                        c.termlinks().mul(premise.term, b);
                         //c.tasklinks().boost(premise.task, score);
                         nar.concept(c.term(), b);
                     }

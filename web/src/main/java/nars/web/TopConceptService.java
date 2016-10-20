@@ -44,7 +44,7 @@ abstract public class TopConceptService<O> extends PeriodicWebsocketService {
 
                 //SummaryStatistics s = new SummaryStatistics();
 
-                ((Default)nar).core.concepts.forEach(n, c -> {
+                ((Default)nar).core.active.forEach(n, c -> {
                     l.add( summarize(c, i[0]++) );
                     //s.addValue(c.pri());
                 });

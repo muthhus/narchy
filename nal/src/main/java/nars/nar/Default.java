@@ -112,7 +112,7 @@ public class Default extends NAR {
 
     @Override
     public final Concept concept(Term term, float boost) {
-        return core.concepts.boost(term, boost);
+        return core.active.mul(term, boost);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class Default extends NAR {
 
     @Override
     public final float activation(@NotNull Termed concept) {
-        BLink<Concept> c = core.concepts.get(concept);
+        BLink<Concept> c = core.active.get(concept);
         return c != null ? c.priIfFiniteElseZero() : 0;
     }
 
@@ -131,7 +131,7 @@ public class Default extends NAR {
     @NotNull
     @Override
     public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        core.concepts.forEachKey(recip);
+        core.active.forEachKey(recip);
         return this;
     }
 
@@ -139,7 +139,7 @@ public class Default extends NAR {
     public void clear() {
         //TODO use a 'clear' event handler that these can attach to
 
-        core.concepts.clear();
+        core.active.clear();
 
         if (stmLinkage!=null)
             stmLinkage.clear();

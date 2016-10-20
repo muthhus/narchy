@@ -8,11 +8,9 @@ import nars.Task;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.gui.BeliefTableChart;
-import nars.remote.SwingAgent;
+import nars.remote.NAgents;
 import nars.task.MutableTask;
 import nars.truth.Truth;
-import spacegraph.Facial;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.Plot2D;
@@ -30,7 +28,7 @@ import static spacegraph.obj.GridSurface.row;
 /**
  * Created by me on 10/8/16.
  */
-public class Recog2D extends SwingAgent {
+public class Recog2D extends NAgents {
 
     private final Graphics2D g;
     private final int h;
@@ -232,6 +230,6 @@ public class Recog2D extends SwingAgent {
     }
 
     public static void main(String[] arg) {
-        SwingAgent.run(Recog2D::new, 100000);
+        NAgents.runRT(Recog2D::new);
     }
 }

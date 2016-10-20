@@ -14,6 +14,7 @@ import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.data.list.FasterList;
@@ -166,15 +167,21 @@ abstract public class NAgent implements NSense, NAction {
 
         int phase = (actionFrame++) % (frameRate);
         if (phase == 0) {
-            ((FrameClock) nar.clock).tick(0); //freeze clock
+            ticks(0); //freeze clock
         }
         if ((phase == frameRate-1) || (frameRate < 2)) {
-            ((FrameClock) nar.clock).tick(1); //resume clock for the last cycle before repeating
+            ticks(1);
             now = nar.time();
             doFrame();
         }
 
 
+    }
+
+    private void ticks(int t) {
+        Clock clock = (Clock) nar.clock;
+        if (clock instanceof FrameClock)
+            ((FrameClock)clock).tick(t); //resume clock for the last cycle before repeating
     }
 
     private void doFrame() {
@@ -326,13 +333,42 @@ abstract public class NAgent implements NSense, NAction {
     }
 
     public NAgent run(final int cycles) {
-        nar.runLater(() -> {
 
-            init();
+        init();
+
+        nar.runLater(() -> {
 
             nar.onFrame(nn -> frame());
         });
         nar.run(cycles);
+        return this;
+    }
+    /** run Real-time */
+    public NAgent runRT(float fps) {
+
+        init();
+
+        new Thread(()->{
+
+            while (true) {
+
+                doFrame();
+
+                now = nar.time();
+
+                nar.run(1);
+
+                now = nar.time();
+
+                if (fps < 500) {
+                    try {
+                        Thread.sleep((long) (1000f / fps));
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        }).start();
+
         return this;
     }
 

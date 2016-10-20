@@ -2,7 +2,7 @@ package nars.experiment.asteroids;
 
 import nars.$;
 import nars.NAR;
-import nars.remote.SwingAgent;
+import nars.remote.NAgents;
 import nars.video.Scale;
 import nars.video.Sensor2D;
 import nars.video.SwingCamera;
@@ -12,13 +12,13 @@ import static java.lang.Math.round;
 /**
  * Created by me on 9/19/16.
  */
-public class NARsteroids extends SwingAgent {
+public class NARsteroids extends NAgents {
 
     private final Asteroids space;
     private final Sensor2D/*<SwingCamera>*/ pixels;
 
     public static void main(String[] args) {
-        run(NARsteroids::new, 5000);
+        runRT(NARsteroids::new);
     }
 
     public NARsteroids(NAR nar) {

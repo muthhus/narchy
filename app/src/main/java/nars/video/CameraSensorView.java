@@ -24,7 +24,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunc 
         this.nar = nar;
         nar.onFrame(nn -> {
             now = nn.time();
-            maxConceptPriority = nar instanceof Default ? ((Default) nar).core.concepts.priMax() : 1; //HACK TODO cache this
+            maxConceptPriority = nar instanceof Default ? ((Default) nar).core.active.priMax() : 1; //HACK TODO cache this
         });
     }
 

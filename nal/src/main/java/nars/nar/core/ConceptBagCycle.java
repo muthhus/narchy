@@ -47,7 +47,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
      * concepts active in this cycle
      */
     @NotNull
-    public final Bag<Concept> concepts;
+    public final Bag<Concept> active;
 
     @Deprecated
     public final transient @NotNull NAR nar;
@@ -96,7 +96,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.conceptBuilder = nar.concepts.conceptBuilder();
 
-        this.concepts = new BagIndexAdapter(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
+        this.active = new BagIndexAdapter(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
 
         this._activation = 1f;
 
@@ -111,13 +111,13 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         n.policy(c, conceptBuilder.sleep(), now);
 
-        n.emotion.alert(1f / concepts.size());
+        n.emotion.alert(1f / active.size());
     }
 
 
 
     public void reset(NAR m) {
-        concepts.clear();
+        active.clear();
     }
 
 
@@ -134,10 +134,10 @@ public class ConceptBagCycle implements Consumer<NAR> {
         this._tasklinks = tasklinksFiredPerFiredConcept.intValue();
         this._termlinks = termlinksFiredPerFiredConcept.intValue();
 
-        concepts.commit();
+        active.commit();
 
         List<BLink<Concept>> toFire = $.newArrayList(cpf);
-        concepts.sample(cpf, toFire::add);
+        active.sample(cpf, toFire::add);
 
         //toFire.sort(sortConceptLinks);
 
@@ -155,7 +155,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     }
 
     public void activate(ObjectFloatHashMap<Concept> activations, Budgeted in, float activation, MutableFloat overflow) {
-        this.concepts.put(activations, in, activation * this._activation, overflow);
+        this.active.put(activations, in, activation * this._activation, overflow);
     }
 
     static final class BudgetSavings extends RawBudget {

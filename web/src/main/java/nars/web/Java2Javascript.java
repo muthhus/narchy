@@ -1,8 +1,7 @@
 package nars.web;
 
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,11 +13,24 @@ import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import nars.util.FSWatch;
 import nars.util.Util;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.teavm.cache.DiskCachedClassHolderSource;
+import org.teavm.cache.DiskProgramCache;
+import org.teavm.cache.DiskRegularMethodNodeCache;
+import org.teavm.cache.FileSymbolTable;
+import org.teavm.debugging.information.DebugInformation;
+import org.teavm.debugging.information.DebugInformationBuilder;
 import org.teavm.diagnostics.Problem;
+import org.teavm.diagnostics.ProblemProvider;
+import org.teavm.model.*;
+import org.teavm.parsing.ClasspathClassHolderSource;
 import org.teavm.tooling.*;
 import org.teavm.tooling.sources.DirectorySourceFileProvider;
+import org.teavm.vm.DirectoryBuildTarget;
+import org.teavm.vm.TeaVMBuilder;
+import org.teavm.vm.TeaVMEntryPoint;
 
 /**
  * see https://github.com/konsoletyper/teavm/blob/master/tools/maven/plugin/src/main/java/org/teavm/maven/TeaVMCompileMojo.java
@@ -44,15 +56,9 @@ public class Java2Javascript {
 
     public static FSWatch autocompile(String dir, String mainClass, Executor exe, String targetDir, String targetFile) throws IOException {
 
-        logger.info("autocompile: {}/{}", dir, mainClass);
+        logger.info("autocompile: {}/{}.java", dir, targetFile);
 
         return new FSWatch(dir, exe, (p) -> {
-
-            try {
-                Thread.sleep(1000); //delay
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
             if (p.getFileName().toString().equals(targetFile + ".java"))
                 Java2Javascript.compile(
@@ -99,34 +105,43 @@ public class Java2Javascript {
 
             final TeaVMTool tool = new TeaVMTool();
 
-            ClassLoader cl = ClassLoader.getSystemClassLoader();
+            ClassLoader cl = new ClassLoader(Thread.currentThread().getContextClassLoader()) {
+                @Override
+                protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+                    System.out.println("load: " + name + " "+ resolve);
+                    return super.loadClass(name, resolve);
+                }
+            };
+
             tool.setClassLoader(cl);
+
 
             tool.addSourceFileProvider(new DirectorySourceFileProvider(srcDir));
 
-            tool.setMinifying(true);
-            tool.setDebugInformationGenerated(true);
+            tool.setMinifying(false);
+            tool.setDebugInformationGenerated(false);
             tool.setSourceMapsFileGenerated(true);
             tool.setSourceFilesCopied(false);
             tool.setMainClass(mainClass);
             tool.setMainPageIncluded(false);
             tool.setIncremental(false);
-            tool.setRuntime(RuntimeCopyOperation.MERGED);
+            tool.setRuntime(RuntimeCopyOperation.SEPARATE);
             tool.setTargetDirectory(targetDir);
             tool.setTargetFileName(targetFileName);
             tool.setCacheDirectory(Files.createTempDir().getAbsoluteFile());
+            //tool.setBytecodeLogging(true);
 
             //delete any existing file
-            //removeTarget(targetDir, targetFileName);
-            //tool.setBytecodeLogging(true);
+            removeTarget(targetDir, targetFileName);
 
             try {
                 tool.generate();
             } catch (Exception e) {
 
-                removeTarget(targetDir, targetFileName);
 
                 logger.error("compile {}", e);
+
+                removeTarget(targetDir, targetFileName);
                 //throw new RuntimeException( e );
             }
 

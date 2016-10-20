@@ -194,7 +194,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
             //if we have a set period time, delay as appropriate otherwise continue immediately with the next cycle
 
-            this.prevTime = periodMS <= 0 ? System.currentTimeMillis() : Util.pauseWaitUntil(prevPrevTime + periodMS);
+            this.prevTime = periodMS < 0 ? System.currentTimeMillis() : Util.pauseWaitUntil(prevPrevTime + periodMS);
 
             frameTime.addValue(prevTime - prevPrevTime);
 

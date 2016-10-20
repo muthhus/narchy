@@ -70,7 +70,7 @@ public class NQuadsRDFTest {
 //        });
 
         n.run(1);
-        n.core.concepts.clear();
+        n.core.active.clear();
         n.log();
         n.input("$0.9$ (Bacteria <-> Pharmacy)?");
 

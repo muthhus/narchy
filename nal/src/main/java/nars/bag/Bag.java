@@ -412,10 +412,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 //        }
 //    }
 
-    @NotNull
-    default double[] priHistogram(int bins) {
-        return priHistogram(new double[bins]);
-    }
+
 
     @NotNull
     default double[] priHistogram(@NotNull double[] x) {
@@ -479,8 +476,13 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
         }
 
+        @Override public Object add(Object c, float x) {
+            return null;
+        }
+
+
         @Override
-        public Object boost(Object key, float boost) {
+        public Object mul(Object key, float boost) {
             return null;
         }
 
@@ -591,8 +593,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     }
 
 
+    @Nullable V add(Object key, float x);
+
     /** gets the link if present, applies a priority multiplier factor, and returns the link */
-    @Nullable V boost(Object key, float factor);
+    @Nullable V mul(Object key, float factor);
 
     /** samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed  */
     @Nullable default BLink<V> pop() {
@@ -640,5 +644,6 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
             return true; //assume it worked
         });
     }
+
 
 }

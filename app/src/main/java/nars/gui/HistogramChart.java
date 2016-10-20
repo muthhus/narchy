@@ -11,6 +11,8 @@ import spacegraph.Surface;
 import spacegraph.math.Color3f;
 import spacegraph.render.Draw;
 
+import java.util.function.Supplier;
+
 /**
  * Created by me on 9/2/16.
  */
@@ -20,6 +22,14 @@ public class HistogramChart extends Surface {
     private final double[] data;
     private final Color3f dark, light;
 
+    public HistogramChart(Supplier<double[]> source, Color3f dark, Color3f light) {
+
+        this.data = source.get();
+        this.dark = dark;
+        this.light = light;
+
+    }
+
     public HistogramChart(NAR nar, FloatFunction<BLink<Concept>> meter, int bins, Color3f dark, Color3f light) {
 
         this.data = new double[bins];
@@ -27,7 +37,7 @@ public class HistogramChart extends Surface {
         this.light = light;
 
         nar.onFrame(nn -> {
-            ((Default) nn).core.concepts.forEach(c -> {
+            ((Default) nn).core.active.forEach(c -> {
                 float p = meter.floatValueOf(c);
                 int b = Util.bin(p, bins - 1);
                 data[b]++;

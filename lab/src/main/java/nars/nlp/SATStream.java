@@ -32,7 +32,7 @@ public class SATStream {
 
         d.run(10360);
 
-        d.core.concepts.print();
+        d.core.active.print();
 
         //d.dumpConcepts("/tmp/x.txt");
 

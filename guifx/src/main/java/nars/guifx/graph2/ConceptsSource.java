@@ -173,7 +173,7 @@ public class ConceptsSource extends GraphSource {
 
         //TODO use forEach witha predicate return to stop early
         eachConcept.reset();
-        Bag<Concept> x = ((Default) nar).core.concepts;
+        Bag<Concept> x = ((Default) nar).core.active;
         x.topWhile(eachConcept);
 
 //        Iterable<Termed> _concepts = StreamSupport.stream(x.spliterator(), false).filter(cc -> {

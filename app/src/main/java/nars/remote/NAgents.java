@@ -9,6 +9,7 @@ import nars.gui.Vis;
 import nars.index.term.tree.TreeTermIndex;
 import nars.nar.Default;
 import nars.nar.Default2;
+import nars.nar.Multi;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
@@ -16,6 +17,7 @@ import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
+import nars.time.RealtimeDSClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
@@ -30,6 +32,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
@@ -38,20 +41,21 @@ import static spacegraph.obj.GridSurface.grid;
 /**
  * Created by me on 9/19/16.
  */
-abstract public class SwingAgent extends NAgent {
+abstract public class NAgents extends NAgent {
 
     public final Map<String, CameraSensor> cam = new LinkedHashMap<>();
 
-    public SwingAgent(NAR nar, int reasonerFramesPerEnvironmentFrame) {
+    public NAgents(NAR nar, int reasonerFramesPerEnvironmentFrame) {
         super(nar, reasonerFramesPerEnvironmentFrame);
 
     }
 
-    public static void run(Function<NAR, SwingAgent> init, int frames) {
+    public static void runRT(Function<NAR, NAgents> init) {
 
 
         //Default nar = newNAR();
-        Default2 nar = newNAR2();
+        Default nar = newNAR1async(4);
+
 
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
@@ -63,14 +67,15 @@ abstract public class SwingAgent extends NAgent {
 
         new Inperience(nar);
 
-        SwingAgent a = init.apply(nar);
+        NAgents a = init.apply(nar);
         a.trace = true;
 
-        int history = 200;
-        chart(a, history);
+
+        chart(a);
 
 
-        a.run(frames);
+        //a.run(frames);
+        a.runRT(100f);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
@@ -85,6 +90,12 @@ abstract public class SwingAgent extends NAgent {
         //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
     }
 
+    private static Default newNAR1async(int cores) {
+        Default d = newMultiThreadNAR(cores);
+        ((MultiThreadExecutioner)d.exe).sync(false);
+        return d;
+    }
+
     private static Default2 newNAR2() {
         Default2 d = new Default2();
 
@@ -94,11 +105,34 @@ abstract public class SwingAgent extends NAgent {
         return d;
     }
 
-    public static Default newNAR() {
-        Random rng = new XorShift128PlusRandom(4);
+    private static Default newNAR3(int cores) {
+        Multi m = new Multi(cores, (i, j) -> {
+            //feedforward
+            if (i+1 == j )
+                return 0.9f; //decay
+
+            //if ((i + 1) % cores == j)
+               // return 0.9f / (j - i);
+
+            return 0;
+            //return Math.random() < 0.5f ? 0.8f : 0f;
+        });
+
+        Default in = m.core[0];
+
+        SpaceGraph.window(grid( Stream.of(m.core).map(c ->
+                Vis.items(c.core.active, c, 32)).toArray(Surface[]::new) ), 900, 700);
+
+        return in;
+    }
+
+
+
+    public static Default newMultiThreadNAR(int threads) {
+        Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(3, 1024*8);
+                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
         int volMax = 40;
         int conceptsPerCycle = 64;
@@ -110,13 +144,22 @@ abstract public class SwingAgent extends NAgent {
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64*1024, 3)
 
-                , new FrameClock(), exe);
+                ,
+                //new FrameClock()
+                new RealtimeDSClock(true),
+                exe) {
+
+            @Override
+            protected void initNAL7() {
+                //no STM linkage
+            }
+        };
 
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-        float p = 0.1f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.7f * p;
@@ -125,21 +168,21 @@ abstract public class SwingAgent extends NAgent {
         nar.confMin.setValue(0.02f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        nar.linkFeedbackRate.setValue(0.05f);
+        //nar.linkFeedbackRate.setValue(0.05f);
         return nar;
     }
 
-    public static void chart(SwingAgent a, int history) {
+    public static void chart(NAgents a) {
         NAR nar = a.nar;
         window(
                 grid(
                         grid(a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new)),
 
-                        //Vis.concepts(nar, 512),
+                        Vis.concepts((Default)nar, 128),
 
                         Vis.agentActions(a, 200),
 
-                        //Vis.budgetHistogram(nar, 32),
+                        Vis.budgetHistogram(nar, 16),
                         Vis.conceptLinePlot(nar,
                                 Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                                 2000)

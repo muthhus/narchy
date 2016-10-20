@@ -171,8 +171,23 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return s;
     }
 
+    @Nullable
     @Override
-    public V boost(Object key, float boost) {
+    public V add(Object key, float x) {
+        BLink<V> c = map.get(key);
+        if (c != null && !c.isDeleted()) {
+            //float dur = c.dur();
+            float pBefore = c.pri();
+            c.priAdd(x);
+            float delta = c.pri() - pBefore;
+            pressure += delta;// * dur;
+            return c.get();
+        }
+        return null;
+    }
+
+    @Override
+    public V mul(Object key, float boost) {
         BLink<V> c = map.get(key);
         if (c != null && !c.isDeleted()) {
             //float dur = c.dur();

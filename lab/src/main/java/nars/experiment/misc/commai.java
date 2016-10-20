@@ -3,7 +3,7 @@ package nars.experiment.misc;
 import nars.$;
 import nars.NAR;
 import nars.concept.SensorConcept;
-import nars.remote.SwingAgent;
+import nars.remote.NAgents;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
@@ -15,7 +15,7 @@ import java.util.Arrays;
  * <p>
  * https://github.com/zeromq/jeromq
  */
-public class commai extends SwingAgent {
+public class commai extends NAgents {
 
 
     //static final byte[] periodChar = {0, 0, 1, 0, 1, 1, 1, 0};  // '.' utf-8 code
@@ -132,7 +132,7 @@ public class commai extends SwingAgent {
 //        Default d = new Default();
 //        new commai(d).run(50000, 100);
 
-        SwingAgent.run(commai::new, 40000);
+        NAgents.runRT(commai::new);
 
     }
 

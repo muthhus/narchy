@@ -6,7 +6,6 @@ import nars.Param;
 import nars.Task;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.bag.impl.experimental.HijackBag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
@@ -29,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -102,7 +100,7 @@ public class Default2 extends NAR {
             active.sample(num, c -> {
                 Concept key = c.get();
                 terms.put(key.term(), c);
-                active.boost(key, conceptSeedCost);
+                active.mul(key, conceptSeedCost);
                 return true;
             });
         }
@@ -137,7 +135,7 @@ public class Default2 extends NAR {
 
             if (here != null) {
 
-                terms.boost(here, conceptVisitCost);
+                terms.mul(here, conceptVisitCost);
 
                 PremiseMatrix.run(here, Default2.this,
                         tasklinksFiring, termlinksFiring,
@@ -190,7 +188,7 @@ public class Default2 extends NAR {
     public Default2() {
         this(new FrameClock(),
                 //new SingleThreadExecutioner()
-                new MultiThreadExecutioner(4)
+                new MultiThreadExecutioner(4, 4096)
         );
     }
 
@@ -198,10 +196,10 @@ public class Default2 extends NAR {
         super(clock, new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024*1024, 8192, 4),
                 new XorShift128PlusRandom(1), Param.defaultSelf(), exe);
 
-        //CurveBag<Concept> cb = new CurveBag(BudgetMerge.plusBlend, random);
-        //cb.setCapacity(2048);
-        active = //cb;
-                new HijackBag<>(2048, 4, random);
+        CurveBag<Concept> cb = new CurveBag(BudgetMerge.plusBlend, random);
+        cb.setCapacity(1024);
+        active = cb;
+//                new HijackBag<>(512, 4, random);
 
 
         durMin.setValue(BUDGET_EPSILON * 2f);
@@ -232,7 +230,7 @@ public class Default2 extends NAR {
     }
 
     private float getNextActivationRate() {
-        return 1f / (cores.size() * cores.stream().mapToInt(GraphPremiseBuilder::duty).sum());
+        return 1f / (cores.stream().mapToInt(GraphPremiseBuilder::duty).sum());
 
     }
 
@@ -255,7 +253,7 @@ public class Default2 extends NAR {
     public final Concept concept(Term term, float boost) {
         Concept c = concept(term);
         if (c!=null) {
-            return active.boost(c, boost);
+            return active.mul(c, boost);
         }
         return null;
     }

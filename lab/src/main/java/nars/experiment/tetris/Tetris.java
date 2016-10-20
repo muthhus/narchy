@@ -16,7 +16,7 @@ import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
-import nars.remote.SwingAgent;
+import nars.remote.NAgents;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.obj.IntTerm;
@@ -42,7 +42,7 @@ import static spacegraph.obj.GridSurface.grid;
 /**
  * Created by me on 7/28/16.
  */
-public class Tetris extends SwingAgent {
+public class Tetris extends NAgents {
 
     @Deprecated public static final int DEFAULT_INDEX_WEIGHT = 25 * 100000;
 
