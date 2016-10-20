@@ -22,7 +22,7 @@
 
 
   <properties>
-    <java.version>1.9</java.version>
+    <java.version>1.8</java.version>
     <teavm.version>0.4.3</teavm.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -83,12 +83,10 @@
       </exclusions>
     </dependency>
 
-    <!-- JavaScriptObjects (JSO) - a JavaScript binding for TeaVM -->
     <dependency>
       <groupId>org.teavm</groupId>
-      <artifactId>teavm-jso-apis</artifactId>
-      <version>${teavm.version}</version>
-      <scope>compile</scope>
+      <artifactId>teavm-jso</artifactId>
+      <version>0.4.3</version>
       <exclusions>
         <exclusion>
           <groupId>org.ow2.asm</groupId>
@@ -96,6 +94,19 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <!-- JavaScriptObjects (JSO) - a JavaScript binding for TeaVM -->
+    <!--<dependency>-->
+      <!--<groupId>org.teavm</groupId>-->
+      <!--<artifactId>teavm-jso-apis</artifactId>-->
+      <!--<version>${teavm.version}</version>-->
+      <!--<exclusions>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.ow2.asm</groupId>-->
+          <!--<artifactId>*</artifactId>-->
+        <!--</exclusion>-->
+      <!--</exclusions>-->
+    <!--</dependency>-->
 
 
 
@@ -106,12 +117,6 @@
       <version>2.0.0.Alpha1</version>
     </dependency>
 
-    <dependency>
-      <groupId>opennars</groupId>
-      <artifactId>app</artifactId>
-      <version>1.8-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
 
     <dependency>
       <groupId>opennars</groupId>
@@ -157,6 +162,9 @@
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
+          <!--<useIncrementalCompilation>true</useIncrementalCompilation>-->
+          <fork>true</fork>
+
         </configuration>
       </plugin>
 
@@ -180,12 +188,12 @@
             </goals>
             <phase>process-classes</phase>
             <configuration>
-              <mainClass>nars.web.Client</mainClass>
-
+              <mainClass>nars.web.ui.TestTeaVM</mainClass>
+              <targetFileName>TestTeaVM.js</targetFileName>
 
               <mainPageIncluded>false</mainPageIncluded>
 
-              <debugInformationGenerated>false</debugInformationGenerated>
+              <debugInformationGenerated>true</debugInformationGenerated>
               <sourceMapsGenerated>false</sourceMapsGenerated>
 
               <targetDirectory>src/main/resources/_compiled/</targetDirectory>

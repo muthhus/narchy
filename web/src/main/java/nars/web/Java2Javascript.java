@@ -7,12 +7,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 
+import com.google.common.base.Joiner;
+import com.google.common.io.Files;
 import nars.util.FSWatch;
 import nars.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.teavm.diagnostics.Problem;
 import org.teavm.tooling.*;
 import org.teavm.tooling.sources.DirectorySourceFileProvider;
 
@@ -25,7 +29,9 @@ public class Java2Javascript {
 
         String dir = "/home/me/opennars/web/src/main/java/nars/web/ui";
         String mainClass = "nars.web.ui.TestTeaVM";
-        Executor exe = ForkJoinPool.commonPool();
+
+        Executor exe = Executors.newFixedThreadPool(1);
+
         String targetDir = "/home/me/opennars/web/src/main/resources/_compiled";
 
         autocompile(dir, mainClass, exe, targetDir);
@@ -33,7 +39,7 @@ public class Java2Javascript {
     }
 
     public static FSWatch autocompile(String dir, String mainClass, Executor exe, String targetDir) throws IOException {
-        return autocompile(dir, mainClass, exe, targetDir, simpleName(mainClass) + ".js");
+        return autocompile(dir, mainClass, exe, targetDir, simpleName(mainClass));
     }
 
     public static FSWatch autocompile(String dir, String mainClass, Executor exe, String targetDir, String targetFile) throws IOException {
@@ -43,52 +49,51 @@ public class Java2Javascript {
         return new FSWatch(dir, exe, (p) -> {
 
             try {
+                Thread.sleep(1000); //delay
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (p.getFileName().toString().equals(targetFile + ".java"))
                 Java2Javascript.compile(
                         new File(dir),
                         mainClass,
-                        new File(targetDir), targetFile
+                        new File(targetDir), targetFile + ".js"
                 );
-            } catch (Exception e) {
-                logger.error("compile changed file: {}", e);
-            }
 
         });
     }
 
     static final Logger logger = LoggerFactory.getLogger(Java2Javascript.class);
 
-    private static final File cacheDir = new File(
-            Util.tempDir(), Java2Javascript.class.getSimpleName()
-    );
+//    private static final File cacheDir = new File(
+//            Util.tempDir(), Java2Javascript.class.getSimpleName()
+//    );
+//    static {
+//        if (!cacheDir.exists() && !cacheDir.mkdir())
+//            throw new RuntimeException("unable to create temporary directory");
+//    }
 
-    static {
-        if (!cacheDir.exists() && !cacheDir.mkdir())
-            throw new RuntimeException("unable to create temporary directory");
-    }
-
-    static final Set<String> busy = Collections.synchronizedSet(new HashSet());
-
-
-
+    //private static final Set<String> busy = Collections.synchronizedSet(new HashSet());
 
     static String simpleName(String c) {
         int lastPackagePeriod = c.lastIndexOf('.');
-        if (lastPackagePeriod==-1)
+        if (lastPackagePeriod == -1)
             return c; //root package
         else
-            return c.substring(lastPackagePeriod+1, c.length());
+            return c.substring(lastPackagePeriod + 1, c.length());
     }
 
-    public static void compile(File srcDir, String mainClass, File targetDir, String targetFileName) throws Exception {
+    public static void compile(File srcDir, String mainClass, File targetDir, String targetFileName) {
 
         String pathMainClass = srcDir + "/" + mainClass;
 
-        synchronized (busy) {
-            if (!busy.add(pathMainClass)) {
-                logger.info("already compiling {}", mainClass);
-                return; //already busy
-            }
-        }
+//        synchronized (busy) {
+//            if (!busy.add(pathMainClass)) {
+//                logger.info("already compiling {}", mainClass);
+//                return; //already busy
+//            }
+//        }
 
         Util.time(logger, "js://" + pathMainClass + ".java", () -> {
 
@@ -100,33 +105,50 @@ public class Java2Javascript {
             tool.addSourceFileProvider(new DirectorySourceFileProvider(srcDir));
 
             tool.setMinifying(true);
-            tool.setDebugInformationGenerated(false);
-            tool.setSourceMapsFileGenerated(false);
+            tool.setDebugInformationGenerated(true);
+            tool.setSourceMapsFileGenerated(true);
             tool.setSourceFilesCopied(false);
             tool.setMainClass(mainClass);
             tool.setMainPageIncluded(false);
-            //tool.setIncremental(true); //<=- not working yet
-            tool.setRuntime(RuntimeCopyOperation.NONE);
+            tool.setIncremental(false);
+            tool.setRuntime(RuntimeCopyOperation.MERGED);
             tool.setTargetDirectory(targetDir);
             tool.setTargetFileName(targetFileName);
-            tool.setCacheDirectory(cacheDir); //shared by all invocations
+            tool.setCacheDirectory(Files.createTempDir().getAbsoluteFile());
+
+            //delete any existing file
+            //removeTarget(targetDir, targetFileName);
+            //tool.setBytecodeLogging(true);
 
             try {
                 tool.generate();
-            } catch (TeaVMToolException e) {
-                throw new RuntimeException( e );
+            } catch (Exception e) {
+
+                removeTarget(targetDir, targetFileName);
+
+                logger.error("compile {}", e);
+                //throw new RuntimeException( e );
             }
 
-            if (!tool.getProblemProvider().getSevereProblems().isEmpty()) {
-                throw new RuntimeException(
-                        tool.getProblemProvider().getSevereProblems().toString()
-                );
+
+            if (!tool.getProblemProvider().getProblems().isEmpty()) {
+                for (Problem p : tool.getProblemProvider().getProblems()) {
+                    logger.warn("{} {}", p.getLocation(), p.getText());
+                }
+            }
+            if (tool.wasCancelled()) {
+                logger.error("fail");
             }
 
         });
 
-        busy.remove(pathMainClass);
+        //busy.remove(pathMainClass);
 
+    }
+
+    public static void removeTarget(File targetDir, String targetFileName) {
+        File r = new File(targetDir, targetFileName);
+        r.delete();
     }
 
 

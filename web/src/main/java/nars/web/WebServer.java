@@ -5,6 +5,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.cache.DirectBufferCache;
 import io.undertow.server.handlers.resource.CachingResourceManager;
+import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
@@ -44,19 +45,23 @@ public class WebServer /*extends PathHandler*/ {
     @SuppressWarnings("HardcodedFileSeparator")
     public WebServer(int httpPort) {
 
-        PathResourceManager resourcePath = new PathResourceManager(getResourcePath(), 0, true, true);
+
 
         this.path = path()
                 .addPrefixPath("/", resource(
-                        new CachingResourceManager(
-                                16384,
-                                16*1024*1024,
-                                new DirectBufferCache(100, 10, 1000),
-                                resourcePath,
-                                0 //7 * 24 * 60 * 60 * 1000
-                        ))
+
+                        new FileResourceManager( getResourcePath().toFile(), 0 ))
+
+//                        new CachingResourceManager(
+//                                16384,
+//                                16*1024*1024,
+//                                new DirectBufferCache(100, 10, 1000),
+//                                new PathResourceManager(getResourcePath(), 0, true, true),
+//                                0 //7 * 24 * 60 * 60 * 1000
+//                        ))
+                            .setCachable((x) -> false)
                             .setDirectoryListingEnabled(true)
-                            .addWelcomeFiles("index0.html")
+                            .addWelcomeFiles("index.html")
                 );
 
         //https://github.com/undertow-io/undertow/blob/master/examples/src/main/java/io/undertow/examples/sessionhandling/SessionServer.java
@@ -65,7 +70,7 @@ public class WebServer /*extends PathHandler*/ {
                 .addHttpListener(httpPort, "0.0.0.0")
                 .setServerOption(ENABLE_HTTP2, true)
                 .setServerOption(ENABLE_SPDY, true)
-                .setIoThreads(2)
+                .setIoThreads(1)
                 .setHandler(path)
                 .build();
 
@@ -74,7 +79,7 @@ public class WebServer /*extends PathHandler*/ {
 //                .addPrefixPath("/{chan}/feed", socket(new WebsocketRouter()));
 
 
-        logger.info("http start: port={} staticFiles={}", httpPort, resourcePath.getBasePath());
+        logger.info("http start: port={}", httpPort);
         synchronized (server) {
             server.start();
         }
