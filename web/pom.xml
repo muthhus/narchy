@@ -6,7 +6,7 @@
   <artifactId>web</artifactId>
   <version>1.8-SNAPSHOT</version>
   <inceptionYear>2016</inceptionYear>
-  <packaging>jar</packaging>
+  <packaging>takari-jar</packaging>
   <parent>
     <groupId>opennars</groupId>
     <artifactId>narchy</artifactId>
@@ -144,6 +144,15 @@
   </dependencies>
 
   <build>
+
+    <!--<resources>-->
+      <!--<resource>-->
+        <!--<directory>src/main/resources</directory>-->
+        <!--<filtering>true</filtering>-->
+        <!--&lt;!&ndash;<excludes></excludes>&ndash;&gt;-->
+      <!--</resource>-->
+    <!--</resources>-->
+
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -188,8 +197,8 @@
             </goals>
             <phase>process-classes</phase>
             <configuration>
-              <mainClass>nars.web.ui.TestTeaVM</mainClass>
-              <sourceDirectory>src/main/java</sourceDirectory>
+              <mainClass>nars.web.ui.Client</mainClass>
+              <sourceDirectory>${build.directory}/src/main/java/</sourceDirectory>
               <targetFileName>classes.js</targetFileName>
 
               <mainPageIncluded>false</mainPageIncluded>
@@ -198,7 +207,7 @@
               <sourceMapsGenerated>false</sourceMapsGenerated>
               <sourceFilesCopied>false</sourceFilesCopied>
 
-              <targetDirectory>src/main/resources/_compiled/</targetDirectory>
+              <targetDirectory>${build.directory}/src/main/resources/_compiled/</targetDirectory>
             </configuration>
           </execution>
         </executions>

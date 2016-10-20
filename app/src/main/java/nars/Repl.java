@@ -125,7 +125,7 @@ public class Repl {
         //InterNAR2 ii = new InterNAR2(d, 15001);
         //ii.connect("tcp://localhost:15000");
 
-        //Util.pause(1000);
+        //Util.sleep(1000);
         //ii.send("test");
 
         new Repl(d);
@@ -157,10 +157,10 @@ public class Repl {
                     // Write two messages, each with an envelope and content
                     publisher.sendMore("A");
                     publisher.send("We don't want to see this");
-                    Util.pause(100);
+                    Util.sleep(100);
                     publisher.sendMore("B");
                     publisher.send("We would like to see this");
-                    Util.pause(100);
+                    Util.sleep(100);
                 }
             }).start();
 

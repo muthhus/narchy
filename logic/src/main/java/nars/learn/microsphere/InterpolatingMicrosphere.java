@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static nars.util.Util.sqr;
+
 
 /**
  * Utility class for the {@link MicrosphereProjectionInterpolator} algorithm.
@@ -144,6 +146,24 @@ public class InterpolatingMicrosphere {
 //            }
         }
     }
+
+    public static LightCurve lightCurve(float dur) {
+        return (dt, evi) -> {
+            return timeDecay(evi, dur, dt);
+        };
+    }
+
+    public static float timeDecay(float evi, float dur, float dt) {
+        if (dt == 0)
+            return evi;
+        dur = Math.max(dur, 1f);
+
+        float newEvi = evi / (1f + dt*dt/dur  );
+
+        //System.out.println("\t\t" + evi + " x ( dt=" + dt + " dur=" + dur + " ) ---> " + evi);
+        return newEvi;
+    }
+
 
 //    /**
 //     * Copy constructor.

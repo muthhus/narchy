@@ -54,7 +54,7 @@ abstract public class NAgents extends NAgent {
 
 
         //Default nar = newNAR();
-        Default nar = newNAR1async(4);
+        Default nar = newNAR1async(3);
         //Default2 nar = newNAR2();
 
 
@@ -76,7 +76,7 @@ abstract public class NAgents extends NAgent {
 
 
         //a.run(frames);
-        a.runRT(100f);
+        a.runRT(50f);
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
@@ -133,14 +133,14 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
+                new MultiThreadExecutioner(threads, 1024 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
         int volMax = 40;
-        int conceptsPerCycle = 4;
+        int conceptsPerCycle = 16;
 
 
         //Multi nar = new Multi(3,512,
-        Default nar = new Default(1024,
+        Default nar = new Default(2048,
                 conceptsPerCycle, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64*1024, 3)
@@ -160,13 +160,13 @@ abstract public class NAgents extends NAgent {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.05f;
+        float p = 0.85f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.7f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.8f * p;
 
-        nar.confMin.setValue(0.02f);
+        nar.confMin.setValue(0.04f);
         nar.compoundVolumeMax.setValue(volMax);
 
         //nar.linkFeedbackRate.setValue(0.05f);
@@ -183,7 +183,7 @@ abstract public class NAgents extends NAgent {
 
                         Vis.agentActions(a, 200),
 
-                        Vis.budgetHistogram(nar, 16),
+                        Vis.budgetHistogram(nar, 32),
                         Vis.conceptLinePlot(nar,
                                 Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
                                 2000)

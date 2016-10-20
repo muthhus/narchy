@@ -704,9 +704,7 @@ public enum Util { ;
         return Math.abs(a - b) < epsilon;
     }
 
-    public static void pause(long milli) {
-        pauseWait(milli);
-    }
+
 
     private final static Object waitLock = new Object();
 
@@ -738,27 +736,6 @@ public enum Util { ;
 //        }
 //        return now;
 //    }
-
-    /** from boofcv: */
-    static void pauseWait(long milli) {
-        if (milli <= 0) return;
-        
-        Thread t = Thread.currentThread();
-        long start = System.currentTimeMillis();
-        long now;
-        while((now=System.currentTimeMillis()) - start < milli) {
-            synchronized(t) {
-                try {
-                    long ignore = milli - (now - start);
-                    if(ignore > 0L) {
-                        t.wait(ignore);
-                    }
-                } catch (InterruptedException var9) {
-                }
-            }
-        }
-
-    }
 
     /** applies a quick, non-lexicographic ordering compare
      * by first testing their lengths
@@ -1333,4 +1310,35 @@ public enum Util { ;
         long c = a ^ b;
         return LongString.toString(c);
     }
+
+    /** http://www.qat.com/using-waitnotify-instead-thread-sleep-java/ */
+    public static void pause(long milli) {
+        if (milli <= 0) return;
+
+        Thread t = Thread.currentThread();
+        long start = System.currentTimeMillis();
+        long now;
+        while((now=System.currentTimeMillis()) - start < milli) {
+            synchronized(t) {
+                try {
+                    long ignore = milli - (now - start);
+                    if(ignore > 0L) {
+                        t.wait(ignore);
+                    }
+                } catch (InterruptedException var9) {
+                }
+            }
+        }
+
+    }
+
+    /** http://www.qat.com/using-waitnotify-instead-thread-sleep-java */
+    public static void sleep(long periodMS) {
+        try {
+            Thread.sleep(periodMS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

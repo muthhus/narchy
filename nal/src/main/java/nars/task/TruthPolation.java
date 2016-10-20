@@ -13,6 +13,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static nars.learn.microsphere.InterpolatingMicrosphere.lightCurve;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -58,21 +59,19 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         }
     }
 
-    public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
-        return TruthPolation.temporalConfidenceLoss(dt, evidence, 1f);
-    };
+//    public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
+//        return TruthPolation.temporalConfidenceLoss(dt, evidence, 1f);
+//    };
 
     @Nullable
-    public Truth truth(long when, Task... tasks) {
-        return truth(when, tasks, evidentialDecayThroughTime);
+    public Truth truth(long when, float dur, Task... tasks) {
+        return truth(when, tasks, lightCurve(dur));
     }
 
     @Nullable
-    public Truth truth(long when, @NotNull Collection<Task> tasks) {
-        return truth(when, tasks.toArray(new Task[tasks.size()]), evidentialDecayThroughTime);
+    public Truth truth(long when, float dur, @NotNull Collection<Task> tasks) {
+        return truth(when, tasks.toArray(new Task[tasks.size()]), lightCurve(dur));
     }
-
-
 
     @Nullable
     public Truth truth(long when, @NotNull Task[] tasks, LightCurve lightCurve) {

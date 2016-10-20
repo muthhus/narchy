@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
+import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
@@ -21,6 +22,7 @@ import java.util.function.Predicate;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
+import static nars.learn.microsphere.InterpolatingMicrosphere.timeDecay;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.util.Util.sqr;
@@ -148,8 +150,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
     private volatile long minT = MAX_VALUE, maxT = Long.MIN_VALUE;
 
-    public long duration() {
-
+    public long range() {
         if (minT==MAX_VALUE || maxT==MIN_VALUE) {
             //cached valus invalidated, re-compute
             forEach(u -> {
@@ -166,9 +167,14 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         if (minT==MAX_VALUE || maxT==MIN_VALUE) {
             return 1; //empty probably} else {
         } else {
-            
+
             return Math.max(0, maxT - minT);
         }
+
+    }
+
+    public float duration() {
+        return ((float)range()) / 2f;
     }
 
     @Override
@@ -252,7 +258,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
 
     public Task matchWeakest(long now) {
-        long duration = duration();
+        float duration = duration();
         return list.minBy(x -> rankTemporalByConfidence(x, now, duration));
     }
 
@@ -311,7 +317,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
             return input; //no need for compression
         }
 
-        long dur = duration();
+        float dur = duration();
 
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
         float inputRank = input != null ? rankTemporalByConfidence(input, now, dur) : Float.POSITIVE_INFINITY;
@@ -363,7 +369,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
 
 
-        long dur = duration();
+        float dur = duration();
         if (against == null) {
 
             //System.out.println(this + " against: " + against + " @ " + now);
@@ -414,23 +420,13 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
                     return Revision.project(res, when, now, o, false);
 
             default:
-                float dur = (float)duration();///(s/2f));
-                return new TruthPolation(s).truth(when, tr, (dt, evi)->{
-                    return timeDecay(evi, dur, dt);
-                });
+                InterpolatingMicrosphere.LightCurve x = InterpolatingMicrosphere.lightCurve(duration());
+                return new TruthPolation(s).truth(when, tr, x);
 
         }
 
     }
 
-    static float timeDecay(float evi, float dur, float dt) {
-        if (dt == 0)
-            return evi;
-        dur = Math.max(dur, 1f);
-        float newEvi = evi / (1f + (dt * dt / (dur  ) ) );
-        //System.out.println("\t\t" + evi + " x ( dt=" + dt + " dur=" + dur + " ) ---> " + evi);
-        return newEvi;
-    }
 
 
     private boolean clean(@NotNull List<Task> trash) {

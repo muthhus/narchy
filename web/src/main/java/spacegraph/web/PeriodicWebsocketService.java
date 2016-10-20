@@ -22,7 +22,7 @@ public abstract class PeriodicWebsocketService extends WebsocketService implemen
     public void run() {
         while (thread!=null) {
             update();
-            Util.pause(updatePeriodMS.intValue());
+            Util.sleep(updatePeriodMS.intValue());
         }
     }
 

@@ -49,7 +49,7 @@ public class SystemTimer {
 	 */
 	public static void sleep(long duration) {
 		if (duration <= 0) return;
-		Util.pause(duration);
+		Util.sleep(duration);
 		//timer.sleep((duration * timerTicksPerSecond) / 1000);
 	}
 }

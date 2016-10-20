@@ -139,7 +139,7 @@ public class LoopPane extends FlowPane {
     }
 
     private void updateSpeed(int nMS) {
-        if (loop.setPeriodMS(nMS)) {
+        loop.setPeriodMS(nMS);
 
             //new delay set:
 
@@ -148,7 +148,6 @@ public class LoopPane extends FlowPane {
                 int MS = nMS;
                 say("@" + MS + "ms (" + Texts.n2(1000.0f / MS) + "hz)");
             });
-        }
     }
 
     private void unpause() {

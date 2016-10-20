@@ -38,7 +38,7 @@ public interface DiscreteEnvironment {
             post(t, a.act(reward, ins), ins, a);
 
             if (periodMS > 0)
-                Util.pause(periodMS);
+                Util.sleep(periodMS);
         }
 
         float scoreAvg = rewardSum/cycles;

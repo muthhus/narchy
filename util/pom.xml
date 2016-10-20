@@ -5,7 +5,7 @@
   <groupId>opennars</groupId>
   <artifactId>util</artifactId>
   <version>1.8-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>takari-jar</packaging>
   <parent>
     <groupId>opennars</groupId>
     <artifactId>narchy</artifactId>
@@ -19,6 +19,9 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+
+
   <dependencies>
     <dependency>
       <groupId>org.jetbrains</groupId>

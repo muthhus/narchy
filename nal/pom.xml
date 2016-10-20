@@ -11,7 +11,7 @@
         <artifactId>narchy</artifactId>
         <version>1.8-SNAPSHOT</version>
     </parent>
-    <packaging>jar</packaging>
+    <packaging>takari-jar</packaging>
     <licenses>
         <license>
             <name>GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)</name>

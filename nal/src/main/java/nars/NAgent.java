@@ -17,6 +17,7 @@ import nars.term.Term;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.truth.Truth;
+import nars.util.Loop;
 import nars.util.data.list.FasterList;
 import nars.util.math.FirstOrderDifferenceFloat;
 import nars.util.math.FloatNormalized;
@@ -348,10 +349,10 @@ abstract public class NAgent implements NSense, NAction {
 
         init();
 
-        new Thread(()->{
+        new Loop("agent", fps) {
 
-            while (true) {
-
+            @Override
+            public void next() {
                 doFrame();
 
                 now = nar.time();
@@ -360,14 +361,29 @@ abstract public class NAgent implements NSense, NAction {
 
                 now = nar.time();
 
-                if (fps < 500) {
-                    try {
-                        Thread.sleep((long) (1000f / fps));
-                    } catch (InterruptedException e) {
-                    }
-                }
             }
-        }).start();
+        };
+
+//        new Thread(()->{
+//
+//            while (true) {
+//
+//                doFrame();
+//
+//                now = nar.time();
+//
+//                nar.run(1);
+//
+//                now = nar.time();
+//
+//                if (fps < 500) {
+//                    try {
+//                        Thread.sleep((long) (1000f / fps));
+//                    } catch (InterruptedException e) {
+//                    }
+//                }
+//            }
+//        }).start();
 
         return this;
     }

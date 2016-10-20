@@ -965,8 +965,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
     public final void runLater(@NotNull Consumer<NAR> t) {
-        //TODO lambda may be optimized slightly
-        runLater(() -> t.accept(this));
+        exe.run(t);
     }
 
 

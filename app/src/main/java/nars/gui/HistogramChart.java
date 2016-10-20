@@ -19,12 +19,12 @@ import java.util.function.Supplier;
 public class HistogramChart extends Surface {
 
 
-    private final double[] data;
+    private final Supplier<double[]> data;
     private final Color3f dark, light;
 
     public HistogramChart(Supplier<double[]> source, Color3f dark, Color3f light) {
 
-        this.data = source.get();
+        this.data = source;
         this.dark = dark;
         this.light = light;
 
@@ -32,7 +32,8 @@ public class HistogramChart extends Surface {
 
     public HistogramChart(NAR nar, FloatFunction<BLink<Concept>> meter, int bins, Color3f dark, Color3f light) {
 
-        this.data = new double[bins];
+        double[] data = new double[bins];
+        this.data = () -> data;
         this.dark = dark;
         this.light = light;
 
@@ -59,6 +60,9 @@ public class HistogramChart extends Surface {
 
     @Override
     protected void paint(GL2 gl) {
+
+        double[] data = this.data.get();
+
         int N = data.length;
         float dx = 1f / N;
         double max = data[Util.argmax(data)];
