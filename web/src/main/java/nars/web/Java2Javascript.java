@@ -2,18 +2,25 @@ package nars.web;
 
 
 import java.io.*;
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.function.Consumer;
 
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import nars.util.FSWatch;
 import nars.util.Util;
 import org.apache.commons.io.IOUtils;
+import org.codehaus.commons.compiler.CompilerFactoryFactory;
+import org.codehaus.commons.compiler.IClassBodyEvaluator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.teavm.cache.DiskCachedClassHolderSource;
@@ -39,35 +46,78 @@ public class Java2Javascript {
 
     public static void main(String[] vsdkjf) throws Exception {
 
-        String dir = "/home/me/opennars/web/src/main/java/nars/web/ui";
+        String srcRoot = "/home/me/opennars/web/src/main/java";
+        //String dir = srcRoot + "/nars/web/ui";
         String mainClass = "nars.web.ui.TestTeaVM";
 
-        Executor exe = Executors.newFixedThreadPool(1);
+        Executor exe = Executors.newSingleThreadExecutor(); //Executors.newFixedThreadPool(1);
 
         String targetDir = "/home/me/opennars/web/src/main/resources/_compiled";
 
-        autocompile(dir, mainClass, exe, targetDir);
+        autocompile(srcRoot, mainClass, exe, targetDir);
 
     }
 
-    public static FSWatch autocompile(String dir, String mainClass, Executor exe, String targetDir) throws IOException {
-        return autocompile(dir, mainClass, exe, targetDir, simpleName(mainClass));
+    //    public static Class compile(String classBody, String... args) throws Exception {
+    public static Class compile(String classBody) throws Exception {
+
+//
+//        // Get arguments.
+//        String[] arguments = new String[ args.length ];
+//        System.arraycopy(args, 0, arguments, 0, arguments.length);
+
+        // Compile the class body.
+        IClassBodyEvaluator cbe = CompilerFactoryFactory.getDefaultCompilerFactory().newClassBodyEvaluator();
+        cbe.cook(classBody);
+        return cbe.getClazz();
+
+//        // Invoke the "public static main(String[])" method.
+//        Method m = c.getMethod("main", String[].class);
+//        Object returnValue = m.invoke(null, (Object) arguments);
+//
+//        // If non-VOID, print the return value.
+//        if (m.getReturnType() != void.class) {
+//            System.out.println(
+//                    returnValue instanceof Object[]
+//                            ? Arrays.toString((Object[]) returnValue)
+//                            : String.valueOf(returnValue)
+//            );
+//        }
     }
 
-    public static FSWatch autocompile(String dir, String mainClass, Executor exe, String targetDir, String targetFile) throws IOException {
 
-        logger.info("autocompile: {}/{}.java", dir, targetFile);
+    public static FSWatch autocompile(String srcRoot, String mainClass, Executor exe, String targetDir) throws IOException {
+        return autocompile(srcRoot, mainClass, exe, targetDir, simpleName(mainClass));
+    }
 
-        return new FSWatch(dir, exe, (p) -> {
+    public static FSWatch autocompile(String srcRoot, String mainClass, Executor exe, String targetDir, String targetFile) throws IOException {
 
-            if (p.getFileName().toString().equals(targetFile + ".java"))
-                Java2Javascript.compile(
-                        new File(dir),
-                        mainClass,
-                        new File(targetDir), targetFile + ".js"
-                );
+        logger.info("autocompile: {}/{}.java", srcRoot, targetFile);
 
-        });
+        String fileDir = srcRoot + "/" + mainClass.substring(0, mainClass.lastIndexOf('.')).replace('.', '/');
+        Consumer<Path> method = (p) -> {
+
+//            Java2Javascript.compile(
+//                    new File(srcRoot),
+//                    mainClass,
+//                    new File(targetDir), targetFile + ".js"
+//            );
+
+            try {
+                Runtime.getRuntime().exec("mvn teavm:compile");
+                Runtime.getRuntime().exec("cp target/javascript/* src/resources/_compiled");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        };
+
+        FSWatch f = new FSWatch(fileDir, exe, method);
+
+        method.accept(null); //initial call
+
+        return f;
     }
 
     static final Logger logger = LoggerFactory.getLogger(Java2Javascript.class);
@@ -90,49 +140,47 @@ public class Java2Javascript {
             return c.substring(lastPackagePeriod + 1, c.length());
     }
 
+
     public static void compile(File srcDir, String mainClass, File targetDir, String targetFileName) {
 
         String pathMainClass = srcDir + "/" + mainClass;
 
-//        synchronized (busy) {
-//            if (!busy.add(pathMainClass)) {
-//                logger.info("already compiling {}", mainClass);
-//                return; //already busy
-//            }
-//        }
 
-        Util.time(logger, "js://" + pathMainClass + ".java", () -> {
+        String compileKey = "js://" + pathMainClass.replace('.', '/') + ".java";
+
+//        ClassLoader cl = new ClassLoader(Java2Javascript.class.getClassLoader()) {
+//            @Override
+//            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+//                System.out.println("load: " + name + " " + resolve);
+//                return super.loadClass(name, resolve);
+//            }
+//        };
+
+
+        Util.time(logger, compileKey, () -> {
+
 
             final TeaVMTool tool = new TeaVMTool();
 
-            ClassLoader cl = new ClassLoader(Thread.currentThread().getContextClassLoader()) {
-                @Override
-                protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-                    System.out.println("load: " + name + " "+ resolve);
-                    return super.loadClass(name, resolve);
-                }
-            };
 
-            tool.setClassLoader(cl);
-
-
+            ///tool.setClassLoader(cl);
             tool.addSourceFileProvider(new DirectorySourceFileProvider(srcDir));
 
-            tool.setMinifying(false);
+            tool.setMinifying(true);
             tool.setDebugInformationGenerated(false);
-            tool.setSourceMapsFileGenerated(true);
-            tool.setSourceFilesCopied(false);
-            tool.setMainClass(mainClass);
+            tool.setSourceMapsFileGenerated(false);
+            tool.setSourceFilesCopied(true);
+            tool.setMainClass(mainClass + "_");
             tool.setMainPageIncluded(false);
             tool.setIncremental(false);
-            tool.setRuntime(RuntimeCopyOperation.SEPARATE);
+            tool.setRuntime(RuntimeCopyOperation.NONE);
             tool.setTargetDirectory(targetDir);
             tool.setTargetFileName(targetFileName);
             tool.setCacheDirectory(Files.createTempDir().getAbsoluteFile());
             //tool.setBytecodeLogging(true);
 
             //delete any existing file
-            removeTarget(targetDir, targetFileName);
+            //removeTarget(targetDir, targetFileName);
 
             try {
                 tool.generate();
@@ -141,9 +189,11 @@ public class Java2Javascript {
 
                 logger.error("compile {}", e);
 
-                removeTarget(targetDir, targetFileName);
+                //removeTarget(targetDir, targetFileName);
                 //throw new RuntimeException( e );
             }
+
+            System.out.println("used resources: " + tool.getUsedResources());
 
 
             if (!tool.getProblemProvider().getProblems().isEmpty()) {
@@ -157,7 +207,6 @@ public class Java2Javascript {
 
         });
 
-        //busy.remove(pathMainClass);
 
     }
 

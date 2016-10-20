@@ -162,7 +162,7 @@
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
-          <!--<useIncrementalCompilation>true</useIncrementalCompilation>-->
+          <useIncrementalCompilation>true</useIncrementalCompilation>
           <fork>true</fork>
 
         </configuration>
@@ -189,12 +189,14 @@
             <phase>process-classes</phase>
             <configuration>
               <mainClass>nars.web.ui.TestTeaVM</mainClass>
-              <targetFileName>TestTeaVM.js</targetFileName>
+              <sourceDirectory>src/main/java</sourceDirectory>
+              <targetFileName>classes.js</targetFileName>
 
               <mainPageIncluded>false</mainPageIncluded>
 
-              <debugInformationGenerated>true</debugInformationGenerated>
+              <debugInformationGenerated>false</debugInformationGenerated>
               <sourceMapsGenerated>false</sourceMapsGenerated>
+              <sourceFilesCopied>false</sourceFilesCopied>
 
               <targetDirectory>src/main/resources/_compiled/</targetDirectory>
             </configuration>

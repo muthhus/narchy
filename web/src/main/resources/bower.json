@@ -16,8 +16,7 @@
     "semantic": "latest",
     "object-editor": "latest",
     "ace-builds": "latest",
-    "metawidget": "latest",
-    "lokijs": "latest"
+    "metawidget": "latest"
   },
   "keywords": [
     "nars",

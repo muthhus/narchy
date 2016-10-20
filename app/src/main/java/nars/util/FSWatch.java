@@ -22,27 +22,27 @@ public class FSWatch implements Runnable {
     private final Consumer<Path> onEvent;
     private Thread thread;
 
-    public FSWatch(String dir, Executor exe, Consumer<Path> onEvent) throws IOException {
-        this(dir, (t) -> exe.execute( () -> onEvent.accept(t)) );
+    public FSWatch(String path, Executor exe, Consumer<Path> onEvent) throws IOException {
+        this(path, (t) -> exe.execute( () -> onEvent.accept(t)) );
     }
 
-    public FSWatch(String dir, Consumer<Path> onEvent) throws IOException {
+    public FSWatch(String path, Consumer<Path> onEvent) throws IOException {
 
         watchService = FileSystems.getDefault().newWatchService();
 
-        this.path = Paths.get(dir);
+        this.path = Paths.get(path);
 
-        watchKey = path.register(watchService,
+        watchKey = this.path.register(watchService,
             StandardWatchEventKinds.ENTRY_CREATE,
             StandardWatchEventKinds.ENTRY_MODIFY,
             StandardWatchEventKinds.ENTRY_DELETE
         );
 
-        logger.info("start: {}", path);
+        logger.info("start: {}", this.path);
 
         this.onEvent = onEvent;
 
-        this.thread = new Thread(this, "FSWatch:" + dir);
+        this.thread = new Thread(this, "FSWatch:" + path);
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
     }
@@ -72,7 +72,7 @@ public class FSWatch implements Runnable {
                 //System.out.println("Waiting for key to be signalled...");
                 key = watchService.take();
             } catch (InterruptedException ex) {
-                //System.out.println("Interrupted Exception");
+                ex.printStackTrace();
                 continue;
             }
 
