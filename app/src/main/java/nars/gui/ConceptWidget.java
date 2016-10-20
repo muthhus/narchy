@@ -168,6 +168,8 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         List<EDraw> ee = edges;
 
+        float maxAttraction = 0.05f;
+
         float pri = l.priIfFiniteElseZero();
         if (pri > 0) {
 
@@ -178,11 +180,12 @@ public class ConceptWidget extends SimpleSpatial<Term> {
             EDraw z = new EDraw();
             z.target = target;
             z.width = width;
-            z.r = 0.1f + pri * (0.5f);
-            z.g = 0.1f + pri * (0.5f - 0.5f * l.qua());
-            z.b = 0.1f + pri * (0.5f - 0.5f * l.dur());
-            z.a = 1f;
-            z.attraction = 0.025f;
+            z.r = pri * 1f / ((Term)target.key).volume();
+            z.g = pri * l.qua();
+            float dur = l.dur();
+            z.b = pri * dur;
+            z.a = 0.9f;
+            z.attraction = (dur*dur) * maxAttraction;
 
             ee.add(z);
             return z;

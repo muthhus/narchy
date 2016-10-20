@@ -15,6 +15,7 @@ import nars.nar.Default;
 import nars.nar.exe.Executioner;
 import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
 import nars.rdfowl.NQuadsRDF;
 import nars.term.Compound;
@@ -22,6 +23,8 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.RealtimeDSClock;
+import nars.time.Tense;
+import nars.util.Loop;
 import nars.util.Texts;
 import nars.util.Wiki;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -42,11 +45,16 @@ import java.util.stream.Collectors;
 import static nars.nlp.Twenglish.tokenize;
 
 /**
- * Created by me on 7/10/16.
- *
- <sseehh> (hear($someone, $something) ==> say($something)).
- <sseehh> ((hear($someone,$something) &&+1 hear($someone,$nextThing)) && hear(I, $something)) ==>+1 say($nextThing).
- <sseehh> (((I<->$someone) && hear($someone, $something)) ==> say($something)).
+
+ $0.9;0.9;0.99$
+
+ $0.9;0.9;0.99$ (hear($someone, $something) ==>+1 say($something)).
+ $0.9;0.9;0.99$ (((hear(#someone,#someThing) &&+1 hear(#someone,$nextThing)) && hear(I, #someThing)) ==>+1 say($nextThing)).
+ $0.9;0.9;0.99$ (((hear($someone,$someThing) &&+1 hear($someone,$nextThing)) <=> hear($someone, ($someThing,$nextThing)))).
+ $0.9;0.9;0.99$ (((I<->$someone) && hear($someone, $something)) ==>+1 hear(I, $something)).
+ $0.9;0.9;0.99$ hear(I, #something)!
+ hear(I,?x)?
+
  */
 public class IRCAgent extends IRC {
     private static final Logger logger = LoggerFactory.getLogger(IRCAgent.class);
@@ -55,7 +63,7 @@ public class IRCAgent extends IRC {
     private final NAR nar;
     //private float ircMessagePri = 0.9f;
 
-    final int wordDelay = 60; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
+    final int wordDelayMS = 150; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
 
     public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);
@@ -69,7 +77,8 @@ public class IRCAgent extends IRC {
 
         //SPEAK
         nar.onTask(t -> {
-            if (t.pri() >= 0.7f) {
+            float p = t.pri();
+            if (p >= 0.7f || (t.term().containsTermRecursively(nar.self) && (p > 0.5f))) {
                 send(channels, t.toString());
             }
         });
@@ -95,9 +104,12 @@ public class IRCAgent extends IRC {
                     String html = enWiki.getRenderedText(page);
                     html = StringEscapeUtils.unescapeHtml4(html);
                     String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ");
+
+                    strippedText = strippedText.toLowerCase();
+
                     //System.out.println(strippedText);
 
-                    hear(strippedText, "wikipedia", page);
+                    hear(strippedText, page, null /*"wikipedia"*/);
 
                     return "Reading " + base + ":" + page + ": " + strippedText.length() + " characters";
 
@@ -273,7 +285,7 @@ public class IRCAgent extends IRC {
                         return;
                     }
                 } catch (GrappaException | Narsese.NarseseException f) {
-                    hear(msg, nick, channel);
+                    hear(msg, nick, null /*channel*/);
                 }
             } catch (Exception e) {
                 pevent.respond(e.toString());
@@ -287,25 +299,41 @@ public class IRCAgent extends IRC {
     }
 
 
-    void hear(String msg, String who, String channel) {
+    void hear(@NotNull String msg, @NotNull  String who, @Nullable String channel) {
 //        nar.believe(
 //                $.inst($.p(tokenize(msg)), $.p($.quote(channel), $.quote(nick))),
 //                Tense.Present
 //        );
 
-        final long[] time = {nar.time()};
+        final List<Term> tokens = tokenize(msg);
+        if (!tokens.isEmpty()) {
 
-        Atom chan_nick = $.quote(channel + "/" + who);
+            Atom chan_nick = $.quote( channel!=null ? (channel + "/" + who) : who );
 
-        nar.runLater(() -> {
+            new Loop(msg, wordDelayMS) {
 
-            for (Term token : tokenize(msg)) {
-                Term pr = $.exec("hear", chan_nick, token );
-                nar.believe(pr, time[0], 1f);
-                time[0] += wordDelay;
-            }
+                int token = 0;
 
-        });
+                @Override
+                public void next() {
+                    if (token >= tokens.size()) {
+                        stop();
+                        return;
+                    }
+                    Term pr = $.exec("hear", chan_nick, tokens.get(token++));
+                    nar.believe(pr, Tense.Present, 1f);
+
+                }
+            };
+//            nar.runLater(() -> {
+//
+//                for (Term token :) {
+//                    nar.believe(pr, time[0], 1f);
+//                    time[0] += wordDelayMS;
+//                }
+//
+//            });
+        }
 
     }
 
@@ -329,7 +357,7 @@ public class IRCAgent extends IRC {
         );
 
 
-        int volMax = 25;
+        int volMax = 30;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -343,7 +371,7 @@ public class IRCAgent extends IRC {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.01f;
+        float p = 0.1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
@@ -367,6 +395,8 @@ public class IRCAgent extends IRC {
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
 
+        new Inperience(nar);
+
         nar.loop(framesPerSecond);
 
         return nar;
@@ -374,7 +404,7 @@ public class IRCAgent extends IRC {
 
     public static void main(String[] args) throws Exception {
 
-        @NotNull Default n = newRealtimeNAR(1024, 10, 32);
+        @NotNull Default n = newRealtimeNAR(1024, 30, 12);
 
 
         IRC bot = new IRCAgent(n,

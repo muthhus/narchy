@@ -26,14 +26,19 @@ abstract public class Loop implements Runnable {
     public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
     private int periodMS;
 
+
     public Loop(String threadName, int periodMS) {
-        thread = new Thread(this, threadName);
+        this(threadName);
 
         start(periodMS);
     }
 
     public Loop(String threadName, float fps) {
         this(threadName, (int)(1000f/fps));
+    }
+
+    public Loop(String threadName) {
+        thread = new Thread(this, threadName);
     }
 
     protected final void start(float fps) {

@@ -55,7 +55,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
         //n.run(20); //headstart
 
-        n.DEFAULT_BELIEF_PRIORITY = 0.05f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
 
 
         //n.log();
@@ -108,6 +108,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
                 //Concept Core
                 Concept concept = b.get();
+                if (concept==null)
+                    return true;
 
                 ConceptWidget root = space.update(concept.term(),
                         t -> new ConceptWidget(t, nar));
@@ -115,7 +117,6 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 //float bPri = root.pri = b.priIfFiniteElseZero();
                 target.add(root);
 
-                root.clearEdges();
 
                 Consumer<BLink<? extends Termed>> absorb = tgt -> {
                     Term tt = tgt.get().term();
@@ -125,6 +126,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 };
 
                 //phase 1: collect
+                root.clearEdges();
                 concept.tasklinks().forEach(absorb);
                 concept.termlinks().forEach(absorb);
 

@@ -73,10 +73,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
     private int _tasklinks, _termlinks;
     private long now;
 
-    /** internal activation multiplier, default=1.0 */
-    private final MutableFloat activation = new MutableFloat(1);
-    private float _activation;
-
 
 //    private Comparator<? super BLink<Concept>> sortConceptLinks = (a, b) -> {
 //        Concept A = a.get();
@@ -98,7 +94,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
         this.active = new BagIndexAdapter(initialCapacity, ((DefaultConceptBuilder) conceptBuilder).defaultCurveSampler);
 
-        this._activation = 1f;
 
         nar.onFrame(this);
         nar.eventReset.on(this::reset);
@@ -122,14 +117,13 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
 
+
     /** called each frame */
     @Override public void accept(NAR nar) {
 
         now = nar.time();
 
         int cpf = conceptsFiredPerCycle.intValue();
-
-        this._activation = this.activation.floatValue()/cpf;
 
         this._tasklinks = tasklinksFiredPerFiredConcept.intValue();
         this._termlinks = termlinksFiredPerFiredConcept.intValue();
@@ -155,7 +149,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     }
 
     public void activate(ObjectFloatHashMap<Concept> activations, Budgeted in, float activation, MutableFloat overflow) {
-        this.active.put(activations, in, activation * this._activation, overflow);
+        this.active.put(activations, in, activation, overflow);
     }
 
     static final class BudgetSavings extends RawBudget {

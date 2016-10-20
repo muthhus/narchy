@@ -43,13 +43,11 @@ public class NARLoop extends Loop {
      * @param initialPeriod
      */
     public NARLoop(@NotNull NAR n, int initialPeriod) {
-        super(n.self + ":loop", initialPeriod);
+        super(n.self + ":loop");
 
         nar = n;
 
-        setPeriodMS(initialPeriod);
-        thread.start();
-        logger.info("started {}", thread);
+        start(initialPeriod);
 
     }
 

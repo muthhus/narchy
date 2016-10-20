@@ -57,6 +57,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static nars.$.$;
 import static nars.Symbols.*;
 import static nars.concept.CompoundConcept.DuplicateMerge;
 import static nars.time.Tense.ETERNAL;
@@ -119,6 +120,10 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      * maximum NAL level currently supported by this memory, for restricting it to activity below NAL8
      */
     int level;
+
+
+    /** global input activation multiplier, applied to both concepts and links  */
+    private MutableFloat activationGlobal = new MutableFloat(1f);
 
 
     private NARLoop loop;
@@ -416,7 +421,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     @Nullable
     public Task goal(@NotNull String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        return goal((Termed) $.$(goalTermString), tense, freq, conf);
+        return goal((Termed) $(goalTermString), tense, freq, conf);
     }
 
     /**
@@ -442,17 +447,17 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
-        return believe(term, tense, freq, confidenceDefault(Symbols.BELIEF));
+        return believe(term, tense, freq, confidenceDefault(BELIEF));
     }
 
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, long when, float freq) {
-        return believe(term, when, freq, confidenceDefault(Symbols.BELIEF));
+        return believe(term, when, freq, confidenceDefault(BELIEF));
     }
 
     @NotNull
     public Task goal(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
-        return goal(term, tense, freq, confidenceDefault(Symbols.GOAL));
+        return goal(term, tense, freq, confidenceDefault(GOAL));
     }
 
 
@@ -643,6 +648,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             return null;
         }
 
+        input.budget().priMult(activationGlobal.floatValue());
 
         Task existing = tasks.addIfAbsent(input);
         if (existing == null) {
@@ -656,9 +662,10 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
                 Concept c = input.concept(this);
 
+                Activation a = c.process(input, this);
+
                 emotion.busy(input.pri());
 
-                Activation a = c.process(input, this);
                 if (a != null) {
 
                     emotion.stress(a.linkOverflow);

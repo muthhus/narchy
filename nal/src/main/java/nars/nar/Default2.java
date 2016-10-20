@@ -49,7 +49,7 @@ public class Default2 extends NAR {
     public final List<GraphPremiseBuilder> cores;
 
     final static Deriver deriver = Deriver.getDefaultDeriver();
-    private float _activation;
+
 
 
     public final class GraphPremiseBuilder implements Runnable {
@@ -223,8 +223,6 @@ public class Default2 extends NAR {
         this.cores = range(0, numCores ).mapToObj(i -> new GraphPremiseBuilder()).collect(toList());
 
         onFrame(()-> {
-            this._activation = getNextActivationRate();
-            active.commit();
             runLater(cores, GraphPremiseBuilder::run, 1);
         });
     }
@@ -260,7 +258,7 @@ public class Default2 extends NAR {
 
     @Override
     public final void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
-        active.put(concepts, in, activation * _activation, overflow);
+        active.put(concepts, in, activation, overflow);
     }
 
     @Override
