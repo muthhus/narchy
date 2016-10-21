@@ -115,10 +115,12 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         Collections.sort(outs, NODE_COMPARATOR);
         return new ByteArrayNodeDefault(in.array(), value, outs);
     }
+
     static public ByteArrayNodeNonLeafVoidValue innerVoid(ByteSeq in, List<Node> outs) {
         Collections.sort(outs, NODE_COMPARATOR);
         return new ByteArrayNodeNonLeafVoidValue(in.array(), outs);
     }
+
     static public ByteArrayNodeNonLeafNullValue innerNull(ByteSeq in, List<Node> outs) {
         Collections.sort(outs, NODE_COMPARATOR);
         return new ByteArrayNodeNonLeafNullValue(in.array(), outs);
@@ -139,8 +141,8 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     static ByteSeq getCommonPrefix(ByteSeq first, ByteSeq second) {
         int minLength = Math.min(first.length(), second.length());
 
-        for(int i = 0; i < minLength; ++i) {
-            if(first.at(i) != second.at(i)) {
+        for (int i = 0; i < minLength; ++i) {
+            if (first.at(i) != second.at(i)) {
                 return first.subSequence(0, i);
             }
         }
@@ -151,13 +153,13 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     static ByteSeq subtractPrefix(ByteSeq main, ByteSeq prefix) {
         int startIndex = prefix.length();
         int mainLength = main.length();
-        return (startIndex > mainLength?ByteSeq.EMPTY:main.subSequence(startIndex, mainLength));
+        return (startIndex > mainLength ? ByteSeq.EMPTY : main.subSequence(startIndex, mainLength));
     }
 
     static int binarySearch(AtomicReferenceArray<? extends Prefixed> l, byte key) {
         int low = 0;
 
-        int high = l.length()-1;
+        int high = l.length() - 1;
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
@@ -169,10 +171,11 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         }
         return -(low + 1);  // key not found
     }
+
     static int binarySearch(List<? extends Prefixed> l, byte key) {
         int low = 0;
 
-        int high = l.size()-1;
+        int high = l.size() - 1;
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
@@ -277,6 +280,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         public byte getIncomingEdgeFirstCharacter() {
             return this.incomingEdgeCharArray[0];
         }
+
         public Node getOutgoingEdge(byte edgeFirstCharacter) {
             //AtomicReferenceArrayListAdapter childNodesList = new AtomicReferenceArrayListAdapter<>(childNodes);
             //NodeCharacterKey searchKey = new NodeCharacterKey(edgeFirstCharacter);
@@ -305,7 +309,6 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             sb.append("Node{");
             sb.append("edge=").append(this.getIncomingEdge());
             sb.append(", value=" + getValue());
-            sb.append(", edges=").append(this.getOutgoingEdges());
             sb.append("}");
             return sb.toString();
         }
@@ -865,17 +868,18 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     }
 
     static ByteSeq getPrefix(ByteSeq input, int endIndex) {
-        return endIndex > input.length()?input:input.subSequence(0, endIndex);
+        return endIndex > input.length() ? input : input.subSequence(0, endIndex);
     }
+
     public static ByteSeq getSuffix(ByteSeq input, int startIndex) {
-        return (startIndex >= input.length()?ByteSeq.EMPTY:input.subSequence(startIndex, input.length()));
+        return (startIndex >= input.length() ? ByteSeq.EMPTY : input.subSequence(startIndex, input.length()));
     }
 
 
     static ByteSeq concatenate(ByteSeq a, ByteSeq b) {
         int aLen = a.length();
         int bLen = b.length();
-        byte[] c = new byte[aLen+bLen];
+        byte[] c = new byte[aLen + bLen];
         a.toArray(c, 0);
         b.toArray(c, aLen);
         return new ByteSeq.RawByteSeq(c);
@@ -1028,23 +1032,29 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
     @NotNull
     public SearchResult random(float descendProb, Random rng) {
-        return random(null, descendProb, rng);
+        return random(root, null, null, descendProb, rng);
     }
 
     @NotNull
-    public SearchResult random(@Nullable SearchResult at, float descendProb, Random rng) {
-        Node current, parent, parentParent;
-        if (at != null && at.found != null) {
-            current = at.found;
-            parent = at.parentNode;
-            parentParent = at.parentNodesParent;
-        } else {
-            current = root;
-            parent = parentParent = null;
-        }
+    public SearchResult random(Node subRoot, float descendProb, Random rng) {
+        return random(subRoot, root, null, descendProb, rng);
+    }
 
-        /*acquireReadLockIfNecessary();
-        try {*/
+    @NotNull
+    public SearchResult random(@NotNull SearchResult at, float descendProb, Random rng) {
+        Node current, parent, parentParent;
+        //if (at != null && at.found != null) {
+        current = at.found;
+        parent = at.parentNode;
+        parentParent = at.parentNodesParent;
+        return random(current, parent, parentParent, descendProb, rng);
+    }
+
+    @NotNull
+    public SearchResult random(Node current, Node parent, Node parentParent, float descendProb, Random rng) {
+
+        //}
+
         while (true) {
             List<Node> c = current.getOutgoingEdges();
             int s = c.size();
@@ -1063,9 +1073,6 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                 }
             }
         }
-        /*} finally {
-            releaseReadLockIfNecessary();
-        }*/
 
         return new SearchResult(current, parent, parentParent);
     }
@@ -1313,15 +1320,15 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * because equals() and hashCode() are not specified by the CharSequence API contract.
      */
     @SuppressWarnings({"JavaDoc"})
-    <O> Iterable<Pair<ByteSeq,O>> getDescendantKeyValuePairs(final ByteSeq startKey, final Node startNode) {
-        return new Iterable<Pair<ByteSeq,O>>() {
+    <O> Iterable<Pair<ByteSeq, O>> getDescendantKeyValuePairs(final ByteSeq startKey, final Node startNode) {
+        return new Iterable<Pair<ByteSeq, O>>() {
             @Override
-            public Iterator<Pair<ByteSeq,O>> iterator() {
-                return new LazyIterator<Pair<ByteSeq,O>>() {
+            public Iterator<Pair<ByteSeq, O>> iterator() {
+                return new LazyIterator<Pair<ByteSeq, O>>() {
                     Iterator<NodeKeyPair> descendantNodes = lazyTraverseDescendants(startKey, startNode).iterator();
 
                     @Override
-                    protected Pair<ByteSeq,O> computeNext() {
+                    protected Pair<ByteSeq, O> computeNext() {
                         // Traverse to the next matching node in the tree and return its key and value...
                         while (descendantNodes.hasNext()) {
                             NodeKeyPair nodeKeyPair = descendantNodes.next();
@@ -1332,7 +1339,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                                 // Call the transformKeyForResult method to allow key to be transformed before returning to client.
                                 // Used by subclasses such as ReversedRadixTree implementations...
 
-                                return pair(transformKeyForResult(nodeKeyPair.key), (O)value);
+                                return pair(transformKeyForResult(nodeKeyPair.key), (O) value);
                             }
                         }
                         // Finished traversing the tree, no more matching nodes to return...
@@ -1531,7 +1538,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
      * Also classifies the search result so that algorithms in methods which use this SearchResult, when adding nodes
      * and removing nodes from the tree, can select appropriate strategies based on the classification.
      */
-    public static class SearchResult {
+    public static final class SearchResult {
         public final ByteSeq key;
         public final Node found;
         public final int charsMatched;
@@ -1548,7 +1555,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
             INVALID // INVALID is never used, except in unit testing
         }
 
-        SearchResult(Node found, Node parentNode, Node parentParentNode) {
+        public SearchResult(Node found, Node parentNode, Node parentParentNode) {
             this(null, found, -1, -1, parentNode, parentParentNode, found != null ? Classification.EXACT_MATCH : Classification.INVALID);
         }
 

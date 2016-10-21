@@ -11,6 +11,7 @@ import nars.util.radixtree.MyConcurrentRadixTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -60,10 +61,10 @@ public class TreeTermIndex extends TermIndex implements Runnable {
     }
 
 
-
     //1. decide how many items to remove, if any
     //2. search for items to meet this quota and remove them
-    @Override public void run() {
+    @Override
+    public void run() {
 
         while (true) {
 
@@ -87,55 +88,69 @@ public class TreeTermIndex extends TermIndex implements Runnable {
         int sizeBefore = sizeEst();
 
 
-        float maxFractionThatCanBeRemovedAtATime = 0.005f;
+        float maxFractionThatCanBeRemovedAtATime = 0.01f;
+        float descentRate = 0.75f;
+
         int maxConceptsThatCanBeRemovedAtATime = (int) Math.max(1, sizeBefore * maxFractionThatCanBeRemovedAtATime);
 
-
-        //none or too few to attempt removal
-        if (sizeBefore - sizeLimit <= maxConceptsThatCanBeRemovedAtATime)
-            return;
-
-        Random rng = nar.random;
+        if ((sizeEst() - sizeLimit) >= maxConceptsThatCanBeRemovedAtATime) {
 
 
-        float descentRate = 0.95f;
+            Random rng = nar.random;
 
+            MyConcurrentRadixTree.SearchResult s = null;
 
-        MyConcurrentRadixTree.SearchResult s = null;
+            concepts.acquireWriteLock();
+            try {
 
-        concepts.acquireWriteLock();
-        try {
+                while ((sizeEst() - sizeLimit) >= maxConceptsThatCanBeRemovedAtATime) {
 
-            while ((sizeEst() - sizeLimit) > 0) {
+                    MyConcurrentRadixTree.Node subRoot = volumeWeightedRoot(rng);
 
-                s = concepts.random(s, descentRate, rng);
-                MyConcurrentRadixTree.Node f = s.found;
+                    if (s == null)
+                        s = concepts.random(subRoot, descentRate, rng);
 
-                if (f != null && f != concepts.root) {
-                    int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);
+                    MyConcurrentRadixTree.Node f = s.found;
 
-                    if (subTreeSize == 0) {
+                    if (f != null && f != subRoot) {
+                        int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);
+
+                        if (subTreeSize > 0) {
+                            //long preBatch = sizeEst();
+                            concepts.removeHavingAcquiredWriteLock(s, true);
+                            //logger.info("  Forgot Batch {}", preBatch - sizeEst());
+                        }
+
                         s = null; //restart
-                    } else if (subTreeSize > 0) {
-                        //long preBatch = sizeEst();
-                        concepts.removeHavingAcquiredWriteLock(s, true);
-                        //logger.info("  Forgot Batch {}", preBatch - sizeEst());
-                        s = null;
-                    } /*else {
-                    logger.info("avoided removing {} elements, continuing..", concepts.size(f));
-                    //continue descent
-                }*/
+                    }
+
                 }
+            } finally {
+                concepts.releaseWriteLock();
             }
 
-        } finally {
-            concepts.releaseWriteLock();
+            int sizeAfter = sizeEst();
+            logger.info("Forgot {} Concepts", sizeBefore - sizeAfter);
         }
 
+    }
 
-        int sizeAfter = sizeEst();
+    /** since the terms are sorted by a volume-byte prefix, we can scan for removals in the higher indices of this node */
+    private MyConcurrentRadixTree.Node volumeWeightedRoot(Random rng) {
 
-        logger.info("Forgot {} Concepts", sizeBefore - sizeAfter);
+        List<MyConcurrentRadixTree.Node> l = concepts.root.getOutgoingEdges();
+        int levels = l.size();
+
+        //HEURISTIC: x^8 sharp curve
+        float r = rng.nextFloat();
+        r = (r*r); //r^2
+        r = (r*r); //r^4
+        r = (r*r); //r^8
+        r = 1-r;
+
+        int n = (int) Math.round((levels-1)*r);
+
+        return l.get(n);
     }
 
     private int sizeEst() {

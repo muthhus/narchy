@@ -195,15 +195,19 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public final void run(@NotNull Runnable r) {
-        //disruptor.publishEvent(runPublisher, r);
-        if (!ring.tryPublishEvent(runPublisher, r)) {
-            logger.warn("dropped: {}", r);
-        }
+        disruptor.publishEvent(runPublisher, r);
+//        if (!ring.tryPublishEvent(runPublisher, r)) {
+//            logger.warn("dropped: {}", r);
+//        }
     }
 
     @Override
     public final void run(@NotNull Consumer<NAR> r) {
-        disruptor.publishEvent(narPublisher, r);
+        if (!ring.tryPublishEvent(narPublisher, r)) {
+            logger.warn("dropped: {}", r);
+        }
+
+        //disruptor.publishEvent(narPublisher, r);
     }
 
 

@@ -32,14 +32,14 @@ public class TermTreeTest {
 
         Function<Term, Concept> cb = (t)->new AtomConcept((Atomic)t, null, null);
 
-        tree.computeIfAbsent(new TermKey($("concept")), cb);
-        tree.computeIfAbsent(new TermKey($("term")), cb);
-        tree.computeIfAbsent(new TermKey($("termutator")), cb);
+        tree.computeIfAbsent(TermKey.term($("concept")), cb);
+        tree.computeIfAbsent(TermKey.term($("term")), cb);
+        tree.computeIfAbsent(TermKey.term($("termutator")), cb);
         //tree.print(System.out);
 
-        assertNotNull(tree.get(new TermKey($("term"))));
-        assertNull(tree.get(new TermKey($("xerm"))));
-        assertNull(tree.get(new TermKey($("te")))); //partial
+        assertNotNull(tree.get(TermKey.term($("term"))));
+        assertNull(tree.get(TermKey.term($("xerm"))));
+        assertNull(tree.get(TermKey.term($("te")))); //partial
 
         assertNotNull(tree.computeIfAbsent(new ByteSeq.RawByteSeq("term"), cb));
         assertEquals(3, tree.size());

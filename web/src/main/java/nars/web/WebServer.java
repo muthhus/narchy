@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import static io.undertow.Handlers.*;
 import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static io.undertow.UndertowOptions.ENABLE_SPDY;
+import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static java.util.zip.Deflater.BEST_SPEED;
 import static spacegraph.irc.IRCAgent.newRealtimeNAR;
 
@@ -38,7 +39,7 @@ public class WebServer /*extends PathHandler*/ {
 
 
     public static HttpHandler socket(WebSocketConnectionCallback w) {
-        return websocket(w).addExtension(new PerMessageDeflateHandshake(false, BEST_SPEED));
+        return websocket(w).addExtension(new PerMessageDeflateHandshake(false, BEST_COMPRESSION));
     }
 
 

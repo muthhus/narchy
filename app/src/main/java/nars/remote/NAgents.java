@@ -133,7 +133,7 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 1024 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
+                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
         int volMax = 40;
         int conceptsPerCycle = 16;
@@ -143,7 +143,7 @@ abstract public class NAgents extends NAgent {
         Default nar = new Default(2048,
                 conceptsPerCycle, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64*1024, 3)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 10000, 64*1024, 3)
 
                 ,
                 //new FrameClock()
@@ -157,7 +157,7 @@ abstract public class NAgents extends NAgent {
         };
 
 
-        nar.beliefConfidence(0.7f);
+        nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.6f);
 
         float p = 0.5f;

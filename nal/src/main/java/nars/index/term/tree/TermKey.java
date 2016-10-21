@@ -30,33 +30,38 @@ public class TermKey extends DynByteSeq {
     final static Lz4Decompressor decompressor = new Lz4Decompressor();
     private final static float minCompressionRatio = 0.9f;
 
-    public TermKey(@NotNull Term conceptualizable) {
-        super(conceptualizable.volume() * 4 + 64 /* ESTIMATE */);
+    /** term with volume byte prepended for sorting by volume */
+    public static TermKey term(@NotNull Term x) {
+        TermKey y = new TermKey(x.volume() * 4 + 64 /* ESTIMATE */);
         try {
-            writeTermSeq(this, conceptualizable, false);
 
-            int before = length();
-            if (compress()) {
+            //volume byte: pre-sorts everything by volume from the root, so that items of certain sizes can
+            //be selected
+            y.writeByte(x.volume());
+
+            writeTermSeq(y, x, false);
+
+            //int before = length();
+            if (x instanceof Compound && y.compress(1)) {
                 //int after = length();
                 //System.out.println(conceptualizable + "\t" + before + " -> " + after + "\t" + new String(array()));
             }
 
             //this.writeByte(0); //null terminator, signifying end-of-term
+            return y;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public TermKey(int len) {
+        super(len);
+    }
+
     public TermKey(@NotNull Task task) {
         super(task.volume() * 4 + 64 /* ESTIMATE */);
         try {
-            //Term, Occurrence, Truth, Evidence
-//            writeTermSeq(this, task.term(), true);
-//            writeLong(task.occurrence());
-//            IO.writeTruth(this, task);
-//            IO.writeEvidence(this, task.evidence());
 
-            //writeUTFWithoutLength(this, task.term().toString());
             writeCompoundSeq(this, task.term(), true);
 
             char punc = task.punc();
@@ -73,37 +78,31 @@ public class TermKey extends DynByteSeq {
 
             compress();
 
-            //System.out.println(task + " uncompressed=" + uncLength + " compressed=" + compressedLength);
-
-            {
-//            byte[] reUncompressed = new byte[uncLength];
-//            int unC2 = decompressor.decompress(compressed,0, length(), reUncompressed, 0, reUncompressed.length );
-//            reUncompressed = Arrays.copyOfRange(reUncompressed, 0, unC2);
-//            byte[] original = Arrays.copyOfRange(uncompressed, 0, uncLength);
-//            if (!Arrays.equals(original, reUncompressed)) {
-//                System.err.println(task + " compression failure:\n\t" + new String(original) + "\n\t" + new String(reUncompressed));
-//            }
-            }
-
-            //writeByte(0); //null terminator, signifying end-of-term
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public boolean compress() {
-        int uncLength = length();
+        return compress(0);
+    }
 
-        //byte[] original = Arrays.copyOfRange(bytes, 0, len);
+    //TODO add parameter for from..to range compresion, currently this will only skip a prefix
+    public boolean compress(int from) {
+        int to = length();
+        int uncLength = to-from;
+
         byte[] uncompressed = this.bytes;
-        byte[] compressed = new byte[Lz4RawCompressor.maxCompressedLength(uncLength)]; //this.bytes; //new byte[1024];
-        //public int compress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength) {
-
+        byte[] compressed = new byte[from + Lz4RawCompressor.maxCompressedLength(uncLength)];
 
         int compressedLength = compressor.get()
-                .compress(uncompressed, 0, uncLength, compressed, 0, compressed.length);
+                .compress(uncompressed, from, uncLength, compressed, from, compressed.length);
+
         if (compressedLength <= (int)(uncLength * minCompressionRatio)) {
+
+            System.arraycopy(bytes, 0, compressed, 0, from); //copy prefix
+            //TODO copy suffix
+
             this.bytes = compressed;
             this.position = compressedLength;
             return true;
