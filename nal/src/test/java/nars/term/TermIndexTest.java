@@ -78,7 +78,7 @@ public class TermIndexTest {
 //    }
     @Test public void testTermSharing5c() {
         testIndex(
-                new Default.DefaultTermTermIndex(1024, rng)
+                new Default.DefaultTermTermIndex(1024)
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }

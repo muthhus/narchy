@@ -50,7 +50,7 @@ public class EllipsisTest {
         default Set<Term> test(int arity, int repeats) {
             Set<Term> selectedFixed = $.newHashSet(arity);
 
-            TermIndex index = new Default.DefaultTermTermIndex(1024, new XorShift128PlusRandom(1));
+            TermIndex index = new Default.DefaultTermTermIndex(1024);
 
             Compound y = getMatchable(arity);
             assertNotNull(y);

@@ -11,6 +11,9 @@ import nars.gui.BeliefTableChart;
 import nars.remote.NAgents;
 import nars.task.MutableTask;
 import nars.truth.Truth;
+import nars.video.Scale;
+import spacegraph.Facial;
+import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.GridSurface;
 import spacegraph.obj.Plot2D;
@@ -40,9 +43,9 @@ public class Recog2D extends NAgents {
     int a = 0;
 
     int image = 0;
-    final int maxImages = 7;
-    int imagePeriod = 128;
-    int TRAINING_PERIOD = imagePeriod * 4;
+    final int maxImages = 4;
+    int imagePeriod = 100;
+    int TRAINING_PERIOD = imagePeriod * 8;
 
     float theta;
     float dTheta = 0.25f;
@@ -52,7 +55,7 @@ public class Recog2D extends NAgents {
     }
 
     public Recog2D(NAR n) {
-        super(n, 6);
+        super(n, 1);
 
         w = 24;
         h = 24;
@@ -83,10 +86,9 @@ public class Recog2D extends NAgents {
         //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
 
-//        new Thread(() -> {
-//            Facial f = new Facial(conceptTraining(imgTrainer, nar));
-//            new SpaceGraph().add(f.maximize()).show(800, 600);
-//        }).start();
+        new Thread(() -> {
+            SpaceGraph.window(conceptTraining(imgTrainer, nar), 800, 600);
+        }).start();
 
     }
 

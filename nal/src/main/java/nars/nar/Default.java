@@ -54,7 +54,7 @@ public class Default extends NAR {
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random,
-                new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO, random),
+                new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
                 new FrameClock());
     }
 
@@ -151,11 +151,11 @@ public class Default extends NAR {
      */
     public static class DefaultTermTermIndex extends MapTermIndex {
 
-        public DefaultTermTermIndex(int capacity, @NotNull Random random) {
+        public DefaultTermTermIndex(int capacity) {
             super(
                     new DefaultConceptBuilder(),
                     new HashMap(capacity),
-                    new HashMap(capacity*2)
+                    new HashMap(capacity)
                     //new ConcurrentHashMap<>(capacity),
                     //new ConcurrentHashMap<>(capacity)
                     //new ConcurrentHashMapUnsafe(capacity)

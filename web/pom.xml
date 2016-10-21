@@ -22,78 +22,78 @@
 
 
   <properties>
-    <java.version>1.8</java.version>
-    <teavm.version>0.4.3</teavm.version>
+    <!--<java.version>1.8</java.version>-->
+    <!--<teavm.version>0.4.3</teavm.version>-->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
 
-    <dependency>
-      <groupId>org.teavm</groupId>
-      <artifactId>teavm-core</artifactId>
-      <version>${teavm.version}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jetbrains.kotlin</groupId>
-          <artifactId>kotlin-stdlib</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jetbrains.kotlin</groupId>
-          <artifactId>kotlin-stdlib</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.teavm</groupId>
-      <artifactId>teavm-tooling</artifactId>
-      <version>${teavm.version}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jetbrains.kotlin</groupId>
-          <artifactId>kotlin-stdlib</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jetbrains.kotlin</groupId>
-          <artifactId>kotlin-stdlib</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.teavm</groupId>-->
+      <!--<artifactId>teavm-core</artifactId>-->
+      <!--<version>${teavm.version}</version>-->
+      <!--<scope>compile</scope>-->
+      <!--<exclusions>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.ow2.asm</groupId>-->
+          <!--<artifactId>*</artifactId>-->
+        <!--</exclusion>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.jetbrains.kotlin</groupId>-->
+          <!--<artifactId>kotlin-stdlib</artifactId>-->
+        <!--</exclusion>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.jetbrains.kotlin</groupId>-->
+          <!--<artifactId>kotlin-stdlib</artifactId>-->
+        <!--</exclusion>-->
+      <!--</exclusions>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.teavm</groupId>-->
+      <!--<artifactId>teavm-tooling</artifactId>-->
+      <!--<version>${teavm.version}</version>-->
+      <!--<scope>compile</scope>-->
+      <!--<exclusions>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.ow2.asm</groupId>-->
+          <!--<artifactId>*</artifactId>-->
+        <!--</exclusion>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.jetbrains.kotlin</groupId>-->
+          <!--<artifactId>kotlin-stdlib</artifactId>-->
+        <!--</exclusion>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.jetbrains.kotlin</groupId>-->
+          <!--<artifactId>kotlin-stdlib</artifactId>-->
+        <!--</exclusion>-->
+      <!--</exclusions>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.teavm</groupId>
-      <artifactId>teavm-classlib</artifactId>
-      <version>${teavm.version}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.teavm</groupId>-->
+      <!--<artifactId>teavm-classlib</artifactId>-->
+      <!--<version>${teavm.version}</version>-->
+      <!--<scope>compile</scope>-->
+      <!--<exclusions>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.ow2.asm</groupId>-->
+          <!--<artifactId>*</artifactId>-->
+        <!--</exclusion>-->
+      <!--</exclusions>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.teavm</groupId>
-      <artifactId>teavm-jso</artifactId>
-      <version>0.4.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.teavm</groupId>-->
+      <!--<artifactId>teavm-jso</artifactId>-->
+      <!--<version>0.4.3</version>-->
+      <!--<exclusions>-->
+        <!--<exclusion>-->
+          <!--<groupId>org.ow2.asm</groupId>-->
+          <!--<artifactId>*</artifactId>-->
+        <!--</exclusion>-->
+      <!--</exclusions>-->
+    <!--</dependency>-->
 
     <!-- JavaScriptObjects (JSO) - a JavaScript binding for TeaVM -->
     <!--<dependency>-->
@@ -164,54 +164,54 @@
       </plugin>
 
 
-      <!-- Configure Java compiler to use Java 8 syntax  -->
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-          <useIncrementalCompilation>true</useIncrementalCompilation>
-          <fork>true</fork>
+      <!--&lt;!&ndash; Configure Java compiler to use Java 8 syntax  &ndash;&gt;-->
+      <!--<plugin>-->
+        <!--<artifactId>maven-compiler-plugin</artifactId>-->
+        <!--<version>3.5.1</version>-->
+        <!--<configuration>-->
+          <!--<source>${java.version}</source>-->
+          <!--<target>${java.version}</target>-->
+          <!--<useIncrementalCompilation>true</useIncrementalCompilation>-->
+          <!--<fork>true</fork>-->
 
-        </configuration>
-      </plugin>
+        <!--</configuration>-->
+      <!--</plugin>-->
 
 
-      <plugin>
-        <groupId>org.teavm</groupId>
-        <artifactId>teavm-maven-plugin</artifactId>
-        <version>${teavm.version}</version>
-        <dependencies>
-          <!-- This dependency is required by TeaVM to emulate subset of Java class library -->
-          <dependency>
-            <groupId>org.teavm</groupId>
-            <artifactId>teavm-classlib</artifactId>
-            <version>${teavm.version}</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <phase>process-classes</phase>
-            <configuration>
-              <mainClass>nars.web.ui.Client</mainClass>
-              <sourceDirectory>${build.directory}/src/main/java/</sourceDirectory>
-              <targetFileName>classes.js</targetFileName>
+      <!--<plugin>-->
+        <!--<groupId>org.teavm</groupId>-->
+        <!--<artifactId>teavm-maven-plugin</artifactId>-->
+        <!--<version>${teavm.version}</version>-->
+        <!--<dependencies>-->
+          <!--&lt;!&ndash; This dependency is required by TeaVM to emulate subset of Java class library &ndash;&gt;-->
+          <!--<dependency>-->
+            <!--<groupId>org.teavm</groupId>-->
+            <!--<artifactId>teavm-classlib</artifactId>-->
+            <!--<version>${teavm.version}</version>-->
+          <!--</dependency>-->
+        <!--</dependencies>-->
+        <!--<executions>-->
+          <!--<execution>-->
+            <!--<goals>-->
+              <!--<goal>compile</goal>-->
+            <!--</goals>-->
+            <!--<phase>process-classes</phase>-->
+            <!--<configuration>-->
+              <!--<mainClass>nars.web.ui.TestTeaVM</mainClass>-->
+              <!--<sourceDirectory>/home/me/n/web/src/main/java</sourceDirectory>-->
+              <!--<targetFileName>classes.js</targetFileName>-->
 
-              <mainPageIncluded>false</mainPageIncluded>
+              <!--<mainPageIncluded>false</mainPageIncluded>-->
 
-              <debugInformationGenerated>false</debugInformationGenerated>
-              <sourceMapsGenerated>false</sourceMapsGenerated>
-              <sourceFilesCopied>false</sourceFilesCopied>
-
-              <targetDirectory>${build.directory}/src/main/resources/_compiled/</targetDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+              <!--<incremental>false</incremental>-->
+              <!--<debugInformationGenerated>false</debugInformationGenerated>-->
+              <!--<sourceMapsGenerated>false</sourceMapsGenerated>-->
+              <!--<sourceFilesCopied>true</sourceFilesCopied>-->
+              <!--&lt;!&ndash;<targetDirectory>${project.build.sourceDirectory}/src/main/resources/_compiled</targetDirectory>&ndash;&gt;-->
+            <!--</configuration>-->
+          <!--</execution>-->
+        <!--</executions>-->
+      <!--</plugin>-->
 
     </plugins>
   </build>

@@ -1,18 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Main page</title>
+
+    <title>I/O Console</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 
-    <script type="text/javascript" charset="utf-8" src= "web_socket.js"></script>
+    <style type="text/css">
+        @import url("terminal.css");
+        @import url("spacegraph.dark.css");
+        @import url("spacegraph.css");
+    </style>
 
-    <script type="text/javascript" charset="utf-8" src="_compiled/runtime.js"></script>
+    <script src="lib/lodash/dist/lodash.min.js"></script>
 
-    <script type="text/javascript" charset="utf-8" src="_compiled/classes.js"></script>
-</script>
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="lib/jquery-ui/jquery-ui.min.js"></script>
+
+    <script src="lib/cytoscape/dist/cytoscape.min.js"></script>
+
+    <script src="lib/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="lib/ace-builds/src-min-noconflict/theme-vibrant_ink.js" type="text/javascript" charset="utf-8"></script>
+    <script src="lib/ace-builds/src-min-noconflict/mode-lisp.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="event.js"></script>
+
+    <script src="web_socket.js"></script>
+    <script src="socketview.js"></script>
+
+    <script src="spacegraph.js"></script>
+    <script src="spacegraph.frame.js"></script>
+
+    <script src="narchy.js"></script>
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="index.css" />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+        #console {
+            position: fixed;
+            width: 100%;
+            font-size: 150%;
+        }
+        #input {
+            position: fixed;
+            opacity: 0.8;
+            /*background-color: orange;*/
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            font-size: 200%;
+            height: 4em !important;
+        }
+
+        .row {
+            font-family: monospace;
+            font-size: 100%;
+        }
+    </style>
 </head>
 
-<body onload="main()">
-</body>
+<body style="position: fixed; width: 100%; height: 100%; ">
+    <script>
 
+        $(document).ready(()=>{
+
+            const term = NARTerminal();
+
+            let body = $('body');
+
+
+            const console = new NARConsole(term, (x) => {
+
+                return div().attr('class', 'row').text(x);
+
+            }).attr('id', 'console').appendTo(body);
+
+            const input = NALEditor(term).attr('id', 'input').appendTo(body);
+
+
+            //$('body').append(SocketNARGraph("active"));
+            //$('body').append(TopTable("active"));
+        });
+
+        function div() {
+            return $(document.createElement('div'));
+        }
+
+    </script>
+</body>
 </html>

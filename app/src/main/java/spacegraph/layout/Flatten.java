@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  */
 public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
 
-    private Quat4f up = new Quat4f();
+    private final Quat4f up;
     private final Quat4f tmp = new Quat4f();
 
     public Flatten() {
@@ -25,10 +25,20 @@ public class Flatten<O> implements SpaceTransform<O>, Consumer<Spatial<O>> {
     @Override
     public void accept(Spatial<O> ss) {
 
+        float[] f = new float[3];
         if (ss instanceof SimpleSpatial) {
             SimpleSpatial s = (SimpleSpatial) ss;
-            s.move(s.x(), s.y(), 0, 0.75f);
-            s.rotate(up, 0.9f, tmp);
+            locate(s, f);
+            s.move(f[0], f[1], f[2], 0.95f );
+
+            s.rotate(up, 0.95f, tmp);
         }
+    }
+
+    //TODO abstract this
+    protected void locate(SimpleSpatial s, float[] f) {
+        f[0] = s.x();
+        f[1] = s.y();
+        f[2] = 0.9f;
     }
 }

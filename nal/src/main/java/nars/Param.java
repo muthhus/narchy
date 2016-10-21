@@ -62,7 +62,7 @@ public abstract class Param /*extends Container*/ implements Level {
 
     /** 1 should work */
     public static final int ACTIVATION_TERMLINK_DEPTH = 1;
-    public static final int ACTIVATION_TASKLINK_DEPTH = 1;
+    public static final int ACTIVATION_TASKLINK_DEPTH = 2;
 
 
     public static boolean DEBUG_ANSWERS = true;

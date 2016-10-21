@@ -123,7 +123,7 @@ public class WebServer /*extends PathHandler*/ {
         @NotNull Default nar = newRealtimeNAR(2048, 2, 2);
         //Default nar = new Default();
 
-        new NARServices(nar, w.path);
+        new nars.web.NARServices(nar, w.path);
 
         //new IRCAgent(nar, "localhost", "NARchy", "#x");
 

@@ -6,6 +6,7 @@
   "directory": "lib/",
   "dependencies": {
 	"jquery":"latest",
+	"d3":"latest",
     "jquery-ui":"latest",
 	"lodash":"latest",
     "cytoscape":"latest",

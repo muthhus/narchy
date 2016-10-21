@@ -157,10 +157,10 @@ abstract public class NAgents extends NAgent {
         };
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.7f);
+        nar.goalConfidence(0.6f);
 
-        float p = 0.85f;
+        float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.7f * p;
@@ -179,7 +179,7 @@ abstract public class NAgents extends NAgent {
                 grid(
                         grid(a.cam.values().stream().map(cs -> new CameraSensorView(cs, nar)).toArray(Surface[]::new)),
 
-                        //Vis.concepts((Default)nar, 128),
+                        Vis.concepts((Default)nar, 128),
 
                         Vis.agentActions(a, 200),
 

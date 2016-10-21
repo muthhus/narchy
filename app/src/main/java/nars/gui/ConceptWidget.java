@@ -17,6 +17,8 @@ import spacegraph.render.Draw;
 
 import java.util.List;
 
+import static nars.nal.UtilityFunctions.or;
+import static nars.util.Util.sqr;
 import static spacegraph.math.v3.v;
 
 
@@ -104,7 +106,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
         scale(nodeScale, nodeScale, nodeScale / 4f);
 
 
-        Draw.hsb( (tt.op().ordinal()/16f), 0.75f, 0.5f * pri + 0.1f  , 1f, shapeColor);
+        Draw.hsb( (tt.op().ordinal()/16f), 0.75f + 0.25f * p, 0.5f  , 1f, shapeColor);
 
 
 
@@ -168,7 +170,7 @@ public class ConceptWidget extends SimpleSpatial<Term> {
 
         List<EDraw> ee = edges;
 
-        float maxAttraction = 0.05f;
+        float maxAttraction = 0.2f;
 
         float pri = l.priIfFiniteElseZero();
         if (pri > 0) {
@@ -180,12 +182,13 @@ public class ConceptWidget extends SimpleSpatial<Term> {
             EDraw z = new EDraw();
             z.target = target;
             z.width = width;
-            z.r = pri * 1f / ((Term)target.key).volume();
-            z.g = pri * l.qua();
+            z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
+            float qua = l.qua();
+            z.g = 0.25f + 0.7f * (pri * qua);
             float dur = l.dur();
-            z.b = pri * dur;
+            z.b = 0.25f + 0.7f * (pri * dur);
             z.a = 0.9f;
-            z.attraction = (dur*dur) * maxAttraction;
+            z.attraction = sqr(or(qua,dur))*maxAttraction;
 
             ee.add(z);
             return z;

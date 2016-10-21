@@ -9,6 +9,7 @@
 } );(
 */
 
+
 /** client-side DB interface */
 function DB() {
     const db = new loki('default', {});
@@ -125,92 +126,165 @@ function SocketNARGraph(path) {
         }
     );
 
-    //var layoutUpdateMaxPeriodMS = 1000;
+    // const layoutUpdatePeriodMS = 50;
+    //
+    // const currentLayout = sg.currentLayout = sg.spacegraph.makeLayout({
+    //     name: 'cose',
+    //     // Called on `layoutready`
+    //     ready: function(){},
+    //
+    //     // Called on `layoutstop`
+    //     stop: function(){},
+    //
+    //     // Whether to animate while running the layout
+    //     animate: true,
+    //
+    //     // The layout animates only after this many milliseconds
+    //     // (prevents flashing on fast runs)
+    //     animationThreshold: 550,
+    //
+    //     // Number of iterations between consecutive screen positions update
+    //     // (0 -> only updated on the end)
+    //     refresh: 2,
+    //
+    //     // Whether to fit the network view after when done
+    //     fit: true,
+    //
+    //     // Padding on fit
+    //     padding: 30,
+    //
+    //     // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+    //     boundingBox: undefined,
+    //
+    //     // Randomize the initial positions of the nodes (true) or use existing positions (false)
+    //     randomize: true,
+    //
+    //     // Extra spacing between components in non-compound graphs
+    //     componentSpacing: 100,
+    //
+    //     // Node repulsion (non overlapping) multiplier
+    //     nodeRepulsion: function( node ){ return 400000; },
+    //
+    //     // Node repulsion (overlapping) multiplier
+    //     nodeOverlap: 10,
+    //
+    //     // Ideal edge (non nested) length
+    //     idealEdgeLength: function( edge ){ return 10; },
+    //
+    //     // Divisor to compute edge forces
+    //     edgeElasticity: function( edge ){ return 100; },
+    //
+    //     // Nesting factor (multiplier) to compute ideal edge length for nested edges
+    //     nestingFactor: 5,
+    //
+    //     // Gravity force (constant)
+    //     gravity: 80,
+    //
+    //     // Maximum number of iterations to perform
+    //     numIter: 1000,
+    //
+    //     // Initial temperature (maximum node displacement)
+    //     initialTemp: 200,
+    //
+    //     // Cooling factor (how the temperature is reduced between consecutive iterations
+    //     coolingFactor: 0.95,
+    //
+    //     // Lower temperature threshold (below this point the layout will end)
+    //     minTemp: 1.0,
+    //
+    //     // Whether to use threading to speed up the layout
+    //     useMultitasking: true
+    // });
+    //
+    // currentLayout.run();
+    //
+    // setInterval(()=>{
+    //     currentLayout.stop();
+    // }, layoutUpdatePeriodMS);
 
-    const currentLayout = sg.currentLayout = sg.spacegraph.makeLayout({
-        /* https://github.com/cytoscape/cytoscape.js-spread */
-        name: 'spread',
-        minDist: 250,
-        //padding: 100,
-
-        speed: 0.06,
-        animate: false,
-        randomize: false, // uses random initial node positions on true
-        fit: false,
-        maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
-        maxExpandIterations: 2, // Maximum number of expanding iterations
-
-        ready: function () {
-            //console.log('starting cola', Date.now());
-        },
-        stop: function () {
-            //console.log('stop cola', Date.now());
-        }
-    });
-
-
-
-    const layout = function () {
-        const currentLayout = sg.currentLayout;
-        if (currentLayout) {
-            currentLayout.stop();
-            currentLayout.run();
-
-            const layoutUpdatePeriodMS = 50;
-            setTimeout(layout, layoutUpdatePeriodMS); //self-trigger
-
-        }
-
-        /* https://github.com/cytoscape/cytoscape.js-cola#api */
+    // const currentLayout = sg.currentLayout = sg.spacegraph.makeLayout({
+    //     /* https://github.com/cytoscape/cytoscape.js-spread */
+    //     name: 'spread',
+    //     minDist: 250,
+    //     //padding: 100,
+    //
+    //     speed: 0.06,
+    //     animate: false,
+    //     randomize: false, // uses random initial node positions on true
+    //     fit: false,
+    //     maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
+    //     maxExpandIterations: 2, // Maximum number of expanding iterations
+    //
+    //     ready: function () {
+    //         //console.log('starting cola', Date.now());
+    //     },
+    //     stop: function () {
+    //         //console.log('stop cola', Date.now());
+    //     }
+    // });
 
 
-        // if (currentLayout) {
-        //     currentLayout.stop();
-        // } else {
-        //     // currentLayout = sg.makeLayout({
-        //     //     name: 'cola',
-        //     //     animate: true,
-        //     //     fit: false,
-        //     //     randomize: false,
-        //     //     maxSimulationTime: 700, // max length in ms to run the layout
-        //     //     speed: 1,
-        //     //     refresh: 2,
-        //     //     //infinite: true,
-        //     //     nodeSpacing: function (node) {
-        //     //         return 70;
-        //     //     }, // extra spacing around nodes
-        //     //
-        //     //     ready: function () {
-        //     //         //console.log('starting cola', Date.now());
-        //     //     },
-        //     //     stop: function () {
-        //     //         //console.log('stop cola', Date.now());
-        //     //     }
-        //     // });
-        //
-        //
-        // }
-        //
-        // currentLayout.run();
 
-
-        // sg.layout({ name: 'cose',
-        //     animate: true,
-        //     fit: false,
-        //     refresh: 1,
-        //     //animationThreshold: 1,
-        //     iterations: 5000,
-        //     initialTemp: 100,
-        //     //coolingfactor: 0.98,
-        //     ready: function() {
-        //         //console.log('starting cose', Date.now());
-        //     },
-        //     stop: function() {
-        //         //console.log('stop cose', Date.now());
-        //     }
-        // });
-
-    };
+    // const layout = function () {
+    //     const currentLayout = sg.currentLayout;
+    //     if (currentLayout) {
+    //         currentLayout.stop();
+    //         if (currentLayout.run) {
+    //             currentLayout.run();
+    //             setTimeout(layout, layoutUpdatePeriodMS); //self-trigger
+    //         }
+    //     }
+    //
+    //     /* https://github.com/cytoscape/cytoscape.js-cola#api */
+    //
+    //
+    //     // if (currentLayout) {
+    //     //     currentLayout.stop();
+    //     // } else {
+    //     //     // currentLayout = sg.makeLayout({
+    //     //     //     name: 'cola',
+    //     //     //     animate: true,
+    //     //     //     fit: false,
+    //     //     //     randomize: false,
+    //     //     //     maxSimulationTime: 700, // max length in ms to run the layout
+    //     //     //     speed: 1,
+    //     //     //     refresh: 2,
+    //     //     //     //infinite: true,
+    //     //     //     nodeSpacing: function (node) {
+    //     //     //         return 70;
+    //     //     //     }, // extra spacing around nodes
+    //     //     //
+    //     //     //     ready: function () {
+    //     //     //         //console.log('starting cola', Date.now());
+    //     //     //     },
+    //     //     //     stop: function () {
+    //     //     //         //console.log('stop cola', Date.now());
+    //     //     //     }
+    //     //     // });
+    //     //
+    //     //
+    //     // }
+    //     //
+    //     // currentLayout.run();
+    //
+    //
+    //     // sg.layout({ name: 'cose',
+    //     //     animate: true,
+    //     //     fit: false,
+    //     //     refresh: 1,
+    //     //     //animationThreshold: 1,
+    //     //     iterations: 5000,
+    //     //     initialTemp: 100,
+    //     //     //coolingfactor: 0.98,
+    //     //     ready: function() {
+    //     //         //console.log('starting cose', Date.now());
+    //     //     },
+    //     //     stop: function() {
+    //     //         //console.log('stop cose', Date.now());
+    //     //     }
+    //     // });
+    //
+    // };
 
 
     function d(x, key) {
@@ -275,11 +349,11 @@ function SocketNARGraph(path) {
         });
 
 
-    setTimeout(() => {
-        const layoutUpdatePeriodMS = 70;
-        setTimeout(layout, layoutUpdatePeriodMS);
-        currentLayout.run();
-    }, 0);
+    // setTimeout(() => {
+    //     // const layoutUpdatePeriodMS = 70;
+    //     // setTimeout(layout, layoutUpdatePeriodMS);
+    //     currentLayout.run();
+    // }, 0);
 
     return sg;
 }
@@ -336,7 +410,7 @@ function _ace(div) {
 function NALEditor(terminal, initialValue) {
 
 
-    const div = $('<div/>').addClass('NALEditor');
+    const div = $('<div/>');//.addClass('NALEditor');
 
     const editor = _ace(div);
 
@@ -364,6 +438,8 @@ function NALEditor(terminal, initialValue) {
         exec: input,
         readOnly: true // false if this command should not apply in readOnly mode
     });
+
+    editor.renderer.setShowGutter(false);
 
     return div;
 }
@@ -508,57 +584,66 @@ function NARInputter(terminal, initialValue) {
     //return d.addClass('ui fluid menu inverted');
 }
 
-function NARConsole(terminal) {
-    const div = $('<div/>').addClass('NARConsole');
+
+function NARConsole(terminal, render) {
+
+    const view = $('<div/>').css('overflow', 'scroll').css('width', '100%').css('height', '100%');
+
+    const maxLines = 32;
+
+    var shown = [];
+
+    terminal.on('message', function(x) {
 
 
-    const editor = _ace(div);
-    editor.setReadOnly(true);
-    editor.renderer.setShowGutter(false);
 
-    div.editor = editor;
+        //const m = JSON.parse(x.data);
+        //console.log(x);
 
-    const maxLines = 256;
-
-    function line(m) {
-        if (typeof(m) === "string") {
-            return m;
+        for (var i = 0; i < x.length; i++) {
+            shown.push( x[i] );
         }
 
-        return JSON.stringify(m);
-    }
+        //rr = _.concat(rr, x);
+        //rr.push( render(m) );
 
-    terminal.on('message', function(newTasks) {
+        const len = shown.length;
+        if (len > maxLines) {
+            shown = shown.slice(len-maxLines, len-1);
+        }
 
         setTimeout(function() {
-            const lines = editor.session.getLength() + newTasks.length;
-            const linesOver = lines - maxLines;
-            if (linesOver > 0) {
-                editor.session.getDocument().removeFullLines(0, linesOver);
-            }
-
-            editor.navigateFileEnd();
-            editor.navigateLineEnd();
-
-            for (let n = Math.max(0, newTasks.length - maxLines); n < newTasks.length; n++) {
-                if (lines + n > 0)
-                    editor.insert('\n');
-                editor.navigateLineStart();
-                editor.insert(line(newTasks[n]));
-            }
-
-            editor.scrollToRow(editor.getLastVisibleRow());
+            view.empty().append(_.map(shown, render));
         }, 0);
+
+
+
+            // const lines = editor.session.getLength() + newTasks.length;
+            // const linesOver = lines - maxLines;
+            // if (linesOver > 0) {
+            //     editor.session.getDocument().removeFullLines(0, linesOver);
+            // }
+            //
+            // editor.navigateFileEnd();
+            // editor.navigateLineEnd();
+            //
+            // for (let n = Math.max(0, newTasks.length - maxLines); n < newTasks.length; n++) {
+            //     if (lines + n > 0)
+            //         editor.insert('\n');
+            //     editor.navigateLineStart();
+            //     editor.insert(line(newTasks[n]));
+            // }
+            //
+            // editor.scrollToRow(editor.getLastVisibleRow());
 
 
     });
 
-    return div;
+    return view;
 
 }
 
 function TopTable(path) {
-    const d = $('<div/>');
     const e = $('<div/>').attr('class', 'ConceptTable').css('overflow', 'scroll');
 
     function row(c) {
@@ -580,25 +665,29 @@ function TopTable(path) {
             .text(c[0]);
     }
 
-    d.append(e);
 
     return SocketView(path,
 
         function (p) {
-            return d;
+            return e;
         },
 
         function (msg) {
-            const m = JSON.parse(msg.data);
 
-            const rr = [];
-            for (let k of m) {
-                rr.push(row(k));
-            }
+            setTimeout(()=> {
+                const m = JSON.parse(msg.data);
 
-            e.empty().append(rr);
+                const rr = [];
+                for (let k of m) {
+                    rr.push(row(k));
+                }
+
+                e.empty().append(rr);
+            }, 0);
 
         }
     );
+
+    return e;
 
 }

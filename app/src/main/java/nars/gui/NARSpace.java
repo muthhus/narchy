@@ -21,6 +21,7 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
+import spacegraph.layout.Flatten;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -44,14 +45,14 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(256, 3, 2, 3 );
+        Default n = new Default(512, 3, 2, 3 );
         //Default2 n = new Default2();
         //n.nal(4);
 
 
         //new ArithmeticInduction(n);
 
-        newConceptWindow(n,  64, 8);
+        newConceptWindow(n,  96, 5);
 
         //n.run(20); //headstart
 
@@ -81,11 +82,8 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                //.run(800);
 //
         n.linkFeedbackRate.setValue(0.05f);
-        n.loop(25f);
-        //n.run(1);
-//        n.forEachConcept(c -> {
-//            c.print();
-//        });
+
+        n.loop(15f);
 
     }
 
@@ -108,7 +106,7 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
                 //Concept Core
                 Concept concept = b.get();
-                if (concept==null)
+                if (concept==null || !display(concept))
                     return true;
 
                 ConceptWidget root = space.update(concept.term(),
@@ -131,18 +129,6 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
                 concept.termlinks().forEach(absorb);
 
 
-//                concept.termlinks().forEach(bt -> {
-//
-//                    final Term tlTarget = bt.get();
-//                    if (tlTarget.equals(ss))
-//                        return; //no self loop
-//
-//                    ConceptWidget termLinkConnection = newLinkWidget(nar, space, root, ss, tlTarget, bt, false);
-//                    if (termLinkConnection!=null) {
-//                        termLinkConnection.pri = bt.pri() * (bPri*1.5f); //scale by its Concept's priority
-//                        target.add(termLinkConnection);
-//                    }
-//                });
 
                 return true;
 
@@ -174,7 +160,12 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 //                                });
 //                            }
 //                        }
-//                        new Flatten()
+                        new Flatten() {
+                            protected void locate(SimpleSpatial s, float[] f) {
+                                super.locate(s, f);
+                                f[2] = 10 - ((Term)(s.key)).volume() * 6;
+                            }
+                        }
 //                        //new Spiral()
 //                        //new FastOrganicLayout()
                 )
@@ -185,6 +176,10 @@ public class NARSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
 
         return s.show(1300, 900);
+    }
+
+    private static boolean display(Concept concept) {
+        return !(concept.term() instanceof Atomic);
     }
 
 //    public static ConceptWidget newLinkWidget(final NAR nar, SpaceGraph<Term> space, final ConceptWidget core, Term SRC, Term TARGET, BLink bt, boolean task) {
