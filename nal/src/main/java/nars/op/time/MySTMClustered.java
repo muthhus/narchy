@@ -35,6 +35,7 @@ public class MySTMClustered extends STMClustered {
     private final int maxGroupSize;
     private final int maxInputVolume;
     private final int minGroupSize;
+    private final int inputsPerFrame;
 
     float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
     float freqCoherenceThresh = 0.9f;
@@ -42,27 +43,26 @@ public class MySTMClustered extends STMClustered {
 
     float confMin;
 
-    /** max tasks per cycle */
-    int inputRate = 1;
 
     public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize) {
-        this(nar, size, punc, maxGroupSize, true);
+        this(nar, size, punc, maxGroupSize, true, 1);
     }
 
-    public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, boolean allowNonInput) {
+    public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxGroupSize, boolean allowNonInput, int intinputsPerFrame) {
         this(nar, size, punc, maxGroupSize, maxGroupSize,
                 Math.round(((float) nar.compoundVolumeMax.intValue()) / (2)) /* estimate */
-                , allowNonInput
-        );
+                , allowNonInput,
+                intinputsPerFrame);
     }
 
-    public MySTMClustered(@NotNull NAR nar, int size, char punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput) {
+    public MySTMClustered(@NotNull NAR nar, int size, char punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput, int inputsPerFrame) {
         super(nar, new MutableInteger(size), punc, maxGroupSize);
 
         this.minGroupSize = minGroupSize;
         this.maxGroupSize = maxGroupSize;
         this.maxInputVolume = maxInputVolume;
 
+        this.inputsPerFrame = inputsPerFrame;
         //this.logger = LoggerFactory.getLogger(toString());
 
         this.allowNonInput = allowNonInput;
@@ -86,7 +86,6 @@ public class MySTMClustered extends STMClustered {
     @Override
     protected boolean iterate() {
 
-
         if (super.iterate()) {
 
             confMin = nar.confMin.floatValue();
@@ -96,7 +95,7 @@ public class MySTMClustered extends STMClustered {
             //clusters where all terms occurr simultaneously at precisely the same time
             //cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
 
-            cluster(((int)(inputRate * nar.exe.load())), minGroupSize, maxGroupSize);
+            cluster(((int)(inputsPerFrame * nar.exe.load())), minGroupSize, maxGroupSize);
 
             //clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
             //if (maxGroupSize != 2)
@@ -104,6 +103,7 @@ public class MySTMClustered extends STMClustered {
 
             return true;
         }
+
         return false;
     }
 

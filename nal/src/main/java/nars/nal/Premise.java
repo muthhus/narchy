@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static nars.nal.UtilityFunctions.aveAri;
+import static nars.nal.UtilityFunctions.or;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -172,7 +173,8 @@ public final class Premise extends RawBudget implements Tasked {
         float qua = belief == null ? taskBudget.qua() : aveAri(taskBudget.qua(), beliefBudget.qua());
 
         float pri =
-                aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
+                belief == null ? taskBudget.pri() : aveAri(taskBudget.pri(), beliefBudget.pri());
+                //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
                 //nar.conceptPriority(c);
 
         return new Premise(c.term(), task, term, belief, pri, dur, qua);

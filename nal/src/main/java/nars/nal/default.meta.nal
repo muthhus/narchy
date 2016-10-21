@@ -266,7 +266,7 @@
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- varIntro((P ==> (--,%S))), (Belief:AbductionN)
     S, P, time(eternal), task(positive), task("."), neqRCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((S <=> P)), (Belief:Comparison)
         S, P, time(eternal), task(negative), task("."), neqRCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((--,(S <=> P))), (Belief:ComparisonN)
-    S, P, time(eternal), task("."), neq(P,S) |- varIntro((S && P)), (Belief:Intersection)
+    S, P, time(eternal), task("."), neqCom(P,S) |- varIntro((S && P)), (Belief:Intersection)
         //S, P, time(eternal), task(negative), task("."), neq(P,S) |- varIntro(((--,%S) && P)), (Belief:IntersectionN)
     //%S, %P, time(eternal), neqCom(P,S) |- (%S || %P), (Belief:Union)
 
@@ -283,7 +283,7 @@
     A, B, task(positive), task("."), time(dtAfter), neqRCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
         A, B, task(negative), task("."), time(dtAfter), neqRCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((--,(A <=>+- B))), (Belief:ComparisonN)
 
-    A, B, task("."), time(dtAfter), neq(A,B) |- (A &&+- B), (Belief:Intersection)
+    A, B, task("."), time(dtAfter), neqCom(A,B) |- varIntro((A &&+- B)), (Belief:Intersection)
         ///A, B, task(negative), task("."), time(dtAfter), neq(A,B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
 
                 //A, B, task(negative), task("."), time(dtAfter), neqRec(A,B) notImplEqui(A), notImplEqui(B) |- ((--,%A) &&+- B), (Belief:IntersectionN)

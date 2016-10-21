@@ -22,7 +22,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.time.RealtimeDSClock;
+import nars.time.RealtimeMSClock;
 import nars.time.Tense;
 import nars.util.Loop;
 import nars.util.Texts;
@@ -54,6 +54,8 @@ import static nars.nlp.Twenglish.tokenize;
  $0.9;0.9;0.99$ (((I<->$someone) && hear($someone, $something)) ==>+1 hear(I, $something)).
  $0.9;0.9;0.99$ hear(I, #something)!
  hear(I,?x)?
+
+ $0.9$ ((#x,"the") <-> (#x,"a")).
 
  */
 public class IRCAgent extends IRC {
@@ -352,12 +354,12 @@ public class IRCAgent extends IRC {
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
 
-                new RealtimeDSClock(),
+                new RealtimeMSClock(true),
                 exe
         );
 
 
-        int volMax = 30;
+        int volMax = 40;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -371,7 +373,7 @@ public class IRCAgent extends IRC {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.1f;
+        float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
@@ -380,20 +382,21 @@ public class IRCAgent extends IRC {
         nar.confMin.setValue(0.05f);
         nar.compoundVolumeMax.setValue(volMax);
 
+        nar.activationGlobal.setValue(0.01f);
 
         nar.inputLater(
                 NQuadsRDF.stream(nar, new File(
                         "/home/me/Downloads/nquad"
                 )).
                         peek(t -> {
-                            t.setBudget(0.01f, 0.25f, 0.75f); //low priority
+                            t.setBudget(0.00f, 0.5f, 0.9f);
                         }).
                         collect(Collectors.toList())
                 , 32
         );
         nar.run(1);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 1);
 
         new Inperience(nar);
 
@@ -404,7 +407,7 @@ public class IRCAgent extends IRC {
 
     public static void main(String[] args) throws Exception {
 
-        @NotNull Default n = newRealtimeNAR(1024, 30, 12);
+        @NotNull Default n = newRealtimeNAR(2048, 20, 60);
 
 
         IRC bot = new IRCAgent(n,

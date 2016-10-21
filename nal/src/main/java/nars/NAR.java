@@ -123,7 +123,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
     /** global input activation multiplier, applied to both concepts and links  */
-    private MutableFloat activationGlobal = new MutableFloat(1f);
+    public MutableFloat activationGlobal = new MutableFloat(1f);
 
 
     private NARLoop loop;

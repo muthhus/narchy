@@ -207,9 +207,13 @@ abstract public class NAgent implements NSense, NAction {
 
             predict();
 
-            if (trace) {
-                logger.info(summary());
-            }
+        } else {
+            logger.warn("sensor overwhelm");
+        }
+
+
+        if (trace) {
+            logger.info(summary());
         }
     }
 

@@ -14,7 +14,7 @@ public class Inventory {
 		add(items.size(), item);
 	}
 
-	public void add(int slot, Item item) {
+	public synchronized void add(int slot, Item item) {
 		if (item instanceof ResourceItem) {
 			ResourceItem toTake = (ResourceItem) item;
 			ResourceItem has = findResource(toTake.resource);

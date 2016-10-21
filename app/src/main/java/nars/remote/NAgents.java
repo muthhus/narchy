@@ -16,8 +16,6 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
-import nars.time.FrameClock;
-import nars.time.RealtimeDSClock;
 import nars.time.RealtimeMSClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -60,8 +58,8 @@ abstract public class NAgents extends NAgent {
 
 
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 8);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 8);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 8,
