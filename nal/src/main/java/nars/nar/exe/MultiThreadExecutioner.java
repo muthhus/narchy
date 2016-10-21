@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -129,11 +130,11 @@ public class MultiThreadExecutioner extends Executioner {
             } catch (AlertException | InterruptedException | TimeoutException e1) {
                 logger.error("Barrier Synchronization: {}", e1);
             }
-        } else {
+        } /*else {
             if (!ring.hasAvailableCapacity(((int)(0.25f * ring.getBufferSize())))) {
                 return; //allow buffer to clear
             }
-        }
+        }*/
 
 
         Consumer[] vv = nar.eventFrameStart.getCachedNullTerminatedArray();
@@ -203,11 +204,10 @@ public class MultiThreadExecutioner extends Executioner {
 
     @Override
     public final void run(@NotNull Consumer<NAR> r) {
+        disruptor.publishEvent(narPublisher, r);
         if (!ring.tryPublishEvent(narPublisher, r)) {
             logger.warn("dropped: {}", r);
         }
-
-        //disruptor.publishEvent(narPublisher, r);
     }
 
 

@@ -9,8 +9,8 @@ import nars.remote.NAgents;
 public class Arkancide extends NAgents {
 
 
-    final int visW = 64;
-    final int visH = 32;
+    final int visW = 48;
+    final int visH = 24;
 
 
     float paddleSpeed = 25f;
@@ -22,7 +22,7 @@ public class Arkancide extends NAgents {
 
 
     public Arkancide(NAR nar) {
-        super(nar, 2 );
+        super(nar, 1 );
 
         noid = new Arkanoid();
 

@@ -108,7 +108,7 @@ abstract public class Loop implements Runnable {
 
     abstract public void next();
 
-    @Deprecated public void join() {
+    public void join() {
         try {
             thread.join();
         } catch (InterruptedException e) {

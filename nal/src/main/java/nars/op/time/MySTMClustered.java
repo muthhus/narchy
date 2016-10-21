@@ -84,7 +84,7 @@ public class MySTMClustered extends STMClustered {
 	protected void iterate() {
 
 
-		try {
+    	synchronized (net) {
 			super.iterate();
 
 			confMin = nar.confMin.floatValue();
@@ -97,11 +97,9 @@ public class MySTMClustered extends STMClustered {
 
 			//clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
 			//if (maxGroupSize != 2)
-				//cluster(2);
-
-		} catch (Exception e) {
-			logger.warn("iterate {}", e);
+			//cluster(2);
 		}
+
 	}
 
 	private void cluster(int minGroupSize, int maxGroupSize) {
@@ -115,15 +113,12 @@ public class MySTMClustered extends STMClustered {
 				//TODO wrap all the coherence tests in one function call which the node can handle in a synchronized way because the results could change in between each of the sub-tests:
 
 				double[] tc = n.coherence(0);
-				if (tc==null)
-					return false;
 
-
-				if (maxGroupSize== 2 || tc[1] >= timeCoherenceThresh) {
+				if (tc!=null && (maxGroupSize== 2 || tc[1] >= timeCoherenceThresh)) {
 					double[] fc = n.coherence(1);
-					if (fc[1] >= freqCoherenceThresh) {
+					if (fc!=null && fc[1] >= freqCoherenceThresh) {
 						double[] cc = n.coherence(2);
-						if (cc[1] >= confCoherenceThresh) {
+						if (cc!=null && cc[1] >= confCoherenceThresh) {
 							return true;
 						}
 						//return true;
@@ -133,6 +128,7 @@ public class MySTMClustered extends STMClustered {
 			})
 			.map(n -> PrimitiveTuples.pair(n, n.coherence(1)[0]))
 			.forEach(nodeFreq -> {
+
 				TasksNode node = nodeFreq.getOne();
 				float freq = (float)nodeFreq.getTwo();
 

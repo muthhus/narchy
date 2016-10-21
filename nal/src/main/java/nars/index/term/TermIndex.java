@@ -145,30 +145,8 @@ public abstract class TermIndex extends TermBuilder {
 
         if (cacheable) {
 
-            //        for (Term x : args)
-//            if (x==null)
-//                throw new NullPointerException();
-
             ProtoCompound p = new ProtoCompound.RawProtoCompound(op, dt, u);
-
-
-            Term t = terms.computeIfAbsent(p, termizer);
-
-//            if (failure[0] != null) {
-//                Throwable f = failure[0];
-//                if (f instanceof InvalidTermException)
-//                    throw ((InvalidTermException) f);
-//                throw new RuntimeException(failure[0]);
-//            }
-
-//            //SANITY TEST:
-//            @NotNull Term retry = super.the(p.op(), p.dt(), p.terms());
-//            if (!t.equals(retry)) {
-//                terms.computeIfAbsent(p, termizer);
-//                throw new RuntimeException("cache fault");
-//            }
-
-            return t;
+            return terms.computeIfAbsent(p, termizer);
 
         } else {
             return _the(op, dt, u);
@@ -183,9 +161,10 @@ public abstract class TermIndex extends TermBuilder {
         }
     }
 
-    private final Term _the(Op o, int dt, Term[] u) {
+    @NotNull private final Term _the(@NotNull Op o, int dt, @NotNull Term[] u) {
         try {
-            return super.the(o, dt, u);
+            Term t =super.the(o, dt, u);
+            return t == null ? False : t;
         } catch (InvalidTermException | InvalidTaskException x) {
             if (Param.DEBUG_EXTRA) {
                 logger.warn("Termizer: {x} : {} {} {}", x, o, dt, u);

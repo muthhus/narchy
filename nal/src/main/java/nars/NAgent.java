@@ -317,8 +317,8 @@ abstract public class NAgent implements NSense, NAction {
             int lookahead = 1;
             for (int i = 0; i < lookahead; i++) {
                 predictors.addAll(
-                    new MutableTask($.seq(action, 1+lookahead, happiness), '?', null).eternal(),
-                    new MutableTask($.impl(action, 1+lookahead, happiness), '?', null).eternal()
+                    new MutableTask($.seq(action, 1+lookahead, happiness), '?', null).eternal()
+                    //new MutableTask($.impl(action, 1+lookahead, happiness), '?', null).eternal()
                     //new MutableTask($.impl(action, dt, happiness), '?', null).time(now, then),
                     //new MutableTask(action, '@', null).time(now, then)
                 );
@@ -345,11 +345,11 @@ abstract public class NAgent implements NSense, NAction {
         return this;
     }
     /** run Real-time */
-    public NAgent runRT(float fps) {
+    public Loop runRT(float fps) {
 
         init();
 
-        new Loop("agent", fps) {
+        return new Loop("agent", fps) {
 
             @Override
             public void next() {
@@ -385,7 +385,6 @@ abstract public class NAgent implements NSense, NAction {
 //            }
 //        }).start();
 
-        return this;
     }
 
 

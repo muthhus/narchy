@@ -54,7 +54,7 @@ abstract public class NAgents extends NAgent {
 
 
         //Default nar = newNAR();
-        Default nar = newNAR1async(3);
+        Default nar = newNAR1async(4);
         //Default2 nar = newNAR2();
 
 
@@ -76,7 +76,7 @@ abstract public class NAgents extends NAgent {
 
 
         //a.run(frames);
-        a.runRT(50f);
+        a.runRT(50f).join();
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
@@ -133,9 +133,9 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
+                new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 40;
+        int volMax = 32;
         int conceptsPerCycle = 16;
 
 
@@ -143,7 +143,7 @@ abstract public class NAgents extends NAgent {
         Default nar = new Default(2048,
                 conceptsPerCycle, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 10000, 64*1024, 3)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 50000, 8*1024, 3)
 
                 ,
                 //new FrameClock()
@@ -158,7 +158,7 @@ abstract public class NAgents extends NAgent {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.6f);
+        nar.goalConfidence(0.75f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;

@@ -1,5 +1,6 @@
 package nars.index.term.tree;
 
+import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.util.ConceptBuilder;
@@ -18,13 +19,13 @@ import java.util.function.Consumer;
 /**
  * concurrent radix tree index
  */
-public class TreeTermIndex extends TermIndex implements Runnable {
+public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
 
     public final TermTree concepts;
 
     private final ConceptBuilder conceptBuilder;
 
-    long updatePeriodMS = 1000;
+    long updatePeriodMS = 500;
 
     int sizeLimit;
 
@@ -49,93 +50,103 @@ public class TreeTermIndex extends TermIndex implements Runnable {
         };
         this.sizeLimit = sizeLimit;
 
-        Thread t = new Thread(this, this.toString() + "_Forget");
-        //t.setPriority(Thread.MAX_PRIORITY - 1);
-        t.setUncaughtExceptionHandler((whichThread, e) -> {
-            logger.error("Forget: {}", e);
-            e.printStackTrace();
-            System.exit(1);
-        });
-        t.start();
+//        Thread t = new Thread(this, this.toString() + "_Forget");
+//        //t.setPriority(Thread.MAX_PRIORITY - 1);
+//        t.setUncaughtExceptionHandler((whichThread, e) -> {
+//            logger.error("Forget: {}", e);
+//            e.printStackTrace();
+//            System.exit(1);
+//        });
+//        t.start();
 
     }
 
-
-    //1. decide how many items to remove, if any
-    //2. search for items to meet this quota and remove them
     @Override
-    public void run() {
-
-        while (true) {
-
-            try {
-                Thread.sleep(updatePeriodMS);
-            } catch (InterruptedException e) {
-            }
-
-            if (nar != null)
-                forgetNextLater();
-        }
-
+    public void start(NAR nar) {
+        super.start(nar);
+        nar.onFrame(this);
     }
 
-    private void forgetNextLater() {
-        nar.runLater(this::forgetNext);
-    }
+    //    //1. decide how many items to remove, if any
+//    //2. search for items to meet this quota and remove them
+//    @Override
+//    public void run() {
+//
+//        while (true) {
+//
+//            try {
+//                Thread.sleep(updatePeriodMS);
+//            } catch (InterruptedException e) {
+//            }
+//
+//            if (nar != null)
+//                forgetNextLater();
+//        }
+//
+//    }
+//
+//    private void forgetNextLater() {
+//        nar.runLater(this::forgetNext);
+//    }
 
     private void forgetNext() {
 
         int sizeBefore = sizeEst();
 
+        int overflow = sizeBefore - sizeLimit;
+
+        if (overflow < 0)
+            return;
 
         float maxFractionThatCanBeRemovedAtATime = 0.01f;
         float descentRate = 0.75f;
+        int iterationLimit = 16; //TODO tune iterationLimit by the overflow amount
 
         int maxConceptsThatCanBeRemovedAtATime = (int) Math.max(1, sizeBefore * maxFractionThatCanBeRemovedAtATime);
 
-        if ((sizeEst() - sizeLimit) >= maxConceptsThatCanBeRemovedAtATime) {
+        if (overflow < maxConceptsThatCanBeRemovedAtATime)
+            return;
 
-
-            Random rng = nar.random;
-
+        concepts.acquireWriteLock();
+        try {
             MyConcurrentRadixTree.SearchResult s = null;
 
-            concepts.acquireWriteLock();
-            try {
+            while ((iterationLimit-- > 0) && ((sizeEst() - sizeLimit) > maxConceptsThatCanBeRemovedAtATime)) {
 
-                while ((sizeEst() - sizeLimit) >= maxConceptsThatCanBeRemovedAtATime) {
+                Random rng = nar.random;
 
-                    MyConcurrentRadixTree.Node subRoot = volumeWeightedRoot(rng);
+                MyConcurrentRadixTree.Node subRoot = volumeWeightedRoot(rng);
 
-                    if (s == null)
-                        s = concepts.random(subRoot, descentRate, rng);
+                if (s == null)
+                    s = concepts.random(subRoot, descentRate, rng);
 
-                    MyConcurrentRadixTree.Node f = s.found;
+                MyConcurrentRadixTree.Node f = s.found;
 
-                    if (f != null && f != subRoot) {
-                        int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);
+                if (f != null && f != subRoot) {
+                    int subTreeSize = concepts.sizeIfLessThan(f, maxConceptsThatCanBeRemovedAtATime);
 
-                        if (subTreeSize > 0) {
-                            //long preBatch = sizeEst();
-                            concepts.removeHavingAcquiredWriteLock(s, true);
-                            //logger.info("  Forgot Batch {}", preBatch - sizeEst());
-                        }
-
-                        s = null; //restart
+                    if (subTreeSize > 0) {
+                        //long preBatch = sizeEst();
+                        concepts.removeHavingAcquiredWriteLock(s, true);
+                        //logger.info("  Forgot Batch {}", preBatch - sizeEst());
                     }
 
+                    s = null; //restart
                 }
-            } finally {
-                concepts.releaseWriteLock();
-            }
 
-            int sizeAfter = sizeEst();
-            logger.info("Forgot {} Concepts", sizeBefore - sizeAfter);
+            }
+        } finally {
+            concepts.releaseWriteLock();
         }
+
+//        int sizeAfter = sizeEst();
+//        logger.info("Forgot {} Concepts", sizeBefore - sizeAfter);
 
     }
 
-    /** since the terms are sorted by a volume-byte prefix, we can scan for removals in the higher indices of this node */
+    /**
+     * since the terms are sorted by a volume-byte prefix, we can scan for removals in the higher indices of this node
+     */
     private MyConcurrentRadixTree.Node volumeWeightedRoot(Random rng) {
 
         List<MyConcurrentRadixTree.Node> l = concepts.root.getOutgoingEdges();
@@ -143,12 +154,12 @@ public class TreeTermIndex extends TermIndex implements Runnable {
 
         //HEURISTIC: x^8 sharp curve
         float r = rng.nextFloat();
-        r = (r*r); //r^2
-        r = (r*r); //r^4
-        r = (r*r); //r^8
-        r = 1-r;
+        r = (r * r); //r^2
+        r = (r * r); //r^4
+        r = (r * r); //r^8
+        r = 1 - r;
 
-        int n = (int) Math.round((levels-1)*r);
+        int n = (int) Math.round((levels - 1) * r);
 
         return l.get(n);
     }
@@ -251,6 +262,11 @@ public class TreeTermIndex extends TermIndex implements Runnable {
 
     protected void onRemoval(@NotNull Concept value) {
         delete(value, nar);
+    }
+
+    @Override
+    public void accept(NAR eachFrame) {
+        forgetNext();
     }
 
 
