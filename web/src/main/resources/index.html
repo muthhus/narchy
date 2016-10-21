@@ -40,10 +40,17 @@
             padding: 0;
             border: 0;
         }
+        #graph {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            opacity: 0.85;
+        }
         #console {
             position: fixed;
             width: 100%;
             font-size: 150%;
+            opacity: 0.5;
         }
         #input {
             position: fixed;
@@ -81,8 +88,9 @@
 
             const input = NALEditor(term).attr('id', 'input').appendTo(body);
 
+            //NALTimeline(term).attr('id', 'graph').appendTo(body);
 
-            //$('body').append(SocketNARGraph("active"));
+            $('body').append(SocketNARGraph("active")).attr('id', 'graph').appendTo(body);
             //$('body').append(TopTable("active"));
         });
 

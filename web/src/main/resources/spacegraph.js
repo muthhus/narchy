@@ -128,7 +128,7 @@ function spacegraph(targetWrapper, opt) {
     targetWrapper.addClass("spacegraph");
 
 
-    var overlaylayer = $('<div class="overlay"></div>').prependTo(targetWrapper);
+    //var overlaylayer = $('<div class="overlay"></div>').prependTo(targetWrapper);
 
     //where cytoscape renders to:
     var target = $('<div class="graph"></div>').appendTo(targetWrapper);
@@ -149,44 +149,54 @@ function spacegraph(targetWrapper, opt) {
         //http://js.cytoscape.org/#events/collection-events
 
         //overlay framenode --------------
-        var frame = NodeFrame(this);
+        var frame =
+            //NodeFrame(this);
+            null;
+
         var that = this;
 
 
+        if (frame) {
 
-        var updateAllWidgets = this.updateAllWidgets = (/*_.throttle(*/function() {
+            this.updateAllWidgets = (/*_.throttle(*/function () {
 
-            if (suppressCommit)
-                return;
+                if (suppressCommit)
+                    return;
 
-            that.nodes().filterFn(function( ele ){
-                if (ele.data('widget') !== undefined)
-                    updateWidget(ele);
+                that.nodes().filterFn(function (ele) {
+                    if (ele.data('widget') !== undefined)
+                        updateWidget(ele);
+                });
+                //that.each(refresh);
+
+            }); //, widgetUpdatePeriodMS);
+
+            this.on('data position select unselect add remove grab drag style', function (e) {
+
+                if (suppressCommit)
+                    return;
+
+                /*console.log( evt.data.foo ); // 'bar'
+
+                 var node = evt.cyTarget;
+                 console.log( 'tapped ' + node.id() );*/
+
+                var target = e.cyTarget;
+                var widget = target.data('widget');
+                if (widget) {
+                    setTimeout(updateWidget, 0, target);
+                    //console.log(this, that, target);
+                    //that.commit();
+                }
+
             });
-            //that.each(refresh);
 
-        }); //, widgetUpdatePeriodMS);
+            if (this.updateAllWidgets)
+                this.on('layoutstop pan zoom', this.updateAllWidgets);
+
+        }
 
 
-        this.on('data position select unselect add remove grab drag style', function (e) {
-
-            if (suppressCommit)
-                return;
-
-            /*console.log( evt.data.foo ); // 'bar'
-
-             var node = evt.cyTarget;
-             console.log( 'tapped ' + node.id() );*/
-
-            var target = e.cyTarget;
-            var widget = target.data('widget');
-            if (widget) {
-                setTimeout(updateWidget, 0, target);
-                //console.log(this, that, target);
-                //that.commit();
-            }
-
-        });
 
 
 
@@ -211,8 +221,6 @@ function spacegraph(targetWrapper, opt) {
 
 
 
-
-        this.on('layoutstop pan zoom', updateAllWidgets);
 
 //            function scaleAndTranslate( _element , _x , _y, wx, wy )  {
 //                
@@ -254,8 +262,7 @@ function spacegraph(targetWrapper, opt) {
         autoungrabify: false,
         autounselectify: true,
         //fps: 25, //target max fps (frames per second)
-        layout: {
-        },
+        layout: 'random',
         // rendering options:
         headless: false,
         styleEnabled: true,
@@ -289,7 +296,7 @@ function spacegraph(targetWrapper, opt) {
                     'font-family':  //keep short because this gets repeated as part of strings in the style system badly
                         'Arial',
                         //'Monospace',
-                    'outside-texture-bg-opacity': 1,
+                    //'outside-texture-bg-opacity': 1,
                     'shadow-blur': 0,
                     'text-shadow-blur': 0,
                     'shadow-opacity': 0,
@@ -361,7 +368,7 @@ function spacegraph(targetWrapper, opt) {
 //    });
 
     s.channels = { };
-    s.overlay = overlaylayer;
+    //s.overlay = overlaylayer;
 
 
     //var ren = s.renderer();
@@ -690,9 +697,9 @@ function spacegraph(targetWrapper, opt) {
 
                     var ep = nn.position();
                     if (!ep || !ep.x) {
-                        var ex = that.extent();
-                        var cx = 0.5 * (ex.x1 + ex.x2);
-                        var cy = 0.5 * (ex.y1 + ex.y2);
+                        //var ex = that.extent();
+                        var cx = Math.random() * 2 - 1; // * (ex.x1 + ex.x2);
+                        var cy = Math.random() * 2 - 1; // * (ex.y1 + ex.y2);
 
                         //try {
                             nn.position({x: cx, y: cy});
@@ -834,30 +841,30 @@ function spacegraph(targetWrapper, opt) {
 
     s.on('add', function(e) {
 
-        var node = e.cyTarget;
+        //var node = e.cyTarget;
 
-        var widget = node.data('widget');
-        if (widget) {
-
-            var nid = node.id();
-
-            var wEle = widget.element;
-            if (!wEle) { //if widget doesnt already exists
-
-                var style = widget.style || {};
-                style.position = 'fixed';
-                style.transformOrigin = '0 0';
-
-                var wid = 'widget_' + nid;
-                var w = $(document.createElement('div')).attr('id', wid).addClass('widget').css(style).appendTo(overlaylayer);
-
-                w.html(widget.html).data('when', Date.now());
-
-                widget.element = w[0];
-
-                updateWidget(node);
-            }
-        }
+        //var widget = node.data('widget');
+        // if (widget) {
+        //
+        //     var nid = node.id();
+        //
+        //     var wEle = widget.element;
+        //     if (!wEle) { //if widget doesnt already exists
+        //
+        //         var style = widget.style || {};
+        //         style.position = 'fixed';
+        //         style.transformOrigin = '0 0';
+        //
+        //         var wid = 'widget_' + nid;
+        //         var w = $(document.createElement('div')).attr('id', wid).addClass('widget').css(style).appendTo(overlaylayer);
+        //
+        //         w.html(widget.html).data('when', Date.now());
+        //
+        //         widget.element = w[0];
+        //
+        //         updateWidget(node);
+        //     }
+        //}
 
         //OTHER content handlers
 

@@ -268,23 +268,22 @@ function SocketNARGraph(path) {
     //     // currentLayout.run();
     //
     //
-    //     // sg.layout({ name: 'cose',
-    //     //     animate: true,
-    //     //     fit: false,
-    //     //     refresh: 1,
-    //     //     //animationThreshold: 1,
-    //     //     iterations: 5000,
-    //     //     initialTemp: 100,
-    //     //     //coolingfactor: 0.98,
-    //     //     ready: function() {
-    //     //         //console.log('starting cose', Date.now());
-    //     //     },
-    //     //     stop: function() {
-    //     //         //console.log('stop cose', Date.now());
-    //     //     }
-    //     // });
-    //
-    // };
+    //     sg.spacegraph.layout({ name: 'cose',
+    //         animate: true,
+    //         fit: false,
+    //         refresh: 1,
+    //         //animationThreshold: 1,
+    //         iterations: 5000,
+    //         initialTemp: 100,
+    //         //coolingfactor: 0.98,
+    //         ready: function() {
+    //             //console.log('starting cose', Date.now());
+    //         },
+    //         stop: function() {
+    //             //console.log('stop cose', Date.now());
+    //         }
+    //     });
+
 
 
     function d(x, key) {
@@ -306,15 +305,17 @@ function SocketNARGraph(path) {
         .style('width', sizeFunc)
         .style('height', sizeFunc)
         .style('background-color', function(x) {
-            const belief = d(x, 'belief');
-            const aBelief = Math.abs(belief);
-            const pri = d(x, 'pri');
-            const priColor = parseInt((0.5 + 0.5 * pri) * 128);
-            const beliefColor = parseInt(( aBelief) * 255);
-            //const qua = d(x, 'qua');
-            //const quaColor = parseInt((0.5 + 0.5 * qua) * 128);
+            const belief = 0.25 + 0.75 * d(x, 'belief');
+            const aBelief = 0.25 + 0.75 * Math.abs(belief);
+            const pri = 0.25 + 0.75 * d(x, 'pri');
 
-            const quaColor = 0.5;
+
+            const priColor = parseInt(pri * 255);
+            const beliefColor = parseInt(aBelief * 255);
+            const quaColor = parseInt(0.5 * 255);
+                //const qua = d(x, 'qua');
+                //const quaColor = parseInt((0.5 + 0.5 * qua) * 128);
+
             if (belief >= 0.05) {
                 return "rgb(" + priColor + "," + beliefColor + "," + quaColor + ")";
             } else if (belief <= -0.05) {
@@ -348,12 +349,165 @@ function SocketNARGraph(path) {
                 parseInt((0.5 + 0.25 * d(x, 'qua')) * 255) + ")";
         });
 
+    var coseDefault = {
+        name: 'cose',
 
-    // setTimeout(() => {
-    //     // const layoutUpdatePeriodMS = 70;
-    //     // setTimeout(layout, layoutUpdatePeriodMS);
-    //     currentLayout.run();
-    // }, 0);
+        // Called on `layoutready`
+        ready: function(){},
+
+        // Called on `layoutstop`
+        stop: function(){},
+
+        // Whether to animate while running the layout
+        animate: false,
+
+        // The layout animates only after this many milliseconds
+        // (prevents flashing on fast runs)
+        animationThreshold: 10,
+
+        // Number of iterations between consecutive screen positions update
+        // (0 -> only updated on the end)
+        refresh: 0,
+
+        // Whether to fit the network view after when done
+        fit: false,
+
+        // Padding on fit
+        padding: 30,
+
+        // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+        boundingBox: { x1: -3000, y1: -1000, x2: 3000, y2: 1000 },
+
+        // Randomize the initial positions of the nodes (true) or use existing positions (false)
+        randomize: false,
+
+        // Extra spacing between components in non-compound graphs
+        componentSpacing: 10,
+
+        // Node repulsion (non overlapping) multiplier
+        nodeRepulsion: function( node ){ return 40000; },
+
+        // Node repulsion (overlapping) multiplier
+        nodeOverlap: 10,
+
+        // Ideal edge (non nested) length
+        idealEdgeLength: function( edge ){ return 2; },
+
+        // Divisor to compute edge forces
+        edgeElasticity: function( edge ){ return 100; },
+
+        // Nesting factor (multiplier) to compute ideal edge length for nested edges
+        nestingFactor: 3,
+
+        // Gravity force (constant)
+        gravity: 80,
+
+        // Maximum number of iterations to perform
+        numIter: 1,
+
+        // Initial temperature (maximum node displacement)
+        initialTemp: 10,
+
+        // Cooling factor (how the temperature is reduced between consecutive iterations
+        coolingFactor: 0.98,
+
+        // Lower temperature threshold (below this point the layout will end)
+        minTemp: 1.0,
+
+        // Whether to use threading to speed up the layout
+        useMultitasking: true
+    };
+    var bfWorking = {
+        name: 'breadthfirst',
+        fit: false,
+        avoidOverlap: true,
+        maximalAdjustments: 2, // how many times to try to position the nodes in a maximal way (i.e. no backtracking)
+        animate: true, // whether to transition the node positions
+        animationDuration: 500, // duration of animation in ms if enabled
+        animationEasing: undefined // easing of animation if enabled
+    };
+
+    var coseTweak = {
+        name: 'cose',
+
+        // Called on `layoutready`
+        ready: function(){
+            console.log('COSE layout ready');
+        },
+
+        // Called on `layoutstop`
+        stop: function(){},
+
+        // Whether to animate while running the layout
+        animate: true,
+
+        // The layout animates only after this many milliseconds
+        // (prevents flashing on fast runs)
+        animationThreshold: 500,
+
+        // Number of iterations between consecutive screen positions update
+        // (0 -> only updated on the end)
+        refresh: 1,
+
+        // Whether to fit the network view after when done
+        fit: true,
+
+        // Padding on fit
+        padding: 30,
+
+        // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+        boundingBox: undefined,
+
+        // Randomize the initial positions of the nodes (true) or use existing positions (false)
+        randomize: true,
+
+        // Extra spacing between components in non-compound graphs
+        componentSpacing: 100,
+
+        // Node repulsion (non overlapping) multiplier
+        nodeRepulsion: function( node ){ return 400000; },
+
+        // Node repulsion (overlapping) multiplier
+        nodeOverlap: 10,
+
+        // Ideal edge (non nested) length
+        idealEdgeLength: function( edge ){ return 10; },
+
+        // Divisor to compute edge forces
+        edgeElasticity: function( edge ){ return 100; },
+
+        // Nesting factor (multiplier) to compute ideal edge length for nested edges
+        nestingFactor: 5,
+
+        // Gravity force (constant)
+        gravity: 80,
+
+        // Maximum number of iterations to perform
+        numIter: 1,
+
+        // Initial temperature (maximum node displacement)
+        initialTemp: 10,
+
+        // Cooling factor (how the temperature is reduced between consecutive iterations
+        coolingFactor: 1.0,
+
+        // Lower temperature threshold (below this point the layout will end)
+        minTemp: 0,
+
+        // Whether to use threading to speed up the layout
+        useMultitasking: true
+    };
+
+    setInterval(() => {
+        // const layoutUpdatePeriodMS = 70;
+        // setTimeout(layout, layoutUpdatePeriodMS);
+        sg.spacegraph.layout(
+            //bfWorking
+            //coseTweak
+            coseDefault
+        );
+    }, 100);
+
 
     return sg;
 }
@@ -443,6 +597,105 @@ function NALEditor(terminal, initialValue) {
 
     return div;
 }
+
+function NALTimeline(terminal) {
+
+
+    const div = $('<div/>');
+
+    cytoscape({
+
+        container: div,
+
+        elements: [
+            { // node n1
+                group: 'nodes', // 'nodes' for a node, 'edges' for an edge
+                // NB the group field can be automatically inferred for you but specifying it
+                // gives you nice debug messages if you mis-init elements
+
+                // NB: id fields must be strings or numbers
+                data: { // element data (put dev data here)
+                    id: 'n1', // mandatory for each element, assigned automatically on undefined
+                    parent: 'nparent', // indicates the compound node parent id; not defined => no parent
+                },
+
+                // scratchpad data (usually temp or nonserialisable data)
+                scratch: {
+                    foo: 'bar'
+                },
+
+                position: { // the model position of the node (optional on init, mandatory after)
+                    x: 100,
+                    y: 100
+                },
+
+                selected: false, // whether the element is selected (default false)
+
+                selectable: true, // whether the selection state is mutable (default true)
+
+                locked: false, // when locked a node's position is immutable (default false)
+
+                grabbable: true, // whether the node can be grabbed and moved by the user
+
+                classes: 'foo bar' // a space separated list of class names that the element has
+            },
+
+            { // node n2
+                data: { id: 'n2' },
+                renderedPosition: { x: 200, y: 200 } // can alternatively specify position in rendered on-screen pixels
+            },
+
+            { // node n3
+                data: { id: 'n3', parent: 'nparent' },
+                position: { x: 123, y: 234 }
+            },
+
+            { // node nparent
+                data: { id: 'nparent', position: { x: 200, y: 100 } }
+            },
+
+            { // edge e1
+                data: {
+                    id: 'e1',
+                    // inferred as an edge because `source` and `target` are specified:
+                    source: 'n1', // the source node id (edge comes from this node)
+                    target: 'n2'  // the target node id (edge goes to this node)
+                }
+            }
+        ],
+
+        layout: {
+            name: 'preset'
+        },
+
+        // so we can see the ids etc
+        style: [
+            {
+                selector: 'node',
+                style: {
+                    'content': 'data(id)'
+                }
+            },
+
+            {
+                selector: ':parent',
+                style: {
+                    'background-opacity': 0.6
+                }
+            }
+        ]
+
+    });
+
+
+
+    terminal.on('message', function(x) {
+        console.log(x);
+    });
+
+    return div;
+}
+
 
 function NARSpeechRecognition(editor) {
     if (!('webkitSpeechRecognition' in window)) {
