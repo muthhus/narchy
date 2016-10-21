@@ -68,6 +68,10 @@ abstract public class Executioner implements Executor {
      */
     public float throttle() { return 0; }
 
+
+    /** a scaling factor that executions can use to throttle the workload they will produce in the next cycle */
+    public float load() { return 0; }
+
     @Override
     public final void execute(Runnable command) {
         run(command);

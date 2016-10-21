@@ -194,16 +194,22 @@ abstract public class NAgent implements NSense, NAction {
             rewardWindow.addValue(rewardValue);
         }
 
-        updateActions();
+        /** safety valve: if overloaded, enter shock / black out and do not receive sensor input */
+        if (nar.exe.load() < 1) {
 
-        curiosity();
+            updateActions();
 
-        updateSensors();
+            curiosity();
 
-        predict();
+            nar.runLater(sensors, SensorConcept::run, 16);
+            happy.run();
+            joy.run();
 
-        if (trace) {
-            logger.info(summary());
+            predict();
+
+            if (trace) {
+                logger.info(summary());
+            }
         }
     }
 
@@ -430,12 +436,6 @@ abstract public class NAgent implements NSense, NAction {
         }
     }
 
-    private void updateSensors() {
-        nar.runLater(sensors, SensorConcept::run, 2);
-        happy.run();
-        joy.run();
-    }
-
     private void updateActions() {
         float m = 0;
         int n = actions.size();
@@ -448,7 +448,7 @@ abstract public class NAgent implements NSense, NAction {
         m/=n;
         avgActionDesire.addValue(w2c(m)); //resulting from the previous frame
 
-        nar.runLater(actions, ActionConcept::run, 2);
+        nar.runLater(actions, ActionConcept::run, 1);
     }
 
     protected void predict() {

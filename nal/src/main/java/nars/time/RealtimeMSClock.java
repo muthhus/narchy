@@ -4,11 +4,22 @@ package nars.time;
 public class RealtimeMSClock extends RealtimeClock {
 
 
+    private final long start;
+
+    public RealtimeMSClock() {
+        this(false);
+    }
+
+
+    public RealtimeMSClock(boolean relativeToStart) {
+        this.start = relativeToStart ? System.currentTimeMillis() : 0L;
+    }
 
     @Override
-    protected final long getRealTime() {
-        return System.currentTimeMillis();
+    protected long getRealTime() {
+        return (System.currentTimeMillis() - start);
     }
+
 
     @Override
     protected final float unitsToSeconds(long l) {

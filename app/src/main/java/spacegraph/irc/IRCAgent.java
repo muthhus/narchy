@@ -389,7 +389,7 @@ public class IRCAgent extends IRC {
                             t.setBudget(0.01f, 0.25f, 0.75f); //low priority
                         }).
                         collect(Collectors.toList())
-                , 4f
+                , 32
         );
         nar.run(1);
 

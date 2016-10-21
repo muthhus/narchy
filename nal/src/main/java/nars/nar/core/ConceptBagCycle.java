@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -117,34 +118,48 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
 
+    final AtomicBoolean busy = new AtomicBoolean(false);
 
     /** called each frame */
     @Override public void accept(NAR nar) {
 
-        now = nar.time();
+        if (busy.compareAndSet(false, true)) {
+            now = nar.time();
 
-        int cpf = conceptsFiredPerCycle.intValue();
+            //updae concept bag
+            active.commit();
 
-        this._tasklinks = tasklinksFiredPerFiredConcept.intValue();
-        this._termlinks = termlinksFiredPerFiredConcept.intValue();
+            float load = nar.exe.load();
 
-        active.commit();
+            int cpf = Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
+            if (cpf > 0) {
 
-        List<BLink<Concept>> toFire = $.newArrayList(cpf);
-        active.sample(cpf, toFire::add);
 
-        //toFire.sort(sortConceptLinks);
+                //logger.info("firing {} concepts (exe load={})", cpf, load);
 
-        this.nar.runLater(toFire, bc -> {
-            Concept c = bc.get();
-            if (c != null) {
-                PremiseMatrix.run(c, this.nar,
-                        _tasklinks, _termlinks,
-                        this.nar::input, //input them within the current thread here
-                        deriver
-                );
+                this._tasklinks = tasklinksFiredPerFiredConcept.intValue();
+                this._termlinks = termlinksFiredPerFiredConcept.intValue();
+
+                List<BLink<Concept>> toFire = $.newArrayList(cpf);
+                active.sample(cpf, toFire::add);
+
+                //toFire.sort(sortConceptLinks);
+
+                this.nar.runLater(toFire, bc -> {
+                    Concept c = bc.get();
+                    if (c != null) {
+                        PremiseMatrix.run(c, this.nar,
+                                _tasklinks, _termlinks,
+                                this.nar::input, //input them within the current thread here
+                                deriver
+                        );
+                    }
+                }, 1);
+
             }
-        }, 2 * nar.exe.concurrency() /* estimate */);
+
+            busy.set(false);
+        }
 
     }
 

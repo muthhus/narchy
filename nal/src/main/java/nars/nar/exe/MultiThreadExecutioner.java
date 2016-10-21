@@ -22,9 +22,13 @@ public class MultiThreadExecutioner extends Executioner {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutioner.class);
 
+    /** actual load value to report as 100% load */
+    public final long safetyLimit;
+
     private final int threads;
     private final RingBuffer<TaskEvent> ring;
     private final AffinityExecutor exe;
+    private final int cap;
 
     //private CPUThrottle throttle;
 
@@ -81,6 +85,9 @@ public class MultiThreadExecutioner extends Executioner {
 
         this.exe = new AffinityExecutor("exe");
 
+        this.cap = ringSize;
+        this.safetyLimit = (int)((1f/threads) * ringSize);
+
         this.disruptor = new Disruptor<>(
                 TaskEvent::new,
                 ringSize /* ringbuffer size */,
@@ -88,8 +95,8 @@ public class MultiThreadExecutioner extends Executioner {
                 ProducerType.MULTI,
                 //new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()
-                //new LiteTimeoutBlockingWaitStrategy(10, TimeUnit.MILLISECONDS)
-                new LiteBlockingWaitStrategy()
+                new LiteTimeoutBlockingWaitStrategy(0, TimeUnit.MILLISECONDS)
+                //new LiteBlockingWaitStrategy()
         );
 
         this.ring = disruptor.getRingBuffer();
@@ -110,6 +117,16 @@ public class MultiThreadExecutioner extends Executioner {
             disruptor.shutdown();
             disruptor.halt();
         }
+    }
+
+    @Override
+    public final float load() {
+
+        int remaining = (int) ring.remainingCapacity();
+        if (remaining < safetyLimit)
+            return 1f;
+
+        return Math.max(0f, 1f - ((float)ring.remainingCapacity() / (cap - safetyLimit)));
     }
 
     @Override
@@ -136,19 +153,18 @@ public class MultiThreadExecutioner extends Executioner {
             }
         }*/
 
+        synchronized (nar.eventFrameStart) {
+            Consumer[] vv = nar.eventFrameStart.getCachedNullTerminatedArray();
+            if (vv != null) {
+                for (int i = 0; ; ) {
+                    Consumer c = vv[i++];
+                    if (c == null)
+                        break; //null terminator hit
 
-        Consumer[] vv = nar.eventFrameStart.getCachedNullTerminatedArray();
-        if (vv != null) {
-            for (int i = 0; ; ) {
-                Consumer c = vv[i++];
-                if (c != null) {
                     run(c);
-                } else
-                    break; //null terminator hit
+                }
             }
         }
-
-
 
     }
 
@@ -194,6 +210,7 @@ public class MultiThreadExecutioner extends Executioner {
         x.val = b;
     };
 
+
     @Override
     public final void run(@NotNull Runnable r) {
         disruptor.publishEvent(runPublisher, r);
@@ -205,9 +222,9 @@ public class MultiThreadExecutioner extends Executioner {
     @Override
     public final void run(@NotNull Consumer<NAR> r) {
         disruptor.publishEvent(narPublisher, r);
-        if (!ring.tryPublishEvent(narPublisher, r)) {
-            logger.warn("dropped: {}", r);
-        }
+//        if (!ring.tryPublishEvent(narPublisher, r)) {
+//            logger.warn("dropped: {}", r);
+//        }
     }
 
 

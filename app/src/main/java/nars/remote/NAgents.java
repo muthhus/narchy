@@ -18,6 +18,7 @@ import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
 import nars.time.RealtimeDSClock;
+import nars.time.RealtimeMSClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.video.*;
@@ -76,7 +77,7 @@ abstract public class NAgents extends NAgent {
 
 
         //a.run(frames);
-        a.runRT(50f).join();
+        a.runRT(60f).join();
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
@@ -133,21 +134,21 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
+                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
-        int volMax = 32;
-        int conceptsPerCycle = 16;
+        int volMax = 40;
+        int conceptsPerCycle = 32;
 
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
                 conceptsPerCycle, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 50000, 8*1024, 3)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 64000, 16*1024, 4)
 
                 ,
                 //new FrameClock()
-                new RealtimeDSClock(true),
+                new RealtimeMSClock(true),
                 exe) {
 
             @Override
@@ -158,15 +159,15 @@ abstract public class NAgents extends NAgent {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.75f);
+        nar.goalConfidence(0.8f);
 
-        float p = 0.5f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.9f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.7f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.8f * p;
 
-        nar.confMin.setValue(0.04f);
+        nar.confMin.setValue(0.02f);
         nar.compoundVolumeMax.setValue(volMax);
 
         //nar.linkFeedbackRate.setValue(0.05f);

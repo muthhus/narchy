@@ -948,7 +948,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * run a procedure for each item in chunked stripes
      */
-    public final <X> void runLater(@NotNull List<X> items, Consumer<X> each, float granularityFactor) {
+    public final <X> void runLater(@NotNull List<X> items, Consumer<X> each, int maxChunkSize) {
 
         int conc = exe.concurrency();
         if (conc==1 && !exe.concurrent()) {
@@ -957,7 +957,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             return;
         } else {
             int s = items.size();
-            int chunkSize = Math.max(1, (int) Math.floor(s / (conc * granularityFactor)));
+            int chunkSize = Math.max(1, Math.min(maxChunkSize, (int) Math.floor(s / conc )));
             for (int i = 0; i < s; ) {
                 int start = i;
                 int end = Math.min(i + chunkSize, s);
@@ -1214,11 +1214,11 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     }
 
     public void inputLater(@NotNull List<? extends Task> tasks) {
-        inputLater(tasks, 1f);
+        inputLater(tasks, 1);
     }
 
-    public void inputLater(@NotNull List<? extends Task> tasks, float granularity) {
-        runLater(tasks, this::input, granularity);
+    public void inputLater(@NotNull List<? extends Task> tasks, int maxChunkSize) {
+        runLater(tasks, this::input, maxChunkSize);
     }
 
     public void inputLater(@NotNull Stream<? extends Task> taskStream) {

@@ -11,12 +11,12 @@ public class RealtimeDSClock extends RealtimeClock {
 
 
     public RealtimeDSClock(boolean relativeToStart) {
-        this.start = relativeToStart ? getRealTime() : 0L;
+        this.start = relativeToStart ? System.currentTimeMillis() : 0L;
     }
 
     @Override
     protected long getRealTime() {
-        return System.currentTimeMillis()/100 - start;
+        return (System.currentTimeMillis() - start)/100;
     }
 
     @Override

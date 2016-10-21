@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,7 +52,9 @@ public class STMClustered extends STM {
 
     public final char punc;
 
-    final Deque<TasksNode> removed = new ConcurrentLinkedDeque<>();
+    final Deque<TasksNode> removed =
+            new ArrayDeque<>();
+            //new ConcurrentLinkedDeque<>();
 
     public final class TasksNode extends Node {
 
@@ -355,10 +358,12 @@ public class STMClustered extends STM {
     }
 
 
-    protected void iterate() {
+    final AtomicBoolean busy = new AtomicBoolean(false);
 
+    protected boolean iterate() {
 
-        synchronized (net) {
+        if (busy.compareAndSet(false, true)) {
+
 
             if (!removed.isEmpty()) {
                 int rr = removed.size();
@@ -376,6 +381,11 @@ public class STMClustered extends STM {
 
             now = nar.time();
 
+
+            busy.set(false);
+            return true;
+        } else {
+            return false;
         }
 
     }
