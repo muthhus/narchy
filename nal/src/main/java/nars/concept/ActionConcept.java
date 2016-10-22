@@ -179,7 +179,7 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
         return new GeneratedTask(this, Symbols.BELIEF, t)
                 .time(when, when)
                 .evidence(commonEvidence)
-                .budget(pri.asFloat(), feedbackDurability)
+                .budgetByTruth(pri.asFloat(), feedbackDurability)
                 .log("Motor Feedback");
     }
 

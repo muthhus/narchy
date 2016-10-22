@@ -9,6 +9,7 @@ import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
+import nars.concept.Command;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
@@ -58,6 +59,9 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.$.$;
+import static nars.Op.ATOM;
+import static nars.Op.INH;
+import static nars.Op.PROD;
 import static nars.Symbols.*;
 import static nars.concept.CompoundConcept.DuplicateMerge;
 import static nars.time.Tense.ETERNAL;
@@ -122,7 +126,9 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     int level;
 
 
-    /** global input activation multiplier, applied to both concepts and links  */
+    /**
+     * global input activation multiplier, applied to both concepts and links
+     */
     public MutableFloat activationGlobal = new MutableFloat(1f);
 
 
@@ -570,7 +576,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         }
 
         Task t = new MutableTask(term, punc, $.t(freq, conf))
-                .budget(pri, dur)
+                .budgetByTruth(pri, dur)
                 .time(time(), occurrenceTime);
 
         inputLater(t);
@@ -648,6 +654,11 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             return null;
         }
 
+        if (input.isCommand()) {
+            inputCommand(input.term());
+            return null;
+        }
+
         input.budget().priMult(activationGlobal.floatValue());
 
         Task existing = tasks.addIfAbsent(input);
@@ -713,6 +724,45 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         return null;
     }
 
+    /**
+     * meta-reasoner evaluator
+     */
+    @Nullable
+    public Term inputCommand(Compound x) {
+
+        Term y;
+
+        if (x.op() == INH && x.isTerm(0, PROD) && x.isTerm(1, ATOM)) {
+            Term functor = x.term(1);
+            Term[] args = x.compound(0).terms();
+
+            Concept functorConcept = concept(functor);
+            if (functorConcept instanceof TermTransform) {
+                y = ((TermTransform) functorConcept).apply(args);
+            } else if (functorConcept instanceof Command) {
+                y = ((Command) functorConcept).apply(args);
+            } else {
+                logger.error("unrecognized command functor: {}", functor);
+                y = null;
+            }
+
+        } else {
+            logger.error("unrecognized command pattern: {}", x);
+            y = null;
+        }
+
+
+        if (y != null) {
+            Compound z = $.func(self, x, y); //form a compound by attaching SELF to it
+            logger.info(" {}", z);
+            eventTaskProcess.emit($.command(z));
+        }
+
+        return y;
+
+    }
+
+
     @Override
     public final void accept(@NotNull Task task) {
         inputLater(task);
@@ -741,6 +791,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
     @NotNull
+    @Deprecated
     public final On onExecution(@NotNull Atomic op, @NotNull Consumer<OperationConcept> each) {
         On o = concept(op, true)
                 .<Topic<OperationConcept>>meta(Execution.class,
@@ -951,13 +1002,13 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     public final <X> void runLater(@NotNull List<X> items, Consumer<X> each, int maxChunkSize) {
 
         int conc = exe.concurrency();
-        if (conc==1 && !exe.concurrent()) {
+        if (conc == 1 && !exe.concurrent()) {
             //special single-thread case: just execute all
             items.forEach(each);
             return;
         } else {
             int s = items.size();
-            int chunkSize = Math.max(1, Math.min(maxChunkSize, (int) Math.floor(s / conc )));
+            int chunkSize = Math.max(1, Math.min(maxChunkSize, (int) Math.floor(s / conc)));
             for (int i = 0; i < s; ) {
                 int start = i;
                 int end = Math.min(i + chunkSize, s);
@@ -1281,7 +1332,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      */
     public final Concept on(@NotNull Concept c) {
         concepts.set(c);
-        //on.add(c);
         return c;
     }
 

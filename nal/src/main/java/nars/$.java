@@ -142,20 +142,20 @@ public enum $ {
     }
 
 
-    public static Compound exec(@NotNull String opTerm, @Nullable Term... arg) {
-        return exec($.the(opTerm), arg);
+    public static Compound func(@NotNull String opTerm, @Nullable Term... arg) {
+        return func($.the(opTerm), arg);
     }
 
-    /** execution (NARS "operation") */
+    /** function ((a,b)==>c) aka: c(a,b) */
     @NotNull
-    public static Compound exec(@NotNull Atomic opTerm, @Nullable Term... arg) {
+    public static Compound func(@NotNull Atomic opTerm, @Nullable Term... arg) {
         return (Compound) compound(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
         );
     }
-    @NotNull public static Compound exec(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
+    @NotNull public static Compound func(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
         return (Compound) compound(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
@@ -992,6 +992,20 @@ public enum $ {
 
     public static void logLevel(Class logClass, Level l) {
         ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(logClass)).setLevel(l);
+    }
+
+    @NotNull
+    public static Task command(@NotNull Compound op) {
+        //TODO use lightweight CommandTask impl without all the logic metadata
+        MutableTask t = new MutableTask(op, Symbols.COMMAND, null);
+        t.setBudget(1f,1f,1f);
+        return t;
+    }
+
+    @NotNull
+    public static Task command(String functor, Term... args) {
+        //TODO use lightweight CommandTask impl without all the logic metadata
+        return command(func(functor, args));
     }
 
 

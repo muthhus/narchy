@@ -612,12 +612,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //        });
 //    }
 
-    @NotNull
-    static Task command(@NotNull Compound op) {
-        //TODO use lightweight CommandTask impl without all the logic metadata
-        return new MutableTask(op, Symbols.COMMAND, null);
-    }
-
     default boolean isEternal() {
         return occurrence() == ETERNAL;
     }

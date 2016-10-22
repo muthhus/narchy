@@ -635,6 +635,7 @@ public interface Compound extends Term, IPair, TermContainer {
         return false;
     }
 
+
 //    default MutableSet<Term> toSetAtemporal() {
 //        int ss = size();
 //        MutableSet<Term> s = new UnifiedSet<>(ss);

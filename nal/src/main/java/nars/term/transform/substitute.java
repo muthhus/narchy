@@ -23,9 +23,8 @@ public final class substitute extends TermTransformOperator  {
 
     @NotNull
     @Override
-    public Term function(@NotNull Compound p) {
+    public Term apply(@NotNull Term[] xx) {
 
-        final Term[] xx = p.terms();
 
         //term to possibly transform
         final Term term = xx[0];

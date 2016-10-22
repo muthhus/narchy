@@ -17,7 +17,6 @@ import nars.nar.exe.MultiThreadExecutioner;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Inperience;
 import nars.op.time.MySTMClustered;
-import nars.rdfowl.NQuadsRDF;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -40,7 +39,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static nars.nlp.Twenglish.tokenize;
 
@@ -322,7 +320,7 @@ public class IRCAgent extends IRC {
                         stop();
                         return;
                     }
-                    Term pr = $.exec("hear", chan_nick, tokens.get(token++));
+                    Term pr = $.func("hear", chan_nick, tokens.get(token++));
                     nar.believe(pr, Tense.Present, 1f);
 
                 }
@@ -346,7 +344,7 @@ public class IRCAgent extends IRC {
 
         Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(3, 1024*8);
+                new MultiThreadExecutioner(2, 1024*8);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 2, 2, random,
 

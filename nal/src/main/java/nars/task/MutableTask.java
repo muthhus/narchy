@@ -99,15 +99,13 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    public MutableTask budget(float p, float d) {
+    public MutableTask budgetByTruth(float p, float d) {
         float q;
         Truth t = truth();
-        if (!isQuestOrQuestion()) {
-            if (t == null)
-                throw new RuntimeException("Truth needs to be defined prior to budget to calculate truthToQuality");
+        if (truth()!=null) {
             q = BudgetFunctions.truthToQuality(t);
         } else {
-            throw new RuntimeException("incorrect punctuation");
+            throw new RuntimeException("missing truth");
         }
 
         setBudget(p, d, q);

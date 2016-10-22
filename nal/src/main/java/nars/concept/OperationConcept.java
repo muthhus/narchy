@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 
  * TODO inherit from WiredConcept which improves on this functionality
  */
-public class OperationConcept extends CompoundConcept<Compound> implements Consumer<NAR> {
+@Deprecated public class OperationConcept extends CompoundConcept<Compound> implements Consumer<NAR> {
 
     protected volatile boolean pendingRun;
 

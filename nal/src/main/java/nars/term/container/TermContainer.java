@@ -80,6 +80,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      */
     @NotNull Term term(int i);
 
+
+    @NotNull default Compound compound(int i) {
+        return ((Compound)term(i));
+    }
+
+
     /**
      * returns subterm automatically casted as compound (Use with caution)
      */

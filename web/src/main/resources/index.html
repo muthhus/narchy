@@ -56,7 +56,6 @@
             position: fixed;
             width: 100%;
             max-height: 90%;
-            font-size: 200%;
             overflow-y: auto;
             overflow-x: hidden;
         }
@@ -87,40 +86,28 @@
 
             const term = NARTerminal();
 
-            var body = $('body');
+            $('body').append(
 
 
-            const console = new NARConsole(term, (x) => {
-
-                //render Task
-                function truthComponentStr(x) {
-
-                    const i = parseInt(Math.round(100 * x));
-                    if (i == 100)
-                        return '1.0';
-                    else if (i == 0)
-                        return '0.0';
-                    else
-                        return i / 100.0;
-                }
-
-                const label = x.term + x.punct + (x.conf ?
-                    "%" + truthComponentStr(x.freq) +
-                    ";" + truthComponentStr(x.conf) + "%" : "");
-
-                //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
-                const fontSize = (100 + 3 * (1 + 10 * parseInt(x.pri * 9.0))) + '%';
+                new NARConsole(term, (x) => {
 
 
-                var d = document.createElement('div');
-                d.style.fontSize = fontSize;
-                d.innerText = label;
-                return d;
+                    const label = x.term + x.punct + truthString(x.freq, x.conf);
+
+                    //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
+                    const fontSize = (100 + 3 * Math.sqrt(1 + 10 * parseInt(x.pri * 9.0))) + '%';
 
 
-            }).attr('id', 'console').appendTo(body);
+                    var d = document.createElement('div');
+                    d.style.fontSize = fontSize;
+                    d.innerText = label;
+                    return d;
 
-            const input = NALEditor(term).attr('id', 'input').appendTo(body);
+
+                }).attr('id', 'console'),
+
+                NALEditor(term).attr('id', 'input')
+            );
 
             //NALTimeline(term).attr('id', 'graph').appendTo(body);
 
@@ -128,6 +115,26 @@
 
             //$('body').append(TopTable("active"));
         });
+
+
+
+        function truthComponentStr(x) {
+
+            const i = parseInt(Math.round(100 * x));
+            if (i == 100)
+                return '1.0';
+            else if (i == 0)
+                return '0.0';
+            else
+                return i / 100.0;
+        }
+
+        function truthString(f, c) {
+            return c ?
+                ("%" + truthComponentStr(f) +
+                ";" + truthComponentStr(c) + "%") :
+                "";
+        }
 
         function div() {
             return $(document.createElement('div'));

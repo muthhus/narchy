@@ -447,7 +447,7 @@ public class OWLInput  {
             nar.believe($.inh(atom(subject), atom(object)));
         }
         else {
-            nar.believe($.exec(predicate,  $.p(atom(subject), atom(object))));
+            nar.believe($.func(predicate,  $.p(atom(subject), atom(object))));
         }
 
 //        // get the entity ids for source and target

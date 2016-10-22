@@ -45,20 +45,9 @@ public abstract class ImmediateOperator extends NullOperator  {
 
 
     public static Task command(@NotNull Class<? extends ImmediateOperator> opClass, Term... args) {
-        return Task.command(
-                operation(opClass,
-                        args)
-        );
+        return $.command(opClass.getSimpleName(), args);
     }
 
-//    public static Compound operation(Class<? extends ImmediateOperator> opClass, Object... args) {
-//        return operation( opClass, termizedProduct(args));
-//    }
-    public static Compound operation(@NotNull Class<? extends ImmediateOperator> opClass, Term... args) {
-        return $.exec(
-                $.the(opClass.getSimpleName()),
-                args);
-    }
 
 
     //    //TODO make Task an interface so this is lightweight

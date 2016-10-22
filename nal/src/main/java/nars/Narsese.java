@@ -110,12 +110,12 @@ public class Narsese extends BaseParser<Object> {
                             memory.qualityDefault(p));
 
                 } else {
-                    ttt.budget(b[0],
+                    ttt.budgetByTruth(b[0],
                             memory.durabilityDefault(p));
                 }
                 break;
             case 2:
-                ttt.budget(b[1], b[0]);
+                ttt.budgetByTruth(b[1], b[0]);
                 break;
             default:
                 ttt.setBudget(b[2], b[1], b[0]);

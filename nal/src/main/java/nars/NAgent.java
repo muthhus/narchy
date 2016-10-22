@@ -417,7 +417,7 @@ abstract public class NAgent implements NSense, NAction {
                             $.t(nar.random.nextFloat()
                                 //Math.random() > 0.5f ? 1f : 0f
                                 , Math.max(nar.truthResolution.floatValue(), 0.5f + (0.5f * nar.random.nextFloat() * gamma * gammaEpsilonFactor))))
-                                .time(now, now).budget(c.pri.asFloat(), nar.durabilityDefault(GOAL)).log("Curiosity"));
+                                .time(now, now).budgetByTruth(c.pri.asFloat(), nar.durabilityDefault(GOAL)).log("Curiosity"));
 
                                 //in order to auto-destruct corectly, the task needs to remove itself from the taskindex too
                 /* {

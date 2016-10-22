@@ -3,18 +3,16 @@ package nars.web;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.cache.DirectBufferCache;
-import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.FileResourceManager;
-import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
+import nars.$;
+import nars.concept.Command;
 import nars.nar.Default;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.irc.IRC;
-import spacegraph.irc.IRCAgent;
 import spacegraph.irc.IRCServer;
 
 import java.io.File;
@@ -25,7 +23,6 @@ import static io.undertow.Handlers.*;
 import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static io.undertow.UndertowOptions.ENABLE_SPDY;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
-import static java.util.zip.Deflater.BEST_SPEED;
 import static spacegraph.irc.IRCAgent.newRealtimeNAR;
 
 
@@ -123,20 +120,25 @@ public class WebServer /*extends PathHandler*/ {
 
         new IRCServer("localhost", 6667);
 
-        @NotNull Default nar = newRealtimeNAR(2048, 2, 2);
+        @NotNull Default nar = newRealtimeNAR(2048, 8, 2);
         //Default nar = new Default();
 
+        nar.on(new Command("memstat") {
+            @Override public Term apply(Term[] terms) {
+                return $.quote(nar.concepts.summary());
+            }
+        });
         new nars.web.NARServices(nar, w.path);
 
         //new IRCAgent(nar, "localhost", "NARchy", "#x");
 
 
-        new IRCAgent(nar,
+        /*new IRCAgent(nar,
                 "experiment1", "irc.freenode.net",
                 //"#123xyz"
                 "#netention"
                 //"#nars"
-        ).start();
+        ).start();*/
 
 
     }

@@ -91,8 +91,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     @NotNull
     @Override
     //public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
-    public Term function(@NotNull Compound p) {
-        final Term[] a = p.terms();
+    public Term apply(@NotNull Term[] a) {
+
 //        if (xx.length < 3) {
 //            throw new UnsupportedOperationException();
 //        }

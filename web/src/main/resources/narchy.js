@@ -585,10 +585,15 @@ function decodeBiNARy(e, m) {
         case 63:
             punct = '?';
             break;
+        case 59:
+            punct = ';';
+            break;
 
         default:
-            //console.error();
-            return [ 'unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data) ];
+
+            var e = [ 'unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data) ];
+            console.error(e);
+            return e;
     }
 
     const pri = d.getFloat32(j); j+=4;

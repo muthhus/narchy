@@ -207,7 +207,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
         return new MutableTask(term(), punc, t)
                 .evidence(commonEvidence)
                 .time(now, when)
-                .budget(pri.asFloat() /*(v, now, prevF, lastInput)*/, dur);
+                .budgetByTruth(pri.asFloat() /*(v, now, prevF, lastInput)*/, dur);
                 //.log(this);
     }
 

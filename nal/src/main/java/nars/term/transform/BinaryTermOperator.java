@@ -23,11 +23,11 @@ public abstract class BinaryTermOperator extends AtomConcept implements TermTran
 
 
     @NotNull
-    @Override public final Term function(@NotNull Compound x) {
-        if (x.size()!=2)
+    @Override public final Term apply(@NotNull Term[] x) {
+        if (x.length!=2)
             throw new UnsupportedOperationException("# args must equal 2");
 
-        return apply(x.term(0), x.term(1));
+        return apply(x[0], x[1]);
     }
 
     @NotNull

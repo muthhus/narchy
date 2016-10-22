@@ -147,9 +147,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         }
 
         @Override
-        public @NotNull Term function(@NotNull Compound args) {
+        public @NotNull Term apply(@NotNull Term[] args) {
 
-            Term x = args.term(0);
+            Term x = args[0];
             if (introduce(x)) {
                 Term[] only = new Term[] { x };
                 introducer.accept((Compound)x, y -> only[0] = y);

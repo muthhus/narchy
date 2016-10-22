@@ -138,7 +138,7 @@ public class Inperience extends Leak<Task> {
 
         Compound tt = task.term();
 
-        if (isExperienceTerm(tt)) //no infinite loops in the present moment
+        if (task.isCommand() || !isExperienceTerm(tt)) //no infinite loops in the present moment
             return;
 
         each.accept(new DefaultBLink(task, task, 1f/tt.volume()));
@@ -189,7 +189,7 @@ public class Inperience extends Leak<Task> {
 
                 MutableTask e = $.task(ret, Symbols.BELIEF, 1f, nar.confidenceDefault(Symbols.BELIEF))
                         .time(nar.time(), o)
-                        .budget(task.priIfFiniteElseZero(), task.dur())
+                        .budgetByTruth(task.priIfFiniteElseZero(), task.dur())
                         .evidence(task)
                         .because("Inperience");
 
@@ -247,7 +247,7 @@ public class Inperience extends Leak<Task> {
             arg[k] = tr.expectation(tr.expectation(), conceptCreationExpectation);
         }
 
-        return $.exec(reify(s.punc()), arg);
+        return $.func(reify(s.punc()), arg);
     }
 
 
@@ -297,7 +297,7 @@ public class Inperience extends Leak<Task> {
 
 
             if (valid) {
-                Compound c = $.exec(anticipate, beliefTerm.term(1));
+                Compound c = $.func(anticipate, beliefTerm.term(1));
                 //if (c!=null) {
                     //long interval = (impsub instanceof Interval ? ((Interval)impsub).duration() : 0);
                     //int interval = 0;
@@ -314,7 +314,7 @@ public class Inperience extends Leak<Task> {
         //the Atomics which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 
-        Compound c = $.exec(op, $.p( belief.term() ) );
+        Compound c = $.func(op, $.p( belief.term() ) );
         if (c!=null)
             input(task, belief, c, 0);
     }

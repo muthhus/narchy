@@ -302,7 +302,7 @@ public abstract class Param /*extends Container*/ implements Level {
         float defDur = durabilityDefault(punc);
 
         if (t.isBeliefOrGoal()) {
-            t.budget(defPri, defDur);
+            t.budgetByTruth(defPri, defDur);
 
             /** if q was not specified, and truth is, then we can calculate q from truthToQuality */
             float q = t.qua();

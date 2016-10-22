@@ -10,16 +10,16 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
 
-public interface TermTransform extends Atomic {
+
+public interface TermTransform extends Atomic, Function<Term[],Term> {
 
     Concept[] StaticBuiltins = {
             new intersect(),
             new differ(),
             new union()
     };
-
-    @NotNull Term function(@NotNull Compound args);
 
 
 

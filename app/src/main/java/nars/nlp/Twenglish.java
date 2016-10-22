@@ -23,7 +23,6 @@ import nars.Narsese;
 import nars.task.MutableTask;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.util.io.Twokenize;
 import nars.util.io.Twokenize.Span;
 import org.jetbrains.annotations.NotNull;
@@ -143,7 +142,7 @@ public class Twenglish {
 //                            tokens
 //                    )
 
-            Term q = $.exec("hear", $.the(source), $.p(tokens));
+            Term q = $.func("hear", $.the(source), tokens);
 
             if (q != null) {
                 MutableTask newtask = new MutableTask(q,'.', 1f, n).present(n); //n.task(q + ". %0.95|0.95%");
