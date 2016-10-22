@@ -383,17 +383,17 @@ public class IRCAgent extends IRC {
         nar.compoundVolumeMax.setValue(volMax);
 
 
-        nar.inputLater(
-                NQuadsRDF.stream(nar, new File(
-                        "/home/me/Downloads/nquad"
-                )).
-                        peek(t -> {
-                            t.setBudget(0.01f, 0.5f, 0.9f);
-                        }).
-                        collect(Collectors.toList())
-                , 32
-        );
-        nar.run(1);
+//        nar.inputLater(
+//                NQuadsRDF.stream(nar, new File(
+//                        "/home/me/Downloads/nquad"
+//                )).
+//                        peek(t -> {
+//                            t.setBudget(0.01f, 0.5f, 0.9f);
+//                        }).
+//                        collect(Collectors.toList())
+//                , 32
+//        );
+//        nar.run(1);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 1);
 

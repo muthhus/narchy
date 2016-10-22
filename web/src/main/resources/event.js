@@ -95,10 +95,10 @@ class EventEmitter {
         if(!listeners || !listeners.length) {
             return false
         }
-        setTimeout( ()=> {
-            for (let i = 0; i < listeners.length; i++)
-                listeners[i].apply(null, args);
-        }, 0);
+
+        for (let i = 0; i < listeners.length; i++)
+            listeners[i].apply(null, args);
+
         //listeners.forEach(function(fn) { fn.apply(null, args) })
         return true
     }

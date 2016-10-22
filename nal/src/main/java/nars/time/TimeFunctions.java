@@ -879,7 +879,7 @@ public interface TimeFunctions {
                         occ += (timeOfDerivedInTask - timeOfBeliefInTask);
                     else if (timeOfDerivedInTask != DTERNAL)
                         occ += timeOfDerivedInTask;
-                } else if (!task.isEternal() && belief.isEternal()) {
+                } else if (!task.isEternal() && belief.isEternal() && B!=null) {
                     long timeOfTaskInBelief = B.subtermTime(T, bd);
                     long timeOfDerivedInBelief = B.subtermTime(C, bd);
 

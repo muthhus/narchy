@@ -28,7 +28,7 @@ public class NarseseIOService extends WebsocketService {
     private final NAR nar;
     private Active active;
 
-    FastConcurrentDirectDeque<byte[]> outgoing = new FastConcurrentDirectDeque();
+    //FastConcurrentDirectDeque<byte[]> outgoing = new FastConcurrentDirectDeque();
 
     public NarseseIOService(NAR n) {
         super();
@@ -39,24 +39,24 @@ public class NarseseIOService extends WebsocketService {
     public void onStart() {
 
         active = new Active(
-                nar.eventTaskProcess.on(this::output),
+                nar.eventTaskProcess.on(this::output)
 //                nar.eventAnswer.on(t -> send(
 //                        "ANS: " + t)),
                 //nar.eventError.on(this::queue),
-                nar.eventFrameStart.on(this::flush)
+//                nar.eventFrameStart.on(this::flush)
         );
 
     }
 
-    protected void flush(NAR n) {
-        if (outgoing.isEmpty())
-            return;
-
-        FastConcurrentDirectDeque b = outgoing;
-        outgoing = new FastConcurrentDirectDeque();
-        //CharSequence x = Json.collectionToJson(b, new StringBuilder(2048));
-        //nar.runLater(()-> send(x));
-    }
+//    protected void flush(NAR n) {
+//        //if (outgoing.isEmpty())
+//            //return;
+//
+////        FastConcurrentDirectDeque b = outgoing;
+////        outgoing = new FastConcurrentDirectDeque();
+//        //CharSequence x = Json.collectionToJson(b, new StringBuilder(2048));
+//        //nar.runLater(()-> send(x));
+//    }
 
     protected void output(Task t) {
         //buffer.add(t.toString());
@@ -104,10 +104,6 @@ public class NarseseIOService extends WebsocketService {
             return;
 
         logger.error("Unrecognizable input: {}", msg);
-
-
-
-
 
 //            if (attemptJSONParseOfText) {
 //                try {

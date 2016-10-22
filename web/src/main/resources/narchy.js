@@ -548,7 +548,7 @@ function NARTerminal() {
                 console.error(e, m.data);
             }
         } else {
-            e.emit('message', decodeBiNARy(e, m.data));
+            e.emit('message', [decodeBiNARy(e, m.data)]);
         }
     };
     ws.onclose = function() {
@@ -571,8 +571,6 @@ function decodeBiNARy(e, m) {
 
     const d = new DataView(m);
 
-
-
     //assume 'd' is a NAR serialized Task
     var j = 0;
     var punct = d.getUint8(j++);
@@ -589,8 +587,8 @@ function decodeBiNARy(e, m) {
             break;
 
         default:
-            console.error('unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data));
-            break;
+            //console.error();
+            return [ 'unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data) ];
     }
 
     const pri = d.getFloat32(j); j+=4;
@@ -613,7 +611,14 @@ function decodeBiNARy(e, m) {
 
     //console.log(term, punct, pri, when, freq, conf);
 
-    return [term, punct, pri, when, freq, conf];
+    return {
+        term: term,
+        punct: punct,
+        pri: pri,
+        when: when,
+        freq: freq,
+        conf: conf
+    };
 
     //var uint8array = new TextEncoder(encoding).encode(string);
     //var string = new TextDecoder(encoding).decode(uint8array);
@@ -922,23 +927,25 @@ function NARInputter(terminal, initialValue) {
 
 function NARConsole(terminal, render) {
 
-    const view = $('<div/>').css('overflow', 'scroll').css('width', '100%').css('height', '100%');
+    const view = $('<div/>').css('width', '100%').css('height', '100%');
 
-    const maxLines = 32;
+    const maxLines = 256;
 
     let shown = [];
 
     terminal.on('message', function(x) {
 
+        //console.log('console: ', JSON.stringify(x), x);
 
 
         //const m = JSON.parse(x.data);
         //console.log(x);
 
-        //for (let i = 0; i < x.length; i++) {
-            //shown.push( x[i] );
-        //}
         shown.push(x);
+
+        // for (let i = 0; i < x.length; i++) {
+        //     shown.push( x[i] );
+        // }
 
         //rr = _.concat(rr, x);
         //rr.push( render(m) );
@@ -950,6 +957,12 @@ function NARConsole(terminal, render) {
 
         setTimeout(function() {
             view.empty().append(_.map(shown, render));
+
+
+
+            var height = view[0].scrollHeight;
+            view.scrollTop(height);
+
         }, 0);
 
 

@@ -36,11 +36,11 @@ import java.util.*;
  * Twitter English - english with additional tags for twitter-like content 
  */
 public class Twenglish {
-    public static final Atomic GOAL = $.the("exclaims");
-    public static final Atomic QUESTION = $.the("asks");
-    //public static final Atom QUEST = $.the("quest");
-    public static final Atomic JUDGMENT = $.the("declares");
-    public static final Atomic FRAGMENT = $.the("says");
+//    public static final Atomic GOAL = $.the("exclaims");
+//    public static final Atomic QUESTION = $.the("asks");
+//    //public static final Atom QUEST = $.the("quest");
+//    public static final Atomic JUDGMENT = $.the("declares");
+//    public static final Atomic FRAGMENT = $.the("says");
 
     //public final ArrayList<String> vocabulary = new ArrayList<>();
     
@@ -50,8 +50,7 @@ public class Twenglish {
 
     //boolean languageBooted = true; //set to false to initialize on first twenglish input
     boolean inputProduct = true;
-    boolean inputConjSeq = true;
-    
+
     
     public static final Map<String,String> POS = new HashMap(){{
         //https://www.englishclub.com/grammar/parts-of-speech-table.htm
@@ -113,17 +112,17 @@ public class Twenglish {
         }
         if (t.isEmpty()) return Collections.emptyList();
 
-        Atomic sentenceType = FRAGMENT;
-        if ((last!=null) && ("punct".equals(last.pattern))) {
-            switch (last.content) {
-                case ".": sentenceType = JUDGMENT; break;
-                case "?": sentenceType = QUESTION; break;
-                //case "@": sentenceType = QUEST; break;
-                case "!": sentenceType = GOAL; break;
-            }
-        }
-        if (!"words".equals(sentenceType.toString()))
-            t.removeLast(); //remove the punctuation, it will be redundant
+//        Atomic sentenceType = FRAGMENT;
+//        if ((last!=null) && ("punct".equals(last.pattern))) {
+//            switch (last.content) {
+//                case ".": sentenceType = JUDGMENT; break;
+//                case "?": sentenceType = QUESTION; break;
+//                //case "@": sentenceType = QUEST; break;
+//                case "!": sentenceType = GOAL; break;
+//            }
+//        }
+//        if (!"words".equals(sentenceType.toString()))
+//            t.removeLast(); //remove the punctuation, it will be redundant
 
 
         if (t.isEmpty())
@@ -144,7 +143,7 @@ public class Twenglish {
 //                            tokens
 //                    )
 
-            Term q = $.image(2, sentenceType, $.the(source), $.sete(tokens));
+            Term q = $.exec("hear", $.the(source), $.p(tokens));
 
             if (q != null) {
                 MutableTask newtask = new MutableTask(q,'.', 1f, n).present(n); //n.task(q + ". %0.95|0.95%");
