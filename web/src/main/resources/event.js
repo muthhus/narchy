@@ -1,27 +1,27 @@
 "use strict";
 
-var DEFAULT_MAX_LISTENERS = 12;
+const DEFAULT_MAX_LISTENERS = 12;
 
 //TODO use ES6 Map for better performance: http://jsperf.com/map-vs-object-as-hashes/2
 class EventEmitter {
     constructor(){
         this._maxListeners = DEFAULT_MAX_LISTENERS;
-        this._events = {} //TODO use ES6 Map
+        this._events = {}; //TODO use ES6 Map
     }
     on(type, listener) {
 
-        var that = this;
+        const that = this;
         if (Array.isArray(type)) {
             _.each(type, function(t) {
                 that.on(t, listener);
             });
-            return;
+            return this;
         }
 
         if(typeof listener != "function") {
             throw new TypeError()
         }
-        var listeners = this._events[type] ||(this._events[type] = []);
+        const listeners = this._events[type] || (this._events[type] = []);
         if(listeners.indexOf(listener) != -1) {
             return this
         }
@@ -39,7 +39,7 @@ class EventEmitter {
         return this
     }
     once(type, listener) {
-        var eventsInstance = this;
+        const eventsInstance = this;
         function onceCallback(){
             eventsInstance.off(type, onceCallback);
             listener.apply(null, arguments)
@@ -48,11 +48,11 @@ class EventEmitter {
     }
     off(type, listener) {
 
-        var that = this;
+        const that = this;
 
         if (type === undefined) {
             //disable everythign
-            for (var k in this._events) {
+            for (let k in this._events) {
                 this.off(k);
             }
             return;
@@ -63,7 +63,7 @@ class EventEmitter {
             return;
         }
 
-        var listeners = this._events[type];
+        let listeners = this._events[type];
 
         if (listener === undefined) {
             //remove any existing
@@ -81,14 +81,14 @@ class EventEmitter {
         }
 
         if(!listeners || !listeners.length) {
-            return this
+            return;
         }
-        var indexOfListener = listeners.indexOf(listener);
+        const indexOfListener = listeners.indexOf(listener);
         if(indexOfListener == -1) {
-            return this
+            return;
         }
         listeners.splice(indexOfListener, 1);
-        return this
+        return;
     }
     emit(type, args){
         const listeners = this._events[type];
@@ -96,7 +96,7 @@ class EventEmitter {
             return false
         }
         setTimeout( ()=> {
-            for (var i = 0; i < listeners.length; i++)
+            for (let i = 0; i < listeners.length; i++)
                 listeners[i].apply(null, args);
         }, 0);
         //listeners.forEach(function(fn) { fn.apply(null, args) })

@@ -17,13 +17,16 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import nars.util.data.rope.StringHack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nustaq.serialization.*;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.function.Function;
 
+import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.ATOM;
 import static nars.Symbols.*;
 import static nars.time.Tense.DTERNAL;
@@ -88,28 +91,60 @@ public class IO {
         return Truth.unhash(in.readInt(), Param.TRUTH_EPSILON);
     }
 
+    /** with Term first */
     public static void writeTask(@NotNull DataOutput out, @NotNull Task t) throws IOException {
 
         writeTerm(out, t.term());
 
         char p = t.punc();
-
-        //TODO combine these into one byte
         out.writeByte(p);
 
-        if (hasTruth(p)) {
+        if (hasTruth(p))
             writeTruth(out, t);
-        }
+
         out.writeLong(t.occurrence());
 
         writeEvidence(out, t.evidence());
 
-        out.writeFloat(t.priIfFiniteElseZero());
-        out.writeFloat(t.dur());
-        out.writeFloat(t.qua());
+        writeBudget(out, t);
 
         out.writeLong(t.creation()); //put this last because it is the least useful really
 
+    }
+
+    /** with Term last */
+    public static void writeTask2(@NotNull DataOutput out, @NotNull Task t) throws IOException {
+
+        char p = t.punc();
+        out.writeByte(p);
+
+        writeBudget(out, t);
+
+        out.writeLong(t.occurrence());
+
+        if (hasTruth(p)) {
+            out.writeFloat(t.freq());
+            out.writeFloat(t.conf());
+        }
+
+        //writeEvidence(out, t.evidence());
+
+        //out.writeLong(t.creation()); //put this last because it is the least useful really
+
+
+        String s = t.term().toString();
+        //out.write(StringHack.bytes(s));
+        out.write(s.getBytes(Charset.defaultCharset()));
+
+
+//        writeUTFWithoutLength(out, s);
+
+    }
+
+    public static void writeBudget(@NotNull DataOutput out, @NotNull Task t) throws IOException {
+        out.writeFloat(t.priIfFiniteElseZero());
+        out.writeFloat(t.dur());
+        out.writeFloat(t.qua());
     }
 
     public static void writeEvidence(@NotNull DataOutput out, @NotNull long[] evi) throws IOException {
@@ -205,6 +240,7 @@ public class IO {
     }
 
 
+
     public static boolean isSpecial(@NotNull Term term) {
         return term instanceof GenericVariable;
     }
@@ -283,6 +319,33 @@ public class IO {
         }
     }
 
+    public enum TaskSerialization {
+        TermFirst,
+        TermLast
+    }
+
+    public static byte[] taskToBytes(Task x) {
+        return taskToBytes(x, TermFirst);
+    }
+    public static byte[] taskToBytes(Task x, TaskSerialization mode) {
+        try {
+            ByteArrayOutputStream bs = new ByteArrayOutputStream(x.volume() * 16 /* estimate */);
+            DataOutputStream dos = new DataOutputStream(bs);
+            switch (mode) {
+                case TermFirst:
+                    IO.writeTask(dos, x);
+                    break;
+                case TermLast:
+                    IO.writeTask2(dos, x);
+                    break;
+            }
+            return bs.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
         try {
             return IO.readTask(new DataInputStream(new ByteArrayInputStream(b)), index);
@@ -300,6 +363,7 @@ public class IO {
             return null;
         }
     }
+
 
     /**
      * serialization and deserialization of terms, tasks, etc.

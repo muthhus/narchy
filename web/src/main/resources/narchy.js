@@ -10,64 +10,64 @@
 */
 
 
-/** client-side DB interface */
-function DB() {
-    const db = new loki('default', {});
-    return db;
-}
-
-function TaskDB(db, terminal) {
-
-
-    const tasks = db.addCollection('tasks', {
-        indices: ['occ', 'term', 'pri', 'conf', 'punc']
-    });
-
-    function arrayToDoc(a) {
-        return {
-            // String.valueOf(t.punc()),
-            punc: a[0],
-
-            // t.term().toString(),
-            term: a[1],
-
-            // truth!=null ? t.freq() : 0,
-            freq: a[2],
-            // truth!=null ? t.conf() : 0,
-            conf: a[3],
-
-            // occ!=ETERNAL ? occ : ":",
-            occ: a[4],
-
-            // Math.round(t.pri()*1000),
-            pri: a[5],
-
-            // Math.round(t.dur()*1000),
-            dur: a[6],
-
-            // Math.round(t.qua()*1000),
-            qua: a[7],
-
-            // t.lastLogged()
-            log: a[8]
-
-        };
-    }
-    /** inserts a task from the raw array format provided by a server */
-    tasks.addTaskArray = function(taskArrays/* array */) {
-
-        if (!Array.isArray(taskArrays))
-            taskArrays = [taskArrays];
-
-        _.each(taskArrays, function(i) { tasks.insert(arrayToDoc(i)); });
-
-
-    };
-
-    terminal.on('message', tasks.addTaskArray);
-
-    return tasks;
-}
+// /** client-side DB interface */
+// function DB() {
+//     const db = new loki('default', {});
+//     return db;
+// }
+//
+// function TaskDB(db, terminal) {
+//
+//
+//     const tasks = db.addCollection('tasks', {
+//         indices: ['occ', 'term', 'pri', 'conf', 'punc']
+//     });
+//
+//     function arrayToDoc(a) {
+//         return {
+//             // String.valueOf(t.punc()),
+//             punc: a[0],
+//
+//             // t.term().toString(),
+//             term: a[1],
+//
+//             // truth!=null ? t.freq() : 0,
+//             freq: a[2],
+//             // truth!=null ? t.conf() : 0,
+//             conf: a[3],
+//
+//             // occ!=ETERNAL ? occ : ":",
+//             occ: a[4],
+//
+//             // Math.round(t.pri()*1000),
+//             pri: a[5],
+//
+//             // Math.round(t.dur()*1000),
+//             dur: a[6],
+//
+//             // Math.round(t.qua()*1000),
+//             qua: a[7],
+//
+//             // t.lastLogged()
+//             log: a[8]
+//
+//         };
+//     }
+//     /** inserts a task from the raw array format provided by a server */
+//     tasks.addTaskArray = function(taskArrays/* array */) {
+//
+//         if (!Array.isArray(taskArrays))
+//             taskArrays = [taskArrays];
+//
+//         _.each(taskArrays, function(i) { tasks.insert(arrayToDoc(i)); });
+//
+//
+//     };
+//
+//     terminal.on('message', tasks.addTaskArray);
+//
+//     return tasks;
+// }
 
 const maxLabelLen = 16;
 function labelize(l) {
@@ -349,14 +349,16 @@ function SocketNARGraph(path) {
                 parseInt((0.5 + 0.25 * d(x, 'qua')) * 255) + ")";
         });
 
-    var coseDefault = {
+    const coseDefault = {
         name: 'cose',
 
         // Called on `layoutready`
-        ready: function(){},
+        ready: function () {
+        },
 
         // Called on `layoutstop`
-        stop: function(){},
+        stop: function () {
+        },
 
         // Whether to animate while running the layout
         animate: false,
@@ -376,7 +378,7 @@ function SocketNARGraph(path) {
         padding: 30,
 
         // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
-        boundingBox: { x1: -3000, y1: -1000, x2: 3000, y2: 1000 },
+        boundingBox: {x1: -3000, y1: -1000, x2: 3000, y2: 1000},
 
         // Randomize the initial positions of the nodes (true) or use existing positions (false)
         randomize: false,
@@ -385,16 +387,22 @@ function SocketNARGraph(path) {
         componentSpacing: 10,
 
         // Node repulsion (non overlapping) multiplier
-        nodeRepulsion: function( node ){ return 40000; },
+        nodeRepulsion: function (node) {
+            return 40000;
+        },
 
         // Node repulsion (overlapping) multiplier
         nodeOverlap: 10,
 
         // Ideal edge (non nested) length
-        idealEdgeLength: function( edge ){ return 2; },
+        idealEdgeLength: function (edge) {
+            return 2;
+        },
 
         // Divisor to compute edge forces
-        edgeElasticity: function( edge ){ return 100; },
+        edgeElasticity: function (edge) {
+            return 100;
+        },
 
         // Nesting factor (multiplier) to compute ideal edge length for nested edges
         nestingFactor: 3,
@@ -417,7 +425,7 @@ function SocketNARGraph(path) {
         // Whether to use threading to speed up the layout
         useMultitasking: true
     };
-    var bfWorking = {
+    let bfWorking = {
         name: 'breadthfirst',
         fit: false,
         avoidOverlap: true,
@@ -427,16 +435,17 @@ function SocketNARGraph(path) {
         animationEasing: undefined // easing of animation if enabled
     };
 
-    var coseTweak = {
+    let coseTweak = {
         name: 'cose',
 
         // Called on `layoutready`
-        ready: function(){
+        ready: function () {
             console.log('COSE layout ready');
         },
 
         // Called on `layoutstop`
-        stop: function(){},
+        stop: function () {
+        },
 
         // Whether to animate while running the layout
         animate: true,
@@ -465,16 +474,22 @@ function SocketNARGraph(path) {
         componentSpacing: 100,
 
         // Node repulsion (non overlapping) multiplier
-        nodeRepulsion: function( node ){ return 400000; },
+        nodeRepulsion: function (node) {
+            return 400000;
+        },
 
         // Node repulsion (overlapping) multiplier
         nodeOverlap: 10,
 
         // Ideal edge (non nested) length
-        idealEdgeLength: function( edge ){ return 10; },
+        idealEdgeLength: function (edge) {
+            return 10;
+        },
 
         // Divisor to compute edge forces
-        edgeElasticity: function( edge ){ return 100; },
+        edgeElasticity: function (edge) {
+            return 100;
+        },
 
         // Nesting factor (multiplier) to compute ideal edge length for nested edges
         nestingFactor: 5,
@@ -515,7 +530,7 @@ function SocketNARGraph(path) {
 
 function NARTerminal() {
 
-    const ws = window.socket('terminal');
+    const ws = NARSocket('terminal');
 
     const e = new EventEmitter();
 
@@ -523,11 +538,17 @@ function NARTerminal() {
         e.emit('connect', this);
     };
     ws.onmessage = function(m) {
-        try {
-            const x = JSON.parse(m.data);
-            e.emit('message', [x]);
-        } catch (e) {
-            console.error(e, m.data);
+
+
+        if (typeof m.data === "string") {
+            try {
+                const x = JSON.parse(m.data);
+                e.emit('message', [x]);
+            } catch (e) {
+                console.error(e, m.data);
+            }
+        } else {
+            e.emit('message', decodeBiNARy(e, m.data));
         }
     };
     ws.onclose = function() {
@@ -535,13 +556,74 @@ function NARTerminal() {
     };
 
     e.socket = ws;
+    e.close = ws.close;
     e.send = function(x) {
         ws.send(x);
     };
-    e.close = ws.close;
-    e.send = ws.send;
 
     return e;
+}
+
+if (!("TextEncoder" in window))
+    alert("Sorry, this browser does not support TextEncoder...");
+
+function decodeBiNARy(e, m) {
+
+    const d = new DataView(m);
+
+
+
+    //assume 'd' is a NAR serialized Task
+    var j = 0;
+    var punct = d.getUint8(j++);
+    switch (punct) {
+
+        case 46:
+            punct = '.';
+            break;
+        case 41:
+            punct = '!';
+            break;
+        case 63:
+            punct = '?';
+            break;
+
+        default:
+            console.error('unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data));
+            break;
+    }
+
+    const pri = d.getFloat32(j); j+=4;
+    const dur = d.getFloat32(j); j+=4;
+    const qua = d.getFloat32(j); j+=4;
+
+    const whenLow = d.getInt32(j); j+=4;
+    const whenHigh = d.getInt32(j); j+=4;
+    const when = whenLow | (whenHigh << 32);
+
+    var freq, conf;
+    if ((punct == '.') || (punct == '!')) {
+        freq = d.getFloat32(j); j+=4;
+        conf = d.getFloat32(j); j+=4;
+    } else {
+        freq = conf = undefined;
+    }
+
+    const term = new TextDecoder("utf8").decode(m.slice(j));
+
+    //console.log(term, punct, pri, when, freq, conf);
+
+    return [term, punct, pri, when, freq, conf];
+
+    //var uint8array = new TextEncoder(encoding).encode(string);
+    //var string = new TextDecoder(encoding).decode(uint8array);
+
+    //var string = new TextDecoder("utf8").decode(m);
+    //console.log(string);
+
+
+    //var width = dv.getUint16(0);
+    //var height = dv.getUint16(2);
 }
 
 function _ace(div) {
@@ -844,7 +926,7 @@ function NARConsole(terminal, render) {
 
     const maxLines = 32;
 
-    var shown = [];
+    let shown = [];
 
     terminal.on('message', function(x) {
 
@@ -853,9 +935,10 @@ function NARConsole(terminal, render) {
         //const m = JSON.parse(x.data);
         //console.log(x);
 
-        for (var i = 0; i < x.length; i++) {
-            shown.push( x[i] );
-        }
+        //for (let i = 0; i < x.length; i++) {
+            //shown.push( x[i] );
+        //}
+        shown.push(x);
 
         //rr = _.concat(rr, x);
         //rr.push( render(m) );
@@ -941,6 +1024,5 @@ function TopTable(path) {
         }
     );
 
-    return e;
 
 }

@@ -113,20 +113,6 @@ public class Json {
         return o == null ? null : StringEscapeUtils.escapeJson(o.toString());
     }
 
-    public static void send(WebSocketChannel socket, Object object, WebSocketCallback t) {
-        if (object instanceof Object[]) {
-            WebSockets.sendText(Json.arrayToJson((Object[]) object, new StringBuilder()).toString(), socket, t);
-        } else if (object instanceof String) {
-            WebSockets.sendText((String) object, socket, t);
-        } else if (object instanceof StringBuilder) {
-            WebSockets.sendText(object.toString(), socket, t);
-        } else if (object instanceof ByteBuffer) {
-            WebSockets.sendText((ByteBuffer) object, socket, t);
-        } else {
-            WebSockets.sendText(Json.jsonize(object), socket, t);
-        }
-    }
-
     /* BROKEN */
     static class FastJsonStreamCoderFactory implements FSTConfiguration.StreamCoderFactory {
         protected final FSTConfiguration conf;

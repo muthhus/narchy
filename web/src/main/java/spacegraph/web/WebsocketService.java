@@ -1,22 +1,28 @@
 package spacegraph.web;
 
-import io.undertow.websockets.core.BufferedBinaryMessage;
-import io.undertow.websockets.core.StreamSourceFrameChannel;
-import io.undertow.websockets.core.WebSocketChannel;
+import io.undertow.websockets.core.*;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Websocket handler that interfaces with a NAR.
  * mounted at a path on the server
  */
 public abstract class WebsocketService extends AbstractWebsocketService {
+    private static final Logger logger = LoggerFactory.getLogger(WebsocketService.class);
 
-    protected final Set<WebSocketChannel> connections = Collections.synchronizedSet( new HashSet<>() );
+
+    protected final List<WebSocketChannel> connections = new CopyOnWriteArrayList();
+
 
 
 //    static {
@@ -31,19 +37,35 @@ public abstract class WebsocketService extends AbstractWebsocketService {
 
     }
 
+    public static void send(WebSocketChannel socket, Object object, WebSocketCallback t) {
+        if (object instanceof Object[]) {
+            WebSockets.sendText(Json.arrayToJson((Object[]) object, new StringBuilder()).toString(), socket, t);
+        } else if (object instanceof String) {
+            WebSockets.sendText((String) object, socket, t);
+        } else if (object instanceof StringBuilder) {
+            WebSockets.sendText(object.toString(), socket, t);
+        } else if (object instanceof byte[]) {
+            WebSockets.sendBinary(ByteBuffer.wrap((byte[]) object), socket, t);
+        } else if (object instanceof ByteBuffer) {
+            WebSockets.sendBinary((ByteBuffer) object, socket, t);
+        } else {
+            WebSockets.sendText(Json.jsonize(object), socket, t);
+        }
+    }
+
     /**
      * broadcast to all
      */
     public void send(Object object) {
-        for (WebSocketChannel s : connections)
-            send(s, object);
+        synchronized (connections) {
+            connections.forEach(x -> send(x, object));
+        }
     }
 
 
     @Override
     protected void onFullBinaryMessage(WebSocketChannel channel, BufferedBinaryMessage message) throws IOException {
-
-        //System.out.println(channel + " recv bin: " + message.getData());
+        logger.info("binar msg: {} {}", channel,  message.getData());
     }
 
     @Override

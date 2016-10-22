@@ -382,14 +382,13 @@ public class IRCAgent extends IRC {
         nar.confMin.setValue(0.05f);
         nar.compoundVolumeMax.setValue(volMax);
 
-        nar.activationGlobal.setValue(0.01f);
 
         nar.inputLater(
                 NQuadsRDF.stream(nar, new File(
                         "/home/me/Downloads/nquad"
                 )).
                         peek(t -> {
-                            t.setBudget(0.00f, 0.5f, 0.9f);
+                            t.setBudget(0.01f, 0.5f, 0.9f);
                         }).
                         collect(Collectors.toList())
                 , 32

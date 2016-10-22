@@ -5,15 +5,19 @@ const defaultWSPort = window.location.port || 8080;
 
 
 /** creates a websocket connection to a path on the server that hosts the currently visible webpage */
-window.socket = function(path) {
-    return new WebSocket('ws://' +
+const NARSocket = function(path) {
+    var ws = new WebSocket('ws://' +
         defaultHostname + ':' +
         defaultWSPort + '/' +
         path);
+    ws.binaryType = 'arraybuffer';
+    return ws;
 };
 
 
 
+/** stores metawidget live data; TODO use WeakMap */
+const mwdata = { };
 function SocketView(path, pathToElement, onData) {
 
     mwdata[path] = ''; //initially empty
@@ -41,8 +45,7 @@ function SocketView(path, pathToElement, onData) {
 }
 
 
-/** stores metawidget live data; TODO use WeakMap */
-var mwdata = { };
+
 
 function SocketMetaWidget(path) {
 
@@ -85,14 +88,16 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
     sg.onMsg = function(msg) {
         let v;
 
-        if (msg.data && typeof msg.data === "string") {
-            try {
-                v = JSON.parse(msg.data);
-            } catch (e) {
-                v = 'Error parsing: ' + e.data;
+        if (msg.data) {
+            if (typeof msg.data === "string") {
+                try {
+                    v = JSON.parse(msg.data);
+                } catch (e) {
+                    v = 'Error parsing: ' + e.data;
+                }
+            } else {
+                v = msg;
             }
-        } else {
-            v = msg;
         }
 
         const nodesToRemove = view.nodesShown || new Set();

@@ -3,6 +3,7 @@ package nars.web;
 import io.undertow.util.FastConcurrentDirectDeque;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
+import nars.IO;
 import nars.NAR;
 import nars.Task;
 import nars.nlp.Twenglish;
@@ -16,8 +17,6 @@ import spacegraph.web.WebsocketService;
 import java.io.IOException;
 import java.util.List;
 
-import static nars.time.Tense.ETERNAL;
-
 /**
  * Created by me on 4/21/16.
  */
@@ -29,7 +28,7 @@ public class NarseseIOService extends WebsocketService {
     private final NAR nar;
     private Active active;
 
-    FastConcurrentDirectDeque<Object[]> buffer = new FastConcurrentDirectDeque();
+    FastConcurrentDirectDeque<byte[]> outgoing = new FastConcurrentDirectDeque();
 
     public NarseseIOService(NAR n) {
         super();
@@ -40,7 +39,7 @@ public class NarseseIOService extends WebsocketService {
     public void onStart() {
 
         active = new Active(
-                nar.eventTaskProcess.on(this::queue),
+                nar.eventTaskProcess.on(this::output),
 //                nar.eventAnswer.on(t -> send(
 //                        "ANS: " + t)),
                 //nar.eventError.on(this::queue),
@@ -50,32 +49,35 @@ public class NarseseIOService extends WebsocketService {
     }
 
     protected void flush(NAR n) {
-        if (buffer.isEmpty())
+        if (outgoing.isEmpty())
             return;
 
-        FastConcurrentDirectDeque b = buffer;
-        buffer = new FastConcurrentDirectDeque();
-        CharSequence x = Json.collectionToJson(b, new StringBuilder(2048));
-        nar.runLater(()-> send(x));
+        FastConcurrentDirectDeque b = outgoing;
+        outgoing = new FastConcurrentDirectDeque();
+        //CharSequence x = Json.collectionToJson(b, new StringBuilder(2048));
+        //nar.runLater(()-> send(x));
     }
 
-    protected void queue(Task t) {
+    protected void output(Task t) {
         //buffer.add(t.toString());
-        Truth truth = t.truth();
-        long occ = t.occurrence();
-        buffer.add(
-            new Object[] {
-                String.valueOf(t.punc()),
-                Json.escape(t.term()),
-                truth!=null ? t.freq() : 0,
-                truth!=null ? t.conf() : 0,
-                occ!=ETERNAL ? occ : "",
-                Math.round(t.pri()*1000),
-                Math.round(t.dur()*1000),
-                Math.round(t.qua()*1000),
-                Json.escape(t.lastLogged())
-            }
-        );
+//        Truth truth = t.truth();
+//        long occ = t.occurrence();
+
+        send(IO.taskToBytes(t, IO.TaskSerialization.TermLast));
+
+//        buffer.add(
+//            new Object[] {
+//                String.valueOf(t.punc()),
+//                Json.escape(t.term()),
+//                truth!=null ? t.freq() : 0,
+//                truth!=null ? t.conf() : 0,
+//                occ!=ETERNAL ? occ : "",
+//                Math.round(t.pri()*1000),
+//                Math.round(t.dur()*1000),
+//                Math.round(t.qua()*1000),
+//                Json.escape(t.lastLogged())
+//            }
+//        );
     }
 
 
