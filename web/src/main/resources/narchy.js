@@ -940,10 +940,35 @@ function NARInputter(terminal, initialValue) {
 function NARConsole(terminal, render) {
 
     const view = $('<div/>').css('width', '100%').css('height', '100%');
+    const items = $('<div/>').appendTo(view);
 
     const maxLines = 256;
 
     let shown = [];
+
+    let queued = false;
+
+    const redraw = () => {
+
+        queued = false;
+
+        const oldItems = items[0];
+        const newItems = oldItems.cloneNode(false);
+        for (let a of Array.from(shown, render)) {
+            if (a) {
+                newItems.appendChild(a);
+            }
+        }
+        view[0].replaceChild(newItems, oldItems );
+        items[0] = newItems;
+
+
+        //setTimeout(() => {
+        const height = oldItems.scrollHeight;
+        view.scrollTop(height);
+        //}, 0);
+
+    };
 
     terminal.on('message', function(x) {
 
@@ -967,25 +992,13 @@ function NARConsole(terminal, render) {
             shown = shown.slice(len-maxLines, len-1);
         }
 
-        let queued = false;
 
         if (!queued) {
 
             queued = true;
 
-            setTimeout(() => {
 
-                queued = false;
-
-                view.empty().append(_.map(shown, render));
-
-                setTimeout(() => {
-                    const height = view[0].scrollHeight;
-                    view.scrollTop(height);
-                }, 0);
-
-
-            }, 0);
+            setTimeout(redraw, 0);
         }
 
 

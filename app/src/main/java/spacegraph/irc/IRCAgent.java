@@ -103,13 +103,11 @@ public class IRCAgent extends IRC {
 
                     String html = enWiki.getRenderedText(page);
                     html = StringEscapeUtils.unescapeHtml4(html);
-                    String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ");
-
-                    strippedText = strippedText.toLowerCase();
+                    String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ").toLowerCase();
 
                     //System.out.println(strippedText);
 
-                    hear(strippedText, page, null /*"wikipedia"*/);
+                    hear(strippedText, page);
 
                     return "Reading " + base + ":" + page + ": " + strippedText.length() + " characters";
 
@@ -285,7 +283,7 @@ public class IRCAgent extends IRC {
                         return;
                     }
                 } catch (GrappaException | Narsese.NarseseException f) {
-                    hear(msg, nick, null /*channel*/);
+                    hear(msg, nick);
                 }
             } catch (Exception e) {
                 pevent.respond(e.toString());
@@ -299,7 +297,11 @@ public class IRCAgent extends IRC {
     }
 
 
-    void hear(@NotNull String msg, @NotNull  String who, @Nullable String channel) {
+    void hear(@NotNull String msg, @NotNull  String who) {
+        hear(nar, msg, who, wordDelayMS);
+    }
+
+    static public Loop hear(NAR nar, @NotNull String msg, @NotNull  String src, int wordDelayMS) {
 //        nar.believe(
 //                $.inst($.p(tokenize(msg)), $.p($.quote(channel), $.quote(nick))),
 //                Tense.Present
@@ -308,9 +310,9 @@ public class IRCAgent extends IRC {
         final List<Term> tokens = tokenize(msg);
         if (!tokens.isEmpty()) {
 
-            Atom chan_nick = $.quote( channel!=null ? (channel + "/" + who) : who );
+            Atom chan_nick = $.quote( src );
 
-            new Loop(msg, wordDelayMS) {
+            return new Loop(msg, wordDelayMS) {
 
                 int token = 0;
 
@@ -335,6 +337,7 @@ public class IRCAgent extends IRC {
 //            });
         }
 
+        return null;
     }
 
     @NotNull

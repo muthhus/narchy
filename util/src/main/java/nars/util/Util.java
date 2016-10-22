@@ -1057,10 +1057,15 @@ public enum Util { ;
     }
 
     public static void time(Logger logger, String procName, Runnable procedure) {
+        long dt = time(procedure);
+        logger.info("{} ({} ms)", procName, dt);
+    }
+
+    public static long time(Runnable procedure) {
         long start = System.currentTimeMillis();
         procedure.run();
         long end = System.currentTimeMillis();
-        logger.info("{} ({} ms)", procName, (end-start));
+        return end - start;
     }
 
 //    public static File resourceAsFile(String resourcePath) {

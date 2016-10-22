@@ -28,7 +28,7 @@ public class NarseseIOService extends WebsocketService {
     static final Logger logger = LoggerFactory.getLogger(NarseseIOService.class);
 
     public static final int OUTPUT_CAPACITY = 128;
-    public static final int OUTPUT_RATE = 16;
+    public static final int OUTPUT_RATE = 4;
 
     private final NAR nar;
     private Active active;
