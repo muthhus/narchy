@@ -7,17 +7,26 @@ import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import nars.$;
-import nars.concept.Command;
+import nars.bag.Bag;
+import nars.concept.Concept;
+import nars.concept.Functor;
 import nars.nar.Default;
+import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
+import nars.term.atom.Atom;
+import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.irc.IRCAgent;
 import spacegraph.irc.IRCServer;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static io.undertow.Handlers.*;
 import static io.undertow.UndertowOptions.ENABLE_HTTP2;
@@ -27,7 +36,6 @@ import static spacegraph.irc.IRCAgent.newRealtimeNAR;
 
 
 public class WebServer /*extends PathHandler*/ {
-
 
 
     public final Undertow server;
@@ -46,11 +54,10 @@ public class WebServer /*extends PathHandler*/ {
     public WebServer(int httpPort) {
 
 
-
         this.path = path()
                 .addPrefixPath("/", resource(
 
-                        new FileResourceManager( getResourcePath().toFile(), 0 ))
+                        new FileResourceManager(getResourcePath().toFile(), 0))
 
 //                        new CachingResourceManager(
 //                                16384,
@@ -59,9 +66,9 @@ public class WebServer /*extends PathHandler*/ {
 //                                new PathResourceManager(getResourcePath(), 0, true, true),
 //                                0 //7 * 24 * 60 * 60 * 1000
 //                        ))
-                            .setCachable((x) -> false)
-                            .setDirectoryListingEnabled(true)
-                            .addWelcomeFiles("index.html")
+                                .setCachable((x) -> false)
+                                .setDirectoryListingEnabled(true)
+                                .addWelcomeFiles("index.html")
                 );
 
         //https://github.com/undertow-io/undertow/blob/master/examples/src/main/java/io/undertow/examples/sessionhandling/SessionServer.java
@@ -123,11 +130,39 @@ public class WebServer /*extends PathHandler*/ {
         @NotNull Default nar = newRealtimeNAR(2048, 8, 2);
         //Default nar = new Default();
 
-        nar.on(new Command("memstat") {
-            @Override public Term apply(Term[] terms) {
-                return $.quote(nar.concepts.summary());
+        nar.on("memstat", (terms) ->
+                $.quote(nar.concepts.summary())
+        );
+        nar.on("top", (terms) -> {
+
+                int length = 10;
+                List<Term> b = $.newArrayList();
+                @NotNull Bag<Concept> cbag = ((Default) nar).core.active;
+
+                String query;
+//            if (arguments.size() > 0 && arguments.term(0) instanceof Atom) {
+//                query = arguments.term(0).toString().toLowerCase();
+//            } else {
+                query = null;
+//            }
+
+                cbag.topWhile(c -> {
+                    String bs = c.get().toString();
+                    if (query == null || bs.toLowerCase().contains(query)) {
+                        b.add($.p(c.get().term(),
+                                $.quote(
+                                        //TODO better summary, or use a table representation
+                                        Texts.n2(c.pri())
+                                )));
+                    }
+                    return b.size() <= length;
+                });
+
+                return $.p(b);
             }
-        });
+
+        );
+
         new nars.web.NARServices(nar, w.path);
 
         //new IRCAgent(nar, "localhost", "NARchy", "#x");

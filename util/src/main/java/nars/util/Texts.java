@@ -281,7 +281,7 @@ public enum Texts {
         return (int) ((d * 10.0f + 0.5f));
     }
 
-    public static CharSequence n2(float x) {
+    public static String n2(float x) {
         if ((x < 0) || (x > 1.0f))
             return twoDecimal.format(x);
 

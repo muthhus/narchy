@@ -574,20 +574,25 @@ function decodeBiNARy(e, m) {
     //assume 'd' is a NAR serialized Task
     var j = 0;
     var punct = d.getUint8(j++);
+    //TODO use charCodePoint
     switch (punct) {
 
         case 46:
             punct = '.';
             break;
-        case 41:
+        case 33:
             punct = '!';
             break;
         case 63:
             punct = '?';
             break;
+        case 64:
+            punct = '@';
+            break;
         case 59:
             punct = ';';
             break;
+
 
         default:
 
@@ -618,8 +623,10 @@ function decodeBiNARy(e, m) {
 
     return {
         term: term,
-        punct: punct,
+        punc: punct,
         pri: pri,
+        dur: dur,
+        qua: qua,
         when: when,
         freq: freq,
         conf: conf

@@ -9,7 +9,7 @@ import nars.budget.Activation;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
-import nars.concept.Command;
+import nars.concept.Functor;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.util.InvalidConceptException;
@@ -55,9 +55,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static nars.$.*;
 import static nars.$.$;
 import static nars.Op.ATOM;
 import static nars.Op.INH;
@@ -349,7 +351,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
     @NotNull
     public List<Task> tasks(@NotNull String parse, @NotNull Consumer<Object[]> unparsed) {
-        List<Task> result = $.newArrayList(1);
+        List<Task> result = newArrayList(1);
         Narsese.the().tasks(parse, result, unparsed, this);
         return result;
     }
@@ -575,7 +577,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             throw new RuntimeException("null term for task");
         }
 
-        Task t = new MutableTask(term, punc, $.t(freq, conf))
+        Task t = new MutableTask(term, punc, t(freq, conf))
                 .budgetByTruth(pri, dur)
                 .time(time(), occurrenceTime);
 
@@ -739,26 +741,23 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             Concept functorConcept = concept(functor);
             if (functorConcept instanceof TermTransform) {
                 y = ((TermTransform) functorConcept).apply(args);
-            } else if (functorConcept instanceof Command) {
-                y = ((Command) functorConcept).apply(args);
+            } else if (functorConcept instanceof Functor) {
+                y = ((Functor) functorConcept).apply(args);
             } else {
-                logger.error("unrecognized command functor: {}", functor);
-                y = null;
+                y = the("unknown_command_functor");
             }
 
         } else {
-            logger.error("unrecognized command pattern: {}", x);
-            y = null;
+            y = the("unknown_command_pattern");
         }
 
+        Compound z = func(self, x, y); //form a compound by attaching SELF to it
 
-        if (y != null) {
-            Compound z = $.func(self, x, y); //form a compound by attaching SELF to it
-            logger.info(" {}", z);
-            eventTaskProcess.emit($.command(z));
-        }
+        logger.info(" {}", z);
 
-        return y;
+        eventTaskProcess.emit(command(z));
+
+        return z;
 
     }
 
@@ -1104,7 +1103,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     public NAR inputAt(long time, @NotNull String... tt) {
         //LongPredicate timeCondition = t -> t == time;
 
-        List<Task> x = $.newArrayList(tt.length);
+        List<Task> x = newArrayList(tt.length);
         for (String s : tt) {
             x.addAll(tasks(s));
         }
@@ -1335,6 +1334,16 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         return c;
     }
 
+    public final Concept on(String functor, Function<Term[],Term> f) {
+        Concept c = new Functor(functor) {
+            @Override public final Term apply(Term[] terms) {
+                return f.apply(terms);
+            }
+        };
+        concepts.set(c);
+        return c;
+    }
+
     /**
      * processes the input before the next frame has run
      */
@@ -1388,7 +1397,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         @Nullable ConceptPolicy prev = c.policy();
         if (prev != p) {
 
-            List<Task> removed = $.newArrayList();
+            List<Task> removed = newArrayList();
             c.policy(p, now, removed);
             tasks.remove(removed);
 

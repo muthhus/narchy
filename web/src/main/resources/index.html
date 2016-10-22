@@ -61,7 +61,6 @@
         }
 
         #input {
-            font-size: 200%;
             position: fixed;
             opacity: 0.8;
             /*background-color: orange;*/
@@ -74,6 +73,18 @@
 
         #input div {
             padding: 2px;
+        }
+        #console .belief {
+            color: white;
+        }
+        #console .command {
+            color: green;
+        }
+        #console .question {
+            color: cyan;
+        }
+        #console .goal {
+            color: orange;
         }
 
     </style>
@@ -92,13 +103,20 @@
                 new NARConsole(term, (x) => {
 
 
-                    const label = x.term + x.punct + truthString(x.freq, x.conf);
+                    const label = x.term + x.punc + truthString(x.freq, x.conf);
 
                     //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
-                    const fontSize = (100 + 3 * Math.sqrt(1 + 10 * parseInt(x.pri * 9.0))) + '%';
+                    const fontSize = (75 + 8 * Math.sqrt(1 + 10 * parseInt(x.pri * 9.0))) + '%';
 
 
                     var d = document.createElement('div');
+                    switch (x.punc) {
+                        case '.': d.className = 'belief'; break;
+                        case '?': d.className = 'question'; break;
+                        case '!': d.className = 'goal'; break;
+                        case ';': d.className = 'command'; break;
+                    }
+                    d.style.opacity = 0.5 + 0.5 * x.dur;
                     d.style.fontSize = fontSize;
                     d.innerText = label;
                     return d;
