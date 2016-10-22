@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.budget.Budget;
+import nars.budget.RawBudget;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -461,10 +462,8 @@ abstract public class NAgent implements NSense, NAction {
                 UtilityFunctions.aveAri(nar.priorityDefault('.'), nar.priorityDefault('!'))
                        /* / (predictors.size()/predictorProbability)*/ * predictorPriFactor;
 
-        Budget boostBudget = Budget.One.clone().multiplied(pri, 0.5f, 0.99f);
-
         for (int i = 0, predictorsSize = predictors.size(); i < predictorsSize; i++) {
-            predictors.set(i, boost(predictors.get(i), boostBudget));
+            predictors.set(i, boost(predictors.get(i)));
         }
     }
 
@@ -488,7 +487,7 @@ abstract public class NAgent implements NSense, NAction {
 //    }
 
 
-    private MutableTask boost(@NotNull MutableTask t, Budget budget) {
+    private MutableTask boost(@NotNull MutableTask t) {
 
         if (nar.random.nextFloat() > predictorProbability)
             return t;
@@ -499,14 +498,18 @@ abstract public class NAgent implements NSense, NAction {
                             .time(now, now + (t.occurrence() - t.creation()));
 
             s.evidence(t)
-                    .budget(budget)
                     .log("Agent Predictor");
 
             nar.inputLater(s);
             return s;
         } else {
 
-            t.budget(budget);
+
+            if (t.isDeleted()) {
+                //TODO check if dur or qua changed?
+                t.setBudget(nar.priorityDefault(t.punc()), t.dur(), t.qua());
+            }
+
             nar.inputLater(t);
             return t;
         }

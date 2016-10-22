@@ -1342,7 +1342,8 @@ public enum Util { ;
         try {
             Thread.sleep(periodMS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            //TODO
+            //e.printStackTrace();
         }
     }
 

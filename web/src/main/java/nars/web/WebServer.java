@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.irc.IRCAgent;
 import spacegraph.irc.IRCServer;
 
 import java.io.File;
@@ -127,10 +128,17 @@ public class WebServer /*extends PathHandler*/ {
 
         WebServer w = new WebServer(httpPort);
 
-        new IRCServer("localhost", 6667);
+        //new IRCServer("localhost", 6667);
 
         @NotNull Default nar = newRealtimeNAR(2048, 8, 2);
         //Default nar = new Default();
+
+//        new IRCAgent(nar,
+//                "experiment1", "irc.freenode.net",
+//                //"#123xyz"
+//                "#netention"
+//                //"#nars"
+//        ).start();
 
         nar.on("J", (terms) -> {
             //WARNING this is dangerous to allow open access
@@ -228,12 +236,7 @@ public class WebServer /*extends PathHandler*/ {
         //new IRCAgent(nar, "localhost", "NARchy", "#x");
 
 
-        /*new IRCAgent(nar,
-                "experiment1", "irc.freenode.net",
-                //"#123xyz"
-                "#netention"
-                //"#nars"
-        ).start();*/
+
 
 
     }

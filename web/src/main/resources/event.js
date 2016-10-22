@@ -27,7 +27,7 @@ class EventEmitter {
         }
         listeners.push(listener);
         if(listeners.length > this._maxListeners) {
-            error(
+            console.error(
                 "possible memory leak, added %i %s listeners, "+
                 "use EventEmitter#setMaxListeners(number) if you " +
                 "want to increase the limit (%i now)",
@@ -91,15 +91,16 @@ class EventEmitter {
 
     }
     emit(type, args){
+
         const listeners = this._events[type];
-        if(!listeners || !listeners.length) {
-            return false
+        if (listeners) {
+            for (let x of listeners)
+                x.apply(null, args);
         }
 
-        for (let i = 0; i < listeners.length; i++)
-            listeners[i].apply(null, args);
-
+        //for (let i = 0; i < listeners.length; i++)
         //listeners.forEach(function(fn) { fn.apply(null, args) })
+
         return true
     }
     setMaxListeners(newMaxListeners){

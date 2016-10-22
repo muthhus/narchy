@@ -44,13 +44,6 @@
 
 
             <plugin>
-                <groupId>io.takari.maven.plugins</groupId>
-                <artifactId>takari-lifecycle-plugin</artifactId>
-                <version>1.12.1</version>
-                <extensions>true</extensions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>

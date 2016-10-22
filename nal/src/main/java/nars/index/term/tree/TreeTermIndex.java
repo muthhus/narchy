@@ -159,9 +159,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
         r = (r * r); //r^8
         r = 1 - r;
 
-        int n = (int) Math.round((levels - 1) * r);
-
-        return l.get(n);
+        return l.get( Math.round((levels - 1) * r) );
     }
 
     private int sizeEst() {

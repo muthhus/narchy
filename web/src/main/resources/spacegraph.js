@@ -122,7 +122,103 @@ class Channel extends EventEmitter {
 }
 
 
+function cytoscapeOptions(opt, ready, target) {
 
+    return _.defaults(opt, {
+        ready: ready,
+        // initial viewport state:
+        zoom: 1,
+        pan: {x: 0, y: 0},
+        // interaction options:
+        minZoom: 1e-50,
+        maxZoom: 1e50,
+        zoomingEnabled: true,
+        userZoomingEnabled: true,
+        panningEnabled: true,
+        userPanningEnabled: true,
+        selectionType: 'single',
+        boxSelectionEnabled: false,
+        autolock: false,
+        autoungrabify: false,
+        autounselectify: true,
+        //fps: 25, //target max fps (frames per second)
+        // rendering options:
+        headless: false,
+        styleEnabled: true,
+        hideEdgesOnViewport: false,
+        hideLabelsOnViewport: false,
+        textureOnViewport: true, //true = higher performance, lower quality
+        motionBlur: false,
+        wheelSensitivity: 1,
+        //pixelRatio: 0.25, //downsample pixels
+        //pixelRatio: 0.5,
+        //pixelRatio: 1,
+
+        initrender: function (evt) { /* ... */
+        },
+
+
+        renderer: {
+            /* ... */
+            name: 'canvas',
+            showFps: false
+        },
+
+        container: target[0],
+
+        style: [
+            {
+                selector: 'node',
+                style: {
+                    'background-color': '#888',
+                    'label': 'data(label)',
+                    'text-valign': 'center',
+                    'text-halign': 'center',
+                    'color': '#fff',
+                    'font-family':  //keep short because this gets repeated as part of strings in the style system badly
+                        //'Arial',
+                        'Monospace',
+                    //'outside-texture-bg-opacity': 1,
+                    'shadow-blur': 0,
+                    'text-shadow-blur': 0,
+                    'shadow-opacity': 1,
+                    'min-zoomed-font-size': 5,
+                    'text-events': false,
+                    'border-width': 0
+                    /*border-width : The size of the node’s border.
+                                         border-style : The style of the node’s border; may be solid, dotted, dashed, or double.
+                                         border-color : The colour of the node’s border.
+                                         border-opacity : The opacity of the node’s border.*/
+                    /*'text-background-opacity': 1,
+                                         'text-background-color': '#ccc',
+                                         'text-background-shape': 'roundrectangle',
+                                         text-border-opacity : The width of the border around the label; the border is disabled for 0 (default value).
+                                         text-border-width : The width of the border around the label.
+                                         text-border-style : The style of the border around the label; may be solid, dotted, dashed, or double.
+                                         text-border-color : The colour of the border around the label.
+                                         text-shadow-blur : The shadow blur distance.
+                                         text-shadow-color : The colour of the shadow.
+                                         text-shadow-offset-x : The x offset relative to the text where the shadow will be displayed, can be negative. If you set blur to 0, add an offset to view your shadow.
+                                         text-shadow-offset-y : The y offset relative to the text where the shadow will be displayed, can be negative. If you set blur to 0, add an offset to view your shadow.
+                                         text-shadow-opacity : The opacity of the shadow on the text; the shadow is disabled for 0 (default value).
+                                         */
+                }
+            }
+            /*,
+                         {
+                         selector: '.background',
+                         style: {
+                         'text-background-opacity': 1,
+                         'text-background-color': '#ccc',
+                         'text-background-shape': 'roundrectangle',
+                         'text-border-color': '#000',
+                         'text-border-width': 1,
+                         'text-border-opacity': 1
+                         }
+                         }*/
+        ]
+    });
+}
 function spacegraph(targetWrapper, opt) {
 
     targetWrapper.addClass("spacegraph");
@@ -131,14 +227,16 @@ function spacegraph(targetWrapper, opt) {
     //var overlaylayer = $('<div class="overlay"></div>').prependTo(targetWrapper);
 
     //where cytoscape renders to:
-    var target = $('<div class="graph"></div>').appendTo(targetWrapper);
+    var target = $('<div class="graph"/>')
+                    .attr('oncontextmenu', "return false;")
+                    .appendTo(targetWrapper);
 
-    target.attr('oncontextmenu', "return false;");
-
-    var commitPeriodMS = 100;
-    var widgetUpdatePeriodMS = 5;
     var suppressCommit = false;
     var zoomDuration = 128; //ms
+
+    var frame =
+        //NodeFrame(this);
+        null;
 
 
     var ready = function() {
@@ -149,14 +247,25 @@ function spacegraph(targetWrapper, opt) {
         //http://js.cytoscape.org/#events/collection-events
 
         //overlay framenode --------------
-        var frame =
-            //NodeFrame(this);
-            null;
 
         var that = this;
 
 
         if (frame) {
+
+
+            const updateWidget = function(target, target2) {
+                if (target2)
+                    target = target2; //extra parameter to match the callee's list
+
+                //if (widget(target)) {
+                //var data = target.data();
+                s.updateNodeWidget(target); //that.updateNodeWidget(target);
+                //if (!data.updating) {
+                //data.updating = setTimeout(s.updateNodeWidget, widgetUpdatePeriodMS, target); //that.updateNodeWidget(target);
+                //}
+                //}
+            }
 
             this.updateAllWidgets = (/*_.throttle(*/function () {
 
@@ -231,110 +340,8 @@ function spacegraph(targetWrapper, opt) {
 //            }        
     };
 
-    function updateWidget(target, target2) {
-        if (target2)
-            target = target2; //extra parameter to match the callee's list
 
-        //if (widget(target)) {
-            //var data = target.data();
-            s.updateNodeWidget(target); //that.updateNodeWidget(target);
-            //if (!data.updating) {
-                //data.updating = setTimeout(s.updateNodeWidget, widgetUpdatePeriodMS, target); //that.updateNodeWidget(target);
-            //}
-        //}
-    }
-
-    opt = _.defaults(opt, {
-        ready: ready,
-        // initial viewport state:
-        zoom: 1,
-        pan: {x: 0, y: 0},
-        // interaction options:
-        minZoom: 1e-50,
-        maxZoom: 1e50,
-        zoomingEnabled: true,
-        userZoomingEnabled: true,
-        panningEnabled: true,
-        userPanningEnabled: true,
-        selectionType: 'single',
-        boxSelectionEnabled: false,
-        autolock: false,
-        autoungrabify: false,
-        autounselectify: true,
-        //fps: 25, //target max fps (frames per second)
-        layout: 'random',
-        // rendering options:
-        headless: false,
-        styleEnabled: true,
-        hideEdgesOnViewport: false,
-        hideLabelsOnViewport: false,
-        textureOnViewport: true, //true = higher performance, lower quality
-        motionBlur: false,
-        wheelSensitivity: 1,
-        //pixelRatio: 0.25, //downsample pixels
-        //pixelRatio: 0.5,
-        //pixelRatio: 1,
-
-        initrender: function (evt) { /* ... */ },
-
-
-        renderer: { /* ... */
-            name: 'canvas',
-            showFps: false
-        },
-        container: target[0],
-
-        style: [
-            {
-                selector: 'node',
-                style: {
-                    'background-color': '#888',
-                    'label': 'data(label)',
-                    'text-valign': 'center',
-                    'text-halign': 'center',
-                    'color': '#fff',
-                    'font-family':  //keep short because this gets repeated as part of strings in the style system badly
-                        'Arial',
-                        //'Monospace',
-                    //'outside-texture-bg-opacity': 1,
-                    'shadow-blur': 0,
-                    'text-shadow-blur': 0,
-                    'shadow-opacity': 0,
-                    'min-zoomed-font-size': 7,
-                    'text-events': false
-                    /*border-width : The size of the node’s border.
-        border-style : The style of the node’s border; may be solid, dotted, dashed, or double.
-        border-color : The colour of the node’s border.
-        border-opacity : The opacity of the node’s border.*/
-                    /*'text-background-opacity': 1,
-                    'text-background-color': '#ccc',
-                    'text-background-shape': 'roundrectangle',
-                    text-border-opacity : The width of the border around the label; the border is disabled for 0 (default value).
-                    text-border-width : The width of the border around the label.
-                    text-border-style : The style of the border around the label; may be solid, dotted, dashed, or double.
-                    text-border-color : The colour of the border around the label.
-                     text-shadow-blur : The shadow blur distance.
-                     text-shadow-color : The colour of the shadow.
-                     text-shadow-offset-x : The x offset relative to the text where the shadow will be displayed, can be negative. If you set blur to 0, add an offset to view your shadow.
-                     text-shadow-offset-y : The y offset relative to the text where the shadow will be displayed, can be negative. If you set blur to 0, add an offset to view your shadow.
-                     text-shadow-opacity : The opacity of the shadow on the text; the shadow is disabled for 0 (default value).
-                     */
-                }
-            }
-            /*,
-            {
-                selector: '.background',
-                style: {
-                    'text-background-opacity': 1,
-                    'text-background-color': '#ccc',
-                    'text-background-shape': 'roundrectangle',
-                    'text-border-color': '#000',
-                    'text-border-width': 1,
-                    'text-border-opacity': 1
-                }
-            }*/
-        ]
-    });
+    opt = cytoscapeOptions(opt, ready, target);
 
 
     var s = cytoscape(opt);
@@ -367,7 +374,7 @@ function spacegraph(targetWrapper, opt) {
 //      }
 //    });
 
-    s.channels = { };
+    //s.channels = { };
     //s.overlay = overlaylayer;
 
 
@@ -565,228 +572,228 @@ function spacegraph(targetWrapper, opt) {
         hs.transform = 'matrix(' + wx+ ',' + matb + ',' + matc + ',' + wy + ',' + px + ',' + py + ')';;
     };
 
-    s.nodeProcessor = [];
-
-    s.updateNode = function(n) {
-        var np = s.nodeProcessor;
-        for (var i = 0; i < np.length; i++)
-            np[i].apply(n);
-    };
-
-    s.addNode = function(n) {
-        var ee = s.get(n.id);
-        var se = spacegraphToCytoscape(n);
-
-        if (!ee) {
-            var added = s.add(se);
-            added.position({x: Math.random(), y: Math.random() });
-
-        } else {
-            ee.data(se);
-
-            if (n.style) {
-                _.each(n.style, function(v, k) {
-                    ee.css(k, v);
-                });
-            }
-
-
-        }
-    };
-
-    s.addNodes = function(nn) {
-        //HACK create a temporary channel and run through addChannel
-        // var cc = new Channel({
-        //     nodes: nn
-        // });
-        // this.addChannel(cc);
-        // return cc;
-
-        for (var n of nn)
-            s.addNode(n);
-    };
-
-
-    s.removeEdge= function(e) {
-        var ee = s.get(e);
-
-        if (ee) {
-            ee.remove();
-            return true;
-        }
-        return false;
-    };
-
-
-    s.addEdge = function(e) {
-        return s.addNode(e);
-        // var ee = s.get(e.id);
-        // var se = spacegraphToCytoscape(e);
-        // if (!ee) {
-        //     //s.addEdges([e]);
-        //     s.add(se);
-        //     return true;
-        // } else {
-        //     ee.data(se);
-        //     return false;
-        // }
-    };
-
-    s.addEdges = function(ee) {
-
-        for (var e of ee)
-            s.addEdge(e);
-
-    };
-
-    s.updateChannel = function(c) {
-
-        //TODO assign channel reference to each edge as done above with nodes
-
-        var that = this;
-
-        s.batch(function() {
-
-            var e = {
-                nodes: c.data.nodes ? c.data.nodes.map(spacegraphToCytoscape) : [], // c.data.nodes,
-                edges: c.data.edges ? c.data.edges.map(spacegraphToCytoscape) : [] //c.data.edges
-            };
-
-            if (c.data.style) {
-                var s = [       ];
-                for (var sel in c.data.style) {
-                    s.push({
-                        selector: sel,
-                        css: c.data.style[sel]
-                    });
-                }
-
-                if (s.length > 0) {
-                    //TODO merge style; this will replace it with c's        
-
-                    var style = that.style();
-                    style.clear();
-
-                    style.fromJson(s);
-                    style.update();
-                }
-            }
-
-            /*
-             for (var i = 0; i < e.nodes.length; i++) {
-             var n = e.nodes[i];
-             if (n.data && n.data.id)
-             that.remove('#' + n.data.id);
-             }
-             */
-
-            that.add( e );
-
-            var channelID = c.id();
-
-            //add position if none exist
-            for (var i = 0; i < e.nodes.length; i++) {
-                var n = e.nodes[i];
-                var ndata = n.data;
-                if (ndata && ndata.id) {
-                    var nn = that.nodes('[id="' + ndata.id + '"]');
-
-                    nn.addClass(channelID);
-
-                    that.updateNode(nn);
-
-                    var ep = nn.position();
-                    if (!ep || !ep.x) {
-                        //var ex = that.extent();
-                        var cx = Math.random() * 2 - 1; // * (ex.x1 + ex.x2);
-                        var cy = Math.random() * 2 - 1; // * (ex.y1 + ex.y2);
-
-                        //try {
-                            nn.position({x: cx, y: cy});
-                        //} catch (e) { }
-                    }
-                }
-            }
-
-            that.resize();
-
-            //suppressCommit = false;
-
-        });
-
-    };
-
-    // /** set and force layout update */
-    // s.setLayout = function(l){
+    // s.nodeProcessor = [];
     //
-    //     if (this.currentLayout)
-    //         if (this.currentLayout.stop)
-    //             this.currentLayout.stop();
+    // s.updateNode = function(n) {
+    //     var np = s.nodeProcessor;
+    //     for (var i = 0; i < np.length; i++)
+    //         np[i].apply(n);
+    // };
     //
-    //     var layout;
-    //     if (l.name) {
-    //         layout = this.makeLayout(l);
+    // s.addNode = function(n) {
+    //     var ee = s.get(n.id);
+    //     var se = spacegraphToCytoscape(n);
+    //
+    //     if (!ee) {
+    //         var added = s.add(se);
+    //         added.position({x: Math.random(), y: Math.random() });
+    //
+    //     } else {
+    //         ee.data(se);
+    //
+    //         if (n.style) {
+    //             _.each(n.style, function(v, k) {
+    //                 ee.css(k, v);
+    //             });
+    //         }
+    //
+    //
     //     }
-    //     else {
-    //         layout = l;
+    // };
+    //
+    // s.addNodes = function(nn) {
+    //     //HACK create a temporary channel and run through addChannel
+    //     // var cc = new Channel({
+    //     //     nodes: nn
+    //     // });
+    //     // this.addChannel(cc);
+    //     // return cc;
+    //
+    //     for (var n of nn)
+    //         s.addNode(n);
+    // };
+    //
+    //
+    // s.removeEdge= function(e) {
+    //     var ee = s.get(e);
+    //
+    //     if (ee) {
+    //         ee.remove();
+    //         return true;
     //     }
-    //
-    //     this.currentLayout = layout;
-    //
-    //     if (layout)
-    //         layout.run();
+    //     return false;
+    // };
     //
     //
-    //     //this.layout(this.currentLayout);
+    // s.addEdge = function(e) {
+    //     return s.addNode(e);
+    //     // var ee = s.get(e.id);
+    //     // var se = spacegraphToCytoscape(e);
+    //     // if (!ee) {
+    //     //     //s.addEdges([e]);
+    //     //     s.add(se);
+    //     //     return true;
+    //     // } else {
+    //     //     ee.data(se);
+    //     //     return false;
+    //     // }
+    // };
     //
-    //     /*if (this.currentLayout.eles)
-    //         delete this.currentLayout.eles;*/
+    // s.addEdges = function(ee) {
     //
-    //     //http://js.cytoscape.org/#layouts
-    //
+    //     for (var e of ee)
+    //         s.addEdge(e);
     //
     // };
-
-    /** depreated */
-    s.addChannel = function(c) {
-
-        var cid = c.id();
-
-        //var nodesBefore = this.nodes().size();
-        var existing = s.channels[cid];
-        if (existing) {
-            if (existing == c) {
-                this.updateChannel(c);
-                return;
-            } else {
-                this.removeChannel(existing);
-            }
-        }
-
-
-        this.channels[cid] = c;
-
-
-        this.updateChannel(c);
-
-        var that = this;
-        var l;
-        c.on('graphChange', function(graph, nodesAdded, edgesAdded, nodesRemoved, edgesRemoved) {
-            "use strict";
-            that.updateChannel(c);
-        });
-
-        /*if (s.currentLayout)
-            this.setLayout(s.currentLayout);*/
-
-    };
-
-    s.clear = function() {
-        for (var c in this.channels) {
-            var chan = s.channels[c];
-            this.removeChannel(chan);
-        }
-    };
+    //
+    // s.updateChannel = function(c) {
+    //
+    //     //TODO assign channel reference to each edge as done above with nodes
+    //
+    //     var that = this;
+    //
+    //     s.batch(function() {
+    //
+    //         var e = {
+    //             nodes: c.data.nodes ? c.data.nodes.map(spacegraphToCytoscape) : [], // c.data.nodes,
+    //             edges: c.data.edges ? c.data.edges.map(spacegraphToCytoscape) : [] //c.data.edges
+    //         };
+    //
+    //         if (c.data.style) {
+    //             var s = [       ];
+    //             for (var sel in c.data.style) {
+    //                 s.push({
+    //                     selector: sel,
+    //                     css: c.data.style[sel]
+    //                 });
+    //             }
+    //
+    //             if (s.length > 0) {
+    //                 //TODO merge style; this will replace it with c's
+    //
+    //                 var style = that.style();
+    //                 style.clear();
+    //
+    //                 style.fromJson(s);
+    //                 style.update();
+    //             }
+    //         }
+    //
+    //         /*
+    //          for (var i = 0; i < e.nodes.length; i++) {
+    //          var n = e.nodes[i];
+    //          if (n.data && n.data.id)
+    //          that.remove('#' + n.data.id);
+    //          }
+    //          */
+    //
+    //         that.add( e );
+    //
+    //         var channelID = c.id();
+    //
+    //         //add position if none exist
+    //         for (var i = 0; i < e.nodes.length; i++) {
+    //             var n = e.nodes[i];
+    //             var ndata = n.data;
+    //             if (ndata && ndata.id) {
+    //                 var nn = that.nodes('[id="' + ndata.id + '"]');
+    //
+    //                 nn.addClass(channelID);
+    //
+    //                 that.updateNode(nn);
+    //
+    //                 var ep = nn.position();
+    //                 if (!ep || !ep.x) {
+    //                     //var ex = that.extent();
+    //                     var cx = Math.random() * 2 - 1; // * (ex.x1 + ex.x2);
+    //                     var cy = Math.random() * 2 - 1; // * (ex.y1 + ex.y2);
+    //
+    //                     //try {
+    //                         nn.position({x: cx, y: cy});
+    //                     //} catch (e) { }
+    //                 }
+    //             }
+    //         }
+    //
+    //         that.resize();
+    //
+    //         //suppressCommit = false;
+    //
+    //     });
+    //
+    // };
+    //
+    // // /** set and force layout update */
+    // // s.setLayout = function(l){
+    // //
+    // //     if (this.currentLayout)
+    // //         if (this.currentLayout.stop)
+    // //             this.currentLayout.stop();
+    // //
+    // //     var layout;
+    // //     if (l.name) {
+    // //         layout = this.makeLayout(l);
+    // //     }
+    // //     else {
+    // //         layout = l;
+    // //     }
+    // //
+    // //     this.currentLayout = layout;
+    // //
+    // //     if (layout)
+    // //         layout.run();
+    // //
+    // //
+    // //     //this.layout(this.currentLayout);
+    // //
+    // //     /*if (this.currentLayout.eles)
+    // //         delete this.currentLayout.eles;*/
+    // //
+    // //     //http://js.cytoscape.org/#layouts
+    // //
+    // //
+    // // };
+    //
+    // /** depreated */
+    // s.addChannel = function(c) {
+    //
+    //     var cid = c.id();
+    //
+    //     //var nodesBefore = this.nodes().size();
+    //     var existing = s.channels[cid];
+    //     if (existing) {
+    //         if (existing == c) {
+    //             this.updateChannel(c);
+    //             return;
+    //         } else {
+    //             this.removeChannel(existing);
+    //         }
+    //     }
+    //
+    //
+    //     this.channels[cid] = c;
+    //
+    //
+    //     this.updateChannel(c);
+    //
+    //     var that = this;
+    //     var l;
+    //     c.on('graphChange', function(graph, nodesAdded, edgesAdded, nodesRemoved, edgesRemoved) {
+    //         "use strict";
+    //         that.updateChannel(c);
+    //     });
+    //
+    //     /*if (s.currentLayout)
+    //         this.setLayout(s.currentLayout);*/
+    //
+    // };
+    //
+    // s.clear = function() {
+    //     for (var c in this.channels) {
+    //         var chan = s.channels[c];
+    //         this.removeChannel(chan);
+    //     }
+    // };
 
     /** get an element (node or edge) */
     s.get = function(id) {
@@ -797,42 +804,42 @@ function spacegraph(targetWrapper, opt) {
 
 
 
-    s.removeNode = function(id) {
-        s.get(id).remove();
-    };
-
-    s.removeNodes = function(ids) {
-        //TODO use the right multi selector
-        var that = this;
-        that.batch(function() {
-            _.each(ids, function(id) {
-                that.removeNode(id);
-            });
-        });
-    };
-
-    s.removeChannel = function(c) {
-
-        c.off();
-
-        s.removeNode(c.id());
-
-        //TODO remove style
-
-        delete s.channels[c.id()];
-        //c.destroy();
-
-        //s.layout();
-
-    };
-
-    s.commit = _.throttle(function() {
-        var cc = s.channels;
-        for (var i in cc)
-            cc[i].commit();
-    }, commitPeriodMS);
-
-    // ----------------------
+    // s.removeNode = function(id) {
+    //     s.get(id).remove();
+    // };
+    //
+    // s.removeNodes = function(ids) {
+    //     //TODO use the right multi selector
+    //     var that = this;
+    //     that.batch(function() {
+    //         _.each(ids, function(id) {
+    //             that.removeNode(id);
+    //         });
+    //     });
+    // };
+    //
+    // s.removeChannel = function(c) {
+    //
+    //     c.off();
+    //
+    //     s.removeNode(c.id());
+    //
+    //     //TODO remove style
+    //
+    //     delete s.channels[c.id()];
+    //     //c.destroy();
+    //
+    //     //s.layout();
+    //
+    // };
+    //
+    // s.commit = _.throttle(function() {
+    //     var cc = s.channels;
+    //     for (var i in cc)
+    //         cc[i].commit();
+    // }, commitPeriodMS);
+    //
+    // // ----------------------
 
     s.on('cxttapstart', function(e) {
         var target = e.cyTarget;
@@ -928,15 +935,17 @@ function spacegraph(targetWrapper, opt) {
 
     });
 
-    s.on('remove', function(e) {
-        var node = e.cyTarget;
+    if (frame) {
+        s.on('remove', function (e) {
+            var node = e.cyTarget;
 
-        var widget = node.data('widget');
-        if (widget) {
-            //remove an associated widget (html div in overlay)
-            widget.element.remove();
-        }
-    });
+            var widget = node.data('widget');
+            if (widget) {
+                //remove an associated widget (html div in overlay)
+                widget.element.remove();
+            }
+        });
+    }
 
 
 
@@ -960,8 +969,8 @@ function spacegraph(targetWrapper, opt) {
     };
 
 
-    //enable popup menu
-    newSpacePopupMenu(s);
+    // //enable popup menu
+    // newSpacePopupMenu(s);
 
 
     return s;

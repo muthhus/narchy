@@ -537,20 +537,25 @@ function NARTerminal() {
     ws.onopen = function() {
         e.emit('connect', this);
     };
+
     ws.onmessage = function(m) {
 
+        let d = m.data;
 
-        if (typeof m.data === "string") {
-            try {
-                const x = JSON.parse(m.data);
-                e.emit('message', [x]);
-            } catch (e) {
-                console.error(e, m.data);
-            }
-        } else {
-            e.emit('message', [decodeBiNARy(e, m.data)]);
+        try {
+
+            e.emit('message', [
+                (typeof d === "string") ?
+                    JSON.parse(d) :
+                    decodeBiNARy(e, d)
+            ] );
+
+        } catch (e) {
+            console.error(e, d);
         }
+
     };
+
     ws.onclose = function() {
         e.emit('disconnect', this);
     };
@@ -697,103 +702,6 @@ function NALEditor(terminal, initialValue) {
     return div;
 }
 
-function NALTimeline(terminal) {
-
-
-    const div = $('<div/>');
-
-    cytoscape({
-
-        container: div,
-
-        elements: [
-            { // node n1
-                group: 'nodes', // 'nodes' for a node, 'edges' for an edge
-                // NB the group field can be automatically inferred for you but specifying it
-                // gives you nice debug messages if you mis-init elements
-
-                // NB: id fields must be strings or numbers
-                data: { // element data (put dev data here)
-                    id: 'n1', // mandatory for each element, assigned automatically on undefined
-                    parent: 'nparent', // indicates the compound node parent id; not defined => no parent
-                },
-
-                // scratchpad data (usually temp or nonserialisable data)
-                scratch: {
-                    foo: 'bar'
-                },
-
-                position: { // the model position of the node (optional on init, mandatory after)
-                    x: 100,
-                    y: 100
-                },
-
-                selected: false, // whether the element is selected (default false)
-
-                selectable: true, // whether the selection state is mutable (default true)
-
-                locked: false, // when locked a node's position is immutable (default false)
-
-                grabbable: true, // whether the node can be grabbed and moved by the user
-
-                classes: 'foo bar' // a space separated list of class names that the element has
-            },
-
-            { // node n2
-                data: { id: 'n2' },
-                renderedPosition: { x: 200, y: 200 } // can alternatively specify position in rendered on-screen pixels
-            },
-
-            { // node n3
-                data: { id: 'n3', parent: 'nparent' },
-                position: { x: 123, y: 234 }
-            },
-
-            { // node nparent
-                data: { id: 'nparent', position: { x: 200, y: 100 } }
-            },
-
-            { // edge e1
-                data: {
-                    id: 'e1',
-                    // inferred as an edge because `source` and `target` are specified:
-                    source: 'n1', // the source node id (edge comes from this node)
-                    target: 'n2'  // the target node id (edge goes to this node)
-                }
-            }
-        ],
-
-        layout: {
-            name: 'preset'
-        },
-
-        // so we can see the ids etc
-        style: [
-            {
-                selector: 'node',
-                style: {
-                    'content': 'data(id)'
-                }
-            },
-
-            {
-                selector: ':parent',
-                style: {
-                    'background-opacity': 0.6
-                }
-            }
-        ]
-
-    });
-
-
-
-    terminal.on('message', function(x) {
-        console.log(x);
-    });
-
-    return div;
-}
 
 
 function NARSpeechRecognition(editor) {
@@ -939,7 +847,7 @@ function NARInputter(terminal, initialValue) {
 
 function NARConsole(terminal, render) {
 
-    const view = $('<div/>').css('width', '100%').css('height', '100%');
+    const view = $('<div/>');//.css('width', '100%').css('height', '100%');
     const items = $('<div/>').appendTo(view);
 
     const maxLines = 256;
@@ -964,7 +872,7 @@ function NARConsole(terminal, render) {
 
 
         //setTimeout(() => {
-        const height = oldItems.scrollHeight;
+        const height = newItems.scrollHeight;
         view.scrollTop(height);
         //}, 0);
 
@@ -1028,25 +936,25 @@ function NARConsole(terminal, render) {
 }
 
 function TopTable(path) {
-    const e = $('<div/>').attr('class', 'ConceptTable').css('overflow', 'scroll');
+    const e = $('<div/>').attr('class', 'ConceptTable');
 
     function row(c) {
         const pri = c[1] / 1000.0;
         const dur = c[2] / 1000.0;
         const qua = c[3] / 1000.0;
 
-        return $(document.createElement('span'))
-            .attr('class', 'ConceptRow')
-            .attr('style',
-                    'font-size:' +
-                        parseInt(100.0 + 3 * 100.0*pri) +
-                    '%; color: rgb(' +
-                        parseInt(128 + 128 * pri) + ',' +
-                        parseInt(64 + 192 * dur) + ',' +
-                        parseInt(64 + 192 * qua) +
-                    ')'
-            )
-            .text(c[0]);
+        const e = document.createElement('span');
+
+        e.className = 'ConceptRow';
+        e.style.fontSize = parseInt(70.0 + 2 * 100.0*pri) + '%';
+        e.style.color = 'rgb(' +
+            parseInt(128 + 128 * pri) + ',' +
+            parseInt(64 + 192 * dur) + ',' +
+            parseInt(64 + 192 * qua) +
+            ')';
+        e.innerText = c[0];
+
+        return e;
     }
 
 

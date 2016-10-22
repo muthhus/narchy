@@ -59,13 +59,13 @@ public class TaskBudgeting {
         //volRatioScale = (float) Math.pow(volRatioScale, 2);
 
 
-        final float durability = baseBudget.dur() * occam;
+        final float durability = baseBudget.dur() * occam * derivationQuality;
         if (durability < minDur)
             return null;
 
         float baseQuality = baseBudget.qua();
 
-        final float quality = and(baseQuality, derivationQuality);
+        final float quality = /*and(baseQuality, */derivationQuality/*)*/;
 
 
         float priority =
@@ -73,7 +73,7 @@ public class TaskBudgeting {
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 baseBudget.pri()
-                        //* occam;
+                        * occam
                         * derivationQuality
                         //;
         ;

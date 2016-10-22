@@ -6,9 +6,10 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 
     <style type="text/css">
-        @import url("terminal.css");
+
         @import url("spacegraph.dark.css");
         @import url("spacegraph.css");
+
     </style>
 
     <script src="lib/lodash/dist/lodash.min.js"></script>
@@ -16,10 +17,17 @@
     <script src="lib/jquery/dist/jquery.min.js"></script>
     <script src="lib/jquery-ui/jquery-ui.min.js"></script>
 
+
+    <link rel="stylesheet" href="lib/gridstack/dist/gridstack.min.css"/>
+    <script src="lib/gridstack/dist/gridstack.min.js"></script>
+
+
     <script src="lib/cytoscape/dist/cytoscape.min.js"></script>
+    <script src="cytoscape-spread/cytoscape-spread.js"></script>
 
     <script src="lib/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="lib/ace-builds/src-min-noconflict/theme-vibrant_ink.js" type="text/javascript" charset="utf-8"></script>
+    <script src="lib/ace-builds/src-min-noconflict/theme-vibrant_ink.js" type="text/javascript"
+            charset="utf-8"></script>
     <script src="lib/ace-builds/src-min-noconflict/mode-lisp.js" type="text/javascript" charset="utf-8"></script>
 
     <script src="event.js"></script>
@@ -32,9 +40,14 @@
 
     <script src="narchy.js"></script>
     <script src="index.js"></script>
-    <link rel="stylesheet" href="index.css" />
 
     <style>
+        html {
+            font-family: monospace, monospace !important;
+            font-stretch: condensed;
+            font-size: 1em; /* see: http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/ */
+        }
+
         body {
             position: fixed;
             margin: 0;
@@ -42,123 +55,317 @@
             border: 0;
             width: 100%;
             height: 100%;
-            font-family: monospace !important;
         }
 
         #graph {
-            position: fixed;
             width: 100%;
             height: 100%;
             opacity: 0.85;
         }
 
         #console {
-            position: fixed;
-            width: 100%;
-            max-height: 90%;
+            max-height: 95%;
             overflow-y: auto;
             overflow-x: hidden;
         }
 
         #input {
             position: fixed;
+            width: 100%;
+
             opacity: 0.8;
             /*background-color: orange;*/
             border-top: 2px solid gray;
             bottom: 0;
             left: 0;
             padding: 0 !important;
-            width: 100%;
             height: 2em !important;
         }
 
         #input div {
             padding: 2px;
         }
+
+        div.ConceptTable {
+            font-family: monospace;
+        }
+
         #console .belief {
             color: white;
         }
+
         #console .command {
             color: greenyellow;
         }
+
         #console .question {
             color: #8e70ff;
         }
+
         #console .goal {
             color: orange;
+        }
+
+        .grid-stack-item {
+            border: 2px solid green;
+        }
+
+        .max {
+            width: 100%;
+            height: 100%;
         }
 
     </style>
 </head>
 
-<body style="position: fixed; width: 100%; height: 100%; ">
-    <script>
+<body class="max">
 
-        $(document).ready(()=>{
+</body>
 
-            const term = NARTerminal();
+<script>
 
-            $('body').append(
-
-
-                new NARConsole(term, (x) => {
+    function gridCell(contents) {
+        return div('grid-stack-item').append(div('grid-stack-item-content').append(contents));
+    }
 
 
-                    const label = x.term + x.punc + truthString(x.freq, x.conf);
+    $(document).ready(() => {
 
-                    //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
-                    const fontSize = (75 + 8 * Math.sqrt(1 + 10 * parseInt(x.pri * 9.0))) + '%';
+        const io = NARTerminal();
+        window.io = io;
 
-
-                    var d = document.createElement('div');
-                    switch (x.punc) {
-                        case '.': d.className = 'belief'; break;
-                        case '?': d.className = 'question'; break;
-                        case '!': d.className = 'goal'; break;
-                        case ';': d.className = 'command'; break;
-                    }
-                    d.style.opacity = 0.5 + 0.5 * x.dur;
-                    d.style.fontSize = fontSize;
-                    d.innerText = label;
-                    return d;
+        $('body').append(
+            //IO(term)
+            Graph(io)
+        );
 
 
-                }).attr('id', 'console'),
+        //$('body').append(SocketNARGraph("active")).attr('id', 'graph').appendTo(body);
 
-                NALEditor(term).attr('id', 'input')
-            );
+        //$('body').append(TopTable("active"));
+    });
 
-            //NALTimeline(term).attr('id', 'graph').appendTo(body);
 
-            //$('body').append(SocketNARGraph("active")).attr('id', 'graph').appendTo(body);
+    function Graph(terminal) {
 
-            //$('body').append(TopTable("active"));
+
+        const d = div('graph max');
+
+        var opt = {
+
+
+            //additional options and overrides for defaults
+        };
+
+        var c = spacegraph(d, opt);
+
+        const colorFunc = function (r, g, b) {
+
+            const R = parseInt(r * 255);
+            const G = parseInt(g * 255);
+            const B = parseInt(b * 255);
+
+            return "rgb(" + R + "," + G + "," + B + ")";
+
+        };
+
+        var changed = true;
+
+//        c.onRender(()=>{
+//           console.log('render');
+//           changed = false;
+//        });
+
+        const maxNodes = 96;
+        const updatePeriodMS = 50;
+
+
+        const layout = c.makeLayout({
+            /* https://github.com/cytoscape/cytoscape.js-spread */
+            name: 'spread',
+            minDist: 250,
+            //padding: 100,
+
+            speed: 0.06,
+            animate: false,
+            randomize: false, // uses random initial node positions on true
+            fit: false,
+            maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
+            maxExpandIterations: 2, // Maximum number of expanding iterations
+
+            ready: function () {
+                //console.log('starting spread', Date.now());
+            },
+            stop: function () {
+                //console.log('stop spread', Date.now());
+            }
         });
 
 
+        setInterval(() => {
 
-        function truthComponentStr(x) {
+            layout.run();
 
-            const i = parseInt(Math.round(100 * x));
-            if (i == 100)
-                return '1.0';
-            else if (i == 0)
-                return '0.0';
-            else
-                return i / 100.0;
+            if (!changed)
+                return;
+
+            c.batch(() => {
+
+                const nodes = c.nodes();
+                const toRemove = (nodes.size()) - maxNodes;
+                if (toRemove > 0) {
+                    //console.log(nodes.size(), 'oversize');
+                    var sorted = nodes.sort((a, b) => {
+                        //increasing priority
+                        return a._private.data.pri - b._private.data.pri;
+                    });
+
+                    for (var i = 0; i < toRemove; i++) {
+                        //console.log(sorted[i], 'removed');
+                        sorted[i].remove();
+                    }
+                    //console.log(nodes.size(), 'current size');
+                }
+
+
+                nodes.each((i, n) => {
+                    var x = n._private.data; //HACK
+                    if (x) {
+
+                        const p1 = 1 + x.pri; // * d(x, 'belief');
+                        const r = parseInt(24 + 48 * (p1 * p1));
+                        n.style({
+                            //                       sg.spacegraph.style().selector('node')
+                            //                       .style('background-color', function(x) {
+                            //                           const belief = 0.25 + 0.75 * d(x, 'belief');
+                            //                           const aBelief = 0.25 + 0.75 * Math.abs(belief);
+                            //                           const pri = 0.25 + 0.75 * d(x, 'pri');
+                            width: r,
+                            height: r,
+                            shape: 'hexagon',
+                            backgroundColor: colorFunc(0.25 + 0.75 * x.pri, x.dur, x.qua)
+
+
+                        });
+                    }
+                });
+            });
+
+            changed = false;
+
+        }, updatePeriodMS);
+
+        terminal.on('message', function (x) {
+            var id = x.term + x.punc + x.freq + ';' + x.conf; //HACK for Task's
+            x.label = x.term; //HACK
+
+            var existing = c.get(id);
+
+            if (!existing) {
+
+                //add
+                c.add({group: "nodes", data: x});
+
+            } else {
+                //replace / merge
+                existing.data = x;
+            }
+
+            changed = true;
+        });
+
+
+        return d;
+    }
+
+    function IO(term) {
+
+        return div().append(
+            new NARConsole(term, (x) => {
+
+
+                const label = x.term + x.punc + truthString(x.freq, x.conf);
+
+                //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
+                const fontSize = (75 + 8 * Math.sqrt(1 + 10 * parseInt(x.pri * 9.0))) + '%';
+
+
+                var d = document.createElement('div');
+                switch (x.punc) {
+                    case '.':
+                        d.className = 'belief';
+                        break;
+                    case '?':
+                        d.className = 'question';
+                        break;
+                    case '!':
+                        d.className = 'goal';
+                        break;
+                    case ';':
+                        d.className = 'command';
+                        break;
+                }
+                d.style.opacity = 0.5 + 0.5 * x.dur;
+                d.style.fontSize = fontSize;
+                d.innerText = label;
+                return d;
+
+
+            }).attr('id', 'console'),
+
+            NALEditor(term).attr('id', 'input')
+        );
+
+    }
+
+
+    function truthComponentStr(x) {
+
+        const i = parseInt(Math.round(100 * x));
+        if (i == 100)
+            return '1.0';
+        else if (i == 0)
+            return '0.0';
+        else
+            return i / 100.0;
+    }
+
+    function truthString(f, c) {
+        return c ?
+            ("%" + truthComponentStr(f) +
+            ";" + truthComponentStr(c) + "%") :
+            "";
+    }
+
+    function div(cssklass) {
+        const d = document.createElement('div');
+        if (cssklass) {
+            d.className = cssklass;
         }
+        return $(d);
+    }
 
-        function truthString(f, c) {
-            return c ?
-                ("%" + truthComponentStr(f) +
-                ";" + truthComponentStr(c) + "%") :
-                "";
-        }
 
-        function div() {
-            return $(document.createElement('div'));
-        }
+    //            div('max grid-stack').append(
+    //
+    //                gridCell([
 
-    </script>
-</body>
+
+    //                ]),
+    //
+    //                //gridCell(div().html('<h1>ABC</h1>')),
+    //                //gridCell( NALTimeline(term).attr('id', 'graph') ),
+    //
+    //                gridCell( TopTable("active") )
+
+    //            ).gridstack({
+    //                cellHeight: 160,
+    //                cellWidth: 160,
+    //                verticalMargin: 20,
+    //                horizontalMargin: 20
+    //            })
+
+
+</script>
+
 </html>

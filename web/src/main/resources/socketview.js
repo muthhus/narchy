@@ -16,15 +16,13 @@ const NARSocket = function(path) {
 
 
 
-/** stores metawidget live data; TODO use WeakMap */
-const mwdata = { };
+
 function SocketView(path, pathToElement, onData) {
 
-    mwdata[path] = ''; //initially empty
 
     const view = pathToElement(path);
 
-    const ws = window.socket(path);
+    const ws = NARSocket(path);
 
     ws.onopen = function () {
         //state.html("Connected");

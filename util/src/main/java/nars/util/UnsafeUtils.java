@@ -1,7 +1,8 @@
 package nars.util;
 
 
-import sun.misc.Unsafe;
+
+import jdk.internal.misc.Unsafe;
 
 import java.lang.reflect.Field;
 
