@@ -955,16 +955,26 @@ function NARConsole(terminal, render) {
             shown = shown.slice(len-maxLines, len-1);
         }
 
-        setTimeout(function() {
-            view.empty().append(_.map(shown, render));
+        var queued = false;
+
+        if (!queued) {
+
+            queued = true;
+
+            setTimeout(() => {
+
+                queued = false;
+
+                view.empty().append(_.map(shown, render));
+
+                setTimeout(() => {
+                    var height = view[0].scrollHeight;
+                    view.scrollTop(height);
+                }, 0);
 
 
-
-            var height = view[0].scrollHeight;
-            view.scrollTop(height);
-
-        }, 0);
-
+            }, 0);
+        }
 
 
             // const lines = editor.session.getLength() + newTasks.length;

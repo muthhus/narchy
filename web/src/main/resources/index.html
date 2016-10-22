@@ -73,10 +73,10 @@
             height: 2em !important;
         }
 
-        .row {
-            padding: 5px;
-
+        #input div {
+            padding: 2px;
         }
+
     </style>
 </head>
 
@@ -95,7 +95,7 @@
                 //render Task
                 function truthComponentStr(x) {
 
-                    const i = parseInt(100 * x);
+                    const i = parseInt(Math.round(100 * x));
                     if (i == 100)
                         return '1.0';
                     else if (i == 0)
@@ -109,10 +109,14 @@
                     ";" + truthComponentStr(x.conf) + "%" : "");
 
                 //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
-                const fontSize = 4 * (1 + 10 * parseInt(x.pri * 9.0)) + '%';
+                const fontSize = (100 + 3 * (1 + 10 * parseInt(x.pri * 9.0))) + '%';
 
 
-                return div().attr('class', 'row').css('font-size', fontSize).text(label);
+                var d = document.createElement('div');
+                d.style.fontSize = fontSize;
+                d.innerText = label;
+                return d;
+
 
             }).attr('id', 'console').appendTo(body);
 

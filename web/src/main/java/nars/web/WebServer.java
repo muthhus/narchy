@@ -13,6 +13,8 @@ import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.irc.IRC;
+import spacegraph.irc.IRCAgent;
 import spacegraph.irc.IRCServer;
 
 import java.io.File;
@@ -128,6 +130,13 @@ public class WebServer /*extends PathHandler*/ {
 
         //new IRCAgent(nar, "localhost", "NARchy", "#x");
 
+
+        new IRCAgent(nar,
+                "experiment1", "irc.freenode.net",
+                //"#123xyz"
+                "#netention"
+                //"#nars"
+        ).start();
 
 
     }

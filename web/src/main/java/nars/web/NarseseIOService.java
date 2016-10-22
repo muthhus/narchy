@@ -6,6 +6,10 @@ import io.undertow.websockets.core.WebSocketChannel;
 import nars.IO;
 import nars.NAR;
 import nars.Task;
+import nars.bag.Bag;
+import nars.bag.impl.CurveBag;
+import nars.budget.merge.BudgetMerge;
+import nars.link.BLink;
 import nars.nlp.Twenglish;
 import nars.truth.Truth;
 import nars.util.event.Active;
@@ -16,6 +20,7 @@ import spacegraph.web.WebsocketService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by me on 4/21/16.
@@ -25,14 +30,23 @@ public class NarseseIOService extends WebsocketService {
 
     static final Logger logger = LoggerFactory.getLogger(NarseseIOService.class);
 
+    public static final int OUTPUT_CAPACITY = 128;
+    public static final int OUTPUT_RATE = 16;
+
     private final NAR nar;
     private Active active;
+
+    final Bag<Task> output;
+    final AtomicBoolean queued = new AtomicBoolean(false);
 
     //FastConcurrentDirectDeque<byte[]> outgoing = new FastConcurrentDirectDeque();
 
     public NarseseIOService(NAR n) {
         super();
         this.nar =  n;
+        output = new CurveBag<Task>(BudgetMerge.plusBlend, nar.random);
+        output.setCapacity(OUTPUT_CAPACITY);
+
     }
 
     @Override
@@ -48,36 +62,30 @@ public class NarseseIOService extends WebsocketService {
 
     }
 
-//    protected void flush(NAR n) {
-//        //if (outgoing.isEmpty())
-//            //return;
-//
+    protected void flush() {
+        BLink<Task> tl;
+
+        output.commit();
+
+        int remaining = OUTPUT_RATE;
+        while (remaining-- > 0 && (tl = output.pop())!=null) {
+            send(IO.taskToBytes(tl.get(), IO.TaskSerialization.TermLast));
+        }
+        queued.set(false);
+
 ////        FastConcurrentDirectDeque b = outgoing;
 ////        outgoing = new FastConcurrentDirectDeque();
 //        //CharSequence x = Json.collectionToJson(b, new StringBuilder(2048));
 //        //nar.runLater(()-> send(x));
-//    }
+    }
 
     protected void output(Task t) {
-        //buffer.add(t.toString());
-//        Truth truth = t.truth();
-//        long occ = t.occurrence();
 
-        send(IO.taskToBytes(t, IO.TaskSerialization.TermLast));
+        output.put(t);
 
-//        buffer.add(
-//            new Object[] {
-//                String.valueOf(t.punc()),
-//                Json.escape(t.term()),
-//                truth!=null ? t.freq() : 0,
-//                truth!=null ? t.conf() : 0,
-//                occ!=ETERNAL ? occ : "",
-//                Math.round(t.pri()*1000),
-//                Math.round(t.dur()*1000),
-//                Math.round(t.qua()*1000),
-//                Json.escape(t.lastLogged())
-//            }
-//        );
+        if (queued.compareAndSet(false, true))
+            nar.runLater(this::flush);
+
     }
 
 

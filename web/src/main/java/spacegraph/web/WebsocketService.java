@@ -57,9 +57,13 @@ public abstract class WebsocketService extends AbstractWebsocketService {
      * broadcast to all
      */
     public void send(Object object) {
-        synchronized (connections) {
-            connections.forEach(x -> send(x, object));
+
+        for (WebSocketChannel x : connections) {
+            send(x, object);
         }
+//        synchronized (connections) {
+//            connections.forEach(x -> send(x, object));
+//        }
     }
 
 
@@ -84,15 +88,20 @@ public abstract class WebsocketService extends AbstractWebsocketService {
     public void onConnect(WebSocketHttpExchange exchange, WebSocketChannel socket) {
 
 
-        if (connections.isEmpty()) {
-            onStart();
+        synchronized (connections) {
+
+            if (connections.isEmpty()) {
+                onStart();
+            }
+
+            connections.add(socket);
         }
 
-        socket.getReceiveSetter().set(this);
         socket.resumeReceives();
 
+        socket.getReceiveSetter().set(this);
+
         onConnect(socket);
-        connections.add(socket);
 
     }
 
@@ -109,10 +118,13 @@ public abstract class WebsocketService extends AbstractWebsocketService {
     protected void onClose(WebSocketChannel socket, StreamSourceFrameChannel channel) throws IOException {
 
         onDisconnect(socket);
-        connections.remove(socket);
 
-        if (connections.isEmpty()) {
-            onStop();
+        synchronized (connections) {
+            connections.remove(socket);
+
+            if (connections.isEmpty()) {
+                onStop();
+            }
         }
 
     }

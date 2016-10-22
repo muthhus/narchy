@@ -65,7 +65,7 @@ public class IRCAgent extends IRC {
     private final NAR nar;
     //private float ircMessagePri = 0.9f;
 
-    final int wordDelayMS = 150; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
+    final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
 
     public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);
@@ -373,7 +373,7 @@ public class IRCAgent extends IRC {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 1f;
+        float p = 0.01f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
