@@ -3,7 +3,6 @@ package nars.nal.nal8.operator;
 
 import nars.$;
 import nars.Task;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

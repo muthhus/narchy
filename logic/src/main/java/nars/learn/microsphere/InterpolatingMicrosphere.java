@@ -25,8 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static nars.util.Util.sqr;
-
 
 /**
  * Utility class for the {@link MicrosphereProjectionInterpolator} algorithm.

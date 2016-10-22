@@ -6,7 +6,6 @@ import nars.budget.Budgeted;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.link.DependentBLink;
-import nars.term.Term;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;

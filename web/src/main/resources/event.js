@@ -88,7 +88,7 @@ class EventEmitter {
             return;
         }
         listeners.splice(indexOfListener, 1);
-        return;
+
     }
     emit(type, args){
         const listeners = this._events[type];

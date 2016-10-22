@@ -9,18 +9,12 @@ import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import nars.$;
 import nars.bag.Bag;
 import nars.concept.Concept;
-import nars.concept.Functor;
 import nars.nar.Default;
-import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
-import nars.term.atom.Atom;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.irc.IRCAgent;
 import spacegraph.irc.IRCServer;
 
 import java.io.File;

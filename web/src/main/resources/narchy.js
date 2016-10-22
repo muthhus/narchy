@@ -572,8 +572,8 @@ function decodeBiNARy(e, m) {
     const d = new DataView(m);
 
     //assume 'd' is a NAR serialized Task
-    var j = 0;
-    var punct = d.getUint8(j++);
+    let j = 0;
+    let punct = d.getUint8(j++);
     //TODO use charCodePoint
     switch (punct) {
 
@@ -609,7 +609,7 @@ function decodeBiNARy(e, m) {
     const whenHigh = d.getInt32(j); j+=4;
     const when = whenLow | (whenHigh << 32);
 
-    var freq, conf;
+    let freq, conf;
     if ((punct == '.') || (punct == '!')) {
         freq = d.getFloat32(j); j+=4;
         conf = d.getFloat32(j); j+=4;
@@ -967,7 +967,7 @@ function NARConsole(terminal, render) {
             shown = shown.slice(len-maxLines, len-1);
         }
 
-        var queued = false;
+        let queued = false;
 
         if (!queued) {
 
@@ -980,7 +980,7 @@ function NARConsole(terminal, render) {
                 view.empty().append(_.map(shown, render));
 
                 setTimeout(() => {
-                    var height = view[0].scrollHeight;
+                    const height = view[0].scrollHeight;
                     view.scrollTop(height);
                 }, 0);
 

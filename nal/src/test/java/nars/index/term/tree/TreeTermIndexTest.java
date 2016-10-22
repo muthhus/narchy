@@ -7,7 +7,8 @@ import org.junit.Test;
 import java.util.List;
 
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 10/21/16.

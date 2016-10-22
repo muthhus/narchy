@@ -17,7 +17,6 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import nars.util.data.rope.StringHack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nustaq.serialization.*;

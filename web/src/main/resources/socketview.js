@@ -6,7 +6,7 @@ const defaultWSPort = window.location.port || 8080;
 
 /** creates a websocket connection to a path on the server that hosts the currently visible webpage */
 const NARSocket = function(path) {
-    var ws = new WebSocket('ws://' +
+    const ws = new WebSocket('ws://' +
         defaultHostname + ':' +
         defaultWSPort + '/' +
         path);

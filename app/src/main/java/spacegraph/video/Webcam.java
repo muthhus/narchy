@@ -5,8 +5,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
-import nars.$;
-import nars.remote.NAgents;
 import nars.video.ImageCamera;
 
 import javax.swing.*;

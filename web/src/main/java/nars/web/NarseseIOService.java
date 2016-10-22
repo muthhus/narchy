@@ -1,6 +1,5 @@
 package nars.web;
 
-import io.undertow.util.FastConcurrentDirectDeque;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import nars.IO;
@@ -11,11 +10,9 @@ import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.nlp.Twenglish;
-import nars.truth.Truth;
 import nars.util.event.Active;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.web.Json;
 import spacegraph.web.WebsocketService;
 
 import java.io.IOException;

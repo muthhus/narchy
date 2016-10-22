@@ -11,8 +11,6 @@ import nars.gui.BeliefTableChart;
 import nars.remote.NAgents;
 import nars.task.MutableTask;
 import nars.truth.Truth;
-import nars.video.Scale;
-import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.obj.GridSurface;

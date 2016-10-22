@@ -4,7 +4,6 @@ import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.concept.util.InvalidConceptException;
 import nars.nal.Stamp;
-import nars.task.MutableTask;
 import nars.task.Revision;
 import nars.task.Tasked;
 import nars.task.util.InvalidTaskException;

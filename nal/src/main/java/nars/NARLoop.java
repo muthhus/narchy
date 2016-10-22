@@ -1,9 +1,6 @@
 package nars;
 
 import nars.util.Loop;
-import nars.util.Util;
-import org.apache.commons.lang3.mutable.MutableFloat;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 

@@ -13,7 +13,6 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static nars.learn.microsphere.InterpolatingMicrosphere.lightCurve;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
