@@ -985,7 +985,7 @@ function updateWidget(node) {
     var pixelScale=widget.pixelScale,
         minPixels= widget.minPixels;
 
-    pixelScale = parseFloat(pixelScale) || 128.0; //# pixels wide
+    pixelScale = parseFloat(pixelScale) || 1.0; //# pixels wide
 
     var pw, ph;
 
@@ -994,14 +994,14 @@ function updateWidget(node) {
         ph = parseFloat(node.renderedHeight());
     }
     catch (e) {
-
+        console.error(e);
         return;
 
     }
 
 
 
-    var scale = parseFloat(widget.scale) || 1.0;
+    var scale = parseFloat(widget.scale) || 0.9;
 
     var cw, ch;
     var narrower = parseInt(pixelScale);
@@ -1045,7 +1045,6 @@ function updateWidget(node) {
         }
     }
 
-
     //console.log(html[0].clientWidth, cw, html[0].clientHeight, ch);
 
     var pos = node.renderedPosition();
@@ -1053,22 +1052,13 @@ function updateWidget(node) {
     var globalToLocalW = pw / cw;
     var globalToLocalH = ph / ch;
 
-    var wx = scale * globalToLocalW;
-    var wy = scale * globalToLocalH;
+    var transformPrecision = 3;
 
+    var wx = (scale * globalToLocalW).toPrecision(transformPrecision);
+    var wy = (scale * globalToLocalH).toPrecision(transformPrecision);
 
     //TODO check extents to determine node visibility for hiding off-screen HTML
     //for possible improved performance
-
-
-
-    //console.log(html, pos.x, pos.y, minPixels, pixelScale);
-
-    var transformPrecision = 3;
-
-    var matb = 0, matc = 0;
-    wx = wx.toPrecision(transformPrecision);
-    wy = wy.toPrecision(transformPrecision);
 
     //parseInt here to reduce precision of numbers for constructing the matrix string
     //TODO replace this with direct matrix object construction involving no string ops
@@ -1086,5 +1076,7 @@ function updateWidget(node) {
     //html.css(nextCSS);
 
     //TODO non-String way to do this
-    style.transform = 'matrix(' + wx+ ',' + matb + ',' + matc + ',' + wy + ',' + px + ',' + py + ')';;
+    //var matb = 0, matc = 0;
+    //style.transform = 'matrix(' + wx+ ',' + 0/*matb*/ + ',' + 0/*matc*/ + ',' + wy + ',' + px + ',' + py + ')';;
+    style.transform = 'matrix(' + wx+ ',0,0,' + wy + ',' + px + ',' + py + ')';;
 }

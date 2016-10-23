@@ -2,7 +2,7 @@
 <html>
 <head>
 
-    <title>I/O Console</title>
+    <title></title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 
     <style type="text/css">
@@ -17,6 +17,7 @@
     <script src="lib/jquery/dist/jquery.min.js"></script>
     <script src="lib/jquery-ui/jquery-ui.min.js"></script>
 
+    <script src="lib/fastdom/fastdom.min.js"></script>
 
     <link rel="stylesheet" href="lib/golden-layout/src/css/goldenlayout-base.css"/>
     <link rel="stylesheet" href="index.layout.css"/>
@@ -33,21 +34,21 @@
 
     <script src="event.js"></script>
 
-    <script src="web_socket.js"></script>
     <script src="socketview.js"></script>
 
     <script src="spacegraph.js"></script>
-    <script src="spacegraph.frame.js"></script>
+    <!--<script src="spacegraph.frame.js"></script>-->
 
     <script src="narchy.js"></script>
-    <script src="index.js"></script>
+
 
     <style>
-        html {
+        html, input, textarea, keygen, select, button {
             font-family: monospace, monospace !important;
-            font-stretch: condensed;
             font-size: 1em; /* see: http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/ */
         }
+
+
 
         body {
             position: fixed;
@@ -87,10 +88,6 @@
             padding: 2px;
         }
 
-        div.ConceptTable {
-            font-family: monospace;
-        }
-
         .belief {
             color: #d4d4d4;
         }
@@ -121,28 +118,25 @@
             display: inline-block;
             cursor: pointer;
         }
+
         .MainMenuButton:hover {
             color: orange;
+            /* TODO scale grow transition */
         }
+
+
 
         .MenuLayer {
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 6000;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.7);
+            z-index: 3;
         }
-
-        .MenuLayer .close {
+        .MenuGraph {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 1em;
-            height: 1em;
-            font-size: 200%;
-            opacity: 0.8;
         }
 
     </style>
@@ -161,7 +155,8 @@
 
     function Menu() {
         const menulayer = div('MenuLayer');
-        const overlaylayer = $('<div class="overlay"></div>').prependTo(menulayer);
+        const graphCanvas = div('MenuGraph max').appendTo(menulayer);
+
         var c;
 
         function close() {
@@ -182,16 +177,24 @@
             add: function(item, parent, options) {
                 options = options || {};
                 options.id = item;
+
+                //disable label if widget is provided
+                options.label = options.widget ? "" : item;
+
                 this.nodes.push( { data: options } );
                 if (parent)
                     this.edges.push( { data: { source: parent, target: item } } );
             }
         };
 
-        let _return = 'return';
+        const body = $('body');
+
+        const _return = 'return';
 
         menu.add(_return, null, {
-            widget: $('<button>[X]</button>').click(function() {
+            widget: $('<button>[X]</button>').click(function(e) {
+                console.log(e);
+                close();
 
             })
         });
@@ -230,12 +233,15 @@
             menu.add('News', 'Status', {});
         }
 
-        menu.add('Find', _return, {});
+        menu.add('Find', _return, {
+            //widget: $('<div><input type="text" placeholder="?"></input></div>')
+            widget: $('<textarea rows="4" cols="50">At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies.</textarea>')
+        });
 
 
 
         c = cytoscape({
-            container: menulayer,
+            container: graphCanvas,
 
             layout: {
                 name: 'concentric',
@@ -261,6 +267,7 @@
 //            },
 
             ready: (a)=>{
+
 
                 var cc = a.cy;
 
@@ -288,7 +295,7 @@
                     selector: 'node',
                     style: {
                         'background-color': '#888',
-                        'label': 'data(id)',
+                        'label': 'data(label)',
                         'text-color': 'white',
                         'shape': 'hexagon',
                         //'width':
@@ -306,6 +313,8 @@
             elements: menu,
         });
 
+        const activeWidgets = new Map();
+
         function onAdd(node) {
 
             //console.log(node);
@@ -316,16 +325,18 @@
                 const widget = (data.widget.jquery) ? data.widget[0] : data.widget; //HACK un-querify
 
                 var nid = node.id();
-                var wid = 'widget_' + nid;
-                widget.setAttribute('id', wid);
+                widget.setAttribute('id', 'node_' + nid);
 
                 var style = widget.style;
-                style.position = 'fixed';
+                //style.position = 'fixed';
                 style.transformOrigin = '0 0';
 
-                overlaylayer.append(widget);
+                menulayer.append(widget);
+                activeWidgets.set(nid, node);
 
-                setTimeout(updateWidget, 0, node);
+                updateWidget(node);
+
+
             }
         }
 
@@ -340,24 +351,34 @@
             const data = node._private.data;
             if (data.widget) {
                 const widget = (data.widget[0]) ? data.widget[0] : data.widget; //HACK un-querify
-
+                activeWidgets.remove(node.id());
                 widget.detach();
             }
 
         });
 
-        c.on('data position grab drag style', /* select unselect  */ function (e) {
+        function updateAll() {
+
+            fastdom.mutate(()=>{
+                activeWidgets.forEach((node, nid) => {
+                    updateWidget(node);
+                });
+            });
+        }
+
+        c.on('pan zoom ready', /* select unselect  */ function (e) {
+            updateAll();
+        });
+
+        c.on('position style data', /* select unselect  */ function (e) {
 
             const node = e.cyTarget;
             const data = node._private.data;
-            if (data.widget) {
-                const widget = (data.widget[0]) ? data.widget[0] : data.widget; //HACK un-querify
-
-                setTimeout(updateWidget, 0, node);
+            if (data && data.widget) {
+                updateWidget(node);
                 //console.log(this, that, target);
                 //that.commit();
             }
-
         });
 
 //            const layout = c.makeLayout({
@@ -384,15 +405,14 @@
 //               layout.run();
 //            });
 
-        var closeButton = $('<button> X </button>').addClass('close').click(()=>{
-            close();
-        });
 
-        menulayer.append(closeButton);
 
         menulayer.hide();
-        menulayer.appendTo($('body'))
-        menulayer.fadeIn();
+
+        fastdom.mutate(()=>{
+            menulayer.appendTo(body)
+            menulayer.fadeIn();
+        });
 
 
     }
@@ -578,9 +598,9 @@
         return d;
     }
 
-    function gridCell(contents) {
-        return div('grid-stack-item').append(div('grid-stack-item-content').append(contents));
-    }
+//    function gridCell(contents) {
+//        return div('grid-stack-item').append(div('grid-stack-item-content').append(contents));
+//    }
 
     function IO(term) {
 

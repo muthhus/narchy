@@ -860,21 +860,24 @@ function NARConsole(terminal, render) {
 
         queued = false;
 
-        const oldItems = items[0];
-        const newItems = oldItems.cloneNode(false);
-        for (let a of Array.from(shown, render)) {
-            if (a) {
-                newItems.appendChild(a);
+        fastdom.mutate(()=> {
+            const oldItems = items[0];
+            const newItems = oldItems.cloneNode(false);
+            for (let a of Array.from(shown, render)) {
+                if (a) {
+                    newItems.appendChild(a);
+                }
             }
-        }
-        view[0].replaceChild(newItems, oldItems );
-        items[0] = newItems;
+            view[0].replaceChild(newItems, oldItems);
+            items[0] = newItems;
 
-
-        setTimeout(() => {
             const height = newItems.scrollHeight;
-            view.scrollTop(height);
-        }, 0);
+
+            setTimeout(() => {
+                view.scrollTop(height);
+            }, 0);
+
+        });
 
     };
 
@@ -974,7 +977,10 @@ function TopTable(path) {
                     rr.push(row(k));
                 }
 
-                e.empty().append(rr);
+                fastdom.mutate(()=>
+                    e.empty().append(rr)
+                );
+
             }, 0);
 
         }
