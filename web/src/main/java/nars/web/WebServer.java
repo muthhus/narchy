@@ -130,7 +130,7 @@ public class WebServer /*extends PathHandler*/ {
 
         //new IRCServer("localhost", 6667);
 
-        @NotNull Default nar = newRealtimeNAR(1024, 8, 16);
+        @NotNull Default nar = newRealtimeNAR(1024, 4, 8);
         //Default nar = new Default();
 
 //        new IRCAgent(nar,
@@ -140,7 +140,7 @@ public class WebServer /*extends PathHandler*/ {
 //                //"#nars"
 //        ).start();
 
-        nar.on("J", (terms) -> {
+        /*nar.on("J", (terms) -> {
             //WARNING this is dangerous to allow open access
             String expr = Atom.unquote(terms[0]);
             Object r;
@@ -150,7 +150,7 @@ public class WebServer /*extends PathHandler*/ {
                 r = e;
             }
             return $.the(r.toString());
-        });
+        });*/
         nar.on("read", (terms) -> {
 
             String protocol = terms[0].toString();

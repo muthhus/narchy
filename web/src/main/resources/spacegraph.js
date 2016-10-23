@@ -989,6 +989,9 @@ function updateWidget(node) {
 
     var pw, ph;
 
+
+    var pos = node.renderedPosition();
+
     try {
         pw = parseFloat(node.renderedWidth());
         ph = parseFloat(node.renderedHeight());
@@ -1001,7 +1004,7 @@ function updateWidget(node) {
 
 
 
-    var scale = parseFloat(widget.scale) || 0.9;
+    var scale = parseFloat(widget.scale) || 0.75;
 
     var cw, ch;
     var narrower = parseInt(pixelScale);
@@ -1047,7 +1050,6 @@ function updateWidget(node) {
 
     //console.log(html[0].clientWidth, cw, html[0].clientHeight, ch);
 
-    var pos = node.renderedPosition();
 
     var globalToLocalW = pw / cw;
     var globalToLocalH = ph / ch;

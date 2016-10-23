@@ -113,8 +113,9 @@
             height: 100%;
         }
 
+
+
         .MainMenuButton {
-            opacity:0.75;
             display: inline-block;
             cursor: pointer;
         }
@@ -135,6 +136,8 @@
             background-color: rgba(0,0,0,0.7);
             z-index: 3;
         }
+
+
         .MenuGraph {
             position: fixed;
         }
@@ -192,7 +195,7 @@
         const _return = 'return';
 
         menu.add(_return, null, {
-            widget: $('<button>[X]</button>').click(function(e) {
+            widget: $('<button>[x]</button>').css({ opacity: 0.75, border: 0 }).click(function(e) {
                 console.log(e);
                 close();
 
@@ -214,7 +217,10 @@
         menu.add('Status', _return, {});
         {
 
-            menu.add('Weather', 'Status', {});
+            menu.add('Weather', 'Status', {
+                widget: $('<iframe width="400" height="400" src="http://wunderground.org"></iframe>')
+            });
+
             {
                 menu.add('Temperature', 'Weather', {});
                 menu.add('Precipitation', 'Weather', {});
@@ -235,7 +241,7 @@
 
         menu.add('Find', _return, {
             //widget: $('<div><input type="text" placeholder="?"></input></div>')
-            widget: $('<textarea rows="4" cols="50">At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies.</textarea>')
+            widget: $('<textarea rows="12" cols="50">At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies.</textarea>')
         });
 
 
@@ -282,8 +288,8 @@
                         pr.closeness(n);
 
                     n.style({
-                        width:  v * 160,
-                        height: v * 120
+                        width:  v * 320,
+                        height: v * 240
                     });
 
                 });
@@ -328,13 +334,13 @@
                 widget.setAttribute('id', 'node_' + nid);
 
                 var style = widget.style;
-                //style.position = 'fixed';
+                style.position = 'fixed';
                 style.transformOrigin = '0 0';
 
                 menulayer.append(widget);
                 activeWidgets.set(nid, node);
 
-                updateWidget(node);
+                setTimeout(()=> updateWidget(node) , 0)
 
 
             }
@@ -392,7 +398,7 @@
             c.animate({
                 fit: {
                     eles: ele,
-                    padding: 120
+                    padding: 40
                 }
             }, {
                 duration: zoomDuration
