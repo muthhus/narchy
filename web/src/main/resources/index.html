@@ -18,8 +18,9 @@
     <script src="lib/jquery-ui/jquery-ui.min.js"></script>
 
 
-    <link rel="stylesheet" href="lib/gridstack/dist/gridstack.min.css"/>
-    <script src="lib/gridstack/dist/gridstack.min.js"></script>
+    <link rel="stylesheet" href="lib/golden-layout/src/css/goldenlayout-base.css"/>
+    <link rel="stylesheet" href="lib/golden-layout/src/css/default-theme.css"/>
+    <script src="lib/golden-layout/dist/goldenlayout.min.js"></script>
 
 
     <script src="lib/cytoscape/dist/cytoscape.min.js"></script>
@@ -63,10 +64,10 @@
             opacity: 0.85;
         }
 
-        #console {
-            max-height: 95%;
+        .terminal {
+            width: 100%;
+            height: 90%;
             overflow-y: auto;
-            overflow-x: hidden;
         }
 
         #input {
@@ -90,19 +91,19 @@
             font-family: monospace;
         }
 
-        #console .belief {
+        .terminal .belief {
             color: white;
         }
 
-        #console .command {
+        .terminal .command {
             color: greenyellow;
         }
 
-        #console .question {
+        .terminal .question {
             color: #8e70ff;
         }
 
-        #console .goal {
+        .terminal .goal {
             color: orange;
         }
 
@@ -124,25 +125,50 @@
 
 <script>
 
-    function gridCell(contents) {
-        return div('grid-stack-item').append(div('grid-stack-item-content').append(contents));
-    }
+
 
 
     $(document).ready(() => {
 
+        var config = {
+            content: [{
+                type: 'row',
+                content:[{
+                    type: 'component',
+                    componentName: 'terminal',
+                    componentState: { label: 'A' }
+                },{
+                    type: 'column',
+                    content:[{
+                        type: 'component',
+                        componentName: 'graph',
+                        componentState: { label: 'B' }
+                    },{
+                        type: 'component',
+                        componentName: 'top',
+                        componentState: { label: 'C' }
+                    }]
+                }]
+            }]
+        };
+
+
         const io = NARTerminal();
         window.io = io;
 
-        $('body').append(
-            //IO(term)
-            Graph(io)
-        );
+        var myLayout = new GoldenLayout( config );
+        myLayout.registerComponent( 'terminal', function( tgt, state ){
+            tgt.getElement().html( IO(io) );
+        });
+        myLayout.registerComponent( 'graph', function( tgt, state ){
+            tgt.getElement().html( Graph(io) );
+        });
+        myLayout.registerComponent( 'top', function( tgt, state ){
+            tgt.getElement().html( TopTable("active") );
+        });
 
+        myLayout.init();
 
-        //$('body').append(SocketNARGraph("active")).attr('id', 'graph').appendTo(body);
-
-        //$('body').append(TopTable("active"));
     });
 
 
@@ -176,8 +202,8 @@
 //           changed = false;
 //        });
 
-        const maxNodes = 96;
-        const updatePeriodMS = 50;
+        const maxNodes = 40;
+        const updatePeriodMS = 100;
 
 
         const layout = c.makeLayout({
@@ -278,10 +304,13 @@
         return d;
     }
 
+    function gridCell(contents) {
+        return div('grid-stack-item').append(div('grid-stack-item-content').append(contents));
+    }
+
     function IO(term) {
 
-        return div().append(
-            new NARConsole(term, (x) => {
+        var c = new NARConsole(term, (x) => {
 
 
                 const label = x.term + x.punc + truthString(x.freq, x.conf);
@@ -311,11 +340,15 @@
                 return d;
 
 
-            }).attr('id', 'console'),
+            }).addClass('terminal');
 
+        c.append(
             NALEditor(term).attr('id', 'input')
         );
+//
+//        ).attr('id', 'console');
 
+        return c;
     }
 
 

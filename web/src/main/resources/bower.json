@@ -17,7 +17,7 @@
     "object-editor": "latest",
     "ace-builds": "latest",
     "metawidget": "latest",
-    "gridstack": "latest"
+    "golden-layout": "latest"
   },
   "keywords": [
     "nars",

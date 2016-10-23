@@ -847,7 +847,7 @@ function NARInputter(terminal, initialValue) {
 
 function NARConsole(terminal, render) {
 
-    const view = $('<div/>');//.css('width', '100%').css('height', '100%');
+    const view = $('<div/>');
     const items = $('<div/>').appendTo(view);
 
     const maxLines = 256;
@@ -871,10 +871,10 @@ function NARConsole(terminal, render) {
         items[0] = newItems;
 
 
-        //setTimeout(() => {
-        const height = newItems.scrollHeight;
-        view.scrollTop(height);
-        //}, 0);
+        setTimeout(() => {
+            const height = newItems.scrollHeight;
+            view.scrollTop(height);
+        }, 0);
 
     };
 
