@@ -130,7 +130,7 @@ public class WebServer /*extends PathHandler*/ {
 
         //new IRCServer("localhost", 6667);
 
-        @NotNull Default nar = newRealtimeNAR(2048, 8, 2);
+        @NotNull Default nar = newRealtimeNAR(1024, 8, 16);
         //Default nar = new Default();
 
 //        new IRCAgent(nar,
@@ -198,12 +198,12 @@ public class WebServer /*extends PathHandler*/ {
             });
             return $.the("Ready (" + dt + " ms)");
         });
-        nar.on("mem", (terms) ->
+        nar.on("memstat", (terms) ->
                 $.quote(nar.concepts.summary())
         );
         nar.on("top", (terms) -> {
 
-                    int length = 10;
+                    int length = 16;
                     List<Term> b = $.newArrayList();
                     @NotNull Bag<Concept> cbag = ((Default) nar).core.active;
 

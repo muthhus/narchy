@@ -345,11 +345,10 @@ public class IRCAgent extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        Executioner exe =
-                //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(2, 1024*8);
+        MultiThreadExecutioner exe = new MultiThreadExecutioner(1, 1024*4);
+        exe.sync(false);
 
-        Default nar = new Default(activeConcepts, conceptsPerFrame, 2, 2, random,
+        Default nar = new Default(activeConcepts, conceptsPerFrame, 2, 3, random,
 
                 //new CaffeineIndex(new DefaultConceptBuilder(random), 10000000, false, exe),
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
@@ -360,7 +359,7 @@ public class IRCAgent extends IRC {
         );
 
 
-        int volMax = 40;
+        int volMax = 50;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -374,13 +373,13 @@ public class IRCAgent extends IRC {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f);
 
-        float p = 0.01f;
+        float p = 0.05f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
         nar.compoundVolumeMax.setValue(volMax);
 
 

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by me on 5/22/16.
+ * TODO use Leak class
  */
 public class MySTMClustered extends STMClustered {
 

@@ -19,7 +19,7 @@
 
 
     <link rel="stylesheet" href="lib/golden-layout/src/css/goldenlayout-base.css"/>
-    <link rel="stylesheet" href="lib/golden-layout/src/css/default-theme.css"/>
+    <link rel="stylesheet" href="index.layout.css"/>
     <script src="lib/golden-layout/dist/goldenlayout.min.js"></script>
 
 
@@ -118,7 +118,11 @@
 
         .MainMenuButton {
             opacity:0.75;
-            margin-right: 3px;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .MainMenuButton:hover {
+            color: orange;
         }
 
         .MenuLayer {
@@ -152,7 +156,7 @@
 
 
     function MainMenuButton() {
-        return $('<button>@</button>').addClass('MainMenuButton').click(()=>{
+        return $('<div>[@]</div>').addClass('MainMenuButton').click(()=>{
 
             var menulayer = div('MenuLayer');
 
@@ -227,16 +231,17 @@
             }]
         }, $('body') );
 
+        layout.on( 'stackCreated', function( stack ) {
+
+            /*
+             * Accessing the DOM element that contains the popout, maximise and * close icon
+             */
+            stack.header.controlsContainer.append(MainMenuButton());
+        });
         layout.registerComponent( 'terminal', function( tgt, state ){
-            tgt.on( 'tab', function( tab ){
-                tab.element.prepend( MainMenuButton() );
-            });
             tgt.getElement().html( IO(io) );
         });
         layout.registerComponent( 'graph', function( tgt, state ){
-            tgt.on( 'tab', function( tab ){
-                tab.element.prepend( MainMenuButton() );
-            });
             tgt.getElement().html( Graph(io) );
         });
         layout.registerComponent( 'top', function( tgt, state ){
