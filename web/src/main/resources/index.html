@@ -91,29 +91,54 @@
             font-family: monospace;
         }
 
-        .terminal .belief {
-            color: white;
+        .belief {
+            color: #d4d4d4;
         }
 
-        .terminal .command {
+        .command {
             color: greenyellow;
         }
 
-        .terminal .question {
+        .question {
             color: #8e70ff;
         }
 
-        .terminal .goal {
+        .goal {
             color: orange;
         }
 
-        .grid-stack-item {
-            border: 2px solid green;
-        }
+        /*.grid-stack-item {*/
+            /*border: 2px solid green;*/
+        /*}*/
 
         .max {
             width: 100%;
             height: 100%;
+        }
+
+        .MainMenuButton {
+            opacity:0.75;
+            margin-right: 3px;
+        }
+
+        .MenuLayer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 6000;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+        }
+
+        .MenuLayer .close {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 1em;
+            height: 1em;
+            font-size: 300%;
+            opacity: 0.8;
         }
 
     </style>
@@ -126,11 +151,61 @@
 <script>
 
 
+    function MainMenuButton() {
+        return $('<button>@</button>').addClass('MainMenuButton').click(()=>{
 
+            var menulayer = div('MenuLayer');
+
+            var c = cytoscape({
+                container: menulayer,
+
+                layout: {
+                    name: 'cose',
+                    idealEdgeLength: 100,
+                    nodeOverlap: 20
+                },
+
+                elements: {
+                    nodes: [
+                        { data: { id: 'a',  } },
+                        { data: { id: 'b' } },
+                        { data: { id: 'c',  } },
+                        { data: { id: 'd' } },
+                        { data: { id: 'e' } },
+                        { data: { id: 'f',  } }
+                    ],
+                        edges: [
+                        { data: { id: 'ad', source: 'a', target: 'd' } },
+                        { data: { id: 'eb', source: 'e', target: 'b' } }
+
+                    ]
+                },
+            });
+
+            var closeButton = $('<button> X </button>').addClass('close').click(()=>{
+                c.destroy();
+                menulayer.fadeOut({
+                    callback: ()=> {
+                        alert('remove');
+                        menulayer.remove();
+                    }
+                })
+            });
+
+            menulayer.append(closeButton);
+
+            menulayer.hide();
+            menulayer.appendTo($('body'))
+            menulayer.fadeIn();
+        });
+    }
 
     $(document).ready(() => {
 
-        var config = {
+        const io = NARTerminal();
+        window.io = io;
+
+        var layout = new GoldenLayout( {
             content: [{
                 type: 'row',
                 content:[{
@@ -150,24 +225,25 @@
                     }]
                 }]
             }]
-        };
+        }, $('body') );
 
-
-        const io = NARTerminal();
-        window.io = io;
-
-        var myLayout = new GoldenLayout( config );
-        myLayout.registerComponent( 'terminal', function( tgt, state ){
+        layout.registerComponent( 'terminal', function( tgt, state ){
+            tgt.on( 'tab', function( tab ){
+                tab.element.prepend( MainMenuButton() );
+            });
             tgt.getElement().html( IO(io) );
         });
-        myLayout.registerComponent( 'graph', function( tgt, state ){
+        layout.registerComponent( 'graph', function( tgt, state ){
+            tgt.on( 'tab', function( tab ){
+                tab.element.prepend( MainMenuButton() );
+            });
             tgt.getElement().html( Graph(io) );
         });
-        myLayout.registerComponent( 'top', function( tgt, state ){
+        layout.registerComponent( 'top', function( tgt, state ){
             tgt.getElement().html( TopTable("active") );
         });
 
-        myLayout.init();
+        layout.init();
 
     });
 
@@ -202,7 +278,7 @@
 //           changed = false;
 //        });
 
-        const maxNodes = 40;
+        const maxNodes = 20;
         const updatePeriodMS = 100;
 
 

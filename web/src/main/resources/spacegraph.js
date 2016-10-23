@@ -151,7 +151,7 @@ function cytoscapeOptions(opt, ready, target) {
         motionBlur: false,
         wheelSensitivity: 1,
         //pixelRatio: 0.25, //downsample pixels
-        //pixelRatio: 0.5,
+        //pixelRatio: 0.25,
         //pixelRatio: 1,
 
         initrender: function (evt) { /* ... */

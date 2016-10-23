@@ -174,7 +174,7 @@ public class WebServer /*extends PathHandler*/ {
 
                         //System.out.println(strippedText);
 
-                        hear(nar, strippedText, page, 75 /*ms per word */);
+                        hear(nar, strippedText, page, 200 /*ms per word */);
 
                         return $.the("Reading " + base + ":" + page + ": " + strippedText.length() + " characters...");
 
