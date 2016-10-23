@@ -154,7 +154,7 @@
     }
 
     function Menu() {
-        const menulayer = div('MenuLayer');
+        const menulayer = div('MenuLayer').attr('oncontextmenu', "return false;");
         const graphCanvas = div('MenuGraph max').appendTo(menulayer);
 
         var c;
@@ -379,6 +379,33 @@
                 //console.log(this, that, target);
                 //that.commit();
             }
+        });
+
+
+        function zoomTo(ele, zoomDuration) {
+            // var pos;
+            // if (!ele || !ele.position)
+            //     pos = { x: 0, y: 0 };
+            // else
+            //     pos = ele.position();
+
+            c.animate({
+                fit: {
+                    eles: ele,
+                    padding: 120
+                }
+            }, {
+                duration: zoomDuration
+                /*step: function() {
+                 }*/
+            });
+        }
+
+        //--------------
+        //right-click autozoom:
+        c.on('cxttapstart', function(e) {
+            var target = e.cyTarget;
+            zoomTo(!target ? undefined : target, 128 /* ms */)
         });
 
 //            const layout = c.makeLayout({
