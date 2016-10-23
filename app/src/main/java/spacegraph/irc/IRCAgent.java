@@ -345,14 +345,13 @@ public class IRCAgent extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutioner exe = new MultiThreadExecutioner(1, 1024*4);
+        MultiThreadExecutioner exe = new MultiThreadExecutioner(2, 1024*4);
         exe.sync(false);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 2, 3, random,
 
                 //new CaffeineIndex(new DefaultConceptBuilder(random), 10000000, false, exe),
                 new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
-
 
                 new RealtimeMSClock(true),
                 exe

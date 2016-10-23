@@ -975,3 +975,116 @@ function spacegraph(targetWrapper, opt) {
 
     return s;
 }
+
+
+function updateWidget(node) {
+    const data = node._private.data;
+    const widget = (data.widget[0]) ? data.widget[0] : data.widget; //HACK un-querify
+
+     //unjquery-ify
+    var pixelScale=widget.pixelScale,
+        minPixels= widget.minPixels;
+
+    pixelScale = parseFloat(pixelScale) || 128.0; //# pixels wide
+
+    var pw, ph;
+
+    try {
+        pw = parseFloat(node.renderedWidth());
+        ph = parseFloat(node.renderedHeight());
+    }
+    catch (e) {
+
+        return;
+
+    }
+
+
+
+    var scale = parseFloat(widget.scale) || 1.0;
+
+    var cw, ch;
+    var narrower = parseInt(pixelScale);
+    if (pw < ph) {
+        cw = narrower;
+        ch = parseInt(pixelScale*(ph/pw));
+    }
+    else {
+        ch = narrower;
+        cw = parseInt(pixelScale*(pw/ph));
+    }
+
+
+
+
+    //get the effective clientwidth/height if it has been resized
+    var style = widget.style;
+    if ((( widget.specWidth !== style.width ) || (widget.specHeight !== style.height))) {
+        var hcw = widget.clientWidth;
+        var hch = widget.clientHeight;
+
+        widget.specWidth = style.width = cw;
+        widget.specHeight = style.height = ch;
+
+        cw = hcw;
+        ch = hch;
+    }
+    if (minPixels) {
+        var hidden = ('none' === style.display);
+
+        if (Math.min(wy, wx) < minPixels / pixelScale) {
+            if (!hidden) {
+                style.display = 'none';
+                return;
+            }
+        }
+        else {
+            if (hidden) {
+                style.display = 'block';
+            }
+        }
+    }
+
+
+    //console.log(html[0].clientWidth, cw, html[0].clientHeight, ch);
+
+    var pos = node.renderedPosition();
+
+    var globalToLocalW = pw / cw;
+    var globalToLocalH = ph / ch;
+
+    var wx = scale * globalToLocalW;
+    var wy = scale * globalToLocalH;
+
+
+    //TODO check extents to determine node visibility for hiding off-screen HTML
+    //for possible improved performance
+
+
+
+    //console.log(html, pos.x, pos.y, minPixels, pixelScale);
+
+    var transformPrecision = 3;
+
+    var matb = 0, matc = 0;
+    wx = wx.toPrecision(transformPrecision);
+    wy = wy.toPrecision(transformPrecision);
+
+    //parseInt here to reduce precision of numbers for constructing the matrix string
+    //TODO replace this with direct matrix object construction involving no string ops
+
+    var halfScale = scale/2.0;
+    var px = (pos.x - (halfScale*pw)).toPrecision(transformPrecision);
+    var py = (pos.y - (halfScale*ph)).toPrecision(transformPrecision);
+
+    //px = parseInt(pos.x - pw / 2.0 + pw * paddingScale / 2.0); //'e' matrix element
+    //py = parseInt(pos.y - ph / 2.0 + ph * paddingScale / 2.0); //'f' matrix element
+    //px = pos.x;
+    //py = pos.y;
+
+    //nextCSS['transform'] = tt;
+    //html.css(nextCSS);
+
+    //TODO non-String way to do this
+    style.transform = 'matrix(' + wx+ ',' + matb + ',' + matc + ',' + wy + ',' + px + ',' + py + ')';;
+}
