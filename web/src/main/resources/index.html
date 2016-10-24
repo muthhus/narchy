@@ -59,12 +59,6 @@
             height: 100%;
         }
 
-        #graph {
-            width: 100%;
-            height: 100%;
-            opacity: 0.85;
-        }
-
         .terminal {
             width: 100%;
             height: 100%;
@@ -73,15 +67,6 @@
 
         #input {
 
-            width: 100%;
-
-
-            /*background-color: orange;*/
-            border-top: 3px solid lightgray;
-            bottom: 0;
-            left: 0;
-            padding: 0 !important;
-            height: 2em !important;
         }
 
 
@@ -460,22 +445,37 @@
         var layout = new GoldenLayout( {
             content: [{
                 type: 'row',
-                content:[{
-                    type: 'component',
-                    componentName: 'terminal',
-                    componentState: { label: 'A' }
-                },{
-                    type: 'column',
-                    content:[{
+                content:[
+                    {
+                        type: 'column',
+                        content:[{
+                            type: 'component',
+                            componentName: 'graph',
+                            componentState: {  }
+                        },{
+                            type: 'component',
+                            componentName: 'top',
+                            componentState: {  }
+                        }]
+                    },
+                    {
+                        type: 'column',
+                        content:[{
+                            type: 'component',
+                            componentName: 'terminal',
+                            componentState: {  }
+                        },{
+                            type: 'component',
+                            componentName: 'input',
+                            componentState: {  }
+                        }]
+                    }
+                    /*{
                         type: 'component',
-                        componentName: 'graph',
-                        componentState: { label: 'B' }
-                    },{
-                        type: 'component',
-                        componentName: 'top',
-                        componentState: { label: 'C' }
-                    }]
-                }]
+                        componentName: 'terminal',
+                        componentState: { label: 'A' }
+                    }*/
+                ]
             }]
         }, $('body') );
 
@@ -489,8 +489,19 @@
         layout.registerComponent( 'terminal', function( tgt, state ){
             tgt.getElement().html( IO(io) );
         });
+        layout.registerComponent( 'input', function( tgt, state ){
+            tgt.getElement().html(
+                NALEditor(io).attr('id', 'input')
+            );
+        });
         layout.registerComponent( 'graph', function( tgt, state ){
-            tgt.getElement().html( Graph(io) );
+
+            const graph = Graph(io);
+            tgt.getElement().html( graph );
+            tgt.on('resize', ()=>{
+                setTimeout(()=>graph.graph.resize(), 0);
+            });
+
         });
         layout.registerComponent( 'top', function( tgt, state ){
             tgt.getElement().html( TopTable("active") );
@@ -629,6 +640,7 @@
             changed = true;
         });
 
+        d.graph = c;
 
         return d;
     }
@@ -639,7 +651,7 @@
 
     function IO(term) {
 
-        var c = new NARConsole(term, (x) => {
+        return new NARConsole(term, (x) => {
 
 
                 const label = x.term + x.punc + truthString(x.freq, x.conf);
@@ -671,13 +683,10 @@
 
             }).addClass('terminal');
 
-        c.append(
-            NALEditor(term).focus().attr('id', 'input')
-        );
 //
 //        ).attr('id', 'console');
 
-        return c;
+        //return c;
     }
 
 

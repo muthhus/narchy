@@ -666,9 +666,11 @@ function editify(div) {
 
     var t = $(document.createElement('textarea')).appendTo(div);
     return CodeMirror.fromTextArea(t[0], {
+        //http://codemirror.net/doc/manual.html#usage
         lineNumbers: false,
         theme: 'night',
-        mode: 'clojure'
+        mode: 'clojure',
+        scrollbarStyle: null //disables scrollbars
     });
 }
 
@@ -701,7 +703,7 @@ function NALEditor(terminal, initialValue) {
     });
 
 
-    div.focus = function() { editor.focus(); return div; };
+    //div.focus = function() { editor.focus(); return div; };
 
     // editor.commands.addCommand({
     //     name: 'submit',
