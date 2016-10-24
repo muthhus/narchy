@@ -648,21 +648,28 @@ function decodeBiNARy(e, m) {
     //var height = dv.getUint16(2);
 }
 
-function _ace(div) {
-    const editor = ace.edit(div[0]);//"editor");
-    editor.setTheme("ace/theme/vibrant_ink");
-    const LispMode = ace.require("ace/mode/lisp").Mode;
-    editor.session.setMode(new LispMode());
+function editify(div) {
+    // const editor = ace.edit(div[0]);//"editor");
+    // editor.setTheme("ace/theme/vibrant_ink");
+    // const LispMode = ace.require("ace/mode/lisp").Mode;
+    // editor.session.setMode(new LispMode());
+    //
+    // editor.$blockScrolling = Infinity;
+    //
+    // div.css({
+    //     position: 'absolute',
+    //     width: '100%',
+    //     height: '100%'
+    // });
+    //
+    // return editor;
 
-    editor.$blockScrolling = Infinity;
-
-    div.css({
-        position: 'absolute',
-        width: '100%',
-        height: '100%'
+    var t = $(document.createElement('textarea')).appendTo(div);
+    return CodeMirror.fromTextArea(t[0], {
+        lineNumbers: false,
+        theme: 'night',
+        mode: 'clojure'
     });
-
-    return editor;
 }
 
 function NALEditor(terminal, initialValue) {
@@ -670,34 +677,39 @@ function NALEditor(terminal, initialValue) {
 
     const div = $('<div/>');//.addClass('NALEditor');
 
-    const editor = _ace(div);
+    const editor = editify(div);
 
     editor.setValue(initialValue || ''); //"((a ==> b) <-> x)!\n\necho(\"what\");");
 
     div.editor = editor;
 
-    const input = function (editor) {
-        const txt = editor.getValue();
-        if (txt) {
+    editor.on('keypress', function(instance, event) {
+        if (event.ctrlKey && event.code==="Enter") {
+            const txt = editor.getValue();
+            if (txt) {
 
-            try {
-                terminal.send(txt);
-            } catch (e) {
-                console.error(e, terminal, txt);
+                try {
+                    terminal.send(txt);
+                } catch (e) {
+                    console.error(e, terminal, txt);
+                }
+
+                editor.setValue('');
             }
 
-            editor.setValue('');
         }
-    };
-
-    editor.commands.addCommand({
-        name: 'submit',
-        bindKey: {win: 'Ctrl-Enter',  mac: 'Ctrl-Enter'},
-        exec: input,
-        readOnly: true // false if this command should not apply in readOnly mode
     });
 
-    editor.renderer.setShowGutter(false);
+
+    div.focus = function() { editor.focus(); return div; };
+
+    // editor.commands.addCommand({
+    //     name: 'submit',
+    //     bindKey: {win: 'Ctrl-Enter',  mac: 'Ctrl-Enter'},
+    //     exec: input,
+    //     readOnly: true // false if this command should not apply in readOnly mode
+    // });
+    //editor.renderer.setShowGutter(false);
 
     return div;
 }

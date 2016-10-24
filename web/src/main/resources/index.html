@@ -27,10 +27,10 @@
     <script src="lib/cytoscape/dist/cytoscape.min.js"></script>
     <script src="cytoscape-spread/cytoscape-spread.js"></script>
 
-    <script src="lib/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="lib/ace-builds/src-min-noconflict/theme-vibrant_ink.js" type="text/javascript"
-            charset="utf-8"></script>
-    <script src="lib/ace-builds/src-min-noconflict/mode-lisp.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
+    <script src="lib/codemirror/lib/codemirror.js"></script>
+    <link rel="stylesheet" href="lib/codemirror/theme/night.css">
+    <script src="lib/codemirror/mode/clojure/clojure.js"></script>
 
     <script src="event.js"></script>
 
@@ -67,25 +67,27 @@
 
         .terminal {
             width: 100%;
-            height: 90%;
+            height: 100%;
             overflow-y: auto;
         }
 
         #input {
-            position: fixed;
+
             width: 100%;
 
-            opacity: 0.8;
+
             /*background-color: orange;*/
-            border-top: 2px solid gray;
+            border-top: 3px solid lightgray;
             bottom: 0;
             left: 0;
             padding: 0 !important;
             height: 2em !important;
         }
 
-        #input div {
-            padding: 2px;
+
+        .CodeMirror {
+            height: auto !important;
+            width: auto !important;
         }
 
         .belief {
@@ -670,7 +672,7 @@
             }).addClass('terminal');
 
         c.append(
-            NALEditor(term).attr('id', 'input')
+            NALEditor(term).focus().attr('id', 'input')
         );
 //
 //        ).attr('id', 'console');
