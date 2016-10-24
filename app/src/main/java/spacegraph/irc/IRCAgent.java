@@ -315,6 +315,7 @@ public class IRCAgent extends IRC {
 
             return new Loop(msg, wordDelayMS) {
 
+                public On onReset;
                 int token = 0;
 
                 @Override
@@ -324,15 +325,21 @@ public class IRCAgent extends IRC {
                         return;
                     }
 
-                    final On onReset = nar.eventReset.on((n)->{
-
-                        stop();
+                    onReset = nar.eventReset.on((n)->{
+                        if (onReset!=null) {
+                            onReset.off();
+                            onReset = null;
+                            stop();
+                        }
                     });
 
-                    //hear(who,what)
-                    //Term pr = $.func("hear", chan_nick, tokens.get(token++));
 
-                    Term pr = $.inh(tokens.get(token++), $.secti($.the("hear"), chan_nick));
+
+                    //hear(who,what)
+                    Term pr = $.func("hear", chan_nick, tokens.get(token++));
+
+                    // (what --> (|,who,"hear")
+                    //Term pr = $.inh(tokens.get(token++), $.secti($.the("hear"), chan_nick));
 
                     nar.believe(pr, Tense.Present, 1f);
 
@@ -421,8 +428,8 @@ public class IRCAgent extends IRC {
 
         IRC bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                //"#123xyz"
-                "#netention"
+                "#123xyz"
+                //"#netention"
                 //"#nars"
         );
 

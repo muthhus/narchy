@@ -81,13 +81,13 @@
 //  corresponds to extensional union, and extensional intersection corresponds
 //  to intensional union.
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neqRCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqRCom(S,P) |- ((S & P) --> M), (Belief:Union)
-    (P --> M), (S --> M), notSet(S), notSet(P), neqRCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
+    (P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P | S)), (Belief:Union)
-    (M --> P), (M --> S), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P - S)), (Belief:Difference)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
+    (M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
 
 //raw product composition
 //    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection)
@@ -153,8 +153,8 @@
     ((|,X,A..+) --> M), (|,X,A..+), neqCom(X,M) |- (X --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
     (M --> (&,X,A..+)), (&,X,A..+), neqCom(X,M) |- (M --> X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-    ((B ~ G) --> S), S, neqRCom(S,B) |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (R --> (B - S)), R, neqRCom(S,B) |- (R --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ((B ~ G) --> S), S, neqCom(S,B) |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (R --> (B - S)), R, neqCom(S,B) |- (R --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)
@@ -264,8 +264,8 @@
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- varIntro(((--,%S) ==> P)), (Belief:InductionN)
     S, P, time(eternal), task(positive), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- varIntro((P ==> S)), (Belief:Abduction)
         S, P, time(eternal), task(negative), task("."), neqCom(P,S), notEqui(S), notImplEqui(P) |- varIntro((P ==> (--,%S))), (Belief:AbductionN)
-    S, P, time(eternal), task(positive), task("."), neqRCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((S <=> P)), (Belief:Comparison)
-        S, P, time(eternal), task(negative), task("."), neqRCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((--,(S <=> P))), (Belief:ComparisonN)
+    S, P, time(eternal), task(positive), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((S <=> P)), (Belief:Comparison)
+        S, P, time(eternal), task(negative), task("."), neqCom(P,S), notImplEqui(S), notImplEqui(P) |- varIntro((--,(S <=> P))), (Belief:ComparisonN)
     S, P, time(eternal), task("."), neqCom(P,S) |- varIntro((S && P)), (Belief:Intersection)
         //S, P, time(eternal), task(negative), task("."), neq(P,S) |- varIntro(((--,%S) && P)), (Belief:IntersectionN)
     //%S, %P, time(eternal), neqCom(P,S) |- (%S || %P), (Belief:Union)
@@ -280,8 +280,8 @@
     A, B, task(positive), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
         A, B, task(negative), task("."), time(dtAfterReverse), neqCom(A,B), notEqui(A), notImplEqui(B) |- varIntro((B ==>+- (--,%A))), (Belief:AbductionN)
 
-    A, B, task(positive), task("."), time(dtAfter), neqRCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
-        A, B, task(negative), task("."), time(dtAfter), neqRCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((--,(A <=>+- B))), (Belief:ComparisonN)
+    A, B, task(positive), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
+        A, B, task(negative), task("."), time(dtAfter), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro((--,(A <=>+- B))), (Belief:ComparisonN)
 
     A, B, task("."), time(dtAfter), neqCom(A,B) |- varIntro((A &&+- B)), (Belief:Intersection)
         ///A, B, task(negative), task("."), time(dtAfter), neq(A,B) |- ((--,%A) &&+- B), (Belief:IntersectionN)
@@ -307,7 +307,7 @@
     (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 //substitutionViaSimilarity
-     X, (B<->C), neqRCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
+     X, (B<->C), neqCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Intersection)
 
 //desire spreading by similarity
      S, (S<->P) |- P, (Goal:Intersection)
@@ -409,10 +409,10 @@
 //precondition combiner inference rule (variable_unification6):
 //  TODO can these also apply to goals somehow
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neqRCom(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Induction)
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neqRCom(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Induction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neqRCom(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Abduction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neqRCom(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neqCom(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Induction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neqCom(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Induction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neqCom(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Abduction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neqCom(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
 
 
 //second level variable introduction

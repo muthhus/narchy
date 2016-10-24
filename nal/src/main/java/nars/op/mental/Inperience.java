@@ -110,7 +110,7 @@ public class Inperience extends Leak<Task> {
 //
 
     public Inperience(@NotNull NAR n) {
-        super(new CurveBag(BudgetMerge.max, n.random), 0.01f, n);
+        super(new CurveBag(BudgetMerge.max, n.random), 0.02f, n);
 
         this.nar = n;
 

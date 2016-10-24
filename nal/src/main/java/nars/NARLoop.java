@@ -13,7 +13,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  * <p>
  * mostly replaced by Executioner's
  */
-@Deprecated
 public class NARLoop extends Loop {
 
     private static final Logger logger = getLogger(NARLoop.class);

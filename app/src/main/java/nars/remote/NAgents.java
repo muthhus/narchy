@@ -59,11 +59,11 @@ abstract public class NAgents extends NAgent {
 
 
         MySTMClustered stm = new MySTMClustered(nar, 64, '.', 3, true, 8);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 8);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
                 4, 8,
-                0.005f, 8);
+                0.01f, 8);
 
         new Inperience(nar);
 
@@ -132,17 +132,17 @@ abstract public class NAgents extends NAgent {
         Random rng = new XorShift128PlusRandom(1);
         final Executioner exe =
                 //new SingleThreadExecutioner();
-                new MultiThreadExecutioner(threads, 4096 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
+                new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
         int volMax = 48;
-        int conceptsPerCycle = 48;
+        int conceptsPerCycle = 128;
 
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(2048,
                 conceptsPerCycle, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 64000, 16*1024, 4)
+                new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 4* 1024 * 128, 16*1024, 4)
 
                 ,
                 //new FrameClock()

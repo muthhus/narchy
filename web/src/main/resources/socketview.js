@@ -335,7 +335,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
     function ReconnectingWebSocket(url, protocols, options) {
 
         // Default settings
-        var settings = {
+        const settings = {
 
             /** Whether this instance should log debug messages. */
             debug: false,
@@ -355,11 +355,11 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
             /** The maximum number of reconnection attempts to make. Unlimited if null. */
             maxReconnectAttempts: null
-        }
+        };
         if (!options) { options = {}; }
 
         // Overwrite and define settings with options if they exist.
-        for (var key in settings) {
+        for (let key in settings) {
             if (typeof options[key] !== 'undefined') {
                 this[key] = options[key];
             } else {
@@ -391,11 +391,11 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
         // Private state variables
 
-        var self = this;
-        var ws;
-        var forcedClose = false;
-        var timedOut = false;
-        var eventTarget = document.createElement('div');
+        const self = this;
+        let ws;
+        let forcedClose = false;
+        let timedOut = false;
+        const eventTarget = document.createElement('div');
 
         // Wire up "on*" properties as event handlers
 
@@ -423,11 +423,10 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
          * @param args Object an optional object that the event will use
          */
         function generateEvent(s, args) {
-            var evt = document.createEvent("CustomEvent");
+            const evt = document.createEvent("CustomEvent");
             evt.initCustomEvent(s, false, false, args);
             return evt;
-        };
-
+        }
         this.open = function (reconnectAttempt) {
             ws = new WebSocket(self.url, protocols || []);
             ws.binaryType = 'arraybuffer';
@@ -445,8 +444,8 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                 console.debug('ReconnectingWebSocket', 'attempt-connect', self.url);
             }
 
-            var localWs = ws;
-            var timeout = setTimeout(function() {
+            const localWs = ws;
+            const timeout = setTimeout(function () {
                 if (self.debug || ReconnectingWebSocket.debugAll) {
                     console.debug('ReconnectingWebSocket', 'connection-timeout', self.url);
                 }
@@ -463,13 +462,14 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                 self.protocol = ws.protocol;
                 self.readyState = WebSocket.OPEN;
                 self.reconnectAttempts = 0;
-                var e = generateEvent('open');
+                const e = generateEvent('open');
                 e.isReconnect = reconnectAttempt;
                 reconnectAttempt = false;
                 eventTarget.dispatchEvent(e);
             };
 
             ws.onclose = function(event) {
+                const timeout = self.reconnectInterval * Math.pow(self.reconnectDecay, self.reconnectAttempts);
                 clearTimeout(timeout);
                 ws = null;
                 if (forcedClose) {
@@ -477,7 +477,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                     eventTarget.dispatchEvent(generateEvent('close'));
                 } else {
                     self.readyState = WebSocket.CONNECTING;
-                    var e = generateEvent('connecting');
+                    const e = generateEvent('connecting');
                     e.code = event.code;
                     e.reason = event.reason;
                     e.wasClean = event.wasClean;
@@ -489,7 +489,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                         eventTarget.dispatchEvent(generateEvent('close'));
                     }
 
-                    var timeout = self.reconnectInterval * Math.pow(self.reconnectDecay, self.reconnectAttempts);
+
                     setTimeout(function() {
                         self.reconnectAttempts++;
                         self.open(true);
@@ -500,7 +500,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                 if (self.debug || ReconnectingWebSocket.debugAll) {
                     console.debug('ReconnectingWebSocket', 'onmessage', self.url, event.data);
                 }
-                var e = generateEvent('message');
+                const e = generateEvent('message');
                 e.data = event.data;
                 eventTarget.dispatchEvent(e);
             };

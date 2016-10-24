@@ -7,6 +7,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.MapSubst;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 public final class substitute extends TermTransformOperator  {
@@ -21,7 +22,7 @@ public final class substitute extends TermTransformOperator  {
     }
 
 
-    @NotNull
+    @Nullable
     @Override
     public Term apply(@NotNull Term[] xx) {
 

@@ -41,10 +41,10 @@ public class TermTreeTest {
         assertNull(tree.get(TermKey.term($("xerm"))));
         assertNull(tree.get(TermKey.term($("te")))); //partial
 
-        assertNotNull(tree.computeIfAbsent(new ByteSeq.RawByteSeq("term"), cb));
+        assertNotNull(tree.computeIfAbsent(TermKey.term($("term")), cb));
         assertEquals(3, tree.size());
 
-        assertNotNull(tree.computeIfAbsent(new ByteSeq.RawByteSeq("termunator"), cb));
+        assertNotNull(tree.computeIfAbsent(TermKey.term($("termunator")), cb));
 
         tree.prettyPrint(System.out);
 

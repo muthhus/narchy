@@ -16,9 +16,9 @@
     "cytoscape-cola": "latest",
     "object-editor": "latest",
     "codemirror": "latest",
-    "metawidget": "latest",
     "golden-layout": "latest",
-    "fastdom": "latest"
+    "fastdom": "latest",
+    "jsoneditor": "^5.5.9"
   },
   "keywords": [
     "nars",

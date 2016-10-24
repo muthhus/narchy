@@ -664,7 +664,7 @@ function editify(div) {
     //
     // return editor;
 
-    var t = $(document.createElement('textarea')).appendTo(div);
+    const t = $(document.createElement('textarea')).appendTo(div);
     return CodeMirror.fromTextArea(t[0], {
         //http://codemirror.net/doc/manual.html#usage
         lineNumbers: false,
