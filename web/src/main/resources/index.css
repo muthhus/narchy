@@ -1,0 +1,85 @@
+html, input, textarea, keygen, select, button {
+    font-family: monospace !important;
+    font-size: 1em; /* see: http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/ */
+}
+
+body {
+    position: fixed;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.terminal {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+
+.CodeMirror {
+    height: auto !important;
+    width: auto !important;
+}
+
+.belief {
+    color: #d4d4d4;
+}
+
+.command {
+    color: greenyellow;
+}
+
+.question {
+    color: #8e70ff;
+}
+
+#input {
+    border: 2px solid rgba(244, 255, 0, 0.71);
+    margin: 0.5em;
+}
+
+.goal {
+    color: orange;
+}
+
+/*.grid-stack-item {*/
+/*border: 2px solid green;*/
+/*}*/
+
+.max {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+.MainMenuButton {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.MainMenuButton:hover {
+    color: orange;
+    /* TODO scale grow transition */
+}
+
+
+
+.MenuLayer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 3;
+}
+
+
+.MenuGraph {
+    position: fixed;
+}
+

@@ -510,10 +510,10 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                 }
                 eventTarget.dispatchEvent(generateEvent('error'));
             };
-        }
+        };
 
         // Whether or not to create a websocket upon instantiation
-        if (this.automaticOpen == true) {
+        if (this.automaticOpen) {
             this.open(false);
         }
 

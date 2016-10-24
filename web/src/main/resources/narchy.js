@@ -601,7 +601,7 @@ function decodeBiNARy(e, m) {
 
         default:
 
-            var e = [ 'unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data) ];
+            const e = [ 'unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data) ];
             console.error(e);
             return e;
     }

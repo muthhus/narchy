@@ -82,8 +82,7 @@
 /*}*/
 
 .lm_controls > li{
-    background-position: center center;
-    background-repeat: no-repeat;
+    background: no-repeat center center;
     position: relative;
 
 }

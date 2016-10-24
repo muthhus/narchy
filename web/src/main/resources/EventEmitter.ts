@@ -4,27 +4,35 @@ const DEFAULT_MAX_LISTENERS = 12;
 
 //TODO use ES6 Map for better performance: http://jsperf.com/map-vs-object-as-hashes/2
 class EventEmitter {
+    private _maxListeners = DEFAULT_MAX_LISTENERS;
+    private _events = new Map();
     constructor(){
-        this._maxListeners = DEFAULT_MAX_LISTENERS;
-        this._events = {}; //TODO use ES6 Map
+
     }
     on(type, listener) {
 
         const that = this;
         if (Array.isArray(type)) {
-            _.each(type, function(t) {
+            for (let t of type)
                 that.on(t, listener);
-            });
             return this;
         }
 
         if(typeof listener != "function") {
-            throw new TypeError()
+            throw new TypeError();
         }
-        const listeners = this._events[type] || (this._events[type] = []);
-        if(listeners.indexOf(listener) != -1) {
-            return this
+
+
+        let listeners = this._events.get(type);
+        if (!listeners) {
+            listeners = [];
+            this._events.set(type, listeners);
         }
+        else if(listeners.indexOf(listener) != -1) {
+            console.error('duplicate add:', type, listener);
+            return this;
+        }
+
         listeners.push(listener);
         if(listeners.length > this._maxListeners) {
             console.error(
@@ -34,36 +42,37 @@ class EventEmitter {
                 listeners.length,
                 type,
                 this._maxListeners
-            )
+            );
         }
-        return this
+        return this;
     }
     once(type, listener) {
         const eventsInstance = this;
         function onceCallback(){
             eventsInstance.off(type, onceCallback);
-            listener.apply(null, arguments)
+            listener.apply(null, arguments);
         }
-        return this.on(type, onceCallback)
+        return this.on(type, onceCallback);
     }
-    off(type, listener) {
+    off(type: string, listener: any=null) {
 
         const that = this;
 
         if (type === undefined) {
             //disable everythign
-            for (let k in this._events) {
-                this.off(k);
-            }
-            return;
+            throw ('unimpl yet');
+            // for (let k of this._events) {
+            //     this.off(k);
+            // }
+            // return;
         } else if (Array.isArray(type)) {
-            _.each(type, function(t) {
-                that.off(t, listener);
-            });
+            for (let tt of type) {
+                that.off(tt, listener);
+            }
             return;
         }
 
-        let listeners = this._events[type];
+        let listeners = this._events.get(type);
 
         if (listener === undefined) {
             //remove any existing
@@ -73,11 +82,11 @@ class EventEmitter {
             return;
 
         } else if (Array.isArray(listener)) {
-            _.each(listener, function(l) {
+            for (let l of type) {
                 that.off(type, l);
-            });
+            }
         } else if(typeof listener != "function") {
-            throw new TypeError()
+            throw new TypeError();
         }
 
         if(!listeners || !listeners.length) {
@@ -88,11 +97,14 @@ class EventEmitter {
             return;
         }
         listeners.splice(indexOfListener, 1);
+        if (listeners.length === 0) {
+            this._events.delete(type); //clear its entry
+        }
 
     }
-    emit(type, args){
+    emit(type: string, args: any[]){
 
-        const listeners = this._events[type];
+        const listeners = this._events.get(type);
         if (listeners) {
             for (let x of listeners)
                 x.apply(null, args);
@@ -101,13 +113,13 @@ class EventEmitter {
         //for (let i = 0; i < listeners.length; i++)
         //listeners.forEach(function(fn) { fn.apply(null, args) })
 
-        return true
+        return true;
     }
     setMaxListeners(newMaxListeners){
         if(parseInt(newMaxListeners) !== newMaxListeners) {
-            throw new TypeError()
+            throw new TypeError();
         }
-        this._maxListeners = newMaxListeners
+        this._maxListeners = newMaxListeners;
     }
 }
 

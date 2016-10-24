@@ -45,7 +45,6 @@ div.jsoneditor-value p {
 }
 
 div.jsoneditor-value {
-    word-break: break-word;
 }
 
 div.jsoneditor-readonly {
@@ -54,8 +53,7 @@ div.jsoneditor-readonly {
 }
 
 div.jsoneditor-empty {
-    border-color: lightgray;
-    border-style: dashed;
+    border: dashed lightgray;
     border-radius: 2px;
 }
 

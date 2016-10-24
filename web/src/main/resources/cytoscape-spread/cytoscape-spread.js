@@ -4,7 +4,7 @@
     } else if (typeof define === "function" && define.amd) {
         define([], f)
     } else {
-        var g;
+        let g;
         if (typeof window !== "undefined") {
             g = window
         } else if (typeof global !== "undefined") {
@@ -17,28 +17,30 @@
         g.cytoscapeSpread = f()
     }
 })(function () {
-    var define, module, exports;
+    let define, module, exports;
     return (function e(t, n, r) {
+        const i = typeof require == "function" && require;
+
         function s(o, u) {
             if (!n[o]) {
                 if (!t[o]) {
-                    var a = typeof require == "function" && require;
+                    const a = typeof require == "function" && require;
                     if (!u && a)return a(o, !0);
                     if (i)return i(o, !0);
-                    var f = new Error("Cannot find module '" + o + "'");
+                    const f = new Error("Cannot find module '" + o + "'");
                     throw f.code = "MODULE_NOT_FOUND", f
                 }
-                var l = n[o] = {exports: {}};
+                const l = n[o] = {exports: {}};
                 t[o][0].call(l.exports, function (e) {
-                    var n = t[o][1][e];
+                    const n = t[o][1][e];
                     return s(n ? n : e)
                 }, l, l.exports, e, t, n, r)
             }
             return n[o].exports
         }
 
-        var i = typeof require == "function" && require;
-        for (var o = 0; o < r.length; o++)s(r[o]);
+
+        for (let o = 0; o < r.length; o++)s(r[o]);
         return s
     })({
         1: [function (_dereq_, module, exports) {
@@ -63,8 +65,8 @@
                  * @return Newly created Edge instance
                  */
                 insertEdge: function (label, weight, vertex1, vertex2, style) {
-                    var e1 = new foograph.Edge(label, weight, vertex2, style);
-                    var e2 = new foograph.Edge(null, weight, vertex1, null);
+                    const e1 = new foograph.Edge(label, weight, vertex2, style);
+                    const e2 = new foograph.Edge(null, weight, vertex1, null);
 
                     vertex1.edges.push(e1);
                     vertex2.reverseEdges.push(e2);
@@ -79,14 +81,15 @@
                  * @param edge Edge to remove
                  */
                 removeEdge: function (vertex1, vertex2) {
-                    for (var i = vertex1.edges.length - 1; i >= 0; i--) {
+                    let i;
+                    for (i = vertex1.edges.length - 1; i >= 0; i--) {
                         if (vertex1.edges[i].endVertex == vertex2) {
                             vertex1.edges.splice(i, 1);
                             break;
                         }
                     }
 
-                    for (var i = vertex2.reverseEdges.length - 1; i >= 0; i--) {
+                    for (i = vertex2.reverseEdges.length - 1; i >= 0; i--) {
                         if (vertex2.reverseEdges[i].endVertex == vertex1) {
                             vertex2.reverseEdges.splice(i, 1);
                             break;
@@ -100,15 +103,16 @@
                  * @param vertex Vertex to remove from the graph
                  */
                 removeVertex: function (vertex) {
-                    for (var i = vertex.edges.length - 1; i >= 0; i--) {
+                    let i;
+                    for (i = vertex.edges.length - 1; i >= 0; i--) {
                         this.removeEdge(vertex, vertex.edges[i].endVertex);
                     }
 
-                    for (var i = vertex.reverseEdges.length - 1; i >= 0; i--) {
+                    for (i = vertex.reverseEdges.length - 1; i >= 0; i--) {
                         this.removeEdge(vertex.reverseEdges[i].endVertex, vertex);
                     }
 
-                    for (var i = this.vertices.length - 1; i >= 0; i--) {
+                    for (i = this.vertices.length - 1; i >= 0; i--) {
                         if (this.vertices[i] == vertex) {
                             this.vertices.splice(i, 1);
                             break;
@@ -124,13 +128,14 @@
                  * @param canvas A proper canvas instance
                  */
                 plot: function (canvas) {
-                    var i = 0;
+                    let v;
+                    let i = 0;
                     /* Draw edges first */
                     for (i = 0; i < this.vertices.length; i++) {
-                        var v = this.vertices[i];
+                        v = this.vertices[i];
                         if (!v.hidden) {
-                            for (var j = 0; j < v.edges.length; j++) {
-                                var e = v.edges[j];
+                            for (let j = 0; j < v.edges.length; j++) {
+                                const e = v.edges[j];
                                 /* Draw edge (if not hidden) */
                                 if (!e.hidden)
                                     e.draw(canvas, v);
@@ -157,7 +162,7 @@
                 Graph: function (label, directed) {
                     /* Fields. */
                     this.label = label;
-                    this.vertices = new Array();
+                    this.vertices = [];
                     this.directed = directed;
                     this.vertexCount = 0;
 
@@ -178,8 +183,8 @@
                  */
                 Vertex: function (label, x, y, style) {
                     this.label = label;
-                    this.edges = new Array();
-                    this.reverseEdges = new Array();
+                    this.edges = [];
+                    this.reverseEdges = [];
                     this.x = x;
                     this.y = y;
                     this.dx = 0;
@@ -238,7 +243,7 @@
                     this.controlY = -1;
                     this.original = null; // If this is a temporary edge it holds the original edge
 
-                    if (style != null) {
+                    if (style) {
                         this.style = style;
                     }
                     else {  // Set to default
@@ -330,11 +335,11 @@
              * @param canvas jsGraphics instance
              */
             foograph.Vertex.prototype.draw = function (canvas) {
-                var x = this.x;
-                var y = this.y;
-                var width = this.style.width;
-                var height = this.style.height;
-                var shape = this.style.shape;
+                const x = this.x;
+                const y = this.y;
+                const width = this.style.width;
+                const height = this.style.height;
+                const shape = this.style.shape;
 
                 canvas.setStroke(2);
                 canvas.setColor(this.style.fillColor);
@@ -363,52 +368,54 @@
              * @param preserveAspect
              */
             foograph.Graph.prototype.normalize = function (width, height, preserveAspect) {
-                for (var i8 in this.vertices) {
-                    var v = this.vertices[i8];
+                let i8;
+                let v;
+                for (i8 in this.vertices) {
+                    v = this.vertices[i8];
                     v.oldX = v.x;
                     v.oldY = v.y;
                 }
-                var mnx = width * 0.1;
-                var mxx = width * 0.9;
-                var mny = height * 0.1;
-                var mxy = height * 0.9;
-                if (preserveAspect == null)
+                const mnx = width * 0.1;
+                const mxx = width * 0.9;
+                const mny = height * 0.1;
+                const mxy = height * 0.9;
+                if (!preserveAspect)
                     preserveAspect = true;
 
-                var minx = Number.MAX_VALUE;
-                var miny = Number.MAX_VALUE;
-                var maxx = Number.MIN_VALUE;
-                var maxy = Number.MIN_VALUE;
+                let minx = Number.MAX_VALUE;
+                let miny = Number.MAX_VALUE;
+                let maxx = Number.MIN_VALUE;
+                let maxy = Number.MIN_VALUE;
 
-                for (var i7 in this.vertices) {
-                    var v = this.vertices[i7];
+                for (let i7 in this.vertices) {
+                    v = this.vertices[i7];
                     if (v.x < minx) minx = v.x;
                     if (v.y < miny) miny = v.y;
                     if (v.x > maxx) maxx = v.x;
                     if (v.y > maxy) maxy = v.y;
                 }
-                var kx = (mxx - mnx) / (maxx - minx);
-                var ky = (mxy - mny) / (maxy - miny);
+                let kx = (mxx - mnx) / (maxx - minx);
+                let ky = (mxy - mny) / (maxy - miny);
 
                 if (preserveAspect) {
                     kx = Math.min(kx, ky);
                     ky = Math.min(kx, ky);
                 }
 
-                var newMaxx = Number.MIN_VALUE;
-                var newMaxy = Number.MIN_VALUE;
-                for (var i8 in this.vertices) {
-                    var v = this.vertices[i8];
+                let newMaxx = Number.MIN_VALUE;
+                let newMaxy = Number.MIN_VALUE;
+                for (i8 in this.vertices) {
+                    v = this.vertices[i8];
                     v.x = (v.x - minx) * kx;
                     v.y = (v.y - miny) * ky;
                     if (v.x > newMaxx) newMaxx = v.x;
                     if (v.y > newMaxy) newMaxy = v.y;
                 }
 
-                var dx = ( width - newMaxx ) / 2.0;
-                var dy = ( height - newMaxy ) / 2.0;
-                for (var i8 in this.vertices) {
-                    var v = this.vertices[i8];
+                const dx = ( width - newMaxx ) / 2.0;
+                const dy = ( height - newMaxy ) / 2.0;
+                for (i8 in this.vertices) {
+                    v = this.vertices[i8];
                     v.x += dx;
                     v.y += dy;
                 }
@@ -421,17 +428,17 @@
              * @param v Start vertex
              */
             foograph.Edge.prototype.draw = function (canvas, v) {
-                var x1 = (v.x + v.style.width / 2);
-                var y1 = (v.y + v.style.height / 2);
-                var x2 = (this.endVertex.x + this.endVertex.style.width / 2);
-                var y2 = (this.endVertex.y + this.endVertex.style.height / 2);
+                const x1 = (v.x + v.style.width / 2);
+                const y1 = (v.y + v.style.height / 2);
+                const x2 = (this.endVertex.x + this.endVertex.style.width / 2);
+                const y2 = (this.endVertex.y + this.endVertex.style.height / 2);
 
                 // Control point (needed only for curved edges)
-                var x3 = this.controlX;
-                var y3 = this.controlY;
+                const x3 = this.controlX;
+                const y3 = this.controlY;
 
                 // Arrow tip and angle
-                var X_TIP, Y_TIP, ANGLE;
+                let X_TIP, Y_TIP, ANGLE;
 
                 /* Quadric Bezier curve definition. */
                 function Bx(t) {
@@ -447,8 +454,9 @@
 
                 if (this.curved) { // Draw a quadric Bezier curve
                     this.curved = false; // Reset
-                    var t = 0, dt = 1 / 10;
-                    var xs = x1, ys = y1, xn, yn;
+                    let t = 0;
+                    const dt = 1 / 10;
+                    let xs = x1, ys = y1, xn, yn;
 
                     while (t < 1 - dt) {
                         t += dt;
@@ -495,19 +503,19 @@
                  */
                 function drawArrow(phi, x, y) {
                     // Arrow bounding box (in px)
-                    var H = 50;
-                    var W = 10;
+                    const H = 50;
+                    let W = 10;
 
                     // Set cartesian coordinates of the arrow
-                    var p11 = 0, p12 = 0;
-                    var p21 = H, p22 = W / 2;
-                    var p31 = H, p32 = -W / 2;
+                    let p11 = 0, p12 = 0;
+                    let p21 = H, p22 = W / 2;
+                    let p31 = H, p32 = -W / 2;
 
                     // Convert to polar coordinates
-                    var r2 = radialCoord(p21, p22);
-                    var r3 = radialCoord(p31, p32);
-                    var phi2 = angularCoord(p21, p22);
-                    var phi3 = angularCoord(p31, p32);
+                    const r2 = radialCoord(p21, p22);
+                    const r3 = radialCoord(p31, p32);
+                    let phi2 = angularCoord(p21, p22);
+                    let phi3 = angularCoord(p31, p32);
 
                     // Rotate the arrow
                     phi2 += phi;
@@ -528,7 +536,7 @@
                     p32 += y;
 
                     // Draw
-                    canvas.fillPolygon(new Array(p11, p21, p31), new Array(p12, p22, p32));
+                    canvas.fillPolygon([p11, p21, p31], [p12, p22, p32]);
                 }
 
                 /**
@@ -537,7 +545,7 @@
                  * @param y Y coordinate
                  */
                 function angularCoord(x, y) {
-                    var phi = 0.0;
+                    let phi = 0.0;
 
                     if (x > 0 && y >= 0) {
                         phi = Math.atan(y / x);
@@ -576,8 +584,8 @@
              * @param graph A valid graph instance
              */
             foograph.RandomVertexLayout.prototype.layout = function (graph) {
-                for (var i = 0; i < graph.vertices.length; i++) {
-                    var v = graph.vertices[i];
+                for (let i = 0; i < graph.vertices.length; i++) {
+                    const v = graph.vertices[i];
                     v.x = (Math.random() * this.width);
                     v.y = (Math.random() * this.height);
                 }
@@ -594,29 +602,33 @@
              *         is only one component.
              */
             foograph.ForceDirectedVertexLayout.prototype.__identifyComponents = function (graph) {
-                var componentCenters = new Array();
-                var components = new Array();
+                let v;
+                let i;
+                let j;
+                const componentCenters = [];
+                const components = [];
 
                 // Depth first search
                 function dfs(vertex) {
-                    var stack = new Array();
-                    var component = new Array();
-                    var centerVertex = new foograph.Vertex("component_center", -1, -1);
+                    const stack = [];
+                    const component = [];
+                    const centerVertex = new foograph.Vertex("component_center", -1, -1);
                     centerVertex.hidden = true;
                     componentCenters.push(centerVertex);
                     components.push(component);
 
                     function visitVertex(v) {
+                        let i;
                         component.push(v);
                         v.__dfsVisited = true;
 
-                        for (var i in v.edges) {
-                            var e = v.edges[i];
+                        for (i in v.edges) {
+                            const e = v.edges[i];
                             if (!e.hidden)
                                 stack.push(e.endVertex);
                         }
 
-                        for (var i in v.reverseEdges) {
+                        for (i in v.reverseEdges) {
                             if (!v.reverseEdges[i].hidden)
                                 stack.push(v.reverseEdges[i].endVertex);
                         }
@@ -624,7 +636,7 @@
 
                     visitVertex(vertex);
                     while (stack.length > 0) {
-                        var u = stack.pop();
+                        const u = stack.pop();
 
                         if (!u.__dfsVisited && !u.hidden) {
                             visitVertex(u);
@@ -633,36 +645,36 @@
                 }
 
                 // Clear DFS visited flag
-                for (var i in graph.vertices) {
-                    var v = graph.vertices[i];
+                for (i in graph.vertices) {
+                    v = graph.vertices[i];
                     v.__dfsVisited = false;
                 }
 
                 // Iterate through all vertices starting DFS from each vertex
                 // that hasn't been visited yet.
-                for (var k in graph.vertices) {
-                    var v = graph.vertices[k];
+                for (let k in graph.vertices) {
+                    v = graph.vertices[k];
                     if (!v.__dfsVisited && !v.hidden)
                         dfs(v);
                 }
 
                 // Interconnect all center vertices
                 if (componentCenters.length > 1) {
-                    for (var i in componentCenters) {
+                    for (i in componentCenters) {
                         graph.insertVertex(componentCenters[i]);
                     }
-                    for (var i in components) {
-                        for (var j in components[i]) {
+                    for (i in components) {
+                        for (j in components[i]) {
                             // Connect visited vertex to "central" component vertex
-                            edge = graph.insertEdge("", 1, components[i][j], componentCenters[i]);
+                            const edge = graph.insertEdge("", 1, components[i][j], componentCenters[i]);
                             edge.hidden = true;
                         }
                     }
 
-                    for (var i in componentCenters) {
-                        for (var j in componentCenters) {
+                    for (i in componentCenters) {
+                        for (j in componentCenters) {
                             if (i != j) {
-                                e = graph.insertEdge("", 3, componentCenters[i], componentCenters[j]);
+                                const e = graph.insertEdge("", 3, componentCenters[i], componentCenters[j]);
                                 e.hidden = true;
                             }
                         }
@@ -681,14 +693,20 @@
              * @param graph A valid graph instance
              */
             foograph.ForceDirectedVertexLayout.prototype.layout = function (graph) {
+                let u;
+                let difx;
+                let dify;
+                let force;
+                let v;
+                let d;
                 this.graph = graph;
-                var area = this.width * this.height;
-                var k = Math.sqrt(area / graph.vertexCount);
+                const area = this.width * this.height;
+                const k = Math.sqrt(area / graph.vertexCount);
 
-                var t = this.width / 10; // Temperature.
-                var dt = t / (this.iterations + 1);
+                let t = this.width / 10; // Temperature.
+                const dt = t / (this.iterations + 1);
 
-                var eps = this.eps; // Minimum distance between the vertices
+                const eps = this.eps; // Minimum distance between the vertices
 
                 // Attractive and repulsive forces
                 function Fa(z) {
@@ -714,28 +732,28 @@
                 }
 
                 // Run through some iterations
-                for (var q = 0; q < this.iterations; q++) {
+                for (let q = 0; q < this.iterations; q++) {
 
                     /* Calculate repulsive forces. */
-                    for (var i1 in graph.vertices) {
-                        var v = graph.vertices[i1];
+                    for (let i1 in graph.vertices) {
+                        v = graph.vertices[i1];
 
                         v.dx = 0;
                         v.dy = 0;
                         // Do not move fixed vertices
                         if (!v.fixed) {
-                            for (var i2 in graph.vertices) {
-                                var u = graph.vertices[i2];
+                            for (let i2 in graph.vertices) {
+                                u = graph.vertices[i2];
                                 if (v != u && !u.fixed) {
                                     /* Difference vector between the two vertices. */
-                                    var difx = v.x - u.x;
-                                    var dify = v.y - u.y;
+                                    difx = v.x - u.x;
+                                    dify = v.y - u.y;
 
                                     /* Length of the dif vector. */
-                                    var d = Math.max(eps, Math.sqrt(difx * difx + dify * dify));
-                                    var force = Fr(d);
-                                    v.dx = v.dx + (difx / d) * force;
-                                    v.dy = v.dy + (dify / d) * force;
+                                    d = Math.max(eps, Math.sqrt(difx * difx + dify * dify));
+                                    force = Fr(d);
+                                    v.dx += (difx / d) * force;
+                                    v.dy += (dify / d) * force;
                                 }
                             }
                             /* Treat the walls as static objects emiting force Fw. */
@@ -755,41 +773,41 @@
                     }
 
                     /* Calculate attractive forces. */
-                    for (var i3 in graph.vertices) {
-                        var v = graph.vertices[i3];
+                    for (let i3 in graph.vertices) {
+                        v = graph.vertices[i3];
 
                         // Do not move fixed vertices
                         if (!v.fixed) {
-                            for (var i4 in v.edges) {
-                                var e = v.edges[i4];
-                                var u = e.endVertex;
-                                var difx = v.x - u.x;
-                                var dify = v.y - u.y;
-                                var d = Math.max(eps, Math.sqrt(difx * difx + dify * dify));
-                                var force = Fa(d);
+                            for (let i4 in v.edges) {
+                                const e = v.edges[i4];
+                                u = e.endVertex;
+                                difx = v.x - u.x;
+                                dify = v.y - u.y;
+                                d = Math.max(eps, Math.sqrt(difx * difx + dify * dify));
+                                force = Fa(d);
 
                                 /* Length of the dif vector. */
-                                var d = Math.max(eps, Math.sqrt(difx * difx + dify * dify));
-                                v.dx = v.dx - (difx / d) * force;
-                                v.dy = v.dy - (dify / d) * force;
+                                d = Math.max(eps, Math.sqrt(difx * difx + dify * dify));
+                                v.dx -= (difx / d) * force;
+                                v.dy -= (dify / d) * force;
 
-                                u.dx = u.dx + (difx / d) * force;
-                                u.dy = u.dy + (dify / d) * force;
+                                u.dx += (difx / d) * force;
+                                u.dy += (dify / d) * force;
                             }
                         }
                     }
 
                     /* Limit the maximum displacement to the temperature t
                      and prevent from being displaced outside frame.     */
-                    for (var i5 in graph.vertices) {
-                        var v = graph.vertices[i5];
+                    for (let i5 in graph.vertices) {
+                        v = graph.vertices[i5];
                         if (!v.fixed) {
                             /* Length of the displacement vector. */
-                            var d = Math.max(eps, Math.sqrt(v.dx * v.dx + v.dy * v.dy));
+                            d = Math.max(eps, Math.sqrt(v.dx * v.dx + v.dy * v.dy));
 
                             /* Limit to the temperature t. */
-                            v.x = v.x + (v.dx / d) * Math.min(d, t);
-                            v.y = v.y + (v.dy / d) * Math.min(d, t);
+                            v.x += (v.dx / d) * Math.min(d, t);
+                            v.y += (v.dy / d) * Math.min(d, t);
 
                             /* Stay inside the frame. */
                             /*
@@ -821,7 +839,7 @@
 
                 // Remove virtual center vertices
                 if (centers) {
-                    for (var i in centers) {
+                    for (let i in centers) {
                         graph.removeVertex(centers[i]);
                     }
                 }
@@ -835,10 +853,10 @@
             'use strict';
 
 // registers the extension on a cytoscape lib ref
-            var getLayout = _dereq_('./layout');
+            const getLayout = _dereq_('./layout');
 
-            var register = function (cytoscape) {
-                var layout = getLayout(cytoscape);
+            const register = function (cytoscape) {
+                const layout = getLayout(cytoscape);
 
                 cytoscape('layout', 'spread', layout);
             };
@@ -850,10 +868,10 @@
             module.exports = register;
 
         }, {"./layout": 3}], 3: [function (_dereq_, module, exports) {
-            var Thread;
+            let Thread;
 
-            var foograph = _dereq_('./foograph');
-            var Voronoi = _dereq_('./rhill-voronoi-core');
+            let foograph = _dereq_('./foograph');
+            let Voronoi = _dereq_('./rhill-voronoi-core');
 
             /*
              * This layout combines several algorithms:
@@ -865,7 +883,7 @@
              *   Gansner and North (doi:10.1007/3-540-37623-2_28)
              */
 
-            var defaults = {
+            const defaults = {
                 animate: true, // whether to show the layout as it's running
                 ready: undefined, // Callback on layoutready
                 stop: undefined, // Callback on layoutstop
@@ -885,22 +903,23 @@
             };
 
             function SpreadLayout(options) {
-                var opts = this.options = {};
-                for (var i in defaults) {
+                let i;
+                const opts = this.options = {};
+                for (i in defaults) {
                     opts[i] = defaults[i];
                 }
-                for (var i in options) {
+                for (i in options) {
                     opts[i] = options[i];
                 }
             }
 
             SpreadLayout.prototype.run = function () {
 
-                var layout = this;
-                var options = this.options;
-                var cy = options.cy;
+                const layout = this;
+                const options = this.options;
+                const cy = options.cy;
 
-                var bb = options.boundingBox || {x1: 0, y1: 0, w: cy.width(), h: cy.height()};
+                const bb = options.boundingBox || {x1: 0, y1: 0, w: cy.width(), h: cy.height()};
                 if (bb.x2 === undefined) {
                     bb.x2 = bb.x1 + bb.w;
                 }
@@ -914,13 +933,13 @@
                     bb.h = bb.y2 - bb.y1;
                 }
 
-                var nodes = cy.nodes();
-                var edges = cy.edges();
-                var cWidth = cy.width();
-                var cHeight = cy.height();
-                var simulationBounds = bb;
-                var padding = options.padding;
-                var simBBFactor = Math.max(1, Math.log(nodes.length) * 0.8);
+                const nodes = cy.nodes();
+                const edges = cy.edges();
+                const cWidth = cy.width();
+                const cHeight = cy.height();
+                const simulationBounds = bb;
+                const padding = options.padding;
+                let simBBFactor = Math.max(1, Math.log(nodes.length) * 0.8);
 
                 if (nodes.length < 100) {
                     simBBFactor /= 2;
@@ -931,7 +950,7 @@
                     layout: layout
                 });
 
-                var simBB = {
+                const simBB = {
                     x1: 0,
                     y1: 0,
                     x2: cWidth * simBBFactor,
@@ -950,8 +969,8 @@
                 simBB.x2 -= padding;
                 simBB.y2 -= padding;
 
-                var width = simBB.x2 - simBB.x1;
-                var height = simBB.y2 - simBB.y1;
+                const width = simBB.x2 - simBB.x1;
+                const height = simBB.y2 - simBB.y1;
 
                 // Get start time
                 //var startTime = Date.now();
@@ -981,7 +1000,7 @@
                 }
 
                 // First I need to create the data structure to pass to the worker
-                var pData = {
+                const pData = {
                     'width': width,
                     'height': height,
                     'minDist': options.minDist,
@@ -996,8 +1015,8 @@
 
                 nodes.each(
                     function (i, node) {
-                        var nodeId = node.id();
-                        var pos = node.position();
+                        const nodeId = node.id();
+                        let pos = node.position();
 
                         if (options.randomize) {
                             pos = {
@@ -1015,8 +1034,8 @@
 
                 edges.each(
                     function () {
-                        var srcNodeId = this.source().id();
-                        var tgtNodeId = this.target().id();
+                        const srcNodeId = this.source().id();
+                        const tgtNodeId = this.target().id();
                         pData['edges'].push({
                             src: srcNodeId,
                             tgt: tgtNodeId
@@ -1024,7 +1043,7 @@
                     });
 
                 //Decleration
-                var t1 = layout.thread;
+                let t1 = layout.thread;
 
                 // reuse old thread if possible
                 if (!t1 /*|| t1.stopped()*/) {
@@ -1041,10 +1060,10 @@
                 function setPositions(pData) { //console.log('set posns')
                     // First we retrieve the important data
                     // var expandIteration = pData[ 'expIt' ];
-                    var dataVertices = pData['vertices'];
-                    var vertices = [];
-                    for (var i = 0; i < dataVertices.length; ++i) {
-                        var dv = dataVertices[i];
+                    const dataVertices = pData['vertices'];
+                    const vertices = [];
+                    for (let i = 0; i < dataVertices.length; ++i) {
+                        const dv = dataVertices[i];
                         vertices[dv.id] = [dv.x, dv.y];
                         /*{
                          x: dv.x,
@@ -1052,10 +1071,10 @@
                          };*/
                     }
 
-                    var sx = simBB.x1;
-                    var sy = simBB.y1;
+                    const sx = simBB.x1;
+                    const sy = simBB.y1;
 
-                    var speed = options.speed;
+                    const speed = options.speed;
 
                     /*
                      * FINALLY:
@@ -1065,9 +1084,9 @@
                     cy.batch(function() {
                         nodes.positions(
                             function (i, node) {
-                                var vertex = vertices[node.id()];
+                                const vertex = vertices[node.id()];
 
-                                var pp = node.position();
+                                const pp = node.position();
 
                                 return {
                                     x: ( sx + vertex[0] ) * speed + (1 - speed) * pp.x,
@@ -1084,9 +1103,9 @@
                     nodes.rtrigger("position");
                 }
 
-                var didLayoutReady = false;
+                let didLayoutReady = false;
                 t1.on('message', function (e) {
-                    var pData = e.message; //console.log('message', e)
+                    const pData = e.message; //console.log('message', e)
 
                     if (!options.animate) {
                         return;
@@ -1105,15 +1124,35 @@
 
                 t1.pass(pData).run(function (pData) {
 
+
+
+                    /*
+                     * FIRST STEP: Application of the Fruchterman-Reingold algorithm
+                     *
+                     * We use the version implemented by the foograph library
+                     *
+                     * Ref.: https://code.google.com/p/foograph/
+                     */
+
+                    // We need to create an instance of a graph compatible with the library
+                    const frg = new foograph.Graph("FRgraph", false);
+                    const fv = frg.vertices;
+                    let expandIteration;
+                    let i;
+                    let cell;
+                    let site;
+                    let centroid;
+                    let currv;
+
                     function cellCentroid(cell) {
-                        var hes = cell.halfedges;
-                        var area = 0,
+                        const hes = cell.halfedges;
+                        let area = 0,
                             x = 0,
                             y = 0;
-                        var p1, p2, f;
+                        let p1, p2, f;
 
-                        for (var i = 0; i < hes.length; ++i) {
-                            var hh = hes[i];
+                        for (let i = 0; i < hes.length; ++i) {
+                            const hh = hes[i];
                             p1 = hh.getEndpoint();
                             p2 = hh.getStartpoint();
 
@@ -1134,8 +1173,8 @@
                     }
 
                     function sitesDistanceSq(ls, rs) {
-                        var dx = ls.x - rs.x;
-                        var dy = ls.y - rs.y;
+                        const dx = ls.x - rs.x;
+                        const dy = ls.y - rs.y;
                         return (dx * dx + dy * dy);
                     }
 
@@ -1143,24 +1182,24 @@
                     Voronoi = _ref_('Voronoi');
 
                     // I need to retrieve the important data
-                    var lWidth = pData['width'];
-                    var lHeight = pData['height'];
-                    var lMinDist = pData['minDist'];
-                    var lMinDistSq = lMinDist*lMinDist;
-                    var lExpFact = pData['expFact'];
-                    var lMaxExpIt = pData['maxExpIt'];
-                    var lMaxFruchtermanReingoldIterations = pData['maxFruchtermanReingoldIterations'];
+                    let lWidth = pData['width'];
+                    let lHeight = pData['height'];
+                    const lMinDist = pData['minDist'];
+                    const lMinDistSq = lMinDist * lMinDist;
+                    let lExpFact = pData['expFact'];
+                    const lMaxExpIt = pData['maxExpIt'];
+                    const lMaxFruchtermanReingoldIterations = pData['maxFruchtermanReingoldIterations'];
 
                     // Prepare the data to output
-                    var savePositions = function () {
+                    const savePositions = function () {
                         pData['width'] = lWidth;
                         pData['height'] = lHeight;
                         pData['expIt'] = expandIteration;
                         pData['expFact'] = lExpFact;
 
                         pData['vertices'] = [];
-                        for (var i = 0; i < fv.length; ++i) {
-                            var ff = fv[i];
+                        for (let i = 0; i < fv.length; ++i) {
+                            const ff = fv[i];
                             pData['vertices'].push({
                                 id: ff.label,
                                 x: ff.x,
@@ -1169,30 +1208,19 @@
                         }
                     };
 
-                    var messagePositions = function () {
+                    const messagePositions = function () {
                         broadcast(pData);
                     };
 
-                    /*
-                     * FIRST STEP: Application of the Fruchterman-Reingold algorithm
-                     *
-                     * We use the version implemented by the foograph library
-                     *
-                     * Ref.: https://code.google.com/p/foograph/
-                     */
-
-                    // We need to create an instance of a graph compatible with the library
-                    var frg = new foograph.Graph("FRgraph", false);
-
-                    var frgNodes = {};
+                    const frgNodes = {};
 
 
                     // Then we have to add the vertices
-                    var dataVertices = pData['vertices'];
-                    for (var ni = 0; ni < dataVertices.length; ++ni) {
-                        var dn = dataVertices[ni];
-                        var id = dn.id;
-                        var v = new foograph.Vertex(id,
+                    const dataVertices = pData['vertices'];
+                    for (let ni = 0; ni < dataVertices.length; ++ni) {
+                        const dn = dataVertices[ni];
+                        const id = dn.id;
+                        const v = new foograph.Vertex(id,
                             //( Math.random() * lHeight ), ( Math.random() * lHeight )
                             dn.x,
                             dn.y
@@ -1201,19 +1229,19 @@
                         frg.insertVertex(v);
                     }
 
-                    var dataEdges = pData['edges'];
-                    for (var ei = 0; ei < dataEdges.length; ++ei) {
-                        var de = dataEdges[ei];
-                        var srcNodeId = de['src'];
-                        var tgtNodeId = de['tgt'];
+                    const dataEdges = pData['edges'];
+                    for (let ei = 0; ei < dataEdges.length; ++ei) {
+                        const de = dataEdges[ei];
+                        const srcNodeId = de['src'];
+                        const tgtNodeId = de['tgt'];
                         frg.insertEdge("", 1, frgNodes[srcNodeId], frgNodes[tgtNodeId]);
                     }
 
-                    var fv = frg.vertices;
+
 
                     // Then we apply the layout
-                    var iterations = lMaxFruchtermanReingoldIterations;
-                    var frLayoutManager = new foograph.ForceDirectedVertexLayout(lWidth, lHeight, iterations, false, lMinDist);
+                    const iterations = lMaxFruchtermanReingoldIterations;
+                    const frLayoutManager = new foograph.ForceDirectedVertexLayout(lWidth, lHeight, iterations, false, lMinDist);
 
                     frLayoutManager.callback = function () {
                         savePositions();
@@ -1239,39 +1267,39 @@
                      */
 
                     // We calculate the Voronoi diagram dor the position of the nodes
-                    var voronoi = new Voronoi();
-                    var bbox = {
+                    const voronoi = new Voronoi();
+                    let bbox = {
                         xl: 0,
                         xr: lWidth,
                         yt: 0,
                         yb: lHeight
                     };
-                    var vSites = [];
-                    for (var i = 0; i < fv.length; ++i) {
+                    const vSites = [];
+                    for (i = 0; i < fv.length; ++i) {
                         vSites[fv[i].label] = fv[i];
                     }
 
                     function checkMinDist(ee) {
-                        var infractions = 0;
+                        let infractions = 0;
                         // Then we check if the minimum distance is satisfied
-                        for (var eei = 0; eei < ee.length; ++eei) {
-                            var e = ee[eei];
-                            if (( e.lSite != null ) && ( e.rSite != null ) && sitesDistanceSq(e.lSite, e.rSite) < lMinDistSq) {
+                        for (let eei = 0; eei < ee.length; ++eei) {
+                            const e = ee[eei];
+                            if (( !e.lSite ) && ( !e.rSite ) && sitesDistanceSq(e.lSite, e.rSite) < lMinDistSq) {
                                 ++infractions;
                             }
                         }
                         return infractions;
                     }
 
-                    var diagram = voronoi.compute(fv, bbox);
+                    let diagram = voronoi.compute(fv, bbox);
 
                     // Then we reposition the nodes at the centroid of their Voronoi cells
-                    var cells = diagram.cells;
-                    for (var i = 0; i < cells.length; ++i) {
-                        var cell = cells[i];
-                        var site = cell.site;
-                        var centroid = cellCentroid(cell);
-                        var currv = vSites[site.label];
+                    const cells = diagram.cells;
+                    for (i = 0; i < cells.length; ++i) {
+                        cell = cells[i];
+                        site = cell.site;
+                        centroid = cellCentroid(cell);
+                        currv = vSites[site.label];
                         currv.x = centroid.x;
                         currv.y = centroid.y;
                     }
@@ -1282,35 +1310,35 @@
                         //console.info("Expanding factor is " + (options.expandingFactor * 100.0) + "%");
                     }
 
-                    var prevInfractions = checkMinDist(diagram.edges);
+                    let prevInfractions = checkMinDist(diagram.edges);
                     //console.info("Initial infractions " + prevInfractions);
 
-                    var bStop = ( prevInfractions <= 0 ) || lMaxExpIt <= 0;
+                    let bStop = ( prevInfractions <= 0 ) || lMaxExpIt <= 0;
 
-                    var voronoiIteration = 0;
-                    var expandIteration = 0;
+                    let voronoiIteration = 0;
+                    expandIteration = 0;
 
                     // var initWidth = lWidth;
 
                     while (!bStop) {
                         ++voronoiIteration;
-                        for (var it = 0; it <= 4; ++it) {
+                        for (let it = 0; it <= 4; ++it) {
                             voronoi.recycle(diagram);
                             diagram = voronoi.compute(fv, bbox);
 
                             // Then we reposition the nodes at the centroid of their Voronoi cells
                             // cells = diagram.cells;
-                            for (var i = 0; i < cells.length; ++i) {
-                                var cell = cells[i];
-                                var site = cell.site;
-                                var centroid = cellCentroid(cell);
-                                var currv = vSites[site.label];
+                            for (i = 0; i < cells.length; ++i) {
+                                cell = cells[i];
+                                site = cell.site;
+                                centroid = cellCentroid(cell);
+                                currv = vSites[site.label];
                                 currv.x = centroid.x;
                                 currv.y = centroid.y;
                             }
                         }
 
-                        var currInfractions = checkMinDist(diagram.edges);
+                        const currInfractions = checkMinDist(diagram.edges);
                         //console.info("Current infractions " + currInfractions);
 
                         if (currInfractions <= 0) {
@@ -1345,7 +1373,7 @@
 
                 }).then(function (pData) {
                     // var expandIteration = pData[ 'expIt' ];
-                    var dataVertices = pData['vertices'];
+                    let dataVertices = pData['vertices'];
 
                     setPositions(pData);
 
@@ -1495,7 +1523,7 @@
                 }
                 // Move leftover beachsections to the beachsection junkyard.
                 if (this.beachline.root) {
-                    var beachsection = this.beachline.getFirst(this.beachline.root);
+                    let beachsection = this.beachline.getFirst(this.beachline.root);
                     while (beachsection) {
                         this.beachsectionJunkyard.push(beachsection); // mark for reuse
                         beachsection = beachsection.rbNext;
@@ -1544,7 +1572,7 @@
             };
 
             Voronoi.prototype.RBTree.prototype.rbInsertSuccessor = function (node, successor) {
-                var parent;
+                let parent;
                 if (node) {
                     // >>> rhill 2011-05-27: Performance: cache previous/next nodes
                     successor.rbPrevious = node;
@@ -1592,7 +1620,7 @@
                 // Fixup the modified tree by recoloring nodes and performing
                 // rotations (2 at most) hence the red-black tree properties are
                 // preserved.
-                var grandpa, uncle;
+                let grandpa, uncle;
                 node = successor;
                 while (parent && parent.rbRed) {
                     grandpa = parent.rbParent;
@@ -1647,7 +1675,7 @@
                 }
                 node.rbNext = node.rbPrevious = null;
                 // <<<
-                var parent = node.rbParent,
+                let parent = node.rbParent,
                     left = node.rbLeft,
                     right = node.rbRight,
                     next;
@@ -1672,7 +1700,7 @@
                     this.root = next;
                 }
                 // enforce red-black rules
-                var isRed;
+                let isRed;
                 if (left && right) {
                     isRed = next.rbRed;
                     next.rbRed = node.rbRed;
@@ -1710,7 +1738,7 @@
                     return;
                 }
                 // the other cases
-                var sibling;
+                let sibling;
                 do {
                     if (node === this.root) {
                         break;
@@ -1769,7 +1797,7 @@
             };
 
             Voronoi.prototype.RBTree.prototype.rbRotateLeft = function (node) {
-                var p = node,
+                const p = node,
                     q = node.rbRight, // can't be null
                     parent = p.rbParent;
                 if (parent) {
@@ -1793,7 +1821,7 @@
             };
 
             Voronoi.prototype.RBTree.prototype.rbRotateRight = function (node) {
-                var p = node,
+                const p = node,
                     q = node.rbLeft, // can't be null
                     parent = p.rbParent;
                 if (parent) {
@@ -1854,7 +1882,7 @@
             };
 
             Voronoi.prototype.createCell = function (site) {
-                var cell = this.cellJunkyard.pop();
+                const cell = this.cellJunkyard.pop();
                 if (cell) {
                     return cell.init(site);
                 }
@@ -1862,8 +1890,8 @@
             };
 
             Voronoi.prototype.Cell.prototype.prepareHalfedges = function () {
-                var halfedges = this.halfedges,
-                    iHalfedge = halfedges.length,
+                const halfedges = this.halfedges;
+                let iHalfedge = halfedges.length,
                     edge;
                 // get rid of unused halfedges
                 // rhill 2011-05-27: Keep it simple, no point here in trying
@@ -1888,8 +1916,8 @@
 
 // Return a list of the neighbor Ids
             Voronoi.prototype.Cell.prototype.getNeighborIds = function () {
-                var neighbors = [],
-                    iHalfedge = this.halfedges.length,
+                const neighbors = [];
+                let iHalfedge = this.halfedges.length,
                     edge;
                 while (iHalfedge--) {
                     edge = this.halfedges[iHalfedge].edge;
@@ -1906,8 +1934,8 @@
 // Compute bounding box
 //
             Voronoi.prototype.Cell.prototype.getBbox = function () {
-                var halfedges = this.halfedges,
-                    iHalfedge = halfedges.length,
+                const halfedges = this.halfedges;
+                let iHalfedge = halfedges.length,
                     xmin = Infinity,
                     ymin = Infinity,
                     xmax = -Infinity,
@@ -1958,8 +1986,8 @@
                 //   "if it is less than 0 then P is to the right of the line segment,
                 //   "if greater than 0 it is to the left, if equal to 0 then it lies
                 //   "on the line segment"
-                var halfedges = this.halfedges,
-                    iHalfedge = halfedges.length,
+                const halfedges = this.halfedges;
+                let iHalfedge = halfedges.length,
                     halfedge,
                     p0, p1, r;
                 while (iHalfedge--) {
@@ -2006,7 +2034,7 @@
                     this.angle = Math.atan2(rSite.y - lSite.y, rSite.x - lSite.x);
                 }
                 else {
-                    var va = edge.va,
+                    const va = edge.va,
                         vb = edge.vb;
                     // rhill 2011-05-31: used to call getStartpoint()/getEndpoint(),
                     // but for performance purpose, these are expanded in place here.
@@ -2032,7 +2060,7 @@
 // this create and add a vertex to the internal collection
 
             Voronoi.prototype.createVertex = function (x, y) {
-                var v = this.vertexJunkyard.pop();
+                let v = this.vertexJunkyard.pop();
                 if (!v) {
                     v = new this.Vertex(x, y);
                 }
@@ -2049,7 +2077,7 @@
 // of halfedges.
 
             Voronoi.prototype.createEdge = function (lSite, rSite, va, vb) {
-                var edge = this.edgeJunkyard.pop();
+                let edge = this.edgeJunkyard.pop();
                 if (!edge) {
                     edge = new this.Edge(lSite, rSite);
                 }
@@ -2072,7 +2100,7 @@
             };
 
             Voronoi.prototype.createBorderEdge = function (lSite, va, vb) {
-                var edge = this.edgeJunkyard.pop();
+                let edge = this.edgeJunkyard.pop();
                 if (!edge) {
                     edge = new this.Edge(lSite, null);
                 }
@@ -2122,7 +2150,7 @@
 // performance gain.
 
             Voronoi.prototype.createBeachsection = function (site) {
-                var beachsection = this.beachsectionJunkyard.pop();
+                let beachsection = this.beachsectionJunkyard.pop();
                 if (!beachsection) {
                     beachsection = new this.Beachsection();
                 }
@@ -2167,29 +2195,29 @@
                 // reduce errors due to computers' finite arithmetic precision.
                 // Maybe can still be improved, will see if any more of this
                 // kind of errors pop up again.
-                var site = arc.site,
-                    rfocx = site.x,
-                    rfocy = site.y,
-                    pby2 = rfocy - directrix;
+                let site = arc.site;
+                const rfocx = site.x,
+                    rfocy = site.y;
+                let pby2 = rfocy - directrix;
                 // parabola in degenerate case where focus is on directrix
                 if (!pby2) {
                     return rfocx;
                 }
-                var lArc = arc.rbPrevious;
+                let lArc = arc.rbPrevious;
                 if (!lArc) {
                     return -Infinity;
                 }
                 site = lArc.site;
-                var lfocx = site.x,
-                    lfocy = site.y,
-                    plby2 = lfocy - directrix;
+                const lfocx = site.x,
+                    lfocy = site.y;
+                let plby2 = lfocy - directrix;
                 // parabola in degenerate case where focus is on directrix
                 if (!plby2) {
                     return lfocx;
                 }
-                var hl = lfocx - rfocx,
-                    aby2 = 1 / pby2 - 1 / plby2,
-                    b = hl / plby2;
+                const hl = lfocx - rfocx,
+                    aby2 = 1 / pby2 - 1 / plby2;
+                let b = hl / plby2;
                 if (aby2) {
                     return (-b + this.sqrt(b * b - 2 * aby2 * (hl * hl / (-2 * plby2) - lfocy + plby2 / 2 + rfocy - pby2 / 2))) / aby2 + rfocx;
                 }
@@ -2200,11 +2228,11 @@
 // calculate the right break point of a particular beach section,
 // given a particular directrix
             Voronoi.prototype.rightBreakPoint = function (arc, directrix) {
-                var rArc = arc.rbNext;
+                const rArc = arc.rbNext;
                 if (rArc) {
                     return this.leftBreakPoint(rArc, directrix);
                 }
-                var site = arc.site;
+                const site = arc.site;
                 return site.y === directrix ? site.x : Infinity;
             };
 
@@ -2215,13 +2243,13 @@
             };
 
             Voronoi.prototype.removeBeachsection = function (beachsection) {
-                var circle = beachsection.circleEvent,
+                const circle = beachsection.circleEvent,
                     x = circle.x,
                     y = circle.ycenter,
-                    vertex = this.createVertex(x, y),
-                    previous = beachsection.rbPrevious,
-                    next = beachsection.rbNext,
-                    disappearingTransitions = [beachsection],
+                    vertex = this.createVertex(x, y);
+                let previous = beachsection.rbPrevious,
+                    next = beachsection.rbNext;
+                const disappearingTransitions = [beachsection],
                     abs_fn = Math.abs;
 
                 // remove collapsed beachsection from beachline
@@ -2237,7 +2265,7 @@
                 // on their left/right side.
 
                 // look left
-                var lArc = previous;
+                let lArc = previous;
                 while (lArc.circleEvent && abs_fn(x - lArc.circleEvent.x) < 1e-9 && abs_fn(y - lArc.circleEvent.ycenter) < 1e-9) {
                     previous = lArc.rbPrevious;
                     disappearingTransitions.unshift(lArc);
@@ -2252,7 +2280,7 @@
                 this.detachCircleEvent(lArc);
 
                 // look right
-                var rArc = next;
+                let rArc = next;
                 while (rArc.circleEvent && abs_fn(x - rArc.circleEvent.x) < 1e-9 && abs_fn(y - rArc.circleEvent.ycenter) < 1e-9) {
                     next = rArc.rbNext;
                     disappearingTransitions.push(rArc);
@@ -2267,8 +2295,8 @@
 
                 // walk through all the disappearing transitions between beach sections and
                 // set the start point of their (implied) edge.
-                var nArcs = disappearingTransitions.length,
-                    iArc;
+                const nArcs = disappearingTransitions.length;
+                let iArc;
                 for (iArc = 1; iArc < nArcs; iArc++) {
                     rArc = disappearingTransitions[iArc];
                     lArc = disappearingTransitions[iArc - 1];
@@ -2291,14 +2319,14 @@
             };
 
             Voronoi.prototype.addBeachsection = function (site) {
-                var x = site.x,
+                const x = site.x,
                     directrix = site.y;
 
                 // find the left and right beach sections which will surround the newly
                 // created beach section.
                 // rhill 2011-06-01: This loop is one of the most often executed,
                 // hence we expand in-place the comparison-against-epsilon calls.
-                var lArc, rArc,
+                let lArc, rArc,
                     dxl, dxr,
                     node = this.beachline.root;
 
@@ -2346,7 +2374,7 @@
                 // undefined or null.
 
                 // create a new beach section object for the site and add it to RB-tree
-                var newArc = this.createBeachsection(site);
+                const newArc = this.createBeachsection(site);
                 this.beachline.rbInsertSuccessor(lArc, newArc);
 
                 // cases:
@@ -2435,7 +2463,7 @@
                     // http://mathforum.org/library/drmath/view/55002.html
                     // Except that I bring the origin at A to simplify
                     // calculation
-                    var lSite = lArc.site,
+                    const lSite = lArc.site,
                         ax = lSite.x,
                         ay = lSite.y,
                         bx = site.x - ax,
@@ -2459,7 +2487,7 @@
                     // and if so create circle events, to handle the point of collapse.
                     this.attachCircleEvent(lArc);
                     this.attachCircleEvent(rArc);
-                    return;
+
                 }
             };
 
@@ -2482,12 +2510,12 @@
             };
 
             Voronoi.prototype.attachCircleEvent = function (arc) {
-                var lArc = arc.rbPrevious,
+                let lArc = arc.rbPrevious,
                     rArc = arc.rbNext;
                 if (!lArc || !rArc) {
                     return;
                 } // does that ever happen?
-                var lSite = lArc.site,
+                const lSite = lArc.site,
                     cSite = arc.site,
                     rSite = rArc.site;
 
@@ -2507,7 +2535,7 @@
                 // The bottom-most part of the circumcircle is our Fortune 'circle
                 // event', and its center is a vertex potentially part of the final
                 // Voronoi diagram.
-                var bx = cSite.x,
+                const bx = cSite.x,
                     by = cSite.y,
                     ax = lSite.x - bx,
                     ay = lSite.y - by,
@@ -2520,12 +2548,12 @@
                 // http://en.wikipedia.org/wiki/Curve_orientation#Orientation_of_a_simple_polygon
                 // rhill 2011-05-21: Nasty finite precision error which caused circumcircle() to
                 // return infinites: 1e-12 seems to fix the problem.
-                var d = 2 * (ax * cy - ay * cx);
+                const d = 2 * (ax * cy - ay * cx);
                 if (d >= -2e-12) {
                     return;
                 }
 
-                var ha = ax * ax + ay * ay,
+                const ha = ax * ax + ay * ay,
                     hc = cx * cx + cy * cy,
                     x = (cy * ha - ay * hc) / d,
                     y = (ax * hc - cx * ha) / d,
@@ -2535,7 +2563,7 @@
                 // to waste CPU cycles by checking
 
                 // recycle circle event object if possible
-                var circleEvent = this.circleEventJunkyard.pop();
+                let circleEvent = this.circleEventJunkyard.pop();
                 if (!circleEvent) {
                     circleEvent = new this.CircleEvent();
                 }
@@ -2548,7 +2576,7 @@
 
                 // find insertion point in RB-tree: circle events are ordered from
                 // smallest to largest
-                var predecessor = null,
+                let predecessor = null,
                     node = this.circleEvents.root;
                 while (node) {
                     if (circleEvent.y < node.y || (circleEvent.y === node.y && circleEvent.x <= node.x)) {
@@ -2577,7 +2605,7 @@
             };
 
             Voronoi.prototype.detachCircleEvent = function (arc) {
-                var circleEvent = arc.circleEvent;
+                const circleEvent = arc.circleEvent;
                 if (circleEvent) {
                     if (!circleEvent.rbPrevious) {
                         this.firstCircleEvent = circleEvent.rbNext;
@@ -2598,14 +2626,14 @@
 //   true: the dangling endpoint could be connected
             Voronoi.prototype.connectEdge = function (edge, bbox) {
                 // skip if end point already connected
-                var vb = edge.vb;
+                let vb = edge.vb;
                 if (!!vb) {
                     return true;
                 }
 
                 // make local copy for performance purpose
-                var va = edge.va,
-                    xl = bbox.xl,
+                let va = edge.va;
+                const xl = bbox.xl,
                     xr = bbox.xr,
                     yt = bbox.yt,
                     yb = bbox.yb,
@@ -2616,8 +2644,8 @@
                     rx = rSite.x,
                     ry = rSite.y,
                     fx = (lx + rx) / 2,
-                    fy = (ly + ry) / 2,
-                    fm, fb;
+                    fy = (ly + ry) / 2;
+                let fm, fb;
 
                 // if we reach here, this means cells which use this edge will need
                 // to be closed, whether because the edge was removed, or because it
@@ -2739,20 +2767,20 @@
 // Thanks!
 // A bit modified to minimize code paths
             Voronoi.prototype.clipEdge = function (edge, bbox) {
-                var ax = edge.va.x,
+                const ax = edge.va.x,
                     ay = edge.va.y,
                     bx = edge.vb.x,
-                    by = edge.vb.y,
-                    t0 = 0,
-                    t1 = 1,
-                    dx = bx - ax,
+                    by = edge.vb.y;
+                let t0 = 0,
+                    t1 = 1;
+                const dx = bx - ax,
                     dy = by - ay;
                 // left
-                var q = ax - bbox.xl;
+                let q = ax - bbox.xl;
                 if (dx === 0 && q < 0) {
                     return false;
                 }
-                var r = -q / dx;
+                let r = -q / dx;
                 if (dx < 0) {
                     if (r < t0) {
                         return false;
@@ -2868,10 +2896,10 @@
             Voronoi.prototype.clipEdges = function (bbox) {
                 // connect all dangling edges to bounding box
                 // or get rid of them if it can't be done
-                var edges = this.edges,
-                    iEdge = edges.length,
-                    edge,
-                    abs_fn = Math.abs;
+                const edges = this.edges;
+                let iEdge = edges.length,
+                    edge;
+                const abs_fn = Math.abs;
 
                 // iterate backward so we can splice safely
                 while (iEdge--) {
@@ -2892,19 +2920,19 @@
 // Each cell refers to its associated site, and a list
 // of halfedges ordered counterclockwise.
             Voronoi.prototype.closeCells = function (bbox) {
-                var xl = bbox.xl,
+                const xl = bbox.xl,
                     xr = bbox.xr,
                     yt = bbox.yt,
                     yb = bbox.yb,
-                    cells = this.cells,
-                    iCell = cells.length,
+                    cells = this.cells;
+                let iCell = cells.length,
                     cell,
                     iLeft,
                     halfedges, nHalfedges,
                     edge,
                     va, vb, vz,
-                    lastBorderSegment,
-                    abs_fn = Math.abs;
+                    lastBorderSegment;
+                const abs_fn = Math.abs;
 
                 while (iCell--) {
                     cell = cells[iCell];
@@ -3075,8 +3103,8 @@
 // added.
 
             Voronoi.prototype.quantizeSites = function (sites) {
-                var ε = this.ε,
-                    n = sites.length,
+                const ε = this.ε;
+                let n = sites.length,
                     site;
                 while (n--) {
                     site = sites[n];
@@ -3127,9 +3155,9 @@
                 }
 
                 // Initialize site event queue
-                var siteEvents = sites.slice(0);
+                const siteEvents = sites.slice(0);
                 siteEvents.sort(function (a, b) {
-                    var r = b.y - a.y;
+                    const r = b.y - a.y;
                     if (r) {
                         return r;
                     }
@@ -3137,12 +3165,12 @@
                 });
 
                 // process queue
-                var site = siteEvents.pop(),
+                let site = siteEvents.pop(),
                     siteid = 0,
                     xsitex, // to avoid duplicate sites
-                    xsitey,
-                    cells = this.cells,
-                    circle;
+                    xsitey;
+                const cells = this.cells;
+                let circle;
 
                 // main loop
                 for (; ;) {
@@ -3189,10 +3217,10 @@
                 this.closeCells(bbox);
 
                 // to measure execution time
-                var stopTime = new Date();
+                let stopTime = new Date();
 
                 // prepare return values
-                var diagram = new this.Diagram();
+                const diagram = new this.Diagram();
                 diagram.cells = this.cells;
                 diagram.edges = this.edges;
                 diagram.vertices = this.vertices;
