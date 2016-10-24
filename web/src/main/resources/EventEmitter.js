@@ -1,24 +1,22 @@
 "use strict";
-var DEFAULT_MAX_LISTENERS = 12;
+const DEFAULT_MAX_LISTENERS = 12;
 //TODO use ES6 Map for better performance: http://jsperf.com/map-vs-object-as-hashes/2
-var EventEmitter = (function () {
-    function EventEmitter() {
+class EventEmitter {
+    constructor() {
         this._maxListeners = DEFAULT_MAX_LISTENERS;
         this._events = new Map();
     }
-    EventEmitter.prototype.on = function (type, listener) {
-        var that = this;
+    on(type, listener) {
+        const that = this;
         if (Array.isArray(type)) {
-            for (var _i = 0, type_1 = type; _i < type_1.length; _i++) {
-                var t = type_1[_i];
+            for (let t of type)
                 that.on(t, listener);
-            }
             return this;
         }
         if (typeof listener != "function") {
             throw new TypeError();
         }
-        var listeners = this._events.get(type);
+        let listeners = this._events.get(type);
         if (!listeners) {
             listeners = [listener];
             this._events.set(type, listeners);
@@ -36,30 +34,28 @@ var EventEmitter = (function () {
             }
         }
         return this;
-    };
-    EventEmitter.prototype.once = function (type, listener) {
-        var eventsInstance = this;
+    }
+    once(type, listener) {
+        const eventsInstance = this;
         function onceCallback() {
             eventsInstance.off(type, onceCallback);
             listener.apply(null, arguments);
         }
         return this.on(type, onceCallback);
-    };
-    EventEmitter.prototype.off = function (type, listener) {
-        if (listener === void 0) { listener = null; }
-        var that = this;
+    }
+    off(type, listener = null) {
+        const that = this;
         if (type === undefined) {
             //disable everythign
             throw ('unimpl yet');
         }
         else if (Array.isArray(type)) {
-            for (var _i = 0, type_2 = type; _i < type_2.length; _i++) {
-                var tt = type_2[_i];
+            for (let tt of type) {
                 that.off(tt, listener);
             }
             return;
         }
-        var listeners = this._events.get(type);
+        let listeners = this._events.get(type);
         if (listener === undefined) {
             //remove any existing
             if (listeners) {
@@ -68,8 +64,7 @@ var EventEmitter = (function () {
             return;
         }
         else if (Array.isArray(listener)) {
-            for (var _a = 0, type_3 = type; _a < type_3.length; _a++) {
-                var l = type_3[_a];
+            for (let l of type) {
                 that.off(type, l);
             }
         }
@@ -79,7 +74,7 @@ var EventEmitter = (function () {
         if (!listeners || !listeners.length) {
             return;
         }
-        var indexOfListener = listeners.indexOf(listener);
+        const indexOfListener = listeners.indexOf(listener);
         if (indexOfListener == -1) {
             return;
         }
@@ -87,25 +82,23 @@ var EventEmitter = (function () {
         if (listeners.length === 0) {
             this._events.delete(type); //clear its entry
         }
-    };
-    EventEmitter.prototype.emit = function (type, args) {
-        var listeners = this._events.get(type);
+    }
+    emit(type, args) {
+        const listeners = this._events.get(type);
         if (listeners) {
-            for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
-                var x = listeners_1[_i];
+            for (let x of listeners) {
                 x.apply(null, args);
             }
         }
         //for (let i = 0; i < listeners.length; i++)
         //listeners.forEach(function(fn) { fn.apply(null, args) })
         return true;
-    };
-    EventEmitter.prototype.setMaxListeners = function (newMaxListeners) {
+    }
+    setMaxListeners(newMaxListeners) {
         if (parseInt(newMaxListeners) !== newMaxListeners) {
             throw new TypeError();
         }
         this._maxListeners = newMaxListeners;
-    };
-    return EventEmitter;
-}());
+    }
+}
 //# sourceMappingURL=EventEmitter.js.map

@@ -184,6 +184,10 @@ public class MultiThreadExecutioner extends Executioner {
 
         disruptor.start();
 
+//        nar.eventReset.on((n) -> {
+//            sync(); //should empty all pending tasks
+//        });
+
 //        this.throttle = new CPUThrottle(
 //                new MutableFloat(25));
 //                //new MutableFloat(0.5f),

@@ -1,6 +1,7 @@
 html, input, textarea, keygen, select, button {
     font-family: monospace !important;
     font-size: 1em; /* see: http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/ */
+    border-radius: 0 !important; /* NO CURVE BORDERS */
 }
 
 body {
