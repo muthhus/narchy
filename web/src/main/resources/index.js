@@ -1,6 +1,5 @@
-
 function MainMenuButton() {
-    return $('<div>[@]</div>').addClass('MainMenuButton').click(()=> setTimeout(Menu, 0) );
+    return $('<div>[@]</div>').addClass('MainMenuButton').click(() => setTimeout(Menu, 0));
 }
 
 function Menu() {
@@ -10,8 +9,8 @@ function Menu() {
     let c;
 
     function close() {
-        menulayer.fadeOut(250, ()=> {
-            setTimeout(()=>{
+        menulayer.fadeOut(250, () => {
+            setTimeout(() => {
                 if (c)
                     c.destroy();
                 menulayer.remove();
@@ -21,19 +20,19 @@ function Menu() {
 
 
     const menu = {
-        nodes: [ ],
-        edges: [ ],
+        nodes: [],
+        edges: [],
 
-        add: function(item, parent, options) {
+        add: function (item, parent, options) {
             options = options || {};
             options.id = item;
 
             //disable label if widget is provided
             options.label = options.widget ? "" : item;
 
-            this.nodes.push( { data: options } );
+            this.nodes.push({data: options});
             if (parent)
-                this.edges.push( { data: { source: parent, target: item } } );
+                this.edges.push({data: {source: parent, target: item}});
         }
     };
 
@@ -42,13 +41,9 @@ function Menu() {
     const _return = 'return';
 
     menu.add(_return, null, {
-        widget: $('<button>[x]</button>').css({ opacity: 0.75, border: 0 }).click(function(e) {
-            console.log(e);
-            close();
-
-        })
+        widget: $('<button>[x]</button>').css({opacity: 0.75, border: 0}).click(() => close())
     });
-    menu.add('System', _return, {});
+    menu.add('System', null, {});
     menu.add('Network', 'System', {});
     menu.add('Memory', 'System', {});
     {
@@ -61,15 +56,18 @@ function Menu() {
         menu.add('Shutdown', 'System', {});
     }
 
-    menu.add('Status', _return, {});
+    menu.add('Status', null, {});
     {
 
         menu.add('Weather', 'Status', {
-            widget: $('<iframe width="400" height="400" src="http://wunderground.org"></iframe>')
+            //widget: $('<iframe width="400" height="400" src="http://wunderground.org"></iframe>')
+
         });
 
         {
-            menu.add('Temperature', 'Weather', {});
+            menu.add('Temperature', 'Weather', {
+                widget: $('<div>Temperature<br/><input type="range" min="0" max="15"/></div>')
+            });
             menu.add('Precipitation', 'Weather', {});
             menu.add('Humidity', 'Weather', {});
             menu.add('Air Quality', 'Weather', {});
@@ -86,11 +84,10 @@ function Menu() {
         menu.add('News', 'Status', {});
     }
 
-    menu.add('Find', _return, {
+    menu.add('Find', null, {
         //widget: $('<div><input type="text" placeholder="?"></input></div>')
-        widget: $('<textarea rows="12" cols="50">At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies.</textarea>')
+        widget: $('<textarea rows="12" cols="50">ABC 123 XYZ</textarea>')
     });
-
 
 
     c = cytoscape({
@@ -98,28 +95,29 @@ function Menu() {
 
         layout: {
             name: 'concentric',
-            concentric: function (node) { // returns numeric value for each node, placing higher nodes in levels towards the centre
-
-                const aStar = node.cy().elements().aStar({root: "#" + _return, goal: node});
-
-                return 100 - (aStar.distance);
-            },
+            // concentric: function (node) { // returns numeric value for each node, placing higher nodes in levels towards the centre
+            //
+            //     const aStar = node.cy().elements().aStar({root: "#" + _return, goal: node});
+            //
+            //     return 100 - (aStar.distance);
+            // },
 
             levelWidth: function(n) { return 1; }, // the variation of concentric values in each level
 
             //equidistant: true,
-            minNodeSpacing: 30,
+            //minNodeSpacing: 30,
 
-            sweep: Math.PI*2.0
+            //sweep: Math.PI*2.0
         },
 
-//            layout:
-//                //name: 'breadthfirst',
-//                //name: 'cose',
-//                fit: true
-//            },
+        // layout: {
+        //     name: 'breadthfirst',
+        //     //name: 'cose',
+        //     //randomize: true,
+        //     fit: true
+        // },
 
-        ready: (a)=>{
+        ready: (a) => {
 
 
             const cc = a.cy;
@@ -129,14 +127,17 @@ function Menu() {
             //.degreeCentralityNormalized();
             //.pageRank();
 
-            cc.nodes().each((i,n) => {
+            cc.nodes().each((i, n) => {
 
-                const v = //1 / Math.pow(pr.rank(n), 2);
+                var v = //1 / Math.pow(pr.rank(n), 2);
                     pr.closeness(n);
 
+                if (v === 0)
+                    v = 1; //root
+
                 n.style({
-                    width:  v * 320,
-                    height: v * 240
+                    width: v * 32,
+                    height: v * 24
                 });
 
             });
@@ -157,7 +158,8 @@ function Menu() {
                     'text-valign': 'center',
                     'text-halign': 'center',
                     'color': '#fff',
-                    'font-family': 'Monospace'
+                    'font-family': 'Monospace',
+                    'font-size': 4
 
                 }
             }
@@ -187,13 +189,13 @@ function Menu() {
             menulayer.append(widget);
             activeWidgets.set(nid, node);
 
-            setTimeout(()=> updateWidget(node) , 0)
+            setTimeout(() => updateWidget(node), 0)
 
 
         }
     }
 
-    c.nodes().each((i,v)=>onAdd(v));
+    c.nodes().each((i, v) => onAdd(v));
     c.on('add', /* select unselect  */ function (e) {
         onAdd(e.cyTarget);
     });
@@ -212,7 +214,7 @@ function Menu() {
 
     function updateAll() {
 
-        fastdom.mutate(()=>{
+        fastdom.mutate(() => {
             activeWidgets.forEach((node, nid) => {
                 updateWidget(node);
             });
@@ -256,7 +258,7 @@ function Menu() {
 
     //--------------
     //right-click autozoom:
-    c.on('cxttapstart', function(e) {
+    c.on('cxttapstart', function (e) {
         let target = e.cyTarget;
         zoomTo(!target ? undefined : target, 128 /* ms */)
     });
@@ -286,10 +288,9 @@ function Menu() {
 //            });
 
 
-
     menulayer.hide();
 
-    fastdom.mutate(()=>{
+    fastdom.mutate(() => {
         menulayer.appendTo(body);
         menulayer.fadeIn();
     });
@@ -337,24 +338,24 @@ $(document).ready(() => {
                  }*/
             ]
         }]
-    }, $('body') );
+    }, $('body'));
 
-    layout.on( 'stackCreated', function( stack ) {
+    layout.on('stackCreated', function (stack) {
 
         /*
          * Accessing the DOM element that contains the popout, maximise and * close icon
          */
         stack.header.controlsContainer.append(MainMenuButton());
     });
-    layout.registerComponent( 'terminal', function( tgt, state ){
-        tgt.getElement().html( IO(io) );
+    layout.registerComponent('terminal', function (tgt, state) {
+        tgt.getElement().html(IO(io));
     });
-    layout.registerComponent( 'input', function( tgt, state ){
+    layout.registerComponent('input', function (tgt, state) {
         tgt.getElement().html(
             NALEditor(io).attr('id', 'input')
         );
     });
-    layout.registerComponent( 'options', function(tgt, state) {
+    layout.registerComponent('options', function (tgt, state) {
 
         // Set default options
         //console.log(JSONEditor());
@@ -390,20 +391,20 @@ $(document).ready(() => {
 //                // Do something...
 //            });
 
-        tgt.getElement().html( dd );
+        tgt.getElement().html(dd);
 
     });
-    layout.registerComponent( 'graph', function( tgt, state ){
+    layout.registerComponent('graph', function (tgt, state) {
 
         const graph = Graph(io);
-        tgt.getElement().html( graph );
-        tgt.on('resize', ()=>{
-            setTimeout(()=>graph.graph.resize(), 0);
+        tgt.getElement().html(graph);
+        tgt.on('resize', () => {
+            setTimeout(() => graph.graph.resize(), 0);
         });
 
     });
-    layout.registerComponent( 'top', function( tgt, state ){
-        tgt.getElement().html( TopTable("active") );
+    layout.registerComponent('top', function (tgt, state) {
+        tgt.getElement().html(TopTable("active"));
     });
 
     layout.init();
@@ -422,7 +423,13 @@ function Graph(terminal) {
         //additional options and overrides for defaults
     };
 
-    const c = spacegraph(d, opt);
+    const c = cytoscape(cytoscapeOptions(opt, function() {}, d));
+    c.get = function(id) {
+        //return s.nodes()._private.ids[id];
+
+        return c._private.elements._private.ids[id];
+    };
+
 
     const colorFunc = function (r, g, b) {
 

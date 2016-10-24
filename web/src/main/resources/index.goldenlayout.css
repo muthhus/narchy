@@ -6,6 +6,13 @@
 .lm_content{
 }
 
+.lm_stack {
+    border: 2px solid transparent;
+}
+.lm_stack:hover {
+    border: 2px solid purple;
+}
+
 .lm_header .lm_tab {
     float: none;
     height: auto;

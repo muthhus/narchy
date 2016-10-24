@@ -25,24 +25,26 @@ class EventEmitter {
 
         let listeners = this._events.get(type);
         if (!listeners) {
-            listeners = [];
+            listeners = [ listener ];
             this._events.set(type, listeners);
         }
         else if(listeners.indexOf(listener) != -1) {
             console.error('duplicate add:', type, listener);
             return this;
-        }
+        } else {
 
-        listeners.push(listener);
-        if(listeners.length > this._maxListeners) {
-            console.error(
-                "possible memory leak, added %i %s listeners, "+
-                "use EventEmitter#setMaxListeners(number) if you " +
-                "want to increase the limit (%i now)",
-                listeners.length,
-                type,
-                this._maxListeners
-            );
+            listeners.push(listener);
+            if (listeners.length > this._maxListeners) {
+                console.error(
+                    "possible memory leak, added %i %s listeners, " +
+                    "use EventEmitter#setMaxListeners(number) if you " +
+                    "want to increase the limit (%i now)",
+                    listeners.length,
+                    type,
+                    this._maxListeners
+                );
+            }
+
         }
         return this;
     }
@@ -106,8 +108,9 @@ class EventEmitter {
 
         const listeners = this._events.get(type);
         if (listeners) {
-            for (let x of listeners)
+            for (let x of listeners) {
                 x.apply(null, args);
+            }
         }
 
         //for (let i = 0; i < listeners.length; i++)

@@ -1,59 +1,65 @@
 "use strict";
-const DEFAULT_MAX_LISTENERS = 12;
+var DEFAULT_MAX_LISTENERS = 12;
 //TODO use ES6 Map for better performance: http://jsperf.com/map-vs-object-as-hashes/2
-class EventEmitter {
-    constructor() {
+var EventEmitter = (function () {
+    function EventEmitter() {
         this._maxListeners = DEFAULT_MAX_LISTENERS;
         this._events = new Map();
     }
-    on(type, listener) {
-        const that = this;
+    EventEmitter.prototype.on = function (type, listener) {
+        var that = this;
         if (Array.isArray(type)) {
-            for (let t of type)
+            for (var _i = 0, type_1 = type; _i < type_1.length; _i++) {
+                var t = type_1[_i];
                 that.on(t, listener);
+            }
             return this;
         }
         if (typeof listener != "function") {
             throw new TypeError();
         }
-        let listeners = this._events.get(type);
+        var listeners = this._events.get(type);
         if (!listeners) {
-            listeners = [];
+            listeners = [listener];
             this._events.set(type, listeners);
         }
         else if (listeners.indexOf(listener) != -1) {
             console.error('duplicate add:', type, listener);
             return this;
         }
-        listeners.push(listener);
-        if (listeners.length > this._maxListeners) {
-            console.error("possible memory leak, added %i %s listeners, " +
-                "use EventEmitter#setMaxListeners(number) if you " +
-                "want to increase the limit (%i now)", listeners.length, type, this._maxListeners);
+        else {
+            listeners.push(listener);
+            if (listeners.length > this._maxListeners) {
+                console.error("possible memory leak, added %i %s listeners, " +
+                    "use EventEmitter#setMaxListeners(number) if you " +
+                    "want to increase the limit (%i now)", listeners.length, type, this._maxListeners);
+            }
         }
         return this;
-    }
-    once(type, listener) {
-        const eventsInstance = this;
+    };
+    EventEmitter.prototype.once = function (type, listener) {
+        var eventsInstance = this;
         function onceCallback() {
             eventsInstance.off(type, onceCallback);
             listener.apply(null, arguments);
         }
         return this.on(type, onceCallback);
-    }
-    off(type, listener = null) {
-        const that = this;
+    };
+    EventEmitter.prototype.off = function (type, listener) {
+        if (listener === void 0) { listener = null; }
+        var that = this;
         if (type === undefined) {
             //disable everythign
             throw ('unimpl yet');
         }
         else if (Array.isArray(type)) {
-            for (let tt of type) {
+            for (var _i = 0, type_2 = type; _i < type_2.length; _i++) {
+                var tt = type_2[_i];
                 that.off(tt, listener);
             }
             return;
         }
-        let listeners = this._events.get(type);
+        var listeners = this._events.get(type);
         if (listener === undefined) {
             //remove any existing
             if (listeners) {
@@ -62,7 +68,8 @@ class EventEmitter {
             return;
         }
         else if (Array.isArray(listener)) {
-            for (let l of type) {
+            for (var _a = 0, type_3 = type; _a < type_3.length; _a++) {
+                var l = type_3[_a];
                 that.off(type, l);
             }
         }
@@ -72,7 +79,7 @@ class EventEmitter {
         if (!listeners || !listeners.length) {
             return;
         }
-        const indexOfListener = listeners.indexOf(listener);
+        var indexOfListener = listeners.indexOf(listener);
         if (indexOfListener == -1) {
             return;
         }
@@ -80,22 +87,25 @@ class EventEmitter {
         if (listeners.length === 0) {
             this._events.delete(type); //clear its entry
         }
-    }
-    emit(type, args) {
-        const listeners = this._events.get(type);
+    };
+    EventEmitter.prototype.emit = function (type, args) {
+        var listeners = this._events.get(type);
         if (listeners) {
-            for (let x of listeners)
+            for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
+                var x = listeners_1[_i];
                 x.apply(null, args);
+            }
         }
         //for (let i = 0; i < listeners.length; i++)
         //listeners.forEach(function(fn) { fn.apply(null, args) })
         return true;
-    }
-    setMaxListeners(newMaxListeners) {
+    };
+    EventEmitter.prototype.setMaxListeners = function (newMaxListeners) {
         if (parseInt(newMaxListeners) !== newMaxListeners) {
             throw new TypeError();
         }
         this._maxListeners = newMaxListeners;
-    }
-}
+    };
+    return EventEmitter;
+}());
 //# sourceMappingURL=EventEmitter.js.map
