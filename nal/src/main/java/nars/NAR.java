@@ -289,6 +289,14 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         bt.forEach(e);
     }
 
+    /** soft-reset: clears plugins (but not essentialc omponents such as indices, clock, etc)
+     * typically this will temporarily clear active memory processes
+     * it is like asking NAR to empty its (conscious) mind to be ready for a new focus
+     * also can be considered a "soft" reset, vs the reset() which is "hard"
+     */
+    public final void clear() {
+        eventReset.emit(this);
+    }
 
     /**
      * Reset the system with an empty memory and reset clock.  Event handlers
@@ -303,7 +311,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
             exe.stop();
             exe.start(this);
 
-            eventReset.emit(this);
+            clear();
 
             clock.clear();
 
@@ -1164,12 +1172,6 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         return this;
     }
 
-    /**
-     * clears active memory (but not memory indices).
-     * it is like asking NAR to empty its (conscious) mind to be ready for a new focus
-     * also can be considered a "soft" reset, vs the reset() which is "hard"
-     */
-    abstract public void clear();
 
     @Nullable
     public final Concept concept(@NotNull Termed t) {

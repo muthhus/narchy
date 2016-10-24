@@ -275,16 +275,6 @@ public class Default2 extends NAR {
         return this;
     }
 
-    @Override
-    public void clear() {
-        //TODO use a 'clear' event handler that these can attach to
-
-        active.clear();
-
-        if (stmLinkage!=null)
-            stmLinkage.clear();
-
-    }
 
 
     public static void main(String[] args) {

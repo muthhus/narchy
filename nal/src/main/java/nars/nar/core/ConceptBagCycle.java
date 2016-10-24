@@ -97,7 +97,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
         nar.onFrame(this);
-        nar.eventReset.on(this::reset);
+        nar.eventReset.on((n)->active.clear());
 
     }
 
@@ -110,11 +110,6 @@ public class ConceptBagCycle implements Consumer<NAR> {
         n.emotion.alert(1f / active.size());
     }
 
-
-
-    public void reset(NAR m) {
-        active.clear();
-    }
 
 
 

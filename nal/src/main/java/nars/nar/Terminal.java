@@ -47,10 +47,6 @@ public class Terminal extends NAR {
 //        return concept(termed, true); //ignore activation
 //    }
 
-    @Override
-    public void clear() {
-        //nothing to clear, terminal is always clear
-    }
 
     @Override
     public float activation(@NotNull Termed termed) {

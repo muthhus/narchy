@@ -174,7 +174,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     public float duration() {
-        return ((float)range()) / 2f;
+        return ((float)range()) / size();
     }
 
     @Override

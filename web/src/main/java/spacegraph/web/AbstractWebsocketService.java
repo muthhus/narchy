@@ -11,6 +11,7 @@ import io.undertow.websockets.core.WebSocketChannel;
 public abstract class AbstractWebsocketService extends AbstractReceiveListener implements WebSocketCallback<Void>,WebSocketConnectionCallback {
 
     public void send(WebSocketChannel socket, Object object) {
+
         WebsocketService.send(socket, object, this);
     }
 

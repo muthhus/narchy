@@ -508,10 +508,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
 
         SortedArray<BLink<V>> items = this.items;
-        BLink<V>[] l = items.array();
+        Object[] l = items.array();
         int removedFromMap = 0;
         for (int s = items.size()-1; s >= 0; s--) {
-            BLink<V> x = l[s];
+            BLink<V> x = (BLink<V>) l[s];
             if (x == null || x.isDeleted()) {
                 items.removeFast(s);
                 if (x!=null)
@@ -531,7 +531,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     private final void updateRange() {
         int s = size();
-        this.minPri = s > 0 ? get(s -1).priIfFiniteElseNeg1() : -1;
+        this.minPri = s > 0 ? get(s - 1).priIfFiniteElseNeg1() : -1;
     }
 
 

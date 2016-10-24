@@ -42,21 +42,21 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
     }
 
-    public static float temporalConfidenceLoss(float dt, float evidence, float decayPeriod) {
-        if (dt <= 0.5f) {
-            return evidence;
-        } else {
-//            float eternalized =
-//                    //c2w(TruthFunctions.eternalize(w2c(evidence)));
-//                    evidence/8f;
-
-
-            float newEvidence = evidence * 1f / (1f + (dt*dt) / (decayPeriod/2f));
-            //System.out.println(dt + "," + evidence + "\t" + decayPeriod + ","+decayFactor + "\t --> " + newEvidence);
-            //return Math.max(eternalized, newEvidence);
-            return newEvidence;
-        }
-    }
+//    public static float temporalConfidenceLoss(float dt, float evidence, float decayPeriod) {
+//        if (dt <= 0.5f) {
+//            return evidence;
+//        } else {
+////            float eternalized =
+////                    //c2w(TruthFunctions.eternalize(w2c(evidence)));
+////                    evidence/8f;
+//
+//
+//            float newEvidence = evidence * 1f / (1f + (dt*dt) / (decayPeriod/2f));
+//            //System.out.println(dt + "," + evidence + "\t" + decayPeriod + ","+decayFactor + "\t --> " + newEvidence);
+//            //return Math.max(eternalized, newEvidence);
+//            return newEvidence;
+//        }
+//    }
 
 //    public static final InterpolatingMicrosphere.LightCurve evidentialDecayThroughTime = (dt, evidence) -> {
 //        return TruthPolation.temporalConfidenceLoss(dt, evidence, 1f);

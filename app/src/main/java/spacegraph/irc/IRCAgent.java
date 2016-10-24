@@ -27,6 +27,7 @@ import nars.util.Loop;
 import nars.util.Texts;
 import nars.util.Wiki;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.event.On;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -322,7 +323,17 @@ public class IRCAgent extends IRC {
                         stop();
                         return;
                     }
-                    Term pr = $.func("hear", chan_nick, tokens.get(token++));
+
+                    final On onReset = nar.eventReset.on((n)->{
+
+                        stop();
+                    });
+
+                    //hear(who,what)
+                    //Term pr = $.func("hear", chan_nick, tokens.get(token++));
+
+                    Term pr = $.inh(tokens.get(token++), $.secti($.the("hear"), chan_nick));
+
                     nar.believe(pr, Tense.Present, 1f);
 
                 }

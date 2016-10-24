@@ -7,6 +7,7 @@ import nars.concept.Concept;
 import nars.term.Term;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
+import nars.util.event.On;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
@@ -21,6 +22,7 @@ import java.util.Iterator;
 public final class STMTemporalLinkage extends STM {
 
     @NotNull public final Deque<Task> stm;
+    private final On onReset;
     float strength = 1f;
 
     public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
@@ -30,6 +32,7 @@ public final class STMTemporalLinkage extends STM {
         stm = new ArrayDeque<>(capacity);
         //stm = new ConcurrentLinkedDeque<>();
 
+        this.onReset = nar.eventReset.on((n)-> clear());
 
     }
 

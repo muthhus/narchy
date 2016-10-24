@@ -135,16 +135,6 @@ public class Default extends NAR {
         return this;
     }
 
-    @Override
-    public void clear() {
-        //TODO use a 'clear' event handler that these can attach to
-
-        core.active.clear();
-
-        if (stmLinkage!=null)
-            stmLinkage.clear();
-
-    }
 
     /**
      * suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution
