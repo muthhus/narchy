@@ -311,7 +311,7 @@ function Menu() {
 
 $(document).ready(() => {
 
-    const io = NARTerminal();
+    const io = NARSocket('terminal', decodeTasks);
     window.io = io;
 
     const layout = new GoldenLayout({
@@ -334,7 +334,7 @@ $(document).ready(() => {
                     type: 'column',
                     content: [{
                         type: 'component',
-                        componentName: 'options',
+                        componentName: 'terminal',
                         componentState: {}
                     }, {
                         type: 'component',
@@ -409,7 +409,7 @@ $(document).ready(() => {
 
         const c = spacegraph({});
 
-        io.on('message', function (x) {
+        io.on('task', function (x) {
 
             const id = x.term + x.punc + x.freq + ';' + x.conf; //HACK for Task's
             x.label = x.term; //HACK
@@ -437,7 +437,7 @@ $(document).ready(() => {
 
     });
     layout.registerComponent('top', function (tgt, state) {
-        tgt.getElement().html(TopTable("active"));
+        tgt.getElement().html(TopTable());
     });
 
     layout.init();

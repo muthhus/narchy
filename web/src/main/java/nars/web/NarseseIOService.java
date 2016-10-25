@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.web.WebsocketService;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,7 +42,7 @@ public class NarseseIOService extends WebsocketService {
 
     public NarseseIOService(NAR n) {
         super();
-        this.nar =  n;
+        this.nar = n;
         output = new CurveBag<Task>(BudgetMerge.plusBlend, nar.random);
         output.setCapacity(OUTPUT_CAPACITY);
 
@@ -64,10 +66,21 @@ public class NarseseIOService extends WebsocketService {
 
         output.commit();
 
-        int remaining = OUTPUT_RATE;
-        while (remaining-- > 0 && (tl = output.pop())!=null) {
-            send(IO.taskToBytes(tl.get(), IO.TaskSerialization.TermLast));
+        try {
+            ByteArrayOutputStream bs = new ByteArrayOutputStream(4096);
+            DataOutputStream dos = new DataOutputStream(bs);
+
+            int remaining = OUTPUT_RATE;
+            while (remaining-- > 0 && (tl = output.pop()) != null) {
+                IO.writeTask2(dos, tl.get());
+            }
+
+            send(bs.toByteArray());
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
         queued.set(false);
 
 ////        FastConcurrentDirectDeque b = outgoing;
@@ -126,7 +139,7 @@ public class NarseseIOService extends WebsocketService {
         try {
             new Twenglish().parse("ui", nar, msg).forEach(t -> {
                 //t.setPriority(INPUT_SENTENCE_PRIORITY);
-                if (t!=null)
+                if (t != null)
                     nar.input(t);
             });
             return true;

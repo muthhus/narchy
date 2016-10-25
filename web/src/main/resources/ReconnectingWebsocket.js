@@ -1,94 +1,66 @@
 "use strict";
 
-const defaultHostname = window.location.hostname || 'localhost';
-const defaultWSPort = window.location.port || 8080;
-
-/** creates a websocket connection to a path on the server that hosts the currently visible webpage */
-const NARSocket = function(path) {
-    const ws = new ReconnectingWebSocket('ws://' +
-        defaultHostname + ':' +
-        defaultWSPort + '/' +
-        path,
-        null /* protocols */,
-        {
-            //Options: //https://github.com/joewalnes/reconnecting-websocket/blob/master/reconnecting-websocket.js#L112
-            /*
-             // The number of milliseconds to delay before attempting to reconnect.
-             reconnectInterval: 1000,
-             // The maximum number of milliseconds to delay a reconnection attempt.
-             maxReconnectInterval: 30000,
-             // The rate of increase of the reconnect delay. Allows reconnect attempts to back off when problems persist.
-             reconnectDecay: 1.5,
-
-             // The maximum time in milliseconds to wait for a connection to succeed before closing and retrying.
-             timeoutInterval: 2000,
-             */
-        });
-    return ws;
-};
 
 
-
-
-function SocketView(path, pathToElement, onData) {
-
-
-    const view = pathToElement(path);
-
-    const ws = NARSocket(path);
-
-    ws.onopen = function () {
-        //state.html("Connected");
-    };
-    ws.onmessage = onData;
-    ws.onclose = function () {
-        //state.html("Disconnected");
-    };
-
-    view.data('socket', ws);
-    view.on("remove", function () {
-        //disconnect the socket when element is removed
-        $(this).data('socket').close();
-    });
-
-
-    return view;
-}
-
-
-
-
-function SocketMetaWidget(path) {
-
-    const varPath = "mwdata['" + path + "']";
-    const view = $('<x-metawidget readonly=true path="' + varPath + '"></x-metawidget>');
-
-    return SocketView(path,
-
-        function(path) {
-            return view;
-        },
-
-        function(msg) {
-            let v;
-            try {
-                v = JSON.parse(msg.data);
-            } catch (e) {
-                v = 'Error parsing: ' + e.data;
-            }
-            mwdata[path] = v;
-
-            view.attr('path', "").attr('path', varPath);
-
-            //target.html(view);
-            //view.text(e.data);
-        }
-    );
-}
-
-
-
-
+// function SocketView(path, pathToElement, onData) {
+//
+//
+//     const view = pathToElement(path);
+//
+//     const ws = NARSocket(path);
+//
+//     ws.onopen = function () {
+//         //state.html("Connected");
+//     };
+//     ws.onmessage = onData;
+//     ws.onclose = function () {
+//         //state.html("Disconnected");
+//     };
+//
+//     view.data('socket', ws);
+//     view.on("remove", function () {
+//         //disconnect the socket when element is removed
+//         $(this).data('socket').close();
+//     });
+//
+//
+//     return view;
+// }
+//
+//
+//
+//
+// function SocketMetaWidget(path) {
+//
+//     const varPath = "mwdata['" + path + "']";
+//     const view = $('<x-metawidget readonly=true path="' + varPath + '"></x-metawidget>');
+//
+//     return SocketView(path,
+//
+//         function(path) {
+//             return view;
+//         },
+//
+//         function(msg) {
+//             let v;
+//             try {
+//                 v = JSON.parse(msg.data);
+//             } catch (e) {
+//                 v = 'Error parsing: ' + e.data;
+//             }
+//             mwdata[path] = v;
+//
+//             view.attr('path', "").attr('path', varPath);
+//
+//             //target.html(view);
+//             //view.text(e.data);
+//         }
+//     );
+// }
+//
+//
+//
+//
 
 // MIT License:
 //

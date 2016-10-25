@@ -8,10 +8,31 @@ function labelize(l) {
 }
 
 
+const defaultHostname = window.location.hostname || 'localhost';
+const defaultWSPort = window.location.port || 8080;
 
-function NARTerminal() {
+/** creates a websocket connection to a path on the server that hosts the currently visible webpage */
+const NARSocket = function(path, onMessage) {
+    const ws = new ReconnectingWebSocket('ws://' +
+        defaultHostname + ':' +
+        defaultWSPort + '/' +
+        path,
+        null /* protocols */,
+        {
+            //Options: //https://github.com/joewalnes/reconnecting-websocket/blob/master/reconnecting-websocket.js#L112
+            /*
+             // The number of milliseconds to delay before attempting to reconnect.
+             reconnectInterval: 1000,
+             // The maximum number of milliseconds to delay a reconnection attempt.
+             maxReconnectInterval: 30000,
+             // The rate of increase of the reconnect delay. Allows reconnect attempts to back off when problems persist.
+             reconnectDecay: 1.5,
 
-    const ws = NARSocket('terminal');
+             // The maximum time in milliseconds to wait for a connection to succeed before closing and retrying.
+             timeoutInterval: 2000,
+             */
+        });
+
 
     const e = new EventEmitter();
 
@@ -21,19 +42,20 @@ function NARTerminal() {
 
     ws.onmessage = function(m) {
 
-        let d = m.data;
+        setTimeout(()=> {
+            let d = m.data;
+            onMessage(e, d);
+        },0);
+// //        try {
+//
+//         if (typeof d === "string")
+//             e.emit('message', JSON.parse(d));
+//         else
+//             decodeTasks(e, d);
 
-        try {
-
-            e.emit('message', [
-                (typeof d === "string") ?
-                    JSON.parse(d) :
-                    decodeBiNARy(e, d)
-            ] );
-
-        } catch (e) {
-            console.error(e);
-        }
+        // } catch (e) {
+        //     console.error(e);
+        // }
 
     };
 
@@ -48,75 +70,96 @@ function NARTerminal() {
     };
 
     return e;
-}
+};
+
+
 
 if (!("TextEncoder" in window))
     alert("Sorry, this browser does not support TextEncoder...");
 
-function decodeBiNARy(e, m) {
+function decodeConceptSummaries(e, m) {
+    const d = new DataView(m);
+    let j = 0;
+
+    while (d.byteLength > j) {
+        const pri = d.getFloat32(j); j += 4;
+        const dur = d.getFloat32(j); j += 4;
+        const qua = d.getFloat32(j); j += 4;
+        const termStrLen = d.getInt16(j);  j += 2;
+        const term = new TextDecoder("utf8").decode(m.slice(j, j+termStrLen)); j += termStrLen;
+        e.emit('concept_summary', [{
+            term: term,
+            pri: pri,
+            dur: dur,
+            qua: qua
+        }]);
+    }
+}
+
+function decodeTasks(e, m) {
 
     const d = new DataView(m);
-
-    //assume 'd' is a NAR serialized Task
     let j = 0;
-    let punct = d.getUint8(j++);
-    //TODO use charCodePoint
-    switch (punct) {
-
-        case 46:
-            punct = '.';
-            break;
-        case 33:
-            punct = '!';
-            break;
-        case 63:
-            punct = '?';
-            break;
-        case 64:
-            punct = '@';
-            break;
-        case 59:
-            punct = ';';
-            break;
 
 
-        default:
+    while (d.byteLength > j) {
 
-            const e = [ 'unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data) ];
-            console.error(e);
-            return e;
+        let punct = String.fromCharCode(d.getUint8(j++)).charAt(0);
+
+
+        //TODO use charCodePoint
+        switch (punct) {
+
+
+            case '.':
+            case '!':
+            case '?':
+            case '@':
+            case ';': {
+                const pri = d.getFloat32(j); j += 4;
+                const dur = d.getFloat32(j); j += 4;
+                const qua = d.getFloat32(j); j += 4;
+
+                const whenLow = d.getInt32(j); j += 4;
+                const whenHigh = d.getInt32(j); j += 4;
+                const when = whenLow | (whenHigh << 32);
+
+                let freq, conf;
+                if ((punct == '.') || (punct == '!')) {
+                    freq = d.getFloat32(j); j += 4;
+                    conf = d.getFloat32(j); j += 4;
+                } else {
+                    freq = conf = undefined;
+                }
+                const termStrLen = d.getInt16(j); j += 2;
+                const term = new TextDecoder("utf8").decode(m.slice(j, j + termStrLen)); j += termStrLen;
+
+                //console.log(term, punct, pri, when, freq, conf);
+
+                e.emit('task', [{
+                    term: term,
+                    punc: punct,
+                    pri: pri,
+                    dur: dur,
+                    qua: qua,
+                    when: when,
+                    freq: freq,
+                    conf: conf
+                }]);
+
+                break;
+            }
+
+
+            default: {
+                const e = ['unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data)];
+                console.error(e);
+                return;
+            }
+        }
+
     }
 
-    const pri = d.getFloat32(j); j+=4;
-    const dur = d.getFloat32(j); j+=4;
-    const qua = d.getFloat32(j); j+=4;
-
-    const whenLow = d.getInt32(j); j+=4;
-    const whenHigh = d.getInt32(j); j+=4;
-    const when = whenLow | (whenHigh << 32);
-
-    let freq, conf;
-    if ((punct == '.') || (punct == '!')) {
-        freq = d.getFloat32(j); j+=4;
-        conf = d.getFloat32(j); j+=4;
-    } else {
-        freq = conf = undefined;
-    }
-
-    const term = new TextDecoder("utf8").decode(m.slice(j));
-
-    //console.log(term, punct, pri, when, freq, conf);
-
-    return {
-        term: term,
-        punc: punct,
-        pri: pri,
-        dur: dur,
-        qua: qua,
-        when: when,
-        freq: freq,
-        conf: conf
-    };
 
     //var uint8array = new TextEncoder(encoding).encode(string);
     //var string = new TextDecoder(encoding).decode(uint8array);
@@ -377,7 +420,7 @@ function NARConsole(terminal, render) {
 
     };
 
-    terminal.on('message', function(x) {
+    terminal.on('task', function(x) {
 
         //console.log('console: ', JSON.stringify(x), x);
 
@@ -434,13 +477,13 @@ function NARConsole(terminal, render) {
 
 }
 
-function TopTable(path) {
+function TopTable() {
     const e = $('<div/>').attr('class', 'ConceptTable');
 
     function row(c) {
-        const pri = c[1] / 1000.0;
-        const dur = c[2] / 1000.0;
-        const qua = c[3] / 1000.0;
+        const pri = c.pri; //c[1] / 1000.0;
+        const dur = c.dur; //c[2] / 1000.0;
+        const qua = c.qua; //c[3] / 1000.0;
 
         const e = document.createElement('span');
 
@@ -451,36 +494,80 @@ function TopTable(path) {
             parseInt(64 + 192 * dur) + ',' +
             parseInt(64 + 192 * qua) +
             ')';
-        e.innerText = c[0];
+        e.innerText = c.term;//[0];
 
         return e;
     }
 
+    var d = div();
+    var s = NARSocket('active', decodeConceptSummaries);
+    var shown = [];
+    var busy = false;
+    var maxShown = 32;
 
-    return SocketView(path,
+    s.on('concept_summary', function(cs) {
 
-        function (p) {
-            return e;
-        },
 
-        function (msg) {
+        shown.push(cs);
 
-            setTimeout(()=> {
-                const m = JSON.parse(msg.data);
+        if (!busy) {
+            busy = true;
+            setTimeout(() => {
+                busy = false;
+
+                //const m = JSON.parse(msg.data);
+                shown.sort((a,b)=>{
+                   return b.pri - a.pri;
+                });
+
+
+                shown = shown.splice(0, maxShown);
 
                 const rr = [];
-                for (let k of m) {
+                for (let k of shown) {
                     rr.push(row(k));
                 }
+                shown = [];
 
-                fastdom.mutate(()=>
-                    e.empty().append(rr)
+
+                fastdom.mutate(() =>
+
+                    d.empty().append(rr)
+
                 );
 
-            }, 0);
 
+
+            }, 0);
         }
-    );
+    });
+
+    return d;
+
+    // return SocketView(path,
+    //
+    //     function (p) {
+    //         return e;
+    //     },
+    //
+    //     function (msg) {
+    //
+    //         setTimeout(()=> {
+    //             const m = JSON.parse(msg.data);
+    //
+    //             const rr = [];
+    //             for (let k of m) {
+    //                 rr.push(row(k));
+    //             }
+    //
+    //             fastdom.mutate(()=>
+    //                 e.empty().append(rr)
+    //             );
+    //
+    //         }, 0);
+    //
+    //     }
+    // );
 
 
 }

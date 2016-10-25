@@ -1,12 +1,16 @@
 package nars;
 
+import nars.budget.Budgeted;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
+import nars.concept.Concept;
 import nars.index.term.TermIndex;
+import nars.link.BLink;
 import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
@@ -131,16 +135,25 @@ public class IO {
         //out.writeLong(t.creation()); //put this last because it is the least useful really
 
 
-        String s = t.term().toString();
-        //out.write(StringHack.bytes(s));
-        out.write(s.getBytes(Charset.defaultCharset()));
+        writeTermStringUTF(out, t);
 
 
 //        writeUTFWithoutLength(out, s);
 
     }
 
-    public static void writeBudget(@NotNull DataOutput out, @NotNull Task t) throws IOException {
+    public static void writeTermStringUTF(@NotNull DataOutput out, @NotNull Termed t) throws IOException {
+        String s = t.term().toString();
+        //out.write(StringHack.bytes(s));
+        writeStringUTF(out, s);
+    }
+
+    public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {
+        out.writeShort(s.length());
+        out.write(s.getBytes(Charset.defaultCharset()));
+    }
+
+    public static void writeBudget(@NotNull DataOutput out, @NotNull Budgeted t) throws IOException {
         out.writeFloat(t.priIfFiniteElseZero());
         out.writeFloat(t.dur());
         out.writeFloat(t.qua());
@@ -317,6 +330,8 @@ public class IO {
             throw new RuntimeException(e);
         }
     }
+
+
 
     public enum TaskSerialization {
         TermFirst,
