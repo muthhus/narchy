@@ -130,7 +130,7 @@ public class WebServer /*extends PathHandler*/ {
 
         //new IRCServer("localhost", 6667);
 
-        @NotNull Default nar = newRealtimeNAR(1024, 4, 8);
+        @NotNull Default nar = newRealtimeNAR(512, 4, 8);
         //Default nar = new Default();
 
 //        new IRCAgent(nar,

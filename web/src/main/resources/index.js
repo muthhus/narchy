@@ -1,3 +1,5 @@
+"use strict";
+
 function MainMenuButton() {
     return $('<div>[@]</div>').addClass('MainMenuButton').click(() => setTimeout(Menu, 0));
 }
@@ -61,7 +63,16 @@ function Menu() {
 
         menu.add('Weather', 'Status', {
             //widget: $('<iframe width="400" height="400" src="http://wunderground.org"></iframe>')
-
+            widget: $('<div><h3>Weather</h3></div>').append(
+                $('<button>Forecast</button>').click(()=>{
+                    var q = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22FUKUSHIMA%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
+                    $.getJSON(q, (d)=>{
+                        console.log(d);
+                        console.log(JSON.stringify(d));
+                        io.send("json(\"" + JSON.stringify(d) + "\")");
+                    });
+                })
+            )
         });
 
         {
@@ -396,10 +407,32 @@ $(document).ready(() => {
     });
     layout.registerComponent('graph', function (tgt, state) {
 
-        const graph = Graph(io);
-        tgt.getElement().html(graph);
+        const c = spacegraph({});
+
+        io.on('message', function (x) {
+
+            const id = x.term + x.punc + x.freq + ';' + x.conf; //HACK for Task's
+            x.label = x.term; //HACK
+
+
+            let existing = c.graph.get(id);
+
+            if (!existing) {
+
+                //add
+                c.graph.add({group: "nodes", data: x});
+
+            } else {
+                //replace / merge
+                existing.data = x;
+            }
+
+            c.changed = true;
+        });
+
+        tgt.getElement().html(c);
         tgt.on('resize', () => {
-            setTimeout(() => graph.graph.resize(), 0);
+            setTimeout(() => c.graph.resize(), 0);
         });
 
     });
@@ -412,144 +445,6 @@ $(document).ready(() => {
 });
 
 
-function Graph(terminal) {
-
-
-    const d = div('graph max');
-
-    const opt = {
-
-
-        //additional options and overrides for defaults
-    };
-
-    const c = cytoscape(cytoscapeOptions(opt, function() {}, d));
-    c.get = function(id) {
-        //return s.nodes()._private.ids[id];
-
-        return c._private.elements._private.ids[id];
-    };
-
-
-    const colorFunc = function (r, g, b) {
-
-        const R = parseInt(r * 255);
-        const G = parseInt(g * 255);
-        const B = parseInt(b * 255);
-
-        return "rgb(" + R + "," + G + "," + B + ")";
-
-    };
-
-    let changed = true;
-
-//        c.onRender(()=>{
-//           console.log('render');
-//           changed = false;
-//        });
-
-    const maxNodes = 20;
-    const updatePeriodMS = 100;
-
-
-    const layout = c.makeLayout({
-        /* https://github.com/cytoscape/cytoscape.js-spread */
-        name: 'spread',
-        minDist: 250,
-        //padding: 100,
-
-        speed: 0.06,
-        animate: false,
-        randomize: false, // uses random initial node positions on true
-        fit: false,
-        maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
-        maxExpandIterations: 2, // Maximum number of expanding iterations
-
-        ready: function () {
-            //console.log('starting spread', Date.now());
-        },
-        stop: function () {
-            //console.log('stop spread', Date.now());
-        }
-    });
-
-
-    setInterval(() => {
-
-        layout.run();
-
-        if (!changed)
-            return;
-
-        c.batch(() => {
-
-            const nodes = c.nodes();
-            const toRemove = (nodes.size()) - maxNodes;
-            if (toRemove > 0) {
-                //console.log(nodes.size(), 'oversize');
-                const sorted = nodes.sort((a, b) => {
-                    //increasing priority
-                    return a._private.data.pri - b._private.data.pri;
-                });
-
-                for (let i = 0; i < toRemove; i++) {
-                    //console.log(sorted[i], 'removed');
-                    sorted[i].remove();
-                }
-                //console.log(nodes.size(), 'current size');
-            }
-
-
-            nodes.each((i, n) => {
-                const x = n._private.data; //HACK
-                if (x) {
-
-                    const p1 = 1 + x.pri; // * d(x, 'belief');
-                    const r = parseInt(24 + 48 * (p1 * p1));
-                    n.style({
-                        //                       sg.spacegraph.style().selector('node')
-                        //                       .style('background-color', function(x) {
-                        //                           const belief = 0.25 + 0.75 * d(x, 'belief');
-                        //                           const aBelief = 0.25 + 0.75 * Math.abs(belief);
-                        //                           const pri = 0.25 + 0.75 * d(x, 'pri');
-                        width: r,
-                        height: r,
-                        shape: 'hexagon',
-                        backgroundColor: colorFunc(0.25 + 0.75 * x.pri, x.dur, x.qua)
-
-
-                    });
-                }
-            });
-        });
-
-        changed = false;
-
-    }, updatePeriodMS);
-
-    terminal.on('message', function (x) {
-        const id = x.term + x.punc + x.freq + ';' + x.conf; //HACK for Task's
-        x.label = x.term; //HACK
-
-        let existing = c.get(id);
-
-        if (!existing) {
-
-            //add
-            c.add({group: "nodes", data: x});
-
-        } else {
-            //replace / merge
-            existing.data = x;
-        }
-
-        changed = true;
-    });
-
-    d.graph = c;
-
-    return d;
-}
 
 //    function gridCell(contents) {
 //        return div('grid-stack-item').append(div('grid-stack-item-content').append(contents));

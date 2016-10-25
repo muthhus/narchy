@@ -24,6 +24,120 @@ function uuid() {
     return randomstring;
 }
 
+function spacegraph(opt) {
+
+    opt = opt || {};
+
+    const d = div('graph max');
+
+    const c = cytoscape(cytoscapeOptions(opt, function() {}, d));
+    const cypp = c._private.elements._private.ids;
+    c.get = function(id) {
+        return cypp[id];
+    };
+
+
+    const colorFunc = function (r, g, b) {
+
+        const R = parseInt(r * 255);
+        const G = parseInt(g * 255);
+        const B = parseInt(b * 255);
+
+        return "rgb(" + R + "," + G + "," + B + ")";
+
+    };
+
+    d.changed = true;
+
+//        c.onRender(()=>{
+//           console.log('render');
+//           changed = false;
+//        });
+
+    const maxNodes = 32;
+    const updatePeriodMS = 100;
+
+
+    const layout = c.makeLayout({
+        /* https://github.com/cytoscape/cytoscape.js-spread */
+        name: 'spread',
+        minDist: 250,
+        //padding: 100,
+
+        speed: 0.06,
+        animate: false,
+        randomize: false, // uses random initial node positions on true
+        fit: false,
+        maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
+        maxExpandIterations: 2, // Maximum number of expanding iterations
+
+        ready: function () {
+            //console.log('starting spread', Date.now());
+        },
+        stop: function () {
+            //console.log('stop spread', Date.now());
+        }
+    });
+
+
+    setInterval(() => {
+
+        layout.run();
+
+        if (!d.changed)
+            return;
+
+        c.batch(() => {
+
+            const nodes = c.nodes();
+            const toRemove = (nodes.size()) - maxNodes;
+            if (toRemove > 0) {
+                //console.log(nodes.size(), 'oversize');
+                const sorted = nodes.sort((a, b) => {
+                    //increasing priority
+                    return a._private.data.pri - b._private.data.pri;
+                });
+
+                for (let i = 0; i < toRemove; i++) {
+                    //console.log(sorted[i], 'removed');
+                    sorted[i].remove();
+                }
+                //console.log(nodes.size(), 'current size');
+            }
+
+
+            nodes.each((i, n) => {
+                const x = n._private.data; //HACK
+                if (x) {
+
+                    const p1 = 1 + x.pri; // * d(x, 'belief');
+                    const r = parseInt(24 + 48 * (p1 * p1));
+                    n.style({
+                        //                       sg.spacegraph.style().selector('node')
+                        //                       .style('background-color', function(x) {
+                        //                           const belief = 0.25 + 0.75 * d(x, 'belief');
+                        //                           const aBelief = 0.25 + 0.75 * Math.abs(belief);
+                        //                           const pri = 0.25 + 0.75 * d(x, 'pri');
+                        width: r,
+                        height: r,
+                        shape: 'hexagon',
+                        backgroundColor: colorFunc(0.25 + 0.75 * x.pri, x.dur, x.qua)
+
+
+                    });
+                }
+            });
+        });
+
+        d.changed = false;
+
+    }, updatePeriodMS);
+
+
+    d.graph = c;
+
+    return d;
+}
 
 
 

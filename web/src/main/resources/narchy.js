@@ -32,7 +32,7 @@ function NARTerminal() {
             ] );
 
         } catch (e) {
-            console.error(e, d);
+            console.error(e);
         }
 
     };
@@ -145,8 +145,9 @@ function editify(div) {
     //
     // return editor;
 
-    const t = $(document.createElement('textarea')).appendTo(div);
-    return CodeMirror.fromTextArea(t[0], {
+    const t = document.createElement('textarea');
+    div.append(t);
+    return CodeMirror.fromTextArea(t, {
         //http://codemirror.net/doc/manual.html#usage
         lineNumbers: false,
         theme: 'night',
