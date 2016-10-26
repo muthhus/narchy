@@ -192,7 +192,9 @@
             timeoutInterval: 2000,
 
             /** The maximum number of reconnection attempts to make. Unlimited if null. */
-            maxReconnectAttempts: null
+            maxReconnectAttempts: null,
+
+            onopen: undefined
         };
         if (!options) { options = {}; }
 
@@ -230,6 +232,7 @@
         // Private state variables
 
         const self = this;
+
         let ws;
         let forcedClose = false;
         let timedOut = false;
@@ -302,6 +305,8 @@
                 self.reconnectAttempts = 0;
                 //const e = generateEvent('open');
                 //e.isReconnect = reconnectAttempt;
+                if (self.onopen)
+                    self.onopen(self /* HACK use 'this' via apply */);
                 reconnectAttempt = false;
                 //eventTarget.dispatchEvent(e);
             };
@@ -353,10 +358,7 @@
             // };
         };
 
-        // Whether or not to create a websocket upon instantiation
-        if (this.automaticOpen) {
-            this.open(false);
-        }
+
 
         // /**
         //  * Transmits data to the server over the WebSocket connection.
@@ -401,6 +403,12 @@
                 ws.close();
             }
         };
+
+        // Whether or not to create a websocket upon instantiation
+        if (this.automaticOpen) {
+            this.open(false);
+        }
+
     }
 
     /**

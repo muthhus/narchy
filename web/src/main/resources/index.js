@@ -69,7 +69,13 @@ function Menu() {
                     $.getJSON(q, (d)=>{
                         console.log(d);
                         console.log(JSON.stringify(d));
-                        io.send("json(\"" + JSON.stringify(d) + "\")");
+                        NARSocket('json/in', null, {
+                            onopen: function(socket) {
+                                console.log(socket);
+                                socket.send(JSON.stringify(d));
+                                socket.close();
+                            }
+                        });
                     });
                 })
             )

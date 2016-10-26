@@ -5,10 +5,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import nars.budget.Budgeted;
-import nars.concept.AtomConcept;
-import nars.concept.CompoundConcept;
 import nars.index.term.TermIndex;
-import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -16,7 +13,6 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.compound.GenericCompound;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.var.AbstractVariable;
@@ -28,9 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
@@ -669,6 +663,7 @@ public class IO {
 
     public static Term fromJSON(String json) {
 
+
         JsonValue v = Json.parse(json);
         return fromJSON(v);
 
@@ -677,9 +672,13 @@ public class IO {
     public static Term fromJSON(JsonValue v) {
         if (v instanceof JsonObject) {
             JsonObject o = (JsonObject)v;
-            List<Term> members = $.newArrayList(o.size());
+            int s = o.size();
+            List<Term> members = $.newArrayList(s);
             o.forEach(m -> members.add( $.inh(fromJSON(m.getValue()), $.the(m.getName())) ));
-            return $.sete(members);
+            return $.
+                    sete
+                    //secte
+                        (members.toArray(new Term[s]));
         } else if (v instanceof JsonArray) {
             JsonArray o = (JsonArray)v;
             List<Term> vv = $.newArrayList(o.size());

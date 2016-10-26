@@ -12,13 +12,13 @@ const defaultHostname = window.location.hostname || 'localhost';
 const defaultWSPort = window.location.port || 8080;
 
 /** creates a websocket connection to a path on the server that hosts the currently visible webpage */
-const NARSocket = function(path, onMessage) {
+const NARSocket = function(path, onMessage, options) {
     const ws = new ReconnectingWebSocket('ws://' +
         defaultHostname + ':' +
         defaultWSPort + '/' +
         path,
         null /* protocols */,
-        {
+        options || {
             //Options: //https://github.com/joewalnes/reconnecting-websocket/blob/master/reconnecting-websocket.js#L112
             /*
              // The number of milliseconds to delay before attempting to reconnect.

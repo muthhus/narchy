@@ -1,22 +1,10 @@
 package spacegraph.web;
 
 
-import nars.util.data.list.FasterList;
-import nars.util.meter.event.FloatGuage;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * in progress

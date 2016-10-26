@@ -22,8 +22,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.irc.IRCAgent;
-import spacegraph.irc.IRCServer;
 
 import java.io.File;
 import java.io.IOException;

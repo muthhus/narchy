@@ -212,5 +212,10 @@ public class NarseseExtendedTest {
 //    }
 
 
+    @Test public void testTripleQuote() {
+        assertEquals( "(\"triplequoted\")", term("(\"\"\"triplequoted\"\"\")").toString() );
+        assertEquals( "(\"triple\\\"quoted\")", term("(\"\"\"triple\"quoted\"\"\")").toString() );
+    }
 
 }
+
