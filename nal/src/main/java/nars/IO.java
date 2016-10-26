@@ -1,5 +1,9 @@
 package nars;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import nars.budget.Budgeted;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
@@ -22,10 +26,11 @@ import nars.truth.Truthed;
 import nars.util.data.rope.StringHack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.nustaq.serialization.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
@@ -377,107 +382,6 @@ public class IO {
     }
 
 
-    /**
-     * serialization and deserialization of terms, tasks, etc.
-     */
-    public static class DefaultCodec extends FSTConfiguration {
-
-        final TermIndex index;
-
-        public DefaultCodec(TermIndex t) {
-            super(null);
-
-            this.index = t;
-
-            createDefaultConfiguration();
-            //setStreamCoderFactory(new FBinaryStreamCoderFactory(this));
-            setForceSerializable(true);
-
-
-            //setCrossPlatform(false);
-            setShareReferences(false);
-            setPreferSpeed(true);
-            setCrossPlatform(false);
-
-
-            registerClass(Atom.class, GenericCompound.class,
-                    AbstractTask.class,
-                    Term[].class,
-                    TermContainer.class,
-                    //long[].class, char.class,
-                    Op.class);
-
-
-            registerSerializer(AbstractTask.class, new FSTBasicObjectSerializer() {
-
-                @Override
-                public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
-                }
-
-                @NotNull
-                @Override
-                public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
-                    return readTask(in, index);
-                }
-
-                @Override
-                public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
-                    writeTask(out, (Task) toWrite);
-                }
-            }, true);
-
-
-            registerSerializer(Atom.class, terms, true);
-            registerSerializer(Atomic.class, terms, true);
-
-            registerSerializer(GenericCompound.class, terms, true);
-
-            registerSerializer(AtomConcept.class, terms, true);
-            registerSerializer(CompoundConcept.class, terms, true);
-
-        }
-
-//        @Nullable
-//        final FSTBasicObjectSerializer termContainers = new FSTBasicObjectSerializer() {
-//
-//            @Override
-//            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
-//            }
-//
-//            @Nullable
-//            @Override
-//            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
-//                return readTermContainer(in, index);
-//            }
-//
-//            @Override
-//            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
-//                writeTermContainer(out, (TermContainer) toWrite);
-//            }
-//        };
-
-        @Nullable
-        final FSTBasicObjectSerializer terms = new FSTBasicObjectSerializer() {
-
-            @Override
-            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
-            }
-
-            @Nullable
-            @Override
-            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
-                return readTerm(in, index);
-            }
-
-            @Override
-            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
-                writeTerm(out, (Term) toWrite);
-            }
-        };
-
-
-    }
-
 
     public interface Printer {
 
@@ -763,6 +667,30 @@ public class IO {
         }
     }
 
+    public static Term fromJSON(String json) {
+
+        JsonValue v = Json.parse(json);
+        return fromJSON(v);
+
+    }
+
+    public static Term fromJSON(JsonValue v) {
+        if (v instanceof JsonObject) {
+            JsonObject o = (JsonObject)v;
+            List<Term> members = $.newArrayList(o.size());
+            o.forEach(m -> members.add( $.inh(fromJSON(m.getValue()), $.the(m.getName())) ));
+            return $.sete(members);
+        } else if (v instanceof JsonArray) {
+            JsonArray o = (JsonArray)v;
+            List<Term> vv = $.newArrayList(o.size());
+            o.forEach(x -> vv.add( fromJSON(x) ));
+            return $.p(vv);
+        }
+        String vv = v.toString();
+        return $.the(vv);
+        //return $.quote(vv);
+    }
+
     /**
      * Writes a string to the specified DataOutput using
      * <a href="DataInput.html#modified-utf-8">modified UTF-8</a>
@@ -841,4 +769,106 @@ public class IO {
             }
         }
     }
+
 }
+//    /**
+//     * serialization and deserialization of terms, tasks, etc.
+//     */
+//    public static class DefaultCodec extends FSTConfiguration {
+//
+//        final TermIndex index;
+//
+//        public DefaultCodec(TermIndex t) {
+//            super(null);
+//
+//            this.index = t;
+//
+//            createDefaultConfiguration();
+//            //setStreamCoderFactory(new FBinaryStreamCoderFactory(this));
+//            setForceSerializable(true);
+//
+//
+//            //setCrossPlatform(false);
+//            setShareReferences(false);
+//            setPreferSpeed(true);
+//            setCrossPlatform(false);
+//
+//
+//            registerClass(Atom.class, GenericCompound.class,
+//                    AbstractTask.class,
+//                    Term[].class,
+//                    TermContainer.class,
+//                    //long[].class, char.class,
+//                    Op.class);
+//
+//
+//            registerSerializer(AbstractTask.class, new FSTBasicObjectSerializer() {
+//
+//                @Override
+//                public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
+//                }
+//
+//                @NotNull
+//                @Override
+//                public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
+//                    return readTask(in, index);
+//                }
+//
+//                @Override
+//                public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+//                    writeTask(out, (Task) toWrite);
+//                }
+//            }, true);
+//
+//
+//            registerSerializer(Atom.class, terms, true);
+//            registerSerializer(Atomic.class, terms, true);
+//
+//            registerSerializer(GenericCompound.class, terms, true);
+//
+//            registerSerializer(AtomConcept.class, terms, true);
+//            registerSerializer(CompoundConcept.class, terms, true);
+//
+//        }
+//
+////        @Nullable
+////        final FSTBasicObjectSerializer termContainers = new FSTBasicObjectSerializer() {
+////
+////            @Override
+////            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
+////            }
+////
+////            @Nullable
+////            @Override
+////            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
+////                return readTermContainer(in, index);
+////            }
+////
+////            @Override
+////            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+////                writeTermContainer(out, (TermContainer) toWrite);
+////            }
+////        };
+//
+//        @Nullable
+//        final FSTBasicObjectSerializer terms = new FSTBasicObjectSerializer() {
+//
+//            @Override
+//            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
+//            }
+//
+//            @Nullable
+//            @Override
+//            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
+//                return readTerm(in, index);
+//            }
+//
+//            @Override
+//            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+//                writeTerm(out, (Term) toWrite);
+//            }
+//        };
+//
+//
+//    }
+//

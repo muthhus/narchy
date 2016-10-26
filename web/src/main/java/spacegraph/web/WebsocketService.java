@@ -45,9 +45,9 @@ public abstract class WebsocketService extends AbstractWebsocketService {
             WebSockets.sendBinary(ByteBuffer.wrap((byte[]) object), socket, t);
         } else if (object instanceof ByteBuffer) {
             WebSockets.sendBinary((ByteBuffer) object, socket, t);
-        } else {
+        } /*else {
             WebSockets.sendText(Json.jsonize(object), socket, t);
-        }
+        }*/
     }
 
     /**
