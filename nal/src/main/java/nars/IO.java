@@ -676,9 +676,11 @@ public class IO {
             List<Term> members = $.newArrayList(s);
             o.forEach(m -> members.add( $.inh(fromJSON(m.getValue()), $.the(m.getName())) ));
             return $.
-                    sete
+                    parallel
+                    //sete
                     //secte
-                        (members.toArray(new Term[s]));
+                        (members/*.toArray(new Term[s])*/);
+
         } else if (v instanceof JsonArray) {
             JsonArray o = (JsonArray)v;
             List<Term> vv = $.newArrayList(o.size());

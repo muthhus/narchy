@@ -67,15 +67,20 @@ function Menu() {
                 $('<button>Forecast</button>').click(()=>{
                     var q = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22FUKUSHIMA%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
                     $.getJSON(q, (d)=>{
-                        console.log(d);
-                        console.log(JSON.stringify(d));
-                        NARSocket('json/in', null, {
-                            onopen: function(socket) {
-                                console.log(socket);
-                                socket.send(JSON.stringify(d));
-                                socket.close();
-                            }
-                        });
+                        d = d.query.results.channel.item.forecast; //WTF
+
+                        for (var i = 0; i < d.length; i++) {
+                            //console.log(d);
+                            //console.log(JSON.stringify(d));
+                            //TODO convert to: NARSocket.send('json/in', JSON.stringify(d))
+                            const msg = JSON.stringify(['Fukushima', d[i]]);
+                            NARSocket('json/in', null, {
+                                onopen: function (socket) {
+                                    socket.send(msg);
+                                    socket.close();
+                                }
+                            });
+                        }
                     });
                 })
             )

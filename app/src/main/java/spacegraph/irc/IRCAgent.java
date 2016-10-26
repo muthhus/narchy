@@ -375,7 +375,7 @@ public class IRCAgent extends IRC {
         );
 
 
-        int volMax = 50;
+        int volMax = 96;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,

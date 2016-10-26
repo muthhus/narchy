@@ -211,7 +211,7 @@ public class WebServer /*extends PathHandler*/ {
         nar.on("top", (terms) -> {
 
                     int length = 16;
-                    List<Term> b = $.newArrayList();
+                    List<Term> b = $.newArrayList(length);
                     @NotNull Bag<Concept> cbag = ((Default) nar).core.active;
 
                     String query;

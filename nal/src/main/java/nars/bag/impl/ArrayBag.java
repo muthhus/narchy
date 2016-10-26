@@ -63,6 +63,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         SortedArray<BLink<V>> items = this.items;
 
+        List<BLink<V>> pendingRemoval;
         synchronized (items) {
             int additional = (toAdd != null) ? 1 : 0;
 
@@ -70,9 +71,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             int c = capacity();
 
             if (s + additional > c) {
-                s = clean(toAdd, s, additional);
+                pendingRemoval = $.newArrayList((s+additional)-c);
+                s = clean(toAdd, s, additional, pendingRemoval);
                 if (s + additional > c)
                     return false; //throw new RuntimeException("overflow");
+            } else {
+                pendingRemoval = null;
             }
 
             if (toAdd != null) {
@@ -93,7 +97,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
                 int ss = size();
                 if (ss < capacity) {
-                    items.addInternal(toAdd); //grows the list if necessary
+                    items.add(toAdd, this);
+                    //items.addInternal(toAdd); //grows the list if necessary
                 } else {
                     //throw new RuntimeException("list became full during insert");
                     return false;
@@ -107,6 +112,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
             }
 
+        }
+
+        //call these outside of the synchronization
+        if (pendingRemoval!=null) {
+            for (BLink<V> w: pendingRemoval) {
+                onRemoved(w);
+                w.delete();
+            }
         }
 
         return true;
@@ -124,7 +137,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    private int clean(@Nullable BLink<V> toAdd, int s, int sizeThresh) {
+    private int clean(@Nullable BLink<V> toAdd, int s, int sizeThresh, List<BLink<V>> pendingRemoval) {
 
         List<BLink<V>> toRemove = $.newArrayList(Math.max(0,s - sizeThresh));
 
@@ -152,9 +165,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 map.putIfAbsent(k, k2);
             }
 
-            onRemoved(w);
-
-            w.delete();
+            pendingRemoval.add(w);
 
         }
         return s;
