@@ -104,7 +104,8 @@ class EventEmitter {
         }
 
     }
-    emit(type: string, args: any[]){
+
+    emit(type: string, ...args: any[]){
 
         const listeners = this._events.get(type);
         if (listeners) {

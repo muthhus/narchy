@@ -36,16 +36,13 @@ const NARSocket = function(path, onMessage) {
 
     const e = new EventEmitter();
 
-    ws.onopen = function() {
-        e.emit('connect', this);
-    };
-
     ws.onmessage = function(m) {
 
-        setTimeout(()=> {
-            let d = m.data;
+        const d = m.data;
+
+        setTimeout(() => {
             onMessage(e, d);
-        },0);
+        } ,0);
 // //        try {
 //
 //         if (typeof d === "string")
@@ -59,15 +56,12 @@ const NARSocket = function(path, onMessage) {
 
     };
 
-    ws.onclose = function() {
-        e.emit('disconnect', this);
-    };
 
     e.socket = ws;
     e.close = ws.close;
-    e.send = function(x) {
-        ws.send(x);
-    };
+    e.send = ws.send;
+
+    //e.send = ws.send;
 
     return e;
 };
@@ -87,12 +81,12 @@ function decodeConceptSummaries(e, m) {
         const qua = d.getFloat32(j); j += 4;
         const termStrLen = d.getInt16(j);  j += 2;
         const term = new TextDecoder("utf8").decode(m.slice(j, j+termStrLen)); j += termStrLen;
-        e.emit('concept_summary', [{
+        e.emit('concept_summary', {
             term: term,
             pri: pri,
             dur: dur,
             qua: qua
-        }]);
+        });
     }
 }
 
@@ -136,7 +130,7 @@ function decodeTasks(e, m) {
 
                 //console.log(term, punct, pri, when, freq, conf);
 
-                e.emit('task', [{
+                e.emit('task', {
                     term: term,
                     punc: punct,
                     pri: pri,
@@ -145,15 +139,14 @@ function decodeTasks(e, m) {
                     when: when,
                     freq: freq,
                     conf: conf
-                }]);
+                });
 
                 break;
             }
 
 
             default: {
-                const e = ['unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data)];
-                console.error(e);
+                console.error('unknown punctuation type: ', punct, new TextDecoder("utf8").decode(m.data));
                 return;
             }
         }
@@ -214,13 +207,7 @@ function NALEditor(terminal, initialValue) {
         if (event.ctrlKey && event.code==="Enter") {
             const txt = editor.getValue();
             if (txt) {
-
-                try {
-                    terminal.send(txt);
-                } catch (e) {
-                    console.error(e, terminal, txt);
-                }
-
+                terminal.send(txt);
                 editor.setValue('');
             }
 

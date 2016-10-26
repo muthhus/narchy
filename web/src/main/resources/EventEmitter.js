@@ -83,7 +83,7 @@ class EventEmitter {
             this._events.delete(type); //clear its entry
         }
     }
-    emit(type, args) {
+    emit(type, ...args) {
         const listeners = this._events.get(type);
         if (listeners) {
             for (let x of listeners) {

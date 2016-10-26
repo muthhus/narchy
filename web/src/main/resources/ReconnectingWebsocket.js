@@ -233,21 +233,21 @@
         let ws;
         let forcedClose = false;
         let timedOut = false;
-        const eventTarget = document.createElement('div');
+        //const eventTarget = document.createElement('div');
 
         // Wire up "on*" properties as event handlers
 
-        eventTarget.addEventListener('open',       function(event) { self.onopen(event); });
+        /*eventTarget.addEventListener('open',       function(event) { self.onopen(event); });
         eventTarget.addEventListener('close',      function(event) { self.onclose(event); });
         eventTarget.addEventListener('connecting', function(event) { self.onconnecting(event); });
         eventTarget.addEventListener('message',    function(event) { self.onmessage(event); });
-        eventTarget.addEventListener('error',      function(event) { self.onerror(event); });
+        eventTarget.addEventListener('error',      function(event) { self.onerror(event); });*/
 
         // Expose the API required by EventTarget
 
-        this.addEventListener = eventTarget.addEventListener.bind(eventTarget);
-        this.removeEventListener = eventTarget.removeEventListener.bind(eventTarget);
-        this.dispatchEvent = eventTarget.dispatchEvent.bind(eventTarget);
+        // this.addEventListener = eventTarget.addEventListener.bind(eventTarget);
+        // this.removeEventListener = eventTarget.removeEventListener.bind(eventTarget);
+        // this.dispatchEvent = eventTarget.dispatchEvent.bind(eventTarget);
 
         /**
          * This function generates an event that is compatible with standard
@@ -260,11 +260,11 @@
          * @param s String The name that the event should use
          * @param args Object an optional object that the event will use
          */
-        function generateEvent(s, args) {
-            const evt = document.createEvent("CustomEvent");
-            evt.initCustomEvent(s, false, false, args);
-            return evt;
-        }
+        // function generateEvent(s, args) {
+        //     const evt = document.createEvent("CustomEvent");
+        //     evt.initCustomEvent(s, false, false, args);
+        //     return evt;
+        // }
         this.open = function (reconnectAttempt) {
             ws = new WebSocket(self.url, protocols || []);
             ws.binaryType = 'arraybuffer';
@@ -274,7 +274,7 @@
                     return;
                 }
             } else {
-                eventTarget.dispatchEvent(generateEvent('connecting'));
+                //eventTarget.dispatchEvent(generateEvent('connecting'));
                 this.reconnectAttempts = 0;
             }
 
@@ -300,10 +300,10 @@
                 self.protocol = ws.protocol;
                 self.readyState = WebSocket.OPEN;
                 self.reconnectAttempts = 0;
-                const e = generateEvent('open');
-                e.isReconnect = reconnectAttempt;
+                //const e = generateEvent('open');
+                //e.isReconnect = reconnectAttempt;
                 reconnectAttempt = false;
-                eventTarget.dispatchEvent(e);
+                //eventTarget.dispatchEvent(e);
             };
 
             ws.onclose = function(event) {
@@ -312,19 +312,19 @@
                 ws = null;
                 if (forcedClose) {
                     self.readyState = WebSocket.CLOSED;
-                    eventTarget.dispatchEvent(generateEvent('close'));
+                    //eventTarget.dispatchEvent(generateEvent('close'));
                 } else {
                     self.readyState = WebSocket.CONNECTING;
-                    const e = generateEvent('connecting');
+                    /*const e = generateEvent('connecting');
                     e.code = event.code;
                     e.reason = event.reason;
-                    e.wasClean = event.wasClean;
-                    eventTarget.dispatchEvent(e);
+                    e.wasClean = event.wasClean;*/
+                    //eventTarget.dispatchEvent(e);
                     if (!reconnectAttempt && !timedOut) {
                         if (self.debug || ReconnectingWebSocket.debugAll) {
                             console.debug('ReconnectingWebSocket', 'onclose', self.url);
                         }
-                        eventTarget.dispatchEvent(generateEvent('close'));
+                        //eventTarget.dispatchEvent(generateEvent('close'));
                     }
 
 
@@ -335,19 +335,22 @@
                 }
             };
             ws.onmessage = function(event) {
-                if (self.debug || ReconnectingWebSocket.debugAll) {
-                    console.debug('ReconnectingWebSocket', 'onmessage', self.url, event.data);
-                }
-                const e = generateEvent('message');
-                e.data = event.data;
-                eventTarget.dispatchEvent(e);
+              self.onmessage(event);
             };
-            ws.onerror = function(event) {
-                if (self.debug || ReconnectingWebSocket.debugAll) {
-                    console.debug('ReconnectingWebSocket', 'onerror', self.url, event);
-                }
-                eventTarget.dispatchEvent(generateEvent('error'));
-            };
+            // ws.onmessage = function(event) {
+            //     if (self.debug || ReconnectingWebSocket.debugAll) {
+            //         console.debug('ReconnectingWebSocket', 'onmessage', self.url, event.data);
+            //     }
+            //     const e = generateEvent('message');
+            //     e.data = event.data;
+            //     //eventTarget.dispatchEvent(e);
+            // };
+            // ws.onerror = function(event) {
+            //     if (self.debug || ReconnectingWebSocket.debugAll) {
+            //         console.debug('ReconnectingWebSocket', 'onerror', self.url, event);
+            //     }
+            //     //eventTarget.dispatchEvent(generateEvent('error'));
+            // };
         };
 
         // Whether or not to create a websocket upon instantiation
@@ -355,21 +358,22 @@
             this.open(false);
         }
 
-        /**
-         * Transmits data to the server over the WebSocket connection.
-         *
-         * @param data a text string, ArrayBuffer or Blob to send to the server.
-         */
-        this.send = function(data) {
-            if (ws) {
-                if (self.debug || ReconnectingWebSocket.debugAll) {
-                    console.debug('ReconnectingWebSocket', 'send', self.url, data);
-                }
-                return ws.send(data);
-            } else {
-                throw 'INVALID_STATE_ERR : Pausing to reconnect websocket';
-            }
-        };
+        // /**
+        //  * Transmits data to the server over the WebSocket connection.
+        //  *
+        //  * @param data a text string, ArrayBuffer or Blob to send to the server.
+        //  */
+        // this.send = function(data) {
+        //     // if (ws) {
+        //     //     if (self.debug || ReconnectingWebSocket.debugAll) {
+        //     //         console.debug('ReconnectingWebSocket', 'send', self.url, data);
+        //     //     }
+        //         return ws.send(data);
+        //     // } else {
+        //     //     throw 'INVALID_STATE_ERR : Pausing to reconnect websocket';
+        //     // }
+        // };
+        this.send = (m) => ws.send(m);
 
         /**
          * Closes the WebSocket connection or connection attempt, if any.
@@ -385,6 +389,8 @@
                 ws.close(code, reason);
             }
         };
+
+
 
         /**
          * Additional public API method to refresh the connection if still open (close, re-open).
@@ -404,11 +410,11 @@
     ReconnectingWebSocket.prototype.onopen = function(event) {};
     /** An event listener to be called when the WebSocket connection's readyState changes to CLOSED. */
     ReconnectingWebSocket.prototype.onclose = function(event) {};
-    /** An event listener to be called when a connection begins being attempted. */
+    // /** An event listener to be called when a connection begins being attempted. */
     ReconnectingWebSocket.prototype.onconnecting = function(event) {};
-    /** An event listener to be called when a message is received from the server. */
+    // /** An event listener to be called when a message is received from the server. */
     ReconnectingWebSocket.prototype.onmessage = function(event) {};
-    /** An event listener to be called when an error occurs. */
+    // /** An event listener to be called when an error occurs. */
     ReconnectingWebSocket.prototype.onerror = function(event) {};
 
     /**

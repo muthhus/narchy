@@ -11,6 +11,7 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.util.Texts;
 import nars.util.Util;
@@ -140,8 +141,8 @@ public class WebServer /*extends PathHandler*/ {
 //                //"#nars"
 //        ).start();
 
-        /*nar.on("J", (terms) -> {
-            //WARNING this is dangerous to allow open access
+        nar.on("J", (terms) -> {
+            //WARNING this could be dangerous to allow open access
             String expr = Atom.unquote(terms[0]);
             Object r;
             try {
@@ -149,8 +150,11 @@ public class WebServer /*extends PathHandler*/ {
             } catch (OgnlException e) {
                 r = e;
             }
-            return $.the(r.toString());
-        });*/
+            if (r instanceof Termed)
+                return ((Termed)r).term();
+            else
+                return $.the(r.toString());
+        });
         nar.on("read", (terms) -> {
 
             String protocol = terms[0].toString();
@@ -183,6 +187,11 @@ public class WebServer /*extends PathHandler*/ {
                     }
 
                 case "url":
+                    //TODO
+                    break;
+
+                case "json":
+                    //TODO
                     break;
 
                 //...
@@ -199,7 +208,7 @@ public class WebServer /*extends PathHandler*/ {
             return $.the("Ready (" + dt + " ms)");
         });
         nar.on("memstat", (terms) ->
-                $.quote(nar.concepts.summary())
+            $.quote(nar.concepts.summary())
         );
         nar.on("top", (terms) -> {
 
