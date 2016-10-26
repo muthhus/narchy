@@ -8,6 +8,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -25,6 +26,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
     /** holds compounds and subterm vectors */
     @NotNull public final Cache<Term, Termed> cache;
 
+    @Nullable
     private final Cache<TermContainer,TermContainer> subterms;
 
 //    @NotNull
@@ -48,17 +50,17 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
         //return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
     };
 
-    public CaffeineIndex(ConceptBuilder conceptBuilder, int capacity, int avgVolume, boolean soft, @NotNull Executor exe) {
+    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, int capacity, int avgVolume, boolean soft, @NotNull Executor exe) {
         this(conceptBuilder, capacity * avgVolume, soft, exe, capacity*4);
     }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor exe) {
+    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor exe) {
         this(conceptBuilder, maxWeight, soft, exe, 0);
     }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor exe, int maxSubterms) {
+    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long maxWeight, boolean soft, @NotNull Executor exe, int maxSubterms) {
         super(conceptBuilder);
 
 
@@ -89,8 +91,9 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener {
     }
 
 
+    @NotNull
     @Override
-    public final TermContainer intern(TermContainer s) {
+    public final TermContainer intern(@NotNull TermContainer s) {
         return subterms!=null ? subterms.get(s, (ss) -> ss) :s;
     }
 

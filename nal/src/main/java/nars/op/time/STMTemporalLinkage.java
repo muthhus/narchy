@@ -22,6 +22,7 @@ import java.util.Iterator;
 public final class STMTemporalLinkage extends STM {
 
     @NotNull public final Deque<Task> stm;
+    @NotNull
     private final On onReset;
     float strength = 1f;
 

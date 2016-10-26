@@ -165,7 +165,7 @@ public abstract class TermIndex extends TermBuilder {
         try {
             Term t =super.the(o, dt, u);
             return t == null ? False : t;
-        } catch (InvalidTermException | InvalidTaskException x) {
+        } catch (@NotNull InvalidTermException | InvalidTaskException x) {
             if (Param.DEBUG_EXTRA) {
                 logger.warn("Termizer: {x} : {} {} {}", x, o, dt, u);
             }
@@ -491,6 +491,7 @@ public abstract class TermIndex extends TermBuilder {
         return cc;
     }
 
+    @Nullable
     public Term conceptualizable(@NotNull Term term) {
         Term termPre;
         do {
@@ -558,7 +559,7 @@ public abstract class TermIndex extends TermBuilder {
     }
 
 
-    static boolean isDeletable(Concept c) {
+    static boolean isDeletable(@NotNull Concept c) {
         return c.get(Concept.Savior.class) == null;
     }
 

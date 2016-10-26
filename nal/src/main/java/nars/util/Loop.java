@@ -27,17 +27,17 @@ abstract public class Loop implements Runnable {
     private int periodMS;
 
 
-    public Loop(String threadName, int periodMS) {
+    public Loop(@NotNull String threadName, int periodMS) {
         this(threadName);
 
         start(periodMS);
     }
 
-    public Loop(String threadName, float fps) {
+    public Loop(@NotNull String threadName, float fps) {
         this(threadName, (int)(1000f/fps));
     }
 
-    public Loop(String threadName) {
+    public Loop(@NotNull String threadName) {
         thread = new Thread(this, threadName);
     }
 
@@ -52,6 +52,7 @@ abstract public class Loop implements Runnable {
         logger.info("started {}", thread);
     }
 
+    @NotNull
     public Loop at(float fps) {
         setPeriodMS((int)(1000f/fps));
         return this;

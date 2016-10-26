@@ -223,6 +223,7 @@ public class TermjectConcept<X> implements AbstractConcept, Termject<X> {
         this.policy = c;
     }
 
+    @NotNull
     @Override
     public Activation process(@NotNull Task input, NAR nar) {
         throw new UnsupportedOperationException();

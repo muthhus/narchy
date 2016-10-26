@@ -1,6 +1,7 @@
 package nars.nar.exe.util;
 
 import net.openhft.affinity.AffinityLock;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
@@ -24,7 +25,7 @@ public class AffinityExecutor implements Executor {
     static final class AffinityThread extends Thread {
 
         Runnable cmd;
-        public AffinityThread(String name, Runnable cmd) {
+        public AffinityThread(@NotNull String name, Runnable cmd) {
             super(name);
             this.cmd = cmd;
         }

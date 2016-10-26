@@ -5,6 +5,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.util.ByteSeq;
 import nars.util.radixtree.MyConcurrentRadixTree;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -15,21 +16,22 @@ import java.util.function.Function;
 public class TermTree extends MyConcurrentRadixTree<Termed> {
 
 
-    public final Termed get(String id) {
+    public final Termed get(@NotNull String id) {
         return getValueForExactKey(key($.$(id)));
     }
 
 
-    public final Termed computeIfAbsent(ByteSeq s, Function<Term, ? extends Termed> conceptBuilder) {
+    public final Termed computeIfAbsent(@NotNull ByteSeq s, @NotNull Function<Term, ? extends Termed> conceptBuilder) {
         return putIfAbsent(s, () -> conceptBuilder.apply($.the(s.toString())));
     }
 
     @Override
-    public Termed put(Termed value) {
+    public Termed put(@NotNull Termed value) {
         return put(key(value), value);
     }
 
-    public static TermKey key(Termed value) {
+    @NotNull
+    public static TermKey key(@NotNull Termed value) {
         return TermKey.term(value.term());
     }
 

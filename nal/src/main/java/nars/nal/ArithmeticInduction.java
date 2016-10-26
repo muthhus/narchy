@@ -248,7 +248,7 @@ public class ArithmeticInduction {
 
     public
     @NotNull
-    static Set<Term> recompressIfChanged(@NotNull Set<Term> orig, Set<Term> newSubs, int depthRemain) {
+    static Set<Term> recompressIfChanged(@NotNull Set<Term> orig, @NotNull Set<Term> newSubs, int depthRemain) {
         //try {
 
         if (newSubs.equals(orig)) {
@@ -262,6 +262,7 @@ public class ArithmeticInduction {
         }
     }
 
+    @NotNull
     private static List<Term> atomSeq(Term x) {
         if (x instanceof Compound) {
             List<Term> s = $.newArrayList(0);
@@ -278,7 +279,7 @@ public class ArithmeticInduction {
 
 
     @Nullable
-    public static IntArrayList ints(List<Term> term) {
+    public static IntArrayList ints(@NotNull List<Term> term) {
         int termSize = term.size();
         IntArrayList l = new IntArrayList(termSize);
         for (int i = 0; i < termSize; i++)
@@ -287,7 +288,8 @@ public class ArithmeticInduction {
     }
 
 
-    public static RangeSet<Integer> ranges(List<Term> term) {
+    @NotNull
+    public static RangeSet<Integer> ranges(@NotNull List<Term> term) {
         TreeRangeSet<Integer> r = TreeRangeSet.create();
         for (Term x : term) {
             if (x instanceof IntInterval)
@@ -300,7 +302,7 @@ public class ArithmeticInduction {
 
 
     @Nullable
-    public static void intOrNull(Term term, IntArrayList target) {
+    public static void intOrNull(@NotNull Term term, @NotNull IntArrayList target) {
         if (term.op() == INT) {
             target.add( ((IntTerm) term).val() );
         }
@@ -383,7 +385,7 @@ public class ArithmeticInduction {
 //    }
 
 
-    static boolean compareNonInteger(Term x, Term y) {
+    static boolean compareNonInteger(@NotNull Term x, @NotNull Term y) {
         if ((x.op() == INT)) {
             return (y.op() == INT);
         } else if (x instanceof Compound) {
@@ -395,7 +397,7 @@ public class ArithmeticInduction {
 
     final static Function<Term, Term> xx = x -> x;
 
-    private static boolean equalNonIntegerAtoms(TermContainer subs) {
+    private static boolean equalNonIntegerAtoms(@NotNull TermContainer subs) {
         Term first = subs.term(0);
         int ss = subs.size();
         return first.pathsTo(xx, (ByteList p, Term x) -> {
@@ -418,7 +420,8 @@ public class ArithmeticInduction {
     //return new GenericVariable(varDep ? Op.VAR_DEP : Op.VAR_INDEP, Integer.toString(i));
     //}
 
-    private static List<IntInterval> features(List<Term> nnnt) {
+    @NotNull
+    private static List<IntInterval> features(@NotNull List<Term> nnnt) {
         FasterList<IntInterval> ll = $.newArrayList(0);
 
         RangeSet<Integer> intIntervals = ranges(nnnt);

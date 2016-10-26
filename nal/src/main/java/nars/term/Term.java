@@ -55,6 +55,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     AtomicSingleton True = new AtomicSingleton("†");
 
     AtomicSingleton False = new AtomicSingleton("Ø") {
+        @NotNull
         @Override
         public Term unneg() {
             return True;
@@ -343,6 +344,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return appendTo;
     }
 
+    @NotNull
     default List<byte[]> pathsTo(Term subterm) {
         List<byte[]> list = $.newArrayList();
         pathsTo(
@@ -352,7 +354,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return list;
     }
 
-    default boolean pathsTo(Term subterm, @NotNull BiPredicate<ByteList,Term> receiver) {
+    default boolean pathsTo(@NotNull Term subterm, @NotNull BiPredicate<ByteList,Term> receiver) {
         return pathsTo((x)->subterm.equals(x) ? x : null, receiver);
     }
 

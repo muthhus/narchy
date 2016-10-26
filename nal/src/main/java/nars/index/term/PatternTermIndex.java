@@ -45,6 +45,7 @@ public class PatternTermIndex extends MapTermIndex {
     }
 
 
+    @NotNull
     protected Termed compute(@NotNull Compound x) {
 
         //dont store the actual rules, they are guaranteed unique by other means

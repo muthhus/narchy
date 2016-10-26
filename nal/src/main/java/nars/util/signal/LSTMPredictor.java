@@ -7,6 +7,7 @@ import nars.util.data.list.FasterList;
 import nars.util.math.DelayedFloat;
 import nars.util.math.FloatSupplier;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -15,14 +16,18 @@ import java.util.List;
  */
 public class LSTMPredictor {
 
+    @NotNull
     private final LiveSTM net;
+    @NotNull
     private final DelayedFloats INSprev;
     //private final List<FloatSupplier> OUTSSprev;
+    @NotNull
     private final List<FloatSupplier> INS;
+    @NotNull
     private final List<FloatSupplier> OUTS;
     boolean training = true;
 
-    public LSTMPredictor(List<FloatSupplier> INS, List<FloatSupplier> OUTS, int delay  /* used when training */) {
+    public LSTMPredictor(@NotNull List<FloatSupplier> INS, @NotNull List<FloatSupplier> OUTS, int delay  /* used when training */) {
 
         int numInputs = INS.size();
         int numOutputs = OUTS.size();
@@ -37,6 +42,7 @@ public class LSTMPredictor {
 
             final Interaction i = Interaction.the(numInputs, numOutputs); //reused
 
+            @NotNull
             @Override
             protected Interaction observe() {
                 throw new UnsupportedOperationException();
@@ -85,7 +91,8 @@ public class LSTMPredictor {
     }
 
 
-    public static DelayedFloats delay(List<FloatSupplier> vector, int history) {
+    @NotNull
+    public static DelayedFloats delay(@NotNull List<FloatSupplier> vector, int history) {
         DelayedFloats delayed = new DelayedFloats(vector.size());
         for (int i = 0; i< vector.size(); i++)
             delayed.add( new DelayedFloat(vector.get(i), history) );
@@ -105,7 +112,8 @@ public class LSTMPredictor {
         return p;
     }
 
-    public static double[] d(List<? extends FloatSupplier> f) {
+    @NotNull
+    public static double[] d(@NotNull List<? extends FloatSupplier> f) {
         double[] d = new double[f.size()];
         for (int i = 0; i < f.size(); i++)
             d[i] = f.get(i).asFloat();

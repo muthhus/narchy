@@ -299,7 +299,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    Rule Budget(Var<float[]> budget) {
+    public Rule Budget(Var<float[]> budget) {
         return sequence(
                 BUDGET_VALUE_MARK,
 
@@ -319,21 +319,21 @@ public class Narsese extends BaseParser<Object> {
         return budget.set(new float[]{(float) pop()});
     }
 
-    Rule BudgetPriorityDurability(Var<float[]> budget) {
+    public Rule BudgetPriorityDurability(Var<float[]> budget) {
         return sequence(
                 VALUE_SEPARATOR, ShortFloat(),
                 budget.set(new float[]{(float) pop(), (float) pop()}) //intermediate representation
         );
     }
 
-    Rule BudgetPriorityDurabilityQuality(Var<float[]> budget) {
+    public Rule BudgetPriorityDurabilityQuality(Var<float[]> budget) {
         return sequence(
                 VALUE_SEPARATOR, ShortFloat(), VALUE_SEPARATOR, ShortFloat(),
                 budget.set(new float[]{(float) pop(), (float) pop(), (float) pop()}) //intermediate representation
         );
     }
 
-    Rule Tense(Var<Tense> tense) {
+    public Rule Tense(Var<Tense> tense) {
         return firstOf(
                 sequence(TENSE_PRESENT, tense.set(Tense.Present)),
                 sequence(TENSE_PAST, tense.set(Tense.Past)),
@@ -341,7 +341,7 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
-    Rule Truth(Var<Truth> truth, Var<Tense> tense) {
+    public Rule Truth(Var<Truth> truth, Var<Tense> tense) {
         return sequence(
 
                 TRUTH_VALUE_MARK,
@@ -964,6 +964,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * produce a term from the terms (& <=1 NALOperator's) on the value stack
      */
+    @Nullable
     @Deprecated
     final Term popTerm(Op op /*default */) {
 
@@ -1103,7 +1104,7 @@ public class Narsese extends BaseParser<Object> {
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(String input, Consumer<Task> c, Consumer<Object[]> unparsed, NAR m) {
+    public static void tasks(String input, Consumer<Task> c, @Nullable Consumer<Object[]> unparsed, NAR m) {
         tasksRaw(input, o -> {
             Task t = decodeTask(m, o);
             if (t == null) {
@@ -1202,6 +1203,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * parse one term NOT NORMALIZED
      */
+    @NotNull
     public Term term(CharSequence s) throws NarseseException {
 
         Exception errorCause = null;

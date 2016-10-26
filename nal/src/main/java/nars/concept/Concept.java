@@ -60,7 +60,7 @@ public interface Concept extends Termed {
     /**
      * termlink templates; null if none exist
      */
-    @NotNull TermContainer templates();
+    @Nullable TermContainer templates();
 
     @Nullable Map<Object, Object> meta();
 
@@ -101,9 +101,10 @@ public interface Concept extends Termed {
 
     @NotNull QuestionTable questions();
 
-    @NotNull QuestionTable quests();
+    @Nullable QuestionTable quests();
 
 
+    @Nullable
     default Map metaOrCreate() {
         Map<Object, Object> m = meta();
         if (m == null) {
@@ -145,7 +146,7 @@ public interface Concept extends Termed {
     void delete(NAR nar);
 
 
-    static void delete(Concept c, NAR nar) {
+    static void delete(@NotNull Concept c, @NotNull NAR nar) {
         List<Task> removed = $.newArrayList();
         c.policy(ConceptPolicy.Deleted, ETERNAL, removed);
         nar.tasks.remove(removed);
@@ -256,7 +257,7 @@ public interface Concept extends Termed {
     /**
      * termlinks only
      */
-    default void crossLink(Budgeted mine, Budgeted theirs, @NotNull Concept them, float scale, @NotNull NAR nar) {
+    default void crossLink(@NotNull Budgeted mine, @NotNull Budgeted theirs, @NotNull Concept them, float scale, @NotNull NAR nar) {
 
         new Activation(theirs, this, them, nar, scale, 1, -1);
         new Activation(mine, them, this, nar, scale, 1, -1);
@@ -453,7 +454,7 @@ public interface Concept extends Termed {
         return freq(time, goals());
     }
 
-    static float freq(long time, BeliefTable table) {
+    static float freq(long time, @NotNull BeliefTable table) {
         Truth t = table.truth(time);
         return t != null ? t.freq() : Float.NaN;
     }

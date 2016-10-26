@@ -15,10 +15,12 @@ import static nars.$.$;
  */
 public class FastCompound extends GenericCompound {
 
+    @NotNull
     private final ObjectByteHashMap<Term> uniqueSubs;
+    @NotNull
     private final Term[] uniqueSubIndex;
 
-    public FastCompound(Compound c) {
+    public FastCompound(@NotNull Compound c) {
         this(c.op(), c.dt(), c.subterms());
         if (c.isNormalized())
             setNormalized();
@@ -32,6 +34,7 @@ public class FastCompound extends GenericCompound {
 
         new SubtermVisitorXY(term()) {
 
+            @NotNull
             @Override
             public SubtermVisitorXY.Next accept(int subterm, Compound superterm, int depth) {
                 System.out.println(superterm + "(" + subterm + "): " + superterm.term(subterm) + ", depth=" + depth);

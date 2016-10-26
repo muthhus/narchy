@@ -229,12 +229,14 @@ public class MutableTask extends AbstractTask {
         return false;
     }
 
+    @NotNull
     public final MutableTask budget(@NotNull Budget bb) {
         setBudget(bb);
         return this;
     }
 
     /** sets the budget even if 'b' has been deleted; priority will be zero in that case */
+    @NotNull
     public final MutableTask budgetSafe(@NotNull Budget b) {
         float p = b.priIfFiniteElseZero();
         setBudget(p, b.dur(), b.qua());
@@ -255,10 +257,12 @@ public class MutableTask extends AbstractTask {
         return yt;
     }
 
-    public static Task clone(Task t, long newOccurrence) {
+    @NotNull
+    public static Task clone(@NotNull Task t, long newOccurrence) {
         return clone(t, t.truth(), newOccurrence);
     }
-    public static Task clone(Task t, Truth newTruth, long newOccurrence) {
+    @NotNull
+    public static Task clone(@NotNull Task t, Truth newTruth, long newOccurrence) {
         MutableTask yt = new MutableTask(t.term(), t.punc(), newTruth);
         yt.budgetSafe(t.budget());
         yt.setEvidence(t.evidence());

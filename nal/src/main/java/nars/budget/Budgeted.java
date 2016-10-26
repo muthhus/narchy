@@ -21,7 +21,7 @@ public interface Budgeted  {
         return totalPriority;
     }
 
-    public static void normalizePriSum(Iterable<? extends Budgeted> l, float total) {
+    public static void normalizePriSum(@NotNull Iterable<? extends Budgeted> l, float total) {
 
         float priSum = Budgeted.priSum(l);
         float mult = total / priSum;
@@ -34,7 +34,7 @@ public interface Budgeted  {
     /**
      * randomly selects an item from a collection, weighted by priority
      */
-    static <E extends Budgeted> E selectRandomByPriority(NAR memory, @NotNull Iterable<E> c) {
+    static <E extends Budgeted> E selectRandomByPriority(@NotNull NAR memory, @NotNull Iterable<E> c) {
         float totalPriority = priSum(c);
 
         if (totalPriority == 0) return null;

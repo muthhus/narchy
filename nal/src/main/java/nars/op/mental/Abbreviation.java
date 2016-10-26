@@ -56,6 +56,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
     /**
      * generated abbreviation belief's confidence
      */
+    @NotNull
     public final MutableFloat abbreviationConfidence;
 
     /**
@@ -90,7 +91,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
 
     @Nullable
     @Override
-    protected void in(Task task, Consumer<BLink<CompoundConcept>> each) {
+    protected void in(Task task, @NotNull Consumer<BLink<CompoundConcept>> each) {
 
         if (task instanceof AbbreviationTask)
             return;
@@ -99,7 +100,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
 
     }
 
-    private void input(Budget b, Consumer<BLink<CompoundConcept>> each, Compound t) {
+    private void input(@NotNull Budget b, @NotNull Consumer<BLink<CompoundConcept>> each, @NotNull Compound t) {
         if (t.vars() == 0) {
             int vol = t.volume();
             if (vol >= minAbbreviableVolume.intValue())
@@ -173,7 +174,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
     //private boolean createRelation = false;
 
 
-    protected void abbreviate(@NotNull CompoundConcept abbreviated, Budget b) {
+    protected void abbreviate(@NotNull CompoundConcept abbreviated, @NotNull Budget b) {
 
         String id;
 //            id = newCanonicalTerm(abbreviated);
@@ -269,10 +270,11 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
      */
     static final class AliasConcept extends AtomConcept {
 
+        @NotNull
         private final Concept abbr;
         private TermContainer templates;
 
-        public AliasConcept(@NotNull String term, @NotNull Concept abbreviated, @NotNull NAR nar, Term... additionalTerms) {
+        public AliasConcept(@NotNull String term, @NotNull Concept abbreviated, @NotNull NAR nar, @NotNull Term... additionalTerms) {
             super(term, Op.ATOM, abbreviated.termlinks(), abbreviated.tasklinks());
 
             abbreviated.put(Concept.Savior.class, this);
@@ -396,14 +398,14 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<CompoundConcept> {
         @NotNull
         private final Term alias;
 
-        public AbbreviationTask(Compound abbreviation, @NotNull Compound abbreviated, Termed alias, float conf) {
+        public AbbreviationTask(@NotNull Compound abbreviation, @NotNull Compound abbreviated, @NotNull Termed alias, float conf) {
             super(abbreviation, Symbols.BELIEF, $.t(1, conf));
             this.abbreviated = abbreviated;
             this.alias = alias.term();
         }
 
         @Override
-        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
 
             super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
 

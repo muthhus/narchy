@@ -135,10 +135,12 @@ public interface Truth extends Truthed {
         return (freqHash << 16) | confHash;
     }
 
+    @Nullable
     static Truth unhash(int h, float epsilon) {
         return unhash(h, (int)(1f/epsilon));
     }
 
+    @Nullable
     static Truth unhash(int h, int hashDiscreteness) {
         return $.t(
                 Util.unhash((h>>16) & 0xffff, hashDiscreteness),
@@ -273,6 +275,7 @@ public interface Truth extends Truthed {
         return Util.equals(freq(), x.freq(), tolerance) && Util.equals(conf(), x.conf(), tolerance);
     }
 
+    @NotNull
     default Truth negated(boolean negate) {
         return negate ? negated() : this;
     }
@@ -281,11 +284,13 @@ public interface Truth extends Truthed {
         return Truth.hash(freq(), conf(), truthEpsilon);
     }
 
+    @Nullable
     default Truth eternalize() {
         return withConf(TruthFunctions.eternalize(conf()));
     }
 
-    static Truth maxConf(Truth a, Truth b) {
+    @NotNull
+    static Truth maxConf(@NotNull Truth a, @NotNull Truth b) {
         return a.conf() >= b.conf() ? a : b;
     }
 //    static <T extends Truthed> T minConf(T a, T b) {

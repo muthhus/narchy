@@ -115,10 +115,14 @@ public class PremiseEval extends Unify {
     @Nullable
     public final Truth beliefTruth;
 
+    @NotNull
     public final Compound taskTerm;
+    @NotNull
     public final Term beliefTerm;
+    @NotNull
     public final NAR nar;
 
+    @NotNull
     public final Task task;
     @Nullable
     public final Task belief;
@@ -186,8 +190,8 @@ public class PremiseEval extends Unify {
 //            this.beliefInverted = false;
 //        }
 
-        //this.cyclic = task.cyclic();
-        this.cyclic = task.cyclic() || (belief != null && belief.cyclic());
+        this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
+        //NOT: this.cyclic = task.cyclic() || (belief != null && belief.cyclic());
 
         this.overlap = belief != null && Stamp.overlapping(task, belief);
 

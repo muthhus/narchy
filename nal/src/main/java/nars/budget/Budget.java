@@ -157,6 +157,7 @@ public interface Budget extends Budgeted {
 //        return this;
 //    }
 //
+    @NotNull
     default Budget priMult(float factor) {
         float p = pri();
         if (p==p)
@@ -164,6 +165,7 @@ public interface Budget extends Budgeted {
         return this;
     }
 
+    @NotNull
     default Budget priLerp(float target, float speed) {
         setPriority(Util.lerp(target, pri(), speed));
         return this;

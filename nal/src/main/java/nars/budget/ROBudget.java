@@ -46,6 +46,7 @@ public final class ROBudget implements Budget {
         return new RawBudget(this);
     }
 
+    @NotNull
     @Override
     public Budget setBudget(float p, float d, float q) {
         throw new UnsupportedOperationException();

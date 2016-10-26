@@ -474,6 +474,7 @@ public class PremiseRule extends GenericCompound {
             return false;
         }
 
+        @NotNull
         @Override
         public Term apply(@NotNull Compound containingCompound, @NotNull Term v) {
 

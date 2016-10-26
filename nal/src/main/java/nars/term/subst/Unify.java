@@ -46,6 +46,7 @@ public abstract class Unify extends Termunator implements Subst {
 
     public final Random random;
     public final Op type;
+    @NotNull
     private final List<Termutator> termutes;
 
     @NotNull
@@ -99,12 +100,12 @@ public abstract class Unify extends Termunator implements Subst {
 
     protected final class Constraints extends Versioned<MatchConstraint> implements BiPredicate<Term,Term> {
 
-        public Constraints(Versioning context, int maxConstr) {
+        public Constraints(@NotNull Versioning context, int maxConstr) {
             super(context, new MatchConstraint[maxConstr]);
         }
 
         @Override
-        public boolean test(Term x, Term y) {
+        public boolean test(@NotNull Term x, @NotNull Term y) {
             int s = size;
             if (s > 0) {
                 MatchConstraint[] ccc = items;

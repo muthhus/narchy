@@ -2,6 +2,7 @@ package nars.nal.meta.op;
 
 import nars.nal.meta.TaskBeliefSubterms;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -15,7 +16,8 @@ public final class TermNotEquals extends SubtermPathCondition {
         super(aPath, a, bPath, b);
     }
 
-    public static TermNotEquals the(TaskBeliefSubterms p) {
+    @NotNull
+    public static TermNotEquals the(@NotNull TaskBeliefSubterms p) {
         if (p.a < p.b) {
             return new TermNotEquals(p.a, p.aPath, p.b, p.bPath);
         } else if (p.a > p.b) {
@@ -35,7 +37,7 @@ public final class TermNotEquals extends SubtermPathCondition {
 
 
     @Override
-    protected boolean eval(Term a, Term b) {
+    protected boolean eval(@NotNull Term a, Term b) {
         return !a.equals(b);
     }
 

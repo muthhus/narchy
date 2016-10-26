@@ -42,7 +42,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     private volatile float mass = 0;
     private static final Logger logger = LoggerFactory.getLogger(ArrayBag.class);
 
-    public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
+    public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, @NotNull Map<V, BLink<V>> map) {
         super(BLink[]::new, map);
 
         this.mergeFunction = mergeFunction;
@@ -124,7 +124,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    private int clean(BLink<V> toAdd, int s, int sizeThresh) {
+    private int clean(@Nullable BLink<V> toAdd, int s, int sizeThresh) {
 
         List<BLink<V>> toRemove = $.newArrayList(Math.max(0,s - sizeThresh));
 
@@ -160,7 +160,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return s;
     }
 
-    private int removeWeakestUntilUnderCapacity(int s, List<BLink<V>> toRemove, boolean pendingAddition) {
+    private int removeWeakestUntilUnderCapacity(int s, @NotNull List<BLink<V>> toRemove, boolean pendingAddition) {
         SortedArray<BLink<V>> items = this.items;
         while (!isEmpty() && ((s - capacity()) + (pendingAddition ? 1 : 0)) > 0) {
             BLink<V> w = items.remove(s - 1);
@@ -504,7 +504,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * must be called in synchronized(items) block
      */
-    private int removeDeleted(List<BLink<V>> removed) {
+    private int removeDeleted(@NotNull List<BLink<V>> removed) {
 
 
         SortedArray<BLink<V>> items = this.items;

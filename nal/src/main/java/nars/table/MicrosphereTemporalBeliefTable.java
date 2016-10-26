@@ -43,6 +43,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         this.capacity = initialCapacity;
     }
 
+    @NotNull
     @Override
     public Iterator<Task> iterator() {
         throw new UnsupportedOperationException();
@@ -131,7 +132,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
         return x;
     }
 
-    private void add(Task x) {
+    private void add(@NotNull Task x) {
         if (list.add(x)) {
             long o = x.occurrence();
             if (minT!=MAX_VALUE) {
@@ -178,7 +179,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
     @Override
-    public boolean removeIf(@NotNull Predicate<? super Task> o, List<Task> trash) {
+    public boolean removeIf(@NotNull Predicate<? super Task> o, @NotNull List<Task> trash) {
         return list.removeIf(((Predicate<Task>) t -> {
             if (o.test(t)) {
                 onRemoved( t, trash );
@@ -188,7 +189,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
     }
 
 
-    private void onRemoved(Task t, List<Task> trash) {
+    private void onRemoved(@NotNull Task t, @NotNull List<Task> trash) {
         if (minT != MAX_VALUE) {
             long o = t.occurrence();
             if ((minT == o) || (maxT == o)) {
@@ -342,7 +343,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
      * t is the target time of the new merged task
      */
     @Nullable
-    private Task merge(@NotNull Task a, @NotNull Task b, long now, Concept concept, @Nullable EternalTable eternal) {
+    private Task merge(@NotNull Task a, @NotNull Task b, long now, @NotNull Concept concept, @Nullable EternalTable eternal) {
 
         float ac = c2w(a.conf());
         float bc = c2w(b.conf());

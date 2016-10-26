@@ -34,7 +34,7 @@ public enum BeliefFunction implements TruthOperator {
 //    },
 
     StructuralIntersection() {
-        @Override public @Nullable Truth apply(final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override public @Nullable Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
             return B != null ? TruthFunctions.intersection(B, defaultTruth(m), minConf) : null;
         }
     },
@@ -42,7 +42,7 @@ public enum BeliefFunction implements TruthOperator {
 
     StructuralAbduction() {
         @Nullable
-        @Override public Truth apply(final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
             return (B != null) ? TruthFunctions.abduction(B, defaultTruth(m), minConf) : null;
         }
     },
@@ -59,7 +59,7 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap
     StructuralDeduction() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, final Truth B, NAR m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull NAR m, float minConf) {
             return T != null ? TruthFunctions.deduction1(T, defaultConfidence(m), minConf) : null;
         }
     },
@@ -292,7 +292,7 @@ public enum BeliefFunction implements TruthOperator {
     //@AllowOverlap
     BeliefStructuralDeduction() {
         @Nullable
-        @Override public Truth apply(final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
             if (B == null) return null;
             return TruthFunctions.deduction1(B, defaultConfidence(m), minConf);
         }
@@ -301,7 +301,7 @@ public enum BeliefFunction implements TruthOperator {
     //@AllowOverlap
     BeliefStructuralDifference() {
         @Nullable
-        @Override public Truth apply(final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
             if (B == null) return null;
             Truth res =  TruthFunctions.deduction1(B, defaultConfidence(m), minConf);
             return (res != null) ? t(1.0f - res.freq(), res.conf()) : null;
@@ -318,11 +318,11 @@ public enum BeliefFunction implements TruthOperator {
     ;
 
     @NotNull
-    private static Truth defaultTruth(NAR m) {
+    private static Truth defaultTruth(@NotNull NAR m) {
         return m.truthDefault(Symbols.BELIEF);
     }
 
-    private static float defaultConfidence(NAR m) {
+    private static float defaultConfidence(@NotNull NAR m) {
         return m.confidenceDefault(Symbols.BELIEF);
     }
 

@@ -13,6 +13,7 @@ public final class ComposedBy extends AtomicBoolCondition {
 
     /** the values here refer to either: 0=task, 1=belief term */
     private final int container, contained;
+    @NotNull
     private final String id;
 
     public ComposedBy(int container, int contained) {
@@ -24,7 +25,7 @@ public final class ComposedBy extends AtomicBoolCondition {
 
 
     @Override
-    public boolean run(PremiseEval p, int now) {
+    public boolean run(@NotNull PremiseEval p, int now) {
         Term container = this.container==0 ? p.taskTerm : p.beliefTerm;
         Term contained = this.contained==0 ? p.taskTerm : p.beliefTerm;
         if (container instanceof Compound) {

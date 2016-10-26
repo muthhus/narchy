@@ -117,7 +117,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                         derive(m, (Compound) r, m.punct.get()); //Term exceeds maximum volume
 
                 }
-            } catch (InvalidTermException | InvalidTaskException e) {
+            } catch (@NotNull InvalidTermException | InvalidTaskException e) {
                 if (Param.DEBUG_EXTRA)
                     logger.warn("{} {}", m, e.toString());
             }
@@ -316,7 +316,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
     static final Map<NAR, Map<PremiseRule, RuleStats>> stats = new ConcurrentHashMap();
 
-    private static void feedback(Premise premise, @NotNull PremiseRule rule, RuleFeedbackDerivedTask t, TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+    private static void feedback(Premise premise, @NotNull PremiseRule rule, @NotNull RuleFeedbackDerivedTask t, @Nullable TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
         Map<PremiseRule, RuleStats> x = stats.computeIfAbsent(nar, n -> new ConcurrentHashMap<>());
 
         RuleStats s = x.computeIfAbsent(rule, d -> new RuleStats());

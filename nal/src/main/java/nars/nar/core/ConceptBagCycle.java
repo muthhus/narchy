@@ -68,6 +68,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
 
 
+    @Nullable
     private final ConceptBuilder conceptBuilder;
 
     //cached value for use in the next firing
@@ -116,7 +117,7 @@ public class ConceptBagCycle implements Consumer<NAR> {
     final AtomicBoolean busy = new AtomicBoolean(false);
 
     /** called each frame */
-    @Override public void accept(NAR nar) {
+    @Override public void accept(@NotNull NAR nar) {
 
         if (busy.compareAndSet(false, true)) {
             now = nar.time();
@@ -158,14 +159,14 @@ public class ConceptBagCycle implements Consumer<NAR> {
 
     }
 
-    public void activate(ObjectFloatHashMap<Concept> activations, Budgeted in, float activation, MutableFloat overflow) {
+    public void activate(@NotNull ObjectFloatHashMap<Concept> activations, @NotNull Budgeted in, float activation, MutableFloat overflow) {
         this.active.put(activations, in, activation, overflow);
     }
 
     static final class BudgetSavings extends RawBudget {
         public final long savedAt;
 
-        public BudgetSavings(Budget value, long savedAt) {
+        public BudgetSavings(@NotNull Budget value, long savedAt) {
             super(value);
             this.savedAt = savedAt;
         }

@@ -8,6 +8,7 @@ import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import nars.truth.func.annotation.AllowOverlap;
 import nars.truth.func.annotation.SinglePremise;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -91,14 +92,14 @@ public enum GoalFunction implements TruthOperator {
     @AllowOverlap
     StructuralDeduction() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, final Truth B, NAR m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull NAR m, float minConf) {
             return T != null ? TruthFunctions.deduction1(T, defaultTruth(m).conf(), minConf) : null;
         }
     },
 
     BeliefStructuralDeduction() {
         @Nullable
-        @Override public Truth apply(final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
             if (B == null) return null;
             return TruthFunctions.deduction1(B, defaultConfidence(m), minConf);
         }
@@ -140,7 +141,7 @@ public enum GoalFunction implements TruthOperator {
     ;
 
     @Nullable
-    private static Truth defaultTruth(NAR m) {
+    private static Truth defaultTruth(@NotNull NAR m) {
         return m.truthDefault(Symbols.GOAL /* goal? */);
     }
 
@@ -182,7 +183,7 @@ public enum GoalFunction implements TruthOperator {
         return overlap;
     }
 
-    private static float defaultConfidence(NAR m) {
+    private static float defaultConfidence(@NotNull NAR m) {
         return m.confidenceDefault(Symbols.GOAL);
     }
 }

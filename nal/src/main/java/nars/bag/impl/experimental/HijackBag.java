@@ -25,6 +25,7 @@ import static nars.util.data.map.nbhm.HijacKache.*;
  */
 public class HijackBag<X> implements Bag<X> {
 
+    @NotNull
     public final HijacKache<X, float[]> map;
 
     /**
@@ -81,7 +82,7 @@ public class HijackBag<X> implements Bag<X> {
      * returns the target array if insertion was successful, null otherwise
      */
     @Nullable
-    private final float[] putBag(final Object key, float newPri) {
+    private final float[] putBag(@NotNull final Object key, float newPri) {
 
         Object[] kvs = map.data;
 
@@ -104,7 +105,7 @@ public class HijackBag<X> implements Bag<X> {
         }
     }
 
-    private int putIdx(Object[] kvs, Object key, float newPri) {
+    private int putIdx(Object[] kvs, @NotNull Object key, float newPri) {
         int maxReprobes = map.reprobes;
 
         int reprobe = 0;
@@ -216,7 +217,7 @@ public class HijackBag<X> implements Bag<X> {
     }
 
     @Override
-    public void put(X x, Budgeted b, float scale, MutableFloat overflowing) {
+    public void put(X x, Budgeted b, float scale, @Nullable MutableFloat overflowing) {
 
         float nP = b.pri() * scale;
         float[] f = putBag(x, nP);
@@ -280,6 +281,7 @@ public class HijackBag<X> implements Bag<X> {
         return f == null ? null : link((X) key, f);
     }
 
+    @NotNull
     private BLink<X> link(X key, float[] f) {
         if (key instanceof Budgeted) {
             return new ArrayBLink.ArrayBLinkToBudgeted((Budgeted)key, f);
@@ -386,7 +388,7 @@ public class HijackBag<X> implements Bag<X> {
         }
     }
 
-    public void forEach(BiConsumer<X, float[]> e) {
+    public void forEach(@NotNull BiConsumer<X, float[]> e) {
         Object[] data = map.data;
         int c = (data.length - 2) / 2;
 
@@ -495,7 +497,7 @@ public class HijackBag<X> implements Bag<X> {
 
     @NotNull
     @Override
-    public Bag<X> commit(Consumer<BLink> each) {
+    public Bag<X> commit(@Nullable Consumer<BLink> each) {
         if (each != null && !isEmpty())
             forEach(each);
 
@@ -504,7 +506,7 @@ public class HijackBag<X> implements Bag<X> {
 
 
     @Override
-    public X mul(Object key, float factor) {
+    public X mul(@NotNull Object key, float factor) {
         BLink<X> b = get(key);
         if (b != null && !b.isDeleted()) {
             float before = b.pri();
@@ -516,7 +518,7 @@ public class HijackBag<X> implements Bag<X> {
         return null;
     }
     @Override
-    public X add(Object key, float x) {
+    public X add(@NotNull Object key, float x) {
         BLink<X> b = get(key);
         if (b != null && !b.isDeleted()) {
             float before = b.pri();

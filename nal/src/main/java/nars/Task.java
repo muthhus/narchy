@@ -416,7 +416,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     @Nullable
-    default Appendable  appendTo(@Nullable Appendable buffer, /**@Nullable*/NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) throws IOException {
+    default Appendable  appendTo(@Nullable Appendable buffer, /**@Nullable*/@Nullable NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) throws IOException {
 
         String contentName;
         if (term) {

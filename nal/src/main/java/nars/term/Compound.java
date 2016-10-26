@@ -142,6 +142,7 @@ public interface Compound extends Term, IPair, TermContainer {
         return r[0];
     }
 
+    @NotNull
     @Override
     default Term unneg() {
         if (op() == NEG) {

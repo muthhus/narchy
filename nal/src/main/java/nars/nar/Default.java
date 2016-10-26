@@ -26,6 +26,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -94,6 +95,7 @@ public class Default extends NAR {
 
     }
 
+    @Nullable
     private STMTemporalLinkage stmLinkage = null;
 
     /** NAL7 plugins */
@@ -110,13 +112,14 @@ public class Default extends NAR {
     }
 
 
+    @Nullable
     @Override
     public final Concept concept(Term term, float boost) {
         return core.active.mul(term, boost);
     }
 
     @Override
-    public final void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
+    public final void activationAdd(@NotNull ObjectFloatHashMap<Concept> concepts, @NotNull Budgeted in, float activation, MutableFloat overflow) {
         core.activate(concepts, in, activation, overflow);
     }
 

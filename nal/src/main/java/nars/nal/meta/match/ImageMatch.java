@@ -76,7 +76,7 @@ public enum ImageMatch {
         }
 
         @Override
-        public void expand(Op op, List<Term> target) {
+        public void expand(@NotNull Op op, @NotNull List<Term> target) {
             if (op.image) {
                 //expand normally because imdexes will be included in the expansion
                 super.expand(op, target);
@@ -92,10 +92,12 @@ public enum ImageMatch {
 
     }
 
-    public static ImageEllipsisMatch getRemaining(Compound y, int from) {
+    @NotNull
+    public static ImageEllipsisMatch getRemaining(@NotNull Compound y, int from) {
         return getRemaining(y, from, y.dt());
     }
-    public static ImageEllipsisMatch getRemaining(Compound y, int from, int dt) {
+    @NotNull
+    public static ImageEllipsisMatch getRemaining(@NotNull Compound y, int from, int dt) {
 
         int l = y.size();
         //insert the relation term where found

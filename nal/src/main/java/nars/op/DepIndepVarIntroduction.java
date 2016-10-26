@@ -33,7 +33,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
     }
 
     @Override
-    public void accept(Task task) {
+    public void accept(@NotNull Task task) {
 
         if (task.cyclic())
             return; //avoids reprocessing the same
@@ -41,6 +41,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         super.accept(task);
     }
 
+    @NotNull
     @Override
     protected Task clone(@NotNull Task original, Compound c) {
         Task t = super.clone(original, c);
@@ -60,8 +61,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         return Terms.substAllRepeats(input, condition, 2);
     }
 
+    @Nullable
     @Override
-    protected Term[] next(Compound input, Term selected) {
+    protected Term[] next(@NotNull Compound input, Term selected) {
 
         if (selected == Imdex)
             return null;
@@ -132,10 +134,12 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     public static class VarIntro extends TermTransformOperator {
 
+        @NotNull
         final DepIndepVarIntroduction introducer;
+        @NotNull
         private final Random random;
 
-        public VarIntro(NAR nar) {
+        public VarIntro(@NotNull NAR nar) {
             super("varIntro");
             this.introducer = new DepIndepVarIntroduction(nar);
             this.random = nar.random;

@@ -132,6 +132,7 @@ public class TermVector implements TermContainer {
         return Terms.filter(terms, filter);
     }
 
+    @NotNull
     public TermVector append(Term x) {
         return new TermVector(ArrayUtils.add(terms,x));
     }
@@ -257,7 +258,7 @@ public class TermVector implements TermContainer {
 
 
     @Override
-    public final boolean equals(Object obj) {
+    public final boolean equals(@NotNull Object obj) {
         if (this == obj)
             return true;
 

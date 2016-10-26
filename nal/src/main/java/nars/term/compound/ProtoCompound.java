@@ -12,9 +12,9 @@ import java.util.Arrays;
  */
 public interface ProtoCompound {
 
-    Op op();
+    @NotNull Op op();
 
-    Term[] terms();
+    @NotNull Term[] terms();
 
     int dt();
 
@@ -38,6 +38,7 @@ public interface ProtoCompound {
             this.hash = Util.hashCombine(Util.hashCombine(t), op.ordinal(), dt);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "RawProtoCompound:" +
@@ -65,11 +66,13 @@ public interface ProtoCompound {
             return Util.equals(args, that.args);
         }
 
+        @NotNull
         @Override
         public final Op op() {
             return op;
         }
 
+        @NotNull
         @Override
         public final Term[] terms() {
             return args;

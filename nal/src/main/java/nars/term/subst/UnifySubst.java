@@ -19,6 +19,7 @@ public class UnifySubst extends Unify {
 
     static final Logger logger = LoggerFactory.getLogger(UnifySubst.class);
 
+    @NotNull
     public final NAR memory;
 
 
@@ -28,7 +29,7 @@ public class UnifySubst extends Unify {
 
     int matches;
 
-    public UnifySubst(Op varType, NAR memory, Collection<Termed> target, int maxMatches) {
+    public UnifySubst(Op varType, @NotNull NAR memory, Collection<Termed> target, int maxMatches) {
         super(memory.concepts, varType, memory.random, Param.SubUnificationStackMax, Param.SubUnificationTermutesMax);
 
         this.memory = memory;

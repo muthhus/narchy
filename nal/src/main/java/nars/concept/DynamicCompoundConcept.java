@@ -34,9 +34,10 @@ import static nars.time.Tense.ETERNAL;
  */
 public class DynamicCompoundConcept extends CompoundConcept {
 
+    @NotNull
     public final NAR nar;
 
-    public DynamicCompoundConcept(Compound term, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
+    public DynamicCompoundConcept(@NotNull Compound term, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
         super(term, termLinks, taskLinks, nar);
         this.nar = nar;
     }
@@ -107,11 +108,12 @@ public class DynamicCompoundConcept extends CompoundConcept {
             return d != null ? d.truth() : super.truth(when, now);
         }
 
+        @Nullable
         protected DynTruth dyntruth(long when, long now) {
             return truth(when, now, DynamicCompoundConcept.this, false, false);
         }
 
-        @Nullable private DynamicCompoundConcept.DynTruth truth(long when, Compound template, boolean evidence) {
+        @Nullable private DynamicCompoundConcept.DynTruth truth(long when, @NotNull Compound template, boolean evidence) {
             return truth(when, when, nar.concept(template), template.op() == NEG, evidence);
         }
 
@@ -153,6 +155,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
         }
 
+        @NotNull
         private DynTruth newDyn(boolean evidence) {
             int n = size();
             final List<Task> e = evidence ? $.newArrayList(n) : null;
@@ -161,7 +164,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         }
 
         /** returns true if the subterm was evaluated successfully, false otherwise */
-        private boolean subTruth(Compound superterm, Term subterm, long when, long now, boolean neg, DynTruth d) {
+        private boolean subTruth(Compound superterm, @NotNull Term subterm, long when, long now, boolean neg, @NotNull DynTruth d) {
 
             Term ss = subterm; //original pre-unnegated subterm for dt relative calculation
 
@@ -187,13 +190,13 @@ public class DynamicCompoundConcept extends CompoundConcept {
 
         }
 
-        private boolean subTruth(Term next, Compound superterm, long when, long now, DynTruth d, Term ss, boolean negated) {
+        private boolean subTruth(@NotNull Term next, Compound superterm, long when, long now, @NotNull DynTruth d, @NotNull Term ss, boolean negated) {
             Concept nextConcept = nar.concept(next);
             return nextConcept != null && subTruth(superterm, nextConcept, when, now, d, ss, negated);
 
         }
 
-        private boolean subTruth(@Nullable Compound superterm, Concept subConcept, long when, long now, DynTruth d, Term ss, boolean negated) {
+        private boolean subTruth(@Nullable Compound superterm, @NotNull Concept subConcept, long when, long now, @NotNull DynTruth d, @NotNull Term ss, boolean negated) {
             BeliefTable table = beliefOrGoal ? subConcept.beliefs() : subConcept.goals();
             boolean tableDynamic = table instanceof DynamicBeliefTable;
             if (!tableDynamic && table.isEmpty()) {
@@ -239,7 +242,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         }
 
         /** unroll IntInterval's */
-        private Iterator<Term> unroll(Compound c) {
+        private Iterator<Term> unroll(@NotNull Compound c) {
             if (!c.hasAny(Op.INT))
                 return Iterators.singletonIterator(c); //no IntInterval's early exit
 

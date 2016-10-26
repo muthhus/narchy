@@ -95,7 +95,7 @@ abstract public class DerivedTask extends MutableTask {
 
 
         @Override
-        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+        public void feedback(@Nullable TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
 
             if (delta == null) {
 
@@ -113,19 +113,19 @@ abstract public class DerivedTask extends MutableTask {
             }
         }
 
-        private void negativeFeedback(NAR nar) {
+        private void negativeFeedback(@NotNull NAR nar) {
             feedback(1f - priIfFiniteElseZero() /* HEURISTIC */, nar);
             //delete(); //delete will happen soon after this
         }
 
-        private void feedbackToPremiseConcepts(NAR nar) {
+        private void feedbackToPremiseConcepts(@NotNull NAR nar) {
             Concept thisConcept = concept(nar);
             feedbackToPremiseConcepts(thisConcept, nar, getParentTask());
             feedbackToPremiseConcepts(thisConcept, nar, getParentBelief());
             feedbackToPremiseConcepts(thisConcept, nar, premise.concept);
         }
 
-        private void feedbackToPremiseConcepts(Concept thisConcept, NAR nar, Termed p) {
+        private void feedbackToPremiseConcepts(@NotNull Concept thisConcept, @NotNull NAR nar, @Nullable Termed p) {
             if (p!=null) {
                 Concept parentConcept = nar.concept(p);
                 if (parentConcept!=null) {
@@ -143,7 +143,7 @@ abstract public class DerivedTask extends MutableTask {
             }
         }
 
-        public void feedbackToPremiseLinks(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+        public void feedbackToPremiseLinks(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
 
 
                 /* HEURISTIC */
@@ -163,7 +163,7 @@ abstract public class DerivedTask extends MutableTask {
 
         }
 
-        void feedback(float score, NAR nar) {
+        void feedback(float score, @NotNull NAR nar) {
 
             //reduce the score factor intensity by lerping it closer to 1.0
             score = Util.lerp(score, 1f, nar.linkFeedbackRate.floatValue());

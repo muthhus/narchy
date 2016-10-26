@@ -49,7 +49,7 @@ public class DefaultTruth implements Truth  {
         //this.hash = Truth.hash(f, c, discreteness);
     }
 
-    public DefaultTruth(char punctuation, NAR m) {
+    public DefaultTruth(char punctuation, @NotNull NAR m) {
         this(1.0f, m.confidenceDefault(punctuation));
     }
 

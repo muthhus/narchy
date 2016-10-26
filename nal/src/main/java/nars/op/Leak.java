@@ -17,14 +17,16 @@ import java.util.function.Consumer;
 public abstract class Leak</* TODO: A, */B>  {
 
     //private static final Logger logger = LoggerFactory.getLogger(MutaTaskBag.class);
+    @NotNull
     public final MutableFloat rate;
+    @NotNull
     public final Bag<B> bag;
 
-    public Leak(Bag<B> bag, float rate, NAR n) {
+    public Leak(@NotNull Bag<B> bag, float rate, @NotNull NAR n) {
          this(bag, new MutableFloat(rate), n);
     }
 
-    public Leak(@NotNull Bag<B> bag, @NotNull MutableFloat rate, NAR n) {
+    public Leak(@NotNull Bag<B> bag, @NotNull MutableFloat rate, @NotNull NAR n) {
         this.bag = bag;
         this.rate = rate;
         n.onTask(task -> {
@@ -43,7 +45,7 @@ public abstract class Leak</* TODO: A, */B>  {
     abstract protected float onOut(@NotNull BLink<B> b);
 
     /** next iteration, each frame */
-    protected void next(NAR nar) {
+    protected void next(@NotNull NAR nar) {
 
         bag.commit();
 

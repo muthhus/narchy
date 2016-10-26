@@ -80,7 +80,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
 
 
-    protected final void input(Task t) {
+    protected final void input(@NotNull Task t) {
 //        if (autoupdate())
 //            nar.inputLater(t);
 //        else
@@ -219,7 +219,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     }
 
 
-    public static void activeAttention(Iterable<? extends Prioritizable> c, MutableFloat min, MutableFloat limit, NAR nar) {
+    public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat min, @NotNull MutableFloat limit, @NotNull NAR nar) {
 
         activeAttention(c,
                 //(cp) -> Util.lerp( limit.floatValue(), min.floatValue(), cp) //direct pri -> pri mapping
@@ -231,7 +231,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
 
 
     /** adaptively sets the priority of a group of sensors via a function  */
-    public static void activeAttention(Iterable<? extends Prioritizable> c, FloatToFloatFunction f, NAR nar) {
+    public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull FloatToFloatFunction f, @NotNull NAR nar) {
         c.forEach( s -> s.pri(() -> {
             return f.valueOf(nar.activation((Termed)s));
         } ) );
@@ -243,7 +243,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
     }
 
 
-    public static void flatAttention(Iterable<? extends Prioritizable> c, MutableFloat p) {
+    public static void flatAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat p) {
         c.forEach( s -> s.pri(p::floatValue) );
     }
 
@@ -255,7 +255,7 @@ public class SensorConcept extends WiredCompoundConcept implements FloatFunction
         }
 
         @Override
-        public void clear(NAR nar) {
+        public void clear(@NotNull NAR nar) {
             //TODO this will happen even if goal.clear is called, which shouldnt
             sensor.current = null;
             currentValue = Float.NaN;

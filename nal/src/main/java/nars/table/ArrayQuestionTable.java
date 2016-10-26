@@ -254,7 +254,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
         return result[0];
     }
 
-    private float remove(Task q, Object reason, @NotNull List<Task> displaced) {
+    private float remove(@NotNull Task q, Object reason, @NotNull List<Task> displaced) {
 
         if (list.remove(q)) {
             if (Param.DEBUG)
@@ -266,7 +266,7 @@ public class ArrayQuestionTable  implements QuestionTable, Comparator<Task> {
 
     }
 
-    private static float remove(List<Task> l, int n, Object reason, @NotNull List<Task> displaced) {
+    private static float remove(@NotNull List<Task> l, int n, Object reason, @NotNull List<Task> displaced) {
 
         Task removed = l.remove(n);
         if (Param.DEBUG)

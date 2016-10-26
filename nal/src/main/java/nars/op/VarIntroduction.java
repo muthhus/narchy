@@ -36,7 +36,7 @@ public abstract class VarIntroduction {
         this.nar = nar;
     }
 
-    @NotNull public void accept(@NotNull Compound c,  Consumer<Compound> each) {
+    @NotNull public void accept(@NotNull Compound c, @NotNull Consumer<Compound> each) {
 
         if (!c.hasAny(ConjOrStatementBits) || (c.volume()) < 2 || (c.volume() > nar.compoundVolumeMax.intValue()))
             return; //earliest failure test
@@ -72,7 +72,7 @@ public abstract class VarIntroduction {
         }
     }
 
-    public void accept(Task input) {
+    public void accept(@NotNull Task input) {
         Compound c = input.term();
         accept(c, newContent -> input(input, newContent));
     }
@@ -119,7 +119,8 @@ public abstract class VarIntroduction {
         return t;
     }
 
-    public VarIntroduction each(NAR nar) {
+    @NotNull
+    public VarIntroduction each(@NotNull NAR nar) {
         nar.onTask(this::accept);
         return this;
     }
@@ -136,7 +137,7 @@ public abstract class VarIntroduction {
         }
 
         /** if input was successful, crosslink to the original */
-        @Override public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+        @Override public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
             //if the original was deleted already before this feedback was applied, delete this task too
             @Nullable Task orig = this.original;
 

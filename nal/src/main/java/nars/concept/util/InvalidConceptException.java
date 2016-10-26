@@ -18,6 +18,7 @@ public final class InvalidConceptException extends RuntimeException {
         this.reason = reason;
     }
 
+    @NotNull
     @Override
     public String getMessage() {
         return "InvalidConceptTerm: " + term + " (" + term.getClass() + "): " + reason;

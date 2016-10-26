@@ -30,13 +30,14 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     @NotNull
     private final Op op;
 
+    @Nullable
     private Map meta;
 
     public AtomConcept(@NotNull Atomic atom, Bag<Term> termLinks, Bag<Task> taskLinks) {
         this(atom.toString(), atom.op(), termLinks, taskLinks);
     }
 
-    protected AtomConcept(String term, Op op, Bag<Term> termLinks, Bag<Task> taskLinks) {
+    protected AtomConcept(@NotNull String term, @NotNull Op op, Bag<Term> termLinks, Bag<Task> taskLinks) {
         super(term);
 
         this.op = op;
@@ -123,7 +124,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
 
 
     @Override
-    public void delete(NAR nar) {
+    public void delete(@NotNull NAR nar) {
         Concept.delete(this, nar);
         meta = null;
     }

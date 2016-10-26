@@ -213,7 +213,7 @@ public final class Premise extends RawBudget implements Tasked {
 //        }
     }
 
-    static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief, Concept answerConcept) {
+    static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief, @NotNull Concept answerConcept) {
         List<Termed> result = $.newArrayList(Param.QUERY_ANSWERS_PER_MATCH);
         new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH)
                 .unifyAll(
@@ -268,7 +268,7 @@ public final class Premise extends RawBudget implements Tasked {
 //    }
 
     @Nullable
-    public final BLink<? extends Termed> termlink(Concept c) {
+    public final BLink<? extends Termed> termlink(@NotNull Concept c) {
         return c.termlinks().get(term);
     }
 
@@ -277,7 +277,7 @@ public final class Premise extends RawBudget implements Tasked {
 //    }
 
     @Nullable
-    public final BLink<? extends Task> tasklink(Concept c) {
+    public final BLink<? extends Task> tasklink(@NotNull Concept c) {
         return c.tasklinks().get(task);
     }
 

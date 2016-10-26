@@ -25,6 +25,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     float descentRate = 0.5f;
     int iterationLimit = 8; //TODO tune iterationLimit by the overflow amount
 
+    @NotNull
     public final TermTree concepts;
 
     private final ConceptBuilder conceptBuilder;
@@ -64,7 +65,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     }
 
     @Override
-    public void start(NAR nar) {
+    public void start(@NotNull NAR nar) {
         super.start(nar);
         nar.onFrame(this);
     }
@@ -146,7 +147,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     /**
      * since the terms are sorted by a volume-byte prefix, we can scan for removals in the higher indices of this node
      */
-    private MyConcurrentRadixTree.Node volumeWeightedRoot(Random rng) {
+    private MyConcurrentRadixTree.Node volumeWeightedRoot(@NotNull Random rng) {
 
         List<MyConcurrentRadixTree.Node> l = concepts.root.getOutgoingEdges();
         int levels = l.size();
@@ -225,7 +226,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     }
 
     @Override
-    public void forEach(Consumer<? super Termed> c) {
+    public void forEach(@NotNull Consumer<? super Termed> c) {
         concepts.forEach(c);
     }
 
@@ -272,6 +273,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
      */
     public static class L1TreeIndex extends TreeTermIndex {
 
+        @NotNull
         private final HijacKache<Term, Termed> L1;
 
         public L1TreeIndex(ConceptBuilder conceptBuilder, int sizeLimit, int cacheSize, int reprobes) {

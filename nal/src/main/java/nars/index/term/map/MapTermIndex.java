@@ -18,11 +18,11 @@ public class MapTermIndex extends MaplikeTermIndex {
 
     @Nullable protected final Map<TermContainer,TermContainer> subterms;
 
-    public MapTermIndex(ConceptBuilder conceptBuilder, Map<Term, Termed> map) {
+    public MapTermIndex(@NotNull ConceptBuilder conceptBuilder, Map<Term, Termed> map) {
         this(conceptBuilder, map, null);
     }
 
-    public MapTermIndex(ConceptBuilder conceptBuilder, Map<Term, Termed> map, @Nullable Map<TermContainer,TermContainer> subMap) {
+    public MapTermIndex(@NotNull ConceptBuilder conceptBuilder, Map<Term, Termed> map, @Nullable Map<TermContainer,TermContainer> subMap) {
         super(conceptBuilder);
         this.concepts = map;
         this.subterms = subMap;
@@ -56,6 +56,7 @@ public class MapTermIndex extends MaplikeTermIndex {
 
     }
 
+    @Nullable
     @Override
     public Termed get(Term x, boolean createIfMissing) {
         if (createIfMissing) {
@@ -71,7 +72,7 @@ public class MapTermIndex extends MaplikeTermIndex {
     }
 
     @Override
-    public void set(@NotNull Term src, Termed target) {
+    public void set(@NotNull Term src, @NotNull Termed target) {
         concepts.merge(src, target, setOrReplaceNonPermanent);
     }
 

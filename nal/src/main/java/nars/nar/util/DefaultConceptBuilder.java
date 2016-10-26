@@ -61,11 +61,13 @@ import java.util.function.Function;
 
             };
 
+    @NotNull
     public <X> Bag<X> newHijackBag(int reprobes) {
         return new HijackBag<>(1, reprobes, mergeDefault, nar.random);
     }
 
-    public <X> Bag<X> newCurveBag(Map m) {
+    @NotNull
+    public <X> Bag<X> newCurveBag(@NotNull Map m) {
         return new CurveBag<>(8, defaultCurveSampler, BudgetMerge.plusBlend, m);
     }
 
@@ -142,7 +144,7 @@ import java.util.function.Function;
 
 
     @Override
-    public void start(NAR nar) {
+    public void start(@NotNull NAR nar) {
 
         this.nar = nar;
 
@@ -225,6 +227,7 @@ import java.util.function.Function;
         return sleep;
     }
 
+    @NotNull
     public Map newBagMap() {
         int defaultInitialCap = 4;
         if (nar.exe.concurrent()) {

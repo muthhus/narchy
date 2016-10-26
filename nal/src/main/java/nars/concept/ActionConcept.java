@@ -27,12 +27,14 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
 
 
     private final float feedbackDurability;
+    @NotNull
     private final long[] commonEvidence;
 
     private Task nextFeedback;
 
     float feedbackResolution;
     public FloatSupplier pri;
+    @Nullable
     private Truth currentDesire;
 
     @Override
@@ -169,6 +171,7 @@ public class ActionConcept extends WiredCompoundConcept implements WiredCompound
         }
     }
 
+    @Nullable
     public Truth desire() { return currentDesire; }
 
     protected boolean alwaysUpdateFeedback() {

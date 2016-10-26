@@ -7,6 +7,7 @@ import nars.term.atom.Atomic;
 import nars.term.transform.CompoundTransform;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -30,6 +31,7 @@ abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term
         this.includeDesire = includeDesire;
     }
 
+    @Nullable
     @Override
     public Term apply(@NotNull Compound parent, @NotNull Term subterm) {
 

@@ -10,6 +10,7 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.time.Clock;
 import nars.time.RealtimeDSClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,9 @@ import java.util.Random;
  */
 public class Multi {
 
+    @NotNull
     private final NARLoop[] loop;
+    @NotNull
     public final Default[] core;
 
     public interface ConnectivityFunction {
@@ -33,7 +36,7 @@ public class Multi {
 
     final static Logger logger = LoggerFactory.getLogger(Multi.class);
 
-    public Multi(int numCores, ConnectivityFunction conn /*, TermIndex index, Clock c*/) {
+    public Multi(int numCores, @NotNull ConnectivityFunction conn /*, TermIndex index, Clock c*/) {
         Clock clock = new RealtimeDSClock(true);
 
         TermIndex index = new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1024 * 1024, 8192, numCores);

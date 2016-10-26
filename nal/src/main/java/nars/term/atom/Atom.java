@@ -11,6 +11,7 @@ public class Atom extends AtomicStringConstant {
         super(validateAtomID(id));
     }
 
+    @NotNull
     private static String validateAtomID(@NotNull String id) {
         if (id.isEmpty())
             throw new UnsupportedOperationException("Empty Atom ID");

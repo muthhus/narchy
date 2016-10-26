@@ -180,13 +180,14 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    private void productNormalizeSubterms(Term[] u) {
+    private void productNormalizeSubterms(@NotNull Term[] u) {
         for (int i = 0, uLength = u.length; i < uLength; i++) {
             u[i] = productNormalize(u[i]);
         }
     }
 
-    public Term productNormalize(Term t) {
+    @NotNull
+    public Term productNormalize(@NotNull Term t) {
         boolean neg = t.op() == NEG;
         if (neg)
             t = t.unneg();
@@ -209,11 +210,12 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    private static Term imageUnwrapToProd(Term p, Compound ii) {
+    private static Term imageUnwrapToProd(Term p, @NotNull Compound ii) {
         return $.p(imageUnwrap(ii, p));
     }
 
-    public static Term[] imageUnwrap(Compound image, Term other) {
+    @NotNull
+    public static Term[] imageUnwrap(@NotNull Compound image, Term other) {
         int l = image.size();
         Term[] t = new Term[l];
         int r = image.dt();
@@ -225,7 +227,7 @@ public abstract class TermBuilder {
     }
 
     /** collection implementation of the conjunction true/false filter */
-    private static TreeSet<Term> conjTrueFalseFilter(TreeSet<Term> terms) {
+    private static TreeSet<Term> conjTrueFalseFilter(@NotNull TreeSet<Term> terms) {
         Iterator<Term> ii = terms.iterator();
         while (ii.hasNext()) {
             Term n = ii.next();

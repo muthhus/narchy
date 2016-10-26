@@ -143,6 +143,7 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     /** a commit should invoke update(null) when its finished
      * @return this instance, HACK due to inheritance fuckup
      * */
+    @NotNull
     protected abstract Object commit();
 
     /** if v is non-null it will be added after making capacity for it */

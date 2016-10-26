@@ -129,6 +129,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * global input activation multiplier, applied to both concepts and links
      */
+    @NotNull
     public MutableFloat activationGlobal = new MutableFloat(1f);
 
 
@@ -194,7 +195,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
 
 
     @Nullable
-    public final Compound normalize(Compound t) {
+    public final Compound normalize(@NotNull Compound t) {
 
 ////        //TODO debug only
 //        if (random.nextFloat() < 0.001f) {
@@ -648,7 +649,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
         //TODO create: protected Concept NAR.process(input, c)  so it can just return or exception here
         try {
             input.normalize(this); //accept into input buffer for eventual processing
-        } catch (InvalidTaskException | InvalidTermException e) {
+        } catch (@NotNull InvalidTaskException | InvalidTermException e) {
             emotion.frustration(input.priIfFiniteElseZero());
             emotion.eror();
 
@@ -696,7 +697,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
                 }
 
 
-            } catch (InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
+            } catch (@NotNull InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
 
                 //input.feedback(null, Float.NaN, Float.NaN, this);
                 if (Param.DEBUG)
@@ -736,7 +737,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      * meta-reasoner evaluator
      */
     @Nullable
-    public Term inputCommand(Compound x) {
+    public Term inputCommand(@NotNull Compound x) {
 
         Term y;
 
@@ -1004,7 +1005,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * run a procedure for each item in chunked stripes
      */
-    public final <X> void runLater(@NotNull List<X> items, Consumer<X> each, int maxChunkSize) {
+    public final <X> void runLater(@NotNull List<X> items, @NotNull Consumer<X> each, int maxChunkSize) {
 
         int conc = exe.concurrency();
         if (conc == 1 && !exe.concurrent()) {
@@ -1329,12 +1330,14 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
      * installs a concept in the index and activates it, used for setup of custom concept implementations
      * implementations should apply active concept capacity policy
      */
+    @NotNull
     public final Concept on(@NotNull Concept c) {
         concepts.set(c);
         return c;
     }
 
-    public final Concept on(String functor, Function<Term[],Term> f) {
+    @NotNull
+    public final Concept on(@NotNull String functor, @NotNull Function<Term[],Term> f) {
         Concept c = new Functor(functor) {
             @Override public final Term apply(Term[] terms) {
                 return f.apply(terms);
@@ -1378,6 +1381,7 @@ public abstract class NAR extends Param implements Level, Consumer<Task>, NARIn,
     /**
      * if the concept is active, returns the Concept while applying the boost factor to its budget
      */
+    @Nullable
     abstract public Concept concept(Term term, float boost);
 
     @Override

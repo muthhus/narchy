@@ -3,6 +3,7 @@ package nars.nar.exe;
 import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -11,6 +12,7 @@ import java.util.function.Consumer;
  * Created by me on 8/16/16.
  */
 abstract public class Executioner implements Executor {
+    @Nullable
     protected NAR nar;
 
     public synchronized void start(NAR nar) {

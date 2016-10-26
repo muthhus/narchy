@@ -73,7 +73,7 @@ public final class MapTaskIndex extends TaskIndex {
     }
 
     @Override
-    public void forEach(Consumer<Task> each) {
+    public void forEach(@NotNull Consumer<Task> each) {
         tasks.forEach((k,v)->each.accept(v));
     }
 }

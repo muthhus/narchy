@@ -22,11 +22,13 @@ public class Activation {
 
     @NotNull public final Budgeted in;
 
+    @NotNull
     public final Concept src;
 
     public final ObjectFloatHashMap<Concept> concepts = new ObjectFloatHashMap<>();
     public final MutableFloat linkOverflow = new MutableFloat(0);
     public final MutableFloat conceptOverflow = new MutableFloat(0);
+    @NotNull
     private final NAR nar;
     private final float minScale; //cut-off limit for recursive spread
 
@@ -61,11 +63,11 @@ public class Activation {
     /**
      * runs the task activation procedure
      */
-    public Activation(@NotNull Budgeted in, @NotNull Concept c, NAR nar, float scale) {
+    public Activation(@NotNull Budgeted in, @NotNull Concept c, @NotNull NAR nar, float scale) {
         this(in, c, c, nar, scale, Param.ACTIVATION_TERMLINK_DEPTH, Param.ACTIVATION_TASKLINK_DEPTH);
     }
 
-    public Activation(@NotNull Task in, NAR nar, float scale) {
+    public Activation(@NotNull Task in, @NotNull NAR nar, float scale) {
         this(in, in.concept(nar), nar, scale);
     }
 
@@ -133,7 +135,7 @@ public class Activation {
         return targetConcept;
     }
 
-    protected final void link(Concept src, Termed target, float scale, int depth) {
+    protected final void link(@NotNull Concept src, @NotNull Termed target, float scale, int depth) {
 
         Concept targetConcept = linkSubterm(src, target, scale, depth);;
 

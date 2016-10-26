@@ -29,7 +29,7 @@ public final class SubUnify extends Unify {
         super(index, type, r, Param.SubUnificationStackMax, Param.SubUnificationTermutesMax);
     }
 
-    public SubUnify(Unify parent, @Nullable Op type) {
+    public SubUnify(@NotNull Unify parent, @Nullable Op type) {
         this(parent.index, type, parent.random);
     }
 

@@ -296,6 +296,7 @@ public class STMClustered extends STM {
         return c;
     }
 
+    @Nullable
     public final Bag<Task> input;
 
     public STMClustered(@NotNull NAR nar, @NotNull MutableInteger capacity, char punc, int expectedTasksPerNode) {
@@ -328,7 +329,7 @@ public class STMClustered extends STM {
 
 
             @Override
-            public void onRemoved(BLink<Task> value) {
+            public void onRemoved(@Nullable BLink<Task> value) {
                 if (value != null)
                     drop((TLink) value);
             }

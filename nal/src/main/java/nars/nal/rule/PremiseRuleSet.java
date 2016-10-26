@@ -93,7 +93,7 @@ public class PremiseRuleSet {
         return new PremiseRuleSet(parse(load(Deriver.class.getResourceAsStream(name).readAllBytes()), p), p);
     }
 
-    static Stream<Pair<Compound, String>> load(PatternTermIndex p, URL path) {
+    static Stream<Pair<Compound, String>> load(@NotNull PatternTermIndex p, @NotNull URL path) {
         try {
 
             return parse(load(readAllLines(Paths.get(path.toURI()))), p);
@@ -240,7 +240,8 @@ public class PremiseRuleSet {
                 .map(src -> Tuples.pair(parse(src, index), src));
     }
 
-    public static PremiseRule parse(String src, PatternTermIndex index) {
+    @NotNull
+    public static PremiseRule parse(@NotNull String src, @NotNull PatternTermIndex index) {
 
 
         //(Compound) index.parseRaw(src)

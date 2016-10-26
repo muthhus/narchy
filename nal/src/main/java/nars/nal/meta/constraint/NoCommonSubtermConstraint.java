@@ -19,7 +19,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
 
     /** comparison between two compounds */
     @Override
-    @NotNull protected final boolean invalid(Compound x, Compound y) {
+    @NotNull protected final boolean invalid(@NotNull Compound x, @NotNull Compound y) {
 
         return subtermOfTheOther(x, y, recurse, true);
     }

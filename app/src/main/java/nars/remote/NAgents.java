@@ -53,7 +53,7 @@ abstract public class NAgents extends NAgent {
 
 
         //Default nar = newNAR();
-        Default nar = newNAR1async(4);
+        Default nar = newNAR1async(3);
         //Default2 nar = newNAR2();
 
 
@@ -75,7 +75,7 @@ abstract public class NAgents extends NAgent {
 
 
         //a.run(frames);
-        a.runRT(60f).join();
+        a.runRT(40f).join();
 
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);

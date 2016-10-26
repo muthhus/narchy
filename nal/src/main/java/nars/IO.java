@@ -79,6 +79,7 @@ public class IO {
         return mm;
     }
 
+    @NotNull
     public static long[] readEvidence(@NotNull DataInput in) throws IOException {
         int eviLength = in.readByte();
         long[] evi = new long[eviLength];
@@ -161,7 +162,7 @@ public class IO {
             out.writeLong(evi[i]);
     }
 
-    public static void writeTruth(@NotNull DataOutput out, Truthed t) throws IOException {
+    public static void writeTruth(@NotNull DataOutput out, @NotNull Truthed t) throws IOException {
         out.writeInt(t.truth().hash(Param.TRUTH_EPSILON));
     }
 
@@ -334,10 +335,11 @@ public class IO {
         TermLast
     }
 
-    public static byte[] taskToBytes(Task x) {
+    @Nullable
+    public static byte[] taskToBytes(@NotNull Task x) {
         return taskToBytes(x, TermFirst);
     }
-    public static byte[] taskToBytes(Task x, TaskSerialization mode) {
+    public static byte[] taskToBytes(@NotNull Task x, @NotNull TaskSerialization mode) {
         try {
             ByteArrayOutputStream bs = new ByteArrayOutputStream(x.volume() * 16 /* estimate */);
             DataOutputStream dos = new DataOutputStream(bs);
@@ -781,7 +783,7 @@ public class IO {
      * @return The number of bytes written out.
      * @throws IOException if an I/O error occurs.
      */
-    public static void writeUTFWithoutLength(DataOutput out, String str) throws IOException {
+    public static void writeUTFWithoutLength(@NotNull DataOutput out, @NotNull String str) throws IOException {
 
 
         //int c, count = 0;

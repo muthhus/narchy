@@ -104,7 +104,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         return unify(term, x, y);
     }
 
-    public @NotNull Term unify(Term term, Term x, Term y) {
+    public @NotNull Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {
         @Nullable Op op = unifying();
 
         boolean hasAnyOp = op == null || (x.hasAny(op) && term.hasAny(op));
@@ -230,7 +230,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         }
 
         @Override
-        public @NotNull Term unify(Term C, Term A, Term B) {
+        public @NotNull Term unify(@NotNull Term C, @NotNull Term A, @NotNull Term B) {
             Compound decomposed = (Compound) parent.beliefTerm;
             int dt = decomposed.dt();
             if (dt == DTERNAL || dt == 0) {

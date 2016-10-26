@@ -31,6 +31,7 @@ public class TermKey extends DynByteSeq {
     private final static float minCompressionRatio = 0.9f;
 
     /** term with volume byte prepended for sorting by volume */
+    @NotNull
     public static TermKey term(@NotNull Term x) {
         TermKey y = new TermKey(x.volume() * 4 + 64 /* ESTIMATE */);
         try {
@@ -140,11 +141,11 @@ public class TermKey extends DynByteSeq {
         }
     }
 
-    public static void writeStringBytes(DataOutput out, Object o) throws IOException {
+    public static void writeStringBytes(@NotNull DataOutput out, @NotNull Object o) throws IOException {
         out.write(bytes(o.toString()));
     }
 
-    public static void writeStringBytes(DataOutput out, String s) throws IOException {
+    public static void writeStringBytes(@NotNull DataOutput out, String s) throws IOException {
         out.write(bytes(s));
     }
 

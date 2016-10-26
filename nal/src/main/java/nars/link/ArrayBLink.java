@@ -39,6 +39,7 @@ import static nars.budget.Budget.validBudgetValue;
     }
 
 
+    @NotNull
     @Override
     public Budget setBudget(float p, float d, float q) {
         f[0] = validBudgetValue(p);
@@ -95,6 +96,7 @@ import static nars.budget.Budget.validBudgetValue;
         return f[2];
     }
 
+    @NotNull
     public ArrayBLink<X> set(X id, float[] v) {
         this.id = id;
         this.f = v;

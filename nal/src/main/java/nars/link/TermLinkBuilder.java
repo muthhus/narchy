@@ -32,7 +32,7 @@ public enum TermLinkBuilder {
 
 //    final static int levelBoost = Op.or(Op.EQUIV, Op.CONJ, Op.IMPL);
 
-    private static int levels(Compound host) {
+    private static int levels(@NotNull Compound host) {
         switch (host.op()) {
             case PROD:
             case SETe:

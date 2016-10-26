@@ -9,6 +9,7 @@ import nars.util.math.FloatNormalized;
 import nars.util.math.FloatSupplier;
 import ognl.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -22,27 +23,32 @@ import java.util.function.Supplier;
  */
 public interface NSense {
 
-    Collection<SensorConcept> sensors();
+    @NotNull Collection<SensorConcept> sensors();
 
     NAR nar();
 
 
-    default SensorConcept sense(String term, BooleanSupplier value) {
+    @NotNull
+    default SensorConcept sense(@NotNull String term, @NotNull BooleanSupplier value) {
         return sense(term, () -> value.getAsBoolean() ? 1f : 0f);
     }
 
-    default SensorConcept sense(String term, FloatSupplier value) {
+    @NotNull
+    default SensorConcept sense(@NotNull String term, FloatSupplier value) {
         return sense(term, value, nar().truthResolution.floatValue(), (v) -> $.t(v, alpha()));
     }
-    default SensorConcept sense(Compound term, FloatSupplier value) {
+    @NotNull
+    default SensorConcept sense(@NotNull Compound term, FloatSupplier value) {
         return sense(term, value, nar().truthResolution.floatValue(), (v) -> $.t(v, alpha()));
     }
 
-    default SensorConcept sense(String term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
+    @NotNull
+    default SensorConcept sense(@NotNull String term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
         return sense($.$(term), value, resolution, truthFunc);
     }
 
-    default SensorConcept sense(Compound term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
+    @NotNull
+    default SensorConcept sense(@NotNull Compound term, FloatSupplier value, float resolution, FloatToObjectFunction<Truth> truthFunc) {
         SensorConcept s = new SensorConcept(term, nar(), value, truthFunc);
         s.resolution(resolution);
 
@@ -60,7 +66,7 @@ public interface NSense {
     /**
      * interpret an int as a selector between enumerated values
      */
-    default <E extends Enum> void senseSwitch(String term, Supplier<E> value) {
+    default <E extends Enum> void senseSwitch(String term, @NotNull Supplier<E> value) {
         E[] values = ((Class<? extends E>) value.get().getClass()).getEnumConstants();
         for (E e : values) {
             String t = switchTerm(term, e.toString());
@@ -68,19 +74,20 @@ public interface NSense {
         }
     }
 
+    @NotNull
     static String switchTerm(String term, String e) {
         //return "(" + e + " --> " + term + ")";
         return "(" + term + " , " + e + ")";
     }
 
-    default void senseSwitch(String term, IntSupplier value, int min, int max) {
+    default void senseSwitch(String term, @NotNull IntSupplier value, int min, int max) {
         senseSwitch(term, value, Util.intSequence(min, max));
     }
 
     /**
      * interpret an int as a selector between (enumerated) integer values
      */
-    default void senseSwitch(String term, IntSupplier value, int[] values) {
+    default void senseSwitch(String term, @NotNull IntSupplier value, @NotNull int[] values) {
         for (int e : values) {
             String t = switchTerm(term, String.valueOf(e));
             sense(t, () -> value.getAsInt() == e);
@@ -90,7 +97,7 @@ public interface NSense {
     /**
      * interpret an int as a selector between (enumerated) object values
      */
-    default <O> void senseSwitch(String term, Supplier<O> value, O... values) {
+    default <O> void senseSwitch(String term, @NotNull Supplier<O> value, @NotNull O... values) {
         for (O e : values) {
             String t = switchTerm(term, "\"" + e.toString() + "\"");
             sense(t, () -> value.get().equals(e));
@@ -98,7 +105,7 @@ public interface NSense {
     }
 
 
-    default void senseFields(String id, Object o) {
+    default void senseFields(String id, @NotNull Object o) {
         Field[] ff = o.getClass().getDeclaredFields();
         for (Field f : ff) {
             if (Modifier.isPublic(f.getModifiers())) {
@@ -113,7 +120,7 @@ public interface NSense {
 //        return this;
 //    }
 
-    default void sense(String id, Object o, String exp) {
+    default void sense(String id, Object o, @NotNull String exp) {
 
         try {
             //Object x = Ognl.parseExpression(exp);
@@ -148,7 +155,8 @@ public interface NSense {
     /**
      * generic lowest common denominator numeric input
      */
-    default Object senseNumber(String id, Object o, String _expr) {
+    @NotNull
+    default Object senseNumber(String id, Object o, @NotNull String _expr) {
         Object expr;
         try {
             expr = Ognl.parseExpression(_expr);
@@ -177,6 +185,7 @@ public interface NSense {
         return fs;
     }
 
+    @NotNull
     private static String term(Object expr) {
 
         if (expr instanceof ASTConst) {
@@ -205,7 +214,7 @@ public interface NSense {
     }
 
 
-    private static String term(SimpleNode a) {
+    private static String term(@NotNull SimpleNode a) {
         int c = a.jjtGetNumChildren();
 
         StringBuilder sb = new StringBuilder(16);//.append('(');

@@ -8,6 +8,7 @@ import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import nars.time.Tense;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class NLPGen {
     final PatternTermIndex index = new PatternTermIndex();
 
     public interface Rule {
-        String get(Term t, float freq, float conf, Tense tense);
+        @NotNull String get(Term t, float freq, float conf, Tense tense);
     }
 
     final List<Rule> rules = new ArrayList();
@@ -102,7 +103,7 @@ public class NLPGen {
 
     }
 
-    private boolean timeMatch(Task t, Tense tense) {
+    private boolean timeMatch(@NotNull Task t, Tense tense) {
         return t.isEternal() && tense == Tense.Eternal;
         //TODO non-eternal case
     }
@@ -111,7 +112,7 @@ public class NLPGen {
         return x.toString();
     }*/
 
-    public String toString(Term x, float freq, float conf, Tense tense) {
+    public String toString(@NotNull Term x, float freq, float conf, Tense tense) {
         for (Rule r : rules) {
             String y = r.get(x, freq, conf, tense);
             if (y != null)
@@ -121,7 +122,7 @@ public class NLPGen {
         return x.toString();
     }
 
-    public String toString(Task x) {
+    public String toString(@NotNull Task x) {
         return toString(x.term(), x.freq(), x.conf(), x.isEternal() ? Tense.Eternal : Tense.Present /* TODO */);
     }
 

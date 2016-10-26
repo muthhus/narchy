@@ -39,7 +39,8 @@ public class TreeTaskIndex extends TaskIndex {
         tasks.remove(key(tt));
     }
 
-    static ByteSeq key(Task x) {
+    @NotNull
+    static ByteSeq key(@NotNull Task x) {
         return new TermKey(x);
     }
 
@@ -50,7 +51,7 @@ public class TreeTaskIndex extends TaskIndex {
     }
 
     @Override
-    public void forEach(Consumer<Task> each) {
+    public void forEach(@NotNull Consumer<Task> each) {
         tasks.forEach(each);
     }
 }

@@ -113,7 +113,7 @@ public enum Tense  {
         return t <= TIMELESS; /* includes ETERNAL */
     }
 
-    public static long getRelativeOccurrence(@NotNull Tense tense, NAR m) {
+    public static long getRelativeOccurrence(@NotNull Tense tense, @NotNull NAR m) {
         return getRelativeOccurrence(m.time(), tense, 1 /*m.duration()*/);
     }
 

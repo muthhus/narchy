@@ -46,6 +46,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Sorted
     };
 
     int capacity;
+    @Nullable
     private Truth truth;
 
     public EternalTable(int initialCapacity) {

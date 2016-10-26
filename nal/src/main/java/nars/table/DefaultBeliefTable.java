@@ -47,6 +47,7 @@ public class DefaultBeliefTable implements BeliefTable {
     /**
      * TODO this value can be cached per cycle (when,now) etc
      */
+    @Nullable
     @Override
     public Truth truth(long when, long now) {
 
@@ -63,7 +64,7 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public void clear(NAR nar) {
+    public void clear(@NotNull NAR nar) {
         if (!eternal.isEmpty())
             throw new UnsupportedOperationException("eternal clear impl soon");
 
@@ -176,7 +177,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     @Override
-    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, CompoundConcept<?> concept, @NotNull NAR nar) {
+    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull List<Task> displaced, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
 
         TruthDelta result;
         if (input.isEternal()) {
@@ -195,7 +196,8 @@ public class DefaultBeliefTable implements BeliefTable {
         return result;
     }
 
-    private EternalTable nonEmptyEternal(CompoundConcept<?> concept, @NotNull Task input) {
+    @NotNull
+    private EternalTable nonEmptyEternal(@NotNull CompoundConcept<?> concept, @NotNull Task input) {
         if (eternal == EternalTable.EMPTY) {
             eternal = new EternalTable(concept.policy().beliefCap(concept, input.isBelief(), true));
         }

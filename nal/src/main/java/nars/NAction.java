@@ -4,6 +4,8 @@ import nars.concept.ActionConcept;
 import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.IntConsumer;
@@ -14,7 +16,7 @@ import java.util.function.IntSupplier;
  */
 public interface NAction {
 
-    Collection<ActionConcept> actions();
+    @NotNull Collection<ActionConcept> actions();
 
     NAR nar();
 
@@ -23,7 +25,8 @@ public interface NAction {
      * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
      * its initial state will remain indetermined until the first feedback is generated.
      * */
-    default ActionConcept actionToggle(String s, Runnable on, Runnable off) {
+    @Nullable
+    default ActionConcept actionToggle(@NotNull String s, @NotNull Runnable on, @NotNull Runnable off) {
 
         final int[] state = { 0 }; // 0: unknown, -1: false, +1: true
 
@@ -47,7 +50,8 @@ public interface NAction {
      * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
      * its initial state will remain indetermined until the first feedback is generated.
      * */
-    default ActionConcept actionTriState(String s, IntConsumer i) {
+    @Nullable
+    default ActionConcept actionTriState(@NotNull String s, @NotNull IntConsumer i) {
 
 
         ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
@@ -85,10 +89,12 @@ public interface NAction {
         return m;
     }
 
-    default ActionConcept actionToggle(String s, BooleanProcedure onChange) {
+    @Nullable
+    default ActionConcept actionToggle(@NotNull String s, @NotNull BooleanProcedure onChange) {
         return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false) );
     }
-    default ActionConcept actionToggleRapid(String s, BooleanProcedure onChange, int minPeriod) {
+    @Nullable
+    default ActionConcept actionToggleRapid(@NotNull String s, @NotNull BooleanProcedure onChange, int minPeriod) {
         return actionToggleRapid(s, () -> onChange.value(true), () -> onChange.value(false), minPeriod );
     }
 
@@ -98,7 +104,8 @@ public interface NAction {
      *
      * TODO generalize to actionPWM (pulse width modulation) with controllable reset period (ex: by frequency, or conf etc)
      * */
-    default ActionConcept actionToggleRapid(String term, Runnable on, Runnable off, int minPeriod) {
+    @Nullable
+    default ActionConcept actionToggleRapid(@NotNull String term, @NotNull Runnable on, @NotNull Runnable off, int minPeriod) {
 
         if (minPeriod < 1)
             throw new UnsupportedOperationException();
@@ -158,7 +165,8 @@ public interface NAction {
      *
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
-    default ActionConcept action(String s, ActionConcept.MotorFunction update) {
+    @NotNull
+    default ActionConcept action(@NotNull String s, @NotNull ActionConcept.MotorFunction update) {
         ActionConcept m = new ActionConcept(s, nar(), update);
         actions().add(m);
         return m;
@@ -170,7 +178,8 @@ public interface NAction {
      *
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
-    default ActionConcept actionBipolar(String s, FloatPredicate update) {
+    @NotNull
+    default ActionConcept actionBipolar(@NotNull String s, @NotNull FloatPredicate update) {
         return action(s, (b, d) -> {
             if (d!=null) {
                 float f = d.freq();
@@ -186,6 +195,7 @@ public interface NAction {
         });
     }
 
+    @Nullable
     default ActionConcept actionRangeIncrement(String s, IntSupplier in, int dx, int min, int max, IntConsumer out) {
         //TODO
         return null;

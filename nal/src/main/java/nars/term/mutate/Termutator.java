@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class Termutator  {
 
     /** should have equals consistency */
+    @NotNull
     public final Object key;
 
     public Termutator(@NotNull Object key) {
@@ -20,7 +21,7 @@ public abstract class Termutator  {
     public abstract boolean run(Unify f, Termutator[] chain, int current);
 
     /** call this to invoke the next termutator in the chain */
-    protected static boolean next(Unify f, Termutator[] chain, int next) {
+    protected static boolean next(@NotNull Unify f, Termutator[] chain, int next) {
 
         //increment the version counter by one and detect if the limit exceeded.
         // this is to prevent infinite recursions in which no version incrementing

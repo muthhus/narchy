@@ -60,6 +60,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
     @Nullable
     public Task current;
     private int dt;
+    @NotNull
     private final long[] commonEvidence;
 
 
@@ -138,7 +139,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            Task t = newInputTask(f, now);
+            Task t = newInputTask(f, prevF, now);
             if (t!=null) {
                 Task prevStart = this.current;
 
@@ -188,12 +189,18 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
 //    }
 
     @Nullable
-    protected Task newInputTask(float v, long now) {
+    protected Task newInputTask(float v, float prevV, long now) {
+        float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
+
         Truth t = truthFloatFunction.valueOf(v);
         if (t == null)
             return null;
         long when = now + dt();
-        return newInputTask(t, now, when);
+        return new MutableTask(term(), punc, t)
+                .evidence(commonEvidence)
+                .time(now, when)
+                .budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/, dur);
+        //.log(this);
     }
 
     /** provides an immediate truth assessment with the last known signal value */
@@ -202,16 +209,7 @@ public abstract class ScalarSignal implements Consumer<NAR>, DoubleSupplier {
         return t!=null ? t.truth() : null;
     }
 
-    @NotNull
-    protected Task newInputTask(Truth t, long now, long when) {
-        return new MutableTask(term(), punc, t)
-                .evidence(commonEvidence)
-                .time(now, when)
-                .budgetByTruth(pri.asFloat() /*(v, now, prevF, lastInput)*/, dur);
-                //.log(this);
-    }
-
-//    public float pri(float v, long now, float prevV, long lastV) {
+    //    public float pri(float v, long now, float prevV, long lastV) {
 //        return pri;
 //    }
 

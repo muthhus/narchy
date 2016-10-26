@@ -30,7 +30,7 @@ public interface ConceptBuilder extends Function<Term, Termed> {
 
     List<Task> EmptyTaskList = Collections.emptyList();
 
-    default void init(Concept c) {
+    default void init(@NotNull Concept c) {
         c.policy(init(), ETERNAL, EmptyTaskList);
     }
 

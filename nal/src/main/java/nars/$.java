@@ -326,7 +326,7 @@ public enum $ {
     }
 
     @NotNull
-    public static Compound p(char[] c, CharToObjectFunction<Term> f) {
+    public static Compound p(@NotNull char[] c, @NotNull CharToObjectFunction<Term> f) {
         Term[] x = new Term[c.length];
         for (int i = 0; i < c.length; i++) {
             x[i] = f.valueOf(c[i]);
@@ -428,7 +428,7 @@ public enum $ {
         return compound(CONJ, 0, s);
     }
     @Nullable
-    public static Term parallel(Collection<Term> s) {
+    public static Term parallel(@NotNull Collection<Term> s) {
         return compound(CONJ, 0, s);
     }
 
@@ -588,6 +588,7 @@ public enum $ {
 
 
     /** create a literal atom from a class (it's name) */
+    @NotNull
     public static Atom the(@NotNull Class c) {
         return (Atom) $.the(c.getName());
     }
@@ -946,7 +947,8 @@ public enum $ {
     }
 
 
-    public static <X> List<X> newArrayList(X... x) {
+    @NotNull
+    public static <X> List<X> newArrayList(@NotNull X... x) {
         FasterList<X> l = $.newArrayList(x.length);
         l.addAll(x);
         return l;
@@ -1003,7 +1005,7 @@ public enum $ {
     }
 
     @NotNull
-    public static Task command(String functor, Term... args) {
+    public static Task command(@NotNull String functor, Term... args) {
         //TODO use lightweight CommandTask impl without all the logic metadata
         return command(func(functor, args));
     }

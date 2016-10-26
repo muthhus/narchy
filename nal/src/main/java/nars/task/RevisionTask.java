@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 public class RevisionTask extends AnswerTask  {
 
 
+    @Nullable
     private Concept concept;
 
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long occTime, Concept target) {
@@ -86,7 +87,7 @@ public class RevisionTask extends AnswerTask  {
 
     /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
     @Override
-    public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
+    public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
 
         //TODO reimplement again
 

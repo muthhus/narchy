@@ -31,12 +31,12 @@ public class PremiseMatrix {
                           @NotNull NAR nar,
                           int tasklinks, int termlinks,
                           @NotNull Consumer<Task> target,
-                          Deriver deriver) {
+                          @NotNull Deriver deriver) {
 
         return run(c, nar, tasklinks, termlinks, target, deriver, c.tasklinks(), c.termlinks());
     }
 
-    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> target, Deriver deriver, Bag<Task> tasklinkBag, Bag<Term> termlinkBag) {
+    public static int run(@NotNull Concept c, @NotNull NAR nar, int tasklinks, int termlinks, @NotNull Consumer<Task> target, @NotNull Deriver deriver, @NotNull Bag<Task> tasklinkBag, @NotNull Bag<Term> termlinkBag) {
         int count = 0;
 
         try {

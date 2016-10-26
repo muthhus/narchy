@@ -105,6 +105,7 @@ public class Inperience extends Leak<Task> {
             believe,
             want
     };
+    @NotNull
     private final NAR nar;
 
 //
@@ -134,7 +135,7 @@ public class Inperience extends Leak<Task> {
     }
 
     @Override
-    protected void in(Task task, Consumer<BLink<Task>> each) {
+    protected void in(Task task, @NotNull Consumer<BLink<Task>> each) {
 
         Compound tt = task.term();
 
@@ -204,7 +205,7 @@ public class Inperience extends Leak<Task> {
     }
 
 
-    private boolean isExperienceTerm(Compound term) {
+    private boolean isExperienceTerm(@NotNull Compound term) {
         return term.op() == INH && operators.contains(term.subterm(1) /* predicate of the inheritance */);
     }
 

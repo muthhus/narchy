@@ -15,7 +15,9 @@ import java.util.Arrays;
  * Created by me on 10/6/16.
  */
 public abstract class SubtermPathCondition extends AtomicBoolCondition {
+    @NotNull
     public final byte[] aPath;
+    @NotNull
     public final byte[] bPath;
     //0=task, 1=belief term pattern
     protected final int a;
@@ -23,11 +25,11 @@ public abstract class SubtermPathCondition extends AtomicBoolCondition {
     @NotNull
     protected final String id;
 
-    public SubtermPathCondition(TaskBeliefSubterms x) {
+    public SubtermPathCondition(@NotNull TaskBeliefSubterms x) {
         this(x.aPath, x.a, x.bPath, x.b);
     }
 
-    public SubtermPathCondition(byte[] aPath, int a, byte[] bPath, int b) {
+    public SubtermPathCondition(@NotNull byte[] aPath, int a, @NotNull byte[] bPath, int b) {
         this.bPath = bPath;
         this.a = a;
         this.aPath = aPath;
@@ -41,7 +43,8 @@ public abstract class SubtermPathCondition extends AtomicBoolCondition {
     }
 
 
-    public static Term resolve(@NotNull PremiseEval ff, int aOrB, byte[] path) {
+    @Nullable
+    public static Term resolve(@NotNull PremiseEval ff, int aOrB, @NotNull byte[] path) {
         return resolve(aOrB == 0 ? ff.taskTerm : ff.beliefTerm, path);
     }
 

@@ -106,7 +106,7 @@ public class TaskBudgeting {
     }
 
     /** occam's razor: penalize complexity - returns a value between 0 and 1 that priority will be scaled by */
-    public static float occamBasic(@NotNull Termed derived, Premise pp) {
+    public static float occamBasic(@NotNull Termed derived, @NotNull Premise pp) {
         Task parentTask = pp.task;
         float parentComplexity = parentTask.complexity();
         Task parentBelief = pp.belief;
@@ -193,7 +193,7 @@ public class TaskBudgeting {
      * @return The budget for the new task which is the belief activated, if
      * necessary
      */
-    public static Budget solutionBudget(@NotNull Task question, @NotNull Task solution, @NotNull Truth projectedTruth, NAR m) {
+    public static Budget solutionBudget(@NotNull Task question, @NotNull Task solution, @NotNull Truth projectedTruth, @NotNull NAR m) {
         //boolean feedbackToLinks = false;
         /*if (task == null) {
             task = nal.getCurrentTask();

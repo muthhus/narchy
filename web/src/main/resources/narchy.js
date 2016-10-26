@@ -490,7 +490,7 @@ function TopTable() {
     var s = NARSocket('active', decodeConceptSummaries);
     var shown = [];
     var busy = false;
-    var maxShown = 32;
+    var maxShown = 1024*1024; //unlimited
 
     s.on('concept_summary', function(cs) {
 

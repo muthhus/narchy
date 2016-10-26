@@ -27,6 +27,7 @@ public class MultiThreadExecutioner extends Executioner {
 
     private final int threads;
     private final RingBuffer<TaskEvent> ring;
+    @NotNull
     private final AffinityExecutor exe;
     private final int cap;
 
@@ -144,7 +145,7 @@ public class MultiThreadExecutioner extends Executioner {
                 if (lastCursor != (this.cursor = ring.getCursor())) {
                     barrier.waitFor(cursor);
                 }
-            } catch (AlertException | InterruptedException | TimeoutException e1) {
+            } catch (@NotNull AlertException | InterruptedException | TimeoutException e1) {
                 logger.error("Barrier Synchronization: {}", e1);
             }
         } /*else {

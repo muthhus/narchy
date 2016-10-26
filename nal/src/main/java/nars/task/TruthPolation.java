@@ -63,7 +63,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 //    };
 
     @Nullable
-    public Truth truth(long when, float dur, Task... tasks) {
+    public Truth truth(long when, float dur, @NotNull Task... tasks) {
         return truth(when, tasks, lightCurve(dur));
     }
 

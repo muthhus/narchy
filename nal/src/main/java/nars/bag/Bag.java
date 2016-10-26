@@ -214,7 +214,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
     }
 
-    default float pri(V x, float valueIfMissing) {
+    default float pri(@NotNull V x, float valueIfMissing) {
         BLink y = get(x);
         if (y==null || y.isDeleted())
             return valueIfMissing;
@@ -560,7 +560,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     };
 
     @NotNull
-    default <Y> BLink<Y> newLink(@NotNull Y i, Budgeted b) {
+    default <Y> BLink<Y> newLink(@NotNull Y i, @NotNull Budgeted b) {
 
         if (i instanceof Budgeted)
             return new DependentBLink((Budgeted) i, b);
@@ -614,7 +614,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
      * the link is to be removed.  if it returns the original value, no change for that link.
      * changes are buffered until after list iteration completes.
      */
-    default void compute(Function<BLink<V>,BLink<V>> o) {
+    default void compute(@NotNull Function<BLink<V>,BLink<V>> o) {
         List<BLink<V>[]> changed = $.newArrayList(size());
         forEach(x -> {
             BLink<V> y;
@@ -637,7 +637,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
     }
 
-    default @NotNull Bag<V> transfer(int maxItemsToSend, Bag target) {
+    default @NotNull Bag<V> transfer(int maxItemsToSend, @NotNull Bag target) {
         return this.sample(maxItemsToSend, t -> {
             target.putLink(t);
             return true; //assume it worked

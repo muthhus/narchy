@@ -146,7 +146,7 @@ public class Revision {
         return solution;
     }
 
-    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, Concept concept) {
+    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth, @NotNull Concept concept) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question
@@ -288,7 +288,7 @@ public class Revision {
 //    }
 //
     @NotNull
-    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {
+    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @NotNull Random rng) {
         if (a.equals(b)) {
             return a;
         } else if (a instanceof Compound) {
@@ -309,14 +309,14 @@ public class Revision {
     }
 
     /** a and b must have same operator and size */
-    @NotNull private static Term dtMergeGeneric(@NotNull Compound a, @NotNull Compound b, float aProp, Random rng) {
+    @NotNull private static Term dtMergeGeneric(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull Random rng) {
         return $.compound(a.op(), DTERNAL, /* although parallel could be maintained if this happens by choosing dt between a and b */
             choose(a.terms(), b.terms(), aProp, rng)
         );
     }
 
     @NotNull
-    private static Term dtMergeTemporal(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {
+    private static Term dtMergeTemporal(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @NotNull Random rng) {
 
         Term a0, a1, b0, b1;
         int adt = a.dt();
@@ -343,7 +343,7 @@ public class Revision {
         throw new RuntimeException("interpolation failure: different or invalid internal structure and can not be compared:\n\t" + a + "\n\t" + b);
     }
 
-    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, Random rng) {
+    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @Nullable Random rng) {
         int newDT;
         int adt = a.dt();
         if (adt != b.dt()) {
@@ -376,7 +376,7 @@ public class Revision {
         return newDT;
     }
 
-    static int choose(int x, int y, float xProp, Random random) {
+    static int choose(int x, int y, float xProp, @NotNull Random random) {
         return random.nextFloat() < xProp ? x : y;
     }
 
@@ -389,10 +389,11 @@ public class Revision {
         return (balance >= 0.5f) ? a : b;
     }
 
-    public static Term choose(Term a, Term b, float aBalance, Random rng) {
+    public static Term choose(Term a, Term b, float aBalance, @NotNull Random rng) {
         return (rng.nextFloat() < aBalance) ? a : b;
     }
-    public static Term[] choose(Term[] a, Term[] b, float aBalance, Random rng) {
+    @NotNull
+    public static Term[] choose(@NotNull Term[] a, Term[] b, float aBalance, @NotNull Random rng) {
         int l = a.length;
         Term[] x = new Term[l];
         for (int i = 0; i < l; i++) {
@@ -497,7 +498,7 @@ public class Revision {
         }
     }
 
-    public static Term intermpolate(Term a, Term b, float aProp, Random rng) {
+    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull Random rng) {
         return intermpolate(a, b, aProp, new MutableFloat(),1,rng);
     }
 

@@ -12,6 +12,7 @@ import java.util.function.Consumer;
  */
 abstract public class STM /*extends BagBuffer<Task>*/ implements Consumer<Task> {
 
+    @NotNull
     public final NAR nar;
     boolean allowNonInput;
     public final MutableInteger capacity;

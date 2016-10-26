@@ -25,6 +25,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ public class Default2 extends NAR {
 
     private static final Logger logger = LoggerFactory.getLogger(Default2.class);
 
+    @NotNull
     public final Bag<Concept> active;
 
     public final List<GraphPremiseBuilder> cores;
@@ -56,7 +58,8 @@ public class Default2 extends NAR {
 
         public static final int seedRate = 1;
 
-        Concept here;
+        @Nullable Concept here;
+        @Nullable
         private BLink<Term> linkHere;
 
         //Bag<Concept> local = new HijackBag<>(32, 4, BudgetMerge.avgBlend, random);
@@ -148,6 +151,7 @@ public class Default2 extends NAR {
         }
 
 
+        @Nullable
         private BLink<Term> go() {
             BLink<Term> next = terms.commit().sample();
             if (next != null) {
@@ -248,7 +252,7 @@ public class Default2 extends NAR {
 
 
     @Override
-    public final Concept concept(Term term, float boost) {
+    public final Concept concept(@NotNull Term term, float boost) {
         Concept c = concept(term);
         if (c!=null) {
             return active.mul(c, boost);
@@ -257,7 +261,7 @@ public class Default2 extends NAR {
     }
 
     @Override
-    public final void activationAdd(ObjectFloatHashMap<Concept> concepts, Budgeted in, float activation, MutableFloat overflow) {
+    public final void activationAdd(@NotNull ObjectFloatHashMap<Concept> concepts, @NotNull Budgeted in, float activation, MutableFloat overflow) {
         active.put(concepts, in, activation, overflow);
     }
 

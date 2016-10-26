@@ -140,7 +140,7 @@ public class EllipsisMatch extends TermVector implements Term {
 
 
     /** returns whether anything has changed in the target */
-    public void expand(Op op, List<Term> target) {
+    public void expand(Op op, @NotNull List<Term> target) {
         int l = terms.length;
         switch (l) {
             case 1:

@@ -141,6 +141,7 @@ public class RawBudget implements Budget {
     }
 
 
+    @NotNull
     @Override
     public final Budget setBudget(float p, float d, float q) {
         this.priority = validBudgetValue(p);

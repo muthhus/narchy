@@ -108,6 +108,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
         throw new UnsupportedOperationException();
     }
 
+    @NotNull
     @Override
     public final TermContainer templates() {
         return templates;
@@ -140,7 +141,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     /**
      * default construction by a NAR on conceptualization
      */
-    CompoundConcept(@NotNull T term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, Map sharedMap) {
+    CompoundConcept(@NotNull T term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
         this(term, b.newCurveBag(sharedMap), b.newCurveBag(sharedMap), nar);
     }
 
@@ -250,7 +251,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
 
 
     @Override
-    public void delete(NAR nar) {
+    public void delete(@NotNull NAR nar) {
 
         Concept.delete(this, nar);
 
@@ -378,6 +379,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
      *
      * @return null if not processed, or an Activation instance to continue with link activation and feedback
      */
+    @Nullable
     @Override
     public final Activation process(@NotNull Task input, @NotNull NAR nar) {
 
@@ -445,7 +447,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     /**
      * apply derivation feedback and update NAR emotion state
      */
-    protected static void feedback(Task input, TruthDelta delta, CompoundConcept concept, NAR nar) {
+    protected static void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull CompoundConcept concept, @NotNull NAR nar) {
 
 
         //update emotion happy/sad

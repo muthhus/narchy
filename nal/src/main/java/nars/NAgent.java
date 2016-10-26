@@ -24,6 +24,7 @@ import nars.util.math.FloatPolarNormalized;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,11 +50,14 @@ abstract public class NAgent implements NSense, NAction {
     public static final Logger logger = LoggerFactory.getLogger(NAgent.class);
 
     /** general reward signal for this agent */
+    @NotNull
     public final SensorConcept happy;
 
     /** d(happy)/dt = change in happiness over time (ie. first-order difference of happiness signal) */
+    @Nullable
     public final SensorConcept joy;
 
+    @NotNull
     public final FloatNormalized rewardNormalized;
 
     public NAR nar;
@@ -90,11 +94,11 @@ abstract public class NAgent implements NSense, NAction {
     private float rewardSum = 0;
     private MutableFloat minSensorPriority, maxSensorPriority;
 
-    public NAgent(NAR nar) {
+    public NAgent(@NotNull NAR nar) {
         this(nar, 1);
     }
 
-    public NAgent(NAR nar, int frameRate) {
+    public NAgent(@NotNull NAR nar, int frameRate) {
 
         this.nar = nar;
         alpha = this.nar.confidenceDefault(BELIEF);
@@ -122,10 +126,12 @@ abstract public class NAgent implements NSense, NAction {
 
     }
 
+    @NotNull
     @Override public final Collection<SensorConcept> sensors() {
         return sensors;
     }
 
+    @NotNull
     @Override public final Collection<ActionConcept> actions() {
         return actions;
     }
@@ -140,7 +146,7 @@ abstract public class NAgent implements NSense, NAction {
     }
 
     /** should only be invoked before agent has started TODO check for this */
-    public void sense(Iterable<SensorConcept> s) {
+    public void sense(@NotNull Iterable<SensorConcept> s) {
         Iterables.addAll(sensors, s);
     }
 
@@ -150,7 +156,7 @@ abstract public class NAgent implements NSense, NAction {
     }
 
     /** should only be invoked before agent has started TODO check for this */
-    public void action(Iterable<ActionConcept> s) {
+    public void action(@NotNull Iterable<ActionConcept> s) {
         Iterables.addAll(actions, s);
     }
 
@@ -217,6 +223,7 @@ abstract public class NAgent implements NSense, NAction {
     }
 
 
+    @NotNull
     public String summary() {
 
         @NotNull Emotion emotion = nar.emotion;
@@ -342,6 +349,7 @@ abstract public class NAgent implements NSense, NAction {
         System.out.println(Joiner.on('\n').join(predictors));
     }
 
+    @NotNull
     public NAgent run(final int cycles) {
 
         init();
@@ -354,6 +362,7 @@ abstract public class NAgent implements NSense, NAction {
         return this;
     }
     /** run Real-time */
+    @NotNull
     public Loop runRT(float fps) {
 
         init();

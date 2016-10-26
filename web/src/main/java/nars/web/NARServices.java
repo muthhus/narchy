@@ -22,7 +22,7 @@ import static nars.web.WebServer.socket;
         path
                 .addPrefixPath("/terminal", socket(new NarseseIOService(nar)))
                 .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 200)))
-                .addPrefixPath("/active", socket(new ActiveConceptService(nar, 100, 32)));
+                .addPrefixPath("/active", socket(new ActiveConceptService(nar, 100, 64)));
 
 
     }

@@ -68,6 +68,7 @@ public class Terminal extends NAR {
 //    }
 
 
+    @Nullable
     @Override
     public Concept concept(Term term, float boost) {
         return null;

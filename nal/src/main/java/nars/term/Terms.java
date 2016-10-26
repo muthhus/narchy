@@ -613,7 +613,7 @@ public class Terms   {
 
     /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
     @Nullable
-    public static Term[] substMaximal(Compound c, Predicate<Term> include, int minCount, int minScore) {
+    public static Term[] substMaximal(@NotNull Compound c, @NotNull Predicate<Term> include, int minCount, int minScore) {
         HashBag<Term> uniques = subtermScore(c,
             t -> include.test(t) ? t.volume() : 0 //sum by complexity if passes include filter
         );
@@ -639,7 +639,7 @@ public class Terms   {
 
     /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
     @Nullable
-    public static Term[] substRoulette(Compound c, Predicate<Term> include, int minCount, Random rng) {
+    public static Term[] substRoulette(@NotNull Compound c, @NotNull Predicate<Term> include, int minCount, Random rng) {
         HashBag<Term> uniques = subtermScore(c,
                 t -> include.test(t) ? 1 : 0 //sum by complexity if passes include filter
         );
@@ -671,7 +671,7 @@ public class Terms   {
 
     /** returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria */
     @Nullable
-    public static Term[] substAllRepeats(Compound c, Predicate<Term> include, int minCount) {
+    public static Term[] substAllRepeats(@NotNull Compound c, @NotNull Predicate<Term> include, int minCount) {
         HashBag<Term> uniques = Terms.subtermScore(c,
                 (sub) -> {
                     return include.test(sub) ? 1 : 0; //sum by complexity if passes include filter
@@ -735,7 +735,8 @@ public class Terms   {
 //    }
 
     /** counts the repetition occurrence count of each subterm within a compound */
-    public static HashBag<Term> subtermScore(Compound c, ToIntFunction<Term> score) {
+    @NotNull
+    public static HashBag<Term> subtermScore(@NotNull Compound c, @NotNull ToIntFunction<Term> score) {
         HashBag<Term> uniques = new HashBag<>(c.volume());
 
         c.recurseTerms((Term subterm) -> {
@@ -750,7 +751,7 @@ public class Terms   {
     /**
      *  atemporally set equality AND with any outer negations removed
      * NOTE: assumes that x must already contain only atemporal terms */
-    public static boolean equalAtemporally(Set<Term> x, Set<Term> y) {
+    public static boolean equalAtemporally(@NotNull Set<Term> x, @NotNull Set<Term> y) {
         if (x.size()!=y.size())
             return false;
         for (Term yy : y) {
@@ -778,7 +779,8 @@ public class Terms   {
     }
 
     /** counts the repetition occurrence count of each subterm within a compound */
-    public static HashBag<Term> subtermScore(Compound c, SubtermScorer score) {
+    @NotNull
+    public static HashBag<Term> subtermScore(@NotNull Compound c, @NotNull SubtermScorer score) {
         HashBag<Term> uniques = new HashBag<>(c.volume());
 
         c.recurseTerms((Term subterm, Compound superterm) -> {

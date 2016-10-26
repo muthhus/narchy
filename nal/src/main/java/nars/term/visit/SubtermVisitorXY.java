@@ -4,6 +4,7 @@ import nars.term.Compound;
 import nars.util.data.list.FasterList;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.visit.SubtermVisitorXY.Next.End;
@@ -18,7 +19,7 @@ abstract public class SubtermVisitorXY {
 
     @NotNull public final Compound root;
 
-    Compound cursorY;
+    @Nullable Compound cursorY;
     byte cursorX;
 
     public SubtermVisitorXY(@NotNull Compound root) {

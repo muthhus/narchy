@@ -64,6 +64,7 @@ public interface TruthOperator {
             return o.apply(belief, task, m, minConf);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return o.toString() + 'X';
@@ -91,6 +92,7 @@ public interface TruthOperator {
             overlapCached = o.allowOverlap();
         }
 
+        @NotNull
         @Override
         public final String toString() {
             return o.toString() + 'N';

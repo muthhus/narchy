@@ -320,14 +320,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     void forEach(Consumer<? super Term> action, int start, int stop);
 
 
-    default void forEachAtomic(Consumer<? super Atomic> action) {
+    default void forEachAtomic(@NotNull Consumer<? super Atomic> action) {
         forEach(x -> {
             if (x instanceof Atomic)
                 action.accept((Atomic)x);
         });
     }
 
-    default void forEachCompound(Consumer<? super Compound> action) {
+    default void forEachCompound(@NotNull Consumer<? super Compound> action) {
         forEach(x -> {
             if (x instanceof Compound)
                 action.accept((Compound)x);
