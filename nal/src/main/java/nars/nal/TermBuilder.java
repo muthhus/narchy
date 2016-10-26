@@ -646,7 +646,11 @@ public abstract class TermBuilder {
 
                     case INH:
                         if (predicate instanceof TermTransform && transformImmediates() && subject.op() == PROD) {
-                            return ((TermTransform) predicate).apply(((Compound) subject).terms());
+                            Term y = ((TermTransform) predicate).apply(((Compound) subject).terms());
+                            if (y == null) {
+                                throw new NullPointerException();
+                            }
+                            return y;
                         }
                         break;
 

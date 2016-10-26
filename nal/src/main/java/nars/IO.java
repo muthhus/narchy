@@ -3,9 +3,7 @@ package nars;
 import nars.budget.Budgeted;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
-import nars.concept.Concept;
 import nars.index.term.TermIndex;
-import nars.link.BLink;
 import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.term.Compound;
@@ -21,6 +19,7 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import nars.util.data.rope.StringHack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nustaq.serialization.*;
@@ -134,23 +133,19 @@ public class IO {
 
         //out.writeLong(t.creation()); //put this last because it is the least useful really
 
-
         writeTermStringUTF(out, t);
-
-
-//        writeUTFWithoutLength(out, s);
-
     }
 
     public static void writeTermStringUTF(@NotNull DataOutput out, @NotNull Termed t) throws IOException {
-        String s = t.term().toString();
-        //out.write(StringHack.bytes(s));
-        writeStringUTF(out, s);
+        writeStringUTF(out, t.term().toString());
     }
 
     public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {
-        out.writeShort(s.length());
-        out.write(s.getBytes(Charset.defaultCharset()));
+
+        //byte[] bb = s.getBytes(Charset.defaultCharset());
+        byte[] bb = StringHack.bytes(s);
+        out.writeShort(bb.length);
+        out.write(bb);
     }
 
     public static void writeBudget(@NotNull DataOutput out, @NotNull Budgeted t) throws IOException {
@@ -173,6 +168,7 @@ public class IO {
 
 
     public static void writeAtomic(@NotNull DataOutput out, @NotNull Atomic a) throws IOException {
+        //TODO use StringHack
         out.writeUTF(a.toString());
     }
 

@@ -21,11 +21,13 @@ import java.util.function.Consumer;
  */
 public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
 
+    float maxFractionThatCanBeRemovedAtATime = 0.03f;
+    float descentRate = 0.5f;
+    int iterationLimit = 8; //TODO tune iterationLimit by the overflow amount
+
     public final TermTree concepts;
 
     private final ConceptBuilder conceptBuilder;
-
-    long updatePeriodMS = 500;
 
     int sizeLimit;
 
@@ -98,9 +100,6 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
         if (overflow < 0)
             return;
 
-        float maxFractionThatCanBeRemovedAtATime = 0.01f;
-        float descentRate = 0.75f;
-        int iterationLimit = 16; //TODO tune iterationLimit by the overflow amount
 
         int maxConceptsThatCanBeRemovedAtATime = (int) Math.max(1, sizeBefore * maxFractionThatCanBeRemovedAtATime);
 

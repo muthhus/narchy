@@ -219,7 +219,9 @@ public class ConceptBagCycle implements Consumer<NAR> {
             if (existing!=null) {
                 if (existing.isDeleted())
                     throw new UnsupportedOperationException();
-                float forgetScale = 1f - (now - existing.savedAt) / forgetPeriod;
+
+                /** cost at least 1 time unit. if zero time units are allowed then concepts could theoreticaly avoid the normal forgetting while being asleep during the same time frame */
+                float forgetScale = 1f - Math.max(1,(now - existing.savedAt)) / forgetPeriod;
                 if (forgetScale > 0) {
                     BudgetMerge.plusBlend.apply(v, existing, forgetScale);
                     c.put(this, null);
