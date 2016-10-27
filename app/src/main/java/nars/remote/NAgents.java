@@ -135,7 +135,7 @@ abstract public class NAgents extends NAgent {
                 new MultiThreadExecutioner(threads, 8192 /* TODO chose a power of 2 number to scale proportionally to # of threads */);
 
         int volMax = 48;
-        int conceptsPerCycle = 128;
+        int conceptsPerCycle = 96;
 
 
         //Multi nar = new Multi(3,512,

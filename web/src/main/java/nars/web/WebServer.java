@@ -3,7 +3,10 @@ package nars.web;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
+import io.undertow.server.handlers.cache.DirectBufferCache;
+import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.FileResourceManager;
+import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import nars.$;
@@ -16,8 +19,10 @@ import nars.term.atom.Atom;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.Wiki;
+import nars.util.data.MutableInteger;
 import ognl.Ognl;
 import ognl.OgnlException;
+import org.apache.commons.lang.mutable.MutableFloat;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -25,14 +30,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static io.undertow.Handlers.*;
 import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static io.undertow.UndertowOptions.ENABLE_SPDY;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
+import static nars.$.*;
 import static spacegraph.irc.IRCAgent.hear;
 import static spacegraph.irc.IRCAgent.newRealtimeNAR;
 
@@ -59,15 +70,15 @@ public class WebServer /*extends PathHandler*/ {
         this.path = path()
                 .addPrefixPath("/", resource(
 
-                        new FileResourceManager(getResourcePath().toFile(), 0))
+//                        new FileResourceManager(getResourcePath().toFile(), 0))
 
-//                        new CachingResourceManager(
-//                                16384,
-//                                16*1024*1024,
-//                                new DirectBufferCache(100, 10, 1000),
-//                                new PathResourceManager(getResourcePath(), 0, true, true),
-//                                0 //7 * 24 * 60 * 60 * 1000
-//                        ))
+                        new CachingResourceManager(
+                                16384,
+                                16*1024*1024,
+                                new DirectBufferCache(100, 10, 1000),
+                                new PathResourceManager(getResourcePath(), 0, true, true),
+                                0 //7 * 24 * 60 * 60 * 1000
+                        ))
                                 .setCachable((x) -> false)
                                 .setDirectoryListingEnabled(true)
                                 .addWelcomeFiles("index.html")
@@ -139,20 +150,50 @@ public class WebServer /*extends PathHandler*/ {
 //                //"#nars"
 //        ).start();
 
-        nar.on("J", (terms) -> {
-            //WARNING this could be dangerous to allow open access
-            String expr = Atom.unquote(terms[0]);
-            Object r;
-            try {
-                r = Ognl.getValue(expr, nar);
-            } catch (OgnlException e) {
-                r = e;
-            }
-            if (r instanceof Termed)
-                return ((Termed)r).term();
-            else
-                return $.the(r.toString());
-        });
+
+        {
+            //access to the NAR
+
+            final Set<Class> classWhitelist = newHashSet(4);
+            classWhitelist.add(org.apache.commons.lang3.mutable.MutableFloat.class);
+            classWhitelist.add(MutableInteger.class);
+            classWhitelist.add(AtomicBoolean.class);
+            classWhitelist.add(AtomicLong.class);
+
+            Field[] ff = nar.getClass().getFields();
+
+            nar.on("nar", (terms) -> {
+                //WARNING this could be dangerous to allow open access
+                Term t = terms[0];
+                if (t.op().var) {
+                    Set<Term> pp = new TreeSet();
+                    for (Field f : ff) {
+                        if (classWhitelist.contains(f.getType())) {
+                            try {
+                                pp.add(func("nar", the(f.getName()), the(f.get(nar))));
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    return parallel(pp);
+                } else {
+                    String expr = Atom.unquote(t);
+                    Object r;
+                    try {
+                        r = Ognl.getValue(expr, nar);
+                    } catch (OgnlException e) {
+                        r = e;
+                    }
+                    if (r instanceof Termed)
+                        return ((Termed) r).term();
+                    else
+                        return the(r.toString());
+                }
+            });
+        }
+
+
         nar.on("read", (terms) -> {
 
             String protocol = terms[0].toString();
@@ -178,10 +219,10 @@ public class WebServer /*extends PathHandler*/ {
 
                         hear(nar, strippedText, page, 200 /*ms per word */);
 
-                        return $.the("Reading " + base + ":" + page + ": " + strippedText.length() + " characters...");
+                        return the("Reading " + base + ":" + page + ": " + strippedText.length() + " characters...");
 
                     } catch (IOException e) {
-                        return $.the(e.toString());
+                        return the(e.toString());
                     }
 
                 case "url":
@@ -196,22 +237,22 @@ public class WebServer /*extends PathHandler*/ {
 
             }
 
-            return $.the("Unknown protocol");
+            return the("Unknown protocol");
 
         });
         nar.on("clear", (terms) -> {
             long dt = Util.time(() -> {
                 ((Default) nar).core.active.clear();
             });
-            return $.the("Ready (" + dt + " ms)");
+            return the("Ready (" + dt + " ms)");
         });
         nar.on("memstat", (terms) ->
-            $.quote(nar.concepts.summary())
+            quote(nar.concepts.summary())
         );
         nar.on("top", (terms) -> {
 
                     int length = 16;
-                    List<Term> b = $.newArrayList(length);
+                    List<Term> b = newArrayList(length);
                     @NotNull Bag<Concept> cbag = ((Default) nar).core.active;
 
                     String query;
@@ -224,8 +265,8 @@ public class WebServer /*extends PathHandler*/ {
                     cbag.topWhile(c -> {
                         String bs = c.get().toString();
                         if (query == null || bs.toLowerCase().contains(query)) {
-                            b.add($.p(c.get().term(),
-                                    $.quote(
+                            b.add(p(c.get().term(),
+                                    quote(
                                             //TODO better summary, or use a table representation
                                             Texts.n2(c.pri())
                                     )));
@@ -233,7 +274,7 @@ public class WebServer /*extends PathHandler*/ {
                         return b.size() <= length;
                     });
 
-                    return $.p(b);
+                    return p(b);
                 }
 
         );
@@ -265,3 +306,4 @@ public class WebServer /*extends PathHandler*/ {
     }*/
 
 }
+

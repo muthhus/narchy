@@ -51,7 +51,6 @@ public class Tetris extends NAgents {
 //            new MultiThreadExecutioner(2, 1024*8);
             new MultiThreadExecutioner(3, 1024*8);
 
-    public static final int runFrames = 665550;
 
     public static final int tetris_width = 8;
     public static final int tetris_height = 16;
@@ -384,7 +383,7 @@ public class Tetris extends NAgents {
         Executioner e = Tetris.exe;
         ((MultiThreadExecutioner)exe).sync(false);
 
-        Default nar = new Default(2048,
+        Default nar = new Default(1024,
                 256, 2, 3, rng,
                 //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*128, maxVol/2, false, e),
                 //new MapDBIndex(new DefaultConceptBuilder(rng), 200000, Executors.newSingleThreadScheduledExecutor()),
@@ -394,7 +393,7 @@ public class Tetris extends NAgents {
 
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f);
+        nar.goalConfidence(0.9f);
 
         Param.DEBUG_ANSWERS = Param.DEBUG;
 
@@ -419,7 +418,7 @@ public class Tetris extends NAgents {
 
 
         nar.compoundVolumeMax.setValue(maxVol);
-        nar.linkFeedbackRate.setValue(0.05f);
+        nar.linkFeedbackRate.setValue(0.15f);
 
         //nar.truthResolution.setValue(0.02f);
 
@@ -457,8 +456,8 @@ public class Tetris extends NAgents {
 
         new Inperience(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 4, true, 8);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 16, '!', 2, true, 4);
 
         //new VariableCompressor(nar);
 

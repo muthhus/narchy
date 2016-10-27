@@ -28,12 +28,6 @@ package nars.util.data;
  */
 public class MutableInteger extends Number implements Comparable, Mutable {
 
-  /**
-   * Required for serialization support.
-   * 
-   * @see java.io.Serializable
-   */
-  private static final long serialVersionUID = 1587163916L;
 
   /** The mutable value. */
   private int value;

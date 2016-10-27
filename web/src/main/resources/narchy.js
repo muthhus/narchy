@@ -165,39 +165,50 @@ function decodeTasks(e, m) {
     //var height = dv.getUint16(2);
 }
 
-function editify(div) {
-    // const editor = ace.edit(div[0]);//"editor");
-    // editor.setTheme("ace/theme/vibrant_ink");
-    // const LispMode = ace.require("ace/mode/lisp").Mode;
-    // editor.session.setMode(new LispMode());
-    //
-    // editor.$blockScrolling = Infinity;
-    //
-    // div.css({
-    //     position: 'absolute',
-    //     width: '100%',
-    //     height: '100%'
-    // });
-    //
-    // return editor;
+// function editify(div) {
+//     // const editor = ace.edit(div[0]);//"editor");
+//     // editor.setTheme("ace/theme/vibrant_ink");
+//     // const LispMode = ace.require("ace/mode/lisp").Mode;
+//     // editor.session.setMode(new LispMode());
+//     //
+//     // editor.$blockScrolling = Infinity;
+//     //
+//     // div.css({
+//     //     position: 'absolute',
+//     //     width: '100%',
+//     //     height: '100%'
+//     // });
+//     //
+//     // return editor;
+//
+//
+// }
+
+function Editor(options) {
+    const div = $('<div/>');//.addClass('NALEditor');
 
     const t = document.createElement('textarea');
     div.append(t);
-    return CodeMirror.fromTextArea(t, {
+    const editor = CodeMirror.fromTextArea(t, options);
+
+    div.editor = editor;
+
+    return div;
+}
+
+function NALInputEditor(terminal, initialValue) {
+
+    const div = $('<div/>');//.addClass('NALEditor');
+
+    const t = document.createElement('textarea');
+    div.append(t);
+    const editor = CodeMirror.fromTextArea(t, {
         //http://codemirror.net/doc/manual.html#usage
         lineNumbers: false,
         theme: 'night',
         mode: 'clojure',
         scrollbarStyle: null //disables scrollbars
     });
-}
-
-function NALEditor(terminal, initialValue) {
-
-
-    const div = $('<div/>');//.addClass('NALEditor');
-
-    const editor = editify(div);
 
     editor.setValue(initialValue || ''); //"((a ==> b) <-> x)!\n\necho(\"what\");");
 
@@ -354,7 +365,7 @@ function NARSpeechRecognition(editor) {
 
 function NARInputter(terminal, initialValue) {
 
-    const e = NALEditor(terminal, initialValue);
+    const e = NALInputEditor(terminal, initialValue);
     const d = $('<div/>').append(
         NARSpeechRecognition(e.editor),
 

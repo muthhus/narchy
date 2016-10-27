@@ -234,17 +234,13 @@ function Menu() {
 
     });
 
-    function updateAll() {
 
+    c.on('pan zoom ready', /* select unselect  */ function (e) {
         fastdom.mutate(() => {
             activeWidgets.forEach((node, nid) => {
                 updateWidget(node);
             });
         });
-    }
-
-    c.on('pan zoom ready', /* select unselect  */ function (e) {
-        updateAll();
     });
 
     c.on('position style data', /* select unselect  */ function (e) {
@@ -269,7 +265,7 @@ function Menu() {
         c.animate({
             fit: {
                 eles: ele,
-                padding: 40
+                padding: 20
             }
         }, {
             duration: zoomDuration
@@ -310,89 +306,140 @@ function Menu() {
 //            });
 
 
-    menulayer.hide();
-
-    fastdom.mutate(() => {
-        menulayer.appendTo(body);
-        menulayer.fadeIn();
-    });
+    fastdom.mutate( () => menulayer.hide().appendTo(body).fadeIn() );
 
 
 }
 
 $(document).ready(() => {
 
-    const io = NARSocket('terminal', decodeTasks);
-    window.io = io;
+    const io = NARSocket('terminal', decodeTasks, {
+        onopen: function() {
 
-    const layout = new GoldenLayout({
-        content: [{
-            type: 'row',
-            content: [
-                {
-                    type: 'column',
-                    content: [{
-                        type: 'component',
-                        componentName: 'graph',
-                        componentState: {}
-                    }, {
-                        type: 'component',
-                        componentName: 'top',
-                        componentState: {}
-                    }]
-                },
-                {
-                    type: 'column',
-                    content: [{
-                        type: 'component',
-                        componentName: 'terminal',
-                        componentState: {}
-                    }, {
-                        type: 'component',
-                        componentName: 'input',
-                        componentState: {}
-                    }]
-                }
-                /*{
-                 type: 'component',
-                 componentName: 'terminal',
-                 componentState: { label: 'A' }
-                 }*/
-            ]
-        }]
-    }, $('body'));
+            const layout = new GoldenLayout({
+                content: [{
+                    type: 'row',
+                    content: [
+                        {
+                            type: 'column',
+                            content: [{
+                                type: 'component',
+                                componentName: 'graph',
+                                componentState: {}
+                            }, {
+                                type: 'component',
+                                componentName: 'top',
+                                componentState: {}
+                            }]
+                        },
+                        // {
+                        //     type: 'column',
+                        //     content: [{
+                        //         type: 'component',
+                        //         componentName: 'edit',
+                        //         componentState: {
+                        //
+                        //             //http://codemirror.net/doc/manual.html#usage
+                        //             lineNumbers: false,
+                        //             theme: 'night',
+                        //             mode: 'clojure',
+                        //             inputStyle: 'contenteditable'
+                        //
+                        //             //scrollbarStyle: null //disables scrollbars
+                        //         }
+                        //     }]
+                        // },
+                        {
+                            type: 'column',
+                            content: [{
+                                type: 'component',
+                                componentName: 'options',
+                                componentState: {}
+                            }]
+                        },
+                        {
+                            type: 'column',
+                            content: [{
+                                type: 'component',
+                                componentName: 'terminal',
+                                componentState: {}
+                            }, {
+                                type: 'component',
+                                componentName: 'input',
+                                componentState: {}
+                            }]
+                        }
+                        /*{
+                         type: 'component',
+                         componentName: 'terminal',
+                         componentState: { label: 'A' }
+                         }*/
+                    ]
+                }]
+            }, $('body'));
 
-    layout.on('stackCreated', function (stack) {
+            layout.on('stackCreated', function (stack) {
 
-        /*
-         * Accessing the DOM element that contains the popout, maximise and * close icon
-         */
-        stack.header.controlsContainer.append(MainMenuButton());
-    });
-    layout.registerComponent('terminal', function (tgt, state) {
-        tgt.getElement().html(IO(io));
-    });
-    layout.registerComponent('input', function (tgt, state) {
-        tgt.getElement().html(
-            NALEditor(io).attr('id', 'input')
-        );
-    });
-    layout.registerComponent('options', function (tgt, state) {
+                /*
+                 * Accessing the DOM element that contains the popout, maximise and * close icon
+                 */
+                stack.header.controlsContainer.append(MainMenuButton());
+            });
+            layout.registerComponent('terminal', function (tgt, state) {
+                tgt.getElement().html(IO(io));
+            });
+            layout.registerComponent('input', function (tgt, state) {
+                tgt.getElement().html(
+                    NALInputEditor(io).attr('id', 'input')
+                );
+            });
+            layout.registerComponent('edit', function (tgt, state) {
+                tgt.getElement().html(
+                    Editor(state)
+                );
+            });
+            layout.registerComponent('options', function (tgt, state) {
+                var ee = Editor({
+                    lineNumbers: false,
+                    theme: 'night',
+                    mode: 'clojure',
+                    inputStyle: 'contenteditable'
+                });
+                tgt.getElement().html(ee);
+                var e = ee.editor;
 
-        // Set default options
-        //console.log(JSONEditor());
-        //JSONEditor().defaults.options.theme = 'jqueryui';
+                io.on('task', (t)=>{
+                    //HACK
+                    if (t.punc === ';') {
+                        const pi = t.term.indexOf("(nar(?1),( &&+0 ,");
+                        if (pi != -1) {
+                            var src = t.term;
+                            src = src.substring(pi + 17, src.length - 2);
+                            src = src.replace(/,nar/gi, ",\nnar");
+                            e.setValue(src);
+                        }
+                    }
+                });
 
-        // Initialize the editor
-        const dd = div('max');
-        let editor = new JSONEditor(dd[0], {
-            schema: {
-                type: "object",
-                properties: {
-                    name: {"type": "string"}
-                }
-            }
-        });
+                io.send('nar(?1)');
+
+            });
+            layout.registerComponent('demo_jsonedit', function (tgt, state) {
+
+                // Set default options
+                //console.log(JSONEditor());
+                //JSONEditor().defaults.options.theme = 'jqueryui';
+
+                // Initialize the editor
+                const dd = div('max');
+                let editor = new JSONEditor(dd[0], {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            name: {"type": "string"}
+                        }
+                    }
+                });
 
 //            // Set the value
 //            editor.setValue({
@@ -413,45 +460,50 @@ $(document).ready(() => {
 //                // Do something...
 //            });
 
-        tgt.getElement().html(dd);
+                tgt.getElement().html(dd);
 
+            });
+            layout.registerComponent('graph', function (tgt, state) {
+
+                const c = spacegraph({});
+
+                io.on('task', function (x) {
+
+                    const id = x.term + x.punc + x.freq + ';' + x.conf; //HACK for Task's
+                    x.label = x.term; //HACK
+
+
+                    let existing = c.graph.get(id);
+
+                    if (!existing) {
+
+                        //add
+                        c.graph.add({group: "nodes", data: x});
+
+                    } else {
+                        //replace / merge
+                        existing.data = x;
+                    }
+
+                    c.changed = true;
+                });
+
+                tgt.getElement().html(c);
+                tgt.on('resize', () => {
+                    setTimeout(() => c.graph.resize(), 0);
+                });
+
+            });
+            layout.registerComponent('top', function (tgt, state) {
+                tgt.getElement().html(TopTable());
+            });
+
+            layout.init();
+
+        }
     });
-    layout.registerComponent('graph', function (tgt, state) {
+    window.io = io;
 
-        const c = spacegraph({});
-
-        io.on('task', function (x) {
-
-            const id = x.term + x.punc + x.freq + ';' + x.conf; //HACK for Task's
-            x.label = x.term; //HACK
-
-
-            let existing = c.graph.get(id);
-
-            if (!existing) {
-
-                //add
-                c.graph.add({group: "nodes", data: x});
-
-            } else {
-                //replace / merge
-                existing.data = x;
-            }
-
-            c.changed = true;
-        });
-
-        tgt.getElement().html(c);
-        tgt.on('resize', () => {
-            setTimeout(() => c.graph.resize(), 0);
-        });
-
-    });
-    layout.registerComponent('top', function (tgt, state) {
-        tgt.getElement().html(TopTable());
-    });
-
-    layout.init();
 
 });
 
