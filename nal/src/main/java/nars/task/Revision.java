@@ -436,7 +436,7 @@ public class Revision {
         if (at != DTERNAL) {
             int bt = bterm.dt();
             if (bt != DTERNAL) {
-                dt = Math.round(lerp(at, bt, aProp));
+                dt = Math.round(lerp(at, bt, ((double)aProp)));
             }
         }
 
@@ -476,6 +476,24 @@ public class Revision {
         return new ProjectedTruth(t.freq(), nextConf, target);
     }
 
+    public static long occInterpolate(@NotNull Task t, @Nullable Task b) {
+        long to = t.occurrence();
+
+        if (b == null)
+            return to;
+
+        long bo = b.occurrence();
+
+        if (to != ETERNAL && bo != ETERNAL) {
+
+            float tw = t.confWeight();
+            float bw = b.confWeight();
+            return Util.lerp(to, bo, ((double)tw) / (bw + tw));
+        } else {
+            return bo != ETERNAL ? bo : to;
+        }
+
+    }
     @NotNull
     public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull PremiseEval p) {
 
@@ -487,11 +505,11 @@ public class Revision {
 
         if (to != ETERNAL && bo != ETERNAL) {
 
-            //randomize choice by confidence
-            float tc = t.confWeight();
-            float tbc = tc + b.confWeight();
+            float tw = t.confWeight();
+            float bw = b.confWeight();
 
-            return p.random.nextFloat() < tc/tbc ? t : b;
+            //randomize choice by confidence
+            return p.random.nextFloat() < tw/(tw+bw) ? t : b;
 
         } else {
             return bo != ETERNAL ? b : t;

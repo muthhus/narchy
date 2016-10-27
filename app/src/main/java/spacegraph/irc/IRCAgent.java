@@ -20,6 +20,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
+import nars.term.var.Variable;
 import nars.time.RealtimeMSClock;
 import nars.time.Tense;
 import nars.util.Loop;
@@ -40,6 +42,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Random;
 
+import static nars.Op.INH;
+import static nars.Op.PROD;
 import static nars.nlp.Twenglish.tokenize;
 
 /**
@@ -146,10 +150,43 @@ public class IRCAgent extends IRC {
 //            }
 //        });
 
-        //inter = new InterNAR(nar, (short)udpPort );
-        //inter.broadcastPriorityThreshold = 0.25f; //lower threshold
+        /*
+        $0.9;0.9;0.99$ (hear(?someone, $something) ==>+1 hear(I,$something)).
+ $0.9;0.9;0.99$ (((hear(#someone,#someThing) &&+1 hear(#someone,$nextThing)) && hear(I, #someThing)) ==>+1 hear(I, $nextThing)).
+ $0.9;0.9;0.99$ (((hear($someone,$someThing) &&+1 hear($someone,$nextThing)) <=> hear($someone, ($someThing,$nextThing)))).
+ $0.9;0.9;0.99$ (((I<->#someone) && hear(#someone, $something)) ==>+1 hear(I, $something)).
+ $0.9;0.9;0.99$ hear(I, #something)!
+ hear(I,?x)?
 
-        //nar.believe("connect(\"" + server + "\").", Tense.Present, 1f, 0.9f);
+ $0.9$ (($x,"the") <-> ($x,"a")).
+         */
+        nar.input(
+                "$0.9;0.9;0.99$ (hear(?someone, $something) ==>+0 hear(I,$something)).",
+                "$0.9;0.9;0.99$ (((hear(#someone,#someThing) &&+1 hear(#someone,$nextThing)) &&+0 hear(I, #someThing)) ==>+1 hear(I, $nextThing)).\n",
+                //"$0.9;0.9;0.99$ (((hear(#someone,$someThing) &&+1 hear(#someone,$nextThing)) <=> hear($someone, ($someThing,$nextThing)))).",
+                "$0.9;0.9;0.99$ hear(I, #something)!",
+                //"(((I<->#someone) && hear(#someone, $something)) ==>+1 hear(I, $something)).",
+                "$0.9;0.9;0.99$ hear(I,?x)?"
+        );
+        final Atomic HEAR = $.the("hear");
+        final Atomic I = $.the("I");
+        nar.onTask(tt->{
+            //HACK
+            if (tt.isBelief()) {
+                if (Math.abs(tt.occurrence()-nar.time()) < 100) {
+                    if (tt.op() == INH && tt.term(0).op() == PROD && tt.term(1).equals(HEAR)) {
+                        Compound arg = (Compound) tt.term(0);
+                        if (arg.term(0).equals(I)) {
+                            Term w = arg.term(1);
+                            if (!(w instanceof Variable)) {
+                                say(channels, w);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
     }
 
     //    abstract class IRCBotOperator extends TermProcedure {
@@ -425,10 +462,10 @@ public class IRCAgent extends IRC {
         @NotNull Default n = newRealtimeNAR(2048, 20, 60);
 
 
-        IRC bot = new IRCAgent(n,
+        IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                //"#123xyz"
-                "#netention"
+                "#123xyz"
+                //"#netention"
                 //"#nars"
         );
 
@@ -438,6 +475,19 @@ public class IRCAgent extends IRC {
 
 
     }
+    final StringBuilder b = new StringBuilder();
+
+    public void say(String[] channels, Term w) {
+        logger.info("say {}", w);
+        b.append(w.toString()).append(' ');
+        if (b.length() > 40) {
+            send(channels, b.toString());
+            b.setLength(0);
+        }
+
+    }
+
+
 //    public static void main(String[] args) throws Exception {
 //        //while (running) {
 //            try {

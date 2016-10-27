@@ -3,6 +3,7 @@ package spacegraph.irc;
 import ch.qos.logback.classic.Level;
 import com.google.common.collect.ImmutableSortedSet;
 import nars.$;
+import nars.term.Term;
 import org.eclipse.collections.impl.factory.Iterables;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
@@ -94,4 +95,6 @@ public class IRC extends ListenerAdapter {
         IRC bot = new IRC("experiment1", "irc.freenode.net", "#123xyz");
 
     }
+
+
 }

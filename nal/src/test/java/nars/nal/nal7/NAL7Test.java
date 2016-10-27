@@ -796,6 +796,15 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
+    @Test public void testIntersectionTemporal() {
+        test()
+                //.log()
+                .inputAt(0, "(x --> a). :|:")
+                .inputAt(16, "(y --> a). :|:")
+                .mustBelieve(cycles,"((x&y)-->a)",1f,0.81f,8)
+                ;
+    }
+
 //    @Test public void testTruthDecayOverTime0() {
 //        testTruthDecayOverTime(0, 0.81f, 0.005f);
 //    }

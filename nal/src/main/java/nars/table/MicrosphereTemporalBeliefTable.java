@@ -347,7 +347,7 @@ public class MicrosphereTemporalBeliefTable implements TemporalBeliefTable {
 
         float ac = c2w(a.conf());
         float bc = c2w(b.conf());
-        long mid = (long) Math.round(Util.lerp(a.occurrence(), b.occurrence(), ac / (ac + bc)));
+        long mid = (long) Math.round(Util.lerp(a.occurrence(), b.occurrence(), (double)ac / (ac + bc)));
 
 //        float f =
 //                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount

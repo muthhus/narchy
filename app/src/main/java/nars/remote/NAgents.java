@@ -62,8 +62,8 @@ abstract public class NAgents extends NAgent {
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 2, true, 4);
 
         Abbreviation abbr = new Abbreviation(nar, "the",
-                4, 8,
-                0.01f, 8);
+                4, 16,
+                0.5f, 32);
 
         new Inperience(nar);
 

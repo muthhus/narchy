@@ -90,7 +90,7 @@ public final class DefaultConceptPolicy extends ConceptPolicy {
         float complexityFactor = v / 64; //(nar.compoundVolumeMax.intValue()/2f); //HEURISTIC
         complexityFactor = Math.min(complexityFactor, 1f); //clip at +1
 
-        int l = Math.round(Util.lerp(min, max, complexityFactor));
+        int l = Math.round(Util.lerp(min, max, (double)complexityFactor));
 
         l = Math.max(l, 1+ c.templates().size()); //at least enough for its templates
 

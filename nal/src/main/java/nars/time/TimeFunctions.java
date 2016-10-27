@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.CONJ;
 import static nars.task.Revision.chooseByConf;
+import static nars.task.Revision.occInterpolate;
 import static nars.time.Tense.*;
 
 /**
@@ -704,7 +705,7 @@ public interface TimeFunctions {
         Task task = p.task;
         Task belief = p.belief;
 
-        long occ = chooseByConf(task, belief, p).occurrence(); //reset
+        long occ = occInterpolate(task, belief); //reset
 
         Compound tt = (Compound) p.taskTerm.unneg();
         Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;
