@@ -40,23 +40,24 @@ public class DynamicCompoundConcept extends CompoundConcept {
     public DynamicCompoundConcept(@NotNull Compound term, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
         super(term, termLinks, taskLinks, nar);
         this.nar = nar;
+        this.beliefs = newBeliefTable(0,0);
+        this.goals = newGoalTable(0,0);
     }
 
-    public static final class DynTruth {
+    public static final class DynTruth extends RawBudget {
         //@NotNull private final List<Truth> t;
         @Nullable final List<Task> e;
-        @Nullable final Budget b;
         private final float confMin;
 
         @Deprecated float freq, conf; //running product
 
-        public DynTruth(Op o, float confMin, List<Task> e, Budget b) {
+        public DynTruth(Op o, float confMin, List<Task> e) {
+            super(0,0,0);
             if (o!=CONJ)
                 throw new UnsupportedOperationException("aggregate truth for " + o + " not implemented or not applicable");
             this.confMin = confMin;
             //this.t = t;
             this.e = e;
-            this.b = b;
             freq = conf = 1f;
         }
 
@@ -122,8 +123,6 @@ public class DynamicCompoundConcept extends CompoundConcept {
             if (templateConcept == null)
                 return null;
 
-
-
             Term template = templateConcept.term();
             if (template instanceof Compound) {
                 Compound ctemplate = (Compound)template;
@@ -159,8 +158,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
         private DynTruth newDyn(boolean evidence) {
             int n = size();
             final List<Task> e = evidence ? $.newArrayList(n) : null;
-            Budget b = evidence ? new RawBudget() : null;
-            return new DynTruth(op(), nar.confMin.floatValue(), e, b);
+            return new DynTruth(op(), nar.confMin.floatValue(), e);
         }
 
         /** returns true if the subterm was evaluated successfully, false otherwise */
@@ -233,7 +231,7 @@ public class DynamicCompoundConcept extends CompoundConcept {
                 if (bt != null) {
                     Budget btb = bt.budget();
                     if (!btb.isDeleted())
-                        BudgetMerge.plusBlend.apply(d.b, btb, 1f);
+                        BudgetMerge.plusBlend.apply(d, btb, 1f);
 
                     d.e.add(bt); //HACK this doesnt include the non-top tasks which may contribute to the evaluated truth during truthpolation
                 }
@@ -326,15 +324,15 @@ public class DynamicCompoundConcept extends CompoundConcept {
                     if ((y != null) && (x==null || (y.conf() > x.conf()))) { //!y.equals(x.truth())) {
 
 
-                        /*if the belief tables provided a value, interpolate this with the dynamic value to get the final truth value */
-                        float overlap = 0; //TODO compute overlap %
-                        Truth z = x != null ? Revision.revise(y,x,1f-overlap,nar.confMin.floatValue()) : y;
-                        long[] e = x!=null ? Stamp.zip(yy.evidence(), x.evidence()) : yy.evidence();
+//                        /*if the belief tables provided a value, interpolate this with the dynamic value to get the final truth value */
+//                        float overlap = 0; //TODO compute overlap %
+//                        Truth z = x != null ? Revision.revise(y,x,1f-overlap,nar.confMin.floatValue()) : y;
+//                        long[] e = x!=null ? Stamp.zip(yy.evidence(), x.evidence()) : yy.evidence();
                         //System.err.println(x + " + " + y + " = " + z);
 
                         RevisionTask t = new RevisionTask(template, beliefOrGoal ? Symbols.BELIEF : Symbols.GOAL,
-                                z, nar.time(), then, e);
-                        t.setBudget(yy.b);
+                                y, nar.time(), then, yy.evidence());
+                        t.setBudget(yy);
                         t.log("Dynamic");
 
 

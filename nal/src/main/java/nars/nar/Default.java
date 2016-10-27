@@ -68,7 +68,7 @@ public class Default extends NAR {
         super(clock, index, random, Param.defaultSelf(), exe);
 
 
-        durMin.setValue(BUDGET_EPSILON * 2f);
+        durMin.setValue(Param.BUDGET_EPSILON*16f);
 
         ConceptBagCycle c = new ConceptBagCycle(this, activeConcepts);
 

@@ -14,6 +14,7 @@ import java.io.IOException;
 import static java.lang.Math.pow;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
+import static nars.util.Util.*;
 
 /**
  * Created by me on 12/11/15.
@@ -145,7 +146,7 @@ public interface Budget extends Budgeted {
         if (p!=p /* fast NaN test */)
             return Float.NaN;
         else
-            return Util.unitize(p);
+            return unitize(p);
     }
 
    
@@ -167,7 +168,7 @@ public interface Budget extends Budgeted {
 
     @NotNull
     default Budget priLerp(float target, float speed) {
-        setPriority(Util.lerp(target, pri(), speed));
+        setPriority(lerp(target, pri(), speed));
         return this;
     }
 
@@ -178,9 +179,9 @@ public interface Budget extends Budgeted {
             return 0; //no change
 
         float p = pri();
-        float target = Util.unitize(p * factor);
+        float target = unitize(p * factor);
         float delta = target - p;
-        setPriority(Util.lerp(target, p, speed));
+        setPriority(lerp(target, p, speed));
         return delta;
 
     }
@@ -192,6 +193,13 @@ public interface Budget extends Budgeted {
         setQuality(qua() * factor);
     }
 
+    default boolean equals(Budgeted b, float epsilon) {
+        return
+                Util.equals(priIfFiniteElseNeg1(), b.priIfFiniteElseNeg1(), epsilon) &&
+                Util.equals(dur(), dur(), epsilon) &&
+                Util.equals(qua(), qua(), epsilon);
+
+    }
 
 //    default void durMult(float factor) {
 //        setDurability(dur() * factor);

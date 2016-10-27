@@ -30,6 +30,7 @@ import org.eclipse.collections.impl.list.mutable.SynchronizedMutableList;
 import org.eclipse.collections.impl.list.mutable.UnmodifiableMutableList;
 import org.eclipse.collections.impl.stack.mutable.ArrayStack;
 import org.eclipse.collections.impl.utility.LazyIterate;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -81,6 +82,22 @@ public class MultiRWFasterList<T>  extends AbstractMultiReaderMutableCollection<
             try {
                 delegate.forEach(action);
             } finally {
+                this.unlockReadLock();
+            }
+        }
+
+        //adds isEmpty() test inside the lock
+        @Nullable
+        @Override public <V extends Comparable<? super V>> T maxBy(Function<? super T, ? extends V> function)
+        {
+            this.acquireReadLock();
+            try
+            {
+                MutableList<T> d = getDelegate();
+                return !d.isEmpty() ? d.maxBy(function) : null;
+            }
+            finally
+            {
                 this.unlockReadLock();
             }
         }

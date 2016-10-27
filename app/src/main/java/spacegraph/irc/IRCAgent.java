@@ -46,14 +46,14 @@ import static nars.nlp.Twenglish.tokenize;
 
  $0.9;0.9;0.99$
 
- $0.9;0.9;0.99$ (hear($someone, $something) ==>+1 say($something)).
- $0.9;0.9;0.99$ (((hear(#someone,#someThing) &&+1 hear(#someone,$nextThing)) && hear(I, #someThing)) ==>+1 say($nextThing)).
+ $0.9;0.9;0.99$ (hear(?someone, $something) ==>+1 hear(I,$something)).
+ $0.9;0.9;0.99$ (((hear(#someone,#someThing) &&+1 hear(#someone,$nextThing)) && hear(I, #someThing)) ==>+1 hear(I, $nextThing)).
  $0.9;0.9;0.99$ (((hear($someone,$someThing) &&+1 hear($someone,$nextThing)) <=> hear($someone, ($someThing,$nextThing)))).
- $0.9;0.9;0.99$ (((I<->$someone) && hear($someone, $something)) ==>+1 hear(I, $something)).
+ $0.9;0.9;0.99$ (((I<->#someone) && hear(#someone, $something)) ==>+1 hear(I, $something)).
  $0.9;0.9;0.99$ hear(I, #something)!
  hear(I,?x)?
 
- $0.9$ ((#x,"the") <-> (#x,"a")).
+ $0.9$ (($x,"the") <-> ($x,"a")).
 
  */
 public class IRCAgent extends IRC {
@@ -427,8 +427,8 @@ public class IRCAgent extends IRC {
 
         IRC bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz"
-                //"#netention"
+                //"#123xyz"
+                "#netention"
                 //"#nars"
         );
 

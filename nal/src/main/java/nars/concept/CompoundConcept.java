@@ -55,9 +55,9 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept, Ter
     @Nullable
     private QuestionTable quests;
     @Nullable
-    private BeliefTable beliefs;
+    protected BeliefTable beliefs;
     @Nullable
-    private BeliefTable goals;
+    protected BeliefTable goals;
 
     private @Nullable Map meta;
 

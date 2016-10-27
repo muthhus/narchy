@@ -171,7 +171,7 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public final Task topTemporal(long when, long now, Task against) {
+    @Nullable public final Task topTemporal(long when, long now, @Nullable Task against) {
         return temporal.match(when, now, against);
     }
 
