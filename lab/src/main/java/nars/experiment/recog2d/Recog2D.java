@@ -44,9 +44,9 @@ public class Recog2D extends NAgents {
     int a = 0;
 
     int image = 0;
-    final int maxImages = 4;
-    int imagePeriod = 16;
-    int TRAINING_PERIOD = imagePeriod * 16;
+    final int maxImages = 9;
+    int imagePeriod = 128;
+    int TRAINING_PERIOD = imagePeriod * 3;
 
 //    float theta;
 //    float dTheta = 0.25f;
@@ -85,10 +85,10 @@ public class Recog2D extends NAgents {
 
 
         //retina
-        //addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
+        addCamera("x", () -> canvas, w, h, v -> $.t(v, alpha));
 
         //still
-        addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
+        //addCamera("x", new Scale(() -> canvas, w, h), v -> $.t(v, alpha));
 
         //nar.log();
 

@@ -63,7 +63,7 @@ public class TrainVector {
             } else if (a != a) {
                 this.error = 1f;
             } else {
-                this.error = ( Math.abs(a - e) - Math.abs(1f-(a-e))) * (this.actualConf);
+                this.error = ( 1f + Math.abs(a - e) ) * (1f + this.actualConf);
             }
         }
     }
@@ -91,8 +91,9 @@ public class TrainVector {
 
                             float thresh = 0.1f;
                             if (d==null || Math.abs(ee-d.freq())>thresh) {
+                                //correction
                                 a.nar.goal(tt, Tense.Present, ee, a.gamma);
-                                return null;
+                                //return null;
                             }
 
                             //return $.t(ee, a.alpha() );

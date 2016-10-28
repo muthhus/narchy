@@ -151,7 +151,7 @@ public class TermIOTest {
 
         NAR b = new Default()
                         .input(new ByteArrayInputStream(x))
-                        .next()
+                        //.next()
                         //.forEachConceptTask(true,true,true,true, out::println)
                         //.forEachConcept(System.out::println)
                         ;

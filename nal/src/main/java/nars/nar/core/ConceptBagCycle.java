@@ -18,14 +18,19 @@ import nars.nar.util.PremiseMatrix;
 import nars.util.data.MutableInteger;
 import nars.util.data.Range;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -186,7 +191,35 @@ public class ConceptBagCycle implements Consumer<NAR> {
             );
         }
 
+        final AtomicBoolean busyPut = new AtomicBoolean(false);
+        final ArrayBlockingQueue<Object[]> pending =
+                //ArrayBlockingQueue
+                new ArrayBlockingQueue(8);
 
+        @Override
+        public void put(ObjectFloatHashMap<? extends Concept> values, Budgeted in, float scale, MutableFloat overflow) {
+            if (busyPut.compareAndSet(false, true)) {
+
+                //synchronized (items) {
+                    super.put(values, in, scale, overflow);
+
+                    //process any pending that arrived
+                    Object[] p;
+                    while ((p = pending.poll()) != null) {
+                        super.put((ObjectFloatHashMap) p[0], (Budgeted) p[1], (float) p[2], (MutableFloat) p[3]);
+                    }
+                //}
+
+                busyPut.set(false);
+            } else {
+                try {
+                    values.compact();
+                    pending.put(new Object[] { values, in, scale, overflow });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         @Override
         public void clear() {
